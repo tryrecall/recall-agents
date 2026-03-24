@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { createEmptyPluginRegistry } from "../plugins/registry-empty.js";
 import { resetPluginRuntimeStateForTest, setActivePluginRegistry } from "../plugins/runtime.js";
 import type { SpeechProviderPlugin } from "../plugins/types.js";
 
-const loadOpenClawPluginsMock = vi.fn();
+const loadRecallPluginsMock = vi.fn();
 
 vi.mock("../plugins/loader.js", () => ({
-  loadOpenClawPlugins: (...args: Parameters<typeof loadOpenClawPluginsMock>) =>
-    loadOpenClawPluginsMock(...args),
+  loadRecallPlugins: (...args: Parameters<typeof loadRecallPluginsMock>) =>
+    loadRecallPluginsMock(...args),
 }));
 
 let getSpeechProvider: typeof import("./provider-registry.js").getSpeechProvider;
@@ -34,8 +34,8 @@ describe("speech provider registry", () => {
   beforeEach(async () => {
     vi.resetModules();
     resetPluginRuntimeStateForTest();
-    loadOpenClawPluginsMock.mockReset();
-    loadOpenClawPluginsMock.mockReturnValue(createEmptyPluginRegistry());
+    loadRecallPluginsMock.mockReset();
+    loadRecallPluginsMock.mockReturnValue(createEmptyPluginRegistry());
     ({ getSpeechProvider, listSpeechProviders, normalizeSpeechProviderId } =
       await import("./provider-registry.js"));
   });
@@ -59,11 +59,11 @@ describe("speech provider registry", () => {
     const providers = listSpeechProviders();
 
     expect(providers.map((provider) => provider.id)).toEqual(["openai", "elevenlabs", "microsoft"]);
-    expect(loadOpenClawPluginsMock).not.toHaveBeenCalled();
+    expect(loadRecallPluginsMock).not.toHaveBeenCalled();
   });
 
   it("loads speech providers from plugins when config is provided", () => {
-    loadOpenClawPluginsMock.mockReturnValue({
+    loadRecallPluginsMock.mockReturnValue({
       ...createEmptyPluginRegistry(),
       speechProviders: [
         {
@@ -74,7 +74,7 @@ describe("speech provider registry", () => {
       ],
     });
 
-    const cfg = {} as OpenClawConfig;
+    const cfg = {} as RecallConfig;
 
     expect(listSpeechProviders(cfg).map((provider) => provider.id)).toEqual([
       "openai",
@@ -82,7 +82,7 @@ describe("speech provider registry", () => {
       "microsoft",
     ]);
     expect(getSpeechProvider("edge", cfg)?.id).toBe("microsoft");
-    expect(loadOpenClawPluginsMock).toHaveBeenCalledWith({ config: cfg });
+    expect(loadRecallPluginsMock).toHaveBeenCalledWith({ config: cfg });
   });
 
   it("returns builtin providers when neither plugins nor active registry provide speech support", () => {

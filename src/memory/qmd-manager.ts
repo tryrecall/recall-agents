@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import readline from "node:readline";
 import { resolveAgentWorkspaceDir } from "../agents/agent-scope.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
 import { writeFileWithinRoot } from "../infra/fs-safe.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
@@ -45,7 +45,7 @@ const QMD_EMBED_BACKOFF_BASE_MS = 60_000;
 const QMD_EMBED_BACKOFF_MAX_MS = 60 * 60 * 1000;
 const HAN_SCRIPT_RE = /[\u3400-\u9fff]/u;
 const QMD_BM25_HAN_KEYWORD_LIMIT = 12;
-const MCPORTER_STATE_KEY = Symbol.for("openclaw.mcporterState");
+const MCPORTER_STATE_KEY = Symbol.for("recall.mcporterState");
 
 type McporterState = {
   coldStartWarned: boolean;
@@ -136,7 +136,7 @@ type QmdManagerMode = "full" | "status";
 
 export class QmdMemoryManager implements MemorySearchManager {
   static async create(params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     agentId: string;
     resolved: ResolvedMemoryBackendConfig;
     mode?: QmdManagerMode;
@@ -150,7 +150,7 @@ export class QmdMemoryManager implements MemorySearchManager {
     return manager;
   }
 
-  private readonly cfg: OpenClawConfig;
+  private readonly cfg: RecallConfig;
   private readonly agentId: string;
   private readonly qmd: ResolvedQmdConfig;
   private readonly workspaceDir: string;
@@ -192,7 +192,7 @@ export class QmdMemoryManager implements MemorySearchManager {
   private attemptedDuplicateDocumentRepair = false;
 
   private constructor(params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     agentId: string;
     resolved: ResolvedQmdConfig;
   }) {

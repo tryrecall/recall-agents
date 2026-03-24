@@ -4,7 +4,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { stageBundledPluginRuntime } from "../../scripts/stage-bundled-plugin-runtime.mjs";
-import { discoverOpenClawPlugins } from "./discovery.js";
+import { discoverRecallPlugins } from "./discovery.js";
 import { loadPluginManifestRegistry } from "./manifest-registry.js";
 
 const tempDirs: string[] = [];
@@ -23,7 +23,7 @@ afterEach(() => {
 
 describe("stageBundledPluginRuntime", () => {
   it("stages bundled dist plugins as runtime wrappers and links staged dist node_modules", () => {
-    const repoRoot = makeRepoRoot("openclaw-stage-bundled-runtime-");
+    const repoRoot = makeRepoRoot("recall-stage-bundled-runtime-");
     const distPluginDir = path.join(repoRoot, "dist", "extensions", "diffs");
     fs.mkdirSync(path.join(repoRoot, "dist"), { recursive: true });
     fs.mkdirSync(distPluginDir, { recursive: true });
@@ -52,7 +52,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("writes wrappers that forward plugin entry imports into canonical dist files", async () => {
-    const repoRoot = makeRepoRoot("openclaw-stage-bundled-runtime-chunks-");
+    const repoRoot = makeRepoRoot("recall-stage-bundled-runtime-chunks-");
     fs.mkdirSync(path.join(repoRoot, "dist", "extensions", "diffs"), { recursive: true });
     fs.writeFileSync(
       path.join(repoRoot, "dist", "chunk-abc.js"),
@@ -78,7 +78,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("stages root runtime sidecars that bundled plugin boundaries resolve directly", () => {
-    const repoRoot = makeRepoRoot("openclaw-stage-bundled-runtime-sidecars-");
+    const repoRoot = makeRepoRoot("recall-stage-bundled-runtime-sidecars-");
     const distPluginDir = path.join(repoRoot, "dist", "extensions", "whatsapp");
     fs.mkdirSync(distPluginDir, { recursive: true });
     fs.writeFileSync(path.join(distPluginDir, "index.js"), "export default {};\n", "utf8");
@@ -107,7 +107,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("keeps plugin command registration on the canonical dist graph when loaded from dist-runtime", async () => {
-    const repoRoot = makeRepoRoot("openclaw-stage-bundled-runtime-commands-");
+    const repoRoot = makeRepoRoot("recall-stage-bundled-runtime-commands-");
     const distPluginDir = path.join(repoRoot, "dist", "extensions", "demo");
     const distCommandsDir = path.join(repoRoot, "dist", "plugins");
     fs.mkdirSync(distPluginDir, { recursive: true });
@@ -116,7 +116,7 @@ describe("stageBundledPluginRuntime", () => {
     fs.writeFileSync(
       path.join(distCommandsDir, "commands.js"),
       [
-        "const registry = globalThis.__openclawTestPluginCommands ??= new Map();",
+        "const registry = globalThis.__recallTestPluginCommands ??= new Map();",
         "export function registerPluginCommand(pluginId, command) {",
         "  registry.set(`/${command.name.toLowerCase()}`, { ...command, pluginId });",
         "}",
@@ -214,19 +214,19 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("copies package metadata files but symlinks other non-js plugin artifacts into the runtime overlay", () => {
-    const repoRoot = makeRepoRoot("openclaw-stage-bundled-runtime-assets-");
+    const repoRoot = makeRepoRoot("recall-stage-bundled-runtime-assets-");
     const distPluginDir = path.join(repoRoot, "dist", "extensions", "diffs");
     fs.mkdirSync(path.join(distPluginDir, "assets"), { recursive: true });
     fs.writeFileSync(
       path.join(distPluginDir, "package.json"),
       JSON.stringify(
-        { name: "@openclaw/diffs", openclaw: { extensions: ["./index.js"] } },
+        { name: "@recall/diffs", recall: { extensions: ["./index.js"] } },
         null,
         2,
       ),
       "utf8",
     );
-    fs.writeFileSync(path.join(distPluginDir, "openclaw.plugin.json"), "{}\n", "utf8");
+    fs.writeFileSync(path.join(distPluginDir, "recall.plugin.json"), "{}\n", "utf8");
     fs.writeFileSync(path.join(distPluginDir, "assets", "info.txt"), "ok\n", "utf8");
 
     stageBundledPluginRuntime({ repoRoot });
@@ -243,7 +243,7 @@ describe("stageBundledPluginRuntime", () => {
       "dist-runtime",
       "extensions",
       "diffs",
-      "openclaw.plugin.json",
+      "recall.plugin.json",
     );
     const runtimeAssetPath = path.join(
       repoRoot,
@@ -263,7 +263,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("preserves package metadata needed for bundled plugin discovery from dist-runtime", () => {
-    const repoRoot = makeRepoRoot("openclaw-stage-bundled-runtime-discovery-");
+    const repoRoot = makeRepoRoot("recall-stage-bundled-runtime-discovery-");
     const distPluginDir = path.join(repoRoot, "dist", "extensions", "demo");
     const runtimeExtensionsDir = path.join(repoRoot, "dist-runtime", "extensions");
     fs.mkdirSync(distPluginDir, { recursive: true });
@@ -271,8 +271,8 @@ describe("stageBundledPluginRuntime", () => {
       path.join(distPluginDir, "package.json"),
       JSON.stringify(
         {
-          name: "@openclaw/demo",
-          openclaw: {
+          name: "@recall/demo",
+          recall: {
             extensions: ["./main.js"],
             setupEntry: "./setup.js",
             startup: {
@@ -286,7 +286,7 @@ describe("stageBundledPluginRuntime", () => {
       "utf8",
     );
     fs.writeFileSync(
-      path.join(distPluginDir, "openclaw.plugin.json"),
+      path.join(distPluginDir, "recall.plugin.json"),
       JSON.stringify(
         {
           id: "demo",
@@ -305,9 +305,9 @@ describe("stageBundledPluginRuntime", () => {
 
     const env = {
       ...process.env,
-      OPENCLAW_BUNDLED_PLUGINS_DIR: runtimeExtensionsDir,
+      RECALL_BUNDLED_PLUGINS_DIR: runtimeExtensionsDir,
     };
-    const discovery = discoverOpenClawPlugins({
+    const discovery = discoverRecallPlugins({
       env,
       cache: false,
     });
@@ -338,7 +338,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("removes stale runtime plugin directories that are no longer in dist", () => {
-    const repoRoot = makeRepoRoot("openclaw-stage-bundled-runtime-stale-");
+    const repoRoot = makeRepoRoot("recall-stage-bundled-runtime-stale-");
     const staleRuntimeDir = path.join(repoRoot, "dist-runtime", "extensions", "stale");
     fs.mkdirSync(staleRuntimeDir, { recursive: true });
     fs.writeFileSync(path.join(staleRuntimeDir, "index.js"), "stale\n", "utf8");
@@ -350,7 +350,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("removes dist-runtime when the built bundled plugin tree is absent", () => {
-    const repoRoot = makeRepoRoot("openclaw-stage-bundled-runtime-missing-");
+    const repoRoot = makeRepoRoot("recall-stage-bundled-runtime-missing-");
     const runtimeRoot = path.join(repoRoot, "dist-runtime", "extensions", "diffs");
     fs.mkdirSync(runtimeRoot, { recursive: true });
 
@@ -360,7 +360,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("tolerates EEXIST when an identical runtime symlink is materialized concurrently", () => {
-    const repoRoot = makeRepoRoot("openclaw-stage-bundled-runtime-eexist-");
+    const repoRoot = makeRepoRoot("recall-stage-bundled-runtime-eexist-");
     const distPluginDir = path.join(repoRoot, "dist", "extensions", "feishu");
     const distSkillDir = path.join(distPluginDir, "skills", "feishu-doc");
     fs.mkdirSync(distSkillDir, { recursive: true });

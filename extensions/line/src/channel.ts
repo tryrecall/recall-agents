@@ -1,16 +1,16 @@
-import { createPairingPrefixStripper } from "openclaw/plugin-sdk/channel-pairing";
-import { createRestrictSendersChannelSecurity } from "openclaw/plugin-sdk/channel-policy";
+import { createPairingPrefixStripper } from "recall/plugin-sdk/channel-pairing";
+import { createRestrictSendersChannelSecurity } from "recall/plugin-sdk/channel-policy";
 import {
   createAttachedChannelResultAdapter,
   createEmptyChannelResult,
-} from "openclaw/plugin-sdk/channel-send-result";
-import { createChatChannelPlugin } from "openclaw/plugin-sdk/core";
-import { createEmptyChannelDirectoryAdapter } from "openclaw/plugin-sdk/directory-runtime";
-import { resolveOutboundMediaUrls } from "openclaw/plugin-sdk/reply-payload";
+} from "recall/plugin-sdk/channel-send-result";
+import { createChatChannelPlugin } from "recall/plugin-sdk/core";
+import { createEmptyChannelDirectoryAdapter } from "recall/plugin-sdk/directory-runtime";
+import { resolveOutboundMediaUrls } from "recall/plugin-sdk/reply-payload";
 import {
   createComputedAccountStatusAdapter,
   createDefaultChannelRuntimeState,
-} from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/status-helpers";
 import {
   buildTokenChannelStatusSummary,
   clearAccountEntryFields,
@@ -20,7 +20,7 @@ import {
   type ChannelStatusIssue,
   type LineConfig,
   type LineChannelData,
-  type OpenClawConfig,
+  type RecallConfig,
   type ResolvedLineAccount,
 } from "../api.js";
 import { lineChannelPluginCommon } from "./channel-shared.js";
@@ -40,7 +40,7 @@ const lineSecurityAdapter = createRestrictSendersChannelSecurity<ResolvedLineAcc
   groupAllowFromPath: "channels.line.groupAllowFrom",
   mentionGated: false,
   policyPathSuffix: "dmPolicy",
-  approveHint: "openclaw pairing approve line <code>",
+  approveHint: "recall pairing approve line <code>",
   normalizeDmEntry: (raw) => raw.replace(/^line:(?:user:)?/i, ""),
 });
 
@@ -163,7 +163,7 @@ export const linePlugin: ChannelPlugin<ResolvedLineAccount> = createChatChannelP
       },
       logoutAccount: async ({ accountId, cfg }) => {
         const envToken = process.env.LINE_CHANNEL_ACCESS_TOKEN?.trim() ?? "";
-        const nextCfg = { ...cfg } as OpenClawConfig;
+        const nextCfg = { ...cfg } as RecallConfig;
         const lineConfig = (cfg.channels?.line ?? {}) as LineConfig;
         const nextLine = { ...lineConfig };
         let cleared = false;
@@ -280,7 +280,7 @@ export const linePlugin: ChannelPlugin<ResolvedLineAccount> = createChatChannelP
   pairing: {
     text: {
       idLabel: "lineUserId",
-      message: "OpenClaw: your access has been approved.",
+      message: "Recall: your access has been approved.",
       // LINE IDs are case-sensitive; only strip prefix variants (line: / line:user:).
       normalizeAllowEntry: createPairingPrefixStripper(/^line:(?:user:)?/i),
       notify: async ({ cfg, id, message }) => {

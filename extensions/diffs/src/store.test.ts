@@ -14,7 +14,7 @@ describe("DiffArtifactStore", () => {
       rootDir,
       store,
       cleanup: cleanupRootDir,
-    } = await createDiffStoreHarness("openclaw-diffs-store-"));
+    } = await createDiffStoreHarness("recall-diffs-store-"));
   });
 
   afterEach(async () => {

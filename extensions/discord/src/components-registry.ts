@@ -1,9 +1,9 @@
-import { resolveGlobalMap } from "openclaw/plugin-sdk/text-runtime";
+import { resolveGlobalMap } from "recall/plugin-sdk/text-runtime";
 import type { DiscordComponentEntry, DiscordModalEntry } from "./components.js";
 
 const DEFAULT_COMPONENT_TTL_MS = 30 * 60 * 1000;
-const DISCORD_COMPONENT_ENTRIES_KEY = Symbol.for("openclaw.discord.componentEntries");
-const DISCORD_MODAL_ENTRIES_KEY = Symbol.for("openclaw.discord.modalEntries");
+const DISCORD_COMPONENT_ENTRIES_KEY = Symbol.for("recall.discord.componentEntries");
+const DISCORD_MODAL_ENTRIES_KEY = Symbol.for("recall.discord.modalEntries");
 
 const componentEntries = resolveGlobalMap<string, DiscordComponentEntry>(
   DISCORD_COMPONENT_ENTRIES_KEY,

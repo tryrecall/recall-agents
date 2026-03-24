@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/amazon-bedrock-provider",
+  "name": "@recall/amazon-bedrock-provider",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw Amazon Bedrock provider plugin",
+  "description": "Recall Amazon Bedrock provider plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

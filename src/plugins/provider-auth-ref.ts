@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.js";
+import type { RecallConfig } from "../config/types.js";
 import { isValidEnvSecretRefId, type SecretRef } from "../config/types.secrets.js";
 import { encodeJsonPointerToken } from "../secrets/json-pointer.js";
 import { getProviderEnvVars } from "../secrets/provider-env-vars.js";
@@ -54,7 +54,7 @@ function resolveDefaultFilePointerId(provider: string): string {
 }
 
 export function resolveRefFallbackInput(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   provider: string;
   preferredEnvVar?: string;
 }): { ref: SecretRef; resolvedValue: string } {
@@ -84,7 +84,7 @@ export function resolveRefFallbackInput(params: {
 
 async function promptEnvSecretRefForSetup(params: {
   provider: string;
-  config: OpenClawConfig;
+  config: RecallConfig;
   prompter: WizardPrompter;
   defaultEnvVar: string;
   copy?: SecretRefSetupPromptCopy;
@@ -131,7 +131,7 @@ async function promptEnvSecretRefForSetup(params: {
   };
   await params.prompter.note(
     params.copy?.envValidatedMessage?.(envVar) ??
-      `Validated environment variable ${envVar}. OpenClaw will store a reference, not the key value.`,
+      `Validated environment variable ${envVar}. Recall will store a reference, not the key value.`,
     "Reference validated",
   );
   return { ref, resolvedValue };
@@ -139,7 +139,7 @@ async function promptEnvSecretRefForSetup(params: {
 
 async function promptProviderSecretRefForSetup(params: {
   provider: string;
-  config: OpenClawConfig;
+  config: RecallConfig;
   prompter: WizardPrompter;
   defaultFilePointer: string;
   copy?: SecretRefSetupPromptCopy;
@@ -233,7 +233,7 @@ async function promptProviderSecretRefForSetup(params: {
     });
     await params.prompter.note(
       params.copy?.providerValidatedMessage?.(selectedProvider, id, providerEntry.source) ??
-        `Validated ${providerEntry.source} reference ${selectedProvider}:${id}. OpenClaw will store a reference, not the key value.`,
+        `Validated ${providerEntry.source} reference ${selectedProvider}:${id}. Recall will store a reference, not the key value.`,
       "Reference validated",
     );
     return { ref, resolvedValue };
@@ -252,7 +252,7 @@ async function promptProviderSecretRefForSetup(params: {
 
 export async function promptSecretRefForSetup(params: {
   provider: string;
-  config: OpenClawConfig;
+  config: RecallConfig;
   prompter: WizardPrompter;
   preferredEnvVar?: string;
   copy?: SecretRefSetupPromptCopy;

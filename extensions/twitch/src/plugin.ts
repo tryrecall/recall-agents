@@ -1,22 +1,22 @@
 /**
- * Twitch channel plugin for OpenClaw.
+ * Twitch channel plugin for Recall.
  *
  * Main plugin export combining all adapters (outbound, actions, status, gateway).
  * This is the primary entry point for the Twitch channel integration.
  */
 
-import { describeAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
+import { describeAccountSnapshot } from "recall/plugin-sdk/account-helpers";
 import {
   createLoggedPairingApprovalNotifier,
   createPairingPrefixStripper,
-} from "openclaw/plugin-sdk/channel-pairing";
-import { createChatChannelPlugin } from "openclaw/plugin-sdk/core";
-import { buildPassiveProbedChannelStatusSummary } from "openclaw/plugin-sdk/extension-shared";
+} from "recall/plugin-sdk/channel-pairing";
+import { createChatChannelPlugin } from "recall/plugin-sdk/core";
+import { buildPassiveProbedChannelStatusSummary } from "recall/plugin-sdk/extension-shared";
 import {
   createComputedAccountStatusAdapter,
   createDefaultChannelRuntimeState,
-} from "openclaw/plugin-sdk/status-helpers";
-import type { OpenClawConfig } from "../api.js";
+} from "recall/plugin-sdk/status-helpers";
+import type { RecallConfig } from "../api.js";
 import { buildChannelConfigSchema } from "../api.js";
 import { twitchMessageActions } from "./actions.js";
 import { removeClientManager } from "./client-manager-registry.js";
@@ -48,7 +48,7 @@ type ResolvedTwitchAccount = TwitchAccountConfig & { accountId?: string | null }
  * Twitch channel plugin.
  *
  * Implements the ChannelPlugin interface to provide Twitch chat integration
- * for OpenClaw. Supports message sending, receiving, access control, and
+ * for Recall. Supports message sending, receiving, access control, and
  * status monitoring.
  */
 export const twitchPlugin: ChannelPlugin<ResolvedTwitchAccount> =
@@ -79,8 +79,8 @@ export const twitchPlugin: ChannelPlugin<ResolvedTwitchAccount> =
       },
       configSchema: buildChannelConfigSchema(TwitchConfigSchema),
       config: {
-        listAccountIds: (cfg: OpenClawConfig): string[] => listAccountIds(cfg),
-        resolveAccount: (cfg: OpenClawConfig, accountId?: string | null): ResolvedTwitchAccount => {
+        listAccountIds: (cfg: RecallConfig): string[] => listAccountIds(cfg),
+        resolveAccount: (cfg: RecallConfig, accountId?: string | null): ResolvedTwitchAccount => {
           const resolvedAccountId = accountId ?? DEFAULT_ACCOUNT_ID;
           const account = getAccountConfig(cfg, resolvedAccountId);
           if (!account) {
@@ -99,7 +99,7 @@ export const twitchPlugin: ChannelPlugin<ResolvedTwitchAccount> =
           };
         },
         defaultAccountId: (): string => DEFAULT_ACCOUNT_ID,
-        isConfigured: (_account: unknown, cfg: OpenClawConfig): boolean =>
+        isConfigured: (_account: unknown, cfg: RecallConfig): boolean =>
           resolveTwitchAccountContext(cfg, DEFAULT_ACCOUNT_ID).configured,
         isEnabled: (account: ResolvedTwitchAccount | undefined): boolean =>
           account?.enabled !== false,
@@ -124,11 +124,11 @@ export const twitchPlugin: ChannelPlugin<ResolvedTwitchAccount> =
           kind,
           runtime,
         }: {
-          cfg: OpenClawConfig;
+          cfg: RecallConfig;
           accountId?: string | null;
           inputs: string[];
           kind: ChannelResolveKind;
-          runtime: import("openclaw/plugin-sdk/runtime-env").RuntimeEnv;
+          runtime: import("recall/plugin-sdk/runtime-env").RuntimeEnv;
         }): Promise<ChannelResolveResult[]> => {
           const account = getAccountConfig(cfg, accountId ?? DEFAULT_ACCOUNT_ID);
           if (!account) {

@@ -1,4 +1,4 @@
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+import { definePluginEntry } from "recall/plugin-sdk/plugin-entry";
 import { buildOpenAIImageGenerationProvider } from "./image-generation-provider.js";
 import { openaiMediaUnderstandingProvider } from "./media-understanding-provider.js";
 import { buildOpenAICodexProviderPlugin } from "./openai-codex-provider.js";

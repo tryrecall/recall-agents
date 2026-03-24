@@ -6,27 +6,27 @@ import {
   logInboundDrop,
   matchesMentionPatterns,
   resolveEnvelopeFormatOptions,
-} from "openclaw/plugin-sdk/channel-inbound";
-import { hasControlCommand } from "openclaw/plugin-sdk/command-auth";
-import { resolveDualTextControlCommandGate } from "openclaw/plugin-sdk/command-auth";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/channel-inbound";
+import { hasControlCommand } from "recall/plugin-sdk/command-auth";
+import { resolveDualTextControlCommandGate } from "recall/plugin-sdk/command-auth";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
 import {
   resolveChannelGroupPolicy,
   resolveChannelGroupRequireMention,
-} from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/config-runtime";
 import {
   buildPendingHistoryContextFromMap,
   recordPendingHistoryEntryIfEnabled,
   type HistoryEntry,
-} from "openclaw/plugin-sdk/reply-history";
-import { finalizeInboundContext } from "openclaw/plugin-sdk/reply-runtime";
-import { resolveAgentRoute } from "openclaw/plugin-sdk/routing";
+} from "recall/plugin-sdk/reply-history";
+import { finalizeInboundContext } from "recall/plugin-sdk/reply-runtime";
+import { resolveAgentRoute } from "recall/plugin-sdk/routing";
 import {
   DM_GROUP_ACCESS_REASON,
   resolveDmGroupAccessWithLists,
-} from "openclaw/plugin-sdk/security-runtime";
-import { sanitizeTerminalText } from "openclaw/plugin-sdk/text-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-runtime";
+} from "recall/plugin-sdk/security-runtime";
+import { sanitizeTerminalText } from "recall/plugin-sdk/text-runtime";
+import { truncateUtf16Safe } from "recall/plugin-sdk/text-runtime";
 import {
   formatIMessageChatTarget,
   isAllowedIMessageSender,
@@ -90,7 +90,7 @@ export type IMessageInboundDecision =
   | IMessageInboundDispatchDecision;
 
 export function resolveIMessageInboundDecision(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId: string;
   message: IMessagePayload;
   opts?: Pick<MonitorIMessageOpts, "requireMention">;
@@ -375,7 +375,7 @@ export function resolveIMessageInboundDecision(params: {
 }
 
 export function buildIMessageInboundContext(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   decision: IMessageInboundDispatchDecision;
   message: IMessagePayload;
   envelopeOptions?: EnvelopeFormatOptions;

@@ -30,11 +30,11 @@ function relativizeScopedPatterns(values: string[], dir?: string): string[] {
 export function resolveVitestIsolation(
   env: Record<string, string | undefined> = process.env,
 ): boolean {
-  const forceIsolation = env.OPENCLAW_TEST_ISOLATE === "1" || env.OPENCLAW_TEST_ISOLATE === "true";
+  const forceIsolation = env.RECALL_TEST_ISOLATE === "1" || env.RECALL_TEST_ISOLATE === "true";
   if (forceIsolation) {
     return true;
   }
-  return env.OPENCLAW_TEST_NO_ISOLATE === "0" || env.OPENCLAW_TEST_NO_ISOLATE === "false";
+  return env.RECALL_TEST_NO_ISOLATE === "0" || env.RECALL_TEST_NO_ISOLATE === "false";
 }
 
 export function createScopedVitestConfig(

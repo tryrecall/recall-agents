@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 
 const listPotentialConfiguredChannelIds = vi.hoisted(() => vi.fn());
 const loadPluginManifestRegistry = vi.hoisted(() => vi.fn());
@@ -55,7 +55,7 @@ describe("resolveGatewayStartupPluginIds", () => {
           "diagnostics-otel": { enabled: true },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expect(
       resolveGatewayStartupPluginIds({
@@ -67,7 +67,7 @@ describe("resolveGatewayStartupPluginIds", () => {
   });
 
   it("does not pull default-on bundled non-channel plugins into startup", () => {
-    const config = {} as OpenClawConfig;
+    const config = {} as RecallConfig;
 
     expect(
       resolveGatewayStartupPluginIds({

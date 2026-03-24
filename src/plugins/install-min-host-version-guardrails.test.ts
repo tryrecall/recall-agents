@@ -28,7 +28,7 @@ const PLUGIN_MANIFEST_PATHS_REQUIRING_MIN_HOST_VERSION = [
 ] as const;
 
 type PackageJsonLike = {
-  openclaw?: {
+  recall?: {
     install?: {
       minHostVersion?: string;
     };
@@ -48,12 +48,12 @@ describe("install minHostVersion guardrails", () => {
         fs.readFileSync(path.resolve(relativePath), "utf-8"),
       ) as PackageJsonLike;
       const requirement = parseMinHostVersionRequirement(
-        manifest.openclaw?.install?.minHostVersion,
+        manifest.recall?.install?.minHostVersion,
       );
 
       expect(
         requirement,
-        `${relativePath} should declare openclaw.install.minHostVersion`,
+        `${relativePath} should declare recall.install.minHostVersion`,
       ).not.toBeNull();
       if (!requirement) {
         continue;
@@ -65,7 +65,7 @@ describe("install minHostVersion guardrails", () => {
       }
       expect(
         isAtLeast(minimum, baseline),
-        `${relativePath} should require at least OpenClaw ${MIN_HOST_VERSION_BASELINE}`,
+        `${relativePath} should require at least Recall ${MIN_HOST_VERSION_BASELINE}`,
       ).toBe(true);
     }
   });

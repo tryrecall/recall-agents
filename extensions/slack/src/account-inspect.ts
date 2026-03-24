@@ -1,12 +1,12 @@
 import {
   DEFAULT_ACCOUNT_ID,
   normalizeAccountId,
-  type OpenClawConfig,
-} from "openclaw/plugin-sdk/account-resolution";
+  type RecallConfig,
+} from "recall/plugin-sdk/account-resolution";
 import {
   hasConfiguredSecretInput,
   normalizeSecretInputString,
-} from "openclaw/plugin-sdk/secret-input";
+} from "recall/plugin-sdk/secret-input";
 import type { SlackAccountSurfaceFields } from "./account-surface-fields.js";
 import {
   mergeSlackAccountConfig,
@@ -64,7 +64,7 @@ function inspectSlackToken(value: unknown): {
 }
 
 export function inspectSlackAccount(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
   envBotToken?: string | null;
   envAppToken?: string | null;

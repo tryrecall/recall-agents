@@ -1,9 +1,9 @@
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
+import type { RecallPluginApi } from "recall/plugin-sdk/plugin-runtime";
 
-type TestPluginApiInput = Partial<OpenClawPluginApi> &
-  Pick<OpenClawPluginApi, "id" | "name" | "source" | "config" | "runtime">;
+type TestPluginApiInput = Partial<RecallPluginApi> &
+  Pick<RecallPluginApi, "id" | "name" | "source" | "config" | "runtime">;
 
-export function createTestPluginApi(api: TestPluginApiInput): OpenClawPluginApi {
+export function createTestPluginApi(api: TestPluginApiInput): RecallPluginApi {
   return {
     registrationMode: "full",
     logger: { info() {}, warn() {}, error() {}, debug() {} },

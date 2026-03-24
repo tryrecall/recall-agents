@@ -1,7 +1,7 @@
 {
-  "name": "@openclaw/voice-call",
+  "name": "@recall/voice-call",
   "version": "2026.3.22",
-  "description": "OpenClaw voice-call plugin",
+  "description": "Recall voice-call plugin",
   "type": "module",
   "dependencies": {
     "@sinclair/typebox": "0.34.48",
@@ -10,17 +10,17 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.3.22"
+    "recall": ">=2026.3.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],

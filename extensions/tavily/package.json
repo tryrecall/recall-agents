@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/tavily-plugin",
+  "name": "@recall/tavily-plugin",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw Tavily plugin",
+  "description": "Recall Tavily plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

@@ -1,7 +1,7 @@
 import os from "node:os";
 import path from "node:path";
 import type { Command } from "commander";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { loadConfig, writeConfigFile } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
@@ -62,7 +62,7 @@ export type PluginUninstallOptions = {
 
 function resolvePluginUninstallId(params: {
   rawId: string;
-  config: OpenClawConfig;
+  config: RecallConfig;
   plugins: PluginRecord[];
 }): { pluginId: string; plugin?: PluginRecord } {
   const rawId = params.rawId.trim();
@@ -114,7 +114,7 @@ function formatPluginLine(plugin: PluginRecord, verbose = false): string {
           : plugin.description,
       )
     : theme.muted("(no description)");
-  const format = plugin.format ?? "openclaw";
+  const format = plugin.format ?? "recall";
 
   if (!verbose) {
     return `${name}${idSuffix} ${status} ${theme.muted(`[${format}]`)} - ${desc}`;
@@ -205,11 +205,11 @@ function formatInstallLines(install: PluginInstallRecord | undefined): string[] 
 export function registerPluginsCli(program: Command) {
   const plugins = program
     .command("plugins")
-    .description("Manage OpenClaw plugins and extensions")
+    .description("Manage Recall plugins and extensions")
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/plugins", "docs.openclaw.ai/cli/plugins")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/plugins", "docs.recall.ai/cli/plugins")}\n`,
     );
 
   plugins
@@ -260,7 +260,7 @@ export function registerPluginsCli(program: Command) {
           return {
             Name: plugin.name || plugin.id,
             ID: plugin.name && plugin.name !== plugin.id ? plugin.id : "",
-            Format: plugin.format ?? "openclaw",
+            Format: plugin.format ?? "recall",
             Status:
               plugin.status === "loaded"
                 ? theme.success("loaded")
@@ -423,7 +423,7 @@ export function registerPluginsCli(program: Command) {
       }
       lines.push("");
       lines.push(`${theme.muted("Status:")} ${inspect.plugin.status}`);
-      lines.push(`${theme.muted("Format:")} ${inspect.plugin.format ?? "openclaw"}`);
+      lines.push(`${theme.muted("Format:")} ${inspect.plugin.format ?? "recall"}`);
       if (inspect.plugin.bundleFormat) {
         lines.push(`${theme.muted("Bundle format:")} ${inspect.plugin.bundleFormat}`);
       }
@@ -540,7 +540,7 @@ export function registerPluginsCli(program: Command) {
     .action(async (id: string) => {
       const cfg = loadConfig();
       const enableResult = enablePluginInConfig(cfg, id);
-      let next: OpenClawConfig = enableResult.config;
+      let next: RecallConfig = enableResult.config;
       const slotResult = applySlotSelectionForPlugin(next, id);
       next = slotResult.config;
       await writeConfigFile(next);
@@ -770,7 +770,7 @@ export function registerPluginsCli(program: Command) {
           lines.push(`- ${formatPluginCompatibilityNotice(notice)} [${marker}]`);
         }
       }
-      const docs = formatDocsLink("/plugin", "docs.openclaw.ai/plugin");
+      const docs = formatDocsLink("/plugin", "docs.recall.ai/plugin");
       lines.push("");
       lines.push(`${theme.muted("Docs:")} ${docs}`);
       defaultRuntime.log(lines.join("\n"));

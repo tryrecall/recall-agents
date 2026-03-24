@@ -11,11 +11,11 @@ vi.mock("@mariozechner/pi-ai/oauth", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/provider-models", () => ({
+vi.mock("recall/plugin-sdk/provider-models", () => ({
   normalizeModelCompat: (model: Record<string, unknown>) => model,
 }));
 
-import type { ProviderResolveDynamicModelContext } from "openclaw/plugin-sdk/core";
+import type { ProviderResolveDynamicModelContext } from "recall/plugin-sdk/core";
 import { resolveCopilotForwardCompatModel } from "./models.js";
 
 function createMockCtx(

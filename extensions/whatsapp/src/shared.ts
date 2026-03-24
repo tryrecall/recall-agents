@@ -1,12 +1,12 @@
-import { describeAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
+import { describeAccountSnapshot } from "recall/plugin-sdk/account-helpers";
 import {
   adaptScopedAccountAccessor,
   createScopedChannelConfigAdapter,
   createScopedDmSecurityResolver,
-} from "openclaw/plugin-sdk/channel-config-helpers";
-import { createAllowlistProviderRouteAllowlistWarningCollector } from "openclaw/plugin-sdk/channel-policy";
-import { createChannelPluginBase } from "openclaw/plugin-sdk/core";
-import { createDelegatedSetupWizardProxy } from "openclaw/plugin-sdk/setup";
+} from "recall/plugin-sdk/channel-config-helpers";
+import { createAllowlistProviderRouteAllowlistWarningCollector } from "recall/plugin-sdk/channel-policy";
+import { createChannelPluginBase } from "recall/plugin-sdk/core";
+import { createDelegatedSetupWizardProxy } from "recall/plugin-sdk/setup";
 import {
   listWhatsAppAccountIds,
   resolveDefaultWhatsAppAccountId,

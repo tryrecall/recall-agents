@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import {
   loadConfig,
   resolveConfigPath,
@@ -40,7 +40,7 @@ type CallGatewayBaseOptions = {
   token?: string;
   password?: string;
   tlsFingerprint?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   method: string;
   params?: unknown;
   expectFinal?: boolean;
@@ -190,7 +190,7 @@ export function ensureExplicitGatewayAuth(params: {
 
 export function buildGatewayConnectionDetails(
   options: {
-    config?: OpenClawConfig;
+    config?: RecallConfig;
     url?: string;
     configPath?: string;
     urlSource?: "cli" | "env";
@@ -214,7 +214,7 @@ export function buildGatewayConnectionDetails(
       : undefined;
   const envUrlOverride = cliUrlOverride
     ? undefined
-    : trimToUndefined(process.env.OPENCLAW_GATEWAY_URL);
+    : trimToUndefined(process.env.RECALL_GATEWAY_URL);
   const urlOverride = cliUrlOverride ?? envUrlOverride;
   const remoteUrl =
     typeof remote?.url === "string" && remote.url.trim().length > 0 ? remote.url.trim() : undefined;
@@ -224,7 +224,7 @@ export function buildGatewayConnectionDetails(
   const url = urlOverride || remoteUrl || localUrl;
   const urlSource = urlOverride
     ? urlSourceHint === "env"
-      ? "env OPENCLAW_GATEWAY_URL"
+      ? "env RECALL_GATEWAY_URL"
       : "cli --url"
     : remoteUrl
       ? "config gateway.remote.url"
@@ -236,7 +236,7 @@ export function buildGatewayConnectionDetails(
     ? "Warn: gateway.mode=remote but gateway.remote.url is missing; set gateway.remote.url or switch gateway.mode=local."
     : undefined;
 
-  const allowPrivateWs = process.env.OPENCLAW_ALLOW_INSECURE_PRIVATE_WS === "1";
+  const allowPrivateWs = process.env.RECALL_ALLOW_INSECURE_PRIVATE_WS === "1";
   // Security check: block ALL insecure ws:// to non-loopback addresses (CWE-319, CVSS 9.8)
   // This applies to the FINAL resolved URL, regardless of source (config, CLI override, etc).
   // Both credentials and chat/conversation data must not be transmitted over plaintext to remote hosts.
@@ -253,9 +253,9 @@ export function buildGatewayConnectionDetails(
         "- or use Tailscale Serve/Funnel for HTTPS remote access",
         allowPrivateWs
           ? undefined
-          : "Break-glass (trusted private networks only): set OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1",
-        "Doctor: openclaw doctor --fix",
-        "Docs: https://docs.openclaw.ai/gateway/remote",
+          : "Break-glass (trusted private networks only): set RECALL_ALLOW_INSECURE_PRIVATE_WS=1",
+        "Doctor: recall doctor --fix",
+        "Docs: https://docs.recall.ai/gateway/remote",
       ].join("\n"),
     );
   }
@@ -287,7 +287,7 @@ type GatewayRemoteSettings = {
 };
 
 type ResolvedGatewayCallContext = {
-  config: OpenClawConfig;
+  config: RecallConfig;
   configPath: string;
   isRemoteMode: boolean;
   remote?: GatewayRemoteSettings;
@@ -326,7 +326,7 @@ function resolveGatewayCallContext(opts: CallGatewayBaseOptions): ResolvedGatewa
   const cliUrlOverride = trimToUndefined(opts.url);
   const envUrlOverride = cliUrlOverride
     ? undefined
-    : trimToUndefined(process.env.OPENCLAW_GATEWAY_URL);
+    : trimToUndefined(process.env.RECALL_GATEWAY_URL);
   const urlOverride = cliUrlOverride ?? envUrlOverride;
   const urlOverrideSource = cliUrlOverride ? "cli" : envUrlOverride ? "env" : undefined;
   const remoteUrl = trimToUndefined(remote?.url);
@@ -357,7 +357,7 @@ function ensureRemoteModeUrlConfigured(context: ResolvedGatewayCallContext): voi
 }
 
 async function resolveGatewaySecretInputString(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   value: unknown;
   path: string;
   env: NodeJS.ProcessEnv;
@@ -423,7 +423,7 @@ function isSupportedGatewaySecretInputPath(path: string): path is SupportedGatew
 }
 
 function readGatewaySecretInputValue(
-  config: OpenClawConfig,
+  config: RecallConfig,
   path: SupportedGatewaySecretInputPath,
 ): unknown {
   if (path === "gateway.auth.token") {
@@ -439,7 +439,7 @@ function readGatewaySecretInputValue(
 }
 
 function hasConfiguredGatewaySecretRef(
-  config: OpenClawConfig,
+  config: RecallConfig,
   path: SupportedGatewaySecretInputPath,
 ): boolean {
   return Boolean(
@@ -453,7 +453,7 @@ function hasConfiguredGatewaySecretRef(
 function resolveGatewayCredentialsFromConfigOptions(params: {
   context: ResolvedGatewayCallContext;
   env: NodeJS.ProcessEnv;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
 }) {
   const { context, env, cfg } = params;
   return {
@@ -496,7 +496,7 @@ function localAuthModeAllowsGatewaySecretInputPath(params: {
 function gatewaySecretInputPathCanWin(params: {
   context: ResolvedGatewayCallContext;
   env: NodeJS.ProcessEnv;
-  config: OpenClawConfig;
+  config: RecallConfig;
   path: SupportedGatewaySecretInputPath;
 }): boolean {
   if (!hasConfiguredGatewaySecretRef(params.config, params.path)) {
@@ -513,7 +513,7 @@ function gatewaySecretInputPathCanWin(params: {
   ) {
     return false;
   }
-  const sentinel = `__OPENCLAW_GATEWAY_SECRET_REF_PROBE_${params.path.replaceAll(".", "_")}__`;
+  const sentinel = `__RECALL_GATEWAY_SECRET_REF_PROBE_${params.path.replaceAll(".", "_")}__`;
   const probeConfig = structuredClone(params.config);
   for (const candidatePath of ALL_GATEWAY_SECRET_INPUT_PATHS) {
     if (!hasConfiguredGatewaySecretRef(probeConfig, candidatePath)) {
@@ -547,7 +547,7 @@ function gatewaySecretInputPathCanWin(params: {
 }
 
 async function resolveConfiguredGatewaySecretInput(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   path: SupportedGatewaySecretInputPath;
   env: NodeJS.ProcessEnv;
 }): Promise<string | undefined> {
@@ -585,7 +585,7 @@ async function resolveConfiguredGatewaySecretInput(params: {
 }
 
 function assignResolvedGatewaySecretInput(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   path: SupportedGatewaySecretInputPath;
   value: string | undefined;
 }): void {
@@ -616,8 +616,8 @@ function assignResolvedGatewaySecretInput(params: {
 async function resolvePreferredGatewaySecretInputs(params: {
   context: ResolvedGatewayCallContext;
   env: NodeJS.ProcessEnv;
-  config: OpenClawConfig;
-}): Promise<OpenClawConfig> {
+  config: RecallConfig;
+}): Promise<RecallConfig> {
   let nextConfig = params.config;
   for (const path of ALL_GATEWAY_SECRET_INPUT_PATHS) {
     if (
@@ -699,7 +699,7 @@ async function resolveGatewayCredentialsFromConfigWithSecretInputs(params: {
 }
 
 export async function resolveGatewayCredentialsWithSecretInputs(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   explicitAuth?: ExplicitGatewayAuth;
   urlOverride?: string;
   urlOverrideSource?: "cli" | "env";

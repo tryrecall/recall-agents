@@ -13,16 +13,16 @@ afterEach(async () => {
 
 describe("loadEnabledClaudeBundleCommands", () => {
   it("loads enabled Claude bundle markdown commands and skips disabled-model-invocation entries", async () => {
-    const env = captureEnv(["HOME", "USERPROFILE", "OPENCLAW_HOME", "OPENCLAW_STATE_DIR"]);
+    const env = captureEnv(["HOME", "USERPROFILE", "RECALL_HOME", "RECALL_STATE_DIR"]);
     try {
-      const homeDir = await tempHarness.createTempDir("openclaw-bundle-commands-home-");
-      const workspaceDir = await tempHarness.createTempDir("openclaw-bundle-commands-workspace-");
+      const homeDir = await tempHarness.createTempDir("recall-bundle-commands-home-");
+      const workspaceDir = await tempHarness.createTempDir("recall-bundle-commands-workspace-");
       process.env.HOME = homeDir;
       process.env.USERPROFILE = homeDir;
-      delete process.env.OPENCLAW_HOME;
-      delete process.env.OPENCLAW_STATE_DIR;
+      delete process.env.RECALL_HOME;
+      delete process.env.RECALL_STATE_DIR;
 
-      const pluginRoot = path.join(homeDir, ".openclaw", "extensions", "compound-bundle");
+      const pluginRoot = path.join(homeDir, ".recall", "extensions", "compound-bundle");
       await fs.mkdir(path.join(pluginRoot, ".claude-plugin"), { recursive: true });
       await fs.mkdir(path.join(pluginRoot, "commands", "workflows"), { recursive: true });
       await fs.writeFile(

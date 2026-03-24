@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
 import { listSlackAccountIds, resolveSlackAccount } from "./accounts.js";
 
 function resolveInteractiveRepliesFromCapabilities(capabilities: unknown): boolean {
@@ -17,7 +17,7 @@ function resolveInteractiveRepliesFromCapabilities(capabilities: unknown): boole
 }
 
 export function isSlackInteractiveRepliesEnabled(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
 }): boolean {
   if (params.accountId) {

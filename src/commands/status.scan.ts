@@ -4,7 +4,7 @@ import { hasPotentialConfiguredChannels } from "../channels/config-presence.js";
 import { resolveCommandSecretRefsViaGateway } from "../cli/command-secret-gateway.js";
 import { getStatusCommandSecretTargetIds } from "../cli/command-secret-targets.js";
 import { withProgress } from "../cli/progress.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { readBestEffortConfig } from "../config/config.js";
 import { resolveConfigPath } from "../config/paths.js";
 import { callGateway } from "../gateway/call.js";
@@ -82,7 +82,7 @@ function buildColdStartUpdateResult(): Awaited<ReturnType<typeof getUpdateCheckR
 }
 
 async function resolveChannelsStatus(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   gatewayReachable: boolean;
   opts: { timeoutMs?: number; all?: boolean };
 }) {
@@ -101,8 +101,8 @@ async function resolveChannelsStatus(params: {
 }
 
 export type StatusScanResult = {
-  cfg: OpenClawConfig;
-  sourceConfig: OpenClawConfig;
+  cfg: RecallConfig;
+  sourceConfig: RecallConfig;
   secretDiagnostics: string[];
   osSummary: ReturnType<typeof resolveOsSummary>;
   tailscaleMode: string;
@@ -130,7 +130,7 @@ export type StatusScanResult = {
 };
 
 async function resolveMemoryStatusSnapshot(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentStatus: Awaited<ReturnType<typeof getAgentLocalStatuses>>;
   memoryPlugin: MemoryPluginStatus;
 }): Promise<MemoryStatusSnapshot | null> {
@@ -367,8 +367,8 @@ export async function scanStatus(
       progress.setLabel("Summarizing channels…");
       const channels = await buildChannelsTable(cfg, {
         // Show token previews in regular status; keep `status --all` redacted.
-        // Set `OPENCLAW_SHOW_SECRETS=0` to force redaction.
-        showSecrets: process.env.OPENCLAW_SHOW_SECRETS?.trim() !== "0",
+        // Set `RECALL_SHOW_SECRETS=0` to force redaction.
+        showSecrets: process.env.RECALL_SHOW_SECRETS?.trim() !== "0",
         sourceConfig: loadedRaw,
       });
       progress.tick();

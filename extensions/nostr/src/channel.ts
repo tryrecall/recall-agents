@@ -1,16 +1,16 @@
-import { describeAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
+import { describeAccountSnapshot } from "recall/plugin-sdk/account-helpers";
 import {
   createScopedDmSecurityResolver,
   createTopLevelChannelConfigAdapter,
-} from "openclaw/plugin-sdk/channel-config-helpers";
-import { createChannelPairingController } from "openclaw/plugin-sdk/channel-pairing";
-import { attachChannelToResult } from "openclaw/plugin-sdk/channel-send-result";
-import { createChatChannelPlugin } from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/channel-config-helpers";
+import { createChannelPairingController } from "recall/plugin-sdk/channel-pairing";
+import { attachChannelToResult } from "recall/plugin-sdk/channel-send-result";
+import { createChatChannelPlugin } from "recall/plugin-sdk/core";
 import {
   buildPassiveChannelStatusSummary,
   buildTrafficStatusSummary,
-} from "openclaw/plugin-sdk/extension-shared";
-import { createComputedAccountStatusAdapter } from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/extension-shared";
+import { createComputedAccountStatusAdapter } from "recall/plugin-sdk/status-helpers";
 import {
   buildChannelConfigSchema,
   collectStatusIssuesFromLastError,

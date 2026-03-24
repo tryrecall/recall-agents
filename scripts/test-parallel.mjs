@@ -33,7 +33,7 @@ const existingFiles = (entries) =>
 let tempArtifactDir = null;
 const ensureTempArtifactDir = () => {
   if (tempArtifactDir === null) {
-    tempArtifactDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-test-parallel-"));
+    tempArtifactDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-test-parallel-"));
   }
   return tempArtifactDir;
 };
@@ -76,7 +76,7 @@ const hostMemoryGiB = Math.floor(os.totalmem() / 1024 ** 3);
 const highMemLocalHost = !isCI && hostMemoryGiB >= 96;
 const lowMemLocalHost = !isCI && hostMemoryGiB < 64;
 const nodeMajor = Number.parseInt(process.versions.node.split(".")[0] ?? "", 10);
-const rawTestProfile = process.env.OPENCLAW_TEST_PROFILE?.trim().toLowerCase();
+const rawTestProfile = process.env.RECALL_TEST_PROFILE?.trim().toLowerCase();
 const testProfile =
   rawTestProfile === "low" ||
   rawTestProfile === "macmini" ||
@@ -94,16 +94,16 @@ const isMacMiniProfile = testProfile === "macmini";
 // correctness exception stayed on the manifest fork lane, so the wrapper now
 // defaults unit runs to threads while preserving explicit fork escapes.
 const forceIsolation =
-  process.env.OPENCLAW_TEST_ISOLATE === "1" || process.env.OPENCLAW_TEST_ISOLATE === "true";
+  process.env.RECALL_TEST_ISOLATE === "1" || process.env.RECALL_TEST_ISOLATE === "true";
 const disableIsolation =
   !forceIsolation &&
-  process.env.OPENCLAW_TEST_NO_ISOLATE !== "0" &&
-  process.env.OPENCLAW_TEST_NO_ISOLATE !== "false";
-const includeGatewaySuite = process.env.OPENCLAW_TEST_INCLUDE_GATEWAY === "1";
-const includeChannelsSuite = process.env.OPENCLAW_TEST_INCLUDE_CHANNELS === "1";
-const includeExtensionsSuite = process.env.OPENCLAW_TEST_INCLUDE_EXTENSIONS === "1";
+  process.env.RECALL_TEST_NO_ISOLATE !== "0" &&
+  process.env.RECALL_TEST_NO_ISOLATE !== "false";
+const includeGatewaySuite = process.env.RECALL_TEST_INCLUDE_GATEWAY === "1";
+const includeChannelsSuite = process.env.RECALL_TEST_INCLUDE_CHANNELS === "1";
+const includeExtensionsSuite = process.env.RECALL_TEST_INCLUDE_EXTENSIONS === "1";
 const noIsolateArgs = disableIsolation ? ["--isolate=false"] : [];
-const skipDefaultRuns = process.env.OPENCLAW_TEST_SKIP_DEFAULT === "1";
+const skipDefaultRuns = process.env.RECALL_TEST_SKIP_DEFAULT === "1";
 const parsePoolOverride = (value, fallback) => {
   if (value === "threads" || value === "forks") {
     return value;
@@ -114,12 +114,12 @@ const parsePoolOverride = (value, fallback) => {
 // git-commit.test.ts still get the worker/process isolation they require.
 const shouldSplitUnitRuns = testProfile !== "serial";
 let runs = [];
-const shardOverride = Number.parseInt(process.env.OPENCLAW_TEST_SHARDS ?? "", 10);
+const shardOverride = Number.parseInt(process.env.RECALL_TEST_SHARDS ?? "", 10);
 const configuredShardCount =
   Number.isFinite(shardOverride) && shardOverride > 1 ? shardOverride : null;
 const shardCount = configuredShardCount ?? (isWindowsCi ? 2 : 1);
 const shardIndexOverride = (() => {
-  const parsed = Number.parseInt(process.env.OPENCLAW_TEST_SHARD_INDEX ?? "", 10);
+  const parsed = Number.parseInt(process.env.RECALL_TEST_SHARD_INDEX ?? "", 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 })();
 const OPTION_TAKES_VALUE = new Set([
@@ -164,24 +164,24 @@ const SINGLE_RUN_ONLY_FLAGS = new Set(["--coverage", "--outputFile", "--mergeRep
 
 if (shardIndexOverride !== null && shardCount <= 1) {
   console.error(
-    `[test-parallel] OPENCLAW_TEST_SHARD_INDEX=${String(
+    `[test-parallel] RECALL_TEST_SHARD_INDEX=${String(
       shardIndexOverride,
-    )} requires OPENCLAW_TEST_SHARDS>1.`,
+    )} requires RECALL_TEST_SHARDS>1.`,
   );
   process.exit(2);
 }
 
 if (shardIndexOverride !== null && shardIndexOverride > shardCount) {
   console.error(
-    `[test-parallel] OPENCLAW_TEST_SHARD_INDEX=${String(
+    `[test-parallel] RECALL_TEST_SHARD_INDEX=${String(
       shardIndexOverride,
-    )} exceeds OPENCLAW_TEST_SHARDS=${String(shardCount)}.`,
+    )} exceeds RECALL_TEST_SHARDS=${String(shardCount)}.`,
   );
   process.exit(2);
 }
 const windowsCiArgs = isWindowsCi ? ["--dangerouslyIgnoreUnhandledErrors"] : [];
 const silentArgs =
-  process.env.OPENCLAW_TEST_SHOW_PASSED_LOGS === "1" ? [] : ["--silent=passed-only"];
+  process.env.RECALL_TEST_SHOW_PASSED_LOGS === "1" ? [] : ["--silent=passed-only"];
 const rawPassthroughArgs = process.argv.slice(2);
 const passthroughArgs =
   rawPassthroughArgs[0] === "--" ? rawPassthroughArgs.slice(1) : rawPassthroughArgs;
@@ -277,7 +277,7 @@ const channelIsolatedFiles = dedupeFilesPreserveOrder([
   ),
 ]);
 const channelIsolatedFileSet = new Set(channelIsolatedFiles);
-const defaultUnitPool = parsePoolOverride(process.env.OPENCLAW_TEST_UNIT_DEFAULT_POOL, "threads");
+const defaultUnitPool = parsePoolOverride(process.env.RECALL_TEST_UNIT_DEFAULT_POOL, "threads");
 const isTargetedIsolatedUnitFile = (fileFilter) =>
   unitForkIsolatedFiles.includes(fileFilter) || unitMemoryIsolatedFiles.includes(fileFilter);
 const inferTarget = (fileFilter) => {
@@ -341,22 +341,22 @@ const defaultHeavyUnitLaneCount =
           ? 5
           : 4;
 const heavyUnitFileLimit = parseEnvNumber(
-  "OPENCLAW_TEST_HEAVY_UNIT_FILE_LIMIT",
+  "RECALL_TEST_HEAVY_UNIT_FILE_LIMIT",
   defaultHeavyUnitFileLimit,
 );
 const heavyUnitLaneCount = parseEnvNumber(
-  "OPENCLAW_TEST_HEAVY_UNIT_LANES",
+  "RECALL_TEST_HEAVY_UNIT_LANES",
   defaultHeavyUnitLaneCount,
 );
-const heavyUnitMinDurationMs = parseEnvNumber("OPENCLAW_TEST_HEAVY_UNIT_MIN_MS", 1200);
+const heavyUnitMinDurationMs = parseEnvNumber("RECALL_TEST_HEAVY_UNIT_MIN_MS", 1200);
 const defaultMemoryHeavyUnitFileLimit =
   testProfile === "serial" ? 0 : isCI ? 64 : testProfile === "low" ? 8 : 16;
 const memoryHeavyUnitFileLimit = parseEnvNumber(
-  "OPENCLAW_TEST_MEMORY_HEAVY_UNIT_FILE_LIMIT",
+  "RECALL_TEST_MEMORY_HEAVY_UNIT_FILE_LIMIT",
   defaultMemoryHeavyUnitFileLimit,
 );
 const memoryHeavyUnitMinDeltaKb = parseEnvNumber(
-  "OPENCLAW_TEST_MEMORY_HEAVY_UNIT_MIN_KB",
+  "RECALL_TEST_MEMORY_HEAVY_UNIT_MIN_KB",
   unitMemoryHotspotManifest.defaultMinDeltaKb,
 );
 const { memoryHeavyFiles: memoryHeavyUnitFiles, timedHeavyFiles: timedHeavyUnitFiles } =
@@ -435,11 +435,11 @@ const channelIsolatedEntries = channelIsolatedFiles.map((file) => ({
 const defaultUnitFastLaneCount = isCI && !isWindows ? 3 : 1;
 const unitFastLaneCount = Math.max(
   1,
-  parseEnvNumber("OPENCLAW_TEST_UNIT_FAST_LANES", defaultUnitFastLaneCount),
+  parseEnvNumber("RECALL_TEST_UNIT_FAST_LANES", defaultUnitFastLaneCount),
 );
 const defaultUnitFastBatchTargetMs = isCI && !isWindows ? 45_000 : 0;
 const unitFastBatchTargetMs = parseEnvNumber(
-  "OPENCLAW_TEST_UNIT_FAST_BATCH_TARGET_MS",
+  "RECALL_TEST_UNIT_FAST_BATCH_TARGET_MS",
   defaultUnitFastBatchTargetMs,
 );
 // Heap snapshots on current main show long-lived unit-fast workers retaining
@@ -463,7 +463,7 @@ const unitFastEntries = unitFastBuckets.flatMap((files, index) => {
       name: recycledBatches.length === 1 ? laneName : `${laneName}-batch-${String(batchIndex + 1)}`,
       serialPhase: "unit-fast",
       env: {
-        OPENCLAW_VITEST_INCLUDE_FILE: writeTempJsonArtifact(
+        RECALL_VITEST_INCLUDE_FILE: writeTempJsonArtifact(
           `vitest-unit-fast-include-${String(index + 1)}-${String(batchIndex + 1)}`,
           batch,
         ),
@@ -567,7 +567,7 @@ const baseRuns = [
           env:
             extensionSharedCandidateFiles.length > 0
               ? {
-                  OPENCLAW_VITEST_INCLUDE_FILE: writeTempJsonArtifact(
+                  RECALL_VITEST_INCLUDE_FILE: writeTempJsonArtifact(
                     "vitest-extensions-include",
                     extensionSharedCandidateFiles,
                   ),
@@ -588,7 +588,7 @@ const baseRuns = [
           env:
             channelSharedCandidateFiles.length > 0
               ? {
-                  OPENCLAW_VITEST_INCLUDE_FILE: writeTempJsonArtifact(
+                  RECALL_VITEST_INCLUDE_FILE: writeTempJsonArtifact(
                     "vitest-channels-include",
                     channelSharedCandidateFiles,
                   ),
@@ -894,18 +894,18 @@ const defaultTopLevelParallelLimit = disableIsolation
             : 3;
 const topLevelParallelLimit = Math.max(
   1,
-  parseEnvNumber("OPENCLAW_TEST_TOP_LEVEL_CONCURRENCY", defaultTopLevelParallelLimit),
+  parseEnvNumber("RECALL_TEST_TOP_LEVEL_CONCURRENCY", defaultTopLevelParallelLimit),
 );
-const overrideWorkers = Number.parseInt(process.env.OPENCLAW_TEST_WORKERS ?? "", 10);
+const overrideWorkers = Number.parseInt(process.env.RECALL_TEST_WORKERS ?? "", 10);
 const resolvedOverride =
   Number.isFinite(overrideWorkers) && overrideWorkers > 0 ? overrideWorkers : null;
 const parallelGatewayEnabled =
   !isMacMiniProfile &&
-  (process.env.OPENCLAW_TEST_PARALLEL_GATEWAY === "1" || (!isCI && highMemLocalHost));
+  (process.env.RECALL_TEST_PARALLEL_GATEWAY === "1" || (!isCI && highMemLocalHost));
 // Keep gateway serial by default except when explicitly requested or on high-memory local hosts.
 const keepGatewaySerial =
   isWindowsCi ||
-  process.env.OPENCLAW_TEST_SERIAL_GATEWAY === "1" ||
+  process.env.RECALL_TEST_SERIAL_GATEWAY === "1" ||
   testProfile === "serial" ||
   !parallelGatewayEnabled;
 const parallelRuns = keepGatewaySerial ? runs.filter((entry) => entry.name !== "gateway") : runs;
@@ -913,7 +913,7 @@ const serialRuns = keepGatewaySerial ? runs.filter((entry) => entry.name === "ga
 const serialPrefixRuns = parallelRuns.filter((entry) => entry.serialPhase);
 const deferredParallelRuns = parallelRuns.filter((entry) => !entry.serialPhase);
 const baseLocalWorkers = Math.max(4, Math.min(16, hostCpuCount));
-const loadAwareDisabledRaw = process.env.OPENCLAW_TEST_LOAD_AWARE?.trim().toLowerCase();
+const loadAwareDisabledRaw = process.env.RECALL_TEST_LOAD_AWARE?.trim().toLowerCase();
 const loadAwareDisabled = loadAwareDisabledRaw === "0" || loadAwareDisabledRaw === "false";
 const loadRatio =
   !isCI && !loadAwareDisabled && process.platform !== "win32" && hostCpuCount > 0
@@ -1017,7 +1017,7 @@ const WARNING_SUPPRESSION_FLAGS = [
 const DEFAULT_CI_MAX_OLD_SPACE_SIZE_MB = 4096;
 const maxOldSpaceSizeMb = (() => {
   // CI can hit Node heap limits (especially on large suites). Allow override, default to 4GB.
-  const raw = process.env.OPENCLAW_TEST_MAX_OLD_SPACE_SIZE_MB ?? "";
+  const raw = process.env.RECALL_TEST_MAX_OLD_SPACE_SIZE_MB ?? "";
   const parsed = Number.parseInt(raw, 10);
   if (Number.isFinite(parsed) && parsed > 0) {
     return parsed;
@@ -1037,26 +1037,26 @@ const formatMemoryKb = (rssKb) =>
       : `${rssKb}KiB`;
 const formatMemoryDeltaKb = (rssKb) =>
   `${rssKb >= 0 ? "+" : "-"}${formatMemoryKb(Math.abs(rssKb))}`;
-const rawMemoryTrace = process.env.OPENCLAW_TEST_MEMORY_TRACE?.trim().toLowerCase();
+const rawMemoryTrace = process.env.RECALL_TEST_MEMORY_TRACE?.trim().toLowerCase();
 const memoryTraceEnabled =
   process.platform !== "win32" &&
   (rawMemoryTrace === "1" ||
     rawMemoryTrace === "true" ||
     (rawMemoryTrace !== "0" && rawMemoryTrace !== "false" && isCI));
-const memoryTracePollMs = Math.max(250, parseEnvNumber("OPENCLAW_TEST_MEMORY_TRACE_POLL_MS", 1000));
-const memoryTraceTopCount = Math.max(1, parseEnvNumber("OPENCLAW_TEST_MEMORY_TRACE_TOP_COUNT", 6));
+const memoryTracePollMs = Math.max(250, parseEnvNumber("RECALL_TEST_MEMORY_TRACE_POLL_MS", 1000));
+const memoryTraceTopCount = Math.max(1, parseEnvNumber("RECALL_TEST_MEMORY_TRACE_TOP_COUNT", 6));
 const heapSnapshotIntervalMs = Math.max(
   0,
-  parseEnvNumber("OPENCLAW_TEST_HEAPSNAPSHOT_INTERVAL_MS", 0),
+  parseEnvNumber("RECALL_TEST_HEAPSNAPSHOT_INTERVAL_MS", 0),
 );
 const heapSnapshotMinIntervalMs = 5000;
 const heapSnapshotEnabled =
   process.platform !== "win32" && heapSnapshotIntervalMs >= heapSnapshotMinIntervalMs;
-const heapSnapshotSignal = process.env.OPENCLAW_TEST_HEAPSNAPSHOT_SIGNAL?.trim() || "SIGUSR2";
+const heapSnapshotSignal = process.env.RECALL_TEST_HEAPSNAPSHOT_SIGNAL?.trim() || "SIGUSR2";
 const heapSnapshotBaseDir = heapSnapshotEnabled
   ? path.resolve(
-      process.env.OPENCLAW_TEST_HEAPSNAPSHOT_DIR?.trim() ||
-        path.join(os.tmpdir(), `openclaw-heapsnapshots-${Date.now()}`),
+      process.env.RECALL_TEST_HEAPSNAPSHOT_DIR?.trim() ||
+        path.join(os.tmpdir(), `recall-heapsnapshots-${Date.now()}`),
     )
   : null;
 const ensureNodeOptionFlag = (nodeOptions, flagPrefix, nextValue) =>
@@ -1468,7 +1468,7 @@ process.on("SIGINT", () => shutdown("SIGINT"));
 process.on("SIGTERM", () => shutdown("SIGTERM"));
 process.on("exit", cleanupTempArtifacts);
 
-if (process.env.OPENCLAW_TEST_LIST_LANES === "1") {
+if (process.env.RECALL_TEST_LIST_LANES === "1") {
   const entriesToPrint = targetedEntries.length > 0 ? targetedEntries : runs;
   for (const entry of entriesToPrint) {
     console.log(formatEntrySummary(entry));

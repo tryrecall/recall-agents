@@ -13,7 +13,7 @@ function manifest(id: string): PluginManifestRecord {
     origin: "bundled",
     rootDir: `/plugins/${id}`,
     source: `/plugins/${id}`,
-    manifestPath: `/plugins/${id}/openclaw.plugin.json`,
+    manifestPath: `/plugins/${id}/recall.plugin.json`,
   };
 }
 
@@ -41,7 +41,7 @@ describe("doctor preview warnings", () => {
           },
         },
       },
-      doctorFixCommand: "openclaw doctor --fix",
+      doctorFixCommand: "recall doctor --fix",
     });
 
     expect(warnings).toEqual([
@@ -63,7 +63,7 @@ describe("doctor preview warnings", () => {
           },
         },
       },
-      doctorFixCommand: "openclaw doctor --fix",
+      doctorFixCommand: "recall doctor --fix",
     });
 
     expect(warnings).toEqual([
@@ -83,14 +83,14 @@ describe("doctor preview warnings", () => {
           },
         },
       },
-      doctorFixCommand: "openclaw doctor --fix",
+      doctorFixCommand: "recall doctor --fix",
     });
 
     expect(warnings).toEqual([
       expect.stringContaining('plugins.allow: stale plugin reference "acpx"'),
     ]);
     expect(warnings[0]).toContain("plugins.entries.acpx");
-    expect(warnings[0]).toContain('Run "openclaw doctor --fix"');
+    expect(warnings[0]).toContain('Run "recall doctor --fix"');
     expect(warnings[0]).not.toContain("Auto-removal is paused");
   });
 
@@ -111,13 +111,13 @@ describe("doctor preview warnings", () => {
           },
         },
       },
-      doctorFixCommand: "openclaw doctor --fix",
+      doctorFixCommand: "recall doctor --fix",
     });
 
     expect(warnings).toEqual([
       expect.stringContaining('plugins.allow: stale plugin reference "acpx"'),
     ]);
     expect(warnings[0]).toContain("Auto-removal is paused");
-    expect(warnings[0]).toContain('rerun "openclaw doctor --fix"');
+    expect(warnings[0]).toContain('rerun "recall doctor --fix"');
   });
 });

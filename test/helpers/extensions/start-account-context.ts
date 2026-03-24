@@ -1,16 +1,16 @@
 import type {
   ChannelAccountSnapshot,
   ChannelGatewayContext,
-  OpenClawConfig,
+  RecallConfig,
   RuntimeEnv,
-} from "openclaw/plugin-sdk/testing";
+} from "recall/plugin-sdk/testing";
 import { vi } from "vitest";
 import { createRuntimeEnv } from "./runtime-env.js";
 
 export function createStartAccountContext<TAccount extends { accountId: string }>(params: {
   account: TAccount;
   abortSignal?: AbortSignal;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   runtime?: RuntimeEnv;
   statusPatchSink?: (next: ChannelAccountSnapshot) => void;
 }): ChannelGatewayContext<TAccount> {
@@ -23,7 +23,7 @@ export function createStartAccountContext<TAccount extends { accountId: string }
   return {
     accountId: params.account.accountId,
     account: params.account,
-    cfg: params.cfg ?? ({} as OpenClawConfig),
+    cfg: params.cfg ?? ({} as RecallConfig),
     runtime: params.runtime ?? createRuntimeEnv(),
     abortSignal: params.abortSignal ?? new AbortController().signal,
     log: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },

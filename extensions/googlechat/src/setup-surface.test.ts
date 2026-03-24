@@ -5,7 +5,7 @@ import {
   runSetupWizardConfigure,
   type WizardPrompter,
 } from "../../../test/helpers/extensions/setup-wizard.js";
-import type { OpenClawConfig } from "../runtime-api.js";
+import type { RecallConfig } from "../runtime-api.js";
 import { googlechatPlugin } from "./channel.js";
 
 const googlechatConfigure = createPluginSetupWizardConfigure(googlechatPlugin);
@@ -26,7 +26,7 @@ describe("googlechat setup wizard", () => {
 
     const result = await runSetupWizardConfigure({
       configure: googlechatConfigure,
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       prompter,
       options: {},
     });

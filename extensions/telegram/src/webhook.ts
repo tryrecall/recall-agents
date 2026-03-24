@@ -1,19 +1,19 @@
 import { timingSafeEqual } from "node:crypto";
 import { createServer } from "node:http";
 import * as grammy from "grammy";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
-import { isDiagnosticsEnabled } from "openclaw/plugin-sdk/infra-runtime";
-import { formatErrorMessage } from "openclaw/plugin-sdk/infra-runtime";
-import { readJsonBodyWithLimit } from "openclaw/plugin-sdk/infra-runtime";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
-import { defaultRuntime } from "openclaw/plugin-sdk/runtime-env";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
+import { isDiagnosticsEnabled } from "recall/plugin-sdk/infra-runtime";
+import { formatErrorMessage } from "recall/plugin-sdk/infra-runtime";
+import { readJsonBodyWithLimit } from "recall/plugin-sdk/infra-runtime";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime-env";
+import { defaultRuntime } from "recall/plugin-sdk/runtime-env";
 import {
   logWebhookError,
   logWebhookProcessed,
   logWebhookReceived,
   startDiagnosticHeartbeat,
   stopDiagnosticHeartbeat,
-} from "openclaw/plugin-sdk/text-runtime";
+} from "recall/plugin-sdk/text-runtime";
 import { resolveTelegramAllowedUpdates } from "./allowed-updates.js";
 import { withTelegramApiErrorLogging } from "./api-logging.js";
 import { createTelegramBot } from "./bot.js";
@@ -106,7 +106,7 @@ function hasValidTelegramWebhookSecret(
 export async function startTelegramWebhook(opts: {
   token: string;
   accountId?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   path?: string;
   port?: number;
   host?: string;

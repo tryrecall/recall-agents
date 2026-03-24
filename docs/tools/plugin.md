@@ -1,5 +1,5 @@
 ---
-summary: "Install, configure, and manage OpenClaw plugins"
+summary: "Install, configure, and manage Recall plugins"
 read_when:
   - Installing or configuring plugins
   - Understanding plugin discovery and load rules
@@ -10,34 +10,34 @@ sidebarTitle: "Install and Configure"
 
 # Plugins
 
-Plugins extend OpenClaw with new capabilities: channels, model providers, tools,
+Plugins extend Recall with new capabilities: channels, model providers, tools,
 skills, speech, image generation, and more. Some plugins are **core** (shipped
-with OpenClaw), others are **external** (published on npm by the community).
+with Recall), others are **external** (published on npm by the community).
 
 ## Quick start
 
 <Steps>
   <Step title="See what is loaded">
     ```bash
-    openclaw plugins list
+    recall plugins list
     ```
   </Step>
 
   <Step title="Install a plugin">
     ```bash
     # From npm
-    openclaw plugins install @openclaw/voice-call
+    recall plugins install @recall/voice-call
 
     # From a local directory or archive
-    openclaw plugins install ./my-plugin
-    openclaw plugins install ./my-plugin.tgz
+    recall plugins install ./my-plugin
+    recall plugins install ./my-plugin.tgz
     ```
 
   </Step>
 
   <Step title="Restart the Gateway">
     ```bash
-    openclaw gateway restart
+    recall gateway restart
     ```
 
     Then configure under `plugins.entries.\<id\>.config` in your config file.
@@ -48,7 +48,7 @@ with OpenClaw), others are **external** (published on npm by the community).
 If you prefer chat-native control, enable `commands.plugins: true` and use:
 
 ```text
-/plugin install clawhub:@openclaw/voice-call
+/plugin install clawhub:@recall/voice-call
 /plugin show voice-call
 /plugin enable voice-call
 ```
@@ -58,14 +58,14 @@ The install path uses the same resolver as the CLI: local path/archive, explicit
 
 ## Plugin types
 
-OpenClaw recognizes two plugin formats:
+Recall recognizes two plugin formats:
 
 | Format     | How it works                                                       | Examples                                               |
 | ---------- | ------------------------------------------------------------------ | ------------------------------------------------------ |
-| **Native** | `openclaw.plugin.json` + runtime module; executes in-process       | Official plugins, community npm packages               |
-| **Bundle** | Codex/Claude/Cursor-compatible layout; mapped to OpenClaw features | `.codex-plugin/`, `.claude-plugin/`, `.cursor-plugin/` |
+| **Native** | `recall.plugin.json` + runtime module; executes in-process       | Official plugins, community npm packages               |
+| **Bundle** | Codex/Claude/Cursor-compatible layout; mapped to Recall features | `.codex-plugin/`, `.claude-plugin/`, `.cursor-plugin/` |
 
-Both show up under `openclaw plugins list`. See [Plugin Bundles](/plugins/bundles) for bundle details.
+Both show up under `recall plugins list`. See [Plugin Bundles](/plugins/bundles) for bundle details.
 
 If you are writing a native plugin, start with [Building Plugins](/plugins/building-plugins)
 and the [Plugin SDK Overview](/plugins/sdk-overview).
@@ -76,14 +76,14 @@ and the [Plugin SDK Overview](/plugins/sdk-overview).
 
 | Plugin          | Package                | Docs                                 |
 | --------------- | ---------------------- | ------------------------------------ |
-| Matrix          | `@openclaw/matrix`     | [Matrix](/channels/matrix)           |
-| Microsoft Teams | `@openclaw/msteams`    | [Microsoft Teams](/channels/msteams) |
-| Nostr           | `@openclaw/nostr`      | [Nostr](/channels/nostr)             |
-| Voice Call      | `@openclaw/voice-call` | [Voice Call](/plugins/voice-call)    |
-| Zalo            | `@openclaw/zalo`       | [Zalo](/channels/zalo)               |
-| Zalo Personal   | `@openclaw/zalouser`   | [Zalo Personal](/plugins/zalouser)   |
+| Matrix          | `@recall/matrix`     | [Matrix](/channels/matrix)           |
+| Microsoft Teams | `@recall/msteams`    | [Microsoft Teams](/channels/msteams) |
+| Nostr           | `@recall/nostr`      | [Nostr](/channels/nostr)             |
+| Voice Call      | `@recall/voice-call` | [Voice Call](/plugins/voice-call)    |
+| Zalo            | `@recall/zalo`       | [Zalo](/channels/zalo)               |
+| Zalo Personal   | `@recall/zalouser`   | [Zalo Personal](/plugins/zalouser)   |
 
-### Core (shipped with OpenClaw)
+### Core (shipped with Recall)
 
 <AccordionGroup>
   <Accordion title="Model providers (enabled by default)">
@@ -136,7 +136,7 @@ Looking for third-party plugins? See [Community Plugins](/plugins/community).
 | `entries.\<id\>` | Per-plugin toggles + config                               |
 
 Config changes **require a gateway restart**. If the Gateway is running with config
-watch + in-process restart enabled (the default `openclaw gateway` path), that
+watch + in-process restart enabled (the default `recall gateway` path), that
 restart is usually performed automatically a moment after the config write lands.
 
 <Accordion title="Plugin states: disabled vs missing vs invalid">
@@ -147,7 +147,7 @@ restart is usually performed automatically a moment after the config write lands
 
 ## Discovery and precedence
 
-OpenClaw scans for plugins in this order (first match wins):
+Recall scans for plugins in this order (first match wins):
 
 <Steps>
   <Step title="Config paths">
@@ -155,15 +155,15 @@ OpenClaw scans for plugins in this order (first match wins):
   </Step>
 
   <Step title="Workspace extensions">
-    `\<workspace\>/.openclaw/extensions/*.ts` and `\<workspace\>/.openclaw/extensions/*/index.ts`.
+    `\<workspace\>/.recall/extensions/*.ts` and `\<workspace\>/.recall/extensions/*/index.ts`.
   </Step>
 
   <Step title="Global extensions">
-    `~/.openclaw/extensions/*.ts` and `~/.openclaw/extensions/*/index.ts`.
+    `~/.recall/extensions/*.ts` and `~/.recall/extensions/*/index.ts`.
   </Step>
 
   <Step title="Bundled plugins">
-    Shipped with OpenClaw. Many are enabled by default (model providers, speech).
+    Shipped with Recall. Many are enabled by default (model providers, speech).
     Others require explicit enablement.
   </Step>
 </Steps>
@@ -200,24 +200,24 @@ Some categories are exclusive (only one active at a time):
 ## CLI reference
 
 ```bash
-openclaw plugins list                    # compact inventory
-openclaw plugins inspect <id>            # deep detail
-openclaw plugins inspect <id> --json     # machine-readable
-openclaw plugins status                  # operational summary
-openclaw plugins doctor                  # diagnostics
+recall plugins list                    # compact inventory
+recall plugins inspect <id>            # deep detail
+recall plugins inspect <id> --json     # machine-readable
+recall plugins status                  # operational summary
+recall plugins doctor                  # diagnostics
 
-openclaw plugins install <package>        # install (ClawHub first, then npm)
-openclaw plugins install clawhub:<pkg>   # install from ClawHub only
-openclaw plugins install <path>          # install from local path
-openclaw plugins install -l <path>       # link (no copy) for dev
-openclaw plugins update <id>             # update one plugin
-openclaw plugins update --all            # update all
+recall plugins install <package>        # install (ClawHub first, then npm)
+recall plugins install clawhub:<pkg>   # install from ClawHub only
+recall plugins install <path>          # install from local path
+recall plugins install -l <path>       # link (no copy) for dev
+recall plugins update <id>             # update one plugin
+recall plugins update --all            # update all
 
-openclaw plugins enable <id>
-openclaw plugins disable <id>
+recall plugins enable <id>
+recall plugins disable <id>
 ```
 
-See [`openclaw plugins` CLI reference](/cli/plugins) for full details.
+See [`recall plugins` CLI reference](/cli/plugins) for full details.
 
 ## Plugin API overview
 

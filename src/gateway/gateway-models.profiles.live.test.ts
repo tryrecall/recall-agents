@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import type { Api, Model } from "@mariozechner/pi-ai";
 import { describe, expect, it } from "vitest";
-import { resolveOpenClawAgentDir } from "../agents/agent-paths.js";
+import { resolveRecallAgentDir } from "../agents/agent-paths.js";
 import { resolveAgentWorkspaceDir } from "../agents/agent-scope.js";
 import {
   type AuthProfileStore,
@@ -23,11 +23,11 @@ import { isLiveTestEnabled } from "../agents/live-test-helpers.js";
 import { getApiKeyForModel } from "../agents/model-auth.js";
 import { normalizeGoogleModelId } from "../agents/model-id-normalization.js";
 import { shouldSuppressBuiltInModel } from "../agents/model-suppression.js";
-import { ensureOpenClawModelsJson } from "../agents/models-config.js";
+import { ensureRecallModelsJson } from "../agents/models-config.js";
 import { isRateLimitErrorMessage } from "../agents/pi-embedded-helpers/errors.js";
 import { discoverAuthStorage, discoverModels } from "../agents/pi-model-discovery.js";
 import { clearRuntimeConfigSnapshot, loadConfig } from "../config/config.js";
-import type { ModelsConfig, OpenClawConfig, ModelProviderConfig } from "../config/types.js";
+import type { ModelsConfig, RecallConfig, ModelProviderConfig } from "../config/types.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import { DEFAULT_AGENT_ID } from "../routing/session-key.js";
 import { stripAssistantInternalScaffolding } from "../shared/text/assistant-visible-text.js";
@@ -43,9 +43,9 @@ import {
 import { startGatewayServer } from "./server.js";
 import { loadSessionEntry, readSessionMessages } from "./session-utils.js";
 
-const ZAI_FALLBACK = isTruthyEnvValue(process.env.OPENCLAW_LIVE_GATEWAY_ZAI_FALLBACK);
-const REQUIRE_PROFILE_KEYS = isTruthyEnvValue(process.env.OPENCLAW_LIVE_REQUIRE_PROFILE_KEYS);
-const PROVIDERS = parseFilter(process.env.OPENCLAW_LIVE_GATEWAY_PROVIDERS);
+const ZAI_FALLBACK = isTruthyEnvValue(process.env.RECALL_LIVE_GATEWAY_ZAI_FALLBACK);
+const REQUIRE_PROFILE_KEYS = isTruthyEnvValue(process.env.RECALL_LIVE_REQUIRE_PROFILE_KEYS);
+const PROVIDERS = parseFilter(process.env.RECALL_LIVE_GATEWAY_PROVIDERS);
 const THINKING_LEVEL = "high";
 const THINKING_TAG_RE = /<\s*\/?\s*(?:think(?:ing)?|thought|antthinking)\s*>/i;
 const FINAL_TAG_RE = /<\s*\/?\s*final\s*>/i;
@@ -55,11 +55,11 @@ const GATEWAY_LIVE_UNBOUNDED_TIMEOUT_MS = 60 * 60 * 1000;
 const GATEWAY_LIVE_MAX_TIMEOUT_MS = 2 * 60 * 60 * 1000;
 const GATEWAY_LIVE_PROBE_TIMEOUT_MS = Math.max(
   30_000,
-  toInt(process.env.OPENCLAW_LIVE_GATEWAY_STEP_TIMEOUT_MS, 90_000),
+  toInt(process.env.RECALL_LIVE_GATEWAY_STEP_TIMEOUT_MS, 90_000),
 );
 const GATEWAY_LIVE_HEARTBEAT_MS = Math.max(
   1_000,
-  toInt(process.env.OPENCLAW_LIVE_GATEWAY_HEARTBEAT_MS, 30_000),
+  toInt(process.env.RECALL_LIVE_GATEWAY_HEARTBEAT_MS, 30_000),
 );
 const GATEWAY_LIVE_STRIP_SCAFFOLDING_MODEL_KEYS = new Set([
   "google/gemini-3-flash-preview",
@@ -71,7 +71,7 @@ const GATEWAY_LIVE_STRIP_SCAFFOLDING_MODEL_KEYS = new Set([
 const GATEWAY_LIVE_MAX_MODELS = resolveGatewayLiveMaxModels();
 const GATEWAY_LIVE_SUITE_TIMEOUT_MS = resolveGatewayLiveSuiteTimeoutMs(GATEWAY_LIVE_MAX_MODELS);
 
-const describeLive = isLiveTestEnabled(["OPENCLAW_LIVE_GATEWAY"]) ? describe : describe.skip;
+const describeLive = isLiveTestEnabled(["RECALL_LIVE_GATEWAY"]) ? describe : describe.skip;
 
 function parseFilter(raw?: string): Set<string> | null {
   const trimmed = raw?.trim();
@@ -95,12 +95,12 @@ function toInt(value: string | undefined, fallback: number): number {
 }
 
 function resolveGatewayLiveMaxModels(): number {
-  const gatewayMax = toInt(process.env.OPENCLAW_LIVE_GATEWAY_MAX_MODELS, -1);
+  const gatewayMax = toInt(process.env.RECALL_LIVE_GATEWAY_MAX_MODELS, -1);
   if (gatewayMax >= 0) {
     return gatewayMax;
   }
   // Reuse shared live-model cap when gateway-specific cap is not provided.
-  return Math.max(0, toInt(process.env.OPENCLAW_LIVE_MAX_MODELS, 0));
+  return Math.max(0, toInt(process.env.RECALL_LIVE_MAX_MODELS, 0));
 }
 
 function resolveGatewayLiveSuiteTimeoutMs(maxModels: number): number {
@@ -725,7 +725,7 @@ async function requestGatewayAgentText(params: {
 
 type GatewayModelSuiteParams = {
   label: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   candidates: Array<Model<Api>>;
   allowNotFoundSkip: boolean;
   extraToolProbes: boolean;
@@ -735,10 +735,10 @@ type GatewayModelSuiteParams = {
 };
 
 function buildLiveGatewayConfig(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   candidates: Array<Model<Api>>;
   providerOverrides?: Record<string, ModelProviderConfig>;
-}): OpenClawConfig {
+}): RecallConfig {
   const providerOverrides = params.providerOverrides ?? {};
   const lmstudioProvider = params.cfg.models?.providers?.lmstudio;
   const baseProviders = params.cfg.models?.providers ?? {};
@@ -780,9 +780,9 @@ function buildLiveGatewayConfig(params: {
 }
 
 function sanitizeAuthConfig(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentDir: string;
-}): OpenClawConfig["auth"] | undefined {
+}): RecallConfig["auth"] | undefined {
   const auth = params.cfg.auth;
   if (!auth) {
     return auth;
@@ -791,7 +791,7 @@ function sanitizeAuthConfig(params: {
     allowKeychainPrompt: false,
   });
 
-  let profiles: NonNullable<OpenClawConfig["auth"]>["profiles"] | undefined;
+  let profiles: NonNullable<RecallConfig["auth"]>["profiles"] | undefined;
   if (auth.profiles) {
     profiles = {};
     for (const [profileId, profile] of Object.entries(auth.profiles)) {
@@ -831,7 +831,7 @@ function sanitizeAuthConfig(params: {
 }
 
 function buildMinimaxProviderOverride(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   api: "openai-completions" | "anthropic-messages";
   baseUrl: string;
 }): ModelProviderConfig | null {
@@ -850,29 +850,29 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
   clearRuntimeConfigSnapshot();
   const runtimeEnv = enterProductionEnvForLiveRun();
   const previous = {
-    configPath: process.env.OPENCLAW_CONFIG_PATH,
-    token: process.env.OPENCLAW_GATEWAY_TOKEN,
-    skipChannels: process.env.OPENCLAW_SKIP_CHANNELS,
-    skipGmail: process.env.OPENCLAW_SKIP_GMAIL_WATCHER,
-    skipCron: process.env.OPENCLAW_SKIP_CRON,
-    skipCanvas: process.env.OPENCLAW_SKIP_CANVAS_HOST,
-    agentDir: process.env.OPENCLAW_AGENT_DIR,
+    configPath: process.env.RECALL_CONFIG_PATH,
+    token: process.env.RECALL_GATEWAY_TOKEN,
+    skipChannels: process.env.RECALL_SKIP_CHANNELS,
+    skipGmail: process.env.RECALL_SKIP_GMAIL_WATCHER,
+    skipCron: process.env.RECALL_SKIP_CRON,
+    skipCanvas: process.env.RECALL_SKIP_CANVAS_HOST,
+    agentDir: process.env.RECALL_AGENT_DIR,
     piAgentDir: process.env.PI_CODING_AGENT_DIR,
-    stateDir: process.env.OPENCLAW_STATE_DIR,
+    stateDir: process.env.RECALL_STATE_DIR,
   };
   let tempAgentDir: string | undefined;
   let tempStateDir: string | undefined;
 
-  process.env.OPENCLAW_SKIP_CHANNELS = "1";
-  process.env.OPENCLAW_SKIP_GMAIL_WATCHER = "1";
-  process.env.OPENCLAW_SKIP_CRON = "1";
-  process.env.OPENCLAW_SKIP_CANVAS_HOST = "1";
+  process.env.RECALL_SKIP_CHANNELS = "1";
+  process.env.RECALL_SKIP_GMAIL_WATCHER = "1";
+  process.env.RECALL_SKIP_CRON = "1";
+  process.env.RECALL_SKIP_CANVAS_HOST = "1";
 
   const token = `test-${randomUUID()}`;
-  process.env.OPENCLAW_GATEWAY_TOKEN = token;
+  process.env.RECALL_GATEWAY_TOKEN = token;
   const agentId = "dev";
 
-  const hostAgentDir = resolveOpenClawAgentDir();
+  const hostAgentDir = resolveRecallAgentDir();
   const hostStore = ensureAuthProfileStore(hostAgentDir, {
     allowKeychainPrompt: false,
   });
@@ -885,26 +885,26 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
     lastGood: hostStore.lastGood ? { ...hostStore.lastGood } : undefined,
     usageStats: hostStore.usageStats ? { ...hostStore.usageStats } : undefined,
   };
-  tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-live-state-"));
-  process.env.OPENCLAW_STATE_DIR = tempStateDir;
+  tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-live-state-"));
+  process.env.RECALL_STATE_DIR = tempStateDir;
   tempAgentDir = path.join(tempStateDir, "agents", DEFAULT_AGENT_ID, "agent");
   saveAuthProfileStore(sanitizedStore, tempAgentDir);
   const tempSessionAgentDir = path.join(tempStateDir, "agents", agentId, "agent");
   if (tempSessionAgentDir !== tempAgentDir) {
     saveAuthProfileStore(sanitizedStore, tempSessionAgentDir);
   }
-  process.env.OPENCLAW_AGENT_DIR = tempAgentDir;
+  process.env.RECALL_AGENT_DIR = tempAgentDir;
   process.env.PI_CODING_AGENT_DIR = tempAgentDir;
 
   const workspaceDir = resolveAgentWorkspaceDir(params.cfg, agentId);
   await fs.mkdir(workspaceDir, { recursive: true });
   const nonceA = randomUUID();
   const nonceB = randomUUID();
-  const toolProbePath = path.join(workspaceDir, `.openclaw-live-tool-probe.${nonceA}.txt`);
+  const toolProbePath = path.join(workspaceDir, `.recall-live-tool-probe.${nonceA}.txt`);
   await fs.writeFile(toolProbePath, `nonceA=${nonceA}\nnonceB=${nonceB}\n`);
 
-  const agentDir = resolveOpenClawAgentDir();
-  const sanitizedCfg: OpenClawConfig = {
+  const agentDir = resolveRecallAgentDir();
+  const sanitizedCfg: RecallConfig = {
     ...params.cfg,
     auth: sanitizeAuthConfig({ cfg: params.cfg, agentDir }),
   };
@@ -913,10 +913,10 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
     candidates: params.candidates,
     providerOverrides: params.providerOverrides,
   });
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-live-"));
-  const tempConfigPath = path.join(tempDir, "openclaw.json");
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-live-"));
+  const tempConfigPath = path.join(tempDir, "recall.json");
   await fs.writeFile(tempConfigPath, `${JSON.stringify(nextCfg, null, 2)}\n`);
-  process.env.OPENCLAW_CONFIG_PATH = tempConfigPath;
+  process.env.RECALL_CONFIG_PATH = tempConfigPath;
 
   const liveProviders = nextCfg.models?.providers;
   if (liveProviders && Object.keys(liveProviders).length > 0) {
@@ -1087,10 +1087,10 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
               idempotencyKey: `idem-${runIdTool}-tool-${toolReadAttempt + 1}`,
               modelKey,
               message: strictReply
-                ? "OpenClaw live tool probe (local, safe): " +
+                ? "Recall live tool probe (local, safe): " +
                   `use the tool named \`read\` (or \`Read\`) with JSON arguments {"path":"${toolProbePath}"}. ` +
                   `Then reply with exactly: ${nonceA} ${nonceB}. No extra text.`
-                : "OpenClaw live tool probe (local, safe): " +
+                : "Recall live tool probe (local, safe): " +
                   `use the tool named \`read\` (or \`Read\`) with JSON arguments {"path":"${toolProbePath}"}. ` +
                   "Then reply with the two nonce values you read (include both).",
               thinkingLevel: params.thinkingLevel,
@@ -1151,12 +1151,12 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
                 idempotencyKey: `idem-${runIdTool}-exec-read-${execReadAttempt + 1}`,
                 modelKey,
                 message: strictReply
-                  ? "OpenClaw live tool probe (local, safe): " +
+                  ? "Recall live tool probe (local, safe): " +
                     "use the tool named `exec` (or `Exec`) to run this command: " +
                     `mkdir -p "${tempDir}" && printf '%s' '${nonceC}' > "${toolWritePath}". ` +
                     `Then use the tool named \`read\` (or \`Read\`) with JSON arguments {"path":"${toolWritePath}"}. ` +
                     `Then reply with exactly: ${nonceC}. No extra text.`
-                  : "OpenClaw live tool probe (local, safe): " +
+                  : "Recall live tool probe (local, safe): " +
                     "use the tool named `exec` (or `Exec`) to run this command: " +
                     `mkdir -p "${tempDir}" && printf '%s' '${nonceC}' > "${toolWritePath}". ` +
                     `Then use the tool named \`read\` (or \`Read\`) with JSON arguments {"path":"${toolWritePath}"}. ` +
@@ -1471,15 +1471,15 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
       await fs.rm(tempStateDir, { recursive: true, force: true });
     }
 
-    process.env.OPENCLAW_CONFIG_PATH = previous.configPath;
-    process.env.OPENCLAW_GATEWAY_TOKEN = previous.token;
-    process.env.OPENCLAW_SKIP_CHANNELS = previous.skipChannels;
-    process.env.OPENCLAW_SKIP_GMAIL_WATCHER = previous.skipGmail;
-    process.env.OPENCLAW_SKIP_CRON = previous.skipCron;
-    process.env.OPENCLAW_SKIP_CANVAS_HOST = previous.skipCanvas;
-    process.env.OPENCLAW_AGENT_DIR = previous.agentDir;
+    process.env.RECALL_CONFIG_PATH = previous.configPath;
+    process.env.RECALL_GATEWAY_TOKEN = previous.token;
+    process.env.RECALL_SKIP_CHANNELS = previous.skipChannels;
+    process.env.RECALL_SKIP_GMAIL_WATCHER = previous.skipGmail;
+    process.env.RECALL_SKIP_CRON = previous.skipCron;
+    process.env.RECALL_SKIP_CANVAS_HOST = previous.skipCanvas;
+    process.env.RECALL_AGENT_DIR = previous.agentDir;
     process.env.PI_CODING_AGENT_DIR = previous.piAgentDir;
-    process.env.OPENCLAW_STATE_DIR = previous.stateDir;
+    process.env.RECALL_STATE_DIR = previous.stateDir;
   }
 }
 
@@ -1489,14 +1489,14 @@ describeLive("gateway live (dev agent, profile keys)", () => {
     async () => {
       clearRuntimeConfigSnapshot();
       const cfg = loadConfig();
-      await ensureOpenClawModelsJson(cfg);
+      await ensureRecallModelsJson(cfg);
 
-      const agentDir = resolveOpenClawAgentDir();
+      const agentDir = resolveRecallAgentDir();
       const authStorage = discoverAuthStorage(agentDir);
       const modelRegistry = discoverModels(authStorage, agentDir);
       const all = modelRegistry.getAll();
 
-      const rawModels = process.env.OPENCLAW_LIVE_GATEWAY_MODELS?.trim();
+      const rawModels = process.env.RECALL_LIVE_GATEWAY_MODELS?.trim();
       const useModern = !rawModels || rawModels === "modern" || rawModels === "all";
       const useExplicit = Boolean(rawModels) && !useModern;
       const filter = useExplicit ? parseFilter(rawModels) : null;
@@ -1547,7 +1547,7 @@ describeLive("gateway live (dev agent, profile keys)", () => {
       logProgress(`[all-models] selection=${useExplicit ? "explicit" : "modern"}`);
       if (selectedCandidates.length < candidates.length) {
         logProgress(
-          `[all-models] capped to ${selectedCandidates.length}/${candidates.length} via OPENCLAW_LIVE_GATEWAY_MAX_MODELS=${maxModels}`,
+          `[all-models] capped to ${selectedCandidates.length}/${candidates.length} via RECALL_LIVE_GATEWAY_MAX_MODELS=${maxModels}`,
         );
       }
       const imageCandidates = selectedCandidates.filter((m) => m.input?.includes("image"));
@@ -1600,26 +1600,26 @@ describeLive("gateway live (dev agent, profile keys)", () => {
     clearRuntimeConfigSnapshot();
     const runtimeEnv = enterProductionEnvForLiveRun();
     const previous = {
-      configPath: process.env.OPENCLAW_CONFIG_PATH,
-      token: process.env.OPENCLAW_GATEWAY_TOKEN,
-      skipChannels: process.env.OPENCLAW_SKIP_CHANNELS,
-      skipGmail: process.env.OPENCLAW_SKIP_GMAIL_WATCHER,
-      skipCron: process.env.OPENCLAW_SKIP_CRON,
-      skipCanvas: process.env.OPENCLAW_SKIP_CANVAS_HOST,
+      configPath: process.env.RECALL_CONFIG_PATH,
+      token: process.env.RECALL_GATEWAY_TOKEN,
+      skipChannels: process.env.RECALL_SKIP_CHANNELS,
+      skipGmail: process.env.RECALL_SKIP_GMAIL_WATCHER,
+      skipCron: process.env.RECALL_SKIP_CRON,
+      skipCanvas: process.env.RECALL_SKIP_CANVAS_HOST,
     };
 
-    process.env.OPENCLAW_SKIP_CHANNELS = "1";
-    process.env.OPENCLAW_SKIP_GMAIL_WATCHER = "1";
-    process.env.OPENCLAW_SKIP_CRON = "1";
-    process.env.OPENCLAW_SKIP_CANVAS_HOST = "1";
+    process.env.RECALL_SKIP_CHANNELS = "1";
+    process.env.RECALL_SKIP_GMAIL_WATCHER = "1";
+    process.env.RECALL_SKIP_CRON = "1";
+    process.env.RECALL_SKIP_CANVAS_HOST = "1";
 
     const token = `test-${randomUUID()}`;
-    process.env.OPENCLAW_GATEWAY_TOKEN = token;
+    process.env.RECALL_GATEWAY_TOKEN = token;
 
     const cfg = loadConfig();
-    await ensureOpenClawModelsJson(cfg);
+    await ensureRecallModelsJson(cfg);
 
-    const agentDir = resolveOpenClawAgentDir();
+    const agentDir = resolveRecallAgentDir();
     const authStorage = discoverAuthStorage(agentDir);
     const modelRegistry = discoverModels(authStorage, agentDir);
     const anthropic = modelRegistry.find("anthropic", "claude-opus-4-5") as Model<Api> | null;
@@ -1640,7 +1640,7 @@ describeLive("gateway live (dev agent, profile keys)", () => {
     await fs.mkdir(workspaceDir, { recursive: true });
     const nonceA = randomUUID();
     const nonceB = randomUUID();
-    const toolProbePath = path.join(workspaceDir, `.openclaw-live-zai-fallback.${nonceA}.txt`);
+    const toolProbePath = path.join(workspaceDir, `.recall-live-zai-fallback.${nonceA}.txt`);
     await fs.writeFile(toolProbePath, `nonceA=${nonceA}\nnonceB=${nonceB}\n`);
 
     let server: Awaited<ReturnType<typeof startGatewayServer>> | undefined;
@@ -1753,12 +1753,12 @@ describeLive("gateway live (dev agent, profile keys)", () => {
       await server.close({ reason: "live test complete" });
       await fs.rm(toolProbePath, { force: true });
 
-      process.env.OPENCLAW_CONFIG_PATH = previous.configPath;
-      process.env.OPENCLAW_GATEWAY_TOKEN = previous.token;
-      process.env.OPENCLAW_SKIP_CHANNELS = previous.skipChannels;
-      process.env.OPENCLAW_SKIP_GMAIL_WATCHER = previous.skipGmail;
-      process.env.OPENCLAW_SKIP_CRON = previous.skipCron;
-      process.env.OPENCLAW_SKIP_CANVAS_HOST = previous.skipCanvas;
+      process.env.RECALL_CONFIG_PATH = previous.configPath;
+      process.env.RECALL_GATEWAY_TOKEN = previous.token;
+      process.env.RECALL_SKIP_CHANNELS = previous.skipChannels;
+      process.env.RECALL_SKIP_GMAIL_WATCHER = previous.skipGmail;
+      process.env.RECALL_SKIP_CRON = previous.skipCron;
+      process.env.RECALL_SKIP_CANVAS_HOST = previous.skipCanvas;
     }
   }, 180_000);
 });

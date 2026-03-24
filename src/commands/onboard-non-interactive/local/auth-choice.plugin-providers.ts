@@ -5,7 +5,7 @@ import {
 } from "../../../agents/agent-scope.js";
 import type { ApiKeyCredential } from "../../../agents/auth-profiles/types.js";
 import { resolveDefaultAgentWorkspaceDir } from "../../../agents/workspace.js";
-import type { OpenClawConfig } from "../../../config/config.js";
+import type { RecallConfig } from "../../../config/config.js";
 import { enablePluginInConfig } from "../../../plugins/enable.js";
 import { resolvePreferredProviderForAuthChoice } from "../../../plugins/provider-auth-choice-preference.js";
 import type {
@@ -29,9 +29,9 @@ const loadAuthChoicePluginProvidersRuntime = createLazyRuntimeSurface(
 );
 
 function buildIsolatedProviderResolutionConfig(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   providerId: string | undefined,
-): OpenClawConfig {
+): RecallConfig {
   if (!providerId) {
     return cfg;
   }
@@ -54,11 +54,11 @@ function buildIsolatedProviderResolutionConfig(
 }
 
 export async function applyNonInteractivePluginProviderChoice(params: {
-  nextConfig: OpenClawConfig;
+  nextConfig: RecallConfig;
   authChoice: string;
   opts: OnboardOptions;
   runtime: RuntimeEnv;
-  baseConfig: OpenClawConfig;
+  baseConfig: RecallConfig;
   resolveApiKey: (input: ProviderResolveNonInteractiveApiKeyParams) => Promise<{
     key: string;
     source: "profile" | "env" | "flag";
@@ -67,7 +67,7 @@ export async function applyNonInteractivePluginProviderChoice(params: {
   toApiKeyCredential: (
     input: ProviderNonInteractiveApiKeyCredentialParams,
   ) => ApiKeyCredential | null;
-}): Promise<OpenClawConfig | null | undefined> {
+}): Promise<RecallConfig | null | undefined> {
   const agentId = resolveDefaultAgentId(params.nextConfig);
   const agentDir = resolveAgentDir(params.nextConfig, agentId);
   const workspaceDir =

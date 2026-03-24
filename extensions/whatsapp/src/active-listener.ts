@@ -1,7 +1,7 @@
-import { formatCliCommand } from "openclaw/plugin-sdk/cli-runtime";
-import type { PollInput } from "openclaw/plugin-sdk/media-runtime";
-import { DEFAULT_ACCOUNT_ID } from "openclaw/plugin-sdk/routing";
-import { resolveGlobalSingleton } from "openclaw/plugin-sdk/text-runtime";
+import { formatCliCommand } from "recall/plugin-sdk/cli-runtime";
+import type { PollInput } from "recall/plugin-sdk/media-runtime";
+import { DEFAULT_ACCOUNT_ID } from "recall/plugin-sdk/routing";
+import { resolveGlobalSingleton } from "recall/plugin-sdk/text-runtime";
 
 export type ActiveWebSendOptions = {
   gifPlayback?: boolean;
@@ -31,7 +31,7 @@ export type ActiveWebListener = {
 
 // Use process-global symbol keys to survive bundler code-splitting and loader
 // cache splits without depending on fragile string property names.
-const WHATSAPP_ACTIVE_LISTENER_STATE_KEY = Symbol.for("openclaw.whatsapp.activeListenerState");
+const WHATSAPP_ACTIVE_LISTENER_STATE_KEY = Symbol.for("recall.whatsapp.activeListenerState");
 
 type ActiveListenerState = {
   listeners: Map<string, ActiveWebListener>;
@@ -66,7 +66,7 @@ export function requireActiveWebListener(accountId?: string | null): {
   const listener = state.listeners.get(id) ?? null;
   if (!listener) {
     throw new Error(
-      `No active WhatsApp Web listener (account: ${id}). Start the gateway, then link WhatsApp with: ${formatCliCommand(`openclaw channels login --channel whatsapp --account ${id}`)}.`,
+      `No active WhatsApp Web listener (account: ${id}). Start the gateway, then link WhatsApp with: ${formatCliCommand(`recall channels login --channel whatsapp --account ${id}`)}.`,
     );
   }
   return { accountId: id, listener };

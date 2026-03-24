@@ -1,17 +1,17 @@
 import type { App } from "@slack/bolt";
-import { formatAllowlistMatchMeta } from "openclaw/plugin-sdk/allow-from";
+import { formatAllowlistMatchMeta } from "recall/plugin-sdk/allow-from";
 import type {
-  OpenClawConfig,
+  RecallConfig,
   SlackReactionNotificationMode,
-} from "openclaw/plugin-sdk/config-runtime";
-import { resolveSessionKey, type SessionScope } from "openclaw/plugin-sdk/config-runtime";
-import type { DmPolicy, GroupPolicy } from "openclaw/plugin-sdk/config-runtime";
-import { createDedupeCache } from "openclaw/plugin-sdk/infra-runtime";
-import type { HistoryEntry } from "openclaw/plugin-sdk/reply-history";
-import { resolveAgentRoute } from "openclaw/plugin-sdk/routing";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { getChildLogger } from "openclaw/plugin-sdk/runtime-env";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/config-runtime";
+import { resolveSessionKey, type SessionScope } from "recall/plugin-sdk/config-runtime";
+import type { DmPolicy, GroupPolicy } from "recall/plugin-sdk/config-runtime";
+import { createDedupeCache } from "recall/plugin-sdk/infra-runtime";
+import type { HistoryEntry } from "recall/plugin-sdk/reply-history";
+import { resolveAgentRoute } from "recall/plugin-sdk/routing";
+import { logVerbose } from "recall/plugin-sdk/runtime-env";
+import { getChildLogger } from "recall/plugin-sdk/runtime-env";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime-env";
 import type { SlackMessageEvent } from "../types.js";
 import { normalizeAllowList, normalizeAllowListLower, normalizeSlackSlug } from "./allow-list.js";
 import type { SlackChannelConfigEntries } from "./channel-config.js";
@@ -22,7 +22,7 @@ import { isSlackChannelAllowedByPolicy } from "./policy.js";
 export { inferSlackChannelType, normalizeSlackChannelType } from "./channel-type.js";
 
 export type SlackMonitorContext = {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId: string;
   botToken: string;
   app: App;
@@ -53,7 +53,7 @@ export type SlackMonitorContext = {
   replyToMode: "off" | "first" | "all";
   threadHistoryScope: "thread" | "channel";
   threadInheritParent: boolean;
-  slashCommand: Required<import("openclaw/plugin-sdk/config-runtime").SlackSlashCommandConfig>;
+  slashCommand: Required<import("recall/plugin-sdk/config-runtime").SlackSlashCommandConfig>;
   textLimit: number;
   ackReactionScope: string;
   typingReaction: string;
@@ -88,7 +88,7 @@ export type SlackMonitorContext = {
 };
 
 export function createSlackMonitorContext(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId: string;
   botToken: string;
   app: App;

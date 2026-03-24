@@ -1,15 +1,15 @@
 ---
-summary: "CLI reference for `openclaw browser` (profiles, tabs, actions, Chrome MCP, and CDP)"
+summary: "CLI reference for `recall browser` (profiles, tabs, actions, Chrome MCP, and CDP)"
 read_when:
-  - You use `openclaw browser` and want examples for common tasks
+  - You use `recall browser` and want examples for common tasks
   - You want to control a browser running on another machine via a node host
   - You want to attach to your local signed-in Chrome via Chrome MCP
 title: "browser"
 ---
 
-# `openclaw browser`
+# `recall browser`
 
-Manage OpenClaw’s browser control server and run browser actions (tabs, snapshots, screenshots, navigation, clicks, typing).
+Manage Recall’s browser control server and run browser actions (tabs, snapshots, screenshots, navigation, clicks, typing).
 
 Related:
 
@@ -26,40 +26,40 @@ Related:
 ## Quick start (local)
 
 ```bash
-openclaw browser profiles
-openclaw browser --browser-profile openclaw start
-openclaw browser --browser-profile openclaw open https://example.com
-openclaw browser --browser-profile openclaw snapshot
+recall browser profiles
+recall browser --browser-profile recall start
+recall browser --browser-profile recall open https://example.com
+recall browser --browser-profile recall snapshot
 ```
 
 ## Profiles
 
 Profiles are named browser routing configs. In practice:
 
-- `openclaw`: launches or attaches to a dedicated OpenClaw-managed Chrome instance (isolated user data dir).
+- `recall`: launches or attaches to a dedicated Recall-managed Chrome instance (isolated user data dir).
 - `user`: controls your existing signed-in Chrome session via Chrome DevTools MCP.
 - custom CDP profiles: point at a local or remote CDP endpoint.
 
 ```bash
-openclaw browser profiles
-openclaw browser create-profile --name work --color "#FF5A36"
-openclaw browser create-profile --name chrome-live --driver existing-session
-openclaw browser delete-profile --name work
+recall browser profiles
+recall browser create-profile --name work --color "#FF5A36"
+recall browser create-profile --name chrome-live --driver existing-session
+recall browser delete-profile --name work
 ```
 
 Use a specific profile:
 
 ```bash
-openclaw browser --browser-profile work tabs
+recall browser --browser-profile work tabs
 ```
 
 ## Tabs
 
 ```bash
-openclaw browser tabs
-openclaw browser open https://docs.openclaw.ai
-openclaw browser focus <targetId>
-openclaw browser close <targetId>
+recall browser tabs
+recall browser open https://docs.recall.ai
+recall browser focus <targetId>
+recall browser close <targetId>
 ```
 
 ## Snapshot / screenshot / actions
@@ -67,21 +67,21 @@ openclaw browser close <targetId>
 Snapshot:
 
 ```bash
-openclaw browser snapshot
+recall browser snapshot
 ```
 
 Screenshot:
 
 ```bash
-openclaw browser screenshot
+recall browser screenshot
 ```
 
 Navigate/click/type (ref-based UI automation):
 
 ```bash
-openclaw browser navigate https://example.com
-openclaw browser click <ref>
-openclaw browser type <ref> "hello"
+recall browser navigate https://example.com
+recall browser click <ref>
+recall browser type <ref> "hello"
 ```
 
 ## Existing Chrome via MCP
@@ -89,10 +89,10 @@ openclaw browser type <ref> "hello"
 Use the built-in `user` profile, or create your own `existing-session` profile:
 
 ```bash
-openclaw browser --browser-profile user tabs
-openclaw browser create-profile --name chrome-live --driver existing-session
-openclaw browser create-profile --name brave-live --driver existing-session --user-data-dir "~/Library/Application Support/BraveSoftware/Brave-Browser"
-openclaw browser --browser-profile chrome-live tabs
+recall browser --browser-profile user tabs
+recall browser create-profile --name chrome-live --driver existing-session
+recall browser create-profile --name brave-live --driver existing-session --user-data-dir "~/Library/Application Support/BraveSoftware/Brave-Browser"
+recall browser --browser-profile chrome-live tabs
 ```
 
 This path is host-only. For Docker, headless servers, Browserless, or other remote setups, use a CDP profile instead.

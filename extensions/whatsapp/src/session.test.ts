@@ -25,7 +25,7 @@ async function emitCredsUpdateAndReadSaveCreds() {
 }
 
 function mockCredsJsonSpies(readContents: string) {
-  const credsSuffix = path.join("/tmp", "openclaw-oauth", "whatsapp", "default", "creds.json");
+  const credsSuffix = path.join("/tmp", "recall-oauth", "whatsapp", "default", "creds.json");
   const copySpy = vi.spyOn(fsSync, "copyFileSync").mockImplementation(() => {});
   const existsSpy = vi.spyOn(fsSync, "existsSync").mockImplementation((p) => {
     if (typeof p !== "string") {
@@ -270,7 +270,7 @@ describe("web session", () => {
     const creds = mockCredsJsonSpies("{}");
     const backupSuffix = path.join(
       "/tmp",
-      "openclaw-oauth",
+      "recall-oauth",
       "whatsapp",
       "default",
       "creds.json.bak",

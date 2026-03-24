@@ -1,14 +1,14 @@
-import { loadConfig, type OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
-import { resolveMarkdownTableMode } from "openclaw/plugin-sdk/config-runtime";
-import { kindFromMime } from "openclaw/plugin-sdk/media-runtime";
-import { resolveOutboundAttachmentFromUrl } from "openclaw/plugin-sdk/media-runtime";
+import { loadConfig, type RecallConfig } from "recall/plugin-sdk/config-runtime";
+import { resolveMarkdownTableMode } from "recall/plugin-sdk/config-runtime";
+import { kindFromMime } from "recall/plugin-sdk/media-runtime";
+import { resolveOutboundAttachmentFromUrl } from "recall/plugin-sdk/media-runtime";
 import { resolveSignalAccount } from "./accounts.js";
 import { signalRpcRequest } from "./client.js";
 import { markdownToSignalText, type SignalTextStyleRange } from "./format.js";
 import { resolveSignalRpcContext } from "./rpc-context.js";
 
 export type SignalSendOpts = {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   baseUrl?: string;
   account?: string;
   accountId?: string;

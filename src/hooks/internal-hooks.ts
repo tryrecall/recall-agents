@@ -1,5 +1,5 @@
 /**
- * Hook system for OpenClaw agent events
+ * Hook system for Recall agent events
  *
  * Provides an extensible event-driven hook system for agent events
  * like command processing, session lifecycle, etc.
@@ -7,7 +7,7 @@
 
 import type { WorkspaceBootstrapFile } from "../agents/workspace.js";
 import type { CliDeps } from "../cli/deps.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { resolveGlobalSingleton } from "../shared/global-singleton.js";
 
@@ -16,7 +16,7 @@ export type InternalHookEventType = "command" | "session" | "agent" | "gateway" 
 export type AgentBootstrapHookContext = {
   workspaceDir: string;
   bootstrapFiles: WorkspaceBootstrapFile[];
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   sessionKey?: string;
   sessionId?: string;
   agentId?: string;
@@ -29,7 +29,7 @@ export type AgentBootstrapHookEvent = InternalHookEvent & {
 };
 
 export type GatewayStartupHookContext = {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   deps?: CliDeps;
   workspaceDir?: string;
 };
@@ -184,7 +184,7 @@ export type InternalHookHandler = (event: InternalHookEvent) => Promise<void> | 
  * are invisible to triggerInternalHook in another chunk, causing hooks
  * to silently fire with zero handlers.
  */
-const INTERNAL_HOOK_HANDLERS_KEY = Symbol.for("openclaw.internalHookHandlers");
+const INTERNAL_HOOK_HANDLERS_KEY = Symbol.for("recall.internalHookHandlers");
 const handlers = resolveGlobalSingleton<Map<string, InternalHookHandler[]>>(
   INTERNAL_HOOK_HANDLERS_KEY,
   () => new Map<string, InternalHookHandler[]>(),

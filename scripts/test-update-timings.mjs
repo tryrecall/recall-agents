@@ -56,7 +56,7 @@ const opts = parseArgs(process.argv.slice(2));
 const reportPath = runVitestJsonReport({
   config: opts.config,
   reportPath: opts.reportPath,
-  prefix: "openclaw-vitest-timings",
+  prefix: "recall-vitest-timings",
 });
 const report = readJsonFile(reportPath);
 const files = Object.fromEntries(

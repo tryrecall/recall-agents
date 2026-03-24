@@ -1,6 +1,6 @@
 import type { Model } from "@mariozechner/pi-ai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 
 const createAnthropicVertexStreamFnForModel = vi.hoisted(() => vi.fn());
 const ensureCustomApiRegistered = vi.hoisted(() => vi.fn());
@@ -43,7 +43,7 @@ describe("prepareModelForSimpleCompletion", () => {
       maxTokens: 4096,
       headers: {},
     };
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       models: {
         providers: {
           ollama: {
@@ -85,12 +85,12 @@ describe("prepareModelForSimpleCompletion", () => {
 
     expect(createAnthropicVertexStreamFnForModel).toHaveBeenCalledWith(model);
     expect(ensureCustomApiRegistered).toHaveBeenCalledWith(
-      "openclaw-anthropic-vertex-simple:https%3A%2F%2Fus-central1-aiplatform.googleapis.com",
+      "recall-anthropic-vertex-simple:https%3A%2F%2Fus-central1-aiplatform.googleapis.com",
       "vertex-stream",
     );
     expect(result).toEqual({
       ...model,
-      api: "openclaw-anthropic-vertex-simple:https%3A%2F%2Fus-central1-aiplatform.googleapis.com",
+      api: "recall-anthropic-vertex-simple:https%3A%2F%2Fus-central1-aiplatform.googleapis.com",
     });
   });
 });

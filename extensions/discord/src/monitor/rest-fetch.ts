@@ -1,6 +1,6 @@
-import { wrapFetchWithAbortSignal } from "openclaw/plugin-sdk/infra-runtime";
-import { danger } from "openclaw/plugin-sdk/runtime-env";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import { wrapFetchWithAbortSignal } from "recall/plugin-sdk/infra-runtime";
+import { danger } from "recall/plugin-sdk/runtime-env";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime-env";
 import { ProxyAgent, fetch as undiciFetch } from "undici";
 
 export function resolveDiscordRestFetch(

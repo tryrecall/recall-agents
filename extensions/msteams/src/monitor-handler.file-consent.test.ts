@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig, PluginRuntime, RuntimeEnv } from "../runtime-api.js";
+import type { RecallConfig, PluginRuntime, RuntimeEnv } from "../runtime-api.js";
 import type { MSTeamsConversationStore } from "./conversation-store.js";
 import type { MSTeamsAdapter } from "./messenger.js";
 import {
@@ -58,7 +58,7 @@ function createDeps(): MSTeamsMessageHandlerDeps {
     recordVote: async () => null,
   };
   return {
-    cfg: {} as OpenClawConfig,
+    cfg: {} as RecallConfig,
     runtime: {
       error: vi.fn(),
     } as unknown as RuntimeEnv,

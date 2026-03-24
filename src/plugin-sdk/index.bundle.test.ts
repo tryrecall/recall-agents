@@ -16,7 +16,7 @@ describe("plugin-sdk bundled exports", () => {
       process.cwd(),
       "node_modules",
       ".cache",
-      "openclaw-plugin-sdk-build",
+      "recall-plugin-sdk-build",
     );
     await fs.mkdir(bundleTempRoot, { recursive: true });
     const outDir = path.join(bundleTempRoot, "bundle");

@@ -3,26 +3,26 @@
 
 export type {
   ChannelPlugin,
-  OpenClawConfig,
-  OpenClawPluginApi,
+  RecallConfig,
+  RecallPluginApi,
   PluginRuntime,
-} from "openclaw/plugin-sdk/core";
-export { clearAccountEntryFields } from "openclaw/plugin-sdk/core";
-export { buildChannelConfigSchema } from "openclaw/plugin-sdk/channel-config-schema";
-export type { ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
-export type { ChannelAccountSnapshot, ChannelGatewayContext } from "openclaw/plugin-sdk/testing";
-export type { ChannelStatusIssue } from "openclaw/plugin-sdk/channel-contract";
-export type { ChannelSetupDmPolicy, ChannelSetupWizard } from "openclaw/plugin-sdk/setup";
+} from "recall/plugin-sdk/core";
+export { clearAccountEntryFields } from "recall/plugin-sdk/core";
+export { buildChannelConfigSchema } from "recall/plugin-sdk/channel-config-schema";
+export type { ReplyPayload } from "recall/plugin-sdk/reply-runtime";
+export type { ChannelAccountSnapshot, ChannelGatewayContext } from "recall/plugin-sdk/testing";
+export type { ChannelStatusIssue } from "recall/plugin-sdk/channel-contract";
+export type { ChannelSetupDmPolicy, ChannelSetupWizard } from "recall/plugin-sdk/setup";
 export {
   buildComputedAccountStatusSnapshot,
   buildTokenChannelStatusSummary,
-} from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/status-helpers";
 export {
   DEFAULT_ACCOUNT_ID,
   formatDocsLink,
   setSetupChannelEnabled,
   splitSetupEntries,
-} from "openclaw/plugin-sdk/setup";
+} from "recall/plugin-sdk/setup";
 // Pre-export all symbols that src/plugin-sdk/line-runtime.ts re-exports from this
 // extension's source files. These named exports register the symbols in jiti's
 // _exportNames map at transform time. The star re-export below then skips them
@@ -51,7 +51,7 @@ export {
   pushTextMessageWithQuickReplies,
   sendMessageLine,
 } from "./src/send.js";
-export * from "openclaw/plugin-sdk/line-runtime";
+export * from "recall/plugin-sdk/line-runtime";
 
 export * from "./src/accounts.js";
 export * from "./src/bot-access.js";

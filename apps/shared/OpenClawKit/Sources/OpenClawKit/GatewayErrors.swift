@@ -1,4 +1,4 @@
-import OpenClawProtocol
+import RecallProtocol
 import Foundation
 
 public enum GatewayConnectAuthDetailCode: String, Sendable {

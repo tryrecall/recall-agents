@@ -7,9 +7,9 @@ import type {
 import type { Client } from "@buape/carbon";
 import { ChannelType } from "discord-api-types/v10";
 import type { GatewayPresenceUpdate } from "discord-api-types/v10";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
-import type { DiscordAccountConfig } from "openclaw/plugin-sdk/config-runtime";
-import { buildPluginBindingApprovalCustomId } from "openclaw/plugin-sdk/conversation-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
+import type { DiscordAccountConfig } from "recall/plugin-sdk/config-runtime";
+import { buildPluginBindingApprovalCustomId } from "recall/plugin-sdk/conversation-runtime";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   clearDiscordComponentEntries,
@@ -57,8 +57,8 @@ const resolvePluginConversationBindingApprovalMock = vi.hoisted(() => vi.fn());
 const buildPluginBindingResolvedTextMock = vi.hoisted(() => vi.fn());
 let lastDispatchCtx: Record<string, unknown> | undefined;
 
-vi.mock("openclaw/plugin-sdk/security-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/security-runtime")>();
+vi.mock("recall/plugin-sdk/security-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/security-runtime")>();
   return {
     ...actual,
     readStoreAllowFromForDmPolicy: async (params: {
@@ -75,8 +75,8 @@ vi.mock("openclaw/plugin-sdk/security-runtime", async (importOriginal) => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/conversation-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/conversation-runtime")>();
+vi.mock("recall/plugin-sdk/conversation-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/conversation-runtime")>();
   return {
     ...actual,
     upsertChannelPairingRequest: (...args: unknown[]) => upsertPairingRequestMock(...args),
@@ -87,8 +87,8 @@ vi.mock("openclaw/plugin-sdk/conversation-runtime", async (importOriginal) => {
     recordInboundSession: (...args: unknown[]) => recordInboundSessionMock(...args),
   };
 });
-vi.mock("openclaw/plugin-sdk/conversation-runtime.js", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/conversation-runtime")>();
+vi.mock("recall/plugin-sdk/conversation-runtime.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/conversation-runtime")>();
   return {
     ...actual,
     upsertChannelPairingRequest: (...args: unknown[]) => upsertPairingRequestMock(...args),
@@ -100,23 +100,23 @@ vi.mock("openclaw/plugin-sdk/conversation-runtime.js", async (importOriginal) =>
   };
 });
 
-vi.mock("openclaw/plugin-sdk/infra-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/infra-runtime")>();
+vi.mock("recall/plugin-sdk/infra-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/infra-runtime")>();
   return {
     ...actual,
     enqueueSystemEvent: (...args: unknown[]) => enqueueSystemEventMock(...args),
   };
 });
-vi.mock("openclaw/plugin-sdk/infra-runtime.js", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/infra-runtime")>();
+vi.mock("recall/plugin-sdk/infra-runtime.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/infra-runtime")>();
   return {
     ...actual,
     enqueueSystemEvent: (...args: unknown[]) => enqueueSystemEventMock(...args),
   };
 });
 
-vi.mock("openclaw/plugin-sdk/reply-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/reply-runtime")>();
+vi.mock("recall/plugin-sdk/reply-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/reply-runtime")>();
   return {
     ...actual,
     dispatchReplyWithBufferedBlockDispatcher: (...args: unknown[]) => dispatchReplyMock(...args),
@@ -136,8 +136,8 @@ vi.mock("../../../../src/auto-reply/reply/provider-dispatcher.js", async (import
   };
 });
 
-vi.mock("openclaw/plugin-sdk/config-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/config-runtime")>();
+vi.mock("recall/plugin-sdk/config-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/config-runtime")>();
   return {
     ...actual,
     readSessionUpdatedAt: (...args: unknown[]) => readSessionUpdatedAtMock(...args),
@@ -145,8 +145,8 @@ vi.mock("openclaw/plugin-sdk/config-runtime", async (importOriginal) => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/plugin-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/plugin-runtime")>();
+vi.mock("recall/plugin-sdk/plugin-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/plugin-runtime")>();
   return {
     ...actual,
     dispatchPluginInteractiveHandler: (...args: unknown[]) =>
@@ -156,14 +156,14 @@ vi.mock("openclaw/plugin-sdk/plugin-runtime", async (importOriginal) => {
 
 describe("discord component interactions", () => {
   let editDiscordComponentMessageMock: ReturnType<typeof vi.spyOn>;
-  const createCfg = (): OpenClawConfig =>
+  const createCfg = (): RecallConfig =>
     ({
       channels: {
         discord: {
           replyToMode: "first",
         },
       },
-    }) as OpenClawConfig;
+    }) as RecallConfig;
 
   const createDiscordConfig = (overrides?: Partial<DiscordAccountConfig>): DiscordAccountConfig =>
     ({
@@ -315,7 +315,7 @@ describe("discord component interactions", () => {
     });
     recordInboundSessionMock.mockClear().mockResolvedValue(undefined);
     readSessionUpdatedAtMock.mockClear().mockReturnValue(undefined);
-    resolveStorePathMock.mockClear().mockReturnValue("/tmp/openclaw-sessions-test.json");
+    resolveStorePathMock.mockClear().mockReturnValue("/tmp/recall-sessions-test.json");
     dispatchPluginInteractiveHandlerMock.mockReset().mockResolvedValue({
       matched: false,
       handled: false,
@@ -325,8 +325,8 @@ describe("discord component interactions", () => {
       status: "approved",
       binding: {
         bindingId: "binding-1",
-        pluginId: "openclaw-codex-app-server",
-        pluginName: "OpenClaw App Server",
+        pluginId: "recall-codex-app-server",
+        pluginName: "Recall App Server",
         pluginRoot: "/plugins/codex",
         channel: "discord",
         accountId: "default",
@@ -335,8 +335,8 @@ describe("discord component interactions", () => {
       },
       request: {
         id: "approval-1",
-        pluginId: "openclaw-codex-app-server",
-        pluginName: "OpenClaw App Server",
+        pluginId: "recall-codex-app-server",
+        pluginName: "Recall App Server",
         pluginRoot: "/plugins/codex",
         requestedAt: Date.now(),
         conversation: {
@@ -491,7 +491,7 @@ describe("discord component interactions", () => {
         cfg: {
           commands: { useAccessGroups: true },
           channels: { discord: { replyToMode: "first" } },
-        } as OpenClawConfig,
+        } as RecallConfig,
         allowFrom: ["owner-1"],
       }),
     );
@@ -523,7 +523,7 @@ describe("discord component interactions", () => {
         cfg: {
           commands: { useAccessGroups: true },
           channels: { discord: { replyToMode: "first" } },
-        } as OpenClawConfig,
+        } as RecallConfig,
         allowFrom: ["123456789"],
       }),
     );
@@ -567,7 +567,7 @@ describe("discord component interactions", () => {
         cfg: {
           commands: { useAccessGroups: true },
           channels: { discord: { replyToMode: "first" } },
-        } as OpenClawConfig,
+        } as RecallConfig,
         allowFrom: ["owner-1"],
       }),
     );
@@ -609,7 +609,7 @@ describe("discord component interactions", () => {
         cfg: {
           commands: { useAccessGroups: true },
           channels: { discord: { replyToMode: "first" } },
-        } as OpenClawConfig,
+        } as RecallConfig,
         allowFrom: ["123456789"],
       }),
     );

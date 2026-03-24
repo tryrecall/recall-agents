@@ -1,9 +1,9 @@
 import type { ProviderPlugin, ProviderPluginWizardSetup } from "../plugins/types.js";
 import { definePluginEntry } from "./plugin-entry.js";
 import type {
-  OpenClawPluginApi,
-  OpenClawPluginConfigSchema,
-  OpenClawPluginDefinition,
+  RecallPluginApi,
+  RecallPluginConfigSchema,
+  RecallPluginDefinition,
 } from "./plugin-entry.js";
 import { createProviderApiKeyAuthMethod } from "./provider-auth.js";
 import { buildSingleProviderApiKeyCatalog } from "./provider-catalog.js";
@@ -27,8 +27,8 @@ export type SingleProviderPluginOptions = {
   id: string;
   name: string;
   description: string;
-  kind?: OpenClawPluginDefinition["kind"];
-  configSchema?: OpenClawPluginConfigSchema | (() => OpenClawPluginConfigSchema);
+  kind?: RecallPluginDefinition["kind"];
+  configSchema?: RecallPluginConfigSchema | (() => RecallPluginConfigSchema);
   provider?: {
     id?: string;
     label: string;
@@ -41,7 +41,7 @@ export type SingleProviderPluginOptions = {
     ProviderPlugin,
     "id" | "label" | "docsPath" | "aliases" | "envVars" | "auth" | "catalog"
   >;
-  register?: (api: OpenClawPluginApi) => void;
+  register?: (api: RecallPluginApi) => void;
 };
 
 function resolveWizardSetup(params: {

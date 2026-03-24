@@ -40,8 +40,8 @@ export type {
 export type {
   AnyAgentTool,
   MediaUnderstandingProviderPlugin,
-  OpenClawPluginApi,
-  OpenClawPluginConfigSchema,
+  RecallPluginApi,
+  RecallPluginConfigSchema,
   PluginLogger,
   ProviderAuthContext,
   ProviderAuthResult,
@@ -54,9 +54,9 @@ export type {
   SubagentRunParams,
   SubagentRunResult,
 } from "../plugins/runtime/types.js";
-export type { OpenClawConfig } from "../config/config.js";
-/** @deprecated Use OpenClawConfig instead */
-export type { OpenClawConfig as ClawdbotConfig } from "../config/config.js";
+export type { RecallConfig } from "../config/config.js";
+/** @deprecated Use RecallConfig instead */
+export type { RecallConfig as ClawdbotConfig } from "../config/config.js";
 export * from "./image-generation.js";
 export type { SecretInput, SecretRef } from "../config/types.secrets.js";
 export type { RuntimeEnv } from "../runtime.js";

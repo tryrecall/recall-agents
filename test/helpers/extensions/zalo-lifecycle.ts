@@ -4,7 +4,7 @@ import {
   clearZaloWebhookSecurityStateForTest,
   monitorZaloProvider,
 } from "../../../extensions/zalo/src/monitor.js";
-import type { OpenClawConfig } from "../../../extensions/zalo/src/runtime-api.js";
+import type { RecallConfig } from "../../../extensions/zalo/src/runtime-api.js";
 import { normalizeSecretInputString } from "../../../extensions/zalo/src/secret-input.js";
 import { createEmptyPluginRegistry } from "../../../src/plugins/registry.js";
 import { setActivePluginRegistry } from "../../../src/plugins/runtime.js";
@@ -66,7 +66,7 @@ export function createLifecycleConfig(params: {
   allowFrom?: string[];
   webhookUrl?: string;
   webhookSecret?: string;
-}): OpenClawConfig {
+}): RecallConfig {
   const webhookUrl = params.webhookUrl ?? "https://example.com/hooks/zalo";
   const webhookSecret = params.webhookSecret ?? "supersecret";
   return {
@@ -84,7 +84,7 @@ export function createLifecycleConfig(params: {
         },
       },
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
 export function createLifecycleAccount(params: {
@@ -154,7 +154,7 @@ export async function postWebhookUpdate(params: {
 
 export async function startWebhookLifecycleMonitor(params: {
   account: ResolvedZaloAccount;
-  config: OpenClawConfig;
+  config: RecallConfig;
   token?: string;
   webhookUrl?: string;
   webhookSecret?: string;

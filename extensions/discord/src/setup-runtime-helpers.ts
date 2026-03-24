@@ -1,10 +1,10 @@
-import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "openclaw/plugin-sdk/account-id";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
+import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "recall/plugin-sdk/account-id";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
 import type {
   ChannelSetupDmPolicy,
   ChannelSetupWizard,
   WizardPrompter,
-} from "openclaw/plugin-sdk/setup-runtime";
+} from "recall/plugin-sdk/setup-runtime";
 import {
   resolveDefaultDiscordSetupAccountId,
   resolveDiscordSetupAccountConfig,
@@ -56,10 +56,10 @@ function mergeAllowFromEntries(
 }
 
 function patchDiscordChannelConfigForAccount(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId: string;
   patch: Record<string, unknown>;
-}): OpenClawConfig {
+}): RecallConfig {
   const accountId = normalizeAccountId(params.accountId);
   const channelConfig = (params.cfg.channels?.discord as Record<string, unknown> | undefined) ?? {};
   if (accountId === DEFAULT_ACCOUNT_ID) {
@@ -99,10 +99,10 @@ function patchDiscordChannelConfigForAccount(params: {
 }
 
 export function setSetupChannelEnabled(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   channel: string,
   enabled: boolean,
-): OpenClawConfig {
+): RecallConfig {
   const channelConfig = (cfg.channels?.[channel] as Record<string, unknown> | undefined) ?? {};
   return {
     ...cfg,
@@ -117,11 +117,11 @@ export function setSetupChannelEnabled(
 }
 
 export function patchChannelConfigForAccount(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channel: "discord";
   accountId: string;
   patch: Record<string, unknown>;
-}): OpenClawConfig {
+}): RecallConfig {
   return patchDiscordChannelConfigForAccount({
     cfg: params.cfg,
     accountId: params.accountId,
@@ -238,10 +238,10 @@ export function createAccountScopedGroupAccessSection<TResolved>(params: {
   >;
   fallbackResolved: (entries: string[]) => TResolved;
   applyAllowlist: (params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     accountId: string;
     resolved: TResolved;
-  }) => OpenClawConfig;
+  }) => RecallConfig;
 }): NonNullable<ChannelSetupWizard["groupAccess"]> {
   return {
     label: params.label,
@@ -361,7 +361,7 @@ export async function resolveEntriesWithOptionalToken<TResult>(params: {
 }
 
 export async function promptLegacyChannelAllowFromForAccount(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   prompter: WizardPrompter;
   accountId?: string;
   noteTitle: string;
@@ -375,8 +375,8 @@ export async function promptLegacyChannelAllowFromForAccount(params: {
     entries: string[];
   }) => Promise<Array<{ input: string; resolved: boolean; id?: string | null }>>;
   resolveToken: (accountId: string) => string | null | undefined;
-  resolveExisting: (accountId: string, cfg: OpenClawConfig) => Array<string | number>;
-}): Promise<OpenClawConfig> {
+  resolveExisting: (accountId: string, cfg: RecallConfig) => Array<string | number>;
+}): Promise<RecallConfig> {
   const accountId = normalizeAccountId(
     params.accountId ?? resolveDefaultDiscordSetupAccountId(params.cfg),
   );

@@ -1,8 +1,8 @@
 import type {
   ProviderResolveDynamicModelContext,
   ProviderRuntimeModel,
-} from "openclaw/plugin-sdk/core";
-import { applyXaiModelCompat, normalizeModelCompat } from "openclaw/plugin-sdk/provider-models";
+} from "recall/plugin-sdk/core";
+import { applyXaiModelCompat, normalizeModelCompat } from "recall/plugin-sdk/provider-models";
 import { resolveXaiCatalogEntry, XAI_BASE_URL } from "./model-definitions.js";
 
 const XAI_MODERN_MODEL_PREFIXES = ["grok-3", "grok-4", "grok-code-fast"] as const;

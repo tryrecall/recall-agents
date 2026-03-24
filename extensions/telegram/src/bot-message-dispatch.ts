@@ -1,37 +1,37 @@
 import type { Bot } from "grammy";
-import { resolveAgentDir } from "openclaw/plugin-sdk/agent-runtime";
+import { resolveAgentDir } from "recall/plugin-sdk/agent-runtime";
 import {
   findModelInCatalog,
   loadModelCatalog,
   modelSupportsVision,
-} from "openclaw/plugin-sdk/agent-runtime";
-import { resolveDefaultModelForAgent } from "openclaw/plugin-sdk/agent-runtime";
+} from "recall/plugin-sdk/agent-runtime";
+import { resolveDefaultModelForAgent } from "recall/plugin-sdk/agent-runtime";
 import {
   logAckFailure,
   logTypingFailure,
   removeAckReactionAfterReply,
-} from "openclaw/plugin-sdk/channel-feedback";
-import { createChannelReplyPipeline } from "openclaw/plugin-sdk/channel-reply-pipeline";
-import { resolveMarkdownTableMode } from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/channel-feedback";
+import { createChannelReplyPipeline } from "recall/plugin-sdk/channel-reply-pipeline";
+import { resolveMarkdownTableMode } from "recall/plugin-sdk/config-runtime";
 import {
   loadSessionStore,
   resolveSessionStoreEntry,
   resolveStorePath,
-} from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/config-runtime";
 import type {
-  OpenClawConfig,
+  RecallConfig,
   ReplyToMode,
   TelegramAccountConfig,
   TelegramDirectConfig,
-} from "openclaw/plugin-sdk/config-runtime";
-import { getAgentScopedMediaLocalRoots } from "openclaw/plugin-sdk/media-runtime";
-import { clearHistoryEntriesIfEnabled } from "openclaw/plugin-sdk/reply-history";
-import { resolveSendableOutboundReplyParts } from "openclaw/plugin-sdk/reply-payload";
-import { resolveChunkMode } from "openclaw/plugin-sdk/reply-runtime";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
-import { resolveAutoTopicLabelConfig, generateTopicLabel } from "openclaw/plugin-sdk/reply-runtime";
-import { danger, logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/config-runtime";
+import { getAgentScopedMediaLocalRoots } from "recall/plugin-sdk/media-runtime";
+import { clearHistoryEntriesIfEnabled } from "recall/plugin-sdk/reply-history";
+import { resolveSendableOutboundReplyParts } from "recall/plugin-sdk/reply-payload";
+import { resolveChunkMode } from "recall/plugin-sdk/reply-runtime";
+import type { ReplyPayload } from "recall/plugin-sdk/reply-runtime";
+import { resolveAutoTopicLabelConfig, generateTopicLabel } from "recall/plugin-sdk/reply-runtime";
+import { danger, logVerbose } from "recall/plugin-sdk/runtime-env";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime-env";
 import { defaultTelegramBotDeps, type TelegramBotDeps } from "./bot-deps.js";
 import type { TelegramMessageContext } from "./bot-message-context.js";
 import type { TelegramBotOptions } from "./bot.js";
@@ -62,7 +62,7 @@ const EMPTY_RESPONSE_FALLBACK = "No response generated. Please try again.";
 /** Minimum chars before sending first streaming message (improves push notification UX) */
 const DRAFT_MIN_INITIAL_CHARS = 30;
 
-async function resolveStickerVisionSupport(cfg: OpenClawConfig, agentId: string) {
+async function resolveStickerVisionSupport(cfg: RecallConfig, agentId: string) {
   try {
     const catalog = await loadModelCatalog({ config: cfg });
     const defaultModel = resolveDefaultModelForAgent({ cfg, agentId });
@@ -110,7 +110,7 @@ export function pruneStickerMediaFromContext(
 type DispatchTelegramMessageParams = {
   context: TelegramMessageContext;
   bot: Bot;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   runtime: RuntimeEnv;
   replyToMode: ReplyToMode;
   streamMode: TelegramStreamMode;
@@ -123,7 +123,7 @@ type DispatchTelegramMessageParams = {
 type TelegramReasoningLevel = "off" | "on" | "stream";
 
 function resolveTelegramReasoningLevel(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionKey?: string;
   agentId: string;
   telegramDeps: TelegramBotDeps;

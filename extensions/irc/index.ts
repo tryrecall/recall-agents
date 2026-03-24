@@ -1,5 +1,5 @@
-import type { ChannelPlugin } from "openclaw/plugin-sdk/core";
-import { defineChannelPluginEntry } from "openclaw/plugin-sdk/core";
+import type { ChannelPlugin } from "recall/plugin-sdk/core";
+import { defineChannelPluginEntry } from "recall/plugin-sdk/core";
 import { ircPlugin } from "./src/channel.js";
 import { setIrcRuntime } from "./src/runtime.js";
 

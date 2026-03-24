@@ -1,29 +1,29 @@
 services:
-  openclaw-gateway:
-    image: ${OPENCLAW_IMAGE:-openclaw:local}
+  recall-gateway:
+    image: ${RECALL_IMAGE:-recall:local}
     environment:
       HOME: /home/node
       TERM: xterm-256color
-      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
-      OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: ${OPENCLAW_ALLOW_INSECURE_PRIVATE_WS:-}
+      RECALL_GATEWAY_TOKEN: ${RECALL_GATEWAY_TOKEN:-}
+      RECALL_ALLOW_INSECURE_PRIVATE_WS: ${RECALL_ALLOW_INSECURE_PRIVATE_WS:-}
       CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
       CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
       CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
-      TZ: ${OPENCLAW_TZ:-UTC}
+      TZ: ${RECALL_TZ:-UTC}
     volumes:
-      - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
-      - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
+      - ${RECALL_CONFIG_DIR}:/home/node/.recall
+      - ${RECALL_WORKSPACE_DIR}:/home/node/.recall/workspace
       ## Uncomment the lines below to enable sandbox isolation
       ## (agents.defaults.sandbox). Requires Docker CLI in the image
-      ## (build with --build-arg OPENCLAW_INSTALL_DOCKER_CLI=1) or use
-      ## scripts/docker/setup.sh with OPENCLAW_SANDBOX=1 for automated setup.
+      ## (build with --build-arg RECALL_INSTALL_DOCKER_CLI=1) or use
+      ## scripts/docker/setup.sh with RECALL_SANDBOX=1 for automated setup.
       ## Set DOCKER_GID to the host's docker group GID (run: stat -c '%g' /var/run/docker.sock).
       # - /var/run/docker.sock:/var/run/docker.sock
     # group_add:
     #   - "${DOCKER_GID:-999}"
     ports:
-      - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
-      - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
+      - "${RECALL_GATEWAY_PORT:-18789}:18789"
+      - "${RECALL_BRIDGE_PORT:-18790}:18790"
     init: true
     restart: unless-stopped
     command:
@@ -32,7 +32,7 @@ services:
         "dist/index.js",
         "gateway",
         "--bind",
-        "${OPENCLAW_GATEWAY_BIND:-lan}",
+        "${RECALL_GATEWAY_BIND:-lan}",
         "--port",
         "18789",
       ]
@@ -49,9 +49,9 @@ services:
       retries: 5
       start_period: 20s
 
-  openclaw-cli:
-    image: ${OPENCLAW_IMAGE:-openclaw:local}
-    network_mode: "service:openclaw-gateway"
+  recall-cli:
+    image: ${RECALL_IMAGE:-recall:local}
+    network_mode: "service:recall-gateway"
     cap_drop:
       - NET_RAW
       - NET_ADMIN
@@ -60,19 +60,19 @@ services:
     environment:
       HOME: /home/node
       TERM: xterm-256color
-      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
-      OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: ${OPENCLAW_ALLOW_INSECURE_PRIVATE_WS:-}
+      RECALL_GATEWAY_TOKEN: ${RECALL_GATEWAY_TOKEN:-}
+      RECALL_ALLOW_INSECURE_PRIVATE_WS: ${RECALL_ALLOW_INSECURE_PRIVATE_WS:-}
       BROWSER: echo
       CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
       CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
       CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
-      TZ: ${OPENCLAW_TZ:-UTC}
+      TZ: ${RECALL_TZ:-UTC}
     volumes:
-      - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
-      - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
+      - ${RECALL_CONFIG_DIR}:/home/node/.recall
+      - ${RECALL_WORKSPACE_DIR}:/home/node/.recall/workspace
     stdin_open: true
     tty: true
     init: true
     entrypoint: ["node", "dist/index.js"]
     depends_on:
-      - openclaw-gateway
+      - recall-gateway

@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/kimi-provider",
+  "name": "@recall/kimi-provider",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw Kimi provider plugin",
+  "description": "Recall Kimi provider plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

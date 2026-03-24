@@ -1,5 +1,5 @@
 import { normalizeChatChannelId } from "../channels/registry.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import type { PluginRecord } from "./registry.js";
 import { defaultSlotIdForKey } from "./slots.js";
 
@@ -173,7 +173,7 @@ const normalizePluginEntries = (entries: unknown): NormalizedPluginsConfig["entr
 };
 
 export const normalizePluginsConfig = (
-  config?: OpenClawConfig["plugins"],
+  config?: RecallConfig["plugins"],
 ): NormalizedPluginsConfig => {
   const memorySlot = normalizeSlotValue(config?.slots?.memory);
   return {
@@ -188,13 +188,13 @@ export const normalizePluginsConfig = (
   };
 };
 
-const hasExplicitMemorySlot = (plugins?: OpenClawConfig["plugins"]) =>
+const hasExplicitMemorySlot = (plugins?: RecallConfig["plugins"]) =>
   Boolean(plugins?.slots && Object.prototype.hasOwnProperty.call(plugins.slots, "memory"));
 
-const hasExplicitMemoryEntry = (plugins?: OpenClawConfig["plugins"]) =>
+const hasExplicitMemoryEntry = (plugins?: RecallConfig["plugins"]) =>
   Boolean(plugins?.entries && Object.prototype.hasOwnProperty.call(plugins.entries, "memory-core"));
 
-export const hasExplicitPluginConfig = (plugins?: OpenClawConfig["plugins"]) => {
+export const hasExplicitPluginConfig = (plugins?: RecallConfig["plugins"]) => {
   if (!plugins) {
     return false;
   }
@@ -220,9 +220,9 @@ export const hasExplicitPluginConfig = (plugins?: OpenClawConfig["plugins"]) => 
 };
 
 export function applyTestPluginDefaults(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   env: NodeJS.ProcessEnv = process.env,
-): OpenClawConfig {
+): RecallConfig {
   if (!env.VITEST) {
     return cfg;
   }
@@ -258,7 +258,7 @@ export function applyTestPluginDefaults(
 }
 
 export function isTestDefaultMemorySlotDisabled(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {
   if (!env.VITEST) {
@@ -310,7 +310,7 @@ export function resolveEnableState(
 }
 
 export function isBundledChannelEnabledByChannelConfig(
-  cfg: OpenClawConfig | undefined,
+  cfg: RecallConfig | undefined,
   pluginId: string,
 ): boolean {
   if (!cfg) {
@@ -332,7 +332,7 @@ export function resolveEffectiveEnableState(params: {
   id: string;
   origin: PluginRecord["origin"];
   config: NormalizedPluginsConfig;
-  rootConfig?: OpenClawConfig;
+  rootConfig?: RecallConfig;
   enabledByDefault?: boolean;
 }): { enabled: boolean; reason?: string } {
   const base = resolveEnableState(params.id, params.origin, params.config, params.enabledByDefault);

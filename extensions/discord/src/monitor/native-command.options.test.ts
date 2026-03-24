@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig, loadConfig } from "../../../../src/config/config.js";
+import type { RecallConfig, loadConfig } from "../../../../src/config/config.js";
 let listNativeCommandSpecs: typeof import("../../../../src/auto-reply/commands-registry.js").listNativeCommandSpecs;
 let createDiscordNativeCommand: typeof import("./native-command.js").createDiscordNativeCommand;
 let createNoopThreadBindingManager: typeof import("./thread-bindings.js").createNoopThreadBindingManager;
@@ -14,7 +14,7 @@ function createNativeCommand(
     throw new Error(`missing native command: ${name}`);
   }
   const cfg = {} as ReturnType<typeof loadConfig>;
-  const discordConfig = {} as NonNullable<OpenClawConfig["channels"]>["discord"];
+  const discordConfig = {} as NonNullable<RecallConfig["channels"]>["discord"];
   return createDiscordNativeCommand({
     command,
     cfg,

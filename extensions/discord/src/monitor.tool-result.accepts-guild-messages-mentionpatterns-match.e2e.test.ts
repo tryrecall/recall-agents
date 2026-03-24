@@ -18,13 +18,13 @@ const BASE_CFG: Config = {
   agents: {
     defaults: {
       model: { primary: "anthropic/claude-opus-4-5" },
-      workspace: "/tmp/openclaw",
+      workspace: "/tmp/recall",
     },
   },
   messages: {
     inbound: { debounceMs: 0 },
   },
-  session: { store: "/tmp/openclaw-sessions.json" },
+  session: { store: "/tmp/recall-sessions.json" },
 };
 
 beforeEach(() => {
@@ -237,14 +237,14 @@ describe("discord tool result dispatch", () => {
     const cfg = createMentionRequiredGuildConfig({
       messages: {
         inbound: { debounceMs: 0 },
-        groupChat: { mentionPatterns: ["\\bopenclaw\\b"] },
+        groupChat: { mentionPatterns: ["\\brecall\\b"] },
       },
     } as Partial<Config>);
 
     const handler = await createHandler(cfg);
     const client = createGuildTextClient();
 
-    await handler(createGuildMessageEvent({ messageId: "m2", content: "openclaw: hello" }), client);
+    await handler(createGuildMessageEvent({ messageId: "m2", content: "recall: hello" }), client);
 
     await vi.waitFor(() => expect(dispatchMock).toHaveBeenCalledTimes(1));
   });
@@ -271,7 +271,7 @@ describe("discord tool result dispatch", () => {
             mentionedEveryone: false,
             mentionedUsers: [],
             mentionedRoles: [],
-            author: { id: "bot-id", bot: true, username: "OpenClaw" },
+            author: { id: "bot-id", bot: true, username: "Recall" },
           },
         },
       }),

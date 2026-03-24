@@ -1,21 +1,21 @@
 ---
 title: "Building Provider Plugins"
 sidebarTitle: "Provider Plugins"
-summary: "Step-by-step guide to building a model provider plugin for OpenClaw"
+summary: "Step-by-step guide to building a model provider plugin for Recall"
 read_when:
   - You are building a new model provider plugin
-  - You want to add an OpenAI-compatible proxy or custom LLM to OpenClaw
+  - You want to add an OpenAI-compatible proxy or custom LLM to Recall
   - You need to understand provider auth, catalogs, and runtime hooks
 ---
 
 # Building Provider Plugins
 
 This guide walks through building a provider plugin that adds a model provider
-(LLM) to OpenClaw. By the end you will have a provider with a model catalog,
+(LLM) to Recall. By the end you will have a provider with a model catalog,
 API key auth, and dynamic model resolution.
 
 <Info>
-  If you have not built any OpenClaw plugin before, read
+  If you have not built any Recall plugin before, read
   [Getting Started](/plugins/building-plugins) first for the basic package
   structure and manifest setup.
 </Info>
@@ -27,17 +27,17 @@ API key auth, and dynamic model resolution.
     <CodeGroup>
     ```json package.json
     {
-      "name": "@myorg/openclaw-acme-ai",
+      "name": "@myorg/recall-acme-ai",
       "version": "1.0.0",
       "type": "module",
-      "openclaw": {
+      "recall": {
         "extensions": ["./index.ts"],
         "providers": ["acme-ai"]
       }
     }
     ```
 
-    ```json openclaw.plugin.json
+    ```json recall.plugin.json
     {
       "id": "acme-ai",
       "name": "Acme AI",
@@ -67,7 +67,7 @@ API key auth, and dynamic model resolution.
     ```
     </CodeGroup>
 
-    The manifest declares `providerAuthEnvVars` so OpenClaw can detect
+    The manifest declares `providerAuthEnvVars` so Recall can detect
     credentials without loading your plugin runtime.
 
   </Step>
@@ -76,8 +76,8 @@ API key auth, and dynamic model resolution.
     A minimal provider needs an `id`, `label`, `auth`, and `catalog`:
 
     ```typescript index.ts
-    import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
-    import { createProviderApiKeyAuthMethod } from "openclaw/plugin-sdk/provider-auth";
+    import { definePluginEntry } from "recall/plugin-sdk/plugin-entry";
+    import { createProviderApiKeyAuthMethod } from "recall/plugin-sdk/provider-auth";
 
     export default definePluginEntry({
       id: "acme-ai",
@@ -145,7 +145,7 @@ API key auth, and dynamic model resolution.
     ```
 
     That is a working provider. Users can now
-    `openclaw onboard --acme-ai-api-key <key>` and select
+    `recall onboard --acme-ai-api-key <key>` and select
     `acme-ai/acme-large` as their model.
 
     For bundled providers that only register one text provider with API-key
@@ -153,7 +153,7 @@ API key auth, and dynamic model resolution.
     `defineSingleProviderPluginEntry(...)` helper:
 
     ```typescript
-    import { defineSingleProviderPluginEntry } from "openclaw/plugin-sdk/provider-entry";
+    import { defineSingleProviderPluginEntry } from "recall/plugin-sdk/provider-entry";
 
     export default defineSingleProviderPluginEntry({
       id: "acme-ai",
@@ -187,7 +187,7 @@ API key auth, and dynamic model resolution.
 
     If your auth flow also needs to patch `models.providers.*`, aliases, and
     the agent default model during onboarding, use the preset helpers from
-    `openclaw/plugin-sdk/provider-onboard`. The narrowest helpers are
+    `recall/plugin-sdk/provider-onboard`. The narrowest helpers are
     `createDefaultModelPresetAppliers(...)`,
     `createDefaultModelsPresetAppliers(...)`, and
     `createModelCatalogPresetAppliers(...)`.
@@ -275,7 +275,7 @@ API key auth, and dynamic model resolution.
     </Tabs>
 
     <Accordion title="All available provider hooks">
-      OpenClaw calls hooks in this order. Most providers only use 2-3:
+      Recall calls hooks in this order. Most providers only use 2-3:
 
       | # | Hook | When to use |
       | --- | --- | --- |
@@ -343,7 +343,7 @@ API key auth, and dynamic model resolution.
     }
     ```
 
-    OpenClaw classifies this as a **hybrid-capability** plugin. This is the
+    Recall classifies this as a **hybrid-capability** plugin. This is the
     recommended pattern for company plugins (one plugin per vendor). See
     [Internals: Capability Ownership](/plugins/architecture#capability-ownership-model).
 
@@ -387,8 +387,8 @@ API key auth, and dynamic model resolution.
 
 ```
 extensions/acme-ai/
-├── package.json              # openclaw.providers metadata
-├── openclaw.plugin.json      # Manifest with providerAuthEnvVars
+├── package.json              # recall.providers metadata
+├── recall.plugin.json      # Manifest with providerAuthEnvVars
 ├── index.ts                  # definePluginEntry + registerProvider
 └── src/
     ├── provider.test.ts      # Tests

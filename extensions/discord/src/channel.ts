@@ -3,31 +3,31 @@ import {
   buildLegacyDmAccountAllowlistAdapter,
   createAccountScopedAllowlistNameResolver,
   createNestedAllowlistOverrideResolver,
-} from "openclaw/plugin-sdk/allowlist-config-edit";
-import { createScopedDmSecurityResolver } from "openclaw/plugin-sdk/channel-config-helpers";
-import { createPairingPrefixStripper } from "openclaw/plugin-sdk/channel-pairing";
-import { createOpenProviderConfiguredRouteWarningCollector } from "openclaw/plugin-sdk/channel-policy";
-import { resolveTargetsWithOptionalToken } from "openclaw/plugin-sdk/channel-targets";
-import { createChatChannelPlugin } from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/allowlist-config-edit";
+import { createScopedDmSecurityResolver } from "recall/plugin-sdk/channel-config-helpers";
+import { createPairingPrefixStripper } from "recall/plugin-sdk/channel-pairing";
+import { createOpenProviderConfiguredRouteWarningCollector } from "recall/plugin-sdk/channel-policy";
+import { resolveTargetsWithOptionalToken } from "recall/plugin-sdk/channel-targets";
+import { createChatChannelPlugin } from "recall/plugin-sdk/core";
 import {
   createChannelDirectoryAdapter,
   createRuntimeDirectoryLiveAdapter,
-} from "openclaw/plugin-sdk/directory-runtime";
+} from "recall/plugin-sdk/directory-runtime";
 import {
   createRuntimeOutboundDelegates,
   resolveOutboundSendDep,
-} from "openclaw/plugin-sdk/infra-runtime";
+} from "recall/plugin-sdk/infra-runtime";
 import {
   buildOutboundBaseSessionKey,
   normalizeMessageChannel,
   normalizeOutboundThreadId,
   resolveThreadSessionKeys,
   type RoutePeer,
-} from "openclaw/plugin-sdk/routing";
+} from "recall/plugin-sdk/routing";
 import {
   createComputedAccountStatusAdapter,
   createDefaultChannelRuntimeState,
-} from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/status-helpers";
 import {
   listDiscordAccountIds,
   resolveDiscordAccount,
@@ -62,7 +62,7 @@ import {
   PAIRING_APPROVED_MESSAGE,
   projectCredentialSnapshotFields,
   resolveConfiguredFromCredentialStatuses,
-  type OpenClawConfig,
+  type RecallConfig,
 } from "./runtime-api.js";
 import { getDiscordRuntime } from "./runtime.js";
 import { fetchChannelPermissionsDiscord } from "./send.js";
@@ -134,7 +134,7 @@ const discordMessageActions: ChannelMessageActionAdapter = {
 function buildDiscordCrossContextComponents(params: {
   originLabel: string;
   message: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
 }) {
   const trimmed = params.message.trim();
@@ -147,7 +147,7 @@ function buildDiscordCrossContextComponents(params: {
   return [new DiscordUiContainer({ cfg: params.cfg, accountId: params.accountId, components })];
 }
 
-function hasDiscordExecApprovalDmRoute(cfg: OpenClawConfig): boolean {
+function hasDiscordExecApprovalDmRoute(cfg: RecallConfig): boolean {
   return listDiscordAccountIds(cfg).some((accountId) => {
     const execApprovals = resolveDiscordAccount({ cfg, accountId }).config.execApprovals;
     if (!execApprovals?.enabled || (execApprovals.approvers?.length ?? 0) === 0) {
@@ -235,7 +235,7 @@ function parseDiscordExplicitTarget(raw: string) {
 }
 
 function buildDiscordBaseSessionKey(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   accountId?: string | null;
   peer: RoutePeer;
@@ -266,7 +266,7 @@ function resolveDiscordOutboundTargetKindHint(params: {
 }
 
 function resolveDiscordOutboundSessionRoute(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   accountId?: string | null;
   target: string;
@@ -337,7 +337,7 @@ export const discordPlugin: ChannelPlugin<ResolvedDiscordAccount, DiscordProbe> 
       agentPrompt: {
         messageToolHints: () => [
           "- Discord components: set `components` when sending messages to include buttons, selects, or v2 containers.",
-          "- Forms: add `components.modal` (title, fields). OpenClaw adds a trigger button and routes submissions as new messages.",
+          "- Forms: add `components.modal` (title, fields). Recall adds a trigger button and routes submissions as new messages.",
         ],
       },
       messaging: {

@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import type { PluginWebSearchProviderEntry } from "../plugins/types.js";
 
 type ProviderUnderTest = "brave" | "gemini" | "grok" | "kimi" | "perplexity" | "duckduckgo";
@@ -31,8 +31,8 @@ vi.mock("../plugins/web-search-providers.runtime.js", () => ({
   resolvePluginWebSearchProviders: resolvePluginWebSearchProvidersMock,
 }));
 
-function asConfig(value: unknown): OpenClawConfig {
-  return value as OpenClawConfig;
+function asConfig(value: unknown): RecallConfig {
+  return value as RecallConfig;
 }
 
 function providerPluginId(provider: ProviderUnderTest): string {
@@ -61,7 +61,7 @@ function ensureRecord(target: Record<string, unknown>, key: string): Record<stri
 }
 
 function setConfiguredProviderKey(
-  configTarget: OpenClawConfig,
+  configTarget: RecallConfig,
   pluginId: string,
   value: unknown,
 ): void {
@@ -126,7 +126,7 @@ function buildTestWebSearchProviders(): PluginWebSearchProviderEntry[] {
   ];
 }
 
-async function runRuntimeWebTools(params: { config: OpenClawConfig; env?: NodeJS.ProcessEnv }) {
+async function runRuntimeWebTools(params: { config: RecallConfig; env?: NodeJS.ProcessEnv }) {
   const sourceConfig = structuredClone(params.config);
   const resolvedConfig = structuredClone(params.config);
   const context = createResolverContext({
@@ -144,7 +144,7 @@ async function runRuntimeWebTools(params: { config: OpenClawConfig; env?: NodeJS
 function createProviderSecretRefConfig(
   provider: ProviderUnderTest,
   envRefId: string,
-): OpenClawConfig {
+): RecallConfig {
   return asConfig({
     tools: {
       web: {
@@ -169,7 +169,7 @@ function createProviderSecretRefConfig(
   });
 }
 
-function readProviderKey(config: OpenClawConfig, provider: ProviderUnderTest): unknown {
+function readProviderKey(config: RecallConfig, provider: ProviderUnderTest): unknown {
   const pluginConfig = config.plugins?.entries?.[providerPluginId(provider)]?.config as
     | { webSearch?: { apiKey?: unknown } }
     | undefined;

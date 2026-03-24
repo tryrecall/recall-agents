@@ -1,21 +1,21 @@
 {
-  "name": "@openclaw/line",
+  "name": "@recall/line",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw LINE channel plugin",
+  "description": "Recall LINE channel plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.3.22"
+    "recall": ">=2026.3.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
@@ -31,7 +31,7 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@openclaw/line",
+      "npmSpec": "@recall/line",
       "localPath": "extensions/line",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.3.22"

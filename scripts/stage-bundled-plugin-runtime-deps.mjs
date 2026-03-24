@@ -36,7 +36,7 @@ function hasRuntimeDeps(packageJson) {
 }
 
 function shouldStageRuntimeDeps(packageJson) {
-  return packageJson.openclaw?.bundle?.stageRuntimeDependencies === true;
+  return packageJson.recall?.bundle?.stageRuntimeDependencies === true;
 }
 
 function sanitizeBundledManifestForRuntimeInstall(pluginDir) {
@@ -44,9 +44,9 @@ function sanitizeBundledManifestForRuntimeInstall(pluginDir) {
   const packageJson = readJson(manifestPath);
   let changed = false;
 
-  if (packageJson.peerDependencies?.openclaw) {
+  if (packageJson.peerDependencies?.recall) {
     const nextPeerDependencies = { ...packageJson.peerDependencies };
-    delete nextPeerDependencies.openclaw;
+    delete nextPeerDependencies.recall;
     if (Object.keys(nextPeerDependencies).length === 0) {
       delete packageJson.peerDependencies;
     } else {
@@ -55,9 +55,9 @@ function sanitizeBundledManifestForRuntimeInstall(pluginDir) {
     changed = true;
   }
 
-  if (packageJson.peerDependenciesMeta?.openclaw) {
+  if (packageJson.peerDependenciesMeta?.recall) {
     const nextPeerDependenciesMeta = { ...packageJson.peerDependenciesMeta };
-    delete nextPeerDependenciesMeta.openclaw;
+    delete nextPeerDependenciesMeta.recall;
     if (Object.keys(nextPeerDependenciesMeta).length === 0) {
       delete packageJson.peerDependenciesMeta;
     } else {
@@ -66,9 +66,9 @@ function sanitizeBundledManifestForRuntimeInstall(pluginDir) {
     changed = true;
   }
 
-  if (packageJson.devDependencies?.openclaw) {
+  if (packageJson.devDependencies?.recall) {
     const nextDevDependencies = { ...packageJson.devDependencies };
-    delete nextDevDependencies.openclaw;
+    delete nextDevDependencies.recall;
     if (Object.keys(nextDevDependencies).length === 0) {
       delete packageJson.devDependencies;
     } else {

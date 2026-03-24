@@ -1,27 +1,27 @@
-import { resolveDefaultAgentId } from "openclaw/plugin-sdk/agent-runtime";
+import { resolveDefaultAgentId } from "recall/plugin-sdk/agent-runtime";
 import {
   isNativeCommandsExplicitlyDisabled,
   resolveNativeCommandsEnabled,
   resolveNativeSkillsEnabled,
-} from "openclaw/plugin-sdk/config-runtime";
-import type { OpenClawConfig, ReplyToMode } from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/config-runtime";
+import type { RecallConfig, ReplyToMode } from "recall/plugin-sdk/config-runtime";
 import {
   resolveChannelGroupPolicy,
   resolveChannelGroupRequireMention,
-} from "openclaw/plugin-sdk/config-runtime";
-import { loadSessionStore, resolveStorePath } from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/config-runtime";
+import { loadSessionStore, resolveStorePath } from "recall/plugin-sdk/config-runtime";
 import {
   resolveThreadBindingIdleTimeoutMsForChannel,
   resolveThreadBindingMaxAgeMsForChannel,
   resolveThreadBindingSpawnPolicy,
-} from "openclaw/plugin-sdk/conversation-runtime";
-import { formatUncaughtError } from "openclaw/plugin-sdk/infra-runtime";
-import { DEFAULT_GROUP_HISTORY_LIMIT, type HistoryEntry } from "openclaw/plugin-sdk/reply-history";
-import { resolveTextChunkLimit } from "openclaw/plugin-sdk/reply-runtime";
-import { danger, logVerbose, shouldLogVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { getChildLogger } from "openclaw/plugin-sdk/runtime-env";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/runtime-env";
-import { createNonExitingRuntime, type RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/conversation-runtime";
+import { formatUncaughtError } from "recall/plugin-sdk/infra-runtime";
+import { DEFAULT_GROUP_HISTORY_LIMIT, type HistoryEntry } from "recall/plugin-sdk/reply-history";
+import { resolveTextChunkLimit } from "recall/plugin-sdk/reply-runtime";
+import { danger, logVerbose, shouldLogVerbose } from "recall/plugin-sdk/runtime-env";
+import { getChildLogger } from "recall/plugin-sdk/runtime-env";
+import { createSubsystemLogger } from "recall/plugin-sdk/runtime-env";
+import { createNonExitingRuntime, type RuntimeEnv } from "recall/plugin-sdk/runtime-env";
 import { resolveTelegramAccount } from "./accounts.js";
 import { defaultTelegramBotDeps, type TelegramBotDeps } from "./bot-deps.js";
 import { registerTelegramHandlers } from "./bot-handlers.js";
@@ -51,7 +51,7 @@ export type TelegramBotOptions = {
   mediaMaxMb?: number;
   replyToMode?: ReplyToMode;
   proxyFetch?: typeof fetch;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   /** Signal to abort in-flight Telegram API fetch requests (e.g. getUpdates) on shutdown. */
   fetchAbortSignal?: AbortSignal;
   updateOffset?: {

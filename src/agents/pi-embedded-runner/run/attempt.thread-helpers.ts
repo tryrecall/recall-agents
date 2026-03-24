@@ -1,7 +1,7 @@
-import type { OpenClawConfig } from "../../../config/config.js";
+import type { RecallConfig } from "../../../config/config.js";
 import { joinPresentTextSegments } from "../../../shared/text/join-segments.js";
 
-export const ATTEMPT_CACHE_TTL_CUSTOM_TYPE = "openclaw.cache-ttl";
+export const ATTEMPT_CACHE_TTL_CUSTOM_TYPE = "recall.cache-ttl";
 
 export function composeSystemPromptWithHookContext(params: {
   baseSystemPrompt?: string;
@@ -34,7 +34,7 @@ export function resolveAttemptSpawnWorkspaceDir(params: {
 export function shouldAppendAttemptCacheTtl(params: {
   timedOutDuringCompaction: boolean;
   compactionOccurredThisAttempt: boolean;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   provider: string;
   modelId: string;
   isCacheTtlEligibleProvider: (provider: string, modelId: string) => boolean;
@@ -54,7 +54,7 @@ export function appendAttemptCacheTtlIfNeeded(params: {
   };
   timedOutDuringCompaction: boolean;
   compactionOccurredThisAttempt: boolean;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   provider: string;
   modelId: string;
   isCacheTtlEligibleProvider: (provider: string, modelId: string) => boolean;

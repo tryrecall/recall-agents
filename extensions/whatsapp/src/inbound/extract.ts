@@ -4,9 +4,9 @@ import {
   getContentType,
   normalizeMessageContent,
 } from "@whiskeysockets/baileys";
-import { formatLocationText, type NormalizedLocation } from "openclaw/plugin-sdk/channel-inbound";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { jidToE164 } from "openclaw/plugin-sdk/text-runtime";
+import { formatLocationText, type NormalizedLocation } from "recall/plugin-sdk/channel-inbound";
+import { logVerbose } from "recall/plugin-sdk/runtime-env";
+import { jidToE164 } from "recall/plugin-sdk/text-runtime";
 import { parseVcard } from "../vcard.js";
 
 const MESSAGE_WRAPPER_KEYS = [

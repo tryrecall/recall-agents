@@ -2,26 +2,26 @@ import {
   DEFAULT_ACCOUNT_ID,
   normalizeAccountId,
   normalizeOptionalAccountId,
-} from "openclaw/plugin-sdk/account-id";
+} from "recall/plugin-sdk/account-id";
 import {
   listCombinedAccountIds,
   listConfiguredAccountIds,
   resolveListedDefaultAccountId,
   resolveNormalizedAccountEntry,
-} from "openclaw/plugin-sdk/account-resolution";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/account-resolution";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
 import { listMatrixEnvAccountIds } from "./env-vars.js";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
-export function resolveMatrixChannelConfig(cfg: OpenClawConfig): Record<string, unknown> | null {
+export function resolveMatrixChannelConfig(cfg: RecallConfig): Record<string, unknown> | null {
   return isRecord(cfg.channels?.matrix) ? cfg.channels.matrix : null;
 }
 
 export function findMatrixAccountEntry(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   accountId: string,
 ): Record<string, unknown> | null {
   const channel = resolveMatrixChannelConfig(cfg);
@@ -38,7 +38,7 @@ export function findMatrixAccountEntry(
 }
 
 export function resolveConfiguredMatrixAccountIds(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): string[] {
   const channel = resolveMatrixChannelConfig(cfg);
@@ -53,7 +53,7 @@ export function resolveConfiguredMatrixAccountIds(
 }
 
 export function resolveMatrixDefaultOrOnlyAccountId(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): string {
   const channel = resolveMatrixChannelConfig(cfg);
@@ -73,7 +73,7 @@ export function resolveMatrixDefaultOrOnlyAccountId(
 }
 
 export function requiresExplicitMatrixDefaultAccount(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {
   const channel = resolveMatrixChannelConfig(cfg);

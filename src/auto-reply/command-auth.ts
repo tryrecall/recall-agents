@@ -1,7 +1,7 @@
 import { getChannelPlugin, listChannelPlugins } from "../channels/plugins/index.js";
 import type { ChannelId, ChannelPlugin } from "../channels/plugins/types.js";
 import { normalizeAnyChannelId } from "../channels/registry.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { normalizeStringEntries } from "../shared/string-normalization.js";
 import {
   INTERNAL_MESSAGE_CHANNEL,
@@ -22,7 +22,7 @@ export type CommandAuthorization = {
 
 function resolveProviderFromContext(
   ctx: MsgContext,
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
 ): { providerId: ChannelId | undefined; hadResolutionError: boolean } {
   const explicitMessageChannel =
     normalizeMessageChannel(ctx.Provider) ??
@@ -99,7 +99,7 @@ function resolveProviderFromContext(
 
 function formatAllowFromList(params: {
   plugin?: ChannelPlugin;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
   allowFrom: Array<string | number>;
 }): string[] {
@@ -115,7 +115,7 @@ function formatAllowFromList(params: {
 
 function normalizeAllowFromEntry(params: {
   plugin?: ChannelPlugin;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
   value: string;
 }): string[] {
@@ -130,7 +130,7 @@ function normalizeAllowFromEntry(params: {
 
 function resolveProviderAllowFrom(params: {
   plugin?: ChannelPlugin;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
 }): {
   allowFrom: Array<string | number>;
@@ -187,7 +187,7 @@ function describeAllowFromResolutionError(err: unknown): string {
 
 function resolveOwnerAllowFromList(params: {
   plugin?: ChannelPlugin;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
   providerId?: ChannelId;
   allowFrom?: Array<string | number>;
@@ -234,7 +234,7 @@ function resolveOwnerAllowFromList(params: {
  */
 function resolveCommandsAllowFromList(params: {
   plugin?: ChannelPlugin;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
   providerId?: ChannelId;
 }): string[] | null {
@@ -294,7 +294,7 @@ function shouldUseFromAsSenderFallback(params: {
 function resolveSenderCandidates(params: {
   plugin?: ChannelPlugin;
   providerId?: ChannelId;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
   senderId?: string | null;
   senderE164?: string | null;
@@ -337,7 +337,7 @@ function resolveSenderCandidates(params: {
 }
 
 function resolveFallbackAllowFrom(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   providerId?: ChannelId;
   accountId?: string | null;
 }): Array<string | number> {
@@ -442,7 +442,7 @@ function resolveFallbackCommandOptions(providerId?: ChannelId): {
 
 export function resolveCommandAuthorization(params: {
   ctx: MsgContext;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   commandAuthorized: boolean;
 }): CommandAuthorization {
   const { ctx, cfg, commandAuthorized } = params;

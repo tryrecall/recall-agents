@@ -26,7 +26,7 @@ const listFeishuThreadMessagesMock = vi.hoisted(() => vi.fn(async () => []));
 
 let handlers: Record<string, (data: unknown) => Promise<void>> = {};
 let lastRuntime: RuntimeEnv | null = null;
-const originalStateDir = process.env.OPENCLAW_STATE_DIR;
+const originalStateDir = process.env.RECALL_STATE_DIR;
 
 vi.mock("./client.js", async () => {
   const actual = await vi.importActual<typeof import("./client.js")>("./client.js");
@@ -51,8 +51,8 @@ vi.mock("./send.js", () => ({
   listFeishuThreadMessages: listFeishuThreadMessagesMock,
 }));
 
-vi.mock("openclaw/plugin-sdk/conversation-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/conversation-runtime")>();
+vi.mock("recall/plugin-sdk/conversation-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/conversation-runtime")>();
   return {
     ...actual,
     resolveConfiguredBindingRoute: (params: unknown) => resolveConfiguredBindingRouteMock(params),
@@ -191,7 +191,7 @@ describe("Feishu ACP-init failure lifecycle", () => {
     vi.clearAllMocks();
     handlers = {};
     lastRuntime = null;
-    process.env.OPENCLAW_STATE_DIR = `/tmp/openclaw-feishu-acp-failure-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    process.env.RECALL_STATE_DIR = `/tmp/recall-feishu-acp-failure-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
     resolveBoundConversationMock.mockReturnValue(null);
     resolveAgentRouteMock.mockReturnValue({
@@ -323,10 +323,10 @@ describe("Feishu ACP-init failure lifecycle", () => {
   afterEach(() => {
     vi.useRealTimers();
     if (originalStateDir === undefined) {
-      delete process.env.OPENCLAW_STATE_DIR;
+      delete process.env.RECALL_STATE_DIR;
       return;
     }
-    process.env.OPENCLAW_STATE_DIR = originalStateDir;
+    process.env.RECALL_STATE_DIR = originalStateDir;
   });
 
   it("sends one ACP failure notice to the topic root across replay", async () => {

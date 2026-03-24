@@ -205,10 +205,10 @@
   - changed-files:
       - any-glob-to-any-file:
           - "extensions/llm-task/**"
-"extensions: lobster":
+"extensions: recall":
   - changed-files:
       - any-glob-to-any-file:
-          - "extensions/lobster/**"
+          - "extensions/recall/**"
 "extensions: memory-core":
   - changed-files:
       - any-glob-to-any-file:

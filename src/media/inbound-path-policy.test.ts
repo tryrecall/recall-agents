@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import {
   DEFAULT_IMESSAGE_ATTACHMENT_ROOTS,
   isInboundPathAllowed,
@@ -55,7 +55,7 @@ describe("inbound-path-policy", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     expect(resolveIMessageAttachmentRoots({ cfg, accountId: "work" })).toEqual([
       "/Users/work/Library/Messages/Attachments",
       "/Users/*/Library/Messages/Attachments",
@@ -79,7 +79,7 @@ describe("inbound-path-policy", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expect(resolveIMessageAttachmentRoots({ cfg, accountId: "work" })).toEqual([
       "/Users/work/Library/Messages/Attachments",
@@ -88,7 +88,7 @@ describe("inbound-path-policy", () => {
   });
 
   it("falls back to default iMessage roots", () => {
-    const cfg = {} as OpenClawConfig;
+    const cfg = {} as RecallConfig;
     expect(resolveIMessageAttachmentRoots({ cfg })).toEqual([...DEFAULT_IMESSAGE_ATTACHMENT_ROOTS]);
     expect(resolveIMessageRemoteAttachmentRoots({ cfg })).toEqual([
       ...DEFAULT_IMESSAGE_ATTACHMENT_ROOTS,

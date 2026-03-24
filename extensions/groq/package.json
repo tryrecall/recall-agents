@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/groq-provider",
+  "name": "@recall/groq-provider",
   "version": "2026.3.14",
   "private": true,
-  "description": "OpenClaw Groq media-understanding provider",
+  "description": "Recall Groq media-understanding provider",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

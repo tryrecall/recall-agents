@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/minimax-provider",
+  "name": "@recall/minimax-provider",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw MiniMax provider and OAuth plugin",
+  "description": "Recall MiniMax provider and OAuth plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

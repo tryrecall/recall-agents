@@ -1,14 +1,14 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
 import {
   readConfigFileSnapshotForWrite,
   writeConfigFile,
-} from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/config-runtime";
 import {
   loadCronStore,
   resolveCronStorePath,
   saveCronStore,
-} from "openclaw/plugin-sdk/config-runtime";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/config-runtime";
+import { createSubsystemLogger } from "recall/plugin-sdk/runtime-env";
 import {
   normalizeTelegramChatId,
   normalizeTelegramLookupTarget,
@@ -98,7 +98,7 @@ function rewriteTargetIfMatch(params: {
 }
 
 function replaceTelegramDefaultToTargets(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   matchKey: string;
   resolvedTarget: string;
 }): boolean {
@@ -137,7 +137,7 @@ function replaceTelegramDefaultToTargets(params: {
 }
 
 export async function maybePersistResolvedTelegramTarget(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   rawTarget: string;
   resolvedChatId: string;
   verbose?: boolean;

@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-# OpenClaw Installer for macOS and Linux
-# Usage: curl -fsSL --proto '=https' --tlsv1.2 https://openclaw.ai/install.sh | bash
+# Recall Installer for macOS and Linux
+# Usage: curl -fsSL --proto '=https' --tlsv1.2 https://recall.ai/install.sh | bash
 
 BOLD='\033[1m'
 ACCENT='\033[38;2;255;77;77m'       # coral-bright  #ff4d4d
@@ -15,7 +15,7 @@ ERROR='\033[38;2;230;57;70m'        # coral-mid     #e63946
 MUTED='\033[38;2;90;100;128m'       # text-muted    #5a6480
 NC='\033[0m' # No Color
 
-DEFAULT_TAGLINE="All your chats, one OpenClaw."
+DEFAULT_TAGLINE="All your chats, one Recall."
 NODE_DEFAULT_MAJOR=24
 NODE_MIN_MAJOR=22
 NODE_MIN_MINOR=16
@@ -74,7 +74,7 @@ run_remote_bash() {
     /bin/bash "$tmp"
 }
 
-GUM_VERSION="${OPENCLAW_GUM_VERSION:-0.17.0}"
+GUM_VERSION="${RECALL_GUM_VERSION:-0.17.0}"
 GUM=""
 GUM_STATUS="skipped"
 GUM_REASON=""
@@ -236,7 +236,7 @@ print_gum_status() {
 print_installer_banner() {
     if [[ -n "$GUM" ]]; then
         local title tagline hint card
-        title="$("$GUM" style --foreground "#ff4d4d" --bold "🦞 OpenClaw Installer")"
+        title="$("$GUM" style --foreground "#ff4d4d" --bold "🤖 Recall Installer")"
         tagline="$("$GUM" style --foreground "#8892b0" "$TAGLINE")"
         hint="$("$GUM" style --foreground "#5a6480" "modern installer mode")"
         card="$(printf '%s\n%s\n%s' "$title" "$tagline" "$hint")"
@@ -246,7 +246,7 @@ print_installer_banner() {
     fi
 
     echo -e "${ACCENT}${BOLD}"
-    echo "  🦞 OpenClaw Installer"
+    echo "  🤖 Recall Installer"
     echo -e "${NC}${INFO}  ${TAGLINE}${NC}"
     echo ""
 }
@@ -262,7 +262,7 @@ detect_os_or_die() {
     if [[ "$OS" == "unknown" ]]; then
         ui_error "Unsupported operating system"
         echo "This installer supports macOS and Linux (including WSL)."
-        echo "For Windows, use: iwr -useb https://openclaw.ai/install.ps1 | iex"
+        echo "For Windows, use: iwr -useb https://recall.ai/install.ps1 | iex"
         exit 1
     fi
 
@@ -354,7 +354,7 @@ show_install_plan() {
     ui_section "Install plan"
     ui_kv "OS" "$OS"
     ui_kv "Install method" "$INSTALL_METHOD"
-    ui_kv "Requested version" "$OPENCLAW_VERSION"
+    ui_kv "Requested version" "$RECALL_VERSION"
     if [[ "$USE_BETA" == "1" ]]; then
         ui_kv "Beta channel" "enabled"
     fi
@@ -374,7 +374,7 @@ show_install_plan() {
 }
 
 show_footer_links() {
-    local faq_url="https://docs.openclaw.ai/start/faq"
+    local faq_url="https://docs.recall.ai/start/faq"
     if [[ -n "$GUM" ]]; then
         local content
         content="$(printf '%s\n%s' "Need help?" "FAQ: ${faq_url}")"
@@ -475,16 +475,16 @@ cleanup_legacy_submodules() {
     fi
 }
 
-cleanup_npm_openclaw_paths() {
+cleanup_npm_recall_paths() {
     local npm_root=""
     npm_root="$(npm root -g 2>/dev/null || true)"
     if [[ -z "$npm_root" || "$npm_root" != *node_modules* ]]; then
         return 1
     fi
-    rm -rf "$npm_root"/.openclaw-* "$npm_root"/openclaw 2>/dev/null || true
+    rm -rf "$npm_root"/.recall-* "$npm_root"/recall 2>/dev/null || true
 }
 
-extract_openclaw_conflict_path() {
+extract_recall_conflict_path() {
     local log="$1"
     local path=""
     path="$(sed -n 's/.*File exists: //p' "$log" | head -n1)"
@@ -498,16 +498,16 @@ extract_openclaw_conflict_path() {
     return 1
 }
 
-cleanup_openclaw_bin_conflict() {
+cleanup_recall_bin_conflict() {
     local bin_path="$1"
     if [[ -z "$bin_path" || ( ! -e "$bin_path" && ! -L "$bin_path" ) ]]; then
         return 1
     fi
     local npm_bin=""
     npm_bin="$(npm_global_bin_dir 2>/dev/null || true)"
-    if [[ -n "$npm_bin" && "$bin_path" != "$npm_bin/openclaw" ]]; then
+    if [[ -n "$npm_bin" && "$bin_path" != "$npm_bin/recall" ]]; then
         case "$bin_path" in
-            "/opt/homebrew/bin/openclaw"|"/usr/local/bin/openclaw")
+            "/opt/homebrew/bin/recall"|"/usr/local/bin/recall")
                 ;;
             *)
                 return 1
@@ -517,9 +517,9 @@ cleanup_openclaw_bin_conflict() {
     if [[ -L "$bin_path" ]]; then
         local target=""
         target="$(readlink "$bin_path" 2>/dev/null || true)"
-        if [[ "$target" == *"/node_modules/openclaw/"* ]]; then
+        if [[ "$target" == *"/node_modules/recall/"* ]]; then
             rm -f "$bin_path"
-            ui_info "Removed stale openclaw symlink at ${bin_path}"
+            ui_info "Removed stale recall symlink at ${bin_path}"
             return 0
         fi
         return 1
@@ -527,7 +527,7 @@ cleanup_openclaw_bin_conflict() {
     local backup=""
     backup="${bin_path}.bak-$(date +%Y%m%d-%H%M%S)"
     if mv "$bin_path" "$backup"; then
-        ui_info "Moved existing openclaw binary to ${backup}"
+        ui_info "Moved existing recall binary to ${backup}"
         return 0
     fi
     return 1
@@ -696,7 +696,7 @@ run_npm_global_install() {
         local log_quoted=""
         printf -v cmd_quoted '%q ' "${cmd[@]}"
         printf -v log_quoted '%q' "$log"
-        run_with_spinner "Installing OpenClaw package" bash -c "${cmd_quoted}>${log_quoted} 2>&1"
+        run_with_spinner "Installing Recall package" bash -c "${cmd_quoted}>${log_quoted} 2>&1"
         return $?
     fi
 
@@ -782,7 +782,7 @@ print_npm_failure_diagnostics() {
     fi
 }
 
-install_openclaw_npm() {
+install_recall_npm() {
     local spec="$1"
     local log
     log="$(mktempfile)"
@@ -792,7 +792,7 @@ install_openclaw_npm() {
             attempted_build_tool_fix=true
             ui_info "Retrying npm install after build tools setup"
             if run_npm_global_install "$spec" "$log"; then
-                ui_success "OpenClaw npm package installed"
+                ui_success "Recall npm package installed"
                 return 0
             fi
         fi
@@ -808,26 +808,26 @@ install_openclaw_npm() {
             tail -n 80 "$log" >&2 || true
         fi
 
-        if grep -q "ENOTEMPTY: directory not empty, rename .*openclaw" "$log"; then
+        if grep -q "ENOTEMPTY: directory not empty, rename .*recall" "$log"; then
             ui_warn "npm left stale directory; cleaning and retrying"
-            cleanup_npm_openclaw_paths
+            cleanup_npm_recall_paths
             if run_npm_global_install "$spec" "$log"; then
-                ui_success "OpenClaw npm package installed"
+                ui_success "Recall npm package installed"
                 return 0
             fi
             return 1
         fi
         if grep -q "EEXIST" "$log"; then
             local conflict=""
-            conflict="$(extract_openclaw_conflict_path "$log" || true)"
-            if [[ -n "$conflict" ]] && cleanup_openclaw_bin_conflict "$conflict"; then
+            conflict="$(extract_recall_conflict_path "$log" || true)"
+            if [[ -n "$conflict" ]] && cleanup_recall_bin_conflict "$conflict"; then
                 if run_npm_global_install "$spec" "$log"; then
-                    ui_success "OpenClaw npm package installed"
+                    ui_success "Recall npm package installed"
                     return 0
                 fi
                 return 1
             fi
-            ui_error "npm failed because an openclaw binary already exists"
+            ui_error "npm failed because an recall binary already exists"
             if [[ -n "$conflict" ]]; then
                 ui_info "Remove or move ${conflict}, then retry"
             fi
@@ -835,7 +835,7 @@ install_openclaw_npm() {
         fi
         return 1
     fi
-    ui_success "OpenClaw npm package installed"
+    ui_success "Recall npm package installed"
     return 0
 }
 
@@ -877,13 +877,13 @@ TAGLINES+=("Your config is valid, your assumptions are not.")
 TAGLINES+=("I don't just autocomplete—I auto-commit (emotionally), then ask you to review (logically).")
 TAGLINES+=("Less clicking, more shipping, fewer \"where did that file go\" moments.")
 TAGLINES+=("Claws out, commit in—let's ship something mildly responsible.")
-TAGLINES+=("I'll butter your workflow like a lobster roll: messy, delicious, effective.")
+TAGLINES+=("I'll butter your workflow like a recall roll: messy, delicious, effective.")
 TAGLINES+=("Shell yeah—I'm here to pinch the toil and leave you the glory.")
 TAGLINES+=("If it's repetitive, I'll automate it; if it's hard, I'll bring jokes and a rollback plan.")
 TAGLINES+=("Because texting yourself reminders is so 2024.")
 TAGLINES+=("WhatsApp, but make it ✨engineering✨.")
 TAGLINES+=("Turning \"I'll reply later\" into \"my bot replied instantly\".")
-TAGLINES+=("The only crab in your contacts you actually want to hear from. 🦞")
+TAGLINES+=("The only crab in your contacts you actually want to hear from. 🤖")
 TAGLINES+=("Chat automation for people who peaked at IRC.")
 TAGLINES+=("Because Siri wasn't answering at 3AM.")
 TAGLINES+=("IPC, but it's your phone.")
@@ -947,9 +947,9 @@ pick_tagline() {
         echo "$DEFAULT_TAGLINE"
         return
     fi
-    if [[ -n "${OPENCLAW_TAGLINE_INDEX:-}" ]]; then
-        if [[ "${OPENCLAW_TAGLINE_INDEX}" =~ ^[0-9]+$ ]]; then
-            local idx=$((OPENCLAW_TAGLINE_INDEX % count))
+    if [[ -n "${RECALL_TAGLINE_INDEX:-}" ]]; then
+        if [[ "${RECALL_TAGLINE_INDEX}" =~ ^[0-9]+$ ]]; then
+            local idx=$((RECALL_TAGLINE_INDEX % count))
             echo "${TAGLINES[$idx]}"
             return
         fi
@@ -960,30 +960,30 @@ pick_tagline() {
 
 TAGLINE=$(pick_tagline)
 
-NO_ONBOARD=${OPENCLAW_NO_ONBOARD:-0}
-NO_PROMPT=${OPENCLAW_NO_PROMPT:-0}
-DRY_RUN=${OPENCLAW_DRY_RUN:-0}
-INSTALL_METHOD=${OPENCLAW_INSTALL_METHOD:-}
-OPENCLAW_VERSION=${OPENCLAW_VERSION:-latest}
-USE_BETA=${OPENCLAW_BETA:-0}
-GIT_DIR_DEFAULT="${HOME}/openclaw"
-GIT_DIR=${OPENCLAW_GIT_DIR:-$GIT_DIR_DEFAULT}
-GIT_UPDATE=${OPENCLAW_GIT_UPDATE:-1}
+NO_ONBOARD=${RECALL_NO_ONBOARD:-0}
+NO_PROMPT=${RECALL_NO_PROMPT:-0}
+DRY_RUN=${RECALL_DRY_RUN:-0}
+INSTALL_METHOD=${RECALL_INSTALL_METHOD:-}
+RECALL_VERSION=${RECALL_VERSION:-latest}
+USE_BETA=${RECALL_BETA:-0}
+GIT_DIR_DEFAULT="${HOME}/recall"
+GIT_DIR=${RECALL_GIT_DIR:-$GIT_DIR_DEFAULT}
+GIT_UPDATE=${RECALL_GIT_UPDATE:-1}
 SHARP_IGNORE_GLOBAL_LIBVIPS="${SHARP_IGNORE_GLOBAL_LIBVIPS:-1}"
-NPM_LOGLEVEL="${OPENCLAW_NPM_LOGLEVEL:-error}"
+NPM_LOGLEVEL="${RECALL_NPM_LOGLEVEL:-error}"
 NPM_SILENT_FLAG="--silent"
-VERBOSE="${OPENCLAW_VERBOSE:-0}"
-VERIFY_INSTALL="${OPENCLAW_VERIFY_INSTALL:-0}"
-OPENCLAW_BIN=""
+VERBOSE="${RECALL_VERBOSE:-0}"
+VERIFY_INSTALL="${RECALL_VERIFY_INSTALL:-0}"
+RECALL_BIN=""
 PNPM_CMD=()
 HELP=0
 
 print_usage() {
     cat <<EOF
-OpenClaw installer (macOS + Linux)
+Recall installer (macOS + Linux)
 
 Usage:
-  curl -fsSL --proto '=https' --tlsv1.2 https://openclaw.ai/install.sh | bash -s -- [options]
+  curl -fsSL --proto '=https' --tlsv1.2 https://recall.ai/install.sh | bash -s -- [options]
 
 Options:
   --install-method, --method npm|git   Install via npm (default) or from a git checkout
@@ -991,7 +991,7 @@ Options:
   --git, --github                     Shortcut for --install-method git
   --version <version|dist-tag|spec>    npm install target (default: latest; use "main" for GitHub main)
   --beta                               Use beta if available, else latest
-  --git-dir, --dir <path>             Checkout directory (default: ~/openclaw)
+  --git-dir, --dir <path>             Checkout directory (default: ~/recall)
   --no-git-update                      Skip git pull for existing checkout
   --no-onboard                          Skip onboarding (non-interactive)
   --no-prompt                           Disable prompts (required in CI/automation)
@@ -1001,25 +1001,25 @@ Options:
   --help, -h                            Show this help
 
 Environment variables:
-  OPENCLAW_INSTALL_METHOD=git|npm
-  OPENCLAW_VERSION=latest|next|main|<semver>|<spec>
-  OPENCLAW_BETA=0|1
-  OPENCLAW_GIT_DIR=...
-  OPENCLAW_GIT_UPDATE=0|1
-  OPENCLAW_NO_PROMPT=1
-  OPENCLAW_VERIFY_INSTALL=1
-  OPENCLAW_DRY_RUN=1
-  OPENCLAW_NO_ONBOARD=1
-  OPENCLAW_VERBOSE=1
-  OPENCLAW_NPM_LOGLEVEL=error|warn|notice  Default: error (hide npm deprecation noise)
+  RECALL_INSTALL_METHOD=git|npm
+  RECALL_VERSION=latest|next|main|<semver>|<spec>
+  RECALL_BETA=0|1
+  RECALL_GIT_DIR=...
+  RECALL_GIT_UPDATE=0|1
+  RECALL_NO_PROMPT=1
+  RECALL_VERIFY_INSTALL=1
+  RECALL_DRY_RUN=1
+  RECALL_NO_ONBOARD=1
+  RECALL_VERBOSE=1
+  RECALL_NPM_LOGLEVEL=error|warn|notice  Default: error (hide npm deprecation noise)
   SHARP_IGNORE_GLOBAL_LIBVIPS=0|1    Default: 1 (avoid sharp building against global libvips)
 
 Examples:
-  curl -fsSL --proto '=https' --tlsv1.2 https://openclaw.ai/install.sh | bash
-  curl -fsSL --proto '=https' --tlsv1.2 https://openclaw.ai/install.sh | bash -s -- --no-onboard
-  curl -fsSL --proto '=https' --tlsv1.2 https://openclaw.ai/install.sh | bash -s -- --no-onboard --verify
-  curl -fsSL --proto '=https' --tlsv1.2 https://openclaw.ai/install.sh | bash -s -- --version main
-  curl -fsSL --proto '=https' --tlsv1.2 https://openclaw.ai/install.sh | bash -s -- --install-method git --no-onboard
+  curl -fsSL --proto '=https' --tlsv1.2 https://recall.ai/install.sh | bash
+  curl -fsSL --proto '=https' --tlsv1.2 https://recall.ai/install.sh | bash -s -- --no-onboard
+  curl -fsSL --proto '=https' --tlsv1.2 https://recall.ai/install.sh | bash -s -- --no-onboard --verify
+  curl -fsSL --proto '=https' --tlsv1.2 https://recall.ai/install.sh | bash -s -- --version main
+  curl -fsSL --proto '=https' --tlsv1.2 https://recall.ai/install.sh | bash -s -- --install-method git --no-onboard
 EOF
 }
 
@@ -1059,7 +1059,7 @@ parse_args() {
                 shift 2
                 ;;
             --version)
-                OPENCLAW_VERSION="$2"
+                RECALL_VERSION="$2"
                 shift 2
                 ;;
             --beta)
@@ -1130,7 +1130,7 @@ choose_install_method_interactive() {
 
     if [[ -n "$GUM" ]] && gum_is_tty; then
         local header selection
-        header="Detected OpenClaw checkout in: ${detected_checkout}
+        header="Detected Recall checkout in: ${detected_checkout}
 Choose install method"
         selection="$("$GUM" choose \
             --header "$header" \
@@ -1153,7 +1153,7 @@ Choose install method"
 
     local choice=""
     choice="$(prompt_choice "$(cat <<EOF
-${WARN}→${NC} Detected a OpenClaw source checkout in: ${INFO}${detected_checkout}${NC}
+${WARN}→${NC} Detected a Recall source checkout in: ${INFO}${detected_checkout}${NC}
 Choose install method:
   1) Update this checkout (git) and use it
   2) Install global via npm (migrate away from git)
@@ -1175,7 +1175,7 @@ EOF
     return 1
 }
 
-detect_openclaw_checkout() {
+detect_recall_checkout() {
     local dir="$1"
     if [[ ! -f "$dir/package.json" ]]; then
         return 1
@@ -1183,7 +1183,7 @@ detect_openclaw_checkout() {
     if [[ ! -f "$dir/pnpm-workspace.yaml" ]]; then
         return 1
     fi
-    if ! grep -q '"name"[[:space:]]*:[[:space:]]*"openclaw"' "$dir/package.json" 2>/dev/null; then
+    if ! grep -q '"name"[[:space:]]*:[[:space:]]*"recall"' "$dir/package.json" 2>/dev/null; then
         return 1
     fi
     echo "$dir"
@@ -1211,7 +1211,7 @@ print_homebrew_admin_fix() {
     echo "  2) Ask an Administrator to grant admin rights, then sign out/in:"
     echo "     sudo dseditgroup -o edit -a ${current_user} -t user admin"
     echo "Then retry:"
-    echo "  curl -fsSL https://openclaw.ai/install.sh | bash"
+    echo "  curl -fsSL https://recall.ai/install.sh | bash"
 }
 
 install_homebrew() {
@@ -1365,7 +1365,7 @@ ensure_default_node_active_shell() {
         echo "  nvm use ${NODE_DEFAULT_MAJOR}"
         echo "  nvm alias default ${NODE_DEFAULT_MAJOR}"
         echo "Then open a new shell and rerun:"
-        echo "  curl -fsSL https://openclaw.ai/install.sh | bash"
+        echo "  curl -fsSL https://recall.ai/install.sh | bash"
     else
         echo "Install/select Node.js ${NODE_DEFAULT_MAJOR} (or Node ${NODE_MIN_VERSION}+ minimum) and ensure it is first on PATH, then rerun installer."
     fi
@@ -1590,10 +1590,10 @@ fix_npm_permissions() {
     ui_success "npm configured for user installs"
 }
 
-ensure_openclaw_bin_link() {
+ensure_recall_bin_link() {
     local npm_root=""
     npm_root="$(npm root -g 2>/dev/null || true)"
-    if [[ -z "$npm_root" || ! -d "$npm_root/openclaw" ]]; then
+    if [[ -z "$npm_root" || ! -d "$npm_root/recall" ]]; then
         return 1
     fi
     local npm_bin=""
@@ -1602,17 +1602,17 @@ ensure_openclaw_bin_link() {
         return 1
     fi
     mkdir -p "$npm_bin"
-    if [[ ! -x "${npm_bin}/openclaw" ]]; then
-        ln -sf "$npm_root/openclaw/dist/entry.js" "${npm_bin}/openclaw"
-        ui_info "Created openclaw bin link at ${npm_bin}/openclaw"
+    if [[ ! -x "${npm_bin}/recall" ]]; then
+        ln -sf "$npm_root/recall/dist/entry.js" "${npm_bin}/recall"
+        ui_info "Created recall bin link at ${npm_bin}/recall"
     fi
     return 0
 }
 
-# Check for existing OpenClaw installation
-check_existing_openclaw() {
-    if [[ -n "$(type -P openclaw 2>/dev/null || true)" ]]; then
-        ui_info "Existing OpenClaw installation detected, upgrading"
+# Check for existing Recall installation
+check_existing_recall() {
+    if [[ -n "$(type -P recall 2>/dev/null || true)" ]]; then
+        ui_info "Existing Recall installation detected, upgrading"
         return 0
     fi
     return 1
@@ -1797,7 +1797,7 @@ warn_shell_path_missing_dir() {
 
     echo ""
     ui_warn "PATH missing ${label}: ${dir}"
-    echo "  This can make openclaw show as \"command not found\" in new terminals."
+    echo "  This can make recall show as \"command not found\" in new terminals."
     echo "  Fix (zsh: ~/.zshrc, bash: ~/.bashrc):"
     echo "    export PATH=\"${dir}:\$PATH\""
 }
@@ -1816,13 +1816,13 @@ maybe_nodenv_rehash() {
     fi
 }
 
-warn_openclaw_not_found() {
-    ui_warn "Installed, but openclaw is not discoverable on PATH in this shell"
+warn_recall_not_found() {
+    ui_warn "Installed, but recall is not discoverable on PATH in this shell"
     echo "  Try: hash -r (bash) or rehash (zsh), then retry."
     local t=""
-    t="$(type -t openclaw 2>/dev/null || true)"
+    t="$(type -t recall 2>/dev/null || true)"
     if [[ "$t" == "alias" || "$t" == "function" ]]; then
-        ui_warn "Found a shell ${t} named openclaw; it may shadow the real binary"
+        ui_warn "Found a shell ${t} named recall; it may shadow the real binary"
     fi
     if command -v nodenv &> /dev/null; then
         echo -e "Using nodenv? Run: ${INFO}nodenv rehash${NC}"
@@ -1841,10 +1841,10 @@ warn_openclaw_not_found() {
     fi
 }
 
-resolve_openclaw_bin() {
+resolve_recall_bin() {
     refresh_shell_command_cache
     local resolved=""
-    resolved="$(type -P openclaw 2>/dev/null || true)"
+    resolved="$(type -P recall 2>/dev/null || true)"
     if [[ -n "$resolved" && -x "$resolved" ]]; then
         echo "$resolved"
         return 0
@@ -1852,7 +1852,7 @@ resolve_openclaw_bin() {
 
     ensure_npm_global_bin_on_path
     refresh_shell_command_cache
-    resolved="$(type -P openclaw 2>/dev/null || true)"
+    resolved="$(type -P recall 2>/dev/null || true)"
     if [[ -n "$resolved" && -x "$resolved" ]]; then
         echo "$resolved"
         return 0
@@ -1860,21 +1860,21 @@ resolve_openclaw_bin() {
 
     local npm_bin=""
     npm_bin="$(npm_global_bin_dir || true)"
-    if [[ -n "$npm_bin" && -x "${npm_bin}/openclaw" ]]; then
-        echo "${npm_bin}/openclaw"
+    if [[ -n "$npm_bin" && -x "${npm_bin}/recall" ]]; then
+        echo "${npm_bin}/recall"
         return 0
     fi
 
     maybe_nodenv_rehash
     refresh_shell_command_cache
-    resolved="$(type -P openclaw 2>/dev/null || true)"
+    resolved="$(type -P recall 2>/dev/null || true)"
     if [[ -n "$resolved" && -x "$resolved" ]]; then
         echo "$resolved"
         return 0
     fi
 
-    if [[ -n "$npm_bin" && -x "${npm_bin}/openclaw" ]]; then
-        echo "${npm_bin}/openclaw"
+    if [[ -n "$npm_bin" && -x "${npm_bin}/recall" ]]; then
+        echo "${npm_bin}/recall"
         return 0
     fi
 
@@ -1882,14 +1882,14 @@ resolve_openclaw_bin() {
     return 1
 }
 
-install_openclaw_from_git() {
+install_recall_from_git() {
     local repo_dir="$1"
-    local repo_url="https://github.com/openclaw/openclaw.git"
+    local repo_url="https://github.com/recall/recall.git"
 
     if [[ -d "$repo_dir/.git" ]]; then
-        ui_info "Installing OpenClaw from git checkout: ${repo_dir}"
+        ui_info "Installing Recall from git checkout: ${repo_dir}"
     else
-        ui_info "Installing OpenClaw from GitHub (${repo_url})"
+        ui_info "Installing Recall from GitHub (${repo_url})"
     fi
 
     if ! check_git; then
@@ -1900,7 +1900,7 @@ install_openclaw_from_git() {
     ensure_pnpm_binary_for_scripts
 
     if [[ ! -d "$repo_dir" ]]; then
-        run_quiet_step "Cloning OpenClaw" git clone "$repo_url" "$repo_dir"
+        run_quiet_step "Cloning Recall" git clone "$repo_url" "$repo_dir"
     fi
 
     if [[ "$GIT_UPDATE" == "1" ]]; then
@@ -1918,24 +1918,24 @@ install_openclaw_from_git() {
     if ! run_quiet_step "Building UI" run_pnpm -C "$repo_dir" ui:build; then
         ui_warn "UI build failed; continuing (CLI may still work)"
     fi
-    run_quiet_step "Building OpenClaw" run_pnpm -C "$repo_dir" build
+    run_quiet_step "Building Recall" run_pnpm -C "$repo_dir" build
 
     ensure_user_local_bin_on_path
 
-    cat > "$HOME/.local/bin/openclaw" <<EOF
+    cat > "$HOME/.local/bin/recall" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 exec node "${repo_dir}/dist/entry.js" "\$@"
 EOF
-    chmod +x "$HOME/.local/bin/openclaw"
-    ui_success "OpenClaw wrapper installed to \$HOME/.local/bin/openclaw"
+    chmod +x "$HOME/.local/bin/recall"
+    ui_success "Recall wrapper installed to \$HOME/.local/bin/recall"
     ui_info "This checkout uses pnpm — run pnpm install (or corepack pnpm install) for deps"
 }
 
-# Install OpenClaw
+# Install Recall
 resolve_beta_version() {
     local beta=""
-    beta="$(npm view openclaw dist-tags.beta 2>/dev/null || true)"
+    beta="$(npm view recall dist-tags.beta 2>/dev/null || true)"
     if [[ -z "$beta" || "$beta" == "undefined" || "$beta" == "null" ]]; then
         return 1
     fi
@@ -1965,7 +1965,7 @@ resolve_package_install_spec() {
     local package_name="$1"
     local value="$2"
     if [[ "${value,,}" == "main" ]]; then
-        echo "github:openclaw/openclaw#main"
+        echo "github:recall/recall#main"
         return 0
     fi
     if is_explicit_package_install_spec "$value"; then
@@ -1979,66 +1979,66 @@ resolve_package_install_spec() {
     echo "${package_name}@${value}"
 }
 
-install_openclaw() {
-    local package_name="openclaw"
+install_recall() {
+    local package_name="recall"
     if [[ "$USE_BETA" == "1" ]]; then
         local beta_version=""
         beta_version="$(resolve_beta_version || true)"
         if [[ -n "$beta_version" ]]; then
-            OPENCLAW_VERSION="$beta_version"
+            RECALL_VERSION="$beta_version"
             ui_info "Beta tag detected (${beta_version})"
-            package_name="openclaw"
+            package_name="recall"
         else
-            OPENCLAW_VERSION="latest"
+            RECALL_VERSION="latest"
             ui_info "No beta tag found; using latest"
         fi
     fi
 
-    if [[ -z "${OPENCLAW_VERSION}" ]]; then
-        OPENCLAW_VERSION="latest"
+    if [[ -z "${RECALL_VERSION}" ]]; then
+        RECALL_VERSION="latest"
     fi
 
     local resolved_version=""
-    if can_resolve_registry_package_version "${OPENCLAW_VERSION}"; then
-        resolved_version="$(npm view "${package_name}@${OPENCLAW_VERSION}" version 2>/dev/null || true)"
+    if can_resolve_registry_package_version "${RECALL_VERSION}"; then
+        resolved_version="$(npm view "${package_name}@${RECALL_VERSION}" version 2>/dev/null || true)"
     fi
     if [[ -n "$resolved_version" ]]; then
-        ui_info "Installing OpenClaw v${resolved_version}"
+        ui_info "Installing Recall v${resolved_version}"
     else
-        ui_info "Installing OpenClaw (${OPENCLAW_VERSION})"
+        ui_info "Installing Recall (${RECALL_VERSION})"
     fi
     local install_spec=""
-    install_spec="$(resolve_package_install_spec "${package_name}" "${OPENCLAW_VERSION}")"
+    install_spec="$(resolve_package_install_spec "${package_name}" "${RECALL_VERSION}")"
 
-    if ! install_openclaw_npm "${install_spec}"; then
+    if ! install_recall_npm "${install_spec}"; then
         ui_warn "npm install failed; retrying"
-        cleanup_npm_openclaw_paths
-        install_openclaw_npm "${install_spec}"
+        cleanup_npm_recall_paths
+        install_recall_npm "${install_spec}"
     fi
 
-    if [[ "${OPENCLAW_VERSION}" == "latest" && "${package_name}" == "openclaw" ]]; then
-        if ! resolve_openclaw_bin &> /dev/null; then
-            ui_warn "npm install openclaw@latest failed; retrying openclaw@next"
-            cleanup_npm_openclaw_paths
-            install_openclaw_npm "openclaw@next"
+    if [[ "${RECALL_VERSION}" == "latest" && "${package_name}" == "recall" ]]; then
+        if ! resolve_recall_bin &> /dev/null; then
+            ui_warn "npm install recall@latest failed; retrying recall@next"
+            cleanup_npm_recall_paths
+            install_recall_npm "recall@next"
         fi
     fi
 
-    ensure_openclaw_bin_link || true
+    ensure_recall_bin_link || true
 
-    ui_success "OpenClaw installed"
+    ui_success "Recall installed"
 }
 
 # Run doctor for migrations (safe, non-interactive)
 run_doctor() {
     ui_info "Running doctor to migrate settings"
-    local claw="${OPENCLAW_BIN:-}"
+    local claw="${RECALL_BIN:-}"
     if [[ -z "$claw" ]]; then
-        claw="$(resolve_openclaw_bin || true)"
+        claw="$(resolve_recall_bin || true)"
     fi
     if [[ -z "$claw" ]]; then
-        ui_info "Skipping doctor (openclaw not on PATH yet)"
-        warn_openclaw_not_found
+        ui_info "Skipping doctor (recall not on PATH yet)"
+        warn_recall_not_found
         return 0
     fi
     run_quiet_step "Running doctor" "$claw" doctor --non-interactive || true
@@ -2046,9 +2046,9 @@ run_doctor() {
 }
 
 maybe_open_dashboard() {
-    local claw="${OPENCLAW_BIN:-}"
+    local claw="${RECALL_BIN:-}"
     if [[ -z "$claw" ]]; then
-        claw="$(resolve_openclaw_bin || true)"
+        claw="$(resolve_recall_bin || true)"
     fi
     if [[ -z "$claw" ]]; then
         return 0
@@ -2060,11 +2060,11 @@ maybe_open_dashboard() {
 }
 
 resolve_workspace_dir() {
-    local profile="${OPENCLAW_PROFILE:-default}"
+    local profile="${RECALL_PROFILE:-default}"
     if [[ "${profile}" != "default" ]]; then
-        echo "${HOME}/.openclaw/workspace-${profile}"
+        echo "${HOME}/.recall/workspace-${profile}"
     else
-        echo "${HOME}/.openclaw/workspace"
+        echo "${HOME}/.recall/workspace"
     fi
 }
 
@@ -2073,7 +2073,7 @@ run_bootstrap_onboarding_if_needed() {
         return
     fi
 
-    local config_path="${OPENCLAW_CONFIG_PATH:-$HOME/.openclaw/openclaw.json}"
+    local config_path="${RECALL_CONFIG_PATH:-$HOME/.recall/recall.json}"
     if [[ -f "${config_path}" || -f "$HOME/.clawdbot/clawdbot.json" || -f "$HOME/.moltbot/moltbot.json" || -f "$HOME/.moldbot/moldbot.json" ]]; then
         return
     fi
@@ -2087,23 +2087,23 @@ run_bootstrap_onboarding_if_needed() {
     fi
 
     if [[ ! -r /dev/tty || ! -w /dev/tty ]]; then
-        ui_info "BOOTSTRAP.md found but no TTY; run openclaw onboard to finish setup"
+        ui_info "BOOTSTRAP.md found but no TTY; run recall onboard to finish setup"
         return
     fi
 
     ui_info "BOOTSTRAP.md found; starting onboarding"
-    local claw="${OPENCLAW_BIN:-}"
+    local claw="${RECALL_BIN:-}"
     if [[ -z "$claw" ]]; then
-        claw="$(resolve_openclaw_bin || true)"
+        claw="$(resolve_recall_bin || true)"
     fi
     if [[ -z "$claw" ]]; then
-        ui_info "BOOTSTRAP.md found but openclaw not on PATH; skipping onboarding"
-        warn_openclaw_not_found
+        ui_info "BOOTSTRAP.md found but recall not on PATH; skipping onboarding"
+        warn_recall_not_found
         return
     fi
 
     "$claw" onboard || {
-        ui_error "Onboarding failed; run openclaw onboard to retry"
+        ui_error "Onboarding failed; run recall onboard to retry"
         return
     }
 }
@@ -2125,9 +2125,9 @@ load_install_version_helpers() {
 
 load_install_version_helpers
 
-if ! declare -F extract_openclaw_semver >/dev/null 2>&1; then
+if ! declare -F extract_recall_semver >/dev/null 2>&1; then
 # Inline fallback when version-parse.sh could not be sourced (for example, stdin install).
-extract_openclaw_semver() {
+extract_recall_semver() {
     local raw="${1:-}"
     local parsed=""
     parsed="$(
@@ -2141,16 +2141,16 @@ extract_openclaw_semver() {
 }
 fi
 
-resolve_openclaw_version() {
+resolve_recall_version() {
     local version=""
     local raw_version_output=""
-    local claw="${OPENCLAW_BIN:-}"
-    if [[ -z "$claw" ]] && command -v openclaw &> /dev/null; then
-        claw="$(command -v openclaw)"
+    local claw="${RECALL_BIN:-}"
+    if [[ -z "$claw" ]] && command -v recall &> /dev/null; then
+        claw="$(command -v recall)"
     fi
     if [[ -n "$claw" ]]; then
         raw_version_output=$("$claw" --version 2>/dev/null | head -n 1 | tr -d '\r')
-        version="$(extract_openclaw_semver "$raw_version_output")"
+        version="$(extract_recall_semver "$raw_version_output")"
         if [[ -z "$version" ]]; then
             version="$raw_version_output"
         fi
@@ -2158,8 +2158,8 @@ resolve_openclaw_version() {
     if [[ -z "$version" ]]; then
         local npm_root=""
         npm_root=$(npm root -g 2>/dev/null || true)
-        if [[ -n "$npm_root" && -f "$npm_root/openclaw/package.json" ]]; then
-            version=$(node -e "console.log(require('${npm_root}/openclaw/package.json').version)" 2>/dev/null || true)
+        if [[ -n "$npm_root" && -f "$npm_root/recall/package.json" ]]; then
+            version=$(node -e "console.log(require('${npm_root}/recall/package.json').version)" 2>/dev/null || true)
         fi
     fi
     echo "$version"
@@ -2191,9 +2191,9 @@ try {
 }
 
 refresh_gateway_service_if_loaded() {
-    local claw="${OPENCLAW_BIN:-}"
+    local claw="${RECALL_BIN:-}"
     if [[ -z "$claw" ]]; then
-        claw="$(resolve_openclaw_bin || true)"
+        claw="$(resolve_recall_bin || true)"
     fi
     if [[ -z "$claw" ]]; then
         return 0
@@ -2227,22 +2227,22 @@ verify_installation() {
     fi
 
     ui_stage "Verifying installation"
-    local claw="${OPENCLAW_BIN:-}"
+    local claw="${RECALL_BIN:-}"
     if [[ -z "$claw" ]]; then
-        claw="$(resolve_openclaw_bin || true)"
+        claw="$(resolve_recall_bin || true)"
     fi
     if [[ -z "$claw" ]]; then
-        ui_error "Install verify failed: openclaw not on PATH yet"
-        warn_openclaw_not_found
+        ui_error "Install verify failed: recall not on PATH yet"
+        warn_recall_not_found
         return 1
     fi
 
-    run_quiet_step "Checking OpenClaw version" "$claw" --version || return 1
+    run_quiet_step "Checking Recall version" "$claw" --version || return 1
 
     if is_gateway_daemon_loaded "$claw"; then
         run_quiet_step "Checking gateway service" "$claw" gateway status --deep || {
             ui_error "Install verify failed: gateway service unhealthy"
-            ui_info "Run: openclaw gateway status --deep"
+            ui_info "Run: recall gateway status --deep"
             return 1
         }
     else
@@ -2265,11 +2265,11 @@ main() {
     detect_os_or_die
 
     local detected_checkout=""
-    detected_checkout="$(detect_openclaw_checkout "$PWD" || true)"
+    detected_checkout="$(detect_recall_checkout "$PWD" || true)"
 
     if [[ -z "$INSTALL_METHOD" && -n "$detected_checkout" ]]; then
         if ! is_promptable; then
-            ui_info "Found OpenClaw checkout but no TTY; defaulting to npm install"
+            ui_info "Found Recall checkout but no TTY; defaulting to npm install"
             INSTALL_METHOD="npm"
         else
             local selected_method=""
@@ -2280,7 +2280,7 @@ main() {
                     ;;
                 *)
                     ui_error "no install method selected"
-                    echo "Re-run with: --install-method git|npm (or set OPENCLAW_INSTALL_METHOD)."
+                    echo "Re-run with: --install-method git|npm (or set RECALL_INSTALL_METHOD)."
                     exit 2
                     ;;
             esac
@@ -2306,7 +2306,7 @@ main() {
 
     # Check for existing installation
     local is_upgrade=false
-    if check_existing_openclaw; then
+    if check_existing_recall; then
         is_upgrade=true
     fi
     local should_open_dashboard=false
@@ -2325,14 +2325,14 @@ main() {
         exit 1
     fi
 
-    ui_stage "Installing OpenClaw"
+    ui_stage "Installing Recall"
 
     local final_git_dir=""
     if [[ "$INSTALL_METHOD" == "git" ]]; then
         # Clean up npm global install if switching to git
-        if npm list -g openclaw &>/dev/null; then
+        if npm list -g recall &>/dev/null; then
             ui_info "Removing npm global install (switching to git)"
-            npm uninstall -g openclaw 2>/dev/null || true
+            npm uninstall -g recall 2>/dev/null || true
             ui_success "npm global install removed"
         fi
 
@@ -2341,12 +2341,12 @@ main() {
             repo_dir="$detected_checkout"
         fi
         final_git_dir="$repo_dir"
-        install_openclaw_from_git "$repo_dir"
+        install_recall_from_git "$repo_dir"
     else
         # Clean up git wrapper if switching to npm
-        if [[ -x "$HOME/.local/bin/openclaw" ]]; then
+        if [[ -x "$HOME/.local/bin/recall" ]]; then
             ui_info "Removing git wrapper (switching to npm)"
-            rm -f "$HOME/.local/bin/openclaw"
+            rm -f "$HOME/.local/bin/recall"
             ui_success "git wrapper removed"
         fi
 
@@ -2358,13 +2358,13 @@ main() {
         # Step 4: npm permissions (Linux)
         fix_npm_permissions
 
-        # Step 5: OpenClaw
-        install_openclaw
+        # Step 5: Recall
+        install_recall
     fi
 
     ui_stage "Finalizing setup"
 
-    OPENCLAW_BIN="$(resolve_openclaw_bin || true)"
+    RECALL_BIN="$(resolve_recall_bin || true)"
 
     # PATH warning: installs can succeed while the user's login shell still lacks npm's global bin dir.
     local npm_bin=""
@@ -2373,7 +2373,7 @@ main() {
         warn_shell_path_missing_dir "$npm_bin" "npm global bin dir"
     fi
     if [[ "$INSTALL_METHOD" == "git" ]]; then
-        if [[ -x "$HOME/.local/bin/openclaw" ]]; then
+        if [[ -x "$HOME/.local/bin/recall" ]]; then
             warn_shell_path_missing_dir "$HOME/.local/bin" "user-local bin dir (~/.local/bin)"
         fi
     fi
@@ -2394,25 +2394,25 @@ main() {
     run_bootstrap_onboarding_if_needed
 
     local installed_version
-    installed_version=$(resolve_openclaw_version)
+    installed_version=$(resolve_recall_version)
 
     echo ""
     if [[ -n "$installed_version" ]]; then
-        ui_celebrate "🦞 OpenClaw installed successfully (${installed_version})!"
+        ui_celebrate "🤖 Recall installed successfully (${installed_version})!"
     else
-        ui_celebrate "🦞 OpenClaw installed successfully!"
+        ui_celebrate "🤖 Recall installed successfully!"
     fi
     if [[ "$is_upgrade" == "true" ]]; then
         local update_messages=(
             "Leveled up! New skills unlocked. You're welcome."
-            "Fresh code, same lobster. Miss me?"
+            "Fresh code, same recall. Miss me?"
             "Back and better. Did you even notice I was gone?"
             "Update complete. I learned some new tricks while I was out."
             "Upgraded! Now with 23% more sass."
-            "I've evolved. Try to keep up. 🦞"
+            "I've evolved. Try to keep up. 🤖"
             "New version, who dis? Oh right, still me but shinier."
             "Patched, polished, and ready to pinch. Let's go."
-            "The lobster has molted. Harder shell, sharper claws."
+            "The recall has molted. Harder shell, sharper claws."
             "Update done! Check the changelog or just trust me, it's good."
             "Reborn from the boiling waters of npm. Stronger now."
             "I went away and came back smarter. You should try it sometime."
@@ -2438,7 +2438,7 @@ main() {
             "Cozy. I've already read your calendar. We need to talk."
             "Finally unpacked. Now point me at your problems."
             "cracks claws Alright, what are we building?"
-            "The lobster has landed. Your terminal will never be the same."
+            "The recall has landed. Your terminal will never be the same."
             "All done! I promise to only judge your code a little bit."
         )
         local completion_message
@@ -2450,19 +2450,19 @@ main() {
     if [[ "$INSTALL_METHOD" == "git" && -n "$final_git_dir" ]]; then
         ui_section "Source install details"
         ui_kv "Checkout" "$final_git_dir"
-        ui_kv "Wrapper" "$HOME/.local/bin/openclaw"
-        ui_kv "Update command" "openclaw update --restart"
-        ui_kv "Switch to npm" "curl -fsSL --proto '=https' --tlsv1.2 https://openclaw.ai/install.sh | bash -s -- --install-method npm"
+        ui_kv "Wrapper" "$HOME/.local/bin/recall"
+        ui_kv "Update command" "recall update --restart"
+        ui_kv "Switch to npm" "curl -fsSL --proto '=https' --tlsv1.2 https://recall.ai/install.sh | bash -s -- --install-method npm"
     elif [[ "$is_upgrade" == "true" ]]; then
         ui_info "Upgrade complete"
         if [[ -r /dev/tty && -w /dev/tty ]]; then
-            local claw="${OPENCLAW_BIN:-}"
+            local claw="${RECALL_BIN:-}"
             if [[ -z "$claw" ]]; then
-                claw="$(resolve_openclaw_bin || true)"
+                claw="$(resolve_recall_bin || true)"
             fi
             if [[ -z "$claw" ]]; then
-                ui_info "Skipping doctor (openclaw not on PATH yet)"
-                warn_openclaw_not_found
+                ui_info "Skipping doctor (recall not on PATH yet)"
+                warn_recall_not_found
                 return 0
             fi
             local -a doctor_args=()
@@ -2471,27 +2471,27 @@ main() {
                     doctor_args+=("--non-interactive")
                 fi
             fi
-            ui_info "Running openclaw doctor"
+            ui_info "Running recall doctor"
             local doctor_ok=0
             if (( ${#doctor_args[@]} )); then
-                OPENCLAW_UPDATE_IN_PROGRESS=1 "$claw" doctor "${doctor_args[@]}" </dev/tty && doctor_ok=1
+                RECALL_UPDATE_IN_PROGRESS=1 "$claw" doctor "${doctor_args[@]}" </dev/tty && doctor_ok=1
             else
-                OPENCLAW_UPDATE_IN_PROGRESS=1 "$claw" doctor </dev/tty && doctor_ok=1
+                RECALL_UPDATE_IN_PROGRESS=1 "$claw" doctor </dev/tty && doctor_ok=1
             fi
             if (( doctor_ok )); then
                 ui_info "Updating plugins"
-                OPENCLAW_UPDATE_IN_PROGRESS=1 "$claw" plugins update --all || true
+                RECALL_UPDATE_IN_PROGRESS=1 "$claw" plugins update --all || true
             else
                 ui_warn "Doctor failed; skipping plugin updates"
             fi
         else
-            ui_info "No TTY; run openclaw doctor and openclaw plugins update --all manually"
+            ui_info "No TTY; run recall doctor and recall plugins update --all manually"
         fi
     else
         if [[ "$NO_ONBOARD" == "1" || "$skip_onboard" == "true" ]]; then
-            ui_info "Skipping onboard (requested); run openclaw onboard later"
+            ui_info "Skipping onboard (requested); run recall onboard later"
         else
-            local config_path="${OPENCLAW_CONFIG_PATH:-$HOME/.openclaw/openclaw.json}"
+            local config_path="${RECALL_CONFIG_PATH:-$HOME/.recall/recall.json}"
             if [[ -f "${config_path}" || -f "$HOME/.clawdbot/clawdbot.json" || -f "$HOME/.moltbot/moltbot.json" || -f "$HOME/.moldbot/moldbot.json" ]]; then
                 ui_info "Config already present; running doctor"
                 run_doctor
@@ -2502,37 +2502,37 @@ main() {
             ui_info "Starting setup"
             echo ""
             if [[ -r /dev/tty && -w /dev/tty ]]; then
-                local claw="${OPENCLAW_BIN:-}"
+                local claw="${RECALL_BIN:-}"
                 if [[ -z "$claw" ]]; then
-                    claw="$(resolve_openclaw_bin || true)"
+                    claw="$(resolve_recall_bin || true)"
                 fi
                 if [[ -z "$claw" ]]; then
-                    ui_info "Skipping onboarding (openclaw not on PATH yet)"
-                    warn_openclaw_not_found
+                    ui_info "Skipping onboarding (recall not on PATH yet)"
+                    warn_recall_not_found
                     return 0
                 fi
                 exec </dev/tty
                 exec "$claw" onboard
             fi
-            ui_info "No TTY; run openclaw onboard to finish setup"
+            ui_info "No TTY; run recall onboard to finish setup"
             return 0
         fi
     fi
 
-    if command -v openclaw &> /dev/null; then
-        local claw="${OPENCLAW_BIN:-}"
+    if command -v recall &> /dev/null; then
+        local claw="${RECALL_BIN:-}"
         if [[ -z "$claw" ]]; then
-            claw="$(resolve_openclaw_bin || true)"
+            claw="$(resolve_recall_bin || true)"
         fi
         if [[ -n "$claw" ]] && is_gateway_daemon_loaded "$claw"; then
             if [[ "$DRY_RUN" == "1" ]]; then
-                ui_info "Gateway daemon detected; would restart (openclaw daemon restart)"
+                ui_info "Gateway daemon detected; would restart (recall daemon restart)"
             else
                 ui_info "Gateway daemon detected; restarting"
-                if OPENCLAW_UPDATE_IN_PROGRESS=1 "$claw" daemon restart >/dev/null 2>&1; then
+                if RECALL_UPDATE_IN_PROGRESS=1 "$claw" daemon restart >/dev/null 2>&1; then
                     ui_success "Gateway restarted"
                 else
-                    ui_warn "Gateway restart failed; try: openclaw daemon restart"
+                    ui_warn "Gateway restart failed; try: recall daemon restart"
                 fi
             fi
         fi
@@ -2549,7 +2549,7 @@ main() {
     show_footer_links
 }
 
-if [[ "${OPENCLAW_INSTALL_SH_NO_RUN:-0}" != "1" ]]; then
+if [[ "${RECALL_INSTALL_SH_NO_RUN:-0}" != "1" ]]; then
     parse_args "$@"
     configure_verbose
     main

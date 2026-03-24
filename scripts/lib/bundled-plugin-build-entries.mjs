@@ -16,15 +16,15 @@ function readBundledPluginPackageJson(packageJsonPath) {
 }
 
 function collectPluginSourceEntries(packageJson) {
-  let packageEntries = Array.isArray(packageJson?.openclaw?.extensions)
-    ? packageJson.openclaw.extensions.filter(
+  let packageEntries = Array.isArray(packageJson?.recall?.extensions)
+    ? packageJson.recall.extensions.filter(
         (entry) => typeof entry === "string" && entry.trim().length > 0,
       )
     : [];
   const setupEntry =
-    typeof packageJson?.openclaw?.setupEntry === "string" &&
-    packageJson.openclaw.setupEntry.trim().length > 0
-      ? packageJson.openclaw.setupEntry
+    typeof packageJson?.recall?.setupEntry === "string" &&
+    packageJson.recall.setupEntry.trim().length > 0
+      ? packageJson.recall.setupEntry
       : undefined;
   if (setupEntry) {
     packageEntries = Array.from(new Set([...packageEntries, setupEntry]));
@@ -77,7 +77,7 @@ export function collectBundledPluginBuildEntries(params = {}) {
     }
 
     const pluginDir = path.join(extensionsRoot, dirent.name);
-    const manifestPath = path.join(pluginDir, "openclaw.plugin.json");
+    const manifestPath = path.join(pluginDir, "recall.plugin.json");
     if (!fs.existsSync(manifestPath)) {
       continue;
     }
@@ -121,7 +121,7 @@ export function listBundledPluginPackArtifacts(params = {}) {
   const artifacts = new Set();
 
   for (const { id, hasPackageJson, sourceEntries } of entries) {
-    artifacts.add(`dist/extensions/${id}/openclaw.plugin.json`);
+    artifacts.add(`dist/extensions/${id}/recall.plugin.json`);
     if (hasPackageJson) {
       artifacts.add(`dist/extensions/${id}/package.json`);
     }

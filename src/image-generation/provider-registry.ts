@@ -1,7 +1,7 @@
 import { normalizeProviderId } from "../agents/model-selection.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { isBlockedObjectKey } from "../infra/prototype-keys.js";
-import { loadOpenClawPlugins } from "../plugins/loader.js";
+import { loadRecallPlugins } from "../plugins/loader.js";
 import { getActivePluginRegistry, getActivePluginRegistryKey } from "../plugins/runtime.js";
 import type { ImageGenerationProviderPlugin } from "../plugins/types.js";
 
@@ -21,17 +21,17 @@ function isSafeImageGenerationProviderId(id: string | undefined): id is string {
 }
 
 function resolvePluginImageGenerationProviders(
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): ImageGenerationProviderPlugin[] {
   const active = getActivePluginRegistry();
   const registry =
     (active?.imageGenerationProviders?.length ?? 0) > 0 || getActivePluginRegistryKey() || !cfg
       ? active
-      : loadOpenClawPlugins({ config: cfg });
+      : loadRecallPlugins({ config: cfg });
   return registry?.imageGenerationProviders?.map((entry) => entry.provider) ?? [];
 }
 
-function buildProviderMaps(cfg?: OpenClawConfig): {
+function buildProviderMaps(cfg?: RecallConfig): {
   canonical: Map<string, ImageGenerationProviderPlugin>;
   aliases: Map<string, ImageGenerationProviderPlugin>;
 } {
@@ -63,14 +63,14 @@ function buildProviderMaps(cfg?: OpenClawConfig): {
 }
 
 export function listImageGenerationProviders(
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): ImageGenerationProviderPlugin[] {
   return [...buildProviderMaps(cfg).canonical.values()];
 }
 
 export function getImageGenerationProvider(
   providerId: string | undefined,
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): ImageGenerationProviderPlugin | undefined {
   const normalized = normalizeImageGenerationProviderId(providerId);
   if (!normalized) {

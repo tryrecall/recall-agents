@@ -1,4 +1,4 @@
-import OpenClawProtocol
+import RecallProtocol
 
-public typealias AnyCodable = OpenClawProtocol.AnyCodable
+public typealias AnyCodable = RecallProtocol.AnyCodable
 

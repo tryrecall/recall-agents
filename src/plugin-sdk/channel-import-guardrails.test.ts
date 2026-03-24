@@ -55,27 +55,27 @@ type GuardedSource = {
 const SAME_CHANNEL_SDK_GUARDS: GuardedSource[] = [
   {
     path: "extensions/discord/src/shared.ts",
-    forbiddenPatterns: [/["']openclaw\/plugin-sdk\/discord["']/, /plugin-sdk-internal\/discord/],
+    forbiddenPatterns: [/["']recall\/plugin-sdk\/discord["']/, /plugin-sdk-internal\/discord/],
   },
   {
     path: "extensions/slack/src/shared.ts",
-    forbiddenPatterns: [/["']openclaw\/plugin-sdk\/slack["']/, /plugin-sdk-internal\/slack/],
+    forbiddenPatterns: [/["']recall\/plugin-sdk\/slack["']/, /plugin-sdk-internal\/slack/],
   },
   {
     path: "extensions/telegram/src/shared.ts",
-    forbiddenPatterns: [/["']openclaw\/plugin-sdk\/telegram["']/, /plugin-sdk-internal\/telegram/],
+    forbiddenPatterns: [/["']recall\/plugin-sdk\/telegram["']/, /plugin-sdk-internal\/telegram/],
   },
   {
     path: "extensions/imessage/src/shared.ts",
-    forbiddenPatterns: [/["']openclaw\/plugin-sdk\/imessage["']/, /plugin-sdk-internal\/imessage/],
+    forbiddenPatterns: [/["']recall\/plugin-sdk\/imessage["']/, /plugin-sdk-internal\/imessage/],
   },
   {
     path: "extensions/whatsapp/src/shared.ts",
-    forbiddenPatterns: [/["']openclaw\/plugin-sdk\/whatsapp["']/, /plugin-sdk-internal\/whatsapp/],
+    forbiddenPatterns: [/["']recall\/plugin-sdk\/whatsapp["']/, /plugin-sdk-internal\/whatsapp/],
   },
   {
     path: "extensions/signal/src/shared.ts",
-    forbiddenPatterns: [/["']openclaw\/plugin-sdk\/signal["']/, /plugin-sdk-internal\/signal/],
+    forbiddenPatterns: [/["']recall\/plugin-sdk\/signal["']/, /plugin-sdk-internal\/signal/],
   },
 ];
 
@@ -139,7 +139,7 @@ const LOCAL_EXTENSION_API_BARREL_GUARDS = [
   "irc",
   "llm-task",
   "line",
-  "lobster",
+  "recall",
   "matrix",
   "mattermost",
   "memory-lancedb",
@@ -420,11 +420,11 @@ describe("channel import guardrails", () => {
   it("keeps bundled extension source files off root and compat plugin-sdk imports", () => {
     for (const file of collectExtensionSourceFiles()) {
       const text = readSource(file);
-      expect(text, `${file} should not import openclaw/plugin-sdk root`).not.toMatch(
-        /["']openclaw\/plugin-sdk["']/,
+      expect(text, `${file} should not import recall/plugin-sdk root`).not.toMatch(
+        /["']recall\/plugin-sdk["']/,
       );
-      expect(text, `${file} should not import openclaw/plugin-sdk/compat`).not.toMatch(
-        /["']openclaw\/plugin-sdk\/compat["']/,
+      expect(text, `${file} should not import recall/plugin-sdk/compat`).not.toMatch(
+        /["']recall\/plugin-sdk\/compat["']/,
       );
     }
   });
@@ -486,7 +486,7 @@ describe("channel import guardrails", () => {
         expect(
           text,
           `${normalized} should import ${extensionId} helpers via the local api barrel`,
-        ).not.toMatch(new RegExp(`["']openclaw/plugin-sdk/${extensionId}["']`, "u"));
+        ).not.toMatch(new RegExp(`["']recall/plugin-sdk/${extensionId}["']`, "u"));
       }
     }
   });

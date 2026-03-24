@@ -2,7 +2,7 @@ import { ChannelType } from "discord-api-types/v10";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { NativeCommandSpec } from "../../../../src/auto-reply/commands-registry.js";
 import { setDefaultChannelPluginRegistryForTests } from "../../../../src/commands/channel-test-helpers.js";
-import type { OpenClawConfig } from "../../../../src/config/config.js";
+import type { RecallConfig } from "../../../../src/config/config.js";
 import { clearPluginCommands, registerPluginCommand } from "../../../../src/plugins/commands.js";
 import {
   createMockCommandInteraction,
@@ -11,7 +11,7 @@ import {
 import { createNoopThreadBindingManager } from "./thread-bindings.js";
 
 type EnsureConfiguredBindingRouteReadyFn =
-  typeof import("openclaw/plugin-sdk/conversation-runtime").ensureConfiguredBindingRouteReady;
+  typeof import("recall/plugin-sdk/conversation-runtime").ensureConfiguredBindingRouteReady;
 
 const ensureConfiguredBindingRouteReadyMock = vi.hoisted(() =>
   vi.fn<EnsureConfiguredBindingRouteReadyFn>(async () => ({
@@ -24,8 +24,8 @@ const runtimeModuleMocks = vi.hoisted(() => ({
   dispatchReplyWithDispatcher: vi.fn(),
 }));
 
-vi.mock("openclaw/plugin-sdk/conversation-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/conversation-runtime")>();
+vi.mock("recall/plugin-sdk/conversation-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/conversation-runtime")>();
   return {
     ...actual,
     ensureConfiguredBindingRouteReady: (...args: unknown[]) =>
@@ -35,8 +35,8 @@ vi.mock("openclaw/plugin-sdk/conversation-runtime", async (importOriginal) => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/plugin-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/plugin-runtime")>();
+vi.mock("recall/plugin-sdk/plugin-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/plugin-runtime")>();
   return {
     ...actual,
     matchPluginCommand: (...args: unknown[]) => runtimeModuleMocks.matchPluginCommand(...args),
@@ -44,8 +44,8 @@ vi.mock("openclaw/plugin-sdk/plugin-runtime", async (importOriginal) => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/reply-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/reply-runtime")>();
+vi.mock("recall/plugin-sdk/reply-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/reply-runtime")>();
   return {
     ...actual,
     dispatchReplyWithDispatcher: (...args: unknown[]) =>
@@ -71,14 +71,14 @@ function createInteraction(params?: {
   });
 }
 
-function createConfig(): OpenClawConfig {
+function createConfig(): RecallConfig {
   return {
     channels: {
       discord: {
         dm: { enabled: true, policy: "open" },
       },
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
 async function loadCreateDiscordNativeCommand() {
@@ -86,7 +86,7 @@ async function loadCreateDiscordNativeCommand() {
   return (await import("./native-command.js")).createDiscordNativeCommand;
 }
 
-async function createNativeCommand(cfg: OpenClawConfig, commandSpec: NativeCommandSpec) {
+async function createNativeCommand(cfg: RecallConfig, commandSpec: NativeCommandSpec) {
   const createDiscordNativeCommand = await loadCreateDiscordNativeCommand();
   return createDiscordNativeCommand({
     command: commandSpec,
@@ -99,7 +99,7 @@ async function createNativeCommand(cfg: OpenClawConfig, commandSpec: NativeComma
   });
 }
 
-async function createPluginCommand(params: { cfg: OpenClawConfig; name: string }) {
+async function createPluginCommand(params: { cfg: RecallConfig; name: string }) {
   const createDiscordNativeCommand = await loadCreateDiscordNativeCommand();
   return createDiscordNativeCommand({
     command: {
@@ -137,7 +137,7 @@ function registerPairPlugin(params?: { discordNativeName?: string }) {
 }
 
 async function expectPairCommandReply(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   commandName: string;
   interaction: MockCommandInteraction;
 }) {
@@ -163,7 +163,7 @@ async function expectPairCommandReply(params: {
   );
 }
 
-async function createStatusCommand(cfg: OpenClawConfig) {
+async function createStatusCommand(cfg: RecallConfig) {
   return await createNativeCommand(cfg, {
     name: "status",
     description: "Status",
@@ -198,7 +198,7 @@ function expectBoundSessionDispatch(
 }
 
 async function expectBoundStatusCommandDispatch(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   interaction: MockCommandInteraction;
   expectedPattern: RegExp;
 }) {
@@ -223,8 +223,8 @@ describe("Discord native plugin command dispatch", () => {
       ok: true,
     });
     const actualPluginRuntime = await vi.importActual<
-      typeof import("openclaw/plugin-sdk/plugin-runtime")
-    >("openclaw/plugin-sdk/plugin-runtime");
+      typeof import("recall/plugin-sdk/plugin-runtime")
+    >("recall/plugin-sdk/plugin-runtime");
     runtimeModuleMocks.matchPluginCommand.mockReset();
     runtimeModuleMocks.matchPluginCommand.mockImplementation(
       actualPluginRuntime.matchPluginCommand,
@@ -289,7 +289,7 @@ describe("Discord native plugin command dispatch", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const commandSpec: NativeCommandSpec = {
       name: "pair",
       description: "Pair",
@@ -401,7 +401,7 @@ describe("Discord native plugin command dispatch", () => {
           },
         },
       ],
-    } as OpenClawConfig;
+    } as RecallConfig;
     const interaction = createInteraction({
       channelType: ChannelType.GuildText,
       channelId,
@@ -445,7 +445,7 @@ describe("Discord native plugin command dispatch", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const interaction = createInteraction({
       channelType: ChannelType.GuildText,
       channelId,
@@ -495,7 +495,7 @@ describe("Discord native plugin command dispatch", () => {
           dm: { enabled: true, policy: "open" },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const interaction = createInteraction({
       channelType: ChannelType.DM,
       channelId,
@@ -529,7 +529,7 @@ describe("Discord native plugin command dispatch", () => {
           },
         },
       ],
-    } as OpenClawConfig;
+    } as RecallConfig;
     const interaction = createInteraction({
       channelType: ChannelType.GuildText,
       channelId,

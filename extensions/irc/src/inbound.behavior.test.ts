@@ -86,7 +86,7 @@ function createAccount(overrides?: Partial<ResolvedIrcAccount>): ResolvedIrcAcco
     accountId: "default",
     enabled: true,
     server: "irc.example.com",
-    nick: "OpenClaw",
+    nick: "Recall",
     config: {
       dmPolicy: "pairing",
       allowFrom: [],

@@ -1,4 +1,4 @@
-import * as providerAuth from "openclaw/plugin-sdk/provider-auth";
+import * as providerAuth from "recall/plugin-sdk/provider-auth";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildOpenAIImageGenerationProvider } from "./image-generation-provider.js";
 

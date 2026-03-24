@@ -1,5 +1,5 @@
-import { defineSingleProviderPluginEntry } from "openclaw/plugin-sdk/provider-entry";
-import { applyXaiModelCompat } from "openclaw/plugin-sdk/provider-models";
+import { defineSingleProviderPluginEntry } from "recall/plugin-sdk/provider-entry";
+import { applyXaiModelCompat } from "recall/plugin-sdk/provider-models";
 import { applyVeniceConfig, VENICE_DEFAULT_MODEL_REF } from "./onboard.js";
 import { buildVeniceProvider } from "./provider-catalog.js";
 

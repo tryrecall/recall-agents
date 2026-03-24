@@ -13,7 +13,7 @@ describe("loadVitestExperimentalConfig", () => {
   it("enables the filesystem module cache explicitly", () => {
     expect(
       loadVitestExperimentalConfig({
-        OPENCLAW_VITEST_FS_MODULE_CACHE: "1",
+        RECALL_VITEST_FS_MODULE_CACHE: "1",
       }),
     ).toEqual({
       experimental: {
@@ -25,7 +25,7 @@ describe("loadVitestExperimentalConfig", () => {
   it("allows disabling the filesystem module cache explicitly", () => {
     expect(
       loadVitestExperimentalConfig({
-        OPENCLAW_VITEST_FS_MODULE_CACHE: "0",
+        RECALL_VITEST_FS_MODULE_CACHE: "0",
       }),
     ).toEqual({});
   });
@@ -33,8 +33,8 @@ describe("loadVitestExperimentalConfig", () => {
   it("enables import timing output and import breakdown reporting", () => {
     expect(
       loadVitestExperimentalConfig({
-        OPENCLAW_VITEST_IMPORT_DURATIONS: "true",
-        OPENCLAW_VITEST_PRINT_IMPORT_BREAKDOWN: "1",
+        RECALL_VITEST_IMPORT_DURATIONS: "true",
+        RECALL_VITEST_PRINT_IMPORT_BREAKDOWN: "1",
       }),
     ).toEqual({
       experimental: {

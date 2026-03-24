@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({
   getChannelPlugin: vi.fn(),
   resolveOutboundTarget: vi.fn(),
   deliverOutboundPayloads: vi.fn(),
-  loadOpenClawPlugins: vi.fn(),
+  loadRecallPlugins: vi.fn(),
 }));
 
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
@@ -32,13 +32,13 @@ describe("sendMessage", () => {
         const match = sessionKey?.match(/^agent:([^:]+)/i);
         return match?.[1] ?? "main";
       },
-      resolveAgentWorkspaceDir: () => "/tmp/openclaw-test-workspace",
+      resolveAgentWorkspaceDir: () => "/tmp/recall-test-workspace",
     }));
     vi.doMock("../../config/plugin-auto-enable.js", () => ({
       applyPluginAutoEnable: ({ config }: { config: unknown }) => ({ config, changes: [] }),
     }));
     vi.doMock("../../plugins/loader.js", () => ({
-      loadOpenClawPlugins: mocks.loadOpenClawPlugins,
+      loadRecallPlugins: mocks.loadRecallPlugins,
     }));
     vi.doMock("./targets.js", () => ({
       resolveOutboundTarget: mocks.resolveOutboundTarget,
@@ -50,7 +50,7 @@ describe("sendMessage", () => {
     mocks.getChannelPlugin.mockClear();
     mocks.resolveOutboundTarget.mockClear();
     mocks.deliverOutboundPayloads.mockClear();
-    mocks.loadOpenClawPlugins.mockClear();
+    mocks.loadRecallPlugins.mockClear();
 
     mocks.getChannelPlugin.mockReturnValue({
       outbound: { deliveryMode: "direct" },
@@ -124,6 +124,6 @@ describe("sendMessage", () => {
       via: "direct",
     });
 
-    expect(mocks.loadOpenClawPlugins).toHaveBeenCalledTimes(1);
+    expect(mocks.loadRecallPlugins).toHaveBeenCalledTimes(1);
   });
 });

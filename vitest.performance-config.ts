@@ -23,13 +23,13 @@ export function loadVitestExperimentalConfig(env: EnvMap = process.env): {
     printImportBreakdown?: true;
   } = {};
 
-  if (!isDisabled(env.OPENCLAW_VITEST_FS_MODULE_CACHE)) {
+  if (!isDisabled(env.RECALL_VITEST_FS_MODULE_CACHE)) {
     experimental.fsModuleCache = true;
   }
-  if (isEnabled(env.OPENCLAW_VITEST_IMPORT_DURATIONS)) {
+  if (isEnabled(env.RECALL_VITEST_IMPORT_DURATIONS)) {
     experimental.importDurations = { print: true };
   }
-  if (isEnabled(env.OPENCLAW_VITEST_PRINT_IMPORT_BREAKDOWN)) {
+  if (isEnabled(env.RECALL_VITEST_PRINT_IMPORT_BREAKDOWN)) {
     experimental.printImportBreakdown = true;
   }
 

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 
 let createOllamaEmbeddingProvider: typeof import("./embeddings-ollama.js").createOllamaEmbeddingProvider;
 
@@ -29,7 +29,7 @@ describe("embeddings-ollama", () => {
     globalThis.fetch = fetchMock as unknown as typeof fetch;
 
     const { provider } = await createOllamaEmbeddingProvider({
-      config: {} as OpenClawConfig,
+      config: {} as RecallConfig,
       provider: "ollama",
       model: "nomic-embed-text",
       fallback: "none",
@@ -66,7 +66,7 @@ describe("embeddings-ollama", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as RecallConfig,
       provider: "ollama",
       model: "",
       fallback: "none",
@@ -90,7 +90,7 @@ describe("embeddings-ollama", () => {
   it("fails fast when memory-search remote apiKey is an unresolved SecretRef", async () => {
     await expect(
       createOllamaEmbeddingProvider({
-        config: {} as OpenClawConfig,
+        config: {} as RecallConfig,
         provider: "ollama",
         model: "nomic-embed-text",
         fallback: "none",
@@ -124,7 +124,7 @@ describe("embeddings-ollama", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as RecallConfig,
       provider: "ollama",
       model: "nomic-embed-text",
       fallback: "none",

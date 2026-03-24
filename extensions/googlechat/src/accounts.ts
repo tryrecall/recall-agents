@@ -4,8 +4,8 @@ import {
   normalizeAccountId,
   resolveAccountEntry,
   resolveMergedAccountConfig,
-} from "openclaw/plugin-sdk/account-resolution";
-import { isSecretRef, type OpenClawConfig } from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/account-resolution";
+import { isSecretRef, type RecallConfig } from "recall/plugin-sdk/core";
 import type { GoogleChatAccountConfig } from "./types.config.js";
 
 export type GoogleChatCredentialSource = "file" | "inline" | "env" | "none";
@@ -30,7 +30,7 @@ const {
 export { listGoogleChatAccountIds, resolveDefaultGoogleChatAccountId };
 
 function mergeGoogleChatAccountConfig(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   accountId: string,
 ): GoogleChatAccountConfig {
   const raw = cfg.channels?.["googlechat"] ?? {};
@@ -129,7 +129,7 @@ function resolveCredentialsFromConfig(params: {
 }
 
 export function resolveGoogleChatAccount(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
 }): ResolvedGoogleChatAccount {
   const accountId = normalizeAccountId(params.accountId);
@@ -150,7 +150,7 @@ export function resolveGoogleChatAccount(params: {
   };
 }
 
-export function listEnabledGoogleChatAccounts(cfg: OpenClawConfig): ResolvedGoogleChatAccount[] {
+export function listEnabledGoogleChatAccounts(cfg: RecallConfig): ResolvedGoogleChatAccount[] {
   return listGoogleChatAccountIds(cfg)
     .map((accountId) => resolveGoogleChatAccount({ cfg, accountId }))
     .filter((account) => account.enabled);

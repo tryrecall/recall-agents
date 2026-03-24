@@ -1,14 +1,14 @@
 {
-  "name": "@openclaw/slack",
+  "name": "@recall/slack",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw Slack channel plugin",
+  "description": "Recall Slack channel plugin",
   "type": "module",
   "dependencies": {
     "@slack/bolt": "^4.6.0",
     "@slack/web-api": "^7.15.0"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],

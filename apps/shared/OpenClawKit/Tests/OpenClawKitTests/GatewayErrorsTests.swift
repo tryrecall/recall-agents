@@ -1,4 +1,4 @@
-import OpenClawKit
+import RecallKit
 import Testing
 
 @Suite struct GatewayErrorsTests {

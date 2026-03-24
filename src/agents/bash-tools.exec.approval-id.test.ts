@@ -51,17 +51,17 @@ function buildPreparedSystemRunPayload(rawInvokeParams: unknown) {
 }
 
 function getTestConfigPath() {
-  return path.join(process.env.HOME ?? "", ".openclaw", "openclaw.json");
+  return path.join(process.env.HOME ?? "", ".recall", "recall.json");
 }
 
-async function writeOpenClawConfig(config: Record<string, unknown>, pretty = false) {
+async function writeRecallConfig(config: Record<string, unknown>, pretty = false) {
   const configPath = getTestConfigPath();
   await fs.mkdir(path.dirname(configPath), { recursive: true });
   await fs.writeFile(configPath, JSON.stringify(config, null, pretty ? 2 : undefined));
 }
 
 async function writeExecApprovalsConfig(config: Record<string, unknown>) {
-  const approvalsPath = path.join(process.env.HOME ?? "", ".openclaw", "exec-approvals.json");
+  const approvalsPath = path.join(process.env.HOME ?? "", ".recall", "exec-approvals.json");
   await fs.mkdir(path.dirname(approvalsPath), { recursive: true });
   await fs.writeFile(approvalsPath, JSON.stringify(config, null, 2));
 }
@@ -213,7 +213,7 @@ describe("exec approvals", () => {
   beforeEach(async () => {
     previousHome = process.env.HOME;
     previousUserProfile = process.env.USERPROFILE;
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-test-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-test-"));
     process.env.HOME = tempDir;
     // Windows uses USERPROFILE for os.homedir()
     process.env.USERPROFILE = tempDir;
@@ -286,7 +286,7 @@ describe("exec approvals", () => {
   });
 
   it("skips approval when node allowlist is satisfied", async () => {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-test-bin-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-test-bin-"));
     const binDir = path.join(tempDir, "bin");
     await fs.mkdir(binDir, { recursive: true });
     const exeName = process.platform === "win32" ? "tool.cmd" : "tool";
@@ -613,7 +613,7 @@ describe("exec approvals", () => {
   });
 
   it("returns an unavailable approval message instead of a local /approve prompt when discord exec approvals are disabled", async () => {
-    await writeOpenClawConfig({
+    await writeRecallConfig({
       channels: {
         discord: {
           enabled: true,
@@ -643,7 +643,7 @@ describe("exec approvals", () => {
   });
 
   it("tells Telegram users that allowed approvers were DMed when Telegram approvals are disabled but Discord DM approvals are enabled", async () => {
-    await writeOpenClawConfig(
+    await writeRecallConfig(
       {
         channels: {
           telegram: {
@@ -742,7 +742,7 @@ describe("exec approvals", () => {
       return { ok: true };
     });
 
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-test-obf-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-test-obf-"));
     const markerPath = path.join(tempDir, "ran.txt");
     const tool = createExecTool({
       host: "gateway",

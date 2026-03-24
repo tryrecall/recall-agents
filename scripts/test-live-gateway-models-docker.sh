@@ -3,11 +3,11 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$ROOT_DIR/scripts/lib/live-docker-auth.sh"
-IMAGE_NAME="${OPENCLAW_IMAGE:-openclaw:local}"
-LIVE_IMAGE_NAME="${OPENCLAW_LIVE_IMAGE:-${IMAGE_NAME}-live}"
-CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw}"
-WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/.openclaw/workspace}"
-PROFILE_FILE="${OPENCLAW_PROFILE_FILE:-$HOME/.profile}"
+IMAGE_NAME="${RECALL_IMAGE:-recall:local}"
+LIVE_IMAGE_NAME="${RECALL_LIVE_IMAGE:-${IMAGE_NAME}-live}"
+CONFIG_DIR="${RECALL_CONFIG_DIR:-$HOME/.recall}"
+WORKSPACE_DIR="${RECALL_WORKSPACE_DIR:-$HOME/.recall/workspace}"
+PROFILE_FILE="${RECALL_PROFILE_FILE:-$HOME/.profile}"
 
 PROFILE_MOUNT=()
 if [[ -f "$PROFILE_FILE" ]]; then
@@ -15,23 +15,23 @@ if [[ -f "$PROFILE_FILE" ]]; then
 fi
 
 AUTH_DIRS=()
-if [[ -n "${OPENCLAW_DOCKER_AUTH_DIRS:-}" ]]; then
+if [[ -n "${RECALL_DOCKER_AUTH_DIRS:-}" ]]; then
   while IFS= read -r auth_dir; do
     [[ -n "$auth_dir" ]] || continue
     AUTH_DIRS+=("$auth_dir")
-  done < <(openclaw_live_collect_auth_dirs)
-elif [[ -n "${OPENCLAW_LIVE_GATEWAY_PROVIDERS:-}" ]]; then
+  done < <(recall_live_collect_auth_dirs)
+elif [[ -n "${RECALL_LIVE_GATEWAY_PROVIDERS:-}" ]]; then
   while IFS= read -r auth_dir; do
     [[ -n "$auth_dir" ]] || continue
     AUTH_DIRS+=("$auth_dir")
-  done < <(openclaw_live_collect_auth_dirs_from_csv "${OPENCLAW_LIVE_GATEWAY_PROVIDERS:-}")
+  done < <(recall_live_collect_auth_dirs_from_csv "${RECALL_LIVE_GATEWAY_PROVIDERS:-}")
 else
   while IFS= read -r auth_dir; do
     [[ -n "$auth_dir" ]] || continue
     AUTH_DIRS+=("$auth_dir")
-  done < <(openclaw_live_collect_auth_dirs)
+  done < <(recall_live_collect_auth_dirs)
 fi
-AUTH_DIRS_CSV="$(openclaw_live_join_csv "${AUTH_DIRS[@]}")"
+AUTH_DIRS_CSV="$(recall_live_join_csv "${AUTH_DIRS[@]}")"
 
 EXTERNAL_AUTH_MOUNTS=()
 for auth_dir in "${AUTH_DIRS[@]}"; do
@@ -44,7 +44,7 @@ done
 read -r -d '' LIVE_TEST_CMD <<'EOF' || true
 set -euo pipefail
 [ -f "$HOME/.profile" ] && source "$HOME/.profile" || true
-IFS=',' read -r -a auth_dirs <<<"${OPENCLAW_DOCKER_AUTH_DIRS_RESOLVED:-}"
+IFS=',' read -r -a auth_dirs <<<"${RECALL_DOCKER_AUTH_DIRS_RESOLVED:-}"
 for auth_dir in "${auth_dirs[@]}"; do
   [ -n "$auth_dir" ] || continue
   if [ -d "/host-auth/$auth_dir" ]; then
@@ -68,9 +68,9 @@ tar -C /src \
 ln -s /app/node_modules "$tmp_dir/node_modules"
 ln -s /app/dist "$tmp_dir/dist"
 if [ -d /app/dist-runtime/extensions ]; then
-  export OPENCLAW_BUNDLED_PLUGINS_DIR=/app/dist-runtime/extensions
+  export RECALL_BUNDLED_PLUGINS_DIR=/app/dist-runtime/extensions
 elif [ -d /app/dist/extensions ]; then
-  export OPENCLAW_BUNDLED_PLUGINS_DIR=/app/dist/extensions
+  export RECALL_BUNDLED_PLUGINS_DIR=/app/dist/extensions
 fi
 cd "$tmp_dir"
 pnpm test:live
@@ -86,16 +86,16 @@ docker run --rm -t \
   -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
   -e HOME=/home/node \
   -e NODE_OPTIONS=--disable-warning=ExperimentalWarning \
-  -e OPENCLAW_SKIP_CHANNELS=1 \
-  -e OPENCLAW_DOCKER_AUTH_DIRS_RESOLVED="$AUTH_DIRS_CSV" \
-  -e OPENCLAW_LIVE_TEST=1 \
-  -e OPENCLAW_LIVE_GATEWAY_MODELS="${OPENCLAW_LIVE_GATEWAY_MODELS:-modern}" \
-  -e OPENCLAW_LIVE_GATEWAY_PROVIDERS="${OPENCLAW_LIVE_GATEWAY_PROVIDERS:-}" \
-  -e OPENCLAW_LIVE_GATEWAY_MAX_MODELS="${OPENCLAW_LIVE_GATEWAY_MAX_MODELS:-24}" \
-  -e OPENCLAW_LIVE_GATEWAY_MODEL_TIMEOUT_MS="${OPENCLAW_LIVE_GATEWAY_MODEL_TIMEOUT_MS:-}" \
+  -e RECALL_SKIP_CHANNELS=1 \
+  -e RECALL_DOCKER_AUTH_DIRS_RESOLVED="$AUTH_DIRS_CSV" \
+  -e RECALL_LIVE_TEST=1 \
+  -e RECALL_LIVE_GATEWAY_MODELS="${RECALL_LIVE_GATEWAY_MODELS:-modern}" \
+  -e RECALL_LIVE_GATEWAY_PROVIDERS="${RECALL_LIVE_GATEWAY_PROVIDERS:-}" \
+  -e RECALL_LIVE_GATEWAY_MAX_MODELS="${RECALL_LIVE_GATEWAY_MAX_MODELS:-24}" \
+  -e RECALL_LIVE_GATEWAY_MODEL_TIMEOUT_MS="${RECALL_LIVE_GATEWAY_MODEL_TIMEOUT_MS:-}" \
   -v "$ROOT_DIR":/src:ro \
-  -v "$CONFIG_DIR":/home/node/.openclaw \
-  -v "$WORKSPACE_DIR":/home/node/.openclaw/workspace \
+  -v "$CONFIG_DIR":/home/node/.recall \
+  -v "$WORKSPACE_DIR":/home/node/.recall/workspace \
   "${EXTERNAL_AUTH_MOUNTS[@]}" \
   "${PROFILE_MOUNT[@]}" \
   "$LIVE_IMAGE_NAME" \

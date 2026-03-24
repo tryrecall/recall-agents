@@ -37,7 +37,7 @@ const listFeishuThreadMessagesMock = vi.hoisted(() => vi.fn(async () => []));
 
 let handlers: Record<string, (data: unknown) => Promise<void>> = {};
 let lastRuntime: RuntimeEnv | null = null;
-const originalStateDir = process.env.OPENCLAW_STATE_DIR;
+const originalStateDir = process.env.RECALL_STATE_DIR;
 
 vi.mock("./client.js", async () => {
   const actual = await vi.importActual<typeof import("./client.js")>("./client.js");
@@ -67,8 +67,8 @@ vi.mock("./send.js", () => ({
   listFeishuThreadMessages: listFeishuThreadMessagesMock,
 }));
 
-vi.mock("openclaw/plugin-sdk/conversation-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/conversation-runtime")>();
+vi.mock("recall/plugin-sdk/conversation-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/conversation-runtime")>();
   return {
     ...actual,
     getSessionBindingService: () => ({
@@ -208,7 +208,7 @@ describe("Feishu card-action lifecycle", () => {
     handlers = {};
     lastRuntime = null;
     resetProcessedFeishuCardActionTokensForTests();
-    process.env.OPENCLAW_STATE_DIR = `/tmp/openclaw-feishu-card-action-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    process.env.RECALL_STATE_DIR = `/tmp/recall-feishu-card-action-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
     const dispatcher = {
       sendToolResult: vi.fn(() => false),
@@ -310,10 +310,10 @@ describe("Feishu card-action lifecycle", () => {
     vi.useRealTimers();
     resetProcessedFeishuCardActionTokensForTests();
     if (originalStateDir === undefined) {
-      delete process.env.OPENCLAW_STATE_DIR;
+      delete process.env.RECALL_STATE_DIR;
       return;
     }
-    process.env.OPENCLAW_STATE_DIR = originalStateDir;
+    process.env.RECALL_STATE_DIR = originalStateDir;
   });
 
   it("routes one reply across duplicate callback delivery", async () => {

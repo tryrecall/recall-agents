@@ -1,5 +1,5 @@
-import type { MemoryPromptSectionBuilder } from "openclaw/plugin-sdk/memory-core";
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+import type { MemoryPromptSectionBuilder } from "recall/plugin-sdk/memory-core";
+import { definePluginEntry } from "recall/plugin-sdk/plugin-entry";
 
 export const buildPromptSection: MemoryPromptSectionBuilder = ({
   availableTools,

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveOpenClawPackageRootSync } from "../infra/openclaw-root.js";
+import { resolveRecallPackageRootSync } from "../infra/recall-root.js";
 
 type PluginSdkAliasCandidateKind = "dist" | "src";
 
@@ -38,7 +38,7 @@ function listPluginSdkSubpathsFromPackageJson(pkg: PluginSdkPackageJson): string
     .toSorted();
 }
 
-function hasTrustedOpenClawRootIndicator(params: {
+function hasTrustedRecallRootIndicator(params: {
   packageRoot: string;
   packageJson: PluginSdkPackageJson;
 }): boolean {
@@ -51,14 +51,14 @@ function hasTrustedOpenClawRootIndicator(params: {
     return false;
   }
   const hasCliEntryExport = Object.prototype.hasOwnProperty.call(packageExports, "./cli-entry");
-  const hasOpenClawBin =
+  const hasRecallBin =
     (typeof params.packageJson.bin === "string" &&
-      params.packageJson.bin.toLowerCase().includes("openclaw")) ||
+      params.packageJson.bin.toLowerCase().includes("recall")) ||
     (typeof params.packageJson.bin === "object" &&
       params.packageJson.bin !== null &&
-      typeof params.packageJson.bin.openclaw === "string");
-  const hasOpenClawEntrypoint = fs.existsSync(path.join(params.packageRoot, "openclaw.mjs"));
-  return hasCliEntryExport || hasOpenClawBin || hasOpenClawEntrypoint;
+      typeof params.packageJson.bin.recall === "string");
+  const hasRecallEntrypoint = fs.existsSync(path.join(params.packageRoot, "recall.mjs"));
+  return hasCliEntryExport || hasRecallBin || hasRecallEntrypoint;
 }
 
 function readPluginSdkSubpathsFromPackageRoot(packageRoot: string): string[] | null {
@@ -66,7 +66,7 @@ function readPluginSdkSubpathsFromPackageRoot(packageRoot: string): string[] | n
   if (!pkg) {
     return null;
   }
-  if (!hasTrustedOpenClawRootIndicator({ packageRoot, packageJson: pkg })) {
+  if (!hasTrustedRecallRootIndicator({ packageRoot, packageJson: pkg })) {
     return null;
   }
   const subpaths = listPluginSdkSubpathsFromPackageJson(pkg);
@@ -93,13 +93,13 @@ export function resolveLoaderPackageRoot(
   params: LoaderModuleResolveParams & { modulePath: string },
 ): string | null {
   const cwd = params.cwd ?? path.dirname(params.modulePath);
-  const fromModulePath = resolveOpenClawPackageRootSync({ cwd });
+  const fromModulePath = resolveRecallPackageRootSync({ cwd });
   if (fromModulePath) {
     return fromModulePath;
   }
   const argv1 = params.argv1 ?? process.argv[1];
   const moduleUrl = params.moduleUrl ?? (params.modulePath ? undefined : import.meta.url);
-  return resolveOpenClawPackageRootSync({
+  return resolveRecallPackageRootSync({
     cwd,
     ...(argv1 ? { argv1 } : {}),
     ...(moduleUrl ? { moduleUrl } : {}),
@@ -110,10 +110,10 @@ function resolveLoaderPluginSdkPackageRoot(
   params: LoaderModuleResolveParams & { modulePath: string },
 ): string | null {
   const cwd = params.cwd ?? path.dirname(params.modulePath);
-  const fromCwd = resolveOpenClawPackageRootSync({ cwd });
+  const fromCwd = resolveRecallPackageRootSync({ cwd });
   const fromExplicitHints =
     params.argv1 || params.moduleUrl
-      ? resolveOpenClawPackageRootSync({
+      ? resolveRecallPackageRootSync({
           cwd,
           ...(params.argv1 ? { argv1: params.argv1 } : {}),
           ...(params.moduleUrl ? { moduleUrl: params.moduleUrl } : {}),
@@ -248,7 +248,7 @@ export function resolvePluginSdkScopedAliasMap(
     for (const kind of orderedKinds) {
       const candidate = candidateMap[kind];
       if (fs.existsSync(candidate)) {
-        aliasMap[`openclaw/plugin-sdk/${subpath}`] = candidate;
+        aliasMap[`recall/plugin-sdk/${subpath}`] = candidate;
         break;
       }
     }
@@ -293,8 +293,8 @@ export function buildPluginLoaderAliasMap(modulePath: string): Record<string, st
   });
   const extensionApiAlias = resolveExtensionApiAlias({ modulePath });
   return {
-    ...(extensionApiAlias ? { "openclaw/extension-api": extensionApiAlias } : {}),
-    ...(pluginSdkAlias ? { "openclaw/plugin-sdk": pluginSdkAlias } : {}),
+    ...(extensionApiAlias ? { "recall/extension-api": extensionApiAlias } : {}),
+    ...(pluginSdkAlias ? { "recall/plugin-sdk": pluginSdkAlias } : {}),
     ...resolvePluginSdkScopedAliasMap({ modulePath }),
   };
 }

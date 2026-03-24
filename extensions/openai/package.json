@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/openai-provider",
+  "name": "@recall/openai-provider",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw OpenAI provider plugins",
+  "description": "Recall OpenAI provider plugins",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

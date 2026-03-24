@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/xai-plugin",
+  "name": "@recall/xai-plugin",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw xAI plugin",
+  "description": "Recall xAI plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

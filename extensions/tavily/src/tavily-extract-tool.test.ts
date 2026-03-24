@@ -1,4 +1,4 @@
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
+import type { RecallPluginApi } from "recall/plugin-sdk/plugin-runtime";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { runTavilyExtract } = vi.hoisted(() => ({
@@ -11,10 +11,10 @@ vi.mock("./tavily-client.js", () => ({
 
 let createTavilyExtractTool: typeof import("./tavily-extract-tool.js").createTavilyExtractTool;
 
-function fakeApi(): OpenClawPluginApi {
+function fakeApi(): RecallPluginApi {
   return {
     config: {},
-  } as OpenClawPluginApi;
+  } as RecallPluginApi;
 }
 
 describe("tavily_extract", () => {

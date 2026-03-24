@@ -1,7 +1,7 @@
 import os from "node:os";
 import path from "node:path";
 import { resolveAgentWorkspaceDir } from "../agents/agent-scope.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { resolveGlobalSingleton } from "../shared/global-singleton.js";
@@ -13,7 +13,7 @@ import type {
   MemorySyncProgressUpdate,
 } from "./types.js";
 
-const MEMORY_SEARCH_MANAGER_CACHE_KEY = Symbol.for("openclaw.memorySearchManagerCache");
+const MEMORY_SEARCH_MANAGER_CACHE_KEY = Symbol.for("recall.memorySearchManagerCache");
 type MemorySearchManagerCacheStore = {
   qmdManagerCache: Map<string, MemorySearchManager>;
 };
@@ -43,7 +43,7 @@ export type MemorySearchManagerResult = {
 };
 
 export async function getMemorySearchManager(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   purpose?: "default" | "status";
 }): Promise<MemorySearchManagerResult> {
@@ -116,7 +116,7 @@ class QmdStatusOnlyManager implements MemorySearchManager {
 
   constructor(
     private readonly params: {
-      cfg: OpenClawConfig;
+      cfg: RecallConfig;
       agentId: string;
       resolved: ResolvedQmdConfig;
     },

@@ -3,7 +3,7 @@ import {
   resolveSetupWizardAllowFromEntries,
   resolveSetupWizardGroupAllowlist,
 } from "../../../test/helpers/extensions/setup-wizard.js";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import { DEFAULT_ACCOUNT_ID } from "../../routing/session-key.js";
 import {
   applySingleTokenPromptResult,
@@ -161,7 +161,7 @@ describe("buildSingleChannelSecretPromptState", () => {
 });
 
 async function runPromptLegacyAllowFrom(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   channel: "discord" | "slack";
   prompter: ReturnType<typeof createPrompter>;
   existing: string[];
@@ -257,7 +257,7 @@ describe("promptLegacyChannelAllowFrom", () => {
     const resolveEntries = vi.fn();
 
     const next = await runPromptLegacyAllowFrom({
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       channel: "discord",
       existing: ["999"],
       prompter,
@@ -278,7 +278,7 @@ describe("promptLegacyChannelAllowFrom", () => {
     const resolveEntries = vi.fn(async () => [{ input: "alice", resolved: true, id: "U1" }]);
 
     const next = await runPromptLegacyAllowFrom({
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       channel: "slack",
       prompter,
       existing: [],
@@ -307,7 +307,7 @@ describe("promptLegacyChannelAllowFromForAccount", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       channel: "slack",
       // oxlint-disable-next-line typescript/no-explicit-any
       prompter: prompter as any,
@@ -409,11 +409,11 @@ describe("promptSingleChannelSecretInput", () => {
   });
 
   it("returns ref + resolved value when external env ref is selected", async () => {
-    process.env.OPENCLAW_TEST_TOKEN = "secret-token";
+    process.env.RECALL_TEST_TOKEN = "secret-token";
     const prompter = {
       select: vi.fn().mockResolvedValueOnce("ref").mockResolvedValueOnce("env"),
       confirm: vi.fn(async () => false),
-      text: vi.fn(async () => "OPENCLAW_TEST_TOKEN"),
+      text: vi.fn(async () => "RECALL_TEST_TOKEN"),
       note: vi.fn(async () => undefined),
     };
 
@@ -429,7 +429,7 @@ describe("promptSingleChannelSecretInput", () => {
       envPrompt: "use env",
       keepPrompt: "keep",
       inputPrompt: "token",
-      preferredEnvVar: "OPENCLAW_TEST_TOKEN",
+      preferredEnvVar: "RECALL_TEST_TOKEN",
     });
 
     expect(result).toEqual({
@@ -437,7 +437,7 @@ describe("promptSingleChannelSecretInput", () => {
       value: {
         source: "env",
         provider: "default",
-        id: "OPENCLAW_TEST_TOKEN",
+        id: "RECALL_TEST_TOKEN",
       },
       resolvedValue: "secret-token",
     });
@@ -502,7 +502,7 @@ describe("applySingleTokenPromptResult", () => {
 
 describe("promptParsedAllowFromForScopedChannel", () => {
   it("writes parsed allowFrom values to default account channel config", async () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         imessage: {
           allowFrom: ["old"],
@@ -530,7 +530,7 @@ describe("promptParsedAllowFromForScopedChannel", () => {
   });
 
   it("writes parsed values to non-default account allowFrom", async () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         signal: {
           accounts: {
@@ -608,7 +608,7 @@ describe("promptParsedAllowFromForAccount", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       accountId: "alt",
       defaultAccountId: DEFAULT_ACCOUNT_ID,
       prompter,
@@ -641,7 +641,7 @@ describe("promptParsedAllowFromForAccount", () => {
             allowFrom: ["old"],
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       defaultAccountId: DEFAULT_ACCOUNT_ID,
       prompter: createPrompter(["new"]),
       noteTitle: "Nostr allowlist",
@@ -665,7 +665,7 @@ describe("promptParsedAllowFromForAccount", () => {
 
 describe("createPromptParsedAllowFromForAccount", () => {
   it("supports computed default account ids and optional notes", async () => {
-    const promptAllowFrom = createPromptParsedAllowFromForAccount<OpenClawConfig>({
+    const promptAllowFrom = createPromptParsedAllowFromForAccount<RecallConfig>({
       defaultAccountId: () => "work",
       message: "msg",
       placeholder: "placeholder",
@@ -793,7 +793,7 @@ describe("channel lookup note helpers", () => {
 
 describe("setAccountAllowFromForChannel", () => {
   it("writes allowFrom on default account channel config", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         imessage: {
           enabled: true,
@@ -817,7 +817,7 @@ describe("setAccountAllowFromForChannel", () => {
   });
 
   it("writes allowFrom on nested non-default account config", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         signal: {
           enabled: true,
@@ -844,7 +844,7 @@ describe("setAccountAllowFromForChannel", () => {
 
 describe("patchChannelConfigForAccount", () => {
   it("patches root channel config for default account", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         telegram: {
           enabled: false,
@@ -866,7 +866,7 @@ describe("patchChannelConfigForAccount", () => {
   });
 
   it("patches nested account config and preserves existing enabled flag", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         slack: {
           enabled: true,
@@ -894,7 +894,7 @@ describe("patchChannelConfigForAccount", () => {
   });
 
   it("moves single-account config into default account when patching non-default", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         telegram: {
           enabled: true,
@@ -927,7 +927,7 @@ describe("patchChannelConfigForAccount", () => {
   });
 
   it("supports imessage/signal account-scoped channel patches", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         signal: {
           enabled: false,
@@ -962,7 +962,7 @@ describe("patchChannelConfigForAccount", () => {
 
 describe("setSetupChannelEnabled", () => {
   it("updates enabled and keeps existing channel fields", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         discord: {
           enabled: true,
@@ -984,7 +984,7 @@ describe("setSetupChannelEnabled", () => {
 
 describe("patchLegacyDmChannelConfig", () => {
   it("patches discord root config and defaults dm.enabled to true", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         discord: {
           dmPolicy: "pairing",
@@ -1002,7 +1002,7 @@ describe("patchLegacyDmChannelConfig", () => {
   });
 
   it("preserves explicit dm.enabled=false for slack", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         slack: {
           dm: {
@@ -1024,7 +1024,7 @@ describe("patchLegacyDmChannelConfig", () => {
 
 describe("setLegacyChannelDmPolicyWithAllowFrom", () => {
   it("adds wildcard allowFrom for open policy using legacy dm allowFrom fallback", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         discord: {
           dm: {
@@ -1046,7 +1046,7 @@ describe("setLegacyChannelDmPolicyWithAllowFrom", () => {
   });
 
   it("sets policy without changing allowFrom when not open", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         slack: {
           allowFrom: ["U1"],
@@ -1102,7 +1102,7 @@ describe("setAccountGroupPolicyForChannel", () => {
 
 describe("setChannelDmPolicyWithAllowFrom", () => {
   it("adds wildcard allowFrom when setting dmPolicy=open", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         signal: {
           dmPolicy: "pairing",
@@ -1122,7 +1122,7 @@ describe("setChannelDmPolicyWithAllowFrom", () => {
   });
 
   it("sets dmPolicy without changing allowFrom for non-open policies", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         imessage: {
           dmPolicy: "open",
@@ -1142,7 +1142,7 @@ describe("setChannelDmPolicyWithAllowFrom", () => {
   });
 
   it("supports telegram channel dmPolicy updates", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         telegram: {
           dmPolicy: "pairing",
@@ -1163,7 +1163,7 @@ describe("setChannelDmPolicyWithAllowFrom", () => {
 
 describe("setTopLevelChannelDmPolicyWithAllowFrom", () => {
   it("adds wildcard allowFrom for open policy", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         zalo: {
           dmPolicy: "pairing",
@@ -1182,7 +1182,7 @@ describe("setTopLevelChannelDmPolicyWithAllowFrom", () => {
   });
 
   it("supports custom allowFrom lookup callback", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         "nextcloud-talk": {
           dmPolicy: "pairing",

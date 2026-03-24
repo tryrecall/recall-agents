@@ -411,7 +411,7 @@ function packageClusterMeta(relativePackagePath) {
   if (relativePackagePath === "ui/package.json") {
     return {
       cluster: "ui",
-      packageName: "openclaw-control-ui",
+      packageName: "recall-control-ui",
       packagePath: relativePackagePath,
       reachability: "workspace-ui",
     };
@@ -494,7 +494,7 @@ async function buildMissingPackages(params = {}) {
       continue;
     }
     const missing = Object.keys(pkg.dependencies ?? {})
-      .filter((dep) => dep !== "openclaw" && !rootDeps.has(dep))
+      .filter((dep) => dep !== "recall" && !rootDeps.has(dep))
       .toSorted(compareStrings);
     if (missing.length === 0) {
       continue;
@@ -514,7 +514,7 @@ async function buildMissingPackages(params = {}) {
       decisionReason: classification.reason,
       packageName: pkg.name ?? meta.packageName,
       packagePath: relativePackagePath,
-      npmSpec: redactNpmSpec(pkg.openclaw?.install?.npmSpec),
+      npmSpec: redactNpmSpec(pkg.recall?.install?.npmSpec),
       private: pkg.private === true,
       pluginSdkReachability:
         pluginSdkEntries.length > 0 ? { staticEntryPoints: pluginSdkEntries } : undefined,

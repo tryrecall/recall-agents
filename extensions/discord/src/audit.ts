@@ -1,9 +1,9 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
 import type {
   DiscordGuildChannelConfig,
   DiscordGuildEntry,
-} from "openclaw/plugin-sdk/config-runtime";
-import { isRecord } from "openclaw/plugin-sdk/text-runtime";
+} from "recall/plugin-sdk/config-runtime";
+import { isRecord } from "recall/plugin-sdk/text-runtime";
 import { inspectDiscordAccount } from "./account-inspect.js";
 import { fetchChannelPermissionsDiscord } from "./send.js";
 
@@ -74,7 +74,7 @@ function listConfiguredGuildChannelKeys(
 }
 
 export function collectDiscordAuditChannelIds(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
 }) {
   const account = inspectDiscordAccount({

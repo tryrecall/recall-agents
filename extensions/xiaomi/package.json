@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/xiaomi-provider",
+  "name": "@recall/xiaomi-provider",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw Xiaomi provider plugin",
+  "description": "Recall Xiaomi provider plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

@@ -1,7 +1,7 @@
 import type { ButtonInteraction, ComponentData, StringSelectMenuInteraction } from "@buape/carbon";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
-import type { DiscordAccountConfig } from "openclaw/plugin-sdk/config-runtime";
-import { buildAgentSessionKey } from "openclaw/plugin-sdk/routing";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
+import type { DiscordAccountConfig } from "recall/plugin-sdk/config-runtime";
+import { buildAgentSessionKey } from "recall/plugin-sdk/routing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { peekSystemEvents, resetSystemEventsForTest } from "../../../../src/infra/system-events.ts";
 import { createAgentComponentButton, createAgentSelectMenu } from "./agent-components.js";
@@ -9,8 +9,8 @@ import { createAgentComponentButton, createAgentSelectMenu } from "./agent-compo
 const readAllowFromStoreMock = vi.hoisted(() => vi.fn());
 const upsertPairingRequestMock = vi.hoisted(() => vi.fn());
 
-vi.mock("openclaw/plugin-sdk/security-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/security-runtime")>();
+vi.mock("recall/plugin-sdk/security-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/security-runtime")>();
   return {
     ...actual,
     readStoreAllowFromForDmPolicy: async (params: {
@@ -27,15 +27,15 @@ vi.mock("openclaw/plugin-sdk/security-runtime", async (importOriginal) => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/conversation-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/conversation-runtime")>();
+vi.mock("recall/plugin-sdk/conversation-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/conversation-runtime")>();
   return {
     ...actual,
     upsertChannelPairingRequest: (...args: unknown[]) => upsertPairingRequestMock(...args),
   };
 });
-vi.mock("openclaw/plugin-sdk/conversation-runtime.js", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/conversation-runtime")>();
+vi.mock("recall/plugin-sdk/conversation-runtime.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/conversation-runtime")>();
   return {
     ...actual,
     upsertChannelPairingRequest: (...args: unknown[]) => upsertPairingRequestMock(...args),
@@ -50,7 +50,7 @@ describe("agent components", () => {
     peer: { kind: "direct", id: "123456789" },
   });
 
-  const createCfg = (): OpenClawConfig => ({}) as OpenClawConfig;
+  const createCfg = (): RecallConfig => ({}) as RecallConfig;
 
   const createBaseDmInteraction = (overrides: Record<string, unknown> = {}) => {
     const reply = vi.fn().mockResolvedValue(undefined);
@@ -110,7 +110,7 @@ describe("agent components", () => {
     expect(pairingText).toContain("Pairing code:");
     const code = pairingText.match(/Pairing code:\s*([A-Z2-9]{8})/)?.[1];
     expect(code).toBeDefined();
-    expect(pairingText).toContain(`openclaw pairing approve discord ${code}`);
+    expect(pairingText).toContain(`recall pairing approve discord ${code}`);
     expect(peekSystemEvents(defaultDmSessionKey)).toEqual([]);
     expect(readAllowFromStoreMock).toHaveBeenCalledWith("discord", "default");
   });

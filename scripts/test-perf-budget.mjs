@@ -12,9 +12,9 @@ function readEnvNumber(name) {
 function parseArgs(argv) {
   const args = {
     config: "vitest.unit.config.ts",
-    maxWallMs: readEnvNumber("OPENCLAW_TEST_PERF_MAX_WALL_MS"),
-    baselineWallMs: readEnvNumber("OPENCLAW_TEST_PERF_BASELINE_WALL_MS"),
-    maxRegressionPct: readEnvNumber("OPENCLAW_TEST_PERF_MAX_REGRESSION_PCT") ?? 10,
+    maxWallMs: readEnvNumber("RECALL_TEST_PERF_MAX_WALL_MS"),
+    baselineWallMs: readEnvNumber("RECALL_TEST_PERF_BASELINE_WALL_MS"),
+    maxRegressionPct: readEnvNumber("RECALL_TEST_PERF_MAX_REGRESSION_PCT") ?? 10,
   };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -59,7 +59,7 @@ const opts = parseArgs(process.argv.slice(2));
 const startedAt = process.hrtime.bigint();
 const reportPath = runVitestJsonReport({
   config: opts.config,
-  prefix: "openclaw-vitest-perf",
+  prefix: "recall-vitest-perf",
 });
 const elapsedMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
 

@@ -1,18 +1,18 @@
 export type {
   ChannelPlugin,
-  OpenClawConfig,
-  OpenClawPluginApi,
+  RecallConfig,
+  RecallPluginApi,
   PluginRuntime,
-} from "openclaw/plugin-sdk/core";
-export { clearAccountEntryFields } from "openclaw/plugin-sdk/core";
-export { buildChannelConfigSchema } from "openclaw/plugin-sdk/channel-config-schema";
-export type { ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
-export type { ChannelAccountSnapshot, ChannelGatewayContext } from "openclaw/plugin-sdk/testing";
-export type { ChannelStatusIssue } from "openclaw/plugin-sdk/channel-contract";
+} from "recall/plugin-sdk/core";
+export { clearAccountEntryFields } from "recall/plugin-sdk/core";
+export { buildChannelConfigSchema } from "recall/plugin-sdk/channel-config-schema";
+export type { ReplyPayload } from "recall/plugin-sdk/reply-runtime";
+export type { ChannelAccountSnapshot, ChannelGatewayContext } from "recall/plugin-sdk/testing";
+export type { ChannelStatusIssue } from "recall/plugin-sdk/channel-contract";
 export {
   buildComputedAccountStatusSnapshot,
   buildTokenChannelStatusSummary,
-} from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/status-helpers";
 export type {
   CardAction,
   LineChannelData,

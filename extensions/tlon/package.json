@@ -1,7 +1,7 @@
 {
-  "name": "@openclaw/tlon",
+  "name": "@recall/tlon",
   "version": "2026.3.22",
-  "description": "OpenClaw Tlon/Urbit channel plugin",
+  "description": "Recall Tlon/Urbit channel plugin",
   "type": "module",
   "dependencies": {
     "@aws-sdk/client-s3": "3.1014.0",
@@ -11,17 +11,17 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.3.22"
+    "recall": ">=2026.3.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
@@ -37,7 +37,7 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@openclaw/tlon",
+      "npmSpec": "@recall/tlon",
       "localPath": "extensions/tlon",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.3.22"

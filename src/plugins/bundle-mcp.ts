@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { applyMergePatch } from "../config/merge-patch.js";
 import { matchBoundaryFileOpenFailure, openBoundaryFileSync } from "../infra/boundary-file-read.js";
 import { isRecord } from "../utils.js";
@@ -321,7 +321,7 @@ export function inspectBundleMcpRuntimeSupport(params: {
 
 export function loadEnabledBundleMcpConfig(params: {
   workspaceDir: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
 }): EnabledBundleMcpConfigResult {
   const registry = loadPluginManifestRegistry({
     workspaceDir: params.workspaceDir,

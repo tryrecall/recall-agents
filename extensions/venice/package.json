@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/venice-provider",
+  "name": "@recall/venice-provider",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw Venice provider plugin",
+  "description": "Recall Venice provider plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

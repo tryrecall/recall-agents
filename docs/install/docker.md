@@ -1,5 +1,5 @@
 ---
-summary: "Optional Docker-based setup and onboarding for OpenClaw"
+summary: "Optional Docker-based setup and onboarding for Recall"
 read_when:
   - You want a containerized gateway instead of local installs
   - You are validating the Docker flow
@@ -12,7 +12,7 @@ Docker is **optional**. Use it only if you want a containerized gateway or to va
 
 ## Is Docker right for me?
 
-- **Yes**: you want an isolated, throwaway gateway environment or to run OpenClaw on a host without local installs.
+- **Yes**: you want an isolated, throwaway gateway environment or to run Recall on a host without local installs.
 - **No**: you are running on your own machine and just want the fastest dev loop. Use the normal install flow instead.
 - **Sandboxing note**: agent sandboxing uses Docker too, but it does **not** require the full gateway to run in Docker. See [Sandboxing](/gateway/sandboxing).
 
@@ -38,12 +38,12 @@ Docker is **optional**. Use it only if you want a containerized gateway or to va
     This builds the gateway image locally. To use a pre-built image instead:
 
     ```bash
-    export OPENCLAW_IMAGE="ghcr.io/openclaw/openclaw:latest"
+    export RECALL_IMAGE="ghcr.io/recall/recall:latest"
     ./scripts/docker/setup.sh
     ```
 
     Pre-built images are published at the
-    [GitHub Container Registry](https://github.com/openclaw/openclaw/pkgs/container/openclaw).
+    [GitHub Container Registry](https://github.com/recall/recall/pkgs/container/recall).
     Common tags: `main`, `latest`, `<version>` (e.g. `2026.2.26`).
 
   </Step>
@@ -64,7 +64,7 @@ Docker is **optional**. Use it only if you want a containerized gateway or to va
     Need the URL again?
 
     ```bash
-    docker compose run --rm openclaw-cli dashboard --no-open
+    docker compose run --rm recall-cli dashboard --no-open
     ```
 
   </Step>
@@ -74,13 +74,13 @@ Docker is **optional**. Use it only if you want a containerized gateway or to va
 
     ```bash
     # WhatsApp (QR)
-    docker compose run --rm openclaw-cli channels login
+    docker compose run --rm recall-cli channels login
 
     # Telegram
-    docker compose run --rm openclaw-cli channels add --channel telegram --token "<token>"
+    docker compose run --rm recall-cli channels add --channel telegram --token "<token>"
 
     # Discord
-    docker compose run --rm openclaw-cli channels add --channel discord --token "<token>"
+    docker compose run --rm recall-cli channels add --channel discord --token "<token>"
     ```
 
     Docs: [WhatsApp](/channels/whatsapp), [Telegram](/channels/telegram), [Discord](/channels/discord)
@@ -93,14 +93,14 @@ Docker is **optional**. Use it only if you want a containerized gateway or to va
 If you prefer to run each step yourself instead of using the setup script:
 
 ```bash
-docker build -t openclaw:local -f Dockerfile .
-docker compose run --rm openclaw-cli onboard
-docker compose up -d openclaw-gateway
+docker build -t recall:local -f Dockerfile .
+docker compose run --rm recall-cli onboard
+docker compose up -d recall-gateway
 ```
 
 <Note>
-Run `docker compose` from the repo root. If you enabled `OPENCLAW_EXTRA_MOUNTS`
-or `OPENCLAW_HOME_VOLUME`, the setup script writes `docker-compose.extra.yml`;
+Run `docker compose` from the repo root. If you enabled `RECALL_EXTRA_MOUNTS`
+or `RECALL_HOME_VOLUME`, the setup script writes `docker-compose.extra.yml`;
 include it with `-f docker-compose.yml -f docker-compose.extra.yml`.
 </Note>
 
@@ -110,13 +110,13 @@ The setup script accepts these optional environment variables:
 
 | Variable                       | Purpose                                                          |
 | ------------------------------ | ---------------------------------------------------------------- |
-| `OPENCLAW_IMAGE`               | Use a remote image instead of building locally                   |
-| `OPENCLAW_DOCKER_APT_PACKAGES` | Install extra apt packages during build (space-separated)        |
-| `OPENCLAW_EXTENSIONS`          | Pre-install extension deps at build time (space-separated names) |
-| `OPENCLAW_EXTRA_MOUNTS`        | Extra host bind mounts (comma-separated `source:target[:opts]`)  |
-| `OPENCLAW_HOME_VOLUME`         | Persist `/home/node` in a named Docker volume                    |
-| `OPENCLAW_SANDBOX`             | Opt in to sandbox bootstrap (`1`, `true`, `yes`, `on`)           |
-| `OPENCLAW_DOCKER_SOCKET`       | Override Docker socket path                                      |
+| `RECALL_IMAGE`               | Use a remote image instead of building locally                   |
+| `RECALL_DOCKER_APT_PACKAGES` | Install extra apt packages during build (space-separated)        |
+| `RECALL_EXTENSIONS`          | Pre-install extension deps at build time (space-separated names) |
+| `RECALL_EXTRA_MOUNTS`        | Extra host bind mounts (comma-separated `source:target[:opts]`)  |
+| `RECALL_HOME_VOLUME`         | Persist `/home/node` in a named Docker volume                    |
+| `RECALL_SANDBOX`             | Opt in to sandbox bootstrap (`1`, `true`, `yes`, `on`)           |
+| `RECALL_DOCKER_SOCKET`       | Override Docker socket path                                      |
 
 ### Health checks
 
@@ -134,12 +134,12 @@ orchestration systems can restart or replace it.
 Authenticated deep health snapshot:
 
 ```bash
-docker compose exec openclaw-gateway node dist/index.js health --token "$OPENCLAW_GATEWAY_TOKEN"
+docker compose exec recall-gateway node dist/index.js health --token "$RECALL_GATEWAY_TOKEN"
 ```
 
 ### LAN vs loopback
 
-`scripts/docker/setup.sh` defaults `OPENCLAW_GATEWAY_BIND=lan` so host access to
+`scripts/docker/setup.sh` defaults `RECALL_GATEWAY_BIND=lan` so host access to
 `http://127.0.0.1:18789` works with Docker port publishing.
 
 - `lan` (default): host browser and host CLI can reach the published gateway port.
@@ -153,41 +153,41 @@ Use bind mode values in `gateway.bind` (`lan` / `loopback` / `custom` /
 
 ### Storage and persistence
 
-Docker Compose bind-mounts `OPENCLAW_CONFIG_DIR` to `/home/node/.openclaw` and
-`OPENCLAW_WORKSPACE_DIR` to `/home/node/.openclaw/workspace`, so those paths
+Docker Compose bind-mounts `RECALL_CONFIG_DIR` to `/home/node/.recall` and
+`RECALL_WORKSPACE_DIR` to `/home/node/.recall/workspace`, so those paths
 survive container replacement.
 
 For full persistence details on VM deployments, see
 [Docker VM Runtime - What persists where](/install/docker-vm-runtime#what-persists-where).
 
 **Disk growth hotspots:** watch `media/`, session JSONL files, `cron/runs/*.jsonl`,
-and rolling file logs under `/tmp/openclaw/`.
+and rolling file logs under `/tmp/recall/`.
 
 ### Shell helpers (optional)
 
 For easier day-to-day Docker management, install `ClawDock`:
 
 ```bash
-mkdir -p ~/.clawdock && curl -sL https://raw.githubusercontent.com/openclaw/openclaw/main/scripts/shell-helpers/clawdock-helpers.sh -o ~/.clawdock/clawdock-helpers.sh
+mkdir -p ~/.clawdock && curl -sL https://raw.githubusercontent.com/recall/recall/main/scripts/shell-helpers/clawdock-helpers.sh -o ~/.clawdock/clawdock-helpers.sh
 echo 'source ~/.clawdock/clawdock-helpers.sh' >> ~/.zshrc && source ~/.zshrc
 ```
 
 Then use `clawdock-start`, `clawdock-stop`, `clawdock-dashboard`, etc. Run
 `clawdock-help` for all commands.
-See the [`ClawDock` Helper README](https://github.com/openclaw/openclaw/blob/main/scripts/shell-helpers/README.md).
+See the [`ClawDock` Helper README](https://github.com/recall/recall/blob/main/scripts/shell-helpers/README.md).
 
 <AccordionGroup>
   <Accordion title="Enable agent sandbox for Docker gateway">
     ```bash
-    export OPENCLAW_SANDBOX=1
+    export RECALL_SANDBOX=1
     ./scripts/docker/setup.sh
     ```
 
     Custom socket path (e.g. rootless Docker):
 
     ```bash
-    export OPENCLAW_SANDBOX=1
-    export OPENCLAW_DOCKER_SOCKET=/run/user/1000/docker.sock
+    export RECALL_SANDBOX=1
+    export RECALL_DOCKER_SOCKET=/run/user/1000/docker.sock
     ./scripts/docker/setup.sh
     ```
 
@@ -201,25 +201,25 @@ See the [`ClawDock` Helper README](https://github.com/openclaw/openclaw/blob/mai
     Disable Compose pseudo-TTY allocation with `-T`:
 
     ```bash
-    docker compose run -T --rm openclaw-cli gateway probe
-    docker compose run -T --rm openclaw-cli devices list --json
+    docker compose run -T --rm recall-cli gateway probe
+    docker compose run -T --rm recall-cli devices list --json
     ```
 
   </Accordion>
 
   <Accordion title="Shared-network security note">
-    `openclaw-cli` uses `network_mode: "service:openclaw-gateway"` so CLI
+    `recall-cli` uses `network_mode: "service:recall-gateway"` so CLI
     commands can reach the gateway over `127.0.0.1`. Treat this as a shared
     trust boundary. The compose config drops `NET_RAW`/`NET_ADMIN` and enables
-    `no-new-privileges` on `openclaw-cli`.
+    `no-new-privileges` on `recall-cli`.
   </Accordion>
 
   <Accordion title="Permissions and EACCES">
     The image runs as `node` (uid 1000). If you see permission errors on
-    `/home/node/.openclaw`, make sure your host bind mounts are owned by uid 1000:
+    `/home/node/.recall`, make sure your host bind mounts are owned by uid 1000:
 
     ```bash
-    sudo chown -R 1000:1000 /path/to/openclaw-config /path/to/openclaw-workspace
+    sudo chown -R 1000:1000 /path/to/recall-config /path/to/recall-workspace
     ```
 
   </Accordion>
@@ -252,16 +252,16 @@ See the [`ClawDock` Helper README](https://github.com/openclaw/openclaw/blob/mai
     The default image is security-first and runs as non-root `node`. For a more
     full-featured container:
 
-    1. **Persist `/home/node`**: `export OPENCLAW_HOME_VOLUME="openclaw_home"`
-    2. **Bake system deps**: `export OPENCLAW_DOCKER_APT_PACKAGES="git curl jq"`
+    1. **Persist `/home/node`**: `export RECALL_HOME_VOLUME="recall_home"`
+    2. **Bake system deps**: `export RECALL_DOCKER_APT_PACKAGES="git curl jq"`
     3. **Install Playwright browsers**:
        ```bash
-       docker compose run --rm openclaw-cli \
+       docker compose run --rm recall-cli \
          node /app/node_modules/playwright-core/cli.js install chromium
        ```
     4. **Persist browser downloads**: set
        `PLAYWRIGHT_BROWSERS_PATH=/home/node/.cache/ms-playwright` and use
-       `OPENCLAW_HOME_VOLUME` or `OPENCLAW_EXTRA_MOUNTS`.
+       `RECALL_HOME_VOLUME` or `RECALL_EXTRA_MOUNTS`.
 
   </Accordion>
 
@@ -329,7 +329,7 @@ scripts/sandbox-setup.sh
 <AccordionGroup>
   <Accordion title="Image missing or sandbox container not starting">
     Build the sandbox image with
-    [`scripts/sandbox-setup.sh`](https://github.com/openclaw/openclaw/blob/main/scripts/sandbox-setup.sh)
+    [`scripts/sandbox-setup.sh`](https://github.com/recall/recall/blob/main/scripts/sandbox-setup.sh)
     or set `agents.defaults.sandbox.docker.image` to your custom image.
     Containers are auto-created per session on demand.
   </Accordion>
@@ -340,7 +340,7 @@ scripts/sandbox-setup.sh
   </Accordion>
 
   <Accordion title="Custom tools not found in sandbox">
-    OpenClaw runs commands with `sh -lc` (login shell), which sources
+    Recall runs commands with `sh -lc` (login shell), which sources
     `/etc/profile` and may reset PATH. Set `docker.env.PATH` to prepend your
     custom tool paths, or add a script under `/etc/profile.d/` in your Dockerfile.
   </Accordion>
@@ -353,9 +353,9 @@ scripts/sandbox-setup.sh
     Fetch a fresh dashboard link and approve the browser device:
 
     ```bash
-    docker compose run --rm openclaw-cli dashboard --no-open
-    docker compose run --rm openclaw-cli devices list
-    docker compose run --rm openclaw-cli devices approve <requestId>
+    docker compose run --rm recall-cli dashboard --no-open
+    docker compose run --rm recall-cli devices list
+    docker compose run --rm recall-cli devices approve <requestId>
     ```
 
     More detail: [Dashboard](/web/dashboard), [Devices](/cli/devices).
@@ -366,9 +366,9 @@ scripts/sandbox-setup.sh
     Reset gateway mode and bind:
 
     ```bash
-    docker compose run --rm openclaw-cli config set gateway.mode local
-    docker compose run --rm openclaw-cli config set gateway.bind lan
-    docker compose run --rm openclaw-cli devices list --url ws://127.0.0.1:18789
+    docker compose run --rm recall-cli config set gateway.mode local
+    docker compose run --rm recall-cli config set gateway.bind lan
+    docker compose run --rm recall-cli devices list --url ws://127.0.0.1:18789
     ```
 
   </Accordion>

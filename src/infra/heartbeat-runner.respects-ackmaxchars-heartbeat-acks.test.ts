@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { runHeartbeatOnce, type HeartbeatDeps } from "./heartbeat-runner.js";
 import { installHeartbeatRunnerTestRuntime } from "./heartbeat-runner.test-harness.js";
 import {
@@ -21,7 +21,7 @@ describe("runHeartbeatOnce ack handling", () => {
     heartbeat: Record<string, unknown>;
     channels: Record<string, unknown>;
     messages?: Record<string, unknown>;
-  }): OpenClawConfig {
+  }): RecallConfig {
     return {
       agents: {
         defaults: {
@@ -118,7 +118,7 @@ describe("runHeartbeatOnce ack handling", () => {
     storePath: string;
     heartbeat?: Record<string, unknown>;
     visibility?: Record<string, unknown>;
-  }): OpenClawConfig {
+  }): RecallConfig {
     return createHeartbeatConfig({
       tmpDir: params.tmpDir,
       storePath: params.storePath,
@@ -141,7 +141,7 @@ describe("runHeartbeatOnce ack handling", () => {
     storePath: string;
     heartbeat?: Record<string, unknown>;
     visibility?: Record<string, unknown>;
-  }): Promise<OpenClawConfig> {
+  }): Promise<RecallConfig> {
     const cfg = createWhatsAppHeartbeatConfig(params);
     await seedMainSessionStore(params.storePath, cfg, {
       lastChannel: "whatsapp",
@@ -165,7 +165,7 @@ describe("runHeartbeatOnce ack handling", () => {
         lastTo: WHATSAPP_GROUP,
       });
 
-      replySpy.mockResolvedValue({ text: "HEARTBEAT_OK 🦞" });
+      replySpy.mockResolvedValue({ text: "HEARTBEAT_OK 🤖" });
       const sendWhatsApp = createMessageSendSpy();
 
       await runHeartbeatOnce({
@@ -212,8 +212,8 @@ describe("runHeartbeatOnce ack handling", () => {
     },
     {
       title: "strips responsePrefix before HEARTBEAT_OK detection and suppresses short ack text",
-      replyText: "[openclaw] HEARTBEAT_OK all good",
-      messages: { responsePrefix: "[openclaw]" },
+      replyText: "[recall] HEARTBEAT_OK all good",
+      messages: { responsePrefix: "[recall]" },
       expectedCalls: 0,
     },
     {

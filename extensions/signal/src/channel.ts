@@ -1,15 +1,15 @@
-import { buildDmGroupAccountAllowlistAdapter } from "openclaw/plugin-sdk/allowlist-config-edit";
-import { createPairingPrefixStripper } from "openclaw/plugin-sdk/channel-pairing";
+import { buildDmGroupAccountAllowlistAdapter } from "recall/plugin-sdk/allowlist-config-edit";
+import { createPairingPrefixStripper } from "recall/plugin-sdk/channel-pairing";
 import {
   attachChannelToResult,
   attachChannelToResults,
-} from "openclaw/plugin-sdk/channel-send-result";
-import { resolveMarkdownTableMode } from "openclaw/plugin-sdk/config-runtime";
-import { createChatChannelPlugin } from "openclaw/plugin-sdk/core";
-import { resolveOutboundSendDep } from "openclaw/plugin-sdk/outbound-runtime";
-import { resolveTextChunkLimit } from "openclaw/plugin-sdk/reply-runtime";
-import { buildOutboundBaseSessionKey, type RoutePeer } from "openclaw/plugin-sdk/routing";
-import { createComputedAccountStatusAdapter } from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/channel-send-result";
+import { resolveMarkdownTableMode } from "recall/plugin-sdk/config-runtime";
+import { createChatChannelPlugin } from "recall/plugin-sdk/core";
+import { resolveOutboundSendDep } from "recall/plugin-sdk/outbound-runtime";
+import { resolveTextChunkLimit } from "recall/plugin-sdk/reply-runtime";
+import { buildOutboundBaseSessionKey, type RoutePeer } from "recall/plugin-sdk/routing";
+import { createComputedAccountStatusAdapter } from "recall/plugin-sdk/status-helpers";
 import { resolveSignalAccount, type ResolvedSignalAccount } from "./accounts.js";
 import { markdownToSignalTextChunks } from "./format.js";
 import {

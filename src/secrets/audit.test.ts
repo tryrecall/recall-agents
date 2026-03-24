@@ -39,9 +39,9 @@ function hasFinding(
 }
 
 async function createAuditFixture(): Promise<AuditFixture> {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-secrets-audit-"));
-  const stateDir = path.join(rootDir, ".openclaw");
-  const configPath = path.join(stateDir, "openclaw.json");
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-secrets-audit-"));
+  const stateDir = path.join(rootDir, ".recall");
+  const configPath = path.join(stateDir, "recall.json");
   const authStorePath = path.join(stateDir, "agents", "main", "agent", "auth-profiles.json");
   const authJsonPath = path.join(stateDir, "agents", "main", "agent", "auth.json");
   const modelsPath = path.join(stateDir, "agents", "main", "agent", "models.json");
@@ -59,8 +59,8 @@ async function createAuditFixture(): Promise<AuditFixture> {
     modelsPath,
     envPath,
     env: {
-      OPENCLAW_STATE_DIR: stateDir,
-      OPENCLAW_CONFIG_PATH: configPath,
+      RECALL_STATE_DIR: stateDir,
+      RECALL_CONFIG_PATH: configPath,
       OPENAI_API_KEY: "env-openai-key", // pragma: allowlist secret
       PATH: resolveRuntimePathEnv(),
     },
@@ -509,7 +509,7 @@ describe("secrets audit", () => {
     const report = await runSecretsAudit({
       env: {
         ...fixture.env,
-        OPENCLAW_AGENT_DIR: externalAgentDir,
+        RECALL_AGENT_DIR: externalAgentDir,
       },
     });
     expect(
@@ -524,7 +524,7 @@ describe("secrets audit", () => {
     expect(report.filesScanned).toContain(externalModelsPath);
   });
 
-  it("does not flag non-sensitive routing headers in openclaw config", async () => {
+  it("does not flag non-sensitive routing headers in recall config", async () => {
     await writeJsonFile(fixture.configPath, {
       models: {
         providers: {

@@ -328,7 +328,7 @@ describe("resolveFeishuCardTemplate", () => {
   });
 
   it("drops unsupported free-form identity themes", () => {
-    expect(resolveFeishuCardTemplate("space lobster")).toBeUndefined();
+    expect(resolveFeishuCardTemplate("space recall")).toBeUndefined();
   });
 });
 
@@ -337,7 +337,7 @@ describe("buildStructuredCard", () => {
     const card = buildStructuredCard("hello", {
       header: {
         title: "Agent",
-        template: "space lobster",
+        template: "space recall",
       },
     });
 

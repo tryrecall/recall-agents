@@ -1,10 +1,10 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
-import { getExecApprovalReplyMetadata } from "openclaw/plugin-sdk/infra-runtime";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
+import { getExecApprovalReplyMetadata } from "recall/plugin-sdk/infra-runtime";
+import type { ReplyPayload } from "recall/plugin-sdk/reply-runtime";
 import { resolveDiscordAccount } from "./accounts.js";
 
 export function isDiscordExecApprovalClientEnabled(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
 }): boolean {
   const config = resolveDiscordAccount(params).config.execApprovals;
@@ -12,7 +12,7 @@ export function isDiscordExecApprovalClientEnabled(params: {
 }
 
 export function shouldSuppressLocalDiscordExecApprovalPrompt(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
   payload: ReplyPayload;
 }): boolean {

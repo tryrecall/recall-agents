@@ -32,7 +32,7 @@ const SUPPRESSED_EVAL_WARNING_PATHS = [
 ] as const;
 
 function buildInputOptions(options: InputOptionsArg): InputOptionsReturn {
-  if (process.env.OPENCLAW_BUILD_VERBOSE === "1") {
+  if (process.env.RECALL_BUILD_VERBOSE === "1") {
     return undefined;
   }
 
@@ -117,7 +117,7 @@ function buildCoreDistEntries(): Record<string, string> {
     "cli/daemon-cli": "src/cli/daemon-cli.ts",
     // Ensure memory-cli is a stable entry so the runtime tools plugin can import
     // it by a deterministic path instead of a content-hashed chunk name.
-    // See https://github.com/openclaw/openclaw/issues/51676
+    // See https://github.com/recall/recall/issues/51676
     "cli/memory-cli": "src/cli/memory-cli.ts",
     extensionAPI: "src/extensionAPI.ts",
     "infra/warning-filter": "src/infra/warning-filter.ts",

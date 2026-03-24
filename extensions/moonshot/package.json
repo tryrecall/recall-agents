@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/moonshot-provider",
+  "name": "@recall/moonshot-provider",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw Moonshot provider plugin",
+  "description": "Recall Moonshot provider plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

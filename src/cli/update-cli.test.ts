@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { Command } from "commander";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig, ConfigFileSnapshot } from "../config/types.openclaw.js";
+import type { RecallConfig, ConfigFileSnapshot } from "../config/types.recall.js";
 import type { UpdateRunResult } from "../infra/update-runner.js";
 import { withEnvAsync } from "../test-utils/env.js";
 import { createCliRuntimeCapture } from "./test-runtime-capture.js";
@@ -41,8 +41,8 @@ vi.mock("../infra/update-runner.js", () => ({
   runGatewayUpdate: vi.fn(),
 }));
 
-vi.mock("../infra/openclaw-root.js", () => ({
-  resolveOpenClawPackageRoot: vi.fn(),
+vi.mock("../infra/recall-root.js", () => ({
+  resolveRecallPackageRoot: vi.fn(),
 }));
 
 vi.mock("../config/config.js", () => ({
@@ -137,7 +137,7 @@ vi.mock("../runtime.js", () => ({
 }));
 
 const { runGatewayUpdate } = await import("../infra/update-runner.js");
-const { resolveOpenClawPackageRoot } = await import("../infra/openclaw-root.js");
+const { resolveRecallPackageRoot } = await import("../infra/recall-root.js");
 const { readConfigFileSnapshot, writeConfigFile } = await import("../config/config.js");
 const { checkUpdateStatus, fetchNpmTagVersion, resolveNpmChannelTag } =
   await import("../infra/update-check.js");
@@ -149,7 +149,7 @@ const { updateCommand, updateStatusCommand, updateWizardCommand } = await import
 const { resolveGitInstallDir } = await import("./update-cli/shared.js");
 
 describe("update-cli", () => {
-  const fixtureRoot = "/tmp/openclaw-update-tests";
+  const fixtureRoot = "/tmp/recall-update-tests";
   let fixtureCount = 0;
 
   const createCaseDir = (prefix: string) => {
@@ -158,9 +158,9 @@ describe("update-cli", () => {
     return dir;
   };
 
-  const baseConfig = {} as OpenClawConfig;
+  const baseConfig = {} as RecallConfig;
   const baseSnapshot: ConfigFileSnapshot = {
-    path: "/tmp/openclaw-config.json",
+    path: "/tmp/recall-config.json",
     exists: true,
     raw: "{}",
     parsed: {},
@@ -187,7 +187,7 @@ describe("update-cli", () => {
   };
 
   const mockPackageInstallStatus = (root: string) => {
-    vi.mocked(resolveOpenClawPackageRoot).mockResolvedValue(root);
+    vi.mocked(resolveRecallPackageRoot).mockResolvedValue(root);
     vi.mocked(checkUpdateStatus).mockResolvedValue({
       root,
       installKind: "package",
@@ -245,7 +245,7 @@ describe("update-cli", () => {
   };
 
   const setupNonInteractiveDowngrade = async () => {
-    const tempDir = createCaseDir("openclaw-update");
+    const tempDir = createCaseDir("recall-update");
     setTty(false);
     readPackageVersion.mockResolvedValue("2.0.0");
 
@@ -269,7 +269,7 @@ describe("update-cli", () => {
   const setupUpdatedRootRefresh = (params?: {
     gatewayUpdateImpl?: () => Promise<UpdateRunResult>;
   }) => {
-    const root = createCaseDir("openclaw-updated-root");
+    const root = createCaseDir("recall-updated-root");
     const entryPath = path.join(root, "dist", "entry.js");
     pathExists.mockImplementation(async (candidate: string) => candidate === entryPath);
     if (params?.gatewayUpdateImpl) {
@@ -291,7 +291,7 @@ describe("update-cli", () => {
     vi.clearAllMocks();
     resetRuntimeCapture();
     vi.mocked(defaultRuntime.exit).mockImplementation(() => {});
-    vi.mocked(resolveOpenClawPackageRoot).mockResolvedValue(process.cwd());
+    vi.mocked(resolveRecallPackageRoot).mockResolvedValue(process.cwd());
     vi.mocked(readConfigFileSnapshot).mockResolvedValue(baseSnapshot);
     vi.mocked(fetchNpmTagVersion).mockResolvedValue({
       tag: "latest",
@@ -334,7 +334,7 @@ describe("update-cli", () => {
       killed: false,
       termination: "exit",
     });
-    readPackageName.mockResolvedValue("openclaw");
+    readPackageName.mockResolvedValue("recall");
     readPackageVersion.mockResolvedValue("1.0.0");
     resolveGlobalManager.mockResolvedValue("npm");
     serviceLoaded.mockResolvedValue(false);
@@ -343,12 +343,12 @@ describe("update-cli", () => {
       pid: 4242,
       state: "running",
     });
-    prepareRestartScript.mockResolvedValue("/tmp/openclaw-restart-test.sh");
+    prepareRestartScript.mockResolvedValue("/tmp/recall-restart-test.sh");
     runRestartScript.mockResolvedValue(undefined);
     inspectPortUsage.mockResolvedValue({
       port: 18789,
       status: "busy",
-      listeners: [{ pid: 4242, command: "openclaw-gateway" }],
+      listeners: [{ pid: 4242, command: "recall-gateway" }],
       hints: [],
     });
     classifyPortListener.mockReturnValue("gateway");
@@ -430,7 +430,7 @@ describe("update-cli", () => {
         options: { json: false },
         assert: () => {
           const logs = vi.mocked(defaultRuntime.log).mock.calls.map((call) => call[0]);
-          expect(logs.join("\n")).toContain("OpenClaw update status");
+          expect(logs.join("\n")).toContain("Recall update status");
         },
       },
       {
@@ -454,7 +454,7 @@ describe("update-cli", () => {
 
   it("parses update status --json as the subcommand option", async () => {
     const program = new Command();
-    program.name("openclaw");
+    program.name("recall");
     program.enablePositionalOptions();
     let seenJson = false;
     const update = program.command("update").option("--json", "", false);
@@ -465,7 +465,7 @@ describe("update-cli", () => {
         seenJson = Boolean(opts.json);
       });
 
-    await program.parseAsync(["node", "openclaw", "update", "status", "--json"]);
+    await program.parseAsync(["node", "recall", "update", "status", "--json"]);
 
     expect(seenJson).toBe(true);
   });
@@ -483,7 +483,7 @@ describe("update-cli", () => {
       name: "defaults to stable channel for package installs when unset",
       options: { yes: true },
       prepare: async () => {
-        const tempDir = createCaseDir("openclaw-update");
+        const tempDir = createCaseDir("recall-update");
         mockPackageInstallStatus(tempDir);
       },
       expectedChannel: undefined as "stable" | undefined,
@@ -496,7 +496,7 @@ describe("update-cli", () => {
       prepare: async () => {
         vi.mocked(readConfigFileSnapshot).mockResolvedValue({
           ...baseSnapshot,
-          config: { update: { channel: "beta" } } as OpenClawConfig,
+          config: { update: { channel: "beta" } } as RecallConfig,
         });
       },
       expectedChannel: "beta" as const,
@@ -529,7 +529,7 @@ describe("update-cli", () => {
       } else {
         expect(runGatewayUpdate).not.toHaveBeenCalled();
         expect(runCommandWithTimeout).toHaveBeenCalledWith(
-          ["npm", "i", "-g", "openclaw@latest", "--no-fund", "--no-audit", "--loglevel=error"],
+          ["npm", "i", "-g", "recall@latest", "--no-fund", "--no-audit", "--loglevel=error"],
           expect.any(Object),
         );
       }
@@ -545,12 +545,12 @@ describe("update-cli", () => {
   );
 
   it("falls back to latest when beta tag is older than release", async () => {
-    const tempDir = createCaseDir("openclaw-update");
+    const tempDir = createCaseDir("recall-update");
 
     mockPackageInstallStatus(tempDir);
     vi.mocked(readConfigFileSnapshot).mockResolvedValue({
       ...baseSnapshot,
-      config: { update: { channel: "beta" } } as OpenClawConfig,
+      config: { update: { channel: "beta" } } as RecallConfig,
     });
     vi.mocked(resolveNpmChannelTag).mockResolvedValue({
       tag: "latest",
@@ -560,7 +560,7 @@ describe("update-cli", () => {
 
     expect(runGatewayUpdate).not.toHaveBeenCalled();
     expect(runCommandWithTimeout).toHaveBeenCalledWith(
-      ["npm", "i", "-g", "openclaw@latest", "--no-fund", "--no-audit", "--loglevel=error"],
+      ["npm", "i", "-g", "recall@latest", "--no-fund", "--no-audit", "--loglevel=error"],
       expect.any(Object),
     );
   });
@@ -570,46 +570,46 @@ describe("update-cli", () => {
       {
         name: "explicit dist-tag",
         run: async () => {
-          mockPackageInstallStatus(createCaseDir("openclaw-update"));
+          mockPackageInstallStatus(createCaseDir("recall-update"));
           await updateCommand({ tag: "next" });
         },
-        expectedSpec: "openclaw@next",
+        expectedSpec: "recall@next",
       },
       {
         name: "main shorthand",
         run: async () => {
-          mockPackageInstallStatus(createCaseDir("openclaw-update"));
+          mockPackageInstallStatus(createCaseDir("recall-update"));
           await updateCommand({ yes: true, tag: "main" });
         },
-        expectedSpec: "github:openclaw/openclaw#main",
+        expectedSpec: "github:recall/recall#main",
       },
       {
         name: "explicit git package spec",
         run: async () => {
-          mockPackageInstallStatus(createCaseDir("openclaw-update"));
-          await updateCommand({ yes: true, tag: "github:openclaw/openclaw#main" });
+          mockPackageInstallStatus(createCaseDir("recall-update"));
+          await updateCommand({ yes: true, tag: "github:recall/recall#main" });
         },
-        expectedSpec: "github:openclaw/openclaw#main",
+        expectedSpec: "github:recall/recall#main",
       },
       {
-        name: "OPENCLAW_UPDATE_PACKAGE_SPEC override",
+        name: "RECALL_UPDATE_PACKAGE_SPEC override",
         run: async () => {
-          mockPackageInstallStatus(createCaseDir("openclaw-update"));
+          mockPackageInstallStatus(createCaseDir("recall-update"));
           await withEnvAsync(
-            { OPENCLAW_UPDATE_PACKAGE_SPEC: "http://10.211.55.2:8138/openclaw-next.tgz" },
+            { RECALL_UPDATE_PACKAGE_SPEC: "http://10.211.55.2:8138/recall-next.tgz" },
             async () => {
               await updateCommand({ yes: true, tag: "latest" });
             },
           );
         },
-        expectedSpec: "http://10.211.55.2:8138/openclaw-next.tgz",
+        expectedSpec: "http://10.211.55.2:8138/recall-next.tgz",
       },
     ]) {
       vi.clearAllMocks();
-      readPackageName.mockResolvedValue("openclaw");
+      readPackageName.mockResolvedValue("recall");
       readPackageVersion.mockResolvedValue("1.0.0");
       resolveGlobalManager.mockResolvedValue("npm");
-      vi.mocked(resolveOpenClawPackageRoot).mockResolvedValue(process.cwd());
+      vi.mocked(resolveRecallPackageRoot).mockResolvedValue(process.cwd());
       await scenario.run();
       expectPackageInstallSpec(scenario.expectedSpec);
     }
@@ -617,11 +617,11 @@ describe("update-cli", () => {
 
   it("prepends portable Git PATH for package updates on Windows", async () => {
     const platformSpy = vi.spyOn(process, "platform", "get").mockReturnValue("win32");
-    const tempDir = createCaseDir("openclaw-update");
-    const localAppData = createCaseDir("openclaw-localappdata");
+    const tempDir = createCaseDir("recall-update");
+    const localAppData = createCaseDir("recall-localappdata");
     const portableGitMingw = path.join(
       localAppData,
-      "OpenClaw",
+      "Recall",
       "deps",
       "portable-git",
       "mingw64",
@@ -629,7 +629,7 @@ describe("update-cli", () => {
     );
     const portableGitUsr = path.join(
       localAppData,
-      "OpenClaw",
+      "Recall",
       "deps",
       "portable-git",
       "usr",
@@ -717,7 +717,7 @@ describe("update-cli", () => {
   });
 
   it("persists the requested channel only after a successful package update", async () => {
-    const tempDir = createCaseDir("openclaw-update");
+    const tempDir = createCaseDir("recall-update");
     mockPackageInstallStatus(tempDir);
 
     await updateCommand({ channel: "beta", yes: true });
@@ -746,7 +746,7 @@ describe("update-cli", () => {
   });
 
   it("does not persist the requested channel when the package update fails", async () => {
-    const tempDir = createCaseDir("openclaw-update");
+    const tempDir = createCaseDir("recall-update");
     mockPackageInstallStatus(tempDir);
     vi.mocked(runCommandWithTimeout).mockImplementation(async (argv) => {
       if (Array.isArray(argv) && argv[0] === "npm" && argv[1] === "i" && argv[2] === "-g") {
@@ -776,7 +776,7 @@ describe("update-cli", () => {
   });
 
   it("keeps the requested channel when plugin sync writes config after update", async () => {
-    const tempDir = createCaseDir("openclaw-update");
+    const tempDir = createCaseDir("recall-update");
     mockPackageInstallStatus(tempDir);
     syncPluginsForUpdateChannel.mockImplementation(async ({ config }) => ({
       changed: true,
@@ -910,8 +910,8 @@ describe("update-cli", () => {
       invoke: async () => {
         await withEnvAsync(
           {
-            OPENCLAW_STATE_DIR: "./state",
-            OPENCLAW_CONFIG_PATH: "./config/openclaw.json",
+            RECALL_STATE_DIR: "./state",
+            RECALL_CONFIG_PATH: "./config/recall.json",
           },
           async () => {
             await updateCommand({});
@@ -922,8 +922,8 @@ describe("update-cli", () => {
         expect.objectContaining({
           cwd: root,
           env: expect.objectContaining({
-            OPENCLAW_STATE_DIR: path.resolve("./state"),
-            OPENCLAW_CONFIG_PATH: path.resolve("./config/openclaw.json"),
+            RECALL_STATE_DIR: path.resolve("./state"),
+            RECALL_CONFIG_PATH: path.resolve("./config/recall.json"),
           }),
           timeoutMs: 60_000,
         }),
@@ -954,7 +954,7 @@ describe("update-cli", () => {
         try {
           await withEnvAsync(
             {
-              OPENCLAW_STATE_DIR: "./state",
+              RECALL_STATE_DIR: "./state",
             },
             async () => {
               await updateCommand({});
@@ -970,7 +970,7 @@ describe("update-cli", () => {
         expect.objectContaining({
           cwd: expect.any(String),
           env: expect.objectContaining({
-            OPENCLAW_STATE_DIR: path.resolve(context?.originalCwd ?? process.cwd(), "./state"),
+            RECALL_STATE_DIR: path.resolve(context?.originalCwd ?? process.cwd(), "./state"),
           }),
           timeoutMs: 60_000,
         }),
@@ -997,7 +997,7 @@ describe("update-cli", () => {
   it("updateCommand continues after doctor sub-step and clears update flag", async () => {
     const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
     try {
-      await withEnvAsync({ OPENCLAW_UPDATE_IN_PROGRESS: undefined }, async () => {
+      await withEnvAsync({ RECALL_UPDATE_IN_PROGRESS: undefined }, async () => {
         vi.mocked(runGatewayUpdate).mockResolvedValue(makeOkUpdateResult());
         vi.mocked(runDaemonRestart).mockResolvedValue(true);
         vi.mocked(doctorCommand).mockResolvedValue(undefined);
@@ -1009,7 +1009,7 @@ describe("update-cli", () => {
           defaultRuntime,
           expect.objectContaining({ nonInteractive: true }),
         );
-        expect(process.env.OPENCLAW_UPDATE_IN_PROGRESS).toBeUndefined();
+        expect(process.env.RECALL_UPDATE_IN_PROGRESS).toBeUndefined();
 
         const logLines = vi.mocked(defaultRuntime.log).mock.calls.map((call) => String(call[0]));
         expect(
@@ -1098,8 +1098,8 @@ describe("update-cli", () => {
   });
 
   it("updateWizardCommand offers dev checkout and forwards selections", async () => {
-    const tempDir = createCaseDir("openclaw-update-wizard");
-    await withEnvAsync({ OPENCLAW_GIT_DIR: tempDir }, async () => {
+    const tempDir = createCaseDir("recall-update-wizard");
+    await withEnvAsync({ RECALL_GIT_DIR: tempDir }, async () => {
       setTty(true);
 
       vi.mocked(checkUpdateStatus).mockResolvedValue({
@@ -1129,10 +1129,10 @@ describe("update-cli", () => {
     });
   });
 
-  it("uses ~/openclaw as the default dev checkout directory", async () => {
+  it("uses ~/recall as the default dev checkout directory", async () => {
     const homedirSpy = vi.spyOn(os, "homedir").mockReturnValue("/tmp/oc-home");
-    await withEnvAsync({ OPENCLAW_GIT_DIR: undefined }, async () => {
-      expect(resolveGitInstallDir()).toBe(path.posix.join("/tmp/oc-home", "openclaw"));
+    await withEnvAsync({ RECALL_GIT_DIR: undefined }, async () => {
+      expect(resolveGitInstallDir()).toBe(path.posix.join("/tmp/oc-home", "recall"));
     });
     homedirSpy.mockRestore();
   });

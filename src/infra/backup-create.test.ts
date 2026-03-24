@@ -4,8 +4,8 @@ import { formatBackupCreateSummary, type BackupCreateResult } from "./backup-cre
 function makeResult(overrides: Partial<BackupCreateResult> = {}): BackupCreateResult {
   return {
     createdAt: "2026-01-01T00:00:00.000Z",
-    archiveRoot: "openclaw-backup-2026-01-01",
-    archivePath: "/tmp/openclaw-backup.tar.gz",
+    archiveRoot: "recall-backup-2026-01-01",
+    archivePath: "/tmp/recall-backup.tar.gz",
     dryRun: false,
     includeWorkspace: true,
     onlyConfig: false,
@@ -26,28 +26,28 @@ describe("formatBackupCreateSummary", () => {
             kind: "state",
             sourcePath: "/state",
             archivePath: "archive/state",
-            displayPath: "~/.openclaw",
+            displayPath: "~/.recall",
           },
         ],
         skipped: [
           {
             kind: "workspace",
             sourcePath: "/workspace",
-            displayPath: "~/Projects/openclaw",
+            displayPath: "~/Projects/recall",
             reason: "covered",
-            coveredBy: "~/.openclaw",
+            coveredBy: "~/.recall",
           },
         ],
       }),
     );
 
     expect(lines).toEqual([
-      "Backup archive: /tmp/openclaw-backup.tar.gz",
+      "Backup archive: /tmp/recall-backup.tar.gz",
       "Included 1 path:",
-      "- state: ~/.openclaw",
+      "- state: ~/.recall",
       "Skipped 1 path:",
-      "- workspace: ~/Projects/openclaw (covered by ~/.openclaw)",
-      "Created /tmp/openclaw-backup.tar.gz",
+      "- workspace: ~/Projects/recall (covered by ~/.recall)",
+      "Created /tmp/recall-backup.tar.gz",
       "Archive verification: passed",
     ]);
   });
@@ -61,23 +61,23 @@ describe("formatBackupCreateSummary", () => {
             kind: "config",
             sourcePath: "/config",
             archivePath: "archive/config",
-            displayPath: "~/.openclaw/config.json",
+            displayPath: "~/.recall/config.json",
           },
           {
             kind: "credentials",
             sourcePath: "/oauth",
             archivePath: "archive/oauth",
-            displayPath: "~/.openclaw/oauth",
+            displayPath: "~/.recall/oauth",
           },
         ],
       }),
     );
 
     expect(lines).toEqual([
-      "Backup archive: /tmp/openclaw-backup.tar.gz",
+      "Backup archive: /tmp/recall-backup.tar.gz",
       "Included 2 paths:",
-      "- config: ~/.openclaw/config.json",
-      "- credentials: ~/.openclaw/oauth",
+      "- config: ~/.recall/config.json",
+      "- credentials: ~/.recall/oauth",
       "Dry run only; archive was not written.",
     ]);
   });

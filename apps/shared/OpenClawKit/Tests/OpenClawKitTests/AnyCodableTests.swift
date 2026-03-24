@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-import OpenClawProtocol
+import RecallProtocol
 
 struct AnyCodableTests {
     @Test

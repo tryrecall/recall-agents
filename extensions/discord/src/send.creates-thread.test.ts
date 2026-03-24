@@ -1,10 +1,10 @@
 import { RateLimitError } from "@buape/carbon";
 import { ChannelType, Routes } from "discord-api-types/v10";
-import { loadWebMediaRaw } from "openclaw/plugin-sdk/web-media";
+import { loadWebMediaRaw } from "recall/plugin-sdk/web-media";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { makeDiscordRest } from "./send.test-harness.js";
 
-vi.mock("openclaw/plugin-sdk/web-media", async () => {
+vi.mock("recall/plugin-sdk/web-media", async () => {
   const { discordWebMediaMockFactory } = await import("./send.test-harness.js");
   return discordWebMediaMockFactory();
 });
@@ -319,8 +319,8 @@ describe("uploadStickerDiscord", () => {
     await uploadStickerDiscord(
       {
         guildId: "g1",
-        name: "openclaw_wave",
-        description: "OpenClaw waving",
+        name: "recall_wave",
+        description: "Recall waving",
         tags: "👋",
         mediaUrl: "file:///tmp/wave.png",
       },
@@ -330,8 +330,8 @@ describe("uploadStickerDiscord", () => {
       Routes.guildStickers("g1"),
       expect.objectContaining({
         body: {
-          name: "openclaw_wave",
-          description: "OpenClaw waving",
+          name: "recall_wave",
+          description: "Recall waving",
           tags: "👋",
           files: [
             expect.objectContaining({

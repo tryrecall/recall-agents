@@ -80,9 +80,9 @@ describe("pairing setup code", () => {
 
   beforeEach(() => {
     vi.resetModules();
-    vi.stubEnv("OPENCLAW_GATEWAY_TOKEN", "");
-    vi.stubEnv("OPENCLAW_GATEWAY_PASSWORD", "");
-    vi.stubEnv("OPENCLAW_GATEWAY_PORT", "");
+    vi.stubEnv("RECALL_GATEWAY_TOKEN", "");
+    vi.stubEnv("RECALL_GATEWAY_PASSWORD", "");
+    vi.stubEnv("RECALL_GATEWAY_PORT", "");
   });
 
   beforeEach(async () => {
@@ -151,7 +151,7 @@ describe("pairing setup code", () => {
     expectResolvedSetupOk(resolved, { authLabel: "password" });
   });
 
-  it("uses OPENCLAW_GATEWAY_PASSWORD without resolving configured password SecretRef", async () => {
+  it("uses RECALL_GATEWAY_PASSWORD without resolving configured password SecretRef", async () => {
     const resolved = await resolvePairingSetupFromConfig(
       {
         gateway: {
@@ -166,7 +166,7 @@ describe("pairing setup code", () => {
       },
       {
         env: {
-          OPENCLAW_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
+          RECALL_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
         },
       },
     );
@@ -252,7 +252,7 @@ describe("pairing setup code", () => {
       },
       {
         env: {
-          OPENCLAW_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
+          RECALL_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
         },
       },
     );
@@ -332,7 +332,7 @@ describe("pairing setup code", () => {
       },
       {
         env: {
-          OPENCLAW_GATEWAY_TOKEN: "new-token",
+          RECALL_GATEWAY_TOKEN: "new-token",
         },
       },
     );

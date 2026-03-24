@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/copilot-proxy",
+  "name": "@recall/copilot-proxy",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw Copilot Proxy provider plugin",
+  "description": "Recall Copilot Proxy provider plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

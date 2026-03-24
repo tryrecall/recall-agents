@@ -4,7 +4,7 @@ import {
   normalizeAccountId,
   normalizeOptionalAccountId,
   resolveMergedAccountConfig,
-} from "openclaw/plugin-sdk/account-resolution";
+} from "recall/plugin-sdk/account-resolution";
 import type { ClawdbotConfig } from "../runtime-api.js";
 import { normalizeResolvedSecretInputString, normalizeSecretInputString } from "./secret-input.js";
 import type {

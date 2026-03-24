@@ -1,6 +1,6 @@
 import { ChannelType, type RequestClient } from "@buape/carbon";
-import { resolveAckReaction, resolveHumanDelayConfig } from "openclaw/plugin-sdk/agent-runtime";
-import { EmbeddedBlockChunker } from "openclaw/plugin-sdk/agent-runtime";
+import { resolveAckReaction, resolveHumanDelayConfig } from "recall/plugin-sdk/agent-runtime";
+import { EmbeddedBlockChunker } from "recall/plugin-sdk/agent-runtime";
 import {
   createStatusReactionController,
   DEFAULT_TIMING,
@@ -8,34 +8,34 @@ import {
   logTypingFailure,
   shouldAckReaction as shouldAckReactionGate,
   type StatusReactionAdapter,
-} from "openclaw/plugin-sdk/channel-feedback";
+} from "recall/plugin-sdk/channel-feedback";
 import {
   formatInboundEnvelope,
   resolveEnvelopeFormatOptions,
-} from "openclaw/plugin-sdk/channel-inbound";
-import { createChannelReplyPipeline } from "openclaw/plugin-sdk/channel-reply-pipeline";
-import { isDangerousNameMatchingEnabled } from "openclaw/plugin-sdk/config-runtime";
-import { resolveDiscordPreviewStreamMode } from "openclaw/plugin-sdk/config-runtime";
-import { resolveMarkdownTableMode } from "openclaw/plugin-sdk/config-runtime";
-import { readSessionUpdatedAt, resolveStorePath } from "openclaw/plugin-sdk/config-runtime";
-import { recordInboundSession } from "openclaw/plugin-sdk/conversation-runtime";
-import { getAgentScopedMediaLocalRoots } from "openclaw/plugin-sdk/media-runtime";
+} from "recall/plugin-sdk/channel-inbound";
+import { createChannelReplyPipeline } from "recall/plugin-sdk/channel-reply-pipeline";
+import { isDangerousNameMatchingEnabled } from "recall/plugin-sdk/config-runtime";
+import { resolveDiscordPreviewStreamMode } from "recall/plugin-sdk/config-runtime";
+import { resolveMarkdownTableMode } from "recall/plugin-sdk/config-runtime";
+import { readSessionUpdatedAt, resolveStorePath } from "recall/plugin-sdk/config-runtime";
+import { recordInboundSession } from "recall/plugin-sdk/conversation-runtime";
+import { getAgentScopedMediaLocalRoots } from "recall/plugin-sdk/media-runtime";
 import {
   buildPendingHistoryContextFromMap,
   clearHistoryEntriesIfEnabled,
-} from "openclaw/plugin-sdk/reply-history";
-import { resolveSendableOutboundReplyParts } from "openclaw/plugin-sdk/reply-payload";
-import { resolveChunkMode } from "openclaw/plugin-sdk/reply-runtime";
-import { dispatchInboundMessage } from "openclaw/plugin-sdk/reply-runtime";
-import { finalizeInboundContext } from "openclaw/plugin-sdk/reply-runtime";
-import { createReplyDispatcherWithTyping } from "openclaw/plugin-sdk/reply-runtime";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
-import { buildAgentSessionKey } from "openclaw/plugin-sdk/routing";
-import { resolveThreadSessionKeys } from "openclaw/plugin-sdk/routing";
-import { danger, logVerbose, shouldLogVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { convertMarkdownTables } from "openclaw/plugin-sdk/text-runtime";
-import { stripReasoningTagsFromText } from "openclaw/plugin-sdk/text-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-runtime";
+} from "recall/plugin-sdk/reply-history";
+import { resolveSendableOutboundReplyParts } from "recall/plugin-sdk/reply-payload";
+import { resolveChunkMode } from "recall/plugin-sdk/reply-runtime";
+import { dispatchInboundMessage } from "recall/plugin-sdk/reply-runtime";
+import { finalizeInboundContext } from "recall/plugin-sdk/reply-runtime";
+import { createReplyDispatcherWithTyping } from "recall/plugin-sdk/reply-runtime";
+import type { ReplyPayload } from "recall/plugin-sdk/reply-runtime";
+import { buildAgentSessionKey } from "recall/plugin-sdk/routing";
+import { resolveThreadSessionKeys } from "recall/plugin-sdk/routing";
+import { danger, logVerbose, shouldLogVerbose } from "recall/plugin-sdk/runtime-env";
+import { convertMarkdownTables } from "recall/plugin-sdk/text-runtime";
+import { stripReasoningTagsFromText } from "recall/plugin-sdk/text-runtime";
+import { truncateUtf16Safe } from "recall/plugin-sdk/text-runtime";
 import { resolveDiscordMaxLinesPerMessage } from "../accounts.js";
 import { chunkDiscordTextWithMode } from "../chunk.js";
 import { resolveDiscordDraftStreamingChunking } from "../draft-chunking.js";

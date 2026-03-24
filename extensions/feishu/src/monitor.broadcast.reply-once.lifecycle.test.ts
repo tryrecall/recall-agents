@@ -32,7 +32,7 @@ const sendMessageFeishuMock = vi.hoisted(() =>
 
 let handlersByAccount = new Map<string, Record<string, (data: unknown) => Promise<void>>>();
 let runtimesByAccount = new Map<string, RuntimeEnv>();
-const originalStateDir = process.env.OPENCLAW_STATE_DIR;
+const originalStateDir = process.env.RECALL_STATE_DIR;
 
 vi.mock("./client.js", async () => {
   const actual = await vi.importActual<typeof import("./client.js")>("./client.js");
@@ -61,8 +61,8 @@ vi.mock("./send.js", () => ({
   sendMessageFeishu: sendMessageFeishuMock,
 }));
 
-vi.mock("openclaw/plugin-sdk/conversation-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/conversation-runtime")>();
+vi.mock("recall/plugin-sdk/conversation-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/conversation-runtime")>();
   return {
     ...actual,
     getSessionBindingService: () => ({
@@ -210,7 +210,7 @@ describe("Feishu broadcast reply-once lifecycle", () => {
     vi.clearAllMocks();
     handlersByAccount = new Map();
     runtimesByAccount = new Map();
-    process.env.OPENCLAW_STATE_DIR = `/tmp/openclaw-feishu-broadcast-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    process.env.RECALL_STATE_DIR = `/tmp/recall-feishu-broadcast-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
     const activeDispatcher = {
       sendToolResult: vi.fn(() => false),
@@ -316,10 +316,10 @@ describe("Feishu broadcast reply-once lifecycle", () => {
   afterEach(() => {
     vi.useRealTimers();
     if (originalStateDir === undefined) {
-      delete process.env.OPENCLAW_STATE_DIR;
+      delete process.env.RECALL_STATE_DIR;
       return;
     }
-    process.env.OPENCLAW_STATE_DIR = originalStateDir;
+    process.env.RECALL_STATE_DIR = originalStateDir;
   });
 
   it("uses one active reply path when the same broadcast event reaches two accounts", async () => {

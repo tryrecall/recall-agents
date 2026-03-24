@@ -65,7 +65,7 @@ describe("irc setup core", () => {
     expect(
       updateIrcAccountConfig(cfg, "work", {
         host: "irc.libera.chat",
-        nick: "openclaw-work",
+        nick: "recall-work",
       }),
     ).toMatchObject({
       channels: {
@@ -73,7 +73,7 @@ describe("irc setup core", () => {
           accounts: {
             work: {
               host: "irc.libera.chat",
-              nick: "openclaw-work",
+              nick: "recall-work",
             },
           },
         },
@@ -89,7 +89,7 @@ describe("irc setup core", () => {
         cfg,
         "default",
         "allowlist",
-        ["openclaw", "#ops", "openclaw", "*"],
+        ["recall", "#ops", "recall", "*"],
         (raw) => {
           const trimmed = raw.trim();
           if (!trimmed) {
@@ -107,7 +107,7 @@ describe("irc setup core", () => {
           enabled: true,
           groupPolicy: "allowlist",
           groups: {
-            "#openclaw": {},
+            "#recall": {},
             "#ops": {},
             "*": {},
           },
@@ -133,7 +133,7 @@ describe("irc setup core", () => {
 
     expect(
       validateInput!({
-        input: { host: "", nick: "openclaw" },
+        input: { host: "", nick: "recall" },
       } as never),
     ).toBe("IRC requires host.");
 
@@ -145,7 +145,7 @@ describe("irc setup core", () => {
 
     expect(
       validateInput!({
-        input: { host: "irc.libera.chat", nick: "openclaw" },
+        input: { host: "irc.libera.chat", nick: "recall" },
       } as never),
     ).toBeNull();
 
@@ -158,11 +158,11 @@ describe("irc setup core", () => {
           host: " irc.libera.chat ",
           port: "7000",
           tls: true,
-          nick: " openclaw ",
+          nick: " recall ",
           username: " claw ",
-          realname: " OpenClaw Bot ",
+          realname: " Recall Bot ",
           password: " secret ",
-          channels: ["#openclaw"],
+          channels: ["#recall"],
         },
       } as never),
     ).toEqual({
@@ -173,11 +173,11 @@ describe("irc setup core", () => {
           host: "irc.libera.chat",
           port: 7000,
           tls: true,
-          nick: "openclaw",
+          nick: "recall",
           username: "claw",
-          realname: "OpenClaw Bot",
+          realname: "Recall Bot",
           password: "secret",
-          channels: ["#openclaw"],
+          channels: ["#recall"],
         },
       },
     });

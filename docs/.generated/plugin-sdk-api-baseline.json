@@ -42,7 +42,7 @@
           }
         },
         {
-          "declaration": "export function emptyPluginConfigSchema(): OpenClawPluginConfigSchema;",
+          "declaration": "export function emptyPluginConfigSchema(): RecallPluginConfigSchema;",
           "exportName": "emptyPluginConfigSchema",
           "kind": "function",
           "source": {
@@ -249,12 +249,12 @@
           }
         },
         {
-          "declaration": "export type OpenClawConfig = OpenClawConfig;",
+          "declaration": "export type RecallConfig = RecallConfig;",
           "exportName": "ClawdbotConfig",
           "kind": "type",
           "source": {
             "line": 32,
-            "path": "src/config/types.openclaw.ts"
+            "path": "src/config/types.recall.ts"
           }
         },
         {
@@ -402,17 +402,17 @@
           }
         },
         {
-          "declaration": "export type OpenClawConfig = OpenClawConfig;",
-          "exportName": "OpenClawConfig",
+          "declaration": "export type RecallConfig = RecallConfig;",
+          "exportName": "RecallConfig",
           "kind": "type",
           "source": {
             "line": 32,
-            "path": "src/config/types.openclaw.ts"
+            "path": "src/config/types.recall.ts"
           }
         },
         {
-          "declaration": "export type OpenClawPluginApi = OpenClawPluginApi;",
-          "exportName": "OpenClawPluginApi",
+          "declaration": "export type RecallPluginApi = RecallPluginApi;",
+          "exportName": "RecallPluginApi",
           "kind": "type",
           "source": {
             "line": 1314,
@@ -420,8 +420,8 @@
           }
         },
         {
-          "declaration": "export type OpenClawPluginConfigSchema = OpenClawPluginConfigSchema;",
-          "exportName": "OpenClawPluginConfigSchema",
+          "declaration": "export type RecallPluginConfigSchema = RecallPluginConfigSchema;",
+          "exportName": "RecallPluginConfigSchema",
           "kind": "type",
           "source": {
             "line": 88,
@@ -636,7 +636,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk",
+      "importSpecifier": "recall/plugin-sdk",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/index.ts"
@@ -890,7 +890,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/allow-from",
+      "importSpecifier": "recall/plugin-sdk/allow-from",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/allow-from.ts"
@@ -946,7 +946,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/channel-actions",
+      "importSpecifier": "recall/plugin-sdk/channel-actions",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/channel-actions.ts"
@@ -1029,7 +1029,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/channel-config-schema",
+      "importSpecifier": "recall/plugin-sdk/channel-config-schema",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/channel-config-schema.ts"
@@ -1166,7 +1166,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/channel-contract",
+      "importSpecifier": "recall/plugin-sdk/channel-contract",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/channel-contract.ts"
@@ -1195,7 +1195,7 @@
           }
         },
         {
-          "declaration": "export function createLoggedPairingApprovalNotifier(format: string | ((params: { cfg: OpenClawConfig; id: string; accountId?: string | undefined; runtime?: RuntimeEnv | undefined; }) => string), log?: (message: string) => void): (params: { ...; }) => Promise<...>;",
+          "declaration": "export function createLoggedPairingApprovalNotifier(format: string | ((params: { cfg: RecallConfig; id: string; accountId?: string | undefined; runtime?: RuntimeEnv | undefined; }) => string), log?: (message: string) => void): (params: { ...; }) => Promise<...>;",
           "exportName": "createLoggedPairingApprovalNotifier",
           "kind": "function",
           "source": {
@@ -1213,7 +1213,7 @@
           }
         },
         {
-          "declaration": "export function createTextPairingAdapter(params: { idLabel: string; message: string; normalizeAllowEntry?: ((entry: string) => string) | undefined; notify: (params: { cfg: OpenClawConfig; id: string; accountId?: string | undefined; runtime?: RuntimeEnv | undefined; } & { ...; }) => void | Promise<...>; }): ChannelPairingAdapter;",
+          "declaration": "export function createTextPairingAdapter(params: { idLabel: string; message: string; normalizeAllowEntry?: ((entry: string) => string) | undefined; notify: (params: { cfg: RecallConfig; id: string; accountId?: string | undefined; runtime?: RuntimeEnv | undefined; } & { ...; }) => void | Promise<...>; }): ChannelPairingAdapter;",
           "exportName": "createTextPairingAdapter",
           "kind": "function",
           "source": {
@@ -1231,7 +1231,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/channel-pairing",
+      "importSpecifier": "recall/plugin-sdk/channel-pairing",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/channel-pairing.ts"
@@ -1242,7 +1242,7 @@
       "entrypoint": "channel-reply-pipeline",
       "exports": [
         {
-          "declaration": "export function createChannelReplyPipeline(params: { cfg: OpenClawConfig; agentId: string; channel?: string | undefined; accountId?: string | undefined; typing?: CreateTypingCallbacksParams | undefined; typingCallbacks?: TypingCallbacks | undefined; }): ChannelReplyPipeline;",
+          "declaration": "export function createChannelReplyPipeline(params: { cfg: RecallConfig; agentId: string; channel?: string | undefined; accountId?: string | undefined; typing?: CreateTypingCallbacksParams | undefined; typingCallbacks?: TypingCallbacks | undefined; }): ChannelReplyPipeline;",
           "exportName": "createChannelReplyPipeline",
           "kind": "function",
           "source": {
@@ -1305,7 +1305,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/channel-reply-pipeline",
+      "importSpecifier": "recall/plugin-sdk/channel-reply-pipeline",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/channel-reply-pipeline.ts"
@@ -1325,7 +1325,7 @@
           }
         },
         {
-          "declaration": "export function createReplyPrefixContext(params: { cfg: OpenClawConfig; agentId: string; channel?: string | undefined; accountId?: string | undefined; }): ReplyPrefixContextBundle;",
+          "declaration": "export function createReplyPrefixContext(params: { cfg: RecallConfig; agentId: string; channel?: string | undefined; accountId?: string | undefined; }): ReplyPrefixContextBundle;",
           "exportName": "createReplyPrefixContext",
           "kind": "function",
           "source": {
@@ -1334,7 +1334,7 @@
           }
         },
         {
-          "declaration": "export function createReplyPrefixOptions(params: { cfg: OpenClawConfig; agentId: string; channel?: string | undefined; accountId?: string | undefined; }): ReplyPrefixOptions;",
+          "declaration": "export function createReplyPrefixOptions(params: { cfg: RecallConfig; agentId: string; channel?: string | undefined; accountId?: string | undefined; }): ReplyPrefixOptions;",
           "exportName": "createReplyPrefixOptions",
           "kind": "function",
           "source": {
@@ -1478,7 +1478,7 @@
           }
         },
         {
-          "declaration": "export function resolveWhatsAppHeartbeatRecipients(cfg: OpenClawConfig, opts?: HeartbeatRecipientsOpts): HeartbeatRecipientsResult;",
+          "declaration": "export function resolveWhatsAppHeartbeatRecipients(cfg: RecallConfig, opts?: HeartbeatRecipientsOpts): HeartbeatRecipientsResult;",
           "exportName": "resolveWhatsAppHeartbeatRecipients",
           "kind": "function",
           "source": {
@@ -2216,7 +2216,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/channel-runtime",
+      "importSpecifier": "recall/plugin-sdk/channel-runtime",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/channel-runtime.ts"
@@ -2254,7 +2254,7 @@
           }
         },
         {
-          "declaration": "export function createTopLevelChannelDmPolicy(params: { label: string; channel: string; policyKey: string; allowFromKey: string; getCurrent: (cfg: OpenClawConfig) => DmPolicy; promptAllowFrom?: ((params: { cfg: OpenClawConfig; prompter: WizardPrompter; accountId?: string | undefined; }) => Promise<...>) | undefined; getAllowFrom?: ((cfg: OpenClawConfig) => (string | number)[] | undefined) | undefined; }): ChannelSetupDmPolicy;",
+          "declaration": "export function createTopLevelChannelDmPolicy(params: { label: string; channel: string; policyKey: string; allowFromKey: string; getCurrent: (cfg: RecallConfig) => DmPolicy; promptAllowFrom?: ((params: { cfg: RecallConfig; prompter: WizardPrompter; accountId?: string | undefined; }) => Promise<...>) | undefined; getAllowFrom?: ((cfg: RecallConfig) => (string | number)[] | undefined) | undefined; }): ChannelSetupDmPolicy;",
           "exportName": "createTopLevelChannelDmPolicy",
           "kind": "function",
           "source": {
@@ -2272,7 +2272,7 @@
           }
         },
         {
-          "declaration": "export function setSetupChannelEnabled(cfg: OpenClawConfig, channel: string, enabled: boolean): OpenClawConfig;",
+          "declaration": "export function setSetupChannelEnabled(cfg: RecallConfig, channel: string, enabled: boolean): RecallConfig;",
           "exportName": "setSetupChannelEnabled",
           "kind": "function",
           "source": {
@@ -2344,7 +2344,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/channel-setup",
+      "importSpecifier": "recall/plugin-sdk/channel-setup",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/channel-setup.ts"
@@ -2355,7 +2355,7 @@
       "entrypoint": "command-auth",
       "exports": [
         {
-          "declaration": "export function buildCommandsMessage(cfg?: OpenClawConfig | undefined, skillCommands?: SkillCommandSpec[] | undefined, options?: CommandsMessageOptions | undefined): string;",
+          "declaration": "export function buildCommandsMessage(cfg?: RecallConfig | undefined, skillCommands?: SkillCommandSpec[] | undefined, options?: CommandsMessageOptions | undefined): string;",
           "exportName": "buildCommandsMessage",
           "kind": "function",
           "source": {
@@ -2364,7 +2364,7 @@
           }
         },
         {
-          "declaration": "export function buildCommandsMessagePaginated(cfg?: OpenClawConfig | undefined, skillCommands?: SkillCommandSpec[] | undefined, options?: CommandsMessageOptions | undefined): CommandsMessageResult;",
+          "declaration": "export function buildCommandsMessagePaginated(cfg?: RecallConfig | undefined, skillCommands?: SkillCommandSpec[] | undefined, options?: CommandsMessageOptions | undefined): CommandsMessageResult;",
           "exportName": "buildCommandsMessagePaginated",
           "kind": "function",
           "source": {
@@ -2400,7 +2400,7 @@
           }
         },
         {
-          "declaration": "export function buildHelpMessage(cfg?: OpenClawConfig | undefined): string;",
+          "declaration": "export function buildHelpMessage(cfg?: RecallConfig | undefined): string;",
           "exportName": "buildHelpMessage",
           "kind": "function",
           "source": {
@@ -2409,7 +2409,7 @@
           }
         },
         {
-          "declaration": "export function buildModelsProviderData(cfg: OpenClawConfig, agentId?: string | undefined): Promise<ModelsProviderData>;",
+          "declaration": "export function buildModelsProviderData(cfg: RecallConfig, agentId?: string | undefined): Promise<ModelsProviderData>;",
           "exportName": "buildModelsProviderData",
           "kind": "function",
           "source": {
@@ -2436,7 +2436,7 @@
           }
         },
         {
-          "declaration": "export function formatModelsAvailableHeader(params: { provider: string; total: number; cfg: OpenClawConfig; agentDir?: string | undefined; sessionEntry?: SessionEntry | undefined; }): string;",
+          "declaration": "export function formatModelsAvailableHeader(params: { provider: string; total: number; cfg: RecallConfig; agentDir?: string | undefined; sessionEntry?: SessionEntry | undefined; }): string;",
           "exportName": "formatModelsAvailableHeader",
           "kind": "function",
           "source": {
@@ -2445,7 +2445,7 @@
           }
         },
         {
-          "declaration": "export function getCommandDetection(_cfg?: OpenClawConfig | undefined): CommandDetection;",
+          "declaration": "export function getCommandDetection(_cfg?: RecallConfig | undefined): CommandDetection;",
           "exportName": "getCommandDetection",
           "kind": "function",
           "source": {
@@ -2454,7 +2454,7 @@
           }
         },
         {
-          "declaration": "export function hasControlCommand(text?: string | undefined, cfg?: OpenClawConfig | undefined, options?: CommandNormalizeOptions | undefined): boolean;",
+          "declaration": "export function hasControlCommand(text?: string | undefined, cfg?: RecallConfig | undefined, options?: CommandNormalizeOptions | undefined): boolean;",
           "exportName": "hasControlCommand",
           "kind": "function",
           "source": {
@@ -2472,7 +2472,7 @@
           }
         },
         {
-          "declaration": "export function isCommandEnabled(cfg: OpenClawConfig, commandKey: string): boolean;",
+          "declaration": "export function isCommandEnabled(cfg: RecallConfig, commandKey: string): boolean;",
           "exportName": "isCommandEnabled",
           "kind": "function",
           "source": {
@@ -2490,7 +2490,7 @@
           }
         },
         {
-          "declaration": "export function isControlCommandMessage(text?: string | undefined, cfg?: OpenClawConfig | undefined, options?: CommandNormalizeOptions | undefined): boolean;",
+          "declaration": "export function isControlCommandMessage(text?: string | undefined, cfg?: RecallConfig | undefined, options?: CommandNormalizeOptions | undefined): boolean;",
           "exportName": "isControlCommandMessage",
           "kind": "function",
           "source": {
@@ -2517,7 +2517,7 @@
           }
         },
         {
-          "declaration": "export function listChatCommandsForConfig(cfg: OpenClawConfig, params?: { skillCommands?: SkillCommandSpec[] | undefined; } | undefined): ChatCommandDefinition[];",
+          "declaration": "export function listChatCommandsForConfig(cfg: RecallConfig, params?: { skillCommands?: SkillCommandSpec[] | undefined; } | undefined): ChatCommandDefinition[];",
           "exportName": "listChatCommandsForConfig",
           "kind": "function",
           "source": {
@@ -2535,7 +2535,7 @@
           }
         },
         {
-          "declaration": "export function listNativeCommandSpecsForConfig(cfg: OpenClawConfig, params?: { skillCommands?: SkillCommandSpec[] | undefined; provider?: string | undefined; } | undefined): NativeCommandSpec[];",
+          "declaration": "export function listNativeCommandSpecsForConfig(cfg: RecallConfig, params?: { skillCommands?: SkillCommandSpec[] | undefined; provider?: string | undefined; } | undefined): NativeCommandSpec[];",
           "exportName": "listNativeCommandSpecsForConfig",
           "kind": "function",
           "source": {
@@ -2553,7 +2553,7 @@
           }
         },
         {
-          "declaration": "export function listSkillCommandsForAgents(params: { cfg: OpenClawConfig; agentIds?: string[] | undefined; }): SkillCommandSpec[];",
+          "declaration": "export function listSkillCommandsForAgents(params: { cfg: RecallConfig; agentIds?: string[] | undefined; }): SkillCommandSpec[];",
           "exportName": "listSkillCommandsForAgents",
           "kind": "function",
           "source": {
@@ -2562,7 +2562,7 @@
           }
         },
         {
-          "declaration": "export function listSkillCommandsForWorkspace(params: { workspaceDir: string; cfg: OpenClawConfig; skillFilter?: string[] | undefined; }): SkillCommandSpec[];",
+          "declaration": "export function listSkillCommandsForWorkspace(params: { workspaceDir: string; cfg: RecallConfig; skillFilter?: string[] | undefined; }): SkillCommandSpec[];",
           "exportName": "listSkillCommandsForWorkspace",
           "kind": "function",
           "source": {
@@ -2571,7 +2571,7 @@
           }
         },
         {
-          "declaration": "export function maybeResolveTextAlias(raw: string, cfg?: OpenClawConfig | undefined): string | null;",
+          "declaration": "export function maybeResolveTextAlias(raw: string, cfg?: RecallConfig | undefined): string | null;",
           "exportName": "maybeResolveTextAlias",
           "kind": "function",
           "source": {
@@ -2598,7 +2598,7 @@
           }
         },
         {
-          "declaration": "export function resolveCommandArgChoices(params: { command: ChatCommandDefinition; arg: CommandArgDefinition; cfg?: OpenClawConfig | undefined; provider?: string | undefined; model?: string | undefined; }): ResolvedCommandArgChoice[];",
+          "declaration": "export function resolveCommandArgChoices(params: { command: ChatCommandDefinition; arg: CommandArgDefinition; cfg?: RecallConfig | undefined; provider?: string | undefined; model?: string | undefined; }): ResolvedCommandArgChoice[];",
           "exportName": "resolveCommandArgChoices",
           "kind": "function",
           "source": {
@@ -2607,7 +2607,7 @@
           }
         },
         {
-          "declaration": "export function resolveCommandArgMenu(params: { command: ChatCommandDefinition; args?: CommandArgs | undefined; cfg?: OpenClawConfig | undefined; }): { arg: CommandArgDefinition; choices: ResolvedCommandArgChoice[]; title?: string | undefined; } | null;",
+          "declaration": "export function resolveCommandArgMenu(params: { command: ChatCommandDefinition; args?: CommandArgs | undefined; cfg?: RecallConfig | undefined; }): { arg: CommandArgDefinition; choices: ResolvedCommandArgChoice[]; title?: string | undefined; } | null;",
           "exportName": "resolveCommandArgMenu",
           "kind": "function",
           "source": {
@@ -2616,7 +2616,7 @@
           }
         },
         {
-          "declaration": "export function resolveCommandAuthorization(params: { ctx: MsgContext; cfg: OpenClawConfig; commandAuthorized: boolean; }): CommandAuthorization;",
+          "declaration": "export function resolveCommandAuthorization(params: { ctx: MsgContext; cfg: RecallConfig; commandAuthorized: boolean; }): CommandAuthorization;",
           "exportName": "resolveCommandAuthorization",
           "kind": "function",
           "source": {
@@ -2661,7 +2661,7 @@
           }
         },
         {
-          "declaration": "export function resolveInboundDirectDmAccessWithRuntime(params: { cfg: OpenClawConfig; channel: ChannelId; accountId: string; dmPolicy?: string | null | undefined; allowFrom?: (string | number)[] | null | undefined; senderId: string; ... 4 more ...; readStoreAllowFrom?: ((provider: ChannelId, accountId: string) => Promise<...>) | undefined; }): Promise<...>;",
+          "declaration": "export function resolveInboundDirectDmAccessWithRuntime(params: { cfg: RecallConfig; channel: ChannelId; accountId: string; dmPolicy?: string | null | undefined; allowFrom?: (string | number)[] | null | undefined; senderId: string; ... 4 more ...; readStoreAllowFrom?: ((provider: ChannelId, accountId: string) => Promise<...>) | undefined; }): Promise<...>;",
           "exportName": "resolveInboundDirectDmAccessWithRuntime",
           "kind": "function",
           "source": {
@@ -2670,7 +2670,7 @@
           }
         },
         {
-          "declaration": "export function resolveModelsCommandReply(params: { cfg: OpenClawConfig; commandBodyNormalized: string; surface?: string | undefined; currentModel?: string | undefined; agentId?: string | undefined; agentDir?: string | undefined; sessionEntry?: SessionEntry | undefined; }): Promise<...>;",
+          "declaration": "export function resolveModelsCommandReply(params: { cfg: RecallConfig; commandBodyNormalized: string; surface?: string | undefined; currentModel?: string | undefined; agentId?: string | undefined; agentDir?: string | undefined; sessionEntry?: SessionEntry | undefined; }): Promise<...>;",
           "exportName": "resolveModelsCommandReply",
           "kind": "function",
           "source": {
@@ -2724,7 +2724,7 @@
           }
         },
         {
-          "declaration": "export function resolveTextCommand(raw: string, cfg?: OpenClawConfig | undefined): { command: ChatCommandDefinition; args?: string | undefined; } | null;",
+          "declaration": "export function resolveTextCommand(raw: string, cfg?: RecallConfig | undefined): { command: ChatCommandDefinition; args?: string | undefined; } | null;",
           "exportName": "resolveTextCommand",
           "kind": "function",
           "source": {
@@ -2742,7 +2742,7 @@
           }
         },
         {
-          "declaration": "export function shouldComputeCommandAuthorized(text?: string | undefined, cfg?: OpenClawConfig | undefined, options?: CommandNormalizeOptions | undefined): boolean;",
+          "declaration": "export function shouldComputeCommandAuthorized(text?: string | undefined, cfg?: RecallConfig | undefined, options?: CommandNormalizeOptions | undefined): boolean;",
           "exportName": "shouldComputeCommandAuthorized",
           "kind": "function",
           "source": {
@@ -2967,7 +2967,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/command-auth",
+      "importSpecifier": "recall/plugin-sdk/command-auth",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/command-auth.ts"
@@ -2978,7 +2978,7 @@
       "entrypoint": "core",
       "exports": [
         {
-          "declaration": "export function applyAccountNameToChannelSection(params: { cfg: OpenClawConfig; channelKey: string; accountId: string; name?: string | undefined; alwaysUseAccounts?: boolean | undefined; }): OpenClawConfig;",
+          "declaration": "export function applyAccountNameToChannelSection(params: { cfg: RecallConfig; channelKey: string; accountId: string; name?: string | undefined; alwaysUseAccounts?: boolean | undefined; }): RecallConfig;",
           "exportName": "applyAccountNameToChannelSection",
           "kind": "function",
           "source": {
@@ -3005,7 +3005,7 @@
           }
         },
         {
-          "declaration": "export function buildChannelOutboundSessionRoute(params: { cfg: OpenClawConfig; agentId: string; channel: string; accountId?: string | null | undefined; peer: { kind: \"direct\" | \"group\" | \"channel\"; id: string; }; chatType: \"direct\" | \"group\" | \"channel\"; from: string; to: string; threadId?: string | ... 1 more ... | undefined; }): ChannelOutboundSessionRoute;",
+          "declaration": "export function buildChannelOutboundSessionRoute(params: { cfg: RecallConfig; agentId: string; channel: string; accountId?: string | null | undefined; peer: { kind: \"direct\" | \"group\" | \"channel\"; id: string; }; chatType: \"direct\" | \"group\" | \"channel\"; from: string; to: string; threadId?: string | ... 1 more ... | undefined; }): ChannelOutboundSessionRoute;",
           "exportName": "buildChannelOutboundSessionRoute",
           "kind": "function",
           "source": {
@@ -3095,7 +3095,7 @@
           }
         },
         {
-          "declaration": "export function deleteAccountFromConfigSection(params: { cfg: OpenClawConfig; sectionKey: string; accountId: string; clearBaseFields?: string[] | undefined; }): OpenClawConfig;",
+          "declaration": "export function deleteAccountFromConfigSection(params: { cfg: RecallConfig; sectionKey: string; accountId: string; clearBaseFields?: string[] | undefined; }): RecallConfig;",
           "exportName": "deleteAccountFromConfigSection",
           "kind": "function",
           "source": {
@@ -3104,7 +3104,7 @@
           }
         },
         {
-          "declaration": "export function emptyPluginConfigSchema(): OpenClawPluginConfigSchema;",
+          "declaration": "export function emptyPluginConfigSchema(): RecallPluginConfigSchema;",
           "exportName": "emptyPluginConfigSchema",
           "kind": "function",
           "source": {
@@ -3158,7 +3158,7 @@
           }
         },
         {
-          "declaration": "export function migrateBaseNameToDefaultAccount(params: { cfg: OpenClawConfig; channelKey: string; alwaysUseAccounts?: boolean | undefined; }): OpenClawConfig;",
+          "declaration": "export function migrateBaseNameToDefaultAccount(params: { cfg: RecallConfig; channelKey: string; alwaysUseAccounts?: boolean | undefined; }): RecallConfig;",
           "exportName": "migrateBaseNameToDefaultAccount",
           "kind": "function",
           "source": {
@@ -3248,7 +3248,7 @@
           }
         },
         {
-          "declaration": "export function setAccountEnabledInConfigSection(params: { cfg: OpenClawConfig; sectionKey: string; accountId: string; enabled: boolean; allowTopLevel?: boolean | undefined; }): OpenClawConfig;",
+          "declaration": "export function setAccountEnabledInConfigSection(params: { cfg: RecallConfig; sectionKey: string; accountId: string; enabled: boolean; allowTopLevel?: boolean | undefined; }): RecallConfig;",
           "exportName": "setAccountEnabledInConfigSection",
           "kind": "function",
           "source": {
@@ -3347,7 +3347,7 @@
           }
         },
         {
-          "declaration": "export type ChannelOutboundSessionRouteParams = {    cfg: OpenClawConfig;    agentId: string;    accountId?: string | null;    target: string;    resolvedTarget?: {        to: string;        kind: import(\"src/channels/plugins/types.core\").ChannelDirectoryEntryKind | \"channel\";        display?: string;        source: \"normalized\" | \"directory\";    };    replyToId?: string | null;    threadId?: string | number | null;};",
+          "declaration": "export type ChannelOutboundSessionRouteParams = {    cfg: RecallConfig;    agentId: string;    accountId?: string | null;    target: string;    resolvedTarget?: {        to: string;        kind: import(\"src/channels/plugins/types.core\").ChannelDirectoryEntryKind | \"channel\";        display?: string;        source: \"normalized\" | \"directory\";    };    replyToId?: string | null;    threadId?: string | number | null;};",
           "exportName": "ChannelOutboundSessionRouteParams",
           "kind": "type",
           "source": {
@@ -3392,17 +3392,17 @@
           }
         },
         {
-          "declaration": "export type OpenClawConfig = OpenClawConfig;",
-          "exportName": "OpenClawConfig",
+          "declaration": "export type RecallConfig = RecallConfig;",
+          "exportName": "RecallConfig",
           "kind": "type",
           "source": {
             "line": 32,
-            "path": "src/config/types.openclaw.ts"
+            "path": "src/config/types.recall.ts"
           }
         },
         {
-          "declaration": "export type OpenClawPluginApi = OpenClawPluginApi;",
-          "exportName": "OpenClawPluginApi",
+          "declaration": "export type RecallPluginApi = RecallPluginApi;",
+          "exportName": "RecallPluginApi",
           "kind": "type",
           "source": {
             "line": 1314,
@@ -3410,8 +3410,8 @@
           }
         },
         {
-          "declaration": "export type OpenClawPluginCommandDefinition = OpenClawPluginCommandDefinition;",
-          "exportName": "OpenClawPluginCommandDefinition",
+          "declaration": "export type RecallPluginCommandDefinition = RecallPluginCommandDefinition;",
+          "exportName": "RecallPluginCommandDefinition",
           "kind": "type",
           "source": {
             "line": 1068,
@@ -3419,8 +3419,8 @@
           }
         },
         {
-          "declaration": "export type OpenClawPluginConfigSchema = OpenClawPluginConfigSchema;",
-          "exportName": "OpenClawPluginConfigSchema",
+          "declaration": "export type RecallPluginConfigSchema = RecallPluginConfigSchema;",
+          "exportName": "RecallPluginConfigSchema",
           "kind": "type",
           "source": {
             "line": 88,
@@ -3428,8 +3428,8 @@
           }
         },
         {
-          "declaration": "export type OpenClawPluginDefinition = OpenClawPluginDefinition;",
-          "exportName": "OpenClawPluginDefinition",
+          "declaration": "export type RecallPluginDefinition = RecallPluginDefinition;",
+          "exportName": "RecallPluginDefinition",
           "kind": "type",
           "source": {
             "line": 1296,
@@ -3437,8 +3437,8 @@
           }
         },
         {
-          "declaration": "export type OpenClawPluginService = OpenClawPluginService;",
-          "exportName": "OpenClawPluginService",
+          "declaration": "export type RecallPluginService = RecallPluginService;",
+          "exportName": "RecallPluginService",
           "kind": "type",
           "source": {
             "line": 1285,
@@ -3446,8 +3446,8 @@
           }
         },
         {
-          "declaration": "export type OpenClawPluginServiceContext = OpenClawPluginServiceContext;",
-          "exportName": "OpenClawPluginServiceContext",
+          "declaration": "export type RecallPluginServiceContext = RecallPluginServiceContext;",
+          "exportName": "RecallPluginServiceContext",
           "kind": "type",
           "source": {
             "line": 1277,
@@ -3455,8 +3455,8 @@
           }
         },
         {
-          "declaration": "export type OpenClawPluginToolContext = OpenClawPluginToolContext;",
-          "exportName": "OpenClawPluginToolContext",
+          "declaration": "export type RecallPluginToolContext = RecallPluginToolContext;",
+          "exportName": "RecallPluginToolContext",
           "kind": "type",
           "source": {
             "line": 103,
@@ -3464,8 +3464,8 @@
           }
         },
         {
-          "declaration": "export type OpenClawPluginToolFactory = OpenClawPluginToolFactory;",
-          "exportName": "OpenClawPluginToolFactory",
+          "declaration": "export type RecallPluginToolFactory = RecallPluginToolFactory;",
+          "exportName": "RecallPluginToolFactory",
           "kind": "type",
           "source": {
             "line": 120,
@@ -3851,7 +3851,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/core",
+      "importSpecifier": "recall/plugin-sdk/core",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/core.ts"
@@ -3871,7 +3871,7 @@
           }
         },
         {
-          "declaration": "export function emptyPluginConfigSchema(): OpenClawPluginConfigSchema;",
+          "declaration": "export function emptyPluginConfigSchema(): RecallPluginConfigSchema;",
           "exportName": "emptyPluginConfigSchema",
           "kind": "function",
           "source": {
@@ -3898,17 +3898,17 @@
           }
         },
         {
-          "declaration": "export type OpenClawConfig = OpenClawConfig;",
-          "exportName": "OpenClawConfig",
+          "declaration": "export type RecallConfig = RecallConfig;",
+          "exportName": "RecallConfig",
           "kind": "type",
           "source": {
             "line": 32,
-            "path": "src/config/types.openclaw.ts"
+            "path": "src/config/types.recall.ts"
           }
         },
         {
-          "declaration": "export type OpenClawPluginApi = OpenClawPluginApi;",
-          "exportName": "OpenClawPluginApi",
+          "declaration": "export type RecallPluginApi = RecallPluginApi;",
+          "exportName": "RecallPluginApi",
           "kind": "type",
           "source": {
             "line": 1314,
@@ -3916,8 +3916,8 @@
           }
         },
         {
-          "declaration": "export type OpenClawPluginCommandDefinition = OpenClawPluginCommandDefinition;",
-          "exportName": "OpenClawPluginCommandDefinition",
+          "declaration": "export type RecallPluginCommandDefinition = RecallPluginCommandDefinition;",
+          "exportName": "RecallPluginCommandDefinition",
           "kind": "type",
           "source": {
             "line": 1068,
@@ -3925,8 +3925,8 @@
           }
         },
         {
-          "declaration": "export type OpenClawPluginConfigSchema = OpenClawPluginConfigSchema;",
-          "exportName": "OpenClawPluginConfigSchema",
+          "declaration": "export type RecallPluginConfigSchema = RecallPluginConfigSchema;",
+          "exportName": "RecallPluginConfigSchema",
           "kind": "type",
           "source": {
             "line": 88,
@@ -3934,8 +3934,8 @@
           }
         },
         {
-          "declaration": "export type OpenClawPluginDefinition = OpenClawPluginDefinition;",
-          "exportName": "OpenClawPluginDefinition",
+          "declaration": "export type RecallPluginDefinition = RecallPluginDefinition;",
+          "exportName": "RecallPluginDefinition",
           "kind": "type",
           "source": {
             "line": 1296,
@@ -3943,8 +3943,8 @@
           }
         },
         {
-          "declaration": "export type OpenClawPluginService = OpenClawPluginService;",
-          "exportName": "OpenClawPluginService",
+          "declaration": "export type RecallPluginService = RecallPluginService;",
+          "exportName": "RecallPluginService",
           "kind": "type",
           "source": {
             "line": 1285,
@@ -3952,8 +3952,8 @@
           }
         },
         {
-          "declaration": "export type OpenClawPluginServiceContext = OpenClawPluginServiceContext;",
-          "exportName": "OpenClawPluginServiceContext",
+          "declaration": "export type RecallPluginServiceContext = RecallPluginServiceContext;",
+          "exportName": "RecallPluginServiceContext",
           "kind": "type",
           "source": {
             "line": 1277,
@@ -4240,7 +4240,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/plugin-entry",
+      "importSpecifier": "recall/plugin-sdk/plugin-entry",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/plugin-entry.ts"
@@ -4251,7 +4251,7 @@
       "entrypoint": "provider-onboard",
       "exports": [
         {
-          "declaration": "export function applyAgentDefaultModelPrimary(cfg: OpenClawConfig, primary: string): OpenClawConfig;",
+          "declaration": "export function applyAgentDefaultModelPrimary(cfg: RecallConfig, primary: string): RecallConfig;",
           "exportName": "applyAgentDefaultModelPrimary",
           "kind": "function",
           "source": {
@@ -4260,7 +4260,7 @@
           }
         },
         {
-          "declaration": "export function applyCloudflareAiGatewayConfig(cfg: OpenClawConfig, params?: { accountId?: string | undefined; gatewayId?: string | undefined; } | undefined): OpenClawConfig;",
+          "declaration": "export function applyCloudflareAiGatewayConfig(cfg: RecallConfig, params?: { accountId?: string | undefined; gatewayId?: string | undefined; } | undefined): RecallConfig;",
           "exportName": "applyCloudflareAiGatewayConfig",
           "kind": "function",
           "source": {
@@ -4269,7 +4269,7 @@
           }
         },
         {
-          "declaration": "export function applyCloudflareAiGatewayProviderConfig(cfg: OpenClawConfig, params?: { accountId?: string | undefined; gatewayId?: string | undefined; } | undefined): OpenClawConfig;",
+          "declaration": "export function applyCloudflareAiGatewayProviderConfig(cfg: RecallConfig, params?: { accountId?: string | undefined; gatewayId?: string | undefined; } | undefined): RecallConfig;",
           "exportName": "applyCloudflareAiGatewayProviderConfig",
           "kind": "function",
           "source": {
@@ -4278,7 +4278,7 @@
           }
         },
         {
-          "declaration": "export function applyOnboardAuthAgentModelsAndProviders(cfg: OpenClawConfig, params: { agentModels: Record<string, AgentModelEntryConfig>; providers: Record<string, ModelProviderConfig>; }): OpenClawConfig;",
+          "declaration": "export function applyOnboardAuthAgentModelsAndProviders(cfg: RecallConfig, params: { agentModels: Record<string, AgentModelEntryConfig>; providers: Record<string, ModelProviderConfig>; }): RecallConfig;",
           "exportName": "applyOnboardAuthAgentModelsAndProviders",
           "kind": "function",
           "source": {
@@ -4287,7 +4287,7 @@
           }
         },
         {
-          "declaration": "export function applyProviderConfigWithDefaultModel(cfg: OpenClawConfig, params: { agentModels: Record<string, AgentModelEntryConfig>; providerId: string; api: \"github-copilot\" | \"openai-completions\" | ... 5 more ... | \"ollama\"; baseUrl: string; defaultModel: ModelDefinitionConfig; defaultModelId?: string | undefined; }): OpenClawConfig;",
+          "declaration": "export function applyProviderConfigWithDefaultModel(cfg: RecallConfig, params: { agentModels: Record<string, AgentModelEntryConfig>; providerId: string; api: \"github-copilot\" | \"openai-completions\" | ... 5 more ... | \"ollama\"; baseUrl: string; defaultModel: ModelDefinitionConfig; defaultModelId?: string | undefined; }): RecallConfig;",
           "exportName": "applyProviderConfigWithDefaultModel",
           "kind": "function",
           "source": {
@@ -4296,7 +4296,7 @@
           }
         },
         {
-          "declaration": "export function applyProviderConfigWithDefaultModelPreset(cfg: OpenClawConfig, params: { providerId: string; api: \"github-copilot\" | \"openai-completions\" | \"openai-responses\" | \"openai-codex-responses\" | \"anthropic-messages\" | \"google-generative-ai\" | \"bedrock-converse-stream\" | \"ollama\"; ... 4 more ...; primaryModelRef?: string | undefined; }): OpenClawConfig;",
+          "declaration": "export function applyProviderConfigWithDefaultModelPreset(cfg: RecallConfig, params: { providerId: string; api: \"github-copilot\" | \"openai-completions\" | \"openai-responses\" | \"openai-codex-responses\" | \"anthropic-messages\" | \"google-generative-ai\" | \"bedrock-converse-stream\" | \"ollama\"; ... 4 more ...; primaryModelRef?: string | undefined; }): RecallConfig;",
           "exportName": "applyProviderConfigWithDefaultModelPreset",
           "kind": "function",
           "source": {
@@ -4305,7 +4305,7 @@
           }
         },
         {
-          "declaration": "export function applyProviderConfigWithDefaultModels(cfg: OpenClawConfig, params: { agentModels: Record<string, AgentModelEntryConfig>; providerId: string; api: \"github-copilot\" | \"openai-completions\" | ... 5 more ... | \"ollama\"; baseUrl: string; defaultModels: ModelDefinitionConfig[]; defaultModelId?: string | undefined; }): OpenClawConfig;",
+          "declaration": "export function applyProviderConfigWithDefaultModels(cfg: RecallConfig, params: { agentModels: Record<string, AgentModelEntryConfig>; providerId: string; api: \"github-copilot\" | \"openai-completions\" | ... 5 more ... | \"ollama\"; baseUrl: string; defaultModels: ModelDefinitionConfig[]; defaultModelId?: string | undefined; }): RecallConfig;",
           "exportName": "applyProviderConfigWithDefaultModels",
           "kind": "function",
           "source": {
@@ -4314,7 +4314,7 @@
           }
         },
         {
-          "declaration": "export function applyProviderConfigWithDefaultModelsPreset(cfg: OpenClawConfig, params: { providerId: string; api: \"github-copilot\" | \"openai-completions\" | \"openai-responses\" | \"openai-codex-responses\" | \"anthropic-messages\" | \"google-generative-ai\" | \"bedrock-converse-stream\" | \"ollama\"; ... 4 more ...; primaryModelRef?: string | undefined; }): OpenClawConfig;",
+          "declaration": "export function applyProviderConfigWithDefaultModelsPreset(cfg: RecallConfig, params: { providerId: string; api: \"github-copilot\" | \"openai-completions\" | \"openai-responses\" | \"openai-codex-responses\" | \"anthropic-messages\" | \"google-generative-ai\" | \"bedrock-converse-stream\" | \"ollama\"; ... 4 more ...; primaryModelRef?: string | undefined; }): RecallConfig;",
           "exportName": "applyProviderConfigWithDefaultModelsPreset",
           "kind": "function",
           "source": {
@@ -4323,7 +4323,7 @@
           }
         },
         {
-          "declaration": "export function applyProviderConfigWithModelCatalog(cfg: OpenClawConfig, params: { agentModels: Record<string, AgentModelEntryConfig>; providerId: string; api: \"github-copilot\" | \"openai-completions\" | ... 5 more ... | \"ollama\"; baseUrl: string; catalogModels: ModelDefinitionConfig[]; }): OpenClawConfig;",
+          "declaration": "export function applyProviderConfigWithModelCatalog(cfg: RecallConfig, params: { agentModels: Record<string, AgentModelEntryConfig>; providerId: string; api: \"github-copilot\" | \"openai-completions\" | ... 5 more ... | \"ollama\"; baseUrl: string; catalogModels: ModelDefinitionConfig[]; }): RecallConfig;",
           "exportName": "applyProviderConfigWithModelCatalog",
           "kind": "function",
           "source": {
@@ -4332,7 +4332,7 @@
           }
         },
         {
-          "declaration": "export function applyProviderConfigWithModelCatalogPreset(cfg: OpenClawConfig, params: { providerId: string; api: \"github-copilot\" | \"openai-completions\" | \"openai-responses\" | \"openai-codex-responses\" | \"anthropic-messages\" | \"google-generative-ai\" | \"bedrock-converse-stream\" | \"ollama\"; baseUrl: string; catalogModels: ModelDefinitionConfig[]; aliases?: readonly AgentModelAliasEntry[] | undefined; primaryModelRef?: string | undefined; }): OpenClawConfig;",
+          "declaration": "export function applyProviderConfigWithModelCatalogPreset(cfg: RecallConfig, params: { providerId: string; api: \"github-copilot\" | \"openai-completions\" | \"openai-responses\" | \"openai-codex-responses\" | \"anthropic-messages\" | \"google-generative-ai\" | \"bedrock-converse-stream\" | \"ollama\"; baseUrl: string; catalogModels: ModelDefinitionConfig[]; aliases?: readonly AgentModelAliasEntry[] | undefined; primaryModelRef?: string | undefined; }): RecallConfig;",
           "exportName": "applyProviderConfigWithModelCatalogPreset",
           "kind": "function",
           "source": {
@@ -4341,7 +4341,7 @@
           }
         },
         {
-          "declaration": "export function applyVercelAiGatewayConfig(cfg: OpenClawConfig): OpenClawConfig;",
+          "declaration": "export function applyVercelAiGatewayConfig(cfg: RecallConfig): RecallConfig;",
           "exportName": "applyVercelAiGatewayConfig",
           "kind": "function",
           "source": {
@@ -4350,7 +4350,7 @@
           }
         },
         {
-          "declaration": "export function applyVercelAiGatewayProviderConfig(cfg: OpenClawConfig): OpenClawConfig;",
+          "declaration": "export function applyVercelAiGatewayProviderConfig(cfg: RecallConfig): RecallConfig;",
           "exportName": "applyVercelAiGatewayProviderConfig",
           "kind": "function",
           "source": {
@@ -4359,7 +4359,7 @@
           }
         },
         {
-          "declaration": "export function createDefaultModelPresetAppliers<TArgs extends unknown[]>(params: { resolveParams: (cfg: OpenClawConfig, ...args: TArgs) => Omit<{ providerId: string; api: \"github-copilot\" | \"openai-completions\" | \"openai-responses\" | ... 4 more ... | \"ollama\"; ... 4 more ...; primaryModelRef?: string | undefined; }, \"primaryModelRef\"> | null | undefined; primaryModelRef: string; }): ProviderOnboardPresetAppliers<...>;",
+          "declaration": "export function createDefaultModelPresetAppliers<TArgs extends unknown[]>(params: { resolveParams: (cfg: RecallConfig, ...args: TArgs) => Omit<{ providerId: string; api: \"github-copilot\" | \"openai-completions\" | \"openai-responses\" | ... 4 more ... | \"ollama\"; ... 4 more ...; primaryModelRef?: string | undefined; }, \"primaryModelRef\"> | null | undefined; primaryModelRef: string; }): ProviderOnboardPresetAppliers<...>;",
           "exportName": "createDefaultModelPresetAppliers",
           "kind": "function",
           "source": {
@@ -4368,7 +4368,7 @@
           }
         },
         {
-          "declaration": "export function createDefaultModelsPresetAppliers<TArgs extends unknown[]>(params: { resolveParams: (cfg: OpenClawConfig, ...args: TArgs) => Omit<{ providerId: string; api: \"github-copilot\" | \"openai-completions\" | \"openai-responses\" | ... 4 more ... | \"ollama\"; ... 4 more ...; primaryModelRef?: string | undefined; }, \"primaryModelRef\"> | null | undefined; primaryModelRef: string; }): ProviderOnboardPresetAppliers<...>;",
+          "declaration": "export function createDefaultModelsPresetAppliers<TArgs extends unknown[]>(params: { resolveParams: (cfg: RecallConfig, ...args: TArgs) => Omit<{ providerId: string; api: \"github-copilot\" | \"openai-completions\" | \"openai-responses\" | ... 4 more ... | \"ollama\"; ... 4 more ...; primaryModelRef?: string | undefined; }, \"primaryModelRef\"> | null | undefined; primaryModelRef: string; }): ProviderOnboardPresetAppliers<...>;",
           "exportName": "createDefaultModelsPresetAppliers",
           "kind": "function",
           "source": {
@@ -4377,7 +4377,7 @@
           }
         },
         {
-          "declaration": "export function createModelCatalogPresetAppliers<TArgs extends unknown[]>(params: { resolveParams: (cfg: OpenClawConfig, ...args: TArgs) => Omit<{ providerId: string; api: \"github-copilot\" | \"openai-completions\" | \"openai-responses\" | ... 4 more ... | \"ollama\"; baseUrl: string; catalogModels: ModelDefinitionConfig[]; aliases?: readonly AgentModelAliasEntry[] | undefined; primaryModelRef?: string | undefined; }, \"primaryModelRef\"> | null | undefined; primaryModelRef: string; }): ProviderOnboardPresetAppliers<...>;",
+          "declaration": "export function createModelCatalogPresetAppliers<TArgs extends unknown[]>(params: { resolveParams: (cfg: RecallConfig, ...args: TArgs) => Omit<{ providerId: string; api: \"github-copilot\" | \"openai-completions\" | \"openai-responses\" | ... 4 more ... | \"ollama\"; baseUrl: string; catalogModels: ModelDefinitionConfig[]; aliases?: readonly AgentModelAliasEntry[] | undefined; primaryModelRef?: string | undefined; }, \"primaryModelRef\"> | null | undefined; primaryModelRef: string; }): ProviderOnboardPresetAppliers<...>;",
           "exportName": "createModelCatalogPresetAppliers",
           "kind": "function",
           "source": {
@@ -4386,7 +4386,7 @@
           }
         },
         {
-          "declaration": "export function ensureModelAllowlistEntry(params: { cfg: OpenClawConfig; modelRef: string; defaultProvider?: string | undefined; }): OpenClawConfig;",
+          "declaration": "export function ensureModelAllowlistEntry(params: { cfg: RecallConfig; modelRef: string; defaultProvider?: string | undefined; }): RecallConfig;",
           "exportName": "ensureModelAllowlistEntry",
           "kind": "function",
           "source": {
@@ -4458,12 +4458,12 @@
           }
         },
         {
-          "declaration": "export type OpenClawConfig = OpenClawConfig;",
-          "exportName": "OpenClawConfig",
+          "declaration": "export type RecallConfig = RecallConfig;",
+          "exportName": "RecallConfig",
           "kind": "type",
           "source": {
             "line": 32,
-            "path": "src/config/types.openclaw.ts"
+            "path": "src/config/types.recall.ts"
           }
         },
         {
@@ -4476,7 +4476,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/provider-onboard",
+      "importSpecifier": "recall/plugin-sdk/provider-onboard",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/provider-onboard.ts"
@@ -4712,7 +4712,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/reply-payload",
+      "importSpecifier": "recall/plugin-sdk/reply-payload",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/reply-payload.ts"
@@ -4741,7 +4741,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/runtime-store",
+      "importSpecifier": "recall/plugin-sdk/runtime-store",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/runtime-store.ts"
@@ -4815,7 +4815,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/secret-input",
+      "importSpecifier": "recall/plugin-sdk/secret-input",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/secret-input.ts"
@@ -4889,12 +4889,12 @@
           }
         },
         {
-          "declaration": "export type OpenClawConfig = OpenClawConfig;",
-          "exportName": "OpenClawConfig",
+          "declaration": "export type RecallConfig = RecallConfig;",
+          "exportName": "RecallConfig",
           "kind": "type",
           "source": {
             "line": 32,
-            "path": "src/config/types.openclaw.ts"
+            "path": "src/config/types.recall.ts"
           }
         },
         {
@@ -4916,7 +4916,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/testing",
+      "importSpecifier": "recall/plugin-sdk/testing",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/testing.ts"
@@ -5044,7 +5044,7 @@
           }
         },
         {
-          "declaration": "export function registerPluginHttpRoute(params: { path?: string | null | undefined; fallbackPath?: string | null | undefined; handler: PluginHttpRouteHandler; auth: OpenClawPluginHttpRouteAuth; ... 6 more ...; registry?: PluginRegistry | undefined; }): () => void;",
+          "declaration": "export function registerPluginHttpRoute(params: { path?: string | null | undefined; fallbackPath?: string | null | undefined; handler: PluginHttpRouteHandler; auth: RecallPluginHttpRouteAuth; ... 6 more ...; registry?: PluginRegistry | undefined; }): () => void;",
           "exportName": "registerPluginHttpRoute",
           "kind": "function",
           "source": {
@@ -5269,7 +5269,7 @@
           }
         }
       ],
-      "importSpecifier": "openclaw/plugin-sdk/webhook-ingress",
+      "importSpecifier": "recall/plugin-sdk/webhook-ingress",
       "source": {
         "line": 1,
         "path": "src/plugin-sdk/webhook-ingress.ts"

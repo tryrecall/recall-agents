@@ -1,25 +1,25 @@
-import { describeAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
-import { formatNormalizedAllowFromEntries } from "openclaw/plugin-sdk/allow-from";
+import { describeAccountSnapshot } from "recall/plugin-sdk/account-helpers";
+import { formatNormalizedAllowFromEntries } from "recall/plugin-sdk/allow-from";
 import {
   adaptScopedAccountAccessor,
   createScopedChannelConfigAdapter,
   createScopedDmSecurityResolver,
-} from "openclaw/plugin-sdk/channel-config-helpers";
+} from "recall/plugin-sdk/channel-config-helpers";
 import {
   composeAccountWarningCollectors,
   composeWarningCollectors,
   createAllowlistProviderOpenWarningCollector,
-} from "openclaw/plugin-sdk/channel-policy";
-import { createChatChannelPlugin } from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/channel-policy";
+import { createChatChannelPlugin } from "recall/plugin-sdk/core";
 import {
   createChannelDirectoryAdapter,
   listResolvedDirectoryEntriesFromSources,
-} from "openclaw/plugin-sdk/directory-runtime";
-import { runStoppablePassiveMonitor } from "openclaw/plugin-sdk/extension-shared";
+} from "recall/plugin-sdk/directory-runtime";
+import { runStoppablePassiveMonitor } from "recall/plugin-sdk/extension-shared";
 import {
   createComputedAccountStatusAdapter,
   createDefaultChannelRuntimeState,
-} from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/status-helpers";
 import {
   listIrcAccountIds,
   resolveDefaultIrcAccountId,

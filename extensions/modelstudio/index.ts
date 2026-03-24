@@ -1,4 +1,4 @@
-import { defineSingleProviderPluginEntry } from "openclaw/plugin-sdk/provider-entry";
+import { defineSingleProviderPluginEntry } from "recall/plugin-sdk/provider-entry";
 import {
   applyModelStudioConfig,
   applyModelStudioConfigCn,

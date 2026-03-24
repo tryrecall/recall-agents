@@ -1,6 +1,6 @@
 import { getAcpSessionManager } from "../acp/control-plane/manager.js";
 import { ACP_SESSION_IDENTITY_RENDERER_VERSION } from "../acp/runtime/session-identifiers.js";
-import { resolveOpenClawAgentDir } from "../agents/agent-paths.js";
+import { resolveRecallAgentDir } from "../agents/agent-paths.js";
 import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "../agents/defaults.js";
 import { loadModelCatalog } from "../agents/model-catalog.js";
 import {
@@ -8,7 +8,7 @@ import {
   resolveConfiguredModelRef,
   resolveHooksGmailModel,
 } from "../agents/model-selection.js";
-import { ensureOpenClawModelsJson } from "../agents/models-config.js";
+import { ensureRecallModelsJson } from "../agents/models-config.js";
 import { resolveModelAsync } from "../agents/pi-embedded-runner/model.js";
 import { resolveAgentSessionDirs } from "../agents/session-dirs.js";
 import { cleanStaleLockFiles } from "../agents/session-write-lock.js";
@@ -24,7 +24,7 @@ import {
 } from "../hooks/internal-hooks.js";
 import { loadInternalHooks } from "../hooks/loader.js";
 import { isTruthyEnvValue } from "../infra/env.js";
-import type { loadOpenClawPlugins } from "../plugins/loader.js";
+import type { loadRecallPlugins } from "../plugins/loader.js";
 import { type PluginServicesHandle, startPluginServices } from "../plugins/services.js";
 import { startBrowserControlServerIfEnabled } from "./server-browser.js";
 import {
@@ -48,9 +48,9 @@ async function prewarmConfiguredPrimaryModel(params: {
     defaultProvider: DEFAULT_PROVIDER,
     defaultModel: DEFAULT_MODEL,
   });
-  const agentDir = resolveOpenClawAgentDir();
+  const agentDir = resolveRecallAgentDir();
   try {
-    await ensureOpenClawModelsJson(params.cfg, agentDir);
+    await ensureRecallModelsJson(params.cfg, agentDir);
     const resolved = await resolveModelAsync(provider, model, agentDir, params.cfg, {
       retryTransientProviderRuntimeMiss: true,
     });
@@ -64,7 +64,7 @@ async function prewarmConfiguredPrimaryModel(params: {
 
 export async function startGatewaySidecars(params: {
   cfg: ReturnType<typeof loadConfig>;
-  pluginRegistry: ReturnType<typeof loadOpenClawPlugins>;
+  pluginRegistry: ReturnType<typeof loadRecallPlugins>;
   defaultWorkspaceDir: string;
   deps: CliDeps;
   startChannels: () => Promise<void>;
@@ -92,7 +92,7 @@ export async function startGatewaySidecars(params: {
     params.log.warn(`session lock cleanup failed on startup: ${String(err)}`);
   }
 
-  // Start OpenClaw browser control server (unless disabled via config).
+  // Start Recall browser control server (unless disabled via config).
   let browserControl: Awaited<ReturnType<typeof startBrowserControlServerIfEnabled>> = null;
   try {
     browserControl = await startBrowserControlServerIfEnabled();
@@ -154,10 +154,10 @@ export async function startGatewaySidecars(params: {
   }
 
   // Launch configured channels so gateway replies via the surface the message came from.
-  // Tests can opt out via OPENCLAW_SKIP_CHANNELS (or legacy OPENCLAW_SKIP_PROVIDERS).
+  // Tests can opt out via RECALL_SKIP_CHANNELS (or legacy RECALL_SKIP_PROVIDERS).
   const skipChannels =
-    isTruthyEnvValue(process.env.OPENCLAW_SKIP_CHANNELS) ||
-    isTruthyEnvValue(process.env.OPENCLAW_SKIP_PROVIDERS);
+    isTruthyEnvValue(process.env.RECALL_SKIP_CHANNELS) ||
+    isTruthyEnvValue(process.env.RECALL_SKIP_PROVIDERS);
   if (!skipChannels) {
     try {
       await prewarmConfiguredPrimaryModel({
@@ -170,7 +170,7 @@ export async function startGatewaySidecars(params: {
     }
   } else {
     params.logChannels.info(
-      "skipping channel start (OPENCLAW_SKIP_CHANNELS=1 or OPENCLAW_SKIP_PROVIDERS=1)",
+      "skipping channel start (RECALL_SKIP_CHANNELS=1 or RECALL_SKIP_PROVIDERS=1)",
     );
   }
 

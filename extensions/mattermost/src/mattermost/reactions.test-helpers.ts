@@ -1,7 +1,7 @@
 import { expect, vi } from "vitest";
-import type { OpenClawConfig } from "../../runtime-api.js";
+import type { RecallConfig } from "../../runtime-api.js";
 
-export function createMattermostTestConfig(): OpenClawConfig {
+export function createMattermostTestConfig(): RecallConfig {
   return {
     channels: {
       mattermost: {

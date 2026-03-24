@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { buildElevenLabsSpeechProvider } from "../../extensions/elevenlabs/speech-provider.ts";
 import { buildMicrosoftSpeechProvider } from "../../extensions/microsoft/speech-provider.ts";
 import { buildOpenAISpeechProvider } from "../../extensions/openai/speech-provider.ts";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { createEmptyPluginRegistry } from "../plugins/registry-empty.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { withEnv } from "../test-utils/env.js";
@@ -110,7 +110,7 @@ const mockAssistantMessage = (content: AssistantMessage["content"]): AssistantMe
   timestamp: Date.now(),
 });
 
-function createOpenAiTelephonyCfg(model: "tts-1" | "gpt-4o-mini-tts"): OpenClawConfig {
+function createOpenAiTelephonyCfg(model: "tts-1" | "gpt-4o-mini-tts"): RecallConfig {
   return {
     messages: {
       tts: {
@@ -290,7 +290,7 @@ describe("tts", () => {
   });
 
   describe("resolveEdgeOutputFormat", () => {
-    const baseCfg: OpenClawConfig = {
+    const baseCfg: RecallConfig = {
       agents: { defaults: { model: { primary: "openai/gpt-4o-mini" } } },
       messages: { tts: {} },
     };
@@ -311,7 +311,7 @@ describe("tts", () => {
                 edge: { outputFormat: "audio-24khz-96kbitrate-mono-mp3" },
               },
             },
-          } as OpenClawConfig,
+          } as RecallConfig,
           expected: "audio-24khz-96kbitrate-mono-mp3",
         },
       ] as const;
@@ -396,7 +396,7 @@ describe("tts", () => {
     let resolveModelAsyncForTest: typeof import("../agents/pi-embedded-runner/model.js").resolveModelAsync;
     let ensureCustomApiRegisteredForTest: typeof import("../agents/custom-api-registry.js").ensureCustomApiRegistered;
 
-    const baseCfg: OpenClawConfig = {
+    const baseCfg: RecallConfig = {
       agents: { defaults: { model: { primary: "openai/gpt-4o-mini" } } },
       messages: { tts: {} },
     };
@@ -494,7 +494,7 @@ describe("tts", () => {
     });
 
     it("uses summaryModel override when configured", async () => {
-      const cfg: OpenClawConfig = {
+      const cfg: RecallConfig = {
         agents: { defaults: { model: { primary: "anthropic/claude-opus-4-5" } } },
         messages: { tts: { summaryModel: "openai/gpt-4.1-mini" } },
       };
@@ -588,7 +588,7 @@ describe("tts", () => {
   });
 
   describe("getTtsProvider", () => {
-    const baseCfg: OpenClawConfig = {
+    const baseCfg: RecallConfig = {
       agents: { defaults: { model: { primary: "openai/gpt-4o-mini" } } },
       messages: { tts: {} },
     };
@@ -654,7 +654,7 @@ describe("tts", () => {
   });
 
   describe("resolveTtsConfig – openai.baseUrl", () => {
-    const baseCfg: OpenClawConfig = {
+    const baseCfg: RecallConfig = {
       agents: { defaults: { model: { primary: "openai/gpt-4o-mini" } } },
       messages: { tts: {} },
     };
@@ -680,7 +680,7 @@ describe("tts", () => {
             messages: {
               tts: { openai: { baseUrl: "http://my-server:9000/v1" } },
             },
-          } as OpenClawConfig,
+          } as RecallConfig,
           env: { OPENAI_TTS_BASE_URL: "http://localhost:8880/v1" },
           expected: "http://my-server:9000/v1",
         },
@@ -691,7 +691,7 @@ describe("tts", () => {
             messages: {
               tts: { openai: { baseUrl: "http://my-server:9000/v1///" } },
             },
-          } as OpenClawConfig,
+          } as RecallConfig,
           env: { OPENAI_TTS_BASE_URL: undefined },
           expected: "http://my-server:9000/v1",
         },
@@ -757,7 +757,7 @@ describe("tts", () => {
   });
 
   describe("maybeApplyTtsToPayload", () => {
-    const baseCfg: OpenClawConfig = {
+    const baseCfg: RecallConfig = {
       agents: { defaults: { model: { primary: "openai/gpt-4o-mini" } } },
       messages: {
         tts: {
@@ -771,8 +771,8 @@ describe("tts", () => {
     const withMockedAutoTtsFetch = async (
       run: (fetchMock: ReturnType<typeof vi.fn>) => Promise<void>,
     ) => {
-      const prevPrefs = process.env.OPENCLAW_TTS_PREFS;
-      process.env.OPENCLAW_TTS_PREFS = `/tmp/tts-test-${Date.now()}.json`;
+      const prevPrefs = process.env.RECALL_TTS_PREFS;
+      process.env.RECALL_TTS_PREFS = `/tmp/tts-test-${Date.now()}.json`;
       const originalFetch = globalThis.fetch;
       const fetchMock = vi.fn(async () => ({
         ok: true,
@@ -783,11 +783,11 @@ describe("tts", () => {
         await run(fetchMock);
       } finally {
         globalThis.fetch = originalFetch;
-        process.env.OPENCLAW_TTS_PREFS = prevPrefs;
+        process.env.RECALL_TTS_PREFS = prevPrefs;
       }
     };
 
-    const taggedCfg: OpenClawConfig = {
+    const taggedCfg: RecallConfig = {
       ...baseCfg,
       messages: {
         ...baseCfg.messages!,

@@ -286,11 +286,11 @@ export function resolveConfigDir(
   env: NodeJS.ProcessEnv = process.env,
   homedir: () => string = os.homedir,
 ): string {
-  const override = env.OPENCLAW_STATE_DIR?.trim();
+  const override = env.RECALL_STATE_DIR?.trim();
   if (override) {
     return resolveUserPath(override, env, homedir);
   }
-  const newDir = path.join(resolveRequiredHomeDir(env, homedir), ".openclaw");
+  const newDir = path.join(resolveRequiredHomeDir(env, homedir), ".recall");
   try {
     const hasNew = fs.existsSync(newDir);
     if (hasNew) {
@@ -311,9 +311,9 @@ function resolveHomeDisplayPrefix(): { home: string; prefix: string } | undefine
   if (!home) {
     return undefined;
   }
-  const explicitHome = process.env.OPENCLAW_HOME?.trim();
+  const explicitHome = process.env.RECALL_HOME?.trim();
   if (explicitHome) {
-    return { home, prefix: "$OPENCLAW_HOME" };
+    return { home, prefix: "$RECALL_HOME" };
   }
   return { home, prefix: "~" };
 }
@@ -371,5 +371,5 @@ export function formatTerminalLink(
   return `\u001b]8;;${safeUrl}\u0007${safeLabel}\u001b]8;;\u0007`;
 }
 
-// Configuration root; can be overridden via OPENCLAW_STATE_DIR.
+// Configuration root; can be overridden via RECALL_STATE_DIR.
 export const CONFIG_DIR = resolveConfigDir();

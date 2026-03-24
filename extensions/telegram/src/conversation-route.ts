@@ -1,22 +1,22 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
 import {
   resolveConfiguredBindingRoute,
   type ConfiguredBindingRouteResult,
-} from "openclaw/plugin-sdk/conversation-runtime";
-import { getSessionBindingService } from "openclaw/plugin-sdk/conversation-runtime";
-import { isPluginOwnedSessionBindingRecord } from "openclaw/plugin-sdk/conversation-runtime";
+} from "recall/plugin-sdk/conversation-runtime";
+import { getSessionBindingService } from "recall/plugin-sdk/conversation-runtime";
+import { isPluginOwnedSessionBindingRecord } from "recall/plugin-sdk/conversation-runtime";
 import {
   buildAgentSessionKey,
   deriveLastRoutePolicy,
   resolveAgentRoute,
-} from "openclaw/plugin-sdk/routing";
+} from "recall/plugin-sdk/routing";
 import {
   buildAgentMainSessionKey,
   DEFAULT_ACCOUNT_ID,
   resolveAgentIdFromSessionKey,
   sanitizeAgentId,
-} from "openclaw/plugin-sdk/routing";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/routing";
+import { logVerbose } from "recall/plugin-sdk/runtime-env";
 import {
   buildTelegramGroupPeerId,
   buildTelegramParentPeer,
@@ -24,7 +24,7 @@ import {
 } from "./bot/helpers.js";
 
 export function resolveTelegramConversationRoute(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId: string;
   chatId: number | string;
   isGroup: boolean;
@@ -156,7 +156,7 @@ export function resolveTelegramConversationRoute(params: {
 }
 
 export function resolveTelegramConversationBaseSessionKey(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   route: Pick<
     ReturnType<typeof resolveTelegramConversationRoute>["route"],
     "agentId" | "accountId" | "matchedBy" | "sessionKey"

@@ -5,7 +5,7 @@ import {
   normalizeChannelId,
 } from "../channels/plugins/index.js";
 import { resolveInstallableChannelPlugin } from "../commands/channel-setup/channel-plugin-resolution.js";
-import { loadConfig, writeConfigFile, type OpenClawConfig } from "../config/config.js";
+import { loadConfig, writeConfigFile, type RecallConfig } from "../config/config.js";
 import { setVerbose } from "../globals.js";
 import { isBlockedObjectKey } from "../infra/prototype-keys.js";
 import { defaultRuntime, type RuntimeEnv } from "../runtime.js";
@@ -24,7 +24,7 @@ function supportsChannelAuthMode(plugin: ChannelPlugin, mode: ChannelAuthMode): 
   return mode === "login" ? Boolean(plugin.auth?.login) : Boolean(plugin.gateway?.logoutAccount);
 }
 
-function isConfiguredAuthPlugin(plugin: ChannelPlugin, cfg: OpenClawConfig): boolean {
+function isConfiguredAuthPlugin(plugin: ChannelPlugin, cfg: RecallConfig): boolean {
   const channels = cfg.channels as Record<string, unknown> | undefined;
   const key = plugin.id;
   if (
@@ -58,7 +58,7 @@ function isConfiguredAuthPlugin(plugin: ChannelPlugin, cfg: OpenClawConfig): boo
   return false;
 }
 
-function resolveConfiguredAuthChannelInput(cfg: OpenClawConfig, mode: ChannelAuthMode): string {
+function resolveConfiguredAuthChannelInput(cfg: RecallConfig, mode: ChannelAuthMode): string {
   const configured = listChannelPlugins()
     .filter((plugin): plugin is ChannelPlugin => supportsChannelAuthMode(plugin, mode))
     .filter((plugin) => isConfiguredAuthPlugin(plugin, cfg))
@@ -79,10 +79,10 @@ function resolveConfiguredAuthChannelInput(cfg: OpenClawConfig, mode: ChannelAut
 async function resolveChannelPluginForMode(
   opts: ChannelAuthOptions,
   mode: ChannelAuthMode,
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   runtime: RuntimeEnv,
 ): Promise<{
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   configChanged: boolean;
   channelInput: string;
   channelId: string;
@@ -120,7 +120,7 @@ async function resolveChannelPluginForMode(
 function resolveAccountContext(
   plugin: ChannelPlugin,
   opts: ChannelAuthOptions,
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
 ) {
   const accountId = opts.account?.trim() || resolveChannelDefaultAccountId({ plugin, cfg });
   return { accountId };

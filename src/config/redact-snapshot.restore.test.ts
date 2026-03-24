@@ -6,7 +6,7 @@ import {
 } from "./redact-snapshot.js";
 import { redactSnapshotTestHints as mainSchemaHints } from "./redact-snapshot.test-hints.js";
 import type { ConfigUiHints } from "./schema.js";
-import type { ConfigFileSnapshot } from "./types.openclaw.js";
+import type { ConfigFileSnapshot } from "./types.recall.js";
 
 type TestSnapshot<TConfig extends Record<string, unknown>> = ConfigFileSnapshot & {
   parsed: TConfig;
@@ -19,7 +19,7 @@ function makeSnapshot<TConfig extends Record<string, unknown>>(
   raw?: string,
 ): TestSnapshot<TConfig> {
   return {
-    path: "/home/user/.openclaw/config.json5",
+    path: "/home/user/.recall/config.json5",
     exists: true,
     raw: raw ?? JSON.stringify(config),
     parsed: config,

@@ -1,7 +1,7 @@
 import type { ChannelPlugin } from "../api.js";
 import {
   resolveLineAccount,
-  type OpenClawConfig,
+  type RecallConfig,
   type ResolvedLineAccount,
 } from "../runtime-api.js";
 import { lineConfigAdapter } from "./config-adapter.js";
@@ -50,7 +50,7 @@ export const lineChannelPluginCommon = {
   "meta" | "capabilities" | "reload" | "configSchema" | "config"
 >;
 
-export function isLineConfigured(cfg: OpenClawConfig, accountId: string): boolean {
+export function isLineConfigured(cfg: RecallConfig, accountId: string): boolean {
   const resolved = resolveLineAccount({ cfg, accountId });
   return Boolean(resolved.channelAccessToken.trim() && resolved.channelSecret.trim());
 }

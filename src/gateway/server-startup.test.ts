@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 
-const ensureOpenClawModelsJsonMock = vi.fn<
+const ensureRecallModelsJsonMock = vi.fn<
   (config: unknown, agentDir: unknown) => Promise<{ agentDir: string; wrote: boolean }>
 >(async () => ({ agentDir: "/tmp/agent", wrote: false }));
 const resolveModelAsyncMock = vi.fn<
@@ -21,12 +21,12 @@ const resolveModelAsyncMock = vi.fn<
 }));
 
 vi.mock("../agents/agent-paths.js", () => ({
-  resolveOpenClawAgentDir: () => "/tmp/agent",
+  resolveRecallAgentDir: () => "/tmp/agent",
 }));
 
 vi.mock("../agents/models-config.js", () => ({
-  ensureOpenClawModelsJson: (config: unknown, agentDir: unknown) =>
-    ensureOpenClawModelsJsonMock(config, agentDir),
+  ensureRecallModelsJson: (config: unknown, agentDir: unknown) =>
+    ensureRecallModelsJsonMock(config, agentDir),
 }));
 
 vi.mock("../agents/pi-embedded-runner/model.js", () => ({
@@ -41,7 +41,7 @@ vi.mock("../agents/pi-embedded-runner/model.js", () => ({
 
 describe("gateway startup primary model warmup", () => {
   beforeEach(() => {
-    ensureOpenClawModelsJsonMock.mockClear();
+    ensureRecallModelsJsonMock.mockClear();
     resolveModelAsyncMock.mockClear();
   });
 
@@ -55,14 +55,14 @@ describe("gateway startup primary model warmup", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     await __testing.prewarmConfiguredPrimaryModel({
       cfg,
       log: { warn: vi.fn() },
     });
 
-    expect(ensureOpenClawModelsJsonMock).toHaveBeenCalledWith(cfg, "/tmp/agent");
+    expect(ensureRecallModelsJsonMock).toHaveBeenCalledWith(cfg, "/tmp/agent");
     expect(resolveModelAsyncMock).toHaveBeenCalledWith(
       "openai-codex",
       "gpt-5.4",
@@ -78,11 +78,11 @@ describe("gateway startup primary model warmup", () => {
     const { __testing } = await import("./server-startup.js");
 
     await __testing.prewarmConfiguredPrimaryModel({
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       log: { warn: vi.fn() },
     });
 
-    expect(ensureOpenClawModelsJsonMock).not.toHaveBeenCalled();
+    expect(ensureRecallModelsJsonMock).not.toHaveBeenCalled();
     expect(resolveModelAsyncMock).not.toHaveBeenCalled();
   });
 });

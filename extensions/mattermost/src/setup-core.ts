@@ -1,4 +1,4 @@
-import type { ChannelSetupAdapter } from "openclaw/plugin-sdk/channel-setup";
+import type { ChannelSetupAdapter } from "recall/plugin-sdk/channel-setup";
 import { resolveMattermostAccount, type ResolvedMattermostAccount } from "./mattermost/accounts.js";
 import { normalizeMattermostBaseUrl } from "./mattermost/client.js";
 import {
@@ -7,7 +7,7 @@ import {
   DEFAULT_ACCOUNT_ID,
   migrateBaseNameToDefaultAccount,
   normalizeAccountId,
-  type OpenClawConfig,
+  type RecallConfig,
 } from "./runtime-api.js";
 import { hasConfiguredSecretInput } from "./secret-input.js";
 
@@ -19,7 +19,7 @@ export function isMattermostConfigured(account: ResolvedMattermostAccount): bool
   return tokenConfigured && Boolean(account.baseUrl);
 }
 
-export function resolveMattermostAccountWithSecrets(cfg: OpenClawConfig, accountId: string) {
+export function resolveMattermostAccountWithSecrets(cfg: RecallConfig, accountId: string) {
   return resolveMattermostAccount({
     cfg,
     accountId,

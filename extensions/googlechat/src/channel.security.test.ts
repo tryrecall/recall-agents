@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../runtime-api.js";
+import type { RecallConfig } from "../runtime-api.js";
 import { googlechatPlugin } from "./channel.js";
 
 describe("googlechatPlugin security", () => {
@@ -23,7 +23,7 @@ describe("googlechatPlugin security", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const account = googlechatPlugin.config.resolveAccount(cfg, "default");
     const resolved = resolveDmPolicy!({ cfg, account });

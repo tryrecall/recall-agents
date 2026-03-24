@@ -1,10 +1,10 @@
 import { listPotentialConfiguredChannelIds } from "../channels/config-presence.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { normalizePluginsConfig, resolveEffectiveEnableState } from "./config-state.js";
 import { loadPluginManifestRegistry } from "./manifest-registry.js";
 
 export function resolveChannelPluginIds(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
 }): string[] {
@@ -18,7 +18,7 @@ export function resolveChannelPluginIds(params: {
 }
 
 export function resolveConfiguredChannelPluginIds(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
 }): string[] {
@@ -32,7 +32,7 @@ export function resolveConfiguredChannelPluginIds(params: {
 }
 
 export function resolveConfiguredDeferredChannelPluginIds(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
 }): string[] {
@@ -56,7 +56,7 @@ export function resolveConfiguredDeferredChannelPluginIds(params: {
 }
 
 export function resolveGatewayStartupPluginIds(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
 }): string[] {

@@ -1,4 +1,4 @@
-import { encodePngRgba, fillPixel } from "openclaw/plugin-sdk/media-runtime";
+import { encodePngRgba, fillPixel } from "recall/plugin-sdk/media-runtime";
 import QRCodeModule from "qrcode-terminal/vendor/QRCode/index.js";
 import QRErrorCorrectLevelModule from "qrcode-terminal/vendor/QRCode/QRErrorCorrectLevel.js";
 

@@ -1,21 +1,21 @@
-import type { ChannelSetupAdapter, ChannelSetupInput } from "openclaw/plugin-sdk/channel-setup";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
-import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "openclaw/plugin-sdk/routing";
+import type { ChannelSetupAdapter, ChannelSetupInput } from "recall/plugin-sdk/channel-setup";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
+import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "recall/plugin-sdk/routing";
 import {
   applyAccountNameToChannelSection,
   patchScopedAccountConfig,
-} from "openclaw/plugin-sdk/setup";
+} from "recall/plugin-sdk/setup";
 import {
   mergeAllowFromEntries,
   createTopLevelChannelDmPolicy,
   promptParsedAllowFromForAccount,
   resolveSetupAccountId,
   setSetupChannelEnabled,
-} from "openclaw/plugin-sdk/setup";
-import type { ChannelSetupDmPolicy } from "openclaw/plugin-sdk/setup";
-import { type ChannelSetupWizard } from "openclaw/plugin-sdk/setup";
-import { formatDocsLink } from "openclaw/plugin-sdk/setup";
-import type { WizardPrompter } from "openclaw/plugin-sdk/setup";
+} from "recall/plugin-sdk/setup";
+import type { ChannelSetupDmPolicy } from "recall/plugin-sdk/setup";
+import { type ChannelSetupWizard } from "recall/plugin-sdk/setup";
+import { formatDocsLink } from "recall/plugin-sdk/setup";
+import type { WizardPrompter } from "recall/plugin-sdk/setup";
 import {
   listNextcloudTalkAccountIds,
   resolveDefaultNextcloudTalkAccountId,
@@ -148,10 +148,10 @@ async function promptNextcloudTalkAllowFrom(params: {
 }
 
 async function promptNextcloudTalkAllowFromForAccount(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   prompter: WizardPrompter;
   accountId?: string;
-}): Promise<OpenClawConfig> {
+}): Promise<RecallConfig> {
   const accountId = resolveSetupAccountId({
     accountId: params.accountId,
     defaultAccountId: resolveDefaultNextcloudTalkAccountId(params.cfg as CoreConfig),

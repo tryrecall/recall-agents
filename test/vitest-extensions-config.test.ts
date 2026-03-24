@@ -14,7 +14,7 @@ afterEach(() => {
 });
 
 const writePatternFile = (basename: string, value: unknown) => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-vitest-extensions-config-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-vitest-extensions-config-"));
   tempDirs.add(dir);
   const filePath = path.join(dir, basename);
   fs.writeFileSync(filePath, `${JSON.stringify(value)}\n`, "utf8");
@@ -36,7 +36,7 @@ describe("extensions vitest include patterns", () => {
 
     expect(
       loadIncludePatternsFromEnv({
-        OPENCLAW_VITEST_INCLUDE_FILE: filePath,
+        RECALL_VITEST_INCLUDE_FILE: filePath,
       }),
     ).toEqual(["extensions/feishu/index.test.ts", "extensions/msteams/src/monitor.test.ts"]);
   });
@@ -48,7 +48,7 @@ describe("extensions vitest include patterns", () => {
 
     expect(() =>
       loadIncludePatternsFromEnv({
-        OPENCLAW_VITEST_INCLUDE_FILE: filePath,
+        RECALL_VITEST_INCLUDE_FILE: filePath,
       }),
     ).toThrow(/JSON array/u);
   });

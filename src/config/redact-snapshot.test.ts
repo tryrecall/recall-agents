@@ -7,7 +7,7 @@ import {
 } from "./redact-snapshot.js";
 import { redactSnapshotTestHints as mainSchemaHints } from "./redact-snapshot.test-hints.js";
 import type { ConfigUiHints } from "./schema.js";
-import type { ConfigFileSnapshot } from "./types.openclaw.js";
+import type { ConfigFileSnapshot } from "./types.recall.js";
 
 type TestSnapshot<TConfig extends Record<string, unknown>> = ConfigFileSnapshot & {
   parsed: TConfig;
@@ -20,7 +20,7 @@ function makeSnapshot<TConfig extends Record<string, unknown>>(
   raw?: string,
 ): TestSnapshot<TConfig> {
   return {
-    path: "/home/user/.openclaw/config.json5",
+    path: "/home/user/.recall/config.json5",
     exists: true,
     raw: raw ?? JSON.stringify(config),
     parsed: config,
@@ -247,9 +247,9 @@ describe("redactConfigSnapshot", () => {
     const snapshot = makeSnapshot({
       channels: {
         irc: {
-          passwordFile: "/etc/openclaw/irc-password.txt",
+          passwordFile: "/etc/recall/irc-password.txt",
           nickserv: {
-            passwordFile: "/etc/openclaw/nickserv-password.txt",
+            passwordFile: "/etc/recall/nickserv-password.txt",
             password: "super-secret-nickserv-password",
           },
         },
@@ -261,8 +261,8 @@ describe("redactConfigSnapshot", () => {
     const irc = channels.irc;
     const nickserv = irc.nickserv as Record<string, unknown>;
 
-    expect(irc.passwordFile).toBe("/etc/openclaw/irc-password.txt");
-    expect(nickserv.passwordFile).toBe("/etc/openclaw/nickserv-password.txt");
+    expect(irc.passwordFile).toBe("/etc/recall/irc-password.txt");
+    expect(nickserv.passwordFile).toBe("/etc/recall/nickserv-password.txt");
     expect(nickserv.password).toBe(REDACTED_SENTINEL);
   });
 

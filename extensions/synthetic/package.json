@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/synthetic-provider",
+  "name": "@recall/synthetic-provider",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw Synthetic provider plugin",
+  "description": "Recall Synthetic provider plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

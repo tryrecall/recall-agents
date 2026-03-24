@@ -3,12 +3,12 @@ import {
   CHUTES_DEFAULT_MODEL_REF,
   CHUTES_MODEL_CATALOG,
   buildChutesModelDefinition,
-} from "openclaw/plugin-sdk/provider-models";
+} from "recall/plugin-sdk/provider-models";
 import {
   applyAgentDefaultModelPrimary,
   applyProviderConfigWithModelCatalogPreset,
-  type OpenClawConfig,
-} from "openclaw/plugin-sdk/provider-onboard";
+  type RecallConfig,
+} from "recall/plugin-sdk/provider-onboard";
 
 export { CHUTES_DEFAULT_MODEL_REF };
 
@@ -16,7 +16,7 @@ export { CHUTES_DEFAULT_MODEL_REF };
  * Apply Chutes provider configuration without changing the default model.
  * Registers all catalog models and sets provider aliases (chutes-fast, etc.).
  */
-export function applyChutesProviderConfig(cfg: OpenClawConfig): OpenClawConfig {
+export function applyChutesProviderConfig(cfg: RecallConfig): RecallConfig {
   return applyProviderConfigWithModelCatalogPreset(cfg, {
     providerId: "chutes",
     api: "openai-completions",
@@ -37,7 +37,7 @@ export function applyChutesProviderConfig(cfg: OpenClawConfig): OpenClawConfig {
 /**
  * Apply Chutes provider configuration AND set Chutes as the default model.
  */
-export function applyChutesConfig(cfg: OpenClawConfig): OpenClawConfig {
+export function applyChutesConfig(cfg: RecallConfig): RecallConfig {
   const next = applyChutesProviderConfig(cfg);
   return {
     ...next,
@@ -58,6 +58,6 @@ export function applyChutesConfig(cfg: OpenClawConfig): OpenClawConfig {
   };
 }
 
-export function applyChutesApiKeyConfig(cfg: OpenClawConfig): OpenClawConfig {
+export function applyChutesApiKeyConfig(cfg: RecallConfig): RecallConfig {
   return applyAgentDefaultModelPrimary(applyChutesProviderConfig(cfg), CHUTES_DEFAULT_MODEL_REF);
 }

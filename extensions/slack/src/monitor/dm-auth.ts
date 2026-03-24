@@ -1,6 +1,6 @@
-import { formatAllowlistMatchMeta } from "openclaw/plugin-sdk/allow-from";
-import { createChannelPairingChallengeIssuer } from "openclaw/plugin-sdk/channel-pairing";
-import { upsertChannelPairingRequest } from "openclaw/plugin-sdk/conversation-runtime";
+import { formatAllowlistMatchMeta } from "recall/plugin-sdk/allow-from";
+import { createChannelPairingChallengeIssuer } from "recall/plugin-sdk/channel-pairing";
+import { upsertChannelPairingRequest } from "recall/plugin-sdk/conversation-runtime";
 import { resolveSlackAllowListMatch } from "./allow-list.js";
 import type { SlackMonitorContext } from "./context.js";
 

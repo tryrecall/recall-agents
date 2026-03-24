@@ -1,7 +1,7 @@
 import { resolveGlobalSingleton } from "../shared/global-singleton.js";
-import type { OpenClawPluginCommandDefinition } from "./types.js";
+import type { RecallPluginCommandDefinition } from "./types.js";
 
-export type RegisteredPluginCommand = OpenClawPluginCommandDefinition & {
+export type RegisteredPluginCommand = RecallPluginCommandDefinition & {
   pluginId: string;
   pluginName?: string;
   pluginRoot?: string;
@@ -12,7 +12,7 @@ type PluginCommandState = {
   registryLocked: boolean;
 };
 
-const PLUGIN_COMMAND_STATE_KEY = Symbol.for("openclaw.pluginCommandsState");
+const PLUGIN_COMMAND_STATE_KEY = Symbol.for("recall.pluginCommandsState");
 
 const state = resolveGlobalSingleton<PluginCommandState>(PLUGIN_COMMAND_STATE_KEY, () => ({
   pluginCommands: new Map<string, RegisteredPluginCommand>(),
@@ -42,7 +42,7 @@ export function clearPluginCommandsForPlugin(pluginId: string): void {
 }
 
 function resolvePluginNativeName(
-  command: OpenClawPluginCommandDefinition,
+  command: RecallPluginCommandDefinition,
   provider?: string,
 ): string {
   const providerName = provider?.trim().toLowerCase();

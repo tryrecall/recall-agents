@@ -4,13 +4,13 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { jsonResult } from "../../agents/tools/common.js";
 import type { ChannelPlugin } from "../../channels/plugins/types.js";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import {
   createChannelTestPluginBase,
   createTestRegistry,
 } from "../../test-utils/channel-plugins.js";
-import { resolvePreferredOpenClawTmpDir } from "../tmp-openclaw-dir.js";
+import { resolvePreferredRecallTmpDir } from "../tmp-recall-dir.js";
 
 vi.mock("../../media/web-media.js", async () => {
   const actual = await vi.importActual<typeof import("../../media/web-media.js")>(
@@ -29,7 +29,7 @@ const slackConfig = {
       appToken: "xapp-test",
     },
   },
-} as OpenClawConfig;
+} as RecallConfig;
 
 async function withSandbox(test: (sandboxDir: string) => Promise<void>) {
   const sandboxDir = await fs.mkdtemp(path.join(os.tmpdir(), "msg-sandbox-"));
@@ -41,7 +41,7 @@ async function withSandbox(test: (sandboxDir: string) => Promise<void>) {
 }
 
 const runDrySend = (params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   actionParams: Record<string, unknown>;
   sandboxRoot?: string;
 }) =>
@@ -133,7 +133,7 @@ describe("runMessageAction media behavior", () => {
           password: "test-password",
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const attachmentPlugin: ChannelPlugin = {
       id: "bluebubbles",
       meta: {
@@ -402,8 +402,8 @@ describe("runMessageAction media behavior", () => {
       }
     });
 
-    it("allows media paths under preferred OpenClaw tmp root", async () => {
-      const tmpRoot = resolvePreferredOpenClawTmpDir();
+    it("allows media paths under preferred Recall tmp root", async () => {
+      const tmpRoot = resolvePreferredRecallTmpDir();
       await fs.mkdir(tmpRoot, { recursive: true });
       const sandboxDir = await fs.mkdtemp(path.join(os.tmpdir(), "msg-sandbox-"));
       try {
@@ -426,7 +426,7 @@ describe("runMessageAction media behavior", () => {
           throw new Error("expected send result");
         }
         expect(result.sendResult?.mediaUrl).toBe(path.resolve(tmpFile));
-        const hostTmpOutsideOpenClaw = path.join(os.tmpdir(), "outside-openclaw", "test-media.png");
+        const hostTmpOutsideRecall = path.join(os.tmpdir(), "outside-recall", "test-media.png");
         await expect(
           runMessageAction({
             cfg: slackConfig,
@@ -434,7 +434,7 @@ describe("runMessageAction media behavior", () => {
             params: {
               channel: "slack",
               target: "#C12345678",
-              media: hostTmpOutsideOpenClaw,
+              media: hostTmpOutsideRecall,
               message: "",
             },
             sandboxRoot: sandboxDir,

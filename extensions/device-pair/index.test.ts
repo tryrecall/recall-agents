@@ -2,12 +2,12 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import type {
-  OpenClawPluginCommandDefinition,
+  RecallPluginCommandDefinition,
   PluginCommandContext,
-} from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createTestPluginApi } from "../../test/helpers/extensions/plugin-api.js";
-import type { OpenClawPluginApi } from "./api.js";
+import type { RecallPluginApi } from "./api.js";
 
 const pluginApiMocks = vi.hoisted(() => ({
   clearDeviceBootstrapTokens: vi.fn(async () => ({ removed: 2 })),
@@ -17,7 +17,7 @@ const pluginApiMocks = vi.hoisted(() => ({
   })),
   revokeDeviceBootstrapToken: vi.fn(async () => ({ removed: true })),
   renderQrPngBase64: vi.fn(async () => "ZmFrZXBuZw=="),
-  resolvePreferredOpenClawTmpDir: vi.fn(() => path.join(os.tmpdir(), "openclaw-device-pair-tests")),
+  resolvePreferredRecallTmpDir: vi.fn(() => path.join(os.tmpdir(), "recall-device-pair-tests")),
 }));
 
 vi.mock("./api.js", () => {
@@ -33,7 +33,7 @@ vi.mock("./api.js", () => {
     listDevicePairing: vi.fn(async () => ({ pending: [] })),
     renderQrPngBase64: pluginApiMocks.renderQrPngBase64,
     revokeDeviceBootstrapToken: pluginApiMocks.revokeDeviceBootstrapToken,
-    resolvePreferredOpenClawTmpDir: pluginApiMocks.resolvePreferredOpenClawTmpDir,
+    resolvePreferredRecallTmpDir: pluginApiMocks.resolvePreferredRecallTmpDir,
     resolveGatewayBindUrl: vi.fn(),
     resolveTailnetHostWithRunner: vi.fn(),
     runPluginCommandWithTimeout: vi.fn(),
@@ -51,10 +51,10 @@ import { approveDevicePairing, listDevicePairing } from "./api.js";
 import registerDevicePair from "./index.js";
 
 function createApi(params?: {
-  runtime?: OpenClawPluginApi["runtime"];
+  runtime?: RecallPluginApi["runtime"];
   pluginConfig?: Record<string, unknown>;
-  registerCommand?: (command: OpenClawPluginCommandDefinition) => void;
-}): OpenClawPluginApi {
+  registerCommand?: (command: RecallPluginCommandDefinition) => void;
+}): RecallPluginApi {
   return createTestPluginApi({
     id: "device-pair",
     name: "device-pair",
@@ -71,16 +71,16 @@ function createApi(params?: {
       publicUrl: "ws://51.79.175.165:18789",
       ...(params?.pluginConfig ?? {}),
     },
-    runtime: (params?.runtime ?? {}) as OpenClawPluginApi["runtime"],
+    runtime: (params?.runtime ?? {}) as RecallPluginApi["runtime"],
     registerCommand: params?.registerCommand,
-  }) as OpenClawPluginApi;
+  }) as RecallPluginApi;
 }
 
 function registerPairCommand(params?: {
-  runtime?: OpenClawPluginApi["runtime"];
+  runtime?: RecallPluginApi["runtime"];
   pluginConfig?: Record<string, unknown>;
-}): OpenClawPluginCommandDefinition {
-  let command: OpenClawPluginCommandDefinition | undefined;
+}): RecallPluginCommandDefinition {
+  let command: RecallPluginCommandDefinition | undefined;
   registerDevicePair.register(
     createApi({
       ...params,
@@ -106,14 +106,14 @@ function createChannelRuntime(
   runtimeKey: string,
   sendKey: string,
   sendMessage: (...args: unknown[]) => Promise<unknown>,
-): OpenClawPluginApi["runtime"] {
+): RecallPluginApi["runtime"] {
   return {
     channel: {
       [runtimeKey]: {
         [sendKey]: sendMessage,
       },
     },
-  } as unknown as OpenClawPluginApi["runtime"];
+  } as unknown as RecallPluginApi["runtime"];
 }
 
 function createCommandContext(params?: Partial<PluginCommandContext>): PluginCommandContext {
@@ -140,11 +140,11 @@ describe("device-pair /pair qr", () => {
       token: "boot-token",
       expiresAtMs: Date.now() + 10 * 60_000,
     });
-    await fs.mkdir(pluginApiMocks.resolvePreferredOpenClawTmpDir(), { recursive: true });
+    await fs.mkdir(pluginApiMocks.resolvePreferredRecallTmpDir(), { recursive: true });
   });
 
   afterEach(async () => {
-    await fs.rm(pluginApiMocks.resolvePreferredOpenClawTmpDir(), { recursive: true, force: true });
+    await fs.rm(pluginApiMocks.resolvePreferredRecallTmpDir(), { recursive: true, force: true });
   });
 
   it("returns an inline QR image for webchat surfaces", async () => {
@@ -159,8 +159,8 @@ describe("device-pair /pair qr", () => {
         scopes: [],
       },
     });
-    expect(text).toContain("Scan this QR code with the OpenClaw iOS app:");
-    expect(text).toContain("![OpenClaw pairing QR](data:image/png;base64,ZmFrZXBuZw==)");
+    expect(text).toContain("Scan this QR code with the Recall iOS app:");
+    expect(text).toContain("![Recall pairing QR](data:image/png;base64,ZmFrZXBuZw==)");
     expect(text).toContain("- Security: single-use bootstrap token");
     expect(text).toContain("**Important:** Run `/pair cleanup` after pairing finishes.");
     expect(text).toContain("If this QR code leaks, run `/pair cleanup` immediately.");
@@ -309,7 +309,7 @@ describe("device-pair /pair qr", () => {
       } & Record<string, unknown>,
     ];
     expect(target).toBe(testCase.expectedTarget);
-    expect(caption).toContain("Scan this QR code with the OpenClaw iOS app:");
+    expect(caption).toContain("Scan this QR code with the Recall iOS app:");
     expect(caption).toContain("IMPORTANT: After pairing finishes, run /pair cleanup.");
     expect(caption).toContain("If this QR code leaks, run /pair cleanup immediately.");
     expect(opts.mediaUrl).toMatch(/pair-qr\.png$/);

@@ -34,7 +34,7 @@ describe("tavily search tool", () => {
       max_results: 5,
       include_answer: true,
       time_range: "week",
-      include_domains: ["docs.openclaw.ai", "", "openclaw.ai"],
+      include_domains: ["docs.recall.ai", "", "recall.ai"],
       exclude_domains: ["bad.example", ""],
     });
 
@@ -46,7 +46,7 @@ describe("tavily search tool", () => {
       maxResults: 5,
       includeAnswer: true,
       timeRange: "week",
-      includeDomains: ["docs.openclaw.ai", "openclaw.ai"],
+      includeDomains: ["docs.recall.ai", "recall.ai"],
       excludeDomains: ["bad.example"],
     });
     expect(result).toMatchObject({
@@ -60,7 +60,7 @@ describe("tavily search tool", () => {
           maxResults: 5,
           includeAnswer: true,
           timeRange: "week",
-          includeDomains: ["docs.openclaw.ai", "openclaw.ai"],
+          includeDomains: ["docs.recall.ai", "recall.ai"],
           excludeDomains: ["bad.example"],
         },
       },

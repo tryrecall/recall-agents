@@ -1,5 +1,5 @@
 export type {
-  OpenClawPluginApi,
+  RecallPluginApi,
   ProviderAuthContext,
   ProviderAuthMethodNonInteractiveContext,
   ProviderAuthResult,

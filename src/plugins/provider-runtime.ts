@@ -1,6 +1,6 @@
 import type { AuthProfileCredential, OAuthCredential } from "../agents/auth-profiles/types.js";
 import { normalizeProviderId } from "../agents/provider-id.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import {
   augmentBundledProviderCatalog,
   resolveBundledProviderBuiltInModelSuppression,
@@ -47,12 +47,12 @@ let cachedHookProvidersWithoutConfig = new WeakMap<
   Map<string, ProviderPlugin[]>
 >();
 let cachedHookProvidersByConfig = new WeakMap<
-  OpenClawConfig,
+  RecallConfig,
   WeakMap<NodeJS.ProcessEnv, Map<string, ProviderPlugin[]>>
 >();
 
 function resolveHookProviderCacheBucket(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   env: NodeJS.ProcessEnv;
 }) {
   if (!params.config) {
@@ -95,7 +95,7 @@ export function clearProviderRuntimeHookCache(): void {
     Map<string, ProviderPlugin[]>
   >();
   cachedHookProvidersByConfig = new WeakMap<
-    OpenClawConfig,
+    RecallConfig,
     WeakMap<NodeJS.ProcessEnv, Map<string, ProviderPlugin[]>>
   >();
 }
@@ -105,7 +105,7 @@ export function resetProviderRuntimeHookCacheForTest(): void {
 }
 
 function resolveProviderPluginsForHooks(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   onlyPluginIds?: string[];
@@ -137,7 +137,7 @@ function resolveProviderPluginsForHooks(params: {
 }
 
 function resolveProviderPluginsForCatalogHooks(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): ProviderPlugin[] {
@@ -157,7 +157,7 @@ function resolveProviderPluginsForCatalogHooks(params: {
 
 export function resolveProviderRuntimePlugin(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): ProviderPlugin | undefined {
@@ -178,7 +178,7 @@ export function resolveProviderRuntimePlugin(params: {
 
 export function runProviderDynamicModel(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderResolveDynamicModelContext;
@@ -188,7 +188,7 @@ export function runProviderDynamicModel(params: {
 
 export async function prepareProviderDynamicModel(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderPrepareDynamicModelContext;
@@ -198,11 +198,11 @@ export async function prepareProviderDynamicModel(params: {
 
 export function normalizeProviderResolvedModelWithPlugin(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: {
-    config?: OpenClawConfig;
+    config?: RecallConfig;
     agentDir?: string;
     workspaceDir?: string;
     provider: string;
@@ -217,7 +217,7 @@ export function normalizeProviderResolvedModelWithPlugin(params: {
 
 export function resolveProviderCapabilitiesWithPlugin(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }) {
@@ -226,7 +226,7 @@ export function resolveProviderCapabilitiesWithPlugin(params: {
 
 export function prepareProviderExtraParams(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderPrepareExtraParamsContext;
@@ -236,7 +236,7 @@ export function prepareProviderExtraParams(params: {
 
 export function wrapProviderStreamFn(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderWrapStreamFnContext;
@@ -246,7 +246,7 @@ export function wrapProviderStreamFn(params: {
 
 export async function prepareProviderRuntimeAuth(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderPrepareRuntimeAuthContext;
@@ -256,7 +256,7 @@ export async function prepareProviderRuntimeAuth(params: {
 
 export async function resolveProviderUsageAuthWithPlugin(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderResolveUsageAuthContext;
@@ -266,7 +266,7 @@ export async function resolveProviderUsageAuthWithPlugin(params: {
 
 export async function resolveProviderUsageSnapshotWithPlugin(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderFetchUsageSnapshotContext;
@@ -276,7 +276,7 @@ export async function resolveProviderUsageSnapshotWithPlugin(params: {
 
 export function formatProviderAuthProfileApiKeyWithPlugin(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: AuthProfileCredential;
@@ -286,7 +286,7 @@ export function formatProviderAuthProfileApiKeyWithPlugin(params: {
 
 export async function refreshProviderOAuthCredentialWithPlugin(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: OAuthCredential;
@@ -296,7 +296,7 @@ export async function refreshProviderOAuthCredentialWithPlugin(params: {
 
 export async function buildProviderAuthDoctorHintWithPlugin(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderAuthDoctorHintContext;
@@ -306,7 +306,7 @@ export async function buildProviderAuthDoctorHintWithPlugin(params: {
 
 export function resolveProviderCacheTtlEligibility(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderCacheTtlEligibilityContext;
@@ -316,7 +316,7 @@ export function resolveProviderCacheTtlEligibility(params: {
 
 export function resolveProviderBinaryThinking(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderThinkingPolicyContext;
@@ -326,7 +326,7 @@ export function resolveProviderBinaryThinking(params: {
 
 export function resolveProviderXHighThinking(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderThinkingPolicyContext;
@@ -336,7 +336,7 @@ export function resolveProviderXHighThinking(params: {
 
 export function resolveProviderDefaultThinkingLevel(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderDefaultThinkingPolicyContext;
@@ -346,7 +346,7 @@ export function resolveProviderDefaultThinkingLevel(params: {
 
 export function resolveProviderModernModelRef(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderModernModelPolicyContext;
@@ -356,7 +356,7 @@ export function resolveProviderModernModelRef(params: {
 
 export function buildProviderMissingAuthMessageWithPlugin(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderBuildMissingAuthMessageContext;
@@ -367,7 +367,7 @@ export function buildProviderMissingAuthMessageWithPlugin(params: {
 }
 
 export function resolveProviderBuiltInModelSuppression(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderBuiltInModelSuppressionContext;
@@ -386,7 +386,7 @@ export function resolveProviderBuiltInModelSuppression(params: {
 }
 
 export async function augmentModelCatalogWithProviderPlugins(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   context: ProviderAugmentModelCatalogContext;

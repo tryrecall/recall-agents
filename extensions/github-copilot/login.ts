@@ -1,9 +1,9 @@
 import { intro, note, outro, spinner } from "@clack/prompts";
-import { ensureAuthProfileStore, upsertAuthProfile } from "openclaw/plugin-sdk/agent-runtime";
-import { stylePromptTitle } from "openclaw/plugin-sdk/cli-runtime";
-import { logConfigUpdated, updateConfig } from "openclaw/plugin-sdk/config-runtime";
-import { applyAuthProfileConfig } from "openclaw/plugin-sdk/provider-auth";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime";
+import { ensureAuthProfileStore, upsertAuthProfile } from "recall/plugin-sdk/agent-runtime";
+import { stylePromptTitle } from "recall/plugin-sdk/cli-runtime";
+import { logConfigUpdated, updateConfig } from "recall/plugin-sdk/config-runtime";
+import { applyAuthProfileConfig } from "recall/plugin-sdk/provider-auth";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime";
 
 const CLIENT_ID = "Iv1.b507a08c87ecfe98";
 const DEVICE_CODE_URL = "https://github.com/login/device/code";

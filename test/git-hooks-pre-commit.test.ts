@@ -27,7 +27,7 @@ function writeExecutable(dir: string, name: string, contents: string): void {
 
 describe("git-hooks/pre-commit (integration)", () => {
   it("does not treat staged filenames as git-add flags (e.g. --all)", () => {
-    const dir = mkdtempSync(path.join(os.tmpdir(), "openclaw-pre-commit-"));
+    const dir = mkdtempSync(path.join(os.tmpdir(), "recall-pre-commit-"));
     run(dir, "git", ["init", "-q", "--initial-branch=main"]);
 
     // Use the real hook script and lightweight helper stubs.

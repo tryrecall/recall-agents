@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 
 const callGateway = vi.fn();
 
@@ -25,12 +25,12 @@ beforeEach(async () => {
 });
 
 describe("resolveCommandSecretRefsViaGateway", () => {
-  function makeTalkApiKeySecretRefConfig(envKey: string): OpenClawConfig {
+  function makeTalkApiKeySecretRefConfig(envKey: string): RecallConfig {
     return {
       talk: {
         apiKey: { source: "env", provider: "default", id: envKey },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
   }
 
   async function withEnvValue(
@@ -95,7 +95,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
       talk: {
         apiKey: "plain", // pragma: allowlist secret
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const result = await resolveCommandSecretRefsViaGateway({
       config,
       commandName: "memory status",
@@ -120,7 +120,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
           },
         ],
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const result = await resolveCommandSecretRefsViaGateway({
       config,
@@ -150,7 +150,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
       talk: {
         apiKey: { source: "env", provider: "default", id: "TALK_API_KEY" },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const result = await resolveCommandSecretRefsViaGateway({
       config,
       commandName: "memory status",
@@ -196,7 +196,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       commandName: "message",
       targetIds: new Set(["channels.discord.accounts.*.token"]),
       allowedPaths: new Set(["channels.discord.accounts.ops.token"]),
@@ -221,7 +221,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
             talk: {
               apiKey: { source: "env", provider: "default", id: envKey },
             },
-          } as OpenClawConfig,
+          } as RecallConfig,
           commandName: "memory status",
           targetIds: new Set(["talk.apiKey"]),
         }),
@@ -250,7 +250,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               default: { source: "env" },
             },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         commandName: "memory status",
         targetIds: new Set(["talk.apiKey"]),
       });
@@ -287,7 +287,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               },
             },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         commandName: "agent",
         targetIds: new Set(["tools.web.search.gemini.apiKey"]),
       });
@@ -315,7 +315,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               },
             },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         commandName: "agent",
         targetIds: new Set(["tools.web.fetch.firecrawl.apiKey"]),
       });
@@ -342,7 +342,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       commandName: "agent",
       targetIds: new Set(["tools.web.search.gemini.apiKey"]),
     });
@@ -391,7 +391,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
           talk: {
             apiKey: { source: "env", provider: "default", id: "TALK_API_KEY" },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         commandName: "memory status",
         targetIds: new Set(["talk.apiKey"]),
       }),
@@ -415,7 +415,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
           talk: {
             apiKey: { source: "env", provider: "default", id: "TALK_API_KEY" },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         commandName: "memory status",
         targetIds: new Set(["talk.apiKey"]),
       }),
@@ -485,7 +485,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
           },
         ],
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const result = await resolveCommandSecretRefsViaGateway({
       config,
@@ -597,7 +597,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               },
             },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         commandName: "message send",
         targetIds: new Set(["talk.apiKey", "talk.providers.*.apiKey"]),
       });
@@ -641,7 +641,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               password: { source: "env", provider: "default", id: gatewayEnvKey },
             },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         commandName: "status",
         targetIds: new Set(["talk.apiKey"]),
         mode: "read_only_status",
@@ -676,7 +676,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
           talk: {
             apiKey: { source: "env", provider: "default", id: envKey },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         commandName: "channels resolve",
         targetIds: new Set(["talk.apiKey"]),
         mode: "read_only_operational",

@@ -83,7 +83,7 @@ export async function minimaxUnderstandImage(params: {
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
-      "MM-API-Source": "OpenClaw",
+      "MM-API-Source": "Recall",
     },
     body: JSON.stringify({
       prompt,

@@ -6,9 +6,9 @@ type PluginManifestShape = {
   id?: unknown;
 };
 
-type OpenClawPackageShape = {
+type RecallPackageShape = {
   name?: unknown;
-  openclaw?: {
+  recall?: {
     install?: {
       npmSpec?: unknown;
     };
@@ -57,13 +57,13 @@ function readBundledPluginRecords(): BundledPluginRecord[] {
   for (const dirName of fs.readdirSync(EXTENSIONS_ROOT).toSorted()) {
     const rootDir = path.join(EXTENSIONS_ROOT, dirName);
     const packagePath = path.join(rootDir, "package.json");
-    const manifestPath = path.join(rootDir, "openclaw.plugin.json");
+    const manifestPath = path.join(rootDir, "recall.plugin.json");
     if (!fs.existsSync(packagePath) || !fs.existsSync(manifestPath)) {
       continue;
     }
 
     const manifest = readJsonFile<PluginManifestShape>(manifestPath);
-    const pkg = readJsonFile<OpenClawPackageShape>(packagePath);
+    const pkg = readJsonFile<RecallPackageShape>(packagePath);
     const manifestId = normalizeText(manifest.id);
     const packageName = normalizeText(pkg.name);
     if (!manifestId || !packageName) {
@@ -74,15 +74,15 @@ function readBundledPluginRecords(): BundledPluginRecord[] {
       dirName,
       packageName,
       manifestId,
-      installNpmSpec: normalizeText(pkg.openclaw?.install?.npmSpec),
-      channelId: normalizeText(pkg.openclaw?.channel?.id),
+      installNpmSpec: normalizeText(pkg.recall?.install?.npmSpec),
+      channelId: normalizeText(pkg.recall?.channel?.id),
     });
   }
   return records;
 }
 
 function resolveAllowedPackageNamesForId(pluginId: string): string[] {
-  return ALLOWED_PACKAGE_SUFFIXES.map((suffix) => `@openclaw/${pluginId}${suffix}`);
+  return ALLOWED_PACKAGE_SUFFIXES.map((suffix) => `@recall/${pluginId}${suffix}`);
 }
 
 describe("bundled plugin naming guardrails", () => {
@@ -98,7 +98,7 @@ describe("bundled plugin naming guardrails", () => {
 
     expect(
       mismatches,
-      `Bundled extension package names must stay anchored to the manifest id via @openclaw/<id> or an approved suffix (${ALLOWED_PACKAGE_SUFFIXES.join(", ")}). Update the plugin naming docs and this invariant before adding a new naming form.\nFound: ${mismatches.join(", ") || "<none>"}`,
+      `Bundled extension package names must stay anchored to the manifest id via @recall/<id> or an approved suffix (${ALLOWED_PACKAGE_SUFFIXES.join(", ")}). Update the plugin naming docs and this invariant before adding a new naming form.\nFound: ${mismatches.join(", ") || "<none>"}`,
     ).toEqual([]);
   });
 
@@ -111,11 +111,11 @@ describe("bundled plugin naming guardrails", () => {
 
     expect(
       mismatches,
-      `Bundled extension directory names should match openclaw.plugin.json:id. If a legacy exception is unavoidable, add it to DIR_ID_EXCEPTIONS with a comment.\nFound: ${mismatches.join(", ") || "<none>"}`,
+      `Bundled extension directory names should match recall.plugin.json:id. If a legacy exception is unavoidable, add it to DIR_ID_EXCEPTIONS with a comment.\nFound: ${mismatches.join(", ") || "<none>"}`,
     ).toEqual([]);
   });
 
-  it("keeps bundled openclaw.install.npmSpec aligned with the package name", () => {
+  it("keeps bundled recall.install.npmSpec aligned with the package name", () => {
     const mismatches = readBundledPluginRecords()
       .filter(
         ({ installNpmSpec, packageName }) =>
@@ -128,7 +128,7 @@ describe("bundled plugin naming guardrails", () => {
 
     expect(
       mismatches,
-      `Bundled openclaw.install.npmSpec values must match the package name so install/update paths stay deterministic.\nFound: ${mismatches.join(", ") || "<none>"}`,
+      `Bundled recall.install.npmSpec values must match the package name so install/update paths stay deterministic.\nFound: ${mismatches.join(", ") || "<none>"}`,
     ).toEqual([]);
   });
 
@@ -144,7 +144,7 @@ describe("bundled plugin naming guardrails", () => {
 
     expect(
       mismatches,
-      `Bundled openclaw.channel.id values must match openclaw.plugin.json:id for the owning plugin.\nFound: ${mismatches.join(", ") || "<none>"}`,
+      `Bundled recall.channel.id values must match recall.plugin.json:id for the owning plugin.\nFound: ${mismatches.join(", ") || "<none>"}`,
     ).toEqual([]);
   });
 });

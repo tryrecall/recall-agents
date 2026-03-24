@@ -131,7 +131,7 @@ describe("resolveMatrixConfig", () => {
               homeserver: "https://matrix.gumadeiras.com",
               userId: "@pinguini:matrix.gumadeiras.com",
               password: "cfg-pass", // pragma: allowlist secret
-              deviceName: "OpenClaw Gateway Pinguini",
+              deviceName: "Recall Gateway Pinguini",
               encryption: true,
             },
           },
@@ -151,7 +151,7 @@ describe("resolveMatrixConfig", () => {
       homeserver: "https://matrix.gumadeiras.com",
       userId: "@pinguini:matrix.gumadeiras.com",
       password: "cfg-pass",
-      deviceName: "OpenClaw Gateway Pinguini",
+      deviceName: "Recall Gateway Pinguini",
       encryption: true,
     });
   });

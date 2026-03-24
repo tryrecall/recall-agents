@@ -58,7 +58,7 @@ export type {
   DmPolicy,
   GroupPolicy,
   MarkdownTableMode,
-  OpenClawConfig,
+  RecallConfig,
   ReplyToMode,
   SignalReactionNotificationMode,
   SlackAccountConfig,

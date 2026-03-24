@@ -44,8 +44,8 @@ vi.mock("./draft-stream.js", () => ({
   createTelegramDraftStream,
 }));
 
-vi.mock("openclaw/plugin-sdk/reply-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/reply-runtime")>();
+vi.mock("recall/plugin-sdk/reply-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/reply-runtime")>();
   return {
     ...actual,
     generateTopicLabel,
@@ -73,8 +73,8 @@ vi.mock("./send.js", () => ({
   sendStickerTelegram,
 }));
 
-vi.mock("openclaw/plugin-sdk/config-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/config-runtime")>();
+vi.mock("recall/plugin-sdk/config-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/config-runtime")>();
   return {
     ...actual,
     loadConfig,
@@ -301,7 +301,7 @@ describe("dispatchTelegramMessage draft streaming", () => {
       expect.objectContaining({
         thread: { id: 777, scope: "dm" },
         mediaLocalRoots: expect.arrayContaining([
-          expect.stringMatching(/[\\/]\.openclaw[\\/]workspace-work$/u),
+          expect.stringMatching(/[\\/]\.recall[\\/]workspace-work$/u),
         ]),
       }),
     );

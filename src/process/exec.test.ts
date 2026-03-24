@@ -3,7 +3,7 @@ import { EventEmitter } from "node:events";
 import fs from "node:fs";
 import process from "node:process";
 import { describe, expect, it, vi } from "vitest";
-import { OPENCLAW_CLI_ENV_VALUE } from "../infra/openclaw-exec-env.js";
+import { RECALL_CLI_ENV_VALUE } from "../infra/recall-exec-env.js";
 import { attachChildProcessBridge } from "./child-process-bridge.js";
 import { resolveCommandEnv, runCommandWithTimeout, shouldSpawnWithShell } from "./exec.js";
 
@@ -21,18 +21,18 @@ describe("runCommandWithTimeout", () => {
     const resolved = resolveCommandEnv({
       argv: ["node", "script.js"],
       baseEnv: {
-        OPENCLAW_BASE_ENV: "base",
-        OPENCLAW_TO_REMOVE: undefined,
+        RECALL_BASE_ENV: "base",
+        RECALL_TO_REMOVE: undefined,
       },
       env: {
-        OPENCLAW_TEST_ENV: "ok",
+        RECALL_TEST_ENV: "ok",
       },
     });
 
-    expect(resolved.OPENCLAW_BASE_ENV).toBe("base");
-    expect(resolved.OPENCLAW_TEST_ENV).toBe("ok");
-    expect(resolved.OPENCLAW_TO_REMOVE).toBeUndefined();
-    expect(resolved.OPENCLAW_CLI).toBe(OPENCLAW_CLI_ENV_VALUE);
+    expect(resolved.RECALL_BASE_ENV).toBe("base");
+    expect(resolved.RECALL_TEST_ENV).toBe("ok");
+    expect(resolved.RECALL_TO_REMOVE).toBeUndefined();
+    expect(resolved.RECALL_CLI).toBe(RECALL_CLI_ENV_VALUE);
   });
 
   it("suppresses npm fund prompts for npm argv", async () => {

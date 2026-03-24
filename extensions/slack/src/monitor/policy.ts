@@ -1,4 +1,4 @@
-import { evaluateGroupRouteAccessForPolicy } from "openclaw/plugin-sdk/group-access";
+import { evaluateGroupRouteAccessForPolicy } from "recall/plugin-sdk/group-access";
 
 export function isSlackChannelAllowedByPolicy(params: {
   groupPolicy: "open" | "disabled" | "allowlist";

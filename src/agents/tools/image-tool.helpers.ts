@@ -1,5 +1,5 @@
 import type { AssistantMessage } from "@mariozechner/pi-ai";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import { extractAssistantText } from "../pi-embedded-utils.js";
 import { coerceToolModelConfig, type ToolModelConfig } from "./model-config.helpers.js";
 
@@ -51,12 +51,12 @@ export function coerceImageAssistantText(params: {
   throw new Error(`Image model returned no text (${params.provider}/${params.model}).`);
 }
 
-export function coerceImageModelConfig(cfg?: OpenClawConfig): ImageModelConfig {
+export function coerceImageModelConfig(cfg?: RecallConfig): ImageModelConfig {
   return coerceToolModelConfig(cfg?.agents?.defaults?.imageModel);
 }
 
 export function resolveProviderVisionModelFromConfig(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   provider: string;
 }): string | null {
   const providerCfg = params.cfg?.models?.providers?.[params.provider] as unknown as

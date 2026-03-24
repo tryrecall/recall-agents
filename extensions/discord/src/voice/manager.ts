@@ -5,21 +5,21 @@ import path from "node:path";
 import type { Readable } from "node:stream";
 import { ChannelType, type Client, ReadyListener } from "@buape/carbon";
 import type { VoicePlugin } from "@buape/carbon/voice";
-import { resolveAgentDir } from "openclaw/plugin-sdk/agent-runtime";
-import { agentCommandFromIngress } from "openclaw/plugin-sdk/agent-runtime";
-import { resolveTtsConfig, type ResolvedTtsConfig } from "openclaw/plugin-sdk/agent-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
-import { isDangerousNameMatchingEnabled } from "openclaw/plugin-sdk/config-runtime";
-import type { DiscordAccountConfig, TtsConfig } from "openclaw/plugin-sdk/config-runtime";
-import { formatErrorMessage } from "openclaw/plugin-sdk/infra-runtime";
-import { resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/infra-runtime";
-import { transcribeAudioFile } from "openclaw/plugin-sdk/media-understanding-runtime";
-import { resolveAgentRoute } from "openclaw/plugin-sdk/routing";
-import { logVerbose, shouldLogVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/runtime-env";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
-import { parseTtsDirectives } from "openclaw/plugin-sdk/speech";
-import { textToSpeech } from "openclaw/plugin-sdk/speech-runtime";
+import { resolveAgentDir } from "recall/plugin-sdk/agent-runtime";
+import { agentCommandFromIngress } from "recall/plugin-sdk/agent-runtime";
+import { resolveTtsConfig, type ResolvedTtsConfig } from "recall/plugin-sdk/agent-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
+import { isDangerousNameMatchingEnabled } from "recall/plugin-sdk/config-runtime";
+import type { DiscordAccountConfig, TtsConfig } from "recall/plugin-sdk/config-runtime";
+import { formatErrorMessage } from "recall/plugin-sdk/infra-runtime";
+import { resolvePreferredRecallTmpDir } from "recall/plugin-sdk/infra-runtime";
+import { transcribeAudioFile } from "recall/plugin-sdk/media-understanding-runtime";
+import { resolveAgentRoute } from "recall/plugin-sdk/routing";
+import { logVerbose, shouldLogVerbose } from "recall/plugin-sdk/runtime-env";
+import { createSubsystemLogger } from "recall/plugin-sdk/runtime-env";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime-env";
+import { parseTtsDirectives } from "recall/plugin-sdk/speech";
+import { textToSpeech } from "recall/plugin-sdk/speech-runtime";
 import { formatMention } from "../mentions.js";
 import { resolveDiscordOwnerAccess } from "../monitor/allow-list.js";
 import { formatDiscordUserTag } from "../monitor/format.js";
@@ -98,8 +98,8 @@ function mergeTtsConfig(base: TtsConfig, override?: TtsConfig): TtsConfig {
   };
 }
 
-function resolveVoiceTtsConfig(params: { cfg: OpenClawConfig; override?: TtsConfig }): {
-  cfg: OpenClawConfig;
+function resolveVoiceTtsConfig(params: { cfg: RecallConfig; override?: TtsConfig }): {
+  cfg: RecallConfig;
   resolved: ResolvedTtsConfig;
 } {
   if (!params.override) {
@@ -197,7 +197,7 @@ function estimateDurationSeconds(pcm: Buffer): number {
 }
 
 async function writeWavFile(pcm: Buffer): Promise<{ path: string; durationSeconds: number }> {
-  const tempDir = await fs.mkdtemp(path.join(resolvePreferredOpenClawTmpDir(), "discord-voice-"));
+  const tempDir = await fs.mkdtemp(path.join(resolvePreferredRecallTmpDir(), "discord-voice-"));
   const filePath = path.join(tempDir, `segment-${randomUUID()}.wav`);
   const wav = buildWavBuffer(pcm);
   await fs.writeFile(filePath, wav);
@@ -217,7 +217,7 @@ function scheduleTempCleanup(tempDir: string, delayMs: number = 30 * 60 * 1000):
 }
 
 async function transcribeAudio(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   filePath: string;
 }): Promise<string | undefined> {
@@ -249,7 +249,7 @@ export class DiscordVoiceManager {
   constructor(
     private params: {
       client: Client;
-      cfg: OpenClawConfig;
+      cfg: RecallConfig;
       discordConfig: DiscordAccountConfig;
       accountId: string;
       runtime: RuntimeEnv;

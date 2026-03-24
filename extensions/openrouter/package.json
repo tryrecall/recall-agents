@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/openrouter-provider",
+  "name": "@recall/openrouter-provider",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw OpenRouter provider plugin",
+  "description": "Recall OpenRouter provider plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

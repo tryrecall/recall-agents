@@ -15,7 +15,7 @@ describe("setupCommand", () => {
 
       await setupCommand(undefined, runtime);
 
-      const configPath = path.join(home, ".openclaw", "openclaw.json");
+      const configPath = path.join(home, ".recall", "recall.json");
       const raw = await fs.readFile(configPath, "utf-8");
 
       expect(raw).toContain('"mode": "local"');
@@ -30,8 +30,8 @@ describe("setupCommand", () => {
         error: vi.fn(),
         exit: vi.fn(),
       };
-      const configDir = path.join(home, ".openclaw");
-      const configPath = path.join(configDir, "openclaw.json");
+      const configDir = path.join(home, ".recall");
+      const configPath = path.join(configDir, "recall.json");
       const workspace = path.join(home, "custom-workspace");
 
       await fs.mkdir(configDir, { recursive: true });

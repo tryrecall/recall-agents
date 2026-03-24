@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
-import type { ChannelMessageActionContext } from "openclaw/plugin-sdk/channel-contract";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
+import type { ChannelMessageActionContext } from "recall/plugin-sdk/channel-contract";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
 import { describe, expect, it, vi } from "vitest";
 
 const handleDiscordMessageActionMock = vi.hoisted(() => vi.fn(async () => ({ ok: true })));
@@ -20,7 +20,7 @@ describe("discordMessageActions", () => {
             enabled: true,
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
     });
 
     expect(discovery).toEqual({
@@ -45,7 +45,7 @@ describe("discordMessageActions", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
     });
 
     expect(discovery?.capabilities).toEqual(["interactive", "components"]);
@@ -65,7 +65,7 @@ describe("discordMessageActions", () => {
             token: "Bot token-main",
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
     });
     const schema = discovery?.schema;
     if (!schema || Array.isArray(schema)) {
@@ -102,7 +102,7 @@ describe("discordMessageActions", () => {
           token: "Bot token-main",
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const toolContext: ChannelMessageActionContext["toolContext"] = {
       currentChannelProvider: "discord",
     };

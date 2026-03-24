@@ -16,7 +16,7 @@ const undiciMocks = vi.hoisted(() => {
 });
 
 const mockedModuleIds = [
-  "openclaw/plugin-sdk/infra-runtime",
+  "recall/plugin-sdk/infra-runtime",
   "../../extensions/telegram/src/fetch.js",
   "../../extensions/telegram/src/proxy.js",
   "./fetch.js",

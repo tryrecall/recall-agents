@@ -1,12 +1,12 @@
 {
-  "name": "@openclaw/synology-chat",
+  "name": "@recall/synology-chat",
   "version": "2026.3.22",
-  "description": "Synology Chat channel plugin for OpenClaw",
+  "description": "Synology Chat channel plugin for Recall",
   "type": "module",
   "dependencies": {
     "zod": "^4.3.6"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
@@ -17,11 +17,11 @@
       "selectionLabel": "Synology Chat (Webhook)",
       "docsPath": "/channels/synology-chat",
       "docsLabel": "synology-chat",
-      "blurb": "Connect your Synology NAS Chat to OpenClaw with full agent capabilities.",
+      "blurb": "Connect your Synology NAS Chat to Recall with full agent capabilities.",
       "order": 90
     },
     "install": {
-      "npmSpec": "@openclaw/synology-chat",
+      "npmSpec": "@recall/synology-chat",
       "localPath": "extensions/synology-chat",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.3.22"

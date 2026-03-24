@@ -208,14 +208,14 @@ describe("DiscordMessageListener", () => {
 
 describe("discord allowlist helpers", () => {
   it("normalizes slugs", () => {
-    expect(normalizeDiscordSlug("Friends of OpenClaw")).toBe("friends-of-openclaw");
+    expect(normalizeDiscordSlug("Friends of Recall")).toBe("friends-of-recall");
     expect(normalizeDiscordSlug("#General")).toBe("general");
     expect(normalizeDiscordSlug("Dev__Chat")).toBe("dev-chat");
   });
 
   it("matches ids by default and names only when enabled", () => {
     const allow = normalizeDiscordAllowList(
-      ["123", "steipete", "Friends of OpenClaw"],
+      ["123", "steipete", "Friends of Recall"],
       ["discord:", "user:", "guild:", "channel:"],
     );
     expect(allow).not.toBeNull();
@@ -224,10 +224,10 @@ describe("discord allowlist helpers", () => {
     }
     expect(allowListMatches(allow, { id: "123" })).toBe(true);
     expect(allowListMatches(allow, { name: "steipete" })).toBe(false);
-    expect(allowListMatches(allow, { name: "friends-of-openclaw" })).toBe(false);
+    expect(allowListMatches(allow, { name: "friends-of-recall" })).toBe(false);
     expect(allowListMatches(allow, { name: "steipete" }, { allowNameMatching: true })).toBe(true);
     expect(
-      allowListMatches(allow, { name: "friends-of-openclaw" }, { allowNameMatching: true }),
+      allowListMatches(allow, { name: "friends-of-recall" }, { allowNameMatching: true }),
     ).toBe(true);
     expect(allowListMatches(allow, { name: "other" })).toBe(false);
   });
@@ -246,38 +246,38 @@ describe("discord allowlist helpers", () => {
 describe("discord guild/channel resolution", () => {
   it("resolves guild entry by id", () => {
     const guildEntries = makeEntries({
-      "123": { slug: "friends-of-openclaw" },
+      "123": { slug: "friends-of-recall" },
     });
     const resolved = resolveDiscordGuildEntry({
-      guild: fakeGuild("123", "Friends of OpenClaw"),
+      guild: fakeGuild("123", "Friends of Recall"),
       guildEntries,
     });
     expect(resolved?.id).toBe("123");
-    expect(resolved?.slug).toBe("friends-of-openclaw");
+    expect(resolved?.slug).toBe("friends-of-recall");
   });
 
   it("resolves guild entry by raw guild id when guild object is missing", () => {
     const guildEntries = makeEntries({
-      "123": { slug: "friends-of-openclaw" },
+      "123": { slug: "friends-of-recall" },
     });
     const resolved = resolveDiscordGuildEntry({
       guildId: "123",
       guildEntries,
     });
     expect(resolved?.id).toBe("123");
-    expect(resolved?.slug).toBe("friends-of-openclaw");
+    expect(resolved?.slug).toBe("friends-of-recall");
   });
 
   it("resolves guild entry by slug key", () => {
     const guildEntries = makeEntries({
-      "friends-of-openclaw": { slug: "friends-of-openclaw" },
+      "friends-of-recall": { slug: "friends-of-recall" },
     });
     const resolved = resolveDiscordGuildEntry({
-      guild: fakeGuild("123", "Friends of OpenClaw"),
+      guild: fakeGuild("123", "Friends of Recall"),
       guildEntries,
     });
     expect(resolved?.id).toBe("123");
-    expect(resolved?.slug).toBe("friends-of-openclaw");
+    expect(resolved?.slug).toBe("friends-of-recall");
   });
 
   it("falls back to wildcard guild entry", () => {
@@ -285,7 +285,7 @@ describe("discord guild/channel resolution", () => {
       "*": { requireMention: false },
     });
     const resolved = resolveDiscordGuildEntry({
-      guild: fakeGuild("123", "Friends of OpenClaw"),
+      guild: fakeGuild("123", "Friends of Recall"),
       guildEntries,
     });
     expect(resolved?.id).toBe("123");
@@ -633,15 +633,15 @@ describe("discord group DM gating", () => {
   it("matches group DM allowlist", () => {
     expect(
       resolveGroupDmAllow({
-        channels: ["openclaw-dm"],
+        channels: ["recall-dm"],
         channelId: "1",
-        channelName: "OpenClaw DM",
-        channelSlug: "openclaw-dm",
+        channelName: "Recall DM",
+        channelSlug: "recall-dm",
       }),
     ).toBe(true);
     expect(
       resolveGroupDmAllow({
-        channels: ["openclaw-dm"],
+        channels: ["recall-dm"],
         channelId: "1",
         channelName: "Other",
         channelSlug: "other",
@@ -897,16 +897,16 @@ const { enqueueSystemEventSpy, resolveAgentRouteMock } = vi.hoisted(() => ({
   })),
 }));
 
-vi.mock("openclaw/plugin-sdk/infra-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/infra-runtime")>();
+vi.mock("recall/plugin-sdk/infra-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/infra-runtime")>();
   return {
     ...actual,
     enqueueSystemEvent: enqueueSystemEventSpy,
   };
 });
 
-vi.mock("openclaw/plugin-sdk/routing", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/routing")>();
+vi.mock("recall/plugin-sdk/routing", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/routing")>();
   return {
     ...actual,
     resolveAgentRoute: resolveAgentRouteMock,

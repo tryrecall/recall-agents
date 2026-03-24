@@ -23,8 +23,8 @@ title: "Tests"
 - `pnpm test:perf:profile:main`: writes a CPU profile for the Vitest main thread (`.artifacts/vitest-main-profile`).
 - `pnpm test:perf:profile:runner`: writes CPU + heap profiles for the unit runner (`.artifacts/vitest-runner-profile`).
 - `pnpm test:perf:update-timings`: refreshes the checked-in slow-file timing snapshot used by `scripts/test-parallel.mjs`.
-- Gateway integration: opt-in via `OPENCLAW_TEST_INCLUDE_GATEWAY=1 pnpm test` or `pnpm test:gateway`.
-- `pnpm test:e2e`: Runs gateway end-to-end smoke tests (multi-instance WS/HTTP/node pairing). Defaults to `forks` + adaptive workers in `vitest.e2e.config.ts`; tune with `OPENCLAW_E2E_WORKERS=<n>` and set `OPENCLAW_E2E_VERBOSE=1` for verbose logs.
+- Gateway integration: opt-in via `RECALL_TEST_INCLUDE_GATEWAY=1 pnpm test` or `pnpm test:gateway`.
+- `pnpm test:e2e`: Runs gateway end-to-end smoke tests (multi-instance WS/HTTP/node pairing). Defaults to `forks` + adaptive workers in `vitest.e2e.config.ts`; tune with `RECALL_E2E_WORKERS=<n>` and set `RECALL_E2E_VERBOSE=1` for verbose logs.
 - `pnpm test:live`: Runs provider live tests (minimax/zai). Requires API keys and `LIVE=1` (or provider-specific `*_LIVE_TEST=1`) to unskip.
 
 ## Local PR gate
@@ -38,12 +38,12 @@ For local PR land/gate checks, run:
 
 If `pnpm test` flakes on a loaded host, rerun once before treating it as a regression, then isolate with `pnpm vitest run <path/to/test>`. For memory-constrained hosts, use:
 
-- `OPENCLAW_TEST_PROFILE=low OPENCLAW_TEST_SERIAL_GATEWAY=1 pnpm test`
-- `OPENCLAW_VITEST_FS_MODULE_CACHE=0 pnpm test:changed`
+- `RECALL_TEST_PROFILE=low RECALL_TEST_SERIAL_GATEWAY=1 pnpm test`
+- `RECALL_VITEST_FS_MODULE_CACHE=0 pnpm test:changed`
 
 ## Model latency bench (local keys)
 
-Script: [`scripts/bench-model.ts`](https://github.com/openclaw/openclaw/blob/main/scripts/bench-model.ts)
+Script: [`scripts/bench-model.ts`](https://github.com/recall/recall/blob/main/scripts/bench-model.ts)
 
 Usage:
 
@@ -58,7 +58,7 @@ Last run (2025-12-31, 20 runs):
 
 ## CLI startup bench
 
-Script: [`scripts/bench-cli-startup.ts`](https://github.com/openclaw/openclaw/blob/main/scripts/bench-cli-startup.ts)
+Script: [`scripts/bench-cli-startup.ts`](https://github.com/recall/recall/blob/main/scripts/bench-cli-startup.ts)
 
 Usage:
 
@@ -86,7 +86,7 @@ Full cold-start flow in a clean Linux container:
 scripts/e2e/onboard-docker.sh
 ```
 
-This script drives the interactive wizard via a pseudo-tty, verifies config/workspace/session files, then starts the gateway and runs `openclaw health`.
+This script drives the interactive wizard via a pseudo-tty, verifies config/workspace/session files, then starts the gateway and runs `recall health`.
 
 ## QR import smoke (Docker)
 

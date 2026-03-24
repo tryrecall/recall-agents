@@ -255,7 +255,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -339,7 +339,7 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -366,7 +366,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -382,7 +382,7 @@ importers:
         specifier: ^10.6.2
         version: 10.6.2
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -404,7 +404,7 @@ importers:
 
   extensions/line:
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -417,7 +417,7 @@ importers:
         specifier: ^8.18.0
         version: 8.18.0
 
-  extensions/lobster:
+  extensions/recall:
     dependencies:
       '@sinclair/typebox':
         specifier: 0.34.48
@@ -444,7 +444,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -460,13 +460,13 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
   extensions/memory-core:
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -508,7 +508,7 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -518,7 +518,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -531,7 +531,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -608,7 +608,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -650,7 +650,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -665,7 +665,7 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -684,7 +684,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
@@ -700,19 +700,19 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
   packages/clawdbot:
     dependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 
   packages/moltbot:
     dependencies:
-      openclaw:
+      recall:
         specifier: workspace:*
         version: link:../..
 

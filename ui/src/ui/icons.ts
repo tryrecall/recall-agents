@@ -366,7 +366,7 @@ export const icons = {
       />
     </svg>
   `,
-  lobster: html`
+  recall: html`
     <svg viewBox="0 0 120 120" fill="none">
       <defs>
         <linearGradient id="lob-g" x1="0%" y1="0%" x2="100%" y2="100%">

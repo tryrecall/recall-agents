@@ -1,27 +1,27 @@
-import { describeAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
-import { formatNormalizedAllowFromEntries } from "openclaw/plugin-sdk/allow-from";
+import { describeAccountSnapshot } from "recall/plugin-sdk/account-helpers";
+import { formatNormalizedAllowFromEntries } from "recall/plugin-sdk/allow-from";
 import {
   adaptScopedAccountAccessor,
   createScopedChannelConfigAdapter,
-} from "openclaw/plugin-sdk/channel-config-helpers";
+} from "recall/plugin-sdk/channel-config-helpers";
 import {
   composeAccountWarningCollectors,
   composeWarningCollectors,
   createAllowlistProviderGroupPolicyWarningCollector,
   createAllowlistProviderOpenWarningCollector,
-} from "openclaw/plugin-sdk/channel-policy";
-import { createChatChannelPlugin } from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/channel-policy";
+import { createChatChannelPlugin } from "recall/plugin-sdk/core";
 import {
   createChannelDirectoryAdapter,
   listResolvedDirectoryGroupEntriesFromMapKeys,
   listResolvedDirectoryUserEntriesFromAllowFrom,
-} from "openclaw/plugin-sdk/directory-runtime";
-import { buildPassiveProbedChannelStatusSummary } from "openclaw/plugin-sdk/extension-shared";
-import { createLazyRuntimeNamedExport } from "openclaw/plugin-sdk/lazy-runtime";
+} from "recall/plugin-sdk/directory-runtime";
+import { buildPassiveProbedChannelStatusSummary } from "recall/plugin-sdk/extension-shared";
+import { createLazyRuntimeNamedExport } from "recall/plugin-sdk/lazy-runtime";
 import {
   createComputedAccountStatusAdapter,
   createDefaultChannelRuntimeState,
-} from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/status-helpers";
 import {
   buildChannelConfigSchema,
   DEFAULT_ACCOUNT_ID,
@@ -33,7 +33,7 @@ import {
   runPassiveAccountLifecycle,
   type ChannelMessageActionAdapter,
   type ChannelStatusIssue,
-  type OpenClawConfig,
+  type RecallConfig,
 } from "../runtime-api.js";
 import { GoogleChatConfigSchema } from "../runtime-api.js";
 import {
@@ -119,7 +119,7 @@ const collectGoogleChatGroupPolicyWarnings =
 const collectGoogleChatSecurityWarnings = composeAccountWarningCollectors<
   ResolvedGoogleChatAccount,
   {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     account: ResolvedGoogleChatAccount;
   }
 >(

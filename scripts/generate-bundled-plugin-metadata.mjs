@@ -6,7 +6,7 @@ import { writeTextFileIfChanged } from "./runtime-postbuild-shared.mjs";
 
 const GENERATED_BY = "scripts/generate-bundled-plugin-metadata.mjs";
 const DEFAULT_OUTPUT_PATH = "src/plugins/bundled-plugin-metadata.generated.ts";
-const MANIFEST_KEY = "openclaw";
+const MANIFEST_KEY = "recall";
 const FORMATTER_CWD = path.resolve(import.meta.dirname, "..");
 const CANONICAL_PACKAGE_ID_ALIASES = {
   "elevenlabs-speech": "elevenlabs",
@@ -148,7 +148,7 @@ export function collectBundledPluginMetadata(params = {}) {
     }
 
     const pluginDir = path.join(extensionsRoot, dirent.name);
-    const manifestPath = path.join(pluginDir, "openclaw.plugin.json");
+    const manifestPath = path.join(pluginDir, "recall.plugin.json");
     const packageJsonPath = path.join(pluginDir, "package.json");
     if (!fs.existsSync(manifestPath) || !fs.existsSync(packageJsonPath)) {
       continue;

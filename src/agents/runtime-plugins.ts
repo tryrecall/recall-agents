@@ -1,10 +1,10 @@
-import type { OpenClawConfig } from "../config/config.js";
-import { loadOpenClawPlugins } from "../plugins/loader.js";
+import type { RecallConfig } from "../config/config.js";
+import { loadRecallPlugins } from "../plugins/loader.js";
 import { getActivePluginRegistryKey } from "../plugins/runtime.js";
 import { resolveUserPath } from "../utils.js";
 
 export function ensureRuntimePluginsLoaded(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string | null;
   allowGatewaySubagentBinding?: boolean;
 }): void {
@@ -17,7 +17,7 @@ export function ensureRuntimePluginsLoaded(params: {
       ? resolveUserPath(params.workspaceDir)
       : undefined;
 
-  loadOpenClawPlugins({
+  loadRecallPlugins({
     config: params.config,
     workspaceDir,
     runtimeOptions: params.allowGatewaySubagentBinding

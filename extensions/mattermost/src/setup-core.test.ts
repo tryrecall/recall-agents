@@ -1,4 +1,4 @@
-import { DEFAULT_ACCOUNT_ID } from "openclaw/plugin-sdk/setup";
+import { DEFAULT_ACCOUNT_ID } from "recall/plugin-sdk/setup";
 import { describe, expect, it, vi } from "vitest";
 
 const resolveMattermostAccount = vi.hoisted(() => vi.fn());

@@ -118,7 +118,7 @@ describe("web processMessage inbound context", () => {
     capturedDispatchParams = undefined;
     backgroundTasks = new Set();
     deliverWebReplyMock.mockClear();
-    sessionDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-process-message-"));
+    sessionDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-process-message-"));
     sessionStorePath = path.join(sessionDir, "sessions.json");
   });
 
@@ -219,7 +219,7 @@ describe("web processMessage inbound context", () => {
           {
             id: "main",
             default: true,
-            identity: { name: "Mainbot", emoji: "🦞", theme: "space lobster" },
+            identity: { name: "Mainbot", emoji: "🤖", theme: "space recall" },
           },
         ],
       },
@@ -230,7 +230,7 @@ describe("web processMessage inbound context", () => {
     expect(getDispatcherResponsePrefix()).toBe("[Mainbot]");
   });
 
-  it("does not force an [openclaw] response prefix in self-chats when identity is unset", async () => {
+  it("does not force an [recall] response prefix in self-chats when identity is unset", async () => {
     await processSelfDirectMessage({
       messages: {},
       session: { store: sessionStorePath },

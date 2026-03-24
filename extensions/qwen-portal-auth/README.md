@@ -1,4 +1,4 @@
-# Qwen OAuth (OpenClaw plugin)
+# Qwen OAuth (Recall plugin)
 
 OAuth provider plugin for **Qwen** (free-tier OAuth).
 
@@ -7,7 +7,7 @@ OAuth provider plugin for **Qwen** (free-tier OAuth).
 Bundled plugins are disabled by default. Enable this one:
 
 ```bash
-openclaw plugins enable qwen-portal-auth
+recall plugins enable qwen-portal-auth
 ```
 
 Restart the Gateway after enabling.
@@ -15,7 +15,7 @@ Restart the Gateway after enabling.
 ## Authenticate
 
 ```bash
-openclaw models auth login --provider qwen-portal --set-default
+recall models auth login --provider qwen-portal --set-default
 ```
 
 ## Notes

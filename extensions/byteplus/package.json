@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/byteplus-provider",
+  "name": "@recall/byteplus-provider",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw BytePlus provider plugin",
+  "description": "Recall BytePlus provider plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

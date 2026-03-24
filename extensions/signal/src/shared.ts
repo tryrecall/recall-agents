@@ -1,10 +1,10 @@
-import { describeAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
+import { describeAccountSnapshot } from "recall/plugin-sdk/account-helpers";
 import {
   adaptScopedAccountAccessor,
   createScopedChannelConfigAdapter,
-} from "openclaw/plugin-sdk/channel-config-helpers";
-import { createRestrictSendersChannelSecurity } from "openclaw/plugin-sdk/channel-policy";
-import { createChannelPluginBase } from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/channel-config-helpers";
+import { createRestrictSendersChannelSecurity } from "recall/plugin-sdk/channel-policy";
+import { createChannelPluginBase } from "recall/plugin-sdk/core";
 import {
   listSignalAccountIds,
   resolveDefaultSignalAccountId,

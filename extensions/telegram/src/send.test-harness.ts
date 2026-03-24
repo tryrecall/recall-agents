@@ -1,4 +1,4 @@
-import type { MockFn } from "openclaw/plugin-sdk/testing";
+import type { MockFn } from "recall/plugin-sdk/testing";
 import { beforeEach, vi } from "vitest";
 
 const { botApi, botCtorSpy } = vi.hoisted(() => ({
@@ -44,7 +44,7 @@ type TelegramSendTestMocks = {
   maybePersistResolvedTelegramTarget: MockFn;
 };
 
-vi.mock("openclaw/plugin-sdk/web-media", () => ({
+vi.mock("recall/plugin-sdk/web-media", () => ({
   loadWebMedia,
 }));
 
@@ -79,8 +79,8 @@ vi.mock("grammy", () => ({
   InputFile: class {},
 }));
 
-vi.mock("openclaw/plugin-sdk/config-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/config-runtime")>();
+vi.mock("recall/plugin-sdk/config-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/config-runtime")>();
   return {
     ...actual,
     loadConfig,

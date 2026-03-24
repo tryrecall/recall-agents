@@ -26,8 +26,8 @@ describe("config io owner display secret autofill", () => {
   });
 
   it("auto-generates and persists commands.ownerDisplaySecret in hash mode", async () => {
-    await withTempHome("openclaw-owner-display-secret-", async (home) => {
-      const configPath = path.join(home, ".openclaw", "openclaw.json");
+    await withTempHome("recall-owner-display-secret-", async (home) => {
+      const configPath = path.join(home, ".recall", "recall.json");
       await fs.mkdir(path.dirname(configPath), { recursive: true });
       await fs.writeFile(
         configPath,

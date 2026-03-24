@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { createEmptyPluginRegistry } from "../plugins/registry.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { runWebSearch } from "./runtime.js";
@@ -96,7 +96,7 @@ describe("web search runtime", () => {
     });
     setActivePluginRegistry(registry);
 
-    const config: OpenClawConfig = {
+    const config: RecallConfig = {
       plugins: {
         entries: {
           "custom-search": {

@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { coerceSecretRef, resolveSecretInputRef } from "../config/types.secrets.js";
 import {
   buildAnthropicVertexProvider,
@@ -50,7 +50,7 @@ import { resolveAwsSdkEnvVarName, resolveEnvApiKey } from "./model-auth.js";
 export { resolveOllamaApiBase } from "./models-config.providers.discovery.js";
 export { normalizeGoogleModelId, normalizeXaiModelId };
 
-type ModelsConfig = NonNullable<OpenClawConfig["models"]>;
+type ModelsConfig = NonNullable<RecallConfig["models"]>;
 export type ProviderConfig = NonNullable<ModelsConfig["providers"]>[string];
 type SecretDefaults = {
   env?: string;
@@ -617,7 +617,7 @@ export function normalizeProviders(params: {
 
 type ImplicitProviderParams = {
   agentDir: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   env?: NodeJS.ProcessEnv;
   workspaceDir?: string;
   explicitProviders?: Record<string, ProviderConfig> | null;
@@ -853,7 +853,7 @@ export function resolveImplicitAnthropicVertexProvider(params: {
 }
 export async function resolveImplicitBedrockProvider(params: {
   agentDir: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   env?: NodeJS.ProcessEnv;
 }): Promise<ProviderConfig | null> {
   const env = params.env ?? process.env;

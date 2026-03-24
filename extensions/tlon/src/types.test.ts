@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../api.js";
+import type { RecallConfig } from "../api.js";
 import { listTlonAccountIds, resolveTlonAccount } from "./types.js";
 
 describe("tlon account helpers", () => {
@@ -14,7 +14,7 @@ describe("tlon account helpers", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expect(listTlonAccountIds(cfg)).toEqual(["alerts", "default", "work"]);
   });
@@ -40,7 +40,7 @@ describe("tlon account helpers", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       "work",
     );
 
@@ -71,7 +71,7 @@ describe("tlon account helpers", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       "default",
     );
 

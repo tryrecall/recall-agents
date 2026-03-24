@@ -1,4 +1,4 @@
-import type { OpenClawConfig, HookConfig } from "../config/config.js";
+import type { RecallConfig, HookConfig } from "../config/config.js";
 import { resolveHookKey } from "./frontmatter.js";
 import type { HookEntry, HookSource } from "./types.js";
 
@@ -24,33 +24,33 @@ export type HookResolutionCollision = {
 };
 
 const HOOK_SOURCE_POLICIES: Record<HookSource, HookSourcePolicy> = {
-  "openclaw-bundled": {
+  "recall-bundled": {
     precedence: 10,
     trustedLocalCode: true,
     defaultEnableMode: "default-on",
-    canOverride: ["openclaw-bundled"],
-    canBeOverriddenBy: ["openclaw-managed", "openclaw-plugin"],
+    canOverride: ["recall-bundled"],
+    canBeOverriddenBy: ["recall-managed", "recall-plugin"],
   },
-  "openclaw-plugin": {
+  "recall-plugin": {
     precedence: 20,
     trustedLocalCode: true,
     defaultEnableMode: "default-on",
-    canOverride: ["openclaw-bundled", "openclaw-plugin"],
-    canBeOverriddenBy: ["openclaw-managed"],
+    canOverride: ["recall-bundled", "recall-plugin"],
+    canBeOverriddenBy: ["recall-managed"],
   },
-  "openclaw-managed": {
+  "recall-managed": {
     precedence: 30,
     trustedLocalCode: true,
     defaultEnableMode: "default-on",
-    canOverride: ["openclaw-bundled", "openclaw-managed", "openclaw-plugin"],
-    canBeOverriddenBy: ["openclaw-managed"],
+    canOverride: ["recall-bundled", "recall-managed", "recall-plugin"],
+    canBeOverriddenBy: ["recall-managed"],
   },
-  "openclaw-workspace": {
+  "recall-workspace": {
     precedence: 40,
     trustedLocalCode: true,
     defaultEnableMode: "explicit-opt-in",
-    canOverride: ["openclaw-workspace"],
-    canBeOverriddenBy: ["openclaw-workspace"],
+    canOverride: ["recall-workspace"],
+    canBeOverriddenBy: ["recall-workspace"],
   },
 };
 
@@ -59,7 +59,7 @@ export function getHookSourcePolicy(source: HookSource): HookSourcePolicy {
 }
 
 export function resolveHookConfig(
-  config: OpenClawConfig | undefined,
+  config: RecallConfig | undefined,
   hookKey: string,
 ): HookConfig | undefined {
   const hooks = config?.hooks?.internal?.entries;
@@ -75,14 +75,14 @@ export function resolveHookConfig(
 
 export function resolveHookEnableState(params: {
   entry: HookEntry;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   hookConfig?: HookConfig;
 }): HookEnableState {
   const { entry, config } = params;
   const hookKey = resolveHookKey(entry.hook.name, entry);
   const hookConfig = params.hookConfig ?? resolveHookConfig(config, hookKey);
 
-  if (entry.hook.source === "openclaw-plugin") {
+  if (entry.hook.source === "recall-plugin") {
     return { enabled: true };
   }
   if (hookConfig?.enabled === false) {

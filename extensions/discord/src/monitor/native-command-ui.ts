@@ -22,12 +22,12 @@ import {
   type CommandArgDefinition,
   type CommandArgValues,
   type CommandArgs,
-} from "openclaw/plugin-sdk/command-auth";
-import type { OpenClawConfig, loadConfig } from "openclaw/plugin-sdk/config-runtime";
-import { loadSessionStore, resolveStorePath } from "openclaw/plugin-sdk/config-runtime";
-import type { ResolvedAgentRoute } from "openclaw/plugin-sdk/routing";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { chunkItems, withTimeout } from "openclaw/plugin-sdk/text-runtime";
+} from "recall/plugin-sdk/command-auth";
+import type { RecallConfig, loadConfig } from "recall/plugin-sdk/config-runtime";
+import { loadSessionStore, resolveStorePath } from "recall/plugin-sdk/config-runtime";
+import type { ResolvedAgentRoute } from "recall/plugin-sdk/routing";
+import { logVerbose } from "recall/plugin-sdk/runtime-env";
+import { chunkItems, withTimeout } from "recall/plugin-sdk/text-runtime";
 import { normalizeDiscordSlug } from "./allow-list.js";
 import { resolveDiscordChannelInfo } from "./message-utils.js";
 import {
@@ -49,7 +49,7 @@ import { resolveDiscordBoundConversationRoute } from "./route-resolution.js";
 import type { ThreadBindingManager } from "./thread-bindings.js";
 import { resolveDiscordThreadParentInfo } from "./threading.js";
 
-type DiscordConfig = NonNullable<OpenClawConfig["channels"]>["discord"];
+type DiscordConfig = NonNullable<RecallConfig["channels"]>["discord"];
 
 const DISCORD_COMMAND_ARG_CUSTOM_ID_KEY = "cmdarg";
 

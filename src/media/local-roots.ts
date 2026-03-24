@@ -1,8 +1,8 @@
 import path from "node:path";
 import { resolveAgentWorkspaceDir } from "../agents/agent-scope.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
-import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
+import { resolvePreferredRecallTmpDir } from "../infra/tmp-recall-dir.js";
 
 type BuildMediaLocalRootsOptions = {
   preferredTmpDir?: string;
@@ -12,7 +12,7 @@ let cachedPreferredTmpDir: string | undefined;
 
 function resolveCachedPreferredTmpDir(): string {
   if (!cachedPreferredTmpDir) {
-    cachedPreferredTmpDir = resolvePreferredOpenClawTmpDir();
+    cachedPreferredTmpDir = resolvePreferredRecallTmpDir();
   }
   return cachedPreferredTmpDir;
 }
@@ -36,7 +36,7 @@ export function getDefaultMediaLocalRoots(): readonly string[] {
 }
 
 export function getAgentScopedMediaLocalRoots(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   agentId?: string,
 ): readonly string[] {
   const roots = buildMediaLocalRoots(resolveStateDir());

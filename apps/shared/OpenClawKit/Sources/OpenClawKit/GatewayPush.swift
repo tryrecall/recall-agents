@@ -1,4 +1,4 @@
-import OpenClawProtocol
+import RecallProtocol
 
 /// Server-push messages from the gateway websocket.
 ///

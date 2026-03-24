@@ -1,9 +1,9 @@
-import { buildDmGroupAccountAllowlistAdapter } from "openclaw/plugin-sdk/allowlist-config-edit";
-import { createChatChannelPlugin } from "openclaw/plugin-sdk/core";
+import { buildDmGroupAccountAllowlistAdapter } from "recall/plugin-sdk/allowlist-config-edit";
+import { createChatChannelPlugin } from "recall/plugin-sdk/core";
 import {
   createAsyncComputedAccountStatusAdapter,
   createDefaultChannelRuntimeState,
-} from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/status-helpers";
 // WhatsApp-specific imports from local extension code (moved from src/web/ and src/channels/plugins/)
 import { resolveWhatsAppAccount, type ResolvedWhatsAppAccount } from "./accounts.js";
 import type { WebChannelStatus } from "./auto-reply/types.js";

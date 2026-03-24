@@ -1,4 +1,4 @@
-import { buildChannelConfigSchema } from "openclaw/plugin-sdk/core";
+import { buildChannelConfigSchema } from "recall/plugin-sdk/core";
 import { z } from "zod";
 
 const ShipSchema = z.string().min(1);

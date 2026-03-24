@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/chutes-provider",
+  "name": "@recall/chutes-provider",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw Chutes.ai provider plugin",
+  "description": "Recall Chutes.ai provider plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

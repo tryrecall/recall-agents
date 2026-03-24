@@ -13,9 +13,9 @@ import {
   splitSetupEntries,
   type ChannelSetupDmPolicy,
   type ChannelSetupWizard,
-  type OpenClawConfig,
+  type RecallConfig,
   type SecretInput,
-} from "openclaw/plugin-sdk/setup";
+} from "recall/plugin-sdk/setup";
 import { listFeishuAccountIds, resolveFeishuCredentials } from "./accounts.js";
 import { probeFeishu } from "./probe.js";
 import { feishuSetupAdapter } from "./setup-core.js";
@@ -38,7 +38,7 @@ function normalizeString(value: unknown): string | undefined {
   return trimmed || undefined;
 }
 
-function setFeishuGroupAllowFrom(cfg: OpenClawConfig, groupAllowFrom: string[]): OpenClawConfig {
+function setFeishuGroupAllowFrom(cfg: RecallConfig, groupAllowFrom: string[]): RecallConfig {
   return {
     ...cfg,
     channels: {
@@ -51,7 +51,7 @@ function setFeishuGroupAllowFrom(cfg: OpenClawConfig, groupAllowFrom: string[]):
   };
 }
 
-function isFeishuConfigured(cfg: OpenClawConfig): boolean {
+function isFeishuConfigured(cfg: RecallConfig): boolean {
   const feishuCfg = cfg.channels?.feishu as FeishuConfig | undefined;
 
   const isAppIdConfigured = (value: unknown): boolean => {
@@ -230,7 +230,7 @@ export const feishuSetupWizard: ChannelSetupWizard = {
         channel,
         enabled: true,
         patch: {},
-      }) as OpenClawConfig;
+      }) as RecallConfig;
     } else if (appSecretResult.action === "set") {
       appSecret = appSecretResult.value;
       appSecretProbeValue = appSecretResult.resolvedValue;
@@ -250,7 +250,7 @@ export const feishuSetupWizard: ChannelSetupWizard = {
           appId,
           appSecret,
         },
-      }) as OpenClawConfig;
+      }) as RecallConfig;
 
       try {
         const probe = await probeFeishu({
@@ -288,7 +288,7 @@ export const feishuSetupWizard: ChannelSetupWizard = {
       cfg: next,
       channel,
       patch: { connectionMode },
-    }) as OpenClawConfig;
+    }) as RecallConfig;
 
     if (connectionMode === "webhook") {
       const currentVerificationToken = (next.channels?.feishu as FeishuConfig | undefined)
@@ -314,7 +314,7 @@ export const feishuSetupWizard: ChannelSetupWizard = {
           cfg: next,
           channel,
           patch: { verificationToken: verificationTokenResult.value },
-        }) as OpenClawConfig;
+        }) as RecallConfig;
       }
 
       const currentEncryptKey = (next.channels?.feishu as FeishuConfig | undefined)?.encryptKey;
@@ -339,7 +339,7 @@ export const feishuSetupWizard: ChannelSetupWizard = {
           cfg: next,
           channel,
           patch: { encryptKey: encryptKeyResult.value },
-        }) as OpenClawConfig;
+        }) as RecallConfig;
       }
 
       const currentWebhookPath = (next.channels?.feishu as FeishuConfig | undefined)?.webhookPath;
@@ -354,7 +354,7 @@ export const feishuSetupWizard: ChannelSetupWizard = {
         cfg: next,
         channel,
         patch: { webhookPath },
-      }) as OpenClawConfig;
+      }) as RecallConfig;
     }
 
     const currentDomain = (next.channels?.feishu as FeishuConfig | undefined)?.domain ?? "feishu";
@@ -370,7 +370,7 @@ export const feishuSetupWizard: ChannelSetupWizard = {
       cfg: next,
       channel,
       patch: { domain: domain as "feishu" | "lark" },
-    }) as OpenClawConfig;
+    }) as RecallConfig;
 
     const groupPolicy = (await prompter.select({
       message: "Group chat policy",

@@ -44,7 +44,7 @@ function createHandlerHarness() {
         buildMentionRegexes: vi.fn().mockReturnValue([]),
       },
       session: {
-        resolveStorePath: vi.fn().mockReturnValue("/tmp/openclaw-test-session.json"),
+        resolveStorePath: vi.fn().mockReturnValue("/tmp/recall-test-session.json"),
         readSessionUpdatedAt: vi.fn().mockReturnValue(123),
         recordInboundSession,
       },

@@ -1,29 +1,29 @@
 import {
   buildDmGroupAccountAllowlistAdapter,
   createNestedAllowlistOverrideResolver,
-} from "openclaw/plugin-sdk/allowlist-config-edit";
-import { createPairingPrefixStripper } from "openclaw/plugin-sdk/channel-pairing";
-import { createAllowlistProviderRouteAllowlistWarningCollector } from "openclaw/plugin-sdk/channel-policy";
-import { attachChannelToResult } from "openclaw/plugin-sdk/channel-send-result";
-import { createChatChannelPlugin } from "openclaw/plugin-sdk/core";
-import { createChannelDirectoryAdapter } from "openclaw/plugin-sdk/directory-runtime";
-import { resolveExecApprovalCommandDisplay } from "openclaw/plugin-sdk/infra-runtime";
-import { buildExecApprovalPendingReplyPayload } from "openclaw/plugin-sdk/infra-runtime";
+} from "recall/plugin-sdk/allowlist-config-edit";
+import { createPairingPrefixStripper } from "recall/plugin-sdk/channel-pairing";
+import { createAllowlistProviderRouteAllowlistWarningCollector } from "recall/plugin-sdk/channel-policy";
+import { attachChannelToResult } from "recall/plugin-sdk/channel-send-result";
+import { createChatChannelPlugin } from "recall/plugin-sdk/core";
+import { createChannelDirectoryAdapter } from "recall/plugin-sdk/directory-runtime";
+import { resolveExecApprovalCommandDisplay } from "recall/plugin-sdk/infra-runtime";
+import { buildExecApprovalPendingReplyPayload } from "recall/plugin-sdk/infra-runtime";
 import {
   resolveOutboundSendDep,
   type OutboundSendDeps,
-} from "openclaw/plugin-sdk/outbound-runtime";
+} from "recall/plugin-sdk/outbound-runtime";
 import {
   buildOutboundBaseSessionKey,
   normalizeMessageChannel,
   normalizeOutboundThreadId,
   resolveThreadSessionKeys,
   type RoutePeer,
-} from "openclaw/plugin-sdk/routing";
+} from "recall/plugin-sdk/routing";
 import {
   createComputedAccountStatusAdapter,
   createDefaultChannelRuntimeState,
-} from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/status-helpers";
 import { parseTelegramTopicConversation } from "../runtime-api.js";
 import {
   buildTokenChannelStatusSummary,
@@ -33,7 +33,7 @@ import {
   projectCredentialSnapshotFields,
   resolveConfiguredFromCredentialStatuses,
   type ChannelMessageActionAdapter,
-  type OpenClawConfig,
+  type RecallConfig,
 } from "../runtime-api.js";
 import {
   listTelegramAccountIds,
@@ -80,7 +80,7 @@ type TelegramSendFn = ReturnType<
 type TelegramSendOptions = NonNullable<Parameters<TelegramSendFn>[2]>;
 
 function buildTelegramSendOptions(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   mediaUrl?: string | null;
   mediaLocalRoots?: readonly string[] | null;
   accountId?: string | null;
@@ -103,7 +103,7 @@ function buildTelegramSendOptions(params: {
 }
 
 async function sendTelegramOutbound(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   to: string;
   text: string;
   mediaUrl?: string | null;
@@ -195,7 +195,7 @@ function parseTelegramExplicitTarget(raw: string) {
 }
 
 function buildTelegramBaseSessionKey(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   accountId?: string | null;
   peer: RoutePeer;
@@ -204,7 +204,7 @@ function buildTelegramBaseSessionKey(params: {
 }
 
 function resolveTelegramOutboundSessionRoute(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   accountId?: string | null;
   target: string;
@@ -254,7 +254,7 @@ function resolveTelegramOutboundSessionRoute(params: {
   };
 }
 
-function hasTelegramExecApprovalDmRoute(cfg: OpenClawConfig): boolean {
+function hasTelegramExecApprovalDmRoute(cfg: RecallConfig): boolean {
   return listTelegramAccountIds(cfg).some((accountId) => {
     if (!isTelegramExecApprovalClientEnabled({ cfg, accountId })) {
       return false;
@@ -606,7 +606,7 @@ export const telegramPlugin = createChatChannelPlugin({
       },
       logoutAccount: async ({ accountId, cfg }) => {
         const envToken = process.env.TELEGRAM_BOT_TOKEN?.trim() ?? "";
-        const nextCfg = { ...cfg } as OpenClawConfig;
+        const nextCfg = { ...cfg } as RecallConfig;
         const nextTelegram = cfg.channels?.telegram ? { ...cfg.channels.telegram } : undefined;
         let cleared = false;
         let changed = false;

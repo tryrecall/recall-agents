@@ -1,6 +1,6 @@
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
-import { loadOpenClawPlugins } from "./loader.js";
+import { loadRecallPlugins } from "./loader.js";
 import type { PluginLoadOptions } from "./loader.js";
 import { createPluginLoaderLogger } from "./logger.js";
 import { getActivePluginRegistry } from "./runtime.js";
@@ -16,7 +16,7 @@ type WebSearchProviderSnapshotCacheEntry = {
   providers: PluginWebSearchProviderEntry[];
 };
 const webSearchProviderSnapshotCache = new WeakMap<
-  OpenClawConfig,
+  RecallConfig,
   WeakMap<NodeJS.ProcessEnv, Map<string, WebSearchProviderSnapshotCacheEntry>>
 >();
 
@@ -24,17 +24,17 @@ const DEFAULT_DISCOVERY_CACHE_MS = 1000;
 const DEFAULT_MANIFEST_CACHE_MS = 1000;
 
 function shouldUseWebSearchProviderSnapshotCache(env: NodeJS.ProcessEnv): boolean {
-  if (env.OPENCLAW_DISABLE_PLUGIN_DISCOVERY_CACHE?.trim()) {
+  if (env.RECALL_DISABLE_PLUGIN_DISCOVERY_CACHE?.trim()) {
     return false;
   }
-  if (env.OPENCLAW_DISABLE_PLUGIN_MANIFEST_CACHE?.trim()) {
+  if (env.RECALL_DISABLE_PLUGIN_MANIFEST_CACHE?.trim()) {
     return false;
   }
-  const discoveryCacheMs = env.OPENCLAW_PLUGIN_DISCOVERY_CACHE_MS?.trim();
+  const discoveryCacheMs = env.RECALL_PLUGIN_DISCOVERY_CACHE_MS?.trim();
   if (discoveryCacheMs === "0") {
     return false;
   }
-  const manifestCacheMs = env.OPENCLAW_PLUGIN_MANIFEST_CACHE_MS?.trim();
+  const manifestCacheMs = env.RECALL_PLUGIN_MANIFEST_CACHE_MS?.trim();
   if (manifestCacheMs === "0") {
     return false;
   }
@@ -43,11 +43,11 @@ function shouldUseWebSearchProviderSnapshotCache(env: NodeJS.ProcessEnv): boolea
 
 function resolveWebSearchProviderSnapshotCacheTtlMs(env: NodeJS.ProcessEnv): number {
   const discoveryCacheMs = resolveCacheMs(
-    env.OPENCLAW_PLUGIN_DISCOVERY_CACHE_MS,
+    env.RECALL_PLUGIN_DISCOVERY_CACHE_MS,
     DEFAULT_DISCOVERY_CACHE_MS,
   );
   const manifestCacheMs = resolveCacheMs(
-    env.OPENCLAW_PLUGIN_MANIFEST_CACHE_MS,
+    env.RECALL_PLUGIN_MANIFEST_CACHE_MS,
     DEFAULT_MANIFEST_CACHE_MS,
   );
   return Math.min(discoveryCacheMs, manifestCacheMs);
@@ -69,7 +69,7 @@ function resolveCacheMs(rawValue: string | undefined, defaultMs: number): number
 }
 
 function buildWebSearchSnapshotCacheKey(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   bundledAllowlistCompat?: boolean;
   env: NodeJS.ProcessEnv;
@@ -80,16 +80,16 @@ function buildWebSearchSnapshotCacheKey(params: {
     bundledAllowlistCompat: params.bundledAllowlistCompat === true,
     config: params.config ?? null,
     env: {
-      OPENCLAW_BUNDLED_PLUGINS_DIR: params.env.OPENCLAW_BUNDLED_PLUGINS_DIR ?? "",
-      OPENCLAW_DISABLE_PLUGIN_DISCOVERY_CACHE:
-        params.env.OPENCLAW_DISABLE_PLUGIN_DISCOVERY_CACHE ?? "",
-      OPENCLAW_DISABLE_PLUGIN_MANIFEST_CACHE:
-        params.env.OPENCLAW_DISABLE_PLUGIN_MANIFEST_CACHE ?? "",
-      OPENCLAW_PLUGIN_DISCOVERY_CACHE_MS: params.env.OPENCLAW_PLUGIN_DISCOVERY_CACHE_MS ?? "",
-      OPENCLAW_PLUGIN_MANIFEST_CACHE_MS: params.env.OPENCLAW_PLUGIN_MANIFEST_CACHE_MS ?? "",
-      OPENCLAW_HOME: params.env.OPENCLAW_HOME ?? "",
-      OPENCLAW_STATE_DIR: params.env.OPENCLAW_STATE_DIR ?? "",
-      OPENCLAW_CONFIG_PATH: params.env.OPENCLAW_CONFIG_PATH ?? "",
+      RECALL_BUNDLED_PLUGINS_DIR: params.env.RECALL_BUNDLED_PLUGINS_DIR ?? "",
+      RECALL_DISABLE_PLUGIN_DISCOVERY_CACHE:
+        params.env.RECALL_DISABLE_PLUGIN_DISCOVERY_CACHE ?? "",
+      RECALL_DISABLE_PLUGIN_MANIFEST_CACHE:
+        params.env.RECALL_DISABLE_PLUGIN_MANIFEST_CACHE ?? "",
+      RECALL_PLUGIN_DISCOVERY_CACHE_MS: params.env.RECALL_PLUGIN_DISCOVERY_CACHE_MS ?? "",
+      RECALL_PLUGIN_MANIFEST_CACHE_MS: params.env.RECALL_PLUGIN_MANIFEST_CACHE_MS ?? "",
+      RECALL_HOME: params.env.RECALL_HOME ?? "",
+      RECALL_STATE_DIR: params.env.RECALL_STATE_DIR ?? "",
+      RECALL_CONFIG_PATH: params.env.RECALL_CONFIG_PATH ?? "",
       HOME: params.env.HOME ?? "",
       USERPROFILE: params.env.USERPROFILE ?? "",
       VITEST: effectiveVitest,
@@ -129,7 +129,7 @@ export function resolvePluginWebSearchProviders(params: {
     ...params,
     env,
   });
-  const registry = loadOpenClawPlugins({
+  const registry = loadRecallPlugins({
     config,
     workspaceDir: params.workspaceDir,
     env,

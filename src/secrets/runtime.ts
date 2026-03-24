@@ -1,4 +1,4 @@
-import { resolveOpenClawAgentDir } from "../agents/agent-paths.js";
+import { resolveRecallAgentDir } from "../agents/agent-paths.js";
 import { listAgentIds, resolveAgentDir } from "../agents/agent-scope.js";
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
 import {
@@ -10,7 +10,7 @@ import {
   clearRuntimeConfigSnapshot,
   setRuntimeConfigSnapshotRefreshHandler,
   setRuntimeConfigSnapshot,
-  type OpenClawConfig,
+  type RecallConfig,
 } from "../config/config.js";
 import { resolveUserPath } from "../utils.js";
 import {
@@ -30,8 +30,8 @@ import { resolveRuntimeWebTools, type RuntimeWebToolsMetadata } from "./runtime-
 export type { SecretResolverWarning } from "./runtime-shared.js";
 
 export type PreparedSecretsRuntimeSnapshot = {
-  sourceConfig: OpenClawConfig;
-  config: OpenClawConfig;
+  sourceConfig: RecallConfig;
+  config: RecallConfig;
   authStores: Array<{ agentDir: string; store: AuthProfileStore }>;
   warnings: SecretResolverWarning[];
   webTools: RuntimeWebToolsMetadata;
@@ -48,12 +48,12 @@ const RUNTIME_PATH_ENV_KEYS = [
   "USERPROFILE",
   "HOMEDRIVE",
   "HOMEPATH",
-  "OPENCLAW_HOME",
-  "OPENCLAW_STATE_DIR",
-  "OPENCLAW_CONFIG_PATH",
-  "OPENCLAW_AGENT_DIR",
+  "RECALL_HOME",
+  "RECALL_STATE_DIR",
+  "RECALL_CONFIG_PATH",
+  "RECALL_AGENT_DIR",
   "PI_CODING_AGENT_DIR",
-  "OPENCLAW_TEST_FAST",
+  "RECALL_TEST_FAST",
 ] as const;
 
 let activeSnapshot: PreparedSecretsRuntimeSnapshot | null = null;
@@ -93,11 +93,11 @@ function clearActiveSecretsRuntimeState(): void {
 }
 
 function collectCandidateAgentDirs(
-  config: OpenClawConfig,
+  config: RecallConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): string[] {
   const dirs = new Set<string>();
-  dirs.add(resolveUserPath(resolveOpenClawAgentDir(env), env));
+  dirs.add(resolveUserPath(resolveRecallAgentDir(env), env));
   for (const agentId of listAgentIds(config)) {
     dirs.add(resolveUserPath(resolveAgentDir(config, agentId, env), env));
   }
@@ -105,7 +105,7 @@ function collectCandidateAgentDirs(
 }
 
 function resolveRefreshAgentDirs(
-  config: OpenClawConfig,
+  config: RecallConfig,
   context: SecretsRuntimeRefreshContext,
 ): string[] {
   const configDerived = collectCandidateAgentDirs(config, context.env);
@@ -132,7 +132,7 @@ function mergeSecretsRuntimeEnv(
 }
 
 export async function prepareSecretsRuntimeSnapshot(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   env?: NodeJS.ProcessEnv;
   agentDirs?: string[];
   loadAuthStore?: (agentDir?: string) => AuthProfileStore;

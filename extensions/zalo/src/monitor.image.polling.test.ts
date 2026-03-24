@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createPluginRuntimeMock } from "../../../test/helpers/extensions/plugin-runtime-mock.js";
 import { createRuntimeEnv } from "../../../test/helpers/extensions/runtime-env.js";
-import type { OpenClawConfig, PluginRuntime } from "../runtime-api.js";
+import type { RecallConfig, PluginRuntime } from "../runtime-api.js";
 import type { ResolvedZaloAccount } from "./accounts.js";
 
 const getWebhookInfoMock = vi.hoisted(() => vi.fn(async () => ({ ok: true, result: { url: "" } })));
@@ -47,7 +47,7 @@ const TEST_CONFIG = {
       },
     },
   },
-} as OpenClawConfig;
+} as RecallConfig;
 
 describe("Zalo polling image handling", () => {
   const finalizeInboundContextMock = vi.fn((ctx: Record<string, unknown>) => ctx);

@@ -1,19 +1,19 @@
 import { type Block, type KnownBlock, type WebClient } from "@slack/web-api";
-import { loadConfig, type OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
-import { resolveMarkdownTableMode } from "openclaw/plugin-sdk/config-runtime";
+import { loadConfig, type RecallConfig } from "recall/plugin-sdk/config-runtime";
+import { resolveMarkdownTableMode } from "recall/plugin-sdk/config-runtime";
 import {
   fetchWithSsrFGuard,
   withTrustedEnvProxyGuardedFetchMode,
-} from "openclaw/plugin-sdk/infra-runtime";
-import { resolveTextChunksWithFallback } from "openclaw/plugin-sdk/reply-payload";
+} from "recall/plugin-sdk/infra-runtime";
+import { resolveTextChunksWithFallback } from "recall/plugin-sdk/reply-payload";
 import {
   chunkMarkdownTextWithMode,
   resolveChunkMode,
   resolveTextChunkLimit,
-} from "openclaw/plugin-sdk/reply-runtime";
-import { isSilentReplyText } from "openclaw/plugin-sdk/reply-runtime";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { loadWebMedia } from "openclaw/plugin-sdk/web-media";
+} from "recall/plugin-sdk/reply-runtime";
+import { isSilentReplyText } from "recall/plugin-sdk/reply-runtime";
+import { logVerbose } from "recall/plugin-sdk/runtime-env";
+import { loadWebMedia } from "recall/plugin-sdk/web-media";
 import type { SlackTokenSource } from "./accounts.js";
 import { resolveSlackAccount } from "./accounts.js";
 import { buildSlackBlocksFallbackText } from "./blocks-fallback.js";
@@ -45,7 +45,7 @@ export type SlackSendIdentity = {
 };
 
 type SlackSendOpts = {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   token?: string;
   accountId?: string;
   mediaUrl?: string;

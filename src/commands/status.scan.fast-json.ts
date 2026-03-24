@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { hasPotentialConfiguredChannels } from "../channels/config-presence.js";
 import { resolveConfigPath, resolveStateDir } from "../config/paths.js";
-import type { OpenClawConfig } from "../config/types.js";
+import type { RecallConfig } from "../config/types.js";
 import { resolveOsSummary } from "../infra/os-summary.js";
 import { loggingState } from "../logging/state.js";
 import { runExec } from "../process/exec.js";
@@ -90,7 +90,7 @@ function resolveDefaultMemoryStorePath(agentId: string): string {
 }
 
 async function resolveMemoryStatusSnapshot(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentStatus: Awaited<ReturnType<typeof getAgentLocalStatuses>>;
   memoryPlugin: MemoryPluginStatus;
 }): Promise<MemoryStatusSnapshot | null> {
@@ -106,7 +106,7 @@ async function resolveMemoryStatusSnapshot(params: {
   });
 }
 
-async function readStatusSourceConfig(): Promise<OpenClawConfig> {
+async function readStatusSourceConfig(): Promise<RecallConfig> {
   if (!shouldSkipMissingConfigFastPath() && !existsSync(resolveConfigPath(process.env))) {
     return {};
   }
@@ -115,9 +115,9 @@ async function readStatusSourceConfig(): Promise<OpenClawConfig> {
 }
 
 async function resolveStatusConfig(params: {
-  sourceConfig: OpenClawConfig;
+  sourceConfig: RecallConfig;
   commandName: "status --json";
-}): Promise<{ resolvedConfig: OpenClawConfig; diagnostics: string[] }> {
+}): Promise<{ resolvedConfig: RecallConfig; diagnostics: string[] }> {
   if (!shouldSkipMissingConfigFastPath() && !existsSync(resolveConfigPath(process.env))) {
     return { resolvedConfig: params.sourceConfig, diagnostics: [] };
   }

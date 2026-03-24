@@ -5,7 +5,7 @@ import {
   runSetupWizardConfigure,
   type WizardPrompter,
 } from "../../../test/helpers/extensions/setup-wizard.js";
-import type { OpenClawConfig } from "../api.js";
+import type { RecallConfig } from "../api.js";
 import { linePlugin } from "./channel.js";
 
 const lineConfigure = createPluginSetupWizardConfigure(linePlugin);
@@ -26,7 +26,7 @@ describe("line setup wizard", () => {
 
     const result = await runSetupWizardConfigure({
       configure: lineConfigure,
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       prompter,
       options: {},
     });

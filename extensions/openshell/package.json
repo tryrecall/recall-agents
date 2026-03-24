@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/openshell-sandbox",
+  "name": "@recall/openshell-sandbox",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw OpenShell sandbox backend",
+  "description": "Recall OpenShell sandbox backend",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

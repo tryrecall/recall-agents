@@ -38,7 +38,7 @@ describe("bundled plugin metadata", () => {
   });
 
   it("prefers built generated paths when present and falls back to source paths", () => {
-    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-bundled-plugin-metadata-"));
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "recall-bundled-plugin-metadata-"));
     tempDirs.push(tempRoot);
 
     fs.mkdirSync(path.join(tempRoot, "plugin"), { recursive: true });
@@ -60,17 +60,17 @@ describe("bundled plugin metadata", () => {
   });
 
   it("supports check mode for stale generated artifacts", () => {
-    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-bundled-plugin-generated-"));
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "recall-bundled-plugin-generated-"));
     tempDirs.push(tempRoot);
 
     writeJson(path.join(tempRoot, "extensions", "alpha", "package.json"), {
-      name: "@openclaw/alpha",
+      name: "@recall/alpha",
       version: "0.0.1",
-      openclaw: {
+      recall: {
         extensions: ["./index.ts"],
       },
     });
-    writeJson(path.join(tempRoot, "extensions", "alpha", "openclaw.plugin.json"), {
+    writeJson(path.join(tempRoot, "extensions", "alpha", "recall.plugin.json"), {
       id: "alpha",
       configSchema: { type: "object" },
     });

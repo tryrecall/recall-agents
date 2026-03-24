@@ -1,6 +1,6 @@
-import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "openclaw/plugin-sdk/account-id";
-import { resolveMergedAccountConfig } from "openclaw/plugin-sdk/account-resolution";
-import { createAccountListHelpers, type OpenClawConfig } from "../runtime-api.js";
+import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "recall/plugin-sdk/account-id";
+import { resolveMergedAccountConfig } from "recall/plugin-sdk/account-resolution";
+import { createAccountListHelpers, type RecallConfig } from "../runtime-api.js";
 import { normalizeResolvedSecretInputString, normalizeSecretInputString } from "../secret-input.js";
 import type {
   MattermostAccountConfig,
@@ -37,7 +37,7 @@ const {
 export { listMattermostAccountIds, resolveDefaultMattermostAccountId };
 
 function mergeMattermostAccountConfig(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   accountId: string,
 ): MattermostAccountConfig {
   return resolveMergedAccountConfig<MattermostAccountConfig>({
@@ -65,7 +65,7 @@ function resolveMattermostRequireMention(config: MattermostAccountConfig): boole
 }
 
 export function resolveMattermostAccount(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
   allowUnresolvedSecretRef?: boolean;
 }): ResolvedMattermostAccount {
@@ -124,7 +124,7 @@ export function resolveMattermostReplyToMode(
   return account.config.replyToMode ?? "off";
 }
 
-export function listEnabledMattermostAccounts(cfg: OpenClawConfig): ResolvedMattermostAccount[] {
+export function listEnabledMattermostAccounts(cfg: RecallConfig): ResolvedMattermostAccount[] {
   return listMattermostAccountIds(cfg)
     .map((accountId) => resolveMattermostAccount({ cfg, accountId }))
     .filter((account) => account.enabled);

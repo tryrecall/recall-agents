@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { resolveProviderCapabilitiesWithPlugin as resolveProviderCapabilitiesWithPluginRuntime } from "../plugins/provider-runtime.js";
 import { normalizeProviderId } from "./model-selection.js";
 
@@ -17,7 +17,7 @@ export type ProviderCapabilities = {
 };
 
 export type ProviderCapabilityLookupOptions = {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 };
@@ -202,7 +202,7 @@ export function isAnthropicProviderFamily(
 export function shouldDropThinkingBlocksForModel(params: {
   provider?: string | null;
   modelId?: string | null;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): boolean {
@@ -215,7 +215,7 @@ export function shouldDropThinkingBlocksForModel(params: {
 export function shouldSanitizeGeminiThoughtSignaturesForModel(params: {
   provider?: string | null;
   modelId?: string | null;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): boolean {

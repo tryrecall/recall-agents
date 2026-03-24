@@ -1,1 +1,1 @@
-export type { OpenClawPluginCommandDefinition } from "openclaw/plugin-sdk/core";
+export type { RecallPluginCommandDefinition } from "recall/plugin-sdk/core";

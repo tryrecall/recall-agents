@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/imessage",
+  "name": "@recall/imessage",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw iMessage channel plugin",
+  "description": "Recall iMessage channel plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],

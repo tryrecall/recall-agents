@@ -4,7 +4,7 @@ import type { AcpInitializeSessionInput } from "../acp/control-plane/manager.typ
 import {
   clearRuntimeConfigSnapshot,
   setRuntimeConfigSnapshot,
-  type OpenClawConfig,
+  type RecallConfig,
 } from "../config/config.js";
 import * as sessionConfig from "../config/sessions.js";
 import * as sessionTranscript from "../config/sessions/transcript.js";
@@ -19,7 +19,7 @@ import {
 } from "../infra/outbound/session-binding-service.js";
 import * as acpSpawnParentStream from "./acp-spawn-parent-stream.js";
 
-function createDefaultSpawnConfig(): OpenClawConfig {
+function createDefaultSpawnConfig(): RecallConfig {
   return {
     acp: {
       enabled: true,
@@ -101,7 +101,7 @@ type AgentCallParams = {
   threadId?: string;
 };
 
-function replaceSpawnConfig(next: OpenClawConfig): void {
+function replaceSpawnConfig(next: RecallConfig): void {
   const current = hoisted.state.cfg as Record<string, unknown>;
   for (const key of Object.keys(current)) {
     delete current[key];

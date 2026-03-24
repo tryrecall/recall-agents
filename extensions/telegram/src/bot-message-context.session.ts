@@ -3,25 +3,25 @@ import {
   resolveEnvelopeFormatOptions,
   toLocationContext,
   type NormalizedLocation,
-} from "openclaw/plugin-sdk/channel-inbound";
-import { normalizeCommandBody } from "openclaw/plugin-sdk/command-auth";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
-import { readSessionUpdatedAt, resolveStorePath } from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/channel-inbound";
+import { normalizeCommandBody } from "recall/plugin-sdk/command-auth";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
+import { readSessionUpdatedAt, resolveStorePath } from "recall/plugin-sdk/config-runtime";
 import type {
   TelegramDirectConfig,
   TelegramGroupConfig,
   TelegramTopicConfig,
-} from "openclaw/plugin-sdk/config-runtime";
-import { recordInboundSession } from "openclaw/plugin-sdk/conversation-runtime";
+} from "recall/plugin-sdk/config-runtime";
+import { recordInboundSession } from "recall/plugin-sdk/conversation-runtime";
 import {
   buildPendingHistoryContextFromMap,
   type HistoryEntry,
-} from "openclaw/plugin-sdk/reply-history";
-import { finalizeInboundContext } from "openclaw/plugin-sdk/reply-runtime";
-import type { ResolvedAgentRoute } from "openclaw/plugin-sdk/routing";
-import { resolveInboundLastRouteSessionKey } from "openclaw/plugin-sdk/routing";
-import { logVerbose, shouldLogVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { resolvePinnedMainDmOwnerFromAllowlist } from "openclaw/plugin-sdk/security-runtime";
+} from "recall/plugin-sdk/reply-history";
+import { finalizeInboundContext } from "recall/plugin-sdk/reply-runtime";
+import type { ResolvedAgentRoute } from "recall/plugin-sdk/routing";
+import { resolveInboundLastRouteSessionKey } from "recall/plugin-sdk/routing";
+import { logVerbose, shouldLogVerbose } from "recall/plugin-sdk/runtime-env";
+import { resolvePinnedMainDmOwnerFromAllowlist } from "recall/plugin-sdk/security-runtime";
 import { normalizeAllowFrom } from "./bot-access.js";
 import type {
   TelegramMediaRef,
@@ -40,7 +40,7 @@ import type { TelegramContext } from "./bot/types.js";
 import { resolveTelegramGroupPromptSettings } from "./group-config-helpers.js";
 
 export async function buildTelegramInboundContextPayload(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   primaryCtx: TelegramContext;
   msg: TelegramContext["message"];
   allMedia: TelegramMediaRef[];

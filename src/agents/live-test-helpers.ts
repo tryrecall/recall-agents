@@ -6,7 +6,7 @@ export function isLiveTestEnabled(
   extraEnvVars: readonly string[] = [],
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {
-  return [...extraEnvVars, "LIVE", "OPENCLAW_LIVE_TEST"].some((name) =>
+  return [...extraEnvVars, "LIVE", "RECALL_LIVE_TEST"].some((name) =>
     isTruthyEnvValue(env[name]),
   );
 }

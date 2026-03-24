@@ -44,7 +44,7 @@ import {
   createExitThrowingRuntime,
   createWizardPrompter,
   readAuthProfilesForAgent,
-  requireOpenClawAgentDir,
+  requireRecallAgentDir,
   setupAuthTestEnv,
 } from "./test-wizard-helpers.js";
 
@@ -117,8 +117,8 @@ function createDefaultProviderPlugins() {
 
 describe("applyAuthChoice", () => {
   const lifecycle = createAuthTestLifecycle([
-    "OPENCLAW_STATE_DIR",
-    "OPENCLAW_AGENT_DIR",
+    "RECALL_STATE_DIR",
+    "RECALL_AGENT_DIR",
     "PI_CODING_AGENT_DIR",
     "ANTHROPIC_API_KEY",
     "OPENROUTER_API_KEY",
@@ -145,7 +145,7 @@ describe("applyAuthChoice", () => {
     if (activeStateDir) {
       await fs.rm(activeStateDir, { recursive: true, force: true });
     }
-    const env = await setupAuthTestEnv("openclaw-auth-");
+    const env = await setupAuthTestEnv("recall-auth-");
     activeStateDir = env.stateDir;
     lifecycle.setStateDir(env.stateDir);
   }
@@ -178,7 +178,7 @@ describe("applyAuthChoice", () => {
   async function readAuthProfiles() {
     return await readAuthProfilesForAgent<{
       profiles?: Record<string, StoredAuthProfile>;
-    }>(requireOpenClawAgentDir());
+    }>(requireRecallAgentDir());
   }
   async function readAuthProfile(profileId: string) {
     return (await readAuthProfiles()).profiles?.[profileId];
@@ -915,7 +915,7 @@ describe("applyAuthChoice", () => {
           providers: {
             filemain: {
               source: "file",
-              path: "/tmp/openclaw-missing-secrets.json",
+              path: "/tmp/recall-missing-secrets.json",
               mode: "json",
             },
           },
@@ -1152,7 +1152,7 @@ describe("applyAuthChoice", () => {
     await setupTempState();
     process.env.LITELLM_API_KEY = "sk-litellm-test"; // pragma: allowlist secret
 
-    const authProfilePath = authProfilePathForAgent(requireOpenClawAgentDir());
+    const authProfilePath = authProfilePathForAgent(requireRecallAgentDir());
     await fs.writeFile(
       authProfilePath,
       JSON.stringify(

@@ -1,17 +1,17 @@
-import { resolveInboundDebounceMs } from "openclaw/plugin-sdk/channel-inbound";
-import { formatCliCommand } from "openclaw/plugin-sdk/cli-runtime";
-import { waitForever } from "openclaw/plugin-sdk/cli-runtime";
-import { hasControlCommand } from "openclaw/plugin-sdk/command-auth";
-import { loadConfig } from "openclaw/plugin-sdk/config-runtime";
-import { formatDurationPrecise } from "openclaw/plugin-sdk/infra-runtime";
-import { enqueueSystemEvent } from "openclaw/plugin-sdk/infra-runtime";
-import { DEFAULT_GROUP_HISTORY_LIMIT } from "openclaw/plugin-sdk/reply-history";
-import { getReplyFromConfig } from "openclaw/plugin-sdk/reply-runtime";
-import { resolveAgentRoute } from "openclaw/plugin-sdk/routing";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { registerUnhandledRejectionHandler } from "openclaw/plugin-sdk/runtime-env";
-import { getChildLogger } from "openclaw/plugin-sdk/runtime-env";
-import { defaultRuntime, type RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import { resolveInboundDebounceMs } from "recall/plugin-sdk/channel-inbound";
+import { formatCliCommand } from "recall/plugin-sdk/cli-runtime";
+import { waitForever } from "recall/plugin-sdk/cli-runtime";
+import { hasControlCommand } from "recall/plugin-sdk/command-auth";
+import { loadConfig } from "recall/plugin-sdk/config-runtime";
+import { formatDurationPrecise } from "recall/plugin-sdk/infra-runtime";
+import { enqueueSystemEvent } from "recall/plugin-sdk/infra-runtime";
+import { DEFAULT_GROUP_HISTORY_LIMIT } from "recall/plugin-sdk/reply-history";
+import { getReplyFromConfig } from "recall/plugin-sdk/reply-runtime";
+import { resolveAgentRoute } from "recall/plugin-sdk/routing";
+import { logVerbose } from "recall/plugin-sdk/runtime-env";
+import { registerUnhandledRejectionHandler } from "recall/plugin-sdk/runtime-env";
+import { getChildLogger } from "recall/plugin-sdk/runtime-env";
+import { defaultRuntime, type RuntimeEnv } from "recall/plugin-sdk/runtime-env";
 import { resolveWhatsAppAccount, resolveWhatsAppMediaMaxBytes } from "../accounts.js";
 import { setActiveWebListener } from "../active-listener.js";
 import { monitorWebInbox } from "../inbound.js";
@@ -390,7 +390,7 @@ export async function monitorWebChannel(
         healthState: "logged-out",
       });
       runtime.error(
-        `WhatsApp session logged out. Run \`${formatCliCommand("openclaw channels login --channel web")}\` to relink.`,
+        `WhatsApp session logged out. Run \`${formatCliCommand("recall channels login --channel web")}\` to relink.`,
       );
       await closeListener();
       break;
@@ -412,7 +412,7 @@ export async function monitorWebChannel(
         "web reconnect: non-retryable close status; stopping monitor",
       );
       runtime.error(
-        `WhatsApp Web connection closed (status ${statusCode}: session conflict). Resolve conflicting WhatsApp Web sessions, then relink with \`${formatCliCommand("openclaw channels login --channel web")}\`. Stopping web monitoring.`,
+        `WhatsApp Web connection closed (status ${statusCode}: session conflict). Resolve conflicting WhatsApp Web sessions, then relink with \`${formatCliCommand("recall channels login --channel web")}\`. Stopping web monitoring.`,
       );
       await closeListener();
       break;

@@ -2,16 +2,16 @@ import {
   buildDeepSeekModelDefinition,
   DEEPSEEK_BASE_URL,
   DEEPSEEK_MODEL_CATALOG,
-} from "openclaw/plugin-sdk/provider-models";
+} from "recall/plugin-sdk/provider-models";
 import {
   applyAgentDefaultModelPrimary,
   applyProviderConfigWithModelCatalog,
-  type OpenClawConfig,
-} from "openclaw/plugin-sdk/provider-onboard";
+  type RecallConfig,
+} from "recall/plugin-sdk/provider-onboard";
 
 export const DEEPSEEK_DEFAULT_MODEL_REF = "deepseek/deepseek-chat";
 
-export function applyDeepSeekProviderConfig(cfg: OpenClawConfig): OpenClawConfig {
+export function applyDeepSeekProviderConfig(cfg: RecallConfig): RecallConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[DEEPSEEK_DEFAULT_MODEL_REF] = {
     ...models[DEEPSEEK_DEFAULT_MODEL_REF],
@@ -27,7 +27,7 @@ export function applyDeepSeekProviderConfig(cfg: OpenClawConfig): OpenClawConfig
   });
 }
 
-export function applyDeepSeekConfig(cfg: OpenClawConfig): OpenClawConfig {
+export function applyDeepSeekConfig(cfg: RecallConfig): RecallConfig {
   return applyAgentDefaultModelPrimary(
     applyDeepSeekProviderConfig(cfg),
     DEEPSEEK_DEFAULT_MODEL_REF,

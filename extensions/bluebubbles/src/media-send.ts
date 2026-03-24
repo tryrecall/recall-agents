@@ -2,11 +2,11 @@ import { constants as fsConstants } from "node:fs";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { basenameFromMediaSource, safeFileURLToPath } from "openclaw/plugin-sdk/infra-runtime";
+import { basenameFromMediaSource, safeFileURLToPath } from "recall/plugin-sdk/infra-runtime";
 import { resolveBlueBubblesAccount } from "./accounts.js";
 import { sendBlueBubblesAttachment } from "./attachments.js";
 import { resolveBlueBubblesMessageId } from "./monitor.js";
-import { resolveChannelMediaMaxBytes, type OpenClawConfig } from "./runtime-api.js";
+import { resolveChannelMediaMaxBytes, type RecallConfig } from "./runtime-api.js";
 import { getBlueBubblesRuntime } from "./runtime.js";
 import { sendMessageBlueBubbles } from "./send.js";
 
@@ -80,7 +80,7 @@ function isPathInsideRoot(candidate: string, root: string): boolean {
   return normalizedCandidate === normalizedRoot || normalizedCandidate.startsWith(rootWithSep);
 }
 
-function resolveMediaLocalRoots(params: { cfg: OpenClawConfig; accountId?: string }): string[] {
+function resolveMediaLocalRoots(params: { cfg: RecallConfig; accountId?: string }): string[] {
   const account = resolveBlueBubblesAccount({
     cfg: params.cfg,
     accountId: params.accountId,
@@ -171,7 +171,7 @@ function resolveFilenameFromSource(source?: string): string | undefined {
 }
 
 export async function sendBlueBubblesMedia(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   to: string;
   mediaUrl?: string;
   mediaPath?: string;

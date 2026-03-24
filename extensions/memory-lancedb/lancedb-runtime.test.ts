@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createLanceDbRuntimeLoader, type LanceDbRuntimeLogger } from "./lancedb-runtime.js";
 
 const TEST_RUNTIME_MANIFEST = {
-  name: "openclaw-memory-lancedb-runtime",
+  name: "recall-memory-lancedb-runtime",
   private: true as const,
   type: "module" as const,
   dependencies: {
@@ -43,7 +43,7 @@ function createLoader(
 ) {
   return createLanceDbRuntimeLoader({
     env: overrides.env ?? ({} as NodeJS.ProcessEnv),
-    resolveStateDir: () => "/tmp/openclaw-state",
+    resolveStateDir: () => "/tmp/recall-state",
     runtimeManifest: TEST_RUNTIME_MANIFEST,
     importBundled:
       overrides.importBundled ??
@@ -65,7 +65,7 @@ describe("lancedb runtime loader", () => {
     const importBundled = vi.fn(async () => bundledModule);
     const importResolved = vi.fn(async () => createMockModule());
     const resolveRuntimeEntry = vi.fn(() => null);
-    const installRuntime = vi.fn(async () => "/tmp/openclaw-state/plugin-runtimes/lancedb.js");
+    const installRuntime = vi.fn(async () => "/tmp/recall-state/plugin-runtimes/lancedb.js");
     const loader = createLoader({
       importBundled,
       importResolved,
@@ -84,10 +84,10 @@ describe("lancedb runtime loader", () => {
     const runtimeModule = createMockModule();
     const importResolved = vi.fn(async () => runtimeModule);
     const resolveRuntimeEntry = vi.fn(
-      () => "/tmp/openclaw-state/plugin-runtimes/memory-lancedb/runtime-entry.js",
+      () => "/tmp/recall-state/plugin-runtimes/memory-lancedb/runtime-entry.js",
     );
     const installRuntime = vi.fn(
-      async () => "/tmp/openclaw-state/plugin-runtimes/memory-lancedb/runtime-entry.js",
+      async () => "/tmp/recall-state/plugin-runtimes/memory-lancedb/runtime-entry.js",
     );
     const loader = createLoader({
       importResolved,
@@ -99,7 +99,7 @@ describe("lancedb runtime loader", () => {
 
     expect(resolveRuntimeEntry).toHaveBeenCalledWith(
       expect.objectContaining({
-        runtimeDir: "/tmp/openclaw-state/plugin-runtimes/memory-lancedb/lancedb",
+        runtimeDir: "/tmp/recall-state/plugin-runtimes/memory-lancedb/lancedb",
       }),
     );
     expect(installRuntime).not.toHaveBeenCalled();
@@ -127,13 +127,13 @@ describe("lancedb runtime loader", () => {
 
     expect(installRuntime).toHaveBeenCalledWith(
       expect.objectContaining({
-        runtimeDir: "/tmp/openclaw-state/plugin-runtimes/memory-lancedb/lancedb",
+        runtimeDir: "/tmp/recall-state/plugin-runtimes/memory-lancedb/lancedb",
         manifest: TEST_RUNTIME_MANIFEST,
       }),
     );
     expect(logger.warn).toHaveBeenCalledWith(
       expect.stringContaining(
-        "installing runtime deps under /tmp/openclaw-state/plugin-runtimes/memory-lancedb/lancedb",
+        "installing runtime deps under /tmp/recall-state/plugin-runtimes/memory-lancedb/lancedb",
       ),
     );
   });
@@ -144,7 +144,7 @@ describe("lancedb runtime loader", () => {
         `${runtimeDir}/node_modules/@lancedb/lancedb/index.js`,
     );
     const loader = createLoader({
-      env: { OPENCLAW_NIX_MODE: "1" } as NodeJS.ProcessEnv,
+      env: { RECALL_NIX_MODE: "1" } as NodeJS.ProcessEnv,
       installRuntime,
     });
 
@@ -160,7 +160,7 @@ describe("lancedb runtime loader", () => {
       .fn()
       .mockRejectedValueOnce(new Error("network down"))
       .mockResolvedValueOnce(
-        "/tmp/openclaw-state/plugin-runtimes/memory-lancedb/lancedb/node_modules/@lancedb/lancedb/index.js",
+        "/tmp/recall-state/plugin-runtimes/memory-lancedb/lancedb/node_modules/@lancedb/lancedb/index.js",
       );
     const importResolved = vi.fn(async () => runtimeModule);
     const loader = createLoader({

@@ -4,10 +4,10 @@ import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { VERSION } from "../version.js";
 import { createConfigIO } from "./io.js";
-import { parseOpenClawVersion } from "./version.js";
+import { parseRecallVersion } from "./version.js";
 
 async function withTempHome(run: (home: string) => Promise<void>): Promise<void> {
-  const home = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-config-"));
+  const home = await fs.mkdtemp(path.join(os.tmpdir(), "recall-config-"));
   try {
     await run(home);
   } finally {
@@ -17,9 +17,9 @@ async function withTempHome(run: (home: string) => Promise<void>): Promise<void>
 
 async function writeConfig(
   home: string,
-  dirname: ".openclaw",
+  dirname: ".recall",
   port: number,
-  filename: string = "openclaw.json",
+  filename: string = "recall.json",
 ) {
   const dir = path.join(home, dirname);
   await fs.mkdir(dir, { recursive: true });
@@ -36,36 +36,36 @@ function createIoForHome(home: string, env: NodeJS.ProcessEnv = {} as NodeJS.Pro
 }
 
 describe("config io paths", () => {
-  it("uses ~/.openclaw/openclaw.json when config exists", async () => {
+  it("uses ~/.recall/recall.json when config exists", async () => {
     await withTempHome(async (home) => {
-      const configPath = await writeConfig(home, ".openclaw", 19001);
+      const configPath = await writeConfig(home, ".recall", 19001);
       const io = createIoForHome(home);
       expect(io.configPath).toBe(configPath);
       expect(io.loadConfig().gateway?.port).toBe(19001);
     });
   });
 
-  it("defaults to ~/.openclaw/openclaw.json when config is missing", async () => {
+  it("defaults to ~/.recall/recall.json when config is missing", async () => {
     await withTempHome(async (home) => {
       const io = createIoForHome(home);
-      expect(io.configPath).toBe(path.join(home, ".openclaw", "openclaw.json"));
+      expect(io.configPath).toBe(path.join(home, ".recall", "recall.json"));
     });
   });
 
-  it("uses OPENCLAW_HOME for default config path", async () => {
+  it("uses RECALL_HOME for default config path", async () => {
     await withTempHome(async (home) => {
       const io = createConfigIO({
-        env: { OPENCLAW_HOME: path.join(home, "svc-home") } as NodeJS.ProcessEnv,
+        env: { RECALL_HOME: path.join(home, "svc-home") } as NodeJS.ProcessEnv,
         homedir: () => path.join(home, "ignored-home"),
       });
-      expect(io.configPath).toBe(path.join(home, "svc-home", ".openclaw", "openclaw.json"));
+      expect(io.configPath).toBe(path.join(home, "svc-home", ".recall", "recall.json"));
     });
   });
 
-  it("honors explicit OPENCLAW_CONFIG_PATH override", async () => {
+  it("honors explicit RECALL_CONFIG_PATH override", async () => {
     await withTempHome(async (home) => {
-      const customPath = await writeConfig(home, ".openclaw", 20002, "custom.json");
-      const io = createIoForHome(home, { OPENCLAW_CONFIG_PATH: customPath } as NodeJS.ProcessEnv);
+      const customPath = await writeConfig(home, ".recall", 20002, "custom.json");
+      const io = createIoForHome(home, { RECALL_CONFIG_PATH: customPath } as NodeJS.ProcessEnv);
       expect(io.configPath).toBe(customPath);
       expect(io.loadConfig().gateway?.port).toBe(20002);
     });
@@ -73,9 +73,9 @@ describe("config io paths", () => {
 
   it("normalizes safe-bin config entries at config load time", async () => {
     await withTempHome(async (home) => {
-      const configDir = path.join(home, ".openclaw");
+      const configDir = path.join(home, ".recall");
       await fs.mkdir(configDir, { recursive: true });
-      const configPath = path.join(configDir, "openclaw.json");
+      const configPath = path.join(configDir, "recall.json");
       await fs.writeFile(
         configPath,
         JSON.stringify(
@@ -133,9 +133,9 @@ describe("config io paths", () => {
 
   it("logs invalid config path details and throws on invalid config", async () => {
     await withTempHome(async (home) => {
-      const configDir = path.join(home, ".openclaw");
+      const configDir = path.join(home, ".recall");
       await fs.mkdir(configDir, { recursive: true });
-      const configPath = path.join(configDir, "openclaw.json");
+      const configPath = path.join(configDir, "recall.json");
       await fs.writeFile(
         configPath,
         JSON.stringify({ gateway: { port: "not-a-number" } }, null, 2),
@@ -161,16 +161,16 @@ describe("config io paths", () => {
   });
 
   it("does not warn when config was last touched by a same-base correction publish", async () => {
-    const parsedVersion = parseOpenClawVersion(VERSION);
+    const parsedVersion = parseRecallVersion(VERSION);
     if (!parsedVersion) {
       throw new Error(`Unable to parse VERSION: ${VERSION}`);
     }
     const touchedVersion = `${parsedVersion.major}.${parsedVersion.minor}.${parsedVersion.patch}-${(parsedVersion.revision ?? 0) + 1}`;
 
     await withTempHome(async (home) => {
-      const configDir = path.join(home, ".openclaw");
+      const configDir = path.join(home, ".recall");
       await fs.mkdir(configDir, { recursive: true });
-      const configPath = path.join(configDir, "openclaw.json");
+      const configPath = path.join(configDir, "recall.json");
       await fs.writeFile(
         configPath,
         JSON.stringify({ meta: { lastTouchedVersion: touchedVersion } }, null, 2),
@@ -190,23 +190,23 @@ describe("config io paths", () => {
       io.loadConfig();
 
       expect(logger.warn).not.toHaveBeenCalledWith(
-        expect.stringContaining("Config was last written by a newer OpenClaw"),
+        expect.stringContaining("Config was last written by a newer Recall"),
       );
       expect(io.configPath).toBe(configPath);
     });
   });
 
   it("does not warn for same-base prerelease configs when current version is newer", async () => {
-    const parsedVersion = parseOpenClawVersion(VERSION);
+    const parsedVersion = parseRecallVersion(VERSION);
     if (!parsedVersion) {
       throw new Error(`Unable to parse VERSION: ${VERSION}`);
     }
     const touchedVersion = `${parsedVersion.major}.${parsedVersion.minor}.${parsedVersion.patch}-beta.1`;
 
     await withTempHome(async (home) => {
-      const configDir = path.join(home, ".openclaw");
+      const configDir = path.join(home, ".recall");
       await fs.mkdir(configDir, { recursive: true });
-      const configPath = path.join(configDir, "openclaw.json");
+      const configPath = path.join(configDir, "recall.json");
       await fs.writeFile(
         configPath,
         JSON.stringify({ meta: { lastTouchedVersion: touchedVersion } }, null, 2),
@@ -226,7 +226,7 @@ describe("config io paths", () => {
       io.loadConfig();
 
       expect(logger.warn).not.toHaveBeenCalledWith(
-        expect.stringContaining("Config was last written by a newer OpenClaw"),
+        expect.stringContaining("Config was last written by a newer Recall"),
       );
       expect(io.configPath).toBe(configPath);
     });

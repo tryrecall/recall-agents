@@ -18,7 +18,7 @@ afterEach(() => {
 });
 
 const writePatternFile = (basename: string, value: unknown) => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-vitest-unit-config-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-vitest-unit-config-"));
   tempDirs.add(dir);
   const filePath = path.join(dir, basename);
   fs.writeFileSync(filePath, `${JSON.stringify(value)}\n`, "utf8");
@@ -40,7 +40,7 @@ describe("loadIncludePatternsFromEnv", () => {
 
     expect(
       loadIncludePatternsFromEnv({
-        OPENCLAW_VITEST_INCLUDE_FILE: filePath,
+        RECALL_VITEST_INCLUDE_FILE: filePath,
       }),
     ).toEqual(["src/infra/update-runner.test.ts", "ui/src/ui/views/chat.test.ts"]);
   });
@@ -61,7 +61,7 @@ describe("loadExtraExcludePatternsFromEnv", () => {
 
     expect(
       loadExtraExcludePatternsFromEnv({
-        OPENCLAW_VITEST_EXTRA_EXCLUDE_FILE: filePath,
+        RECALL_VITEST_EXTRA_EXCLUDE_FILE: filePath,
       }),
     ).toEqual(["src/infra/update-runner.test.ts", "ui/src/ui/views/chat.test.ts"]);
   });
@@ -73,7 +73,7 @@ describe("loadExtraExcludePatternsFromEnv", () => {
 
     expect(() =>
       loadExtraExcludePatternsFromEnv({
-        OPENCLAW_VITEST_EXTRA_EXCLUDE_FILE: filePath,
+        RECALL_VITEST_EXTRA_EXCLUDE_FILE: filePath,
       }),
     ).toThrow(/JSON array/u);
   });

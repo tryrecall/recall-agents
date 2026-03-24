@@ -1,7 +1,7 @@
 {
-  "name": "@openclaw/mattermost",
+  "name": "@recall/mattermost",
   "version": "2026.3.22",
-  "description": "OpenClaw Mattermost channel plugin",
+  "description": "Recall Mattermost channel plugin",
   "type": "module",
   "dependencies": {
     "@sinclair/typebox": "0.34.48",
@@ -9,17 +9,17 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.3.22"
+    "recall": ">=2026.3.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
@@ -34,7 +34,7 @@
       "order": 65
     },
     "install": {
-      "npmSpec": "@openclaw/mattermost",
+      "npmSpec": "@recall/mattermost",
       "localPath": "extensions/mattermost",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.3.22"

@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
-import { resolveSendableOutboundReplyParts } from "openclaw/plugin-sdk/reply-payload";
+import { resolveSendableOutboundReplyParts } from "recall/plugin-sdk/reply-payload";
 import { resolveBootstrapWarningSignaturesSeen } from "../../agents/bootstrap-budget.js";
 import { runCliAgent } from "../../agents/cli-runner.js";
 import { getCliSessionId } from "../../agents/cli-session.js";
@@ -469,7 +469,7 @@ export async function runAgentTurnWithFallback(params: {
                       // Serialize tool result delivery to preserve message ordering.
                       // Without this, concurrent tool callbacks race through typing signals
                       // and message sends, causing out-of-order delivery to the user.
-                      // See: https://github.com/openclaw/openclaw/issues/11044
+                      // See: https://github.com/recall/recall/issues/11044
                       let toolResultChain: Promise<void> = Promise.resolve();
                       return (payload: ReplyPayload) => {
                         toolResultChain = toolResultChain
@@ -660,7 +660,7 @@ export async function runAgentTurnWithFallback(params: {
           ? "⚠️ Context overflow — prompt too large for this model. Try a shorter message or a larger-context model."
           : isRoleOrderingError
             ? "⚠️ Message ordering conflict - please try again. If this persists, use /new to start a fresh session."
-            : `⚠️ Agent failed before reply: ${trimmedMessage}.\nLogs: openclaw logs --follow`;
+            : `⚠️ Agent failed before reply: ${trimmedMessage}.\nLogs: recall logs --follow`;
 
       return {
         kind: "final",

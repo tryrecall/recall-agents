@@ -3,14 +3,14 @@ import {
   createStandardChannelSetupStatus,
   DEFAULT_ACCOUNT_ID,
   hasConfiguredSecretInput,
-  type OpenClawConfig,
+  type RecallConfig,
   patchChannelConfigForAccount,
   setChannelDmPolicyWithAllowFrom,
   setSetupChannelEnabled,
   splitSetupEntries,
-} from "openclaw/plugin-sdk/setup";
-import type { ChannelSetupDmPolicy, ChannelSetupWizard } from "openclaw/plugin-sdk/setup";
-import { formatCliCommand, formatDocsLink } from "openclaw/plugin-sdk/setup-tools";
+} from "recall/plugin-sdk/setup";
+import type { ChannelSetupDmPolicy, ChannelSetupWizard } from "recall/plugin-sdk/setup";
+import { formatCliCommand, formatDocsLink } from "recall/plugin-sdk/setup-tools";
 import { inspectTelegramAccount } from "./account-inspect.js";
 import {
   listTelegramAccountIds,
@@ -29,9 +29,9 @@ import {
 const channel = "telegram" as const;
 
 function ensureTelegramDefaultGroupMentionGate(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   accountId: string,
-): OpenClawConfig {
+): RecallConfig {
   const resolved = resolveTelegramAccount({ cfg, accountId });
   const wildcardGroup = resolved.config.groups?.["*"];
   if (wildcardGroup?.requireMention !== undefined) {
@@ -53,7 +53,7 @@ function ensureTelegramDefaultGroupMentionGate(
   });
 }
 
-function shouldShowTelegramDmAccessWarning(cfg: OpenClawConfig, accountId: string): boolean {
+function shouldShowTelegramDmAccessWarning(cfg: RecallConfig, accountId: string): boolean {
   const merged = mergeTelegramAccountConfig(cfg, accountId);
   const policy = merged.dmPolicy ?? "pairing";
   const hasAllowFrom =
@@ -70,8 +70,8 @@ function buildTelegramDmAccessWarningLines(accountId: string): string[] {
     "Your bot is using DM policy: pairing.",
     "Any Telegram user who discovers the bot can send pairing requests.",
     "For private use, configure an allowlist with your Telegram user id:",
-    "  " + formatCliCommand(`openclaw config set ${configBase}.dmPolicy "allowlist"`),
-    "  " + formatCliCommand(`openclaw config set ${configBase}.allowFrom '["YOUR_USER_ID"]'`),
+    "  " + formatCliCommand(`recall config set ${configBase}.dmPolicy "allowlist"`),
+    "  " + formatCliCommand(`recall config set ${configBase}.allowFrom '["YOUR_USER_ID"]'`),
     `Docs: ${formatDocsLink("/channels/pairing", "channels/pairing")}`,
   ];
 }

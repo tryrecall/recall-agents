@@ -1,23 +1,23 @@
 {
-  "name": "@openclaw/bluebubbles",
+  "name": "@recall/bluebubbles",
   "version": "2026.3.22",
-  "description": "OpenClaw BlueBubbles channel plugin",
+  "description": "Recall BlueBubbles channel plugin",
   "type": "module",
   "dependencies": {
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.3.22"
+    "recall": ">=2026.3.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
@@ -40,7 +40,7 @@
       "order": 75
     },
     "install": {
-      "npmSpec": "@openclaw/bluebubbles",
+      "npmSpec": "@recall/bluebubbles",
       "localPath": "extensions/bluebubbles",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.3.22"

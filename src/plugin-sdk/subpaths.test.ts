@@ -14,13 +14,13 @@ import type {
   ChannelStatusIssue as ContractChannelStatusIssue,
   ChannelThreadingContext as ContractChannelThreadingContext,
   ChannelThreadingToolContext as ContractChannelThreadingToolContext,
-} from "openclaw/plugin-sdk/channel-contract";
+} from "recall/plugin-sdk/channel-contract";
 import type {
   ChannelMessageActionContext as CoreChannelMessageActionContext,
-  OpenClawPluginApi as CoreOpenClawPluginApi,
+  RecallPluginApi as CoreRecallPluginApi,
   PluginRuntime as CorePluginRuntime,
-} from "openclaw/plugin-sdk/core";
-import * as providerEntrySdk from "openclaw/plugin-sdk/provider-entry";
+} from "recall/plugin-sdk/core";
+import * as providerEntrySdk from "recall/plugin-sdk/provider-entry";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import type { ChannelMessageActionContext } from "../channels/plugins/types.js";
 import type {
@@ -37,10 +37,10 @@ import type {
   ChannelThreadingToolContext,
 } from "../channels/plugins/types.js";
 import type { PluginRuntime } from "../plugins/runtime/types.js";
-import type { OpenClawPluginApi } from "../plugins/types.js";
+import type { RecallPluginApi } from "../plugins/types.js";
 import type {
   ChannelMessageActionContext as SharedChannelMessageActionContext,
-  OpenClawPluginApi as SharedOpenClawPluginApi,
+  RecallPluginApi as SharedRecallPluginApi,
   PluginRuntime as SharedPluginRuntime,
 } from "./channel-plugin-common.js";
 import { pluginSdkSubpaths } from "./entrypoints.js";
@@ -124,7 +124,7 @@ describe("plugin-sdk subpath exports", () => {
       "compat",
       "device-pair",
       "google",
-      "lobster",
+      "recall",
       "pairing-access",
       "provider-model-definitions",
       "qwen-portal-auth",
@@ -564,10 +564,10 @@ describe("plugin-sdk subpath exports", () => {
     expectTypeOf<ContractChannelStatusIssue>().toMatchTypeOf<ChannelStatusIssue>();
     expectTypeOf<ContractChannelThreadingContext>().toMatchTypeOf<ChannelThreadingContext>();
     expectTypeOf<ContractChannelThreadingToolContext>().toMatchTypeOf<ChannelThreadingToolContext>();
-    expectTypeOf<CoreOpenClawPluginApi>().toMatchTypeOf<OpenClawPluginApi>();
+    expectTypeOf<CoreRecallPluginApi>().toMatchTypeOf<RecallPluginApi>();
     expectTypeOf<CorePluginRuntime>().toMatchTypeOf<PluginRuntime>();
     expectTypeOf<CoreChannelMessageActionContext>().toMatchTypeOf<ChannelMessageActionContext>();
-    expectTypeOf<CoreOpenClawPluginApi>().toMatchTypeOf<SharedOpenClawPluginApi>();
+    expectTypeOf<CoreRecallPluginApi>().toMatchTypeOf<SharedRecallPluginApi>();
     expectTypeOf<CorePluginRuntime>().toMatchTypeOf<SharedPluginRuntime>();
     expectTypeOf<CoreChannelMessageActionContext>().toMatchTypeOf<SharedChannelMessageActionContext>();
   });
@@ -582,14 +582,14 @@ describe("plugin-sdk subpath exports", () => {
       channelReplyPipelineSdk,
       ...representativeModules
     ] = await Promise.all([
-      importResolvedPluginSdkSubpath("openclaw/plugin-sdk/core"),
-      importResolvedPluginSdkSubpath("openclaw/plugin-sdk/text-runtime"),
-      importResolvedPluginSdkSubpath("openclaw/plugin-sdk/plugin-entry"),
-      importResolvedPluginSdkSubpath("openclaw/plugin-sdk/channel-lifecycle"),
-      importResolvedPluginSdkSubpath("openclaw/plugin-sdk/channel-pairing"),
-      importResolvedPluginSdkSubpath("openclaw/plugin-sdk/channel-reply-pipeline"),
+      importResolvedPluginSdkSubpath("recall/plugin-sdk/core"),
+      importResolvedPluginSdkSubpath("recall/plugin-sdk/text-runtime"),
+      importResolvedPluginSdkSubpath("recall/plugin-sdk/plugin-entry"),
+      importResolvedPluginSdkSubpath("recall/plugin-sdk/channel-lifecycle"),
+      importResolvedPluginSdkSubpath("recall/plugin-sdk/channel-pairing"),
+      importResolvedPluginSdkSubpath("recall/plugin-sdk/channel-reply-pipeline"),
       ...representativeRuntimeSmokeSubpaths.map((id) =>
-        importResolvedPluginSdkSubpath(`openclaw/plugin-sdk/${id}`),
+        importResolvedPluginSdkSubpath(`recall/plugin-sdk/${id}`),
       ),
     ]);
 

@@ -24,7 +24,7 @@ import {
   withTrustedWebSearchEndpoint,
   wrapWebContent,
   writeCachedSearchPayload,
-} from "openclaw/plugin-sdk/provider-web-search";
+} from "recall/plugin-sdk/provider-web-search";
 
 const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
 const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta";
@@ -193,7 +193,7 @@ function createGeminiToolDefinition(
           error: "missing_gemini_api_key",
           message:
             "web_search (gemini) needs an API key. Set GEMINI_API_KEY in the Gateway environment, or configure tools.web.search.gemini.apiKey.",
-          docs: "https://docs.openclaw.ai/tools/web",
+          docs: "https://docs.recall.ai/tools/web",
         };
       }
 
@@ -250,7 +250,7 @@ export function createGeminiWebSearchProvider(): WebSearchProviderPlugin {
     envVars: ["GEMINI_API_KEY"],
     placeholder: "AIza...",
     signupUrl: "https://aistudio.google.com/apikey",
-    docsUrl: "https://docs.openclaw.ai/tools/web",
+    docsUrl: "https://docs.recall.ai/tools/web",
     autoDetectOrder: 20,
     credentialPath: "plugins.entries.google.config.webSearch.apiKey",
     inactiveSecretPaths: ["plugins.entries.google.config.webSearch.apiKey"],

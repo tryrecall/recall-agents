@@ -2,8 +2,8 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 
 // Mock recordInboundSession to capture updateLastRoute parameter
 const recordInboundSessionMock = vi.fn().mockResolvedValue(undefined);
-vi.mock("openclaw/plugin-sdk/conversation-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/conversation-runtime")>();
+vi.mock("recall/plugin-sdk/conversation-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/conversation-runtime")>();
   return {
     ...actual,
     recordInboundSession: (...args: unknown[]) => recordInboundSessionMock(...args),

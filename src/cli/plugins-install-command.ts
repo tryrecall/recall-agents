@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { loadConfig } from "../config/config.js";
 import { installHooksFromNpmSpec, installHooksFromPath } from "../hooks/install.js";
 import { resolveArchiveKind } from "../infra/archive.js";
@@ -32,7 +32,7 @@ import {
 import { persistHookPackInstall, persistPluginInstall } from "./plugins-install-persist.js";
 
 async function installBundledPluginSource(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   rawSpec: string;
   bundledSource: BundledPluginSource;
   warning: string;
@@ -62,7 +62,7 @@ async function installBundledPluginSource(params: {
 }
 
 async function tryInstallHookPackFromLocalPath(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   resolvedPath: string;
   link?: boolean;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
@@ -137,7 +137,7 @@ async function tryInstallHookPackFromLocalPath(params: {
 }
 
 async function tryInstallHookPackFromNpmSpec(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   spec: string;
   pin?: boolean;
 }): Promise<{ ok: true } | { ok: false; error: string }> {

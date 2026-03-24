@@ -6,13 +6,13 @@ import {
   telegramOutbound,
   whatsappOutbound,
 } from "../../../test/channel-outbounds.js";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import { createOutboundTestPlugin, createTestRegistry } from "../../test-utils/channel-plugins.js";
 import { withEnvAsync } from "../../test-utils/env.js";
 import { createIMessageTestPlugin } from "../../test-utils/imessage-test-plugin.js";
 import { createInternalHookEventPayload } from "../../test-utils/internal-hook-event-payload.js";
-import { resolvePreferredOpenClawTmpDir } from "../tmp-openclaw-dir.js";
+import { resolvePreferredRecallTmpDir } from "../tmp-recall-dir.js";
 
 const mocks = vi.hoisted(() => ({
   appendAssistantMessageToSessionTranscript: vi.fn(async () => ({ ok: true, sessionFile: "x" })),
@@ -84,11 +84,11 @@ type DeliverModule = typeof import("./deliver.js");
 let deliverOutboundPayloads: DeliverModule["deliverOutboundPayloads"];
 let normalizeOutboundPayloads: DeliverModule["normalizeOutboundPayloads"];
 
-const telegramChunkConfig: OpenClawConfig = {
+const telegramChunkConfig: RecallConfig = {
   channels: { telegram: { botToken: "tok-1", textChunkLimit: 2 } },
 };
 
-const whatsappChunkConfig: OpenClawConfig = {
+const whatsappChunkConfig: RecallConfig = {
   channels: { whatsapp: { textChunkLimit: 4000 } },
 };
 
@@ -101,7 +101,7 @@ async function deliverWhatsAppPayload(params: {
     NonNullable<Parameters<DeliverModule["deliverOutboundPayloads"]>[0]["deps"]>["sendWhatsApp"]
   >;
   payload: DeliverOutboundPayload;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
 }) {
   return deliverOutboundPayloads({
     cfg: params.cfg ?? whatsappChunkConfig,
@@ -115,7 +115,7 @@ async function deliverWhatsAppPayload(params: {
 async function deliverTelegramPayload(params: {
   sendTelegram: NonNullable<NonNullable<DeliverOutboundArgs["deps"]>["sendTelegram"]>;
   payload: DeliverOutboundPayload;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   accountId?: string;
   session?: DeliverSession;
 }) {
@@ -137,7 +137,7 @@ async function runChunkedWhatsAppDelivery(params?: {
     .fn()
     .mockResolvedValueOnce({ messageId: "w1", toJid: "jid" })
     .mockResolvedValueOnce({ messageId: "w2", toJid: "jid" });
-  const cfg: OpenClawConfig = {
+  const cfg: RecallConfig = {
     channels: { whatsapp: { textChunkLimit: 2 } },
   };
   const results = await deliverOutboundPayloads({
@@ -169,7 +169,7 @@ async function runBestEffortPartialFailureDelivery() {
     .mockRejectedValueOnce(new Error("fail"))
     .mockResolvedValueOnce({ messageId: "w2", toJid: "jid" });
   const onError = vi.fn();
-  const cfg: OpenClawConfig = {};
+  const cfg: RecallConfig = {};
   const results = await deliverOutboundPayloads({
     cfg,
     channel: "whatsapp",
@@ -248,7 +248,7 @@ describe("deliverOutboundPayloads", () => {
 
   it("clamps telegram text chunk size to protocol max even with higher config", async () => {
     const sendTelegram = vi.fn().mockResolvedValue({ messageId: "m1", chatId: "c1" });
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: { telegram: { botToken: "tok-1", textChunkLimit: 10_000 } },
     };
     const text = "<".repeat(3_000);
@@ -369,7 +369,7 @@ describe("deliverOutboundPayloads", () => {
 
   it("preserves explicit telegram buttons when sender path provides them", async () => {
     const sendTelegram = vi.fn().mockResolvedValue({ messageId: "m1", chatId: "c1" });
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         telegram: {
           execApprovals: {
@@ -461,12 +461,12 @@ describe("deliverOutboundPayloads", () => {
     );
     expect(
       sendOpts?.mediaLocalRoots?.some((root) =>
-        root.endsWith(path.join(".openclaw", "workspace-work")),
+        root.endsWith(path.join(".recall", "workspace-work")),
       ),
     ).toBe(true);
   });
 
-  it("includes OpenClaw tmp root in telegram mediaLocalRoots", async () => {
+  it("includes Recall tmp root in telegram mediaLocalRoots", async () => {
     const sendTelegram = vi.fn().mockResolvedValue({ messageId: "m1", chatId: "c1" });
 
     await deliverTelegramPayload({
@@ -478,12 +478,12 @@ describe("deliverOutboundPayloads", () => {
       "123",
       "hi",
       expect.objectContaining({
-        mediaLocalRoots: expect.arrayContaining([resolvePreferredOpenClawTmpDir()]),
+        mediaLocalRoots: expect.arrayContaining([resolvePreferredRecallTmpDir()]),
       }),
     );
   });
 
-  it("includes OpenClaw tmp root in signal mediaLocalRoots", async () => {
+  it("includes Recall tmp root in signal mediaLocalRoots", async () => {
     const sendSignal = vi.fn().mockResolvedValue({ messageId: "s1", timestamp: 123 });
 
     await deliverOutboundPayloads({
@@ -498,7 +498,7 @@ describe("deliverOutboundPayloads", () => {
       "+1555",
       "hi",
       expect.objectContaining({
-        mediaLocalRoots: expect.arrayContaining([resolvePreferredOpenClawTmpDir()]),
+        mediaLocalRoots: expect.arrayContaining([resolvePreferredRecallTmpDir()]),
       }),
     );
   });
@@ -530,7 +530,7 @@ describe("deliverOutboundPayloads", () => {
     );
 
     await deliverOutboundPayloads({
-      cfg: { channels: { matrix: {} } } as OpenClawConfig,
+      cfg: { channels: { matrix: {} } } as RecallConfig,
       channel: "matrix",
       to: "room:!room:example",
       payloads: [{ text: "voice caption", mediaUrl: "file:///tmp/clip.mp3", audioAsVoice: true }],
@@ -546,7 +546,7 @@ describe("deliverOutboundPayloads", () => {
     );
   });
 
-  it("includes OpenClaw tmp root in whatsapp mediaLocalRoots", async () => {
+  it("includes Recall tmp root in whatsapp mediaLocalRoots", async () => {
     const sendWhatsApp = vi.fn().mockResolvedValue({ messageId: "w1", toJid: "jid" });
 
     await deliverOutboundPayloads({
@@ -561,12 +561,12 @@ describe("deliverOutboundPayloads", () => {
       "+1555",
       "hi",
       expect.objectContaining({
-        mediaLocalRoots: expect.arrayContaining([resolvePreferredOpenClawTmpDir()]),
+        mediaLocalRoots: expect.arrayContaining([resolvePreferredRecallTmpDir()]),
       }),
     );
   });
 
-  it("includes OpenClaw tmp root in imessage mediaLocalRoots", async () => {
+  it("includes Recall tmp root in imessage mediaLocalRoots", async () => {
     const sendIMessage = vi.fn().mockResolvedValue({ messageId: "i1", chatId: "chat-1" });
 
     await deliverOutboundPayloads({
@@ -581,14 +581,14 @@ describe("deliverOutboundPayloads", () => {
       "imessage:+15551234567",
       "hi",
       expect.objectContaining({
-        mediaLocalRoots: expect.arrayContaining([resolvePreferredOpenClawTmpDir()]),
+        mediaLocalRoots: expect.arrayContaining([resolvePreferredRecallTmpDir()]),
       }),
     );
   });
 
   it("uses signal media maxBytes from config", async () => {
     const sendSignal = vi.fn().mockResolvedValue({ messageId: "s1", timestamp: 123 });
-    const cfg: OpenClawConfig = { channels: { signal: { mediaMaxMb: 2 } } };
+    const cfg: RecallConfig = { channels: { signal: { mediaMaxMb: 2 } } };
 
     const results = await deliverOutboundPayloads({
       cfg,
@@ -613,7 +613,7 @@ describe("deliverOutboundPayloads", () => {
 
   it("chunks Signal markdown using the format-first chunker", async () => {
     const sendSignal = vi.fn().mockResolvedValue({ messageId: "s1", timestamp: 123 });
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: { signal: { textChunkLimit: 20 } },
     };
     const text = `Intro\\n\\n\`\`\`\`md\\n${"y".repeat(60)}\\n\`\`\`\\n\\nOutro`;
@@ -651,7 +651,7 @@ describe("deliverOutboundPayloads", () => {
 
   it("respects newline chunk mode for WhatsApp", async () => {
     const sendWhatsApp = vi.fn().mockResolvedValue({ messageId: "w1", toJid: "jid" });
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: { whatsapp: { textChunkLimit: 4000, chunkMode: "newline" } },
     };
 
@@ -781,7 +781,7 @@ describe("deliverOutboundPayloads", () => {
       ]),
     );
 
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: { matrix: { textChunkLimit: 4000, chunkMode: "newline" } },
     };
     const text = "```js\nconst a = 1;\nconst b = 2;\n```\nAfter";
@@ -808,7 +808,7 @@ describe("deliverOutboundPayloads", () => {
         },
       ]),
     );
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       agents: { defaults: { mediaMaxMb: 3 } },
     };
 
@@ -944,7 +944,7 @@ describe("deliverOutboundPayloads", () => {
     const sendWhatsApp = vi.fn().mockResolvedValue({ messageId: "w1", toJid: "jid" });
     const abortController = new AbortController();
     abortController.abort();
-    const cfg: OpenClawConfig = {};
+    const cfg: RecallConfig = {};
 
     await expect(
       deliverOutboundPayloads({
@@ -965,7 +965,7 @@ describe("deliverOutboundPayloads", () => {
   it("passes normalized payload to onError", async () => {
     const sendWhatsApp = vi.fn().mockRejectedValue(new Error("boom"));
     const onError = vi.fn();
-    const cfg: OpenClawConfig = {};
+    const cfg: RecallConfig = {};
 
     await deliverOutboundPayloads({
       cfg,

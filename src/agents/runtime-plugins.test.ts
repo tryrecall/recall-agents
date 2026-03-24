@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const hoisted = vi.hoisted(() => ({
-  loadOpenClawPlugins: vi.fn(),
+  loadRecallPlugins: vi.fn(),
   getActivePluginRegistryKey: vi.fn<() => string | null>(),
 }));
 
 vi.mock("../plugins/loader.js", () => ({
-  loadOpenClawPlugins: hoisted.loadOpenClawPlugins,
+  loadRecallPlugins: hoisted.loadRecallPlugins,
 }));
 
 vi.mock("../plugins/runtime.js", () => ({
@@ -15,7 +15,7 @@ vi.mock("../plugins/runtime.js", () => ({
 
 describe("ensureRuntimePluginsLoaded", () => {
   beforeEach(() => {
-    hoisted.loadOpenClawPlugins.mockReset();
+    hoisted.loadRecallPlugins.mockReset();
     hoisted.getActivePluginRegistryKey.mockReset();
     hoisted.getActivePluginRegistryKey.mockReturnValue(null);
     vi.resetModules();
@@ -31,7 +31,7 @@ describe("ensureRuntimePluginsLoaded", () => {
       allowGatewaySubagentBinding: true,
     });
 
-    expect(hoisted.loadOpenClawPlugins).not.toHaveBeenCalled();
+    expect(hoisted.loadRecallPlugins).not.toHaveBeenCalled();
   });
 
   it("loads runtime plugins when no active registry exists", async () => {
@@ -43,7 +43,7 @@ describe("ensureRuntimePluginsLoaded", () => {
       allowGatewaySubagentBinding: true,
     });
 
-    expect(hoisted.loadOpenClawPlugins).toHaveBeenCalledWith({
+    expect(hoisted.loadRecallPlugins).toHaveBeenCalledWith({
       config: {} as never,
       workspaceDir: "/tmp/workspace",
       runtimeOptions: {

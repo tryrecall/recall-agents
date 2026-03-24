@@ -4,17 +4,17 @@ import {
   formatLocationText,
   resolveInboundSessionEnvelopeContext,
   toLocationContext,
-} from "openclaw/plugin-sdk/channel-inbound";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/channel-inbound";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
 import {
   recordInboundSession,
   resolvePinnedMainDmOwnerFromAllowlist,
-} from "openclaw/plugin-sdk/conversation-runtime";
-import { recordChannelActivity } from "openclaw/plugin-sdk/infra-runtime";
-import type { HistoryEntry } from "openclaw/plugin-sdk/reply-history";
-import { finalizeInboundContext } from "openclaw/plugin-sdk/reply-runtime";
-import { resolveAgentRoute } from "openclaw/plugin-sdk/routing";
-import { logVerbose, shouldLogVerbose } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/conversation-runtime";
+import { recordChannelActivity } from "recall/plugin-sdk/infra-runtime";
+import type { HistoryEntry } from "recall/plugin-sdk/reply-history";
+import { finalizeInboundContext } from "recall/plugin-sdk/reply-runtime";
+import { resolveAgentRoute } from "recall/plugin-sdk/routing";
+import { logVerbose, shouldLogVerbose } from "recall/plugin-sdk/runtime-env";
 import { normalizeAllowFrom } from "./bot-access.js";
 import { resolveLineGroupConfigEntry, resolveLineGroupHistoryKey } from "./group-keys.js";
 import type { LineGroupConfig, ResolvedLineAccount } from "./types.js";
@@ -27,7 +27,7 @@ interface MediaRef {
 interface BuildLineMessageContextParams {
   event: MessageEvent;
   allMedia: MediaRef[];
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   account: ResolvedLineAccount;
   commandAuthorized: boolean;
   groupHistories?: Map<string, HistoryEntry[]>;
@@ -73,7 +73,7 @@ function buildPeerId(source: EventSource): string {
 
 function resolveLineInboundRoute(params: {
   source: EventSource;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   account: ResolvedLineAccount;
 }): {
   userId?: string;
@@ -226,7 +226,7 @@ function resolveLineGroupSystemPrompt(
 }
 
 async function finalizeLineInboundContext(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   account: ResolvedLineAccount;
   event: MessageEvent | PostbackEvent;
   route: LineRouteInfo;
@@ -453,7 +453,7 @@ export async function buildLineMessageContext(params: BuildLineMessageContextPar
 
 export async function buildLinePostbackContext(params: {
   event: PostbackEvent;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   account: ResolvedLineAccount;
   commandAuthorized: boolean;
 }) {

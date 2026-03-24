@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../../src/config/config.js";
+import type { RecallConfig } from "../../../src/config/config.js";
 import type { SignalDaemonExitEvent } from "./daemon.js";
 import {
   createMockSignalDaemonHandle,
@@ -31,7 +31,7 @@ function createMonitorRuntime() {
 }
 
 function createSignalConfig(overrides: Record<string, unknown> = {}): Record<string, unknown> {
-  const base = config as OpenClawConfig;
+  const base = config as RecallConfig;
   const channels = (base.channels ?? {}) as Record<string, unknown>;
   const signal = (channels.signal ?? {}) as Record<string, unknown>;
   return {
@@ -64,7 +64,7 @@ function createAutoAbortController() {
 
 async function runMonitorWithMocks(opts: MonitorSignalProviderOptions) {
   return monitorSignalProvider({
-    config: config as OpenClawConfig,
+    config: config as RecallConfig,
     waitForTransportReady: waitForTransportReadyMock as any,
     ...opts,
   });

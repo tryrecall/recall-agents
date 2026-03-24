@@ -1,14 +1,14 @@
-import { describeAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
-import { DEFAULT_ACCOUNT_ID } from "openclaw/plugin-sdk/account-id";
-import { createHybridChannelConfigAdapter } from "openclaw/plugin-sdk/channel-config-helpers";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
-import { createChatChannelPlugin, type ChannelPlugin } from "openclaw/plugin-sdk/core";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
-import { createRuntimeOutboundDelegates } from "openclaw/plugin-sdk/outbound-runtime";
+import { describeAccountSnapshot } from "recall/plugin-sdk/account-helpers";
+import { DEFAULT_ACCOUNT_ID } from "recall/plugin-sdk/account-id";
+import { createHybridChannelConfigAdapter } from "recall/plugin-sdk/channel-config-helpers";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
+import { createChatChannelPlugin, type ChannelPlugin } from "recall/plugin-sdk/core";
+import { createLazyRuntimeModule } from "recall/plugin-sdk/lazy-runtime";
+import { createRuntimeOutboundDelegates } from "recall/plugin-sdk/outbound-runtime";
 import {
   createComputedAccountStatusAdapter,
   createDefaultChannelRuntimeState,
-} from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/status-helpers";
 import { tlonChannelConfigSchema } from "./config-schema.js";
 import { resolveTlonOutboundSessionRoute } from "./session-route.js";
 import {

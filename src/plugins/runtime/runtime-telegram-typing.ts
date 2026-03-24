@@ -1,16 +1,16 @@
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import { logWarn } from "../../logger.js";
 
 export type CreateTelegramTypingLeaseParams = {
   to: string;
   accountId?: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   intervalMs?: number;
   messageThreadId?: number;
   pulse: (params: {
     to: string;
     accountId?: string;
-    cfg?: OpenClawConfig;
+    cfg?: RecallConfig;
     messageThreadId?: number;
   }) => Promise<unknown>;
 };

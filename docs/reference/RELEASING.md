@@ -8,7 +8,7 @@ read_when:
 
 # Release Policy
 
-OpenClaw has three public release lanes:
+Recall has three public release lanes:
 
 - stable: tagged releases that publish to npm `latest`
 - beta: prerelease tags that publish to npm `beta`
@@ -26,7 +26,7 @@ OpenClaw has three public release lanes:
 - `latest` means the current stable npm release
 - `beta` means the current prerelease npm release
 - Stable correction releases also publish to npm `latest`
-- Every OpenClaw release ships the npm package and macOS app together
+- Every Recall release ships the npm package and macOS app together
 
 ## Release cadence
 
@@ -40,7 +40,7 @@ OpenClaw has three public release lanes:
 - Run `pnpm build` before `pnpm release:check` so the expected `dist/*` release
   artifacts exist for the pack validation step
 - Run `pnpm release:check` before every tagged release
-- Run `RELEASE_TAG=vYYYY.M.D node --import tsx scripts/openclaw-npm-release-check.ts`
+- Run `RELEASE_TAG=vYYYY.M.D node --import tsx scripts/recall-npm-release-check.ts`
   (or the matching beta/correction tag) before approval
 - npm release preflight fails closed unless the tarball includes both
   `dist/control-ui/index.html` and a non-empty `dist/control-ui/assets/` payload
@@ -54,11 +54,11 @@ OpenClaw has three public release lanes:
 
 ## Public references
 
-- [`.github/workflows/openclaw-npm-release.yml`](https://github.com/openclaw/openclaw/blob/main/.github/workflows/openclaw-npm-release.yml)
-- [`scripts/openclaw-npm-release-check.ts`](https://github.com/openclaw/openclaw/blob/main/scripts/openclaw-npm-release-check.ts)
-- [`scripts/package-mac-dist.sh`](https://github.com/openclaw/openclaw/blob/main/scripts/package-mac-dist.sh)
-- [`scripts/make_appcast.sh`](https://github.com/openclaw/openclaw/blob/main/scripts/make_appcast.sh)
+- [`.github/workflows/recall-npm-release.yml`](https://github.com/recall/recall/blob/main/.github/workflows/recall-npm-release.yml)
+- [`scripts/recall-npm-release-check.ts`](https://github.com/recall/recall/blob/main/scripts/recall-npm-release-check.ts)
+- [`scripts/package-mac-dist.sh`](https://github.com/recall/recall/blob/main/scripts/package-mac-dist.sh)
+- [`scripts/make_appcast.sh`](https://github.com/recall/recall/blob/main/scripts/make_appcast.sh)
 
 Maintainers use the private release docs in
-[`openclaw/maintainers/release/README.md`](https://github.com/openclaw/maintainers/blob/main/release/README.md)
+[`recall/maintainers/release/README.md`](https://github.com/recall/maintainers/blob/main/release/README.md)
 for the actual runbook.

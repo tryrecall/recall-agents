@@ -1,13 +1,13 @@
 import { Command } from "commander";
 import { vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { createCliRuntimeCapture } from "./test-runtime-capture.js";
 
-export const loadConfig = vi.fn<() => OpenClawConfig>(() => ({}) as OpenClawConfig);
-export const writeConfigFile = vi.fn<(config: OpenClawConfig) => Promise<void>>(
+export const loadConfig = vi.fn<() => RecallConfig>(() => ({}) as RecallConfig);
+export const writeConfigFile = vi.fn<(config: RecallConfig) => Promise<void>>(
   async () => undefined,
 );
-export const resolveStateDir = vi.fn(() => "/tmp/openclaw-state");
+export const resolveStateDir = vi.fn(() => "/tmp/recall-state");
 export const installPluginFromMarketplace = vi.fn();
 export const listMarketplacePlugins = vi.fn();
 export const resolveMarketplaceInstallShortcut = vi.fn();
@@ -39,7 +39,7 @@ vi.mock("../runtime.js", () => ({
 
 vi.mock("../config/config.js", () => ({
   loadConfig: () => loadConfig(),
-  writeConfigFile: (config: OpenClawConfig) => writeConfigFile(config),
+  writeConfigFile: (config: RecallConfig) => writeConfigFile(config),
 }));
 
 vi.mock("../config/paths.js", () => ({
@@ -160,27 +160,27 @@ export function resetPluginsCliTestState() {
   installHooksFromPath.mockReset();
   recordHookInstall.mockReset();
 
-  loadConfig.mockReturnValue({} as OpenClawConfig);
+  loadConfig.mockReturnValue({} as RecallConfig);
   writeConfigFile.mockResolvedValue(undefined);
-  resolveStateDir.mockReturnValue("/tmp/openclaw-state");
+  resolveStateDir.mockReturnValue("/tmp/recall-state");
   resolveMarketplaceInstallShortcut.mockResolvedValue(null);
   installPluginFromMarketplace.mockResolvedValue({
     ok: false,
     error: "marketplace install failed",
   });
-  enablePluginInConfig.mockImplementation((cfg: OpenClawConfig) => ({ config: cfg }));
-  recordPluginInstall.mockImplementation((cfg: OpenClawConfig) => cfg);
+  enablePluginInConfig.mockImplementation((cfg: RecallConfig) => ({ config: cfg }));
+  recordPluginInstall.mockImplementation((cfg: RecallConfig) => cfg);
   buildPluginStatusReport.mockReturnValue({
     plugins: [],
     diagnostics: [],
   });
-  applyExclusiveSlotSelection.mockImplementation(({ config }: { config: OpenClawConfig }) => ({
+  applyExclusiveSlotSelection.mockImplementation(({ config }: { config: RecallConfig }) => ({
     config,
     warnings: [],
   }));
   uninstallPlugin.mockResolvedValue({
     ok: true,
-    config: {} as OpenClawConfig,
+    config: {} as RecallConfig,
     warnings: [],
     actions: {
       entry: false,
@@ -194,12 +194,12 @@ export function resetPluginsCliTestState() {
   updateNpmInstalledPlugins.mockResolvedValue({
     outcomes: [],
     changed: false,
-    config: {} as OpenClawConfig,
+    config: {} as RecallConfig,
   });
   updateNpmInstalledHookPacks.mockResolvedValue({
     outcomes: [],
     changed: false,
-    config: {} as OpenClawConfig,
+    config: {} as RecallConfig,
   });
   promptYesNo.mockResolvedValue(true);
   installPluginFromPath.mockResolvedValue({ ok: false, error: "path install disabled in test" });
@@ -220,5 +220,5 @@ export function resetPluginsCliTestState() {
     ok: false,
     error: "hook npm install disabled in test",
   });
-  recordHookInstall.mockImplementation((cfg: OpenClawConfig) => cfg);
+  recordHookInstall.mockImplementation((cfg: RecallConfig) => cfg);
 }

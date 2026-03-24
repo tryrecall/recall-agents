@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import {
   applyExclusiveSlotSelection,
   buildPluginStatusReport,
@@ -53,7 +53,7 @@ describe("plugins cli install", () => {
       plugins: {
         entries: {},
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const enabledCfg = {
       plugins: {
         entries: {
@@ -62,7 +62,7 @@ describe("plugins cli install", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const installedCfg = {
       ...enabledCfg,
       plugins: {
@@ -70,17 +70,17 @@ describe("plugins cli install", () => {
         installs: {
           alpha: {
             source: "marketplace",
-            installPath: "/tmp/openclaw-state/extensions/alpha",
+            installPath: "/tmp/recall-state/extensions/alpha",
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     loadConfig.mockReturnValue(cfg);
     installPluginFromMarketplace.mockResolvedValue({
       ok: true,
       pluginId: "alpha",
-      targetDir: "/tmp/openclaw-state/extensions/alpha",
+      targetDir: "/tmp/recall-state/extensions/alpha",
       version: "1.2.3",
       marketplaceName: "Claude",
       marketplaceSource: "local/repo",
@@ -110,7 +110,7 @@ describe("plugins cli install", () => {
       plugins: {
         entries: {},
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const enabledCfg = {
       plugins: {
         entries: {
@@ -119,7 +119,7 @@ describe("plugins cli install", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const installedCfg = {
       ...enabledCfg,
       plugins: {
@@ -128,21 +128,21 @@ describe("plugins cli install", () => {
           demo: {
             source: "clawhub",
             spec: "clawhub:demo@1.2.3",
-            installPath: "/tmp/openclaw-state/extensions/demo",
+            installPath: "/tmp/recall-state/extensions/demo",
             clawhubPackage: "demo",
             clawhubFamily: "code-plugin",
             clawhubChannel: "official",
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     loadConfig.mockReturnValue(cfg);
     parseClawHubPluginSpec.mockReturnValue({ name: "demo" });
     installPluginFromClawHub.mockResolvedValue({
       ok: true,
       pluginId: "demo",
-      targetDir: "/tmp/openclaw-state/extensions/demo",
+      targetDir: "/tmp/recall-state/extensions/demo",
       version: "1.2.3",
       packageName: "demo",
       clawhub: {
@@ -191,7 +191,7 @@ describe("plugins cli install", () => {
       plugins: {
         entries: {},
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const enabledCfg = {
       plugins: {
         entries: {
@@ -200,7 +200,7 @@ describe("plugins cli install", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const installedCfg = {
       ...enabledCfg,
       plugins: {
@@ -209,18 +209,18 @@ describe("plugins cli install", () => {
           demo: {
             source: "clawhub",
             spec: "clawhub:demo@1.2.3",
-            installPath: "/tmp/openclaw-state/extensions/demo",
+            installPath: "/tmp/recall-state/extensions/demo",
             clawhubPackage: "demo",
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     loadConfig.mockReturnValue(cfg);
     installPluginFromClawHub.mockResolvedValue({
       ok: true,
       pluginId: "demo",
-      targetDir: "/tmp/openclaw-state/extensions/demo",
+      targetDir: "/tmp/recall-state/extensions/demo",
       version: "1.2.3",
       packageName: "demo",
       clawhub: {
@@ -257,7 +257,7 @@ describe("plugins cli install", () => {
       plugins: {
         entries: {},
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const enabledCfg = {
       plugins: {
         entries: {
@@ -266,7 +266,7 @@ describe("plugins cli install", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     loadConfig.mockReturnValue(cfg);
     installPluginFromClawHub.mockResolvedValue({
@@ -277,7 +277,7 @@ describe("plugins cli install", () => {
     installPluginFromNpmSpec.mockResolvedValue({
       ok: true,
       pluginId: "demo",
-      targetDir: "/tmp/openclaw-state/extensions/demo",
+      targetDir: "/tmp/recall-state/extensions/demo",
       version: "1.2.3",
       npmResolution: {
         packageName: "demo",
@@ -309,18 +309,18 @@ describe("plugins cli install", () => {
   it("does not fall back to npm when ClawHub rejects a real package", async () => {
     installPluginFromClawHub.mockResolvedValue({
       ok: false,
-      error: 'Use "openclaw skills install demo" instead.',
+      error: 'Use "recall skills install demo" instead.',
       code: "skill_package",
     });
 
     await expect(runPluginsCommand(["plugins", "install", "demo"])).rejects.toThrow("__exit__:1");
 
     expect(installPluginFromNpmSpec).not.toHaveBeenCalled();
-    expect(runtimeErrors.at(-1)).toContain('Use "openclaw skills install demo" instead.');
+    expect(runtimeErrors.at(-1)).toContain('Use "recall skills install demo" instead.');
   });
 
   it("falls back to installing hook packs from npm specs", async () => {
-    const cfg = {} as OpenClawConfig;
+    const cfg = {} as RecallConfig;
     const installedCfg = {
       hooks: {
         internal: {
@@ -332,7 +332,7 @@ describe("plugins cli install", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     loadConfig.mockReturnValue(cfg);
     installPluginFromClawHub.mockResolvedValue({
@@ -342,7 +342,7 @@ describe("plugins cli install", () => {
     });
     installPluginFromNpmSpec.mockResolvedValue({
       ok: false,
-      error: "package.json missing openclaw.plugin.json",
+      error: "package.json missing recall.plugin.json",
     });
     installHooksFromNpmSpec.mockResolvedValue({
       ok: true,

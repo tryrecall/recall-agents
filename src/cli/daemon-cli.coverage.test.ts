@@ -27,8 +27,8 @@ const buildGatewayInstallPlan = vi.fn(
     programArguments: ["/bin/node", "cli", "gateway", "--port", String(params.port)],
     workingDirectory: process.cwd(),
     environment: {
-      OPENCLAW_GATEWAY_PORT: String(params.port),
-      ...(params.token ? { OPENCLAW_GATEWAY_TOKEN: params.token } : {}),
+      RECALL_GATEWAY_PORT: String(params.port),
+      ...(params.token ? { RECALL_GATEWAY_TOKEN: params.token } : {}),
     },
   }),
 );
@@ -124,15 +124,15 @@ describe("daemon-cli coverage", () => {
   beforeEach(() => {
     daemonProgram = createDaemonProgram();
     envSnapshot = captureEnv([
-      "OPENCLAW_STATE_DIR",
-      "OPENCLAW_CONFIG_PATH",
-      "OPENCLAW_GATEWAY_PORT",
-      "OPENCLAW_PROFILE",
+      "RECALL_STATE_DIR",
+      "RECALL_CONFIG_PATH",
+      "RECALL_GATEWAY_PORT",
+      "RECALL_PROFILE",
     ]);
-    process.env.OPENCLAW_STATE_DIR = "/tmp/openclaw-cli-state";
-    process.env.OPENCLAW_CONFIG_PATH = "/tmp/openclaw-cli-state/openclaw.json";
-    delete process.env.OPENCLAW_GATEWAY_PORT;
-    delete process.env.OPENCLAW_PROFILE;
+    process.env.RECALL_STATE_DIR = "/tmp/recall-cli-state";
+    process.env.RECALL_CONFIG_PATH = "/tmp/recall-cli-state/recall.json";
+    delete process.env.RECALL_GATEWAY_PORT;
+    delete process.env.RECALL_PROFILE;
     serviceReadCommand.mockResolvedValue(null);
     resolveGatewayProbeAuthWithSecretInputs.mockClear();
     buildGatewayInstallPlan.mockClear();
@@ -162,12 +162,12 @@ describe("daemon-cli coverage", () => {
     serviceReadCommand.mockResolvedValueOnce({
       programArguments: ["/bin/node", "cli", "gateway", "--port", "19001"],
       environment: {
-        OPENCLAW_PROFILE: "dev",
-        OPENCLAW_STATE_DIR: "/tmp/openclaw-daemon-state",
-        OPENCLAW_CONFIG_PATH: "/tmp/openclaw-daemon-state/openclaw.json",
-        OPENCLAW_GATEWAY_PORT: "19001",
+        RECALL_PROFILE: "dev",
+        RECALL_STATE_DIR: "/tmp/recall-daemon-state",
+        RECALL_CONFIG_PATH: "/tmp/recall-daemon-state/recall.json",
+        RECALL_GATEWAY_PORT: "19001",
       },
-      sourcePath: "/tmp/ai.openclaw.gateway.plist",
+      sourcePath: "/tmp/ai.tryrecall.gateway.plist",
     });
 
     await runDaemonCommand(["daemon", "status", "--json"]);

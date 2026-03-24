@@ -4,8 +4,8 @@ let collectTelegramUnmentionedGroupIds: typeof import("./audit.js").collectTeleg
 let auditTelegramGroupMembership: typeof import("./audit.js").auditTelegramGroupMembership;
 const fetchWithTimeoutMock = vi.hoisted(() => vi.fn());
 
-vi.mock("openclaw/plugin-sdk/text-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/text-runtime")>();
+vi.mock("recall/plugin-sdk/text-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/text-runtime")>();
   return {
     ...actual,
     fetchWithTimeout: fetchWithTimeoutMock,

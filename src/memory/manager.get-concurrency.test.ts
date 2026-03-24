@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import "./test-runtime-mocks.js";
 import type { MemoryIndexManager } from "./index.js";
 
@@ -48,7 +48,7 @@ describe("memory manager cache hydration", () => {
     ({ closeAllMemoryIndexManagers, MemoryIndexManager: RawMemoryIndexManager } =
       await import("./manager.js"));
     vi.clearAllMocks();
-    workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-mem-concurrent-"));
+    workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-mem-concurrent-"));
     await fs.mkdir(path.join(workspaceDir, "memory"), { recursive: true });
     await fs.writeFile(path.join(workspaceDir, "MEMORY.md"), "Hello memory.");
     hoisted.providerCreateCalls = 0;
@@ -60,7 +60,7 @@ describe("memory manager cache hydration", () => {
     await fs.rm(workspaceDir, { recursive: true, force: true });
   });
 
-  function createMemoryConcurrencyConfig(indexPath: string): OpenClawConfig {
+  function createMemoryConcurrencyConfig(indexPath: string): RecallConfig {
     return {
       agents: {
         defaults: {
@@ -74,7 +74,7 @@ describe("memory manager cache hydration", () => {
         },
         list: [{ id: "main", default: true }],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
   }
 
   it("deduplicates concurrent manager creation for the same cache key", async () => {

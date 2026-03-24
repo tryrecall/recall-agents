@@ -105,10 +105,10 @@ export async function spawnGatewayInstance(name: string): Promise<GatewayInstanc
   const port = await getFreePort();
   const hookToken = `token-${name}-${randomUUID()}`;
   const gatewayToken = `gateway-${name}-${randomUUID()}`;
-  const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), `openclaw-e2e-${name}-`));
-  const configDir = path.join(homeDir, ".openclaw");
+  const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), `recall-e2e-${name}-`));
+  const configDir = path.join(homeDir, ".recall");
   await fs.mkdir(configDir, { recursive: true });
-  const configPath = path.join(configDir, "openclaw.json");
+  const configPath = path.join(configDir, "recall.json");
   const stateDir = path.join(configDir, "state");
   const config = {
     gateway: {
@@ -141,17 +141,17 @@ export async function spawnGatewayInstance(name: string): Promise<GatewayInstanc
         env: {
           ...process.env,
           HOME: homeDir,
-          OPENCLAW_CONFIG_PATH: configPath,
-          OPENCLAW_STATE_DIR: stateDir,
-          OPENCLAW_GATEWAY_TOKEN: "",
-          OPENCLAW_GATEWAY_PASSWORD: "",
-          OPENCLAW_SKIP_CHANNELS: "1",
-          OPENCLAW_SKIP_PROVIDERS: "1",
-          OPENCLAW_SKIP_GMAIL_WATCHER: "1",
-          OPENCLAW_SKIP_CRON: "1",
-          OPENCLAW_SKIP_BROWSER_CONTROL_SERVER: "1",
-          OPENCLAW_SKIP_CANVAS_HOST: "1",
-          OPENCLAW_TEST_MINIMAL_GATEWAY: "1",
+          RECALL_CONFIG_PATH: configPath,
+          RECALL_STATE_DIR: stateDir,
+          RECALL_GATEWAY_TOKEN: "",
+          RECALL_GATEWAY_PASSWORD: "",
+          RECALL_SKIP_CHANNELS: "1",
+          RECALL_SKIP_PROVIDERS: "1",
+          RECALL_SKIP_GMAIL_WATCHER: "1",
+          RECALL_SKIP_CRON: "1",
+          RECALL_SKIP_BROWSER_CONTROL_SERVER: "1",
+          RECALL_SKIP_CANVAS_HOST: "1",
+          RECALL_TEST_MINIMAL_GATEWAY: "1",
           VITEST: "1",
         },
         stdio: ["ignore", "pipe", "pipe"],

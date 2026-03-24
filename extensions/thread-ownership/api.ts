@@ -1,1 +1,1 @@
-export * from "openclaw/plugin-sdk/thread-ownership";
+export * from "recall/plugin-sdk/thread-ownership";

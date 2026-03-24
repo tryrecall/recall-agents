@@ -10,7 +10,7 @@ import type {
 import { createEmptyPluginRegistry } from "./registry-empty.js";
 import type { PluginRegistry } from "./registry.js";
 
-const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-plugin-binding-"));
+const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "recall-plugin-binding-"));
 const approvalsPath = path.join(tempRoot, "plugin-binding-approvals.json");
 
 const sessionBindingState = vi.hoisted(() => {
@@ -96,7 +96,7 @@ vi.mock("../infra/home-dir.js", async (importOriginal) => {
   return {
     ...actual,
     expandHomePrefix: (value: string) => {
-      if (value === "~/.openclaw/plugin-binding-approvals.json") {
+      if (value === "~/.recall/plugin-binding-approvals.json") {
         return approvalsPath;
       }
       return actual.expandHomePrefix(value);
@@ -192,7 +192,7 @@ describe("plugin conversation binding approvals", () => {
       return {
         ...actual,
         expandHomePrefix: (value: string) => {
-          if (value === "~/.openclaw/plugin-binding-approvals.json") {
+          if (value === "~/.recall/plugin-binding-approvals.json") {
             return approvalsPath;
           }
           return actual.expandHomePrefix(value);
@@ -914,7 +914,7 @@ describe("plugin conversation binding approvals", () => {
   it("migrates a legacy codex thread binding session key through the new approval flow", async () => {
     sessionBindingState.setRecord({
       bindingId: "binding-legacy-codex-thread",
-      targetSessionKey: "openclaw-app-server:thread:019ce411-6322-7db2-a821-1a61c530e7d9",
+      targetSessionKey: "recall-app-server:thread:019ce411-6322-7db2-a821-1a61c530e7d9",
       targetKind: "session",
       conversation: {
         channel: "telegram",
@@ -929,7 +929,7 @@ describe("plugin conversation binding approvals", () => {
     });
 
     const request = await requestPluginConversationBinding({
-      pluginId: "openclaw-codex-app-server",
+      pluginId: "recall-codex-app-server",
       pluginName: "Codex App Server",
       pluginRoot: "/plugins/codex-a",
       requestedBySenderId: "user-1",
@@ -947,7 +947,7 @@ describe("plugin conversation binding approvals", () => {
 
     expect(binding).toEqual(
       expect.objectContaining({
-        pluginId: "openclaw-codex-app-server",
+        pluginId: "recall-codex-app-server",
         pluginRoot: "/plugins/codex-a",
         conversationId: "8460800771",
       }),

@@ -6,15 +6,15 @@ function mockContextDeps(params: {
   loadConfig: () => unknown;
   discoveredModels?: DiscoveredModel[];
 }) {
-  const ensureOpenClawModelsJson = vi.fn(async () => {});
+  const ensureRecallModelsJson = vi.fn(async () => {});
   vi.doMock("../config/config.js", () => ({
     loadConfig: params.loadConfig,
   }));
   vi.doMock("./models-config.js", () => ({
-    ensureOpenClawModelsJson,
+    ensureRecallModelsJson,
   }));
   vi.doMock("./agent-paths.js", () => ({
-    resolveOpenClawAgentDir: () => "/tmp/openclaw-agent",
+    resolveRecallAgentDir: () => "/tmp/recall-agent",
   }));
   vi.doMock("./pi-model-discovery-runtime.js", () => ({
     discoverAuthStorage: vi.fn(() => ({})),
@@ -22,7 +22,7 @@ function mockContextDeps(params: {
       getAll: () => params.discoveredModels ?? [],
     })),
   }));
-  return { ensureOpenClawModelsJson };
+  return { ensureRecallModelsJson };
 }
 
 function mockContextModuleDeps(loadConfigImpl: () => unknown) {
@@ -99,24 +99,24 @@ describe("lookupContextTokens", () => {
     );
   });
 
-  it("only warms eagerly for real openclaw startup commands that need model metadata", async () => {
+  it("only warms eagerly for real recall startup commands that need model metadata", async () => {
     const argvSnapshot = process.argv;
     try {
       for (const scenario of [
         {
-          argv: ["node", "openclaw", "chat"],
+          argv: ["node", "recall", "chat"],
           expectedCalls: 1,
         },
         {
-          argv: ["node", "openclaw", "--profile", "--", "config", "validate"],
+          argv: ["node", "recall", "--profile", "--", "config", "validate"],
           expectedCalls: 0,
         },
         {
-          argv: ["node", "openclaw", "logs", "--limit", "5"],
+          argv: ["node", "recall", "logs", "--limit", "5"],
           expectedCalls: 0,
         },
         {
-          argv: ["node", "openclaw", "status", "--json"],
+          argv: ["node", "recall", "status", "--json"],
           expectedCalls: 0,
         },
         {
@@ -126,12 +126,12 @@ describe("lookupContextTokens", () => {
       ]) {
         vi.resetModules();
         const loadConfigMock = vi.fn(() => ({ models: {} }));
-        const { ensureOpenClawModelsJson } = mockContextModuleDeps(loadConfigMock);
+        const { ensureRecallModelsJson } = mockContextModuleDeps(loadConfigMock);
         process.argv = scenario.argv;
         await import("./context.js");
         await flushAsyncWarmup();
         expect(loadConfigMock).toHaveBeenCalledTimes(scenario.expectedCalls);
-        expect(ensureOpenClawModelsJson).toHaveBeenCalledTimes(scenario.expectedCalls);
+        expect(ensureRecallModelsJson).toHaveBeenCalledTimes(scenario.expectedCalls);
       }
     } finally {
       process.argv = argvSnapshot;

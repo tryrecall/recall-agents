@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
-import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/agent-runtime";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
+import { jsonResult, readNumberParam, readStringParam } from "recall/plugin-sdk/agent-runtime";
+import type { RecallPluginApi } from "recall/plugin-sdk/plugin-runtime";
 import { runTavilyExtract } from "./tavily-client.js";
 
 function optionalStringEnum<const T extends readonly string[]>(
@@ -47,7 +47,7 @@ const TavilyExtractToolSchema = Type.Object(
   { additionalProperties: false },
 );
 
-export function createTavilyExtractTool(api: OpenClawPluginApi) {
+export function createTavilyExtractTool(api: RecallPluginApi) {
   return {
     name: "tavily_extract",
     label: "Tavily Extract",

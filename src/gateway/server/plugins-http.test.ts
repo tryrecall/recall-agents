@@ -17,7 +17,7 @@ import {
   shouldEnforceGatewayAuthForPluginPath,
 } from "./plugins-http.js";
 
-const loadOpenClawPlugins = vi.hoisted(() => vi.fn());
+const loadRecallPlugins = vi.hoisted(() => vi.fn());
 type HandleGatewayRequestOptions = GatewayRequestOptions & {
   extraHandlers?: Record<string, unknown>;
 };
@@ -26,7 +26,7 @@ const handleGatewayRequest = vi.hoisted(() =>
 );
 
 vi.mock("../../plugins/loader.js", () => ({
-  loadOpenClawPlugins,
+  loadRecallPlugins,
 }));
 
 vi.mock("../server-methods.js", () => ({
@@ -71,7 +71,7 @@ function createSubagentRuntimeRegistry() {
 async function createSubagentRuntime(): Promise<PluginRuntime["subagent"]> {
   const serverPlugins = await import("../server-plugins.js");
   const runtimeModule = await import("../../plugins/runtime/index.js");
-  loadOpenClawPlugins.mockReturnValue(createSubagentRuntimeRegistry());
+  loadRecallPlugins.mockReturnValue(createSubagentRuntimeRegistry());
   serverPlugins.loadGatewayPlugins({
     cfg: {},
     workspaceDir: "/tmp",
@@ -85,7 +85,7 @@ async function createSubagentRuntime(): Promise<PluginRuntime["subagent"]> {
     baseMethods: [],
   });
   serverPlugins.setFallbackGatewayContext({} as GatewayRequestContext);
-  const call = loadOpenClawPlugins.mock.calls.at(-1)?.[0] as
+  const call = loadRecallPlugins.mock.calls.at(-1)?.[0] as
     | { runtimeOptions?: { allowGatewaySubagentBinding?: boolean } }
     | undefined;
   if (call?.runtimeOptions?.allowGatewaySubagentBinding !== true) {
@@ -143,7 +143,7 @@ describe("createGatewayPluginRequestHandler", () => {
   });
 
   it("caps unauthenticated plugin routes to non-admin subagent scopes", async () => {
-    loadOpenClawPlugins.mockReset();
+    loadRecallPlugins.mockReset();
     handleGatewayRequest.mockReset();
     handleGatewayRequest.mockImplementation(async (opts: HandleGatewayRequestOptions) => {
       const scopes = opts.client?.connect.scopes ?? [];

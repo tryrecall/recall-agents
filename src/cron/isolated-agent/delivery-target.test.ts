@@ -1,5 +1,5 @@
 import { afterAll, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 
 vi.mock("../../config/sessions.js", () => ({
   loadSessionStore: vi.fn().mockReturnValue({}),
@@ -47,15 +47,15 @@ afterAll(() => {
   vi.resetModules();
 });
 
-function makeCfg(overrides?: Partial<OpenClawConfig>): OpenClawConfig {
+function makeCfg(overrides?: Partial<RecallConfig>): RecallConfig {
   return {
     bindings: [],
     channels: {},
     ...overrides,
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
-function makeTelegramBoundCfg(accountId = "account-b"): OpenClawConfig {
+function makeTelegramBoundCfg(accountId = "account-b"): RecallConfig {
   return makeCfg({
     bindings: [
       {
@@ -107,7 +107,7 @@ function setStoredWhatsAppAllowFrom(allowFrom: string[]) {
 }
 
 async function resolveForAgent(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   target?: { channel?: "last" | "telegram"; to?: string };
 }) {
   const channel = params.target ? params.target.channel : DEFAULT_TARGET.channel;
@@ -118,7 +118,7 @@ async function resolveForAgent(params: {
   });
 }
 
-async function resolveLastTarget(cfg: OpenClawConfig) {
+async function resolveLastTarget(cfg: RecallConfig) {
   return resolveForAgent({
     cfg,
     target: { channel: "last", to: undefined },

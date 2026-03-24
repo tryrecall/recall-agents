@@ -11,12 +11,12 @@ import {
   type StringSelectMenuInteraction,
 } from "@buape/carbon";
 import { ApplicationCommandOptionType } from "discord-api-types/v10";
-import { resolveHumanDelayConfig } from "openclaw/plugin-sdk/agent-runtime";
-import { createChannelReplyPipeline } from "openclaw/plugin-sdk/channel-reply-pipeline";
+import { resolveHumanDelayConfig } from "recall/plugin-sdk/agent-runtime";
+import { createChannelReplyPipeline } from "recall/plugin-sdk/channel-reply-pipeline";
 import {
   resolveCommandAuthorizedFromAuthorizers,
   resolveNativeCommandSessionTargets,
-} from "openclaw/plugin-sdk/command-auth";
+} from "recall/plugin-sdk/command-auth";
 import {
   buildCommandTextFromArgs,
   findCommandByNativeName,
@@ -30,27 +30,27 @@ import {
   type CommandArgValues,
   type CommandArgs,
   type NativeCommandSpec,
-} from "openclaw/plugin-sdk/command-auth";
-import type { OpenClawConfig, loadConfig } from "openclaw/plugin-sdk/config-runtime";
-import { isDangerousNameMatchingEnabled } from "openclaw/plugin-sdk/config-runtime";
-import { resolveOpenProviderRuntimeGroupPolicy } from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/command-auth";
+import type { RecallConfig, loadConfig } from "recall/plugin-sdk/config-runtime";
+import { isDangerousNameMatchingEnabled } from "recall/plugin-sdk/config-runtime";
+import { resolveOpenProviderRuntimeGroupPolicy } from "recall/plugin-sdk/config-runtime";
 import {
   ensureConfiguredBindingRouteReady,
   resolveConfiguredBindingRoute,
-} from "openclaw/plugin-sdk/conversation-runtime";
-import { buildPairingReply } from "openclaw/plugin-sdk/conversation-runtime";
-import { getAgentScopedMediaLocalRoots } from "openclaw/plugin-sdk/media-runtime";
-import { executePluginCommand, matchPluginCommand } from "openclaw/plugin-sdk/plugin-runtime";
+} from "recall/plugin-sdk/conversation-runtime";
+import { buildPairingReply } from "recall/plugin-sdk/conversation-runtime";
+import { getAgentScopedMediaLocalRoots } from "recall/plugin-sdk/media-runtime";
+import { executePluginCommand, matchPluginCommand } from "recall/plugin-sdk/plugin-runtime";
 import {
   resolveSendableOutboundReplyParts,
   resolveTextChunksWithFallback,
-} from "openclaw/plugin-sdk/reply-payload";
-import { resolveChunkMode, resolveTextChunkLimit } from "openclaw/plugin-sdk/reply-runtime";
-import { dispatchReplyWithDispatcher } from "openclaw/plugin-sdk/reply-runtime";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/runtime-env";
-import { loadWebMedia } from "openclaw/plugin-sdk/web-media";
+} from "recall/plugin-sdk/reply-payload";
+import { resolveChunkMode, resolveTextChunkLimit } from "recall/plugin-sdk/reply-runtime";
+import { dispatchReplyWithDispatcher } from "recall/plugin-sdk/reply-runtime";
+import type { ReplyPayload } from "recall/plugin-sdk/reply-runtime";
+import { logVerbose } from "recall/plugin-sdk/runtime-env";
+import { createSubsystemLogger } from "recall/plugin-sdk/runtime-env";
+import { loadWebMedia } from "recall/plugin-sdk/web-media";
 import { resolveDiscordMaxLinesPerMessage } from "../accounts.js";
 import { chunkDiscordTextWithMode } from "../chunk.js";
 import {
@@ -85,11 +85,11 @@ import { resolveDiscordSenderIdentity } from "./sender-identity.js";
 import type { ThreadBindingManager } from "./thread-bindings.js";
 import { resolveDiscordThreadParentInfo } from "./threading.js";
 
-type DiscordConfig = NonNullable<OpenClawConfig["channels"]>["discord"];
+type DiscordConfig = NonNullable<RecallConfig["channels"]>["discord"];
 const log = createSubsystemLogger("discord/native-command");
 
 function resolveDiscordNativeCommandAllowlistAccess(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
   sender: { id: string; name?: string; tag?: string };
   chatType: "direct" | "group" | "thread" | "channel";

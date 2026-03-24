@@ -13,11 +13,11 @@ function loadPatternListFile(filePath: string, label: string): string[] {
 export function loadIncludePatternsFromEnv(
   env: Record<string, string | undefined> = process.env,
 ): string[] | null {
-  const includeFile = env.OPENCLAW_VITEST_INCLUDE_FILE?.trim();
+  const includeFile = env.RECALL_VITEST_INCLUDE_FILE?.trim();
   if (!includeFile) {
     return null;
   }
-  return loadPatternListFile(includeFile, "OPENCLAW_VITEST_INCLUDE_FILE");
+  return loadPatternListFile(includeFile, "RECALL_VITEST_INCLUDE_FILE");
 }
 
 export function createChannelsVitestConfig(env?: Record<string, string | undefined>) {

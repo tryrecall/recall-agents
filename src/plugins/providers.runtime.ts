@@ -3,7 +3,7 @@ import {
   withBundledPluginAllowlistCompat,
   withBundledPluginEnablementCompat,
 } from "./bundled-compat.js";
-import { loadOpenClawPlugins, type PluginLoadOptions } from "./loader.js";
+import { loadRecallPlugins, type PluginLoadOptions } from "./loader.js";
 import { createPluginLoaderLogger } from "./logger.js";
 import {
   resolveBundledProviderCompatPluginIds,
@@ -54,7 +54,7 @@ export function resolvePluginProviders(params: {
           pluginIds: bundledProviderCompatPluginIds,
         })
       : maybeVitestCompat;
-  const registry = loadOpenClawPlugins({
+  const registry = loadRecallPlugins({
     config,
     workspaceDir: params.workspaceDir,
     env,

@@ -2,24 +2,24 @@ import type {
   ProviderAuthContext,
   ProviderResolveDynamicModelContext,
   ProviderRuntimeModel,
-} from "openclaw/plugin-sdk/plugin-entry";
+} from "recall/plugin-sdk/plugin-entry";
 import {
   CODEX_CLI_PROFILE_ID,
   ensureAuthProfileStore,
   listProfilesForProvider,
   type OAuthCredential,
-} from "openclaw/plugin-sdk/provider-auth";
-import { buildOauthProviderAuthResult } from "openclaw/plugin-sdk/provider-auth";
-import { loginOpenAICodexOAuth } from "openclaw/plugin-sdk/provider-auth-login";
+} from "recall/plugin-sdk/provider-auth";
+import { buildOauthProviderAuthResult } from "recall/plugin-sdk/provider-auth";
+import { loginOpenAICodexOAuth } from "recall/plugin-sdk/provider-auth-login";
 import {
   DEFAULT_CONTEXT_TOKENS,
   normalizeModelCompat,
   normalizeProviderId,
   OPENAI_CODEX_DEFAULT_MODEL,
   type ProviderPlugin,
-} from "openclaw/plugin-sdk/provider-models";
-import { createOpenAIAttributionHeadersWrapper } from "openclaw/plugin-sdk/provider-stream";
-import { fetchCodexUsage } from "openclaw/plugin-sdk/provider-usage";
+} from "recall/plugin-sdk/provider-models";
+import { createOpenAIAttributionHeadersWrapper } from "recall/plugin-sdk/provider-stream";
+import { fetchCodexUsage } from "recall/plugin-sdk/provider-usage";
 import { buildOpenAICodexProvider } from "./openai-codex-catalog.js";
 import {
   cloneFirstTemplateModel,

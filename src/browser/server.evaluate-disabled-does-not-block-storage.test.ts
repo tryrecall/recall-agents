@@ -43,9 +43,9 @@ vi.mock("../config/config.js", async (importOriginal) => {
       browser: {
         enabled: true,
         evaluateEnabled: false,
-        defaultProfile: "openclaw",
+        defaultProfile: "recall",
         profiles: {
-          openclaw: { cdpPort: testPort + 1, color: "#FF4500" },
+          recall: { cdpPort: testPort + 1, color: "#FF4500" },
         },
       },
     }),
@@ -74,12 +74,12 @@ describe("browser control evaluate gating", () => {
     ({ startBrowserControlServerFromConfig, stopBrowserControlServer } =
       await import("./server.js"));
     testPort = await getFreePort();
-    prevGatewayPort = process.env.OPENCLAW_GATEWAY_PORT;
-    process.env.OPENCLAW_GATEWAY_PORT = String(testPort - 2);
-    prevGatewayToken = process.env.OPENCLAW_GATEWAY_TOKEN;
-    prevGatewayPassword = process.env.OPENCLAW_GATEWAY_PASSWORD;
-    delete process.env.OPENCLAW_GATEWAY_TOKEN;
-    delete process.env.OPENCLAW_GATEWAY_PASSWORD;
+    prevGatewayPort = process.env.RECALL_GATEWAY_PORT;
+    process.env.RECALL_GATEWAY_PORT = String(testPort - 2);
+    prevGatewayToken = process.env.RECALL_GATEWAY_TOKEN;
+    prevGatewayPassword = process.env.RECALL_GATEWAY_PASSWORD;
+    delete process.env.RECALL_GATEWAY_TOKEN;
+    delete process.env.RECALL_GATEWAY_PASSWORD;
 
     pwMocks.cookiesGetViaPlaywright.mockClear();
     pwMocks.storageGetViaPlaywright.mockClear();
@@ -91,19 +91,19 @@ describe("browser control evaluate gating", () => {
   afterEach(async () => {
     vi.restoreAllMocks();
     if (prevGatewayPort === undefined) {
-      delete process.env.OPENCLAW_GATEWAY_PORT;
+      delete process.env.RECALL_GATEWAY_PORT;
     } else {
-      process.env.OPENCLAW_GATEWAY_PORT = prevGatewayPort;
+      process.env.RECALL_GATEWAY_PORT = prevGatewayPort;
     }
     if (prevGatewayToken === undefined) {
-      delete process.env.OPENCLAW_GATEWAY_TOKEN;
+      delete process.env.RECALL_GATEWAY_TOKEN;
     } else {
-      process.env.OPENCLAW_GATEWAY_TOKEN = prevGatewayToken;
+      process.env.RECALL_GATEWAY_TOKEN = prevGatewayToken;
     }
     if (prevGatewayPassword === undefined) {
-      delete process.env.OPENCLAW_GATEWAY_PASSWORD;
+      delete process.env.RECALL_GATEWAY_PASSWORD;
     } else {
-      process.env.OPENCLAW_GATEWAY_PASSWORD = prevGatewayPassword;
+      process.env.RECALL_GATEWAY_PASSWORD = prevGatewayPassword;
     }
 
     await stopBrowserControlServer();

@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
+import { resolvePreferredRecallTmpDir } from "../infra/tmp-recall-dir.js";
 import { loadWebMedia } from "./web-media.js";
 
 const TINY_PNG_BASE64 =
@@ -12,7 +12,7 @@ let fixtureRoot = "";
 let tinyPngFile = "";
 
 beforeAll(async () => {
-  fixtureRoot = await fs.mkdtemp(path.join(resolvePreferredOpenClawTmpDir(), "web-media-core-"));
+  fixtureRoot = await fs.mkdtemp(path.join(resolvePreferredRecallTmpDir(), "web-media-core-"));
   tinyPngFile = path.join(fixtureRoot, "tiny.png");
   await fs.writeFile(tinyPngFile, Buffer.from(TINY_PNG_BASE64, "base64"));
 });

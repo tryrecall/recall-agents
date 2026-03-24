@@ -28,7 +28,7 @@ describe("firecrawl scrape tool", () => {
     } as never);
 
     const result = await tool.execute("call-1", {
-      url: "https://docs.openclaw.ai",
+      url: "https://docs.recall.ai",
       maxChars: 1500,
       onlyMainContent: false,
       maxAgeMs: 5000,
@@ -39,7 +39,7 @@ describe("firecrawl scrape tool", () => {
 
     expect(runFirecrawlScrape).toHaveBeenCalledWith({
       cfg: { env: "test" },
-      url: "https://docs.openclaw.ai",
+      url: "https://docs.recall.ai",
       extractMode: "markdown",
       maxChars: 1500,
       onlyMainContent: false,
@@ -53,7 +53,7 @@ describe("firecrawl scrape tool", () => {
         ok: true,
         params: {
           cfg: { env: "test" },
-          url: "https://docs.openclaw.ai",
+          url: "https://docs.recall.ai",
           extractMode: "markdown",
           maxChars: 1500,
           onlyMainContent: false,
@@ -73,14 +73,14 @@ describe("firecrawl scrape tool", () => {
     } as never);
 
     await tool.execute("call-2", {
-      url: "https://docs.openclaw.ai",
+      url: "https://docs.recall.ai",
       extractMode: "text",
       proxy: "invalid",
     });
 
     expect(runFirecrawlScrape).toHaveBeenCalledWith({
       cfg: { env: "test" },
-      url: "https://docs.openclaw.ai",
+      url: "https://docs.recall.ai",
       extractMode: "text",
       maxChars: undefined,
       onlyMainContent: undefined,

@@ -40,18 +40,18 @@ describe("firecrawl web search provider", () => {
     }
 
     const result = await tool.execute({
-      query: "openclaw docs",
+      query: "recall docs",
       count: 4,
     });
 
     expect(runFirecrawlSearch).toHaveBeenCalledWith({
       cfg: { test: true },
-      query: "openclaw docs",
+      query: "recall docs",
       count: 4,
     });
     expect(result).toEqual({
       cfg: { test: true },
-      query: "openclaw docs",
+      query: "recall docs",
       count: 4,
     });
   });

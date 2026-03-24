@@ -37,7 +37,7 @@ describe("createRestrictSendersChannelSecurity", () => {
       allowFrom: ["line:user:abc"],
       policyPath: "channels.line.dmPolicy",
       allowFromPath: "channels.line.",
-      approveHint: "Approve via: openclaw pairing list line / openclaw pairing approve line <code>",
+      approveHint: "Approve via: recall pairing list line / recall pairing approve line <code>",
       normalizeEntry: undefined,
     });
 

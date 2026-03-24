@@ -4,7 +4,7 @@ import type { ResolvedSlackAccount } from "../../../../extensions/slack/src/acco
 import type { SlackMessageEvent } from "../../../../extensions/slack/src/types.js";
 import { withTempHome } from "../../../../test/helpers/temp-home.js";
 import type { MsgContext } from "../../../auto-reply/templating.js";
-import type { OpenClawConfig } from "../../../config/config.js";
+import type { RecallConfig } from "../../../config/config.js";
 import { inboundCtxCapture } from "./inbound-testkit.js";
 import { expectChannelInboundContextContract } from "./suites.js";
 
@@ -20,8 +20,8 @@ const dispatchInboundMessageMock = vi.hoisted(() =>
   ),
 );
 
-vi.mock("openclaw/plugin-sdk/reply-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/reply-runtime")>();
+vi.mock("recall/plugin-sdk/reply-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/reply-runtime")>();
   return {
     ...actual,
     dispatchInboundMessage: vi.fn(async (params: { ctx: MsgContext }) => {
@@ -39,8 +39,8 @@ vi.mock("openclaw/plugin-sdk/reply-runtime", async (importOriginal) => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/conversation-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/conversation-runtime")>();
+vi.mock("recall/plugin-sdk/conversation-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/conversation-runtime")>();
   return {
     ...actual,
     recordInboundSession: vi.fn(async (params: { ctx: MsgContext }) => {
@@ -183,7 +183,7 @@ describe("channel inbound contract", () => {
       const ctx = createInboundSlackTestContext({
         cfg: {
           channels: { slack: { enabled: true } },
-        } as OpenClawConfig,
+        } as RecallConfig,
       });
       // oxlint-disable-next-line typescript/no-explicit-any
       ctx.resolveUserName = async () => ({ name: "Alice" }) as any;
@@ -214,7 +214,7 @@ describe("channel inbound contract", () => {
             groups: { "*": { requireMention: false } },
           },
         },
-      } satisfies OpenClawConfig,
+      } satisfies RecallConfig,
       message: {
         chat: { id: 42, type: "group", title: "Ops" },
         text: "hello",

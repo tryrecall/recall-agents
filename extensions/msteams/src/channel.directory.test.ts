@@ -3,7 +3,7 @@ import {
   createDirectoryTestRuntime,
   expectDirectorySurface,
 } from "../../../test/helpers/extensions/directory.js";
-import type { OpenClawConfig, RuntimeEnv } from "../runtime-api.js";
+import type { RecallConfig, RuntimeEnv } from "../runtime-api.js";
 import { msteamsPlugin } from "./channel.js";
 
 function requireDirectorySelf(
@@ -33,7 +33,7 @@ describe("msteams directory", () => {
             tenantId: "tenant-id-5678",
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
 
       const result = await directorySelf({ cfg, runtime: runtimeEnv });
       expect(result).toEqual({ kind: "user", id: "test-app-id-1234", name: "test-app-id-1234" });
@@ -43,7 +43,7 @@ describe("msteams directory", () => {
       vi.stubEnv("MSTEAMS_APP_ID", "");
       vi.stubEnv("MSTEAMS_APP_PASSWORD", "");
       vi.stubEnv("MSTEAMS_TENANT_ID", "");
-      const cfg = { channels: {} } as unknown as OpenClawConfig;
+      const cfg = { channels: {} } as unknown as RecallConfig;
       const result = await directorySelf({ cfg, runtime: runtimeEnv });
       expect(result).toBeNull();
     });
@@ -65,7 +65,7 @@ describe("msteams directory", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const directory = expectDirectorySurface(msteamsPlugin.directory);
 
@@ -108,7 +108,7 @@ describe("msteams directory", () => {
           dms: { "  Carol  ": {}, "user:Dave": {} },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const directory = expectDirectorySurface(msteamsPlugin.directory);
 

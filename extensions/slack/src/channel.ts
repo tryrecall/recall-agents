@@ -2,34 +2,34 @@ import {
   buildLegacyDmAccountAllowlistAdapter,
   createAccountScopedAllowlistNameResolver,
   createFlatAllowlistOverrideResolver,
-} from "openclaw/plugin-sdk/allowlist-config-edit";
+} from "recall/plugin-sdk/allowlist-config-edit";
 import {
   adaptScopedAccountAccessor,
   createScopedDmSecurityResolver,
-} from "openclaw/plugin-sdk/channel-config-helpers";
-import { createPairingPrefixStripper } from "openclaw/plugin-sdk/channel-pairing";
-import { createOpenProviderConfiguredRouteWarningCollector } from "openclaw/plugin-sdk/channel-policy";
-import { resolveTargetsWithOptionalToken } from "openclaw/plugin-sdk/channel-targets";
-import { createChatChannelPlugin } from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/channel-config-helpers";
+import { createPairingPrefixStripper } from "recall/plugin-sdk/channel-pairing";
+import { createOpenProviderConfiguredRouteWarningCollector } from "recall/plugin-sdk/channel-policy";
+import { resolveTargetsWithOptionalToken } from "recall/plugin-sdk/channel-targets";
+import { createChatChannelPlugin } from "recall/plugin-sdk/core";
 import {
   createChannelDirectoryAdapter,
   createRuntimeDirectoryLiveAdapter,
-} from "openclaw/plugin-sdk/directory-runtime";
-import { buildPassiveProbedChannelStatusSummary } from "openclaw/plugin-sdk/extension-shared";
+} from "recall/plugin-sdk/directory-runtime";
+import { buildPassiveProbedChannelStatusSummary } from "recall/plugin-sdk/extension-shared";
 import {
   createRuntimeOutboundDelegates,
   resolveOutboundSendDep,
-} from "openclaw/plugin-sdk/outbound-runtime";
+} from "recall/plugin-sdk/outbound-runtime";
 import {
   buildOutboundBaseSessionKey,
   normalizeOutboundThreadId,
   resolveThreadSessionKeys,
   type RoutePeer,
-} from "openclaw/plugin-sdk/routing";
+} from "recall/plugin-sdk/routing";
 import {
   createComputedAccountStatusAdapter,
   createDefaultChannelRuntimeState,
-} from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/status-helpers";
 import {
   listEnabledSlackAccounts,
   resolveSlackAccount,
@@ -58,7 +58,7 @@ import {
   projectCredentialSnapshotFields,
   resolveConfiguredFromRequiredCredentialStatuses,
   type ChannelPlugin,
-  type OpenClawConfig,
+  type RecallConfig,
 } from "./runtime-api.js";
 import { getSlackRuntime } from "./runtime.js";
 import { fetchSlackScopes } from "./scopes.js";
@@ -167,7 +167,7 @@ function parseSlackExplicitTarget(raw: string) {
 }
 
 function buildSlackBaseSessionKey(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   accountId?: string | null;
   peer: RoutePeer;
@@ -176,7 +176,7 @@ function buildSlackBaseSessionKey(params: {
 }
 
 async function resolveSlackChannelType(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
   channelId: string;
 }): Promise<"channel" | "group" | "dm" | "unknown"> {
@@ -239,7 +239,7 @@ async function resolveSlackChannelType(params: {
 }
 
 async function resolveSlackOutboundSessionRoute(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   accountId?: string | null;
   target: string;
@@ -459,7 +459,7 @@ export const slackPlugin: ChannelPlugin<ResolvedSlackAccount, SlackProbe> = crea
       invoke: async (action, cfg, toolContext) =>
         await getSlackRuntime().channel.slack.handleSlackAction(
           action,
-          cfg as OpenClawConfig,
+          cfg as RecallConfig,
           toolContext as SlackActionContext | undefined,
         ),
     }),

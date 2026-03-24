@@ -3,11 +3,11 @@ import {
   readNumberParam,
   readStringArrayParam,
   readStringParam,
-} from "openclaw/plugin-sdk/agent-runtime";
-import { readBooleanParam } from "openclaw/plugin-sdk/boolean-param";
-import { resolveReactionMessageId } from "openclaw/plugin-sdk/channel-actions";
-import type { ChannelMessageActionContext } from "openclaw/plugin-sdk/channel-contract";
-import { normalizeInteractiveReply } from "openclaw/plugin-sdk/interactive-runtime";
+} from "recall/plugin-sdk/agent-runtime";
+import { readBooleanParam } from "recall/plugin-sdk/boolean-param";
+import { resolveReactionMessageId } from "recall/plugin-sdk/channel-actions";
+import type { ChannelMessageActionContext } from "recall/plugin-sdk/channel-contract";
+import { normalizeInteractiveReply } from "recall/plugin-sdk/interactive-runtime";
 import { buildDiscordInteractiveComponents } from "../shared-interactive.js";
 import { resolveDiscordChannelId } from "../targets.js";
 import { tryHandleDiscordMessageActionGuildAdmin } from "./handle-action.guild-admin.js";

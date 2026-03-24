@@ -1,7 +1,7 @@
 {
-  "name": "@openclaw/msteams",
+  "name": "@recall/msteams",
   "version": "2026.3.22",
-  "description": "OpenClaw Microsoft Teams channel plugin",
+  "description": "Recall Microsoft Teams channel plugin",
   "type": "module",
   "dependencies": {
     "@microsoft/agents-hosting": "^1.4.1",
@@ -9,17 +9,17 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.3.22"
+    "recall": ">=2026.3.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
@@ -37,7 +37,7 @@
       "order": 60
     },
     "install": {
-      "npmSpec": "@openclaw/msteams",
+      "npmSpec": "@recall/msteams",
       "localPath": "extensions/msteams",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.3.22"

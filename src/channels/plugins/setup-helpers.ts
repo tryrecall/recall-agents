@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "../../routing/session-key.js";
 import type { ChannelSetupAdapter } from "./types.adapters.js";
 import type { ChannelSetupInput } from "./types.core.js";
@@ -9,14 +9,14 @@ type ChannelSectionBase = {
   accounts?: Record<string, Record<string, unknown>>;
 };
 
-function channelHasAccounts(cfg: OpenClawConfig, channelKey: string): boolean {
+function channelHasAccounts(cfg: RecallConfig, channelKey: string): boolean {
   const channels = cfg.channels as Record<string, unknown> | undefined;
   const base = channels?.[channelKey] as ChannelSectionBase | undefined;
   return Boolean(base?.accounts && Object.keys(base.accounts).length > 0);
 }
 
 function shouldStoreNameInAccounts(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channelKey: string;
   accountId: string;
   alwaysUseAccounts?: boolean;
@@ -31,12 +31,12 @@ function shouldStoreNameInAccounts(params: {
 }
 
 export function applyAccountNameToChannelSection(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channelKey: string;
   accountId: string;
   name?: string;
   alwaysUseAccounts?: boolean;
-}): OpenClawConfig {
+}): RecallConfig {
   const trimmed = params.name?.trim();
   if (!trimmed) {
     return params.cfg;
@@ -63,7 +63,7 @@ export function applyAccountNameToChannelSection(params: {
           name: trimmed,
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
   }
   const baseAccounts: Record<string, Record<string, unknown>> = base?.accounts ?? {};
   const existingAccount = baseAccounts[accountId] ?? {};
@@ -86,14 +86,14 @@ export function applyAccountNameToChannelSection(params: {
         },
       },
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
 export function migrateBaseNameToDefaultAccount(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channelKey: string;
   alwaysUseAccounts?: boolean;
-}): OpenClawConfig {
+}): RecallConfig {
   if (params.alwaysUseAccounts) {
     return params.cfg;
   }
@@ -120,17 +120,17 @@ export function migrateBaseNameToDefaultAccount(params: {
         accounts,
       },
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
 export function prepareScopedSetupConfig(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channelKey: string;
   accountId: string;
   name?: string;
   alwaysUseAccounts?: boolean;
   migrateBaseName?: boolean;
-}): OpenClawConfig {
+}): RecallConfig {
   const namedConfig = applyAccountNameToChannelSection({
     cfg: params.cfg,
     channelKey: params.channelKey,
@@ -149,11 +149,11 @@ export function prepareScopedSetupConfig(params: {
 }
 
 export function applySetupAccountConfigPatch(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channelKey: string;
   accountId: string;
   patch: Record<string, unknown>;
-}): OpenClawConfig {
+}): RecallConfig {
   return patchScopedAccountConfig({
     cfg: params.cfg,
     channelKey: params.channelKey,
@@ -235,7 +235,7 @@ export function createEnvPatchedAccountSetupAdapter(params: {
 }
 
 export function patchScopedAccountConfig(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channelKey: string;
   accountId: string;
   patch: Record<string, unknown>;
@@ -243,7 +243,7 @@ export function patchScopedAccountConfig(params: {
   ensureChannelEnabled?: boolean;
   ensureAccountEnabled?: boolean;
   scopeDefaultToAccounts?: boolean;
-}): OpenClawConfig {
+}): RecallConfig {
   const accountId = normalizeAccountId(params.accountId);
   const channels = params.cfg.channels as Record<string, unknown> | undefined;
   const channelConfig = channels?.[params.channelKey];
@@ -268,7 +268,7 @@ export function patchScopedAccountConfig(params: {
           ...patch,
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
   }
 
   const accounts = base?.accounts ?? {};
@@ -295,7 +295,7 @@ export function patchScopedAccountConfig(params: {
         },
       },
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
 type ChannelSectionRecord = Record<string, unknown> & {
@@ -495,9 +495,9 @@ function cloneIfObject<T>(value: T): T {
 // move top-level account settings into accounts.default so the original
 // account keeps working without duplicate account values at channel root.
 export function moveSingleAccountChannelSectionToDefaultAccount(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channelKey: string;
-}): OpenClawConfig {
+}): RecallConfig {
   const channels = params.cfg.channels as Record<string, unknown> | undefined;
   const baseConfig = channels?.[params.channelKey];
   const base =
@@ -546,7 +546,7 @@ export function moveSingleAccountChannelSectionToDefaultAccount(params: {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
   }
   const keysToMove = resolveSingleAccountKeysToMove({
     channelKey: params.channelKey,
@@ -574,5 +574,5 @@ export function moveSingleAccountChannelSectionToDefaultAccount(params: {
         },
       },
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }

@@ -2,30 +2,30 @@
 summary: "Integrated browser control service + action commands"
 read_when:
   - Adding agent-controlled browser automation
-  - Debugging why openclaw is interfering with your own Chrome
+  - Debugging why recall is interfering with your own Chrome
   - Implementing browser settings + lifecycle in the macOS app
-title: "Browser (OpenClaw-managed)"
+title: "Browser (Recall-managed)"
 ---
 
-# Browser (openclaw-managed)
+# Browser (recall-managed)
 
-OpenClaw can run a **dedicated Chrome/Brave/Edge/Chromium profile** that the agent controls.
+Recall can run a **dedicated Chrome/Brave/Edge/Chromium profile** that the agent controls.
 It is isolated from your personal browser and is managed through a small local
 control service inside the Gateway (loopback only).
 
 Beginner view:
 
 - Think of it as a **separate, agent-only browser**.
-- The `openclaw` profile does **not** touch your personal browser profile.
+- The `recall` profile does **not** touch your personal browser profile.
 - The agent can **open tabs, read pages, click, and type** in a safe lane.
 - The built-in `user` profile attaches to your real signed-in Chrome session via Chrome MCP.
 
 ## What you get
 
-- A separate browser profile named **openclaw** (orange accent by default).
+- A separate browser profile named **recall** (orange accent by default).
 - Deterministic tab control (list/open/focus/close).
 - Agent actions (click/type/drag/select), snapshots, screenshots, PDFs.
-- Optional multi-profile support (`openclaw`, `work`, `remote`, ...).
+- Optional multi-profile support (`recall`, `work`, `remote`, ...).
 
 This browser is **not** your daily driver. It is a safe, isolated surface for
 agent automation and verification.
@@ -33,33 +33,33 @@ agent automation and verification.
 ## Quick start
 
 ```bash
-openclaw browser --browser-profile openclaw status
-openclaw browser --browser-profile openclaw start
-openclaw browser --browser-profile openclaw open https://example.com
-openclaw browser --browser-profile openclaw snapshot
+recall browser --browser-profile recall status
+recall browser --browser-profile recall start
+recall browser --browser-profile recall open https://example.com
+recall browser --browser-profile recall snapshot
 ```
 
 If you get “Browser disabled”, enable it in config (see below) and restart the
 Gateway.
 
-## Profiles: `openclaw` vs `user`
+## Profiles: `recall` vs `user`
 
-- `openclaw`: managed, isolated browser (no extension required).
+- `recall`: managed, isolated browser (no extension required).
 - `user`: built-in Chrome MCP attach profile for your **real signed-in Chrome**
   session.
 
 For agent browser tool calls:
 
-- Default: use the isolated `openclaw` browser.
+- Default: use the isolated `recall` browser.
 - Prefer `profile="user"` when existing logged-in sessions matter and the user
   is at the computer to click/approve any attach prompt.
 - `profile` is the explicit override when you want a specific browser mode.
 
-Set `browser.defaultProfile: "openclaw"` if you want managed mode by default.
+Set `browser.defaultProfile: "recall"` if you want managed mode by default.
 
 ## Configuration
 
-Browser settings live in `~/.openclaw/openclaw.json`.
+Browser settings live in `~/.recall/recall.json`.
 
 ```json5
 {
@@ -74,14 +74,14 @@ Browser settings live in `~/.openclaw/openclaw.json`.
     // cdpUrl: "http://127.0.0.1:18792", // legacy single-profile override
     remoteCdpTimeoutMs: 1500, // remote CDP HTTP timeout (ms)
     remoteCdpHandshakeTimeoutMs: 3000, // remote CDP WebSocket handshake timeout (ms)
-    defaultProfile: "openclaw",
+    defaultProfile: "recall",
     color: "#FF4500",
     headless: false,
     noSandbox: false,
     attachOnly: false,
     executablePath: "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
     profiles: {
-      openclaw: { cdpPort: 18800, color: "#FF4500" },
+      recall: { cdpPort: 18800, color: "#FF4500" },
       work: { cdpPort: 18801, color: "#0066CC" },
       user: {
         driver: "existing-session",
@@ -104,7 +104,7 @@ Notes:
 
 - The browser control service binds to loopback on a port derived from `gateway.port`
   (default: `18791`, which is gateway + 2).
-- If you override the Gateway port (`gateway.port` or `OPENCLAW_GATEWAY_PORT`),
+- If you override the Gateway port (`gateway.port` or `RECALL_GATEWAY_PORT`),
   the derived browser ports shift to stay in the same “family”.
 - `cdpUrl` defaults to the managed local CDP port when unset.
 - `remoteCdpTimeoutMs` applies to remote (non-loopback) CDP reachability checks.
@@ -115,9 +115,9 @@ Notes:
 - `browser.ssrfPolicy.allowPrivateNetwork` remains supported as a legacy alias for compatibility.
 - `attachOnly: true` means “never launch a local browser; only attach if it is already running.”
 - `color` + per-profile `color` tint the browser UI so you can see which profile is active.
-- Default profile is `openclaw` (OpenClaw-managed standalone browser). Use `defaultProfile: "user"` to opt into the signed-in user browser.
+- Default profile is `recall` (Recall-managed standalone browser). Use `defaultProfile: "user"` to opt into the signed-in user browser.
 - Auto-detect order: system default browser if Chromium-based; otherwise Chrome → Brave → Edge → Chromium → Chrome Canary.
-- Local `openclaw` profiles auto-assign `cdpPort`/`cdpUrl` — set those only for remote CDP.
+- Local `recall` profiles auto-assign `cdpPort`/`cdpUrl` — set those only for remote CDP.
 - `driver: "existing-session"` uses Chrome DevTools MCP instead of raw CDP. Do
   not set `cdpUrl` for that driver.
 - Set `browser.profiles.<name>.userDataDir` when an existing-session profile
@@ -126,13 +126,13 @@ Notes:
 ## Use Brave (or another Chromium-based browser)
 
 If your **system default** browser is Chromium-based (Chrome/Brave/Edge/etc),
-OpenClaw uses it automatically. Set `browser.executablePath` to override
+Recall uses it automatically. Set `browser.executablePath` to override
 auto-detection:
 
 CLI example:
 
 ```bash
-openclaw config set browser.executablePath "/usr/bin/google-chrome"
+recall config set browser.executablePath "/usr/bin/google-chrome"
 ```
 
 ```json5
@@ -163,20 +163,20 @@ openclaw config set browser.executablePath "/usr/bin/google-chrome"
 - **Local control (default):** the Gateway starts the loopback control service and can launch a local browser.
 - **Remote control (node host):** run a node host on the machine that has the browser; the Gateway proxies browser actions to it.
 - **Remote CDP:** set `browser.profiles.<name>.cdpUrl` (or `browser.cdpUrl`) to
-  attach to a remote Chromium-based browser. In this case, OpenClaw will not launch a local browser.
+  attach to a remote Chromium-based browser. In this case, Recall will not launch a local browser.
 
 Remote CDP URLs can include auth:
 
 - Query tokens (e.g., `https://provider.example?token=<token>`)
 - HTTP Basic auth (e.g., `https://user:pass@provider.example`)
 
-OpenClaw preserves the auth when calling `/json/*` endpoints and when connecting
+Recall preserves the auth when calling `/json/*` endpoints and when connecting
 to the CDP WebSocket. Prefer environment variables or secrets managers for
 tokens instead of committing them to config files.
 
 ## Node browser proxy (zero-config default)
 
-If you run a **node host** on the machine that has your browser, OpenClaw can
+If you run a **node host** on the machine that has your browser, Recall can
 auto-route browser tool calls to that node without any extra browser config.
 This is the default path for remote gateways.
 
@@ -185,7 +185,7 @@ Notes:
 - The node host exposes its local browser control server via a **proxy command**.
 - Profiles come from the node’s own `browser.profiles` config (same as local).
 - `nodeHost.browserProxy.allowProfiles` is optional. Leave it empty for the legacy/default behavior: all configured profiles remain reachable through the proxy, including profile create/delete routes.
-- If you set `nodeHost.browserProxy.allowProfiles`, OpenClaw treats it as a least-privilege boundary: only allowlisted profiles can be targeted, and persistent profile create/delete routes are blocked on the proxy surface.
+- If you set `nodeHost.browserProxy.allowProfiles`, Recall treats it as a least-privilege boundary: only allowlisted profiles can be targeted, and persistent profile create/delete routes are blocked on the proxy surface.
 - Disable if you don’t want it:
   - On the node: `nodeHost.browserProxy.enabled=false`
   - On the gateway: `gateway.nodes.browser.mode="off"`
@@ -193,7 +193,7 @@ Notes:
 ## Browserless (hosted remote CDP)
 
 [Browserless](https://browserless.io) is a hosted Chromium service that exposes
-CDP endpoints over HTTPS. You can point an OpenClaw browser profile at a
+CDP endpoints over HTTPS. You can point an Recall browser profile at a
 Browserless region endpoint and authenticate with your API key.
 
 Example:
@@ -223,11 +223,11 @@ Notes:
 ## Direct WebSocket CDP providers
 
 Some hosted browser services expose a **direct WebSocket** endpoint rather than
-the standard HTTP-based CDP discovery (`/json/version`). OpenClaw supports both:
+the standard HTTP-based CDP discovery (`/json/version`). Recall supports both:
 
-- **HTTP(S) endpoints** (e.g. Browserless) — OpenClaw calls `/json/version` to
+- **HTTP(S) endpoints** (e.g. Browserless) — Recall calls `/json/version` to
   discover the WebSocket debugger URL, then connects.
-- **WebSocket endpoints** (`ws://` / `wss://`) — OpenClaw connects directly,
+- **WebSocket endpoints** (`ws://` / `wss://`) — Recall connects directly,
   skipping `/json/version`. Use this for services like
   [Browserbase](https://www.browserbase.com) or any provider that hands you a
   WebSocket URL.
@@ -272,7 +272,7 @@ Notes:
 Key ideas:
 
 - Browser control is loopback-only; access flows through the Gateway’s auth or node pairing.
-- If browser control is enabled and no auth is configured, OpenClaw auto-generates `gateway.auth.token` on startup and persists it to config.
+- If browser control is enabled and no auth is configured, Recall auto-generates `gateway.auth.token` on startup and persists it to config.
 - Keep the Gateway and any node hosts on a private network (Tailscale); avoid public exposure.
 - Treat remote CDP URLs/tokens as secrets; prefer env vars or a secrets manager.
 
@@ -283,15 +283,15 @@ Remote CDP tips:
 
 ## Profiles (multi-browser)
 
-OpenClaw supports multiple named profiles (routing configs). Profiles can be:
+Recall supports multiple named profiles (routing configs). Profiles can be:
 
-- **openclaw-managed**: a dedicated Chromium-based browser instance with its own user data directory + CDP port
+- **recall-managed**: a dedicated Chromium-based browser instance with its own user data directory + CDP port
 - **remote**: an explicit CDP URL (Chromium-based browser running elsewhere)
 - **existing session**: your existing Chrome profile via Chrome DevTools MCP auto-connect
 
 Defaults:
 
-- The `openclaw` profile is auto-created if missing.
+- The `recall` profile is auto-created if missing.
 - The `user` profile is built-in for Chrome MCP existing-session attach.
 - Existing-session profiles are opt-in beyond `user`; create them with `--driver existing-session`.
 - Local CDP ports allocate from **18800–18899** by default.
@@ -301,7 +301,7 @@ All control endpoints accept `?profile=<name>`; the CLI uses `--browser-profile`
 
 ## Existing-session via Chrome DevTools MCP
 
-OpenClaw can also attach to a running Chromium-based browser profile through the
+Recall can also attach to a running Chromium-based browser profile through the
 official Chrome DevTools MCP server. This reuses the tabs and login state
 already open in that browser profile.
 
@@ -343,7 +343,7 @@ Then in the matching browser:
 
 1. Open that browser's inspect page for remote debugging.
 2. Enable remote debugging.
-3. Keep the browser running and approve the connection prompt when OpenClaw attaches.
+3. Keep the browser running and approve the connection prompt when Recall attaches.
 
 Common inspect pages:
 
@@ -354,10 +354,10 @@ Common inspect pages:
 Live attach smoke test:
 
 ```bash
-openclaw browser --browser-profile user start
-openclaw browser --browser-profile user status
-openclaw browser --browser-profile user tabs
-openclaw browser --browser-profile user snapshot --format ai
+recall browser --browser-profile user start
+recall browser --browser-profile user status
+recall browser --browser-profile user tabs
+recall browser --browser-profile user snapshot --format ai
 ```
 
 What success looks like:
@@ -373,7 +373,7 @@ What to check if attach does not work:
 - the target Chromium-based browser is version `144+`
 - remote debugging is enabled in that browser's inspect page
 - the browser showed and you accepted the attach consent prompt
-- `openclaw doctor` migrates old extension-based browser config and checks that
+- `recall doctor` migrates old extension-based browser config and checks that
   Chrome is installed locally for default auto-connect profiles, but it cannot
   enable browser-side remote debugging for you
 
@@ -387,12 +387,12 @@ Agent use:
 
 Notes:
 
-- This path is higher-risk than the isolated `openclaw` profile because it can
+- This path is higher-risk than the isolated `recall` profile because it can
   act inside your signed-in browser session.
-- OpenClaw does not launch the browser for this driver; it attaches to an
+- Recall does not launch the browser for this driver; it attaches to an
   existing session only.
-- OpenClaw uses the official Chrome DevTools MCP `--autoConnect` flow here. If
-  `userDataDir` is set, OpenClaw passes it through to target that explicit
+- Recall uses the official Chrome DevTools MCP `--autoConnect` flow here. If
+  `userDataDir` is set, Recall passes it through to target that explicit
   Chromium user data directory.
 - Existing-session screenshots support page captures and `--ref` element
   captures from snapshots, but not CSS `--element` selectors.
@@ -411,7 +411,7 @@ Notes:
 
 ## Browser selection
 
-When launching locally, OpenClaw picks the first available:
+When launching locally, Recall picks the first available:
 
 1. Chrome
 2. Brave
@@ -449,17 +449,17 @@ All endpoints accept `?profile=<name>`.
 If gateway auth is configured, browser HTTP routes require auth too:
 
 - `Authorization: Bearer <gateway token>`
-- `x-openclaw-password: <gateway password>` or HTTP Basic auth with that password
+- `x-recall-password: <gateway password>` or HTTP Basic auth with that password
 
 ### Playwright requirement
 
 Some features (navigate/act/AI snapshot/role snapshot, element screenshots, PDF) require
 Playwright. If Playwright isn’t installed, those endpoints return a clear 501
-error. ARIA snapshots and basic screenshots still work for openclaw-managed Chrome.
+error. ARIA snapshots and basic screenshots still work for recall-managed Chrome.
 
 If you see `Playwright is not available in this gateway build`, install the full
 Playwright package (not `playwright-core`) and restart the gateway, or reinstall
-OpenClaw with browser support.
+Recall with browser support.
 
 #### Docker Playwright install
 
@@ -467,13 +467,13 @@ If your Gateway runs in Docker, avoid `npx playwright` (npm override conflicts).
 Use the bundled CLI instead:
 
 ```bash
-docker compose run --rm openclaw-cli \
+docker compose run --rm recall-cli \
   node /app/node_modules/playwright-core/cli.js install chromium
 ```
 
 To persist browser downloads, set `PLAYWRIGHT_BROWSERS_PATH` (for example,
 `/home/node/.cache/ms-playwright`) and make sure `/home/node` is persisted via
-`OPENCLAW_HOME_VOLUME` or a bind mount. See [Docker](/install/docker).
+`RECALL_HOME_VOLUME` or a bind mount. See [Docker](/install/docker).
 
 ## How it works (internal)
 
@@ -495,89 +495,89 @@ All commands also accept `--json` for machine-readable output (stable payloads).
 
 Basics:
 
-- `openclaw browser status`
-- `openclaw browser start`
-- `openclaw browser stop`
-- `openclaw browser tabs`
-- `openclaw browser tab`
-- `openclaw browser tab new`
-- `openclaw browser tab select 2`
-- `openclaw browser tab close 2`
-- `openclaw browser open https://example.com`
-- `openclaw browser focus abcd1234`
-- `openclaw browser close abcd1234`
+- `recall browser status`
+- `recall browser start`
+- `recall browser stop`
+- `recall browser tabs`
+- `recall browser tab`
+- `recall browser tab new`
+- `recall browser tab select 2`
+- `recall browser tab close 2`
+- `recall browser open https://example.com`
+- `recall browser focus abcd1234`
+- `recall browser close abcd1234`
 
 Inspection:
 
-- `openclaw browser screenshot`
-- `openclaw browser screenshot --full-page`
-- `openclaw browser screenshot --ref 12`
-- `openclaw browser screenshot --ref e12`
-- `openclaw browser snapshot`
-- `openclaw browser snapshot --format aria --limit 200`
-- `openclaw browser snapshot --interactive --compact --depth 6`
-- `openclaw browser snapshot --efficient`
-- `openclaw browser snapshot --labels`
-- `openclaw browser snapshot --selector "#main" --interactive`
-- `openclaw browser snapshot --frame "iframe#main" --interactive`
-- `openclaw browser console --level error`
-- `openclaw browser errors --clear`
-- `openclaw browser requests --filter api --clear`
-- `openclaw browser pdf`
-- `openclaw browser responsebody "**/api" --max-chars 5000`
+- `recall browser screenshot`
+- `recall browser screenshot --full-page`
+- `recall browser screenshot --ref 12`
+- `recall browser screenshot --ref e12`
+- `recall browser snapshot`
+- `recall browser snapshot --format aria --limit 200`
+- `recall browser snapshot --interactive --compact --depth 6`
+- `recall browser snapshot --efficient`
+- `recall browser snapshot --labels`
+- `recall browser snapshot --selector "#main" --interactive`
+- `recall browser snapshot --frame "iframe#main" --interactive`
+- `recall browser console --level error`
+- `recall browser errors --clear`
+- `recall browser requests --filter api --clear`
+- `recall browser pdf`
+- `recall browser responsebody "**/api" --max-chars 5000`
 
 Actions:
 
-- `openclaw browser navigate https://example.com`
-- `openclaw browser resize 1280 720`
-- `openclaw browser click 12 --double`
-- `openclaw browser click e12 --double`
-- `openclaw browser type 23 "hello" --submit`
-- `openclaw browser press Enter`
-- `openclaw browser hover 44`
-- `openclaw browser scrollintoview e12`
-- `openclaw browser drag 10 11`
-- `openclaw browser select 9 OptionA OptionB`
-- `openclaw browser download e12 report.pdf`
-- `openclaw browser waitfordownload report.pdf`
-- `openclaw browser upload /tmp/openclaw/uploads/file.pdf`
-- `openclaw browser fill --fields '[{"ref":"1","type":"text","value":"Ada"}]'`
-- `openclaw browser dialog --accept`
-- `openclaw browser wait --text "Done"`
-- `openclaw browser wait "#main" --url "**/dash" --load networkidle --fn "window.ready===true"`
-- `openclaw browser evaluate --fn '(el) => el.textContent' --ref 7`
-- `openclaw browser highlight e12`
-- `openclaw browser trace start`
-- `openclaw browser trace stop`
+- `recall browser navigate https://example.com`
+- `recall browser resize 1280 720`
+- `recall browser click 12 --double`
+- `recall browser click e12 --double`
+- `recall browser type 23 "hello" --submit`
+- `recall browser press Enter`
+- `recall browser hover 44`
+- `recall browser scrollintoview e12`
+- `recall browser drag 10 11`
+- `recall browser select 9 OptionA OptionB`
+- `recall browser download e12 report.pdf`
+- `recall browser waitfordownload report.pdf`
+- `recall browser upload /tmp/recall/uploads/file.pdf`
+- `recall browser fill --fields '[{"ref":"1","type":"text","value":"Ada"}]'`
+- `recall browser dialog --accept`
+- `recall browser wait --text "Done"`
+- `recall browser wait "#main" --url "**/dash" --load networkidle --fn "window.ready===true"`
+- `recall browser evaluate --fn '(el) => el.textContent' --ref 7`
+- `recall browser highlight e12`
+- `recall browser trace start`
+- `recall browser trace stop`
 
 State:
 
-- `openclaw browser cookies`
-- `openclaw browser cookies set session abc123 --url "https://example.com"`
-- `openclaw browser cookies clear`
-- `openclaw browser storage local get`
-- `openclaw browser storage local set theme dark`
-- `openclaw browser storage session clear`
-- `openclaw browser set offline on`
-- `openclaw browser set headers --headers-json '{"X-Debug":"1"}'`
-- `openclaw browser set credentials user pass`
-- `openclaw browser set credentials --clear`
-- `openclaw browser set geo 37.7749 -122.4194 --origin "https://example.com"`
-- `openclaw browser set geo --clear`
-- `openclaw browser set media dark`
-- `openclaw browser set timezone America/New_York`
-- `openclaw browser set locale en-US`
-- `openclaw browser set device "iPhone 14"`
+- `recall browser cookies`
+- `recall browser cookies set session abc123 --url "https://example.com"`
+- `recall browser cookies clear`
+- `recall browser storage local get`
+- `recall browser storage local set theme dark`
+- `recall browser storage session clear`
+- `recall browser set offline on`
+- `recall browser set headers --headers-json '{"X-Debug":"1"}'`
+- `recall browser set credentials user pass`
+- `recall browser set credentials --clear`
+- `recall browser set geo 37.7749 -122.4194 --origin "https://example.com"`
+- `recall browser set geo --clear`
+- `recall browser set media dark`
+- `recall browser set timezone America/New_York`
+- `recall browser set locale en-US`
+- `recall browser set device "iPhone 14"`
 
 Notes:
 
 - `upload` and `dialog` are **arming** calls; run them before the click/press
   that triggers the chooser/dialog.
-- Download and trace output paths are constrained to OpenClaw temp roots:
-  - traces: `/tmp/openclaw` (fallback: `${os.tmpdir()}/openclaw`)
-  - downloads: `/tmp/openclaw/downloads` (fallback: `${os.tmpdir()}/openclaw/downloads`)
-- Upload paths are constrained to an OpenClaw temp uploads root:
-  - uploads: `/tmp/openclaw/uploads` (fallback: `${os.tmpdir()}/openclaw/uploads`)
+- Download and trace output paths are constrained to Recall temp roots:
+  - traces: `/tmp/recall` (fallback: `${os.tmpdir()}/recall`)
+  - downloads: `/tmp/recall/downloads` (fallback: `${os.tmpdir()}/recall/downloads`)
+- Upload paths are constrained to an Recall temp uploads root:
+  - uploads: `/tmp/recall/uploads` (fallback: `${os.tmpdir()}/recall/uploads`)
 - `upload` can also set file inputs directly via `--input-ref` or `--element`.
 - `snapshot`:
   - `--format ai` (default when Playwright is installed): returns an AI snapshot with numeric refs (`aria-ref="<n>"`).
@@ -593,16 +593,16 @@ Notes:
 
 ## Snapshots and refs
 
-OpenClaw supports two “snapshot” styles:
+Recall supports two “snapshot” styles:
 
-- **AI snapshot (numeric refs)**: `openclaw browser snapshot` (default; `--format ai`)
+- **AI snapshot (numeric refs)**: `recall browser snapshot` (default; `--format ai`)
   - Output: a text snapshot that includes numeric refs.
-  - Actions: `openclaw browser click 12`, `openclaw browser type 23 "hello"`.
+  - Actions: `recall browser click 12`, `recall browser type 23 "hello"`.
   - Internally, the ref is resolved via Playwright’s `aria-ref`.
 
-- **Role snapshot (role refs like `e12`)**: `openclaw browser snapshot --interactive` (or `--compact`, `--depth`, `--selector`, `--frame`)
+- **Role snapshot (role refs like `e12`)**: `recall browser snapshot --interactive` (or `--compact`, `--depth`, `--selector`, `--frame`)
   - Output: a role-based list/tree with `[ref=e12]` (and optional `[nth=1]`).
-  - Actions: `openclaw browser click e12`, `openclaw browser highlight e12`.
+  - Actions: `recall browser click e12`, `recall browser highlight e12`.
   - Internally, the ref is resolved via `getByRole(...)` (plus `nth()` for duplicates).
   - Add `--labels` to include a viewport screenshot with overlayed `e12` labels.
 
@@ -616,18 +616,18 @@ Ref behavior:
 You can wait on more than just time/text:
 
 - Wait for URL (globs supported by Playwright):
-  - `openclaw browser wait --url "**/dash"`
+  - `recall browser wait --url "**/dash"`
 - Wait for load state:
-  - `openclaw browser wait --load networkidle`
+  - `recall browser wait --load networkidle`
 - Wait for a JS predicate:
-  - `openclaw browser wait --fn "window.ready===true"`
+  - `recall browser wait --fn "window.ready===true"`
 - Wait for a selector to become visible:
-  - `openclaw browser wait "#main"`
+  - `recall browser wait "#main"`
 
 These can be combined:
 
 ```bash
-openclaw browser wait "#main" \
+recall browser wait "#main" \
   --url "**/dash" \
   --load networkidle \
   --fn "window.ready===true" \
@@ -638,16 +638,16 @@ openclaw browser wait "#main" \
 
 When an action fails (e.g. “not visible”, “strict mode violation”, “covered”):
 
-1. `openclaw browser snapshot --interactive`
+1. `recall browser snapshot --interactive`
 2. Use `click <ref>` / `type <ref>` (prefer role refs in interactive mode)
-3. If it still fails: `openclaw browser highlight <ref>` to see what Playwright is targeting
+3. If it still fails: `recall browser highlight <ref>` to see what Playwright is targeting
 4. If the page behaves oddly:
-   - `openclaw browser errors --clear`
-   - `openclaw browser requests --filter api --clear`
+   - `recall browser errors --clear`
+   - `recall browser requests --filter api --clear`
 5. For deep debugging: record a trace:
-   - `openclaw browser trace start`
+   - `recall browser trace start`
    - reproduce the issue
-   - `openclaw browser trace stop` (prints `TRACE:<path>`)
+   - `recall browser trace stop` (prints `TRACE:<path>`)
 
 ## JSON output
 
@@ -656,10 +656,10 @@ When an action fails (e.g. “not visible”, “strict mode violation”, “co
 Examples:
 
 ```bash
-openclaw browser status --json
-openclaw browser snapshot --interactive --json
-openclaw browser requests --filter api --json
-openclaw browser cookies --json
+recall browser status --json
+recall browser snapshot --interactive --json
+recall browser requests --filter api --json
+recall browser cookies --json
 ```
 
 Role snapshots in JSON include `refs` plus a small `stats` block (lines/chars/refs/interactive) so tools can reason about payload size and density.
@@ -682,8 +682,8 @@ These are useful for “make the site behave like X” workflows:
 
 ## Security & privacy
 
-- The openclaw browser profile may contain logged-in sessions; treat it as sensitive.
-- `browser act kind=evaluate` / `openclaw browser evaluate` and `wait --fn`
+- The recall browser profile may contain logged-in sessions; treat it as sensitive.
+- `browser act kind=evaluate` / `recall browser evaluate` and `wait --fn`
   execute arbitrary JavaScript in the page context. Prompt injection can steer
   this. Disable it with `browser.evaluateEnabled=false` if you do not need it.
 - For logins and anti-bot notes (X/Twitter, etc.), see [Browser login + X/Twitter posting](/tools/browser-login).
@@ -724,7 +724,7 @@ How it maps:
 - `browser act` uses the snapshot `ref` IDs to click/type/drag/select.
 - `browser screenshot` captures pixels (full page or element).
 - `browser` accepts:
-  - `profile` to choose a named browser profile (openclaw, chrome, or remote CDP).
+  - `profile` to choose a named browser profile (recall, chrome, or remote CDP).
   - `target` (`sandbox` | `host` | `node`) to select where the browser lives.
   - In sandboxed sessions, `target: "host"` requires `agents.defaults.sandbox.browser.allowHostControl=true`.
   - If `target` is omitted: sandboxed sessions default to `sandbox`, non-sandbox sessions default to `host`.

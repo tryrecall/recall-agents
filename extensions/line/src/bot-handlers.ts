@@ -11,30 +11,30 @@ import {
   buildMentionRegexes,
   matchesMentionPatterns,
   resolveMentionGatingWithBypass,
-} from "openclaw/plugin-sdk/channel-inbound";
-import { createChannelPairingChallengeIssuer } from "openclaw/plugin-sdk/channel-pairing";
-import { hasControlCommand, resolveControlCommandGate } from "openclaw/plugin-sdk/command-auth";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/channel-inbound";
+import { createChannelPairingChallengeIssuer } from "recall/plugin-sdk/channel-pairing";
+import { hasControlCommand, resolveControlCommandGate } from "recall/plugin-sdk/command-auth";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
 import {
   resolveAllowlistProviderRuntimeGroupPolicy,
   resolveDefaultGroupPolicy,
   warnMissingProviderGroupPolicyFallbackOnce,
-} from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/config-runtime";
 import {
   readChannelAllowFromStore,
   resolvePairingIdLabel,
   upsertChannelPairingRequest,
-} from "openclaw/plugin-sdk/conversation-runtime";
-import { evaluateMatchedGroupAccessForPolicy } from "openclaw/plugin-sdk/group-access";
+} from "recall/plugin-sdk/conversation-runtime";
+import { evaluateMatchedGroupAccessForPolicy } from "recall/plugin-sdk/group-access";
 import {
   DEFAULT_GROUP_HISTORY_LIMIT,
   clearHistoryEntriesIfEnabled,
   recordPendingHistoryEntryIfEnabled,
   type HistoryEntry,
-} from "openclaw/plugin-sdk/reply-history";
-import { resolveAgentRoute } from "openclaw/plugin-sdk/routing";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime";
-import { danger, logVerbose } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/reply-history";
+import { resolveAgentRoute } from "recall/plugin-sdk/routing";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime";
+import { danger, logVerbose } from "recall/plugin-sdk/runtime-env";
 import {
   firstDefined,
   isSenderAllowed,
@@ -72,7 +72,7 @@ function isDownloadableLineMessageType(
 }
 
 export interface LineHandlerContext {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   account: ResolvedLineAccount;
   runtime: RuntimeEnv;
   mediaMaxBytes: number;
@@ -454,7 +454,7 @@ function resolveEventRawText(event: MessageEvent | PostbackEvent): string {
 }
 
 function resolveLineCommandAuthorized(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   event: MessageEvent | PostbackEvent;
   senderId?: string;
   allow: NormalizedAllowFrom;

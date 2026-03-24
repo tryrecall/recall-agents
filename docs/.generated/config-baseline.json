@@ -1450,7 +1450,7 @@
         "advanced"
       ],
       "label": "Embedded Pi",
-      "help": "Embedded Pi runner hardening controls for how workspace-local Pi settings are trusted and applied in OpenClaw sessions.",
+      "help": "Embedded Pi runner hardening controls for how workspace-local Pi settings are trusted and applied in Recall sessions.",
       "hasChildren": true
     },
     {
@@ -2619,7 +2619,7 @@
         "storage"
       ],
       "label": "Memory Search Index Path",
-      "help": "Sets where the SQLite memory index is stored on disk for each agent. Keep the default `~/.openclaw/memory/{agentId}.sqlite` unless you need custom storage placement or backup policy alignment.",
+      "help": "Sets where the SQLite memory index is stored on disk for each agent. Keep the default `~/.recall/memory/{agentId}.sqlite` unless you need custom storage placement or backup policy alignment.",
       "hasChildren": false
     },
     {
@@ -3163,7 +3163,7 @@
         "storage"
       ],
       "label": "Sandbox Browser Network",
-      "help": "Docker network for sandbox browser containers (default: openclaw-sandbox-browser). Avoid bridge if you need stricter isolation.",
+      "help": "Docker network for sandbox browser containers (default: recall-sandbox-browser). Avoid bridge if you need stricter isolation.",
       "hasChildren": false
     },
     {
@@ -5270,7 +5270,7 @@
         "advanced"
       ],
       "label": "Agent Runtime",
-      "help": "Optional runtime descriptor for this agent. Use embedded for default OpenClaw execution or acp for external ACP harness defaults.",
+      "help": "Optional runtime descriptor for this agent. Use embedded for default Recall execution or acp for external ACP harness defaults.",
       "hasChildren": true
     },
     {
@@ -5298,7 +5298,7 @@
         "advanced"
       ],
       "label": "Agent ACP Harness Agent",
-      "help": "Optional ACP harness agent id to use for this OpenClaw agent (for example codex, claude).",
+      "help": "Optional ACP harness agent id to use for this Recall agent (for example codex, claude).",
       "hasChildren": false
     },
     {
@@ -5358,7 +5358,7 @@
         "advanced"
       ],
       "label": "Agent Runtime Type",
-      "help": "Runtime type for this agent: \"embedded\" (default OpenClaw runtime) or \"acp\" (ACP harness defaults).",
+      "help": "Runtime type for this agent: \"embedded\" (default Recall runtime) or \"acp\" (ACP harness defaults).",
       "hasChildren": false
     },
     {
@@ -8153,7 +8153,7 @@
         "storage"
       ],
       "label": "Browser Profile Driver",
-      "help": "Per-profile browser driver mode. Use \"openclaw\" (or legacy \"clawd\") for CDP-based profiles, or use \"existing-session\" for host-local Chrome DevTools MCP attachment.",
+      "help": "Per-profile browser driver mode. Use \"recall\" (or legacy \"clawd\") for CDP-based profiles, or use \"existing-session\" for host-local Chrome DevTools MCP attachment.",
       "hasChildren": false
     },
     {
@@ -13076,7 +13076,7 @@
         "performance"
       ],
       "label": "Discord EventQueue Listener Timeout (ms)",
-      "help": "Canonical Discord listener timeout control in ms for gateway normalization/enqueue handlers. Default is 120000 in OpenClaw; set per account via channels.discord.accounts.<id>.eventQueue.listenerTimeout.",
+      "help": "Canonical Discord listener timeout control in ms for gateway normalization/enqueue handlers. Default is 120000 in Recall; set per account via channels.discord.accounts.<id>.eventQueue.listenerTimeout.",
       "hasChildren": false
     },
     {
@@ -31085,7 +31085,7 @@
         "network"
       ],
       "label": "Synology Chat",
-      "help": "Connect your Synology NAS Chat to OpenClaw with full agent capabilities.",
+      "help": "Connect your Synology NAS Chat to Recall with full agent capabilities.",
       "hasChildren": true
     },
     {
@@ -38856,7 +38856,7 @@
         "advanced"
       ],
       "label": "Allow /mcp",
-      "help": "Allow /mcp chat command to manage OpenClaw MCP server config under mcp.servers (default: false).",
+      "help": "Allow /mcp chat command to manage Recall MCP server config under mcp.servers (default: false).",
       "hasChildren": false
     },
     {
@@ -39459,7 +39459,7 @@
         "storage"
       ],
       "label": "Cache Trace File Path",
-      "help": "JSONL output path for cache trace logs (default: $OPENCLAW_STATE_DIR/logs/cache-trace.jsonl).",
+      "help": "JSONL output path for cache trace logs (default: $RECALL_STATE_DIR/logs/cache-trace.jsonl).",
       "hasChildren": false
     },
     {
@@ -39797,7 +39797,7 @@
         "network"
       ],
       "label": "Wide-area Discovery Domain",
-      "help": "Optional unicast DNS-SD domain for wide-area discovery, such as openclaw.internal. Use this when you intentionally publish gateway discovery beyond local mDNS scopes.",
+      "help": "Optional unicast DNS-SD domain for wide-area discovery, such as recall.internal. Use this when you intentionally publish gateway discovery beyond local mDNS scopes.",
       "hasChildren": false
     },
     {
@@ -39891,7 +39891,7 @@
         "advanced"
       ],
       "label": "Environment Variable Overrides",
-      "help": "Explicit key/value environment variable overrides merged into runtime process environment for OpenClaw. Use this for deterministic env configuration instead of relying only on shell profile side effects.",
+      "help": "Explicit key/value environment variable overrides merged into runtime process environment for Recall. Use this for deterministic env configuration instead of relying only on shell profile side effects.",
       "hasChildren": true
     },
     {
@@ -40322,7 +40322,7 @@
         "storage"
       ],
       "label": "Control UI Base Path",
-      "help": "Optional URL prefix where the Control UI is served (e.g. /openclaw).",
+      "help": "Optional URL prefix where the Control UI is served (e.g. /recall).",
       "hasChildren": false
     },
     {
@@ -40969,7 +40969,7 @@
         "network"
       ],
       "label": "Gateway Node Allowlist (Extra Commands)",
-      "help": "Extra node.invoke commands to allow beyond the gateway defaults (array of command strings). Enabling dangerous commands here is a security-sensitive override and is flagged by `openclaw security audit`.",
+      "help": "Extra node.invoke commands to allow beyond the gateway defaults (array of command strings). Enabling dangerous commands here is a security-sensitive override and is flagged by `recall security audit`.",
       "hasChildren": true
     },
     {
@@ -41605,7 +41605,7 @@
         "advanced"
       ],
       "label": "Hooks",
-      "help": "Inbound webhook automation surface for mapping external events into wake or agent actions in OpenClaw. Keep this locked down with explicit token/session/agent controls before exposing it beyond trusted networks.",
+      "help": "Inbound webhook automation surface for mapping external events into wake or agent actions in Recall. Keep this locked down with explicit token/session/agent controls before exposing it beyond trusted networks.",
       "hasChildren": true
     },
     {
@@ -42926,7 +42926,7 @@
         "advanced"
       ],
       "label": "MCP",
-      "help": "Global MCP server definitions managed by OpenClaw. Embedded Pi and other runtime adapters can consume these servers without storing them inside Pi-owned project settings.",
+      "help": "Global MCP server definitions managed by Recall. Embedded Pi and other runtime adapters can consume these servers without storing them inside Pi-owned project settings.",
       "hasChildren": true
     },
     {
@@ -42940,7 +42940,7 @@
         "advanced"
       ],
       "label": "MCP Servers",
-      "help": "Named MCP server definitions. OpenClaw stores them in its own config and runtime adapters decide which transports are supported at execution time.",
+      "help": "Named MCP server definitions. Recall stores them in its own config and runtime adapters decide which transports are supported at execution time.",
       "hasChildren": true
     },
     {
@@ -43113,7 +43113,7 @@
         "storage"
       ],
       "label": "Memory Backend",
-      "help": "Selects the global memory engine: \"builtin\" uses OpenClaw memory internals, while \"qmd\" uses the QMD sidecar pipeline. Keep \"builtin\" unless you intentionally operate QMD.",
+      "help": "Selects the global memory engine: \"builtin\" uses Recall memory internals, while \"qmd\" uses the QMD sidecar pipeline. Keep \"builtin\" unless you intentionally operate QMD.",
       "hasChildren": false
     },
     {
@@ -44974,7 +44974,7 @@
         "advanced"
       ],
       "label": "Metadata",
-      "help": "Metadata fields automatically maintained by OpenClaw to record write/version history for this config file. Keep these values system-managed and avoid manual edits unless debugging migration history.",
+      "help": "Metadata fields automatically maintained by Recall to record write/version history for this config file. Keep these values system-managed and avoid manual edits unless debugging migration history.",
       "hasChildren": true
     },
     {
@@ -45002,7 +45002,7 @@
         "media"
       ],
       "label": "Config Last Touched Version",
-      "help": "Auto-set when OpenClaw writes the config.",
+      "help": "Auto-set when Recall writes the config.",
       "hasChildren": false
     },
     {
@@ -45355,7 +45355,7 @@
         "models"
       ],
       "label": "Model Provider Inject num_ctx (OpenAI Compat)",
-      "help": "Controls whether OpenClaw injects `options.num_ctx` for Ollama providers configured with the OpenAI-compatible adapter (`openai-completions`). Default is true. Set false only if your proxy/upstream rejects unknown `options` payload fields.",
+      "help": "Controls whether Recall injects `options.num_ctx` for Ollama providers configured with the OpenAI-compatible adapter (`openai-completions`). Default is true. Set false only if your proxy/upstream rejects unknown `options` payload fields.",
       "hasChildren": false
     },
     {
@@ -45753,7 +45753,7 @@
         "storage"
       ],
       "label": "Node Browser Proxy Allowed Profiles",
-      "help": "Optional allowlist of browser profile names exposed through node proxy routing. Leave empty to preserve the default full profile surface, including profile create/delete routes. When set, OpenClaw enforces least-privilege profile access and blocks persistent profile create/delete through the proxy.",
+      "help": "Optional allowlist of browser profile names exposed through node proxy routing. Leave empty to preserve the default full profile surface, including profile create/delete routes. When set, Recall enforces least-privilege profile access and blocks persistent profile create/delete through the proxy.",
       "hasChildren": true
     },
     {
@@ -46190,7 +46190,7 @@
         "advanced"
       ],
       "label": "Queue Owner TTL Seconds",
-      "help": "Idle queue-owner TTL for acpx prompt turns. Keep this short in OpenClaw to avoid delayed completion after each turn.",
+      "help": "Idle queue-owner TTL for acpx prompt turns. Keep this short in Recall to avoid delayed completion after each turn.",
       "hasChildren": false
     },
     {
@@ -46325,8 +46325,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/amazon-bedrock-provider",
-      "help": "OpenClaw Amazon Bedrock provider plugin (plugin: amazon-bedrock)",
+      "label": "@recall/amazon-bedrock-provider",
+      "help": "Recall Amazon Bedrock provider plugin (plugin: amazon-bedrock)",
       "hasChildren": true
     },
     {
@@ -46339,7 +46339,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/amazon-bedrock-provider Config",
+      "label": "@recall/amazon-bedrock-provider Config",
       "help": "Plugin-defined config payload for amazon-bedrock.",
       "hasChildren": false
     },
@@ -46353,7 +46353,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/amazon-bedrock-provider",
+      "label": "Enable @recall/amazon-bedrock-provider",
       "hasChildren": false
     },
     {
@@ -46446,8 +46446,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/anthropic-provider",
-      "help": "OpenClaw Anthropic provider plugin (plugin: anthropic)",
+      "label": "@recall/anthropic-provider",
+      "help": "Recall Anthropic provider plugin (plugin: anthropic)",
       "hasChildren": true
     },
     {
@@ -46460,7 +46460,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/anthropic-provider Config",
+      "label": "@recall/anthropic-provider Config",
       "help": "Plugin-defined config payload for anthropic.",
       "hasChildren": false
     },
@@ -46474,7 +46474,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/anthropic-provider",
+      "label": "Enable @recall/anthropic-provider",
       "hasChildren": false
     },
     {
@@ -46567,8 +46567,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/bluebubbles",
-      "help": "OpenClaw BlueBubbles channel plugin (plugin: bluebubbles)",
+      "label": "@recall/bluebubbles",
+      "help": "Recall BlueBubbles channel plugin (plugin: bluebubbles)",
       "hasChildren": true
     },
     {
@@ -46581,7 +46581,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/bluebubbles Config",
+      "label": "@recall/bluebubbles Config",
       "help": "Plugin-defined config payload for bluebubbles.",
       "hasChildren": false
     },
@@ -46595,7 +46595,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/bluebubbles",
+      "label": "Enable @recall/bluebubbles",
       "hasChildren": false
     },
     {
@@ -46688,8 +46688,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/brave-plugin",
-      "help": "OpenClaw Brave plugin (plugin: brave)",
+      "label": "@recall/brave-plugin",
+      "help": "Recall Brave plugin (plugin: brave)",
       "hasChildren": true
     },
     {
@@ -46702,7 +46702,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/brave-plugin Config",
+      "label": "@recall/brave-plugin Config",
       "help": "Plugin-defined config payload for brave.",
       "hasChildren": true
     },
@@ -46762,7 +46762,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/brave-plugin",
+      "label": "Enable @recall/brave-plugin",
       "hasChildren": false
     },
     {
@@ -46855,8 +46855,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/byteplus-provider",
-      "help": "OpenClaw BytePlus provider plugin (plugin: byteplus)",
+      "label": "@recall/byteplus-provider",
+      "help": "Recall BytePlus provider plugin (plugin: byteplus)",
       "hasChildren": true
     },
     {
@@ -46869,7 +46869,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/byteplus-provider Config",
+      "label": "@recall/byteplus-provider Config",
       "help": "Plugin-defined config payload for byteplus.",
       "hasChildren": false
     },
@@ -46883,7 +46883,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/byteplus-provider",
+      "label": "Enable @recall/byteplus-provider",
       "hasChildren": false
     },
     {
@@ -46976,8 +46976,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/chutes-provider",
-      "help": "OpenClaw Chutes.ai provider plugin (plugin: chutes)",
+      "label": "@recall/chutes-provider",
+      "help": "Recall Chutes.ai provider plugin (plugin: chutes)",
       "hasChildren": true
     },
     {
@@ -46990,7 +46990,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/chutes-provider Config",
+      "label": "@recall/chutes-provider Config",
       "help": "Plugin-defined config payload for chutes.",
       "hasChildren": false
     },
@@ -47004,7 +47004,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/chutes-provider",
+      "label": "Enable @recall/chutes-provider",
       "hasChildren": false
     },
     {
@@ -47097,8 +47097,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/cloudflare-ai-gateway-provider",
-      "help": "OpenClaw Cloudflare AI Gateway provider plugin (plugin: cloudflare-ai-gateway)",
+      "label": "@recall/cloudflare-ai-gateway-provider",
+      "help": "Recall Cloudflare AI Gateway provider plugin (plugin: cloudflare-ai-gateway)",
       "hasChildren": true
     },
     {
@@ -47111,7 +47111,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/cloudflare-ai-gateway-provider Config",
+      "label": "@recall/cloudflare-ai-gateway-provider Config",
       "help": "Plugin-defined config payload for cloudflare-ai-gateway.",
       "hasChildren": false
     },
@@ -47125,7 +47125,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/cloudflare-ai-gateway-provider",
+      "label": "Enable @recall/cloudflare-ai-gateway-provider",
       "hasChildren": false
     },
     {
@@ -47218,8 +47218,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/copilot-proxy",
-      "help": "OpenClaw Copilot Proxy provider plugin (plugin: copilot-proxy)",
+      "label": "@recall/copilot-proxy",
+      "help": "Recall Copilot Proxy provider plugin (plugin: copilot-proxy)",
       "hasChildren": true
     },
     {
@@ -47232,7 +47232,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/copilot-proxy Config",
+      "label": "@recall/copilot-proxy Config",
       "help": "Plugin-defined config payload for copilot-proxy.",
       "hasChildren": false
     },
@@ -47246,7 +47246,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/copilot-proxy",
+      "label": "Enable @recall/copilot-proxy",
       "hasChildren": false
     },
     {
@@ -47339,8 +47339,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/deepgram-provider",
-      "help": "OpenClaw Deepgram media-understanding provider (plugin: deepgram)",
+      "label": "@recall/deepgram-provider",
+      "help": "Recall Deepgram media-understanding provider (plugin: deepgram)",
       "hasChildren": true
     },
     {
@@ -47353,7 +47353,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/deepgram-provider Config",
+      "label": "@recall/deepgram-provider Config",
       "help": "Plugin-defined config payload for deepgram.",
       "hasChildren": false
     },
@@ -47367,7 +47367,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/deepgram-provider",
+      "label": "Enable @recall/deepgram-provider",
       "hasChildren": false
     },
     {
@@ -47460,8 +47460,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/deepseek-provider",
-      "help": "OpenClaw DeepSeek provider plugin (plugin: deepseek)",
+      "label": "@recall/deepseek-provider",
+      "help": "Recall DeepSeek provider plugin (plugin: deepseek)",
       "hasChildren": true
     },
     {
@@ -47474,7 +47474,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/deepseek-provider Config",
+      "label": "@recall/deepseek-provider Config",
       "help": "Plugin-defined config payload for deepseek.",
       "hasChildren": false
     },
@@ -47488,7 +47488,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/deepseek-provider",
+      "label": "Enable @recall/deepseek-provider",
       "hasChildren": false
     },
     {
@@ -47716,8 +47716,8 @@
       "tags": [
         "observability"
       ],
-      "label": "@openclaw/diagnostics-otel",
-      "help": "OpenClaw diagnostics OpenTelemetry exporter (plugin: diagnostics-otel)",
+      "label": "@recall/diagnostics-otel",
+      "help": "Recall diagnostics OpenTelemetry exporter (plugin: diagnostics-otel)",
       "hasChildren": true
     },
     {
@@ -47730,7 +47730,7 @@
       "tags": [
         "observability"
       ],
-      "label": "@openclaw/diagnostics-otel Config",
+      "label": "@recall/diagnostics-otel Config",
       "help": "Plugin-defined config payload for diagnostics-otel.",
       "hasChildren": false
     },
@@ -47744,7 +47744,7 @@
       "tags": [
         "observability"
       ],
-      "label": "Enable @openclaw/diagnostics-otel",
+      "label": "Enable @recall/diagnostics-otel",
       "hasChildren": false
     },
     {
@@ -48295,8 +48295,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/discord",
-      "help": "OpenClaw Discord channel plugin (plugin: discord)",
+      "label": "@recall/discord",
+      "help": "Recall Discord channel plugin (plugin: discord)",
       "hasChildren": true
     },
     {
@@ -48309,7 +48309,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/discord Config",
+      "label": "@recall/discord Config",
       "help": "Plugin-defined config payload for discord.",
       "hasChildren": false
     },
@@ -48323,7 +48323,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/discord",
+      "label": "Enable @recall/discord",
       "hasChildren": false
     },
     {
@@ -48416,8 +48416,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/duckduckgo-plugin",
-      "help": "OpenClaw DuckDuckGo plugin (plugin: duckduckgo)",
+      "label": "@recall/duckduckgo-plugin",
+      "help": "Recall DuckDuckGo plugin (plugin: duckduckgo)",
       "hasChildren": true
     },
     {
@@ -48430,7 +48430,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/duckduckgo-plugin Config",
+      "label": "@recall/duckduckgo-plugin Config",
       "help": "Plugin-defined config payload for duckduckgo.",
       "hasChildren": true
     },
@@ -48487,7 +48487,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/duckduckgo-plugin",
+      "label": "Enable @recall/duckduckgo-plugin",
       "hasChildren": false
     },
     {
@@ -48580,8 +48580,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/elevenlabs-speech",
-      "help": "OpenClaw ElevenLabs speech plugin (plugin: elevenlabs)",
+      "label": "@recall/elevenlabs-speech",
+      "help": "Recall ElevenLabs speech plugin (plugin: elevenlabs)",
       "hasChildren": true
     },
     {
@@ -48594,7 +48594,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/elevenlabs-speech Config",
+      "label": "@recall/elevenlabs-speech Config",
       "help": "Plugin-defined config payload for elevenlabs.",
       "hasChildren": false
     },
@@ -48608,7 +48608,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/elevenlabs-speech",
+      "label": "Enable @recall/elevenlabs-speech",
       "hasChildren": false
     },
     {
@@ -48701,8 +48701,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/exa-plugin",
-      "help": "OpenClaw Exa plugin (plugin: exa)",
+      "label": "@recall/exa-plugin",
+      "help": "Recall Exa plugin (plugin: exa)",
       "hasChildren": true
     },
     {
@@ -48715,7 +48715,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/exa-plugin Config",
+      "label": "@recall/exa-plugin Config",
       "help": "Plugin-defined config payload for exa.",
       "hasChildren": true
     },
@@ -48757,7 +48757,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/exa-plugin",
+      "label": "Enable @recall/exa-plugin",
       "hasChildren": false
     },
     {
@@ -48850,8 +48850,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/fal-provider",
-      "help": "OpenClaw fal provider plugin (plugin: fal)",
+      "label": "@recall/fal-provider",
+      "help": "Recall fal provider plugin (plugin: fal)",
       "hasChildren": true
     },
     {
@@ -48864,7 +48864,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/fal-provider Config",
+      "label": "@recall/fal-provider Config",
       "help": "Plugin-defined config payload for fal.",
       "hasChildren": false
     },
@@ -48878,7 +48878,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/fal-provider",
+      "label": "Enable @recall/fal-provider",
       "hasChildren": false
     },
     {
@@ -48971,8 +48971,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/feishu",
-      "help": "OpenClaw Feishu/Lark channel plugin (community maintained by @m1heng) (plugin: feishu)",
+      "label": "@recall/feishu",
+      "help": "Recall Feishu/Lark channel plugin (community maintained by @m1heng) (plugin: feishu)",
       "hasChildren": true
     },
     {
@@ -48985,7 +48985,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/feishu Config",
+      "label": "@recall/feishu Config",
       "help": "Plugin-defined config payload for feishu.",
       "hasChildren": false
     },
@@ -48999,7 +48999,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/feishu",
+      "label": "Enable @recall/feishu",
       "hasChildren": false
     },
     {
@@ -49092,8 +49092,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/firecrawl-plugin",
-      "help": "OpenClaw Firecrawl plugin (plugin: firecrawl)",
+      "label": "@recall/firecrawl-plugin",
+      "help": "Recall Firecrawl plugin (plugin: firecrawl)",
       "hasChildren": true
     },
     {
@@ -49106,7 +49106,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/firecrawl-plugin Config",
+      "label": "@recall/firecrawl-plugin Config",
       "help": "Plugin-defined config payload for firecrawl.",
       "hasChildren": true
     },
@@ -49162,7 +49162,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/firecrawl-plugin",
+      "label": "Enable @recall/firecrawl-plugin",
       "hasChildren": false
     },
     {
@@ -49255,8 +49255,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/github-copilot-provider",
-      "help": "OpenClaw GitHub Copilot provider plugin (plugin: github-copilot)",
+      "label": "@recall/github-copilot-provider",
+      "help": "Recall GitHub Copilot provider plugin (plugin: github-copilot)",
       "hasChildren": true
     },
     {
@@ -49269,7 +49269,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/github-copilot-provider Config",
+      "label": "@recall/github-copilot-provider Config",
       "help": "Plugin-defined config payload for github-copilot.",
       "hasChildren": false
     },
@@ -49283,7 +49283,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/github-copilot-provider",
+      "label": "Enable @recall/github-copilot-provider",
       "hasChildren": false
     },
     {
@@ -49376,8 +49376,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/google-plugin",
-      "help": "OpenClaw Google plugin (plugin: google)",
+      "label": "@recall/google-plugin",
+      "help": "Recall Google plugin (plugin: google)",
       "hasChildren": true
     },
     {
@@ -49390,7 +49390,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/google-plugin Config",
+      "label": "@recall/google-plugin Config",
       "help": "Plugin-defined config payload for google.",
       "hasChildren": true
     },
@@ -49446,7 +49446,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/google-plugin",
+      "label": "Enable @recall/google-plugin",
       "hasChildren": false
     },
     {
@@ -49539,8 +49539,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/googlechat",
-      "help": "OpenClaw Google Chat channel plugin (plugin: googlechat)",
+      "label": "@recall/googlechat",
+      "help": "Recall Google Chat channel plugin (plugin: googlechat)",
       "hasChildren": true
     },
     {
@@ -49553,7 +49553,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/googlechat Config",
+      "label": "@recall/googlechat Config",
       "help": "Plugin-defined config payload for googlechat.",
       "hasChildren": false
     },
@@ -49567,7 +49567,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/googlechat",
+      "label": "Enable @recall/googlechat",
       "hasChildren": false
     },
     {
@@ -49660,8 +49660,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/groq-provider",
-      "help": "OpenClaw Groq media-understanding provider (plugin: groq)",
+      "label": "@recall/groq-provider",
+      "help": "Recall Groq media-understanding provider (plugin: groq)",
       "hasChildren": true
     },
     {
@@ -49674,7 +49674,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/groq-provider Config",
+      "label": "@recall/groq-provider Config",
       "help": "Plugin-defined config payload for groq.",
       "hasChildren": false
     },
@@ -49688,7 +49688,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/groq-provider",
+      "label": "Enable @recall/groq-provider",
       "hasChildren": false
     },
     {
@@ -49781,8 +49781,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/huggingface-provider",
-      "help": "OpenClaw Hugging Face provider plugin (plugin: huggingface)",
+      "label": "@recall/huggingface-provider",
+      "help": "Recall Hugging Face provider plugin (plugin: huggingface)",
       "hasChildren": true
     },
     {
@@ -49795,7 +49795,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/huggingface-provider Config",
+      "label": "@recall/huggingface-provider Config",
       "help": "Plugin-defined config payload for huggingface.",
       "hasChildren": false
     },
@@ -49809,7 +49809,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/huggingface-provider",
+      "label": "Enable @recall/huggingface-provider",
       "hasChildren": false
     },
     {
@@ -49902,8 +49902,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/imessage",
-      "help": "OpenClaw iMessage channel plugin (plugin: imessage)",
+      "label": "@recall/imessage",
+      "help": "Recall iMessage channel plugin (plugin: imessage)",
       "hasChildren": true
     },
     {
@@ -49916,7 +49916,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/imessage Config",
+      "label": "@recall/imessage Config",
       "help": "Plugin-defined config payload for imessage.",
       "hasChildren": false
     },
@@ -49930,7 +49930,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/imessage",
+      "label": "Enable @recall/imessage",
       "hasChildren": false
     },
     {
@@ -50023,8 +50023,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/irc",
-      "help": "OpenClaw IRC channel plugin (plugin: irc)",
+      "label": "@recall/irc",
+      "help": "Recall IRC channel plugin (plugin: irc)",
       "hasChildren": true
     },
     {
@@ -50037,7 +50037,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/irc Config",
+      "label": "@recall/irc Config",
       "help": "Plugin-defined config payload for irc.",
       "hasChildren": false
     },
@@ -50051,7 +50051,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/irc",
+      "label": "Enable @recall/irc",
       "hasChildren": false
     },
     {
@@ -50144,8 +50144,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/kilocode-provider",
-      "help": "OpenClaw Kilo Gateway provider plugin (plugin: kilocode)",
+      "label": "@recall/kilocode-provider",
+      "help": "Recall Kilo Gateway provider plugin (plugin: kilocode)",
       "hasChildren": true
     },
     {
@@ -50158,7 +50158,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/kilocode-provider Config",
+      "label": "@recall/kilocode-provider Config",
       "help": "Plugin-defined config payload for kilocode.",
       "hasChildren": false
     },
@@ -50172,7 +50172,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/kilocode-provider",
+      "label": "Enable @recall/kilocode-provider",
       "hasChildren": false
     },
     {
@@ -50265,8 +50265,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/kimi-provider",
-      "help": "OpenClaw Kimi provider plugin (plugin: kimi)",
+      "label": "@recall/kimi-provider",
+      "help": "Recall Kimi provider plugin (plugin: kimi)",
       "hasChildren": true
     },
     {
@@ -50279,7 +50279,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/kimi-provider Config",
+      "label": "@recall/kimi-provider Config",
       "help": "Plugin-defined config payload for kimi.",
       "hasChildren": false
     },
@@ -50293,7 +50293,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/kimi-provider",
+      "label": "Enable @recall/kimi-provider",
       "hasChildren": false
     },
     {
@@ -50386,8 +50386,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/line",
-      "help": "OpenClaw LINE channel plugin (plugin: line)",
+      "label": "@recall/line",
+      "help": "Recall LINE channel plugin (plugin: line)",
       "hasChildren": true
     },
     {
@@ -50400,7 +50400,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/line Config",
+      "label": "@recall/line Config",
       "help": "Plugin-defined config payload for line.",
       "hasChildren": false
     },
@@ -50414,7 +50414,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/line",
+      "label": "Enable @recall/line",
       "hasChildren": false
     },
     {
@@ -50689,7 +50689,7 @@
       "hasChildren": false
     },
     {
-      "path": "plugins.entries.lobster",
+      "path": "plugins.entries.recall",
       "kind": "plugin",
       "type": "object",
       "required": false,
@@ -50698,12 +50698,12 @@
       "tags": [
         "advanced"
       ],
-      "label": "Lobster",
-      "help": "Typed workflow tool with resumable approvals. (plugin: lobster)",
+      "label": "Recall",
+      "help": "Typed workflow tool with resumable approvals. (plugin: recall)",
       "hasChildren": true
     },
     {
-      "path": "plugins.entries.lobster.config",
+      "path": "plugins.entries.recall.config",
       "kind": "plugin",
       "type": "object",
       "required": false,
@@ -50712,12 +50712,12 @@
       "tags": [
         "advanced"
       ],
-      "label": "Lobster Config",
-      "help": "Plugin-defined config payload for lobster.",
+      "label": "Recall Config",
+      "help": "Plugin-defined config payload for recall.",
       "hasChildren": false
     },
     {
-      "path": "plugins.entries.lobster.enabled",
+      "path": "plugins.entries.recall.enabled",
       "kind": "plugin",
       "type": "boolean",
       "required": false,
@@ -50726,11 +50726,11 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable Lobster",
+      "label": "Enable Recall",
       "hasChildren": false
     },
     {
-      "path": "plugins.entries.lobster.hooks",
+      "path": "plugins.entries.recall.hooks",
       "kind": "plugin",
       "type": "object",
       "required": false,
@@ -50744,7 +50744,7 @@
       "hasChildren": true
     },
     {
-      "path": "plugins.entries.lobster.hooks.allowPromptInjection",
+      "path": "plugins.entries.recall.hooks.allowPromptInjection",
       "kind": "plugin",
       "type": "boolean",
       "required": false,
@@ -50758,7 +50758,7 @@
       "hasChildren": false
     },
     {
-      "path": "plugins.entries.lobster.subagent",
+      "path": "plugins.entries.recall.subagent",
       "kind": "plugin",
       "type": "object",
       "required": false,
@@ -50772,7 +50772,7 @@
       "hasChildren": true
     },
     {
-      "path": "plugins.entries.lobster.subagent.allowedModels",
+      "path": "plugins.entries.recall.subagent.allowedModels",
       "kind": "plugin",
       "type": "array",
       "required": false,
@@ -50786,7 +50786,7 @@
       "hasChildren": true
     },
     {
-      "path": "plugins.entries.lobster.subagent.allowedModels.*",
+      "path": "plugins.entries.recall.subagent.allowedModels.*",
       "kind": "plugin",
       "type": "string",
       "required": false,
@@ -50796,7 +50796,7 @@
       "hasChildren": false
     },
     {
-      "path": "plugins.entries.lobster.subagent.allowModelOverride",
+      "path": "plugins.entries.recall.subagent.allowModelOverride",
       "kind": "plugin",
       "type": "boolean",
       "required": false,
@@ -50819,8 +50819,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/matrix",
-      "help": "OpenClaw Matrix channel plugin (plugin: matrix)",
+      "label": "@recall/matrix",
+      "help": "Recall Matrix channel plugin (plugin: matrix)",
       "hasChildren": true
     },
     {
@@ -50833,7 +50833,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/matrix Config",
+      "label": "@recall/matrix Config",
       "help": "Plugin-defined config payload for matrix.",
       "hasChildren": false
     },
@@ -50847,7 +50847,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/matrix",
+      "label": "Enable @recall/matrix",
       "hasChildren": false
     },
     {
@@ -50940,8 +50940,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/mattermost",
-      "help": "OpenClaw Mattermost channel plugin (plugin: mattermost)",
+      "label": "@recall/mattermost",
+      "help": "Recall Mattermost channel plugin (plugin: mattermost)",
       "hasChildren": true
     },
     {
@@ -50954,7 +50954,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/mattermost Config",
+      "label": "@recall/mattermost Config",
       "help": "Plugin-defined config payload for mattermost.",
       "hasChildren": false
     },
@@ -50968,7 +50968,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/mattermost",
+      "label": "Enable @recall/mattermost",
       "hasChildren": false
     },
     {
@@ -51061,8 +51061,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/memory-core",
-      "help": "OpenClaw core memory search plugin (plugin: memory-core)",
+      "label": "@recall/memory-core",
+      "help": "Recall core memory search plugin (plugin: memory-core)",
       "hasChildren": true
     },
     {
@@ -51075,7 +51075,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/memory-core Config",
+      "label": "@recall/memory-core Config",
       "help": "Plugin-defined config payload for memory-core.",
       "hasChildren": false
     },
@@ -51089,7 +51089,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/memory-core",
+      "label": "Enable @recall/memory-core",
       "hasChildren": false
     },
     {
@@ -51182,8 +51182,8 @@
       "tags": [
         "storage"
       ],
-      "label": "@openclaw/memory-lancedb",
-      "help": "OpenClaw LanceDB-backed long-term memory plugin with auto-recall/capture (plugin: memory-lancedb)",
+      "label": "@recall/memory-lancedb",
+      "help": "Recall LanceDB-backed long-term memory plugin with auto-recall/capture (plugin: memory-lancedb)",
       "hasChildren": true
     },
     {
@@ -51196,7 +51196,7 @@
       "tags": [
         "storage"
       ],
-      "label": "@openclaw/memory-lancedb Config",
+      "label": "@recall/memory-lancedb Config",
       "help": "Plugin-defined config payload for memory-lancedb.",
       "hasChildren": true
     },
@@ -51339,7 +51339,7 @@
       "tags": [
         "storage"
       ],
-      "label": "Enable @openclaw/memory-lancedb",
+      "label": "Enable @recall/memory-lancedb",
       "hasChildren": false
     },
     {
@@ -51432,8 +51432,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/microsoft-speech",
-      "help": "OpenClaw Microsoft speech plugin (plugin: microsoft)",
+      "label": "@recall/microsoft-speech",
+      "help": "Recall Microsoft speech plugin (plugin: microsoft)",
       "hasChildren": true
     },
     {
@@ -51446,7 +51446,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/microsoft-speech Config",
+      "label": "@recall/microsoft-speech Config",
       "help": "Plugin-defined config payload for microsoft.",
       "hasChildren": false
     },
@@ -51460,7 +51460,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/microsoft-speech",
+      "label": "Enable @recall/microsoft-speech",
       "hasChildren": false
     },
     {
@@ -51553,8 +51553,8 @@
       "tags": [
         "performance"
       ],
-      "label": "@openclaw/minimax-provider",
-      "help": "OpenClaw MiniMax provider and OAuth plugin (plugin: minimax)",
+      "label": "@recall/minimax-provider",
+      "help": "Recall MiniMax provider and OAuth plugin (plugin: minimax)",
       "hasChildren": true
     },
     {
@@ -51567,7 +51567,7 @@
       "tags": [
         "performance"
       ],
-      "label": "@openclaw/minimax-provider Config",
+      "label": "@recall/minimax-provider Config",
       "help": "Plugin-defined config payload for minimax.",
       "hasChildren": false
     },
@@ -51581,7 +51581,7 @@
       "tags": [
         "performance"
       ],
-      "label": "Enable @openclaw/minimax-provider",
+      "label": "Enable @recall/minimax-provider",
       "hasChildren": false
     },
     {
@@ -51674,8 +51674,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/mistral-provider",
-      "help": "OpenClaw Mistral provider plugin (plugin: mistral)",
+      "label": "@recall/mistral-provider",
+      "help": "Recall Mistral provider plugin (plugin: mistral)",
       "hasChildren": true
     },
     {
@@ -51688,7 +51688,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/mistral-provider Config",
+      "label": "@recall/mistral-provider Config",
       "help": "Plugin-defined config payload for mistral.",
       "hasChildren": false
     },
@@ -51702,7 +51702,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/mistral-provider",
+      "label": "Enable @recall/mistral-provider",
       "hasChildren": false
     },
     {
@@ -51795,8 +51795,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/modelstudio-provider",
-      "help": "OpenClaw Model Studio provider plugin (plugin: modelstudio)",
+      "label": "@recall/modelstudio-provider",
+      "help": "Recall Model Studio provider plugin (plugin: modelstudio)",
       "hasChildren": true
     },
     {
@@ -51809,7 +51809,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/modelstudio-provider Config",
+      "label": "@recall/modelstudio-provider Config",
       "help": "Plugin-defined config payload for modelstudio.",
       "hasChildren": false
     },
@@ -51823,7 +51823,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/modelstudio-provider",
+      "label": "Enable @recall/modelstudio-provider",
       "hasChildren": false
     },
     {
@@ -51916,8 +51916,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/moonshot-provider",
-      "help": "OpenClaw Moonshot provider plugin (plugin: moonshot)",
+      "label": "@recall/moonshot-provider",
+      "help": "Recall Moonshot provider plugin (plugin: moonshot)",
       "hasChildren": true
     },
     {
@@ -51930,7 +51930,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/moonshot-provider Config",
+      "label": "@recall/moonshot-provider Config",
       "help": "Plugin-defined config payload for moonshot.",
       "hasChildren": true
     },
@@ -52000,7 +52000,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/moonshot-provider",
+      "label": "Enable @recall/moonshot-provider",
       "hasChildren": false
     },
     {
@@ -52093,8 +52093,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/msteams",
-      "help": "OpenClaw Microsoft Teams channel plugin (plugin: msteams)",
+      "label": "@recall/msteams",
+      "help": "Recall Microsoft Teams channel plugin (plugin: msteams)",
       "hasChildren": true
     },
     {
@@ -52107,7 +52107,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/msteams Config",
+      "label": "@recall/msteams Config",
       "help": "Plugin-defined config payload for msteams.",
       "hasChildren": false
     },
@@ -52121,7 +52121,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/msteams",
+      "label": "Enable @recall/msteams",
       "hasChildren": false
     },
     {
@@ -52214,8 +52214,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/nextcloud-talk",
-      "help": "OpenClaw Nextcloud Talk channel plugin (plugin: nextcloud-talk)",
+      "label": "@recall/nextcloud-talk",
+      "help": "Recall Nextcloud Talk channel plugin (plugin: nextcloud-talk)",
       "hasChildren": true
     },
     {
@@ -52228,7 +52228,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/nextcloud-talk Config",
+      "label": "@recall/nextcloud-talk Config",
       "help": "Plugin-defined config payload for nextcloud-talk.",
       "hasChildren": false
     },
@@ -52242,7 +52242,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/nextcloud-talk",
+      "label": "Enable @recall/nextcloud-talk",
       "hasChildren": false
     },
     {
@@ -52335,8 +52335,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/nostr",
-      "help": "OpenClaw Nostr channel plugin for NIP-04 encrypted DMs (plugin: nostr)",
+      "label": "@recall/nostr",
+      "help": "Recall Nostr channel plugin for NIP-04 encrypted DMs (plugin: nostr)",
       "hasChildren": true
     },
     {
@@ -52349,7 +52349,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/nostr Config",
+      "label": "@recall/nostr Config",
       "help": "Plugin-defined config payload for nostr.",
       "hasChildren": false
     },
@@ -52363,7 +52363,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/nostr",
+      "label": "Enable @recall/nostr",
       "hasChildren": false
     },
     {
@@ -52456,8 +52456,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/nvidia-provider",
-      "help": "OpenClaw NVIDIA provider plugin (plugin: nvidia)",
+      "label": "@recall/nvidia-provider",
+      "help": "Recall NVIDIA provider plugin (plugin: nvidia)",
       "hasChildren": true
     },
     {
@@ -52470,7 +52470,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/nvidia-provider Config",
+      "label": "@recall/nvidia-provider Config",
       "help": "Plugin-defined config payload for nvidia.",
       "hasChildren": false
     },
@@ -52484,7 +52484,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/nvidia-provider",
+      "label": "Enable @recall/nvidia-provider",
       "hasChildren": false
     },
     {
@@ -52577,8 +52577,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/ollama-provider",
-      "help": "OpenClaw Ollama provider plugin (plugin: ollama)",
+      "label": "@recall/ollama-provider",
+      "help": "Recall Ollama provider plugin (plugin: ollama)",
       "hasChildren": true
     },
     {
@@ -52591,7 +52591,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/ollama-provider Config",
+      "label": "@recall/ollama-provider Config",
       "help": "Plugin-defined config payload for ollama.",
       "hasChildren": false
     },
@@ -52605,7 +52605,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/ollama-provider",
+      "label": "Enable @recall/ollama-provider",
       "hasChildren": false
     },
     {
@@ -52819,8 +52819,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/openai-provider",
-      "help": "OpenClaw OpenAI provider plugins (plugin: openai)",
+      "label": "@recall/openai-provider",
+      "help": "Recall OpenAI provider plugins (plugin: openai)",
       "hasChildren": true
     },
     {
@@ -52833,7 +52833,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/openai-provider Config",
+      "label": "@recall/openai-provider Config",
       "help": "Plugin-defined config payload for openai.",
       "hasChildren": false
     },
@@ -52847,7 +52847,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/openai-provider",
+      "label": "Enable @recall/openai-provider",
       "hasChildren": false
     },
     {
@@ -52940,8 +52940,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/opencode-provider",
-      "help": "OpenClaw OpenCode Zen provider plugin (plugin: opencode)",
+      "label": "@recall/opencode-provider",
+      "help": "Recall OpenCode Zen provider plugin (plugin: opencode)",
       "hasChildren": true
     },
     {
@@ -52954,8 +52954,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/opencode-go-provider",
-      "help": "OpenClaw OpenCode Go provider plugin (plugin: opencode-go)",
+      "label": "@recall/opencode-go-provider",
+      "help": "Recall OpenCode Go provider plugin (plugin: opencode-go)",
       "hasChildren": true
     },
     {
@@ -52968,7 +52968,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/opencode-go-provider Config",
+      "label": "@recall/opencode-go-provider Config",
       "help": "Plugin-defined config payload for opencode-go.",
       "hasChildren": false
     },
@@ -52982,7 +52982,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/opencode-go-provider",
+      "label": "Enable @recall/opencode-go-provider",
       "hasChildren": false
     },
     {
@@ -53075,7 +53075,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/opencode-provider Config",
+      "label": "@recall/opencode-provider Config",
       "help": "Plugin-defined config payload for opencode.",
       "hasChildren": false
     },
@@ -53089,7 +53089,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/opencode-provider",
+      "label": "Enable @recall/opencode-provider",
       "hasChildren": false
     },
     {
@@ -53182,8 +53182,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/openrouter-provider",
-      "help": "OpenClaw OpenRouter provider plugin (plugin: openrouter)",
+      "label": "@recall/openrouter-provider",
+      "help": "Recall OpenRouter provider plugin (plugin: openrouter)",
       "hasChildren": true
     },
     {
@@ -53196,7 +53196,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/openrouter-provider Config",
+      "label": "@recall/openrouter-provider Config",
       "help": "Plugin-defined config payload for openrouter.",
       "hasChildren": false
     },
@@ -53210,7 +53210,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/openrouter-provider",
+      "label": "Enable @recall/openrouter-provider",
       "hasChildren": false
     },
     {
@@ -53360,7 +53360,7 @@
         "advanced"
       ],
       "label": "Sandbox Source",
-      "help": "OpenShell sandbox source for first-time create. Defaults to openclaw.",
+      "help": "OpenShell sandbox source for first-time create. Defaults to recall.",
       "hasChildren": false
     },
     {
@@ -53591,8 +53591,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/perplexity-plugin",
-      "help": "OpenClaw Perplexity plugin (plugin: perplexity)",
+      "label": "@recall/perplexity-plugin",
+      "help": "Recall Perplexity plugin (plugin: perplexity)",
       "hasChildren": true
     },
     {
@@ -53605,7 +53605,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/perplexity-plugin Config",
+      "label": "@recall/perplexity-plugin Config",
       "help": "Plugin-defined config payload for perplexity.",
       "hasChildren": true
     },
@@ -53675,7 +53675,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/perplexity-plugin",
+      "label": "Enable @recall/perplexity-plugin",
       "hasChildren": false
     },
     {
@@ -53889,8 +53889,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/qianfan-provider",
-      "help": "OpenClaw Qianfan provider plugin (plugin: qianfan)",
+      "label": "@recall/qianfan-provider",
+      "help": "Recall Qianfan provider plugin (plugin: qianfan)",
       "hasChildren": true
     },
     {
@@ -53903,7 +53903,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/qianfan-provider Config",
+      "label": "@recall/qianfan-provider Config",
       "help": "Plugin-defined config payload for qianfan.",
       "hasChildren": false
     },
@@ -53917,7 +53917,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/qianfan-provider",
+      "label": "Enable @recall/qianfan-provider",
       "hasChildren": false
     },
     {
@@ -54131,8 +54131,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/sglang-provider",
-      "help": "OpenClaw SGLang provider plugin (plugin: sglang)",
+      "label": "@recall/sglang-provider",
+      "help": "Recall SGLang provider plugin (plugin: sglang)",
       "hasChildren": true
     },
     {
@@ -54145,7 +54145,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/sglang-provider Config",
+      "label": "@recall/sglang-provider Config",
       "help": "Plugin-defined config payload for sglang.",
       "hasChildren": false
     },
@@ -54159,7 +54159,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/sglang-provider",
+      "label": "Enable @recall/sglang-provider",
       "hasChildren": false
     },
     {
@@ -54252,8 +54252,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/signal",
-      "help": "OpenClaw Signal channel plugin (plugin: signal)",
+      "label": "@recall/signal",
+      "help": "Recall Signal channel plugin (plugin: signal)",
       "hasChildren": true
     },
     {
@@ -54266,7 +54266,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/signal Config",
+      "label": "@recall/signal Config",
       "help": "Plugin-defined config payload for signal.",
       "hasChildren": false
     },
@@ -54280,7 +54280,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/signal",
+      "label": "Enable @recall/signal",
       "hasChildren": false
     },
     {
@@ -54373,8 +54373,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/slack",
-      "help": "OpenClaw Slack channel plugin (plugin: slack)",
+      "label": "@recall/slack",
+      "help": "Recall Slack channel plugin (plugin: slack)",
       "hasChildren": true
     },
     {
@@ -54387,7 +54387,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/slack Config",
+      "label": "@recall/slack Config",
       "help": "Plugin-defined config payload for slack.",
       "hasChildren": false
     },
@@ -54401,7 +54401,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/slack",
+      "label": "Enable @recall/slack",
       "hasChildren": false
     },
     {
@@ -54494,8 +54494,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/synology-chat",
-      "help": "Synology Chat channel plugin for OpenClaw (plugin: synology-chat)",
+      "label": "@recall/synology-chat",
+      "help": "Synology Chat channel plugin for Recall (plugin: synology-chat)",
       "hasChildren": true
     },
     {
@@ -54508,7 +54508,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/synology-chat Config",
+      "label": "@recall/synology-chat Config",
       "help": "Plugin-defined config payload for synology-chat.",
       "hasChildren": false
     },
@@ -54522,7 +54522,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/synology-chat",
+      "label": "Enable @recall/synology-chat",
       "hasChildren": false
     },
     {
@@ -54615,8 +54615,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/synthetic-provider",
-      "help": "OpenClaw Synthetic provider plugin (plugin: synthetic)",
+      "label": "@recall/synthetic-provider",
+      "help": "Recall Synthetic provider plugin (plugin: synthetic)",
       "hasChildren": true
     },
     {
@@ -54629,7 +54629,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/synthetic-provider Config",
+      "label": "@recall/synthetic-provider Config",
       "help": "Plugin-defined config payload for synthetic.",
       "hasChildren": false
     },
@@ -54643,7 +54643,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/synthetic-provider",
+      "label": "Enable @recall/synthetic-provider",
       "hasChildren": false
     },
     {
@@ -54857,8 +54857,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/tavily-plugin",
-      "help": "OpenClaw Tavily plugin (plugin: tavily)",
+      "label": "@recall/tavily-plugin",
+      "help": "Recall Tavily plugin (plugin: tavily)",
       "hasChildren": true
     },
     {
@@ -54871,7 +54871,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/tavily-plugin Config",
+      "label": "@recall/tavily-plugin Config",
       "help": "Plugin-defined config payload for tavily.",
       "hasChildren": true
     },
@@ -54927,7 +54927,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/tavily-plugin",
+      "label": "Enable @recall/tavily-plugin",
       "hasChildren": false
     },
     {
@@ -55020,8 +55020,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/telegram",
-      "help": "OpenClaw Telegram channel plugin (plugin: telegram)",
+      "label": "@recall/telegram",
+      "help": "Recall Telegram channel plugin (plugin: telegram)",
       "hasChildren": true
     },
     {
@@ -55034,7 +55034,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/telegram Config",
+      "label": "@recall/telegram Config",
       "help": "Plugin-defined config payload for telegram.",
       "hasChildren": false
     },
@@ -55048,7 +55048,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/telegram",
+      "label": "Enable @recall/telegram",
       "hasChildren": false
     },
     {
@@ -55300,8 +55300,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/tlon",
-      "help": "OpenClaw Tlon/Urbit channel plugin (plugin: tlon)",
+      "label": "@recall/tlon",
+      "help": "Recall Tlon/Urbit channel plugin (plugin: tlon)",
       "hasChildren": true
     },
     {
@@ -55314,7 +55314,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/tlon Config",
+      "label": "@recall/tlon Config",
       "help": "Plugin-defined config payload for tlon.",
       "hasChildren": false
     },
@@ -55328,7 +55328,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/tlon",
+      "label": "Enable @recall/tlon",
       "hasChildren": false
     },
     {
@@ -55421,8 +55421,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/together-provider",
-      "help": "OpenClaw Together provider plugin (plugin: together)",
+      "label": "@recall/together-provider",
+      "help": "Recall Together provider plugin (plugin: together)",
       "hasChildren": true
     },
     {
@@ -55435,7 +55435,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/together-provider Config",
+      "label": "@recall/together-provider Config",
       "help": "Plugin-defined config payload for together.",
       "hasChildren": false
     },
@@ -55449,7 +55449,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/together-provider",
+      "label": "Enable @recall/together-provider",
       "hasChildren": false
     },
     {
@@ -55542,8 +55542,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/twitch",
-      "help": "OpenClaw Twitch channel plugin (plugin: twitch)",
+      "label": "@recall/twitch",
+      "help": "Recall Twitch channel plugin (plugin: twitch)",
       "hasChildren": true
     },
     {
@@ -55556,7 +55556,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/twitch Config",
+      "label": "@recall/twitch Config",
       "help": "Plugin-defined config payload for twitch.",
       "hasChildren": false
     },
@@ -55570,7 +55570,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/twitch",
+      "label": "Enable @recall/twitch",
       "hasChildren": false
     },
     {
@@ -55663,8 +55663,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/venice-provider",
-      "help": "OpenClaw Venice provider plugin (plugin: venice)",
+      "label": "@recall/venice-provider",
+      "help": "Recall Venice provider plugin (plugin: venice)",
       "hasChildren": true
     },
     {
@@ -55677,7 +55677,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/venice-provider Config",
+      "label": "@recall/venice-provider Config",
       "help": "Plugin-defined config payload for venice.",
       "hasChildren": false
     },
@@ -55691,7 +55691,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/venice-provider",
+      "label": "Enable @recall/venice-provider",
       "hasChildren": false
     },
     {
@@ -55784,8 +55784,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/vercel-ai-gateway-provider",
-      "help": "OpenClaw Vercel AI Gateway provider plugin (plugin: vercel-ai-gateway)",
+      "label": "@recall/vercel-ai-gateway-provider",
+      "help": "Recall Vercel AI Gateway provider plugin (plugin: vercel-ai-gateway)",
       "hasChildren": true
     },
     {
@@ -55798,7 +55798,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/vercel-ai-gateway-provider Config",
+      "label": "@recall/vercel-ai-gateway-provider Config",
       "help": "Plugin-defined config payload for vercel-ai-gateway.",
       "hasChildren": false
     },
@@ -55812,7 +55812,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/vercel-ai-gateway-provider",
+      "label": "Enable @recall/vercel-ai-gateway-provider",
       "hasChildren": false
     },
     {
@@ -55905,8 +55905,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/vllm-provider",
-      "help": "OpenClaw vLLM provider plugin (plugin: vllm)",
+      "label": "@recall/vllm-provider",
+      "help": "Recall vLLM provider plugin (plugin: vllm)",
       "hasChildren": true
     },
     {
@@ -55919,7 +55919,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/vllm-provider Config",
+      "label": "@recall/vllm-provider Config",
       "help": "Plugin-defined config payload for vllm.",
       "hasChildren": false
     },
@@ -55933,7 +55933,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/vllm-provider",
+      "label": "Enable @recall/vllm-provider",
       "hasChildren": false
     },
     {
@@ -56026,8 +56026,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/voice-call",
-      "help": "OpenClaw voice-call plugin (plugin: voice-call)",
+      "label": "@recall/voice-call",
+      "help": "Recall voice-call plugin (plugin: voice-call)",
       "hasChildren": true
     },
     {
@@ -56040,7 +56040,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/voice-call Config",
+      "label": "@recall/voice-call Config",
       "help": "Plugin-defined config payload for voice-call.",
       "hasChildren": true
     },
@@ -57410,7 +57410,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/voice-call",
+      "label": "Enable @recall/voice-call",
       "hasChildren": false
     },
     {
@@ -57503,8 +57503,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/volcengine-provider",
-      "help": "OpenClaw Volcengine provider plugin (plugin: volcengine)",
+      "label": "@recall/volcengine-provider",
+      "help": "Recall Volcengine provider plugin (plugin: volcengine)",
       "hasChildren": true
     },
     {
@@ -57517,7 +57517,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/volcengine-provider Config",
+      "label": "@recall/volcengine-provider Config",
       "help": "Plugin-defined config payload for volcengine.",
       "hasChildren": false
     },
@@ -57531,7 +57531,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/volcengine-provider",
+      "label": "Enable @recall/volcengine-provider",
       "hasChildren": false
     },
     {
@@ -57624,8 +57624,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/whatsapp",
-      "help": "OpenClaw WhatsApp channel plugin (plugin: whatsapp)",
+      "label": "@recall/whatsapp",
+      "help": "Recall WhatsApp channel plugin (plugin: whatsapp)",
       "hasChildren": true
     },
     {
@@ -57638,7 +57638,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/whatsapp Config",
+      "label": "@recall/whatsapp Config",
       "help": "Plugin-defined config payload for whatsapp.",
       "hasChildren": false
     },
@@ -57652,7 +57652,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/whatsapp",
+      "label": "Enable @recall/whatsapp",
       "hasChildren": false
     },
     {
@@ -57745,8 +57745,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/xai-plugin",
-      "help": "OpenClaw xAI plugin (plugin: xai)",
+      "label": "@recall/xai-plugin",
+      "help": "Recall xAI plugin (plugin: xai)",
       "hasChildren": true
     },
     {
@@ -57759,7 +57759,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/xai-plugin Config",
+      "label": "@recall/xai-plugin Config",
       "help": "Plugin-defined config payload for xai.",
       "hasChildren": true
     },
@@ -57829,7 +57829,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/xai-plugin",
+      "label": "Enable @recall/xai-plugin",
       "hasChildren": false
     },
     {
@@ -57922,8 +57922,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/xiaomi-provider",
-      "help": "OpenClaw Xiaomi provider plugin (plugin: xiaomi)",
+      "label": "@recall/xiaomi-provider",
+      "help": "Recall Xiaomi provider plugin (plugin: xiaomi)",
       "hasChildren": true
     },
     {
@@ -57936,7 +57936,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/xiaomi-provider Config",
+      "label": "@recall/xiaomi-provider Config",
       "help": "Plugin-defined config payload for xiaomi.",
       "hasChildren": false
     },
@@ -57950,7 +57950,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/xiaomi-provider",
+      "label": "Enable @recall/xiaomi-provider",
       "hasChildren": false
     },
     {
@@ -58043,8 +58043,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/zai-provider",
-      "help": "OpenClaw Z.AI provider plugin (plugin: zai)",
+      "label": "@recall/zai-provider",
+      "help": "Recall Z.AI provider plugin (plugin: zai)",
       "hasChildren": true
     },
     {
@@ -58057,7 +58057,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/zai-provider Config",
+      "label": "@recall/zai-provider Config",
       "help": "Plugin-defined config payload for zai.",
       "hasChildren": false
     },
@@ -58071,7 +58071,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/zai-provider",
+      "label": "Enable @recall/zai-provider",
       "hasChildren": false
     },
     {
@@ -58164,8 +58164,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/zalo",
-      "help": "OpenClaw Zalo channel plugin (plugin: zalo)",
+      "label": "@recall/zalo",
+      "help": "Recall Zalo channel plugin (plugin: zalo)",
       "hasChildren": true
     },
     {
@@ -58178,7 +58178,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/zalo Config",
+      "label": "@recall/zalo Config",
       "help": "Plugin-defined config payload for zalo.",
       "hasChildren": false
     },
@@ -58192,7 +58192,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/zalo",
+      "label": "Enable @recall/zalo",
       "hasChildren": false
     },
     {
@@ -58285,8 +58285,8 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/zalouser",
-      "help": "OpenClaw Zalo Personal Account plugin via native zca-js integration (plugin: zalouser)",
+      "label": "@recall/zalouser",
+      "help": "Recall Zalo Personal Account plugin via native zca-js integration (plugin: zalouser)",
       "hasChildren": true
     },
     {
@@ -58299,7 +58299,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "@openclaw/zalouser Config",
+      "label": "@recall/zalouser Config",
       "help": "Plugin-defined config payload for zalouser.",
       "hasChildren": false
     },
@@ -58313,7 +58313,7 @@
       "tags": [
         "advanced"
       ],
-      "label": "Enable @openclaw/zalouser",
+      "label": "Enable @recall/zalouser",
       "hasChildren": false
     },
     {
@@ -58407,7 +58407,7 @@
         "advanced"
       ],
       "label": "Plugin Install Records",
-      "help": "CLI-managed install metadata (used by `openclaw plugins update` to locate install sources).",
+      "help": "CLI-managed install metadata (used by `recall plugins update` to locate install sources).",
       "hasChildren": true
     },
     {
@@ -58485,7 +58485,7 @@
         "storage"
       ],
       "label": "Plugin Install Path",
-      "help": "Resolved install directory (usually ~/.openclaw/extensions/<id>).",
+      "help": "Resolved install directory (usually ~/.recall/extensions/<id>).",
       "hasChildren": false
     },
     {
@@ -59351,7 +59351,7 @@
         "storage"
       ],
       "label": "Session Parent Fork Max Tokens",
-      "help": "Maximum parent-session token count allowed for thread/session inheritance forking. If the parent exceeds this, OpenClaw starts a fresh thread session instead of forking; set 0 to disable this protection.",
+      "help": "Maximum parent-session token count allowed for thread/session inheritance forking. If the parent exceeds this, Recall starts a fresh thread session instead of forking; set 0 to disable this protection.",
       "hasChildren": false
     },
     {
@@ -65310,7 +65310,7 @@
         "advanced"
       ],
       "label": "Updates",
-      "help": "Update-channel and startup-check behavior for keeping OpenClaw runtime versions current. Use conservative channels in production and more experimental channels only in controlled environments.",
+      "help": "Update-channel and startup-check behavior for keeping Recall runtime versions current. Use conservative channels in production and more experimental channels only in controlled environments.",
       "hasChildren": true
     },
     {
@@ -65614,7 +65614,7 @@
         "advanced"
       ],
       "label": "Wizard Last Run Version",
-      "help": "OpenClaw version recorded at the time of the most recent wizard run on this config. Use this when diagnosing behavior differences across version-to-version setup changes.",
+      "help": "Recall version recorded at the time of the most recent wizard run on this config. Use this when diagnosing behavior differences across version-to-version setup changes.",
       "hasChildren": false
     }
   ]

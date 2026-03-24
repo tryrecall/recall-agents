@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import type { PluginWebSearchProviderEntry } from "../plugins/types.js";
 
 const mocks = vi.hoisted(() => ({
   resolvePluginWebSearchProviders: vi.fn<
-    (params?: { config?: OpenClawConfig }) => PluginWebSearchProviderEntry[]
+    (params?: { config?: RecallConfig }) => PluginWebSearchProviderEntry[]
   >(() => []),
   listBundledWebSearchProviders: vi.fn<() => PluginWebSearchProviderEntry[]>(() => []),
   resolveBundledWebSearchPluginId: vi.fn<(providerId?: string) => string | undefined>(
@@ -106,7 +106,7 @@ describe("onboard-search provider resolution", () => {
     );
 
     const mod = await import("./onboard-search.js");
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       tools: {
         web: {
           search: {
@@ -147,7 +147,7 @@ describe("onboard-search provider resolution", () => {
     );
 
     const mod = await import("./onboard-search.js");
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       plugins: {
         installs: {
           "custom-plugin": {
@@ -198,7 +198,7 @@ describe("onboard-search provider resolution", () => {
     mocks.resolveBundledWebSearchPluginId.mockReturnValue("firecrawl");
 
     const mod = await import("./onboard-search.js");
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       tools: {
         web: {
           search: {
@@ -248,7 +248,7 @@ describe("onboard-search provider resolution", () => {
       progress: vi.fn(() => ({ update: vi.fn(), stop: vi.fn() })),
     };
 
-    const result = await mod.setupSearch({} as OpenClawConfig, {} as never, prompter as never);
+    const result = await mod.setupSearch({} as RecallConfig, {} as never, prompter as never);
 
     expect(result.tools?.web?.search?.provider).toBe("duckduckgo");
     expect(result.plugins?.entries?.duckduckgo?.enabled).toBe(true);

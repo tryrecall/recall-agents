@@ -1,5 +1,5 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime-env";
 import { describe, expect, it } from "vitest";
 import { monitorLineProvider } from "./monitor.js";
 
@@ -9,7 +9,7 @@ describe("monitorLineProvider fail-closed webhook auth", () => {
       monitorLineProvider({
         channelAccessToken: "token",
         channelSecret: "   ",
-        config: {} as OpenClawConfig,
+        config: {} as RecallConfig,
         runtime: {} as RuntimeEnv,
       }),
     ).rejects.toThrow("LINE webhook mode requires a non-empty channel secret.");
@@ -20,7 +20,7 @@ describe("monitorLineProvider fail-closed webhook auth", () => {
       monitorLineProvider({
         channelAccessToken: "   ",
         channelSecret: "secret",
-        config: {} as OpenClawConfig,
+        config: {} as RecallConfig,
         runtime: {} as RuntimeEnv,
       }),
     ).rejects.toThrow("LINE webhook mode requires a non-empty channel access token.");

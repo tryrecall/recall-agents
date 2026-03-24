@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/kilocode-provider",
+  "name": "@recall/kilocode-provider",
   "version": "2026.3.22",
   "private": true,
-  "description": "OpenClaw Kilo Gateway provider plugin",
+  "description": "Recall Kilo Gateway provider plugin",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

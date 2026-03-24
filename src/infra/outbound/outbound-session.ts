@@ -22,7 +22,7 @@ import type { MsgContext } from "../../auto-reply/templating.js";
 import type { ChatType } from "../../channels/chat-type.js";
 import { getChannelPlugin } from "../../channels/plugins/index.js";
 import type { ChannelId } from "../../channels/plugins/types.js";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import { recordSessionMetaFromInbound, resolveStorePath } from "../../config/sessions.js";
 import { isWhatsAppGroupJid, normalizeWhatsAppTarget } from "../../plugin-sdk/whatsapp-shared.js";
 import { buildAgentSessionKey, type RoutePeer } from "../../routing/resolve-route.js";
@@ -40,7 +40,7 @@ export type OutboundSessionRoute = {
 };
 
 export type ResolveOutboundSessionRouteParams = {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channel: ChannelId;
   agentId: string;
   accountId?: string | null;
@@ -106,7 +106,7 @@ function inferPeerKind(params: {
 }
 
 function buildBaseSessionKey(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   channel: ChannelId;
   accountId?: string | null;
@@ -124,7 +124,7 @@ function buildBaseSessionKey(params: {
 
 // Best-effort mpim detection: allowlist/config, then Slack API (if token available).
 async function resolveSlackChannelType(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
   channelId: string;
 }): Promise<"channel" | "group" | "dm" | "unknown"> {
@@ -964,7 +964,7 @@ export async function resolveOutboundSessionRoute(
 }
 
 export async function ensureOutboundSessionEntry(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   channel: ChannelId;
   accountId?: string | null;

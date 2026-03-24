@@ -1,7 +1,7 @@
 ---
-summary: "Synology Chat webhook setup and OpenClaw config"
+summary: "Synology Chat webhook setup and Recall config"
 read_when:
-  - Setting up Synology Chat with OpenClaw
+  - Setting up Synology Chat with Recall
   - Debugging Synology Chat webhook routing
 title: "Synology Chat"
 ---
@@ -19,7 +19,7 @@ Synology Chat is plugin-based and not part of the default core channel install.
 Install from a local checkout:
 
 ```bash
-openclaw plugins install ./extensions/synology-chat
+recall plugins install ./extensions/synology-chat
 ```
 
 Details: [Plugins](/tools/plugin)
@@ -27,17 +27,17 @@ Details: [Plugins](/tools/plugin)
 ## Quick setup
 
 1. Install and enable the Synology Chat plugin.
-   - `openclaw onboard` now shows Synology Chat in the same channel setup list as `openclaw channels add`.
-   - Non-interactive setup: `openclaw channels add --channel synology-chat --token <token> --url <incoming-webhook-url>`
+   - `recall onboard` now shows Synology Chat in the same channel setup list as `recall channels add`.
+   - Non-interactive setup: `recall channels add --channel synology-chat --token <token> --url <incoming-webhook-url>`
 2. In Synology Chat integrations:
    - Create an incoming webhook and copy its URL.
    - Create an outgoing webhook with your secret token.
-3. Point the outgoing webhook URL to your OpenClaw gateway:
+3. Point the outgoing webhook URL to your Recall gateway:
    - `https://gateway-host/webhook/synology` by default.
    - Or your custom `channels.synology-chat.webhookPath`.
-4. Finish setup in OpenClaw.
-   - Guided: `openclaw onboard`
-   - Direct: `openclaw channels add --channel synology-chat --token <token> --url <incoming-webhook-url>`
+4. Finish setup in Recall.
+   - Guided: `recall onboard`
+   - Direct: `recall channels add --channel synology-chat --token <token> --url <incoming-webhook-url>`
 5. Restart gateway and send a DM to the Synology Chat bot.
 
 Minimal config:
@@ -68,7 +68,7 @@ For the default account, you can use env vars:
 - `SYNOLOGY_NAS_HOST`
 - `SYNOLOGY_ALLOWED_USER_IDS` (comma-separated)
 - `SYNOLOGY_RATE_LIMIT`
-- `OPENCLAW_BOT_NAME`
+- `RECALL_BOT_NAME`
 
 Config values override env vars.
 
@@ -81,8 +81,8 @@ Config values override env vars.
 - `dmPolicy: "disabled"` blocks DMs.
 - Reply recipient binding stays on stable numeric `user_id` by default. `channels.synology-chat.dangerouslyAllowNameMatching: true` is break-glass compatibility mode that re-enables mutable username/nickname lookup for reply delivery.
 - Pairing approvals work with:
-  - `openclaw pairing list synology-chat`
-  - `openclaw pairing approve synology-chat <CODE>`
+  - `recall pairing list synology-chat`
+  - `recall pairing approve synology-chat <CODE>`
 
 ## Outbound delivery
 
@@ -91,8 +91,8 @@ Use numeric Synology Chat user IDs as targets.
 Examples:
 
 ```bash
-openclaw message send --channel synology-chat --target 123456 --text "Hello from OpenClaw"
-openclaw message send --channel synology-chat --target synology-chat:123456 --text "Hello again"
+recall message send --channel synology-chat --target 123456 --text "Hello from Recall"
+recall message send --channel synology-chat --target synology-chat:123456 --text "Hello again"
 ```
 
 Media sends are supported by URL-based file delivery.
@@ -103,7 +103,7 @@ Multiple Synology Chat accounts are supported under `channels.synology-chat.acco
 Each account can override token, incoming URL, webhook path, DM policy, and limits.
 Direct-message sessions are isolated per account and user, so the same numeric `user_id`
 on two different Synology accounts does not share transcript state.
-Give each enabled account a distinct `webhookPath`. OpenClaw now rejects duplicate exact paths
+Give each enabled account a distinct `webhookPath`. Recall now rejects duplicate exact paths
 and refuses to start named accounts that only inherit a shared webhook path in multi-account setups.
 If you intentionally need legacy inheritance for a named account, set
 `dangerouslyAllowInheritedWebhookPath: true` on that account or at `channels.synology-chat`,

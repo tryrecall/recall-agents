@@ -1,13 +1,13 @@
-import { OPENCODE_ZEN_DEFAULT_MODEL_REF } from "openclaw/plugin-sdk/provider-models";
+import { OPENCODE_ZEN_DEFAULT_MODEL_REF } from "recall/plugin-sdk/provider-models";
 import {
   applyAgentDefaultModelPrimary,
   withAgentModelAliases,
-  type OpenClawConfig,
-} from "openclaw/plugin-sdk/provider-onboard";
+  type RecallConfig,
+} from "recall/plugin-sdk/provider-onboard";
 
 export { OPENCODE_ZEN_DEFAULT_MODEL_REF };
 
-export function applyOpencodeZenProviderConfig(cfg: OpenClawConfig): OpenClawConfig {
+export function applyOpencodeZenProviderConfig(cfg: RecallConfig): RecallConfig {
   return {
     ...cfg,
     agents: {
@@ -22,7 +22,7 @@ export function applyOpencodeZenProviderConfig(cfg: OpenClawConfig): OpenClawCon
   };
 }
 
-export function applyOpencodeZenConfig(cfg: OpenClawConfig): OpenClawConfig {
+export function applyOpencodeZenConfig(cfg: RecallConfig): RecallConfig {
   return applyAgentDefaultModelPrimary(
     applyOpencodeZenProviderConfig(cfg),
     OPENCODE_ZEN_DEFAULT_MODEL_REF,

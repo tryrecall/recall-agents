@@ -23,7 +23,7 @@ import {
   setupWebhookTargetsForTest,
   trackWebhookRegistrationForTest,
 } from "./monitor.webhook.test-helpers.js";
-import type { OpenClawConfig, PluginRuntime } from "./runtime-api.js";
+import type { RecallConfig, PluginRuntime } from "./runtime-api.js";
 
 // Mock dependencies
 vi.mock("./send.js", () => ({
@@ -147,7 +147,7 @@ describe("BlueBubbles webhook monitor", () => {
 
   function setupWebhookTarget(params?: {
     account?: ReturnType<typeof createMockAccount>;
-    config?: OpenClawConfig;
+    config?: RecallConfig;
     core?: PluginRuntime;
   }) {
     const registration = trackWebhookRegistrationForTest(

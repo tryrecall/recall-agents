@@ -80,7 +80,7 @@ export const sessionMessages: unknown[] = [
   },
 ];
 export const sessionAbortCompactionMock: Mock<(reason?: unknown) => void> = vi.fn();
-export const createOpenClawCodingToolsMock = vi.fn(() => []);
+export const createRecallCodingToolsMock = vi.fn(() => []);
 
 export function resetCompactHooksHarnessMocks(): void {
   hookRunner.hasHooks.mockReset();
@@ -161,8 +161,8 @@ export function resetCompactHooksHarnessMocks(): void {
     },
   );
   sessionAbortCompactionMock.mockReset();
-  createOpenClawCodingToolsMock.mockReset();
-  createOpenClawCodingToolsMock.mockReturnValue([]);
+  createRecallCodingToolsMock.mockReset();
+  createRecallCodingToolsMock.mockReturnValue([]);
 }
 
 export async function loadCompactHooksHarness(): Promise<{
@@ -251,7 +251,7 @@ export async function loadCompactHooksHarness(): Promise<{
   }));
 
   vi.doMock("../models-config.js", () => ({
-    ensureOpenClawModelsJson: vi.fn(async () => {}),
+    ensureRecallModelsJson: vi.fn(async () => {}),
   }));
 
   vi.doMock("../model-auth.js", () => ({
@@ -313,7 +313,7 @@ export async function loadCompactHooksHarness(): Promise<{
   }));
 
   vi.doMock("../docs-path.js", () => ({
-    resolveOpenClawDocsPath: vi.fn(async () => undefined),
+    resolveRecallDocsPath: vi.fn(async () => undefined),
   }));
 
   vi.doMock("../channel-tools.js", () => ({
@@ -322,7 +322,7 @@ export async function loadCompactHooksHarness(): Promise<{
   }));
 
   vi.doMock("../pi-tools.js", () => ({
-    createOpenClawCodingTools: createOpenClawCodingToolsMock,
+    createRecallCodingTools: createRecallCodingToolsMock,
   }));
 
   vi.doMock("./google.js", () => ({
@@ -405,7 +405,7 @@ export async function loadCompactHooksHarness(): Promise<{
   }));
 
   vi.doMock("../agent-paths.js", () => ({
-    resolveOpenClawAgentDir: vi.fn(() => "/tmp"),
+    resolveRecallAgentDir: vi.fn(() => "/tmp"),
   }));
 
   vi.doMock("../agent-scope.js", () => ({

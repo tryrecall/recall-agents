@@ -3,15 +3,15 @@
 import PackageDescription
 
 let package = Package(
-    name: "OpenClawKit",
+    name: "RecallKit",
     platforms: [
         .iOS(.v18),
         .macOS(.v15),
     ],
     products: [
-        .library(name: "OpenClawProtocol", targets: ["OpenClawProtocol"]),
-        .library(name: "OpenClawKit", targets: ["OpenClawKit"]),
-        .library(name: "OpenClawChatUI", targets: ["OpenClawChatUI"]),
+        .library(name: "RecallProtocol", targets: ["RecallProtocol"]),
+        .library(name: "RecallKit", targets: ["RecallKit"]),
+        .library(name: "RecallChatUI", targets: ["RecallChatUI"]),
     ],
     dependencies: [
         .package(url: "https://github.com/steipete/ElevenLabsKit", exact: "0.1.0"),
@@ -19,18 +19,18 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "OpenClawProtocol",
-            path: "Sources/OpenClawProtocol",
+            name: "RecallProtocol",
+            path: "Sources/RecallProtocol",
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency"),
             ]),
         .target(
-            name: "OpenClawKit",
+            name: "RecallKit",
             dependencies: [
-                "OpenClawProtocol",
+                "RecallProtocol",
                 .product(name: "ElevenLabsKit", package: "ElevenLabsKit"),
             ],
-            path: "Sources/OpenClawKit",
+            path: "Sources/RecallKit",
             resources: [
                 .process("Resources"),
             ],
@@ -38,22 +38,22 @@ let package = Package(
                 .enableUpcomingFeature("StrictConcurrency"),
             ]),
         .target(
-            name: "OpenClawChatUI",
+            name: "RecallChatUI",
             dependencies: [
-                "OpenClawKit",
+                "RecallKit",
                 .product(
                     name: "Textual",
                     package: "textual",
                     condition: .when(platforms: [.macOS, .iOS])),
             ],
-            path: "Sources/OpenClawChatUI",
+            path: "Sources/RecallChatUI",
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency"),
             ]),
         .testTarget(
-            name: "OpenClawKitTests",
-            dependencies: ["OpenClawKit", "OpenClawChatUI"],
-            path: "Tests/OpenClawKitTests",
+            name: "RecallKitTests",
+            dependencies: ["RecallKit", "RecallChatUI"],
+            path: "Tests/RecallKitTests",
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency"),
                 .enableExperimentalFeature("SwiftTesting"),

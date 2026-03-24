@@ -1,7 +1,7 @@
 ---
-summary: "OpenClaw capabilities across channels, routing, media, and UX."
+summary: "Recall capabilities across channels, routing, media, and UX."
 read_when:
-  - You want a full list of what OpenClaw supports
+  - You want a full list of what Recall supports
 title: "Features"
 ---
 
@@ -70,4 +70,4 @@ title: "Features"
 - Browser automation, exec, sandboxing
 - Web search (Brave, Perplexity, Gemini, Grok, Kimi, Firecrawl)
 - Cron jobs and heartbeat scheduling
-- Skills, plugins, and workflow pipelines (Lobster)
+- Skills, plugins, and workflow pipelines (Recall)

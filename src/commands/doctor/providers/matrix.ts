@@ -1,5 +1,5 @@
 import { formatCliCommand } from "../../../cli/command-format.js";
-import type { OpenClawConfig } from "../../../config/config.js";
+import type { RecallConfig } from "../../../config/config.js";
 import {
   autoPrepareLegacyMatrixCrypto,
   detectLegacyMatrixCrypto,
@@ -26,7 +26,7 @@ export function formatMatrixLegacyStatePreview(
     `- Legacy sync store: ${detection.legacyStoragePath} -> ${detection.targetStoragePath}`,
     `- Legacy crypto store: ${detection.legacyCryptoPath} -> ${detection.targetCryptoPath}`,
     ...(detection.selectionNote ? [`- ${detection.selectionNote}`] : []),
-    '- Run "openclaw doctor --fix" to migrate this Matrix state now.',
+    '- Run "recall doctor --fix" to migrate this Matrix state now.',
   ].join("\n");
 }
 
@@ -44,14 +44,14 @@ export function formatMatrixLegacyCryptoPreview(
         `- Legacy crypto store: ${plan.legacyCryptoPath}`,
         `- New recovery key file: ${plan.recoveryKeyPath}`,
         `- Migration state file: ${plan.statePath}`,
-        '- Run "openclaw doctor --fix" to extract any saved backup key now. Backed-up room keys will restore automatically on next gateway start.',
+        '- Run "recall doctor --fix" to extract any saved backup key now. Backed-up room keys will restore automatically on next gateway start.',
       ].join("\n"),
     );
   }
   return notes;
 }
 
-export async function collectMatrixInstallPathWarnings(cfg: OpenClawConfig): Promise<string[]> {
+export async function collectMatrixInstallPathWarnings(cfg: RecallConfig): Promise<string[]> {
   const issue = await detectPluginInstallPathIssue({
     pluginId: "matrix",
     install: cfg.plugins?.installs?.matrix,
@@ -62,14 +62,14 @@ export async function collectMatrixInstallPathWarnings(cfg: OpenClawConfig): Pro
   return formatPluginInstallPathIssue({
     issue,
     pluginLabel: "Matrix",
-    defaultInstallCommand: "openclaw plugins install @openclaw/matrix",
-    repoInstallCommand: "openclaw plugins install ./extensions/matrix",
+    defaultInstallCommand: "recall plugins install @recall/matrix",
+    repoInstallCommand: "recall plugins install ./extensions/matrix",
     formatCommand: formatCliCommand,
   }).map((entry) => `- ${entry}`);
 }
 
 export async function applyMatrixDoctorRepair(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   env: NodeJS.ProcessEnv;
 }): Promise<{ changes: string[]; warnings: string[] }> {
   const changes: string[] = [];
@@ -97,7 +97,7 @@ export async function applyMatrixDoctorRepair(params: {
       matrixSnapshotReady = false;
       warnings.push(`- Failed creating a Matrix migration snapshot before repair: ${String(err)}`);
       warnings.push(
-        '- Skipping Matrix migration changes for now. Resolve the snapshot failure, then rerun "openclaw doctor --fix".',
+        '- Skipping Matrix migration changes for now. Resolve the snapshot failure, then rerun "recall doctor --fix".',
       );
     }
   } else if (pendingMatrixMigration) {
@@ -147,7 +147,7 @@ export async function applyMatrixDoctorRepair(params: {
 }
 
 export async function runMatrixDoctorSequence(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   env: NodeJS.ProcessEnv;
   shouldRepair: boolean;
 }): Promise<{ changeNotes: string[]; warningNotes: string[] }> {

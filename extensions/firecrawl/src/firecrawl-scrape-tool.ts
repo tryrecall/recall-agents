@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
-import { jsonResult, readNumberParam, readStringParam } from "openclaw/plugin-sdk/agent-runtime";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
+import { jsonResult, readNumberParam, readStringParam } from "recall/plugin-sdk/agent-runtime";
+import type { RecallPluginApi } from "recall/plugin-sdk/plugin-runtime";
 import { runFirecrawlScrape } from "./firecrawl-client.js";
 
 function optionalStringEnum<const T extends readonly string[]>(
@@ -57,7 +57,7 @@ const FirecrawlScrapeToolSchema = Type.Object(
   { additionalProperties: false },
 );
 
-export function createFirecrawlScrapeTool(api: OpenClawPluginApi) {
+export function createFirecrawlScrapeTool(api: RecallPluginApi) {
   return {
     name: "firecrawl_scrape",
     label: "Firecrawl Scrape",

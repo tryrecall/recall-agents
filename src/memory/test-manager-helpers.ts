@@ -1,8 +1,8 @@
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import type { MemoryIndexManager } from "./index.js";
 
 export async function getRequiredMemoryIndexManager(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId?: string;
   purpose?: "default" | "status";
 }): Promise<MemoryIndexManager> {

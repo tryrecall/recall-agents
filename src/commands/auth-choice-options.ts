@@ -1,5 +1,5 @@
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { resolveManifestProviderAuthChoices } from "../plugins/provider-auth-choices.js";
 import { resolveProviderWizardOptions } from "../plugins/provider-wizard.js";
 import {
@@ -30,7 +30,7 @@ function compareGroupLabels(a: AuthChoiceGroup, b: AuthChoiceGroup): number {
 }
 
 function resolveManifestProviderChoiceOptions(params?: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): AuthChoiceOption[] {
@@ -49,7 +49,7 @@ function resolveManifestProviderChoiceOptions(params?: {
 }
 
 function resolveRuntimeFallbackProviderChoiceOptions(params?: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): AuthChoiceOption[] {
@@ -70,7 +70,7 @@ function resolveRuntimeFallbackProviderChoiceOptions(params?: {
 export function formatAuthChoiceChoicesForCli(params?: {
   includeSkip?: boolean;
   includeLegacyAliases?: boolean;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): string {
@@ -85,7 +85,7 @@ export function formatAuthChoiceChoicesForCli(params?: {
 export function buildAuthChoiceOptions(params: {
   store: AuthProfileStore;
   includeSkip: boolean;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): AuthChoiceOption[] {
@@ -125,7 +125,7 @@ export function buildAuthChoiceOptions(params: {
 export function buildAuthChoiceGroups(params: {
   store: AuthProfileStore;
   includeSkip: boolean;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): {

@@ -1,8 +1,8 @@
-import { resolveChannelGroupRequireMention } from "openclaw/plugin-sdk/channel-policy";
-import { resolveExactLineGroupConfigKey, type OpenClawConfig } from "../runtime-api.js";
+import { resolveChannelGroupRequireMention } from "recall/plugin-sdk/channel-policy";
+import { resolveExactLineGroupConfigKey, type RecallConfig } from "../runtime-api.js";
 
 type LineGroupContext = {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
   groupId?: string | null;
 };

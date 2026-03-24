@@ -1,7 +1,7 @@
 import { Container, Separator, TextDisplay } from "@buape/carbon";
 import { beforeEach, describe, expect, it } from "vitest";
 import { vi } from "vitest";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 
 let applyCrossContextDecoration: typeof import("./outbound-policy.js").applyCrossContextDecoration;
 let buildCrossContextDecoration: typeof import("./outbound-policy.js").buildCrossContextDecoration;
@@ -59,13 +59,13 @@ const slackConfig = {
       appToken: "xapp-test",
     },
   },
-} as OpenClawConfig;
+} as RecallConfig;
 
 const discordConfig = {
   channels: {
     discord: {},
   },
-} as OpenClawConfig;
+} as RecallConfig;
 
 describe("outbound policy helpers", () => {
   beforeEach(async () => {
@@ -95,7 +95,7 @@ describe("outbound policy helpers", () => {
       tools: {
         message: { crossContext: { allowAcrossProviders: true } },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expect(() =>
       enforceCrossContextPolicy({
@@ -126,7 +126,7 @@ describe("outbound policy helpers", () => {
       tools: {
         message: { crossContext: { allowWithinProvider: false } },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expect(() =>
       enforceCrossContextPolicy({

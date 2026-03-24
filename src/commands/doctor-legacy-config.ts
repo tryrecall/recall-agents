@@ -1,6 +1,6 @@
 import { normalizeProviderId } from "../agents/model-selection.js";
 import { shouldMoveSingleAccountChannelKey } from "../channels/plugins/setup-helpers.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { resolveNormalizedProviderModelMaxTokens } from "../config/defaults.js";
 import {
   formatSlackStreamingBooleanMigrationMessage,
@@ -14,14 +14,14 @@ import { migrateLegacyWebSearchConfig } from "../config/legacy-web-search.js";
 import { DEFAULT_TALK_PROVIDER, normalizeTalkSection } from "../config/talk.js";
 import { DEFAULT_ACCOUNT_ID } from "../routing/session-key.js";
 
-export function normalizeCompatibilityConfigValues(cfg: OpenClawConfig): {
-  config: OpenClawConfig;
+export function normalizeCompatibilityConfigValues(cfg: RecallConfig): {
+  config: RecallConfig;
   changes: string[];
 } {
   const changes: string[] = [];
   const NANO_BANANA_SKILL_KEY = "nano-banana-pro";
   const NANO_BANANA_MODEL = "google/gemini-3-pro-image-preview";
-  let next: OpenClawConfig = cfg;
+  let next: RecallConfig = cfg;
 
   const isRecord = (value: unknown): value is Record<string, unknown> =>
     Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -433,7 +433,7 @@ export function normalizeCompatibilityConfigValues(cfg: OpenClawConfig): {
     }
     next = {
       ...next,
-      channels: nextChannels as OpenClawConfig["channels"],
+      channels: nextChannels as RecallConfig["channels"],
     };
   };
 
@@ -484,7 +484,7 @@ export function normalizeCompatibilityConfigValues(cfg: OpenClawConfig): {
 
     next = {
       ...next,
-      browser: migratedBrowser as OpenClawConfig["browser"],
+      browser: migratedBrowser as RecallConfig["browser"],
     };
     changes.push(
       `Moved browser.ssrfPolicy.allowPrivateNetwork → browser.ssrfPolicy.dangerouslyAllowPrivateNetwork (${String(resolvedDangerousAllowPrivateNetwork)}).`,
@@ -493,9 +493,9 @@ export function normalizeCompatibilityConfigValues(cfg: OpenClawConfig): {
 
   const normalizeLegacyNanoBananaSkill = () => {
     type ModelProviderEntry = Partial<
-      NonNullable<NonNullable<OpenClawConfig["models"]>["providers"]>[string]
+      NonNullable<NonNullable<RecallConfig["models"]>["providers"]>[string]
     >;
-    type ModelsConfigPatch = Partial<NonNullable<OpenClawConfig["models"]>>;
+    type ModelsConfigPatch = Partial<NonNullable<RecallConfig["models"]>>;
 
     const rawSkills = next.skills;
     if (!isRecord(rawSkills)) {
@@ -580,10 +580,10 @@ export function normalizeCompatibilityConfigValues(cfg: OpenClawConfig): {
     if (!hasGoogleApiKey && legacyApiKey) {
       rawGoogle.apiKey = legacyApiKey;
       rawProviders.google = rawGoogle;
-      rawModels.providers = rawProviders as NonNullable<OpenClawConfig["models"]>["providers"];
+      rawModels.providers = rawProviders as NonNullable<RecallConfig["models"]>["providers"];
       next = {
         ...next,
-        models: rawModels as OpenClawConfig["models"],
+        models: rawModels as RecallConfig["models"],
       };
       changes.push(
         `Moved skills.entries.${NANO_BANANA_SKILL_KEY}.${legacyEnvApiKey ? "env.GEMINI_API_KEY" : "apiKey"} → models.providers.google.apiKey.`,
@@ -621,7 +621,7 @@ export function normalizeCompatibilityConfigValues(cfg: OpenClawConfig): {
       return;
     }
 
-    const normalizedTalk = normalizeTalkSection(rawTalk as OpenClawConfig["talk"]);
+    const normalizedTalk = normalizeTalkSection(rawTalk as RecallConfig["talk"]);
     if (!normalizedTalk) {
       return;
     }
@@ -806,7 +806,7 @@ export function normalizeCompatibilityConfigValues(cfg: OpenClawConfig): {
       ...next,
       tools: {
         ...next.tools,
-        media: nextMedia as NonNullable<OpenClawConfig["tools"]>["media"],
+        media: nextMedia as NonNullable<RecallConfig["tools"]>["media"],
       },
     };
   };
@@ -885,7 +885,7 @@ export function normalizeCompatibilityConfigValues(cfg: OpenClawConfig): {
       ...next,
       models: {
         ...next.models,
-        providers: nextProviders as NonNullable<OpenClawConfig["models"]>["providers"],
+        providers: nextProviders as NonNullable<RecallConfig["models"]>["providers"],
       },
     };
   };

@@ -3,7 +3,7 @@ import { isDiscordExecApprovalClientEnabled } from "../../extensions/discord/src
 import { buildTelegramExecApprovalButtons } from "../../extensions/telegram/src/approval-buttons.js";
 import { isTelegramExecApprovalClientEnabled } from "../../extensions/telegram/src/exec-approvals.js";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { buildExecApprovalPendingReplyPayload } from "../infra/exec-approval-reply.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createChannelTestPluginBase, createTestRegistry } from "../test-utils/channel-plugins.js";
@@ -104,10 +104,10 @@ const TARGETS_CFG = {
       targets: [{ channel: "slack", to: "U123" }],
     },
   },
-} as OpenClawConfig;
+} as RecallConfig;
 
 function createForwarder(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   deliver?: ReturnType<typeof vi.fn>;
   resolveSessionTarget?: () => { channel: string; to: string } | null;
 }) {
@@ -126,7 +126,7 @@ function createForwarder(params: {
   return { deliver, forwarder };
 }
 
-function makeSessionCfg(options: { discordExecApprovalsEnabled?: boolean } = {}): OpenClawConfig {
+function makeSessionCfg(options: { discordExecApprovalsEnabled?: boolean } = {}): RecallConfig {
   return {
     ...(options.discordExecApprovalsEnabled
       ? {
@@ -141,11 +141,11 @@ function makeSessionCfg(options: { discordExecApprovalsEnabled?: boolean } = {})
         }
       : {}),
     approvals: { exec: { enabled: true, mode: "session" } },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
 async function expectDiscordSessionTargetRequest(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   expectedAccepted: boolean;
   expectedDeliveryCount: number;
 }) {
@@ -177,7 +177,7 @@ async function expectSessionFilterRequestResult(params: {
         sessionFilter: params.sessionFilter,
       },
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 
   const { deliver, forwarder } = createForwarder({
     cfg,
@@ -209,7 +209,7 @@ describe("exec approval forwarder", () => {
     vi.useFakeTimers();
     const cfg = {
       approvals: { exec: { enabled: true, mode: "session" } },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const { deliver, forwarder } = createForwarder({
       cfg,
@@ -261,7 +261,7 @@ describe("exec approval forwarder", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const { deliver, forwarder } = createForwarder({
       cfg,
@@ -294,7 +294,7 @@ describe("exec approval forwarder", () => {
           targets: [{ channel: "telegram", to: "123" }],
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const { deliver, forwarder } = createForwarder({ cfg });
 
@@ -388,7 +388,7 @@ describe("exec approval forwarder", () => {
 
   it("returns false when forwarding is disabled", async () => {
     const { deliver, forwarder } = createForwarder({
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
     });
     await expect(forwarder.handleRequested(baseRequest)).resolves.toBe(false);
     expect(deliver).not.toHaveBeenCalled();
@@ -446,7 +446,7 @@ describe("exec approval forwarder", () => {
           targets: [{ channel: "telegram", to: "123" }],
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const { deliver, forwarder } = createForwarder({ cfg });
 
     await forwarder.handleResolved({

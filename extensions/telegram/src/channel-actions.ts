@@ -3,16 +3,16 @@ import {
   createUnionActionGate,
   listTokenSourcedAccounts,
   resolveReactionMessageId,
-} from "openclaw/plugin-sdk/channel-actions";
-import { createMessageToolButtonsSchema } from "openclaw/plugin-sdk/channel-actions";
+} from "recall/plugin-sdk/channel-actions";
+import { createMessageToolButtonsSchema } from "recall/plugin-sdk/channel-actions";
 import type {
   ChannelMessageActionAdapter,
   ChannelMessageActionName,
   ChannelMessageToolDiscovery,
   ChannelMessageToolSchemaContribution,
-} from "openclaw/plugin-sdk/channel-contract";
-import type { TelegramActionConfig } from "openclaw/plugin-sdk/config-runtime";
-import { extractToolSend } from "openclaw/plugin-sdk/tool-send";
+} from "recall/plugin-sdk/channel-contract";
+import type { TelegramActionConfig } from "recall/plugin-sdk/config-runtime";
+import { extractToolSend } from "recall/plugin-sdk/tool-send";
 import {
   createTelegramActionGate,
   listEnabledTelegramAccounts,

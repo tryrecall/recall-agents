@@ -8,7 +8,7 @@ import {
   resolveActiveTalkProviderConfig,
   resolveTalkApiKey,
 } from "./talk.js";
-import type { OpenClawConfig } from "./types.js";
+import type { RecallConfig } from "./types.js";
 import type { ModelDefinitionConfig } from "./types.models.js";
 import { hasConfiguredSecretInput } from "./types.secrets.js";
 
@@ -97,7 +97,7 @@ export function resolveNormalizedProviderModelMaxTokens(params: {
   return Math.min(safeMaxTokens, params.contextWindow);
 }
 
-function resolveAnthropicDefaultAuthMode(cfg: OpenClawConfig): AnthropicAuthDefaultsMode | null {
+function resolveAnthropicDefaultAuthMode(cfg: RecallConfig): AnthropicAuthDefaultsMode | null {
   const profiles = cfg.auth?.profiles ?? {};
   const anthropicProfiles = Object.entries(profiles).filter(
     ([, profile]) => profile?.provider === "anthropic",
@@ -154,7 +154,7 @@ export type SessionDefaultsOptions = {
   warnState?: WarnState;
 };
 
-export function applyMessageDefaults(cfg: OpenClawConfig): OpenClawConfig {
+export function applyMessageDefaults(cfg: RecallConfig): RecallConfig {
   const messages = cfg.messages;
   const hasAckScope = messages?.ackReactionScope !== undefined;
   if (hasAckScope) {
@@ -170,9 +170,9 @@ export function applyMessageDefaults(cfg: OpenClawConfig): OpenClawConfig {
 }
 
 export function applySessionDefaults(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   options: SessionDefaultsOptions = {},
-): OpenClawConfig {
+): RecallConfig {
   const session = cfg.session;
   if (!session || session.mainKey === undefined) {
     return cfg;
@@ -182,7 +182,7 @@ export function applySessionDefaults(
   const warn = options.warn ?? console.warn;
   const warnState = options.warnState ?? defaultWarnState;
 
-  const next: OpenClawConfig = {
+  const next: RecallConfig = {
     ...cfg,
     session: { ...session, mainKey: "main" },
   };
@@ -195,7 +195,7 @@ export function applySessionDefaults(
   return next;
 }
 
-export function applyTalkApiKey(config: OpenClawConfig): OpenClawConfig {
+export function applyTalkApiKey(config: RecallConfig): RecallConfig {
   const normalized = normalizeTalkConfig(config);
   const resolved = resolveTalkApiKey();
   if (!resolved) {
@@ -232,11 +232,11 @@ export function applyTalkApiKey(config: OpenClawConfig): OpenClawConfig {
   };
 }
 
-export function applyTalkConfigNormalization(config: OpenClawConfig): OpenClawConfig {
+export function applyTalkConfigNormalization(config: RecallConfig): RecallConfig {
   return normalizeTalkConfig(config);
 }
 
-export function applyModelDefaults(cfg: OpenClawConfig): OpenClawConfig {
+export function applyModelDefaults(cfg: RecallConfig): RecallConfig {
   let mutated = false;
   let nextCfg = cfg;
 
@@ -377,7 +377,7 @@ export function applyModelDefaults(cfg: OpenClawConfig): OpenClawConfig {
   };
 }
 
-export function applyAgentDefaults(cfg: OpenClawConfig): OpenClawConfig {
+export function applyAgentDefaults(cfg: RecallConfig): RecallConfig {
   const agents = cfg.agents;
   const defaults = agents?.defaults;
   const hasMax =
@@ -418,7 +418,7 @@ export function applyAgentDefaults(cfg: OpenClawConfig): OpenClawConfig {
   };
 }
 
-export function applyLoggingDefaults(cfg: OpenClawConfig): OpenClawConfig {
+export function applyLoggingDefaults(cfg: RecallConfig): RecallConfig {
   const logging = cfg.logging;
   if (!logging) {
     return cfg;
@@ -435,7 +435,7 @@ export function applyLoggingDefaults(cfg: OpenClawConfig): OpenClawConfig {
   };
 }
 
-export function applyContextPruningDefaults(cfg: OpenClawConfig): OpenClawConfig {
+export function applyContextPruningDefaults(cfg: RecallConfig): RecallConfig {
   const defaults = cfg.agents?.defaults;
   if (!defaults) {
     return cfg;
@@ -537,7 +537,7 @@ export function applyContextPruningDefaults(cfg: OpenClawConfig): OpenClawConfig
   };
 }
 
-export function applyCompactionDefaults(cfg: OpenClawConfig): OpenClawConfig {
+export function applyCompactionDefaults(cfg: RecallConfig): RecallConfig {
   const defaults = cfg.agents?.defaults;
   if (!defaults) {
     return cfg;

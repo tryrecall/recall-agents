@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const loadConfigMock = vi.fn();
-const loadOpenClawPluginsMock = vi.fn();
+const loadRecallPluginsMock = vi.fn();
 let buildPluginStatusReport: typeof import("./status.js").buildPluginStatusReport;
 let buildPluginInspectReport: typeof import("./status.js").buildPluginInspectReport;
 let buildAllPluginInspectReports: typeof import("./status.js").buildAllPluginInspectReports;
@@ -15,7 +15,7 @@ vi.mock("../config/config.js", () => ({
 }));
 
 vi.mock("./loader.js", () => ({
-  loadOpenClawPlugins: (...args: unknown[]) => loadOpenClawPluginsMock(...args),
+  loadRecallPlugins: (...args: unknown[]) => loadRecallPluginsMock(...args),
 }));
 
 vi.mock("../agents/agent-scope.js", () => ({
@@ -31,9 +31,9 @@ describe("buildPluginStatusReport", () => {
   beforeEach(async () => {
     vi.resetModules();
     loadConfigMock.mockReset();
-    loadOpenClawPluginsMock.mockReset();
+    loadRecallPluginsMock.mockReset();
     loadConfigMock.mockReturnValue({});
-    loadOpenClawPluginsMock.mockReturnValue({
+    loadRecallPluginsMock.mockReturnValue({
       plugins: [],
       diagnostics: [],
       channels: [],
@@ -64,7 +64,7 @@ describe("buildPluginStatusReport", () => {
   });
 
   it("forwards an explicit env to plugin loading", () => {
-    const env = { HOME: "/tmp/openclaw-home" } as NodeJS.ProcessEnv;
+    const env = { HOME: "/tmp/recall-home" } as NodeJS.ProcessEnv;
 
     buildPluginStatusReport({
       config: {},
@@ -72,7 +72,7 @@ describe("buildPluginStatusReport", () => {
       env,
     });
 
-    expect(loadOpenClawPluginsMock).toHaveBeenCalledWith(
+    expect(loadRecallPluginsMock).toHaveBeenCalledWith(
       expect.objectContaining({
         config: {},
         workspaceDir: "/workspace",
@@ -82,7 +82,7 @@ describe("buildPluginStatusReport", () => {
   });
 
   it("normalizes bundled plugin versions to the core base release", () => {
-    loadOpenClawPluginsMock.mockReturnValue({
+    loadRecallPluginsMock.mockReturnValue({
       plugins: [
         {
           id: "whatsapp",
@@ -131,7 +131,7 @@ describe("buildPluginStatusReport", () => {
     const report = buildPluginStatusReport({
       config: {},
       env: {
-        OPENCLAW_VERSION: "2026.3.23-1",
+        RECALL_VERSION: "2026.3.23-1",
       } as NodeJS.ProcessEnv,
     });
 
@@ -152,7 +152,7 @@ describe("buildPluginStatusReport", () => {
         },
       },
     });
-    loadOpenClawPluginsMock.mockReturnValue({
+    loadRecallPluginsMock.mockReturnValue({
       plugins: [
         {
           id: "google",
@@ -237,7 +237,7 @@ describe("buildPluginStatusReport", () => {
   });
 
   it("builds inspect reports for every loaded plugin", () => {
-    loadOpenClawPluginsMock.mockReturnValue({
+    loadRecallPluginsMock.mockReturnValue({
       plugins: [
         {
           id: "lca",
@@ -336,7 +336,7 @@ describe("buildPluginStatusReport", () => {
   });
 
   it("builds compatibility warnings for legacy compatibility paths", () => {
-    loadOpenClawPluginsMock.mockReturnValue({
+    loadRecallPluginsMock.mockReturnValue({
       plugins: [
         {
           id: "lca",
@@ -395,7 +395,7 @@ describe("buildPluginStatusReport", () => {
   });
 
   it("builds structured compatibility notices with deterministic ordering", () => {
-    loadOpenClawPluginsMock.mockReturnValue({
+    loadRecallPluginsMock.mockReturnValue({
       plugins: [
         {
           id: "hook-only",
@@ -501,7 +501,7 @@ describe("buildPluginStatusReport", () => {
   });
 
   it("returns no compatibility warnings for modern capability plugins", () => {
-    loadOpenClawPluginsMock.mockReturnValue({
+    loadRecallPluginsMock.mockReturnValue({
       plugins: [
         {
           id: "modern",
@@ -551,7 +551,7 @@ describe("buildPluginStatusReport", () => {
   });
 
   it("populates bundleCapabilities from plugin record", () => {
-    loadOpenClawPluginsMock.mockReturnValue({
+    loadRecallPluginsMock.mockReturnValue({
       plugins: [
         {
           id: "claude-bundle",
@@ -609,7 +609,7 @@ describe("buildPluginStatusReport", () => {
   });
 
   it("returns empty bundleCapabilities and mcpServers for non-bundle plugins", () => {
-    loadOpenClawPluginsMock.mockReturnValue({
+    loadRecallPluginsMock.mockReturnValue({
       plugins: [
         {
           id: "plain-plugin",

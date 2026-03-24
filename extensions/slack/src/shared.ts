@@ -1,15 +1,15 @@
-import { describeAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
-import { formatAllowFromLowercase } from "openclaw/plugin-sdk/allow-from";
+import { describeAccountSnapshot } from "recall/plugin-sdk/account-helpers";
+import { formatAllowFromLowercase } from "recall/plugin-sdk/allow-from";
 import {
   adaptScopedAccountAccessor,
   createScopedChannelConfigAdapter,
-} from "openclaw/plugin-sdk/channel-config-helpers";
-import { createChannelPluginBase } from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/channel-config-helpers";
+import { createChannelPluginBase } from "recall/plugin-sdk/core";
 import {
   formatDocsLink,
   hasConfiguredSecretInput,
   patchChannelConfigForAccount,
-} from "openclaw/plugin-sdk/setup";
+} from "recall/plugin-sdk/setup";
 import { inspectSlackAccount } from "./account-inspect.js";
 import {
   listSlackAccountIds,
@@ -23,17 +23,17 @@ import {
   getChatChannelMeta,
   SlackConfigSchema,
   type ChannelPlugin,
-  type OpenClawConfig,
+  type RecallConfig,
 } from "./runtime-api.js";
 
 export const SLACK_CHANNEL = "slack" as const;
 
 function buildSlackManifest(botName: string) {
-  const safeName = botName.trim() || "OpenClaw";
+  const safeName = botName.trim() || "Recall";
   const manifest = {
     display_information: {
       name: safeName,
-      description: `${safeName} connector for OpenClaw`,
+      description: `${safeName} connector for Recall`,
     },
     features: {
       bot_user: {
@@ -46,8 +46,8 @@ function buildSlackManifest(botName: string) {
       },
       slash_commands: [
         {
-          command: "/openclaw",
-          description: "Send a message to OpenClaw",
+          command: "/recall",
+          description: "Send a message to Recall",
           should_escape: false,
         },
       ],
@@ -97,7 +97,7 @@ function buildSlackManifest(botName: string) {
   return JSON.stringify(manifest, null, 2);
 }
 
-export function buildSlackSetupLines(botName = "OpenClaw"): string[] {
+export function buildSlackSetupLines(botName = "Recall"): string[] {
   return [
     "1) Slack API -> Create App -> From scratch or From manifest (with the JSON below)",
     "2) Add Socket Mode + enable it to get the app-level token (xapp-...)",
@@ -113,10 +113,10 @@ export function buildSlackSetupLines(botName = "OpenClaw"): string[] {
 }
 
 export function setSlackChannelAllowlist(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   accountId: string,
   channelKeys: string[],
-): OpenClawConfig {
+): RecallConfig {
   const channels = Object.fromEntries(channelKeys.map((key) => [key, { allow: true }]));
   return patchChannelConfigForAccount({
     cfg,

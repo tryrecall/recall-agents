@@ -1,10 +1,10 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
-import { resolveThreadSessionKeys } from "openclaw/plugin-sdk/routing";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
+import { resolveThreadSessionKeys } from "recall/plugin-sdk/routing";
 import { describe, expect, it } from "vitest";
 import { resolveTelegramConversationBaseSessionKey } from "./conversation-route.js";
 
 describe("resolveTelegramConversationBaseSessionKey", () => {
-  const cfg: OpenClawConfig = {};
+  const cfg: RecallConfig = {};
 
   it("keeps the routed session key for the default account", () => {
     expect(

@@ -228,9 +228,9 @@ async function applyMutation(args: string[], stdin?: Buffer) {
 
 describe("openshell remote fs bridge", () => {
   it("writes, reads, renames, and removes files without local host paths", async () => {
-    const workspaceDir = await makeTempDir("openclaw-openshell-remote-local-");
-    const remoteWorkspaceDir = await makeTempDir("openclaw-openshell-remote-workspace-");
-    const remoteAgentDir = await makeTempDir("openclaw-openshell-remote-agent-");
+    const workspaceDir = await makeTempDir("recall-openshell-remote-local-");
+    const remoteWorkspaceDir = await makeTempDir("recall-openshell-remote-workspace-");
+    const remoteAgentDir = await makeTempDir("recall-openshell-remote-agent-");
     const remoteWorkspaceRealDir = await fs.realpath(remoteWorkspaceDir);
     const remoteAgentRealDir = await fs.realpath(remoteAgentDir);
     const backend = createBackendMock({

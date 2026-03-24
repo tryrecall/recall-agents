@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../runtime-api.js";
+import type { RecallConfig } from "../runtime-api.js";
 import { sendMessageMSTeams } from "./send.js";
 
 const mockState = vi.hoisted(() => ({
@@ -96,7 +96,7 @@ describe("sendMessageMSTeams", () => {
     });
 
     await sendMessageMSTeams({
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       to: "conversation:19:conversation@thread.tacv2",
       text: "hello",
       mediaUrl: "file:///tmp/agent-workspace/inline.png",
@@ -177,7 +177,7 @@ describe("sendMessageMSTeams", () => {
     });
 
     await sendMessageMSTeams({
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       to: "conversation:19:bot-framework-id@thread.tacv2",
       text: "here is a file",
       mediaUrl: "https://example.com/doc.pdf",
@@ -243,7 +243,7 @@ describe("sendMessageMSTeams", () => {
     });
 
     await sendMessageMSTeams({
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       to: "conversation:19:fallback-id@thread.tacv2",
       text: "report",
       mediaUrl: "https://example.com/report.pdf",

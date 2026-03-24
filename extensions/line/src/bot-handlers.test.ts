@@ -1,12 +1,12 @@
 import type { MessageEvent, PostbackEvent } from "@line/bot-sdk";
-import type { HistoryEntry } from "openclaw/plugin-sdk/reply-history";
+import type { HistoryEntry } from "recall/plugin-sdk/reply-history";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { LineAccountConfig } from "./types.js";
 
 // Avoid pulling in globals/pairing/media dependencies; this suite only asserts
 // allowlist/groupPolicy gating and message-context wiring.
-vi.mock("openclaw/plugin-sdk/runtime-env", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/runtime-env")>();
+vi.mock("recall/plugin-sdk/runtime-env", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/runtime-env")>();
   return {
     ...actual,
     danger: (text: string) => text,
@@ -20,7 +20,7 @@ const { readAllowFromStoreMock, upsertPairingRequestMock } = vi.hoisted(() => ({
   upsertPairingRequestMock: vi.fn(async () => ({ code: "CODE", created: true })),
 }));
 
-vi.mock("openclaw/plugin-sdk/conversation-runtime", () => ({
+vi.mock("recall/plugin-sdk/conversation-runtime", () => ({
   resolvePairingIdLabel: () => "lineUserId",
   readChannelAllowFromStore: readAllowFromStoreMock,
   upsertChannelPairingRequest: upsertPairingRequestMock,

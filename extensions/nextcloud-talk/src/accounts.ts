@@ -1,5 +1,5 @@
-import { resolveMergedAccountConfig } from "openclaw/plugin-sdk/account-resolution";
-import { tryReadSecretFileSync } from "openclaw/plugin-sdk/infra-runtime";
+import { resolveMergedAccountConfig } from "recall/plugin-sdk/account-resolution";
+import { tryReadSecretFileSync } from "recall/plugin-sdk/infra-runtime";
 import {
   createAccountListHelpers,
   DEFAULT_ACCOUNT_ID,
@@ -15,7 +15,7 @@ function isTruthyEnvValue(value?: string): boolean {
 }
 
 const debugAccounts = (...args: unknown[]) => {
-  if (isTruthyEnvValue(process.env.OPENCLAW_DEBUG_NEXTCLOUD_TALK_ACCOUNTS)) {
+  if (isTruthyEnvValue(process.env.RECALL_DEBUG_NEXTCLOUD_TALK_ACCOUNTS)) {
     console.warn("[nextcloud-talk:accounts]", ...args);
   }
 };

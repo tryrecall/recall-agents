@@ -1,27 +1,27 @@
-import { describeAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
-import { formatAllowFromLowercase } from "openclaw/plugin-sdk/allow-from";
-import { createMessageToolCardSchema } from "openclaw/plugin-sdk/channel-actions";
+import { describeAccountSnapshot } from "recall/plugin-sdk/account-helpers";
+import { formatAllowFromLowercase } from "recall/plugin-sdk/allow-from";
+import { createMessageToolCardSchema } from "recall/plugin-sdk/channel-actions";
 import {
   adaptScopedAccountAccessor,
   createHybridChannelConfigAdapter,
-} from "openclaw/plugin-sdk/channel-config-helpers";
+} from "recall/plugin-sdk/channel-config-helpers";
 import type {
   ChannelMessageActionAdapter,
   ChannelMessageToolDiscovery,
-} from "openclaw/plugin-sdk/channel-contract";
-import { createPairingPrefixStripper } from "openclaw/plugin-sdk/channel-pairing";
+} from "recall/plugin-sdk/channel-contract";
+import { createPairingPrefixStripper } from "recall/plugin-sdk/channel-pairing";
 import {
   createAllowlistProviderGroupPolicyWarningCollector,
   projectConfigAccountIdWarningCollector,
-} from "openclaw/plugin-sdk/channel-policy";
-import { createChatChannelPlugin } from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/channel-policy";
+import { createChatChannelPlugin } from "recall/plugin-sdk/core";
 import {
   createChannelDirectoryAdapter,
   createRuntimeDirectoryLiveAdapter,
-} from "openclaw/plugin-sdk/directory-runtime";
-import { createLazyRuntimeNamedExport } from "openclaw/plugin-sdk/lazy-runtime";
-import { createRuntimeOutboundDelegates } from "openclaw/plugin-sdk/outbound-runtime";
-import { createComputedAccountStatusAdapter } from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/directory-runtime";
+import { createLazyRuntimeNamedExport } from "recall/plugin-sdk/lazy-runtime";
+import { createRuntimeOutboundDelegates } from "recall/plugin-sdk/outbound-runtime";
+import { createComputedAccountStatusAdapter } from "recall/plugin-sdk/status-helpers";
 import type { ChannelMeta, ChannelPlugin, ClawdbotConfig } from "../runtime-api.js";
 import {
   buildChannelConfigSchema,

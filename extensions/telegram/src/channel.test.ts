@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../../src/config/config.js";
+import type { RecallConfig } from "../../../src/config/config.js";
 import type { PluginRuntime } from "../../../src/plugins/runtime/types.js";
 import { createStartAccountContext } from "../../../test/helpers/extensions/start-account-context.js";
 import type { ResolvedTelegramAccount } from "./accounts.js";
@@ -39,7 +39,7 @@ vi.mock("./monitor.js", async (importOriginal) => {
   };
 });
 
-function createCfg(): OpenClawConfig {
+function createCfg(): RecallConfig {
   return {
     channels: {
       telegram: {
@@ -51,21 +51,21 @@ function createCfg(): OpenClawConfig {
         },
       },
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
-function resolveAccount(cfg: OpenClawConfig, accountId: string): ResolvedTelegramAccount {
+function resolveAccount(cfg: RecallConfig, accountId: string): ResolvedTelegramAccount {
   return telegramPlugin.config.resolveAccount(cfg, accountId) as ResolvedTelegramAccount;
 }
 
-function createStartTelegramContext(cfg: OpenClawConfig, accountId: string) {
+function createStartTelegramContext(cfg: RecallConfig, accountId: string) {
   return createStartAccountContext({
     account: resolveAccount(cfg, accountId),
     cfg,
   });
 }
 
-function startTelegramAccount(cfg: OpenClawConfig, accountId: string) {
+function startTelegramAccount(cfg: RecallConfig, accountId: string) {
   return telegramPlugin.gateway!.startAccount!(createStartTelegramContext(cfg, accountId));
 }
 
@@ -115,7 +115,7 @@ function installGatewayRuntime(params?: { probeOk?: boolean; botUsername?: strin
   };
 }
 
-function configureOpsProxyNetwork(cfg: OpenClawConfig) {
+function configureOpsProxyNetwork(cfg: RecallConfig) {
   cfg.channels!.telegram!.accounts!.ops = {
     ...cfg.channels!.telegram!.accounts!.ops,
     proxy: "http://127.0.0.1:8888",
@@ -167,7 +167,7 @@ describe("telegramPlugin groups", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expect(
       telegramPlugin.groups?.resolveRequireMention?.({

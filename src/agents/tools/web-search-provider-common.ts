@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import { normalizeResolvedSecretInputString } from "../../config/types.secrets.js";
 import { normalizeSecretInput } from "../../utils/normalize-secret-input.js";
 import { withTrustedWebToolsEndpoint } from "./web-guarded-fetch.js";
@@ -14,7 +14,7 @@ import {
   writeCache,
 } from "./web-shared.js";
 
-export type SearchConfigRecord = (NonNullable<OpenClawConfig["tools"]>["web"] extends infer Web
+export type SearchConfigRecord = (NonNullable<RecallConfig["tools"]>["web"] extends infer Web
   ? Web extends { search?: infer Search }
     ? Search
     : never
@@ -31,7 +31,7 @@ type UnsupportedWebSearchFilterName =
 export const DEFAULT_SEARCH_COUNT = 5;
 export const MAX_SEARCH_COUNT = 10;
 
-const SEARCH_CACHE_KEY = Symbol.for("openclaw.web-search.cache");
+const SEARCH_CACHE_KEY = Symbol.for("recall.web-search.cache");
 
 function getSharedSearchCache(): Map<string, CacheEntry<Record<string, unknown>>> {
   const root = globalThis as Record<PropertyKey, unknown>;
@@ -287,7 +287,7 @@ function describeUnsupportedSearchFilter(name: UnsupportedWebSearchFilterName): 
 export function buildUnsupportedSearchFilterResponse(
   params: Record<string, unknown>,
   provider: string,
-  docs = "https://docs.openclaw.ai/tools/web",
+  docs = "https://docs.recall.ai/tools/web",
 ):
   | {
       error: string;

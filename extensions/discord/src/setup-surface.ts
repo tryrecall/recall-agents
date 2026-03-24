@@ -1,9 +1,9 @@
 import {
-  type OpenClawConfig,
+  type RecallConfig,
   type WizardPrompter,
   type ChannelSetupWizard,
-} from "openclaw/plugin-sdk/setup-runtime";
-import { formatDocsLink } from "openclaw/plugin-sdk/setup-tools";
+} from "recall/plugin-sdk/setup-runtime";
+import { formatDocsLink } from "recall/plugin-sdk/setup-tools";
 import { resolveDiscordChannelAllowlist } from "./resolve-channels.js";
 import { resolveDiscordUserAllowlist } from "./resolve-users.js";
 import {
@@ -48,10 +48,10 @@ async function resolveDiscordAllowFromEntries(params: { token?: string; entries:
 }
 
 async function promptDiscordAllowFrom(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   prompter: WizardPrompter;
   accountId?: string;
-}): Promise<OpenClawConfig> {
+}): Promise<RecallConfig> {
   return await promptLegacyChannelAllowFromForAccount({
     cfg: params.cfg,
     prompter: params.prompter,
@@ -90,7 +90,7 @@ async function promptDiscordAllowFrom(params: {
 }
 
 async function resolveDiscordGroupAllowlist(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId: string;
   credentialValues: { token?: string };
   entries: string[];

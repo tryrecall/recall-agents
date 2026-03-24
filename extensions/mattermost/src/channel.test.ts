@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../runtime-api.js";
+import type { RecallConfig } from "../runtime-api.js";
 import { createChannelReplyPipeline } from "../runtime-api.js";
 const { sendMessageMattermostMock } = vi.hoisted(() => ({
   sendMessageMattermostMock: vi.fn(),
@@ -18,7 +18,7 @@ import {
   withMockedGlobalFetch,
 } from "./mattermost/reactions.test-helpers.js";
 
-function getDescribedActions(cfg: OpenClawConfig): string[] {
+function getDescribedActions(cfg: RecallConfig): string[] {
   return [...(mattermostPlugin.actions?.describeMessageTool?.({ cfg })?.actions ?? [])];
 }
 
@@ -102,7 +102,7 @@ describe("mattermostPlugin", () => {
     it("uses replyToMode for channel messages and keeps direct messages off", () => {
       const resolveReplyToMode = requireMattermostReplyToModeResolver();
 
-      const cfg: OpenClawConfig = {
+      const cfg: RecallConfig = {
         channels: {
           mattermost: {
             replyToMode: "all",
@@ -152,7 +152,7 @@ describe("mattermostPlugin", () => {
     };
 
     it("exposes react when mattermost is configured", () => {
-      const cfg: OpenClawConfig = {
+      const cfg: RecallConfig = {
         channels: {
           mattermost: {
             enabled: true,
@@ -170,7 +170,7 @@ describe("mattermostPlugin", () => {
     });
 
     it("hides react when mattermost is not configured", () => {
-      const cfg: OpenClawConfig = {
+      const cfg: RecallConfig = {
         channels: {
           mattermost: {
             enabled: true,
@@ -183,7 +183,7 @@ describe("mattermostPlugin", () => {
     });
 
     it("keeps buttons optional in message tool schema", () => {
-      const cfg: OpenClawConfig = {
+      const cfg: RecallConfig = {
         channels: {
           mattermost: {
             enabled: true,
@@ -203,7 +203,7 @@ describe("mattermostPlugin", () => {
     });
 
     it("hides react when actions.reactions is false", () => {
-      const cfg: OpenClawConfig = {
+      const cfg: RecallConfig = {
         channels: {
           mattermost: {
             enabled: true,
@@ -220,7 +220,7 @@ describe("mattermostPlugin", () => {
     });
 
     it("respects per-account actions.reactions in message discovery", () => {
-      const cfg: OpenClawConfig = {
+      const cfg: RecallConfig = {
         channels: {
           mattermost: {
             enabled: true,
@@ -242,7 +242,7 @@ describe("mattermostPlugin", () => {
     });
 
     it("blocks react when default account disables reactions and accountId is omitted", async () => {
-      const cfg: OpenClawConfig = {
+      const cfg: RecallConfig = {
         channels: {
           mattermost: {
             enabled: true,
@@ -381,7 +381,7 @@ describe("mattermostPlugin", () => {
             baseUrl: "https://chat.example.com",
           },
         },
-      } as OpenClawConfig;
+      } as RecallConfig;
 
       await sendText({
         cfg,
@@ -447,14 +447,14 @@ describe("mattermostPlugin", () => {
       const formatAllowFrom = mattermostPlugin.config.formatAllowFrom!;
 
       const formatted = formatAllowFrom({
-        cfg: {} as OpenClawConfig,
+        cfg: {} as RecallConfig,
         allowFrom: [" @Alice ", " user:USER123 ", " mattermost:BOT999 "],
       });
       expect(formatted).toEqual(["@alice", "user123", "bot999"]);
     });
 
     it("uses account responsePrefix overrides", () => {
-      const cfg: OpenClawConfig = {
+      const cfg: RecallConfig = {
         channels: {
           mattermost: {
             responsePrefix: "[Channel]",

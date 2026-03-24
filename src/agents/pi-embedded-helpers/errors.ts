@@ -1,5 +1,5 @@
 import type { AssistantMessage } from "@mariozechner/pi-ai";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import {
   extractLeadingHttpStatus,
@@ -548,7 +548,7 @@ export function isRawApiErrorPayload(raw?: string): boolean {
 
 export function formatAssistantErrorText(
   msg: AssistantMessage,
-  opts?: { cfg?: OpenClawConfig; sessionKey?: string; provider?: string; model?: string },
+  opts?: { cfg?: RecallConfig; sessionKey?: string; provider?: string; model?: string },
 ): string | undefined {
   // Also format errors if errorMessage is present, even if stopReason isn't "error"
   const raw = (msg.errorMessage ?? "").trim();
@@ -829,7 +829,7 @@ export function isModelNotFoundErrorMessage(raw: string): boolean {
   }
   const lower = raw.toLowerCase();
 
-  // Direct pattern matches from OpenClaw internals and common providers.
+  // Direct pattern matches from Recall internals and common providers.
   if (
     lower.includes("unknown model") ||
     lower.includes("model not found") ||

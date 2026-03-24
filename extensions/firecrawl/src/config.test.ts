@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_FIRECRAWL_BASE_URL,
@@ -43,7 +43,7 @@ describe("firecrawl config helpers", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expect(resolveFirecrawlSearchConfig(cfg)).toEqual({
       apiKey: "plugin-key",
@@ -63,7 +63,7 @@ describe("firecrawl config helpers", () => {
     expect(resolveFirecrawlMaxAgeMs()).toBe(DEFAULT_FIRECRAWL_MAX_AGE_MS);
     expect(resolveFirecrawlScrapeTimeoutSeconds()).toBe(DEFAULT_FIRECRAWL_SCRAPE_TIMEOUT_SECONDS);
     expect(resolveFirecrawlSearchTimeoutSeconds()).toBe(DEFAULT_FIRECRAWL_SEARCH_TIMEOUT_SECONDS);
-    expect(resolveFirecrawlBaseUrl({} as OpenClawConfig)).not.toBe(DEFAULT_FIRECRAWL_BASE_URL);
+    expect(resolveFirecrawlBaseUrl({} as RecallConfig)).not.toBe(DEFAULT_FIRECRAWL_BASE_URL);
   });
 
   it("respects positive numeric overrides for scrape and cache behavior", () => {
@@ -79,7 +79,7 @@ describe("firecrawl config helpers", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expect(resolveFirecrawlOnlyMainContent(cfg)).toBe(false);
     expect(resolveFirecrawlMaxAgeMs(cfg)).toBe(1234);

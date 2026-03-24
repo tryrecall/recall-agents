@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
 import {
   resolveThreadBindingIdleTimeoutMsForChannel,
   resolveThreadBindingMaxAgeMsForChannel,
@@ -8,9 +8,9 @@ import {
   type BindingTargetKind,
   type SessionBindingAdapter,
   type SessionBindingRecord,
-} from "openclaw/plugin-sdk/conversation-runtime";
-import { normalizeAccountId, resolveAgentIdFromSessionKey } from "openclaw/plugin-sdk/routing";
-import { resolveGlobalSingleton } from "openclaw/plugin-sdk/text-runtime";
+} from "recall/plugin-sdk/conversation-runtime";
+import { normalizeAccountId, resolveAgentIdFromSessionKey } from "recall/plugin-sdk/routing";
+import { resolveGlobalSingleton } from "recall/plugin-sdk/text-runtime";
 
 type FeishuBindingTargetKind = "subagent" | "acp";
 
@@ -51,7 +51,7 @@ type FeishuThreadBindingsState = {
   bindingsByAccountConversation: Map<string, FeishuThreadBindingRecord>;
 };
 
-const FEISHU_THREAD_BINDINGS_STATE_KEY = Symbol.for("openclaw.feishuThreadBindingsState");
+const FEISHU_THREAD_BINDINGS_STATE_KEY = Symbol.for("recall.feishuThreadBindingsState");
 const state = resolveGlobalSingleton<FeishuThreadBindingsState>(
   FEISHU_THREAD_BINDINGS_STATE_KEY,
   () => ({
@@ -118,7 +118,7 @@ function toSessionBindingRecord(
 
 export function createFeishuThreadBindingManager(params: {
   accountId?: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
 }): FeishuThreadBindingManager {
   const accountId = normalizeAccountId(params.accountId);
   const existing = getState().managersByAccountId.get(accountId);

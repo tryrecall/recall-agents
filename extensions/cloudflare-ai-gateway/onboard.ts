@@ -2,12 +2,12 @@ import {
   buildCloudflareAiGatewayModelDefinition,
   CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF,
   resolveCloudflareAiGatewayBaseUrl,
-} from "openclaw/plugin-sdk/provider-models";
+} from "recall/plugin-sdk/provider-models";
 import {
   applyAgentDefaultModelPrimary,
   applyProviderConfigWithDefaultModel,
-  type OpenClawConfig,
-} from "openclaw/plugin-sdk/provider-onboard";
+  type RecallConfig,
+} from "recall/plugin-sdk/provider-onboard";
 
 export { CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF };
 
@@ -39,9 +39,9 @@ export function buildCloudflareAiGatewayConfigPatch(params: {
 }
 
 export function applyCloudflareAiGatewayProviderConfig(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   params?: { accountId?: string; gatewayId?: string },
-): OpenClawConfig {
+): RecallConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF] = {
     ...models[CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF],
@@ -83,9 +83,9 @@ export function applyCloudflareAiGatewayProviderConfig(
 }
 
 export function applyCloudflareAiGatewayConfig(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   params?: { accountId?: string; gatewayId?: string },
-): OpenClawConfig {
+): RecallConfig {
   return applyAgentDefaultModelPrimary(
     applyCloudflareAiGatewayProviderConfig(cfg, params),
     CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF,

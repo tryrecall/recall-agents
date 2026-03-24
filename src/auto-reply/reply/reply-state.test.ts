@@ -45,7 +45,7 @@ async function seedSessionStore(params: {
 }
 
 async function createCompactionSessionFixture(entry: SessionEntry) {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-compact-"));
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "recall-compact-"));
   tempDirs.push(tmp);
   const storePath = path.join(tmp, "sessions.json");
   const sessionKey = "main";
@@ -446,7 +446,7 @@ describe("incrementCompactionCount", () => {
   });
 
   it("updates sessionId and sessionFile when compaction rotated transcripts", async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-compact-rotate-"));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "recall-compact-rotate-"));
     tempDirs.push(tmp);
     const storePath = path.join(tmp, "sessions.json");
     const sessionKey = "main";
@@ -474,7 +474,7 @@ describe("incrementCompactionCount", () => {
   });
 
   it("preserves fork transcript filenames when compaction rotates transcripts", async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-compact-fork-"));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "recall-compact-fork-"));
     tempDirs.push(tmp);
     const storePath = path.join(tmp, "sessions.json");
     const sessionKey = "main";
@@ -504,7 +504,7 @@ describe("incrementCompactionCount", () => {
   });
 
   it("falls back to the derived transcript path when rewritten absolute sessionFile is unsafe", async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-compact-unsafe-"));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "recall-compact-unsafe-"));
     tempDirs.push(tmp);
     const storePath = path.join(tmp, "sessions.json");
     const sessionKey = "main";

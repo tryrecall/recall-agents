@@ -1,6 +1,6 @@
 import Foundation
 
-public enum OpenClawCapability: String, Codable, Sendable {
+public enum RecallCapability: String, Codable, Sendable {
     case canvas
     case browser
     case camera

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createPluginSetupWizardStatus } from "../../../test/helpers/extensions/setup-wizard.js";
-import type { OpenClawConfig } from "../runtime-api.js";
+import type { RecallConfig } from "../runtime-api.js";
 import { feishuPlugin } from "./channel.js";
 
 const feishuGetStatus = createPluginSetupWizardStatus(feishuPlugin);
@@ -19,7 +19,7 @@ describe("feishu setup wizard status", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       accountOverrides: {},
     });
 

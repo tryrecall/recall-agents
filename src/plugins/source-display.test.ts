@@ -10,11 +10,11 @@ function createPluginSourceRoots() {
     "homebrew",
     "lib",
     "node_modules",
-    "openclaw",
+    "recall",
     "extensions",
   );
-  const globalRoot = path.resolve(path.sep, "Users", "x", ".openclaw", "extensions");
-  const workspaceRoot = path.resolve(path.sep, "Users", "x", "ws", ".openclaw", "extensions");
+  const globalRoot = path.resolve(path.sep, "Users", "x", ".recall", "extensions");
+  const workspaceRoot = path.resolve(path.sep, "Users", "x", "ws", ".recall", "extensions");
   return {
     stock: stockRoot,
     global: globalRoot,
@@ -63,12 +63,12 @@ describe("formatPluginSourceForTable", () => {
   });
 
   it("resolves source roots from an explicit env override", () => {
-    const homeDir = path.resolve(path.sep, "tmp", "openclaw-home");
+    const homeDir = path.resolve(path.sep, "tmp", "recall-home");
     const roots = withPathResolutionEnv(
       homeDir,
       {
-        OPENCLAW_BUNDLED_PLUGINS_DIR: "~/bundled",
-        OPENCLAW_STATE_DIR: "~/state",
+        RECALL_BUNDLED_PLUGINS_DIR: "~/bundled",
+        RECALL_STATE_DIR: "~/state",
       },
       (env) =>
         resolvePluginSourceRoots({
@@ -80,7 +80,7 @@ describe("formatPluginSourceForTable", () => {
     expect(roots).toEqual({
       stock: path.join(homeDir, "bundled"),
       global: path.join(homeDir, "state", "extensions"),
-      workspace: path.join(homeDir, "ws", ".openclaw", "extensions"),
+      workspace: path.join(homeDir, "ws", ".recall", "extensions"),
     });
   });
 });

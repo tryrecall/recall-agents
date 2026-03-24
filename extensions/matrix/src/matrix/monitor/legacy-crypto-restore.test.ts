@@ -25,7 +25,7 @@ function writeFile(filePath: string, value: string) {
 describe("maybeRestoreLegacyMatrixBackup", () => {
   it("marks pending legacy backup restore as completed after success", async () => {
     await withTempHome(async (home) => {
-      const stateDir = path.join(home, ".openclaw");
+      const stateDir = path.join(home, ".recall");
       const auth = {
         accountId: "default",
         homeserver: "https://matrix.example.org",
@@ -62,7 +62,7 @@ describe("maybeRestoreLegacyMatrixBackup", () => {
         stateDir,
         env: {
           ...process.env,
-          OPENCLAW_STATE_DIR: stateDir,
+          RECALL_STATE_DIR: stateDir,
           HOME: home,
         },
       });
@@ -88,7 +88,7 @@ describe("maybeRestoreLegacyMatrixBackup", () => {
 
   it("keeps the restore pending when startup restore fails", async () => {
     await withTempHome(async (home) => {
-      const stateDir = path.join(home, ".openclaw");
+      const stateDir = path.join(home, ".recall");
       const auth = {
         accountId: "default",
         homeserver: "https://matrix.example.org",
@@ -125,7 +125,7 @@ describe("maybeRestoreLegacyMatrixBackup", () => {
         stateDir,
         env: {
           ...process.env,
-          OPENCLAW_STATE_DIR: stateDir,
+          RECALL_STATE_DIR: stateDir,
           HOME: home,
         },
       });
@@ -148,7 +148,7 @@ describe("maybeRestoreLegacyMatrixBackup", () => {
 
   it("restores from a sibling token-hash directory when the access token changed", async () => {
     await withTempHome(async (home) => {
-      const stateDir = path.join(home, ".openclaw");
+      const stateDir = path.join(home, ".recall");
       const oldAuth = {
         accountId: "default",
         homeserver: "https://matrix.example.org",
@@ -193,7 +193,7 @@ describe("maybeRestoreLegacyMatrixBackup", () => {
         stateDir,
         env: {
           ...process.env,
-          OPENCLAW_STATE_DIR: stateDir,
+          RECALL_STATE_DIR: stateDir,
           HOME: home,
         },
       });

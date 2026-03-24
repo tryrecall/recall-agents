@@ -9,7 +9,7 @@ LINUX_VM="Ubuntu 24.04.3 ARM64"
 OPENAI_API_KEY_ENV="OPENAI_API_KEY"
 PACKAGE_SPEC=""
 JSON_OUTPUT=0
-RUN_DIR="$(mktemp -d /tmp/openclaw-parallels-npm-update.XXXXXX)"
+RUN_DIR="$(mktemp -d /tmp/recall-parallels-npm-update.XXXXXX)"
 MAIN_TGZ_DIR="$(mktemp -d)"
 MAIN_TGZ_PATH=""
 SERVER_PID=""
@@ -57,7 +57,7 @@ usage() {
 Usage: bash scripts/e2e/parallels-npm-update-smoke.sh [options]
 
 Options:
-  --package-spec <npm-spec>  Baseline npm package spec. Default: openclaw@latest
+  --package-spec <npm-spec>  Baseline npm package spec. Default: recall@latest
   --openai-api-key-env <var> Host env var name for OpenAI API key. Default: OPENAI_API_KEY
   --json                     Print machine-readable JSON summary.
   -h, --help                 Show help.
@@ -92,7 +92,7 @@ OPENAI_API_KEY_VALUE="${!OPENAI_API_KEY_ENV:-}"
 [[ -n "$OPENAI_API_KEY_VALUE" ]] || die "$OPENAI_API_KEY_ENV is required"
 
 resolve_latest_version() {
-  npm view openclaw version --userconfig "$(mktemp)"
+  npm view recall version --userconfig "$(mktemp)"
 }
 
 resolve_host_ip() {
@@ -127,7 +127,7 @@ pack_main_tgz() {
     npm pack --ignore-scripts --json --pack-destination "$MAIN_TGZ_DIR" \
       | python3 -c 'import json, sys; data = json.load(sys.stdin); print(data[-1]["filename"])'
   )"
-  MAIN_TGZ_PATH="$MAIN_TGZ_DIR/openclaw-main-$CURRENT_HEAD_SHORT.tgz"
+  MAIN_TGZ_PATH="$MAIN_TGZ_DIR/recall-main-$CURRENT_HEAD_SHORT.tgz"
   cp "$MAIN_TGZ_DIR/$pkg" "$MAIN_TGZ_PATH"
 }
 
@@ -138,7 +138,7 @@ start_server() {
   (
     cd "$MAIN_TGZ_DIR"
     exec python3 -m http.server "$HOST_PORT" --bind 0.0.0.0
-  ) >/tmp/openclaw-parallels-npm-update-http.log 2>&1 &
+  ) >/tmp/recall-parallels-npm-update-http.log 2>&1 &
   SERVER_PID=$!
   sleep 1
   kill -0 "$SERVER_PID" >/dev/null 2>&1 || die "failed to start host HTTP server"
@@ -162,7 +162,7 @@ import re
 import sys
 
 text = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")
-matches = re.findall(r"OpenClaw [^\r\n]+", text)
+matches = re.findall(r"Recall [^\r\n]+", text)
 print(matches[-1] if matches else "")
 PY
 }
@@ -186,14 +186,14 @@ PY
 run_macos_update() {
   local tgz_url="$1"
   local head_short="$2"
-  cat <<EOF | prlctl exec "$MACOS_VM" --current-user /usr/bin/tee /tmp/openclaw-main-update.sh >/dev/null
+  cat <<EOF | prlctl exec "$MACOS_VM" --current-user /usr/bin/tee /tmp/recall-main-update.sh >/dev/null
 set -euo pipefail
 export PATH=/opt/homebrew/bin:/opt/homebrew/opt/node/bin:/opt/homebrew/sbin:/usr/bin:/bin:/usr/sbin:/sbin
 if [ -z "\${HOME:-}" ]; then export HOME="/Users/\$(id -un)"; fi
 cd "\$HOME"
-curl -fsSL "$tgz_url" -o /tmp/openclaw-main-update.tgz
-/opt/homebrew/bin/npm install -g /tmp/openclaw-main-update.tgz
-version="\$(/opt/homebrew/bin/openclaw --version)"
+curl -fsSL "$tgz_url" -o /tmp/recall-main-update.tgz
+/opt/homebrew/bin/npm install -g /tmp/recall-main-update.tgz
+version="\$(/opt/homebrew/bin/recall --version)"
 printf '%s\n' "\$version"
 case "\$version" in
   *"$head_short"*) ;;
@@ -202,34 +202,34 @@ case "\$version" in
     exit 1
     ;;
 esac
-/opt/homebrew/bin/openclaw models set openai/gpt-5.4
-/opt/homebrew/bin/openclaw gateway status --deep --require-rpc
-/opt/homebrew/bin/openclaw agent --agent main --session-id parallels-npm-update-macos-$head_short --message "Reply with exact ASCII text OK only." --json
+/opt/homebrew/bin/recall models set openai/gpt-5.4
+/opt/homebrew/bin/recall gateway status --deep --require-rpc
+/opt/homebrew/bin/recall agent --agent main --session-id parallels-npm-update-macos-$head_short --message "Reply with exact ASCII text OK only." --json
 EOF
-  prlctl exec "$MACOS_VM" --current-user /bin/bash /tmp/openclaw-main-update.sh
+  prlctl exec "$MACOS_VM" --current-user /bin/bash /tmp/recall-main-update.sh
 }
 
 run_windows_update() {
   local tgz_url="$1"
   local head_short="$2"
   guest_powershell "$(cat <<EOF
-\$env:PATH = "\$env:LOCALAPPDATA\OpenClaw\deps\portable-git\cmd;\$env:LOCALAPPDATA\OpenClaw\deps\portable-git\mingw64\bin;\$env:LOCALAPPDATA\OpenClaw\deps\portable-git\usr\bin;\$env:PATH"
-\$tgz = Join-Path \$env:TEMP 'openclaw-main-update.tgz'
+\$env:PATH = "\$env:LOCALAPPDATA\Recall\deps\portable-git\cmd;\$env:LOCALAPPDATA\Recall\deps\portable-git\mingw64\bin;\$env:LOCALAPPDATA\Recall\deps\portable-git\usr\bin;\$env:PATH"
+\$tgz = Join-Path \$env:TEMP 'recall-main-update.tgz'
 curl.exe -fsSL '$tgz_url' -o \$tgz
 npm.cmd install -g \$tgz --no-fund --no-audit
-\$openclaw = Join-Path \$env:APPDATA 'npm\openclaw.cmd'
-\$version = & \$openclaw --version
+\$recall = Join-Path \$env:APPDATA 'npm\recall.cmd'
+\$version = & \$recall --version
 \$version
 if (\$version -notmatch '$head_short') {
   throw 'version mismatch: expected substring $head_short'
 }
-& \$openclaw models set openai/gpt-5.4
+& \$recall models set openai/gpt-5.4
 # Windows can keep the old hashed dist modules alive across in-place global npm upgrades.
 # Restart the gateway/service before verifying status or the next agent turn.
-& \$openclaw gateway restart
+& \$recall gateway restart
 Start-Sleep -Seconds 5
-& \$openclaw gateway status --deep --require-rpc
-& \$openclaw agent --agent main --session-id parallels-npm-update-windows-$head_short --message 'Reply with exact ASCII text OK only.' --json
+& \$recall gateway status --deep --require-rpc
+& \$recall agent --agent main --session-id parallels-npm-update-windows-$head_short --message 'Reply with exact ASCII text OK only.' --json
 EOF
 )"
 }
@@ -237,13 +237,13 @@ EOF
 run_linux_update() {
   local tgz_url="$1"
   local head_short="$2"
-  cat <<EOF | prlctl exec "$LINUX_VM" /usr/bin/tee /tmp/openclaw-main-update.sh >/dev/null
+  cat <<EOF | prlctl exec "$LINUX_VM" /usr/bin/tee /tmp/recall-main-update.sh >/dev/null
 set -euo pipefail
 export HOME=/root
 cd "\$HOME"
-curl -fsSL "$tgz_url" -o /tmp/openclaw-main-update.tgz
-npm install -g /tmp/openclaw-main-update.tgz --no-fund --no-audit
-version="\$(openclaw --version)"
+curl -fsSL "$tgz_url" -o /tmp/recall-main-update.tgz
+npm install -g /tmp/recall-main-update.tgz --no-fund --no-audit
+version="\$(recall --version)"
 printf '%s\n' "\$version"
 case "\$version" in
   *"$head_short"*) ;;
@@ -252,10 +252,10 @@ case "\$version" in
     exit 1
     ;;
 esac
-openclaw models set openai/gpt-5.4
-openclaw agent --local --agent main --session-id parallels-npm-update-linux-$head_short --message "Reply with exact ASCII text OK only." --json
+recall models set openai/gpt-5.4
+recall agent --local --agent main --session-id parallels-npm-update-linux-$head_short --message "Reply with exact ASCII text OK only." --json
 EOF
-  prlctl exec "$LINUX_VM" /usr/bin/env "OPENAI_API_KEY=$OPENAI_API_KEY_VALUE" /bin/bash /tmp/openclaw-main-update.sh
+  prlctl exec "$LINUX_VM" /usr/bin/env "OPENAI_API_KEY=$OPENAI_API_KEY_VALUE" /bin/bash /tmp/recall-main-update.sh
 }
 
 write_summary_json() {
@@ -299,7 +299,7 @@ PY
 
 LATEST_VERSION="$(resolve_latest_version)"
 if [[ -z "$PACKAGE_SPEC" ]]; then
-  PACKAGE_SPEC="openclaw@$LATEST_VERSION"
+  PACKAGE_SPEC="recall@$LATEST_VERSION"
 fi
 
 say "Run fresh npm baseline: $PACKAGE_SPEC"

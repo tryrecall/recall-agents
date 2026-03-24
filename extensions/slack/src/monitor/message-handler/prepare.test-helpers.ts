@@ -1,11 +1,11 @@
 import type { App } from "@slack/bolt";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import type { RecallConfig } from "recall/plugin-sdk/config-runtime";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime-env";
 import type { ResolvedSlackAccount } from "../../accounts.js";
 import { createSlackMonitorContext } from "../context.js";
 
 export function createInboundSlackTestContext(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   appClient?: App["client"];
   defaultRequireMention?: boolean;
   replyToMode?: "off" | "all" | "first";
@@ -40,7 +40,7 @@ export function createInboundSlackTestContext(params: {
     threadInheritParent: false,
     slashCommand: {
       enabled: false,
-      name: "openclaw",
+      name: "recall",
       sessionPrefix: "slack:slash",
       ephemeral: true,
     },

@@ -42,7 +42,7 @@ const opts = parseArgs(process.argv.slice(2));
 const reportPath = runVitestJsonReport({
   config: opts.config,
   reportPath: opts.reportPath,
-  prefix: "openclaw-vitest-hotspots",
+  prefix: "recall-vitest-hotspots",
 });
 const report = readJsonFile(reportPath);
 const fileResults = collectVitestFileDurations(report).toSorted(

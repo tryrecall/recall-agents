@@ -24,7 +24,7 @@ let resolveExecApprovalsPath: ExecApprovalsModule["resolveExecApprovalsPath"];
 let resolveExecApprovalsSocketPath: ExecApprovalsModule["resolveExecApprovalsSocketPath"];
 
 const tempDirs: string[] = [];
-const originalOpenClawHome = process.env.OPENCLAW_HOME;
+const originalRecallHome = process.env.RECALL_HOME;
 
 beforeEach(async () => {
   vi.resetModules();
@@ -44,10 +44,10 @@ beforeEach(async () => {
 
 afterEach(() => {
   vi.restoreAllMocks();
-  if (originalOpenClawHome === undefined) {
-    delete process.env.OPENCLAW_HOME;
+  if (originalRecallHome === undefined) {
+    delete process.env.RECALL_HOME;
   } else {
-    process.env.OPENCLAW_HOME = originalOpenClawHome;
+    process.env.RECALL_HOME = originalRecallHome;
   }
   for (const dir of tempDirs.splice(0)) {
     fs.rmSync(dir, { recursive: true, force: true });
@@ -57,12 +57,12 @@ afterEach(() => {
 function createHomeDir(): string {
   const dir = makeTempDir();
   tempDirs.push(dir);
-  process.env.OPENCLAW_HOME = dir;
+  process.env.RECALL_HOME = dir;
   return dir;
 }
 
 function approvalsFilePath(homeDir: string): string {
-  return path.join(homeDir, ".openclaw", "exec-approvals.json");
+  return path.join(homeDir, ".recall", "exec-approvals.json");
 }
 
 function readApprovalsFile(homeDir: string): ExecApprovalsFile {
@@ -74,10 +74,10 @@ describe("exec approvals store helpers", () => {
     const dir = createHomeDir();
 
     expect(path.normalize(resolveExecApprovalsPath())).toBe(
-      path.normalize(path.join(dir, ".openclaw", "exec-approvals.json")),
+      path.normalize(path.join(dir, ".recall", "exec-approvals.json")),
     );
     expect(path.normalize(resolveExecApprovalsSocketPath())).toBe(
-      path.normalize(path.join(dir, ".openclaw", "exec-approvals.sock")),
+      path.normalize(path.join(dir, ".recall", "exec-approvals.sock")),
     );
   });
 

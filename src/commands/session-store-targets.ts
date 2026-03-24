@@ -3,12 +3,12 @@ import {
   type SessionStoreSelectionOptions,
   type SessionStoreTarget,
 } from "../config/sessions.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { RuntimeEnv } from "../runtime.js";
 export { resolveSessionStoreTargets, type SessionStoreSelectionOptions, type SessionStoreTarget };
 
 export function resolveSessionStoreTargetsOrExit(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   opts: SessionStoreSelectionOptions;
   runtime: RuntimeEnv;
 }): SessionStoreTarget[] | null {

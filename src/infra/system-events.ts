@@ -14,7 +14,7 @@ type SessionQueue = {
   lastContextKey: string | null;
 };
 
-const SYSTEM_EVENT_QUEUES_KEY = Symbol.for("openclaw.systemEvents.queues");
+const SYSTEM_EVENT_QUEUES_KEY = Symbol.for("recall.systemEvents.queues");
 
 const queues = resolveGlobalMap<string, SessionQueue>(SYSTEM_EVENT_QUEUES_KEY);
 

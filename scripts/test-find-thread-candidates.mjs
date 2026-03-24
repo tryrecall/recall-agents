@@ -15,12 +15,12 @@ function readEnvNumber(name) {
 export function parseArgs(argv) {
   const args = {
     config: "vitest.unit.config.ts",
-    limit: Number.isFinite(readEnvNumber("OPENCLAW_TEST_THREAD_CANDIDATE_LIMIT"))
-      ? Math.max(1, Math.floor(readEnvNumber("OPENCLAW_TEST_THREAD_CANDIDATE_LIMIT")))
+    limit: Number.isFinite(readEnvNumber("RECALL_TEST_THREAD_CANDIDATE_LIMIT"))
+      ? Math.max(1, Math.floor(readEnvNumber("RECALL_TEST_THREAD_CANDIDATE_LIMIT")))
       : 20,
-    minDurationMs: readEnvNumber("OPENCLAW_TEST_THREAD_CANDIDATE_MIN_DURATION_MS") ?? 250,
-    minGainMs: readEnvNumber("OPENCLAW_TEST_THREAD_CANDIDATE_MIN_GAIN_MS") ?? 100,
-    minGainPct: readEnvNumber("OPENCLAW_TEST_THREAD_CANDIDATE_MIN_GAIN_PCT") ?? 10,
+    minDurationMs: readEnvNumber("RECALL_TEST_THREAD_CANDIDATE_MIN_DURATION_MS") ?? 250,
+    minGainMs: readEnvNumber("RECALL_TEST_THREAD_CANDIDATE_MIN_GAIN_MS") ?? 100,
+    minGainPct: readEnvNumber("RECALL_TEST_THREAD_CANDIDATE_MIN_GAIN_PCT") ?? 10,
     json: false,
     files: [],
   };

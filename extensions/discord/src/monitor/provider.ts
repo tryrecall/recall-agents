@@ -15,35 +15,35 @@ import {
   listNativeCommandSpecsForConfig,
   listSkillCommandsForAgents,
   type NativeCommandSpec,
-} from "openclaw/plugin-sdk/command-auth";
+} from "recall/plugin-sdk/command-auth";
 import {
   isNativeCommandsExplicitlyDisabled,
   resolveNativeCommandsEnabled,
   resolveNativeSkillsEnabled,
-} from "openclaw/plugin-sdk/config-runtime";
-import type { OpenClawConfig, ReplyToMode } from "openclaw/plugin-sdk/config-runtime";
-import { loadConfig } from "openclaw/plugin-sdk/config-runtime";
-import { isDangerousNameMatchingEnabled } from "openclaw/plugin-sdk/config-runtime";
+} from "recall/plugin-sdk/config-runtime";
+import type { RecallConfig, ReplyToMode } from "recall/plugin-sdk/config-runtime";
+import { loadConfig } from "recall/plugin-sdk/config-runtime";
+import { isDangerousNameMatchingEnabled } from "recall/plugin-sdk/config-runtime";
 import {
   GROUP_POLICY_BLOCKED_LABEL,
   resolveOpenProviderRuntimeGroupPolicy,
   resolveDefaultGroupPolicy,
   warnMissingProviderGroupPolicyFallbackOnce,
-} from "openclaw/plugin-sdk/config-runtime";
-import { createConnectedChannelStatusPatch } from "openclaw/plugin-sdk/gateway-runtime";
-import { formatErrorMessage } from "openclaw/plugin-sdk/infra-runtime";
-import { getPluginCommandSpecs } from "openclaw/plugin-sdk/plugin-runtime";
-import { resolveTextChunkLimit } from "openclaw/plugin-sdk/reply-runtime";
+} from "recall/plugin-sdk/config-runtime";
+import { createConnectedChannelStatusPatch } from "recall/plugin-sdk/gateway-runtime";
+import { formatErrorMessage } from "recall/plugin-sdk/infra-runtime";
+import { getPluginCommandSpecs } from "recall/plugin-sdk/plugin-runtime";
+import { resolveTextChunkLimit } from "recall/plugin-sdk/reply-runtime";
 import {
   danger,
   isVerbose,
   logVerbose,
   shouldLogVerbose,
   warn,
-} from "openclaw/plugin-sdk/runtime-env";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/runtime-env";
-import { createNonExitingRuntime, type RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
-import { summarizeStringEntries } from "openclaw/plugin-sdk/text-runtime";
+} from "recall/plugin-sdk/runtime-env";
+import { createSubsystemLogger } from "recall/plugin-sdk/runtime-env";
+import { createNonExitingRuntime, type RuntimeEnv } from "recall/plugin-sdk/runtime-env";
+import { summarizeStringEntries } from "recall/plugin-sdk/text-runtime";
 import { resolveDiscordAccount } from "../accounts.js";
 import { getDiscordGatewayEmitter } from "../monitor.gateway.js";
 import { fetchDiscordApplicationId } from "../probe.js";
@@ -90,7 +90,7 @@ import { formatThreadBindingDurationLabel } from "./thread-bindings.messages.js"
 export type MonitorDiscordOpts = {
   token?: string;
   accountId?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   runtime?: RuntimeEnv;
   abortSignal?: AbortSignal;
   mediaMaxMb?: number;
@@ -204,7 +204,7 @@ function classifyAcpStatusProbeError(params: {
 }
 
 async function probeDiscordAcpBindingHealth(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionKey: string;
   storedState?: "idle" | "running" | "error";
   lastActivityAt?: number;
@@ -848,7 +848,7 @@ export async function monitorDiscordProvider(opts: MonitorDiscordOpts = {}) {
     const logger = createSubsystemLogger("discord/monitor");
     const guildHistories = new Map<
       string,
-      import("openclaw/plugin-sdk/reply-history").HistoryEntry[]
+      import("recall/plugin-sdk/reply-history").HistoryEntry[]
     >();
     let botUserId: string | undefined;
     let botUserName: string | undefined;

@@ -1,14 +1,14 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "name": "OpenClaw",
+  "name": "Recall",
   "description": "Self-hosted gateway that connects WhatsApp, Telegram, Discord, iMessage, and more to AI coding agents. Run a single Gateway process on your own machine and message your AI assistant from anywhere.",
   "theme": "mint",
   "icons": {
     "library": "lucide"
   },
   "logo": {
-    "light": "/assets/pixel-lobster.svg",
-    "dark": "/assets/pixel-lobster.svg"
+    "light": "/assets/pixel-recall.svg",
+    "dark": "/assets/pixel-recall.svg"
   },
   "fonts": {
     "body": {
@@ -18,7 +18,7 @@
       "family": "DM Sans"
     }
   },
-  "favicon": "/assets/pixel-lobster.svg",
+  "favicon": "/assets/pixel-recall.svg",
   "colors": {
     "primary": "#FF5A36",
     "dark": "#FF5A36",
@@ -36,12 +36,12 @@
     "links": [
       {
         "label": "GitHub",
-        "href": "https://github.com/openclaw/openclaw",
+        "href": "https://github.com/recall/recall",
         "icon": "github"
       },
       {
         "label": "Releases",
-        "href": "https://github.com/openclaw/openclaw/releases",
+        "href": "https://github.com/recall/recall/releases",
         "icon": "package"
       },
       {
@@ -338,15 +338,15 @@
     },
     {
       "source": "/clawd",
-      "destination": "/start/openclaw"
+      "destination": "/start/recall"
     },
     {
       "source": "/start/clawd",
-      "destination": "/start/openclaw"
+      "destination": "/start/recall"
     },
     {
       "source": "/start/clawd/",
-      "destination": "/start/openclaw"
+      "destination": "/start/recall"
     },
     {
       "source": "/start/pairing",
@@ -901,7 +901,7 @@
               {
                 "group": "Guides",
                 "pages": [
-                  "start/openclaw",
+                  "start/recall",
                   "start/wizard-cli-reference",
                   "start/wizard-cli-automation"
                 ]
@@ -1147,7 +1147,7 @@
                   "tools/exec",
                   "tools/exec-approvals",
                   "tools/llm-task",
-                  "tools/lobster",
+                  "tools/recall",
                   "tools/loop-detection",
                   "tools/pdf",
                   "tools/reactions",
@@ -1553,7 +1553,7 @@
               },
               {
                 "group": "指南",
-                "pages": ["zh-CN/start/openclaw"]
+                "pages": ["zh-CN/start/recall"]
               }
             ]
           },
@@ -1709,7 +1709,7 @@
                   "zh-CN/tools/exec-approvals",
                   "zh-CN/tools/firecrawl",
                   "zh-CN/tools/llm-task",
-                  "zh-CN/tools/lobster",
+                  "zh-CN/tools/recall",
                   "zh-CN/perplexity",
                   "zh-CN/tools/reactions",
                   "zh-CN/tools/thinking",

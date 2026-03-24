@@ -1,17 +1,17 @@
-# @openclaw/zalo
+# @recall/zalo
 
-Zalo channel plugin for OpenClaw (Bot API).
+Zalo channel plugin for Recall (Bot API).
 
 ## Install (local checkout)
 
 ```bash
-openclaw plugins install ./extensions/zalo
+recall plugins install ./extensions/zalo
 ```
 
 ## Install (npm)
 
 ```bash
-openclaw plugins install @openclaw/zalo
+recall plugins install @recall/zalo
 ```
 
 Onboarding: select Zalo and confirm the install prompt to fetch the plugin automatically.

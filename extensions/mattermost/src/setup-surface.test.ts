@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../runtime-api.js";
+import type { RecallConfig } from "../runtime-api.js";
 import { mattermostSetupWizard } from "./setup-surface.js";
 
 describe("mattermost setup surface", () => {
@@ -20,7 +20,7 @@ describe("mattermost setup surface", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
     });
 
     expect(configured).toBe(true);
@@ -33,7 +33,7 @@ describe("mattermost setup surface", () => {
           channels: {
             mattermost: {},
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         accountId: "default",
       } as never),
     ).toBe(true);
@@ -51,7 +51,7 @@ describe("mattermost setup surface", () => {
               },
             },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         accountId: "default",
       } as never),
     ).toBe(false);
@@ -63,14 +63,14 @@ describe("mattermost setup surface", () => {
 
     expect(
       mattermostSetupWizard.envShortcut?.isAvailable?.({
-        cfg: { channels: { mattermost: {} } } as OpenClawConfig,
+        cfg: { channels: { mattermost: {} } } as RecallConfig,
         accountId: "default",
       } as never),
     ).toBe(true);
 
     expect(
       mattermostSetupWizard.envShortcut?.isAvailable?.({
-        cfg: { channels: { mattermost: {} } } as OpenClawConfig,
+        cfg: { channels: { mattermost: {} } } as RecallConfig,
         accountId: "work",
       } as never),
     ).toBe(false);
@@ -79,7 +79,7 @@ describe("mattermost setup surface", () => {
   it("keeps env shortcut as a no-op patch for the selected account", () => {
     expect(
       mattermostSetupWizard.envShortcut?.apply?.({
-        cfg: { channels: { mattermost: { enabled: false } } } as OpenClawConfig,
+        cfg: { channels: { mattermost: { enabled: false } } } as RecallConfig,
         accountId: "default",
       } as never),
     ).toEqual({

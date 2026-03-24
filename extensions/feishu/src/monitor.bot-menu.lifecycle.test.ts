@@ -35,7 +35,7 @@ const sendMessageFeishuMock = vi.hoisted(() =>
 
 let handlers: Record<string, (data: unknown) => Promise<void>> = {};
 let lastRuntime: RuntimeEnv | null = null;
-const originalStateDir = process.env.OPENCLAW_STATE_DIR;
+const originalStateDir = process.env.RECALL_STATE_DIR;
 
 vi.mock("./client.js", async () => {
   const actual = await vi.importActual<typeof import("./client.js")>("./client.js");
@@ -65,8 +65,8 @@ vi.mock("./send.js", () => ({
   sendMessageFeishu: sendMessageFeishuMock,
 }));
 
-vi.mock("openclaw/plugin-sdk/conversation-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/conversation-runtime")>();
+vi.mock("recall/plugin-sdk/conversation-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/conversation-runtime")>();
   return {
     ...actual,
     getSessionBindingService: () => ({
@@ -180,7 +180,7 @@ describe("Feishu bot-menu lifecycle", () => {
     vi.clearAllMocks();
     handlers = {};
     lastRuntime = null;
-    process.env.OPENCLAW_STATE_DIR = `/tmp/openclaw-feishu-bot-menu-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    process.env.RECALL_STATE_DIR = `/tmp/recall-feishu-bot-menu-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
     const dispatcher = {
       sendToolResult: vi.fn(() => false),
@@ -281,10 +281,10 @@ describe("Feishu bot-menu lifecycle", () => {
   afterEach(() => {
     vi.useRealTimers();
     if (originalStateDir === undefined) {
-      delete process.env.OPENCLAW_STATE_DIR;
+      delete process.env.RECALL_STATE_DIR;
       return;
     }
-    process.env.OPENCLAW_STATE_DIR = originalStateDir;
+    process.env.RECALL_STATE_DIR = originalStateDir;
   });
 
   it("opens one launcher card across duplicate quick-actions replay", async () => {

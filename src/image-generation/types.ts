@@ -1,5 +1,5 @@
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 
 export type GeneratedImageAsset = {
   buffer: Buffer;
@@ -22,7 +22,7 @@ export type ImageGenerationRequest = {
   provider: string;
   model: string;
   prompt: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentDir?: string;
   authStore?: AuthProfileStore;
   timeoutMs?: number;

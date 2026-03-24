@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { loggingState } from "../logging/state.js";
 
 const mocks = vi.hoisted(() => ({
-  resolveConfigPath: vi.fn(() => `/tmp/openclaw-status-scan-missing-${process.pid}.json`),
+  resolveConfigPath: vi.fn(() => `/tmp/recall-status-scan-missing-${process.pid}.json`),
   hasPotentialConfiguredChannels: vi.fn(),
   readBestEffortConfig: vi.fn(),
   resolveCommandSecretRefsViaGateway: vi.fn(),
