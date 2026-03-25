@@ -1272,6 +1272,14 @@ async function agentCommandInternal(
       });
     }
 
+    // Emit a transcript update after the agent run completes so that SSE
+    // listeners (e.g. the sessions-history endpoint) are notified about the
+    // assistant response.  The user-message append at the top of this function
+    // already emits; this covers the assistant side.
+    if (sessionFile) {
+      emitSessionTranscriptUpdate(sessionFile);
+    }
+
     const payloads = result.payloads ?? [];
     return await deliverAgentCommandResult({
       cfg,
