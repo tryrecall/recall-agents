@@ -543,6 +543,70 @@ export async function handleOpenAiHttpRequest(
       return;
     }
 
+    if (evt.stream === "tool") {
+      const phase = evt.data?.phase;
+      const toolName = typeof evt.data?.name === "string" ? evt.data.name : "unknown";
+      const toolCallId = typeof evt.data?.toolCallId === "string" ? evt.data.toolCallId : `call_${randomUUID()}`;
+
+      if (!wroteRole) {
+        wroteRole = true;
+        writeAssistantRoleChunk(res, { runId, model });
+      }
+
+      if (phase === "start") {
+        const args = evt.data?.args ? JSON.stringify(evt.data.args) : "{}";
+        writeSse(res, {
+          id: runId,
+          object: "chat.completion.chunk",
+          created: Math.floor(Date.now() / 1000),
+          model,
+          choices: [
+            {
+              index: 0,
+              delta: {
+                tool_calls: [
+                  {
+                    index: 0,
+                    id: toolCallId,
+                    type: "function",
+                    function: { name: toolName, arguments: args },
+                  },
+                ],
+              },
+              finish_reason: null,
+            },
+          ],
+        });
+      } else if (phase === "result") {
+        const result = evt.data?.result != null ? JSON.stringify(evt.data.result) : "{}";
+        const isError = Boolean(evt.data?.isError);
+        writeSse(res, {
+          id: runId,
+          object: "chat.completion.chunk",
+          created: Math.floor(Date.now() / 1000),
+          model,
+          choices: [
+            {
+              index: 0,
+              delta: {
+                tool_calls: [
+                  {
+                    index: 0,
+                    id: toolCallId,
+                    type: "function",
+                    function: { name: toolName, arguments: "" },
+                    _tool_result: { result, isError },
+                  },
+                ],
+              },
+              finish_reason: null,
+            },
+          ],
+        });
+      }
+      return;
+    }
+
     if (evt.stream === "lifecycle") {
       const phase = evt.data?.phase;
       if (phase === "end" || phase === "error") {
