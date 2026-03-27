@@ -159,6 +159,13 @@ export type GatewayAuthConfig = {
   /** Rate-limit configuration for failed authentication attempts. */
   rateLimit?: GatewayAuthRateLimitConfig;
   /**
+   * When true, token/password-authenticated clients keep their self-declared
+   * operator scopes even without device identity.  Use for server-to-server
+   * integrations (e.g. dashboard → gateway) where device pairing is impractical.
+   * The token itself becomes the trust boundary.  @default false
+   */
+  dangerouslyPreserveTokenScopes?: boolean;
+  /**
    * Configuration for trusted-proxy auth mode.
    * Required when mode is "trusted-proxy".
    */
