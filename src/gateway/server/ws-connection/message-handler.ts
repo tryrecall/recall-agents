@@ -793,19 +793,25 @@ export function attachGatewayWsMessageHandler(params: GatewayWsMessageHandlerPar
             isLocalClient,
           });
           // Shared token/password auth can bypass pairing for trusted operators.
-          // Device-less clients still clear self-declared scopes by default, with
-          // one narrow exception: the direct-local backend gateway-client shared-
-          // auth handoff used for in-process control-plane coordination.
+          // Device-less clients only keep self-declared scopes on the explicit
+          // allow path, including trusted token-authenticated backend operators.
+          //
+          // gateway.auth.dangerouslyPreserveTokenScopes: when true, token-authenticated
+          // clients keep their self-declared operator scopes even without device identity.
+          // Use for server-to-server integrations (e.g. dashboard → gateway) where device
+          // pairing is impractical. The token itself is the trust boundary.
+          const preserveTokenScopes =
+            configSnapshot.gateway?.auth?.dangerouslyPreserveTokenScopes === true &&
+            authOk &&
+            (authMethod === "token" || authMethod === "password") &&
+            decision.kind === "allow";
           if (
             !device &&
-            !skipLocalBackendSelfPairing &&
-            shouldClearUnboundScopesForMissingDeviceIdentity({
-              decision,
-              controlUiAuthPolicy,
-              preserveInsecureLocalControlUiScopes,
-              authMethod,
-              trustedProxyAuthOk,
-            })
+            !preserveTokenScopes &&
+            (decision.kind !== "allow" ||
+              (!controlUiAuthPolicy.allowBypass &&
+                !preserveInsecureLocalControlUiScopes &&
+                (authMethod === "token" || authMethod === "password" || trustedProxyAuthOk)))
           ) {
             clearUnboundScopes();
           }
