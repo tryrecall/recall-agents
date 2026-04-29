@@ -48,6 +48,13 @@ export type AgentCommandOpts = {
   sessionKey?: string;
   thinking?: string;
   thinkingOnce?: string;
+  /**
+   * Per-run reasoning level. "off" suppresses reasoning emission;
+   * "on" includes reasoning in the final reply; "stream" emits thinking_delta
+   * events as they arrive. Plumbed through to subscribeEmbeddedPiSession's
+   * reasoningMode, which gates whether stream:"thinking" AgentEvents fire.
+   */
+  reasoning?: string;
   verbose?: string;
   json?: boolean;
   timeout?: string;
