@@ -747,4 +747,59 @@ describe("OpenAI-compatible HTTP API (e2e)", () => {
       // shared server
     }
   });
+
+  it("forwards thinking-stream events as delta.thinking_content chunks", async () => {
+    // Regression: AgentEvent {stream: "thinking"} events emitted by
+    // pi-embedded-subscribe (when the upstream Anthropic provider returns
+    // thinking_delta content blocks) used to be dropped by the openai-http
+    // listener. The downstream signature-recall-chat dashboard already routes
+    // delta.thinking_content into a <Thinking> UI block; we just need the
+    // gateway to forward it. See dashboard issue #110.
+    const port = enabledPort;
+    agentCommand.mockClear();
+    agentCommand.mockImplementationOnce((async (opts: unknown) => {
+      const runId = (opts as { runId?: string } | undefined)?.runId ?? "";
+      // Emit two thinking deltas, then the final answer text.
+      emitAgentEvent({ runId, stream: "thinking", data: { delta: "Let me think... " } });
+      emitAgentEvent({ runId, stream: "thinking", data: { delta: "17 * 23 = 391." } });
+      emitAgentEvent({ runId, stream: "assistant", data: { delta: "391" } });
+      return { payloads: [{ text: "391" }] };
+    }) as never);
+
+    const res = await postChatCompletions(port, {
+      stream: true,
+      model: "recall",
+      messages: [{ role: "user", content: "What is 17 * 23?" }],
+      thinking: { type: "enabled", budget_tokens: 1024 },
+    });
+    expect(res.status).toBe(200);
+
+    const text = await res.text();
+    const data = parseSseDataLines(text);
+    expect(data[data.length - 1]).toBe("[DONE]");
+
+    const jsonChunks = data
+      .filter((d) => d !== "[DONE]")
+      .map((d) => JSON.parse(d) as Record<string, unknown>);
+
+    // Thinking content should be present on its own chunk(s).
+    const allThinking = jsonChunks
+      .flatMap((c) => (c.choices as Array<Record<string, unknown>> | undefined) ?? [])
+      .map((choice) => (choice.delta as Record<string, unknown> | undefined)?.thinking_content)
+      .filter((v): v is string => typeof v === "string")
+      .join("");
+    expect(allThinking).toBe("Let me think... 17 * 23 = 391.");
+
+    // Regular content (the final answer) should still be on `delta.content`.
+    const allContent = jsonChunks
+      .flatMap((c) => (c.choices as Array<Record<string, unknown>> | undefined) ?? [])
+      .map((choice) => (choice.delta as Record<string, unknown> | undefined)?.content)
+      .filter((v): v is string => typeof v === "string")
+      .join("");
+    expect(allContent).toBe("391");
+
+    // Thinking should NEVER end up in the answer-text content chunks.
+    expect(allContent).not.toContain("Let me think");
+    expect(allContent).not.toContain("17 * 23 = 391.");
+  });
 });

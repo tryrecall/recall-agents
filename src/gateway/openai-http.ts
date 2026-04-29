@@ -150,6 +150,40 @@ function writeAssistantContentChunk(
   });
 }
 
+/**
+ * Emit a thinking-delta chunk for clients that subscribe to Anthropic's
+ * extended-thinking content blocks. OpenAI's native chat-completion shape has
+ * no thinking field, so we use a custom `delta.thinking_content` key. The
+ * Recall dashboard's stream-transform (in tryrecall/signature-recall-chat)
+ * already routes `delta.thinking_content` to a separate `thinking-delta` UI
+ * message so it renders as a collapsible <Thinking> block above the answer.
+ *
+ * This is the gateway-side half of issue #110 in signature-recall-chat:
+ * pi-embedded-subscribe emits AgentEvent {stream: "thinking", data.text} when
+ * the upstream provider returns Anthropic thinking_delta events. Without this
+ * forwarder, those events were dropped silently.
+ */
+function writeAssistantThinkingChunk(
+  res: ServerResponse,
+  params: { runId: string; model: string; thinkingContent: string },
+) {
+  writeSse(res, {
+    id: params.runId,
+    object: "chat.completion.chunk",
+    created: Math.floor(Date.now() / 1000),
+    model: params.model,
+    choices: [
+      {
+        index: 0,
+        // Custom field. OpenAI never reads it; clients that want thinking
+        // content opt in by checking for this field.
+        delta: { thinking_content: params.thinkingContent },
+        finish_reason: null,
+      },
+    ],
+  });
+}
+
 function asMessages(val: unknown): OpenAiChatMessage[] {
   return Array.isArray(val) ? (val as OpenAiChatMessage[]) : [];
 }
@@ -539,6 +573,30 @@ export async function handleOpenAiHttpRequest(
         model,
         content,
         finishReason: null,
+      });
+      return;
+    }
+
+    // Forward Anthropic extended-thinking deltas to the client. These arrive
+    // as AgentEvent {stream: "thinking", data: {text, delta}} from
+    // pi-embedded-subscribe whenever the upstream provider streams a
+    // thinking_delta content block. We emit them as a separate chunk with a
+    // custom `delta.thinking_content` field so consumers can render the
+    // reasoning trace distinctly from the answer text. See issue #110 in
+    // tryrecall/signature-recall-chat.
+    if (evt.stream === "thinking") {
+      const delta = typeof evt.data?.delta === "string" ? evt.data.delta : "";
+      if (!delta) {
+        return;
+      }
+      if (!wroteRole) {
+        wroteRole = true;
+        writeAssistantRoleChunk(res, { runId, model });
+      }
+      writeAssistantThinkingChunk(res, {
+        runId,
+        model,
+        thinkingContent: delta,
       });
       return;
     }
