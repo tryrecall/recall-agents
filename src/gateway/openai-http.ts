@@ -94,8 +94,12 @@ function resolveThinkingFromRequest(payload: OpenAiChatCompletionRequest): strin
     if (budget === undefined) {
       return "medium";
     }
-    if (budget <= 1024) return "low";
-    if (budget <= 4096) return "medium";
+    if (budget <= 1024) {
+      return "low";
+    }
+    if (budget <= 4096) {
+      return "medium";
+    }
     return "high";
   }
   return undefined;
@@ -156,6 +160,14 @@ function buildAgentCommandInput(params: {
   messageChannel: string;
   /** Optional thinking level hint. "low"/"medium"/"high"/etc. */
   thinking?: string;
+  /**
+   * Optional reasoning level. "on"/"stream". When set, agent-command resolves
+   * resolvedReasoningLevel which subscribeEmbeddedPiSession uses for
+   * reasoningMode. "stream" is what gates emission of stream:"thinking"
+   * AgentEvents — without it, the gateway never receives thinking events
+   * to forward as delta.thinking_content chunks.
+   */
+  reasoning?: string;
 }) {
   return {
     message: params.prompt.message,
@@ -171,6 +183,11 @@ function buildAgentCommandInput(params: {
     // thinking_delta content blocks. See PR forwarding those events as
     // delta.thinking_content chunks back to the client.
     thinking: params.thinking,
+    // Forward reasoning level so the runner emits stream:"thinking" events
+    // for each Anthropic thinking_delta block. Without this, even with
+    // thinkingEnabled=true at the API level, no thinking_content chunks
+    // would be forwarded out as SSE.
+    reasoning: params.reasoning,
     // HTTP API callers are authenticated operator clients for this gateway context.
     senderIsOwner: true as const,
     allowModelOverride: true as const,
@@ -559,6 +576,12 @@ export async function handleOpenAiHttpRequest(
   const runId = `chatcmpl_${randomUUID()}`;
   const deps = createDefaultDeps();
   const thinkingHint = resolveThinkingFromRequest(payload);
+  // When the request opts in to thinking (via either reasoning_effort or
+  // an explicit thinking:enabled object), set reasoning="stream" too so
+  // pi-embedded-subscribe emits AgentEvents on each Anthropic
+  // thinking_delta block. The gateway's openai-http handler then forwards
+  // those events as delta.thinking_content SSE chunks (PR #4).
+  const reasoningHint = thinkingHint ? "stream" : undefined;
   const commandInput = buildAgentCommandInput({
     prompt: {
       message: prompt.message,
@@ -569,6 +592,7 @@ export async function handleOpenAiHttpRequest(
     runId,
     messageChannel,
     thinking: thinkingHint,
+    reasoning: reasoningHint,
   });
 
   if (!stream) {
@@ -662,7 +686,8 @@ export async function handleOpenAiHttpRequest(
     if (evt.stream === "tool") {
       const phase = evt.data?.phase;
       const toolName = typeof evt.data?.name === "string" ? evt.data.name : "unknown";
-      const toolCallId = typeof evt.data?.toolCallId === "string" ? evt.data.toolCallId : `call_${randomUUID()}`;
+      const toolCallId =
+        typeof evt.data?.toolCallId === "string" ? evt.data.toolCallId : `call_${randomUUID()}`;
 
       if (!wroteRole) {
         wroteRole = true;
