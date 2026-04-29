@@ -748,6 +748,83 @@ describe("OpenAI-compatible HTTP API (e2e)", () => {
     }
   });
 
+  it("translates request body 'reasoning_effort' to opts.thinking", async () => {
+    // Without this, the openai-compat /v1/chat/completions endpoint never
+    // turned the reasoning hint into the agent runtime's thinking field, so
+    // pi-embedded-subscribe never set thinkingEnabled=true and the upstream
+    // provider was called without extended thinking. See dashboard issue #110.
+    const port = enabledPort;
+    let capturedOpts: Record<string, unknown> | undefined;
+    agentCommand.mockClear();
+    agentCommand.mockImplementationOnce((async (opts: unknown) => {
+      capturedOpts = opts as Record<string, unknown>;
+      return { payloads: [{ text: "ok" }] };
+    }) as never);
+
+    await postChatCompletions(port, {
+      stream: false,
+      model: "recall",
+      messages: [{ role: "user", content: "hi" }],
+      reasoning_effort: "medium",
+    });
+
+    expect(capturedOpts?.thinking).toBe("medium");
+  });
+
+  it("translates Anthropic-shape thinking object to opts.thinking via budget bucket", async () => {
+    const port = enabledPort;
+
+    // Helper to capture opts on each call.
+    async function capture(body: Record<string, unknown>): Promise<string | undefined> {
+      let captured: Record<string, unknown> | undefined;
+      agentCommand.mockClear();
+      agentCommand.mockImplementationOnce((async (opts: unknown) => {
+        captured = opts as Record<string, unknown>;
+        return { payloads: [{ text: "ok" }] };
+      }) as never);
+      await postChatCompletions(port, {
+        stream: false,
+        model: "recall",
+        messages: [{ role: "user", content: "hi" }],
+        ...body,
+      });
+      return captured?.thinking as string | undefined;
+    }
+
+    // Anthropic shape with no budget → default to medium.
+    expect(await capture({ thinking: { type: "enabled" } })).toBe("medium");
+    // Small budget → low.
+    expect(await capture({ thinking: { type: "enabled", budget_tokens: 512 } })).toBe("low");
+    // Mid budget → medium.
+    expect(await capture({ thinking: { type: "enabled", budget_tokens: 2048 } })).toBe("medium");
+    // Large budget → high.
+    expect(await capture({ thinking: { type: "enabled", budget_tokens: 8192 } })).toBe("high");
+    // Disabled or missing → undefined (don't force a default).
+    expect(await capture({ thinking: { type: "disabled" } })).toBeUndefined();
+    expect(await capture({})).toBeUndefined();
+  });
+
+  it("reasoning_effort wins over thinking when both are set", async () => {
+    const port = enabledPort;
+    let captured: Record<string, unknown> | undefined;
+    agentCommand.mockClear();
+    agentCommand.mockImplementationOnce((async (opts: unknown) => {
+      captured = opts as Record<string, unknown>;
+      return { payloads: [{ text: "ok" }] };
+    }) as never);
+
+    await postChatCompletions(port, {
+      stream: false,
+      model: "recall",
+      messages: [{ role: "user", content: "hi" }],
+      // OpenAI canonical hint says high; Anthropic-shape says budget=512 (would be "low").
+      reasoning_effort: "high",
+      thinking: { type: "enabled", budget_tokens: 512 },
+    });
+
+    expect(captured?.thinking).toBe("high");
+  });
+
   it("forwards thinking-stream events as delta.thinking_content chunks", async () => {
     // Regression: AgentEvent {stream: "thinking"} events emitted by
     // pi-embedded-subscribe (when the upstream Anthropic provider returns
