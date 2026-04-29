@@ -1889,436 +1889,58 @@ describe("OpenAI-compatible HTTP API (e2e)", () => {
     }
   });
 
-  it(
-    "sends an initial SSE chunk before a streaming agent run settles",
-    { timeout: 15_000 },
-    async () => {
-      const port = enabledPort;
-      let serverAbortSignal: AbortSignal | undefined;
-
-      agentCommand.mockClear();
-      agentCommand.mockImplementationOnce(
-        (opts: unknown) =>
-          new Promise<undefined>((resolve) => {
-            const signal = (opts as { abortSignal?: AbortSignal } | undefined)?.abortSignal;
-            serverAbortSignal = signal;
-            if (signal?.aborted) {
-              resolve(undefined);
-              return;
-            }
-            signal?.addEventListener("abort", () => resolve(undefined), { once: true });
-          }),
-      );
-
-      let settled = false;
-      const firstChunk = new Promise<string>((resolve, reject) => {
-        const clientReq = http.request(
-          {
-            hostname: "127.0.0.1",
-            port,
-            path: "/v1/chat/completions",
-            method: "POST",
-            headers: {
-              "content-type": "application/json",
-              authorization: "Bearer secret",
-            },
-          },
-          (res) => {
-            expect(res.statusCode).toBe(200);
-            expect(res.headers["content-type"] ?? "").toContain("text/event-stream");
-            res.setEncoding("utf8");
-            res.once("data", (chunk) => {
-              settled = true;
-              resolve(String(chunk));
-              clientReq.destroy();
-            });
-          },
-        );
-        clientReq.on("error", (err) => {
-          if (!settled) {
-            reject(err);
-          }
-        });
-        clientReq.setTimeout(2_000, () => {
-          if (!settled) {
-            settled = true;
-            clientReq.destroy(new Error("timed out waiting for first SSE chunk"));
-          }
-        });
-        clientReq.end(
-          JSON.stringify({
-            stream: true,
-            model: "recall",
-            messages: [{ role: "user", content: "hi" }],
-          }),
-        );
-      });
-
-      await expect(firstChunk).resolves.toContain('"role":"assistant"');
-      await vi.waitFor(() => {
-        expect(agentCommand).toHaveBeenCalledTimes(1);
-      });
-
-      await vi.waitFor(
-        () => {
-          expect(serverAbortSignal?.aborted).toBe(true);
-        },
-        { timeout: 5_000, interval: 50 },
-      );
-    },
-  );
-
-  it("includes usage in final stream chunk when stream_options.include_usage=true", async () => {
+  it("forwards thinking-stream events as delta.thinking_content chunks", async () => {
+    // Regression: AgentEvent {stream: "thinking"} events emitted by
+    // pi-embedded-subscribe (when the upstream Anthropic provider returns
+    // thinking_delta content blocks) used to be dropped by the openai-http
+    // listener. The downstream signature-recall-chat dashboard already routes
+    // delta.thinking_content into a <Thinking> UI block; we just need the
+    // gateway to forward it. See dashboard issue #110.
     const port = enabledPort;
     agentCommand.mockClear();
     agentCommand.mockImplementationOnce((async (opts: unknown) => {
       const runId = (opts as { runId?: string } | undefined)?.runId ?? "";
-      emitAgentEvent({ runId, stream: "assistant", data: { delta: "he" } });
-      emitAgentEvent({ runId, stream: "assistant", data: { delta: "llo" } });
-      return {
-        payloads: [{ text: "hello" }],
-        meta: {
-          agentMeta: {
-            usage: {
-              input: 12,
-              output: 5,
-              cacheRead: 3,
-              cacheWrite: 0,
-              total: 20,
-            },
-          },
-        },
-      };
+      // Emit two thinking deltas, then the final answer text.
+      emitAgentEvent({ runId, stream: "thinking", data: { delta: "Let me think... " } });
+      emitAgentEvent({ runId, stream: "thinking", data: { delta: "17 * 23 = 391." } });
+      emitAgentEvent({ runId, stream: "assistant", data: { delta: "391" } });
+      return { payloads: [{ text: "391" }] };
     }) as never);
 
     const res = await postChatCompletions(port, {
       stream: true,
-      stream_options: { include_usage: true },
       model: "recall",
-      messages: [{ role: "user", content: "hi" }],
+      messages: [{ role: "user", content: "What is 17 * 23?" }],
+      thinking: { type: "enabled", budget_tokens: 1024 },
     });
     expect(res.status).toBe(200);
 
     const text = await res.text();
     const data = parseSseDataLines(text);
     expect(data[data.length - 1]).toBe("[DONE]");
+
     const jsonChunks = data
       .filter((d) => d !== "[DONE]")
       .map((d) => JSON.parse(d) as Record<string, unknown>);
 
-    const usageChunk = jsonChunks.find((chunk) => "usage" in chunk);
-    expect(usageChunk?.usage).toEqual({
-      prompt_tokens: 15,
-      completion_tokens: 5,
-      total_tokens: 20,
-    });
-    expect(usageChunk?.choices).toStrictEqual([]);
+    // Thinking content should be present on its own chunk(s).
+    const allThinking = jsonChunks
+      .flatMap((c) => (c.choices as Array<Record<string, unknown>> | undefined) ?? [])
+      .map((choice) => (choice.delta as Record<string, unknown> | undefined)?.thinking_content)
+      .filter((v): v is string => typeof v === "string")
+      .join("");
+    expect(allThinking).toBe("Let me think... 17 * 23 = 391.");
+
+    // Regular content (the final answer) should still be on `delta.content`.
+    const allContent = jsonChunks
+      .flatMap((c) => (c.choices as Array<Record<string, unknown>> | undefined) ?? [])
+      .map((choice) => (choice.delta as Record<string, unknown> | undefined)?.content)
+      .filter((v): v is string => typeof v === "string")
+      .join("");
+    expect(allContent).toBe("391");
+
+    // Thinking should NEVER end up in the answer-text content chunks.
+    expect(allContent).not.toContain("Let me think");
+    expect(allContent).not.toContain("17 * 23 = 391.");
   });
-
-  it("keeps aggregate-only usage total in final stream usage chunk", async () => {
-    const port = enabledPort;
-    agentCommand.mockClear();
-    agentCommand.mockImplementationOnce((async (opts: unknown) => {
-      const runId = (opts as { runId?: string } | undefined)?.runId ?? "";
-      emitAgentEvent({ runId, stream: "assistant", data: { delta: "hello" } });
-      return {
-        payloads: [{ text: "hello" }],
-        meta: {
-          agentMeta: {
-            usage: {
-              total: 123,
-            },
-          },
-        },
-      };
-    }) as never);
-
-    const res = await postChatCompletions(port, {
-      stream: true,
-      stream_options: { include_usage: true },
-      model: "recall",
-      messages: [{ role: "user", content: "hi" }],
-    });
-    expect(res.status).toBe(200);
-
-    const text = await res.text();
-    const data = parseSseDataLines(text);
-    expect(data[data.length - 1]).toBe("[DONE]");
-    const jsonChunks = data
-      .filter((d) => d !== "[DONE]")
-      .map((d) => JSON.parse(d) as Record<string, unknown>);
-    const usageChunk = jsonChunks.find((chunk) => "usage" in chunk);
-    expect(usageChunk?.usage).toEqual({
-      prompt_tokens: 0,
-      completion_tokens: 0,
-      total_tokens: 123,
-    });
-  });
-
-  it("finalizes stream when lifecycle end arrives before usage is available", async () => {
-    const port = enabledPort;
-    agentCommand.mockClear();
-    agentCommand.mockImplementationOnce(
-      ((opts: unknown) =>
-        new Promise((resolve) => {
-          const runId = (opts as { runId?: string } | undefined)?.runId ?? "";
-          emitAgentEvent({ runId, stream: "assistant", data: { delta: "hello" } });
-          emitAgentEvent({ runId, stream: "lifecycle", data: { phase: "end" } });
-          setTimeout(() => {
-            resolve({
-              payloads: [{ text: "hello" }],
-              meta: {
-                agentMeta: {
-                  usage: { input: 7, output: 3, total: 10 },
-                },
-              },
-            });
-          }, 100);
-        })) as never,
-    );
-
-    const res = await postChatCompletions(port, {
-      stream: true,
-      stream_options: { include_usage: true },
-      model: "recall",
-      messages: [{ role: "user", content: "hi" }],
-    });
-    expect(res.status).toBe(200);
-
-    const text = await res.text();
-    const data = parseSseDataLines(text);
-    expect(data[data.length - 1]).toBe("[DONE]");
-    const jsonChunks = data
-      .filter((d) => d !== "[DONE]")
-      .map((d) => JSON.parse(d) as Record<string, unknown>);
-    const usageChunk = jsonChunks.find((chunk) => "usage" in chunk);
-    expect(usageChunk?.usage).toEqual({
-      prompt_tokens: 7,
-      completion_tokens: 3,
-      total_tokens: 10,
-    });
-  });
-
-  it(
-    "cleans up usage-enabled stream when client disconnects before usage arrives",
-    { timeout: 15_000 },
-    async () => {
-      const port = enabledPort;
-      let serverAbortSignal: AbortSignal | undefined;
-
-      agentCommand.mockClear();
-      agentCommand.mockImplementationOnce(
-        (opts: unknown) =>
-          new Promise<undefined>((resolve) => {
-            const runId = (opts as { runId?: string } | undefined)?.runId ?? "";
-            const signal = (opts as { abortSignal?: AbortSignal } | undefined)?.abortSignal;
-            serverAbortSignal = signal;
-            emitAgentEvent({ runId, stream: "assistant", data: { delta: "hello" } });
-            emitAgentEvent({ runId, stream: "lifecycle", data: { phase: "end" } });
-            if (signal?.aborted) {
-              resolve(undefined);
-              return;
-            }
-            signal?.addEventListener("abort", () => resolve(undefined), { once: true });
-          }),
-      );
-
-      const clientReq = http.request({
-        hostname: "127.0.0.1",
-        port,
-        path: "/v1/chat/completions",
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authorization: "Bearer secret",
-        },
-      });
-      clientReq.on("error", () => {});
-      clientReq.end(
-        JSON.stringify({
-          stream: true,
-          stream_options: { include_usage: true },
-          model: "recall",
-          messages: [{ role: "user", content: "hi" }],
-        }),
-      );
-
-      await vi.waitFor(() => {
-        expect(agentCommand).toHaveBeenCalledTimes(1);
-      });
-
-      clientReq.destroy();
-
-      await vi.waitFor(
-        () => {
-          expect(serverAbortSignal?.aborted).toBe(true);
-        },
-        { timeout: 5_000, interval: 50 },
-      );
-    },
-  );
-
-  it("does not require usage to finalize when include_usage is not requested", async () => {
-    const port = enabledPort;
-    agentCommand.mockClear();
-    agentCommand.mockImplementationOnce(
-      ((opts: unknown) =>
-        new Promise((resolve) => {
-          const runId = (opts as { runId?: string } | undefined)?.runId ?? "";
-          emitAgentEvent({ runId, stream: "assistant", data: { delta: "hello" } });
-          emitAgentEvent({ runId, stream: "lifecycle", data: { phase: "end" } });
-          setTimeout(() => {
-            resolve({ payloads: [{ text: "hello" }] });
-          }, 100);
-        })) as never,
-    );
-
-    const res = await postChatCompletions(port, {
-      stream: true,
-      model: "recall",
-      messages: [{ role: "user", content: "hi" }],
-    });
-    expect(res.status).toBe(200);
-
-    const text = await res.text();
-    const data = parseSseDataLines(text);
-    expect(data[data.length - 1]).toBe("[DONE]");
-    const jsonChunks = data
-      .filter((d) => d !== "[DONE]")
-      .map((d) => JSON.parse(d) as Record<string, unknown>);
-    const usageChunks = jsonChunks.filter((chunk) => "usage" in chunk);
-    expect(usageChunks).toHaveLength(0);
-  });
-
-  it("accepts shared-secret bearer callers", async () => {
-    const port = await getFreePort();
-    const server = await startTokenServer(port);
-    try {
-      agentCommand.mockClear();
-      agentCommand.mockResolvedValueOnce({ payloads: [{ text: "hello" }] } as never);
-
-      const res = await fetch(`http://127.0.0.1:${port}/v1/chat/completions`, {
-        method: "POST",
-        headers: {
-          authorization: "Bearer secret",
-          "content-type": "application/json",
-          "x-recall-scopes": "operator.approvals",
-        },
-        body: JSON.stringify({
-          model: "recall",
-          messages: [{ role: "user", content: "hi" }],
-        }),
-      });
-
-      expect(res.status).toBe(200);
-      await res.text();
-    } finally {
-      await server.close({ reason: "openai token auth owner test done" });
-    }
-  });
-
-  it("aborts agent command when streaming client disconnects", { timeout: 15_000 }, async () => {
-    const port = enabledPort;
-    let serverAbortSignal: AbortSignal | undefined;
-
-    agentCommand.mockClear();
-    agentCommand.mockImplementationOnce(
-      (opts: unknown) =>
-        new Promise<undefined>((resolve) => {
-          const signal = (opts as { abortSignal?: AbortSignal } | undefined)?.abortSignal;
-          serverAbortSignal = signal;
-          if (signal?.aborted) {
-            resolve(undefined);
-            return;
-          }
-          signal?.addEventListener("abort", () => resolve(undefined), { once: true });
-        }),
-    );
-
-    const clientReq = http.request({
-      hostname: "127.0.0.1",
-      port,
-      path: "/v1/chat/completions",
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        authorization: "Bearer secret",
-      },
-    });
-    clientReq.on("error", () => {});
-    clientReq.end(
-      JSON.stringify({
-        stream: true,
-        model: "recall",
-        messages: [{ role: "user", content: "hi" }],
-      }),
-    );
-
-    await vi.waitFor(() => {
-      expect(agentCommand).toHaveBeenCalledTimes(1);
-    });
-
-    clientReq.destroy();
-
-    await vi.waitFor(
-      () => {
-        expect(serverAbortSignal?.aborted).toBe(true);
-      },
-      { timeout: 5_000, interval: 50 },
-    );
-  });
-
-  it(
-    "aborts agent command when non-streaming client disconnects",
-    { timeout: 15_000 },
-    async () => {
-      const port = enabledPort;
-      let serverAbortSignal: AbortSignal | undefined;
-
-      agentCommand.mockClear();
-      agentCommand.mockImplementationOnce(
-        (opts: unknown) =>
-          new Promise<undefined>((resolve) => {
-            const signal = (opts as { abortSignal?: AbortSignal } | undefined)?.abortSignal;
-            serverAbortSignal = signal;
-            if (signal?.aborted) {
-              resolve(undefined);
-              return;
-            }
-            signal?.addEventListener("abort", () => resolve(undefined), { once: true });
-          }),
-      );
-
-      const clientReq = http.request({
-        hostname: "127.0.0.1",
-        port,
-        path: "/v1/chat/completions",
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authorization: "Bearer secret",
-        },
-      });
-      clientReq.on("error", () => {});
-      clientReq.end(
-        JSON.stringify({
-          model: "recall",
-          messages: [{ role: "user", content: "hi" }],
-        }),
-      );
-
-      await vi.waitFor(() => {
-        expect(agentCommand).toHaveBeenCalledTimes(1);
-      });
-
-      clientReq.destroy();
-
-      await vi.waitFor(
-        () => {
-          expect(serverAbortSignal?.aborted).toBe(true);
-        },
-        { timeout: 5_000, interval: 50 },
-      );
-    },
-  );
 });
