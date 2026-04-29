@@ -75,12 +75,56 @@ type OpenAiChatCompletionRequest = {
   tool_choice?: unknown;
   messages?: unknown;
   user?: unknown;
-  max_tokens?: unknown;
-  max_completion_tokens?: unknown;
-  temperature?: unknown;
-  top_p?: unknown;
-  response_format?: unknown;
+  /**
+   * OpenAI-style hint for reasoning effort. Accepts "low" | "medium" |
+   * "high" (and "minimal" / "auto" are mapped via `normalizeThinkLevel`).
+   */
+  reasoning_effort?: unknown;
+  /**
+   * Anthropic-style extended-thinking opt-in. Either a string
+   * ("low"/"medium"/"high") or an object
+   * `{ type: "enabled", budget_tokens?: number }` per Anthropic's
+   * Messages API. Mapped to a coarse think-level for the agent runtime.
+   */
+  thinking?: unknown;
 };
+
+/**
+ * Translate the request body's reasoning hint into a coarse think-level
+ * string the agent runtime accepts ("low"/"medium"/"high"/...).
+ *
+ * Precedence (when more than one is set):
+ *   1. `reasoning_effort` (OpenAI canonical) wins
+ *   2. `thinking` as a string ("medium")
+ *   3. `thinking` as `{ type: "enabled", budget_tokens?: N }` — Anthropic shape;
+ *      we bucket the budget into low/medium/high if provided, else default "medium".
+ *
+ * Returns undefined when nothing is set, signalling to the agent runtime that
+ * thinking should remain off.
+ */
+function resolveThinkingFromRequest(payload: OpenAiChatCompletionRequest): string | undefined {
+  if (typeof payload.reasoning_effort === "string" && payload.reasoning_effort.trim()) {
+    return payload.reasoning_effort.trim();
+  }
+  if (typeof payload.thinking === "string" && payload.thinking.trim()) {
+    return payload.thinking.trim();
+  }
+  const thinking = payload.thinking;
+  if (thinking && typeof thinking === "object") {
+    const obj = thinking as Record<string, unknown>;
+    if (obj.type !== "enabled") {
+      return undefined;
+    }
+    const budget = typeof obj.budget_tokens === "number" ? obj.budget_tokens : undefined;
+    if (budget === undefined) {
+      return "medium";
+    }
+    if (budget <= 1024) return "low";
+    if (budget <= 4096) return "medium";
+    return "high";
+  }
+  return undefined;
+}
 
 const DEFAULT_OPENAI_CHAT_COMPLETIONS_BODY_BYTES = 20 * 1024 * 1024;
 const IMAGE_ONLY_USER_MESSAGE = "User sent image(s) with no text.";
@@ -137,13 +181,8 @@ function buildAgentCommandInput(params: {
   sessionKey: string;
   runId: string;
   messageChannel: string;
-  abortSignal?: AbortSignal;
-  streamParams?: {
-    maxTokens?: number;
-    temperature?: number;
-    topP?: number;
-    responseFormat?: Record<string, unknown>;
-  };
+  /** Optional thinking level hint. "low"/"medium"/"high"/etc. */
+  thinking?: string;
 }) {
   return {
     message: params.prompt.message,
@@ -156,6 +195,13 @@ function buildAgentCommandInput(params: {
     deliver: false as const,
     messageChannel: params.messageChannel,
     bestEffortDeliver: false as const,
+    // Forward thinking hint to the agent runtime so pi-embedded-subscribe can
+    // flip thinkingEnabled=true and the upstream Anthropic provider streams
+    // thinking_delta content blocks. See PR forwarding those events as
+    // delta.thinking_content chunks back to the client.
+    thinking: params.thinking,
+    // HTTP API callers are authenticated operator clients for this gateway context.
+    senderIsOwner: true as const,
     allowModelOverride: true as const,
     abortSignal: params.abortSignal,
     streamParams: params.streamParams,
@@ -878,10 +924,7 @@ export async function handleOpenAiHttpRequest(
 
   const runId = `chatcmpl_${randomUUID()}`;
   const deps = createDefaultDeps();
-  const abortController = new AbortController();
-  const mergedExtraSystemPrompt = [prompt.extraSystemPrompt, toolChoicePrompt]
-    .filter((part): part is string => Boolean(part))
-    .join("\n\n");
+  const thinkingHint = resolveThinkingFromRequest(payload);
   const commandInput = buildAgentCommandInput({
     prompt: {
       message: prompt.message,
@@ -893,8 +936,7 @@ export async function handleOpenAiHttpRequest(
     sessionKey,
     runId,
     messageChannel,
-    abortSignal: abortController.signal,
-    streamParams,
+    thinking: thinkingHint,
   });
 
   if (!stream) {
