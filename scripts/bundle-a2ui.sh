@@ -20,6 +20,25 @@ if [[ ! -d "$A2UI_RENDERER_DIR" || ! -d "$A2UI_APP_DIR" ]]; then
     echo "A2UI sources missing; keeping prebuilt bundle."
     exit 0
   fi
+  if [[ "${RECALL_A2UI_SKIP_MISSING:-0}" == "1" ]]; then
+    # Release builds run from a clean checkout where the
+    # apps/shared/RecallKit/Tools/CanvasA2UI source tree may not be
+    # vendored into this repo. The gateway HTTP runtime does not depend
+    # on the A2UI canvas bundle; emit a stub so the rest of the build
+    # can proceed and the release artifact still ships.
+    echo "A2UI sources missing; RECALL_A2UI_SKIP_MISSING=1, writing stub bundle to $OUTPUT_FILE."
+    mkdir -p "$(dirname "$OUTPUT_FILE")"
+    cat > "$OUTPUT_FILE" <<'STUB'
+// A2UI bundle stub.
+// The full A2UI renderer is not bundled in this release because the
+// upstream sources (apps/shared/RecallKit/Tools/CanvasA2UI) were not
+// available at build time. The canvas-host A2UI feature is a no-op
+// when this stub is loaded; all other agent runtimes (CLI, gateway,
+// embedded Pi) work normally.
+export {};
+STUB
+    exit 0
+  fi
   echo "A2UI sources missing and no prebuilt bundle found at: $OUTPUT_FILE" >&2
   exit 1
 fi
