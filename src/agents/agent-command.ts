@@ -526,6 +526,15 @@ function runAgentAttempt(params: {
     // chat-completions forwarder (PR #4) to relay back as
     // delta.thinking_content chunks.
     reasoningLevel: params.resolvedReasoningLevel,
+    // subscribeEmbeddedPiSession's streamReasoning gate is
+    // `reasoningMode === "stream" && typeof params.onReasoningStream === "function"`.
+    // When reasoning is enabled, provide a no-op so the gate passes; the
+    // gateway's onAgentEvent already relays the stream:"thinking" events
+    // out as delta.thinking_content SSE chunks.
+    onReasoningStream:
+      params.resolvedReasoningLevel === "stream" || params.resolvedReasoningLevel === "on"
+        ? () => undefined
+        : undefined,
     timeoutMs: params.timeoutMs,
     runId: params.runId,
     lane: params.opts.lane,
