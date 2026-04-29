@@ -11,9 +11,11 @@ import { normalizeReplyPayload } from "../auto-reply/reply/normalize-reply.js";
 import {
   formatThinkingLevels,
   formatXHighModelHint,
+  normalizeReasoningLevel,
   normalizeThinkLevel,
   normalizeVerboseLevel,
   supportsXHighThinking,
+  type ReasoningLevel,
   type ThinkLevel,
   type VerboseLevel,
 } from "../auto-reply/thinking.js";
@@ -362,6 +364,7 @@ function runAgentAttempt(params: {
   body: string;
   isFallbackRetry: boolean;
   resolvedThinkLevel: ThinkLevel;
+  resolvedReasoningLevel: ReasoningLevel;
   timeoutMs: number;
   runId: string;
   opts: AgentCommandOpts & { senderIsOwner: boolean };
@@ -518,6 +521,11 @@ function runAgentAttempt(params: {
     authProfileIdSource: authProfileId ? params.sessionEntry?.authProfileOverrideSource : undefined,
     thinkLevel: params.resolvedThinkLevel,
     verboseLevel: params.resolvedVerboseLevel,
+    // Pass reasoning level so subscribeEmbeddedPiSession sets reasoningMode
+    // correctly and emits stream:"thinking" events for the openai-http
+    // chat-completions forwarder (PR #4) to relay back as
+    // delta.thinking_content chunks.
+    reasoningLevel: params.resolvedReasoningLevel,
     timeoutMs: params.timeoutMs,
     runId: params.runId,
     lane: params.opts.lane,
@@ -609,6 +617,16 @@ async function prepareAgentCommandExecution(
     throw new Error(`Invalid one-shot thinking level. Use one of: ${thinkingLevelsHint}.`);
   }
 
+  // Per-run reasoning override. The chat-completions HTTP path forwards
+  // request body's reasoning_effort/thinking hint into opts.reasoning so the
+  // pi-embedded-runner subscribes with reasoningMode="on"/"stream" and
+  // emits stream:"thinking" AgentEvents. Without this, the gateway's
+  // openai-http thinking forwarder (PR #4) has nothing to forward.
+  const reasoningOverride: ReasoningLevel | undefined = normalizeReasoningLevel(opts.reasoning);
+  if (opts.reasoning && !reasoningOverride) {
+    throw new Error('Invalid reasoning level. Use "off", "on", or "stream".');
+  }
+
   const verboseOverride = normalizeVerboseLevel(opts.verbose);
   if (opts.verbose && !verboseOverride) {
     throw new Error('Invalid verbose level. Use "on", "full", or "off".');
@@ -687,6 +705,7 @@ async function prepareAgentCommandExecution(
     agentCfg,
     thinkOverride,
     thinkOnce,
+    reasoningOverride,
     verboseOverride,
     timeoutMs,
     sessionId,
@@ -720,6 +739,7 @@ async function agentCommandInternal(
     agentCfg,
     thinkOverride,
     thinkOnce,
+    reasoningOverride,
     verboseOverride,
     timeoutMs,
     sessionId,
@@ -897,6 +917,12 @@ async function agentCommandInternal(
     let resolvedThinkLevel = thinkOnce ?? thinkOverride ?? persistedThinking;
     const resolvedVerboseLevel =
       verboseOverride ?? persistedVerbose ?? (agentCfg?.verboseDefault as VerboseLevel | undefined);
+    // Resolve reasoning level for this run. Per-call opts.reasoning wins; fall
+    // back to persisted session value, then "off". This is what gates whether
+    // pi-embedded-subscribe emits stream:"thinking" AgentEvents — so the chat
+    // completions HTTP path needs to plumb opts.reasoning down here.
+    const persistedReasoning = (sessionEntry?.reasoningLevel as ReasoningLevel | undefined) ?? undefined;
+    const resolvedReasoningLevel: ReasoningLevel = reasoningOverride ?? persistedReasoning ?? "off";
 
     if (sessionKey) {
       registerAgentRunContext(runId, {
@@ -1193,6 +1219,7 @@ async function agentCommandInternal(
             body,
             isFallbackRetry,
             resolvedThinkLevel,
+            resolvedReasoningLevel,
             timeoutMs,
             runId,
             opts,
