@@ -323,20 +323,7 @@ function normalizeExplicitOverrideInput(raw: string, kind: "provider" | "model")
   return trimmed;
 }
 
-async function persistSessionEntry(params: PersistSessionEntryParams): Promise<void> {
-  const persisted = await updateSessionStore(params.storePath, (store) => {
-    const merged = mergeSessionEntry(store[params.sessionKey], params.entry);
-    // Preserve explicit `delete` clears done by session override helpers.
-    for (const field of OVERRIDE_FIELDS_CLEARED_BY_DELETE) {
-      if (!Object.hasOwn(params.entry, field)) {
-        Reflect.deleteProperty(merged, field);
-      }
-    }
-    store[params.sessionKey] = merged;
-    return merged;
-  });
-  params.sessionStore[params.sessionKey] = persisted;
-}
+
 
 function resolveFallbackRetryPrompt(params: { body: string; isFallbackRetry: boolean }): string {
   if (!params.isFallbackRetry) {
