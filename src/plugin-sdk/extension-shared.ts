@@ -1,4 +1,4 @@
-import { createAmbientNodeProxyAgent, hasAmbientNodeProxyConfigured } from "@recall/proxyline";
+import { createAmbientNodeProxyAgent, hasAmbientNodeProxyConfigured } from "@openclaw/proxyline";
 import type { z } from "zod";
 import type { RecallConfig } from "../config/config.js";
 import { resolveActiveManagedProxyTlsOptions } from "../infra/net/proxy/managed-proxy-undici.js";

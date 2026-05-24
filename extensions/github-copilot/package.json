@@ -11,7 +11,7 @@
     "@earendil-works/pi-ai": "0.75.4",
     "@recall/plugin-sdk": "workspace:*"
   },
-  "recall": {
+  "recall-agents": {
     "extensions": [
       "./index.ts"
     ]

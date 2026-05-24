@@ -5,10 +5,10 @@ import {
   ensureDirectoryWithinRoot,
   findExistingAncestor,
   writeViaSiblingTempPath,
-} from "@recall/fs-safe/advanced";
-import { root as fsSafeRoot, type ReadResult } from "@recall/fs-safe/root";
+} from "@openclaw/fs-safe/advanced";
+import { root as fsSafeRoot, type ReadResult } from "@openclaw/fs-safe/root";
 
-export { FsSafeError, type FsSafeErrorCode } from "@recall/fs-safe/errors";
+export { FsSafeError, type FsSafeErrorCode } from "@openclaw/fs-safe/errors";
 export {
   assertAbsolutePathInput,
   canonicalPathFromExistingAncestor,
@@ -20,11 +20,11 @@ export {
   type EnsureAbsoluteDirectoryResult,
   type ResolvedAbsolutePath,
   type ResolvedWritableAbsolutePath,
-} from "@recall/fs-safe/advanced";
-export { isPathInside } from "@recall/fs-safe/path";
-export { pathExists, pathExistsSync } from "@recall/fs-safe/advanced";
-export { movePathToTrash, type MovePathToTrashOptions } from "@recall/fs-safe/advanced";
-export { readLocalFileFromRoots, resolveLocalPathFromRootsSync } from "@recall/fs-safe/advanced";
+} from "@openclaw/fs-safe/advanced";
+export { isPathInside } from "@openclaw/fs-safe/path";
+export { pathExists, pathExistsSync } from "@openclaw/fs-safe/advanced";
+export { movePathToTrash, type MovePathToTrashOptions } from "@openclaw/fs-safe/advanced";
+export { readLocalFileFromRoots, resolveLocalPathFromRootsSync } from "@openclaw/fs-safe/advanced";
 export {
   appendRegularFile,
   appendRegularFileSync,
@@ -33,7 +33,7 @@ export {
   resolveRegularFileAppendFlags,
   statRegularFile,
   statRegularFileSync,
-} from "@recall/fs-safe/advanced";
+} from "@openclaw/fs-safe/advanced";
 export {
   openLocalFileSafely,
   readLocalFileSafely,
@@ -41,21 +41,21 @@ export {
   root,
   type OpenResult,
   type ReadResult,
-} from "@recall/fs-safe/root";
-export { sanitizeUntrustedFileName } from "@recall/fs-safe/advanced";
+} from "@openclaw/fs-safe/root";
+export { sanitizeUntrustedFileName } from "@openclaw/fs-safe/advanced";
 export {
   readSecureFile,
   type SecureFileReadOptions,
   type SecureFileReadResult,
-} from "@recall/fs-safe/secure-file";
+} from "@openclaw/fs-safe/secure-file";
 export {
   walkDirectory,
   walkDirectorySync,
   type WalkDirectoryEntry,
   type WalkDirectoryOptions,
   type WalkDirectoryResult,
-} from "@recall/fs-safe/walk";
-export { withTimeout } from "@recall/fs-safe/advanced";
+} from "@openclaw/fs-safe/walk";
+export { withTimeout } from "@openclaw/fs-safe/advanced";
 
 export type ExternalFileWriteOptions = {
   rootDir: string;

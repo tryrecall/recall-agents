@@ -6,4 +6,4 @@ export {
   isWindowsNetworkPath,
   safeFileURLToPath,
   trySafeFileURLToPath,
-} from "@recall/fs-safe/advanced";
+} from "@openclaw/fs-safe/advanced";

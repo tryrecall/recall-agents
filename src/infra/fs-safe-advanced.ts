@@ -8,4 +8,4 @@ export {
   writeViaSiblingTempPath,
   type AssertNoSymlinkParentsOptions,
   type FileIdentityStat,
-} from "@recall/fs-safe/advanced";
+} from "@openclaw/fs-safe/advanced";

@@ -194,8 +194,8 @@ function shouldNeverBundleDependency(id: string): boolean {
 
 function shouldAlwaysBundleDependency(id: string): boolean {
   return (
-    id === "@recall/fs-safe" ||
-    id.startsWith("@recall/fs-safe/") ||
+    id === "@openclaw/fs-safe" ||
+    id.startsWith("@openclaw/fs-safe/") ||
     id === "zod" ||
     id.startsWith("zod/")
   );

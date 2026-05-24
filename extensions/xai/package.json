@@ -12,7 +12,7 @@
     "@recall/plugin-sdk": "workspace:*",
     "ws": "8.20.1"
   },
-  "recall": {
+  "recall-agents": {
     "extensions": [
       "./index.ts"
     ]

@@ -24,4 +24,4 @@ export {
   type ArchiveLogger,
   type ArchiveSecurityErrorCode,
   type TarEntryInfo,
-} from "@recall/fs-safe/archive";
+} from "@openclaw/fs-safe/archive";

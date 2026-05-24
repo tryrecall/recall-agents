@@ -13,7 +13,7 @@
   "devDependencies": {
     "@recall/plugin-sdk": "workspace:*"
   },
-  "recall": {
+  "recall-agents": {
     "extensions": [
       "./index.ts"
     ],

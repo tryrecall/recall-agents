@@ -3,7 +3,7 @@ import {
   JsonFileReadError,
   readJson as readJsonImpl,
   readJsonIfExists as readJsonIfExistsImpl,
-} from "@recall/fs-safe/json";
+} from "@openclaw/fs-safe/json";
 import { replaceFileAtomic } from "./replace-file.js";
 
 export {
@@ -17,7 +17,7 @@ export {
   writeJson,
   writeJson as writeJsonAtomic,
   writeJsonSync,
-} from "@recall/fs-safe/json";
+} from "@openclaw/fs-safe/json";
 
 const RETRY_MAX_ATTEMPTS = 3;
 const RETRY_BASE_DELAY_MS = 50;
@@ -25,7 +25,7 @@ const RETRY_BASE_DELAY_MS = 50;
 /**
  * Recursively walks the error cause chain to detect
  * "File changed during read" errors wrapped inside
- * JsonFileReadError by @recall/fs-safe.
+ * JsonFileReadError by @openclaw/fs-safe.
  */
 function isFileChangedDuringRead(err: unknown): boolean {
   let current: unknown = err;
@@ -88,7 +88,7 @@ export async function readDurableJsonFile<T>(filePath: string): Promise<T | null
 
 /**
  * tryReadJson delegates to readJsonIfExists instead of the internal
- * tryReadJsonImpl from @recall/fs-safe. The fs-safe implementation
+ * tryReadJsonImpl from @openclaw/fs-safe. The fs-safe implementation
  * swallows all errors internally and returns null, which prevents
  * the retry wrapper from detecting transient "File changed during read"
  * race conditions.
@@ -110,7 +110,7 @@ export async function readJsonFile<T>(filePath: string): Promise<T | null> {
   return tryReadJson<T>(filePath);
 }
 
-export { createAsyncLock } from "@recall/fs-safe/advanced";
+export { createAsyncLock } from "@openclaw/fs-safe/advanced";
 
 export type WriteTextAtomicOptions = {
   mode?: number;

@@ -7,7 +7,7 @@
   "dependencies": {
     "@earendil-works/pi-ai": "0.75.4"
   },
-  "recall": {
+  "recall-agents": {
     "extensions": [
       "./index.ts"
     ]

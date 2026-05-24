@@ -17,17 +17,17 @@
   },
   "devDependencies": {
     "@recall/plugin-sdk": "workspace:*",
-    "recall": "workspace:*"
+    "recall-agents": "workspace:*"
   },
   "peerDependencies": {
-    "recall": ">=2026.5.22"
+    "recall-agents": ">=2026.5.22"
   },
   "peerDependenciesMeta": {
-    "recall": {
+    "recall-agents": {
       "optional": true
     }
   },
-  "recall": {
+  "recall-agents": {
     "extensions": [
       "./index.ts"
     ],

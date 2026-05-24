@@ -1,0 +1,12 @@
+{
+  "name": "@recall/modelstudio-provider",
+  "version": "2026.3.22",
+  "private": true,
+  "description": "Recall Model Studio provider plugin",
+  "type": "module",
+  "recall-agents": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}
