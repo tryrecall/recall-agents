@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import type { GroupKeyResolution } from "../config/sessions.js";
 import { channelRouteDedupeKey } from "../plugin-sdk/channel-route.js";
 import { resetPluginRuntimeStateForTest } from "../plugins/runtime.js";
@@ -866,9 +866,9 @@ describe("createInboundDebouncer", () => {
 
 describe("initSessionState BodyStripped", () => {
   it("prefers BodyForAgent over Body for group chats", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-sender-meta-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-sender-meta-"));
     const storePath = path.join(root, "sessions.json");
-    const cfg = { session: { store: storePath } } as OpenClawConfig;
+    const cfg = { session: { store: storePath } } as RecallConfig;
 
     const result = await initSessionState({
       ctx: {
@@ -888,9 +888,9 @@ describe("initSessionState BodyStripped", () => {
   });
 
   it("prefers BodyForAgent over Body for direct chats", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-sender-meta-direct-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-sender-meta-direct-"));
     const storePath = path.join(root, "sessions.json");
-    const cfg = { session: { store: storePath } } as OpenClawConfig;
+    const cfg = { session: { store: storePath } } as RecallConfig;
 
     const result = await initSessionState({
       ctx: {
@@ -917,11 +917,11 @@ describe("mention helpers", () => {
       },
     });
     expect(regexes).toHaveLength(1);
-    expect(regexes[0]?.test("openclaw")).toBe(true);
+    expect(regexes[0]?.test("recall")).toBe(true);
   });
 
   it("normalizes zero-width characters", () => {
-    expect(normalizeMentionText("open\u200bclaw")).toBe("openclaw");
+    expect(normalizeMentionText("open\u200bclaw")).toBe("recall");
   });
 
   it("matches patterns case-insensitively", () => {
@@ -965,7 +965,7 @@ describe("mention helpers", () => {
   });
 
   it("strips safe mention patterns and ignores unsafe ones", () => {
-    const stripped = stripMentions("openclaw " + "a".repeat(28) + "!", {} as MsgContext, {
+    const stripped = stripMentions("recall " + "a".repeat(28) + "!", {} as MsgContext, {
       messages: {
         groupChat: { mentionPatterns: ["\\bopenclaw\\b", "(a+)+$"] },
       },
@@ -986,7 +986,7 @@ describe("resolveGroupRequireMention", () => {
   });
 
   it("respects Discord guild/channel requireMention settings", async () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         discord: {
           guilds: {
@@ -1016,7 +1016,7 @@ describe("resolveGroupRequireMention", () => {
   });
 
   it("respects Slack channel requireMention settings", async () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         slack: {
           channels: {
@@ -1041,7 +1041,7 @@ describe("resolveGroupRequireMention", () => {
   });
 
   it("uses Slack fallback resolver semantics for default-account wildcard channels", async () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         slack: {
           defaultAccount: "work",
@@ -1071,7 +1071,7 @@ describe("resolveGroupRequireMention", () => {
   });
 
   it("keeps core reply-stage resolution aligned for Slack default-account wildcard fallbacks", async () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         slack: {
           defaultAccount: "work",
@@ -1101,7 +1101,7 @@ describe("resolveGroupRequireMention", () => {
   });
 
   it("uses Discord fallback resolver semantics for guild slug matches", async () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         discord: {
           guilds: {
@@ -1130,7 +1130,7 @@ describe("resolveGroupRequireMention", () => {
   });
 
   it("keeps core reply-stage resolution aligned for Discord slug + wildcard guild fallbacks", async () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         discord: {
           guilds: {
@@ -1161,7 +1161,7 @@ describe("resolveGroupRequireMention", () => {
   });
 
   it("respects LINE prefixed group keys in reply-stage requireMention resolution", async () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         line: {
           groups: {
@@ -1185,7 +1185,7 @@ describe("resolveGroupRequireMention", () => {
   });
 
   it("preserves plugin-backed channel requireMention resolution", async () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         imessage: {
           groups: {

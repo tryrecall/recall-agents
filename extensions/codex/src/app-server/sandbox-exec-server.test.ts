@@ -20,7 +20,7 @@ afterEach(async () => {
   await closeCodexSandboxExecServersForTests();
 });
 
-describe("OpenClaw Codex sandbox exec-server", () => {
+describe("Recall Codex sandbox exec-server", () => {
   it("reports unavailable app-server remote environment support without exposing an environment", async () => {
     const sandbox = createSandboxContext({});
     const client = {
@@ -116,7 +116,7 @@ describe("OpenClaw Codex sandbox exec-server", () => {
     const addRequest = requests[0];
     expect(addRequest?.method).toBe("environment/add");
     expect(environment).toEqual({
-      environmentId: expect.stringMatching(/^openclaw-sandbox-/),
+      environmentId: expect.stringMatching(/^recall-sandbox-/),
       cwd: "/workspace",
     });
     const execServerUrl =
@@ -285,9 +285,9 @@ describe("OpenClaw Codex sandbox exec-server", () => {
     vi.stubEnv("HOME", "/gateway-home");
     vi.stubEnv("USER", "gateway-user");
     vi.stubEnv("TMPDIR", "/gateway-tmp");
-    vi.stubEnv("OPENCLAW_TEST_SECRET_TOKEN", "host-secret");
-    vi.stubEnv("OPENCLAW_TEST_DATABASE_PASSWORD", "host-password");
-    vi.stubEnv("OPENCLAW_TEST_PRIVATE_KEY", "host-private-key");
+    vi.stubEnv("RECALL_TEST_SECRET_TOKEN", "host-secret");
+    vi.stubEnv("RECALL_TEST_DATABASE_PASSWORD", "host-password");
+    vi.stubEnv("RECALL_TEST_PRIVATE_KEY", "host-private-key");
     const buildExecSpec = vi.fn(async () => ({
       argv: ["/bin/sh", "-lc", "true"],
       env: {},
@@ -412,7 +412,7 @@ describe("OpenClaw Codex sandbox exec-server", () => {
       sandbox,
     });
     const unauthorizedUrl = execServerUrlFromClient(client).replace(
-      /\/openclaw-[^/?#]+/u,
+      /\/recall-[^/?#]+/u,
       "/wrong",
     );
     const socket = await openSocket(unauthorizedUrl);

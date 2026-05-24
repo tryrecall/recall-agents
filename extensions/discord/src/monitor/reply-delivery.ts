@@ -1,21 +1,21 @@
-import { resolveAgentAvatar } from "openclaw/plugin-sdk/agent-runtime";
-import { sendDurableMessageBatch } from "openclaw/plugin-sdk/channel-message";
+import { resolveAgentAvatar } from "recall/plugin-sdk/agent-runtime";
+import { sendDurableMessageBatch } from "recall/plugin-sdk/channel-message";
 import type {
   MarkdownTableMode,
-  OpenClawConfig,
+  RecallConfig,
   ReplyToMode,
-} from "openclaw/plugin-sdk/config-contracts";
-import type { OutboundMediaAccess } from "openclaw/plugin-sdk/media-runtime";
+} from "recall/plugin-sdk/config-contracts";
+import type { OutboundMediaAccess } from "recall/plugin-sdk/media-runtime";
 import {
   buildOutboundSessionContext,
   type OutboundDeliveryFormattingOptions,
   type OutboundIdentity,
   type OutboundSendDeps,
-} from "openclaw/plugin-sdk/outbound-runtime";
-import type { ChunkMode } from "openclaw/plugin-sdk/reply-chunking";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-dispatch-runtime";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/outbound-runtime";
+import type { ChunkMode } from "recall/plugin-sdk/reply-chunking";
+import type { ReplyPayload } from "recall/plugin-sdk/reply-dispatch-runtime";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime-env";
+import { normalizeOptionalString } from "recall/plugin-sdk/string-coerce-runtime";
 import type { RequestClient } from "../internal/discord.js";
 import { sendMessageDiscord, sendVoiceMessageDiscord } from "../send.js";
 import { sanitizeDiscordFrontChannelReplyPayloads } from "./reply-safety.js";
@@ -62,7 +62,7 @@ function resolveBoundThreadBinding(params: {
 }
 
 function resolveBindingIdentity(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   binding: DiscordThreadBindingLookupRecord | undefined,
 ): OutboundIdentity | undefined {
   if (!binding) {
@@ -84,7 +84,7 @@ function resolveBindingIdentity(
 }
 
 function createDiscordDeliveryDeps(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   token: string;
   rest?: RequestClient;
 }): OutboundSendDeps {
@@ -121,7 +121,7 @@ type DiscordDeliveryOptions = {
 };
 
 function resolveDiscordDeliveryOptions(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   target: string;
   sessionKey?: string;
   threadBindings?: DiscordThreadBindingLookup;
@@ -156,7 +156,7 @@ function resolveDiscordDeliveryOptions(params: {
 }
 
 export async function deliverDiscordReply(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   replies: ReplyPayload[];
   target: string;
   token: string;

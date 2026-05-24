@@ -18,7 +18,7 @@ afterEach(() => {
 });
 
 function makeTempDir() {
-  return makeTrackedTempDir("openclaw-provider-setup-trust", tempDirs);
+  return makeTrackedTempDir("recall-provider-setup-trust", tempDirs);
 }
 
 function writeJson(filePath: string, value: unknown) {
@@ -42,9 +42,9 @@ function writeWorkspaceProviderPlugin(params: {
   providerId: string;
   markerDir: string;
 }) {
-  const pluginDir = path.join(params.workspaceDir, ".openclaw", "extensions", params.pluginId);
+  const pluginDir = path.join(params.workspaceDir, ".recall", "extensions", params.pluginId);
   mkdirSafeDir(pluginDir);
-  writeJson(path.join(pluginDir, "openclaw.plugin.json"), {
+  writeJson(path.join(pluginDir, "recall.plugin.json"), {
     id: params.pluginId,
     name: "Setup Trust Provider",
     description: "Test workspace provider plugin",
@@ -103,9 +103,9 @@ describe("setup provider workspace trust", () => {
     });
 
     const env: NodeJS.ProcessEnv = {
-      OPENCLAW_STATE_DIR: stateDir,
-      OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1",
-      OPENCLAW_BUNDLED_PLUGINS_DIR: undefined,
+      RECALL_STATE_DIR: stateDir,
+      RECALL_DISABLE_BUNDLED_PLUGINS: "1",
+      RECALL_BUNDLED_PLUGINS_DIR: undefined,
     };
 
     withEnv(env, () => {
@@ -144,9 +144,9 @@ describe("setup provider workspace trust", () => {
     });
 
     const env: NodeJS.ProcessEnv = {
-      OPENCLAW_STATE_DIR: stateDir,
-      OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1",
-      OPENCLAW_BUNDLED_PLUGINS_DIR: undefined,
+      RECALL_STATE_DIR: stateDir,
+      RECALL_DISABLE_BUNDLED_PLUGINS: "1",
+      RECALL_BUNDLED_PLUGINS_DIR: undefined,
     };
 
     withEnv(env, () => {

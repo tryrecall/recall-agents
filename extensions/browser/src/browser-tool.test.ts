@@ -4,7 +4,7 @@ const browserClientMocks = vi.hoisted(() => ({
   browserCloseTab: vi.fn(async (..._args: unknown[]) => ({})),
   browserDoctor: vi.fn(async (..._args: unknown[]) => ({
     ok: true,
-    profile: "openclaw",
+    profile: "recall",
     transport: "cdp",
     checks: [],
     status: {
@@ -68,7 +68,7 @@ const browserConfigMocks = vi.hoisted(() => ({
     enabled: true,
     controlPort: 18791,
     profiles: {},
-    defaultProfile: "openclaw",
+    defaultProfile: "recall",
     actionTimeoutMs: 60_000,
   })),
   resolveProfile: vi.fn((resolved: Record<string, unknown>, name: string) => {
@@ -78,7 +78,7 @@ const browserConfigMocks = vi.hoisted(() => ({
     if (!profile) {
       return null;
     }
-    const driver = profile.driver === "existing-session" ? "existing-session" : "openclaw";
+    const driver = profile.driver === "existing-session" ? "existing-session" : "recall";
     if (driver === "existing-session") {
       return {
         name,
@@ -127,10 +127,10 @@ const configMocks = vi.hoisted(() => ({
     }
   >(() => ({ browser: {} })),
 }));
-vi.mock("openclaw/plugin-sdk/runtime-config-snapshot", async () => {
+vi.mock("recall/plugin-sdk/runtime-config-snapshot", async () => {
   const actual = await vi.importActual<
-    typeof import("openclaw/plugin-sdk/runtime-config-snapshot")
-  >("openclaw/plugin-sdk/runtime-config-snapshot");
+    typeof import("recall/plugin-sdk/runtime-config-snapshot")
+  >("recall/plugin-sdk/runtime-config-snapshot");
   return {
     ...actual,
     getRuntimeConfig: configMocks.loadConfig,
@@ -177,7 +177,7 @@ vi.mock("./browser-tool.runtime.js", () => {
 
   return {
     DEFAULT_AI_SNAPSHOT_MAX_CHARS: 40_000,
-    DEFAULT_UPLOAD_DIR: "/tmp/openclaw-browser-uploads",
+    DEFAULT_UPLOAD_DIR: "/tmp/recall-browser-uploads",
     BrowserToolSchema: {},
     ...browserActionsMocks,
     ...browserClientMocks,
@@ -248,7 +248,7 @@ function resetBrowserToolMocks() {
     enabled: true,
     controlPort: 18791,
     profiles: {},
-    defaultProfile: "openclaw",
+    defaultProfile: "recall",
     actionTimeoutMs: 60_000,
   });
   nodesUtilsMocks.listNodes.mockResolvedValue([]);
@@ -286,7 +286,7 @@ function resetBrowserToolMocks() {
 
 function setResolvedBrowserProfiles(
   profiles: Record<string, Record<string, unknown>>,
-  defaultProfile = "openclaw",
+  defaultProfile = "recall",
 ) {
   browserConfigMocks.resolveBrowserConfig.mockReturnValue({
     enabled: true,

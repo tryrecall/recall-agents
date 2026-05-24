@@ -1,13 +1,13 @@
 import {
   attachChannelToResult,
   createAttachedChannelResultAdapter,
-} from "openclaw/plugin-sdk/channel-send-result";
-import { resolveOutboundSendDep } from "openclaw/plugin-sdk/outbound-send-deps";
+} from "recall/plugin-sdk/channel-send-result";
+import { resolveOutboundSendDep } from "recall/plugin-sdk/outbound-send-deps";
 import {
   resolvePayloadMediaUrls,
   resolveTextChunksWithFallback,
   sendPayloadMediaSequence,
-} from "openclaw/plugin-sdk/reply-payload";
+} from "recall/plugin-sdk/reply-payload";
 import { chunkTextForOutbound, type ChannelOutboundAdapter } from "../runtime-api.js";
 import { createMSTeamsPollStoreFs } from "./polls.js";
 import { buildMSTeamsPresentationCard, MSTEAMS_PRESENTATION_CAPABILITIES } from "./presentation.js";

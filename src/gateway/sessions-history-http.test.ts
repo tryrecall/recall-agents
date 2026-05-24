@@ -21,7 +21,7 @@ import {
 installGatewayTestHooks();
 
 const AUTH_HEADER = { Authorization: "Bearer test-gateway-token-1234567890" };
-const READ_SCOPE_HEADER = { "x-openclaw-scopes": "operator.read" };
+const READ_SCOPE_HEADER = { "x-recall-scopes": "operator.read" };
 const cleanupDirs: string[] = [];
 
 afterEach(async () => {
@@ -31,7 +31,7 @@ afterEach(async () => {
 });
 
 async function createSessionStoreFile(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-session-history-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-session-history-"));
   cleanupDirs.push(dir);
   const storePath = path.join(dir, "sessions.json");
   testState.sessionStorePath = storePath;
@@ -72,7 +72,7 @@ function makeTranscriptAssistantMessage(params: {
     role: "assistant" as const,
     content: params.content ?? [{ type: "text", text: params.text }],
     api: "openai-responses",
-    provider: "openclaw",
+    provider: "recall",
     model: "delivery-mirror",
     usage: {
       input: 0,
@@ -201,7 +201,7 @@ type SessionHistorySseStream = {
   streamState: { buffer: string };
 };
 
-function expectOpenClawMetadata(
+function expectRecallMetadata(
   metadata: { id?: string; seq?: number } | undefined,
   expected: { id?: string; seq: number },
 ) {
@@ -261,7 +261,7 @@ async function expectMessageEventMatch(
   ).toBe(params.text);
   expect((event.data as { messageSeq?: number }).messageSeq).toBe(params.seq);
   if (params.id !== undefined) {
-    expectOpenClawMetadata(
+    expectRecallMetadata(
       (event.data as { message?: { __openclaw?: { id?: string; seq?: number } } }).message?.[
         "__openclaw"
       ],
@@ -305,7 +305,7 @@ describe("session history HTTP endpoints", () => {
       expect(body.sessionKey).toBe("agent:main:main");
       expect(body.messages).toHaveLength(1);
       expect(body.messages?.[0]?.content?.[0]?.text).toBe("hello from history");
-      expectOpenClawMetadata(
+      expectRecallMetadata(
         (
           body.messages?.[0] as {
             __openclaw?: { id?: string; seq?: number };
@@ -475,7 +475,7 @@ describe("session history HTTP endpoints", () => {
         }>;
       };
       expect(nextData.messages?.[0]?.content?.[0]?.text).toBe("third message");
-      expectOpenClawMetadata(nextData.messages?.[0]?.["__openclaw"], {
+      expectRecallMetadata(nextData.messages?.[0]?.["__openclaw"], {
         id: thirdMessageId,
         seq: 3,
       });
@@ -565,7 +565,7 @@ describe("session history HTTP endpoints", () => {
       expect(body.sessionKey).toBe("agent:main:main");
       expect(body.messages).toHaveLength(1);
       expect(body.messages?.[0]?.content?.[0]?.text).toBe("Done.");
-      expectOpenClawMetadata(body.messages?.[0]?.["__openclaw"], {
+      expectRecallMetadata(body.messages?.[0]?.["__openclaw"], {
         id: visibleMessageId,
         seq: 2,
       });

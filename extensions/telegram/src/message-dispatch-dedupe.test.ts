@@ -14,7 +14,7 @@ import {
 const tempDirs: string[] = [];
 
 function createStorePath(): string {
-  const dir = mkdtempSync(path.join(tmpdir(), "openclaw-telegram-dispatch-dedupe-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "recall-telegram-dispatch-dedupe-"));
   tempDirs.push(dir);
   return path.join(dir, "sessions.json");
 }

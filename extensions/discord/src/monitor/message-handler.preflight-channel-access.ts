@@ -1,5 +1,5 @@
-import { logDebug } from "openclaw/plugin-sdk/logging-core";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
+import { logDebug } from "recall/plugin-sdk/logging-core";
+import { logVerbose } from "recall/plugin-sdk/runtime-env";
 import {
   isDiscordGroupAllowedByPolicy,
   resolveGroupDmAllow,

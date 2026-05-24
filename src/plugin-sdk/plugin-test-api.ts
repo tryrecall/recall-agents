@@ -1,12 +1,12 @@
 import {
   attachPluginApiFacades,
-  type OpenClawPluginApiWithoutFacades,
+  type RecallPluginApiWithoutFacades,
 } from "../plugins/api-facades.js";
-import type { OpenClawPluginApi } from "./plugin-runtime.js";
+import type { RecallPluginApi } from "./plugin-runtime.js";
 
-export type TestPluginApiInput = Partial<OpenClawPluginApi>;
+export type TestPluginApiInput = Partial<RecallPluginApi>;
 
-export function createTestPluginApi(api: TestPluginApiInput = {}): OpenClawPluginApi {
+export function createTestPluginApi(api: TestPluginApiInput = {}): RecallPluginApi {
   const { agent, lifecycle, runContext, session, ...flatApi } = api;
   const mergedApi = {
     id: "test-plugin",
@@ -14,7 +14,7 @@ export function createTestPluginApi(api: TestPluginApiInput = {}): OpenClawPlugi
     source: "test",
     registrationMode: "full",
     config: {},
-    runtime: {} as OpenClawPluginApi["runtime"],
+    runtime: {} as RecallPluginApi["runtime"],
     logger: { info() {}, warn() {}, error() {}, debug() {} },
     registerTool() {},
     registerHook() {},
@@ -88,7 +88,7 @@ export function createTestPluginApi(api: TestPluginApiInput = {}): OpenClawPlugi
     },
     on() {},
     ...flatApi,
-  } as OpenClawPluginApiWithoutFacades;
+  } as RecallPluginApiWithoutFacades;
   const withFacades = attachPluginApiFacades(mergedApi);
   return {
     ...withFacades,

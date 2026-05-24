@@ -1,6 +1,6 @@
 import { normalizeChatType } from "../../channels/chat-type.js";
 import type { InboundEventKind } from "../../channels/inbound-event/kind.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import type { SessionSendPolicyDecision } from "../../sessions/send-policy.js";
 import {
   isExplicitCommandTurn,
@@ -32,7 +32,7 @@ function isUnauthorizedTextSlashCommand(ctx: SourceReplyDeliveryModeContext): bo
 }
 
 export function resolveSourceReplyDeliveryMode(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   ctx: SourceReplyDeliveryModeContext;
   requested?: SourceReplyDeliveryMode;
   strictMessageToolOnly?: boolean;
@@ -88,7 +88,7 @@ export type SourceReplyVisibilityPolicy = {
 };
 
 export function resolveSourceReplyVisibilityPolicy(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   ctx: SourceReplyDeliveryModeContext;
   requested?: SourceReplyDeliveryMode;
   strictMessageToolOnly?: boolean;

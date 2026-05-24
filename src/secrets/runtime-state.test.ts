@@ -22,20 +22,20 @@ function authStore(key: string): AuthProfileStore {
 }
 
 describe("secrets runtime state", () => {
-  const previousStateDir = process.env.OPENCLAW_STATE_DIR;
+  const previousStateDir = process.env.RECALL_STATE_DIR;
 
   afterEach(() => {
     clearSecretsRuntimeSnapshot();
     if (previousStateDir === undefined) {
-      delete process.env.OPENCLAW_STATE_DIR;
+      delete process.env.RECALL_STATE_DIR;
     } else {
-      process.env.OPENCLAW_STATE_DIR = previousStateDir;
+      process.env.RECALL_STATE_DIR = previousStateDir;
     }
   });
 
   it("clears loaded auth-profile cache without importing the full secrets runtime", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-runtime-state-cache-"));
-    process.env.OPENCLAW_STATE_DIR = root;
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "recall-runtime-state-cache-"));
+    process.env.RECALL_STATE_DIR = root;
     const agentDir = path.join(root, "agents", "default", "agent");
 
     try {

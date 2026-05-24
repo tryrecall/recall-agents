@@ -159,7 +159,7 @@ describe("browser manage output", () => {
         ? {
             enabled: true,
             profile: "remote",
-            driver: "openclaw",
+            driver: "recall",
             transport: "cdp",
             running: true,
             cdpReady: true,
@@ -196,8 +196,8 @@ describe("browser manage output", () => {
       if (req.path === "/") {
         return {
           enabled: true,
-          profile: "openclaw",
-          driver: "openclaw",
+          profile: "recall",
+          driver: "recall",
           transport: "cdp",
           running: true,
           cdpReady: true,
@@ -215,7 +215,7 @@ describe("browser manage output", () => {
         };
       }
       if (req.path === "/profiles") {
-        return { profiles: [{ name: "openclaw", running: true }] };
+        return { profiles: [{ name: "recall", running: true }] };
       }
       if (req.path === "/tabs") {
         return {

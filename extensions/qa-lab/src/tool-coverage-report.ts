@@ -285,10 +285,10 @@ export function buildQaToolCoverageReport(params: {
     reportOnlyTools: rows.filter((row) => !row.required || Boolean(row.tracking)).length,
     trackedTools: rows.filter((row) => Boolean(row.tracking)).length,
     nativeWorkspaceTools: rows.filter((row) => row.bucket === "codex-native-workspace").length,
-    dynamicIntegrationTools: rows.filter((row) => row.bucket === "openclaw-dynamic-integration")
+    dynamicIntegrationTools: rows.filter((row) => row.bucket === "recall-dynamic-integration")
       .length,
     searchableDynamicTools: rows.filter(
-      (row) => row.capabilityLayer === "openclaw-dynamic-searchable",
+      (row) => row.capabilityLayer === "recall-dynamic-searchable",
     ).length,
     optionalTools: rows.filter((row) => row.bucket === "optional-profile-or-plugin").length,
     passingTools: evaluated
@@ -310,7 +310,7 @@ export function buildQaToolCoverageReport(params: {
 
 export function renderQaToolCoverageMarkdownReport(report: QaToolCoverageReport): string {
   const lines = [
-    `# OpenClaw Runtime Tool Coverage — ${report.runtimePair[0]} vs ${report.runtimePair[1]}`,
+    `# Recall Runtime Tool Coverage — ${report.runtimePair[0]} vs ${report.runtimePair[1]}`,
     "",
     `- Generated at: ${report.generatedAt}`,
     `- Mode: ${report.evaluated ? "runtime summary" : "catalog inventory"}`,
@@ -319,7 +319,7 @@ export function renderQaToolCoverageMarkdownReport(report: QaToolCoverageReport)
     `- Report-only tools: ${report.reportOnlyTools}`,
     `- Tracked issue rows: ${report.trackedTools}`,
     `- Codex-native workspace tools: ${report.nativeWorkspaceTools}`,
-    `- OpenClaw dynamic integration tools: ${report.dynamicIntegrationTools}`,
+    `- Recall dynamic integration tools: ${report.dynamicIntegrationTools}`,
     `- Searchable/deferred dynamic tools: ${report.searchableDynamicTools}`,
     `- Optional/profile/plugin-dependent tools: ${report.optionalTools}`,
     `- Passing tools: ${report.passingTools}`,

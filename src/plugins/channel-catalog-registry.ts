@@ -1,5 +1,5 @@
 import type { PluginInstallRecord } from "../config/types.plugins.js";
-import { discoverOpenClawPlugins, type PluginDiscoveryResult } from "./discovery.js";
+import { discoverRecallPlugins, type PluginDiscoveryResult } from "./discovery.js";
 import { shouldRejectHardlinkedPluginFiles } from "./hardlink-policy.js";
 import { loadInstalledPluginIndexInstallRecordsSync } from "./installed-plugin-index-record-reader.js";
 import {
@@ -37,7 +37,7 @@ export function listChannelCatalogEntries(
   const installRecords = resolveInstallRecords(params);
   const discovery =
     params.discovery ??
-    discoverOpenClawPlugins({
+    discoverRecallPlugins({
       workspaceDir: params.workspaceDir,
       env: params.env,
       ...(installRecords && Object.keys(installRecords).length > 0 ? { installRecords } : {}),

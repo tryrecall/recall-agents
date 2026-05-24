@@ -1,8 +1,8 @@
 {
-  "name": "@openclaw/qa-lab",
+  "name": "@recall/qa-lab",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw QA lab plugin with private debugger UI and scenario runner",
+  "description": "Recall QA lab plugin with private debugger UI and scenario runner",
   "type": "module",
   "dependencies": {
     "@copilotkit/aimock": "1.27.0",
@@ -12,21 +12,21 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/discord": "workspace:*",
-    "@openclaw/plugin-sdk": "workspace:*",
-    "@openclaw/slack": "workspace:*",
-    "@openclaw/whatsapp": "workspace:*",
-    "openclaw": "workspace:*"
+    "@recall/discord": "workspace:*",
+    "@recall/plugin-sdk": "workspace:*",
+    "@recall/slack": "workspace:*",
+    "@recall/whatsapp": "workspace:*",
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.5.22"
+    "recall": ">=2026.5.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],

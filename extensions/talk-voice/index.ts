@@ -1,12 +1,12 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import type { SpeechVoiceOption } from "openclaw/plugin-sdk/speech";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
+import type { SpeechVoiceOption } from "recall/plugin-sdk/speech";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
-import { resolveActiveTalkProviderConfig } from "openclaw/plugin-sdk/talk-config-runtime";
-import { definePluginEntry, type OpenClawPluginApi } from "./api.js";
+} from "recall/plugin-sdk/string-coerce-runtime";
+import { resolveActiveTalkProviderConfig } from "recall/plugin-sdk/talk-config-runtime";
+import { definePluginEntry, type RecallPluginApi } from "./api.js";
 
 function mask(s: string, keep: number = 6): string {
   const trimmed = s.trim();
@@ -121,7 +121,7 @@ export default definePluginEntry({
   id: "talk-voice",
   name: "Talk Voice",
   description: "Command helpers for managing Talk voice configuration",
-  register(api: OpenClawPluginApi) {
+  register(api: RecallPluginApi) {
     api.registerCommand({
       name: "voice",
       nativeNames: {
@@ -135,7 +135,7 @@ export default definePluginEntry({
         const tokens = args.split(/\s+/).filter(Boolean);
         const action = normalizeLowercaseStringOrEmpty(tokens[0] ?? "status");
 
-        const cfg = api.runtime.config.current() as OpenClawConfig;
+        const cfg = api.runtime.config.current() as RecallConfig;
         const active = resolveActiveTalkProviderConfig(cfg.talk);
         if (!active) {
           return {

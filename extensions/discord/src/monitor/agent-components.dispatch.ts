@@ -1,14 +1,14 @@
-import { resolveHumanDelayConfig } from "openclaw/plugin-sdk/agent-runtime";
+import { resolveHumanDelayConfig } from "recall/plugin-sdk/agent-runtime";
 import {
   formatInboundEnvelope,
   resolveEnvelopeFormatOptions,
-} from "openclaw/plugin-sdk/channel-inbound";
-import { isDangerousNameMatchingEnabled } from "openclaw/plugin-sdk/dangerous-name-runtime";
-import { runInboundReplyTurn } from "openclaw/plugin-sdk/inbound-reply-dispatch";
-import { logError } from "openclaw/plugin-sdk/logging-core";
-import { resolveMarkdownTableMode } from "openclaw/plugin-sdk/markdown-table-runtime";
-import { getAgentScopedMediaLocalRoots } from "openclaw/plugin-sdk/media-runtime";
-import { createNonExitingRuntime, logVerbose } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/channel-inbound";
+import { isDangerousNameMatchingEnabled } from "recall/plugin-sdk/dangerous-name-runtime";
+import { runInboundReplyTurn } from "recall/plugin-sdk/inbound-reply-dispatch";
+import { logError } from "recall/plugin-sdk/logging-core";
+import { resolveMarkdownTableMode } from "recall/plugin-sdk/markdown-table-runtime";
+import { getAgentScopedMediaLocalRoots } from "recall/plugin-sdk/media-runtime";
+import { createNonExitingRuntime, logVerbose } from "recall/plugin-sdk/runtime-env";
 import { resolveDiscordMaxLinesPerMessage } from "../accounts.js";
 import { createDiscordRestClient } from "../client.js";
 import { resolveDiscordConversationIdentity } from "../conversation-identity.js";

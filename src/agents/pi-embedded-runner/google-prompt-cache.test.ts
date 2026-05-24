@@ -212,7 +212,7 @@ describe("google prompt cache", () => {
         id: "entry-1",
         parentId: null,
         timestamp: new Date(1_000).toISOString(),
-        customType: "openclaw.google-prompt-cache",
+        customType: "recall.google-prompt-cache",
         data: {
           status: "ready",
           timestamp: now,
@@ -320,7 +320,7 @@ describe("google prompt cache", () => {
         parentId: null,
         timestamp: new Date(now - 5_000).toISOString(),
         type: "custom",
-        customType: "openclaw.google-prompt-cache",
+        customType: "recall.google-prompt-cache",
         data: {
           status: "ready",
           timestamp: now - 5_000,

@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/diffs",
+  "name": "@recall/diffs",
   "version": "2026.5.22",
-  "description": "OpenClaw diff viewer plugin",
+  "description": "Recall diff viewer plugin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/tryrecall/recall-agents"
   },
   "type": "module",
   "scripts": {
@@ -18,14 +18,14 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "npmSpec": "@openclaw/diffs",
+      "npmSpec": "@recall/diffs",
       "localPath": "extensions/diffs",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.30"

@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { resolveCliRuntimeExecutionProvider } from "./model-runtime-aliases.js";
 
 function createAnthropicAuthConfig(params: {
   order?: string[];
-  models?: NonNullable<NonNullable<OpenClawConfig["agents"]>["defaults"]>["models"];
-}): OpenClawConfig {
+  models?: NonNullable<NonNullable<RecallConfig["agents"]>["defaults"]>["models"];
+}): RecallConfig {
   return {
     auth: {
       order: params.order ? { anthropic: params.order } : undefined,
@@ -19,7 +19,7 @@ function createAnthropicAuthConfig(params: {
         models: params.models,
       },
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
 describe("resolveCliRuntimeExecutionProvider", () => {

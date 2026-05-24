@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveOAuthDir } from "../../config/paths.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { captureEnv } from "../../test-utils/env.js";
 import { testing as externalAuthTesting } from "./external-auth.js";
@@ -37,11 +37,11 @@ function createCredential(overrides: Partial<OAuthCredential> = {}): OAuthCreden
 
 const tempDirs: string[] = [];
 const envSnapshot = captureEnv([
-  "OPENCLAW_STATE_DIR",
-  "OPENCLAW_AGENT_DIR",
+  "RECALL_STATE_DIR",
+  "RECALL_AGENT_DIR",
   "PI_CODING_AGENT_DIR",
-  "OPENCLAW_OAUTH_DIR",
-  "OPENCLAW_AUTH_PROFILE_SECRET_KEY",
+  "RECALL_OAUTH_DIR",
+  "RECALL_AUTH_PROFILE_SECRET_KEY",
 ]);
 
 beforeEach(() => {
@@ -275,7 +275,7 @@ describe("createOAuthManager", () => {
           "openai-codex": { auth: "oauth", baseUrl: "", models: [] },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies RecallConfig;
     const buildApiKey = vi.fn(async (_provider, value: OAuthCredential) => value.access);
     const manager = createOAuthManager({
       buildApiKey,
@@ -309,10 +309,10 @@ describe("createOAuthManager", () => {
   it("does not overlay external auth while checking main-store adoption", async () => {
     const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "oauth-manager-main-adopt-"));
     tempDirs.push(tempRoot);
-    process.env.OPENCLAW_STATE_DIR = tempRoot;
+    process.env.RECALL_STATE_DIR = tempRoot;
     const mainAgentDir = path.join(tempRoot, "agents", "main", "agent");
     const agentDir = path.join(tempRoot, "agents", "sub", "agent");
-    process.env.OPENCLAW_AGENT_DIR = mainAgentDir;
+    process.env.RECALL_AGENT_DIR = mainAgentDir;
     process.env.PI_CODING_AGENT_DIR = mainAgentDir;
     await fs.mkdir(agentDir, { recursive: true });
     await fs.mkdir(mainAgentDir, { recursive: true });
@@ -396,10 +396,10 @@ describe("createOAuthManager", () => {
   it("refreshes with the adopted external oauth credential", async () => {
     const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "oauth-manager-refresh-"));
     tempDirs.push(tempRoot);
-    process.env.OPENCLAW_STATE_DIR = tempRoot;
+    process.env.RECALL_STATE_DIR = tempRoot;
     const mainAgentDir = path.join(tempRoot, "agents", "main", "agent");
     const agentDir = path.join(tempRoot, "agents", "sub", "agent");
-    process.env.OPENCLAW_AGENT_DIR = mainAgentDir;
+    process.env.RECALL_AGENT_DIR = mainAgentDir;
     process.env.PI_CODING_AGENT_DIR = mainAgentDir;
     await fs.mkdir(agentDir, { recursive: true });
     await fs.mkdir(mainAgentDir, { recursive: true });
@@ -460,13 +460,13 @@ describe("createOAuthManager", () => {
   it("refreshes legacy oauthRef sidecar credentials and writes rotated tokens inline", async () => {
     const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "oauth-manager-legacy-ref-"));
     tempDirs.push(tempRoot);
-    process.env.OPENCLAW_STATE_DIR = tempRoot;
-    process.env.OPENCLAW_OAUTH_DIR = path.join(tempRoot, "credentials");
-    process.env.OPENCLAW_AUTH_PROFILE_SECRET_KEY = "legacy-seed";
+    process.env.RECALL_STATE_DIR = tempRoot;
+    process.env.RECALL_OAUTH_DIR = path.join(tempRoot, "credentials");
+    process.env.RECALL_AUTH_PROFILE_SECRET_KEY = "legacy-seed";
     const agentDir = path.join(tempRoot, "agents", "main", "agent");
     const profileId = "openai-codex:default";
     const ref = {
-      source: "openclaw-credentials" as const,
+      source: "recall-credentials" as const,
       provider: "openai-codex" as const,
       id: "0123456789abcdef0123456789abcdef",
     };
@@ -558,7 +558,7 @@ describe("createOAuthManager", () => {
   it("skips the refresh adapter when the credential has no refresh token", async () => {
     const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "oauth-manager-no-refresh-"));
     tempDirs.push(tempRoot);
-    process.env.OPENCLAW_STATE_DIR = tempRoot;
+    process.env.RECALL_STATE_DIR = tempRoot;
     const agentDir = path.join(tempRoot, "agents", "main", "agent");
     await fs.mkdir(agentDir, { recursive: true });
     const profileId = "openai-codex:default";
@@ -601,7 +601,7 @@ describe("createOAuthManager", () => {
   it("redacts the external oauth credential attempted during refresh failures", async () => {
     const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "oauth-manager-refresh-redact-"));
     tempDirs.push(tempRoot);
-    process.env.OPENCLAW_STATE_DIR = tempRoot;
+    process.env.RECALL_STATE_DIR = tempRoot;
     const agentDir = path.join(tempRoot, "agents", "sub", "agent");
     await fs.mkdir(agentDir, { recursive: true });
     const profileId = "minimax-portal:default";

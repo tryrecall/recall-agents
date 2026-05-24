@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 
 const loadManifestMetadataSnapshotMock = vi.hoisted(() => vi.fn());
 const getCurrentPluginMetadataSnapshotMock = vi.hoisted(() => vi.fn());
@@ -53,7 +53,7 @@ describe("configured model manifest workspace scope", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     expect(buildConfiguredModelCatalog({ cfg })).toMatchObject([
       {
@@ -78,7 +78,7 @@ describe("configured model manifest workspace scope", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     expect(buildConfiguredModelCatalog({ cfg, workspaceDir: "/workspace/a" })).toMatchObject([
       {
@@ -117,7 +117,7 @@ describe("configured model manifest workspace scope", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     expect(buildConfiguredModelCatalog({ cfg })).toMatchObject([
       {

@@ -1,6 +1,6 @@
-export { resolvePreferredOpenClawTmpDir, withTempWorkspace } from "./src/runtime-api.js";
+export { resolvePreferredRecallTmpDir, withTempWorkspace } from "./src/runtime-api.js";
 export {
   definePluginEntry,
   type AnyAgentTool,
-  type OpenClawPluginApi,
-} from "openclaw/plugin-sdk/plugin-entry";
+  type RecallPluginApi,
+} from "recall/plugin-sdk/plugin-entry";

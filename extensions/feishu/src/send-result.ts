@@ -2,7 +2,7 @@ import {
   createMessageReceiptFromOutboundResults,
   type MessageReceipt,
   type MessageReceiptPartKind,
-} from "openclaw/plugin-sdk/channel-message";
+} from "recall/plugin-sdk/channel-message";
 
 type FeishuMessageApiResponse = {
   code?: number;

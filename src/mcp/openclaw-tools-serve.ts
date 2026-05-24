@@ -1,8 +1,8 @@
 /**
- * Standalone MCP server for selected built-in OpenClaw tools.
+ * Standalone MCP server for selected built-in Recall tools.
  *
- * Run via: node --import tsx src/mcp/openclaw-tools-serve.ts
- * Or: bun src/mcp/openclaw-tools-serve.ts
+ * Run via: node --import tsx src/mcp/recall-tools-serve.ts
+ * Or: bun src/mcp/recall-tools-serve.ts
  */
 import { pathToFileURL } from "node:url";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -11,27 +11,27 @@ import { createCronTool } from "../agents/tools/cron-tool.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { connectToolsMcpServerToStdio, createToolsMcpServer } from "./tools-stdio-server.js";
 
-export function resolveOpenClawToolsForMcp(): AnyAgentTool[] {
+export function resolveRecallToolsForMcp(): AnyAgentTool[] {
   return [createCronTool()];
 }
 
-function createOpenClawToolsMcpServer(
+function createRecallToolsMcpServer(
   params: {
     tools?: AnyAgentTool[];
   } = {},
 ): Server {
-  const tools = params.tools ?? resolveOpenClawToolsForMcp();
-  return createToolsMcpServer({ name: "openclaw-tools", tools });
+  const tools = params.tools ?? resolveRecallToolsForMcp();
+  return createToolsMcpServer({ name: "recall-tools", tools });
 }
 
-async function serveOpenClawToolsMcp(): Promise<void> {
-  const server = createOpenClawToolsMcpServer();
+async function serveRecallToolsMcp(): Promise<void> {
+  const server = createRecallToolsMcpServer();
   await connectToolsMcpServerToStdio(server);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  serveOpenClawToolsMcp().catch((err) => {
-    process.stderr.write(`openclaw-tools-serve: ${formatErrorMessage(err)}\n`);
+  serveRecallToolsMcp().catch((err) => {
+    process.stderr.write(`recall-tools-serve: ${formatErrorMessage(err)}\n`);
     process.exit(1);
   });
 }

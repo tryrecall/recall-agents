@@ -6,13 +6,13 @@ import {
   die,
   ensureValue,
   makeTempDir,
-  packOpenClaw,
+  packRecall,
   parsePlatformList,
   parseProvider,
   repoRoot,
   resolveHostIp,
   resolveLatestVersion,
-  resolveOpenClawRegistryVersion,
+  resolveRecallRegistryVersion,
   resolveProviderAuth,
   resolveWindowsProviderAuth,
   run,
@@ -95,14 +95,14 @@ interface NpmUpdateSummary {
 const macosVm = "macOS Tahoe";
 const windowsVm = "Windows 11";
 const linuxVmDefault = "Ubuntu 24.04.3 ARM64";
-const updateTimeoutSeconds = Number(process.env.OPENCLAW_PARALLELS_NPM_UPDATE_TIMEOUT_S || 1200);
+const updateTimeoutSeconds = Number(process.env.RECALL_PARALLELS_NPM_UPDATE_TIMEOUT_S || 1200);
 
 function usage(): string {
   return `Usage: bash scripts/e2e/parallels-npm-update-smoke.sh [options]
 
 Options:
-  --package-spec <npm-spec>  Baseline npm package spec. Default: openclaw@latest
-  --update-target <target>    Target passed to guest 'openclaw update --tag'.
+  --package-spec <npm-spec>  Baseline npm package spec. Default: recall@latest
+  --update-target <target>    Target passed to guest 'recall update --tag'.
                              Default: host-served tgz packed from current checkout.
   --fresh-target <npm-spec>   Also run fresh install smoke for this package after update lanes.
   --beta-validation [target]  Resolve a beta tag/alias/version, then run latest->target update
@@ -248,11 +248,11 @@ class NpmUpdateSmoke {
 
   async run(): Promise<void> {
     this.startedAt = Date.now();
-    this.runDir = await makeTempDir("openclaw-parallels-npm-update.");
-    this.tgzDir = await makeTempDir("openclaw-parallels-npm-update-tgz.");
+    this.runDir = await makeTempDir("recall-parallels-npm-update.");
+    this.tgzDir = await makeTempDir("recall-parallels-npm-update-tgz.");
     try {
       this.latestVersion = resolveLatestVersion();
-      this.packageSpec = this.options.packageSpec || `openclaw@${this.latestVersion}`;
+      this.packageSpec = this.options.packageSpec || `recall@${this.latestVersion}`;
       this.currentHead = run("git", ["rev-parse", "HEAD"], { quiet: true }).stdout.trim();
       this.currentHeadShort = run("git", ["rev-parse", "--short=7", "HEAD"], {
         quiet: true,
@@ -271,7 +271,7 @@ class NpmUpdateSmoke {
       await this.runFreshBaselines();
 
       await this.prepareUpdateTarget();
-      say(`Run same-guest openclaw update to ${this.updateTargetEffective}`);
+      say(`Run same-guest recall update to ${this.updateTargetEffective}`);
       await this.runSameGuestUpdates();
 
       if (this.freshTargetSpec) {
@@ -303,7 +303,7 @@ class NpmUpdateSmoke {
     if (this.options.platforms.has("linux")) {
       jobs.push(
         this.spawnFresh("Linux", "linux", ["--vm", this.linuxVm], {
-          OPENCLAW_PARALLELS_LINUX_DISABLE_BONJOUR: "1",
+          RECALL_PARALLELS_LINUX_DISABLE_BONJOUR: "1",
         }),
       );
     }
@@ -337,7 +337,7 @@ class NpmUpdateSmoke {
           "linux",
           ["--vm", this.linuxVm],
           {
-            OPENCLAW_PARALLELS_LINUX_DISABLE_BONJOUR: "1",
+            RECALL_PARALLELS_LINUX_DISABLE_BONJOUR: "1",
           },
           this.freshTargetSpec,
           "fresh-target",
@@ -408,7 +408,7 @@ class NpmUpdateSmoke {
 
   private async prepareUpdateTarget(): Promise<void> {
     if (!this.options.updateTarget || this.options.updateTarget === "local-main") {
-      this.artifact = await packOpenClaw({
+      this.artifact = await packRecall({
         destination: this.tgzDir,
         requireControlUi: true,
       });
@@ -430,7 +430,7 @@ class NpmUpdateSmoke {
     this.updateTargetEffective = this.options.updateTarget;
     this.updateExpectedNeedle = this.isExplicitPackageTarget(this.updateTargetEffective)
       ? ""
-      : resolveOpenClawRegistryVersion(this.updateTargetEffective) || this.updateTargetEffective;
+      : resolveRecallRegistryVersion(this.updateTargetEffective) || this.updateTargetEffective;
     const metadata = this.resolveRegistryPackageMetadata(this.updateTargetEffective);
     this.updateTargetPackageVersion = metadata.version;
     this.updateTargetBuildCommit =
@@ -469,7 +469,7 @@ class NpmUpdateSmoke {
     if (this.isExplicitPackageTarget(target)) {
       return { gitHead: "", tarball: "", version: "" };
     }
-    const spec = target.startsWith("openclaw@") ? target : `openclaw@${target}`;
+    const spec = target.startsWith("recall@") ? target : `recall@${target}`;
     const output = run("npm", ["view", spec, "version", "dist.tarball", "gitHead", "--json"], {
       check: false,
       quiet: true,
@@ -667,7 +667,7 @@ class NpmUpdateSmoke {
     const scriptPath = this.writeGuestScript(
       macosVm,
       script,
-      "openclaw-parallels-npm-update-macos",
+      "recall-parallels-npm-update-macos",
     );
     const macosExecArgs = this.resolveMacosUpdateExecArgs(ctx);
     const sudoUserArgIndex = macosExecArgs.indexOf("-u");
@@ -801,7 +801,7 @@ class NpmUpdateSmoke {
     const scriptPath = this.writeGuestScript(
       this.linuxVm,
       script,
-      "openclaw-parallels-npm-update-linux",
+      "recall-parallels-npm-update-linux",
     );
     try {
       const status = await this.runStreamingToJobLog(
@@ -811,7 +811,7 @@ class NpmUpdateSmoke {
           this.linuxVm,
           "/usr/bin/env",
           "HOME=/root",
-          "OPENCLAW_ALLOW_ROOT=1",
+          "RECALL_ALLOW_ROOT=1",
           "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/snap/bin",
           "bash",
           scriptPath,
@@ -908,11 +908,11 @@ class NpmUpdateSmoke {
     ) {
       return;
     }
-    const baseline = resolveOpenClawRegistryVersion(this.packageSpec);
-    const target = resolveOpenClawRegistryVersion(this.options.updateTarget);
+    const baseline = resolveRecallRegistryVersion(this.packageSpec);
+    const target = resolveRecallRegistryVersion(this.options.updateTarget);
     if (baseline && target && baseline === target) {
       die(
-        `--update-target ${this.options.updateTarget} resolves to openclaw@${target}, same as baseline ${this.packageSpec}; publish or choose a newer --update-target before running VM update coverage`,
+        `--update-target ${this.options.updateTarget} resolves to recall@${target}, same as baseline ${this.packageSpec}; publish or choose a newer --update-target before running VM update coverage`,
       );
     }
   }
@@ -926,7 +926,7 @@ class NpmUpdateSmoke {
 
   private async extractLastVersion(logPath: string): Promise<string> {
     const log = await readFile(logPath, "utf8").catch(() => "");
-    const matches = [...log.matchAll(/OpenClaw\s+([0-9][^\s]*)/gi)];
+    const matches = [...log.matchAll(/Recall\s+([0-9][^\s]*)/gi)];
     return matches.at(-1)?.[1] ?? "";
   }
 
@@ -950,27 +950,27 @@ class NpmUpdateSmoke {
 
   private configurePublishedTargets(): void {
     if (this.options.betaValidation) {
-      const version = resolveOpenClawRegistryVersion(this.options.betaValidation);
+      const version = resolveRecallRegistryVersion(this.options.betaValidation);
       if (!version) {
         die(`could not resolve beta validation target: ${this.options.betaValidation}`);
       }
       this.options.updateTarget = version;
-      this.options.freshTargetSpec = `openclaw@${version}`;
-      say(`Beta validation target: openclaw@${version}`);
+      this.options.freshTargetSpec = `recall@${version}`;
+      say(`Beta validation target: recall@${version}`);
     } else if (
       this.options.updateTarget &&
       this.options.updateTarget !== "local-main" &&
       !this.isExplicitPackageTarget(this.options.updateTarget)
     ) {
-      const version = resolveOpenClawRegistryVersion(this.options.updateTarget);
+      const version = resolveRecallRegistryVersion(this.options.updateTarget);
       if (version) {
         this.options.updateTarget = version;
       }
     }
 
     if (this.options.freshTargetSpec) {
-      const version = resolveOpenClawRegistryVersion(this.options.freshTargetSpec);
-      this.freshTargetSpec = version ? `openclaw@${version}` : this.options.freshTargetSpec;
+      const version = resolveRecallRegistryVersion(this.options.freshTargetSpec);
+      this.freshTargetSpec = version ? `recall@${version}` : this.options.freshTargetSpec;
     }
   }
 

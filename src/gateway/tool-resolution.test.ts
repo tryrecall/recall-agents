@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { resolveGatewayScopedTools } from "./tool-resolution.js";
 
 describe("resolveGatewayScopedTools", () => {
   beforeAll(() => {
     resolveGatewayScopedTools({
-      cfg: { tools: { profile: "minimal" } } as OpenClawConfig,
+      cfg: { tools: { profile: "minimal" } } as RecallConfig,
       sessionKey: "agent:main:telegram:group:-100123",
       messageProvider: "telegram",
       inboundEventKind: "room_event",
@@ -15,7 +15,7 @@ describe("resolveGatewayScopedTools", () => {
 
   it("force-allows the message tool for room-event loopback turns", () => {
     const result = resolveGatewayScopedTools({
-      cfg: { tools: { profile: "minimal" } } as OpenClawConfig,
+      cfg: { tools: { profile: "minimal" } } as RecallConfig,
       sessionKey: "agent:main:telegram:group:-100123",
       messageProvider: "telegram",
       inboundEventKind: "room_event",
@@ -30,7 +30,7 @@ describe("resolveGatewayScopedTools", () => {
 
   it("keeps ordinary loopback turns under the configured profile", () => {
     const result = resolveGatewayScopedTools({
-      cfg: { tools: { profile: "minimal" } } as OpenClawConfig,
+      cfg: { tools: { profile: "minimal" } } as RecallConfig,
       sessionKey: "agent:main:telegram:group:-100123",
       messageProvider: "telegram",
       inboundEventKind: "user_request",

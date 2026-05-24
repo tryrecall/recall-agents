@@ -1,12 +1,12 @@
 import { rm } from "node:fs/promises";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
 import {
   clearPluginInteractiveHandlers,
   registerPluginInteractiveHandler,
-} from "openclaw/plugin-sdk/plugin-runtime";
-import type { MsgContext } from "openclaw/plugin-sdk/reply-runtime";
-import { loadSessionStore } from "openclaw/plugin-sdk/session-store-runtime";
-import { mockPinnedHostnameResolution } from "openclaw/plugin-sdk/test-env";
+} from "recall/plugin-sdk/plugin-runtime";
+import type { MsgContext } from "recall/plugin-sdk/reply-runtime";
+import { loadSessionStore } from "recall/plugin-sdk/session-store-runtime";
+import { mockPinnedHostnameResolution } from "recall/plugin-sdk/test-env";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { TelegramInteractiveHandlerContext } from "./interactive-dispatch.js";
 const {
@@ -77,7 +77,7 @@ function waitForReplyCalls(count: number) {
 }
 
 async function loadEnvelopeTimestampHelpers() {
-  return await import("openclaw/plugin-sdk/channel-test-helpers");
+  return await import("recall/plugin-sdk/channel-test-helpers");
 }
 
 async function loadInboundContextContract() {
@@ -251,7 +251,7 @@ describe("createTelegramBot", () => {
     replySpy.mockClear();
     editMessageTextSpy.mockClear();
 
-    const storePath = `/tmp/openclaw-telegram-callback-authz-${process.pid}-${Date.now()}.json`;
+    const storePath = `/tmp/recall-telegram-callback-authz-${process.pid}-${Date.now()}.json`;
 
     await rm(storePath, { force: true });
     try {
@@ -319,7 +319,7 @@ describe("createTelegramBot", () => {
     replySpy.mockClear();
     editMessageTextSpy.mockClear();
 
-    const storePath = `/tmp/openclaw-telegram-group-model-authz-${process.pid}-${Date.now()}.json`;
+    const storePath = `/tmp/recall-telegram-group-model-authz-${process.pid}-${Date.now()}.json`;
 
     await rm(storePath, { force: true });
     try {
@@ -392,7 +392,7 @@ describe("createTelegramBot", () => {
     replySpy.mockClear();
     editMessageTextSpy.mockClear();
 
-    const storePath = `/tmp/openclaw-telegram-group-model-authz-runtime-${process.pid}-${Date.now()}.json`;
+    const storePath = `/tmp/recall-telegram-group-model-authz-runtime-${process.pid}-${Date.now()}.json`;
 
     await rm(storePath, { force: true });
     try {
@@ -1184,8 +1184,8 @@ describe("createTelegramBot", () => {
     editMessageTextSpy.mockClear();
 
     const modelId = "us.anthropic.claude-3-5-sonnet-20240620-v1:0";
-    const storePath = `/tmp/openclaw-telegram-model-compact-${process.pid}-${Date.now()}.json`;
-    const config: OpenClawConfig = {
+    const storePath = `/tmp/recall-telegram-model-compact-${process.pid}-${Date.now()}.json`;
+    const config: RecallConfig = {
       agents: {
         defaults: {
           model: `bedrock/${modelId}`,
@@ -1331,8 +1331,8 @@ describe("createTelegramBot", () => {
     replySpy.mockClear();
     editMessageTextSpy.mockClear();
 
-    const storePath = `/tmp/openclaw-telegram-model-default-${process.pid}-${Date.now()}.json`;
-    const config: OpenClawConfig = {
+    const storePath = `/tmp/recall-telegram-model-default-${process.pid}-${Date.now()}.json`;
+    const config: RecallConfig = {
       agents: {
         defaults: {
           model: "claude-opus-4-6",
@@ -1404,7 +1404,7 @@ describe("createTelegramBot", () => {
     replySpy.mockClear();
     editMessageTextSpy.mockClear();
 
-    const storePath = `/tmp/openclaw-telegram-model-html-${process.pid}-${Date.now()}.json`;
+    const storePath = `/tmp/recall-telegram-model-html-${process.pid}-${Date.now()}.json`;
 
     await rm(storePath, { force: true });
     try {
@@ -1466,7 +1466,7 @@ describe("createTelegramBot", () => {
       expect(editCall[0]).toBe(1234);
       expect(editCall[1]).toBe(17);
       expect(editCall[2]).toBe(
-        `${CHECK_MARK_EMOJI} Model changed to <b>openai/gpt-5.4</b>\n\nSession-only model selection. Runtime unchanged. Use /model openai/gpt-5.4 --runtime &lt;runtime&gt; to switch harnesses. The agent default in openclaw.json is unchanged; /reset or a new session may return to that default.`,
+        `${CHECK_MARK_EMOJI} Model changed to <b>openai/gpt-5.4</b>\n\nSession-only model selection. Runtime unchanged. Use /model openai/gpt-5.4 --runtime &lt;runtime&gt; to switch harnesses. The agent default in recall.json is unchanged; /reset or a new session may return to that default.`,
       );
       expect(requireRecord(editCall[3], "edit params").parse_mode).toBe("HTML");
 
@@ -1488,7 +1488,7 @@ describe("createTelegramBot", () => {
     replySpy.mockClear();
     editMessageTextSpy.mockClear();
 
-    const storePath = `/tmp/openclaw-telegram-model-fresh-cfg-${process.pid}-${Date.now()}.json`;
+    const storePath = `/tmp/recall-telegram-model-fresh-cfg-${process.pid}-${Date.now()}.json`;
 
     await rm(storePath, { force: true });
     try {
@@ -2156,7 +2156,7 @@ describe("createTelegramBot", () => {
             message_id: 101,
             text: "Done, here is the image",
             date: 1736380700,
-            from: { id: 999, is_bot: true, first_name: "OpenClaw" },
+            from: { id: 999, is_bot: true, first_name: "Recall" },
             photo: [{ file_id: "generated-photo-1" }],
           },
         },
@@ -2205,7 +2205,7 @@ describe("createTelegramBot", () => {
     };
     expect(payload.ReplyChain?.map((entry) => entry.messageId)).toEqual(["102", "101"]);
     expect(payload.ReplyChain?.[1]).toMatchObject({
-      sender: "OpenClaw",
+      sender: "Recall",
       body: "Done, here is the image",
       mediaRef: "telegram:file/generated-photo-1",
     });
@@ -2221,7 +2221,7 @@ describe("createTelegramBot", () => {
     );
     const messagesById = new Map(messages.map((message) => [message.message_id, message]));
     expect(messagesById.get("101")).toMatchObject({
-      sender: "OpenClaw",
+      sender: "Recall",
       body: "Done, here is the image",
       media_ref: "telegram:file/generated-photo-1",
       is_reply_target: true,
@@ -2582,7 +2582,7 @@ describe("createTelegramBot", () => {
         reply_to_message: {
           message_id: 42,
           text: "original reply",
-          from: { id: 999, first_name: "OpenClaw" },
+          from: { id: 999, first_name: "Recall" },
         },
       },
       me: { id: 999, username: "openclaw_bot" },

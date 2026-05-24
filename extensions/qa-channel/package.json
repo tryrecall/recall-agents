@@ -1,8 +1,8 @@
 {
-  "name": "@openclaw/qa-channel",
+  "name": "@recall/qa-channel",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw QA synthetic channel plugin",
+  "description": "Recall QA synthetic channel plugin",
   "type": "module",
   "exports": {
     ".": "./index.ts",
@@ -15,18 +15,18 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*",
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.5.22"
+    "recall": ">=2026.5.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
@@ -38,7 +38,7 @@
       "detailLabel": "QA Channel",
       "docsPath": "/channels/qa-channel",
       "docsLabel": "qa-channel",
-      "blurb": "Synthetic Slack-class transport for automated OpenClaw QA scenarios.",
+      "blurb": "Synthetic Slack-class transport for automated Recall QA scenarios.",
       "systemImage": "checklist",
       "order": 999,
       "exposure": {

@@ -1,21 +1,21 @@
 ---
-summary: "Run the OpenClaw Gateway on EasyRunner with Podman and Caddy"
+summary: "Run the Recall Gateway on EasyRunner with Podman and Caddy"
 read_when:
-  - Deploying OpenClaw on EasyRunner
+  - Deploying Recall on EasyRunner
   - Running the Gateway behind EasyRunner's Caddy proxy
   - Choosing persistent volumes and auth for a hosted Gateway
 title: "EasyRunner"
 ---
 
-EasyRunner can host the OpenClaw Gateway as a small containerized app behind its
+EasyRunner can host the Recall Gateway as a small containerized app behind its
 Caddy proxy. This guide assumes an EasyRunner host that runs Podman-compatible
 Compose apps and exposes HTTPS through Caddy.
 
 ## Before you begin
 
 - An EasyRunner server with a domain routed to it.
-- A built or published OpenClaw container image.
-- A persistent config volume for `/home/node/.openclaw`.
+- A built or published Recall container image.
+- A persistent config volume for `/home/node/.recall`.
 - A persistent workspace volume for `/workspace`.
 - A strong Gateway token or password.
 
@@ -29,33 +29,33 @@ Create an EasyRunner app with a Compose file shaped like this:
 
 ```yaml
 services:
-  openclaw:
-    image: ghcr.io/openclaw/openclaw:latest
+  recall:
+    image: ghcr.io/tryrecall/recall-agents:latest
     restart: unless-stopped
     environment:
-      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
-      OPENCLAW_HOME: /home/node
-      OPENCLAW_STATE_DIR: /home/node/.openclaw
-      OPENCLAW_CONFIG_PATH: /home/node/.openclaw/openclaw.json
-      OPENCLAW_WORKSPACE_DIR: /workspace
+      RECALL_GATEWAY_TOKEN: ${RECALL_GATEWAY_TOKEN}
+      RECALL_HOME: /home/node
+      RECALL_STATE_DIR: /home/node/.recall
+      RECALL_CONFIG_PATH: /home/node/.tryrecall/recall-agents.json
+      RECALL_WORKSPACE_DIR: /workspace
     volumes:
-      - openclaw-config:/home/node/.openclaw
-      - openclaw-workspace:/workspace
+      - recall-config:/home/node/.recall
+      - recall-workspace:/workspace
     labels:
-      caddy: openclaw.example.com
+      caddy: recall.example.com
       caddy.reverse_proxy: "{{upstreams 1455}}"
-    command: ["openclaw", "gateway", "--bind", "lan", "--port", "1455"]
+    command: ["recall", "gateway", "--bind", "lan", "--port", "1455"]
 
 volumes:
-  openclaw-config:
-  openclaw-workspace:
+  recall-config:
+  recall-workspace:
 ```
 
-Replace `openclaw.example.com` with your Gateway hostname. Store
-`OPENCLAW_GATEWAY_TOKEN` in EasyRunner's secret/environment manager instead of
+Replace `recall.example.com` with your Gateway hostname. Store
+`RECALL_GATEWAY_TOKEN` in EasyRunner's secret/environment manager instead of
 committing it to the app definition.
 
-## Configure OpenClaw
+## Configure Recall
 
 Inside the persistent config volume, keep the Gateway reachable only through
 the proxy and require auth:
@@ -66,7 +66,7 @@ the proxy and require auth:
     bind: "lan",
     port: 1455,
     auth: {
-      token: "${OPENCLAW_GATEWAY_TOKEN}",
+      token: "${RECALL_GATEWAY_TOKEN}",
     },
   },
 }
@@ -81,8 +81,8 @@ the exact proxy path rather than disabling auth checks globally. See
 From your workstation:
 
 ```bash
-openclaw gateway probe --url https://openclaw.example.com --token <token>
-openclaw gateway status --url https://openclaw.example.com --token <token>
+recall gateway probe --url https://recall.example.com --token <token>
+recall gateway status --url https://recall.example.com --token <token>
 ```
 
 From the EasyRunner host, check the app logs for a listening Gateway and no
@@ -90,10 +90,10 @@ startup SecretRef, plugin, or channel auth failures.
 
 ## Updates and backups
 
-- Pull or build the new OpenClaw image, then redeploy the EasyRunner app.
-- Back up the `openclaw-config` volume before updates.
-- Back up `openclaw-workspace` if agents write durable project data there.
-- Run `openclaw doctor` after major updates to catch config migrations and
+- Pull or build the new Recall image, then redeploy the EasyRunner app.
+- Back up the `recall-config` volume before updates.
+- Back up `recall-workspace` if agents write durable project data there.
+- Run `recall doctor` after major updates to catch config migrations and
   service warnings.
 
 ## Troubleshooting
@@ -103,7 +103,7 @@ startup SecretRef, plugin, or channel auth failures.
 - Auth fails: rotate the token in EasyRunner secrets and the local client
   command together.
 - Files are root-owned after restore: repair the mounted volumes so the
-  container user can write `/home/node/.openclaw` and `/workspace`.
+  container user can write `/home/node/.recall` and `/workspace`.
 - Browser or channel plugins fail: check whether the required external
   binaries, network egress, and mounted credentials are available inside the
   container.

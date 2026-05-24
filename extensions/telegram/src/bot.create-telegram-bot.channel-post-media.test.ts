@@ -470,7 +470,7 @@ describe("createTelegramBot channel_post media", () => {
           reply_to_message: {
             message_id: 99,
             text: "previous bot reply",
-            from: { id: 999, is_bot: true, first_name: "OpenClaw" },
+            from: { id: 999, is_bot: true, first_name: "Recall" },
           },
         },
         me: { id: 999, username: "openclaw_bot" },

@@ -32,8 +32,8 @@ import {
   normalizeStructuredPromptSection,
 } from "./prompt-cache-stability.js";
 import {
-  buildOpenClawToolFallbackText,
-  shouldRenderOpenClawToolWorkflowHints,
+  buildRecallToolFallbackText,
+  shouldRenderRecallToolWorkflowHints,
 } from "./prompt-surface.js";
 import { sanitizeForPromptLiteral } from "./sanitize-for-prompt.js";
 import { SYSTEM_PROMPT_CACHE_BOUNDARY } from "./system-prompt-cache-boundary.js";
@@ -527,7 +527,7 @@ function buildMessagingSection(params: {
     "- Cross-session messaging → use sessions_send(sessionKey, message)",
     subagentOrchestrationGuidance,
     completionEventGuidance,
-    "- Never use exec/curl for provider messaging; OpenClaw handles all routing internally.",
+    "- Never use exec/curl for provider messaging; Recall handles all routing internally.",
     params.availableTools.has("message")
       ? [
           "",
@@ -542,7 +542,7 @@ function buildMessagingSection(params: {
           messageToolOnly
             ? "- If you use `message` (`action=send`) to deliver visible output, do not repeat that visible content in your final answer."
             : suppressSilentTokenGuidance
-              ? "- Do not use `message(action=send)` to deliver the current source-channel reply; reply normally so OpenClaw can route it once."
+              ? "- Do not use `message(action=send)` to deliver the current source-channel reply; reply normally so Recall can route it once."
               : `- If you use \`message\` (\`action=send\`) to deliver your user-visible reply, respond with ONLY: ${SILENT_REPLY_TOKEN} (avoid duplicate replies).`,
           showGenericInlineButtonHint
             ? params.inlineButtonsEnabled
@@ -595,17 +595,17 @@ function buildDocsSection(params: {
   }
   const lines = [
     "## Documentation",
-    docsPath ? `Docs: ${docsPath}` : "Docs: https://docs.openclaw.ai",
-    docsPath ? "Mirror: https://docs.openclaw.ai" : undefined,
-    sourcePath ? `Source: ${sourcePath}` : "Source: https://github.com/openclaw/openclaw",
+    docsPath ? `Docs: ${docsPath}` : "Docs: https://docs.recall.ai",
+    docsPath ? "Mirror: https://docs.recall.ai" : undefined,
+    sourcePath ? `Source: ${sourcePath}` : "Source: https://github.com/tryrecall/recall-agents",
     docsPath
-      ? "OpenClaw behavior/config/architecture: read local docs first."
-      : "OpenClaw behavior/config/architecture: read docs mirror first.",
+      ? "Recall behavior/config/architecture: read local docs first."
+      : "Recall behavior/config/architecture: read docs mirror first.",
     "Config fields: use `gateway` action `config.schema.lookup`; broader config docs: `docs/gateway/configuration.md`, `docs/gateway/configuration-reference.md`.",
     sourcePath
       ? "If docs are stale/incomplete, inspect local source."
       : "If docs are stale/incomplete, inspect GitHub source.",
-    "Diagnosing issues: run `openclaw status` when possible; ask user only if blocked.",
+    "Diagnosing issues: run `recall status` when possible; ask user only if blocked.",
     "",
   ];
   return lines.filter((line): line is string => line !== undefined);
@@ -754,10 +754,10 @@ export function buildAgentSystemPrompt(params: {
     nodes: "List/describe/notify/camera/screen on paired nodes",
     cron: "Manage cron jobs and wake events (use for reminders; when scheduling a reminder, write the systemEvent text as something that will read like a reminder when it fires, and mention that it is a reminder depending on the time gap between setting and firing; include recent context in reminder text if appropriate)",
     message: "Send messages and channel actions",
-    gateway: "Restart, apply config, or run updates on the running OpenClaw process",
+    gateway: "Restart, apply config, or run updates on the running Recall process",
     agents_list: acpSpawnRuntimeEnabled
-      ? 'List OpenClaw agent ids allowed for sessions_spawn when runtime="subagent" (not ACP harness ids)'
-      : "List OpenClaw agent ids allowed for sessions_spawn",
+      ? 'List Recall agent ids allowed for sessions_spawn when runtime="subagent" (not ACP harness ids)'
+      : "List Recall agent ids allowed for sessions_spawn",
     sessions_list: "List other sessions (incl. sub-agents) with filters/last",
     sessions_history: "Fetch history for another session/sub-agent",
     sessions_send: "Send a message to another session/sub-agent",
@@ -845,7 +845,7 @@ export function buildAgentSystemPrompt(params: {
     const name = resolveToolName(tool);
     toolLines.push(summary ? `- ${name}: ${summary}` : `- ${name}`);
   }
-  const renderOpenClawToolWorkflowHints = shouldRenderOpenClawToolWorkflowHints({
+  const renderRecallToolWorkflowHints = shouldRenderRecallToolWorkflowHints({
     surface: promptSurface,
     hasToolList: toolLines.length > 0,
   });
@@ -952,7 +952,7 @@ export function buildAgentSystemPrompt(params: {
 
   // For "none" mode, return just the basic identity line
   if (promptMode === "none") {
-    return ["You are a personal assistant running inside OpenClaw.", modelIdentityLine]
+    return ["You are a personal assistant running inside Recall.", modelIdentityLine]
       .filter(Boolean)
       .join("\n");
   }
@@ -975,7 +975,7 @@ export function buildAgentSystemPrompt(params: {
     promptMode,
     promptSurface,
     toolLines,
-    renderOpenClawToolWorkflowHints,
+    renderRecallToolWorkflowHints,
     hasGateway,
     readToolName,
     execToolName,
@@ -1012,19 +1012,19 @@ export function buildAgentSystemPrompt(params: {
   });
   const stablePrefix = cacheStablePromptPrefix(stablePrefixCacheKey, () => {
     const lines = [
-      "You are a personal assistant running inside OpenClaw.",
+      "You are a personal assistant running inside Recall.",
       "",
       "## Tooling",
       "Available tools are policy-filtered. Names are case-sensitive; call exactly as listed.",
       toolLines.length > 0
         ? toolLines.join("\n")
-        : buildOpenClawToolFallbackText({
+        : buildRecallToolFallbackText({
             surface: promptSurface,
             execToolName,
             processToolName,
           }),
       "TOOLS.md is usage guidance, not availability.",
-      ...(renderOpenClawToolWorkflowHints
+      ...(renderRecallToolWorkflowHints
         ? [
             `For long waits, avoid rapid poll loops: use ${execToolName} with enough yieldMs or ${processToolName}(action=poll, timeout=<ms>).`,
             "Larger work: use `sessions_spawn`; completion is push-based.",
@@ -1048,7 +1048,7 @@ export function buildAgentSystemPrompt(params: {
               : []),
           ]
         : []),
-      ...(renderOpenClawToolWorkflowHints
+      ...(renderRecallToolWorkflowHints
         ? [
             availableTools.has("sessions_yield")
               ? "Do not poll `subagents list` / `sessions_list` in a loop; use `sessions_yield` when waiting for spawned sub-agent completion events, and check status only on-demand (for intervention, debugging, or when explicitly asked)."
@@ -1096,21 +1096,21 @@ export function buildAgentSystemPrompt(params: {
         fallback: [],
       }),
       ...safetySection,
-      "## OpenClaw Control",
+      "## Recall Control",
       "Do not invent commands.",
       "Config/restart: prefer `gateway` tool (`config.schema.lookup|get|patch|apply`, `restart`).",
-      "CLI lifecycle only on explicit user request: `openclaw gateway status|restart|start|stop`.",
+      "CLI lifecycle only on explicit user request: `recall gateway status|restart|start|stop`.",
       "`restart`, not stop+start.",
       "",
       ...skillsSection,
       ...memorySection,
-      hasGateway && !isMinimal ? "## OpenClaw Self-Update" : "",
+      hasGateway && !isMinimal ? "## Recall Self-Update" : "",
       hasGateway && !isMinimal
         ? [
             "Only explicit user request.",
             "Before config edits/questions: `config.schema.lookup` for the exact dot path.",
             "Actions: config.get, config.patch, config.apply, update.run. Config writes hot-reload when possible; restart when required.",
-            "After restart, OpenClaw pings the last active session automatically.",
+            "After restart, Recall pings the last active session automatically.",
           ].join("\n")
         : "",
       hasGateway && !isMinimal ? "" : "",
@@ -1203,7 +1203,7 @@ export function buildAgentSystemPrompt(params: {
       }),
       ...bootstrapSystemPromptSections,
       "## Workspace Files (injected)",
-      "These user-editable files are loaded by OpenClaw and included below in Project Context.",
+      "These user-editable files are loaded by Recall and included below in Project Context.",
       "",
       ...buildAssistantOutputDirectivesSection({ isMinimal, sourceMessageToolOnly }),
     ];

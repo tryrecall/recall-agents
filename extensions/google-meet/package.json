@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/google-meet",
+  "name": "@recall/google-meet",
   "version": "2026.5.22",
-  "description": "OpenClaw Google Meet participant plugin",
+  "description": "Recall Google Meet participant plugin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/tryrecall/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -12,23 +12,23 @@
     "typebox": "1.1.38"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*",
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.5.22"
+    "recall": ">=2026.5.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "npmSpec": "@openclaw/google-meet",
+      "npmSpec": "@recall/google-meet",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.20"
     },

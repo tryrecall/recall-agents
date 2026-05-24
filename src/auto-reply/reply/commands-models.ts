@@ -26,7 +26,7 @@ import { listOpenAIAuthProfileProvidersForAgentRuntime } from "../../agents/open
 import { resolveDefaultAgentWorkspaceDir } from "../../agents/workspace.js";
 import { getChannelPlugin } from "../../channels/plugins/index.js";
 import type { SessionEntry } from "../../config/sessions.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
@@ -92,7 +92,7 @@ function normalizeRuntimeChoiceId(runtime: string | undefined): string {
 }
 
 function buildRuntimeChoice(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   provider: string;
   runtime: string;
   cli?: boolean;
@@ -104,7 +104,7 @@ function buildRuntimeChoice(params: {
     label,
     description:
       id === "pi"
-        ? "Use the built-in OpenClaw Pi runtime."
+        ? "Use the built-in Recall Pi runtime."
         : params.cli
           ? `Run ${params.provider} models through ${label}.`
           : `Use the ${label} runtime selected by the effective harness policy.`,
@@ -112,7 +112,7 @@ function buildRuntimeChoice(params: {
 }
 
 function buildDefaultRuntimeChoice(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId?: string;
   provider: string;
   modelId?: string;
@@ -141,7 +141,7 @@ function addRuntimeChoice(
 }
 
 export async function buildModelsProviderData(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   agentId?: string,
   options: { view?: "default" | "all"; workspaceDir?: string } = {},
 ): Promise<ModelsProviderData> {
@@ -393,7 +393,7 @@ function parseModelsArgs(raw: string): ParsedModelsCommand {
 
 function resolveProviderLabel(params: {
   provider: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId?: string;
   agentDir?: string;
   workspaceDir?: string;
@@ -426,7 +426,7 @@ function resolveProviderLabel(params: {
 export function formatModelsAvailableHeader(params: {
   provider: string;
   total: number;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId?: string;
   agentDir?: string;
   workspaceDir?: string;
@@ -472,7 +472,7 @@ function buildProviderInfos(params: {
 }
 
 export async function resolveModelsCommandReply(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   commandBodyNormalized: string;
   surface?: string;
   currentModel?: string;

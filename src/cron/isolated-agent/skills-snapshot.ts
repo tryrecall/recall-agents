@@ -1,6 +1,6 @@
 import type { SkillSnapshot } from "../../agents/skills.js";
 import { matchesSkillFilter } from "../../agents/skills/filter.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { createLazyImportLoader } from "../../shared/lazy-promise.js";
 
 const skillsSnapshotRuntimeLoader = createLazyImportLoader(
@@ -13,7 +13,7 @@ async function loadSkillsSnapshotRuntime() {
 
 export async function resolveCronSkillsSnapshot(params: {
   workspaceDir: string;
-  config: OpenClawConfig;
+  config: RecallConfig;
   agentId: string;
   existingSnapshot?: SkillSnapshot;
   isFastTestEnv: boolean;

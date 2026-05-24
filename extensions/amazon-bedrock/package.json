@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/amazon-bedrock-provider",
+  "name": "@recall/amazon-bedrock-provider",
   "version": "2026.5.22",
-  "description": "OpenClaw Amazon Bedrock provider plugin",
+  "description": "Recall Amazon Bedrock provider plugin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/tryrecall/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -15,14 +15,14 @@
     "@smithy/shared-ini-file-loader": "4.5.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "npmSpec": "@openclaw/amazon-bedrock-provider",
+      "npmSpec": "@recall/amazon-bedrock-provider",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.5.12-beta.1"
     },

@@ -2,12 +2,12 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { SessionManager } from "@earendil-works/pi-coding-agent";
-import type { EmbeddedRunAttemptParams } from "openclaw/plugin-sdk/agent-harness";
-import { classifyEmbeddedPiRunResultForModelFallback } from "openclaw/plugin-sdk/agent-harness-runtime";
+import type { EmbeddedRunAttemptParams } from "recall/plugin-sdk/agent-harness";
+import { classifyEmbeddedPiRunResultForModelFallback } from "recall/plugin-sdk/agent-harness-runtime";
 import {
   createContractRunResult,
   OUTCOME_FALLBACK_RUNTIME_CONTRACT,
-} from "openclaw/plugin-sdk/agent-runtime-test-contracts";
+} from "recall/plugin-sdk/agent-runtime-test-contracts";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   CodexAppServerEventProjector,
@@ -24,7 +24,7 @@ type ProjectedAttemptResult = ReturnType<CodexAppServerEventProjector["buildResu
 type MirrorTaggedMessage = { __openclaw?: { mirrorIdentity?: string } };
 
 async function createParams(): Promise<EmbeddedRunAttemptParams> {
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-codex-outcome-contract-"));
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-codex-outcome-contract-"));
   tempDirs.add(tempDir);
   const sessionFile = path.join(tempDir, "session.jsonl");
   SessionManager.open(sessionFile);
@@ -101,7 +101,7 @@ afterEach(async () => {
 });
 
 describe("Outcome/fallback runtime contract - Codex app-server adapter", () => {
-  it("preserves an empty terminal turn for OpenClaw-owned fallback classification", async () => {
+  it("preserves an empty terminal turn for Recall-owned fallback classification", async () => {
     const projector = await createProjector();
     await projector.handleNotification(
       forCurrentTurn("turn/completed", {
@@ -141,7 +141,7 @@ describe("Outcome/fallback runtime contract - Codex app-server adapter", () => {
     expect(result.promptError).toBeNull();
   });
 
-  it("preserves reasoning-only terminal turns for OpenClaw-owned fallback classification", async () => {
+  it("preserves reasoning-only terminal turns for Recall-owned fallback classification", async () => {
     const projector = await createProjector();
     await projector.handleNotification(
       forCurrentTurn("item/reasoning/textDelta", {
@@ -201,7 +201,7 @@ describe("Outcome/fallback runtime contract - Codex app-server adapter", () => {
     expect(reasoningMessage.timestamp).toBeGreaterThan(0);
   });
 
-  it("preserves planning-only terminal turns for OpenClaw-owned fallback classification", async () => {
+  it("preserves planning-only terminal turns for Recall-owned fallback classification", async () => {
     const projector = await createProjector();
     await projector.handleNotification(
       forCurrentTurn("item/plan/delta", {

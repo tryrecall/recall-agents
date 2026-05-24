@@ -11,8 +11,8 @@ Adds web search provider support.
 
 ## Distribution
 
-- Package: `@openclaw/perplexity-plugin`
-- Install route: included in OpenClaw
+- Package: `@recall/perplexity-plugin`
+- Install route: included in Recall
 
 ## Surface
 

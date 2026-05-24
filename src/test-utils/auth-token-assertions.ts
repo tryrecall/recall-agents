@@ -1,10 +1,10 @@
 import { expect } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 
 export function expectGeneratedTokenPersistedToGatewayAuth(params: {
   generatedToken?: string;
   authToken?: string;
-  persistedConfig?: OpenClawConfig;
+  persistedConfig?: RecallConfig;
 }) {
   expect(params.generatedToken).toMatch(/^[0-9a-f]{48}$/);
   expect(params.authToken).toBe(params.generatedToken);

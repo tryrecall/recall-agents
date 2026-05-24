@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/twitch",
+  "name": "@recall/twitch",
   "version": "2026.5.22",
-  "description": "OpenClaw Twitch channel plugin",
+  "description": "Recall Twitch channel plugin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/tryrecall/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -14,15 +14,15 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
     "setupEntry": "./setup-entry.ts",
     "install": {
-      "npmSpec": "@openclaw/twitch",
+      "npmSpec": "@recall/twitch",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.10"
     },

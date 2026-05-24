@@ -1,16 +1,16 @@
 {
-  "name": "@openclaw/tavily-plugin",
+  "name": "@recall/tavily-plugin",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw Tavily plugin",
+  "description": "Recall Tavily plugin",
   "type": "module",
   "dependencies": {
     "typebox": "1.1.38"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

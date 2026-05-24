@@ -1,4 +1,4 @@
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { normalizeLowercaseStringOrEmpty } from "recall/plugin-sdk/string-coerce-runtime";
 
 export function normalizeSignalMessagingTarget(raw: string): string | undefined {
   const trimmed = raw.trim();

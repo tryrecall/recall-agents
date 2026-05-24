@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   findUnsupportedSchemaKeywords,
   GEMINI_UNSUPPORTED_SCHEMA_KEYWORDS,
@@ -15,10 +15,10 @@ import { createMockPluginRegistry } from "../plugins/hooks.test-helpers.js";
 import type { AuthProfileStore } from "./auth-profiles/types.js";
 import "./test-helpers/fast-bash-tools.js";
 import "./test-helpers/fast-coding-tools.js";
-import "./test-helpers/fast-openclaw-tools.js";
-import * as openClawPluginTools from "./openclaw-plugin-tools.js";
-import { createOpenClawTools } from "./openclaw-tools.js";
-import { createOpenClawCodingTools } from "./pi-tools.js";
+import "./test-helpers/fast-recall-tools.js";
+import * as openClawPluginTools from "./recall-plugin-tools.js";
+import { createRecallTools } from "./recall-tools.js";
+import { createRecallCodingTools } from "./pi-tools.js";
 import { createHostSandboxFsBridge } from "./test-helpers/host-sandbox-fs-bridge.js";
 import { expectReadWriteEditTools } from "./test-helpers/pi-tools-fs-helpers.js";
 import { createPiToolsSandboxContext } from "./test-helpers/pi-tools-sandbox-context.js";
@@ -75,7 +75,7 @@ async function writeSessionStore(
 }
 
 function createToolsForStoredSession(storeTemplate: string, sessionKey: string) {
-  return createOpenClawCodingTools({
+  return createRecallCodingTools({
     sessionKey,
     config: {
       session: {
@@ -92,7 +92,7 @@ function createToolsForStoredSession(storeTemplate: string, sessionKey: string) 
   });
 }
 
-function expectNoSubagentControlTools(tools: ReturnType<typeof createOpenClawCodingTools>) {
+function expectNoSubagentControlTools(tools: ReturnType<typeof createRecallCodingTools>) {
   const names = new Set(tools.map((tool) => tool.name));
   expect(names.has("sessions_spawn")).toBe(false);
   expect(names.has("sessions_list")).toBe(false);
@@ -105,14 +105,14 @@ function applyRuntimeToolsAllow<T extends { name: string }>(tools: T[], toolsAll
   return tools.filter((tool) => allowSet.has(normalizeToolName(tool.name)));
 }
 
-type OpenClawCodingTool = ReturnType<typeof createOpenClawCodingTools>[number];
-type OpenClawToolsOptions = NonNullable<Parameters<typeof createOpenClawTools>[0]>;
+type RecallCodingTool = ReturnType<typeof createRecallCodingTools>[number];
+type RecallToolsOptions = NonNullable<Parameters<typeof createRecallTools>[0]>;
 
 function toolNameList(tools: readonly { name: string }[]): string[] {
   return tools.map((tool) => tool.name);
 }
 
-function requireTool(tools: OpenClawCodingTool[], name: string): OpenClawCodingTool {
+function requireTool(tools: RecallCodingTool[], name: string): RecallCodingTool {
   const tool = tools.find((candidate) => candidate.name === name);
   if (!tool) {
     throw new Error(`expected ${name} tool`);
@@ -120,19 +120,19 @@ function requireTool(tools: OpenClawCodingTool[], name: string): OpenClawCodingT
   return tool;
 }
 
-function requireToolExecute(tool: OpenClawCodingTool): NonNullable<OpenClawCodingTool["execute"]> {
+function requireToolExecute(tool: RecallCodingTool): NonNullable<RecallCodingTool["execute"]> {
   if (!tool.execute) {
     throw new Error(`expected ${tool.name} tool execute`);
   }
   return tool.execute;
 }
 
-function latestCreateOpenClawToolsOptions(): OpenClawToolsOptions {
-  const calls = vi.mocked(createOpenClawTools).mock.calls;
+function latestCreateRecallToolsOptions(): RecallToolsOptions {
+  const calls = vi.mocked(createRecallTools).mock.calls;
   const lastCall = calls.at(-1);
   const options = lastCall?.[0];
   if (!options) {
-    throw new Error("expected createOpenClawTools call");
+    throw new Error("expected createRecallTools call");
   }
   return options;
 }
@@ -149,15 +149,15 @@ function expectListIncludes(
   }
 }
 
-describe("createOpenClawCodingTools", () => {
-  const testConfig: OpenClawConfig = {};
+describe("createRecallCodingTools", () => {
+  const testConfig: RecallConfig = {};
 
   afterEach(() => {
     resetGlobalHookRunner();
   });
 
   it("exposes gateway config and restart actions to owner sessions", () => {
-    const tools = createOpenClawCodingTools({ config: testConfig });
+    const tools = createRecallCodingTools({ config: testConfig });
     const gateway = requireTool(tools, "gateway");
 
     const parameters = gateway.parameters as {
@@ -173,7 +173,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("does not add Tool Search control tools from the shared factory by default", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       config: {
         tools: {
           toolSearch: true,
@@ -193,9 +193,9 @@ describe("createOpenClawCodingTools", () => {
     initializeGlobalHookRunner(
       createMockPluginRegistry([{ hookName: "before_tool_call", handler: beforeToolCall }]),
     );
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-hook-channel-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-hook-channel-"));
     await fs.writeFile(path.join(tmpDir, "note.txt"), "hello");
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       workspaceDir: tmpDir,
       currentChannelId: "telegram:-100123",
       hookChannelId: "-100123",
@@ -210,7 +210,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("adds PI Tool Search control tools when explicitly requested", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       includeToolSearchControls: true,
       config: {
         tools: {
@@ -227,7 +227,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("keeps PI Tool Search controls available under restrictive tool profiles", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       includeToolSearchControls: true,
       config: {
         tools: {
@@ -246,7 +246,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("keeps PI Tool Search controls available under restrictive tool allowlists", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       includeToolSearchControls: true,
       config: {
         tools: {
@@ -266,7 +266,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("lets explicit deny policies remove PI Tool Search controls", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       includeToolSearchControls: true,
       config: {
         tools: {
@@ -282,18 +282,18 @@ describe("createOpenClawCodingTools", () => {
     expect(names.has("read")).toBe(true);
   });
 
-  it("keeps PI Tool Search controls when core OpenClaw tools are not materialized", () => {
-    const createOpenClawToolsMock = vi.mocked(createOpenClawTools);
-    createOpenClawToolsMock.mockClear();
+  it("keeps PI Tool Search controls when core Recall tools are not materialized", () => {
+    const createRecallToolsMock = vi.mocked(createRecallTools);
+    createRecallToolsMock.mockClear();
 
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       includeCoreTools: false,
       includeToolSearchControls: true,
       toolConstructionPlan: {
         includeBaseCodingTools: false,
         includeShellTools: false,
         includeChannelTools: false,
-        includeOpenClawTools: false,
+        includeRecallTools: false,
         includePluginTools: true,
       },
       config: {
@@ -304,7 +304,7 @@ describe("createOpenClawCodingTools", () => {
     });
     const names = new Set(tools.map((tool) => tool.name));
 
-    expect(createOpenClawToolsMock).not.toHaveBeenCalled();
+    expect(createRecallToolsMock).not.toHaveBeenCalled();
     expect(names.has("tool_search_code")).toBe(true);
     expect(names.has("tool_search")).toBe(true);
     expect(names.has("tool_describe")).toBe(true);
@@ -314,7 +314,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("exposes control-plane tools to configured sessions", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       config: testConfig,
     });
     const names = new Set(tools.map((tool) => tool.name));
@@ -326,7 +326,7 @@ describe("createOpenClawCodingTools", () => {
 
   it("resolves isolated cron runtime toolsAllow", () => {
     const allowed = applyRuntimeToolsAllow(
-      createOpenClawCodingTools({
+      createRecallCodingTools({
         config: testConfig,
       }),
       ["cron"],
@@ -343,28 +343,28 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("uses runtime toolsAllow when materializing plugin tools", () => {
-    const createOpenClawToolsMock = vi.mocked(createOpenClawTools);
-    createOpenClawToolsMock.mockClear();
+    const createRecallToolsMock = vi.mocked(createRecallTools);
+    createRecallToolsMock.mockClear();
 
-    createOpenClawCodingTools({
+    createRecallCodingTools({
       config: testConfig,
       runtimeToolAllowlist: ["memory_search", "memory_get"],
     });
 
-    expect(createOpenClawToolsMock).toHaveBeenCalledTimes(1);
-    const options = latestCreateOpenClawToolsOptions();
+    expect(createRecallToolsMock).toHaveBeenCalledTimes(1);
+    const options = latestCreateRecallToolsOptions();
     expectListIncludes(options.pluginToolAllowlist, ["memory_search", "memory_get"]);
   });
 
   it("preserves runtime-allowed message through restrictive profiles", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       config: { tools: { profile: "minimal" } },
       runtimeToolAllowlist: ["message"],
       toolConstructionPlan: {
         includeBaseCodingTools: false,
         includeShellTools: false,
         includeChannelTools: false,
-        includeOpenClawTools: true,
+        includeRecallTools: true,
         includePluginTools: false,
       },
     });
@@ -373,15 +373,15 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("preserves runtime allowlist groups containing message through restrictive profiles", () => {
-    for (const runtimeToolAllowlist of [["group:messaging"], ["group:openclaw"], ["*"]]) {
-      const tools = createOpenClawCodingTools({
+    for (const runtimeToolAllowlist of [["group:messaging"], ["group:recall"], ["*"]]) {
+      const tools = createRecallCodingTools({
         config: { tools: { profile: "minimal" } },
         runtimeToolAllowlist,
         toolConstructionPlan: {
           includeBaseCodingTools: false,
           includeShellTools: false,
           includeChannelTools: false,
-          includeOpenClawTools: true,
+          includeRecallTools: true,
           includePluginTools: false,
         },
       });
@@ -390,37 +390,37 @@ describe("createOpenClawCodingTools", () => {
     }
   });
 
-  it("passes source reply delivery mode to OpenClaw tool construction", () => {
-    const createOpenClawToolsMock = vi.mocked(createOpenClawTools);
-    createOpenClawToolsMock.mockClear();
+  it("passes source reply delivery mode to Recall tool construction", () => {
+    const createRecallToolsMock = vi.mocked(createRecallTools);
+    createRecallToolsMock.mockClear();
 
-    createOpenClawCodingTools({
+    createRecallCodingTools({
       config: testConfig,
       forceMessageTool: true,
       sourceReplyDeliveryMode: "message_tool_only",
     });
 
-    expect(createOpenClawToolsMock).toHaveBeenCalledTimes(1);
-    expect(latestCreateOpenClawToolsOptions().sourceReplyDeliveryMode).toBe("message_tool_only");
+    expect(createRecallToolsMock).toHaveBeenCalledTimes(1);
+    expect(latestCreateRecallToolsOptions().sourceReplyDeliveryMode).toBe("message_tool_only");
   });
 
   it("skips unrelated tool families when construction is planned from a narrow allowlist", () => {
-    const createOpenClawToolsMock = vi.mocked(createOpenClawTools);
-    createOpenClawToolsMock.mockClear();
+    const createRecallToolsMock = vi.mocked(createRecallTools);
+    createRecallToolsMock.mockClear();
 
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       config: testConfig,
       toolConstructionPlan: {
         includeBaseCodingTools: true,
         includeShellTools: false,
         includeChannelTools: false,
-        includeOpenClawTools: false,
+        includeRecallTools: false,
         includePluginTools: false,
       },
     });
     const names = new Set(tools.map((tool) => tool.name));
 
-    expect(createOpenClawToolsMock).not.toHaveBeenCalled();
+    expect(createRecallToolsMock).not.toHaveBeenCalled();
     expect(names.has("read")).toBe(true);
     expect(names.has("write")).toBe(true);
     expect(names.has("edit")).toBe(true);
@@ -430,30 +430,30 @@ describe("createOpenClawCodingTools", () => {
     expect(names.has("message")).toBe(false);
   });
 
-  it("passes plugin suppression into OpenClaw tool construction plans", () => {
-    const createOpenClawToolsMock = vi.mocked(createOpenClawTools);
-    createOpenClawToolsMock.mockClear();
+  it("passes plugin suppression into Recall tool construction plans", () => {
+    const createRecallToolsMock = vi.mocked(createRecallTools);
+    createRecallToolsMock.mockClear();
 
-    createOpenClawCodingTools({
+    createRecallCodingTools({
       config: testConfig,
       toolConstructionPlan: {
         includeBaseCodingTools: false,
         includeShellTools: false,
         includeChannelTools: false,
-        includeOpenClawTools: true,
+        includeRecallTools: true,
         includePluginTools: false,
       },
     });
 
-    expect(createOpenClawToolsMock).toHaveBeenCalledTimes(1);
-    expect(latestCreateOpenClawToolsOptions().disablePluginTools).toBe(true);
+    expect(createRecallToolsMock).toHaveBeenCalledTimes(1);
+    expect(latestCreateRecallToolsOptions().disablePluginTools).toBe(true);
   });
 
-  it("keeps plugin-only construction off the OpenClaw core factory", () => {
-    const createOpenClawToolsMock = vi.mocked(createOpenClawTools);
-    createOpenClawToolsMock.mockClear();
+  it("keeps plugin-only construction off the Recall core factory", () => {
+    const createRecallToolsMock = vi.mocked(createRecallTools);
+    createRecallToolsMock.mockClear();
 
-    createOpenClawCodingTools({
+    createRecallCodingTools({
       config: testConfig,
       includeCoreTools: false,
       runtimeToolAllowlist: ["memory_search"],
@@ -461,23 +461,23 @@ describe("createOpenClawCodingTools", () => {
         includeBaseCodingTools: false,
         includeShellTools: false,
         includeChannelTools: false,
-        includeOpenClawTools: false,
+        includeRecallTools: false,
         includePluginTools: true,
       },
     });
 
-    expect(createOpenClawToolsMock).not.toHaveBeenCalled();
+    expect(createRecallToolsMock).not.toHaveBeenCalled();
   });
 
   it("forwards active model metadata to plugin-only tool construction", () => {
-    const createOpenClawToolsMock = vi.mocked(createOpenClawTools);
-    createOpenClawToolsMock.mockClear();
+    const createRecallToolsMock = vi.mocked(createRecallTools);
+    createRecallToolsMock.mockClear();
     const resolvePluginToolsSpy = vi
-      .spyOn(openClawPluginTools, "resolveOpenClawPluginToolsForOptions")
+      .spyOn(openClawPluginTools, "resolveRecallPluginToolsForOptions")
       .mockReturnValue([]);
 
     try {
-      createOpenClawCodingTools({
+      createRecallCodingTools({
         config: testConfig,
         includeCoreTools: false,
         runtimeToolAllowlist: ["memory_search"],
@@ -487,12 +487,12 @@ describe("createOpenClawCodingTools", () => {
           includeBaseCodingTools: false,
           includeShellTools: false,
           includeChannelTools: false,
-          includeOpenClawTools: false,
+          includeRecallTools: false,
           includePluginTools: true,
         },
       });
 
-      expect(createOpenClawToolsMock).not.toHaveBeenCalled();
+      expect(createRecallToolsMock).not.toHaveBeenCalled();
       expect(resolvePluginToolsSpy).toHaveBeenCalledTimes(1);
       const pluginToolOptions = resolvePluginToolsSpy.mock.calls[0]?.[0].options;
       expect(pluginToolOptions?.modelProvider).toBe("openrouter");
@@ -503,10 +503,10 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("forwards auth profiles to plugin-only tool construction", () => {
-    const createOpenClawToolsMock = vi.mocked(createOpenClawTools);
-    createOpenClawToolsMock.mockClear();
+    const createRecallToolsMock = vi.mocked(createRecallTools);
+    createRecallToolsMock.mockClear();
     const resolvePluginToolsSpy = vi
-      .spyOn(openClawPluginTools, "resolveOpenClawPluginToolsForOptions")
+      .spyOn(openClawPluginTools, "resolveRecallPluginToolsForOptions")
       .mockReturnValue([]);
     const authProfileStore = {
       version: 1,
@@ -523,7 +523,7 @@ describe("createOpenClawCodingTools", () => {
     } satisfies AuthProfileStore;
 
     try {
-      createOpenClawCodingTools({
+      createRecallCodingTools({
         config: {
           auth: {
             order: {
@@ -538,12 +538,12 @@ describe("createOpenClawCodingTools", () => {
           includeBaseCodingTools: false,
           includeShellTools: false,
           includeChannelTools: false,
-          includeOpenClawTools: false,
+          includeRecallTools: false,
           includePluginTools: true,
         },
       });
 
-      expect(createOpenClawToolsMock).not.toHaveBeenCalled();
+      expect(createRecallToolsMock).not.toHaveBeenCalled();
       expect(resolvePluginToolsSpy).toHaveBeenCalledTimes(1);
       const pluginToolOptions = resolvePluginToolsSpy.mock.calls[0]?.[0].options;
       expect(pluginToolOptions?.authProfileStore).toBe(authProfileStore);
@@ -553,39 +553,39 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("uses tools.alsoAllow for optional plugin discovery without widening to all plugins", () => {
-    const createOpenClawToolsMock = vi.mocked(createOpenClawTools);
-    createOpenClawToolsMock.mockClear();
+    const createRecallToolsMock = vi.mocked(createRecallTools);
+    createRecallToolsMock.mockClear();
 
-    createOpenClawCodingTools({
+    createRecallCodingTools({
       config: { tools: { alsoAllow: ["lobster"] } },
     });
 
-    expect(createOpenClawToolsMock).toHaveBeenCalledTimes(1);
-    expect(latestCreateOpenClawToolsOptions().pluginToolAllowlist).toStrictEqual([
+    expect(createRecallToolsMock).toHaveBeenCalledTimes(1);
+    expect(latestCreateRecallToolsOptions().pluginToolAllowlist).toStrictEqual([
       "lobster",
       DEFAULT_PLUGIN_TOOLS_ALLOWLIST_ENTRY,
     ]);
   });
 
-  it("passes explicit denylist entries to OpenClaw tool factory planning", () => {
-    const createOpenClawToolsMock = vi.mocked(createOpenClawTools);
-    createOpenClawToolsMock.mockClear();
+  it("passes explicit denylist entries to Recall tool factory planning", () => {
+    const createRecallToolsMock = vi.mocked(createRecallTools);
+    createRecallToolsMock.mockClear();
 
-    createOpenClawCodingTools({
+    createRecallCodingTools({
       config: { tools: { deny: ["pdf"] } },
     });
 
-    expect(createOpenClawToolsMock).toHaveBeenCalledTimes(1);
-    expectListIncludes(latestCreateOpenClawToolsOptions().pluginToolDenylist, ["pdf"]);
+    expect(createRecallToolsMock).toHaveBeenCalledTimes(1);
+    expectListIncludes(latestCreateRecallToolsOptions().pluginToolDenylist, ["pdf"]);
   });
 
-  it("passes inherited allowlist entries to OpenClaw plugin discovery", async () => {
-    const createOpenClawToolsMock = vi.mocked(createOpenClawTools);
-    createOpenClawToolsMock.mockClear();
+  it("passes inherited allowlist entries to Recall plugin discovery", async () => {
+    const createRecallToolsMock = vi.mocked(createRecallTools);
+    createRecallToolsMock.mockClear();
     const agentId = `inherited-allow-${Date.now()}-${Math.random().toString(16).slice(2)}`;
     const storeTemplate = path.join(
       os.tmpdir(),
-      `openclaw-session-store-${agentId}-{agentId}.json`,
+      `recall-session-store-${agentId}-{agentId}.json`,
     );
     await writeSessionStore(storeTemplate, agentId, {
       [`agent:${agentId}:subagent:limited`]: {
@@ -598,7 +598,7 @@ describe("createOpenClawCodingTools", () => {
       },
     });
 
-    createOpenClawCodingTools({
+    createRecallCodingTools({
       sessionKey: `agent:${agentId}:subagent:limited`,
       config: {
         session: {
@@ -607,23 +607,23 @@ describe("createOpenClawCodingTools", () => {
       },
     });
 
-    expect(createOpenClawToolsMock).toHaveBeenCalledTimes(1);
-    expectListIncludes(latestCreateOpenClawToolsOptions().pluginToolAllowlist, [
+    expect(createRecallToolsMock).toHaveBeenCalledTimes(1);
+    expectListIncludes(latestCreateRecallToolsOptions().pluginToolAllowlist, [
       "custom_plugin_tool",
       "sessions_spawn",
     ]);
   });
 
   it("passes effective allow-list-restricted tool surface to spawned sessions", () => {
-    const createOpenClawToolsMock = vi.mocked(createOpenClawTools);
-    createOpenClawToolsMock.mockClear();
+    const createRecallToolsMock = vi.mocked(createRecallTools);
+    createRecallToolsMock.mockClear();
 
-    createOpenClawCodingTools({
+    createRecallCodingTools({
       config: { tools: { allow: ["read", "sessions_spawn"] } },
     });
 
-    expect(createOpenClawToolsMock).toHaveBeenCalledTimes(1);
-    const inheritedAllow = latestCreateOpenClawToolsOptions().inheritedToolAllowlist;
+    expect(createRecallToolsMock).toHaveBeenCalledTimes(1);
+    const inheritedAllow = latestCreateRecallToolsOptions().inheritedToolAllowlist;
     expectListIncludes(inheritedAllow, ["read", "sessions_spawn"]);
     expect(inheritedAllow?.includes("exec")).toBe(false);
     expect(inheritedAllow?.includes("process")).toBe(false);
@@ -632,7 +632,7 @@ describe("createOpenClawCodingTools", () => {
   it("records core tool-prep stages for hot-path diagnostics", () => {
     const stages: string[] = [];
 
-    createOpenClawCodingTools({
+    createRecallCodingTools({
       config: testConfig,
       recordToolPrepStage: (name) => stages.push(name),
     });
@@ -642,8 +642,8 @@ describe("createOpenClawCodingTools", () => {
       "workspace-policy",
       "base-coding-tools",
       "shell-tools",
-      "openclaw-tools:test-helper",
-      "openclaw-tools",
+      "recall-tools:test-helper",
+      "recall-tools",
       "message-provider-policy",
       "model-provider-policy",
       "authorization-policy",
@@ -654,14 +654,14 @@ describe("createOpenClawCodingTools", () => {
     ]);
     expect(stages.indexOf("tool-policy")).toBeLessThan(stages.indexOf("workspace-policy"));
     expect(stages.indexOf("workspace-policy")).toBeLessThan(stages.indexOf("base-coding-tools"));
-    expect(stages.indexOf("openclaw-tools:test-helper")).toBeLessThan(
-      stages.indexOf("openclaw-tools"),
+    expect(stages.indexOf("recall-tools:test-helper")).toBeLessThan(
+      stages.indexOf("recall-tools"),
     );
     expect(stages.indexOf("schema-normalization")).toBeLessThan(stages.indexOf("tool-hooks"));
   });
 
   it("preserves action enums in normalized schemas", () => {
-    const defaultTools = createOpenClawCodingTools({ config: testConfig });
+    const defaultTools = createRecallCodingTools({ config: testConfig });
     const toolNames = ["canvas", "nodes", "cron", "gateway", "message"];
     const missingNames = toolNames.filter(
       (name) => !defaultTools.some((candidate) => candidate.name === name),
@@ -685,68 +685,68 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("enforces apply_patch availability and canonical names across model/provider constraints", () => {
-    const defaultTools = createOpenClawCodingTools({ config: testConfig });
+    const defaultTools = createRecallCodingTools({ config: testConfig });
     expect(toolNameList(defaultTools)).toContain("exec");
     expect(toolNameList(defaultTools)).toContain("process");
     expect(toolNameList(defaultTools)).not.toContain("apply_patch");
 
-    const openAiTools = createOpenClawCodingTools({
+    const openAiTools = createRecallCodingTools({
       config: testConfig,
       modelProvider: "openai",
       modelId: "gpt-5.4",
     });
     expect(toolNameList(openAiTools)).toContain("apply_patch");
 
-    const codexTools = createOpenClawCodingTools({
+    const codexTools = createRecallCodingTools({
       config: testConfig,
       modelProvider: "openai-codex",
       modelId: "gpt-5.4",
     });
     expect(toolNameList(codexTools)).toContain("apply_patch");
 
-    const disabledConfig: OpenClawConfig = {
+    const disabledConfig: RecallConfig = {
       tools: {
         exec: {
           applyPatch: { enabled: false },
         },
       },
     };
-    const disabledOpenAiTools = createOpenClawCodingTools({
+    const disabledOpenAiTools = createRecallCodingTools({
       config: disabledConfig,
       modelProvider: "openai",
       modelId: "gpt-5.4",
     });
     expect(toolNameList(disabledOpenAiTools)).not.toContain("apply_patch");
 
-    const anthropicTools = createOpenClawCodingTools({
+    const anthropicTools = createRecallCodingTools({
       config: disabledConfig,
       modelProvider: "anthropic",
       modelId: "claude-opus-4-6",
     });
     expect(toolNameList(anthropicTools)).not.toContain("apply_patch");
 
-    const allowModelsConfig: OpenClawConfig = {
+    const allowModelsConfig: RecallConfig = {
       tools: {
         exec: {
           applyPatch: { allowModels: ["gpt-5.4"] },
         },
       },
     };
-    const allowed = createOpenClawCodingTools({
+    const allowed = createRecallCodingTools({
       config: allowModelsConfig,
       modelProvider: "openai",
       modelId: "gpt-5.4",
     });
     expect(toolNameList(allowed)).toContain("apply_patch");
 
-    const denied = createOpenClawCodingTools({
+    const denied = createRecallCodingTools({
       config: allowModelsConfig,
       modelProvider: "openai",
       modelId: "gpt-5.4-mini",
     });
     expect(toolNameList(denied)).not.toContain("apply_patch");
 
-    const oauthTools = createOpenClawCodingTools({
+    const oauthTools = createRecallCodingTools({
       config: testConfig,
       modelProvider: "anthropic",
       modelAuthMode: "oauth",
@@ -760,7 +760,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("provides top-level object schemas for all tools", () => {
-    const tools = createOpenClawCodingTools({ config: testConfig });
+    const tools = createRecallCodingTools({ config: testConfig });
     const offenders = tools
       .map((tool) => {
         const schema =
@@ -779,7 +779,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("does not expose provider-specific message tools", () => {
-    const tools = createOpenClawCodingTools({ messageProvider: "discord" });
+    const tools = createRecallCodingTools({ messageProvider: "discord" });
     const names = new Set(tools.map((tool) => tool.name));
     expect(names.has("discord")).toBe(false);
     expect(names.has("slack")).toBe(false);
@@ -788,7 +788,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("filters session tools for sub-agent sessions by default", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       sessionKey: "agent:main:subagent:test",
     });
     const names = new Set(tools.map((tool) => tool.name));
@@ -805,7 +805,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("uses stored spawnDepth to apply leaf tool policy for flat depth-2 session keys", async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-depth-policy-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-depth-policy-"));
     try {
       const storeTemplate = path.join(tmpDir, "sessions-{agentId}.json");
       await writeSessionStore(storeTemplate, "main", {
@@ -824,7 +824,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("applies subagent tool policy to ACP children spawned under a subagent envelope", async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-acp-subagent-policy-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-acp-subagent-policy-"));
     try {
       const storeTemplate = path.join(tmpDir, "sessions-{agentId}.json");
       await writeSessionStore(storeTemplate, "main", {
@@ -874,7 +874,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("applies leaf tool policy for cross-agent subagent sessions when spawnDepth is missing", async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-cross-agent-subagent-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-cross-agent-subagent-"));
     try {
       const storeTemplate = path.join(tmpDir, "sessions-{agentId}.json");
       await writeSessionStore(storeTemplate, "main", {
@@ -900,7 +900,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("supports allow-only sub-agent tool policy", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       sessionKey: "agent:main:subagent:test",
       config: {
         tools: {
@@ -916,7 +916,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("applies tool profiles before allow/deny policies", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       config: { tools: { profile: "messaging" } },
     });
     const names = new Set(tools.map((tool) => tool.name));
@@ -928,12 +928,12 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("includes browser tool with full profile when browser is configured (#76507)", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       config: {
         tools: { profile: "full" },
         browser: { enabled: true },
         plugins: { entries: { browser: { enabled: true } } },
-      } as OpenClawConfig,
+      } as RecallConfig,
     });
     const names = new Set(tools.map((tool) => tool.name));
     // full profile must not filter any tools — browser, canvas, etc. must be present.
@@ -944,12 +944,12 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("includes browser tool with full profile (#76507)", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       config: {
         tools: { profile: "full" },
         browser: { enabled: true },
         plugins: { entries: { browser: { enabled: true } } },
-      } as OpenClawConfig,
+      } as RecallConfig,
     });
     const names = new Set(tools.map((tool) => tool.name));
     expect(names.has("browser")).toBe(true);
@@ -960,11 +960,11 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("includes browser tool without explicit profile (defaults to no filtering) (#76507)", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       config: {
         browser: { enabled: true },
         plugins: { entries: { browser: { enabled: true } } },
-      } as OpenClawConfig,
+      } as RecallConfig,
     });
     const names = new Set(tools.map((tool) => tool.name));
     // No profile means no profile filtering — all tools pass.
@@ -976,15 +976,15 @@ describe("createOpenClawCodingTools", () => {
       browser: { enabled: true },
       plugins: { entries: { browser: { enabled: true } } },
       tools: { profile: "coding" },
-    } as OpenClawConfig;
-    const codingSubagent = createOpenClawCodingTools({
+    } as RecallConfig;
+    const codingSubagent = createRecallCodingTools({
       sessionKey: "agent:main:subagent:test",
       config: baseConfig,
     });
     const codingNames = new Set(codingSubagent.map((tool) => tool.name));
     expect(codingNames.has("browser")).toBe(false);
 
-    const subagentAllowOnly = createOpenClawCodingTools({
+    const subagentAllowOnly = createRecallCodingTools({
       sessionKey: "agent:main:subagent:test",
       config: {
         ...baseConfig,
@@ -992,27 +992,27 @@ describe("createOpenClawCodingTools", () => {
           profile: "coding",
           subagents: { tools: { allow: ["browser"] } },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
     });
     expect(toolNameList(subagentAllowOnly)).not.toContain("browser");
 
-    const profileStageAlsoAllow = createOpenClawCodingTools({
+    const profileStageAlsoAllow = createRecallCodingTools({
       sessionKey: "agent:main:subagent:test",
       config: {
         ...baseConfig,
         tools: { profile: "coding", alsoAllow: ["browser"] },
-      } as OpenClawConfig,
+      } as RecallConfig,
     });
     expect(toolNameList(profileStageAlsoAllow)).toContain("browser");
   });
 
   it("can keep message available when a cron route needs it under the coding profile", () => {
-    const codingTools = createOpenClawCodingTools({
+    const codingTools = createRecallCodingTools({
       config: { tools: { profile: "coding" } },
     });
     expect(toolNameList(codingTools)).not.toContain("message");
 
-    const cronTools = createOpenClawCodingTools({
+    const cronTools = createRecallCodingTools({
       config: { tools: { profile: "coding" } },
       forceMessageTool: true,
     });
@@ -1020,7 +1020,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("keeps message available for message-tool-only source replies under the coding profile", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       config: { tools: { profile: "coding" } },
       sourceReplyDeliveryMode: "message_tool_only",
     });
@@ -1029,7 +1029,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("keeps heartbeat response available for heartbeat runs under the coding profile", () => {
-    const codingTools = createOpenClawCodingTools({
+    const codingTools = createRecallCodingTools({
       config: { tools: { profile: "coding" } },
       trigger: "heartbeat",
       enableHeartbeatTool: true,
@@ -1040,11 +1040,11 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("enables heartbeat response when visible replies are message-tool-only", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       config: {
         messages: { visibleReplies: "message_tool" },
         tools: { profile: "coding" },
-      } as OpenClawConfig,
+      } as RecallConfig,
       trigger: "heartbeat",
     });
 
@@ -1052,14 +1052,14 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("can keep message available when a cron route needs it under a provider coding profile", () => {
-    const providerProfileTools = createOpenClawCodingTools({
+    const providerProfileTools = createRecallCodingTools({
       config: { tools: { byProvider: { openai: { profile: "coding" } } } },
       modelProvider: "openai",
       modelId: "gpt-5.4",
     });
     expect(toolNameList(providerProfileTools)).not.toContain("message");
 
-    const cronTools = createOpenClawCodingTools({
+    const cronTools = createRecallCodingTools({
       config: { tools: { byProvider: { openai: { profile: "coding" } } } },
       modelProvider: "openai",
       modelId: "gpt-5.4",
@@ -1071,14 +1071,14 @@ describe("createOpenClawCodingTools", () => {
   it.each(providerAliasCases)(
     "applies canonical tools.byProvider deny policy to core tools for alias %s",
     (alias, canonical) => {
-      const tools = createOpenClawCodingTools({
+      const tools = createRecallCodingTools({
         config: {
           tools: {
             byProvider: {
               [canonical]: { deny: ["read"] },
             },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         modelProvider: alias,
       });
       const names = new Set(tools.map((tool) => tool.name));
@@ -1089,7 +1089,7 @@ describe("createOpenClawCodingTools", () => {
   );
 
   it("expands group shorthands in global tool policy", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       config: { tools: { allow: ["group:fs"] } },
     });
     const names = new Set(tools.map((tool) => tool.name));
@@ -1101,7 +1101,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("expands group shorthands in global tool deny policy", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       config: { tools: { deny: ["group:fs"] } },
     });
     const names = new Set(tools.map((tool) => tool.name));
@@ -1112,7 +1112,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("lets agent profiles override global profiles", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       sessionKey: "agent:work:main",
       config: {
         tools: { profile: "coding" },
@@ -1128,7 +1128,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("removes unsupported JSON Schema keywords for Cloud Code Assist API compatibility", () => {
-    const googleTools = createOpenClawCodingTools({
+    const googleTools = createRecallCodingTools({
       modelProvider: "google",
     });
     for (const tool of googleTools) {
@@ -1142,7 +1142,7 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("applies xai model compat for direct Grok tool cleanup", () => {
-    const xaiTools = createOpenClawCodingTools({
+    const xaiTools = createRecallCodingTools({
       modelProvider: "xai",
       modelCompat: {
         toolSchemaProfile: "xai",
@@ -1169,11 +1169,11 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("returns image-aware read metadata for images and text-only blocks for text files", async () => {
-    const defaultTools = createOpenClawCodingTools();
+    const defaultTools = createRecallCodingTools();
     const readTool = requireTool(defaultTools, "read");
     const readExecute = requireToolExecute(readTool);
 
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-read-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-read-"));
     try {
       const imagePath = path.join(tmpDir, "sample.png");
       await fs.writeFile(imagePath, tinyPngBuffer);
@@ -1197,7 +1197,7 @@ describe("createOpenClawCodingTools", () => {
       }
 
       const textPath = path.join(tmpDir, "sample.txt");
-      const contents = "Hello from openclaw read tool.";
+      const contents = "Hello from recall read tool.";
       await fs.writeFile(textPath, contents, "utf8");
 
       const textResult = await readExecute("tool-2", {
@@ -1211,10 +1211,10 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("filters tools by sandbox policy", () => {
-    const sandboxDir = path.join(os.tmpdir(), "openclaw-sandbox");
+    const sandboxDir = path.join(os.tmpdir(), "recall-sandbox");
     const sandbox = createPiToolsSandboxContext({
       workspaceDir: sandboxDir,
-      agentWorkspaceDir: path.join(os.tmpdir(), "openclaw-workspace"),
+      agentWorkspaceDir: path.join(os.tmpdir(), "recall-workspace"),
       workspaceAccess: "none" as const,
       fsBridge: createHostSandboxFsBridge(sandboxDir),
       tools: {
@@ -1222,17 +1222,17 @@ describe("createOpenClawCodingTools", () => {
         deny: ["browser"],
       },
     });
-    const tools = createOpenClawCodingTools({ sandbox });
+    const tools = createRecallCodingTools({ sandbox });
     expect(toolNameList(tools)).toContain("exec");
     expect(toolNameList(tools)).not.toContain("read");
     expect(toolNameList(tools)).not.toContain("browser");
   });
 
   it("hard-disables write/edit when sandbox workspaceAccess is ro", () => {
-    const sandboxDir = path.join(os.tmpdir(), "openclaw-sandbox");
+    const sandboxDir = path.join(os.tmpdir(), "recall-sandbox");
     const sandbox = createPiToolsSandboxContext({
       workspaceDir: sandboxDir,
-      agentWorkspaceDir: path.join(os.tmpdir(), "openclaw-workspace"),
+      agentWorkspaceDir: path.join(os.tmpdir(), "recall-workspace"),
       workspaceAccess: "ro" as const,
       fsBridge: createHostSandboxFsBridge(sandboxDir),
       tools: {
@@ -1240,16 +1240,16 @@ describe("createOpenClawCodingTools", () => {
         deny: [],
       },
     });
-    const tools = createOpenClawCodingTools({ sandbox });
+    const tools = createRecallCodingTools({ sandbox });
     expect(toolNameList(tools)).toContain("read");
     expect(toolNameList(tools)).not.toContain("write");
     expect(toolNameList(tools)).not.toContain("edit");
   });
 
   it("accepts canonical parameters for read/write/edit", async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-canonical-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-canonical-"));
     try {
-      const tools = createOpenClawCodingTools({ workspaceDir: tmpDir });
+      const tools = createRecallCodingTools({ workspaceDir: tmpDir });
       const { readTool, writeTool, editTool } = expectReadWriteEditTools(tools);
 
       const filePath = "canonical-test.txt";
@@ -1278,9 +1278,9 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("rejects legacy alias parameters", async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-legacy-alias-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-legacy-alias-"));
     try {
-      const tools = createOpenClawCodingTools({ workspaceDir: tmpDir });
+      const tools = createRecallCodingTools({ workspaceDir: tmpDir });
       const { readTool, writeTool, editTool } = expectReadWriteEditTools(tools);
 
       await expect(
@@ -1309,9 +1309,9 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("rejects structured content blocks for write", async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-structured-write-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-structured-write-"));
     try {
-      const tools = createOpenClawCodingTools({ workspaceDir: tmpDir });
+      const tools = createRecallCodingTools({ workspaceDir: tmpDir });
       const writeTool = requireTool(tools, "write");
       const writeExecute = requireToolExecute(writeTool);
 
@@ -1330,12 +1330,12 @@ describe("createOpenClawCodingTools", () => {
   });
 
   it("rejects structured edit payloads", async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-structured-edit-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-structured-edit-"));
     try {
       const filePath = path.join(tmpDir, "structured-edit.js");
       await fs.writeFile(filePath, "const value = 'old';\n", "utf8");
 
-      const tools = createOpenClawCodingTools({ workspaceDir: tmpDir });
+      const tools = createRecallCodingTools({ workspaceDir: tmpDir });
       const editTool = requireTool(tools, "edit");
       const editExecute = requireToolExecute(editTool);
 

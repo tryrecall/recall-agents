@@ -223,7 +223,7 @@ export function createSubagentRegistryLifecycleController(params: {
         const text = extractTextFromChatContent(record.content, { joinWith: "" });
         return (
           record.role === "assistant" &&
-          record.provider === "openclaw" &&
+          record.provider === "recall" &&
           record.model === "delivery-mirror" &&
           text === expectedText
         );

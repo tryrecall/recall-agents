@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import {
   normalizeModelCatalogProviderId,
   planManifestModelCatalogRows,
@@ -17,7 +17,7 @@ import {
 type ManifestCatalogRowsForListMode = "static-authoritative" | "supplemental";
 
 function loadManifestCatalogRowsForPluginIds(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   env?: NodeJS.ProcessEnv;
   index: PluginRegistrySnapshot;
   registry: PluginManifestRegistry;
@@ -55,7 +55,7 @@ function loadManifestCatalogRowsForPluginIds(params: {
 }
 
 function resolveConventionModelCatalogPluginIds(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   index: PluginRegistrySnapshot;
   providerFilter: string;
 }): readonly string[] {
@@ -77,7 +77,7 @@ function resolveConventionModelCatalogPluginIds(params: {
 }
 
 function resolveDeclaredModelCatalogPluginIds(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   index: PluginRegistrySnapshot;
   providerFilter: string;
 }): readonly string[] {
@@ -90,7 +90,7 @@ function resolveDeclaredModelCatalogPluginIds(params: {
 }
 
 function loadManifestCatalogRowsForList(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   providerFilter?: string;
   env?: NodeJS.ProcessEnv;
   mode?: ManifestCatalogRowsForListMode;
@@ -148,7 +148,7 @@ function loadManifestCatalogRowsForList(params: {
 }
 
 export function loadStaticManifestCatalogRowsForList(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   providerFilter?: string;
   env?: NodeJS.ProcessEnv;
   metadataSnapshot?: PluginMetadataSnapshot;
@@ -160,7 +160,7 @@ export function loadStaticManifestCatalogRowsForList(params: {
 }
 
 export function loadSupplementalManifestCatalogRowsForList(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   providerFilter?: string;
   env?: NodeJS.ProcessEnv;
   metadataSnapshot?: PluginMetadataSnapshot;

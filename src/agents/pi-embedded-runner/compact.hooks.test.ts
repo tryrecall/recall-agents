@@ -4,7 +4,7 @@ import {
   applyExtraParamsToAgentMock,
   buildEmbeddedSystemPromptMock,
   contextEngineCompactMock,
-  createOpenClawCodingToolsMock,
+  createRecallCodingToolsMock,
   ensureRuntimePluginsLoaded,
   estimateTokensMock,
   getMemorySearchManagerMock,
@@ -371,7 +371,7 @@ describe("compactEmbeddedPiSessionDirect hooks", () => {
       senderE164: "+15551234567",
     });
 
-    expectRecordFields(mockCallArg(createOpenClawCodingToolsMock), {
+    expectRecordFields(mockCallArg(createRecallCodingToolsMock), {
       senderId: "sender-1",
       senderName: "Alice",
       senderUsername: "alice_u",

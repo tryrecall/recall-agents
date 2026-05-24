@@ -143,8 +143,8 @@ const RETRY_GUARD_MODEL_APIS = new Set([
   "openai-responses",
   "openai-codex-responses",
   "azure-openai-responses",
-  "openclaw-openai-responses-transport",
-  "openclaw-azure-openai-responses-transport",
+  "recall-openai-responses-transport",
+  "recall-azure-openai-responses-transport",
 ]);
 const DEFAULT_PLANNING_ONLY_RETRY_LIMIT = 1;
 const STRICT_AGENTIC_PLANNING_ONLY_RETRY_LIMIT = 2;

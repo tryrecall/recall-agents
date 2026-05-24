@@ -1,7 +1,7 @@
 import path from "node:path";
 import { getRuntimeConfig } from "../../config/config.js";
 import { resolveStateDir } from "../../config/paths.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import type { MigrationProviderContext } from "../../plugins/types.js";
 import type { RuntimeEnv } from "../../runtime.js";
 
@@ -9,7 +9,7 @@ export function createMigrationLogger(runtime: RuntimeEnv, opts: { json?: boolea
   const info = opts.json ? runtime.error : runtime.log;
   return {
     debug: (message: string) => {
-      if (process.env.OPENCLAW_VERBOSE === "1") {
+      if (process.env.RECALL_VERBOSE === "1") {
         info(message);
       }
     },
@@ -34,7 +34,7 @@ export function buildMigrationContext(params: {
   overwrite?: boolean;
   providerOptions?: Record<string, unknown>;
   backupPath?: string;
-  configOverride?: OpenClawConfig;
+  configOverride?: RecallConfig;
   runtime: RuntimeEnv;
   reportDir?: string;
   json?: boolean;

@@ -1,10 +1,10 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
 import {
   normalizePluginsConfig,
   resolveEffectiveEnableState,
   resolvePluginConfigObject,
-} from "openclaw/plugin-sdk/plugin-config-runtime";
-import { isTruthyEnvValue } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/plugin-config-runtime";
+import { isTruthyEnvValue } from "recall/plugin-sdk/runtime-env";
 
 export type CanvasHostConfig = {
   enabled?: boolean;
@@ -62,7 +62,7 @@ export function parseCanvasPluginConfig(value: unknown): CanvasPluginConfig {
   return host ? { host } : {};
 }
 
-export function isCanvasPluginEnabled(config?: OpenClawConfig): boolean {
+export function isCanvasPluginEnabled(config?: RecallConfig): boolean {
   if (!config) {
     return true;
   }
@@ -76,7 +76,7 @@ export function isCanvasPluginEnabled(config?: OpenClawConfig): boolean {
 }
 
 export function resolveCanvasHostConfig(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   pluginConfig?: Record<string, unknown>;
 }): CanvasHostConfig {
   const pluginConfig =
@@ -85,8 +85,8 @@ export function resolveCanvasHostConfig(params: {
   return parsedPluginConfig.host ?? {};
 }
 
-export function isCanvasHostEnabled(config?: OpenClawConfig): boolean {
-  if (isTruthyEnvValue(process.env.OPENCLAW_SKIP_CANVAS_HOST)) {
+export function isCanvasHostEnabled(config?: RecallConfig): boolean {
+  if (isTruthyEnvValue(process.env.RECALL_SKIP_CANVAS_HOST)) {
     return false;
   }
   if (!isCanvasPluginEnabled(config)) {
@@ -109,7 +109,7 @@ export const canvasConfigSchema: CanvasPluginConfigSchema = {
     },
     "host.root": {
       label: "Canvas Host Root Directory",
-      help: "Directory to serve. Defaults to the OpenClaw state canvas directory.",
+      help: "Directory to serve. Defaults to the Recall state canvas directory.",
       advanced: true,
     },
     "host.port": {

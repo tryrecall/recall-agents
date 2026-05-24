@@ -1,5 +1,5 @@
 import { parseAvailableTags, readNumberParam, readStringParam } from "../runtime-api.js";
-import type { OpenClawConfig } from "../runtime-api.js";
+import type { RecallConfig } from "../runtime-api.js";
 import type {
   DiscordChannelCreate,
   DiscordChannelEdit,
@@ -28,10 +28,10 @@ function readDiscordBooleanParam(
 export function createDiscordActionOptions<
   T extends Record<string, unknown> = Record<string, never>,
 >(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string;
   extra?: T;
-}): { cfg: OpenClawConfig; accountId?: string } & T {
+}): { cfg: RecallConfig; accountId?: string } & T {
   return {
     cfg: params.cfg,
     ...(params.accountId ? { accountId: params.accountId } : {}),

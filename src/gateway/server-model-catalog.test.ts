@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { GatewayModelChoice } from "./server-model-catalog.js";
 import {
   resetModelCatalogCacheForTest,
@@ -33,7 +33,7 @@ function model(id: string): GatewayModelChoice {
   return { id, name: id, provider: "openai" } as GatewayModelChoice;
 }
 
-const getConfig = () => ({}) as OpenClawConfig;
+const getConfig = () => ({}) as RecallConfig;
 
 describe("loadGatewayModelCatalog", () => {
   beforeEach(async () => {

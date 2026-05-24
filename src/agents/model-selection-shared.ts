@@ -1,5 +1,5 @@
 import { resolveAgentModelPrimaryValue } from "../config/model-input.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { getCurrentPluginMetadataSnapshot } from "../plugins/current-plugin-metadata-snapshot.js";
 import { loadManifestMetadataSnapshot } from "../plugins/manifest-contract-eligibility.js";
@@ -78,7 +78,7 @@ function mergeModelCatalogEntries(params: {
 
 export function inferUniqueProviderFromConfiguredModels(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     model: string;
   } & ModelManifestNormalizationContext,
 ): string | undefined {
@@ -182,7 +182,7 @@ export function inferUniqueProviderFromCatalog(params: {
 
 export function resolveBareModelDefaultProvider(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     catalog: readonly ModelCatalogEntry[];
     model: string;
     defaultProvider: string;
@@ -205,7 +205,7 @@ function isConcreteOpenRouterFreeModelRef(ref: ModelRef): boolean {
 
 function resolveConfiguredOpenRouterCompatFreeRef(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     defaultProvider: string;
     allowManifestNormalization?: boolean;
     allowPluginNormalization?: boolean;
@@ -247,7 +247,7 @@ function resolveConfiguredOpenRouterCompatFreeRef(
 
 export function resolveConfiguredOpenRouterCompatAlias(
   params: {
-    cfg?: OpenClawConfig;
+    cfg?: RecallConfig;
     raw: string;
     defaultProvider: string;
     allowManifestNormalization?: boolean;
@@ -276,7 +276,7 @@ export function resolveConfiguredOpenRouterCompatAlias(
 
 function parseModelRefWithCompatAlias(
   params: {
-    cfg?: OpenClawConfig;
+    cfg?: RecallConfig;
     raw: string;
     defaultProvider: string;
     allowManifestNormalization?: boolean;
@@ -296,7 +296,7 @@ function parseModelRefWithCompatAlias(
 
 function resolveExactConfiguredProviderRef(
   params: {
-    cfg?: OpenClawConfig;
+    cfg?: RecallConfig;
     raw: string;
     allowManifestNormalization?: boolean;
     allowPluginNormalization?: boolean;
@@ -344,7 +344,7 @@ function resolveExactConfiguredProviderRef(
 
 export function resolveAllowlistModelKey(
   params: {
-    cfg?: OpenClawConfig;
+    cfg?: RecallConfig;
     raw: string;
     defaultProvider: string;
   } & ModelManifestNormalizationContext,
@@ -363,7 +363,7 @@ export function resolveAllowlistModelKey(
 
 export function buildConfiguredAllowlistKeys(
   params: {
-    cfg: OpenClawConfig | undefined;
+    cfg: RecallConfig | undefined;
     defaultProvider: string;
   } & ModelManifestNormalizationContext,
 ): Set<string> | null {
@@ -389,7 +389,7 @@ export function buildConfiguredAllowlistKeys(
 
 export function buildModelAliasIndex(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     defaultProvider: string;
     allowManifestNormalization?: boolean;
     allowPluginNormalization?: boolean;
@@ -438,7 +438,7 @@ type ModelCatalogMetadata = {
 
 function buildModelCatalogMetadata(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     defaultProvider: string;
   } & ModelManifestNormalizationContext,
 ): ModelCatalogMetadata {
@@ -529,7 +529,7 @@ function buildSyntheticAllowedCatalogEntry(params: {
 
 export function resolveModelRefFromString(
   params: {
-    cfg?: OpenClawConfig;
+    cfg?: RecallConfig;
     raw: string;
     defaultProvider: string;
     aliasIndex?: ModelAliasIndex;
@@ -562,7 +562,7 @@ export function resolveModelRefFromString(
 
 export function resolveConfiguredModelRef(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     defaultProvider: string;
     defaultModel: string;
     allowManifestNormalization?: boolean;
@@ -648,7 +648,7 @@ export function resolveConfiguredModelRef(
 
 export function buildAllowedModelSetWithFallbacks(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     catalog: ModelCatalogEntry[];
     defaultProvider: string;
     defaultModel?: string;
@@ -848,7 +848,7 @@ function getModelRefStatusFromAllowedSet(params: {
 
 export function getModelRefStatusWithFallbackModels(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     catalog: ModelCatalogEntry[];
     ref: ModelRef;
     defaultProvider: string;
@@ -873,7 +873,7 @@ export function getModelRefStatusWithFallbackModels(
 
 export function resolveAllowedModelRefFromAliasIndex(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     raw: string;
     defaultProvider: string;
     aliasIndex: ModelAliasIndex;
@@ -912,7 +912,7 @@ export function resolveAllowedModelRefFromAliasIndex(
   return { ref: resolved.ref, key: status.key };
 }
 
-export function hasConfiguredProviderModelRows(cfg: OpenClawConfig): boolean {
+export function hasConfiguredProviderModelRows(cfg: RecallConfig): boolean {
   const providers = cfg.models?.providers;
   if (!providers || typeof providers !== "object") {
     return false;
@@ -921,7 +921,7 @@ export function hasConfiguredProviderModelRows(cfg: OpenClawConfig): boolean {
 }
 
 function resolveConfiguredModelManifestPlugins(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   workspaceDir?: string;
   manifestPlugins?: ModelManifestPlugins;
 }): ModelManifestPlugins {
@@ -948,7 +948,7 @@ function resolveConfiguredModelManifestPlugins(params: {
 }
 
 export function buildConfiguredModelCatalog(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   workspaceDir?: string;
   manifestPlugins?: ModelManifestPlugins;
 }): ModelCatalogEntry[] {
@@ -1002,7 +1002,7 @@ export function buildConfiguredModelCatalog(params: {
 
 export function resolveHooksGmailModel(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     defaultProvider: string;
   } & ModelManifestNormalizationContext,
 ): ModelRef | null {
@@ -1043,7 +1043,7 @@ export function normalizeModelSelection(value: unknown): string | undefined {
   return undefined;
 }
 
-export function parseConfiguredModelVisibilityEntries(params: { cfg?: OpenClawConfig }): {
+export function parseConfiguredModelVisibilityEntries(params: { cfg?: RecallConfig }): {
   exactModelRefs: string[];
   providerWildcards: Set<string>;
   hasEntries: boolean;
@@ -1150,7 +1150,7 @@ function dedupeModelCatalogEntries(entries: readonly ModelCatalogEntry[]): Model
 
 export function createModelVisibilityPolicyWithFallbacks(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     catalog: ModelCatalogEntry[];
     defaultProvider: string;
     defaultModel?: string;

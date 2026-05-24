@@ -3,13 +3,13 @@ export {
   expectGeneratedTokenPersistedToGatewayAuth,
   type CliMockOutputRuntime,
   type CliRuntimeCapture,
-} from "openclaw/plugin-sdk/test-fixtures";
+} from "recall/plugin-sdk/test-fixtures";
 export {
   createTempHomeEnv,
   withEnv,
   withEnvAsync,
   withFetchPreconnect,
   isLiveTestEnabled,
-} from "openclaw/plugin-sdk/test-env";
-export type { FetchMock, TempHomeEnv } from "openclaw/plugin-sdk/test-env";
-export type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+} from "recall/plugin-sdk/test-env";
+export type { FetchMock, TempHomeEnv } from "recall/plugin-sdk/test-env";
+export type { RecallConfig } from "recall/plugin-sdk/config-contracts";

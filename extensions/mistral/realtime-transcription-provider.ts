@@ -5,9 +5,9 @@ import {
   type RealtimeTranscriptionSession,
   type RealtimeTranscriptionSessionCreateRequest,
   type RealtimeTranscriptionWebSocketTransport,
-} from "openclaw/plugin-sdk/realtime-transcription";
-import { normalizeResolvedSecretInputString } from "openclaw/plugin-sdk/secret-input";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/realtime-transcription";
+import { normalizeResolvedSecretInputString } from "recall/plugin-sdk/secret-input";
+import { normalizeOptionalString } from "recall/plugin-sdk/string-coerce-runtime";
 
 type MistralRealtimeTranscriptionEncoding =
   | "pcm_s16le"

@@ -13,7 +13,7 @@ describe("buildCliAgentSystemPrompt", () => {
 
   it("uses config-backed sub-agent delegation mode", () => {
     const prompt = buildCliAgentSystemPrompt({
-      workspaceDir: "/tmp/openclaw",
+      workspaceDir: "/tmp/recall",
       config: {
         agents: {
           defaults: {
@@ -37,7 +37,7 @@ describe("buildCliAgentSystemPrompt", () => {
 
   it("uses CLI backend tool fallback instead of PI tool assumptions", () => {
     const prompt = buildCliAgentSystemPrompt({
-      workspaceDir: "/tmp/openclaw",
+      workspaceDir: "/tmp/recall",
       tools: [],
       modelDisplay: "test/model",
     });
@@ -47,7 +47,7 @@ describe("buildCliAgentSystemPrompt", () => {
     expect(prompt).not.toContain("For long waits, avoid rapid poll loops");
     expect(prompt).not.toContain("Larger work: use `sessions_spawn`");
     expect(prompt).not.toContain("Do not poll `subagents list` / `sessions_list` in a loop");
-    expect(prompt).toContain("No OpenClaw tool list is injected");
+    expect(prompt).toContain("No Recall tool list is injected");
   });
 
   it("includes CLI-scoped plugin command guidance", () => {
@@ -68,7 +68,7 @@ describe("buildCliAgentSystemPrompt", () => {
     });
 
     const prompt = buildCliAgentSystemPrompt({
-      workspaceDir: "/tmp/openclaw",
+      workspaceDir: "/tmp/recall",
       tools: [{ name: "exec" } as never],
       modelDisplay: "test/model",
     });

@@ -4,7 +4,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/openclaw-status-corrupt-plugin-deps.XXXXXX")"
+TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/recall-status-corrupt-plugin-deps.XXXXXX")"
 cleanup() {
   rm -rf "$TMP_DIR"
 }
@@ -12,24 +12,24 @@ trap cleanup EXIT
 
 HOME_DIR="$TMP_DIR/home"
 STATE_DIR="$TMP_DIR/state"
-CONFIG_PATH="$TMP_DIR/openclaw.json"
+CONFIG_PATH="$TMP_DIR/recall.json"
 PLUGIN_DIR="$TMP_DIR/plugin"
 STAGE_DIR="$TMP_DIR/stage"
 mkdir -p "$HOME_DIR" "$STATE_DIR" "$PLUGIN_DIR" "$STAGE_DIR/node_modules/ansi-escapes"
-printf "corrupt rename residue\n" > "$STAGE_DIR/node_modules/ansi-escapes/.openclaw-rename-tmp"
+printf "corrupt rename residue\n" > "$STAGE_DIR/node_modules/ansi-escapes/.recall-rename-tmp"
 
 cat > "$PLUGIN_DIR/package.json" <<'JSON'
 {
-  "name": "@example/openclaw-e2e-corrupt-chat",
+  "name": "@example/recall-e2e-corrupt-chat",
   "version": "1.0.0",
-  "openclaw": {
+  "recall": {
     "extensions": ["./index.cjs"],
     "setupEntry": "./setup-entry.cjs"
   }
 }
 JSON
 
-cat > "$PLUGIN_DIR/openclaw.plugin.json" <<'JSON'
+cat > "$PLUGIN_DIR/recall.plugin.json" <<'JSON'
 {
   "id": "e2e-corrupt-chat",
   "configSchema": {
@@ -69,8 +69,8 @@ cat > "$PLUGIN_DIR/setup-entry.cjs" <<'JS'
 const fs = require("node:fs");
 const path = require("node:path");
 
-const stageDir = process.env.OPENCLAW_PLUGIN_STAGE_DIR || "";
-const renameResidue = path.join(stageDir, "node_modules", "ansi-escapes", ".openclaw-rename-tmp");
+const stageDir = process.env.RECALL_PLUGIN_STAGE_DIR || "";
+const renameResidue = path.join(stageDir, "node_modules", "ansi-escapes", ".recall-rename-tmp");
 if (fs.existsSync(renameResidue)) {
   const err = new Error("ENOTEMPTY: directory not empty, rename 'ansi-escapes'");
   err.code = "ENOTEMPTY";
@@ -117,15 +117,15 @@ JSON
 
 run_openclaw() {
   HOME="$HOME_DIR" \
-  OPENCLAW_HOME="$STATE_DIR" \
-  OPENCLAW_STATE_DIR="$STATE_DIR" \
-  OPENCLAW_CONFIG_PATH="$CONFIG_PATH" \
-  OPENCLAW_PLUGIN_STAGE_DIR="$STAGE_DIR" \
-  OPENCLAW_DISABLE_BUNDLED_PLUGINS=1 \
-  OPENCLAW_NO_ONBOARD=1 \
-  OPENCLAW_NO_PROMPT=1 \
-  OPENCLAW_SKIP_CHANNELS=1 \
-  OPENCLAW_SKIP_PROVIDERS=1 \
+  RECALL_HOME="$STATE_DIR" \
+  RECALL_STATE_DIR="$STATE_DIR" \
+  RECALL_CONFIG_PATH="$CONFIG_PATH" \
+  RECALL_PLUGIN_STAGE_DIR="$STAGE_DIR" \
+  RECALL_DISABLE_BUNDLED_PLUGINS=1 \
+  RECALL_NO_ONBOARD=1 \
+  RECALL_NO_PROMPT=1 \
+  RECALL_SKIP_CHANNELS=1 \
+  RECALL_SKIP_PROVIDERS=1 \
   COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
   NO_COLOR=1 \
     node "$ROOT_DIR/scripts/run-node.mjs" "$@"
@@ -137,7 +137,7 @@ AFTER="$TMP_DIR/status-after.txt"
 
 run_openclaw status --all --timeout 1 > "$BEFORE"
 grep -F "e2e-corrupt-chat" "$BEFORE" >/dev/null
-grep -F "plugin load failed: dependency tree corrupted; run openclaw doctor --fix" "$BEFORE" >/dev/null
+grep -F "plugin load failed: dependency tree corrupted; run recall doctor --fix" "$BEFORE" >/dev/null
 
 run_openclaw doctor --fix --non-interactive --yes > "$DOCTOR"
 if [[ -e "$STAGE_DIR" ]]; then

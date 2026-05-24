@@ -5,7 +5,7 @@ import {
   loadAuthProfileStoreWithoutExternalProfiles,
 } from "../agents/auth-profiles.js";
 import type { AuthProfileStore } from "../agents/auth-profiles/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { PluginOrigin } from "../plugins/plugin-origin.types.js";
 import { resolveUserPath } from "../utils.js";
 import {
@@ -50,7 +50,7 @@ function loadRuntimePrepareHelpers() {
 }
 
 async function resolveLoadablePluginOrigins(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   env: NodeJS.ProcessEnv;
 }): Promise<ReadonlyMap<string, PluginOrigin>> {
   const workspaceDir = resolveAgentWorkspaceDir(
@@ -67,7 +67,7 @@ async function resolveLoadablePluginOrigins(params: {
   return listPluginOriginsFromMetadataSnapshot(snapshot);
 }
 
-function hasConfiguredPluginEntries(config: OpenClawConfig): boolean {
+function hasConfiguredPluginEntries(config: RecallConfig): boolean {
   const entries = config.plugins?.entries;
   return (
     !!entries &&
@@ -77,7 +77,7 @@ function hasConfiguredPluginEntries(config: OpenClawConfig): boolean {
   );
 }
 
-function hasConfiguredChannelEntries(config: OpenClawConfig): boolean {
+function hasConfiguredChannelEntries(config: RecallConfig): boolean {
   const channels = config.channels;
   return (
     !!channels &&
@@ -88,7 +88,7 @@ function hasConfiguredChannelEntries(config: OpenClawConfig): boolean {
 }
 
 export async function prepareSecretsRuntimeSnapshot(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   env?: NodeJS.ProcessEnv;
   agentDirs?: string[];
   includeAuthStoreRefs?: boolean;

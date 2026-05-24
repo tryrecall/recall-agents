@@ -1,5 +1,5 @@
 import type { EffectiveToolInventoryResult } from "../../agents/tools-effective-inventory.types.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { logDebug, logWarn } from "../../logger.js";
 import { stringifyRouteThreadId } from "../../plugin-sdk/channel-route.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
@@ -31,7 +31,7 @@ const TOOLS_EFFECTIVE_CACHE_LIMIT = 128;
 let nowForToolsEffectiveCache = () => Date.now();
 
 type TrustedToolsEffectiveContext = {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   sessionKey: string;
   modelProvider?: string;
@@ -56,7 +56,7 @@ const toolsEffectiveInflight = new Map<string, Promise<EffectiveToolInventoryRes
 
 function resolveRequestedAgentIdOrRespondError(params: {
   rawAgentId: unknown;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   respond: RespondFn;
 }) {
   const knownAgents = listAgentIds(params.cfg);

@@ -76,7 +76,7 @@ steps:
           expr: "`${env.gateway.baseUrl}/api/diagnostics/prometheus`"
       - set: gatewayToken
         value:
-          expr: "String(env.gateway.token ?? env.gateway.runtimeEnv.OPENCLAW_GATEWAY_TOKEN ?? '')"
+          expr: "String(env.gateway.token ?? env.gateway.runtimeEnv.RECALL_GATEWAY_TOKEN ?? '')"
       - assert:
           expr: "gatewayToken.length > 0"
           message: "expected QA gateway token to be available for protected scrape"
@@ -148,7 +148,7 @@ steps:
           expr: "!/\\/tmp\\/|\\/private\\/tmp\\/|\\/app\\//.test(prometheusText)"
           message: "prometheus output leaked a local file path"
       - assert:
-          expr: "!prometheusText.includes('openclaw.content.')"
+          expr: "!prometheusText.includes('recall.content.')"
           message: "prometheus output leaked content attributes"
       - assert:
           expr: "!/openclaw_prometheus_series_dropped_total(?:\\{[^}]*\\})?\\s+(?!0(?:\\.0+)?(?:\\s|$))/.test(prometheusText)"

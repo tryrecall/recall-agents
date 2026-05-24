@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { resetConfigRuntimeState, setRuntimeConfigSnapshot } from "../config/config.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import type { SessionEntry } from "../config/sessions.js";
 import { createEmptyPluginRegistry } from "../plugins/registry-empty.js";
 import { resetPluginRuntimeStateForTest, setActivePluginRegistry } from "../plugins/runtime.js";
@@ -48,20 +48,20 @@ function createSymlinkOrSkip(targetPath: string, linkPath: string): boolean {
   }
 }
 
-function createSingleAgentAvatarConfig(workspace: string): OpenClawConfig {
+function createSingleAgentAvatarConfig(workspace: string): RecallConfig {
   return {
     session: { mainKey: "main" },
     agents: {
       list: [{ id: "main", default: true, workspace, identity: { avatar: "avatar-link.png" } }],
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
 function createModelDefaultsConfig(params: {
   primary: string;
   models?: Record<string, { agentRuntime?: { id: string } }>;
   agentRuntime?: { id: string };
-}): OpenClawConfig {
+}): RecallConfig {
   return {
     agents: {
       defaults: {
@@ -74,7 +74,7 @@ function createModelDefaultsConfig(params: {
         },
       },
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
 function requireString(value: string | undefined, label: string): string {
@@ -539,7 +539,7 @@ describe("gateway session utils", () => {
           thinkingDefault: "high",
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     expectFields(defaults, {
       modelProvider: "openai-codex",
@@ -568,7 +568,7 @@ describe("gateway session utils", () => {
           },
         ],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const row = buildGatewaySessionRow({
       cfg,
@@ -597,7 +597,7 @@ describe("gateway session utils", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const row = buildGatewaySessionRow({
       cfg,
@@ -626,7 +626,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "work" },
       agents: { list: [{ id: "ops", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     expect(resolveSessionStoreKey({ cfg, sessionKey: "main" })).toBe("agent:ops:work");
     expect(resolveSessionStoreKey({ cfg, sessionKey: "work" })).toBe("agent:ops:work");
     expect(resolveSessionStoreKey({ cfg, sessionKey: "agent:ops:main" })).toBe("agent:ops:work");
@@ -640,7 +640,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "work" },
       agents: { list: [{ id: "ops", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     expect(resolveSessionStoreKey({ cfg, sessionKey: "agent:main:discord:direct:u1" })).toBe(
       "agent:main:discord:direct:u1",
     );
@@ -650,7 +650,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "work" },
       agents: { list: [{ id: "ops", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const legacyMainAlias = resolveSessionStoreKey({ cfg, sessionKey: "agent:main:main" });
 
     expect(legacyMainAlias).toBe("agent:ops:work");
@@ -665,7 +665,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main" },
       agents: { list: [{ id: "ops", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     expect(resolveSessionStoreKey({ cfg, sessionKey: "discord:group:123" })).toBe(
       "agent:ops:discord:group:123",
     );
@@ -678,7 +678,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main" },
       agents: { list: [{ id: "ops" }, { id: "review" }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     expect(resolveSessionStoreKey({ cfg, sessionKey: "main" })).toBe("agent:ops:main");
     expect(resolveSessionStoreKey({ cfg, sessionKey: "discord:group:123" })).toBe(
       "agent:ops:discord:group:123",
@@ -688,7 +688,7 @@ describe("gateway session utils", () => {
   test("resolveSessionStoreKey falls back to main when agents.list is missing", () => {
     const cfg = {
       session: { mainKey: "work" },
-    } as OpenClawConfig;
+    } as RecallConfig;
     expect(resolveSessionStoreKey({ cfg, sessionKey: "main" })).toBe("agent:main:work");
     expect(resolveSessionStoreKey({ cfg, sessionKey: "thread-1" })).toBe("agent:main:thread-1");
   });
@@ -697,7 +697,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main" },
       agents: { list: [{ id: "ops", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     expect(resolveSessionStoreKey({ cfg, sessionKey: "CoP" })).toBe(
       resolveSessionStoreKey({ cfg, sessionKey: "cop" }),
     );
@@ -712,7 +712,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main" },
       agents: { list: [{ id: "ops", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const mixedGroupId = "VWATodkf2hc8zdOS76q9Tb0+5Bi522E03qLdaQ/9ypg=";
     expect(resolveSessionStoreKey({ cfg, sessionKey: `Signal:Group:${mixedGroupId}` })).toBe(
       `agent:ops:signal:group:${mixedGroupId}`,
@@ -725,7 +725,7 @@ describe("gateway session utils", () => {
   test("canonicalizeSpawnedByForAgent preserves Signal group ids", () => {
     const cfg = {
       session: { mainKey: "main" },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const mixedGroupId = "VWATodkf2hc8zdOS76q9Tb0+5Bi522E03qLdaQ/9ypg=";
 
     expect(canonicalizeSpawnedByForAgent(cfg, "ops", `Signal:Group:${mixedGroupId}`)).toBe(
@@ -740,7 +740,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { scope: "global", mainKey: "work" },
       agents: { list: [{ id: "ops", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     expect(resolveSessionStoreKey({ cfg, sessionKey: "main" })).toBe("global");
     const target = resolveGatewaySessionStoreTarget({ cfg, key: "main" });
     expect(target.canonicalKey).toBe("global");
@@ -750,14 +750,14 @@ describe("gateway session utils", () => {
   test("resolveGatewaySessionStoreTarget uses canonical key for main alias", () => {
     const storeTemplate = path.join(
       os.tmpdir(),
-      "openclaw-session-utils",
+      "recall-session-utils",
       "{agentId}",
       "sessions.json",
     );
     const cfg = {
       session: { mainKey: "main", store: storeTemplate },
       agents: { list: [{ id: "ops", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const target = resolveGatewaySessionStoreTarget({ cfg, key: "main" });
     expect(target.canonicalKey).toBe("agent:ops:main");
     expect(target.storeKeys).toContain("agent:ops:main");
@@ -776,7 +776,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main", store: storePath },
       agents: { list: [{ id: "ops", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const target = resolveGatewaySessionStoreTarget({ cfg, key: "agent:ops:mysession" });
     expect(target.canonicalKey).toBe("agent:ops:mysession");
     expect(target.storeKeys).toContain("agent:ops:mysession");
@@ -800,7 +800,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main", store: storePath },
       agents: { list: [{ id: "ops", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const target = resolveGatewaySessionStoreTarget({ cfg, key: "agent:ops:mysession" });
     expect(target.storeKeys).toContain("agent:ops:mysession");
     expect(target.storeKeys).toContain("agent:ops:MySession");
@@ -817,7 +817,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "work", store: storePath },
       agents: { list: [{ id: "ops", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const target = resolveGatewaySessionStoreTarget({ cfg, key: "agent:ops:main" });
     expect(target.canonicalKey).toBe("agent:ops:work");
     expect(target.storeKeys).toContain("agent:ops:MAIN");
@@ -842,7 +842,7 @@ describe("gateway session utils", () => {
           store: path.join(stateDir, "agents", "{agentId}", "sessions", "sessions.json"),
         },
         agents: { list: [{ id: "main", default: true }] },
-      } as OpenClawConfig;
+      } as RecallConfig;
 
       const target = resolveGatewaySessionStoreTarget({ cfg, key: "agent:retired-agent:main" });
 
@@ -870,7 +870,7 @@ describe("gateway session utils", () => {
             store: path.join(stateDir, "agents", "{agentId}", "sessions", "sessions.json"),
           },
           agents: { list: [{ id: "main", default: true }] },
-        } as OpenClawConfig;
+        } as RecallConfig;
         setRuntimeConfigSnapshot(cfg, cfg);
 
         const loaded = loadSessionEntry("agent:retired-agent:main");
@@ -917,7 +917,7 @@ describe("gateway session utils", () => {
         const cfg = {
           session: { mainKey: "main", store: storeTemplate },
           agents: { list: [{ id: "ops", default: true }] },
-        } as OpenClawConfig;
+        } as RecallConfig;
         setRuntimeConfigSnapshot(cfg, cfg);
 
         const target = resolveGatewaySessionStoreTarget({ cfg, key: "agent:main:main" });
@@ -968,7 +968,7 @@ describe("gateway session utils", () => {
         const cfg = {
           session: { mainKey: "work", store: storeTemplate },
           agents: { list: [{ id: "ops", default: true }] },
-        } as OpenClawConfig;
+        } as RecallConfig;
         setRuntimeConfigSnapshot(cfg, cfg);
 
         const loaded = loadSessionEntry("agent:main:work");
@@ -1007,7 +1007,7 @@ describe("gateway session utils", () => {
             store: path.join(stateDir, "agents", "{agentId}", "sessions", "sessions.json"),
           },
           agents: { list: [{ id: "main", default: true }] },
-        } as OpenClawConfig;
+        } as RecallConfig;
         setRuntimeConfigSnapshot(cfg, cfg);
 
         const loaded = loadSessionEntry("agent:main:main");
@@ -1058,7 +1058,7 @@ describe("gateway session utils", () => {
             store: path.join(stateDir, "agents", "{agentId}", "sessions", "sessions.json"),
           },
           agents: { list: [{ id: "main", default: true }] },
-        } as OpenClawConfig;
+        } as RecallConfig;
         setRuntimeConfigSnapshot(cfg, cfg);
 
         const loaded = loadSessionEntry("agent:main:main");
@@ -1089,7 +1089,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main" },
       agents: { list: [{ id: "main", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const store: Record<string, SessionEntry> = {
       "agent:main:Main": {
         sessionId: "sess-stale",
@@ -1118,7 +1118,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main" },
       agents: { list: [{ id: "main", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const store: Record<string, SessionEntry> = {
       "agent:main:main": {
         sessionId: "sess-stale",
@@ -1184,7 +1184,7 @@ describe("gateway session utils", () => {
       agents: {
         list: [{ id: "main", default: true, identity: { name: "开发助手" } }],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const result = listAgentsForGateway(cfg);
 
@@ -1208,7 +1208,7 @@ describe("gateway session utils", () => {
           },
         ],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const result = listAgentsForGateway(cfg);
 
@@ -1225,7 +1225,7 @@ describe("gateway session utils", () => {
       agents: {
         list: [{ id: "main", default: true, identity: {} }],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const result = listAgentsForGateway(cfg);
 
@@ -1237,14 +1237,14 @@ describe("gateway session utils", () => {
   });
 
   test("listAgentsForGateway keeps explicit agents.list scope over disk-only agents (scope boundary)", async () => {
-    await withStateDirEnv("openclaw-agent-list-scope-", async ({ stateDir }) => {
+    await withStateDirEnv("recall-agent-list-scope-", async ({ stateDir }) => {
       fs.mkdirSync(path.join(stateDir, "agents", "main"), { recursive: true });
       fs.mkdirSync(path.join(stateDir, "agents", "codex"), { recursive: true });
 
       const cfg = {
         session: { mainKey: "main" },
         agents: { list: [{ id: "main", default: true }] },
-      } as OpenClawConfig;
+      } as RecallConfig;
 
       const { agents } = listAgentsForGateway(cfg);
       expect(agents.map((agent) => agent.id)).toEqual(["main"]);
@@ -1264,7 +1264,7 @@ describe("gateway session utils", () => {
         },
         list: [{ id: "main", default: true }],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const result = listAgentsForGateway(cfg);
     expectFields(result.agents[0], {
@@ -1299,7 +1299,7 @@ describe("gateway session utils", () => {
         },
         list: [{ id: "main", default: true }],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const result = listAgentsForGateway(cfg);
     expectFields(result.agents[0], {
@@ -1332,7 +1332,7 @@ describe("gateway session utils", () => {
           },
         ],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const result = listAgentsForGateway(cfg);
     const ops = result.agents.find((agent) => agent.id === "ops");
@@ -1476,7 +1476,7 @@ describe("resolveSessionModelRef", () => {
 
 describe("listSessionsFromStore selected model display", () => {
   test("async list yields during bulk transcript title and last-message hydration", async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-sessions-list-yield-"));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-sessions-list-yield-"));
     try {
       const storePath = path.join(tmpDir, "sessions.json");
       const store: Record<string, SessionEntry> = {};
@@ -1541,7 +1541,7 @@ describe("listSessionsFromStore selected model display", () => {
   });
 
   test("caps transcript title and last-message hydration for bulk list responses", async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-sessions-list-cap-"));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-sessions-list-cap-"));
     try {
       const storePath = path.join(tmpDir, "sessions.json");
       const store: Record<string, SessionEntry> = {};
@@ -1708,7 +1708,7 @@ describe("listSessionsFromStore selected model display", () => {
           { id: "alias", model: { primary: "anthropic/sonnet-4.6" } },
         ],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const result = listSessionsFromStore({
       cfg,
@@ -1745,7 +1745,7 @@ describe("listSessionsFromStore selected model display", () => {
         defaults: { model: { primary: "openai/gpt-5.4" } },
         list: [{ id: "main", model: { primary: "anthropic/claude-sonnet-4-6" } }],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const result = listSessionsFromStore({
       cfg,
@@ -1771,7 +1771,7 @@ describe("listSessionsFromStore selected model display", () => {
         defaults: { model: { primary: "openai/gpt-5.4" } },
         list: [{ id: "main", model: { primary: "anthropic/claude-sonnet-4-6" } }],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const result = listSessionsFromStore({
       cfg,
@@ -1793,7 +1793,7 @@ describe("listSessionsFromStore selected model display", () => {
 });
 
 describe("resolveSessionModelIdentityRef", () => {
-  const resolveLegacyIdentityRef = (cfg: OpenClawConfig, modelProvider?: string) =>
+  const resolveLegacyIdentityRef = (cfg: RecallConfig, modelProvider?: string) =>
     resolveSessionModelIdentityRef(cfg, {
       sessionId: "legacy-session",
       updatedAt: Date.now(),
@@ -1834,7 +1834,7 @@ describe("resolveSessionModelIdentityRef", () => {
           models: [{ id: "qwen-max" }],
         },
       },
-    } as unknown as OpenClawConfig["models"];
+    } as unknown as RecallConfig["models"];
 
     const resolved = resolveSessionModelIdentityRef(cfg, {
       sessionId: "custom-provider-runtime-model",
@@ -1873,7 +1873,7 @@ describe("resolveSessionModelIdentityRef", () => {
           models: [{ id: "qwen-max" }],
         },
       },
-    } as unknown as OpenClawConfig["models"];
+    } as unknown as RecallConfig["models"];
 
     const resolved = resolveSessionModelIdentityRef(cfg, {
       sessionId: "ambiguous-custom-provider-runtime-model",

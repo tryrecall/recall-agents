@@ -1,9 +1,9 @@
-import { normalizeAccountId } from "openclaw/plugin-sdk/account-resolution";
+import { normalizeAccountId } from "recall/plugin-sdk/account-resolution";
 import {
   createResolvedDirectoryEntriesLister,
   type DirectoryConfigParams,
-} from "openclaw/plugin-sdk/directory-config-runtime";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/directory-config-runtime";
+import { normalizeLowercaseStringOrEmpty } from "recall/plugin-sdk/string-coerce-runtime";
 import {
   mergeSlackAccountConfig,
   resolveDefaultSlackAccountId,

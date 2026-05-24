@@ -19,9 +19,9 @@ const SCENARIOS = new Set([
 
 function usage() {
   return `Usage:
-  node scripts/lib/openclaw-test-state.mjs -- create [--label <name>] [--scenario <name>] [--env-file <path>] [--json]
-  node scripts/lib/openclaw-test-state.mjs shell [--label <name>] [--scenario <name>]
-  node scripts/lib/openclaw-test-state.mjs shell-function
+  node scripts/lib/recall-test-state.mjs -- create [--label <name>] [--scenario <name>] [--env-file <path>] [--json]
+  node scripts/lib/recall-test-state.mjs shell [--label <name>] [--scenario <name>]
+  node scripts/lib/recall-test-state.mjs shell-function
 
 Scenarios: ${[...SCENARIOS].join(", ")}
 `;
@@ -148,7 +148,7 @@ function scenarioConfig(scenario, options = {}) {
         ],
       },
       skills: {
-        allowBundled: ["memory", "openclaw-testing"],
+        allowBundled: ["memory", "recall-testing"],
         limits: {
           maxSkillsInPrompt: 8,
           maxSkillsPromptChars: 30000,
@@ -223,7 +223,7 @@ function scenarioConfig(scenario, options = {}) {
         port: Number(options.port || 18789),
         auth: {
           mode: "token",
-          token: options.token || "openclaw-test-token",
+          token: options.token || "recall-test-token",
         },
         controlUi: {
           enabled: false,
@@ -237,7 +237,7 @@ function scenarioConfig(scenario, options = {}) {
 function scenarioEnv(scenario) {
   if (scenario === "external-service") {
     return {
-      OPENCLAW_SERVICE_REPAIR_POLICY: "external",
+      RECALL_SERVICE_REPAIR_POLICY: "external",
     };
   }
   return {};
@@ -259,18 +259,18 @@ function generateAuthProfileSecretKey() {
 
 function renderAuthProfileSecretKeyExport() {
   return [
-    'OPENCLAW_AUTH_PROFILE_SECRET_KEY_FILE="$OPENCLAW_TEST_STATE_HOME/.openclaw-test-auth-profile-secret-key"',
-    'if [ -s "$OPENCLAW_AUTH_PROFILE_SECRET_KEY_FILE" ]; then',
-    '  OPENCLAW_AUTH_PROFILE_SECRET_KEY="$(cat "$OPENCLAW_AUTH_PROFILE_SECRET_KEY_FILE")"',
+    'RECALL_AUTH_PROFILE_SECRET_KEY_FILE="$RECALL_TEST_STATE_HOME/.recall-test-auth-profile-secret-key"',
+    'if [ -s "$RECALL_AUTH_PROFILE_SECRET_KEY_FILE" ]; then',
+    '  RECALL_AUTH_PROFILE_SECRET_KEY="$(cat "$RECALL_AUTH_PROFILE_SECRET_KEY_FILE")"',
     "else",
-    '  OPENCLAW_AUTH_PROFILE_SECRET_KEY="$(od -An -N 32 -tx1 /dev/urandom | tr -d " \\n")"',
-    '  ( umask 077; printf "%s\\n" "$OPENCLAW_AUTH_PROFILE_SECRET_KEY" > "$OPENCLAW_AUTH_PROFILE_SECRET_KEY_FILE" )',
+    '  RECALL_AUTH_PROFILE_SECRET_KEY="$(od -An -N 32 -tx1 /dev/urandom | tr -d " \\n")"',
+    '  ( umask 077; printf "%s\\n" "$RECALL_AUTH_PROFILE_SECRET_KEY" > "$RECALL_AUTH_PROFILE_SECRET_KEY_FILE" )',
     "fi",
-    'if [ -z "$OPENCLAW_AUTH_PROFILE_SECRET_KEY" ]; then',
-    '  echo "failed to generate OPENCLAW_AUTH_PROFILE_SECRET_KEY" >&2',
+    'if [ -z "$RECALL_AUTH_PROFILE_SECRET_KEY" ]; then',
+    '  echo "failed to generate RECALL_AUTH_PROFILE_SECRET_KEY" >&2',
     "  return 1 2>/dev/null || exit 1",
     "fi",
-    "export OPENCLAW_AUTH_PROFILE_SECRET_KEY",
+    "export RECALL_AUTH_PROFILE_SECRET_KEY",
   ];
 }
 
@@ -280,9 +280,9 @@ function renderConfigWrite(configPathExpression, config) {
   }
   const json = JSON.stringify(config, null, 2);
   return [
-    `cat > ${configPathExpression} <<'OPENCLAW_TEST_STATE_JSON'`,
+    `cat > ${configPathExpression} <<'RECALL_TEST_STATE_JSON'`,
     json,
-    "OPENCLAW_TEST_STATE_JSON",
+    "RECALL_TEST_STATE_JSON",
   ].join("\n");
 }
 
@@ -294,17 +294,17 @@ function buildCreatePlan(options = {}) {
   }
   const root = options.root;
   const home = path.join(root, "home");
-  const stateDir = path.join(home, ".openclaw");
-  const configPath = path.join(stateDir, "openclaw.json");
+  const stateDir = path.join(home, ".recall");
+  const configPath = path.join(stateDir, "recall.json");
   const workspaceDir = path.join(home, "workspace");
   const config = scenarioConfig(scenario, options);
   const env = {
     HOME: home,
     USERPROFILE: home,
-    OPENCLAW_HOME: home,
-    OPENCLAW_STATE_DIR: stateDir,
-    OPENCLAW_CONFIG_PATH: configPath,
-    OPENCLAW_AUTH_PROFILE_SECRET_KEY: generateAuthProfileSecretKey(),
+    RECALL_HOME: home,
+    RECALL_STATE_DIR: stateDir,
+    RECALL_CONFIG_PATH: configPath,
+    RECALL_AUTH_PROFILE_SECRET_KEY: generateAuthProfileSecretKey(),
     ...scenarioEnv(scenario),
   };
   return {
@@ -323,7 +323,7 @@ function buildCreatePlan(options = {}) {
 
 export async function createState(options = {}) {
   const label = normalizeLabel(options.label);
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), `openclaw-${label}-`));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), `recall-${label}-`));
   const plan = buildCreatePlan({ ...options, root });
   await fs.mkdir(plan.stateDir, { recursive: true });
   await fs.mkdir(plan.workspaceDir, { recursive: true });
@@ -342,25 +342,25 @@ export function renderShellSnippet(options = {}) {
   const scenario = requireScenario(options.scenario);
   const config = scenarioConfig(scenario, options);
   const env = scenarioEnv(scenario);
-  const homeTemplate = `openclaw-${label}-${scenario}-home.XXXXXX`;
+  const homeTemplate = `recall-${label}-${scenario}-home.XXXXXX`;
   const lines = [
-    'OPENCLAW_TEST_STATE_TMP_ROOT="${OPENCLAW_TEST_STATE_TMPDIR:-${TMPDIR:-/tmp}}"',
-    "export OPENCLAW_TEST_STATE_TMP_ROOT",
-    'mkdir -p "$OPENCLAW_TEST_STATE_TMP_ROOT"',
-    `OPENCLAW_TEST_STATE_HOME="$(mktemp -d "$OPENCLAW_TEST_STATE_TMP_ROOT/${homeTemplate}")"`,
-    'export HOME="$OPENCLAW_TEST_STATE_HOME"',
-    'export USERPROFILE="$OPENCLAW_TEST_STATE_HOME"',
-    'export OPENCLAW_HOME="$OPENCLAW_TEST_STATE_HOME"',
-    'export OPENCLAW_STATE_DIR="$OPENCLAW_TEST_STATE_HOME/.openclaw"',
-    'export OPENCLAW_CONFIG_PATH="$OPENCLAW_STATE_DIR/openclaw.json"',
+    'RECALL_TEST_STATE_TMP_ROOT="${RECALL_TEST_STATE_TMPDIR:-${TMPDIR:-/tmp}}"',
+    "export RECALL_TEST_STATE_TMP_ROOT",
+    'mkdir -p "$RECALL_TEST_STATE_TMP_ROOT"',
+    `RECALL_TEST_STATE_HOME="$(mktemp -d "$RECALL_TEST_STATE_TMP_ROOT/${homeTemplate}")"`,
+    'export HOME="$RECALL_TEST_STATE_HOME"',
+    'export USERPROFILE="$RECALL_TEST_STATE_HOME"',
+    'export RECALL_HOME="$RECALL_TEST_STATE_HOME"',
+    'export RECALL_STATE_DIR="$RECALL_TEST_STATE_HOME/.recall"',
+    'export RECALL_CONFIG_PATH="$RECALL_STATE_DIR/recall.json"',
     ...renderAuthProfileSecretKeyExport(),
-    'export OPENCLAW_TEST_WORKSPACE_DIR="$OPENCLAW_TEST_STATE_HOME/workspace"',
-    'mkdir -p "$OPENCLAW_STATE_DIR" "$OPENCLAW_TEST_WORKSPACE_DIR"',
+    'export RECALL_TEST_WORKSPACE_DIR="$RECALL_TEST_STATE_HOME/workspace"',
+    'mkdir -p "$RECALL_STATE_DIR" "$RECALL_TEST_WORKSPACE_DIR"',
   ];
   for (const [key, value] of Object.entries(env)) {
     lines.push(`export ${key}=${shellQuote(value)}`);
   }
-  const configWrite = renderConfigWrite('"$OPENCLAW_CONFIG_PATH"', config);
+  const configWrite = renderConfigWrite('"$RECALL_CONFIG_PATH"', config);
   if (configWrite) {
     lines.push(configWrite);
   }
@@ -375,52 +375,52 @@ export function renderShellFunction() {
   case "$scenario" in
     empty|minimal|update-stable|upgrade-survivor|gateway-loopback|external-service) ;;
     *)
-      echo "unknown OpenClaw test-state scenario: $scenario" >&2
+      echo "unknown Recall test-state scenario: $scenario" >&2
       return 1
       ;;
   esac
   case "$raw_label" in
     /*)
-      OPENCLAW_TEST_STATE_HOME="$raw_label"
-      mkdir -p "$OPENCLAW_TEST_STATE_HOME"
+      RECALL_TEST_STATE_HOME="$raw_label"
+      mkdir -p "$RECALL_TEST_STATE_HOME"
       ;;
     *)
       label="$(printf "%s" "$label" | tr -cs "A-Za-z0-9_.-" "-" | sed -e "s/^-*//" -e "s/-*$//")"
       [ -n "$label" ] || label="state"
-      local tmp_root="\${OPENCLAW_TEST_STATE_TMPDIR:-\${TMPDIR:-/tmp}}"
+      local tmp_root="\${RECALL_TEST_STATE_TMPDIR:-\${TMPDIR:-/tmp}}"
       mkdir -p "$tmp_root"
-      OPENCLAW_TEST_STATE_HOME="$(mktemp -d "$tmp_root/openclaw-$label-$scenario-home.XXXXXX")"
+      RECALL_TEST_STATE_HOME="$(mktemp -d "$tmp_root/recall-$label-$scenario-home.XXXXXX")"
       ;;
   esac
-  export HOME="$OPENCLAW_TEST_STATE_HOME"
-  export USERPROFILE="$OPENCLAW_TEST_STATE_HOME"
-  export OPENCLAW_HOME="$OPENCLAW_TEST_STATE_HOME"
-  export OPENCLAW_STATE_DIR="$OPENCLAW_TEST_STATE_HOME/.openclaw"
-  export OPENCLAW_CONFIG_PATH="$OPENCLAW_STATE_DIR/openclaw.json"
+  export HOME="$RECALL_TEST_STATE_HOME"
+  export USERPROFILE="$RECALL_TEST_STATE_HOME"
+  export RECALL_HOME="$RECALL_TEST_STATE_HOME"
+  export RECALL_STATE_DIR="$RECALL_TEST_STATE_HOME/.recall"
+  export RECALL_CONFIG_PATH="$RECALL_STATE_DIR/recall.json"
   ${renderAuthProfileSecretKeyExport().join("\n  ")}
-  export OPENCLAW_TEST_WORKSPACE_DIR="$OPENCLAW_TEST_STATE_HOME/workspace"
-  unset OPENCLAW_AGENT_DIR
+  export RECALL_TEST_WORKSPACE_DIR="$RECALL_TEST_STATE_HOME/workspace"
+  unset RECALL_AGENT_DIR
   unset PI_CODING_AGENT_DIR
-  unset OPENCLAW_SERVICE_REPAIR_POLICY
-  mkdir -p "$OPENCLAW_STATE_DIR" "$OPENCLAW_TEST_WORKSPACE_DIR"
+  unset RECALL_SERVICE_REPAIR_POLICY
+  mkdir -p "$RECALL_STATE_DIR" "$RECALL_TEST_WORKSPACE_DIR"
   case "$scenario" in
     minimal)
-      cat > "$OPENCLAW_CONFIG_PATH" <<'OPENCLAW_TEST_STATE_JSON'
+      cat > "$RECALL_CONFIG_PATH" <<'RECALL_TEST_STATE_JSON'
 {}
-OPENCLAW_TEST_STATE_JSON
+RECALL_TEST_STATE_JSON
       ;;
     update-stable)
-      cat > "$OPENCLAW_CONFIG_PATH" <<'OPENCLAW_TEST_STATE_JSON'
+      cat > "$RECALL_CONFIG_PATH" <<'RECALL_TEST_STATE_JSON'
 {
   "update": {
     "channel": "stable"
   },
   "plugins": {}
 }
-OPENCLAW_TEST_STATE_JSON
+RECALL_TEST_STATE_JSON
       ;;
     upgrade-survivor)
-      cat > "$OPENCLAW_CONFIG_PATH" <<'OPENCLAW_TEST_STATE_JSON'
+      cat > "$RECALL_CONFIG_PATH" <<'RECALL_TEST_STATE_JSON'
 {
   "update": {
     "channel": "stable"
@@ -494,7 +494,7 @@ OPENCLAW_TEST_STATE_JSON
   "skills": {
     "allowBundled": [
       "memory",
-      "openclaw-testing"
+      "recall-testing"
     ],
     "limits": {
       "maxSkillsInPrompt": 8,
@@ -592,29 +592,29 @@ OPENCLAW_TEST_STATE_JSON
     }
   }
 }
-OPENCLAW_TEST_STATE_JSON
+RECALL_TEST_STATE_JSON
       ;;
     gateway-loopback)
-      cat > "$OPENCLAW_CONFIG_PATH" <<'OPENCLAW_TEST_STATE_JSON'
+      cat > "$RECALL_CONFIG_PATH" <<'RECALL_TEST_STATE_JSON'
 {
   "gateway": {
     "port": 18789,
     "auth": {
       "mode": "token",
-      "token": "openclaw-test-token"
+      "token": "recall-test-token"
     },
     "controlUi": {
       "enabled": false
     }
   }
 }
-OPENCLAW_TEST_STATE_JSON
+RECALL_TEST_STATE_JSON
       ;;
     external-service)
-      export OPENCLAW_SERVICE_REPAIR_POLICY="external"
-      cat > "$OPENCLAW_CONFIG_PATH" <<'OPENCLAW_TEST_STATE_JSON'
+      export RECALL_SERVICE_REPAIR_POLICY="external"
+      cat > "$RECALL_CONFIG_PATH" <<'RECALL_TEST_STATE_JSON'
 {}
-OPENCLAW_TEST_STATE_JSON
+RECALL_TEST_STATE_JSON
       ;;
   esac
 }

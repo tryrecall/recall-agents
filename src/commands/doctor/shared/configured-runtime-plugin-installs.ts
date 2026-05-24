@@ -2,7 +2,7 @@ import {
   collectConfiguredAgentHarnessRuntimes,
   type ConfiguredAgentHarnessRuntimeOptions,
 } from "../../../agents/harness-runtimes.js";
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { RecallConfig } from "../../../config/types.recall.js";
 import type { PluginPackageInstall } from "../../../plugins/manifest.js";
 
 export type ConfiguredRuntimePluginInstallCandidate = {
@@ -19,14 +19,14 @@ export const CONFIGURED_RUNTIME_PLUGIN_INSTALL_CANDIDATES: readonly ConfiguredRu
     {
       pluginId: "acpx",
       label: "ACPX Runtime",
-      npmSpec: "@openclaw/acpx",
+      npmSpec: "@recall/acpx",
       trustedSourceLinkedOfficialInstall: true,
     },
     // Runtime-only configs do not have a provider/channel integration catalog entry.
     {
       pluginId: "codex",
       label: "Codex",
-      npmSpec: "@openclaw/codex",
+      npmSpec: "@recall/codex",
       trustedSourceLinkedOfficialInstall: true,
     },
   ];
@@ -45,7 +45,7 @@ function asRecord(value: unknown): Record<string, unknown> | undefined {
     : undefined;
 }
 
-function acpxRuntimeIsConfigured(cfg: OpenClawConfig): boolean {
+function acpxRuntimeIsConfigured(cfg: RecallConfig): boolean {
   const acp = asRecord(cfg.acp);
   const backend = typeof acp?.backend === "string" ? acp.backend.trim().toLowerCase() : "";
   return (
@@ -55,7 +55,7 @@ function acpxRuntimeIsConfigured(cfg: OpenClawConfig): boolean {
 }
 
 export function collectConfiguredRuntimePluginIds(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   env: NodeJS.ProcessEnv,
   options?: ConfiguredAgentHarnessRuntimeOptions,
 ): string[] {

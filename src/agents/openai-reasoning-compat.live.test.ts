@@ -12,7 +12,7 @@ import {
   logLiveProgress,
 } from "./live-test-helpers.js";
 import { getApiKeyForModel, requireApiKey } from "./model-auth.js";
-import { ensureOpenClawModelsJson } from "./models-config.js";
+import { ensureRecallModelsJson } from "./models-config.js";
 import { sanitizeSessionHistory } from "./pi-embedded-runner/replay-history.js";
 import { discoverAuthStorage, discoverModels } from "./pi-model-discovery.js";
 
@@ -21,7 +21,7 @@ const REQUIRE_PROFILE_KEYS = isLiveProfileKeyModeEnabled();
 const LIVE_CREDENTIAL_PRECEDENCE = REQUIRE_PROFILE_KEYS ? "profile-first" : "env-first";
 const DEFAULT_TARGET_MODEL_REF = "openai-codex/gpt-5.1-codex-mini";
 const TARGET_MODEL_REF =
-  process.env.OPENCLAW_LIVE_OPENAI_REASONING_COMPAT_MODEL?.trim() || DEFAULT_TARGET_MODEL_REF;
+  process.env.RECALL_LIVE_OPENAI_REASONING_COMPAT_MODEL?.trim() || DEFAULT_TARGET_MODEL_REF;
 const describeLive = LIVE ? describe : describe.skip;
 
 const logProgress = logLiveProgress;
@@ -84,7 +84,7 @@ function resolveTargetModelRef(): { provider: string; modelId: string } {
   const modelId = rest.join("/").trim();
   if (!provider?.trim() || !modelId) {
     throw new Error(
-      `Invalid OPENCLAW_LIVE_OPENAI_REASONING_COMPAT_MODEL: ${JSON.stringify(TARGET_MODEL_REF)}`,
+      `Invalid RECALL_LIVE_OPENAI_REASONING_COMPAT_MODEL: ${JSON.stringify(TARGET_MODEL_REF)}`,
     );
   }
   return {
@@ -99,7 +99,7 @@ describeLive("openai reasoning compat live", () => {
     async () => {
       const { provider, modelId } = resolveTargetModelRef();
       const cfg = getRuntimeConfig();
-      await ensureOpenClawModelsJson(cfg);
+      await ensureRecallModelsJson(cfg);
 
       const agentDir = resolveDefaultAgentDir(cfg);
       const authStorage = discoverAuthStorage(agentDir);
@@ -153,7 +153,7 @@ describeLive("openai reasoning compat live", () => {
     async () => {
       const { provider, modelId } = resolveTargetModelRef();
       const cfg = getRuntimeConfig();
-      await ensureOpenClawModelsJson(cfg);
+      await ensureRecallModelsJson(cfg);
 
       const agentDir = resolveDefaultAgentDir(cfg);
       const authStorage = discoverAuthStorage(agentDir);

@@ -1,5 +1,5 @@
-import { jsonResult, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
-import { getRuntimeConfigSnapshot } from "openclaw/plugin-sdk/runtime-config-snapshot";
+import { jsonResult, readStringParam } from "recall/plugin-sdk/provider-web-search";
+import { getRuntimeConfigSnapshot } from "recall/plugin-sdk/runtime-config-snapshot";
 import { Type } from "typebox";
 import {
   buildXaiCodeExecutionPayload,
@@ -108,8 +108,8 @@ export function createCodeExecutionTool(options?: {
         return jsonResult({
           error: "missing_xai_api_key",
           message:
-            "code_execution needs xAI credentials. Run `openclaw onboard --auth-choice xai-oauth` to sign in with Grok, run `openclaw onboard --auth-choice xai-api-key`, set `XAI_API_KEY` in the Gateway environment, or configure `plugins.entries.xai.config.webSearch.apiKey`.",
-          docs: "https://docs.openclaw.ai/tools/code-execution",
+            "code_execution needs xAI credentials. Run `recall onboard --auth-choice xai-oauth` to sign in with Grok, run `recall onboard --auth-choice xai-api-key`, set `XAI_API_KEY` in the Gateway environment, or configure `plugins.entries.xai.config.webSearch.apiKey`.",
+          docs: "https://docs.recall.ai/tools/code-execution",
         });
       }
 

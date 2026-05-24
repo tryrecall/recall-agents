@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { normalizeAgentId } from "../routing/session-key.js";
 
 type CrestodianRescueDecision =
@@ -22,7 +22,7 @@ type CrestodianRescueDecision =
     };
 
 type CrestodianRescuePolicyInput = {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId?: string;
   senderIsOwner: boolean;
   isDirectMessage: boolean;
@@ -32,7 +32,7 @@ function resolvePendingTtlMinutes(value: unknown): number {
   return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : 15;
 }
 
-function resolveAgentEntry(cfg: OpenClawConfig, agentId?: string) {
+function resolveAgentEntry(cfg: RecallConfig, agentId?: string) {
   if (!agentId) {
     return undefined;
   }
@@ -42,12 +42,12 @@ function resolveAgentEntry(cfg: OpenClawConfig, agentId?: string) {
   );
 }
 
-function resolveScopedExecConfig(cfg: OpenClawConfig, agentId?: string) {
+function resolveScopedExecConfig(cfg: RecallConfig, agentId?: string) {
   return resolveAgentEntry(cfg, agentId)?.tools?.exec;
 }
 
 function resolveScopedSandboxMode(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   agentId?: string,
 ): "off" | "non-main" | "all" {
   return (
@@ -55,7 +55,7 @@ function resolveScopedSandboxMode(
   );
 }
 
-function isYoloHostPosture(cfg: OpenClawConfig, agentId?: string): boolean {
+function isYoloHostPosture(cfg: RecallConfig, agentId?: string): boolean {
   const scopedExec = resolveScopedExecConfig(cfg, agentId);
   const globalExec = cfg.tools?.exec;
   const security = scopedExec?.security ?? globalExec?.security ?? "full";
@@ -97,7 +97,7 @@ export function resolveCrestodianRescuePolicy(
       sandboxActive,
       reason: "sandbox-active",
       message:
-        "Crestodian rescue is blocked because OpenClaw sandboxing is active. Fix the install locally or disable sandboxing before using remote rescue.",
+        "Crestodian rescue is blocked because Recall sandboxing is active. Fix the install locally or disable sandboxing before using remote rescue.",
     };
   }
   if (configuredEnabled === "auto" && !yolo) {
@@ -122,7 +122,7 @@ export function resolveCrestodianRescuePolicy(
       yolo,
       sandboxActive,
       reason: "not-owner",
-      message: "Crestodian rescue only accepts commands from an OpenClaw owner.",
+      message: "Crestodian rescue only accepts commands from an Recall owner.",
     };
   }
   if (ownerDmOnly && !input.isDirectMessage) {

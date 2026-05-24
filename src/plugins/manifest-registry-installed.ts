@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { tryReadJsonSync } from "../infra/json-files.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
 import { normalizeOptionalTrimmedStringList } from "../shared/string-normalization.js";
@@ -13,7 +13,7 @@ import type { BundledChannelConfigCollector } from "./manifest-registry.js";
 import {
   DEFAULT_PLUGIN_ENTRY_CANDIDATES,
   getPackageManifestMetadata,
-  type OpenClawPackageManifest,
+  type RecallPackageManifest,
   type PackageManifest,
   type PluginPackageChannel,
 } from "./manifest.js";
@@ -360,7 +360,7 @@ function normalizePersistedPackageChannel(value: unknown): PluginPackageChannel 
 }
 
 function resolveInstalledPackageMetadata(record: InstalledPluginIndexRecord): {
-  packageManifest?: OpenClawPackageManifest;
+  packageManifest?: RecallPackageManifest;
   packageDependencies?: PluginDependencySpecMap;
   packageOptionalDependencies?: PluginDependencySpecMap;
 } {
@@ -437,7 +437,7 @@ function toPluginCandidate(record: InstalledPluginIndexRecord): PluginCandidate 
 
 export function loadPluginManifestRegistryForInstalledIndex(params: {
   index: InstalledPluginIndex;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   pluginIds?: readonly string[];

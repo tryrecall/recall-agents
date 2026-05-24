@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source scripts/lib/openclaw-e2e-instance.sh
-openclaw_e2e_eval_test_state_from_b64 "${OPENCLAW_TEST_STATE_SCRIPT_B64:?missing OPENCLAW_TEST_STATE_SCRIPT_B64}"
-export OPENCLAW_SKIP_CHANNELS=1
-export OPENCLAW_SKIP_GMAIL_WATCHER=1
-export OPENCLAW_SKIP_CRON=1
-export OPENCLAW_SKIP_CANVAS_HOST=1
-export OPENCLAW_SKIP_BROWSER_CONTROL_SERVER=1
-export OPENCLAW_SKIP_ACPX_RUNTIME=1
-export OPENCLAW_SKIP_ACPX_RUNTIME_PROBE=1
+source scripts/lib/recall-e2e-instance.sh
+openclaw_e2e_eval_test_state_from_b64 "${RECALL_TEST_STATE_SCRIPT_B64:?missing RECALL_TEST_STATE_SCRIPT_B64}"
+export RECALL_SKIP_CHANNELS=1
+export RECALL_SKIP_GMAIL_WATCHER=1
+export RECALL_SKIP_CRON=1
+export RECALL_SKIP_CANVAS_HOST=1
+export RECALL_SKIP_BROWSER_CONTROL_SERVER=1
+export RECALL_SKIP_ACPX_RUNTIME=1
+export RECALL_SKIP_ACPX_RUNTIME_PROBE=1
 
 PORT="${PORT:?missing PORT}"
 MOCK_PORT="${MOCK_PORT:?missing MOCK_PORT}"
-TOKEN="${OPENCLAW_GATEWAY_TOKEN:?missing OPENCLAW_GATEWAY_TOKEN}"
-SUCCESS_MARKER="OPENCLAW_SCHEMA_E2E_OK"
+TOKEN="${RECALL_GATEWAY_TOKEN:?missing RECALL_GATEWAY_TOKEN}"
+SUCCESS_MARKER="RECALL_SCHEMA_E2E_OK"
 RAW_SCHEMA_ERROR="400 The following tools cannot be used with reasoning.effort 'minimal': web_search."
-MOCK_REQUEST_LOG="/tmp/openclaw-openai-web-search-minimal-requests.jsonl"
-GATEWAY_LOG="/tmp/openclaw-openai-web-search-minimal-gateway.log"
+MOCK_REQUEST_LOG="/tmp/recall-openai-web-search-minimal-requests.jsonl"
+GATEWAY_LOG="/tmp/recall-openai-web-search-minimal-gateway.log"
 mock_pid=""
 gateway_pid=""
 
@@ -38,11 +38,11 @@ dump_debug_logs() {
   echo "OpenAI web_search minimal Docker E2E failed with exit code $status" >&2
   for file in \
     "$GATEWAY_LOG" \
-    /tmp/openclaw-openai-web-search-minimal-mock.log \
-    /tmp/openclaw-openai-web-search-minimal-client-success.log \
-    /tmp/openclaw-openai-web-search-minimal-client-reject.log \
+    /tmp/recall-openai-web-search-minimal-mock.log \
+    /tmp/recall-openai-web-search-minimal-client-success.log \
+    /tmp/recall-openai-web-search-minimal-client-reject.log \
     "$MOCK_REQUEST_LOG" \
-    "$OPENCLAW_STATE_DIR/openclaw.json"; do
+    "$RECALL_STATE_DIR/recall.json"; do
     if [ -f "$file" ]; then
       echo "--- $file ---" >&2
       sed -n '1,260p' "$file" >&2 || true
@@ -52,7 +52,7 @@ dump_debug_logs() {
 trap 'status=$?; dump_debug_logs "$status"; exit "$status"' ERR
 
 entry="$(openclaw_e2e_resolve_entrypoint)"
-mkdir -p "$OPENCLAW_STATE_DIR"
+mkdir -p "$RECALL_STATE_DIR"
 
 node scripts/e2e/lib/openai-web-search-minimal/assertions.mjs assert-patch-behavior
 
@@ -62,7 +62,7 @@ MOCK_PORT="$MOCK_PORT" \
   MOCK_REQUEST_LOG="$MOCK_REQUEST_LOG" \
   SUCCESS_MARKER="$SUCCESS_MARKER" \
   RAW_SCHEMA_ERROR="$RAW_SCHEMA_ERROR" \
-  node scripts/e2e/lib/openai-web-search-minimal/mock-server.mjs >/tmp/openclaw-openai-web-search-minimal-mock.log 2>&1 &
+  node scripts/e2e/lib/openai-web-search-minimal/mock-server.mjs >/tmp/recall-openai-web-search-minimal-mock.log 2>&1 &
 mock_pid="$!"
 
 for _ in $(seq 1 80); do
@@ -95,11 +95,11 @@ node "$entry" gateway health \
   --timeout 120000 \
   --json >/dev/null
 
-PORT="$PORT" OPENCLAW_GATEWAY_TOKEN="$TOKEN" node scripts/e2e/lib/openai-web-search-minimal/client.mjs success >/tmp/openclaw-openai-web-search-minimal-client-success.log 2>&1
+PORT="$PORT" RECALL_GATEWAY_TOKEN="$TOKEN" node scripts/e2e/lib/openai-web-search-minimal/client.mjs success >/tmp/recall-openai-web-search-minimal-client-success.log 2>&1
 
 node scripts/e2e/lib/openai-web-search-minimal/assertions.mjs assert-success-request "$MOCK_REQUEST_LOG"
 
-PORT="$PORT" OPENCLAW_GATEWAY_TOKEN="$TOKEN" node scripts/e2e/lib/openai-web-search-minimal/client.mjs reject >/tmp/openclaw-openai-web-search-minimal-client-reject.log 2>&1
+PORT="$PORT" RECALL_GATEWAY_TOKEN="$TOKEN" node scripts/e2e/lib/openai-web-search-minimal/client.mjs reject >/tmp/recall-openai-web-search-minimal-client-reject.log 2>&1
 
 for _ in $(seq 1 80); do
   if grep -Fq "$RAW_SCHEMA_ERROR" "$GATEWAY_LOG"; then

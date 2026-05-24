@@ -23,7 +23,7 @@ describe("buildSlackInteractiveBlocks", () => {
         elements: [
           {
             type: "static_select",
-            action_id: "openclaw:reply_select:1",
+            action_id: "recall:reply_select:1",
             placeholder: {
               type: "plain_text",
               text: "Pick one",
@@ -55,7 +55,7 @@ describe("buildSlackInteractiveBlocks", () => {
         elements: [
           {
             type: "button",
-            action_id: "openclaw:reply_button:1:1",
+            action_id: "recall:reply_button:1:1",
             text: {
               type: "plain_text",
               text: "Retry",
@@ -114,9 +114,9 @@ describe("buildSlackInteractiveBlocks", () => {
       }>;
     };
 
-    expect(buttonBlock.elements?.[0]?.action_id).toBe("openclaw:reply_button:1:1");
+    expect(buttonBlock.elements?.[0]?.action_id).toBe("recall:reply_button:1:1");
     expect(buttonBlock.elements?.[0]?.value).toBe("pluginbind:approval-123:o");
-    expect(selectBlock.elements?.[0]?.action_id).toBe("openclaw:reply_select:1");
+    expect(selectBlock.elements?.[0]?.action_id).toBe("recall:reply_select:1");
     expect(selectBlock.elements?.[0]?.options?.[0]?.value).toBe("codex:approve:thread-1");
   });
 
@@ -197,7 +197,7 @@ describe("buildSlackInteractiveBlocks", () => {
     expect(buttonBlock.elements?.[0]?.value).toBe("a".repeat(2000));
     expect(buttonBlock.elements?.[1]).toEqual({
       type: "button",
-      action_id: "openclaw:reply_button:1:3",
+      action_id: "recall:reply_button:1:3",
       text: {
         type: "plain_text",
         text: "Docs",
@@ -272,7 +272,7 @@ describe("buildSlackInteractiveBlocks", () => {
 
     expect(buttonBlock.elements?.[0]).toEqual({
       type: "button",
-      action_id: "openclaw:reply_button:1:1",
+      action_id: "recall:reply_button:1:1",
       text: {
         type: "plain_text",
         text: "Docs",
@@ -331,7 +331,7 @@ describe("buildSlackPresentationBlocks", () => {
         elements: [
           {
             type: "button",
-            action_id: "openclaw:reply_button:1:1",
+            action_id: "recall:reply_button:1:1",
             text: {
               type: "plain_text",
               text: "Approve",
@@ -386,8 +386,8 @@ describe("resolveSlackReplyBlocks", () => {
       | undefined;
     expect(blocks?.[0]?.block_id).toBe("openclaw_reply_buttons_1");
     expect(blocks?.[1]?.block_id).toBe("openclaw_reply_buttons_2");
-    expect(presentationButtonBlock?.elements?.[0]?.action_id).toBe("openclaw:reply_button:2:1");
+    expect(presentationButtonBlock?.elements?.[0]?.action_id).toBe("recall:reply_button:2:1");
     expect(blocks?.[2]?.block_id).toBe("openclaw_reply_buttons_3");
-    expect(legacyButtonBlock?.elements?.[0]?.action_id).toBe("openclaw:reply_button:3:1");
+    expect(legacyButtonBlock?.elements?.[0]?.action_id).toBe("recall:reply_button:3:1");
   });
 });

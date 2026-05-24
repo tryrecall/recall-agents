@@ -2,11 +2,11 @@
 set -euo pipefail
 trap "" PIPE
 export TERM=xterm-256color
-source scripts/lib/openclaw-e2e-instance.sh
-openclaw_e2e_eval_test_state_from_b64 "${OPENCLAW_TEST_STATE_FUNCTION_B64:?missing OPENCLAW_TEST_STATE_FUNCTION_B64}"
+source scripts/lib/recall-e2e-instance.sh
+openclaw_e2e_eval_test_state_from_b64 "${RECALL_TEST_STATE_FUNCTION_B64:?missing RECALL_TEST_STATE_FUNCTION_B64}"
 ONBOARD_FLAGS="--flow quickstart --auth-choice skip --skip-channels --skip-skills --skip-daemon --skip-ui"
-OPENCLAW_ENTRY="$(openclaw_e2e_resolve_entrypoint)"
-export OPENCLAW_ENTRY
+RECALL_ENTRY="$(openclaw_e2e_resolve_entrypoint)"
+export RECALL_ENTRY
 
 # Provide a minimal trash shim to avoid noisy "missing trash" logs in containers.
 openclaw_e2e_install_trash_shim
@@ -49,7 +49,7 @@ wait_for_log() {
 }
 
 start_gateway() {
-  GATEWAY_PID="$(openclaw_e2e_start_gateway "$OPENCLAW_ENTRY" 18789 /tmp/gateway-e2e.log)"
+  GATEWAY_PID="$(openclaw_e2e_start_gateway "$RECALL_ENTRY" 18789 /tmp/gateway-e2e.log)"
 }
 
 wait_for_gateway() {
@@ -84,9 +84,9 @@ run_wizard_cmd() {
   echo "== Wizard case: $case_name =="
   set_isolated_openclaw_env "$state_ref"
 
-  input_fifo="$(mktemp -u "/tmp/openclaw-onboard-${case_name}.XXXXXX")"
+  input_fifo="$(mktemp -u "/tmp/recall-onboard-${case_name}.XXXXXX")"
   mkfifo "$input_fifo"
-  local log_path="/tmp/openclaw-onboard-${case_name}.log"
+  local log_path="/tmp/recall-onboard-${case_name}.log"
   WIZARD_LOG_PATH="$log_path"
   export WIZARD_LOG_PATH
   # Run under script to keep an interactive TTY for clack prompts.
@@ -129,14 +129,14 @@ run_wizard() {
   local validate_fn="${4:-}"
 
   # Default onboarding command wrapper.
-  run_wizard_cmd "$case_name" "$state_ref" "node \"$OPENCLAW_ENTRY\" onboard $ONBOARD_FLAGS" "$send_fn" true "$validate_fn"
+  run_wizard_cmd "$case_name" "$state_ref" "node \"$RECALL_ENTRY\" onboard $ONBOARD_FLAGS" "$send_fn" true "$validate_fn"
 }
 
 assert_onboard_config() {
   local scenario="$1"
   shift
-  openclaw_e2e_assert_file "$OPENCLAW_CONFIG_PATH"
-  node scripts/e2e/lib/onboard/assert-config.mjs "$scenario" "$OPENCLAW_CONFIG_PATH" "$@"
+  openclaw_e2e_assert_file "$RECALL_CONFIG_PATH"
+  node scripts/e2e/lib/onboard/assert-config.mjs "$scenario" "$RECALL_CONFIG_PATH" "$@"
 }
 
 set_isolated_openclaw_env() {
@@ -193,7 +193,7 @@ send_skills_flow() {
 
 run_case_local_basic() {
   set_isolated_openclaw_env local-basic
-  openclaw_e2e_run_logged local-basic node "$OPENCLAW_ENTRY" onboard \
+  openclaw_e2e_run_logged local-basic node "$RECALL_ENTRY" onboard \
     --non-interactive \
     --accept-risk \
     --flow quickstart \
@@ -205,8 +205,8 @@ run_case_local_basic() {
     --skip-health
 
   # Assert config + workspace scaffolding.
-  workspace_dir="$OPENCLAW_STATE_DIR/workspace"
-  sessions_dir="$OPENCLAW_STATE_DIR/agents/main/sessions"
+  workspace_dir="$RECALL_STATE_DIR/workspace"
+  sessions_dir="$RECALL_STATE_DIR/agents/main/sessions"
 
   openclaw_e2e_assert_dir "$sessions_dir"
   for file in AGENTS.md BOOTSTRAP.md IDENTITY.md SOUL.md TOOLS.md USER.md; do
@@ -220,7 +220,7 @@ run_case_local_basic() {
 run_case_remote_non_interactive() {
   set_isolated_openclaw_env remote-non-interactive
   # Smoke test non-interactive remote config write.
-  openclaw_e2e_run_logged remote-non-interactive node "$OPENCLAW_ENTRY" onboard --non-interactive --accept-risk \
+  openclaw_e2e_run_logged remote-non-interactive node "$RECALL_ENTRY" onboard --non-interactive --accept-risk \
     --mode remote \
     --remote-url ws://gateway.local:18789 \
     --remote-token remote-token \
@@ -232,9 +232,9 @@ run_case_remote_non_interactive() {
 
 run_case_reset() {
   set_isolated_openclaw_env reset-config
-  node scripts/e2e/lib/onboard/write-config.mjs reset "$OPENCLAW_CONFIG_PATH"
+  node scripts/e2e/lib/onboard/write-config.mjs reset "$RECALL_CONFIG_PATH"
 
-  openclaw_e2e_run_logged reset-config node "$OPENCLAW_ENTRY" onboard \
+  openclaw_e2e_run_logged reset-config node "$RECALL_ENTRY" onboard \
     --non-interactive \
     --accept-risk \
     --flow quickstart \
@@ -251,7 +251,7 @@ run_case_reset() {
 
 run_case_channels() {
   # Channels-only configure flow.
-  run_wizard_cmd channels channels "node \"$OPENCLAW_ENTRY\" configure --section channels" send_channels_flow
+  run_wizard_cmd channels channels "node \"$RECALL_ENTRY\" configure --section channels" send_channels_flow
 
   assert_onboard_config channels
 }
@@ -260,9 +260,9 @@ run_case_skills() {
   local home_dir
   set_isolated_openclaw_env skills
   home_dir="$HOME"
-  node scripts/e2e/lib/onboard/write-config.mjs skills "$OPENCLAW_CONFIG_PATH"
+  node scripts/e2e/lib/onboard/write-config.mjs skills "$RECALL_CONFIG_PATH"
 
-  run_wizard_cmd skills "$home_dir" "node \"$OPENCLAW_ENTRY\" configure --section skills" send_skills_flow
+  run_wizard_cmd skills "$home_dir" "node \"$RECALL_ENTRY\" configure --section skills" send_skills_flow
 
   assert_onboard_config skills
 }

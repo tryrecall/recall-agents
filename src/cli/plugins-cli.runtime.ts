@@ -8,7 +8,7 @@ import {
   readConfigFileSnapshot,
   replaceConfigFile,
 } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { tracePluginLifecyclePhaseAsync } from "../plugins/plugin-lifecycle-trace.js";
 import { defaultRuntime } from "../runtime.js";
 import { formatDocsLink } from "../terminal/links.js";
@@ -90,7 +90,7 @@ function pluginIdListIncludes(list: readonly string[] | undefined, pluginId: str
 }
 
 function formatBlockedRuntimePluginGuidance(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   pluginId: string;
 }): string | undefined {
   const pluginId = params.pluginId;
@@ -109,7 +109,7 @@ function formatBlockedRuntimePluginGuidance(params: {
 }
 
 function formatDisabledRuntimePluginGuidance(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   pluginId: string;
 }): string {
   const allow = params.cfg.plugins?.allow;
@@ -124,7 +124,7 @@ function formatDisabledRuntimePluginGuidance(params: {
 }
 
 function collectConfiguredRuntimePluginWarnings(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   env: NodeJS.ProcessEnv;
   plugins: readonly { enabled?: boolean; id: string; status?: string }[];
 }): string[] {
@@ -159,7 +159,7 @@ function collectConfiguredRuntimePluginWarnings(params: {
     }
     const installSpec = formatConfiguredRuntimePluginInstallSpec(candidate);
     return [
-      `- Configured runtime "${runtimeId}" requires the ${candidate.label} plugin, but no enabled "${runtimeId}" plugin was found. Run "openclaw doctor --fix" to install ${installSpec}, or install it manually with "openclaw plugins install ${installSpec}".`,
+      `- Configured runtime "${runtimeId}" requires the ${candidate.label} plugin, but no enabled "${runtimeId}" plugin was found. Run "recall doctor --fix" to install ${installSpec}, or install it manually with "recall plugins install ${installSpec}".`,
     ];
   });
 }
@@ -175,7 +175,7 @@ export async function runPluginsEnableCommand(id: string): Promise<void> {
   const { refreshPluginRegistryAfterConfigMutation } =
     await import("./plugins-registry-refresh.js");
   const snapshot = await readConfigFileSnapshot();
-  const cfg = (snapshot.sourceConfig ?? snapshot.config) as OpenClawConfig;
+  const cfg = (snapshot.sourceConfig ?? snapshot.config) as RecallConfig;
   const report = buildPluginRegistrySnapshotReport({ config: cfg });
   id = normalizePluginId(id);
   if (!report.plugins.some((plugin) => matchesPluginId(plugin, id))) {
@@ -184,7 +184,7 @@ export async function runPluginsEnableCommand(id: string): Promise<void> {
   const enableResult = enablePluginInConfig(cfg, id, {
     updateChannelConfig: false,
   });
-  let next: OpenClawConfig = enableResult.config;
+  let next: RecallConfig = enableResult.config;
   const slotResult = applySlotSelectionForPlugin(next, id);
   next = slotResult.config;
   await replaceConfigFile({
@@ -218,7 +218,7 @@ export async function runPluginsDisableCommand(id: string): Promise<void> {
   const { refreshPluginRegistryAfterConfigMutation } =
     await import("./plugins-registry-refresh.js");
   const snapshot = await readConfigFileSnapshot();
-  const cfg = (snapshot.sourceConfig ?? snapshot.config) as OpenClawConfig;
+  const cfg = (snapshot.sourceConfig ?? snapshot.config) as RecallConfig;
   const report = buildPluginRegistrySnapshotReport({ config: cfg });
   id = normalizePluginId(id);
   if (!report.plugins.some((plugin) => matchesPluginId(plugin, id))) {
@@ -303,7 +303,7 @@ export async function runPluginsRegistryCommand(opts: PluginRegistryOptions): Pr
   ];
   if (inspection.refreshReasons.length > 0) {
     lines.push(`${theme.muted("Refresh reasons:")} ${inspection.refreshReasons.join(", ")}`);
-    lines.push(`${theme.muted("Repair:")} ${theme.command("openclaw plugins registry --refresh")}`);
+    lines.push(`${theme.muted("Repair:")} ${theme.command("recall plugins registry --refresh")}`);
   }
   defaultRuntime.log(lines.join("\n"));
 }
@@ -322,7 +322,7 @@ export async function runPluginsDoctorCommand(): Promise<void> {
   const cfg = getRuntimeConfig();
   const configSnapshot = await readConfigFileSnapshot().catch(() => null);
   const sourceCfg = (configSnapshot?.sourceConfig ?? configSnapshot?.config ?? cfg) as
-    | OpenClawConfig
+    | RecallConfig
     | undefined;
   const report = buildPluginDiagnosticsReport({ config: cfg, effectiveOnly: true });
   const errors = report.plugins.filter((p) => p.status === "error");
@@ -334,7 +334,7 @@ export async function runPluginsDoctorCommand(): Promise<void> {
   const stalePluginConfigHits = scanStalePluginConfig(sourceCfg ?? cfg, process.env);
   const stalePluginConfigWarnings = collectStalePluginConfigWarnings({
     hits: stalePluginConfigHits,
-    doctorFixCommand: "openclaw doctor --fix",
+    doctorFixCommand: "recall doctor --fix",
     autoRepairBlocked: isStalePluginAutoRepairBlocked(sourceCfg ?? cfg, process.env),
   });
   const configuredRuntimePluginWarnings = collectConfiguredRuntimePluginWarnings({
@@ -388,10 +388,10 @@ export async function runPluginsDoctorCommand(): Promise<void> {
         lines.push(`  shadowed: ${shortenHomeInString(diag.source)}`);
       }
       lines.push("  repair:");
-      lines.push("    openclaw plugins inspect " + (diag.pluginId ?? "<plugin-id>"));
+      lines.push("    recall plugins inspect " + (diag.pluginId ?? "<plugin-id>"));
       lines.push("    edit or remove the config-selected plugin source");
-      lines.push("    openclaw plugins registry --refresh");
-      lines.push("    openclaw gateway restart --force");
+      lines.push("    recall plugins registry --refresh");
+      lines.push("    recall gateway restart --force");
     }
   }
   if (compatibility.length > 0) {
@@ -417,7 +417,7 @@ export async function runPluginsDoctorCommand(): Promise<void> {
     }
     lines.push("No plugin install-tree issues detected; configuration warnings remain.");
   }
-  const docs = formatDocsLink("/plugin", "docs.openclaw.ai/plugin");
+  const docs = formatDocsLink("/plugin", "docs.recall.ai/plugin");
   lines.push("");
   lines.push(`${theme.muted("Docs:")} ${docs}`);
   defaultRuntime.log(lines.join("\n"));

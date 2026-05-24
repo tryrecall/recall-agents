@@ -176,7 +176,7 @@ function expectSignedPayloadFields(
   expect(payload?.split("|")).toEqual([
     "v2",
     "device-1",
-    "openclaw-control-ui",
+    "recall-control-ui",
     "webchat",
     "operator",
     params.scopes.join(","),

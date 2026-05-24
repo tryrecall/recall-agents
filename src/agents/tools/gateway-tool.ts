@@ -4,7 +4,7 @@ import { isRestartEnabled } from "../../config/commands.flags.js";
 import { parseConfigJson5, resolveConfigSnapshotHash } from "../../config/io.js";
 import { applyMergePatch } from "../../config/merge-patch.js";
 import { extractDeliveryInfo } from "../../config/sessions.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import {
   buildRestartSuccessContinuation,
   formatDoctorNonInteractiveHint,
@@ -312,11 +312,11 @@ function assertGatewayConfigMutationAllowed(params: {
   }
 
   // Block writes that newly enable any dangerous config flag.
-  // Uses the same flag enumeration as `openclaw security audit`.
+  // Uses the same flag enumeration as `recall security audit`.
   const currentFlags = new Set(
-    collectEnabledInsecureOrDangerousFlags(params.currentConfig as OpenClawConfig),
+    collectEnabledInsecureOrDangerousFlags(params.currentConfig as RecallConfig),
   );
-  const nextFlags = collectEnabledInsecureOrDangerousFlags(nextConfig as OpenClawConfig);
+  const nextFlags = collectEnabledInsecureOrDangerousFlags(nextConfig as RecallConfig);
   const newlyEnabled = nextFlags.filter((f) => !currentFlags.has(f));
   if (newlyEnabled.length > 0) {
     throw new Error(
@@ -364,7 +364,7 @@ const GatewayToolSchema = Type.Object({
 
 export function createGatewayTool(opts?: {
   agentSessionKey?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
 }): AnyAgentTool {
   return {
     label: "Gateway",

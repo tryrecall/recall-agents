@@ -409,7 +409,7 @@ md.core.ruler.after("linkify", "linkify-cjk-trim", (state) => {
         continue;
       }
       // Only trim linkify-generated autolinks, not explicit markdown links
-      // like [OpenClaw中文](https://docs.openclaw.ai) where CJK in display
+      // like [Recall中文](https://docs.recall.ai) where CJK in display
       // text is intentional and href must not be rewritten.
       if (token.markup !== "linkify") {
         continue;

@@ -3,10 +3,10 @@ import {
   buildChannelKeyCandidates,
   resolveChannelEntryMatchWithFallback,
   type ChannelMatchSource,
-} from "openclaw/plugin-sdk/channel-targets";
-import type { ChannelBotLoopProtectionConfig } from "openclaw/plugin-sdk/config-contracts";
-import { mergePairLoopGuardConfig } from "openclaw/plugin-sdk/pair-loop-guard-runtime";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/channel-targets";
+import type { ChannelBotLoopProtectionConfig } from "recall/plugin-sdk/config-contracts";
+import { mergePairLoopGuardConfig } from "recall/plugin-sdk/pair-loop-guard-runtime";
+import { normalizeLowercaseStringOrEmpty } from "recall/plugin-sdk/string-coerce-runtime";
 import { normalizeSlackSlug } from "./allow-list.js";
 
 export type SlackChannelConfigResolved = {

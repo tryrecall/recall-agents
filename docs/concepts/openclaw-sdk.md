@@ -1,33 +1,33 @@
 ---
-summary: "Public OpenClaw App SDK for external apps, scripts, dashboards, CI jobs, and IDE extensions"
-title: "OpenClaw App SDK"
+summary: "Public Recall App SDK for external apps, scripts, dashboards, CI jobs, and IDE extensions"
+title: "Recall App SDK"
 sidebarTitle: "App SDK"
 read_when:
-  - You are building an external app, script, dashboard, CI job, or IDE extension that talks to OpenClaw
+  - You are building an external app, script, dashboard, CI job, or IDE extension that talks to Recall
   - You are choosing between the App SDK and the Plugin SDK
   - You are integrating with Gateway agent runs, sessions, events, approvals, models, or tools
 ---
 
-The **OpenClaw App SDK** is the public client API for apps outside the
-OpenClaw process. Use `@openclaw/sdk` when a script, dashboard, CI job, IDE
+The **Recall App SDK** is the public client API for apps outside the
+Recall process. Use `@recall/sdk` when a script, dashboard, CI job, IDE
 extension, or other external app wants to connect to the Gateway, start agent
 runs, stream events, wait for results, cancel work, or inspect Gateway
 resources.
 
 <Note>
   The App SDK is different from the [Plugin SDK](/plugins/sdk-overview).
-  `@openclaw/sdk` talks to the Gateway from outside OpenClaw.
-  `openclaw/plugin-sdk/*` is only for plugins that run inside OpenClaw and
+  `@recall/sdk` talks to the Gateway from outside Recall.
+  `recall/plugin-sdk/*` is only for plugins that run inside Recall and
   register providers, channels, tools, hooks, or trusted runtimes.
 </Note>
 
 ## What ships today
 
-`@openclaw/sdk` ships with:
+`@recall/sdk` ships with:
 
 | Surface                   | Status  | What it does                                                                      |
 | ------------------------- | ------- | --------------------------------------------------------------------------------- |
-| `OpenClaw`                | Ready   | Main client entry point. Owns transport, connection, requests, and events.        |
+| `Recall`                | Ready   | Main client entry point. Owns transport, connection, requests, and events.        |
 | `GatewayClientTransport`  | Ready   | WebSocket transport backed by the Gateway client.                                 |
 | `oc.agents`               | Ready   | Lists, creates, updates, deletes, and gets agent handles.                         |
 | `Agent.run()`             | Ready   | Starts a Gateway `agent` run and returns a `Run`.                                 |
@@ -47,8 +47,8 @@ resources.
 | `normalizeGatewayEvent()` | Ready   | Converts raw Gateway events into the stable SDK event shape.                      |
 
 The SDK also exports the core types used by those surfaces:
-`AgentRunParams`, `RunResult`, `RunStatus`, `OpenClawEvent`,
-`OpenClawEventType`, `GatewayEvent`, `OpenClawTransport`,
+`AgentRunParams`, `RunResult`, `RunStatus`, `RecallEvent`,
+`RecallEventType`, `GatewayEvent`, `RecallTransport`,
 `GatewayRequestOptions`, `SessionCreateParams`, `SessionSendParams`,
 `ArtifactSummary`, `ArtifactQuery`, `ArtifactsListResult`,
 `ArtifactsGetResult`, `ArtifactsDownloadResult`,
@@ -63,26 +63,26 @@ Create a client with an explicit Gateway URL, or inject a custom transport for
 tests and embedded app runtimes.
 
 ```typescript
-import { OpenClaw } from "@openclaw/sdk";
+import { Recall } from "@recall/sdk";
 
-const oc = new OpenClaw({
+const oc = new Recall({
   url: "ws://127.0.0.1:18789",
-  token: process.env.OPENCLAW_GATEWAY_TOKEN,
+  token: process.env.RECALL_GATEWAY_TOKEN,
   requestTimeoutMs: 30_000,
 });
 
 await oc.connect();
 ```
 
-`new OpenClaw({ gateway: "ws://..." })` is equivalent to `url`. The
+`new Recall({ gateway: "ws://..." })` is equivalent to `url`. The
 `gateway: "auto"` option is accepted by the constructor, but automatic Gateway
 discovery is not a separate SDK feature yet; pass `url` when the app does not
 already know how to discover the Gateway.
 
-For tests, pass an object that implements `OpenClawTransport`:
+For tests, pass an object that implements `RecallTransport`:
 
 ```typescript
-const oc = new OpenClaw({
+const oc = new Recall({
   transport: {
     async request(method, params) {
       return { method, params };
@@ -152,14 +152,14 @@ await session.compact({ maxLines: 200 });
 
 ## Stream events
 
-The SDK normalizes raw Gateway events into a stable `OpenClawEvent` envelope:
+The SDK normalizes raw Gateway events into a stable `RecallEvent` envelope:
 
 ```typescript
-type OpenClawEvent = {
+type RecallEvent = {
   version: 1;
   id: string;
   ts: number;
-  type: OpenClawEventType;
+  type: RecallEventType;
   runId?: string;
   sessionId?: string;
   sessionKey?: string;
@@ -257,7 +257,7 @@ const approvals = await oc.approvals.list();
 await oc.approvals.respond("approval-id", { decision: "approve" });
 ```
 
-Task helpers use the durable task ledger that also backs `openclaw tasks`:
+Task helpers use the durable task ledger that also backs `recall tasks`:
 
 ```typescript
 const tasks = await oc.tasks.list({ status: "running", sessionKey: "agent:main:main" });
@@ -291,7 +291,7 @@ environment, or approval behavior.
 
 ## App SDK vs Plugin SDK
 
-Use the App SDK when code lives outside OpenClaw:
+Use the App SDK when code lives outside Recall:
 
 - Node scripts that start or observe agent runs
 - CI jobs that call a Gateway
@@ -300,7 +300,7 @@ Use the App SDK when code lives outside OpenClaw:
 - external bridges that do not need to become channel plugins
 - integration tests with fake or real Gateway transports
 
-Use the Plugin SDK when code runs inside OpenClaw:
+Use the Plugin SDK when code runs inside Recall:
 
 - provider plugins
 - channel plugins
@@ -308,12 +308,12 @@ Use the Plugin SDK when code runs inside OpenClaw:
 - agent harness plugins
 - trusted runtime helpers
 
-App SDK code should import from `@openclaw/sdk`. Plugin code should import from
-documented `openclaw/plugin-sdk/*` subpaths. Do not mix the two contracts.
+App SDK code should import from `@recall/sdk`. Plugin code should import from
+documented `recall/plugin-sdk/*` subpaths. Do not mix the two contracts.
 
 ## Related
 
-- [OpenClaw App SDK API design](/reference/openclaw-sdk-api-design)
+- [Recall App SDK API design](/reference/recall-sdk-api-design)
 - [Gateway RPC reference](/reference/rpc)
 - [Agent loop](/concepts/agent-loop)
 - [Agent runtimes](/concepts/agent-runtimes)

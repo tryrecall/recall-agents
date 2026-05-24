@@ -1,21 +1,21 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { logTypingFailure } from "openclaw/plugin-sdk/channel-feedback";
-import { resolveStableChannelMessageIngress } from "openclaw/plugin-sdk/channel-ingress-runtime";
-import { createChannelPairingController } from "openclaw/plugin-sdk/channel-pairing";
-import type { MarkdownTableMode, OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { resolveInboundRouteEnvelopeBuilderWithRuntime } from "openclaw/plugin-sdk/inbound-envelope";
-import { resolveSendableOutboundReplyParts } from "openclaw/plugin-sdk/reply-payload";
+import { logTypingFailure } from "recall/plugin-sdk/channel-feedback";
+import { resolveStableChannelMessageIngress } from "recall/plugin-sdk/channel-ingress-runtime";
+import { createChannelPairingController } from "recall/plugin-sdk/channel-pairing";
+import type { MarkdownTableMode, RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { resolveInboundRouteEnvelopeBuilderWithRuntime } from "recall/plugin-sdk/inbound-envelope";
+import { resolveSendableOutboundReplyParts } from "recall/plugin-sdk/reply-payload";
 import {
   deliverTextOrMediaReply,
   type OutboundReplyPayload,
-} from "openclaw/plugin-sdk/reply-payload";
-import { waitForAbortSignal } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/reply-payload";
+import { waitForAbortSignal } from "recall/plugin-sdk/runtime-env";
 import {
   resolveDefaultGroupPolicy,
   warnMissingProviderGroupPolicyFallbackOnce,
-} from "openclaw/plugin-sdk/runtime-group-policy";
-import { normalizeStringEntries } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { registerPluginHttpRoute, resolveWebhookPath } from "openclaw/plugin-sdk/webhook-ingress";
+} from "recall/plugin-sdk/runtime-group-policy";
+import { normalizeStringEntries } from "recall/plugin-sdk/string-coerce-runtime";
+import { registerPluginHttpRoute, resolveWebhookPath } from "recall/plugin-sdk/webhook-ingress";
 import type { ResolvedZaloAccount } from "./accounts.js";
 import {
   ZaloApiError,
@@ -48,7 +48,7 @@ import {
 export type ZaloMonitorOptions = {
   token: string;
   account: ResolvedZaloAccount;
-  config: OpenClawConfig;
+  config: RecallConfig;
   runtime: ZaloRuntimeEnv;
   abortSignal: AbortSignal;
   useWebhook?: boolean;
@@ -70,7 +70,7 @@ type ZaloWebhookModule = typeof import("./monitor.webhook.js");
 type ZaloProcessingContext = {
   token: string;
   account: ResolvedZaloAccount;
-  config: OpenClawConfig;
+  config: RecallConfig;
   runtime: ZaloRuntimeEnv;
   core: ZaloCoreRuntime;
   mediaMaxMb: number;
@@ -723,7 +723,7 @@ async function deliverZaloReply(params: {
   chatId: string;
   runtime: ZaloRuntimeEnv;
   core: ZaloCoreRuntime;
-  config: OpenClawConfig;
+  config: RecallConfig;
   webhookUrl?: string;
   webhookPath?: string;
   proxyUrl?: string;

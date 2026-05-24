@@ -19,7 +19,7 @@ const agentRuntimeMocks = vi.hoisted(() => ({
 }));
 
 vi.mock("./app-server/shared-client.js", () => sharedClientMocks);
-vi.mock("openclaw/plugin-sdk/agent-runtime", () => agentRuntimeMocks);
+vi.mock("recall/plugin-sdk/agent-runtime", () => agentRuntimeMocks);
 
 import {
   handleCodexConversationBindingResolved,
@@ -39,7 +39,7 @@ function mockCallArg(mock: ReturnType<typeof vi.fn>, callIndex = 0, argIndex = 0
 
 describe("codex conversation binding", () => {
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-codex-binding-"));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-codex-binding-"));
   });
 
   afterEach(async () => {
@@ -310,7 +310,7 @@ describe("codex conversation binding", () => {
     });
   });
 
-  it("blocks bound Codex app-server turns when the current OpenClaw session is sandboxed", async () => {
+  it("blocks bound Codex app-server turns when the current Recall session is sandboxed", async () => {
     const sessionFile = path.join(tempDir, "session.jsonl");
     await fs.writeFile(
       `${sessionFile}.codex-app-server.json`,
@@ -353,7 +353,7 @@ describe("codex conversation binding", () => {
       handled: true,
       reply: {
         text: expect.stringContaining(
-          "Codex-native Codex app-server conversation binding is unavailable because OpenClaw sandboxing is active for this session.",
+          "Codex-native Codex app-server conversation binding is unavailable because Recall sandboxing is active for this session.",
         ),
       },
     });
@@ -403,14 +403,14 @@ describe("codex conversation binding", () => {
       handled: true,
       reply: {
         text: expect.stringContaining(
-          "Codex-native Codex app-server conversation binding is unavailable because OpenClaw exec host=node is active for this session.",
+          "Codex-native Codex app-server conversation binding is unavailable because Recall exec host=node is active for this session.",
         ),
       },
     });
     expect(sharedClientMocks.getSharedCodexAppServerClient).not.toHaveBeenCalled();
   });
 
-  it("blocks bound Codex CLI node turns when the current OpenClaw session is sandboxed", async () => {
+  it("blocks bound Codex CLI node turns when the current Recall session is sandboxed", async () => {
     const resumeCodexCliSessionOnNode = vi.fn();
 
     const result = await handleCodexConversationInboundClaim(
@@ -451,7 +451,7 @@ describe("codex conversation binding", () => {
       handled: true,
       reply: {
         text: expect.stringContaining(
-          "Codex-native Codex CLI node conversation binding is unavailable because OpenClaw sandboxing is active for this session.",
+          "Codex-native Codex CLI node conversation binding is unavailable because Recall sandboxing is active for this session.",
         ),
       },
     });

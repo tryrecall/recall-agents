@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import { createOutboundTestPlugin, createTestRegistry } from "../../test-utils/channel-plugins.js";
 import { runMessageAction } from "./message-action-runner.js";
@@ -67,7 +67,7 @@ describe("runMessageAction core send routing", () => {
           enabled: true,
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const result = await runMessageAction({
       cfg,
@@ -120,7 +120,7 @@ describe("runMessageAction core send routing", () => {
           enabled: true,
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const result = await runMessageAction({
       cfg,
@@ -177,7 +177,7 @@ describe("runMessageAction core send routing", () => {
             botToken: "123:test",
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       action: "send",
       params: {
         channel: "telegram",
@@ -203,7 +203,7 @@ describe("runMessageAction core send routing", () => {
       chatId: "c1",
     });
     ttsMocks.maybeApplyTtsToPayload.mockResolvedValueOnce({
-      mediaUrl: "file:///tmp/openclaw-voice.ogg",
+      mediaUrl: "file:///tmp/recall-voice.ogg",
       audioAsVoice: true,
       spokenText: "hello there",
     });
@@ -236,7 +236,7 @@ describe("runMessageAction core send routing", () => {
             auto: "tagged",
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       action: "send",
       params: {
         channel: "testchat",
@@ -259,6 +259,6 @@ describe("runMessageAction core send routing", () => {
     expect(sendMedia).toHaveBeenCalledOnce();
     const mediaInput = firstMockArg(sendMedia, "send media");
     expect(mediaInput.text).toBe("");
-    expect(mediaInput.mediaUrl).toBe("file:///tmp/openclaw-voice.ogg");
+    expect(mediaInput.mediaUrl).toBe("file:///tmp/recall-voice.ogg");
   });
 });

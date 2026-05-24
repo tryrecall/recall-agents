@@ -5,11 +5,11 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 source "$ROOT_DIR/scripts/lib/docker-e2e-image.sh"
-IMAGE_NAME="$(docker_e2e_resolve_image "openclaw-cron-mcp-cleanup-e2e" OPENCLAW_IMAGE)"
+IMAGE_NAME="$(docker_e2e_resolve_image "recall-cron-mcp-cleanup-e2e" RECALL_IMAGE)"
 PORT="18789"
 TOKEN="cron-mcp-e2e-$(date +%s)-$$"
-CONTAINER_NAME="openclaw-cron-mcp-e2e-$$"
-CLIENT_LOG="$(mktemp -t openclaw-cron-mcp-client-log.XXXXXX)"
+CONTAINER_NAME="recall-cron-mcp-e2e-$$"
+CLIENT_LOG="$(mktemp -t recall-cron-mcp-client-log.XXXXXX)"
 
 cleanup() {
   docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
@@ -18,33 +18,33 @@ cleanup() {
 trap cleanup EXIT
 
 docker_e2e_build_or_reuse "$IMAGE_NAME" cron-mcp-cleanup
-OPENCLAW_TEST_STATE_SCRIPT_B64="$(docker_e2e_test_state_shell_b64 cron-mcp-cleanup empty)"
+RECALL_TEST_STATE_SCRIPT_B64="$(docker_e2e_test_state_shell_b64 cron-mcp-cleanup empty)"
 
 echo "Running in-container cron/subagent MCP cleanup smoke..."
 # Harness files are mounted read-only; the app under test comes from /app/dist.
 set +e
 docker_e2e_run_with_harness \
   --name "$CONTAINER_NAME" \
-  -e "OPENCLAW_TEST_FAST=1" \
-  -e "OPENCLAW_GATEWAY_TOKEN=$TOKEN" \
-  -e "OPENCLAW_SKIP_CHANNELS=1" \
-  -e "OPENCLAW_SKIP_GMAIL_WATCHER=1" \
-  -e "OPENCLAW_SKIP_CANVAS_HOST=1" \
-  -e "OPENCLAW_SKIP_ACPX_RUNTIME=1" \
-  -e "OPENCLAW_SKIP_ACPX_RUNTIME_PROBE=1" \
-  -e "OPENCLAW_TEST_STATE_SCRIPT_B64=$OPENCLAW_TEST_STATE_SCRIPT_B64" \
+  -e "RECALL_TEST_FAST=1" \
+  -e "RECALL_GATEWAY_TOKEN=$TOKEN" \
+  -e "RECALL_SKIP_CHANNELS=1" \
+  -e "RECALL_SKIP_GMAIL_WATCHER=1" \
+  -e "RECALL_SKIP_CANVAS_HOST=1" \
+  -e "RECALL_SKIP_ACPX_RUNTIME=1" \
+  -e "RECALL_SKIP_ACPX_RUNTIME_PROBE=1" \
+  -e "RECALL_TEST_STATE_SCRIPT_B64=$RECALL_TEST_STATE_SCRIPT_B64" \
   -e "GW_URL=ws://127.0.0.1:$PORT" \
   -e "GW_TOKEN=$TOKEN" \
-  -e "OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1" \
+  -e "RECALL_ALLOW_INSECURE_PRIVATE_WS=1" \
   "$IMAGE_NAME" \
   bash -lc "set -euo pipefail
-    source scripts/lib/openclaw-e2e-instance.sh
-    openclaw_e2e_eval_test_state_from_b64 \"\${OPENCLAW_TEST_STATE_SCRIPT_B64:?missing OPENCLAW_TEST_STATE_SCRIPT_B64}\"
+    source scripts/lib/recall-e2e-instance.sh
+    openclaw_e2e_eval_test_state_from_b64 \"\${RECALL_TEST_STATE_SCRIPT_B64:?missing RECALL_TEST_STATE_SCRIPT_B64}\"
     entry=\"\$(openclaw_e2e_resolve_entrypoint)\"
     export MOCK_PORT=44081
-    export SUCCESS_MARKER=OPENCLAW_CRON_MCP_CLEANUP_OK
-    export MOCK_REQUEST_LOG=/tmp/openclaw-cron-mock-openai-requests.jsonl
-    export OPENCLAW_DOCKER_OPENAI_BASE_URL=\"http://127.0.0.1:\$MOCK_PORT/v1\"
+    export SUCCESS_MARKER=RECALL_CRON_MCP_CLEANUP_OK
+    export MOCK_REQUEST_LOG=/tmp/recall-cron-mock-openai-requests.jsonl
+    export RECALL_DOCKER_OPENAI_BASE_URL=\"http://127.0.0.1:\$MOCK_PORT/v1\"
     mock_pid=\"\$(openclaw_e2e_start_mock_openai \"\$MOCK_PORT\" /tmp/cron-mcp-cleanup-mock-openai.log)\"
     gateway_pid=
     cleanup_inner() {

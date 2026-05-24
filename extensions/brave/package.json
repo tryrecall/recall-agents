@@ -1,21 +1,21 @@
 {
-  "name": "@openclaw/brave-plugin",
+  "name": "@recall/brave-plugin",
   "version": "2026.5.22",
-  "description": "OpenClaw Brave plugin",
+  "description": "Recall Brave plugin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/tryrecall/recall-agents"
   },
   "type": "module",
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "npmSpec": "@openclaw/brave-plugin",
+      "npmSpec": "@recall/brave-plugin",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.10",
       "allowInvalidConfigRecovery": true

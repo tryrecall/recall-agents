@@ -874,7 +874,7 @@ describe("agentCommand – LiveSessionModelSwitchError retry", () => {
     };
     state.sessionEntryMock = sessionEntry;
     state.sessionStoreMock = { "agent:main": sessionEntry };
-    state.storePathMock = "/tmp/openclaw-sessions.json";
+    state.storePathMock = "/tmp/recall-sessions.json";
     state.deliverAgentCommandResultMock.mockResolvedValue(undefined);
 
     await agentCommand({
@@ -1193,7 +1193,7 @@ describe("agentCommand – LiveSessionModelSwitchError retry", () => {
     state.sessionEntryMock = sessionEntry;
     const sessionStore: Record<string, SessionEntry> = { "agent:main": sessionEntry };
     state.sessionStoreMock = sessionStore;
-    state.storePathMock = "/tmp/openclaw-session-store.json";
+    state.storePathMock = "/tmp/recall-session-store.json";
     setupModelSwitchRetry({
       provider: "openai",
       model: "gpt-5.4",
@@ -1234,7 +1234,7 @@ describe("agentCommand – LiveSessionModelSwitchError retry", () => {
     state.sessionEntryMock = sessionEntry;
     const sessionStore: Record<string, SessionEntry> = { "agent:main": sessionEntry };
     state.sessionStoreMock = sessionStore;
-    state.storePathMock = "/tmp/openclaw-session-store.json";
+    state.storePathMock = "/tmp/recall-session-store.json";
     state.runWithModelFallbackMock.mockImplementationOnce(async (params: FallbackRunnerParams) => {
       const result = await params.run(params.provider, params.model);
       sessionStore["agent:main"] = {
@@ -1467,7 +1467,7 @@ describe("agentCommand – LiveSessionModelSwitchError retry", () => {
     await agentCommand({
       message: [
         INTERNAL_RUNTIME_CONTEXT_BEGIN,
-        "OpenClaw runtime context (internal):",
+        "Recall runtime context (internal):",
         "hidden task completion event",
         INTERNAL_RUNTIME_CONTEXT_END,
       ].join("\n"),

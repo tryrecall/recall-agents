@@ -335,7 +335,7 @@ function createArgMenusHarness() {
     channelsConfig: undefined,
     slashCommand: {
       enabled: true,
-      name: "openclaw",
+      name: "recall",
       ephemeral: true,
       sessionPrefix: "slack:slash",
     },
@@ -618,7 +618,7 @@ describe("Slack native command argument menus", () => {
       channelsConfig: undefined,
       slashCommand: {
         enabled: true,
-        name: "openclaw",
+        name: "recall",
         ephemeral: true,
         sessionPrefix: "slack:slash",
       },
@@ -1001,7 +1001,7 @@ function createPolicyHarness(overrides?: {
     channelsConfig: overrides?.channelsConfig,
     slashCommand: {
       enabled: true,
-      name: "openclaw",
+      name: "recall",
       ephemeral: true,
       sessionPrefix: "slack:slash",
     },

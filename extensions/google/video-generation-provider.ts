@@ -1,21 +1,21 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { resolveApiKeyForProvider } from "openclaw/plugin-sdk/provider-auth-runtime";
+import { resolveApiKeyForProvider } from "recall/plugin-sdk/provider-auth-runtime";
 import {
   createProviderOperationDeadline,
   executeProviderOperationWithRetry,
   resolveProviderOperationTimeoutMs,
   waitProviderOperationPollInterval,
-} from "openclaw/plugin-sdk/provider-http";
-import { writeExternalFileWithinRoot } from "openclaw/plugin-sdk/security-runtime";
-import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { resolvePreferredOpenClawTmpDir, withTempWorkspace } from "openclaw/plugin-sdk/temp-path";
+} from "recall/plugin-sdk/provider-http";
+import { writeExternalFileWithinRoot } from "recall/plugin-sdk/security-runtime";
+import { fetchWithSsrFGuard } from "recall/plugin-sdk/ssrf-runtime";
+import { normalizeOptionalString } from "recall/plugin-sdk/string-coerce-runtime";
+import { resolvePreferredRecallTmpDir, withTempWorkspace } from "recall/plugin-sdk/temp-path";
 import type {
   GeneratedVideoAsset,
   VideoGenerationProvider,
   VideoGenerationRequest,
-} from "openclaw/plugin-sdk/video-generation";
+} from "recall/plugin-sdk/video-generation";
 import { parseGeminiAuth, resolveGoogleGenerativeAiApiOrigin } from "./api.js";
 import {
   createGoogleVideoGenerationProviderMetadata,
@@ -154,7 +154,7 @@ async function downloadGeneratedVideo(params: {
   index: number;
 }): Promise<GeneratedVideoAsset> {
   return await withTempWorkspace(
-    { rootDir: resolvePreferredOpenClawTmpDir(), prefix: "openclaw-google-video-" },
+    { rootDir: resolvePreferredRecallTmpDir(), prefix: "recall-google-video-" },
     async ({ dir: tempDir }) => {
       const fileName = `video-${params.index + 1}.mp4`;
       const downloadPath = path.join(tempDir, fileName);

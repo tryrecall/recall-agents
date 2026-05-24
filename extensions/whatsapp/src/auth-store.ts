@@ -1,10 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { formatCliCommand } from "openclaw/plugin-sdk/cli-runtime";
-import { DEFAULT_ACCOUNT_ID } from "openclaw/plugin-sdk/routing";
-import { info, success } from "openclaw/plugin-sdk/runtime-env";
-import { getChildLogger } from "openclaw/plugin-sdk/runtime-env";
-import { defaultRuntime, type RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import { formatCliCommand } from "recall/plugin-sdk/cli-runtime";
+import { DEFAULT_ACCOUNT_ID } from "recall/plugin-sdk/routing";
+import { info, success } from "recall/plugin-sdk/runtime-env";
+import { getChildLogger } from "recall/plugin-sdk/runtime-env";
+import { defaultRuntime, type RuntimeEnv } from "recall/plugin-sdk/runtime-env";
 import { resolveOAuthDir } from "./auth-store.runtime.js";
 import {
   assertWebCredsPathRegularFileOrMissing,
@@ -475,7 +475,7 @@ export async function pickWebChannel(
   }
   if (!auth.exists) {
     throw new Error(
-      `No WhatsApp Web session found. Run \`${formatCliCommand("openclaw channels login --channel whatsapp --verbose")}\` to link.`,
+      `No WhatsApp Web session found. Run \`${formatCliCommand("recall channels login --channel whatsapp --verbose")}\` to link.`,
     );
   }
   return choice;

@@ -41,7 +41,7 @@ const transformConfigWithPendingPluginInstallsMock = vi.hoisted(() =>
       });
       await writeConfigFileMock(transformed.nextConfig);
       return {
-        path: snapshot.path ?? "/tmp/openclaw.json",
+        path: snapshot.path ?? "/tmp/recall.json",
         previousHash: snapshot.hash ?? null,
         persistedHash: "persisted-hash",
         snapshot,
@@ -101,7 +101,7 @@ describe("agents add command", () => {
 
     expect(runtime.error).toHaveBeenCalledOnce();
     expect(runtime.error).toHaveBeenCalledWith(
-      `Non-interactive agent creation requires --workspace. Re-run ${formatCliCommand("openclaw agents add <id> --workspace <path>")} or omit flags to use the wizard.`,
+      `Non-interactive agent creation requires --workspace. Re-run ${formatCliCommand("recall agents add <id> --workspace <path>")} or omit flags to use the wizard.`,
     );
     expect(runtime.exit).toHaveBeenCalledWith(1);
     expect(writeConfigFileMock).not.toHaveBeenCalled();
@@ -116,7 +116,7 @@ describe("agents add command", () => {
 
     expect(runtime.error).toHaveBeenCalledOnce();
     expect(runtime.error).toHaveBeenCalledWith(
-      `Non-interactive agent creation requires --workspace. Re-run ${formatCliCommand("openclaw agents add <id> --workspace <path>")} or omit flags to use the wizard.`,
+      `Non-interactive agent creation requires --workspace. Re-run ${formatCliCommand("recall agents add <id> --workspace <path>")} or omit flags to use the wizard.`,
     );
     expect(runtime.exit).toHaveBeenCalledWith(1);
     expect(writeConfigFileMock).not.toHaveBeenCalled();
@@ -139,7 +139,7 @@ describe("agents add command", () => {
   });
 
   it("copies only portable auth profiles when seeding a new agent store", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-agents-add-auth-copy-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-agents-add-auth-copy-"));
     try {
       const sourceAgentDir = path.join(root, "main", "agent");
       const destAgentDir = path.join(root, "work", "agent");
@@ -195,9 +195,9 @@ describe("agents add command", () => {
   });
 
   it("copies portable Codex OAuth profiles inline", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-agents-add-oauth-copy-"));
-    const previousStateDir = process.env.OPENCLAW_STATE_DIR;
-    process.env.OPENCLAW_STATE_DIR = root;
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-agents-add-oauth-copy-"));
+    const previousStateDir = process.env.RECALL_STATE_DIR;
+    process.env.RECALL_STATE_DIR = root;
     try {
       const sourceAgentDir = path.join(root, "main", "agent");
       const destAgentDir = path.join(root, "work", "agent");
@@ -244,27 +244,27 @@ describe("agents add command", () => {
       });
     } finally {
       if (previousStateDir === undefined) {
-        delete process.env.OPENCLAW_STATE_DIR;
+        delete process.env.RECALL_STATE_DIR;
       } else {
-        process.env.OPENCLAW_STATE_DIR = previousStateDir;
+        process.env.RECALL_STATE_DIR = previousStateDir;
       }
       await fs.rm(root, { recursive: true, force: true });
     }
   });
 
   it("skips legacy sidecar-backed Codex OAuth profiles when seeding a new agent store", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-agents-add-oauth-ref-skip-"));
-    const previousOAuthDir = process.env.OPENCLAW_OAUTH_DIR;
-    const previousSecretKey = process.env.OPENCLAW_AUTH_PROFILE_SECRET_KEY;
-    process.env.OPENCLAW_OAUTH_DIR = path.join(root, "credentials");
-    process.env.OPENCLAW_AUTH_PROFILE_SECRET_KEY = "legacy-seed";
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-agents-add-oauth-ref-skip-"));
+    const previousOAuthDir = process.env.RECALL_OAUTH_DIR;
+    const previousSecretKey = process.env.RECALL_AUTH_PROFILE_SECRET_KEY;
+    process.env.RECALL_OAUTH_DIR = path.join(root, "credentials");
+    process.env.RECALL_AUTH_PROFILE_SECRET_KEY = "legacy-seed";
     try {
       const sourceAgentDir = path.join(root, "main", "agent");
       const destAgentDir = path.join(root, "work", "agent");
       const destAuthPath = path.join(destAgentDir, "auth-profiles.json");
       const profileId = "openai-codex:default";
       const ref = {
-        source: "openclaw-credentials" as const,
+        source: "recall-credentials" as const,
         provider: "openai-codex" as const,
         id: "0123456789abcdef0123456789abcdef",
       };
@@ -324,14 +324,14 @@ describe("agents add command", () => {
       await expect(fs.stat(destAuthPath)).rejects.toMatchObject({ code: "ENOENT" });
     } finally {
       if (previousOAuthDir === undefined) {
-        delete process.env.OPENCLAW_OAUTH_DIR;
+        delete process.env.RECALL_OAUTH_DIR;
       } else {
-        process.env.OPENCLAW_OAUTH_DIR = previousOAuthDir;
+        process.env.RECALL_OAUTH_DIR = previousOAuthDir;
       }
       if (previousSecretKey === undefined) {
-        delete process.env.OPENCLAW_AUTH_PROFILE_SECRET_KEY;
+        delete process.env.RECALL_AUTH_PROFILE_SECRET_KEY;
       } else {
-        process.env.OPENCLAW_AUTH_PROFILE_SECRET_KEY = previousSecretKey;
+        process.env.RECALL_AUTH_PROFILE_SECRET_KEY = previousSecretKey;
       }
       await fs.rm(root, { recursive: true, force: true });
     }

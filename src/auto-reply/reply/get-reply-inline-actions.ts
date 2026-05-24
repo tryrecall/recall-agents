@@ -3,7 +3,7 @@ import type { BlockReplyChunking } from "../../agents/pi-embedded-block-chunker.
 import type { SkillCommandSpec } from "../../agents/skills.js";
 import { getChannelPlugin } from "../../channels/plugins/index.js";
 import type { SessionEntry } from "../../config/sessions.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { logVerbose } from "../../globals.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { generateSecureToken } from "../../infra/secure-random.js";
@@ -161,7 +161,7 @@ function extractBlockedToolReason(result: unknown): string | null {
 export async function handleInlineActions(params: {
   ctx: MsgContext;
   sessionCtx: TemplateContext;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   agentDir?: string;
   sessionEntry?: SessionEntry;

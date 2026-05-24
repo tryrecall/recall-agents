@@ -1,7 +1,7 @@
-import { defineSingleProviderPluginEntry } from "openclaw/plugin-sdk/provider-entry";
-import { OPENAI_COMPATIBLE_REPLAY_HOOKS } from "openclaw/plugin-sdk/provider-model-shared";
-import { defaultToolStreamExtraParams } from "openclaw/plugin-sdk/provider-stream-shared";
-import { jsonResult } from "openclaw/plugin-sdk/provider-web-search";
+import { defineSingleProviderPluginEntry } from "recall/plugin-sdk/provider-entry";
+import { OPENAI_COMPATIBLE_REPLAY_HOOKS } from "recall/plugin-sdk/provider-model-shared";
+import { defaultToolStreamExtraParams } from "recall/plugin-sdk/provider-stream-shared";
+import { jsonResult } from "recall/plugin-sdk/provider-web-search";
 import { Type } from "typebox";
 import {
   applyXaiRuntimeModelCompat,
@@ -129,8 +129,8 @@ function createLazyCodeExecutionTool(ctx: {
         return jsonResult({
           error: "missing_xai_api_key",
           message:
-            "code_execution needs xAI credentials. Run `openclaw onboard --auth-choice xai-oauth` to sign in with Grok, run `openclaw onboard --auth-choice xai-api-key`, set `XAI_API_KEY` in the Gateway environment, or configure `plugins.entries.xai.config.webSearch.apiKey`.",
-          docs: "https://docs.openclaw.ai/tools/code-execution",
+            "code_execution needs xAI credentials. Run `recall onboard --auth-choice xai-oauth` to sign in with Grok, run `recall onboard --auth-choice xai-api-key`, set `XAI_API_KEY` in the Gateway environment, or configure `plugins.entries.xai.config.webSearch.apiKey`.",
+          docs: "https://docs.recall.ai/tools/code-execution",
         });
       }
       return await tool.execute(toolCallId, args);

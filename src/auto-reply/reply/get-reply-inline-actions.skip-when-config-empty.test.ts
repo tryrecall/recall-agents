@@ -11,10 +11,10 @@ import { stripInlineStatus } from "./reply-inline.js";
 import { buildTestCtx } from "./test-ctx.js";
 import type { TypingController } from "./typing.js";
 
-const { buildStatusReplyMock, createOpenClawToolsMock, getChannelPluginMock, handleCommandsMock } =
+const { buildStatusReplyMock, createRecallToolsMock, getChannelPluginMock, handleCommandsMock } =
   vi.hoisted(() => ({
     buildStatusReplyMock: vi.fn(),
-    createOpenClawToolsMock: vi.fn(),
+    createRecallToolsMock: vi.fn(),
     getChannelPluginMock: vi.fn(),
     handleCommandsMock: vi.fn(),
   }));
@@ -28,8 +28,8 @@ vi.mock("./commands.runtime.js", () => ({
   buildStatusReply: (...args: unknown[]) => buildStatusReplyMock(...args),
 }));
 
-vi.mock("../../agents/openclaw-tools.runtime.js", () => ({
-  createOpenClawTools: (...args: unknown[]) => createOpenClawToolsMock(...args),
+vi.mock("../../agents/recall-tools.runtime.js", () => ({
+  createRecallTools: (...args: unknown[]) => createRecallToolsMock(...args),
 }));
 
 vi.mock("../../channels/plugins/index.js", () => ({
@@ -184,10 +184,10 @@ describe("handleInlineActions", () => {
     handleCommandsMock.mockReset();
     handleCommandsMock.mockResolvedValue({ shouldContinue: true, reply: undefined });
     getChannelPluginMock.mockReset();
-    createOpenClawToolsMock.mockReset();
+    createRecallToolsMock.mockReset();
     buildStatusReplyMock.mockReset();
     buildStatusReplyMock.mockResolvedValue({ text: "status" });
-    createOpenClawToolsMock.mockReturnValue([]);
+    createRecallToolsMock.mockReturnValue([]);
     getChannelPluginMock.mockImplementation((channelId?: string) =>
       channelId === "whatsapp"
         ? { commands: { skipWhenConfigEmpty: true } }
@@ -594,7 +594,7 @@ describe("handleInlineActions", () => {
   it("passes requesterAgentIdOverride into inline tool runtimes", async () => {
     const typing = createTypingController();
     const toolExecute = vi.fn(async () => ({ text: "spawned" }));
-    createOpenClawToolsMock.mockReturnValue([
+    createRecallToolsMock.mockReturnValue([
       {
         name: "sessions_spawn",
         execute: toolExecute,
@@ -643,7 +643,7 @@ describe("handleInlineActions", () => {
 
     expect(result).toEqual({ kind: "reply", reply: { text: "✅ Done." } });
     expect(
-      mockObjectArg(createOpenClawToolsMock, "createOpenClawTools").requesterAgentIdOverride,
+      mockObjectArg(createRecallToolsMock, "createRecallTools").requesterAgentIdOverride,
     ).toBe("named-worker");
     expect(toolExecute).toHaveBeenCalledTimes(1);
   });
@@ -651,7 +651,7 @@ describe("handleInlineActions", () => {
   it("passes sender identity into inline tool runtimes", async () => {
     const typing = createTypingController();
     const toolExecute = vi.fn(async () => ({ text: "updated" }));
-    createOpenClawToolsMock.mockReturnValue([
+    createRecallToolsMock.mockReturnValue([
       {
         name: "message",
         execute: toolExecute,
@@ -698,7 +698,7 @@ describe("handleInlineActions", () => {
     );
 
     expect(result).toEqual({ kind: "reply", reply: { text: "✅ Done." } });
-    expect(mockObjectArg(createOpenClawToolsMock, "createOpenClawTools")).not.toHaveProperty(
+    expect(mockObjectArg(createRecallToolsMock, "createRecallTools")).not.toHaveProperty(
       "senderIsOwner",
     );
     const toolCall = mockCallArgs(toolExecute, "toolExecute");
@@ -722,7 +722,7 @@ describe("handleInlineActions", () => {
         reason: "denied by policy",
       },
     }));
-    createOpenClawToolsMock.mockReturnValue([
+    createRecallToolsMock.mockReturnValue([
       {
         name: "message",
         execute: toolExecute,
@@ -791,7 +791,7 @@ describe("handleInlineActions", () => {
       kind: "reply",
       reply: { text: "❌ Tool call blocked: denied by policy" },
     });
-    const toolsArgs = mockObjectArg(createOpenClawToolsMock, "createOpenClawTools");
+    const toolsArgs = mockObjectArg(createRecallToolsMock, "createRecallTools");
     expect(toolsArgs.sessionId).toBe("target-session");
     expect(toolsArgs.currentChannelId).toBe("whatsapp");
     const blockedToolCall = mockCallArgs(toolExecute, "toolExecute");
@@ -808,7 +808,7 @@ describe("handleInlineActions", () => {
   it("does not execute inline tool dispatch targets denied by tool policy", async () => {
     const typing = createTypingController();
     const toolExecute = vi.fn(async () => ({ content: "sent" }));
-    createOpenClawToolsMock.mockReturnValue([
+    createRecallToolsMock.mockReturnValue([
       {
         name: "message",
         execute: toolExecute,
@@ -865,7 +865,7 @@ describe("handleInlineActions", () => {
     const typing = createTypingController();
     const messageExecute = vi.fn(async () => ({ content: "sent" }));
     const sessionsExecute = vi.fn(async () => ({ content: "listed" }));
-    createOpenClawToolsMock.mockReturnValue([
+    createRecallToolsMock.mockReturnValue([
       {
         name: "message",
         execute: messageExecute,
@@ -926,7 +926,7 @@ describe("handleInlineActions", () => {
   it("applies sender-specific tool policy to inline tool dispatch", async () => {
     const typing = createTypingController();
     const toolExecute = vi.fn(async () => ({ content: "sent" }));
-    createOpenClawToolsMock.mockReturnValue([
+    createRecallToolsMock.mockReturnValue([
       {
         name: "message",
         execute: toolExecute,
@@ -983,7 +983,7 @@ describe("handleInlineActions", () => {
   });
 
   it("applies subagent policy to ACP envelope inline dispatch sessions", async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-inline-acp-policy-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-inline-acp-policy-"));
     try {
       const storeTemplate = path.join(tmpDir, "sessions-{agentId}.json");
       await writeSessionStore(storeTemplate, "main", {
@@ -999,7 +999,7 @@ describe("handleInlineActions", () => {
 
       const typing = createTypingController();
       const toolExecute = vi.fn(async () => ({ content: "spawned" }));
-      createOpenClawToolsMock.mockReturnValue([
+      createRecallToolsMock.mockReturnValue([
         {
           name: "sessions_spawn",
           execute: toolExecute,
@@ -1063,7 +1063,7 @@ describe("handleInlineActions", () => {
   it("passes sandboxed runtime state into inline tool construction", async () => {
     const typing = createTypingController();
     const toolExecute = vi.fn(async () => ({ content: "listed" }));
-    createOpenClawToolsMock.mockReturnValue([
+    createRecallToolsMock.mockReturnValue([
       {
         name: "sessions_list",
         execute: toolExecute,
@@ -1114,7 +1114,7 @@ describe("handleInlineActions", () => {
     );
 
     expect(result).toEqual({ kind: "reply", reply: { text: "listed" } });
-    expect(createOpenClawToolsMock).toHaveBeenCalledWith(
+    expect(createRecallToolsMock).toHaveBeenCalledWith(
       expect.objectContaining({
         sandboxed: true,
       }),

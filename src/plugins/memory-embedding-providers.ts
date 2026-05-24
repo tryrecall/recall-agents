@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { SecretInput } from "../config/types.secrets.js";
 import type { EmbeddingInput } from "../memory-host-sdk/host/embedding-inputs.js";
 
@@ -46,7 +46,7 @@ export type MemoryEmbeddingProvider = {
 };
 
 export type MemoryEmbeddingProviderCreateOptions = {
-  config: OpenClawConfig;
+  config: RecallConfig;
   agentDir?: string;
   provider?: string;
   fallback?: string;
@@ -99,7 +99,7 @@ export type RegisteredMemoryEmbeddingProvider = {
   ownerPluginId?: string;
 };
 
-const MEMORY_EMBEDDING_PROVIDERS_KEY = Symbol.for("openclaw.memoryEmbeddingProviders");
+const MEMORY_EMBEDDING_PROVIDERS_KEY = Symbol.for("recall.memoryEmbeddingProviders");
 
 function getMemoryEmbeddingProviders(): Map<string, RegisteredMemoryEmbeddingProvider> {
   const globalStore = globalThis as Record<PropertyKey, unknown>;

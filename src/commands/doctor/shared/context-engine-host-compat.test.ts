@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { RecallConfig } from "../../../config/types.recall.js";
 import { registerContextEngine } from "../../../context-engine/registry.js";
 import type { ContextEngine, ContextEngineHostCapability } from "../../../context-engine/types.js";
 import {
@@ -45,7 +45,7 @@ function registerEngine(requiredCapabilities: ContextEngineHostCapability[]): st
   return id;
 }
 
-function configWithEngine(engineId: string, cfg: OpenClawConfig = {}): OpenClawConfig {
+function configWithEngine(engineId: string, cfg: RecallConfig = {}): RecallConfig {
   return {
     ...cfg,
     plugins: {
@@ -92,7 +92,7 @@ describe("doctor context-engine host compatibility", () => {
           },
         },
       }),
-      doctorFixCommand: "openclaw doctor --fix",
+      doctorFixCommand: "recall doctor --fix",
     });
 
     expect(warnings).toEqual([]);
@@ -111,7 +111,7 @@ describe("doctor context-engine host compatibility", () => {
           },
         },
       }),
-      doctorFixCommand: "openclaw doctor --fix",
+      doctorFixCommand: "recall doctor --fix",
     });
 
     expect(result.config.plugins?.slots?.contextEngine).toBe("legacy");
@@ -133,7 +133,7 @@ describe("doctor context-engine host compatibility", () => {
     });
     const result = await maybeRepairContextEngineHostCompatibility({
       cfg,
-      doctorFixCommand: "openclaw doctor --fix",
+      doctorFixCommand: "recall doctor --fix",
     });
 
     expect(result.config).toBe(cfg);
@@ -154,7 +154,7 @@ describe("doctor context-engine host compatibility", () => {
     });
     const result = await maybeRepairContextEngineHostCompatibility({
       cfg,
-      doctorFixCommand: "openclaw doctor --fix",
+      doctorFixCommand: "recall doctor --fix",
     });
 
     expect(result.config).toBe(cfg);

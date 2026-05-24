@@ -1,5 +1,5 @@
 ---
-summary: "Quick examples for listing, installing, updating, inspecting, and uninstalling OpenClaw plugins"
+summary: "Quick examples for listing, installing, updating, inspecting, and uninstalling Recall plugins"
 read_when:
   - You want quick plugin list, install, update, inspect, or uninstall examples
   - You want to choose a plugin install source
@@ -11,7 +11,7 @@ doc-schema-version: 1
 
 Use this page for common plugin management commands. For the exhaustive command
 contract, flags, source-selection rules, and edge cases, see
-[`openclaw plugins`](/cli/plugins).
+[`recall plugins`](/cli/plugins).
 
 Most install workflows are:
 
@@ -23,62 +23,62 @@ Most install workflows are:
 ## List and search plugins
 
 ```bash
-openclaw plugins list
-openclaw plugins list --enabled
-openclaw plugins list --verbose
-openclaw plugins list --json
-openclaw plugins search "calendar"
+recall plugins list
+recall plugins list --enabled
+recall plugins list --verbose
+recall plugins list --json
+recall plugins search "calendar"
 ```
 
 Use `--json` for scripts:
 
 ```bash
-openclaw plugins list --json \
+recall plugins list --json \
   | jq '.plugins[] | {id, enabled, format, source, dependencyStatus}'
 ```
 
-`plugins list` is a cold inventory check. It shows what OpenClaw can discover
+`plugins list` is a cold inventory check. It shows what Recall can discover
 from config, manifests, and the plugin registry; it does not prove that an
 already-running Gateway imported the plugin runtime. The JSON output includes
 registry diagnostics and each plugin's static `dependencyStatus` when the
 plugin package declares `dependencies` or `optionalDependencies`.
 
 `plugins search` queries ClawHub for installable plugin packages and prints
-install hints such as `openclaw plugins install clawhub:<package>`.
+install hints such as `recall plugins install clawhub:<package>`.
 
 ## Install plugins
 
 ```bash
 # Search ClawHub for plugin packages.
-openclaw plugins search "calendar"
+recall plugins search "calendar"
 
 # Install from ClawHub.
-openclaw plugins install clawhub:<package>
-openclaw plugins install clawhub:<package>@1.2.3
-openclaw plugins install clawhub:<package>@beta
+recall plugins install clawhub:<package>
+recall plugins install clawhub:<package>@1.2.3
+recall plugins install clawhub:<package>@beta
 
 # Install from npm.
-openclaw plugins install npm:<package>
-openclaw plugins install npm:@scope/openclaw-plugin@1.2.3
-openclaw plugins install npm:@openclaw/codex
+recall plugins install npm:<package>
+recall plugins install npm:@scope/recall-plugin@1.2.3
+recall plugins install npm:@recall/codex
 
 # Install from a local npm pack artifact.
-openclaw plugins install npm-pack:<path.tgz>
+recall plugins install npm-pack:<path.tgz>
 
 # Install from git or a local development checkout.
-openclaw plugins install git:github.com/acme/openclaw-plugin@v1.0.0
-openclaw plugins install ./my-plugin
-openclaw plugins install --link ./my-plugin
+recall plugins install git:github.com/acme/recall-plugin@v1.0.0
+recall plugins install ./my-plugin
+recall plugins install --link ./my-plugin
 ```
 
 Bare package specs install from npm during the launch cutover. Use `clawhub:`,
 `npm:`, `git:`, or `npm-pack:` when you need deterministic source selection.
-If the bare name matches an official plugin id, OpenClaw can install the
+If the bare name matches an official plugin id, Recall can install the
 catalog entry directly.
 
 Use `--force` only when you intentionally want to overwrite an existing install
 target. For routine upgrades of tracked npm, ClawHub, or hook-pack installs, use
-`openclaw plugins update`.
+`recall plugins update`.
 
 ## Restart and inspect
 
@@ -88,8 +88,8 @@ managed or reload is disabled, restart it yourself before checking live runtime
 surfaces:
 
 ```bash
-openclaw gateway restart
-openclaw plugins inspect <plugin-id> --runtime --json
+recall gateway restart
+recall plugins inspect <plugin-id> --runtime --json
 ```
 
 Use `inspect --runtime` when you need proof that the plugin registered runtime
@@ -100,13 +100,13 @@ config, and registry checks.
 ## Update plugins
 
 ```bash
-openclaw plugins update <plugin-id>
-openclaw plugins update <npm-package-or-spec>
-openclaw plugins update --all
-openclaw plugins update <plugin-id> --dry-run
+recall plugins update <plugin-id>
+recall plugins update <npm-package-or-spec>
+recall plugins update --all
+recall plugins update <plugin-id> --dry-run
 ```
 
-When you pass a plugin id, OpenClaw reuses the tracked install spec. Stored
+When you pass a plugin id, Recall reuses the tracked install spec. Stored
 dist-tags such as `@beta` and exact pinned versions continue to be used on
 later `update <plugin-id>` runs.
 
@@ -114,23 +114,23 @@ For npm installs, you can pass an explicit package spec to switch the tracked
 record:
 
 ```bash
-openclaw plugins update @scope/openclaw-plugin@beta
-openclaw plugins update @scope/openclaw-plugin
+recall plugins update @scope/recall-plugin@beta
+recall plugins update @scope/recall-plugin
 ```
 
 The second command moves a plugin back to the registry's default release line
 when it was previously pinned to an exact version or tag.
 
-When `openclaw update` runs on the beta channel, plugin records can prefer
+When `recall update` runs on the beta channel, plugin records can prefer
 matching `@beta` releases. For the exact fallback and pinning rules, see
-[`openclaw plugins`](/cli/plugins#update).
+[`recall plugins`](/cli/plugins#update).
 
 ## Uninstall plugins
 
 ```bash
-openclaw plugins uninstall <plugin-id> --dry-run
-openclaw plugins uninstall <plugin-id>
-openclaw plugins uninstall <plugin-id> --keep-files
+recall plugins uninstall <plugin-id> --dry-run
+recall plugins uninstall <plugin-id>
+recall plugins uninstall <plugin-id> --keep-files
 ```
 
 Uninstall removes the plugin's config entry, persisted plugin index record,
@@ -138,7 +138,7 @@ allow/deny list entries, and linked load paths when applicable. Managed install
 directories are removed unless you pass `--keep-files`. A running managed
 Gateway restarts automatically when the uninstall changes plugin source.
 
-In Nix mode (`OPENCLAW_NIX_MODE=1`), plugin install, update, uninstall, enable,
+In Nix mode (`RECALL_NIX_MODE=1`), plugin install, update, uninstall, enable,
 and disable commands are disabled. Manage those choices in the Nix source for
 the install instead.
 
@@ -146,16 +146,16 @@ the install instead.
 
 | Source      | Use when                                                                    | Example                                                        |
 | ----------- | --------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| ClawHub     | You want OpenClaw-native discovery, scan summaries, versions, and hints     | `openclaw plugins install clawhub:<package>`                   |
-| npmjs.com   | You already ship JavaScript packages or need npm dist-tags/private registry | `openclaw plugins install npm:@acme/openclaw-plugin`           |
-| git         | You want a branch, tag, or commit from a repository                         | `openclaw plugins install git:github.com/<owner>/<repo>@<ref>` |
-| local path  | You are developing or testing a plugin on the same machine                  | `openclaw plugins install --link ./my-plugin`                  |
-| npm pack    | You are proving a local package artifact through npm install semantics      | `openclaw plugins install npm-pack:<path.tgz>`                 |
-| marketplace | You are installing a Claude-compatible marketplace plugin                   | `openclaw plugins install <plugin> --marketplace <source>`     |
+| ClawHub     | You want Recall-native discovery, scan summaries, versions, and hints     | `recall plugins install clawhub:<package>`                   |
+| npmjs.com   | You already ship JavaScript packages or need npm dist-tags/private registry | `recall plugins install npm:@acme/recall-plugin`           |
+| git         | You want a branch, tag, or commit from a repository                         | `recall plugins install git:github.com/<owner>/<repo>@<ref>` |
+| local path  | You are developing or testing a plugin on the same machine                  | `recall plugins install --link ./my-plugin`                  |
+| npm pack    | You are proving a local package artifact through npm install semantics      | `recall plugins install npm-pack:<path.tgz>`                 |
+| marketplace | You are installing a Claude-compatible marketplace plugin                   | `recall plugins install <plugin> --marketplace <source>`     |
 
 ## Publish plugins
 
-ClawHub is the primary public discovery surface for OpenClaw plugins. Publish
+ClawHub is the primary public discovery surface for Recall plugins. Publish
 there when you want users to find plugin metadata, version history, registry
 scan results, and install hints before they install.
 
@@ -172,10 +172,10 @@ publishing:
 
 ```json package.json
 {
-  "name": "@acme/openclaw-plugin",
+  "name": "@acme/recall-plugin",
   "version": "1.0.0",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": ["./dist/index.js"]
   }
 }
@@ -183,9 +183,9 @@ publishing:
 
 ```bash
 npm publish --access public
-openclaw plugins install npm:@acme/openclaw-plugin
-openclaw plugins install npm:@acme/openclaw-plugin@beta
-openclaw plugins install npm:@acme/openclaw-plugin@1.0.0
+recall plugins install npm:@acme/recall-plugin
+recall plugins install npm:@acme/recall-plugin@beta
+recall plugins install npm:@acme/recall-plugin@1.0.0
 ```
 
 Use these pages for the full publishing contract instead of treating this page
@@ -203,7 +203,7 @@ If the same package is available on both ClawHub and npm, use the explicit
 ## Related
 
 - [Plugins](/tools/plugin) - install, configure, restart, and troubleshoot
-- [`openclaw plugins`](/cli/plugins) - full CLI reference
+- [`recall plugins`](/cli/plugins) - full CLI reference
 - [Community plugins](/plugins/community) - public discovery and ClawHub publishing
 - [ClawHub](/clawhub/cli) - registry CLI operations
 - [Building plugins](/plugins/building-plugins) - create a plugin package

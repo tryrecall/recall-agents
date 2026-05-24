@@ -14,7 +14,7 @@ import {
   extractRtt,
   readTelegramSummary,
   safeRunLabel,
-  validateOpenClawPackageSpec,
+  validateRecallPackageSpec,
 } from "../../scripts/lib/rtt-harness.ts";
 import { testing as cliTesting } from "../../scripts/rtt.ts";
 
@@ -34,31 +34,31 @@ afterEach(async () => {
 });
 
 describe("RTT harness", () => {
-  it("validates OpenClaw package specs", () => {
-    expect(validateOpenClawPackageSpec("openclaw@main")).toBe("openclaw@main");
-    expect(validateOpenClawPackageSpec("openclaw@alpha")).toBe("openclaw@alpha");
-    expect(validateOpenClawPackageSpec("openclaw@beta")).toBe("openclaw@beta");
-    expect(validateOpenClawPackageSpec("openclaw@latest")).toBe("openclaw@latest");
-    expect(validateOpenClawPackageSpec("openclaw@2026.4.30")).toBe("openclaw@2026.4.30");
-    expect(validateOpenClawPackageSpec("openclaw@2026.4.30-beta.2")).toBe(
-      "openclaw@2026.4.30-beta.2",
+  it("validates Recall package specs", () => {
+    expect(validateRecallPackageSpec("recall@main")).toBe("recall@main");
+    expect(validateRecallPackageSpec("recall@alpha")).toBe("recall@alpha");
+    expect(validateRecallPackageSpec("recall@beta")).toBe("recall@beta");
+    expect(validateRecallPackageSpec("recall@latest")).toBe("recall@latest");
+    expect(validateRecallPackageSpec("recall@2026.4.30")).toBe("recall@2026.4.30");
+    expect(validateRecallPackageSpec("recall@2026.4.30-beta.2")).toBe(
+      "recall@2026.4.30-beta.2",
     );
-    expect(validateOpenClawPackageSpec("openclaw@2026.4.30-alpha.2")).toBe(
-      "openclaw@2026.4.30-alpha.2",
+    expect(validateRecallPackageSpec("recall@2026.4.30-alpha.2")).toBe(
+      "recall@2026.4.30-alpha.2",
     );
 
-    expect(() => validateOpenClawPackageSpec("@openclaw/openclaw@beta")).toThrow(
+    expect(() => validateRecallPackageSpec("@tryrecall/recall-agents@beta")).toThrow(
       /Package spec must be/,
     );
-    expect(() => validateOpenClawPackageSpec("openclaw@next")).toThrow(/Package spec must be/);
+    expect(() => validateRecallPackageSpec("recall@next")).toThrow(/Package spec must be/);
   });
 
   it("builds stable run labels", () => {
-    expect(safeRunLabel("openclaw@beta")).toBe("openclaw_beta");
+    expect(safeRunLabel("recall@beta")).toBe("openclaw_beta");
     expect(
       buildRunId({
         now: new Date("2026-05-01T03:04:05.678Z"),
-        spec: "openclaw@beta",
+        spec: "recall@beta",
         index: 1,
       }),
     ).toBe("2026-05-01T030405678Z-openclaw_beta-2");
@@ -67,37 +67,37 @@ describe("RTT harness", () => {
   it("constructs harness env without dropping caller env", () => {
     const env = createHarnessEnv({
       baseEnv: {
-        OPENCLAW_QA_TELEGRAM_GROUP_ID: "-100123",
-        OPENCLAW_NPM_TELEGRAM_FAST: "0",
+        RECALL_QA_TELEGRAM_GROUP_ID: "-100123",
+        RECALL_NPM_TELEGRAM_FAST: "0",
       },
       providerMode: "mock-openai",
       rawOutputDir: ".artifacts/rtt/run/raw",
       samples: 20,
       sampleTimeoutMs: 30_000,
       scenarios: ["telegram-mentioned-message-reply"],
-      spec: "openclaw@beta",
+      spec: "recall@beta",
       timeoutMs: 180_000,
       version: "2026.4.30-beta.1",
     });
 
-    expect(env.OPENCLAW_QA_TELEGRAM_GROUP_ID).toBe("-100123");
-    expect(env.OPENCLAW_NPM_TELEGRAM_PACKAGE_SPEC).toBe("openclaw@beta");
-    expect(env.OPENCLAW_NPM_TELEGRAM_PACKAGE_LABEL).toBe("openclaw@beta (2026.4.30-beta.1)");
-    expect(env.OPENCLAW_NPM_TELEGRAM_PROVIDER_MODE).toBe("mock-openai");
-    expect(env.OPENCLAW_NPM_TELEGRAM_SCENARIOS).toBe("telegram-mentioned-message-reply");
-    expect(env.OPENCLAW_NPM_TELEGRAM_OUTPUT_DIR).toBe(".artifacts/rtt/run/raw");
-    expect(env.OPENCLAW_NPM_TELEGRAM_FAST).toBe("0");
-    expect(env.OPENCLAW_NPM_TELEGRAM_WARM_SAMPLES).toBe("20");
-    expect(env.OPENCLAW_NPM_TELEGRAM_SAMPLE_TIMEOUT_MS).toBe("30000");
-    expect(env.OPENCLAW_QA_TELEGRAM_CANARY_TIMEOUT_MS).toBe("180000");
-    expect(env.OPENCLAW_QA_TELEGRAM_SCENARIO_TIMEOUT_MS).toBe("180000");
+    expect(env.RECALL_QA_TELEGRAM_GROUP_ID).toBe("-100123");
+    expect(env.RECALL_NPM_TELEGRAM_PACKAGE_SPEC).toBe("recall@beta");
+    expect(env.RECALL_NPM_TELEGRAM_PACKAGE_LABEL).toBe("recall@beta (2026.4.30-beta.1)");
+    expect(env.RECALL_NPM_TELEGRAM_PROVIDER_MODE).toBe("mock-openai");
+    expect(env.RECALL_NPM_TELEGRAM_SCENARIOS).toBe("telegram-mentioned-message-reply");
+    expect(env.RECALL_NPM_TELEGRAM_OUTPUT_DIR).toBe(".artifacts/rtt/run/raw");
+    expect(env.RECALL_NPM_TELEGRAM_FAST).toBe("0");
+    expect(env.RECALL_NPM_TELEGRAM_WARM_SAMPLES).toBe("20");
+    expect(env.RECALL_NPM_TELEGRAM_SAMPLE_TIMEOUT_MS).toBe("30000");
+    expect(env.RECALL_QA_TELEGRAM_CANARY_TIMEOUT_MS).toBe("180000");
+    expect(env.RECALL_QA_TELEGRAM_SCENARIO_TIMEOUT_MS).toBe("180000");
   });
 
   it("forwards Convex credential controls without dropping RTT sample controls", () => {
     const env = createHarnessEnv({
       baseEnv: {
-        OPENCLAW_QA_CONVEX_SITE_URL: "https://qa-credentials.example.convex.site",
-        OPENCLAW_QA_CONVEX_SECRET_MAINTAINER: "maintainer-secret",
+        RECALL_QA_CONVEX_SITE_URL: "https://qa-credentials.example.convex.site",
+        RECALL_QA_CONVEX_SECRET_MAINTAINER: "maintainer-secret",
       },
       credentialRole: "maintainer",
       credentialSource: "convex",
@@ -106,15 +106,15 @@ describe("RTT harness", () => {
       samples: 7,
       sampleTimeoutMs: 45_000,
       scenarios: ["telegram-mentioned-message-reply"],
-      spec: "openclaw@beta",
+      spec: "recall@beta",
       timeoutMs: 180_000,
       version: "2026.4.30-beta.1",
     });
 
-    expect(env.OPENCLAW_NPM_TELEGRAM_CREDENTIAL_SOURCE).toBe("convex");
-    expect(env.OPENCLAW_NPM_TELEGRAM_CREDENTIAL_ROLE).toBe("maintainer");
-    expect(env.OPENCLAW_NPM_TELEGRAM_WARM_SAMPLES).toBe("7");
-    expect(env.OPENCLAW_NPM_TELEGRAM_SAMPLE_TIMEOUT_MS).toBe("45000");
+    expect(env.RECALL_NPM_TELEGRAM_CREDENTIAL_SOURCE).toBe("convex");
+    expect(env.RECALL_NPM_TELEGRAM_CREDENTIAL_ROLE).toBe("maintainer");
+    expect(env.RECALL_NPM_TELEGRAM_WARM_SAMPLES).toBe("7");
+    expect(env.RECALL_NPM_TELEGRAM_SAMPLE_TIMEOUT_MS).toBe("45000");
     expect(() =>
       assertRequiredEnv(env, { credentialRole: "maintainer", credentialSource: "convex" }),
     ).not.toThrow();
@@ -124,11 +124,11 @@ describe("RTT harness", () => {
     const script = await fs.readFile(DOCKER_SCRIPT_PATH, "utf8");
     const sourceIndex = script.indexOf('source "$credential_env_file"');
     const tokenExportIndex = script.indexOf(
-      'export TELEGRAM_BOT_TOKEN="${OPENCLAW_QA_TELEGRAM_SUT_BOT_TOKEN:?missing OPENCLAW_QA_TELEGRAM_SUT_BOT_TOKEN}"',
+      'export TELEGRAM_BOT_TOKEN="${RECALL_QA_TELEGRAM_SUT_BOT_TOKEN:?missing RECALL_QA_TELEGRAM_SUT_BOT_TOKEN}"',
     );
     const installEnvSnapshotIndex = script.indexOf('install_env=("${docker_env[@]}")');
     const convexSecretForwardIndex = script.indexOf(
-      "OPENCLAW_QA_CONVEX_SECRET_CI",
+      "RECALL_QA_CONVEX_SECRET_CI",
       installEnvSnapshotIndex,
     );
     const packageInstallIndex = script.indexOf("npm install -g");
@@ -148,7 +148,7 @@ describe("RTT harness", () => {
     expect(script).toContain("start_credential_heartbeat() {\n  (\n    set +e");
     expect(script).toContain("Convex credential heartbeat exited with status");
     expect(script).toContain('kill -TERM "$rtt_shell_pid"');
-    expect(script).not.toContain('export TELEGRAM_BOT_TOKEN="$OPENCLAW_QA_TELEGRAM_SUT_BOT_TOKEN"');
+    expect(script).not.toContain('export TELEGRAM_BOT_TOKEN="$RECALL_QA_TELEGRAM_SUT_BOT_TOKEN"');
   });
 
   it("keeps broker helper heartbeat and empty-response handling aligned with QA leases", async () => {
@@ -161,7 +161,7 @@ describe("RTT harness", () => {
   });
 
   it("generates final-only Telegram RTT delivery config for release packages", async () => {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-rtt-config-test-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-rtt-config-test-"));
     tempDirs.push(tempDir);
     const configPath = path.join(tempDir, "config.json");
 
@@ -208,7 +208,7 @@ describe("RTT harness", () => {
       rawSummary: summary,
       runId: "run",
       scenarios: ["telegram-mentioned-message-reply"],
-      spec: "openclaw@beta",
+      spec: "recall@beta",
       startedAt: new Date("2026-05-01T00:00:00.000Z"),
       version: "2026.4.30-beta.1",
     });
@@ -220,7 +220,7 @@ describe("RTT harness", () => {
         rawSummaryPath: "runs/run/raw/telegram-qa-summary.json",
         resultPath: "runs/run/result.json",
       },
-      package: { spec: "openclaw@beta", version: "2026.4.30-beta.1" },
+      package: { spec: "recall@beta", version: "2026.4.30-beta.1" },
       run: {
         durationMs: 12_000,
         finishedAt: "2026-05-01T00:00:12.000Z",
@@ -263,7 +263,7 @@ describe("RTT harness", () => {
       },
       runId: "run",
       scenarios: ["telegram-mentioned-message-reply"],
-      spec: "openclaw@latest",
+      spec: "recall@latest",
       startedAt: new Date("2026-05-01T00:00:00.000Z"),
       version: "2026.4.29",
     });
@@ -273,7 +273,7 @@ describe("RTT harness", () => {
   });
 
   it("appends JSONL rows", async () => {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-rtt-test-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-rtt-test-"));
     tempDirs.push(tempDir);
     const jsonlPath = path.join(tempDir, "data/rtt.jsonl");
     await appendJsonl(jsonlPath, { run: 1 });
@@ -284,9 +284,9 @@ describe("RTT harness", () => {
 
   it("parses CLI options", () => {
     const parsed = cliTesting.parseArgs([
-      "openclaw@latest",
+      "recall@latest",
       "--package-tgz",
-      "/tmp/openclaw.tgz",
+      "/tmp/recall.tgz",
       "--provider",
       "live-frontier",
       "--credential-source",
@@ -302,21 +302,21 @@ describe("RTT harness", () => {
       "--timeout-ms",
       "240000",
       "--harness-root",
-      "/tmp/openclaw",
+      "/tmp/recall",
       "--output",
       "/tmp/runs",
     ]);
 
-    expect(parsed.spec).toBe("openclaw@latest");
+    expect(parsed.spec).toBe("recall@latest");
     expect(parsed.options).toStrictEqual({
-      packageTgz: "/tmp/openclaw.tgz",
+      packageTgz: "/tmp/recall.tgz",
       credentialRole: "ci",
       credentialSource: "convex",
       providerMode: "live-frontier",
       runs: 3,
       samples: 5,
       sampleTimeoutMs: 30_000,
-      harnessRoot: "/tmp/openclaw",
+      harnessRoot: "/tmp/recall",
       output: "/tmp/runs",
       scenarios: ["telegram-mentioned-message-reply"],
       timeoutMs: 240_000,

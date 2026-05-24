@@ -3,21 +3,21 @@ import os from "node:os";
 import path from "node:path";
 import { Command } from "commander";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { ConfigFileSnapshot, OpenClawConfig } from "../config/types.js";
+import type { ConfigFileSnapshot, RecallConfig } from "../config/types.js";
 import type { PluginManifestRecord, PluginManifestRegistry } from "../plugins/manifest-registry.js";
 import type { PluginMetadataSnapshot } from "../plugins/plugin-metadata-snapshot.js";
 import { createCliRuntimeCapture, mockRuntimeModule } from "./test-runtime-capture.js";
 
 /**
  * Test for issue #6070:
- * `openclaw config set/unset` must update snapshot.resolved (user config after $include/${ENV},
+ * `recall config set/unset` must update snapshot.resolved (user config after $include/${ENV},
  * but before runtime defaults), so runtime defaults don't leak into the written config.
  */
 
 const mockReadConfigFileSnapshot = vi.fn<() => Promise<ConfigFileSnapshot>>();
 const mockWriteConfigFile = vi.fn<
   (
-    cfg: OpenClawConfig,
+    cfg: RecallConfig,
     options?: { unsetPaths?: string[][]; explicitSetPaths?: string[][] },
   ) => Promise<void>
 >(async () => {});
@@ -33,11 +33,11 @@ vi.mock("../config/config.js", async (importOriginal) => {
     ...actual,
     readConfigFileSnapshot: () => mockReadConfigFileSnapshot(),
     writeConfigFile: (
-      cfg: OpenClawConfig,
+      cfg: RecallConfig,
       options?: { unsetPaths?: string[][]; explicitSetPaths?: string[][] },
     ) => mockWriteConfigFile(cfg, options),
     replaceConfigFile: (params: {
-      nextConfig: OpenClawConfig;
+      nextConfig: RecallConfig;
       writeOptions?: { unsetPaths?: string[][]; explicitSetPaths?: string[][] };
     }) => mockWriteConfigFile(params.nextConfig, params.writeOptions),
   };
@@ -72,11 +72,11 @@ vi.mock("../runtime.js", async () => {
 });
 
 function buildSnapshot(params: {
-  resolved: OpenClawConfig;
-  config: OpenClawConfig;
+  resolved: RecallConfig;
+  config: RecallConfig;
 }): ConfigFileSnapshot {
   return {
-    path: "/tmp/openclaw.json",
+    path: "/tmp/recall.json",
     exists: true,
     raw: JSON.stringify(params.resolved),
     parsed: params.resolved,
@@ -91,7 +91,7 @@ function buildSnapshot(params: {
   };
 }
 
-function setSnapshot(resolved: OpenClawConfig, config: OpenClawConfig) {
+function setSnapshot(resolved: RecallConfig, config: RecallConfig) {
   mockReadConfigFileSnapshot.mockResolvedValueOnce(buildSnapshot({ resolved, config }));
 }
 
@@ -108,7 +108,7 @@ function writeTempJson5File(prefix: string, value: unknown): string {
   return pathname;
 }
 
-function withRuntimeDefaults(resolved: OpenClawConfig): OpenClawConfig {
+function withRuntimeDefaults(resolved: RecallConfig): RecallConfig {
   return {
     ...resolved,
     agents: {
@@ -127,7 +127,7 @@ function createPluginManifestRecord(
     channels: [],
     cliBackends: [],
     hooks: [],
-    manifestPath: `/tmp/${overrides.id}/openclaw.plugin.json`,
+    manifestPath: `/tmp/${overrides.id}/recall.plugin.json`,
     origin: "bundled",
     providers: [],
     rootDir: `/tmp/${overrides.id}`,
@@ -244,7 +244,7 @@ function setExternalFeishuSchema() {
       diagnostics: [],
       plugins: [
         createPluginManifestRecord({
-          id: "openclaw-lark",
+          id: "recall-lark",
           origin: "global",
           channels: ["feishu"],
           channelConfigs: {
@@ -274,7 +274,7 @@ function makeInvalidSnapshot(params: {
   path?: string;
 }): ConfigFileSnapshot {
   return {
-    path: params.path ?? "/tmp/custom-openclaw.json",
+    path: params.path ?? "/tmp/custom-recall.json",
     exists: true,
     raw: "{}",
     parsed: {},
@@ -328,12 +328,12 @@ async function runValidateJsonAndGetPayload() {
   };
 }
 
-function firstWrittenConfig(): OpenClawConfig {
+function firstWrittenConfig(): RecallConfig {
   const written = firstMockArg(mockWriteConfigFile);
   if (!written) {
     throw new Error("expected written config");
   }
-  return written as OpenClawConfig;
+  return written as RecallConfig;
 }
 
 function firstWriteConfigOptions():
@@ -435,7 +435,7 @@ describe("config cli", () => {
 
   describe("config set - issue #6070", () => {
     it("preserves existing config keys when setting a new value", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         agents: {
           list: [{ id: "main" }, { id: "oracle", workspace: "~/oracle-workspace" }],
         },
@@ -443,7 +443,7 @@ describe("config cli", () => {
         tools: { allow: ["group:fs"] },
         logging: { level: "debug" },
       };
-      const runtimeMerged: OpenClawConfig = {
+      const runtimeMerged: RecallConfig = {
         ...withRuntimeDefaults(resolved),
       };
       setSnapshot(resolved, runtimeMerged);
@@ -461,7 +461,7 @@ describe("config cli", () => {
     });
 
     it("marks set paths explicit so default-equal writes persist", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         channels: {
           telegram: {
             botToken: "tok-abc",
@@ -476,7 +476,7 @@ describe("config cli", () => {
             dmPolicy: "pairing",
           },
         },
-      } as OpenClawConfig;
+      } as RecallConfig;
       setSnapshot(resolved, runtimeMerged);
 
       await runConfigCommand(["config", "set", "channels.telegram.dmPolicy", "pairing"]);
@@ -488,7 +488,7 @@ describe("config cli", () => {
     });
 
     it("marks object set paths explicit so nested default-equal writes persist", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         channels: {
           telegram: {
             botToken: "tok-abc",
@@ -503,7 +503,7 @@ describe("config cli", () => {
             dmPolicy: "pairing",
           },
         },
-      } as OpenClawConfig;
+      } as RecallConfig;
       setSnapshot(resolved, runtimeMerged);
 
       await runConfigCommand([
@@ -519,7 +519,7 @@ describe("config cli", () => {
     });
 
     it("does not inject runtime defaults into the written config", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
       };
       const runtimeMerged = {
@@ -533,7 +533,7 @@ describe("config cli", () => {
         } as never,
         messages: { ackReaction: "✅" } as never,
         sessions: { persistence: { enabled: true } } as never,
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       setSnapshot(resolved, runtimeMerged);
 
       await runConfigCommand(["config", "set", "gateway.auth.mode", "token"]);
@@ -550,7 +550,7 @@ describe("config cli", () => {
     });
 
     it("writes agents.defaults.videoGenerationModel.primary without disturbing sibling defaults", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         agents: {
           defaults: {
             model: "openai/gpt-5.4",
@@ -581,7 +581,7 @@ describe("config cli", () => {
     });
 
     it("normalizes retired Google Gemini model refs before writing config mutations", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         agents: {
           defaults: {
             model: {
@@ -614,7 +614,7 @@ describe("config cli", () => {
     });
 
     it("normalizes explicit model-map paths before writing config mutations", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         agents: {
           defaults: {
             models: {
@@ -643,7 +643,7 @@ describe("config cli", () => {
     });
 
     it("normalizes agent-list model refs before writing config mutations", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         agents: {
           list: [
             {
@@ -669,7 +669,7 @@ describe("config cli", () => {
     });
 
     it("normalizes provider catalog model refs before writing config mutations", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         models: {
           providers: {
             google: {
@@ -705,16 +705,16 @@ describe("config cli", () => {
         runConfigCommand([
           "config",
           "set",
-          'plugins.installs["openclaw-web-search"].spec',
-          '"@ollama/openclaw-web-search@0.2.2"',
+          'plugins.installs["recall-web-search"].spec',
+          '"@ollama/recall-web-search@0.2.2"',
           "--strict-json",
           "--dry-run",
         ]),
       ).rejects.toThrow("__exit__:1");
 
       expect(mockWriteConfigFile).not.toHaveBeenCalled();
-      expectErrorIncludes("openclaw plugins install <spec>");
-      expectErrorIncludes("openclaw plugins update <plugin-id>");
+      expectErrorIncludes("recall plugins install <spec>");
+      expectErrorIncludes("recall plugins update <plugin-id>");
     });
 
     it("rejects auto-managed meta.lastTouchedVersion config updates (#80849)", async () => {
@@ -828,7 +828,7 @@ describe("config cli", () => {
     });
 
     it("rejects protected model map replacement unless explicitly requested", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         agents: {
           defaults: {
             models: {
@@ -855,7 +855,7 @@ describe("config cli", () => {
     });
 
     it("merges protected model map values with --merge", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         agents: {
           defaults: {
             models: {
@@ -896,7 +896,7 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand([
@@ -918,7 +918,7 @@ describe("config cli", () => {
     });
 
     it("drops gateway.auth.password when switching mode to token", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: {
           auth: {
             mode: "password",
@@ -943,7 +943,7 @@ describe("config cli", () => {
     });
 
     it("drops gateway.auth.token when switching mode to password", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: {
           auth: {
             mode: "token",
@@ -966,7 +966,7 @@ describe("config cli", () => {
     });
 
     it("applies mode-based credential cleanup using the final batch result", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: {
           auth: {
             mode: "password",
@@ -996,7 +996,7 @@ describe("config cli", () => {
 
   describe("config get", () => {
     it("redacts sensitive values", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: {
           auth: {
             token: "super-secret-token",
@@ -1007,12 +1007,12 @@ describe("config cli", () => {
 
       await runConfigCommand(["config", "get", "gateway.auth.token"]);
 
-      expect(mockLog).toHaveBeenCalledWith("__OPENCLAW_REDACTED__");
+      expect(mockLog).toHaveBeenCalledWith("__RECALL_REDACTED__");
     });
 
     it("prints materialized subagent archive default", async () => {
-      const resolved: OpenClawConfig = {};
-      const config: OpenClawConfig = {
+      const resolved: RecallConfig = {};
+      const config: RecallConfig = {
         agents: {
           defaults: {
             maxConcurrent: 4,
@@ -1033,7 +1033,7 @@ describe("config cli", () => {
 
   describe("config validate", () => {
     it("prints success and exits 0 when config is valid", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1073,7 +1073,7 @@ describe("config cli", () => {
 
       const payload = await runValidateJsonAndGetPayload();
       expect(payload.valid).toBe(false);
-      expect(payload.path).toBe("/tmp/custom-openclaw.json");
+      expect(payload.path).toBe("/tmp/custom-recall.json");
       expect(payload.issues).toEqual([{ path: "gateway.bind", message: "Invalid enum value" }]);
       expect(mockError).not.toHaveBeenCalled();
     });
@@ -1094,7 +1094,7 @@ describe("config cli", () => {
 
       const payload = await runValidateJsonAndGetPayload();
       expect(payload.valid).toBe(false);
-      expect(payload.path).toBe("/tmp/custom-openclaw.json");
+      expect(payload.path).toBe("/tmp/custom-recall.json");
       expect(payload.issues).toEqual([
         {
           path: "update.channel",
@@ -1107,7 +1107,7 @@ describe("config cli", () => {
 
     it("prints file-not-found and exits 1 when config file is missing", async () => {
       setSnapshotOnce({
-        path: "/tmp/openclaw.json",
+        path: "/tmp/recall.json",
         exists: false,
         raw: null,
         parsed: {},
@@ -1204,7 +1204,7 @@ describe("config cli", () => {
 
   describe("config set parsing flags", () => {
     it("falls back to raw string when parsing fails and strict mode is off", async () => {
-      const resolved: OpenClawConfig = { gateway: { port: 18789 } };
+      const resolved: RecallConfig = { gateway: { port: 18789 } };
       setSnapshot(resolved, resolved);
 
       await runConfigCommand(["config", "set", "gateway.auth.mode", "{bad"]);
@@ -1244,7 +1244,7 @@ describe("config cli", () => {
     });
 
     it("accepts --strict-json with batch mode and applies batch payload", async () => {
-      const resolved: OpenClawConfig = { gateway: { port: 18789 } };
+      const resolved: RecallConfig = { gateway: { port: 18789 } };
       setSnapshot(resolved, resolved);
 
       await runConfigCommand([
@@ -1293,7 +1293,7 @@ describe("config cli", () => {
 
   describe("config set builders and dry-run", () => {
     it("supports SecretRef builder mode without requiring a value argument", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1321,13 +1321,13 @@ describe("config cli", () => {
 
     it("keeps numeric config set path segments as object keys for schema-backed Discord guild records", async () => {
       setConfigMutationShapeSchema();
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         channels: {
           discord: {
             enabled: true,
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand([
@@ -1352,13 +1352,13 @@ describe("config cli", () => {
 
     it("keeps numeric config set path segments as object keys for other schema-backed records", async () => {
       setConfigMutationShapeSchema();
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         channels: {
           telegram: {
             enabled: true,
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand([
@@ -1383,7 +1383,7 @@ describe("config cli", () => {
 
     it("still creates arrays for schema-backed numeric list indexes", async () => {
       setConfigMutationShapeSchema();
-      const resolved: OpenClawConfig = {};
+      const resolved: RecallConfig = {};
       setSnapshot(resolved, resolved);
 
       await runConfigCommand(["config", "set", "agents.list.0.id", '"tech"', "--strict-json"]);
@@ -1397,7 +1397,7 @@ describe("config cli", () => {
     });
 
     it("fails early when unsupported mutable paths are assigned SecretRef objects (builder mode)", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1422,7 +1422,7 @@ describe("config cli", () => {
     });
 
     it("fails early when parent-object writes include unsupported SecretRef objects", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1443,7 +1443,7 @@ describe("config cli", () => {
     });
 
     it("supports provider builder mode under secrets.providers.<alias>", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1472,7 +1472,7 @@ describe("config cli", () => {
     });
 
     it("runs resolvability checks in builder dry-run mode without writing", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -1507,7 +1507,7 @@ describe("config cli", () => {
     });
 
     it("requires schema validation in JSON dry-run mode", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1529,7 +1529,7 @@ describe("config cli", () => {
 
     it("dry-runs config patch channel fields against plugin-owned schemas", async () => {
       setExternalFeishuSchema();
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         channels: {
           feishu: {
             appId: "app-id",
@@ -1538,13 +1538,13 @@ describe("config cli", () => {
         },
       };
       setSnapshot(resolved, resolved);
-      const pathname = writeTempJson5File("openclaw-config-plugin-channel-schema", {
+      const pathname = writeTempJson5File("recall-config-plugin-channel-schema", {
         channels: {
           feishu: {
             appId: "app-id",
             appSecret: "secret",
             replyMode: "thread",
-            footer: "OpenClaw",
+            footer: "Recall",
           },
         },
       });
@@ -1557,7 +1557,7 @@ describe("config cli", () => {
     });
 
     it("fails dry-run when unsupported mutable paths receive SecretRef objects in value/json mode", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -1584,7 +1584,7 @@ describe("config cli", () => {
     });
 
     it("aggregates policy failures across batch entries", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1605,7 +1605,7 @@ describe("config cli", () => {
     });
 
     it("does not duplicate policy errors in --dry-run --json mode for parent-object writes", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1638,7 +1638,7 @@ describe("config cli", () => {
     });
 
     it("logs a dry-run note when value mode performs no validation checks", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1652,7 +1652,7 @@ describe("config cli", () => {
     });
 
     it("supports batch mode for refs/providers in dry-run", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -1675,7 +1675,7 @@ describe("config cli", () => {
     });
 
     it("skips exec SecretRef resolvability checks in dry-run by default", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -1710,7 +1710,7 @@ describe("config cli", () => {
     });
 
     it("allows exec SecretRef resolvability checks in dry-run when --allow-exec is set", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -1752,7 +1752,7 @@ describe("config cli", () => {
     it("rejects --allow-exec without --dry-run", async () => {
       const nonexistentBatchPath = path.join(
         os.tmpdir(),
-        `openclaw-config-batch-nonexistent-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
+        `recall-config-batch-nonexistent-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
       );
       await expect(
         runConfigCommand(["config", "set", "--batch-file", nonexistentBatchPath, "--allow-exec"]),
@@ -1764,7 +1764,7 @@ describe("config cli", () => {
     });
 
     it("fails dry-run when skipped exec refs use an unconfigured provider", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {},
@@ -1792,7 +1792,7 @@ describe("config cli", () => {
     });
 
     it("fails dry-run when skipped exec refs use a provider with mismatched source", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -1824,7 +1824,7 @@ describe("config cli", () => {
     });
 
     it("writes sibling SecretRef paths when target uses sibling-ref shape", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         channels: {
           googlechat: {
@@ -1898,12 +1898,12 @@ describe("config cli", () => {
     });
 
     it("supports batch-file mode", async () => {
-      const resolved: OpenClawConfig = { gateway: { port: 18789 } };
+      const resolved: RecallConfig = { gateway: { port: 18789 } };
       setSnapshot(resolved, resolved);
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-batch-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
+        `recall-config-batch-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
       );
       fs.writeFileSync(pathname, '[{"path":"gateway.auth.mode","value":"token"}]', "utf8");
       try {
@@ -1918,7 +1918,7 @@ describe("config cli", () => {
     });
 
     it("batch-file nested leaf updates preserve agents defaults and list siblings", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         agents: {
           defaults: {
             models: {
@@ -1938,7 +1938,7 @@ describe("config cli", () => {
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-memory-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
+        `recall-config-memory-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
       );
       fs.writeFileSync(
         pathname,
@@ -1971,7 +1971,7 @@ describe("config cli", () => {
     it("rejects malformed batch-file payloads", async () => {
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-batch-invalid-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
+        `recall-config-batch-invalid-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
       );
       fs.writeFileSync(pathname, '{"path":"gateway.auth.mode","value":"token"}', "utf8");
       try {
@@ -1999,12 +1999,12 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       setSnapshot(resolved, resolved);
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-patch-${Date.now()}-${Math.random().toString(16).slice(2)}.json5`,
+        `recall-config-patch-${Date.now()}-${Math.random().toString(16).slice(2)}.json5`,
       );
       fs.writeFileSync(
         pathname,
@@ -2072,10 +2072,10 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       setSnapshot(resolved, resolved);
 
-      const pathname = writeTempJson5File("openclaw-config-patch-empty-object", {
+      const pathname = writeTempJson5File("recall-config-patch-empty-object", {
         agents: {
           defaults: {
             models: {
@@ -2107,10 +2107,10 @@ describe("config cli", () => {
             mode: "socket",
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       setSnapshot(resolved, resolved);
 
-      const pathname = writeTempJson5File("openclaw-config-patch-empty-merge", {
+      const pathname = writeTempJson5File("recall-config-patch-empty-merge", {
         channels: {
           slack: {},
         },
@@ -2135,10 +2135,10 @@ describe("config cli", () => {
             enabled: true,
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       setSnapshot(resolved, resolved);
 
-      const pathname = writeTempJson5File("openclaw-config-patch-numeric-object-key", {
+      const pathname = writeTempJson5File("recall-config-patch-numeric-object-key", {
         channels: {
           discord: {
             guilds: {
@@ -2172,12 +2172,12 @@ describe("config cli", () => {
             default: { source: "env" },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       setSnapshot(resolved, resolved);
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-patch-dry-${Date.now()}-${Math.random().toString(16).slice(2)}.json5`,
+        `recall-config-patch-dry-${Date.now()}-${Math.random().toString(16).slice(2)}.json5`,
       );
       fs.writeFileSync(
         pathname,
@@ -2210,12 +2210,12 @@ describe("config cli", () => {
             default: { source: "env" },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       setSnapshot(resolved, resolved);
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-patch-ref-schema-${Date.now()}-${Math.random()
+        `recall-config-patch-ref-schema-${Date.now()}-${Math.random()
           .toString(16)
           .slice(2)}.json5`,
       );
@@ -2255,13 +2255,13 @@ describe("config cli", () => {
             enabled: false,
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       setSnapshot(resolved, resolved);
       mockResolveSecretRefValue.mockRejectedValue(new Error("missing env var"));
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-patch-nested-ref-${Date.now()}-${Math.random()
+        `recall-config-patch-nested-ref-${Date.now()}-${Math.random()
           .toString(16)
           .slice(2)}.json5`,
       );
@@ -2324,12 +2324,12 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       setSnapshot(resolved, resolved);
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-patch-replace-${Date.now()}-${Math.random().toString(16).slice(2)}.json5`,
+        `recall-config-patch-replace-${Date.now()}-${Math.random().toString(16).slice(2)}.json5`,
       );
       fs.writeFileSync(
         pathname,
@@ -2380,7 +2380,7 @@ describe("config cli", () => {
     it("rejects unused config patch replace paths", async () => {
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-patch-unused-replace-${Date.now()}-${Math.random()
+        `recall-config-patch-unused-replace-${Date.now()}-${Math.random()
           .toString(16)
           .slice(2)}.json5`,
       );
@@ -2430,7 +2430,7 @@ describe("config cli", () => {
     });
 
     it("fails dry-run when a builder-assigned SecretRef is unresolved", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2460,7 +2460,7 @@ describe("config cli", () => {
     });
 
     it("emits structured JSON for --dry-run --json success", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2503,7 +2503,7 @@ describe("config cli", () => {
     });
 
     it("emits skipped exec metadata for --dry-run --json success", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2545,7 +2545,7 @@ describe("config cli", () => {
     });
 
     it("emits structured JSON for --dry-run --json failure", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2584,7 +2584,7 @@ describe("config cli", () => {
     });
 
     it("keeps distinct resolvability failures when messages are identical but refs differ", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2622,7 +2622,7 @@ describe("config cli", () => {
     });
 
     it("aggregates schema and resolvability failures in --dry-run --json mode", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2657,7 +2657,7 @@ describe("config cli", () => {
     });
 
     it("fails dry-run when provider updates make existing refs unresolvable", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2698,7 +2698,7 @@ describe("config cli", () => {
     });
 
     it("fails dry-run for nested provider edits that make existing refs unresolvable", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2775,7 +2775,7 @@ describe("config cli", () => {
 
   describe("config unset - issue #6070", () => {
     it("preserves existing config keys when unsetting a value", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         agents: { list: [{ id: "main" }] },
         gateway: { port: 18789 },
         tools: {
@@ -2784,7 +2784,7 @@ describe("config cli", () => {
         },
         logging: { level: "debug" },
       };
-      const runtimeMerged: OpenClawConfig = {
+      const runtimeMerged: RecallConfig = {
         ...withRuntimeDefaults(resolved),
       };
       setSnapshot(resolved, runtimeMerged);
@@ -2805,12 +2805,12 @@ describe("config cli", () => {
     });
 
     it("removes only the specified array element", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         agents: {
           list: [{ id: "agent-a" }, { id: "agent-b" }, { id: "agent-c" }],
         },
       };
-      const runtimeMerged: OpenClawConfig = {
+      const runtimeMerged: RecallConfig = {
         ...withRuntimeDefaults(resolved),
       };
       setSnapshot(resolved, runtimeMerged);
@@ -2824,7 +2824,7 @@ describe("config cli", () => {
     });
 
     it("preserves write-level unset handling for numeric object keys", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         channels: {
           discord: {
             guilds: {
@@ -2833,7 +2833,7 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand(["config", "unset", "channels.discord.guilds.123"]);
@@ -2851,7 +2851,7 @@ describe("config cli", () => {
     });
 
     it("dry-runs an unset without writing the config file", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         agents: { list: [{ id: "main" }] },
         gateway: { port: 18789 },
         tools: {
@@ -2865,12 +2865,12 @@ describe("config cli", () => {
       await runConfigCommand(["config", "unset", "tools.alsoAllow", "--dry-run"]);
 
       expect(mockWriteConfigFile).not.toHaveBeenCalled();
-      expectLogIncludes("Dry run successful: 1 update(s) validated against /tmp/openclaw.json.");
+      expectLogIncludes("Dry run successful: 1 update(s) validated against /tmp/recall.json.");
       expect(mockReadConfigFileSnapshot).toHaveBeenCalledTimes(2);
     });
 
     it("prints JSON for config unset dry-run", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         agents: { list: [{ id: "main" }] },
         gateway: { port: 18789 },
         tools: {
@@ -2897,7 +2897,7 @@ describe("config cli", () => {
     });
 
     it("prints structured JSON when unset dry-run misses a path", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         tools: {
           profile: "coding",
@@ -2933,7 +2933,7 @@ describe("config cli", () => {
     });
 
     it("validates existing refs when unset dry-run removes all secret providers", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2971,7 +2971,7 @@ describe("config cli", () => {
     });
 
     it("validates existing refs when unset dry-run removes secret defaults", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: RecallConfig = {
         gateway: { port: 18789 },
         secrets: {
           defaults: {
@@ -2990,7 +2990,7 @@ describe("config cli", () => {
             },
           },
         } as never,
-      } as OpenClawConfig;
+      } as RecallConfig;
       setSnapshot(resolved, resolved);
       setSnapshot(resolved, resolved);
 
@@ -3004,7 +3004,7 @@ describe("config cli", () => {
         provider: "default",
         id: "WEB_SEARCH_API_KEY",
       });
-      expectLogIncludes("Dry run successful: 1 update(s) validated against /tmp/openclaw.json.");
+      expectLogIncludes("Dry run successful: 1 update(s) validated against /tmp/recall.json.");
     });
 
     it("rejects config unset --json without --dry-run", async () => {
@@ -3028,24 +3028,24 @@ describe("config cli", () => {
 
   describe("config file", () => {
     it("prints the active config file path", async () => {
-      const resolved: OpenClawConfig = { gateway: { port: 18789 } };
+      const resolved: RecallConfig = { gateway: { port: 18789 } };
       setSnapshot(resolved, resolved);
 
       await runConfigCommand(["config", "file"]);
 
-      expect(mockLog).toHaveBeenCalledWith("/tmp/openclaw.json");
+      expect(mockLog).toHaveBeenCalledWith("/tmp/recall.json");
       expect(mockWriteConfigFile).not.toHaveBeenCalled();
     });
 
     it("handles config file path with home directory", async () => {
-      const resolved: OpenClawConfig = { gateway: { port: 18789 } };
+      const resolved: RecallConfig = { gateway: { port: 18789 } };
       const snapshot = buildSnapshot({ resolved, config: resolved });
-      snapshot.path = "/home/user/.openclaw/openclaw.json";
+      snapshot.path = "/home/user/.tryrecall/recall-agents.json";
       mockReadConfigFileSnapshot.mockResolvedValueOnce(snapshot);
 
       await runConfigCommand(["config", "file"]);
 
-      expect(mockLog).toHaveBeenCalledWith("/home/user/.openclaw/openclaw.json");
+      expect(mockLog).toHaveBeenCalledWith("/home/user/.tryrecall/recall-agents.json");
     });
   });
 });

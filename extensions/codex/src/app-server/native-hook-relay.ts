@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import type {
   NativeHookRelayEvent,
   NativeHookRelayRegistrationHandle,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "recall/plugin-sdk/agent-harness-runtime";
 import type { JsonObject, JsonValue } from "./protocol.js";
 
 export const CODEX_NATIVE_HOOK_RELAY_EVENTS: readonly NativeHookRelayEvent[] = [
@@ -71,7 +71,7 @@ export function buildCodexNativeHookRelayConfig(params: {
             command,
             timeout,
             async: false,
-            statusMessage: "OpenClaw native hook relay",
+            statusMessage: "Recall native hook relay",
           },
         ],
       },
@@ -82,7 +82,7 @@ export function buildCodexNativeHookRelayConfig(params: {
         event,
         command,
         timeout,
-        statusMessage: "OpenClaw native hook relay",
+        statusMessage: "Recall native hook relay",
       }),
     };
     for (const sourcePath of CODEX_SESSION_FLAGS_HOOK_SOURCE_PATHS) {

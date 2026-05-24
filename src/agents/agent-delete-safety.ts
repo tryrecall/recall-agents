@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { isPathInside } from "../infra/path-guards.js";
 import { normalizeAgentId } from "../routing/session-key.js";
 import { lowercasePreservingWhitespace } from "../shared/string-coerce.js";
@@ -29,7 +29,7 @@ function workspacePathsOverlap(left: string, right: string): boolean {
 }
 
 export function findOverlappingWorkspaceAgentIds(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   agentId: string,
   workspaceDir: string,
 ): string[] {

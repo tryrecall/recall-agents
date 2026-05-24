@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import type { RuntimeEnv } from "../../runtime.js";
 
 const mocks = vi.hoisted(() => ({
@@ -49,7 +49,7 @@ describe("modelsSetCommand", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const runtimeConfig = {
       agents: {
         defaults: {
@@ -58,7 +58,7 @@ describe("modelsSetCommand", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     mocks.readConfigFileSnapshot.mockResolvedValue({
       valid: true,
       hash: "config-hash",
@@ -95,7 +95,7 @@ describe("modelsSetCommand", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const runtimeConfig = {
       agents: {
         defaults: {
@@ -105,7 +105,7 @@ describe("modelsSetCommand", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     mocks.readConfigFileSnapshot.mockResolvedValue({
       valid: true,
       hash: "config-hash",

@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/tlon",
+  "name": "@recall/tlon",
   "version": "2026.5.22",
-  "description": "OpenClaw Tlon/Urbit channel plugin",
+  "description": "Recall Tlon/Urbit channel plugin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/tryrecall/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -15,18 +15,18 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*",
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.5.22"
+    "recall": ">=2026.5.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
@@ -68,7 +68,7 @@
       ]
     },
     "install": {
-      "npmSpec": "@openclaw/tlon",
+      "npmSpec": "@recall/tlon",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.10"
     },

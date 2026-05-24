@@ -1,4 +1,4 @@
-import { MarkdownConfigSchema } from "openclaw/plugin-sdk/channel-config-primitives";
+import { MarkdownConfigSchema } from "recall/plugin-sdk/channel-config-primitives";
 import { z } from "zod";
 
 /**

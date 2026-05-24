@@ -30,7 +30,7 @@ const outPaths = [
     "shared",
     "OpenClawKit",
     "Sources",
-    "OpenClawProtocol",
+    "RecallProtocol",
     "GatewayModels.swift",
   ),
 ];

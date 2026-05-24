@@ -1,20 +1,20 @@
 import type { Chat, Message } from "grammy/types";
-import { formatLocationText } from "openclaw/plugin-sdk/channel-inbound";
+import { formatLocationText } from "recall/plugin-sdk/channel-inbound";
 import {
   resolveCommandAuthorization,
   type CommandAuthorization,
-} from "openclaw/plugin-sdk/command-auth-native";
+} from "recall/plugin-sdk/command-auth-native";
 import type {
-  OpenClawConfig,
+  RecallConfig,
   TelegramAccountConfig,
   TelegramDirectConfig,
   TelegramGroupConfig,
   TelegramDmThreadReplies,
   TelegramTopicConfig,
-} from "openclaw/plugin-sdk/config-contracts";
-import { readChannelAllowFromStore } from "openclaw/plugin-sdk/conversation-runtime";
-import { normalizeAccountId } from "openclaw/plugin-sdk/routing";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/config-contracts";
+import { readChannelAllowFromStore } from "recall/plugin-sdk/conversation-runtime";
+import { normalizeAccountId } from "recall/plugin-sdk/routing";
+import { normalizeOptionalString } from "recall/plugin-sdk/string-coerce-runtime";
 import { expandTelegramAllowFromWithAccessGroups } from "../access-groups.js";
 import { firstDefined, normalizeAllowFrom, type NormalizedAllowFrom } from "../bot-access.js";
 import { normalizeTelegramReplyToMessageId } from "../outbound-params.js";
@@ -191,7 +191,7 @@ export function withResolvedTelegramForumFlag<T extends { chat: object }>(
 }
 
 export async function resolveTelegramGroupAllowFromContext(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   chatId: string | number;
   accountId?: string;
   senderId?: string;
@@ -415,7 +415,7 @@ export function buildTelegramGroupFrom(chatId: number | string, messageThreadId?
   return `telegram:group:${buildTelegramGroupPeerId(chatId, messageThreadId)}`;
 }
 
-export function isTelegramCommandsAllowFromConfigured(cfg: OpenClawConfig): boolean {
+export function isTelegramCommandsAllowFromConfigured(cfg: RecallConfig): boolean {
   const commandsAllowFrom = cfg.commands?.allowFrom;
   return (
     commandsAllowFrom != null &&
@@ -425,7 +425,7 @@ export function isTelegramCommandsAllowFromConfigured(cfg: OpenClawConfig): bool
 }
 
 export function resolveTelegramCommandAuthorization(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId: string;
   chatId: number;
   isGroup: boolean;

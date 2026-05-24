@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { captureEnv } from "../test-utils/env.js";
 import {
   writeBundleProbeMcpServer,
@@ -84,7 +84,7 @@ beforeEach(async () => {
   const { setCliRunnerPrepareTestDeps } = await import("./cli-runner/prepare.js");
   setCliRunnerPrepareTestDeps({
     // This test validates downstream bundle MCP config injection. The generic
-    // OpenClaw loopback tool inventory is covered by prepare-level tests and is
+    // Recall loopback tool inventory is covered by prepare-level tests and is
     // expensive under cold Linux container workers.
     resolveMcpLoopbackScopedTools: () => ({ agentId: "main", tools: [] }),
   });
@@ -108,16 +108,16 @@ describe("runCliAgent bundle MCP e2e", () => {
       const envSnapshot = captureEnv([
         "HOME",
         "USERPROFILE",
-        "OPENCLAW_HOME",
-        "OPENCLAW_STATE_DIR",
-        "OPENCLAW_DISABLE_PERSISTED_PLUGIN_REGISTRY",
+        "RECALL_HOME",
+        "RECALL_STATE_DIR",
+        "RECALL_DISABLE_PERSISTED_PLUGIN_REGISTRY",
       ]);
-      const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-cli-bundle-mcp-"));
+      const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "recall-cli-bundle-mcp-"));
       process.env.HOME = tempHome;
       process.env.USERPROFILE = tempHome;
-      delete process.env.OPENCLAW_HOME;
-      delete process.env.OPENCLAW_STATE_DIR;
-      process.env.OPENCLAW_DISABLE_PERSISTED_PLUGIN_REGISTRY = "1";
+      delete process.env.RECALL_HOME;
+      delete process.env.RECALL_STATE_DIR;
+      process.env.RECALL_DISABLE_PERSISTED_PLUGIN_REGISTRY = "1";
       resetGlobalHookRunner();
 
       const workspaceDir = path.join(tempHome, "workspace");
@@ -125,14 +125,14 @@ describe("runCliAgent bundle MCP e2e", () => {
       const binDir = path.join(tempHome, "bin");
       const serverScriptPath = path.join(tempHome, "mcp", "bundle-probe.mjs");
       const fakeClaudePath = path.join(binDir, "fake-claude.mjs");
-      const pluginRoot = path.join(tempHome, ".openclaw", "extensions", "bundle-probe");
+      const pluginRoot = path.join(tempHome, ".recall", "extensions", "bundle-probe");
       await fs.mkdir(workspaceDir, { recursive: true });
       await writeBundleProbeMcpServer(serverScriptPath);
       await writeFakeClaudeCli(fakeClaudePath);
       await writeClaudeBundle({ pluginRoot, serverScriptPath });
       installTestClaudeBackend({ commandPath: fakeClaudePath });
 
-      const config: OpenClawConfig = {
+      const config: RecallConfig = {
         agents: {
           defaults: {
             workspace: workspaceDir,
@@ -183,16 +183,16 @@ describe("runCliAgent bundle MCP e2e", () => {
       const envSnapshot = captureEnv([
         "HOME",
         "USERPROFILE",
-        "OPENCLAW_HOME",
-        "OPENCLAW_STATE_DIR",
-        "OPENCLAW_DISABLE_PERSISTED_PLUGIN_REGISTRY",
+        "RECALL_HOME",
+        "RECALL_STATE_DIR",
+        "RECALL_DISABLE_PERSISTED_PLUGIN_REGISTRY",
       ]);
-      const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-cli-live-cleanup-"));
+      const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "recall-cli-live-cleanup-"));
       process.env.HOME = tempHome;
       process.env.USERPROFILE = tempHome;
-      delete process.env.OPENCLAW_HOME;
-      delete process.env.OPENCLAW_STATE_DIR;
-      process.env.OPENCLAW_DISABLE_PERSISTED_PLUGIN_REGISTRY = "1";
+      delete process.env.RECALL_HOME;
+      delete process.env.RECALL_STATE_DIR;
+      process.env.RECALL_DISABLE_PERSISTED_PLUGIN_REGISTRY = "1";
       resetGlobalHookRunner();
       await closeMcpLoopbackServer();
 
@@ -202,14 +202,14 @@ describe("runCliAgent bundle MCP e2e", () => {
       const serverScriptPath = path.join(tempHome, "mcp", "bundle-probe.mjs");
       const fakeClaudePath = path.join(binDir, "fake-live-claude.mjs");
       const fakeClaudePidPath = path.join(tempHome, "fake-live-claude.pid");
-      const pluginRoot = path.join(tempHome, ".openclaw", "extensions", "bundle-probe");
+      const pluginRoot = path.join(tempHome, ".recall", "extensions", "bundle-probe");
       await fs.mkdir(workspaceDir, { recursive: true });
       await writeBundleProbeMcpServer(serverScriptPath);
       await writeFakeClaudeLiveCli({ filePath: fakeClaudePath, pidPath: fakeClaudePidPath });
       await writeClaudeBundle({ pluginRoot, serverScriptPath });
       installTestClaudeBackend({ commandPath: fakeClaudePath, liveSession: "claude-stdio" });
 
-      const config: OpenClawConfig = {
+      const config: RecallConfig = {
         agents: {
           defaults: {
             workspace: workspaceDir,

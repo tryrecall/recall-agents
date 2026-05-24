@@ -1,15 +1,15 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-types";
+import type { RecallConfig } from "recall/plugin-sdk/config-types";
 import { describe, expect, it, vi } from "vitest";
 import { createActiveCfgProvider, resolveActiveCfg, type GatewayCfgLoader } from "./active-cfg.js";
 
-const getRuntimeConfigMock = vi.hoisted(() => vi.fn<() => OpenClawConfig>());
+const getRuntimeConfigMock = vi.hoisted(() => vi.fn<() => RecallConfig>());
 
-vi.mock("openclaw/plugin-sdk/runtime-config-snapshot", () => ({
+vi.mock("recall/plugin-sdk/runtime-config-snapshot", () => ({
   getRuntimeConfig: getRuntimeConfigMock,
 }));
 
-function asCfg(shape: { bindings: Array<{ id: string }> }): OpenClawConfig {
-  return shape as unknown as OpenClawConfig;
+function asCfg(shape: { bindings: Array<{ id: string }> }): RecallConfig {
+  return shape as unknown as RecallConfig;
 }
 
 describe("resolveActiveCfg", () => {
@@ -37,7 +37,7 @@ describe("createActiveCfgProvider", () => {
     const first = asCfg({ bindings: [{ id: "first" }] });
     const second = asCfg({ bindings: [{ id: "second" }] });
     const load = vi
-      .fn<() => OpenClawConfig>()
+      .fn<() => RecallConfig>()
       .mockReturnValueOnce(first)
       .mockReturnValueOnce(second);
 
@@ -50,7 +50,7 @@ describe("createActiveCfgProvider", () => {
 
   it("never caches a previously loaded value", () => {
     const fallback = asCfg({ bindings: [] });
-    const calls: OpenClawConfig[] = [
+    const calls: RecallConfig[] = [
       asCfg({ bindings: [{ id: "a" }] }),
       asCfg({ bindings: [{ id: "b" }] }),
       asCfg({ bindings: [{ id: "c" }] }),

@@ -1,14 +1,14 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { clearSessionStoreCacheForTest } from "openclaw/plugin-sdk/session-store-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { clearSessionStoreCacheForTest } from "recall/plugin-sdk/session-store-runtime";
 import { describe, expect, it } from "vitest";
 import { slackApprovalCapability, slackNativeApprovalAdapter } from "./approval-native.js";
 
 function buildConfig(
-  overrides?: Partial<NonNullable<NonNullable<OpenClawConfig["channels"]>["slack"]>>,
-): OpenClawConfig {
+  overrides?: Partial<NonNullable<NonNullable<RecallConfig["channels"]>["slack"]>>,
+): RecallConfig {
   return {
     channels: {
       slack: {
@@ -22,10 +22,10 @@ function buildConfig(
         ...overrides,
       },
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
-const STORE_PATH = path.join(os.tmpdir(), "openclaw-slack-approval-native-test.json");
+const STORE_PATH = path.join(os.tmpdir(), "recall-slack-approval-native-test.json");
 
 function writeStore(store: Record<string, unknown>) {
   fs.writeFileSync(STORE_PATH, `${JSON.stringify(store, null, 2)}\n`, "utf8");
@@ -342,7 +342,7 @@ describe("slack native approval adapter", () => {
           targets: [{ channel: "slack", to: "U123OWNER" }],
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const request = {
       id: "plugin:req-1",
       request: {
@@ -413,7 +413,7 @@ describe("slack native approval adapter", () => {
           mode: "session",
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const request = {
       id: "plugin:req-account-bound",
       request: {
@@ -1007,7 +1007,7 @@ describe("slack native approval adapter", () => {
           targets: [{ channel: "slack", to: "user:U123OWNER" }],
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expect(
       shouldSuppress({
@@ -1049,7 +1049,7 @@ describe("slack native approval adapter", () => {
           targets: [{ channel: "slack", to: "U123OWNER" }],
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expect(
       shouldSuppress({
@@ -1095,7 +1095,7 @@ describe("slack native approval adapter", () => {
           targets: [{ channel: "slack", to: "channel:CAPPROVALS" }],
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expect(
       shouldSuppress({

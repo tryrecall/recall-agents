@@ -18,8 +18,8 @@ import {
   type MessagingToolSend,
   type MessagingToolSourceReplyPayload,
   wrapToolWithBeforeToolCallHook,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
-import { normalizeAgentId } from "openclaw/plugin-sdk/routing";
+} from "recall/plugin-sdk/agent-harness-runtime";
+import { normalizeAgentId } from "recall/plugin-sdk/routing";
 import type { CodexDynamicToolsLoading } from "./config.js";
 import { invalidInlineImageText, sanitizeInlineImageDataUrl } from "./image-payload-sanitizer.js";
 import {
@@ -62,9 +62,9 @@ export type CodexDynamicToolBridge = {
   };
 };
 
-export const CODEX_OPENCLAW_DYNAMIC_TOOL_NAMESPACE = "openclaw";
+export const CODEX_RECALL_DYNAMIC_TOOL_NAMESPACE = "recall";
 
-// Keep OpenClaw session spawning searchable in Codex mode so Codex's native
+// Keep Recall session spawning searchable in Codex mode so Codex's native
 // spawn_agent remains the primary Codex subagent surface.
 const ALWAYS_DIRECT_DYNAMIC_TOOL_NAMES = new Set(["sessions_yield"]);
 const DEFAULT_CODEX_DYNAMIC_TOOL_RESULT_MAX_CHARS = 16_000;
@@ -133,14 +133,14 @@ export function createCodexDynamicToolBridge(params: {
             contentItems: [
               {
                 type: "inputText",
-                text: `OpenClaw tool is not available for this turn: ${call.tool}`,
+                text: `Recall tool is not available for this turn: ${call.tool}`,
               },
             ],
             success: false,
           };
         }
         return {
-          contentItems: [{ type: "inputText", text: `Unknown OpenClaw tool: ${call.tool}` }],
+          contentItems: [{ type: "inputText", text: `Unknown Recall tool: ${call.tool}` }],
           success: false,
         };
       }
@@ -262,7 +262,7 @@ function createCodexDynamicToolSpec(params: {
   }
   return {
     ...base,
-    namespace: CODEX_OPENCLAW_DYNAMIC_TOOL_NAMESPACE,
+    namespace: CODEX_RECALL_DYNAMIC_TOOL_NAMESPACE,
     deferLoading: true,
   };
 }
@@ -558,7 +558,7 @@ function convertToolContents(
     return content.flatMap(convertToolContent);
   }
 
-  const noticeText = `...(OpenClaw truncated dynamic tool result: original ${totalTextChars} chars, showing ${maxChars}; rerun with narrower args.)`;
+  const noticeText = `...(Recall truncated dynamic tool result: original ${totalTextChars} chars, showing ${maxChars}; rerun with narrower args.)`;
   const notice = `\n${noticeText}`;
   const textBudget = Math.max(0, maxChars - notice.length);
   let remainingTextBudget = textBudget;

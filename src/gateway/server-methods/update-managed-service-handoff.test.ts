@@ -46,7 +46,7 @@ async function runHelperWithExistingSentinel(params: {
     await vi.importActual<typeof import("node:child_process")>("node:child_process");
   const { startManagedServiceUpdateHandoff } =
     await import("./update-managed-service-handoff.js");
-  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-handoff-helper-test-"));
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-handoff-helper-test-"));
   tempDirs.add(tmpDir);
 
   await startManagedServiceUpdateHandoff({
@@ -55,7 +55,7 @@ async function runHelperWithExistingSentinel(params: {
     restartDelayMs: 500,
     parentPid: process.pid,
     execPath: "/usr/local/bin/node",
-    argv1: "/opt/openclaw/openclaw.mjs",
+    argv1: "/opt/tryrecall/recall-agents.mjs",
     ...(params.handoffId ? { handoffId: params.handoffId } : {}),
     env: {},
     meta: {
@@ -115,9 +115,9 @@ describe("managed service update handoff", () => {
     const { startManagedServiceUpdateHandoff, stripSupervisorHintEnv } =
       await import("./update-managed-service-handoff.js");
     const serviceIdentityEnv = {
-      OPENCLAW_LAUNCHD_LABEL: "com.example.openclaw.test",
-      OPENCLAW_SYSTEMD_UNIT: "openclaw-test.service",
-      OPENCLAW_WINDOWS_TASK_NAME: "OpenClaw Test Gateway",
+      RECALL_LAUNCHD_LABEL: "com.example.recall.test",
+      RECALL_SYSTEMD_UNIT: "recall-test.service",
+      RECALL_WINDOWS_TASK_NAME: "Recall Test Gateway",
     } satisfies NodeJS.ProcessEnv;
     const supervisorEnv = Object.fromEntries(
       SUPERVISOR_HINT_ENV_VARS.map((key) => [key, "supervised"]),
@@ -133,12 +133,12 @@ describe("managed service update handoff", () => {
     });
 
     const result = await startManagedServiceUpdateHandoff({
-      root: "/tmp/openclaw",
+      root: "/tmp/recall",
       timeoutMs: 1_800_000,
       restartDelayMs: 500,
       parentPid: 12345,
       execPath: "/usr/local/bin/node",
-      argv1: "/opt/openclaw/openclaw.mjs",
+      argv1: "/opt/tryrecall/recall-agents.mjs",
       env: {
         ...supervisorEnv,
         ...serviceIdentityEnv,
@@ -151,7 +151,7 @@ describe("managed service update handoff", () => {
     });
 
     expect(result.status).toBe("started");
-    expect(result.command).toBe("openclaw update --yes --timeout 1800");
+    expect(result.command).toBe("recall update --yes --timeout 1800");
     expect(spawnMock).toHaveBeenCalledTimes(1);
     const [execPath, args, options] = spawnMock.mock.calls[0] as unknown as [
       string,
@@ -180,7 +180,7 @@ describe("managed service update handoff", () => {
     )) {
       expect(options.env[key]).toBeUndefined();
     }
-    expect(options.env.OPENCLAW_UPDATE_RUN_HANDOFF).toBe("1");
+    expect(options.env.RECALL_UPDATE_RUN_HANDOFF).toBe("1");
     expect(options.env[CONTROL_PLANE_UPDATE_SENTINEL_META_ENV]).toMatch(/sentinel-meta\.json$/u);
   });
 
@@ -233,11 +233,11 @@ describe("managed service update handoff", () => {
   });
 
   it("sweeps stale handoff temp directories while keeping fresh handoff logs", async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-handoff-cleanup-test-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-handoff-cleanup-test-"));
     tempDirs.add(tmpDir);
     const staleDir = path.join(tmpDir, `${MANAGED_SERVICE_UPDATE_HANDOFF_TEMP_PREFIX}stale`);
     const freshDir = path.join(tmpDir, `${MANAGED_SERVICE_UPDATE_HANDOFF_TEMP_PREFIX}fresh`);
-    const unrelatedDir = path.join(tmpDir, "openclaw-other-temp");
+    const unrelatedDir = path.join(tmpDir, "recall-other-temp");
     await fs.mkdir(staleDir, { recursive: true });
     await fs.mkdir(freshDir, { recursive: true });
     await fs.mkdir(unrelatedDir, { recursive: true });

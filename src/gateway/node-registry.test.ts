@@ -38,7 +38,7 @@ function makeClient(
       minProtocol: 1,
       maxProtocol: 1,
       client: {
-        id: opts.clientId ?? "openclaw-macos",
+        id: opts.clientId ?? "recall-macos",
         version: opts.version ?? "1.0.0",
         platform: opts.platform ?? "darwin",
         mode: "node",
@@ -144,7 +144,7 @@ describe("gateway/node-registry", () => {
     const frames: string[] = [];
     registry.register(
       makeClient("conn-1", "node-1", frames, {
-        clientId: "openclaw-node-host",
+        clientId: "recall-node-host",
         platform: "linux",
       }),
       {},
@@ -279,7 +279,7 @@ describe("gateway/node-registry", () => {
     const frames: string[] = [];
     registry.register(
       makeClient("conn-1", "node-1", frames, {
-        clientId: "openclaw-node-host",
+        clientId: "recall-node-host",
         platform: "linux",
       }),
       {},
@@ -399,7 +399,7 @@ describe("gateway/node-registry", () => {
     const frames: string[] = [];
     registry.register(
       makeClient("conn-1", "node-1", frames, {
-        clientId: "openclaw-node-host",
+        clientId: "recall-node-host",
         platform: "linux",
       }),
       {},

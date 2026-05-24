@@ -1,5 +1,5 @@
 ---
-summary: "Frequently asked questions about OpenClaw setup, configuration, and usage"
+summary: "Frequently asked questions about Recall setup, configuration, and usage"
 read_when:
   - Answering common setup, install, onboarding, or runtime support questions
   - Triaging user-reported issues before deeper debugging
@@ -13,7 +13,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 1. **Quick status (first check)**
 
    ```bash
-   openclaw status
+   recall status
    ```
 
    Fast local summary: OS + update, gateway/service reachability, agents/sessions, provider config + runtime issues (when gateway is reachable).
@@ -21,7 +21,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 2. **Pasteable report (safe to share)**
 
    ```bash
-   openclaw status --all
+   recall status --all
    ```
 
    Read-only diagnosis with log tail (tokens redacted).
@@ -29,7 +29,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 3. **Daemon + port state**
 
    ```bash
-   openclaw gateway status
+   recall gateway status
    ```
 
    Shows supervisor runtime vs RPC reachability, the probe target URL, and which config the service likely used.
@@ -37,7 +37,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 4. **Deep probes**
 
    ```bash
-   openclaw status --deep
+   recall status --deep
    ```
 
    Runs a live gateway health probe, including channel probes when supported
@@ -46,13 +46,13 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 5. **Tail the latest log**
 
    ```bash
-   openclaw logs --follow
+   recall logs --follow
    ```
 
    If RPC is down, fall back to:
 
    ```bash
-   tail -f "$(ls -t /tmp/openclaw/openclaw-*.log | head -1)"
+   tail -f "$(ls -t /tmp/tryrecall/recall-agents-*.log | head -1)"
    ```
 
    File logs are separate from service logs; see [Logging](/logging) and [Troubleshooting](/gateway/troubleshooting).
@@ -60,7 +60,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 6. **Run the doctor (repairs)**
 
    ```bash
-   openclaw doctor
+   recall doctor
    ```
 
    Repairs/migrates config/state + runs health checks. See [Doctor](/gateway/doctor).
@@ -68,8 +68,8 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 7. **Gateway snapshot**
 
    ```bash
-   openclaw health --json
-   openclaw health --verbose   # shows the target URL + config path on errors
+   recall health --json
+   recall health --verbose   # shows the target URL + config path on errors
    ```
 
    Asks the running gateway for a full snapshot (WS-only). See [Health](/gateway/health).
@@ -79,15 +79,15 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 First-run Q&A — install, onboard, auth routes, subscriptions, initial failures —
 lives on the [First-run FAQ](/help/faq-first-run).
 
-## What is OpenClaw?
+## What is Recall?
 
 <AccordionGroup>
-  <Accordion title="What is OpenClaw, in one paragraph?">
-    OpenClaw is a personal AI assistant you run on your own devices. It replies on the messaging surfaces you already use (WhatsApp, Telegram, Slack, Mattermost, Discord, Google Chat, Signal, iMessage, WebChat, and bundled channel plugins such as QQ Bot) and can also do voice + a live Canvas on supported platforms. The **Gateway** is the always-on control plane; the assistant is the product.
+  <Accordion title="What is Recall, in one paragraph?">
+    Recall is a personal AI assistant you run on your own devices. It replies on the messaging surfaces you already use (WhatsApp, Telegram, Slack, Mattermost, Discord, Google Chat, Signal, iMessage, WebChat, and bundled channel plugins such as QQ Bot) and can also do voice + a live Canvas on supported platforms. The **Gateway** is the always-on control plane; the assistant is the product.
   </Accordion>
 
   <Accordion title="Value proposition">
-    OpenClaw is not "just a Claude wrapper." It's a **local-first control plane** that lets you run a
+    Recall is not "just a Claude wrapper." It's a **local-first control plane** that lets you run a
     capable assistant on **your own hardware**, reachable from the chat apps you already use, with
     stateful sessions, memory, and tools - without handing control of your workflows to a hosted
     SaaS.
@@ -123,7 +123,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
   </Accordion>
 
-  <Accordion title="What are the top five everyday use cases for OpenClaw?">
+  <Accordion title="What are the top five everyday use cases for Recall?">
     Everyday wins usually look like:
 
     - **Personal briefings:** summaries of inbox, calendar, and news you care about.
@@ -134,21 +134,21 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
   </Accordion>
 
-  <Accordion title="Can OpenClaw help with lead gen, outreach, ads, and blogs for a SaaS?">
+  <Accordion title="Can Recall help with lead gen, outreach, ads, and blogs for a SaaS?">
     Yes for **research, qualification, and drafting**. It can scan sites, build shortlists,
     summarize prospects, and write outreach or ad copy drafts.
 
     For **outreach or ad runs**, keep a human in the loop. Avoid spam, follow local laws and
     platform policies, and review anything before it is sent. The safest pattern is to let
-    OpenClaw draft and you approve.
+    Recall draft and you approve.
 
     Docs: [Security](/gateway/security).
 
   </Accordion>
 
   <Accordion title="What are the advantages vs Claude Code for web development?">
-    OpenClaw is a **personal assistant** and coordination layer, not an IDE replacement. Use
-    Claude Code or Codex for the fastest direct coding loop inside a repo. Use OpenClaw when you
+    Recall is a **personal assistant** and coordination layer, not an IDE replacement. Use
+    Claude Code or Codex for the fastest direct coding loop inside a repo. Use Recall when you
     want durable memory, cross-device access, and tool orchestration.
 
     Advantages:
@@ -159,7 +159,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
     - **Always-on Gateway** (run on a VPS, interact from anywhere)
     - **Nodes** for local browser/screen/camera/exec
 
-    Showcase: [https://openclaw.ai/showcase](https://openclaw.ai/showcase)
+    Showcase: [https://recall.ai/showcase](https://recall.ai/showcase)
 
   </Accordion>
 </AccordionGroup>
@@ -168,11 +168,11 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
 <AccordionGroup>
   <Accordion title="How do I customize skills without keeping the repo dirty?">
-    Use managed overrides instead of editing the repo copy. Put your changes in `~/.openclaw/skills/<name>/SKILL.md` (or add a folder via `skills.load.extraDirs` in `~/.openclaw/openclaw.json`). Precedence is `<workspace>/skills` → `<workspace>/.agents/skills` → `~/.agents/skills` → `~/.openclaw/skills` → bundled → `skills.load.extraDirs`, so managed overrides still win over bundled skills without touching git. If you need the skill installed globally but only visible to some agents, keep the shared copy in `~/.openclaw/skills` and control visibility with `agents.defaults.skills` and `agents.list[].skills`. Only upstream-worthy edits should live in the repo and go out as PRs.
+    Use managed overrides instead of editing the repo copy. Put your changes in `~/.recall/skills/<name>/SKILL.md` (or add a folder via `skills.load.extraDirs` in `~/.tryrecall/recall-agents.json`). Precedence is `<workspace>/skills` → `<workspace>/.agents/skills` → `~/.agents/skills` → `~/.recall/skills` → bundled → `skills.load.extraDirs`, so managed overrides still win over bundled skills without touching git. If you need the skill installed globally but only visible to some agents, keep the shared copy in `~/.recall/skills` and control visibility with `agents.defaults.skills` and `agents.list[].skills`. Only upstream-worthy edits should live in the repo and go out as PRs.
   </Accordion>
 
   <Accordion title="Can I load skills from a custom folder?">
-    Yes. Add extra directories via `skills.load.extraDirs` in `~/.openclaw/openclaw.json` (lowest precedence). Default precedence is `<workspace>/skills` → `<workspace>/.agents/skills` → `~/.agents/skills` → `~/.openclaw/skills` → bundled → `skills.load.extraDirs`. `clawhub` installs into `./skills` by default, which OpenClaw treats as `<workspace>/skills` on the next session. If the skill should only be visible to certain agents, pair that with `agents.defaults.skills` or `agents.list[].skills`.
+    Yes. Add extra directories via `skills.load.extraDirs` in `~/.tryrecall/recall-agents.json` (lowest precedence). Default precedence is `<workspace>/skills` → `<workspace>/.agents/skills` → `~/.agents/skills` → `~/.recall/skills` → bundled → `skills.load.extraDirs`. `clawhub` installs into `./skills` by default, which Recall treats as `<workspace>/skills` on the next session. If the skill should only be visible to certain agents, pair that with `agents.defaults.skills` or `agents.list[].skills`.
   </Accordion>
 
   <Accordion title="How can I use different models for different tasks?">
@@ -225,16 +225,16 @@ lives on the [First-run FAQ](/help/faq-first-run).
     Check the resolved requester route first:
 
     - Completion-mode subagent delivery prefers any bound thread or conversation route when one exists.
-    - If the completion origin only carries a channel, OpenClaw falls back to the requester session's stored route (`lastChannel` / `lastTo` / `lastAccountId`) so direct delivery can still succeed.
+    - If the completion origin only carries a channel, Recall falls back to the requester session's stored route (`lastChannel` / `lastTo` / `lastAccountId`) so direct delivery can still succeed.
     - If neither a bound route nor a usable stored route exists, direct delivery can fail and the result falls back to queued session delivery instead of posting immediately to chat.
     - Invalid or stale targets can still force queue fallback or final delivery failure.
-    - If the child's last visible assistant reply is the exact silent token `NO_REPLY` / `no_reply`, or exactly `ANNOUNCE_SKIP`, OpenClaw intentionally suppresses the announce instead of posting stale earlier progress.
+    - If the child's last visible assistant reply is the exact silent token `NO_REPLY` / `no_reply`, or exactly `ANNOUNCE_SKIP`, Recall intentionally suppresses the announce instead of posting stale earlier progress.
     - If the child timed out after only tool calls, the announce can collapse that into a short partial-progress summary instead of replaying raw tool output.
 
     Debug:
 
     ```bash
-    openclaw tasks show <runId-or-sessionKey>
+    recall tasks show <runId-or-sessionKey>
     ```
 
     Docs: [Sub-agents](/tools/subagents), [Background Tasks](/automation/tasks), [Session Tools](/concepts/session-tool).
@@ -247,15 +247,15 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
     Checklist:
 
-    - Confirm cron is enabled (`cron.enabled`) and `OPENCLAW_SKIP_CRON` is not set.
+    - Confirm cron is enabled (`cron.enabled`) and `RECALL_SKIP_CRON` is not set.
     - Check the Gateway is running 24/7 (no sleep/restarts).
     - Verify timezone settings for the job (`--tz` vs host timezone).
 
     Debug:
 
     ```bash
-    openclaw cron run <jobId>
-    openclaw cron runs --id <jobId> --limit 50
+    recall cron run <jobId>
+    recall cron runs --id <jobId> --limit 50
     ```
 
     Docs: [Cron jobs](/automation/cron-jobs), [Automation](/automation).
@@ -277,8 +277,8 @@ lives on the [First-run FAQ](/help/faq-first-run).
     Debug:
 
     ```bash
-    openclaw cron runs --id <jobId> --limit 50
-    openclaw tasks show <runId-or-sessionKey>
+    recall cron runs --id <jobId> --limit 50
+    recall tasks show <runId-or-sessionKey>
     ```
 
     Docs: [Cron jobs](/automation/cron-jobs), [Background Tasks](/automation/tasks).
@@ -306,8 +306,8 @@ lives on the [First-run FAQ](/help/faq-first-run).
     Debug:
 
     ```bash
-    openclaw cron runs --id <jobId> --limit 50
-    openclaw tasks show <runId-or-sessionKey>
+    recall cron runs --id <jobId> --limit 50
+    recall tasks show <runId-or-sessionKey>
     ```
 
     Docs: [Cron jobs](/automation/cron-jobs), [cron CLI](/cli/cron).
@@ -315,23 +315,23 @@ lives on the [First-run FAQ](/help/faq-first-run).
   </Accordion>
 
   <Accordion title="How do I install skills on Linux?">
-    Use native `openclaw skills` commands or drop skills into your workspace. The macOS Skills UI isn't available on Linux.
+    Use native `recall skills` commands or drop skills into your workspace. The macOS Skills UI isn't available on Linux.
     Browse skills at [https://clawhub.ai](https://clawhub.ai).
 
     ```bash
-    openclaw skills search "calendar"
-    openclaw skills search --limit 20
-    openclaw skills install <skill-slug>
-    openclaw skills install <skill-slug> --version <version>
-    openclaw skills install <skill-slug> --force
-    openclaw skills install <skill-slug> --global
-    openclaw skills update --all
-    openclaw skills update --all --global
-    openclaw skills list --eligible
-    openclaw skills check
+    recall skills search "calendar"
+    recall skills search --limit 20
+    recall skills install <skill-slug>
+    recall skills install <skill-slug> --version <version>
+    recall skills install <skill-slug> --force
+    recall skills install <skill-slug> --global
+    recall skills update --all
+    recall skills update --all --global
+    recall skills list --eligible
+    recall skills check
     ```
 
-    Native `openclaw skills install` writes into the active workspace `skills/`
+    Native `recall skills install` writes into the active workspace `skills/`
     directory by default. Add `--global` to install into the shared managed
     skills directory for all local agents. Install the separate `clawhub` CLI
     only if you want to publish or sync your own skills. Use
@@ -340,7 +340,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
   </Accordion>
 
-  <Accordion title="Can OpenClaw run tasks on a schedule or continuously in the background?">
+  <Accordion title="Can Recall run tasks on a schedule or continuously in the background?">
     Yes. Use the Gateway scheduler:
 
     - **Cron jobs** for scheduled or recurring tasks (persist across restarts).
@@ -353,7 +353,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
   </Accordion>
 
   <Accordion title="Can I run Apple macOS-only skills from Linux?">
-    Not directly. macOS skills are gated by `metadata.openclaw.os` plus required binaries, and skills only appear in the system prompt when they are eligible on the **Gateway host**. On Linux, `darwin`-only skills (like `apple-notes`, `apple-reminders`, `things-mac`) will not load unless you override the gating.
+    Not directly. macOS skills are gated by `metadata.recall.os` plus required binaries, and skills only appear in the system prompt when they are eligible on the **Gateway host**. On Linux, `darwin`-only skills (like `apple-notes`, `apple-reminders`, `things-mac`) will not load unless you override the gating.
 
     You have three supported patterns:
 
@@ -361,7 +361,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
     Run the Gateway where the macOS binaries exist, then connect from Linux in [remote mode](#gateway-ports-already-running-and-remote-mode) or over Tailscale. The skills load normally because the Gateway host is macOS.
 
     **Option B - use a macOS node (no SSH).**
-    Run the Gateway on Linux, pair a macOS node (menubar app), and set **Node Run Commands** to "Always Ask" or "Always Allow" on the Mac. OpenClaw can treat macOS-only skills as eligible when the required binaries exist on the node. The agent runs those skills via the `nodes` tool. If you choose "Always Ask", approving "Always Allow" in the prompt adds that command to the allowlist.
+    Run the Gateway on Linux, pair a macOS node (menubar app), and set **Node Run Commands** to "Always Ask" or "Always Allow" on the Mac. Recall can treat macOS-only skills as eligible when the required binaries exist on the node. The agent runs those skills via the `nodes` tool. If you choose "Always Ask", approving "Always Allow" in the prompt adds that command to the allowlist.
 
     **Option C - proxy macOS binaries over SSH (advanced).**
     Keep the Gateway on Linux, but make the required CLI binaries resolve to SSH wrappers that run on a Mac. Then override the skill to allow Linux so it stays eligible.
@@ -375,13 +375,13 @@ lives on the [First-run FAQ](/help/faq-first-run).
        ```
 
     2. Put the wrapper on `PATH` on the Linux host (for example `~/bin/memo`).
-    3. Override the skill metadata (workspace or `~/.openclaw/skills`) to allow Linux:
+    3. Override the skill metadata (workspace or `~/.recall/skills`) to allow Linux:
 
        ```markdown
        ---
        name: apple-notes
        description: Manage Apple Notes via the memo CLI on macOS.
-       metadata: { "openclaw": { "os": ["darwin", "linux"], "requires": { "bins": ["memo"] } } }
+       metadata: { "recall": { "os": ["darwin", "linux"], "requires": { "bins": ["memo"] } } }
        ---
        ```
 
@@ -408,27 +408,27 @@ lives on the [First-run FAQ](/help/faq-first-run).
     Install skills:
 
     ```bash
-    openclaw skills install <skill-slug>
-    openclaw skills update --all
+    recall skills install <skill-slug>
+    recall skills update --all
     ```
 
-    Native installs land in the active workspace `skills/` directory. For shared skills across all local agents, use `openclaw skills install <slug> --global` (or place them manually in `~/.openclaw/skills/<name>/SKILL.md`). If only some agents should see a shared install, configure `agents.defaults.skills` or `agents.list[].skills`. Some skills expect binaries installed via Homebrew; on Linux that means Linuxbrew (see the Homebrew Linux FAQ entry above). See [Skills](/tools/skills), [Skills config](/tools/skills-config), and [ClawHub](/tools/clawhub).
+    Native installs land in the active workspace `skills/` directory. For shared skills across all local agents, use `recall skills install <slug> --global` (or place them manually in `~/.recall/skills/<name>/SKILL.md`). If only some agents should see a shared install, configure `agents.defaults.skills` or `agents.list[].skills`. Some skills expect binaries installed via Homebrew; on Linux that means Linuxbrew (see the Homebrew Linux FAQ entry above). See [Skills](/tools/skills), [Skills config](/tools/skills-config), and [ClawHub](/tools/clawhub).
 
   </Accordion>
 
-  <Accordion title="How do I use my existing signed-in Chrome with OpenClaw?">
+  <Accordion title="How do I use my existing signed-in Chrome with Recall?">
     Use the built-in `user` browser profile, which attaches through Chrome DevTools MCP:
 
     ```bash
-    openclaw browser --browser-profile user tabs
-    openclaw browser --browser-profile user snapshot
+    recall browser --browser-profile user tabs
+    recall browser --browser-profile user snapshot
     ```
 
     If you want a custom name, create an explicit MCP profile:
 
     ```bash
-    openclaw browser create-profile --name chrome-live --driver existing-session
-    openclaw browser --browser-profile chrome-live tabs
+    recall browser create-profile --name chrome-live --driver existing-session
+    recall browser --browser-profile chrome-live tabs
     ```
 
     This path can use the local host browser or a connected browser node. If the Gateway runs elsewhere, either run a node host on the browser machine or use remote CDP instead.
@@ -453,8 +453,8 @@ lives on the [First-run FAQ](/help/faq-first-run).
     The default image is security-first and runs as the `node` user, so it does not
     include system packages, Homebrew, or bundled browsers. For a fuller setup:
 
-    - Persist `/home/node` with `OPENCLAW_HOME_VOLUME` so caches survive.
-    - Bake system deps into the image with `OPENCLAW_IMAGE_APT_PACKAGES`.
+    - Persist `/home/node` with `RECALL_HOME_VOLUME` so caches survive.
+    - Bake system deps into the image with `RECALL_IMAGE_APT_PACKAGES`.
     - Install Playwright browsers via the bundled CLI:
       `node /app/node_modules/playwright-core/cli.js install chromium`
     - Set `PLAYWRIGHT_BROWSERS_PATH` and ensure the path is persisted.
@@ -477,19 +477,19 @@ lives on the [First-run FAQ](/help/faq-first-run).
   <Accordion title="How do I bind a host folder into the sandbox?">
     Set `agents.defaults.sandbox.docker.binds` to `["host:path:mode"]` (e.g., `"/home/user/src:/src:ro"`). Global + per-agent binds merge; per-agent binds are ignored when `scope: "shared"`. Use `:ro` for anything sensitive and remember binds bypass the sandbox filesystem walls.
 
-    OpenClaw validates bind sources against both the normalized path and the canonical path resolved through the deepest existing ancestor. That means symlink-parent escapes still fail closed even when the last path segment does not exist yet, and allowed-root checks still apply after symlink resolution.
+    Recall validates bind sources against both the normalized path and the canonical path resolved through the deepest existing ancestor. That means symlink-parent escapes still fail closed even when the last path segment does not exist yet, and allowed-root checks still apply after symlink resolution.
 
     See [Sandboxing](/gateway/sandboxing#custom-bind-mounts) and [Sandbox vs Tool Policy vs Elevated](/gateway/sandbox-vs-tool-policy-vs-elevated#bind-mounts-security-quick-check) for examples and safety notes.
 
   </Accordion>
 
   <Accordion title="How does memory work?">
-    OpenClaw memory is just Markdown files in the agent workspace:
+    Recall memory is just Markdown files in the agent workspace:
 
     - Daily notes in `memory/YYYY-MM-DD.md`
     - Curated long-term notes in `MEMORY.md` (main/private sessions only)
 
-    OpenClaw also runs a **silent pre-compaction memory flush** to remind the model
+    Recall also runs a **silent pre-compaction memory flush** to remind the model
     to write durable notes before auto-compaction. This only runs when the workspace
     is writable (read-only sandboxes skip it). See [Memory](/concepts/memory).
 
@@ -523,12 +523,12 @@ lives on the [First-run FAQ](/help/faq-first-run).
     Codex CLI login)** does not help for semantic memory search. OpenAI embeddings
     still need a real API key (`OPENAI_API_KEY` or `models.providers.openai.apiKey`).
 
-    If you don't set a provider explicitly, OpenClaw auto-selects a provider when it
+    If you don't set a provider explicitly, Recall auto-selects a provider when it
     can resolve an API key (auth profiles, `models.providers.*.apiKey`, or env vars).
     It prefers OpenAI if an OpenAI key resolves, otherwise Gemini if a Gemini key
     resolves, then Voyage, then Mistral. If no remote key is available, memory
     search stays disabled until you configure it. If you have a local model path
-    configured and present, OpenClaw
+    configured and present, Recall
     prefers `local`. Ollama is supported when you explicitly set
     `memorySearch.provider = "ollama"`.
 
@@ -544,11 +544,11 @@ lives on the [First-run FAQ](/help/faq-first-run).
 ## Where things live on disk
 
 <AccordionGroup>
-  <Accordion title="Is all data used with OpenClaw saved locally?">
-    No - **OpenClaw's state is local**, but **external services still see what you send them**.
+  <Accordion title="Is all data used with Recall saved locally?">
+    No - **Recall's state is local**, but **external services still see what you send them**.
 
     - **Local by default:** sessions, memory files, config, and workspace live on the Gateway host
-      (`~/.openclaw` + your workspace directory).
+      (`~/.recall` + your workspace directory).
     - **Remote by necessity:** messages you send to model providers (Anthropic/OpenAI/etc.) go to
       their APIs, and chat platforms (WhatsApp/Telegram/Slack/etc.) store message data on their
       servers.
@@ -559,42 +559,42 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
   </Accordion>
 
-  <Accordion title="Where does OpenClaw store its data?">
-    Everything lives under `$OPENCLAW_STATE_DIR` (default: `~/.openclaw`):
+  <Accordion title="Where does Recall store its data?">
+    Everything lives under `$RECALL_STATE_DIR` (default: `~/.recall`):
 
     | Path                                                            | Purpose                                                            |
     | --------------------------------------------------------------- | ------------------------------------------------------------------ |
-    | `$OPENCLAW_STATE_DIR/openclaw.json`                             | Main config (JSON5)                                                |
-    | `$OPENCLAW_STATE_DIR/credentials/oauth.json`                    | Legacy OAuth import (copied into auth profiles on first use)       |
-    | `$OPENCLAW_STATE_DIR/agents/<agentId>/agent/auth-profiles.json` | Auth profiles (OAuth, API keys, and optional `keyRef`/`tokenRef`)  |
-    | `$OPENCLAW_STATE_DIR/secrets.json`                              | Optional file-backed secret payload for `file` SecretRef providers |
-    | `$OPENCLAW_STATE_DIR/agents/<agentId>/agent/auth.json`          | Legacy compatibility file (static `api_key` entries scrubbed)      |
-    | `$OPENCLAW_STATE_DIR/credentials/`                              | Provider state (e.g. `whatsapp/<accountId>/creds.json`)            |
-    | `$OPENCLAW_STATE_DIR/agents/`                                   | Per-agent state (agentDir + sessions)                              |
-    | `$OPENCLAW_STATE_DIR/agents/<agentId>/sessions/`                | Conversation history & state (per agent)                           |
-    | `$OPENCLAW_STATE_DIR/agents/<agentId>/sessions/sessions.json`   | Session metadata (per agent)                                       |
+    | `$RECALL_STATE_DIR/recall.json`                             | Main config (JSON5)                                                |
+    | `$RECALL_STATE_DIR/credentials/oauth.json`                    | Legacy OAuth import (copied into auth profiles on first use)       |
+    | `$RECALL_STATE_DIR/agents/<agentId>/agent/auth-profiles.json` | Auth profiles (OAuth, API keys, and optional `keyRef`/`tokenRef`)  |
+    | `$RECALL_STATE_DIR/secrets.json`                              | Optional file-backed secret payload for `file` SecretRef providers |
+    | `$RECALL_STATE_DIR/agents/<agentId>/agent/auth.json`          | Legacy compatibility file (static `api_key` entries scrubbed)      |
+    | `$RECALL_STATE_DIR/credentials/`                              | Provider state (e.g. `whatsapp/<accountId>/creds.json`)            |
+    | `$RECALL_STATE_DIR/agents/`                                   | Per-agent state (agentDir + sessions)                              |
+    | `$RECALL_STATE_DIR/agents/<agentId>/sessions/`                | Conversation history & state (per agent)                           |
+    | `$RECALL_STATE_DIR/agents/<agentId>/sessions/sessions.json`   | Session metadata (per agent)                                       |
 
-    Legacy single-agent path: `~/.openclaw/agent/*` (migrated by `openclaw doctor`).
+    Legacy single-agent path: `~/.recall/agent/*` (migrated by `recall doctor`).
 
-    Your **workspace** (AGENTS.md, memory files, skills, etc.) is separate and configured via `agents.defaults.workspace` (default: `~/.openclaw/workspace`).
+    Your **workspace** (AGENTS.md, memory files, skills, etc.) is separate and configured via `agents.defaults.workspace` (default: `~/.recall/workspace`).
 
   </Accordion>
 
   <Accordion title="Where should AGENTS.md / SOUL.md / USER.md / MEMORY.md live?">
-    These files live in the **agent workspace**, not `~/.openclaw`.
+    These files live in the **agent workspace**, not `~/.recall`.
 
     - **Workspace (per agent)**: `AGENTS.md`, `SOUL.md`, `IDENTITY.md`, `USER.md`,
       `MEMORY.md`, `memory/YYYY-MM-DD.md`, optional `HEARTBEAT.md`.
-      Lowercase root `memory.md` is legacy repair input only; `openclaw doctor --fix`
+      Lowercase root `memory.md` is legacy repair input only; `recall doctor --fix`
       can merge it into `MEMORY.md` when both files exist.
-    - **State dir (`~/.openclaw`)**: config, channel/provider state, auth profiles, sessions, logs,
-      and shared skills (`~/.openclaw/skills`).
+    - **State dir (`~/.recall`)**: config, channel/provider state, auth profiles, sessions, logs,
+      and shared skills (`~/.recall/skills`).
 
-    Default workspace is `~/.openclaw/workspace`, configurable via:
+    Default workspace is `~/.recall/workspace`, configurable via:
 
     ```json5
     {
-      agents: { defaults: { workspace: "~/.openclaw/workspace" } },
+      agents: { defaults: { workspace: "~/.recall/workspace" } },
     }
     ```
 
@@ -614,7 +614,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
     private (for example GitHub private). This captures memory + AGENTS/SOUL/USER
     files, and lets you restore the assistant's "mind" later.
 
-    Do **not** commit anything under `~/.openclaw` (credentials, sessions, tokens, or encrypted secrets payloads).
+    Do **not** commit anything under `~/.recall` (credentials, sessions, tokens, or encrypted secrets payloads).
     If you need a full restore, back up both the workspace and the state directory
     separately (see the migration question above).
 
@@ -622,7 +622,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
   </Accordion>
 
-  <Accordion title="How do I completely uninstall OpenClaw?">
+  <Accordion title="How do I completely uninstall Recall?">
     See the dedicated guide: [Uninstall](/install/uninstall).
   </Accordion>
 
@@ -632,7 +632,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
     host locations unless sandboxing is enabled. If you need isolation, use
     [`agents.defaults.sandbox`](/gateway/sandboxing) or per-agent sandbox settings. If you
     want a repo to be the default working directory, point that agent's
-    `workspace` to the repo root. The OpenClaw repo is just source code; keep the
+    `workspace` to the repo root. The Recall repo is just source code; keep the
     workspace separate unless you intentionally want the agent to work inside it.
 
     Example (repo as default cwd):
@@ -658,13 +658,13 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
 <AccordionGroup>
   <Accordion title="What format is the config? Where is it?">
-    OpenClaw reads an optional **JSON5** config from `$OPENCLAW_CONFIG_PATH` (default: `~/.openclaw/openclaw.json`):
+    Recall reads an optional **JSON5** config from `$RECALL_CONFIG_PATH` (default: `~/.tryrecall/recall-agents.json`):
 
     ```
-    $OPENCLAW_CONFIG_PATH
+    $RECALL_CONFIG_PATH
     ```
 
-    If the file is missing, it uses safe-ish defaults (including a default workspace of `~/.openclaw/workspace`).
+    If the file is missing, it uses safe-ish defaults (including a default workspace of `~/.recall/workspace`).
 
   </Accordion>
 
@@ -690,7 +690,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
     - `gateway.remote.token` / `.password` do **not** enable local gateway auth by themselves.
     - Local call paths can use `gateway.remote.*` as fallback only when `gateway.auth.*` is unset.
-    - For password auth, set `gateway.auth.mode: "password"` plus `gateway.auth.password` (or `OPENCLAW_GATEWAY_PASSWORD`) instead.
+    - For password auth, set `gateway.auth.mode: "password"` plus `gateway.auth.password` (or `RECALL_GATEWAY_PASSWORD`) instead.
     - If `gateway.auth.token` / `gateway.auth.password` is explicitly configured via SecretRef and unresolved, resolution fails closed (no remote fallback masking).
     - Shared-secret Control UI setups authenticate via `connect.params.auth.token` or `connect.params.auth.password` (stored in app/UI settings). Identity-bearing modes such as Tailscale Serve or `trusted-proxy` use request headers instead. Avoid putting shared secrets in URLs.
     - With `gateway.auth.mode: "trusted-proxy"`, same-host loopback reverse proxies require explicit `gateway.auth.trustedProxy.allowLoopback = true` and a loopback entry in `gateway.trustedProxies`.
@@ -698,9 +698,9 @@ lives on the [First-run FAQ](/help/faq-first-run).
   </Accordion>
 
   <Accordion title="Why do I need a token on localhost now?">
-    OpenClaw enforces gateway auth by default, including loopback. In the normal default path that means token auth: if no explicit auth path is configured, gateway startup resolves to token mode and generates a runtime-only token for that startup, so **local WS clients must authenticate**. Configure `gateway.auth.token`, `gateway.auth.password`, `OPENCLAW_GATEWAY_TOKEN`, or `OPENCLAW_GATEWAY_PASSWORD` explicitly when clients need a stable secret across restarts. This blocks other local processes from calling the Gateway.
+    Recall enforces gateway auth by default, including loopback. In the normal default path that means token auth: if no explicit auth path is configured, gateway startup resolves to token mode and generates a runtime-only token for that startup, so **local WS clients must authenticate**. Configure `gateway.auth.token`, `gateway.auth.password`, `RECALL_GATEWAY_TOKEN`, or `RECALL_GATEWAY_PASSWORD` explicitly when clients need a stable secret across restarts. This blocks other local processes from calling the Gateway.
 
-    If you prefer a different auth path, you can explicitly choose password mode (or, for identity-aware reverse proxies, `trusted-proxy`). If you **really** want open loopback, set `gateway.auth.mode: "none"` explicitly in your config. Doctor can generate a token for you any time: `openclaw doctor --generate-gateway-token`.
+    If you prefer a different auth path, you can explicitly choose password mode (or, for identity-aware reverse proxies, `trusted-proxy`). If you **really** want open loopback, set `gateway.auth.mode: "none"` explicitly in your config. Doctor can generate a token for you any time: `recall doctor --generate-gateway-token`.
 
   </Accordion>
 
@@ -726,9 +726,9 @@ lives on the [First-run FAQ](/help/faq-first-run).
     ```
 
     - `off`: hides tagline text but keeps the banner title/version line.
-    - `default`: uses `All your chats, one OpenClaw.` every time.
+    - `default`: uses `All your chats, one Recall.` every time.
     - `random`: rotating funny/seasonal taglines (default behavior).
-    - If you want no banner at all, set env `OPENCLAW_HIDE_BANNER=1`.
+    - If you want no banner at all, set env `RECALL_HIDE_BANNER=1`.
 
   </Accordion>
 
@@ -742,7 +742,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
     - DuckDuckGo is key-free, but it is an unofficial HTML-based integration.
     - SearXNG is key-free/self-hosted; configure `SEARXNG_BASE_URL` or `plugins.entries.searxng.config.webSearch.baseUrl`.
 
-    **Recommended:** run `openclaw configure --section web` and choose a provider.
+    **Recommended:** run `recall configure --section web` and choose a provider.
     Environment alternatives:
 
     - Brave: `BRAVE_API_KEY`
@@ -793,8 +793,8 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
     - If you use allowlists, add `web_search`/`web_fetch`/`x_search` or `group:web`.
     - `web_fetch` is enabled by default (unless explicitly disabled).
-    - If `tools.web.fetch.provider` is omitted, OpenClaw auto-detects the first ready fetch fallback provider from available credentials. Today the bundled provider is Firecrawl.
-    - Daemons read env vars from `~/.openclaw/.env` (or the service environment).
+    - If `tools.web.fetch.provider` is omitted, Recall auto-detects the first ready fetch fallback provider from available credentials. Today the bundled provider is Firecrawl.
+    - Daemons read env vars from `~/.recall/.env` (or the service environment).
 
     Docs: [Web tools](/tools/web).
 
@@ -804,27 +804,27 @@ lives on the [First-run FAQ](/help/faq-first-run).
     `config.apply` replaces the **entire config**. If you send a partial object, everything
     else is removed.
 
-    Current OpenClaw protects many accidental clobbers:
+    Current Recall protects many accidental clobbers:
 
-    - OpenClaw-owned config writes validate the full post-change config before writing.
-    - Invalid or destructive OpenClaw-owned writes are rejected and saved as `openclaw.json.rejected.*`.
-    - If a direct edit breaks startup or hot reload, Gateway fails closed or skips the reload; it does not rewrite `openclaw.json`.
-    - `openclaw doctor --fix` owns repair and can restore last-known-good while saving the rejected file as `openclaw.json.clobbered.*`.
+    - Recall-owned config writes validate the full post-change config before writing.
+    - Invalid or destructive Recall-owned writes are rejected and saved as `recall.json.rejected.*`.
+    - If a direct edit breaks startup or hot reload, Gateway fails closed or skips the reload; it does not rewrite `recall.json`.
+    - `recall doctor --fix` owns repair and can restore last-known-good while saving the rejected file as `recall.json.clobbered.*`.
 
     Recover:
 
-    - Check `openclaw logs --follow` for `Invalid config at`, `Config write rejected:`, or `config reload skipped (invalid config)`.
-    - Inspect the newest `openclaw.json.clobbered.*` or `openclaw.json.rejected.*` beside the active config.
-    - Run `openclaw config validate` and `openclaw doctor --fix`.
-    - Copy only the intended keys back with `openclaw config set` or `config.patch`.
-    - If you have no last-known-good or rejected payload, restore from backup, or re-run `openclaw doctor` and reconfigure channels/models.
+    - Check `recall logs --follow` for `Invalid config at`, `Config write rejected:`, or `config reload skipped (invalid config)`.
+    - Inspect the newest `recall.json.clobbered.*` or `recall.json.rejected.*` beside the active config.
+    - Run `recall config validate` and `recall doctor --fix`.
+    - Copy only the intended keys back with `recall config set` or `config.patch`.
+    - If you have no last-known-good or rejected payload, restore from backup, or re-run `recall doctor` and reconfigure channels/models.
     - If this was unexpected, file a bug and include your last known config or any backup.
     - A local coding agent can often reconstruct a working config from logs or history.
 
     Avoid it:
 
-    - Use `openclaw config set` for small changes.
-    - Use `openclaw configure` for interactive edits.
+    - Use `recall config set` for small changes.
+    - Use `recall configure` for interactive edits.
     - Use `config.schema.lookup` first when you are not sure about an exact path or field shape; it returns a shallow schema node plus immediate child summaries for drill-down.
     - Use `config.patch` for partial RPC edits; keep `config.apply` for full-config replacement only.
     - If you are using the agent-facing `gateway` tool from an agent run, it will still reject writes to `tools.exec.ask` / `tools.exec.security` (including legacy `tools.bash.*` aliases that normalize to the same protected exec paths).
@@ -846,7 +846,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
   </Accordion>
 
-  <Accordion title="Can the OpenClaw browser run headless?">
+  <Accordion title="Can the Recall browser run headless?">
     Yes. It's a config option:
 
     ```json5
@@ -903,8 +903,8 @@ lives on the [First-run FAQ](/help/faq-first-run).
     5. Approve the node on the Gateway:
 
        ```bash
-       openclaw devices list
-       openclaw devices approve <requestId>
+       recall devices list
+       recall devices approve <requestId>
        ```
 
     No separate TCP bridge is required; nodes connect over the Gateway WebSocket.
@@ -919,9 +919,9 @@ lives on the [First-run FAQ](/help/faq-first-run).
   <Accordion title="Tailscale is connected but I get no replies. What now?">
     Check the basics:
 
-    - Gateway is running: `openclaw gateway status`
-    - Gateway health: `openclaw status`
-    - Channel health: `openclaw channels status`
+    - Gateway is running: `recall gateway status`
+    - Gateway health: `recall status`
+    - Channel health: `recall channels status`
 
     Then verify auth and routing:
 
@@ -933,7 +933,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
   </Accordion>
 
-  <Accordion title="Can two OpenClaw instances talk to each other (local + VPS)?">
+  <Accordion title="Can two Recall instances talk to each other (local + VPS)?">
     Yes. There is no built-in "bot-to-bot" bridge, but you can wire it up in a few
     reliable ways:
 
@@ -941,14 +941,14 @@ lives on the [First-run FAQ](/help/faq-first-run).
     Have Bot A send a message to Bot B, then let Bot B reply as usual.
 
     **CLI bridge (generic):** run a script that calls the other Gateway with
-    `openclaw agent --message ... --deliver`, targeting a chat where the other bot
+    `recall agent --message ... --deliver`, targeting a chat where the other bot
     listens. If one bot is on a remote VPS, point your CLI at that remote Gateway
     via SSH/Tailscale (see [Remote access](/gateway/remote)).
 
     Example pattern (run from a machine that can reach the target Gateway):
 
     ```bash
-    openclaw agent --message "Hello from local bot" --deliver --channel telegram --reply-to <chat-id>
+    recall agent --message "Hello from local bot" --deliver --channel telegram --reply-to <chat-id>
     ```
 
     Tip: add a guardrail so the two bots do not loop endlessly (mention-only, channel
@@ -1010,7 +1010,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
   <Accordion title="Minimal sane config for a first install">
     ```json5
     {
-      agents: { defaults: { workspace: "~/.openclaw/workspace" } },
+      agents: { defaults: { workspace: "~/.recall/workspace" } },
       channels: { whatsapp: { allowFrom: ["+15555550123"] } },
     }
     ```
@@ -1040,7 +1040,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
     If you want the Control UI without SSH, use Tailscale Serve on the VPS:
 
     ```bash
-    openclaw gateway --tailscale serve
+    recall gateway --tailscale serve
     ```
 
     This keeps the gateway bound to loopback and exposes HTTPS via Tailscale. See [Tailscale](/gateway/tailscale).
@@ -1058,8 +1058,8 @@ lives on the [First-run FAQ](/help/faq-first-run).
     3. **Approve the node** on the gateway:
 
        ```bash
-       openclaw devices list
-       openclaw devices approve <requestId>
+       recall devices list
+       recall devices approve <requestId>
        ```
 
     Docs: [Gateway protocol](/gateway/protocol), [Discovery](/gateway/discovery), [macOS remote mode](/platforms/mac/remote).
@@ -1081,11 +1081,11 @@ lives on the [First-run FAQ](/help/faq-first-run).
 ## Env vars and .env loading
 
 <AccordionGroup>
-  <Accordion title="How does OpenClaw load environment variables?">
-    OpenClaw reads env vars from the parent process (shell, launchd/systemd, CI, etc.) and additionally loads:
+  <Accordion title="How does Recall load environment variables?">
+    Recall reads env vars from the parent process (shell, launchd/systemd, CI, etc.) and additionally loads:
 
     - `.env` from the current working directory
-    - a global fallback `.env` from `~/.openclaw/.env` (aka `$OPENCLAW_STATE_DIR/.env`)
+    - a global fallback `.env` from `~/.recall/.env` (aka `$RECALL_STATE_DIR/.env`)
 
     Neither `.env` file overrides existing env vars.
 
@@ -1107,7 +1107,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
   <Accordion title="I started the Gateway via the service and my env vars disappeared. What now?">
     Two common fixes:
 
-    1. Put the missing keys in `~/.openclaw/.env` so they're picked up even when the service doesn't inherit your shell env.
+    1. Put the missing keys in `~/.recall/.env` so they're picked up even when the service doesn't inherit your shell env.
     2. Enable shell import (opt-in convenience):
 
     ```json5
@@ -1122,19 +1122,19 @@ lives on the [First-run FAQ](/help/faq-first-run).
     ```
 
     This runs your login shell and imports only missing expected keys (never overrides). Env var equivalents:
-    `OPENCLAW_LOAD_SHELL_ENV=1`, `OPENCLAW_SHELL_ENV_TIMEOUT_MS=15000`.
+    `RECALL_LOAD_SHELL_ENV=1`, `RECALL_SHELL_ENV_TIMEOUT_MS=15000`.
 
   </Accordion>
 
   <Accordion title='I set COPILOT_GITHUB_TOKEN, but models status shows "Shell env: off." Why?'>
-    `openclaw models status` reports whether **shell env import** is enabled. "Shell env: off"
-    does **not** mean your env vars are missing - it just means OpenClaw won't load
+    `recall models status` reports whether **shell env import** is enabled. "Shell env: off"
+    does **not** mean your env vars are missing - it just means Recall won't load
     your login shell automatically.
 
     If the Gateway runs as a service (launchd/systemd), it won't inherit your shell
     environment. Fix by doing one of these:
 
-    1. Put the token in `~/.openclaw/.env`:
+    1. Put the token in `~/.recall/.env`:
 
        ```
        COPILOT_GITHUB_TOKEN=...
@@ -1146,7 +1146,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
     Then restart the gateway and recheck:
 
     ```bash
-    openclaw models status
+    recall models status
     ```
 
     Copilot tokens are read from `COPILOT_GITHUB_TOKEN` (also `GH_TOKEN` / `GITHUB_TOKEN`).
@@ -1178,7 +1178,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
   </Accordion>
 
-  <Accordion title="Is there a way to make a team of OpenClaw instances (one CEO and many agents)?">
+  <Accordion title="Is there a way to make a team of Recall instances (one CEO and many agents)?">
     Yes, via **multi-agent routing** and **sub-agents**. You can create one coordinator
     agent and several worker agents with their own workspaces and models.
 
@@ -1205,30 +1205,30 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
   </Accordion>
 
-  <Accordion title="How do I completely reset OpenClaw but keep it installed?">
+  <Accordion title="How do I completely reset Recall but keep it installed?">
     Use the reset command:
 
     ```bash
-    openclaw reset
+    recall reset
     ```
 
     Non-interactive full reset:
 
     ```bash
-    openclaw reset --scope full --yes --non-interactive
+    recall reset --scope full --yes --non-interactive
     ```
 
     Then re-run setup:
 
     ```bash
-    openclaw onboard --install-daemon
+    recall onboard --install-daemon
     ```
 
     Notes:
 
     - Onboarding also offers **Reset** if it sees an existing config. See [Onboarding (CLI)](/start/wizard).
-    - If you used profiles (`--profile` / `OPENCLAW_PROFILE`), reset each state dir (defaults are `~/.openclaw-<profile>`).
-    - Dev reset: `openclaw gateway --dev --reset` (dev-only; wipes dev config + credentials + sessions + workspace).
+    - If you used profiles (`--profile` / `RECALL_PROFILE`), reset each state dir (defaults are `~/.recall-<profile>`).
+    - Dev reset: `recall gateway --dev --reset` (dev-only; wipes dev config + credentials + sessions + workspace).
 
   </Accordion>
 
@@ -1284,7 +1284,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
     ```
 
     If `HEARTBEAT.md` exists but is effectively empty (only blank lines and markdown
-    headers like `# Heading`), OpenClaw skips the heartbeat run to save API calls.
+    headers like `# Heading`), Recall skips the heartbeat run to save API calls.
     If the file is missing, the heartbeat still runs and the model decides what to do.
 
     Per-agent overrides use `agents.list[].heartbeat`. Docs: [Heartbeat](/gateway/heartbeat).
@@ -1292,7 +1292,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
   </Accordion>
 
   <Accordion title='Do I need to add a "bot account" to a WhatsApp group?'>
-    No. OpenClaw runs on **your own account**, so if you're in the group, OpenClaw can see it.
+    No. Recall runs on **your own account**, so if you're in the group, Recall can see it.
     By default, group replies are blocked until you allow senders (`groupPolicy: "allowlist"`).
 
     If you want only **you** to be able to trigger group replies:
@@ -1314,7 +1314,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
     Option 1 (fastest): tail logs and send a test message in the group:
 
     ```bash
-    openclaw logs --follow --json
+    recall logs --follow --json
     ```
 
     Look for `chatId` (or `from`) ending in `@g.us`, like:
@@ -1323,14 +1323,14 @@ lives on the [First-run FAQ](/help/faq-first-run).
     Option 2 (if already configured/allowlisted): list groups from config:
 
     ```bash
-    openclaw directory groups list --channel whatsapp
+    recall directory groups list --channel whatsapp
     ```
 
     Docs: [WhatsApp](/channels/whatsapp), [Directory](/cli/directory), [Logs](/cli/logs).
 
   </Accordion>
 
-  <Accordion title="Why does OpenClaw not reply in a group?">
+  <Accordion title="Why does Recall not reply in a group?">
     Two common causes:
 
     - Mention gating is on (default). You must @mention the bot (or match `mentionPatterns`).
@@ -1347,7 +1347,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
   <Accordion title="How many workspaces and agents can I create?">
     No hard limits. Dozens (even hundreds) are fine, but watch for:
 
-    - **Disk growth:** sessions + transcripts live under `~/.openclaw/agents/<agentId>/sessions/`.
+    - **Disk growth:** sessions + transcripts live under `~/.recall/agents/<agentId>/sessions/`.
     - **Token cost:** more agents means more concurrent model usage.
     - **Ops overhead:** per-agent auth profiles, workspaces, and channel routing.
 
@@ -1355,7 +1355,7 @@ lives on the [First-run FAQ](/help/faq-first-run).
 
     - Keep one **active** workspace per agent (`agents.defaults.workspace`).
     - Prune old sessions (delete JSONL or store entries) if disk grows.
-    - Use `openclaw doctor` to spot stray workspaces and profile mismatches.
+    - Use `recall doctor` to spot stray workspaces and profile mismatches.
 
   </Accordion>
 
@@ -1394,15 +1394,15 @@ lives on the [Models FAQ](/help/faq-models).
     Precedence:
 
     ```
-    --port > OPENCLAW_GATEWAY_PORT > gateway.port > default 18789
+    --port > RECALL_GATEWAY_PORT > gateway.port > default 18789
     ```
 
   </Accordion>
 
-  <Accordion title='Why does openclaw gateway status say "Runtime: running" but "Connectivity probe: failed"?'>
+  <Accordion title='Why does recall gateway status say "Runtime: running" but "Connectivity probe: failed"?'>
     Because "running" is the **supervisor's** view (launchd/systemd/schtasks). The connectivity probe is the CLI actually connecting to the gateway WebSocket.
 
-    Use `openclaw gateway status` and trust these lines:
+    Use `recall gateway status` and trust these lines:
 
     - `Probe target:` (the URL the probe actually used)
     - `Listening:` (what's actually bound on the port)
@@ -1410,13 +1410,13 @@ lives on the [Models FAQ](/help/faq-models).
 
   </Accordion>
 
-  <Accordion title='Why does openclaw gateway status show "Config (cli)" and "Config (service)" different?'>
-    You're editing one config file while the service is running another (often a `--profile` / `OPENCLAW_STATE_DIR` mismatch).
+  <Accordion title='Why does recall gateway status show "Config (cli)" and "Config (service)" different?'>
+    You're editing one config file while the service is running another (often a `--profile` / `RECALL_STATE_DIR` mismatch).
 
     Fix:
 
     ```bash
-    openclaw gateway install --force
+    recall gateway install --force
     ```
 
     Run that from the same `--profile` / environment you want the service to use.
@@ -1424,13 +1424,13 @@ lives on the [Models FAQ](/help/faq-models).
   </Accordion>
 
   <Accordion title='What does "another gateway instance is already listening" mean?'>
-    OpenClaw enforces a runtime lock by binding the WebSocket listener immediately on startup (default `ws://127.0.0.1:18789`). If the bind fails with `EADDRINUSE`, it throws `GatewayLockError` indicating another instance is already listening.
+    Recall enforces a runtime lock by binding the WebSocket listener immediately on startup (default `ws://127.0.0.1:18789`). If the bind fails with `EADDRINUSE`, it throws `GatewayLockError` indicating another instance is already listening.
 
-    Fix: stop the other instance, free the port, or run with `openclaw gateway --port <port>`.
+    Fix: stop the other instance, free the port, or run with `recall gateway --port <port>`.
 
   </Accordion>
 
-  <Accordion title="How do I run OpenClaw in remote mode (client connects to a Gateway elsewhere)?">
+  <Accordion title="How do I run Recall in remote mode (client connects to a Gateway elsewhere)?">
     Set `gateway.mode: "remote"` and point to a remote WebSocket URL, optionally with shared-secret remote credentials:
 
     ```json5
@@ -1448,7 +1448,7 @@ lives on the [Models FAQ](/help/faq-models).
 
     Notes:
 
-    - `openclaw gateway` only starts when `gateway.mode` is `local` (or you pass the override flag).
+    - `recall gateway` only starts when `gateway.mode` is `local` (or you pass the override flag).
     - The macOS app watches the config file and switches modes live when these values change.
     - `gateway.remote.token` / `.password` are client-side remote credentials only; they do not enable local gateway auth by themselves.
 
@@ -1467,19 +1467,19 @@ lives on the [Models FAQ](/help/faq-models).
 
     Fix:
 
-    - Fastest: `openclaw dashboard` (prints + copies the dashboard URL, tries to open; shows SSH hint if headless).
-    - If you don't have a token yet: `openclaw doctor --generate-gateway-token`.
+    - Fastest: `recall dashboard` (prints + copies the dashboard URL, tries to open; shows SSH hint if headless).
+    - If you don't have a token yet: `recall doctor --generate-gateway-token`.
     - If remote, tunnel first: `ssh -N -L 18789:127.0.0.1:18789 user@host` then open `http://127.0.0.1:18789/`.
-    - Shared-secret mode: set `gateway.auth.token` / `OPENCLAW_GATEWAY_TOKEN` or `gateway.auth.password` / `OPENCLAW_GATEWAY_PASSWORD`, then paste the matching secret in Control UI settings.
+    - Shared-secret mode: set `gateway.auth.token` / `RECALL_GATEWAY_TOKEN` or `gateway.auth.password` / `RECALL_GATEWAY_PASSWORD`, then paste the matching secret in Control UI settings.
     - Tailscale Serve mode: make sure `gateway.auth.allowTailscale` is enabled and you are opening the Serve URL, not a raw loopback/tailnet URL that bypasses Tailscale identity headers.
     - Trusted-proxy mode: make sure you are coming through the configured identity-aware proxy, not a raw gateway URL. Same-host loopback proxies also need `gateway.auth.trustedProxy.allowLoopback = true`.
     - If mismatch persists after the one retry, rotate/re-approve the paired device token:
-      - `openclaw devices list`
-      - `openclaw devices rotate --device <id> --role operator`
+      - `recall devices list`
+      - `recall devices rotate --device <id> --role operator`
     - If that rotate call says it was denied, check two things:
       - paired-device sessions can rotate only their **own** device unless they also have `operator.admin`
       - explicit `--scope` values cannot exceed the caller's current operator scopes
-    - Still stuck? Run `openclaw status --all` and follow [Troubleshooting](/gateway/troubleshooting). See [Dashboard](/web/dashboard) for auth details.
+    - Still stuck? Run `recall status --all` and follow [Troubleshooting](/gateway/troubleshooting). See [Dashboard](/web/dashboard) for auth details.
 
   </Accordion>
 
@@ -1500,18 +1500,18 @@ lives on the [Models FAQ](/help/faq-models).
 
     Yes, but you must isolate:
 
-    - `OPENCLAW_CONFIG_PATH` (per-instance config)
-    - `OPENCLAW_STATE_DIR` (per-instance state)
+    - `RECALL_CONFIG_PATH` (per-instance config)
+    - `RECALL_STATE_DIR` (per-instance state)
     - `agents.defaults.workspace` (workspace isolation)
     - `gateway.port` (unique ports)
 
     Quick setup (recommended):
 
-    - Use `openclaw --profile <name> ...` per instance (auto-creates `~/.openclaw-<name>`).
+    - Use `recall --profile <name> ...` per instance (auto-creates `~/.recall-<name>`).
     - Set a unique `gateway.port` in each profile config (or pass `--port` for manual runs).
-    - Install a per-profile service: `openclaw --profile <name> gateway install`.
+    - Install a per-profile service: `recall --profile <name> gateway install`.
 
-    Profiles also suffix service names (`ai.openclaw.<profile>`; legacy `com.openclaw.*`, `openclaw-gateway-<profile>.service`, `OpenClaw Gateway (<profile>)`).
+    Profiles also suffix service names (`ai.recall.<profile>`; legacy `com.recall.*`, `recall-gateway-<profile>.service`, `Recall Gateway (<profile>)`).
     Full guide: [Multiple gateways](/gateway/multiple-gateways).
 
   </Accordion>
@@ -1536,7 +1536,7 @@ lives on the [Models FAQ](/help/faq-models).
     If you're using the CLI or TUI, the URL should look like:
 
     ```
-    openclaw tui --url ws://<host>:18789 --token <token>
+    recall tui --url ws://<host>:18789 --token <token>
     ```
 
     Protocol details: [Gateway protocol](/gateway/protocol).
@@ -1551,7 +1551,7 @@ lives on the [Models FAQ](/help/faq-models).
     File logs (structured):
 
     ```
-    /tmp/openclaw/openclaw-YYYY-MM-DD.log
+    /tmp/tryrecall/recall-agents-YYYY-MM-DD.log
     ```
 
     You can set a stable path via `logging.file`. File log level is controlled by `logging.level`. Console verbosity is controlled by `--verbose` and `logging.consoleLevel`.
@@ -1559,14 +1559,14 @@ lives on the [Models FAQ](/help/faq-models).
     Fastest log tail:
 
     ```bash
-    openclaw logs --follow
+    recall logs --follow
     ```
 
     Service/supervisor logs (when the gateway runs via launchd/systemd):
 
-    - macOS launchd stdout: `~/Library/Logs/openclaw/gateway.log` (profiles use `gateway-<profile>.log`; stderr is suppressed)
-    - Linux: `journalctl --user -u openclaw-gateway[-<profile>].service -n 200 --no-pager`
-    - Windows: `schtasks /Query /TN "OpenClaw Gateway (<profile>)" /V /FO LIST`
+    - macOS launchd stdout: `~/Library/Logs/recall/gateway.log` (profiles use `gateway-<profile>.log`; stderr is suppressed)
+    - Linux: `journalctl --user -u recall-gateway[-<profile>].service -n 200 --no-pager`
+    - Windows: `schtasks /Query /TN "Recall Gateway (<profile>)" /V /FO LIST`
 
     See [Troubleshooting](/gateway/troubleshooting) for more.
 
@@ -1576,15 +1576,15 @@ lives on the [Models FAQ](/help/faq-models).
     Use the gateway helpers:
 
     ```bash
-    openclaw gateway status
-    openclaw gateway restart
+    recall gateway status
+    recall gateway restart
     ```
 
-    If you run the gateway manually, `openclaw gateway --force` can reclaim the port. See [Gateway](/gateway).
+    If you run the gateway manually, `recall gateway --force` can reclaim the port. See [Gateway](/gateway).
 
   </Accordion>
 
-  <Accordion title="I closed my terminal on Windows - how do I restart OpenClaw?">
+  <Accordion title="I closed my terminal on Windows - how do I restart Recall?">
     There are **two Windows install modes**:
 
     **1) WSL2 (recommended):** the Gateway runs inside Linux.
@@ -1593,14 +1593,14 @@ lives on the [Models FAQ](/help/faq-models).
 
     ```powershell
     wsl
-    openclaw gateway status
-    openclaw gateway restart
+    recall gateway status
+    recall gateway restart
     ```
 
     If you never installed the service, start it in the foreground:
 
     ```bash
-    openclaw gateway run
+    recall gateway run
     ```
 
     **2) Native Windows (not recommended):** the Gateway runs directly in Windows.
@@ -1608,14 +1608,14 @@ lives on the [Models FAQ](/help/faq-models).
     Open PowerShell and run:
 
     ```powershell
-    openclaw gateway status
-    openclaw gateway restart
+    recall gateway status
+    recall gateway restart
     ```
 
     If you run it manually (no service), use:
 
     ```powershell
-    openclaw gateway run
+    recall gateway run
     ```
 
     Docs: [Windows (WSL2)](/platforms/windows), [Gateway service runbook](/gateway).
@@ -1626,10 +1626,10 @@ lives on the [Models FAQ](/help/faq-models).
     Start with a quick health sweep:
 
     ```bash
-    openclaw status
-    openclaw models status
-    openclaw channels status
-    openclaw logs --follow
+    recall status
+    recall models status
+    recall channels status
+    recall logs --follow
     ```
 
     Common causes:
@@ -1648,15 +1648,15 @@ lives on the [Models FAQ](/help/faq-models).
   <Accordion title='"Disconnected from gateway: no reason" - what now?'>
     This usually means the UI lost the WebSocket connection. Check:
 
-    1. Is the Gateway running? `openclaw gateway status`
-    2. Is the Gateway healthy? `openclaw status`
-    3. Does the UI have the right token? `openclaw dashboard`
+    1. Is the Gateway running? `recall gateway status`
+    2. Is the Gateway healthy? `recall status`
+    3. Does the UI have the right token? `recall dashboard`
     4. If remote, is the tunnel/Tailscale link up?
 
     Then tail logs:
 
     ```bash
-    openclaw logs --follow
+    recall logs --follow
     ```
 
     Docs: [Dashboard](/web/dashboard), [Remote access](/gateway/remote), [Troubleshooting](/gateway/troubleshooting).
@@ -1667,13 +1667,13 @@ lives on the [Models FAQ](/help/faq-models).
     Start with logs and channel status:
 
     ```bash
-    openclaw channels status
-    openclaw channels logs --channel telegram
+    recall channels status
+    recall channels logs --channel telegram
     ```
 
     Then match the error:
 
-    - `BOT_COMMANDS_TOO_MUCH`: the Telegram menu has too many entries. OpenClaw already trims to the Telegram limit and retries with fewer commands, but some menu entries still need to be dropped. Reduce plugin/skill/custom commands, or disable `channels.telegram.commands.native` if you do not need the menu.
+    - `BOT_COMMANDS_TOO_MUCH`: the Telegram menu has too many entries. Recall already trims to the Telegram limit and retries with fewer commands, but some menu entries still need to be dropped. Reduce plugin/skill/custom commands, or disable `channels.telegram.commands.native` if you do not need the menu.
     - `TypeError: fetch failed`, `Network request for 'setMyCommands' failed!`, or similar network errors: if you are on a VPS or behind a proxy, confirm outbound HTTPS is allowed and DNS works for `api.telegram.org`.
 
     If the Gateway is remote, make sure you are looking at logs on the Gateway host.
@@ -1686,9 +1686,9 @@ lives on the [Models FAQ](/help/faq-models).
     First confirm the Gateway is reachable and the agent can run:
 
     ```bash
-    openclaw status
-    openclaw models status
-    openclaw logs --follow
+    recall status
+    recall models status
+    recall logs --follow
     ```
 
     In the TUI, use `/status` to see the current state. If you expect replies in a chat
@@ -1702,8 +1702,8 @@ lives on the [Models FAQ](/help/faq-models).
     If you installed the service:
 
     ```bash
-    openclaw gateway stop
-    openclaw gateway start
+    recall gateway stop
+    recall gateway start
     ```
 
     This stops/starts the **supervised service** (launchd on macOS, systemd on Linux).
@@ -1712,18 +1712,18 @@ lives on the [Models FAQ](/help/faq-models).
     If you're running in the foreground, stop with Ctrl-C, then:
 
     ```bash
-    openclaw gateway run
+    recall gateway run
     ```
 
     Docs: [Gateway service runbook](/gateway).
 
   </Accordion>
 
-  <Accordion title="ELI5: openclaw gateway restart vs openclaw gateway">
-    - `openclaw gateway restart`: restarts the **background service** (launchd/systemd).
-    - `openclaw gateway`: runs the gateway **in the foreground** for this terminal session.
+  <Accordion title="ELI5: recall gateway restart vs recall gateway">
+    - `recall gateway restart`: restarts the **background service** (launchd/systemd).
+    - `recall gateway`: runs the gateway **in the foreground** for this terminal session.
 
-    If you installed the service, use the gateway commands. Use `openclaw gateway` when
+    If you installed the service, use the gateway commands. Use `recall gateway` when
     you want a one-off, foreground run.
 
   </Accordion>
@@ -1737,12 +1737,12 @@ lives on the [Models FAQ](/help/faq-models).
 
 <AccordionGroup>
   <Accordion title="My skill generated an image/PDF, but nothing was sent">
-    Outbound attachments from the agent must include a `MEDIA:<path-or-url>` line (on its own line). See [OpenClaw assistant setup](/start/openclaw) and [Agent send](/tools/agent-send).
+    Outbound attachments from the agent must include a `MEDIA:<path-or-url>` line (on its own line). See [Recall assistant setup](/start/recall) and [Agent send](/tools/agent-send).
 
     CLI sending:
 
     ```bash
-    openclaw message send --target +15555550123 --message "Here you go" --media /path/to/file.png
+    recall message send --target +15555550123 --message "Here you go" --media /path/to/file.png
     ```
 
     Also check:
@@ -1760,16 +1760,16 @@ lives on the [Models FAQ](/help/faq-models).
 ## Security and access control
 
 <AccordionGroup>
-  <Accordion title="Is it safe to expose OpenClaw to inbound DMs?">
+  <Accordion title="Is it safe to expose Recall to inbound DMs?">
     Treat inbound DMs as untrusted input. Defaults are designed to reduce risk:
 
     - Default behavior on DM-capable channels is **pairing**:
       - Unknown senders receive a pairing code; the bot does not process their message.
-      - Approve with: `openclaw pairing approve --channel <channel> [--account <id>] <code>`
-      - Pending requests are capped at **3 per channel**; check `openclaw pairing list --channel <channel> [--account <id>]` if a code didn't arrive.
+      - Approve with: `recall pairing approve --channel <channel> [--account <id>] <code>`
+      - Pending requests are capped at **3 per channel**; check `recall pairing list --channel <channel> [--account <id>]` if a code didn't arrive.
     - Opening DMs publicly requires explicit opt-in (`dmPolicy: "open"` and allowlist `"*"`).
 
-    Run `openclaw doctor` to surface risky DM policies.
+    Run `recall doctor` to surface risky DM policies.
 
   </Accordion>
 
@@ -1793,9 +1793,9 @@ lives on the [Models FAQ](/help/faq-models).
 
   </Accordion>
 
-  <Accordion title="Is OpenClaw less safe because it uses TypeScript/Node instead of Rust/WASM?">
+  <Accordion title="Is Recall less safe because it uses TypeScript/Node instead of Rust/WASM?">
     Language and runtime matter, but they are not the main risk for a personal
-    agent. The practical OpenClaw risks are gateway exposure, who can message the
+    agent. The practical Recall risks are gateway exposure, who can message the
     bot, prompt injection, tool scope, credential handling, browser access, exec
     access, and third-party skill or plugin trust.
 
@@ -1808,18 +1808,18 @@ lives on the [Models FAQ](/help/faq-models).
     - use pairing and allowlists for DMs and groups
     - deny or sandbox risky tools for untrusted inputs
     - install only trusted plugins and skills
-    - run `openclaw security audit --deep` after config changes
+    - run `recall security audit --deep` after config changes
 
     Details: [Security](/gateway/security), [Sandboxing](/gateway/sandboxing).
 
   </Accordion>
 
-  <Accordion title="I saw reports about exposed OpenClaw instances. What should I check?">
+  <Accordion title="I saw reports about exposed Recall instances. What should I check?">
     First check your actual deployment:
 
     ```bash
-    openclaw security audit --deep
-    openclaw gateway status
+    recall security audit --deep
+    recall gateway status
     ```
 
     A safer baseline is:
@@ -1841,7 +1841,7 @@ lives on the [Models FAQ](/help/faq-models).
 
   <Accordion title="Are ClawHub skills and third-party plugins safe to install?">
     Treat third-party skills and plugins as code you are choosing to trust.
-    ClawHub skill pages expose scan state before install, and OpenClaw plugin
+    ClawHub skill pages expose scan state before install, and Recall plugin
     install/update flows run built-in dangerous-code checks, but scans are not a
     complete security boundary.
 
@@ -1896,7 +1896,7 @@ lives on the [Models FAQ](/help/faq-models).
     Check pending requests:
 
     ```bash
-    openclaw pairing list telegram
+    recall pairing list telegram
     ```
 
     If you want immediate access, allowlist your sender id or set `dmPolicy: "open"`
@@ -1905,18 +1905,18 @@ lives on the [Models FAQ](/help/faq-models).
   </Accordion>
 
   <Accordion title="WhatsApp: will it message my contacts? How does pairing work?">
-    No. Default WhatsApp DM policy is **pairing**. Unknown senders only get a pairing code and their message is **not processed**. OpenClaw only replies to chats it receives or to explicit sends you trigger.
+    No. Default WhatsApp DM policy is **pairing**. Unknown senders only get a pairing code and their message is **not processed**. Recall only replies to chats it receives or to explicit sends you trigger.
 
     Approve pairing with:
 
     ```bash
-    openclaw pairing approve whatsapp <code>
+    recall pairing approve whatsapp <code>
     ```
 
     List pending requests:
 
     ```bash
-    openclaw pairing list whatsapp
+    recall pairing list whatsapp
     ```
 
     Wizard phone number prompt: it's used to set your **allowlist/owner** so your own DMs are permitted. It's not used for auto-sending. If you run on your personal WhatsApp number, use that number and enable `channels.whatsapp.selfChatMode`.
@@ -1958,8 +1958,8 @@ lives on the [Models FAQ](/help/faq-models).
     stop current run
     stop agent
     stop the agent
-    stop openclaw
-    openclaw stop
+    stop recall
+    recall stop
     stop don't do anything
     stop do not do anything
     stop doing anything
@@ -1987,7 +1987,7 @@ lives on the [Models FAQ](/help/faq-models).
   </Accordion>
 
   <Accordion title='How do I send a Discord message from Telegram? ("Cross-context messaging denied")'>
-    OpenClaw blocks **cross-provider** messaging by default. If a tool call is bound
+    Recall blocks **cross-provider** messaging by default. If a tool call is bound
     to Telegram, it won't send to Discord unless you explicitly allow it.
 
     Enable cross-provider messaging for the agent:
@@ -2026,13 +2026,13 @@ lives on the [Models FAQ](/help/faq-models).
 
 <AccordionGroup>
   <Accordion title='What is the default model for Anthropic with an API key?'>
-    In OpenClaw, credentials and model selection are separate. Setting `ANTHROPIC_API_KEY` (or storing an Anthropic API key in auth profiles) enables authentication, but the actual default model is whatever you configure in `agents.defaults.model.primary` (for example, `anthropic/claude-sonnet-4-6` or `anthropic/claude-opus-4-6`). If you see `No credentials found for profile "anthropic:default"`, it means the Gateway couldn't find Anthropic credentials in the expected `auth-profiles.json` for the agent that's running.
+    In Recall, credentials and model selection are separate. Setting `ANTHROPIC_API_KEY` (or storing an Anthropic API key in auth profiles) enables authentication, but the actual default model is whatever you configure in `agents.defaults.model.primary` (for example, `anthropic/claude-sonnet-4-6` or `anthropic/claude-opus-4-6`). If you see `No credentials found for profile "anthropic:default"`, it means the Gateway couldn't find Anthropic credentials in the expected `auth-profiles.json` for the agent that's running.
   </Accordion>
 </AccordionGroup>
 
 ---
 
-Still stuck? Ask in [Discord](https://discord.com/invite/clawd) or open a [GitHub discussion](https://github.com/openclaw/openclaw/discussions).
+Still stuck? Ask in [Discord](https://discord.com/invite/clawd) or open a [GitHub discussion](https://github.com/tryrecall/recall-agents/discussions).
 
 ## Related
 

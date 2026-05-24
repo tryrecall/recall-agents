@@ -3,8 +3,8 @@ import { ButtonStyle } from "discord-api-types/v10";
 import type {
   ModelsProviderData,
   ModelsRuntimeChoice,
-} from "openclaw/plugin-sdk/models-provider-runtime";
-import { normalizeProviderId } from "openclaw/plugin-sdk/provider-model-shared";
+} from "recall/plugin-sdk/models-provider-runtime";
+import { normalizeProviderId } from "recall/plugin-sdk/provider-model-shared";
 import {
   Button,
   Container,
@@ -181,8 +181,8 @@ function getRuntimeChoices(params: {
   return [
     {
       id: "pi",
-      label: "OpenClaw Pi Default",
-      description: "Use the built-in OpenClaw Pi runtime.",
+      label: "Recall Pi Default",
+      description: "Use the built-in Recall Pi runtime.",
     },
   ];
 }

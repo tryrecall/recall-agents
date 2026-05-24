@@ -16,7 +16,7 @@ import {
   resolveSessionTranscriptsDirForAgent,
 } from "../config/sessions/paths.js";
 import type { SessionEntry } from "../config/sessions/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { stripEnvelope, stripMessageIdHints } from "../shared/chat-envelope.js";
 import { asFiniteNumber } from "../shared/number-coercion.js";
@@ -88,7 +88,7 @@ const logger = createSubsystemLogger("usage-cost-cache");
 
 type UsageCostRefreshState = {
   agentId?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   fullRefreshRequested: boolean;
   pendingSessionFiles: Set<string>;
   running: boolean;
@@ -183,7 +183,7 @@ const addTotals = (target: CostUsageTotals, source: CostUsageTotals): void => {
   target.missingCostEntries += source.missingCostEntries;
 };
 
-function resolveUsageCostPricingFingerprint(config?: OpenClawConfig): string {
+function resolveUsageCostPricingFingerprint(config?: RecallConfig): string {
   return resolveModelCostConfigFingerprint(config);
 }
 
@@ -1071,7 +1071,7 @@ async function* readJsonlRecords(
 
 async function scanTranscriptFile(params: {
   filePath: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   startOffset?: number;
   endOffset?: number;
   onEntry: (entry: ParsedTranscriptEntry) => void;
@@ -1111,7 +1111,7 @@ async function scanTranscriptFile(params: {
 
 async function scanUsageFile(params: {
   filePath: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   startOffset?: number;
   endOffset?: number;
   onEntry: (entry: ParsedUsageEntry) => void;
@@ -1205,7 +1205,7 @@ export async function loadCostUsageSummary(params?: {
   endMs?: number;
   /** @deprecated Use startMs/endMs. */
   days?: number;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
 }): Promise<CostUsageSummary> {
   const now = new Date();
@@ -1294,7 +1294,7 @@ export async function loadCostUsageSummary(params?: {
 
 async function scanUsageFileForCache(params: {
   file: UsageCostTranscriptFile;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   previous?: UsageCostCacheFileEntry;
   includeSessionSummary?: boolean;
 }): Promise<UsageCostCacheFileEntry> {
@@ -1439,7 +1439,7 @@ async function scanUsageFileForCache(params: {
 }
 
 export async function refreshCostUsageCache(params?: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   maxFiles?: number;
   sessionFiles?: string[];
@@ -1508,7 +1508,7 @@ export async function refreshCostUsageCache(params?: {
 export async function loadCostUsageSummaryFromCache(params: {
   startMs: number;
   endMs: number;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   requestRefresh?: boolean;
   refreshMode?: "background" | "sync-when-empty";
@@ -1569,7 +1569,7 @@ export async function loadSessionCostSummaryFromCache(params: {
   sessionId?: string;
   sessionEntry?: SessionEntry;
   sessionFile: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   startMs?: number;
   endMs?: number;
@@ -1694,7 +1694,7 @@ export async function loadSessionCostSummaryFromCache(params: {
 }
 
 export function requestCostUsageCacheRefresh(params?: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   sessionFiles?: string[];
 }): void {
@@ -1720,7 +1720,7 @@ export function requestCostUsageCacheRefresh(params?: {
 function mergeUsageCostRefreshRequest(
   state: UsageCostRefreshState,
   params?: {
-    config?: OpenClawConfig;
+    config?: RecallConfig;
     agentId?: string;
     sessionFiles?: string[];
   },
@@ -1907,7 +1907,7 @@ export async function loadSessionCostSummary(params: {
   sessionId?: string;
   sessionEntry?: SessionEntry;
   sessionFile?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   startMs?: number;
   endMs?: number;
@@ -2218,7 +2218,7 @@ export async function loadSessionUsageTimeSeries(params: {
   sessionId?: string;
   sessionEntry?: SessionEntry;
   sessionFile?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   maxPoints?: number;
 }): Promise<SessionUsageTimeSeries | null> {
@@ -2324,7 +2324,7 @@ export async function loadSessionLogs(params: {
   sessionId?: string;
   sessionEntry?: SessionEntry;
   sessionFile?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   limit?: number;
 }): Promise<SessionLogEntry[] | null> {

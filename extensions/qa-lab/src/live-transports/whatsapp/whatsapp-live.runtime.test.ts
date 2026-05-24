@@ -96,7 +96,7 @@ describe("WhatsApp QA live runtime", () => {
   });
 
   it("unpacks auth archives into a caller-provided temp directory", async () => {
-    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-wa-qa-test-"));
+    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "recall-wa-qa-test-"));
     try {
       const archiveBase64 = await createTgz({
         root: tempRoot,
@@ -139,7 +139,7 @@ describe("WhatsApp QA live runtime", () => {
       {},
       {
         allowFrom: ["+15550000001"],
-        authDir: "/tmp/openclaw-whatsapp-qa-auth",
+        authDir: "/tmp/recall-whatsapp-qa-auth",
         dmPolicy: "allowlist",
         groupJid: "120363000000000000@g.us",
         sutAccountId: "sut",

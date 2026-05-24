@@ -1,8 +1,8 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { readJsonFileWithFallback, writeJsonFileAtomically } from "openclaw/plugin-sdk/json-store";
-import { resolveStateDir } from "openclaw/plugin-sdk/state-paths";
+import { readJsonFileWithFallback, writeJsonFileAtomically } from "recall/plugin-sdk/json-store";
+import { resolveStateDir } from "recall/plugin-sdk/state-paths";
 import { fingerprintTelegramBotToken } from "./token-fingerprint.js";
 
 const STORE_VERSION = 3;

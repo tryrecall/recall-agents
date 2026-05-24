@@ -168,7 +168,7 @@ function createTaskRegistryMaintenanceHarness(params: {
       return next;
     },
     isCronRuntimeAuthoritative: () => params.cronRuntimeAuthoritative ?? true,
-    resolveCronStorePath: () => "/tmp/openclaw-test-cron/jobs.json",
+    resolveCronStorePath: () => "/tmp/recall-test-cron/jobs.json",
     loadCronStoreSync: () => params.cronStore ?? { version: 1, jobs: [] },
     resolveCronRunLogPath: ({ jobId }) => jobId,
     readCronRunLogEntriesSync: (jobId) => cronRunLogEntries[jobId] ?? [],
@@ -218,7 +218,7 @@ describe("task-registry maintenance issue #60299", () => {
     createTaskRegistryMaintenanceHarness({
       tasks,
       loadSessionStore: loadSessionStoreMock,
-      resolveStorePath: () => "/tmp/openclaw-test-sessions-main.json",
+      resolveStorePath: () => "/tmp/recall-test-sessions-main.json",
     });
 
     expectMaintenanceCounts(await runTaskRegistryMaintenance(), { reconciled: tasks.length });

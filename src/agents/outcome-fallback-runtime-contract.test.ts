@@ -2,9 +2,9 @@ import {
   createContractFallbackConfig,
   createContractRunResult,
   OUTCOME_FALLBACK_RUNTIME_CONTRACT,
-} from "openclaw/plugin-sdk/agent-runtime-test-contracts";
+} from "recall/plugin-sdk/agent-runtime-test-contracts";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { runWithModelFallback } from "./model-fallback.js";
 import { classifyEmbeddedPiRunResultForModelFallback } from "./pi-embedded-runner/result-fallback-classifier.js";
 
@@ -15,7 +15,7 @@ vi.mock("./auth-profiles/source-check.js", () => ({
 describe("Outcome/fallback runtime contract - Pi fallback classifier", () => {
   beforeAll(async () => {
     await runWithModelFallback({
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       provider: OUTCOME_FALLBACK_RUNTIME_CONTRACT.primaryProvider,
       model: OUTCOME_FALLBACK_RUNTIME_CONTRACT.primaryModel,
       run: vi.fn().mockResolvedValue(createContractRunResult({ meta: { durationMs: 1 } })),
@@ -64,7 +64,7 @@ describe("Outcome/fallback runtime contract - Pi fallback classifier", () => {
     const run = vi.fn().mockResolvedValueOnce(primary).mockResolvedValueOnce(fallback);
 
     const result = await runWithModelFallback({
-      cfg: createContractFallbackConfig() as unknown as OpenClawConfig,
+      cfg: createContractFallbackConfig() as unknown as RecallConfig,
       provider: OUTCOME_FALLBACK_RUNTIME_CONTRACT.primaryProvider,
       model: OUTCOME_FALLBACK_RUNTIME_CONTRACT.primaryModel,
       run,
@@ -177,7 +177,7 @@ describe("Outcome/fallback runtime contract - Pi fallback classifier", () => {
     const contractCase = nonFallbackCases[0];
     const run = vi.fn().mockResolvedValue(contractCase.result);
     const result = await runWithModelFallback({
-      cfg: createContractFallbackConfig() as unknown as OpenClawConfig,
+      cfg: createContractFallbackConfig() as unknown as RecallConfig,
       provider: OUTCOME_FALLBACK_RUNTIME_CONTRACT.primaryProvider,
       model: OUTCOME_FALLBACK_RUNTIME_CONTRACT.primaryModel,
       run,

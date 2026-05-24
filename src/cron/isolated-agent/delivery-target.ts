@@ -4,7 +4,7 @@ import { resolveAgentMainSessionKey } from "../../config/sessions/main-session.j
 import { resolveStorePath } from "../../config/sessions/paths.js";
 import { readSessionEntry } from "../../config/sessions/store-load.js";
 import type { SessionEntry } from "../../config/sessions/types.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { maybeResolveIdLikeTarget } from "../../infra/outbound/target-id-resolution.js";
 import { normalizeTargetForProvider } from "../../infra/outbound/target-normalization.js";
@@ -113,7 +113,7 @@ async function loadDeliveryTargetRuntime() {
   return await deliveryTargetRuntimeLoader.load();
 }
 export async function resolveDeliveryTarget(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   agentId: string,
   jobPayload: {
     channel?: ChannelId;

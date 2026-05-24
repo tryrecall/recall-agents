@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { createOpenClawTestInstance } from "./openclaw-test-instance.js";
+import { createRecallTestInstance } from "./recall-test-instance.js";
 
 async function expectPathMissing(targetPath: string): Promise<void> {
   try {
@@ -13,10 +13,10 @@ async function expectPathMissing(targetPath: string): Promise<void> {
   throw new Error(`Expected missing path: ${targetPath}`);
 }
 
-describe("openclaw test instance", () => {
+describe("recall test instance", () => {
   it("creates isolated config and spawn env without mutating process env", async () => {
     const previousHome = process.env.HOME;
-    const inst = await createOpenClawTestInstance({
+    const inst = await createRecallTestInstance({
       name: "instance-unit",
       gatewayToken: "gateway-token",
       hookToken: "hook-token",
@@ -26,19 +26,19 @@ describe("openclaw test instance", () => {
         },
       },
       env: {
-        OPENCLAW_SKIP_CRON: "0",
+        RECALL_SKIP_CRON: "0",
       },
     });
 
     try {
       expect(process.env.HOME).toBe(previousHome);
       expect(inst.homeDir).toBe(path.join(inst.state.root, "home"));
-      expect(inst.stateDir).toBe(path.join(inst.homeDir, ".openclaw"));
-      expect(inst.configPath).toBe(path.join(inst.stateDir, "openclaw.json"));
+      expect(inst.stateDir).toBe(path.join(inst.homeDir, ".recall"));
+      expect(inst.configPath).toBe(path.join(inst.stateDir, "recall.json"));
       expect(inst.env.HOME).toBe(inst.homeDir);
-      expect(inst.env.OPENCLAW_STATE_DIR).toBe(inst.stateDir);
-      expect(inst.env.OPENCLAW_CONFIG_PATH).toBe(inst.configPath);
-      expect(inst.env.OPENCLAW_SKIP_CRON).toBe("0");
+      expect(inst.env.RECALL_STATE_DIR).toBe(inst.stateDir);
+      expect(inst.env.RECALL_CONFIG_PATH).toBe(inst.configPath);
+      expect(inst.env.RECALL_SKIP_CRON).toBe("0");
 
       const config = JSON.parse(await fs.readFile(inst.configPath, "utf8"));
       expect(config).toStrictEqual({

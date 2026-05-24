@@ -1,22 +1,22 @@
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
 import type {
-  OpenClawPluginApi,
-  OpenClawConfig,
+  RecallPluginApi,
+  RecallConfig,
   ProviderAuthContext,
   ProviderAuthResult,
   ProviderCatalogContext,
-} from "openclaw/plugin-sdk/plugin-entry";
+} from "recall/plugin-sdk/plugin-entry";
 import {
   MINIMAX_OAUTH_MARKER,
   ensureAuthProfileStore,
   listProfilesForProvider,
-} from "openclaw/plugin-sdk/provider-auth";
-import { buildOauthProviderAuthResult } from "openclaw/plugin-sdk/provider-auth";
-import { createProviderApiKeyAuthMethod } from "openclaw/plugin-sdk/provider-auth-api-key";
-import { buildProviderReplayFamilyHooks } from "openclaw/plugin-sdk/provider-model-shared";
-import { MINIMAX_FAST_MODE_STREAM_HOOKS } from "openclaw/plugin-sdk/provider-stream-family";
-import { fetchMinimaxUsage } from "openclaw/plugin-sdk/provider-usage";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/provider-auth";
+import { buildOauthProviderAuthResult } from "recall/plugin-sdk/provider-auth";
+import { createProviderApiKeyAuthMethod } from "recall/plugin-sdk/provider-auth-api-key";
+import { buildProviderReplayFamilyHooks } from "recall/plugin-sdk/provider-model-shared";
+import { MINIMAX_FAST_MODE_STREAM_HOOKS } from "recall/plugin-sdk/provider-stream-family";
+import { fetchMinimaxUsage } from "recall/plugin-sdk/provider-usage";
+import { normalizeOptionalString } from "recall/plugin-sdk/string-coerce-runtime";
 import { isMiniMaxModernModelId, MINIMAX_DEFAULT_MODEL_ID } from "./api.js";
 import type { MiniMaxRegion } from "./oauth.js";
 import { applyMinimaxApiConfig, applyMinimaxApiConfigCn } from "./onboard.js";
@@ -69,11 +69,11 @@ function portalModelRef(modelId: string): string {
   return `${PORTAL_PROVIDER_ID}/${modelId}`;
 }
 
-function getProviderBaseUrl(cfg: OpenClawConfig, providerId: string): string | undefined {
+function getProviderBaseUrl(cfg: RecallConfig, providerId: string): string | undefined {
   return normalizeOptionalString(cfg.models?.providers?.[providerId]?.baseUrl);
 }
 
-function resolveMinimaxUsageBaseUrl(cfg: OpenClawConfig): string | undefined {
+function resolveMinimaxUsageBaseUrl(cfg: RecallConfig): string | undefined {
   return getProviderBaseUrl(cfg, PORTAL_PROVIDER_ID) ?? getProviderBaseUrl(cfg, API_PROVIDER_ID);
 }
 
@@ -238,7 +238,7 @@ function createMinimaxOAuthMethod(region: MiniMaxRegion) {
   };
 }
 
-export function registerMinimaxProviders(api: OpenClawPluginApi) {
+export function registerMinimaxProviders(api: RecallPluginApi) {
   api.registerProvider({
     id: API_PROVIDER_ID,
     label: PROVIDER_LABEL,

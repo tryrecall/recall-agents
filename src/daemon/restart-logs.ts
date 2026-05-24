@@ -13,12 +13,12 @@ export type GatewayLogPaths = {
 };
 
 function resolveGatewayLogPrefix(env: GatewayServiceEnv): string {
-  return env.OPENCLAW_LOG_PREFIX?.trim() || "gateway";
+  return env.RECALL_LOG_PREFIX?.trim() || "gateway";
 }
 
 function resolveMacLaunchAgentLogPrefix(env: GatewayServiceEnv): string {
   return (
-    env.OPENCLAW_LOG_PREFIX?.trim() || `gateway${resolveGatewayProfileSuffix(env.OPENCLAW_PROFILE)}`
+    env.RECALL_LOG_PREFIX?.trim() || `gateway${resolveGatewayProfileSuffix(env.RECALL_PROFILE)}`
   );
 }
 
@@ -35,7 +35,7 @@ export function resolveGatewayLogPaths(env: GatewayServiceEnv): GatewayLogPaths 
 
 export function resolveMacLaunchAgentLogPaths(env: GatewayServiceEnv): GatewayLogPaths {
   const home = resolveHomeDir(env).replaceAll("\\", "/");
-  const logDir = path.posix.join(home, "Library", "Logs", "openclaw");
+  const logDir = path.posix.join(home, "Library", "Logs", "recall");
   const prefix = resolveMacLaunchAgentLogPrefix(env);
   return {
     logDir,
@@ -83,7 +83,7 @@ export function renderCmdRestartLogSetup(env: GatewayServiceEnv): {
     quotedLogPath,
     lines: [
       `if not exist ${quotedLogDir} mkdir ${quotedLogDir} >nul 2>&1`,
-      `>> ${quotedLogPath} 2>&1 echo [%DATE% %TIME%] openclaw restart log initialized`,
+      `>> ${quotedLogPath} 2>&1 echo [%DATE% %TIME%] recall restart log initialized`,
     ],
   };
 }

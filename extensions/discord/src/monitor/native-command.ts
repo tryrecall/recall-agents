@@ -1,9 +1,9 @@
 import { ApplicationCommandOptionType } from "discord-api-types/v10";
-import { resolveNativeCommandSessionTargets } from "openclaw/plugin-sdk/command-auth-native";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { buildPairingReply } from "openclaw/plugin-sdk/conversation-runtime";
-import { isDangerousNameMatchingEnabled } from "openclaw/plugin-sdk/dangerous-name-runtime";
-import { getAgentScopedMediaLocalRoots } from "openclaw/plugin-sdk/media-runtime";
+import { resolveNativeCommandSessionTargets } from "recall/plugin-sdk/command-auth-native";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { buildPairingReply } from "recall/plugin-sdk/conversation-runtime";
+import { isDangerousNameMatchingEnabled } from "recall/plugin-sdk/dangerous-name-runtime";
+import { getAgentScopedMediaLocalRoots } from "recall/plugin-sdk/media-runtime";
 import {
   buildCommandTextFromArgs,
   findCommandByNativeName,
@@ -12,11 +12,11 @@ import {
   serializeCommandArgs,
   type ChatCommandDefinition,
   type NativeCommandSpec,
-} from "openclaw/plugin-sdk/native-command-registry";
-import { resolveChunkMode, resolveTextChunkLimit } from "openclaw/plugin-sdk/reply-chunking";
-import { createSubsystemLogger, logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { resolveOpenProviderRuntimeGroupPolicy } from "openclaw/plugin-sdk/runtime-group-policy";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/native-command-registry";
+import { resolveChunkMode, resolveTextChunkLimit } from "recall/plugin-sdk/reply-chunking";
+import { createSubsystemLogger, logVerbose } from "recall/plugin-sdk/runtime-env";
+import { resolveOpenProviderRuntimeGroupPolicy } from "recall/plugin-sdk/runtime-group-policy";
+import { normalizeOptionalString } from "recall/plugin-sdk/string-coerce-runtime";
 import {
   resolveDiscordAccountAllowFrom,
   resolveDiscordAccountDmPolicy,
@@ -86,7 +86,7 @@ import type { ThreadBindingManager } from "./thread-bindings.js";
 const log = createSubsystemLogger("discord/native-command");
 export { testing, testing as __testing } from "./native-command.runtime.js";
 
-function resolveDiscordCommandOwnerAllowFrom(cfg: OpenClawConfig): string[] | undefined {
+function resolveDiscordCommandOwnerAllowFrom(cfg: RecallConfig): string[] | undefined {
   const raw = cfg.commands?.ownerAllowFrom;
   if (!Array.isArray(raw) || raw.length === 0) {
     return undefined;
@@ -118,7 +118,7 @@ function resolveDiscordCommandOwnerAllowFrom(cfg: OpenClawConfig): string[] | un
 
 export function createDiscordNativeCommand(params: {
   command: NativeCommandSpec;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   discordConfig: DiscordConfig;
   accountId: string;
   sessionPrefix: string;
@@ -230,7 +230,7 @@ async function dispatchDiscordCommandInteraction(params: {
   prompt: string;
   command: ChatCommandDefinition;
   commandArgs?: DiscordCommandArgs;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   discordConfig: DiscordConfig;
   accountId: string;
   sessionPrefix: string;

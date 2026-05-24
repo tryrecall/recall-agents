@@ -1,7 +1,7 @@
-import { configureFsSafePython } from "@openclaw/fs-safe/config";
+import { configureFsSafePython } from "@recall/fs-safe/config";
 
 const hasPythonModeOverride =
-  process.env.FS_SAFE_PYTHON_MODE != null || process.env.OPENCLAW_FS_SAFE_PYTHON_MODE != null;
+  process.env.FS_SAFE_PYTHON_MODE != null || process.env.RECALL_FS_SAFE_PYTHON_MODE != null;
 
 if (!hasPythonModeOverride) {
   configureFsSafePython({ mode: "off" });

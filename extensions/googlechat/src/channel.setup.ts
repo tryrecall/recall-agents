@@ -1,11 +1,11 @@
-import { describeAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
-import { formatNormalizedAllowFromEntries } from "openclaw/plugin-sdk/allow-from";
+import { describeAccountSnapshot } from "recall/plugin-sdk/account-helpers";
+import { formatNormalizedAllowFromEntries } from "recall/plugin-sdk/allow-from";
 import {
   adaptScopedAccountAccessor,
   createScopedChannelConfigAdapter,
-} from "openclaw/plugin-sdk/channel-config-helpers";
-import type { ChannelPlugin } from "openclaw/plugin-sdk/channel-core";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/channel-config-helpers";
+import type { ChannelPlugin } from "recall/plugin-sdk/channel-core";
+import { normalizeLowercaseStringOrEmpty } from "recall/plugin-sdk/string-coerce-runtime";
 import {
   type GoogleChatConfigAccessorAccount,
   listGoogleChatAccountIds,

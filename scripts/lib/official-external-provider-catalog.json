@@ -1,11 +1,11 @@
 {
   "entries": [
     {
-      "name": "@openclaw/amazon-bedrock-provider",
-      "description": "OpenClaw Amazon Bedrock provider plugin",
+      "name": "@recall/amazon-bedrock-provider",
+      "description": "Recall Amazon Bedrock provider plugin",
       "source": "official",
       "kind": "provider",
-      "openclaw": {
+      "recall": {
         "plugin": {
           "id": "amazon-bedrock",
           "label": "Amazon Bedrock"
@@ -19,18 +19,18 @@
           }
         ],
         "install": {
-          "npmSpec": "@openclaw/amazon-bedrock-provider",
+          "npmSpec": "@recall/amazon-bedrock-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.12-beta.1"
         }
       }
     },
     {
-      "name": "@openclaw/amazon-bedrock-mantle-provider",
-      "description": "OpenClaw Amazon Bedrock Mantle provider plugin",
+      "name": "@recall/amazon-bedrock-mantle-provider",
+      "description": "Recall Amazon Bedrock Mantle provider plugin",
       "source": "official",
       "kind": "provider",
-      "openclaw": {
+      "recall": {
         "plugin": {
           "id": "amazon-bedrock-mantle",
           "label": "Amazon Bedrock Mantle"
@@ -44,18 +44,18 @@
           }
         ],
         "install": {
-          "npmSpec": "@openclaw/amazon-bedrock-mantle-provider",
+          "npmSpec": "@recall/amazon-bedrock-mantle-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.12-beta.1"
         }
       }
     },
     {
-      "name": "@openclaw/anthropic-vertex-provider",
-      "description": "OpenClaw Anthropic Vertex provider plugin",
+      "name": "@recall/anthropic-vertex-provider",
+      "description": "Recall Anthropic Vertex provider plugin",
       "source": "official",
       "kind": "provider",
-      "openclaw": {
+      "recall": {
         "plugin": {
           "id": "anthropic-vertex",
           "label": "Anthropic Vertex"
@@ -69,18 +69,18 @@
           }
         ],
         "install": {
-          "npmSpec": "@openclaw/anthropic-vertex-provider",
+          "npmSpec": "@recall/anthropic-vertex-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.12-beta.1"
         }
       }
     },
     {
-      "name": "@openclaw/codex",
-      "description": "OpenClaw Codex harness and model provider plugin",
+      "name": "@recall/codex",
+      "description": "Recall Codex harness and model provider plugin",
       "source": "official",
       "kind": "provider",
-      "openclaw": {
+      "recall": {
         "plugin": {
           "id": "codex",
           "label": "Codex"
@@ -107,7 +107,7 @@
           }
         ],
         "install": {
-          "npmSpec": "@openclaw/codex",
+          "npmSpec": "@recall/codex",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.1-beta.1"
         }

@@ -28,7 +28,7 @@ import {
   type PluginToolDescriptorConfigCacheKeyMemo,
   writeCachedPluginToolDescriptors,
 } from "./tool-descriptor-cache.js";
-import type { OpenClawPluginToolContext } from "./types.js";
+import type { RecallPluginToolContext } from "./types.js";
 
 export {
   resetPluginToolDescriptorCache,
@@ -237,7 +237,7 @@ function createPluginToolFactoryTiming(params: {
 
 function resolvePluginToolFactoryEntry(params: {
   entry: PluginToolRegistration;
-  ctx: OpenClawPluginToolContext;
+  ctx: RecallPluginToolContext;
   declaredNames: string[];
   factoryTimingStartedAt: number;
   logError: (message: string) => void;
@@ -503,7 +503,7 @@ function readPluginCacheSource(plugin: PluginManifestRecord): string {
 
 function buildPluginDescriptorCacheKey(params: {
   plugin: PluginManifestRecord;
-  ctx: OpenClawPluginToolContext;
+  ctx: RecallPluginToolContext;
   currentRuntimeConfig?: PluginLoadOptions["config"] | null;
   configCacheKeyMemo?: PluginToolDescriptorConfigCacheKeyMemo;
 }): string {
@@ -530,7 +530,7 @@ function cachedDescriptorsCoverToolNames(params: {
 
 function createCachedDescriptorPluginTool(params: {
   descriptor: CachedPluginToolDescriptor;
-  ctx: OpenClawPluginToolContext;
+  ctx: RecallPluginToolContext;
   loadContext: ReturnType<typeof resolvePluginRuntimeLoadContext>;
   runtimeOptions: PluginLoadOptions["runtimeOptions"];
 }): AnyAgentTool {
@@ -616,7 +616,7 @@ function resolveCachedPluginTools(params: {
   onlyPluginIds: readonly string[];
   existing: Set<string>;
   existingNormalized: Set<string>;
-  ctx: OpenClawPluginToolContext;
+  ctx: RecallPluginToolContext;
   loadContext: ReturnType<typeof resolvePluginRuntimeLoadContext>;
   runtimeOptions: PluginLoadOptions["runtimeOptions"];
   currentRuntimeConfig?: PluginLoadOptions["config"] | null;
@@ -808,7 +808,7 @@ function registryHasScopedPluginTools(
 }
 
 function resolvePluginToolLoadState(params: {
-  context: OpenClawPluginToolContext;
+  context: RecallPluginToolContext;
   toolAllowlist?: string[];
   toolDenylist?: string[];
   allowGatewaySubagentBinding?: boolean;
@@ -864,7 +864,7 @@ function resolvePluginToolLoadState(params: {
 }
 
 export function ensureStandalonePluginToolRegistryLoaded(params: {
-  context: OpenClawPluginToolContext;
+  context: RecallPluginToolContext;
   toolAllowlist?: string[];
   toolDenylist?: string[];
   allowGatewaySubagentBinding?: boolean;
@@ -883,7 +883,7 @@ export function ensureStandalonePluginToolRegistryLoaded(params: {
 }
 
 export function resolvePluginTools(params: {
-  context: OpenClawPluginToolContext;
+  context: RecallPluginToolContext;
   existingToolNames?: Set<string>;
   toolAllowlist?: string[];
   toolDenylist?: string[];

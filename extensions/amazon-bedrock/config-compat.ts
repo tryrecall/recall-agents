@@ -1,4 +1,4 @@
-import { isRecord } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { isRecord } from "recall/plugin-sdk/string-coerce-runtime";
 
 type JsonRecord = Record<string, unknown>;
 

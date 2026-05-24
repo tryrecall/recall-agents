@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import { createRequire } from "node:module";
 import os from "node:os";
 import path from "node:path";
-import { readJsonFileWithFallback } from "openclaw/plugin-sdk/json-store";
+import { readJsonFileWithFallback } from "recall/plugin-sdk/json-store";
 import { quoteCommandPart, splitCommandParts } from "./command-line.js";
 import {
   extractTrustedCodexProjectPaths,
@@ -12,16 +12,16 @@ import {
 import { resolveAcpxPluginRoot } from "./config.js";
 import type { ResolvedAcpxPluginConfig } from "./config.js";
 import {
-  OPENCLAW_ACPX_LEASE_ID_ARG,
-  OPENCLAW_ACPX_LEASE_ID_ENV,
-  OPENCLAW_GATEWAY_INSTANCE_ID_ARG,
+  RECALL_ACPX_LEASE_ID_ARG,
+  RECALL_ACPX_LEASE_ID_ENV,
+  RECALL_GATEWAY_INSTANCE_ID_ARG,
 } from "./process-lease.js";
 
 const CODEX_ACP_PACKAGE = "@zed-industries/codex-acp";
 const CODEX_ACP_BIN = "codex-acp";
 const CLAUDE_ACP_PACKAGE = "@agentclientprotocol/claude-agent-acp";
 const CLAUDE_ACP_BIN = "claude-agent-acp";
-const RUN_CONFIGURED_COMMAND_SENTINEL = "--openclaw-run-configured";
+const RUN_CONFIGURED_COMMAND_SENTINEL = "--recall-run-configured";
 const requireFromHere = createRequire(import.meta.url);
 
 type PackageManifest = {
@@ -38,7 +38,7 @@ function readSelfManifest(): PackageManifest {
 function readManifestDependencyVersion(packageName: string): string {
   const version = readSelfManifest().dependencies?.[packageName];
   if (typeof version !== "string" || version.trim() === "") {
-    throw new Error(`Missing ${packageName} dependency version in @openclaw/acpx manifest`);
+    throw new Error(`Missing ${packageName} dependency version in @recall/acpx manifest`);
   }
   return version;
 }
@@ -93,7 +93,7 @@ async function resolveInstalledAcpPackageBinPath(
 }
 
 async function resolveInstalledCodexAcpBinPath(): Promise<string | undefined> {
-  // Keep OpenClaw's isolated CODEX_HOME wrapper, but launch the plugin-local
+  // Keep Recall's isolated CODEX_HOME wrapper, but launch the plugin-local
   // Codex ACP adapter when the package dependency is available.
   return await resolveInstalledAcpPackageBinPath(CODEX_ACP_PACKAGE, CODEX_ACP_BIN);
 }
@@ -238,11 +238,11 @@ const stderrLogFileNamePrefix = ${params.stderrLogFileNamePrefix ? JSON.stringif
 const stderrLogMaxChars = 256 * 1024;
 
 const openClawWrapperArgs = new Set([
-  ${quoteCommandPart(OPENCLAW_ACPX_LEASE_ID_ARG)},
-  ${quoteCommandPart(OPENCLAW_GATEWAY_INSTANCE_ID_ARG)},
+  ${quoteCommandPart(RECALL_ACPX_LEASE_ID_ARG)},
+  ${quoteCommandPart(RECALL_GATEWAY_INSTANCE_ID_ARG)},
 ]);
 
-function readOpenClawWrapperArg(args, name) {
+function readRecallWrapperArg(args, name) {
   const index = args.indexOf(name);
   if (index < 0) {
     return undefined;
@@ -261,8 +261,8 @@ function resolveStderrLogPath(args) {
     return undefined;
   }
   const leaseId =
-    process.env[${JSON.stringify(OPENCLAW_ACPX_LEASE_ID_ENV)}] ||
-    readOpenClawWrapperArg(args, ${quoteCommandPart(OPENCLAW_ACPX_LEASE_ID_ARG)}) ||
+    process.env[${JSON.stringify(RECALL_ACPX_LEASE_ID_ENV)}] ||
+    readRecallWrapperArg(args, ${quoteCommandPart(RECALL_ACPX_LEASE_ID_ARG)}) ||
     "pid-" + process.pid;
   const fileName = stderrLogFileNamePrefix + "." + safeDiagnosticFilePart(leaseId) + ".log";
   return fileURLToPath(new URL("./" + fileName, import.meta.url));
@@ -362,7 +362,7 @@ function finishStderrLog() {
   writeRedactedStderrLog(text);
 }
 
-function stripOpenClawWrapperArgs(args) {
+function stripRecallWrapperArgs(args) {
   const stripped = [];
   for (let index = 0; index < args.length; index += 1) {
     const value = args[index];
@@ -386,7 +386,7 @@ try {
   // Stderr capture is diagnostic-only; never break the ACP adapter.
 }
 
-const configuredArgs = stripOpenClawWrapperArgs(rawConfiguredArgs);
+const configuredArgs = stripRecallWrapperArgs(rawConfiguredArgs);
 
 function resolveNpmCliPath() {
   const candidate = path.resolve(
@@ -423,7 +423,7 @@ const args =
     : [...defaultArgs, ...configuredArgs];
 
 if (!command) {
-  console.error("[openclaw] missing configured ${params.displayName} ACP command");
+  console.error("[recall] missing configured ${params.displayName} ACP command");
   process.exit(1);
 }
 
@@ -492,7 +492,7 @@ const parentWatcher =
 parentWatcher?.unref?.();
 
 child.on("error", (error) => {
-  console.error(\`[openclaw] failed to launch ${params.displayName} ACP wrapper: \${error.message}\`);
+  console.error(\`[recall] failed to launch ${params.displayName} ACP wrapper: \${error.message}\`);
   process.exit(1);
 });
 
@@ -538,7 +538,7 @@ const env = {
 function buildClaudeAcpWrapperScript(installedBinPath?: string): string {
   return buildAdapterWrapperScript({
     displayName: "Claude",
-    // This package is patched in OpenClaw; fallback must not float to an unpatched newer release.
+    // This package is patched in Recall; fallback must not float to an unpatched newer release.
     packageSpec: `${CLAUDE_ACP_PACKAGE}@${CLAUDE_ACP_PACKAGE_VERSION}`,
     binName: CLAUDE_ACP_BIN,
     installedBinPath,

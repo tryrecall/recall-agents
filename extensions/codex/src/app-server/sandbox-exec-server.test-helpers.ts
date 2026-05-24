@@ -1,4 +1,4 @@
-import type { SandboxContext } from "openclaw/plugin-sdk/sandbox";
+import type { SandboxContext } from "recall/plugin-sdk/sandbox";
 import { vi } from "vitest";
 import WebSocket from "ws";
 
@@ -25,17 +25,17 @@ export function createSandboxContext(overrides: {
     workspaceDir: "/host/workspace",
     agentWorkspaceDir: "/host/workspace",
     workspaceAccess: "rw",
-    runtimeId: "openclaw-test-runtime",
-    runtimeLabel: "openclaw-test-runtime",
-    containerName: "openclaw-test-runtime",
+    runtimeId: "recall-test-runtime",
+    runtimeLabel: "recall-test-runtime",
+    containerName: "recall-test-runtime",
     containerWorkdir: "/workspace",
     docker: { binds: [], image: "test", workdir: "/workspace", env: {}, network: "none" },
     tools: {},
     browserAllowHostControl: false,
     backend: {
       id: "docker",
-      runtimeId: "openclaw-test-runtime",
-      runtimeLabel: "openclaw-test-runtime",
+      runtimeId: "recall-test-runtime",
+      runtimeLabel: "recall-test-runtime",
       workdir: "/workspace",
       buildExecSpec:
         overrides.buildExecSpec ??

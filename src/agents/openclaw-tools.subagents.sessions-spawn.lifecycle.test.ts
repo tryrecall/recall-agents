@@ -12,7 +12,7 @@ import {
   setupSessionsSpawnGatewayMock,
   setSessionsSpawnConfigOverride,
   waitForSessionsSpawnEvent,
-} from "./openclaw-tools.subagents.sessions-spawn.test-harness.js";
+} from "./recall-tools.subagents.sessions-spawn.test-harness.js";
 import {
   testing as bundleMcpRuntimeTesting,
   getOrCreateSessionMcpRuntime,
@@ -23,8 +23,8 @@ import {
 } from "./subagent-registry.js";
 
 const fastModeEnv = vi.hoisted(() => {
-  const previous = process.env.OPENCLAW_TEST_FAST;
-  process.env.OPENCLAW_TEST_FAST = "1";
+  const previous = process.env.RECALL_TEST_FAST;
+  process.env.RECALL_TEST_FAST = "1";
   return { previous };
 });
 
@@ -175,7 +175,7 @@ async function waitForRunCleanup(childSessionKey: string) {
   });
 }
 
-describe("openclaw-tools: subagents (sessions_spawn lifecycle)", () => {
+describe("recall-tools: subagents (sessions_spawn lifecycle)", () => {
   beforeEach(async () => {
     await bundleMcpRuntimeTesting.resetSessionMcpRuntimeManager();
     resetSessionsSpawnAnnounceFlowOverride();
@@ -218,10 +218,10 @@ describe("openclaw-tools: subagents (sessions_spawn lifecycle)", () => {
 
   afterAll(() => {
     if (fastModeEnv.previous === undefined) {
-      delete process.env.OPENCLAW_TEST_FAST;
+      delete process.env.RECALL_TEST_FAST;
       return;
     }
-    process.env.OPENCLAW_TEST_FAST = fastModeEnv.previous;
+    process.env.RECALL_TEST_FAST = fastModeEnv.previous;
   });
 
   it("sessions_spawn runs cleanup flow after subagent completion", async () => {
@@ -349,7 +349,7 @@ describe("openclaw-tools: subagents (sessions_spawn lifecycle)", () => {
     await getOrCreateSessionMcpRuntime({
       sessionId: "session:subagent:mcp-retire",
       sessionKey: child.sessionKey,
-      workspaceDir: "/tmp/openclaw-subagent-mcp-retire",
+      workspaceDir: "/tmp/recall-subagent-mcp-retire",
       cfg: { mcp: { servers: {} } } as Parameters<typeof getOrCreateSessionMcpRuntime>[0]["cfg"],
     });
     expect(bundleMcpRuntimeTesting.getCachedSessionIds()).toContain("session:subagent:mcp-retire");

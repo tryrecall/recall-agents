@@ -1,8 +1,8 @@
 import type {
   ProviderDefaultThinkingPolicyContext,
   ProviderThinkingProfile,
-} from "openclaw/plugin-sdk/core";
-import type { ModelProviderConfig } from "openclaw/plugin-sdk/provider-model-types";
+} from "recall/plugin-sdk/core";
+import type { ModelProviderConfig } from "recall/plugin-sdk/provider-model-types";
 import { normalizeAntigravityModelId, normalizeGoogleModelId } from "./model-id.js";
 import { isGoogleGemini3ProModel, isGoogleGemini3ThinkingLevelModel } from "./thinking-api.js";
 

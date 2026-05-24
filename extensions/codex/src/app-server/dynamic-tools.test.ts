@@ -1,21 +1,21 @@
 import type { AgentToolResult } from "@earendil-works/pi-agent-core";
-import type { AnyAgentTool } from "openclaw/plugin-sdk/agent-harness";
+import type { AnyAgentTool } from "recall/plugin-sdk/agent-harness";
 import {
   HEARTBEAT_RESPONSE_TOOL_NAME,
   wrapToolWithBeforeToolCallHook,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "recall/plugin-sdk/agent-harness-runtime";
 import {
   initializeGlobalHookRunner,
   resetGlobalHookRunner,
-} from "openclaw/plugin-sdk/hook-runtime";
+} from "recall/plugin-sdk/hook-runtime";
 import {
   createEmptyPluginRegistry,
   createMockPluginRegistry,
   setActivePluginRegistry,
-} from "openclaw/plugin-sdk/plugin-test-runtime";
+} from "recall/plugin-sdk/plugin-test-runtime";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
-  CODEX_OPENCLAW_DYNAMIC_TOOL_NAMESPACE,
+  CODEX_RECALL_DYNAMIC_TOOL_NAMESPACE,
   createCodexDynamicToolBridge,
 } from "./dynamic-tools.js";
 import type { JsonValue } from "./protocol.js";
@@ -161,7 +161,7 @@ afterEach(() => {
 });
 
 describe("createCodexDynamicToolBridge", () => {
-  it("keeps turn-yield direct while deferring OpenClaw session spawn", () => {
+  it("keeps turn-yield direct while deferring Recall session spawn", () => {
     const bridge = createCodexDynamicToolBridge({
       tools: [
         createTool({ name: "web_search" }),
@@ -181,22 +181,22 @@ describe("createCodexDynamicToolBridge", () => {
 
     expectDynamicSpec(webSearch, {
       name: "web_search",
-      namespace: CODEX_OPENCLAW_DYNAMIC_TOOL_NAMESPACE,
+      namespace: CODEX_RECALL_DYNAMIC_TOOL_NAMESPACE,
       deferLoading: true,
     });
     expectDynamicSpec(message, {
       name: "message",
-      namespace: CODEX_OPENCLAW_DYNAMIC_TOOL_NAMESPACE,
+      namespace: CODEX_RECALL_DYNAMIC_TOOL_NAMESPACE,
       deferLoading: true,
     });
     expectDynamicSpec(heartbeat, {
       name: HEARTBEAT_RESPONSE_TOOL_NAME,
-      namespace: CODEX_OPENCLAW_DYNAMIC_TOOL_NAMESPACE,
+      namespace: CODEX_RECALL_DYNAMIC_TOOL_NAMESPACE,
       deferLoading: true,
     });
     expectDynamicSpec(sessionsSpawn, {
       name: "sessions_spawn",
-      namespace: CODEX_OPENCLAW_DYNAMIC_TOOL_NAMESPACE,
+      namespace: CODEX_RECALL_DYNAMIC_TOOL_NAMESPACE,
       deferLoading: true,
     });
     expectNoNamespace(sessionsYield);
@@ -213,7 +213,7 @@ describe("createCodexDynamicToolBridge", () => {
     expectDynamicSpec(bridge.specs[0], { name: "message" });
     expectDynamicSpec(bridge.specs[1], {
       name: "web_search",
-      namespace: CODEX_OPENCLAW_DYNAMIC_TOOL_NAMESPACE,
+      namespace: CODEX_RECALL_DYNAMIC_TOOL_NAMESPACE,
       deferLoading: true,
     });
     expectNoNamespace(bridge.specs[0]);
@@ -250,7 +250,7 @@ describe("createCodexDynamicToolBridge", () => {
       contentItems: [
         {
           type: "inputText",
-          text: `OpenClaw tool is not available for this turn: ${HEARTBEAT_RESPONSE_TOOL_NAME}`,
+          text: `Recall tool is not available for this turn: ${HEARTBEAT_RESPONSE_TOOL_NAME}`,
         },
       ],
     });
@@ -311,7 +311,7 @@ describe("createCodexDynamicToolBridge", () => {
     }
     const text = firstItem.text;
     expect(text.length).toBeLessThanOrEqual(180);
-    expect(text).toContain("OpenClaw truncated dynamic tool result");
+    expect(text).toContain("Recall truncated dynamic tool result");
     expect(text).toContain("original 400 chars");
     expect(text).toContain("rerun with narrower args");
   });
@@ -362,7 +362,7 @@ describe("createCodexDynamicToolBridge", () => {
       throw new Error("expected inputText tool result");
     }
     expect(firstItem.text.length).toBeLessThanOrEqual(180);
-    expect(firstItem.text).toContain("OpenClaw truncated dynamic tool result");
+    expect(firstItem.text).toContain("Recall truncated dynamic tool result");
   });
 
   it("keeps truncation notices within tiny configured caps", async () => {
@@ -403,7 +403,7 @@ describe("createCodexDynamicToolBridge", () => {
       throw new Error("expected inputText tool result");
     }
     expect(firstItem.text.length).toBeLessThanOrEqual(32);
-    expect(firstItem.text).toBe("...(OpenClaw truncated dynamic tool".slice(0, 32));
+    expect(firstItem.text).toBe("...(Recall truncated dynamic tool".slice(0, 32));
   });
 
   it("budgets configured truncation across all text result blocks", async () => {
@@ -449,7 +449,7 @@ describe("createCodexDynamicToolBridge", () => {
       .map((item) => (item.type === "inputText" && typeof item.text === "string" ? item.text : ""))
       .join("");
     expect(text.length).toBeLessThanOrEqual(180);
-    expect(text).toContain("OpenClaw truncated dynamic tool result");
+    expect(text).toContain("Recall truncated dynamic tool result");
     expect(text).toContain("original 400 chars");
     expect(text).not.toContain("b".repeat(100));
   });
@@ -960,7 +960,7 @@ describe("createCodexDynamicToolBridge", () => {
   });
 
   it("keeps config out of Codex tool-result contexts", async () => {
-    const config = { session: { store: "/tmp/openclaw-session-store.json" } };
+    const config = { session: { store: "/tmp/recall-session-store.json" } };
     const registry = createEmptyPluginRegistry();
     const middlewareContexts: Record<string, unknown>[] = [];
     const legacyContexts: Record<string, unknown>[] = [];

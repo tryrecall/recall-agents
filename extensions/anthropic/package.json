@@ -1,16 +1,16 @@
 {
-  "name": "@openclaw/anthropic-provider",
+  "name": "@recall/anthropic-provider",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw Anthropic provider plugin",
+  "description": "Recall Anthropic provider plugin",
   "type": "module",
   "dependencies": {
     "@earendil-works/pi-ai": "0.75.4"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

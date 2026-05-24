@@ -1,25 +1,25 @@
 import {
   defineFinalizableLivePreviewAdapter,
   deliverWithFinalizableLivePreviewAdapter,
-} from "openclaw/plugin-sdk/channel-message";
+} from "recall/plugin-sdk/channel-message";
 import {
   formatChannelProgressDraftLineForEntry,
   resolveChannelStreamingPreviewToolProgress,
-} from "openclaw/plugin-sdk/channel-streaming";
-import { isLoopbackHost } from "openclaw/plugin-sdk/gateway-runtime";
-import { createClaimableDedupe, type ClaimableDedupe } from "openclaw/plugin-sdk/persistent-dedupe";
+} from "recall/plugin-sdk/channel-streaming";
+import { isLoopbackHost } from "recall/plugin-sdk/gateway-runtime";
+import { createClaimableDedupe, type ClaimableDedupe } from "recall/plugin-sdk/persistent-dedupe";
 import {
   buildTtsSupplementMediaPayload,
   getReplyPayloadTtsSupplement,
   isReasoningReplyPayload,
-} from "openclaw/plugin-sdk/reply-payload";
-import { resolveInboundLastRouteSessionKey } from "openclaw/plugin-sdk/routing";
-import { resolvePinnedMainDmOwnerFromAllowlist } from "openclaw/plugin-sdk/security-runtime";
-import { isPrivateNetworkOptInEnabled } from "openclaw/plugin-sdk/ssrf-runtime";
+} from "recall/plugin-sdk/reply-payload";
+import { resolveInboundLastRouteSessionKey } from "recall/plugin-sdk/routing";
+import { resolvePinnedMainDmOwnerFromAllowlist } from "recall/plugin-sdk/security-runtime";
+import { isPrivateNetworkOptInEnabled } from "recall/plugin-sdk/ssrf-runtime";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/string-coerce-runtime";
 import { getMattermostRuntime } from "../runtime.js";
 import {
   resolveMattermostAccount,
@@ -86,7 +86,7 @@ import {
 import type {
   ChannelAccountSnapshot,
   ChatType,
-  OpenClawConfig,
+  RecallConfig,
   ReplyPayload,
   RuntimeEnv,
 } from "./runtime-api.js";
@@ -124,7 +124,7 @@ export type MonitorMattermostOpts = {
   botToken?: string;
   baseUrl?: string;
   accountId?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   runtime?: RuntimeEnv;
   abortSignal?: AbortSignal;
   statusSink?: (patch: Partial<ChannelAccountSnapshot>) => void;
@@ -516,7 +516,7 @@ function buildMattermostWsUrl(baseUrl: string): string {
 export async function monitorMattermostProvider(opts: MonitorMattermostOpts = {}): Promise<void> {
   const core = getMattermostRuntime();
   const runtime = resolveRuntime(opts);
-  const cfg = (opts.config ?? core.config.current()) as OpenClawConfig;
+  const cfg = (opts.config ?? core.config.current()) as RecallConfig;
   const account = resolveMattermostAccount({
     cfg,
     accountId: opts.accountId,
@@ -662,7 +662,7 @@ export async function monitorMattermostProvider(opts: MonitorMattermostOpts = {}
               message: post.message ?? "",
               props: post.props ?? undefined,
             },
-            ephemeral_text: `OpenClaw ignored this action for ${decision.roomLabel}.`,
+            ephemeral_text: `Recall ignored this action for ${decision.roomLabel}.`,
           },
         };
       },

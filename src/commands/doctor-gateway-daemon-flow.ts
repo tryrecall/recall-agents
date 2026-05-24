@@ -1,6 +1,6 @@
 import { formatCliCommand } from "../cli/command-format.js";
 import { resolveGatewayPort } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   resolveGatewayLaunchAgentLabel,
   resolveNodeLaunchAgentLabel,
@@ -105,10 +105,10 @@ async function maybeRepairLaunchAgentBootstrap(params: {
 
 function renderBlockingSystemGatewayServices(services: ExtraGatewayService[]): string {
   return [
-    "System-level OpenClaw gateway service detected while the user gateway service is not installed.",
+    "System-level Recall gateway service detected while the user gateway service is not installed.",
     ...services.map((svc) => `- ${svc.label} (${svc.detail})`),
-    "OpenClaw will not install a second user-level gateway service automatically.",
-    "Run `openclaw gateway status --deep` or `openclaw doctor --deep` to inspect duplicate services.",
+    "Recall will not install a second user-level gateway service automatically.",
+    "Run `recall gateway status --deep` or `recall doctor --deep` to inspect duplicate services.",
     `Set ${SERVICE_REPAIR_POLICY_ENV}=external if a system supervisor owns the gateway lifecycle.`,
   ].join("\n");
 }
@@ -125,12 +125,12 @@ function renderEstablishedGatewayConnections(connections: PortConnection[]): str
       return `- ${pid} ${direction}${command}${address}${commandLine}`;
     }),
     ...(connections.length > 8 ? [`- ... ${connections.length - 8} more connection(s)`] : []),
-    "If logs show protocol mismatch after rollback, stop stale OpenClaw client processes listed here and rerun doctor.",
+    "If logs show protocol mismatch after rollback, stop stale Recall client processes listed here and rerun doctor.",
   ].join("\n");
 }
 
 async function maybeReportEstablishedGatewayClients(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   deep: boolean;
   port?: number;
 }): Promise<void> {
@@ -148,7 +148,7 @@ async function maybeReportEstablishedGatewayClients(params: {
 }
 
 export async function maybeRepairGatewayDaemon(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   runtime: RuntimeEnv;
   prompter: DoctorPrompter;
   options: DoctorOptions;
@@ -204,7 +204,7 @@ export async function maybeRepairGatewayDaemon(params: {
     await maybeRepairLaunchAgentBootstrap({
       env: {
         ...process.env,
-        OPENCLAW_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
+        RECALL_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
       },
       title: "Node",
       runtime: params.runtime,
@@ -276,7 +276,7 @@ export async function maybeRepairGatewayDaemon(params: {
       );
       if (!install) {
         note(
-          `Run ${formatCliCommand("openclaw gateway install")} when you want to install the gateway service.`,
+          `Run ${formatCliCommand("recall gateway install")} when you want to install the gateway service.`,
           "Gateway",
         );
       }
@@ -376,9 +376,9 @@ export async function maybeRepairGatewayDaemon(params: {
   }
 
   if (process.platform === "darwin") {
-    const label = resolveGatewayLaunchAgentLabel(process.env.OPENCLAW_PROFILE);
+    const label = resolveGatewayLaunchAgentLabel(process.env.RECALL_PROFILE);
     note(
-      `LaunchAgent loaded; stopping requires "${formatCliCommand("openclaw gateway stop")}" or launchctl bootout gui/$UID/${label}.`,
+      `LaunchAgent loaded; stopping requires "${formatCliCommand("recall gateway stop")}" or launchctl bootout gui/$UID/${label}.`,
       "Gateway",
     );
   }

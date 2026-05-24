@@ -146,7 +146,7 @@ export function buildTtsSupplementMediaPayload(payload: ReplyPayload): ReplyPayl
 export type ReplyPayloadMetadata = {
   assistantMessageIndex?: number;
   /**
-   * Internal OpenClaw notices generated after a runtime/provider failure are
+   * Internal Recall notices generated after a runtime/provider failure are
    * not assistant source replies. Dispatch may deliver them even when normal
    * assistant source replies are message-tool-only; sendPolicy deny still wins.
    */

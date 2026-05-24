@@ -1,17 +1,17 @@
 import { createHmac } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { safeEqualSecret } from "openclaw/plugin-sdk/security-runtime";
+import { safeEqualSecret } from "recall/plugin-sdk/security-runtime";
 import {
   normalizeOptionalString,
   normalizeStringifiedOptionalString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/string-coerce-runtime";
 import { getMattermostRuntime } from "../runtime.js";
 import { updateMattermostPost, type MattermostClient, type MattermostPost } from "./client.js";
 import {
   isTrustedProxyAddress,
   readRequestBodyWithLimit,
   resolveClientIp,
-  type OpenClawConfig,
+  type RecallConfig,
 } from "./runtime-api.js";
 
 const INTERACTION_MAX_BODY_BYTES = 64 * 1024;
@@ -69,7 +69,7 @@ export function getInteractionCallbackUrl(accountId: string): string | undefined
   return callbackUrls.get(accountId);
 }
 
-type InteractionCallbackConfig = Pick<OpenClawConfig, "gateway" | "channels"> & {
+type InteractionCallbackConfig = Pick<RecallConfig, "gateway" | "channels"> & {
   interactions?: {
     callbackBaseUrl?: string;
   };
@@ -174,7 +174,7 @@ const interactionSecrets = new Map<string, string>();
 let defaultInteractionSecret: string | undefined;
 
 function deriveInteractionSecret(botToken: string): string {
-  return createHmac("sha256", "openclaw-mattermost-interactions").update(botToken).digest("hex");
+  return createHmac("sha256", "recall-mattermost-interactions").update(botToken).digest("hex");
 }
 
 export function setInteractionSecret(accountIdOrBotToken: string, botToken?: string): void {

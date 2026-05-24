@@ -2,7 +2,7 @@ import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { CORE_HEALTH_CHECKS } from "./doctor-core-checks.js";
 import type { HealthCheck } from "./health-checks.js";
 
@@ -27,7 +27,7 @@ describe("doctor core skills readiness smoke", () => {
   });
 
   it("detects and repairs a real unavailable workspace skill", async () => {
-    tmp = await fs.mkdtemp(join(tmpdir(), "openclaw-health-skills-"));
+    tmp = await fs.mkdtemp(join(tmpdir(), "recall-health-skills-"));
     const skillDir = join(tmp, "skills", "missing-tool");
     await fs.mkdir(skillDir, { recursive: true });
     await fs.writeFile(
@@ -35,14 +35,14 @@ describe("doctor core skills readiness smoke", () => {
       `---
 name: missing-tool
 description: Missing tool
-metadata: '{"openclaw":{"requires":{"bins":["openclaw-test-missing-skill-bin"]}}}'
+metadata: '{"recall":{"requires":{"bins":["recall-test-missing-skill-bin"]}}}'
 ---
 
 # Missing tool
 `,
       "utf-8",
     );
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       agents: {
         defaults: {
           workspace: tmp,

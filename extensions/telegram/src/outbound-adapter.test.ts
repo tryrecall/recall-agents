@@ -1,5 +1,5 @@
-import { verifyDurableFinalCapabilityProofs } from "openclaw/plugin-sdk/channel-message";
-import { adaptMessagePresentationForChannel } from "openclaw/plugin-sdk/interactive-runtime";
+import { verifyDurableFinalCapabilityProofs } from "recall/plugin-sdk/channel-message";
+import { adaptMessagePresentationForChannel } from "recall/plugin-sdk/interactive-runtime";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const sendMessageTelegramMock = vi.fn();

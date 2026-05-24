@@ -56,21 +56,21 @@ const browserCommandAliasRegistry: PluginManifestCommandAliasRegistry = {
 
 describe("isGatewayRunFastPathArgv", () => {
   it("matches only plain gateway foreground starts without root options or help", () => {
-    expect(isGatewayRunFastPathArgv(["node", "openclaw", "gateway"])).toBe(true);
-    expect(isGatewayRunFastPathArgv(["node", "openclaw", "gateway", "--force"])).toBe(true);
-    expect(isGatewayRunFastPathArgv(["node", "openclaw", "gateway", "--port", "18789"])).toBe(true);
-    expect(isGatewayRunFastPathArgv(["node", "openclaw", "gateway", "--auth=none"])).toBe(true);
+    expect(isGatewayRunFastPathArgv(["node", "recall", "gateway"])).toBe(true);
+    expect(isGatewayRunFastPathArgv(["node", "recall", "gateway", "--force"])).toBe(true);
+    expect(isGatewayRunFastPathArgv(["node", "recall", "gateway", "--port", "18789"])).toBe(true);
+    expect(isGatewayRunFastPathArgv(["node", "recall", "gateway", "--auth=none"])).toBe(true);
     expect(
-      isGatewayRunFastPathArgv(["node", "openclaw", "--no-color", "gateway", "--bind", "loopback"]),
+      isGatewayRunFastPathArgv(["node", "recall", "--no-color", "gateway", "--bind", "loopback"]),
     ).toBe(true);
-    expect(isGatewayRunFastPathArgv(["node", "openclaw", "gateway", "run"])).toBe(true);
+    expect(isGatewayRunFastPathArgv(["node", "recall", "gateway", "run"])).toBe(true);
     expect(
-      isGatewayRunFastPathArgv(["node", "openclaw", "gateway", "run", "--raw-stream-path", "x"]),
+      isGatewayRunFastPathArgv(["node", "recall", "gateway", "run", "--raw-stream-path", "x"]),
     ).toBe(true);
-    expect(isGatewayRunFastPathArgv(["node", "openclaw", "gateway", "call", "health"])).toBe(false);
-    expect(isGatewayRunFastPathArgv(["node", "openclaw", "gateway", "--help"])).toBe(false);
-    expect(isGatewayRunFastPathArgv(["node", "openclaw", "gateway", "--port"])).toBe(false);
-    expect(isGatewayRunFastPathArgv(["node", "openclaw", "gateway", "--unknown"])).toBe(false);
+    expect(isGatewayRunFastPathArgv(["node", "recall", "gateway", "call", "health"])).toBe(false);
+    expect(isGatewayRunFastPathArgv(["node", "recall", "gateway", "--help"])).toBe(false);
+    expect(isGatewayRunFastPathArgv(["node", "recall", "gateway", "--port"])).toBe(false);
+    expect(isGatewayRunFastPathArgv(["node", "recall", "gateway", "--unknown"])).toBe(false);
   });
 });
 
@@ -110,46 +110,46 @@ describe("rewriteUpdateFlagArgv", () => {
 
 describe("shouldEnsureCliPath", () => {
   it("skips path bootstrap for help/version invocations", () => {
-    expect(shouldEnsureCliPath(["node", "openclaw", "--help"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "-V"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "-v"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "--help"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "-V"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "-v"])).toBe(false);
   });
 
   it("skips path bootstrap for read-only fast paths", () => {
-    expect(shouldEnsureCliPath(["node", "openclaw"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "--profile", "work"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "approvals"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "channels"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "cron"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "devices"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "plugins"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "mcp"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "status"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "--log-level", "debug", "status"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "sessions", "--json"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "config", "get", "update"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "models", "status", "--json"])).toBe(false);
-    expect(shouldEnsureCliPath(["node", "openclaw", "tools", "effective"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "--profile", "work"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "approvals"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "channels"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "cron"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "devices"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "plugins"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "mcp"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "status"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "--log-level", "debug", "status"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "sessions", "--json"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "config", "get", "update"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "models", "status", "--json"])).toBe(false);
+    expect(shouldEnsureCliPath(["node", "recall", "tools", "effective"])).toBe(false);
   });
 
   it("keeps path bootstrap for mutating or unknown commands", () => {
-    expect(shouldEnsureCliPath(["node", "openclaw", "message", "send"])).toBe(true);
-    expect(shouldEnsureCliPath(["node", "openclaw", "voicecall", "status"])).toBe(true);
-    expect(shouldEnsureCliPath(["node", "openclaw", "acp", "-v"])).toBe(true);
+    expect(shouldEnsureCliPath(["node", "recall", "message", "send"])).toBe(true);
+    expect(shouldEnsureCliPath(["node", "recall", "voicecall", "status"])).toBe(true);
+    expect(shouldEnsureCliPath(["node", "recall", "acp", "-v"])).toBe(true);
   });
 });
 
 describe("shouldStartCrestodianForBareRoot", () => {
   it("starts Crestodian for bare root invocations", () => {
-    expect(shouldStartCrestodianForBareRoot(["node", "openclaw"])).toBe(true);
-    expect(shouldStartCrestodianForBareRoot(["node", "openclaw", "--profile", "work"])).toBe(true);
-    expect(shouldStartCrestodianForBareRoot(["node", "openclaw", "--dev"])).toBe(true);
+    expect(shouldStartCrestodianForBareRoot(["node", "recall"])).toBe(true);
+    expect(shouldStartCrestodianForBareRoot(["node", "recall", "--profile", "work"])).toBe(true);
+    expect(shouldStartCrestodianForBareRoot(["node", "recall", "--dev"])).toBe(true);
   });
 
   it("does not start Crestodian for help, version, or commands", () => {
-    expect(shouldStartCrestodianForBareRoot(["node", "openclaw", "--help"])).toBe(false);
-    expect(shouldStartCrestodianForBareRoot(["node", "openclaw", "-V"])).toBe(false);
-    expect(shouldStartCrestodianForBareRoot(["node", "openclaw", "status"])).toBe(false);
+    expect(shouldStartCrestodianForBareRoot(["node", "recall", "--help"])).toBe(false);
+    expect(shouldStartCrestodianForBareRoot(["node", "recall", "-V"])).toBe(false);
+    expect(shouldStartCrestodianForBareRoot(["node", "recall", "status"])).toBe(false);
   });
 });
 
@@ -158,7 +158,7 @@ describe("shouldStartCrestodianForModernOnboard", () => {
     expect(
       shouldStartCrestodianForModernOnboard([
         "node",
-        "openclaw",
+        "recall",
         "onboard",
         "--modern",
         "--non-interactive",
@@ -168,69 +168,69 @@ describe("shouldStartCrestodianForModernOnboard", () => {
   });
 
   it("keeps classic onboard and help on the normal command path", () => {
-    expect(shouldStartCrestodianForModernOnboard(["node", "openclaw", "onboard"])).toBe(false);
+    expect(shouldStartCrestodianForModernOnboard(["node", "recall", "onboard"])).toBe(false);
     expect(
-      shouldStartCrestodianForModernOnboard(["node", "openclaw", "onboard", "--modern", "--help"]),
+      shouldStartCrestodianForModernOnboard(["node", "recall", "onboard", "--modern", "--help"]),
     ).toBe(false);
   });
 });
 
 describe("shouldStartProxyForCli", () => {
   it("starts managed proxy routing for the --update shorthand", () => {
-    expect(shouldStartProxyForCli(["node", "openclaw", "--update"])).toBe(true);
-    expect(shouldStartProxyForCli(["node", "openclaw", "--profile", "p", "--update"])).toBe(true);
+    expect(shouldStartProxyForCli(["node", "recall", "--update"])).toBe(true);
+    expect(shouldStartProxyForCli(["node", "recall", "--profile", "p", "--update"])).toBe(true);
   });
 
   it("skips managed proxy routing for bare parent default help", () => {
-    expect(shouldStartProxyForCli(["node", "openclaw", "plugins"])).toBe(false);
-    expect(shouldStartProxyForCli(["node", "openclaw", "channels"])).toBe(false);
-    expect(shouldStartProxyForCli(["node", "openclaw", "cron"])).toBe(false);
-    expect(shouldStartProxyForCli(["node", "openclaw", "devices"])).toBe(false);
-    expect(shouldStartProxyForCli(["node", "openclaw", "mcp"])).toBe(false);
+    expect(shouldStartProxyForCli(["node", "recall", "plugins"])).toBe(false);
+    expect(shouldStartProxyForCli(["node", "recall", "channels"])).toBe(false);
+    expect(shouldStartProxyForCli(["node", "recall", "cron"])).toBe(false);
+    expect(shouldStartProxyForCli(["node", "recall", "devices"])).toBe(false);
+    expect(shouldStartProxyForCli(["node", "recall", "mcp"])).toBe(false);
   });
 });
 
 describe("shouldUseRootHelpFastPath", () => {
   it("uses the fast path for root help only", () => {
-    expect(shouldUseRootHelpFastPath(["node", "openclaw", "--help"])).toBe(true);
-    expect(shouldUseRootHelpFastPath(["node", "openclaw", "--profile", "work", "-h"])).toBe(true);
-    expect(shouldUseRootHelpFastPath(["node", "openclaw", "help", "--help"])).toBe(true);
-    expect(shouldUseRootHelpFastPath(["node", "openclaw", "tools", "--help"])).toBe(true);
-    expect(shouldUseRootHelpFastPath(["node", "openclaw", "status", "--help"])).toBe(false);
-    expect(shouldUseRootHelpFastPath(["node", "openclaw", "--help", "status"])).toBe(false);
-    expect(shouldUseRootHelpFastPath(["node", "openclaw", "help", "gateway"])).toBe(false);
+    expect(shouldUseRootHelpFastPath(["node", "recall", "--help"])).toBe(true);
+    expect(shouldUseRootHelpFastPath(["node", "recall", "--profile", "work", "-h"])).toBe(true);
+    expect(shouldUseRootHelpFastPath(["node", "recall", "help", "--help"])).toBe(true);
+    expect(shouldUseRootHelpFastPath(["node", "recall", "tools", "--help"])).toBe(true);
+    expect(shouldUseRootHelpFastPath(["node", "recall", "status", "--help"])).toBe(false);
+    expect(shouldUseRootHelpFastPath(["node", "recall", "--help", "status"])).toBe(false);
+    expect(shouldUseRootHelpFastPath(["node", "recall", "help", "gateway"])).toBe(false);
   });
 });
 
 describe("shouldUseBrowserHelpFastPath", () => {
   it("uses the fast path for browser command help only", () => {
-    expect(shouldUseBrowserHelpFastPath(["node", "openclaw", "browser", "--help"])).toBe(true);
-    expect(shouldUseBrowserHelpFastPath(["node", "openclaw", "browser", "-h"])).toBe(true);
+    expect(shouldUseBrowserHelpFastPath(["node", "recall", "browser", "--help"])).toBe(true);
+    expect(shouldUseBrowserHelpFastPath(["node", "recall", "browser", "-h"])).toBe(true);
     expect(
-      shouldUseBrowserHelpFastPath(["node", "openclaw", "--profile", "work", "browser", "-h"]),
+      shouldUseBrowserHelpFastPath(["node", "recall", "--profile", "work", "browser", "-h"]),
     ).toBe(true);
-    expect(shouldUseBrowserHelpFastPath(["node", "openclaw", "browser", "status", "--help"])).toBe(
+    expect(shouldUseBrowserHelpFastPath(["node", "recall", "browser", "status", "--help"])).toBe(
       false,
     );
-    expect(shouldUseBrowserHelpFastPath(["node", "openclaw", "browser", "--version"])).toBe(false);
-    expect(shouldUseBrowserHelpFastPath(["node", "openclaw", "status", "--help"])).toBe(false);
-    expect(shouldUseBrowserHelpFastPath(["node", "openclaw", "browser", "--version"])).toBe(false);
+    expect(shouldUseBrowserHelpFastPath(["node", "recall", "browser", "--version"])).toBe(false);
+    expect(shouldUseBrowserHelpFastPath(["node", "recall", "status", "--help"])).toBe(false);
+    expect(shouldUseBrowserHelpFastPath(["node", "recall", "browser", "--version"])).toBe(false);
   });
 });
 
 describe("parent command help fast paths", () => {
   it("use fast paths for secrets and nodes parent help only", () => {
-    expect(shouldUseSecretsHelpFastPath(["node", "openclaw", "secrets", "--help"])).toBe(true);
-    expect(shouldUseSecretsHelpFastPath(["node", "openclaw", "secrets", "-h"])).toBe(true);
-    expect(shouldUseSecretsHelpFastPath(["node", "openclaw", "secrets", "--version"])).toBe(false);
-    expect(shouldUseSecretsHelpFastPath(["node", "openclaw", "secrets", "audit", "--help"])).toBe(
+    expect(shouldUseSecretsHelpFastPath(["node", "recall", "secrets", "--help"])).toBe(true);
+    expect(shouldUseSecretsHelpFastPath(["node", "recall", "secrets", "-h"])).toBe(true);
+    expect(shouldUseSecretsHelpFastPath(["node", "recall", "secrets", "--version"])).toBe(false);
+    expect(shouldUseSecretsHelpFastPath(["node", "recall", "secrets", "audit", "--help"])).toBe(
       false,
     );
 
-    expect(shouldUseNodesHelpFastPath(["node", "openclaw", "nodes", "--help"])).toBe(true);
-    expect(shouldUseNodesHelpFastPath(["node", "openclaw", "nodes", "-h"])).toBe(true);
-    expect(shouldUseNodesHelpFastPath(["node", "openclaw", "nodes", "--version"])).toBe(false);
-    expect(shouldUseNodesHelpFastPath(["node", "openclaw", "nodes", "invoke", "--help"])).toBe(
+    expect(shouldUseNodesHelpFastPath(["node", "recall", "nodes", "--help"])).toBe(true);
+    expect(shouldUseNodesHelpFastPath(["node", "recall", "nodes", "-h"])).toBe(true);
+    expect(shouldUseNodesHelpFastPath(["node", "recall", "nodes", "--version"])).toBe(false);
+    expect(shouldUseNodesHelpFastPath(["node", "recall", "nodes", "invoke", "--help"])).toBe(
       false,
     );
   });
@@ -239,15 +239,15 @@ describe("parent command help fast paths", () => {
 describe("shouldUseSetupOnboardConfigureHelpFastPath", () => {
   it("uses the fast path only for setup, onboard, and configure help", () => {
     expect(
-      shouldUseSetupOnboardConfigureHelpFastPath(["node", "openclaw", "setup", "--help"]),
+      shouldUseSetupOnboardConfigureHelpFastPath(["node", "recall", "setup", "--help"]),
     ).toBe(true);
-    expect(shouldUseSetupOnboardConfigureHelpFastPath(["node", "openclaw", "onboard", "-h"])).toBe(
+    expect(shouldUseSetupOnboardConfigureHelpFastPath(["node", "recall", "onboard", "-h"])).toBe(
       true,
     );
     expect(
       shouldUseSetupOnboardConfigureHelpFastPath([
         "node",
-        "openclaw",
+        "recall",
         "--profile",
         "work",
         "configure",
@@ -257,30 +257,30 @@ describe("shouldUseSetupOnboardConfigureHelpFastPath", () => {
     expect(
       shouldUseSetupOnboardConfigureHelpFastPath([
         "node",
-        "openclaw",
+        "recall",
         "onboard",
         "status",
         "--help",
       ]),
     ).toBe(false);
     expect(
-      shouldUseSetupOnboardConfigureHelpFastPath(["node", "openclaw", "status", "--help"]),
+      shouldUseSetupOnboardConfigureHelpFastPath(["node", "recall", "status", "--help"]),
     ).toBe(false);
   });
 });
 
 describe("resolvePrecomputedSubcommandHelpFastPath", () => {
   it("uses the fast path only for allowlisted parent command help", () => {
-    expect(resolvePrecomputedSubcommandHelpFastPath(["node", "openclaw", "doctor", "--help"])).toBe(
+    expect(resolvePrecomputedSubcommandHelpFastPath(["node", "recall", "doctor", "--help"])).toBe(
       "doctor",
     );
-    expect(resolvePrecomputedSubcommandHelpFastPath(["node", "openclaw", "gateway", "-h"])).toBe(
+    expect(resolvePrecomputedSubcommandHelpFastPath(["node", "recall", "gateway", "-h"])).toBe(
       "gateway",
     );
     expect(
       resolvePrecomputedSubcommandHelpFastPath([
         "node",
-        "openclaw",
+        "recall",
         "--profile",
         "work",
         "--no-color",
@@ -289,44 +289,44 @@ describe("resolvePrecomputedSubcommandHelpFastPath", () => {
       ]),
     ).toBe("models");
     expect(
-      resolvePrecomputedSubcommandHelpFastPath(["node", "openclaw", "plugins", "--help"]),
+      resolvePrecomputedSubcommandHelpFastPath(["node", "recall", "plugins", "--help"]),
     ).toBe("plugins");
     expect(
-      resolvePrecomputedSubcommandHelpFastPath(["node", "openclaw", "doctor", "--version"]),
+      resolvePrecomputedSubcommandHelpFastPath(["node", "recall", "doctor", "--version"]),
     ).toBeNull();
     expect(
-      resolvePrecomputedSubcommandHelpFastPath(["node", "openclaw", "gateway", "-V"]),
+      resolvePrecomputedSubcommandHelpFastPath(["node", "recall", "gateway", "-V"]),
     ).toBeNull();
     expect(
       resolvePrecomputedSubcommandHelpFastPath([
         "node",
-        "openclaw",
+        "recall",
         "doctor",
         "--help",
         "--version",
       ]),
     ).toBeNull();
     expect(
-      resolvePrecomputedSubcommandHelpFastPath(["node", "openclaw", "doctor", "--version", "-h"]),
+      resolvePrecomputedSubcommandHelpFastPath(["node", "recall", "doctor", "--version", "-h"]),
     ).toBeNull();
     expect(
-      resolvePrecomputedSubcommandHelpFastPath(["node", "openclaw", "--bogus", "doctor", "--help"]),
+      resolvePrecomputedSubcommandHelpFastPath(["node", "recall", "--bogus", "doctor", "--help"]),
     ).toBeNull();
     expect(
-      resolvePrecomputedSubcommandHelpFastPath(["node", "openclaw", "doctor", "--help", "--bogus"]),
+      resolvePrecomputedSubcommandHelpFastPath(["node", "recall", "doctor", "--help", "--bogus"]),
     ).toBeNull();
     expect(
-      resolvePrecomputedSubcommandHelpFastPath(["node", "openclaw", "doctor", "--help", "extra"]),
+      resolvePrecomputedSubcommandHelpFastPath(["node", "recall", "doctor", "--help", "extra"]),
     ).toBeNull();
     expect(
-      resolvePrecomputedSubcommandHelpFastPath(["node", "openclaw", "gateway", "status", "--help"]),
+      resolvePrecomputedSubcommandHelpFastPath(["node", "recall", "gateway", "status", "--help"]),
     ).toBeNull();
     expect(
-      resolvePrecomputedSubcommandHelpFastPath(["node", "openclaw", "status", "--help"]),
+      resolvePrecomputedSubcommandHelpFastPath(["node", "recall", "status", "--help"]),
     ).toBeNull();
     expect(
-      resolvePrecomputedSubcommandHelpFastPath(["node", "openclaw", "doctor", "--help"], {
-        OPENCLAW_DISABLE_CLI_STARTUP_HELP_FAST_PATH: "1",
+      resolvePrecomputedSubcommandHelpFastPath(["node", "recall", "doctor", "--help"], {
+        RECALL_DISABLE_CLI_STARTUP_HELP_FAST_PATH: "1",
       }),
     ).toBeNull();
   });
@@ -393,7 +393,7 @@ describe("resolveMissingPluginCommandMessage", () => {
     expect(message).toContain("runtime slash command");
     expect(message).toContain("/dreaming");
     expect(message).toContain("memory-core");
-    expect(message).toContain("openclaw memory");
+    expect(message).toContain("recall memory");
   });
 
   it("returns the runtime command message even when plugins.allow is set", () => {
@@ -447,7 +447,7 @@ describe("resolveMissingPluginCommandMessage", () => {
 
     expect(message).toContain('"voice-call" plugin');
     expect(message).toContain("disabled by default");
-    expect(message).toContain("openclaw plugins enable voice-call");
+    expect(message).toContain("recall plugins enable voice-call");
   });
 
   it("returns null for CLI command aliases when disabled-by-default parent plugins are enabled", () => {

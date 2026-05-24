@@ -83,13 +83,13 @@ describe("install.ps1 failure handling", () => {
     const booleanSuccessBody = extractFunctionBody(source, "Test-BooleanSuccessResult");
     expect(completeInstallBody).toMatch(/\$PSCommandPath/);
     expect(completeInstallBody).toMatch(/\bexit \$script:InstallExitCode\b/);
-    expect(completeInstallBody).toMatch(/\bthrow "OpenClaw installation failed with exit code/);
+    expect(completeInstallBody).toMatch(/\bthrow "Recall installation failed with exit code/);
     expect(booleanSuccessBody).toContain("$Results.Count -gt 0");
     expect(source).toContain("$installSucceeded = Test-BooleanSuccessResult -Results $mainResults");
   });
 
   it("runs npm install through the resolved command with quiet CI defaults", () => {
-    const npmInstallBody = extractFunctionBody(source, "Install-OpenClaw");
+    const npmInstallBody = extractFunctionBody(source, "Install-Recall");
     expect(npmInstallBody).toContain("$npmOutput = Invoke-NpmCommand -Arguments");
     expect(npmInstallBody).toContain('$env:NPM_CONFIG_LOGLEVEL = "error"');
     expect(npmInstallBody).toContain('$env:NPM_CONFIG_UPDATE_NOTIFIER = "false"');
@@ -117,7 +117,7 @@ describe("install.ps1 failure handling", () => {
     const commandSafeBody = extractFunctionBody(source, "Invoke-CommandFromWindowsSafeDirectory");
     const npmCommandBody = extractFunctionBody(source, "Invoke-NpmCommand");
     const corepackCommandBody = extractFunctionBody(source, "Invoke-CorepackCommand");
-    const openClawPathBody = extractFunctionBody(source, "Ensure-OpenClawOnPath");
+    const openClawPathBody = extractFunctionBody(source, "Ensure-RecallOnPath");
     const ensurePnpmBody = extractFunctionBody(source, "Ensure-Pnpm");
     const mainBody = extractFunctionBody(source, "Main");
 
@@ -135,25 +135,25 @@ describe("install.ps1 failure handling", () => {
     );
     expect(ensurePnpmBody).toContain('Invoke-NpmCommand -Arguments @("install", "-g", $pnpmSpec)');
     expect(mainBody).toContain(
-      'Invoke-NpmCommand -Arguments @("uninstall", "-g", "openclaw")',
+      'Invoke-NpmCommand -Arguments @("uninstall", "-g", "recall")',
     );
     expect(mainBody).toContain(
       'Invoke-NpmCommand -Arguments @("list", "-g", "--depth", "0", "--json")',
     );
   });
 
-  it("rejects OpenClaw GitHub source targets for npm installs", () => {
-    const npmInstallBody = extractFunctionBody(source, "Install-OpenClaw");
-    const sourceTargetBody = extractFunctionBody(source, "Test-OpenClawSourcePackageInstallSpec");
+  it("rejects Recall GitHub source targets for npm installs", () => {
+    const npmInstallBody = extractFunctionBody(source, "Install-Recall");
+    const sourceTargetBody = extractFunctionBody(source, "Test-RecallSourcePackageInstallSpec");
     expect(sourceTargetBody).toContain('$normalizedTag -eq "main"');
-    expect(sourceTargetBody).toContain("^github:openclaw/openclaw");
-    expect(npmInstallBody).toContain("Test-OpenClawSourcePackageInstallSpec -RequestedTag $Tag");
-    expect(npmInstallBody).toContain("npm installs do not support OpenClaw GitHub source targets");
+    expect(sourceTargetBody).toContain("^github:tryrecall/recall-agents");
+    expect(npmInstallBody).toContain("Test-RecallSourcePackageInstallSpec -RequestedTag $Tag");
+    expect(npmInstallBody).toContain("npm installs do not support Recall GitHub source targets");
     expect(npmInstallBody).toContain("-InstallMethod git -Tag main");
   });
 
   it("preserves caller-relative local tarball install specs before safe-cwd npm calls", () => {
-    const resolveSpecBody = extractFunctionBody(source, "Resolve-NpmOpenClawInstallSpec");
+    const resolveSpecBody = extractFunctionBody(source, "Resolve-NpmRecallInstallSpec");
     const localSpecBody = extractFunctionBody(source, "Resolve-LocalNpmPackageInstallSpec");
     const localPathBody = extractFunctionBody(source, "Resolve-LocalNpmPackagePath");
 
@@ -175,14 +175,14 @@ describe("install.ps1 failure handling", () => {
     const portableNodeRootBody = extractFunctionBody(source, "Get-PortableNodeRoot");
     const portableNodePathBody = extractFunctionBody(source, "Ensure-PortableNodeOnUserPath");
     const userPathBody = extractFunctionBody(source, "Add-ToUserPath");
-    const depsRootBody = extractFunctionBody(source, "Get-OpenClawDepsRoot");
+    const depsRootBody = extractFunctionBody(source, "Get-RecallDepsRoot");
     const resolveNodeBody = extractFunctionBody(source, "Resolve-PortableNodeDownload");
     const expandNodeBody = extractFunctionBody(source, "Expand-PortableNodeArchive");
 
     expect(installNodeBody).toContain("Install-PortableNode");
     expect(installNodeBody).toContain("Portable Node.js bootstrap failed");
     expect(installNodeBody).toContain("Error: Could not install Node.js automatically.");
-    expect(depsRootBody).toContain("OpenClaw\\deps");
+    expect(depsRootBody).toContain("Recall\\deps");
     expect(portableNodeRootBody).toContain("portable-node");
     expect(portableNodeBody).toContain("Ensure-PortableNodeOnUserPath");
     expect(portableNodeBody).toContain(
@@ -217,7 +217,7 @@ describe("install.ps1 failure handling", () => {
     const usePortableGitBody = extractFunctionBody(source, "Use-PortableGitIfPresent");
     const ensureGitBody = extractFunctionBody(source, "Ensure-Git");
 
-    expect(portableGitRootBody).toContain("Get-OpenClawDepsRoot");
+    expect(portableGitRootBody).toContain("Get-RecallDepsRoot");
     expect(portableGitPathEntriesBody).toContain("mingw64\\bin");
     expect(portableGitPathEntriesBody).toContain("usr\\bin");
     expect(portableGitPathEntriesBody).toContain("Split-Path -Parent $gitExe");
@@ -232,7 +232,7 @@ describe("install.ps1 failure handling", () => {
     const pnpmVersionBody = extractFunctionBody(source, "Get-RepoPnpmVersion");
     const pnpmVersionMatchBody = extractFunctionBody(source, "Test-PnpmCommandMatchesVersion");
     const ensurePnpmBody = extractFunctionBody(source, "Ensure-Pnpm");
-    const gitInstallBody = extractFunctionBody(source, "Install-OpenClawFromGit");
+    const gitInstallBody = extractFunctionBody(source, "Install-RecallFromGit");
     const mainBody = extractFunctionBody(source, "Main");
 
     expect(pnpmVersionBody).toContain("package.json");
@@ -254,11 +254,11 @@ describe("install.ps1 failure handling", () => {
     expect(gitInstallBody.indexOf("git -C $RepoDir pull --rebase")).toBeLessThan(
       gitInstallBody.indexOf("Ensure-Pnpm -RepoDir $RepoDir"),
     );
-    expect(mainBody).toContain("$gitInstallResults = @(Install-OpenClawFromGit");
+    expect(mainBody).toContain("$gitInstallResults = @(Install-RecallFromGit");
     expect(mainBody).toContain(
       "Test-BooleanSuccessResult -Results $gitInstallResults",
     );
-    expect(mainBody).toContain("$npmInstallResults = @(Install-OpenClaw)");
+    expect(mainBody).toContain("$npmInstallResults = @(Install-Recall)");
     expect(mainBody).toContain(
       "Test-BooleanSuccessResult -Results $npmInstallResults",
     );
@@ -274,7 +274,7 @@ describe("install.ps1 failure handling", () => {
     expect(gitInstallBody).toContain('$entryPath = Join-Path $RepoDir "dist\\\\entry.js"');
     expect(gitInstallBody).toContain("Test-Path $entryPath");
     expect(gitInstallBody).toContain(
-      'Write-Host "[!] OpenClaw build did not produce $entryPath"',
+      'Write-Host "[!] Recall build did not produce $entryPath"',
     );
     expect(gitInstallBody).toContain('node ""$entryPath"" %*');
     expect(gitInstallBody).not.toContain("& $pnpmCommand -C $RepoDir install");
@@ -282,25 +282,25 @@ describe("install.ps1 failure handling", () => {
   });
 
   it("cleans legacy git submodules only from the selected git checkout", () => {
-    const gitInstallBody = extractFunctionBody(source, "Install-OpenClawFromGit");
+    const gitInstallBody = extractFunctionBody(source, "Install-RecallFromGit");
     const mainBody = extractFunctionBody(source, "Main");
     expect(gitInstallBody).toContain("Remove-LegacySubmodule -RepoDir $RepoDir");
     expect(mainBody).not.toContain("Remove-LegacySubmodule");
   });
 
   it("launches interactive onboarding outside Main's captured output", () => {
-    const interactiveCommandBody = extractFunctionBody(source, "Invoke-InteractiveOpenClawCommand");
+    const interactiveCommandBody = extractFunctionBody(source, "Invoke-InteractiveRecallCommand");
     const mainBody = extractFunctionBody(source, "Main");
     expect(interactiveCommandBody).toContain("Start-Process");
     expect(interactiveCommandBody).toContain("-NoNewWindow");
     expect(interactiveCommandBody).toContain("-Wait");
     expect(interactiveCommandBody).toContain("-PassThru");
     expect(mainBody).toContain('Write-Host "Starting setup..." -ForegroundColor Cyan');
-    expect(mainBody).toContain("Invoke-InteractiveOpenClawCommand onboard");
+    expect(mainBody).toContain("Invoke-InteractiveRecallCommand onboard");
   });
 
   runIfPowerShell("exits non-zero when run as a script file", () => {
-    const tempDir = harness.createTempDir("openclaw-install-ps1-");
+    const tempDir = harness.createTempDir("recall-install-ps1-");
     const scriptPath = join(tempDir, "install.ps1");
     writeFileSync(scriptPath, createFailingNodeFixture(source));
     chmodSync(scriptPath, 0o755);
@@ -318,7 +318,7 @@ describe("install.ps1 failure handling", () => {
   });
 
   runIfPowerShell("throws without killing the caller when run as a scriptblock", () => {
-    const tempDir = harness.createTempDir("openclaw-install-ps1-");
+    const tempDir = harness.createTempDir("recall-install-ps1-");
     const scriptPath = join(tempDir, "install.ps1");
     writeFileSync(scriptPath, createFailingNodeFixture(source));
     chmodSync(scriptPath, 0o755);
@@ -334,12 +334,12 @@ describe("install.ps1 failure handling", () => {
     const result = runPowerShell(["-NoLogo", "-NoProfile", "-Command", command]);
 
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain("caught=OpenClaw installation failed with exit code 1.");
+    expect(result.stdout).toContain("caught=Recall installation failed with exit code 1.");
     expect(result.stdout).toContain("alive-after-install");
   });
 
   runIfPowerShell("treats noisy Git install false as failure", () => {
-    const tempDir = harness.createTempDir("openclaw-install-ps1-");
+    const tempDir = harness.createTempDir("recall-install-ps1-");
     const scriptPath = join(tempDir, "install.ps1");
     const scriptWithoutEntryPoint = source.replace(ENTRYPOINT_RE, "");
     writeFileSync(
@@ -350,15 +350,15 @@ describe("install.ps1 failure handling", () => {
         "function Write-Banner { }",
         "function Ensure-ExecutionPolicy { return $true }",
         "function Check-Node { return $true }",
-        "function Check-ExistingOpenClaw { return $false }",
+        "function Check-ExistingRecall { return $false }",
         "function Get-NpmCommandPath { return $null }",
-        "function Install-OpenClawFromGit {",
+        "function Install-RecallFromGit {",
         "  Write-Output 'pnpm stdout before failure'",
         "  return $false",
         "}",
-        "function Ensure-OpenClawOnPath { throw 'should not continue after failed git install' }",
+        "function Ensure-RecallOnPath { throw 'should not continue after failed git install' }",
         "$InstallMethod = 'git'",
-        "$GitDir = 'C:\\\\openclaw-test'",
+        "$GitDir = 'C:\\\\recall-test'",
         "$NoOnboard = $true",
         "$result = Main",
         'if ($result -ne $false) { throw "Main returned $result" }',
@@ -375,7 +375,7 @@ describe("install.ps1 failure handling", () => {
   });
 
   runIfPowerShell("keeps npm chatter out of Main's success return value", () => {
-    const tempDir = harness.createTempDir("openclaw-install-ps1-");
+    const tempDir = harness.createTempDir("recall-install-ps1-");
     const scriptPath = join(tempDir, "install.ps1");
     const scriptWithoutEntryPoint = source.replace(ENTRYPOINT_RE, "");
     writeFileSync(
@@ -386,12 +386,12 @@ describe("install.ps1 failure handling", () => {
         "function Write-Banner { }",
         "function Ensure-ExecutionPolicy { return $true }",
         "function Check-Node { return $true }",
-        "function Check-ExistingOpenClaw { return $false }",
+        "function Check-ExistingRecall { return $false }",
         "function Add-ToPath { param([string]$Path) }",
-        "function Install-OpenClaw { Write-Output 'npm stdout'; return $true }",
-        "function Ensure-OpenClawOnPath { return $true }",
+        "function Install-Recall { Write-Output 'npm stdout'; return $true }",
+        "function Ensure-RecallOnPath { return $true }",
         "function Refresh-GatewayServiceIfLoaded { }",
-        "function Invoke-OpenClawCommand { return 'OpenClaw test-version' }",
+        "function Invoke-RecallCommand { return 'Recall test-version' }",
         "$NoOnboard = $true",
         "$result = Main",
         "if ($result -is [array]) { throw 'Main returned an array' }",
@@ -415,7 +415,7 @@ describe("install.ps1 failure handling", () => {
   });
 
   runIfPowerShell("uses Main's final boolean result when helper output precedes success", () => {
-    const tempDir = harness.createTempDir("openclaw-install-ps1-");
+    const tempDir = harness.createTempDir("recall-install-ps1-");
     const scriptPath = join(tempDir, "install.ps1");
     const scriptWithoutEntryPoint = source.replace(ENTRYPOINT_RE, "");
     writeFileSync(
@@ -426,15 +426,15 @@ describe("install.ps1 failure handling", () => {
         "function Write-Banner { }",
         "function Ensure-ExecutionPolicy { return $true }",
         "function Check-Node { return $true }",
-        "function Check-ExistingOpenClaw { return $false }",
+        "function Check-ExistingRecall { return $false }",
         "function Add-ToPath { param([string]$Path) }",
-        "function Install-OpenClaw {",
+        "function Install-Recall {",
         "  Write-Output 'native chatter'",
         "  return $true",
         "}",
-        "function Ensure-OpenClawOnPath { return $true }",
+        "function Ensure-RecallOnPath { return $true }",
         "function Refresh-GatewayServiceIfLoaded { }",
-        "function Invoke-OpenClawCommand { return 'OpenClaw test-version' }",
+        "function Invoke-RecallCommand { return 'Recall test-version' }",
         "$NoOnboard = $true",
         ...ENTRYPOINT_LINES,
         "",

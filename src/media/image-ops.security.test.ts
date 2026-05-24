@@ -23,13 +23,13 @@ vi.mock("../process/exec.js", () => ({
 import { getImageMetadata, resizeToJpeg } from "./image-ops.js";
 
 describe("image ops external backend security", () => {
-  const previousBackend = process.env.OPENCLAW_IMAGE_BACKEND;
+  const previousBackend = process.env.RECALL_IMAGE_BACKEND;
 
   afterEach(() => {
     if (previousBackend === undefined) {
-      delete process.env.OPENCLAW_IMAGE_BACKEND;
+      delete process.env.RECALL_IMAGE_BACKEND;
     } else {
-      process.env.OPENCLAW_IMAGE_BACKEND = previousBackend;
+      process.env.RECALL_IMAGE_BACKEND = previousBackend;
     }
     loadBundledPluginPublicArtifactModuleSyncMock.mockReset();
     resolveSystemBinMock.mockReset();
@@ -37,7 +37,7 @@ describe("image ops external backend security", () => {
   });
 
   it("does not use external metadata tools for unrecognized image bytes", async () => {
-    process.env.OPENCLAW_IMAGE_BACKEND = "imagemagick";
+    process.env.RECALL_IMAGE_BACKEND = "imagemagick";
     resolveSystemBinMock.mockReturnValue("/usr/bin/magick");
 
     const svgWithExternalReference = Buffer.from(
@@ -51,7 +51,7 @@ describe("image ops external backend security", () => {
   });
 
   it("stops backend fallback after a real processing error", async () => {
-    delete process.env.OPENCLAW_IMAGE_BACKEND;
+    delete process.env.RECALL_IMAGE_BACKEND;
     resolveSystemBinMock.mockReturnValue("/usr/bin/magick");
     loadBundledPluginPublicArtifactModuleSyncMock.mockReturnValue({
       createMediaAttachmentImageOps: () => ({

@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { emptyPluginConfigSchema } from "../plugins/config-schema.js";
 import type {
   AnyAgentTool,
@@ -14,22 +14,22 @@ import type {
   MigrationProviderContext,
   MigrationProviderPlugin,
   MigrationSummary,
-  OpenClawPluginApi,
-  OpenClawPluginCommandDefinition,
-  OpenClawPluginConfigSchema,
-  OpenClawPluginDefinition,
-  OpenClawPluginHttpRouteHandler,
-  OpenClawPluginNodeHostCommand,
-  OpenClawPluginNodeInvokePolicy,
-  OpenClawPluginNodeInvokePolicyContext,
-  OpenClawPluginNodeInvokePolicyResult,
-  OpenClawPluginReloadRegistration,
-  OpenClawPluginSecurityAuditCollector,
-  OpenClawPluginSecurityAuditContext,
-  OpenClawPluginService,
-  OpenClawPluginServiceContext,
-  OpenClawPluginToolContext,
-  OpenClawPluginToolFactory,
+  RecallPluginApi,
+  RecallPluginCommandDefinition,
+  RecallPluginConfigSchema,
+  RecallPluginDefinition,
+  RecallPluginHttpRouteHandler,
+  RecallPluginNodeHostCommand,
+  RecallPluginNodeInvokePolicy,
+  RecallPluginNodeInvokePolicyContext,
+  RecallPluginNodeInvokePolicyResult,
+  RecallPluginReloadRegistration,
+  RecallPluginSecurityAuditCollector,
+  RecallPluginSecurityAuditContext,
+  RecallPluginService,
+  RecallPluginServiceContext,
+  RecallPluginToolContext,
+  RecallPluginToolFactory,
   PluginLogger,
   ProviderAugmentModelCatalogContext,
   ProviderAuthContext,
@@ -83,8 +83,8 @@ import type {
   ProviderWrapStreamFnContext,
   UnifiedModelCatalogProviderContext,
   UnifiedModelCatalogProviderPlugin,
-  OpenClawGatewayDiscoveryAdvertiseContext,
-  OpenClawGatewayDiscoveryService,
+  RecallGatewayDiscoveryAdvertiseContext,
+  RecallGatewayDiscoveryService,
   SpeechProviderPlugin,
   PluginCommandContext,
   PluginCommandResult,
@@ -134,16 +134,16 @@ export type {
   MigrationProviderContext,
   MigrationProviderPlugin,
   MigrationSummary,
-  OpenClawPluginApi,
-  OpenClawPluginNodeHostCommand,
-  OpenClawPluginNodeInvokePolicy,
-  OpenClawPluginNodeInvokePolicyContext,
-  OpenClawPluginNodeInvokePolicyResult,
-  OpenClawPluginReloadRegistration,
-  OpenClawPluginSecurityAuditCollector,
-  OpenClawPluginSecurityAuditContext,
-  OpenClawPluginToolContext,
-  OpenClawPluginToolFactory,
+  RecallPluginApi,
+  RecallPluginNodeHostCommand,
+  RecallPluginNodeInvokePolicy,
+  RecallPluginNodeInvokePolicyContext,
+  RecallPluginNodeInvokePolicyResult,
+  RecallPluginReloadRegistration,
+  RecallPluginSecurityAuditCollector,
+  RecallPluginSecurityAuditContext,
+  RecallPluginToolContext,
+  RecallPluginToolFactory,
   PluginCommandContext,
   PluginCommandResult,
   PluginAgentEventEmitParams,
@@ -175,8 +175,8 @@ export type {
   PluginSessionExtensionProjection,
   PluginToolMetadataRegistration,
   PluginTrustedToolPolicyRegistration,
-  OpenClawPluginConfigSchema,
-  OpenClawPluginHttpRouteHandler,
+  RecallPluginConfigSchema,
+  RecallPluginHttpRouteHandler,
   ProviderDiscoveryContext,
   ProviderCatalogContext,
   ProviderCatalogResult,
@@ -225,17 +225,17 @@ export type {
   ProviderWrapStreamFnContext,
   UnifiedModelCatalogProviderContext,
   UnifiedModelCatalogProviderPlugin,
-  OpenClawGatewayDiscoveryAdvertiseContext,
-  OpenClawGatewayDiscoveryService,
-  OpenClawPluginService,
-  OpenClawPluginServiceContext,
+  RecallGatewayDiscoveryAdvertiseContext,
+  RecallGatewayDiscoveryService,
+  RecallPluginService,
+  RecallPluginServiceContext,
   ProviderAuthContext,
   ProviderAuthDoctorHintContext,
   ProviderAuthMethodNonInteractiveContext,
   ProviderAuthMethod,
   ProviderAuthResult,
-  OpenClawPluginCommandDefinition,
-  OpenClawPluginDefinition,
+  RecallPluginCommandDefinition,
+  RecallPluginDefinition,
   PluginLogger,
 };
 export type {
@@ -255,7 +255,7 @@ export type {
   UnifiedModelCatalogKind,
   UnifiedModelCatalogSource,
 } from "../model-catalog/types.js";
-export type { OpenClawConfig };
+export type { RecallConfig };
 
 export {
   buildJsonPluginConfigSchema,
@@ -269,27 +269,27 @@ type DefinePluginEntryOptions = {
   name: string;
   description: string;
   /**
-   * @deprecated Declare exclusive plugin kind in `openclaw.plugin.json` via
+   * @deprecated Declare exclusive plugin kind in `recall.plugin.json` via
    * manifest `kind`. Runtime-entry `kind` remains only as a compatibility
    * fallback for older plugins.
    */
-  kind?: OpenClawPluginDefinition["kind"];
-  configSchema?: OpenClawPluginConfigSchema | (() => OpenClawPluginConfigSchema);
-  reload?: OpenClawPluginDefinition["reload"];
-  nodeHostCommands?: OpenClawPluginDefinition["nodeHostCommands"];
-  securityAuditCollectors?: OpenClawPluginDefinition["securityAuditCollectors"];
-  register: (api: OpenClawPluginApi) => void;
+  kind?: RecallPluginDefinition["kind"];
+  configSchema?: RecallPluginConfigSchema | (() => RecallPluginConfigSchema);
+  reload?: RecallPluginDefinition["reload"];
+  nodeHostCommands?: RecallPluginDefinition["nodeHostCommands"];
+  securityAuditCollectors?: RecallPluginDefinition["securityAuditCollectors"];
+  register: (api: RecallPluginApi) => void;
 };
 
-/** Normalized object shape that OpenClaw loads from a plugin entry module. */
+/** Normalized object shape that Recall loads from a plugin entry module. */
 type DefinedPluginEntry = {
   id: string;
   name: string;
   description: string;
-  configSchema: OpenClawPluginConfigSchema;
-  register: NonNullable<OpenClawPluginDefinition["register"]>;
+  configSchema: RecallPluginConfigSchema;
+  register: NonNullable<RecallPluginDefinition["register"]>;
 } & Pick<
-  OpenClawPluginDefinition,
+  RecallPluginDefinition,
   "kind" | "reload" | "nodeHostCommands" | "securityAuditCollectors"
 >;
 
@@ -298,7 +298,7 @@ type DefinedPluginEntry = {
  *
  * Use this for provider, tool, command, service, memory, and context-engine
  * plugins. Channel plugins should use `defineChannelPluginEntry(...)` from
- * `openclaw/plugin-sdk/core` so they inherit the channel capability wiring.
+ * `recall/plugin-sdk/core` so they inherit the channel capability wiring.
  */
 export function definePluginEntry({
   id,

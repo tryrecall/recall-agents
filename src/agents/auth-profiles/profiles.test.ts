@@ -57,12 +57,12 @@ function expectOAuthCredentialFields(
 
 describe("promoteAuthProfileInOrder", () => {
   it("normalizes copied secrets when using the locked upsert path", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-auth-profile-upsert-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-auth-profile-upsert-"));
     const agentDir = path.join(stateDir, "agents", "main", "agent");
-    const previousStateDir = process.env.OPENCLAW_STATE_DIR;
-    const previousOAuthDir = process.env.OPENCLAW_OAUTH_DIR;
-    process.env.OPENCLAW_STATE_DIR = stateDir;
-    delete process.env.OPENCLAW_OAUTH_DIR;
+    const previousStateDir = process.env.RECALL_STATE_DIR;
+    const previousOAuthDir = process.env.RECALL_OAUTH_DIR;
+    process.env.RECALL_STATE_DIR = stateDir;
+    delete process.env.RECALL_OAUTH_DIR;
     try {
       fs.mkdirSync(agentDir, { recursive: true });
 
@@ -98,24 +98,24 @@ describe("promoteAuthProfileInOrder", () => {
       });
     } finally {
       if (previousStateDir === undefined) {
-        delete process.env.OPENCLAW_STATE_DIR;
+        delete process.env.RECALL_STATE_DIR;
       } else {
-        process.env.OPENCLAW_STATE_DIR = previousStateDir;
+        process.env.RECALL_STATE_DIR = previousStateDir;
       }
       if (previousOAuthDir === undefined) {
-        delete process.env.OPENCLAW_OAUTH_DIR;
+        delete process.env.RECALL_OAUTH_DIR;
       } else {
-        process.env.OPENCLAW_OAUTH_DIR = previousOAuthDir;
+        process.env.RECALL_OAUTH_DIR = previousOAuthDir;
       }
       fs.rmSync(stateDir, { recursive: true, force: true });
     }
   });
 
   it("persists openai-codex oauth credentials inline", () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-auth-profile-metadata-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-auth-profile-metadata-"));
     const agentDir = path.join(stateDir, "agents", "main", "agent");
-    const previousStateDir = process.env.OPENCLAW_STATE_DIR;
-    process.env.OPENCLAW_STATE_DIR = stateDir;
+    const previousStateDir = process.env.RECALL_STATE_DIR;
+    process.env.RECALL_STATE_DIR = stateDir;
     try {
       fs.mkdirSync(agentDir, { recursive: true });
       const profileId = "openai-codex:default";
@@ -171,19 +171,19 @@ describe("promoteAuthProfileInOrder", () => {
       );
     } finally {
       if (previousStateDir === undefined) {
-        delete process.env.OPENCLAW_STATE_DIR;
+        delete process.env.RECALL_STATE_DIR;
       } else {
-        process.env.OPENCLAW_STATE_DIR = previousStateDir;
+        process.env.RECALL_STATE_DIR = previousStateDir;
       }
       fs.rmSync(stateDir, { recursive: true, force: true });
     }
   });
 
   it("preserves access-only openai-codex oauth credentials inline", () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-auth-profile-access-only-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-auth-profile-access-only-"));
     const agentDir = path.join(stateDir, "agents", "main", "agent");
-    const previousStateDir = process.env.OPENCLAW_STATE_DIR;
-    process.env.OPENCLAW_STATE_DIR = stateDir;
+    const previousStateDir = process.env.RECALL_STATE_DIR;
+    process.env.RECALL_STATE_DIR = stateDir;
     try {
       fs.mkdirSync(agentDir, { recursive: true });
       const profileId = "openai-codex:default";
@@ -225,20 +225,20 @@ describe("promoteAuthProfileInOrder", () => {
       );
     } finally {
       if (previousStateDir === undefined) {
-        delete process.env.OPENCLAW_STATE_DIR;
+        delete process.env.RECALL_STATE_DIR;
       } else {
-        process.env.OPENCLAW_STATE_DIR = previousStateDir;
+        process.env.RECALL_STATE_DIR = previousStateDir;
       }
       fs.rmSync(stateDir, { recursive: true, force: true });
     }
   });
 
   it("keeps copied openai-codex oauth profiles inline", () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-auth-profile-copy-ref-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-auth-profile-copy-ref-"));
     const mainAgentDir = path.join(stateDir, "agents", "main", "agent");
     const copiedAgentDir = path.join(stateDir, "agents", "copied", "agent");
-    const previousStateDir = process.env.OPENCLAW_STATE_DIR;
-    process.env.OPENCLAW_STATE_DIR = stateDir;
+    const previousStateDir = process.env.RECALL_STATE_DIR;
+    process.env.RECALL_STATE_DIR = stateDir;
     try {
       fs.mkdirSync(mainAgentDir, { recursive: true });
       fs.mkdirSync(copiedAgentDir, { recursive: true });
@@ -303,19 +303,19 @@ describe("promoteAuthProfileInOrder", () => {
       expect(copiedRaw).not.toContain("oauthRef");
     } finally {
       if (previousStateDir === undefined) {
-        delete process.env.OPENCLAW_STATE_DIR;
+        delete process.env.RECALL_STATE_DIR;
       } else {
-        process.env.OPENCLAW_STATE_DIR = previousStateDir;
+        process.env.RECALL_STATE_DIR = previousStateDir;
       }
       fs.rmSync(stateDir, { recursive: true, force: true });
     }
   });
 
   it("moves a relogin profile to the front of an existing per-agent provider order", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-auth-order-promote-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-auth-order-promote-"));
     const agentDir = path.join(stateDir, "agents", "main", "agent");
-    const previousStateDir = process.env.OPENCLAW_STATE_DIR;
-    process.env.OPENCLAW_STATE_DIR = stateDir;
+    const previousStateDir = process.env.RECALL_STATE_DIR;
+    process.env.RECALL_STATE_DIR = stateDir;
     try {
       fs.mkdirSync(agentDir, { recursive: true });
       const newProfileId = "openai-codex:bunsthedev@gmail.com";
@@ -359,19 +359,19 @@ describe("promoteAuthProfileInOrder", () => {
       ]);
     } finally {
       if (previousStateDir === undefined) {
-        delete process.env.OPENCLAW_STATE_DIR;
+        delete process.env.RECALL_STATE_DIR;
       } else {
-        process.env.OPENCLAW_STATE_DIR = previousStateDir;
+        process.env.RECALL_STATE_DIR = previousStateDir;
       }
       fs.rmSync(stateDir, { recursive: true, force: true });
     }
   });
 
   it("clears matching lastGood after a stale refresh_token_reused profile", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-auth-clear-lastgood-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-auth-clear-lastgood-"));
     const agentDir = path.join(stateDir, "agents", "main", "agent");
-    const previousStateDir = process.env.OPENCLAW_STATE_DIR;
-    process.env.OPENCLAW_STATE_DIR = stateDir;
+    const previousStateDir = process.env.RECALL_STATE_DIR;
+    process.env.RECALL_STATE_DIR = stateDir;
     try {
       fs.mkdirSync(agentDir, { recursive: true });
       const staleProfileId = "openai-codex:default";
@@ -401,19 +401,19 @@ describe("promoteAuthProfileInOrder", () => {
       expect(loadAuthProfileStoreForRuntime(agentDir).lastGood).toBeUndefined();
     } finally {
       if (previousStateDir === undefined) {
-        delete process.env.OPENCLAW_STATE_DIR;
+        delete process.env.RECALL_STATE_DIR;
       } else {
-        process.env.OPENCLAW_STATE_DIR = previousStateDir;
+        process.env.RECALL_STATE_DIR = previousStateDir;
       }
       fs.rmSync(stateDir, { recursive: true, force: true });
     }
   });
 
   it("does not clear lastGood when the failed profile is not the stored profile", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-auth-clear-lastgood-keep-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-auth-clear-lastgood-keep-"));
     const agentDir = path.join(stateDir, "agents", "main", "agent");
-    const previousStateDir = process.env.OPENCLAW_STATE_DIR;
-    process.env.OPENCLAW_STATE_DIR = stateDir;
+    const previousStateDir = process.env.RECALL_STATE_DIR;
+    process.env.RECALL_STATE_DIR = stateDir;
     try {
       fs.mkdirSync(agentDir, { recursive: true });
       const goodProfileId = "openai-codex:user@example.test";
@@ -445,9 +445,9 @@ describe("promoteAuthProfileInOrder", () => {
       );
     } finally {
       if (previousStateDir === undefined) {
-        delete process.env.OPENCLAW_STATE_DIR;
+        delete process.env.RECALL_STATE_DIR;
       } else {
-        process.env.OPENCLAW_STATE_DIR = previousStateDir;
+        process.env.RECALL_STATE_DIR = previousStateDir;
       }
       fs.rmSync(stateDir, { recursive: true, force: true });
     }

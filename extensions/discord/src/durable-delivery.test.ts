@@ -1,10 +1,10 @@
-import { sendDurableMessageBatch } from "openclaw/plugin-sdk/channel-message";
+import { sendDurableMessageBatch } from "recall/plugin-sdk/channel-message";
 import {
   createEmptyPluginRegistry,
   createTestRegistry,
   resetPluginRuntimeStateForTest,
   setActivePluginRegistry,
-} from "openclaw/plugin-sdk/plugin-test-runtime";
+} from "recall/plugin-sdk/plugin-test-runtime";
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
   createDiscordOutboundHoisted,

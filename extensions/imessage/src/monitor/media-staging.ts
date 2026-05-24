@@ -1,8 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { isInboundPathAllowed } from "openclaw/plugin-sdk/media-runtime";
-import { saveMediaBuffer } from "openclaw/plugin-sdk/media-store";
-import { loadWebMedia } from "openclaw/plugin-sdk/web-media";
+import { isInboundPathAllowed } from "recall/plugin-sdk/media-runtime";
+import { saveMediaBuffer } from "recall/plugin-sdk/media-store";
+import { loadWebMedia } from "recall/plugin-sdk/web-media";
 import type { IMessageAttachment } from "./types.js";
 
 export type StagedIMessageAttachment = {

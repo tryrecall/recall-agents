@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import os from "node:os";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { getShellEnvAppliedKeys } from "../infra/shell-env.js";
 import { resolvePluginSetupProvider } from "../plugins/setup-registry.js";
 import type { ProviderAuthEvidence } from "../secrets/provider-env-vars.js";
@@ -19,7 +19,7 @@ export type EnvApiKeyResult = {
 };
 
 export type EnvApiKeyLookupOptions = {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   aliasMap?: Readonly<Record<string, string>>;
   candidateMap?: Readonly<Record<string, readonly string[]>>;

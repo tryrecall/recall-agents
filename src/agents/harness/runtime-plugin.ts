@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { withActivatedPluginIds } from "../../plugins/activation-context.js";
 import {
   resolveActivatableProviderOwnerPluginIds,
@@ -21,7 +21,7 @@ function dedupePluginIds(values: readonly string[]): string[] {
   return result;
 }
 
-function restrictiveAllowlistOmitsPlugin(config: OpenClawConfig | undefined, pluginId: string) {
+function restrictiveAllowlistOmitsPlugin(config: RecallConfig | undefined, pluginId: string) {
   if (config?.plugins?.bundledDiscovery === "compat") {
     return false;
   }
@@ -31,7 +31,7 @@ function restrictiveAllowlistOmitsPlugin(config: OpenClawConfig | undefined, plu
 
 function resolveCodexHarnessPluginIds(params: {
   provider: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir: string;
 }): string[] {
   if (restrictiveAllowlistOmitsPlugin(params.config, "codex")) {
@@ -68,10 +68,10 @@ function resolveCodexHarnessPluginIds(params: {
 }
 
 function withRuntimePluginIdsAllowed(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   requiredPluginId: string;
   pluginIds: readonly string[];
-}): OpenClawConfig | undefined {
+}): RecallConfig | undefined {
   if (params.pluginIds.length === 0) {
     return params.config;
   }
@@ -91,7 +91,7 @@ function withRuntimePluginIdsAllowed(params: {
 export async function ensureSelectedAgentHarnessPlugin(params: {
   provider: string;
   modelId: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   sessionKey?: string;
   agentHarnessRuntimeOverride?: string;

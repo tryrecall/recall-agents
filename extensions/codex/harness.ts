@@ -1,7 +1,7 @@
 import type {
   AgentHarness,
   ContextEngineHostCapability,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "recall/plugin-sdk/agent-harness-runtime";
 import type {
   CodexAppServerListModelsOptions,
   CodexAppServerModel,

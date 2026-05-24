@@ -4,7 +4,7 @@
  * @kind problem
  * @problem.severity error
  * @precision high
- * @id js/openclaw/managed-proxy-runtime-mutation
+ * @id js/recall/managed-proxy-runtime-mutation
  * @tags maintainability
  *       security
  *       external/cwe/cwe-441
@@ -25,8 +25,8 @@ predicate forbiddenEnvKey(string key) {
       "GLOBAL_AGENT_HTTPS_PROXY",
       "GLOBAL_AGENT_NO_PROXY",
       "GLOBAL_AGENT_FORCE_GLOBAL_AGENT",
-      "OPENCLAW_PROXY_ACTIVE",
-      "OPENCLAW_PROXY_LOOPBACK_MODE"
+      "RECALL_PROXY_ACTIVE",
+      "RECALL_PROXY_LOOPBACK_MODE"
     ]
 }
 

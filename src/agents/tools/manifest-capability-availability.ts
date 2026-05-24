@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { getCurrentPluginMetadataSnapshot } from "../../plugins/current-plugin-metadata-snapshot.js";
 import {
   isManifestPluginAvailableForControlPlane,
@@ -65,7 +65,7 @@ function listCapabilityAuthSignals(params: {
 }
 
 export function getCurrentCapabilityMetadataSnapshot(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
 }): PluginMetadataSnapshot | undefined {
   const workspaceDir = params.workspaceDir ?? getActivePluginRegistryWorkspaceDirFromState();
@@ -76,7 +76,7 @@ export function getCurrentCapabilityMetadataSnapshot(params: {
 }
 
 export function loadCapabilityMetadataSnapshot(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): Pick<PluginMetadataSnapshot, "index" | "plugins"> {
@@ -103,7 +103,7 @@ export function loadCapabilityMetadataSnapshot(params: {
 export function hasSnapshotCapabilityAvailability(params: {
   snapshot: Pick<PluginMetadataSnapshot, "index" | "plugins">;
   key: CapabilityContractKey;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   authStore?: AuthProfileStore;
 }): boolean {
   if (params.config?.plugins?.enabled === false) {
@@ -169,7 +169,7 @@ export function hasSnapshotCapabilityAvailability(params: {
 export function hasSnapshotProviderEnvAvailability(params: {
   snapshot: Pick<PluginMetadataSnapshot, "index" | "plugins">;
   providerId: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
 }): boolean {
   if (params.config?.plugins?.enabled === false) {
     return false;
@@ -200,7 +200,7 @@ export function hasSnapshotCapabilityProviderAvailability(params: {
   snapshot: Pick<PluginMetadataSnapshot, "index" | "plugins">;
   key: CapabilityContractKey;
   providerId: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   authStore?: AuthProfileStore;
 }): boolean {
   if (params.config?.plugins?.enabled === false) {

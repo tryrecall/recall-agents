@@ -1,8 +1,8 @@
-export { fetchWithRuntimeDispatcher } from "openclaw/plugin-sdk/runtime-fetch";
-export type { FetchLike, SavedMedia } from "openclaw/plugin-sdk/media-runtime";
+export { fetchWithRuntimeDispatcher } from "recall/plugin-sdk/runtime-fetch";
+export type { FetchLike, SavedMedia } from "recall/plugin-sdk/media-runtime";
 export {
   readRemoteMediaBuffer,
   saveMediaBuffer,
   saveRemoteMedia,
-} from "openclaw/plugin-sdk/media-runtime";
-export { logVerbose } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/media-runtime";
+export { logVerbose } from "recall/plugin-sdk/runtime-env";

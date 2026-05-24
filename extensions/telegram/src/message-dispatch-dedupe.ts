@@ -1,6 +1,6 @@
 import path from "node:path";
 import type { Message } from "grammy/types";
-import { createClaimableDedupe, type ClaimableDedupe } from "openclaw/plugin-sdk/persistent-dedupe";
+import { createClaimableDedupe, type ClaimableDedupe } from "recall/plugin-sdk/persistent-dedupe";
 
 const TELEGRAM_MESSAGE_DISPATCH_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const TELEGRAM_MESSAGE_DISPATCH_MEMORY_MAX = 5000;

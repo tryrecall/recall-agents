@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { ModelCatalogEntry } from "./model-catalog.types.js";
 
 const modelCatalogMocks = vi.hoisted(() => ({
@@ -19,7 +19,7 @@ const modelAuthMocks = vi.hoisted(() => ({
     vi.fn<
       (params: {
         provider: string;
-        cfg?: OpenClawConfig;
+        cfg?: RecallConfig;
         workspaceDir?: string;
         runtimeLookup?: unknown;
       }) => boolean
@@ -73,7 +73,7 @@ describe("prepared provider auth state", () => {
   });
 
   it("reuses prepared runtime auth lookup data while warming providers", async () => {
-    const cfg = {} as OpenClawConfig;
+    const cfg = {} as RecallConfig;
     modelCatalogMocks.loadModelCatalog.mockResolvedValue([
       { id: "gpt", name: "gpt", provider: "openai" },
       { id: "claude", name: "claude", provider: "anthropic" },
@@ -91,7 +91,7 @@ describe("prepared provider auth state", () => {
   });
 
   it("hasAuthForModelProvider returns the prepared answer after warm and falls through to compute after clear", async () => {
-    const cfg = {} as OpenClawConfig;
+    const cfg = {} as RecallConfig;
     modelCatalogMocks.loadModelCatalog.mockResolvedValue([
       { id: "gpt", name: "gpt", provider: "openai" },
       { id: "claude", name: "claude", provider: "anthropic" },
@@ -118,7 +118,7 @@ describe("prepared provider auth state", () => {
   });
 
   it("hasAuthForModelProvider falls through to compute when the caller narrows the auth-discovery scope", async () => {
-    const cfg = {} as OpenClawConfig;
+    const cfg = {} as RecallConfig;
     modelCatalogMocks.loadModelCatalog.mockResolvedValue([
       { id: "gpt", name: "gpt", provider: "openai" },
     ]);
@@ -148,7 +148,7 @@ describe("prepared provider auth state", () => {
   });
 
   it("hasAuthForModelProvider uses the prepared answer for equivalent runtime config clones", async () => {
-    const cfg = { gateway: { port: 18789 } } as OpenClawConfig;
+    const cfg = { gateway: { port: 18789 } } as RecallConfig;
     const clonedCfg = structuredClone(cfg);
     modelCatalogMocks.loadModelCatalog.mockResolvedValue([
       { id: "gpt", name: "gpt", provider: "openai" },
@@ -165,7 +165,7 @@ describe("prepared provider auth state", () => {
   });
 
   it("hasAuthForModelProvider falls through to compute when the caller passes a non-default workspaceDir", async () => {
-    const cfg = {} as OpenClawConfig;
+    const cfg = {} as RecallConfig;
     modelCatalogMocks.loadModelCatalog.mockResolvedValue([
       { id: "gpt", name: "gpt", provider: "openai" },
     ]);
@@ -198,8 +198,8 @@ describe("prepared provider auth state", () => {
   });
 
   it("does not publish an older warm after the prepared auth state is cleared", async () => {
-    const firstCfg = { gateway: { port: 18789 } } as OpenClawConfig;
-    const secondCfg = { gateway: { port: 19001 } } as OpenClawConfig;
+    const firstCfg = { gateway: { port: 18789 } } as RecallConfig;
+    const secondCfg = { gateway: { port: 19001 } } as RecallConfig;
     let resolveFirstCatalog: ((catalog: ModelCatalogEntry[]) => void) | undefined;
     let resolveSecondCatalog: ((catalog: ModelCatalogEntry[]) => void) | undefined;
     modelCatalogMocks.loadModelCatalog
@@ -240,7 +240,7 @@ describe("prepared provider auth state", () => {
   });
 
   it("does not publish a warm that is cancelled before completion", async () => {
-    const cfg = {} as OpenClawConfig;
+    const cfg = {} as RecallConfig;
     let cancelled = false;
     modelCatalogMocks.loadModelCatalog.mockResolvedValue([
       { id: "gpt", name: "gpt", provider: "openai" },
@@ -262,7 +262,7 @@ describe("prepared provider auth state", () => {
   });
 
   it("stops sweeping providers when a warm is cancelled mid-flight", async () => {
-    const cfg = {} as OpenClawConfig;
+    const cfg = {} as RecallConfig;
     let cancelled = false;
     modelCatalogMocks.loadModelCatalog.mockResolvedValue([
       { id: "gpt", name: "gpt", provider: "openai" },

@@ -1,4 +1,4 @@
-import { sleep } from "openclaw/plugin-sdk/runtime-env";
+import { sleep } from "recall/plugin-sdk/runtime-env";
 
 type QaBrowserGateway = {
   call: (

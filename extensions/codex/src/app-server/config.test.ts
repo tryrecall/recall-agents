@@ -74,8 +74,8 @@ describe("Codex app-server config", () => {
         },
       },
       env: {
-        OPENCLAW_CODEX_APP_SERVER_APPROVAL_POLICY: "never",
-        OPENCLAW_CODEX_APP_SERVER_SANDBOX: "read-only",
+        RECALL_CODEX_APP_SERVER_APPROVAL_POLICY: "never",
+        RECALL_CODEX_APP_SERVER_SANDBOX: "read-only",
       },
     });
 
@@ -455,7 +455,7 @@ allowed_sandbox_modes = ["read-only", "workspace-write"]
     expectRuntimePolicy(
       resolveRuntimeForTest({
         pluginConfig: {},
-        env: { OPENCLAW_CODEX_APP_SERVER_MODE: "yolo" },
+        env: { RECALL_CODEX_APP_SERVER_MODE: "yolo" },
         requirementsToml,
       }),
       {
@@ -493,7 +493,7 @@ allowed_sandbox_modes = ["read-only", "workspace-write"]
   it("rejects the retired dynamic tool profile key", () => {
     expect(
       readCodexPluginConfig({
-        codexDynamicToolsProfile: "openclaw-compat",
+        codexDynamicToolsProfile: "recall-compat",
         codexDynamicToolsLoading: "direct",
       }),
     ).toEqual({});
@@ -597,7 +597,7 @@ allowed_sandbox_modes = ["read-only", "workspace-write"]
     expectFields(
       resolveRuntimeForTest({
         pluginConfig: { appServer: { command: "/opt/codex/bin/codex" } },
-        env: { OPENCLAW_CODEX_APP_SERVER_BIN: "/usr/local/bin/codex" },
+        env: { RECALL_CODEX_APP_SERVER_BIN: "/usr/local/bin/codex" },
       }).start,
       "configured start",
       {
@@ -609,7 +609,7 @@ allowed_sandbox_modes = ["read-only", "workspace-write"]
     expectFields(
       resolveRuntimeForTest({
         pluginConfig: {},
-        env: { OPENCLAW_CODEX_APP_SERVER_BIN: "/usr/local/bin/codex" },
+        env: { RECALL_CODEX_APP_SERVER_BIN: "/usr/local/bin/codex" },
       }).start,
       "environment start",
       {
@@ -624,7 +624,7 @@ allowed_sandbox_modes = ["read-only", "workspace-write"]
       resolveRuntimeForTest({
         pluginConfig: {
           appServer: {
-            command: "node C:\\Users\\me\\.openclaw\\npm\\node_modules\\@openai\\codex\\bin\\codex.js",
+            command: "node C:\\Users\\me\\.recall\\npm\\node_modules\\@openai\\codex\\bin\\codex.js",
           },
         },
       }),
@@ -635,11 +635,11 @@ allowed_sandbox_modes = ["read-only", "workspace-write"]
       resolveRuntimeForTest({
         pluginConfig: {},
         env: {
-          OPENCLAW_CODEX_APP_SERVER_BIN:
-            "node C:\\Users\\me\\.openclaw\\npm\\node_modules\\@openai\\codex\\bin\\codex.js",
+          RECALL_CODEX_APP_SERVER_BIN:
+            "node C:\\Users\\me\\.recall\\npm\\node_modules\\@openai\\codex\\bin\\codex.js",
         },
       }),
-    ).toThrow("OPENCLAW_CODEX_APP_SERVER_BIN must be only the Codex app-server executable path");
+    ).toThrow("RECALL_CODEX_APP_SERVER_BIN must be only the Codex app-server executable path");
   });
 
   it("preserves executable paths that contain spaces", () => {
@@ -661,7 +661,7 @@ allowed_sandbox_modes = ["read-only", "workspace-write"]
           },
         },
         env: {
-          OPENCLAW_CODEX_COMPUTER_USE_PLUGIN_NAME: "env-fallback-plugin",
+          RECALL_CODEX_COMPUTER_USE_PLUGIN_NAME: "env-fallback-plugin",
         },
       }),
     ).toEqual({
@@ -677,10 +677,10 @@ allowed_sandbox_modes = ["read-only", "workspace-write"]
       resolveCodexComputerUseConfig({
         pluginConfig: {},
         env: {
-          OPENCLAW_CODEX_COMPUTER_USE: "1",
-          OPENCLAW_CODEX_COMPUTER_USE_MARKETPLACE_SOURCE: "github:example/plugins",
-          OPENCLAW_CODEX_COMPUTER_USE_AUTO_INSTALL: "true",
-          OPENCLAW_CODEX_COMPUTER_USE_MARKETPLACE_DISCOVERY_TIMEOUT_MS: "30000",
+          RECALL_CODEX_COMPUTER_USE: "1",
+          RECALL_CODEX_COMPUTER_USE_MARKETPLACE_SOURCE: "github:example/plugins",
+          RECALL_CODEX_COMPUTER_USE_AUTO_INSTALL: "true",
+          RECALL_CODEX_COMPUTER_USE_MARKETPLACE_DISCOVERY_TIMEOUT_MS: "30000",
         },
       }),
       "computer use config",
@@ -713,7 +713,7 @@ allowed_sandbox_modes = ["read-only", "workspace-write"]
   it("allows environment mode fallback to opt in to guardian-reviewed local execution", () => {
     const runtime = resolveRuntimeForTest({
       pluginConfig: {},
-      env: { OPENCLAW_CODEX_APP_SERVER_MODE: "guardian" },
+      env: { RECALL_CODEX_APP_SERVER_MODE: "guardian" },
     });
 
     expectRuntimePolicy(runtime, {
@@ -738,10 +738,10 @@ allowed_sandbox_modes = ["read-only", "workspace-write"]
     ).toBe("guardian_subagent");
   });
 
-  it("ignores removed OPENCLAW_CODEX_APP_SERVER_GUARDIAN fallback", () => {
+  it("ignores removed RECALL_CODEX_APP_SERVER_GUARDIAN fallback", () => {
     const runtime = resolveRuntimeForTest({
       pluginConfig: {},
-      env: { OPENCLAW_CODEX_APP_SERVER_GUARDIAN: "1" },
+      env: { RECALL_CODEX_APP_SERVER_GUARDIAN: "1" },
     });
 
     expectRuntimePolicy(runtime, {
@@ -869,7 +869,7 @@ allowed_sandbox_modes = ["read-only", "workspace-write"]
 
   it("keeps runtime config keys aligned with manifest schema and UI hints", async () => {
     const manifest = JSON.parse(
-      await fs.readFile(new URL("../../openclaw.plugin.json", import.meta.url), "utf8"),
+      await fs.readFile(new URL("../../recall.plugin.json", import.meta.url), "utf8"),
     ) as {
       configSchema: {
         properties: {
@@ -928,7 +928,7 @@ allowed_sandbox_modes = ["read-only", "workspace-write"]
 
   it("does not schema-default mode-derived policy fields", async () => {
     const manifest = JSON.parse(
-      await fs.readFile(new URL("../../openclaw.plugin.json", import.meta.url), "utf8"),
+      await fs.readFile(new URL("../../recall.plugin.json", import.meta.url), "utf8"),
     ) as {
       configSchema: {
         properties: {

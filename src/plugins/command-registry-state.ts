@@ -3,10 +3,10 @@ import { normalizeOptionalLowercaseString } from "../shared/string-coerce.js";
 import type {
   AgentPromptGuidance,
   AgentPromptSurfaceKind,
-  OpenClawPluginCommandDefinition,
+  RecallPluginCommandDefinition,
 } from "./types.js";
 
-export type RegisteredPluginCommand = OpenClawPluginCommandDefinition & {
+export type RegisteredPluginCommand = RecallPluginCommandDefinition & {
   pluginId: string;
   pluginName?: string;
   pluginRoot?: string;
@@ -17,7 +17,7 @@ type PluginCommandState = {
   registryLocked: boolean;
 };
 
-const PLUGIN_COMMAND_STATE_KEY = Symbol.for("openclaw.pluginCommandsState");
+const PLUGIN_COMMAND_STATE_KEY = Symbol.for("recall.pluginCommandsState");
 
 const getState = () =>
   resolveGlobalSingleton<PluginCommandState>(PLUGIN_COMMAND_STATE_KEY, () => ({

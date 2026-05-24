@@ -3,7 +3,7 @@ import {
   resolveAgentModelPrimaryValue,
   toAgentModelListLike,
 } from "../config/model-input.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
@@ -205,7 +205,7 @@ export function normalizeStoredOverrideModel(params: {
 export function resolveAllowlistModelKey(
   raw: string,
   defaultProvider: string,
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
   manifestPlugins?: ModelManifestNormalizationContext["manifestPlugins"],
 ): string | null {
   return resolveAllowlistModelKeyFromShared({ cfg, raw, defaultProvider, manifestPlugins });
@@ -213,7 +213,7 @@ export function resolveAllowlistModelKey(
 
 export function resolveDefaultModelForAgent(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     agentId?: string;
     allowPluginNormalization?: boolean;
   } & ModelManifestNormalizationContext,
@@ -248,7 +248,7 @@ export function resolveDefaultModelForAgent(
 
 export async function canonicalizeCaseOnlyCatalogModelRef(params: {
   raw: string | undefined;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   defaultProvider: string;
   loadCatalog: () => Promise<ModelCatalogEntry[]>;
   aliasIndex?: ModelAliasIndex;
@@ -310,7 +310,7 @@ function appendAuthProfileSuffix(modelRef: string, profile: string | undefined):
   return profile ? `${modelRef}@${profile}` : modelRef;
 }
 
-function resolveAllowedFallbacks(params: { cfg: OpenClawConfig; agentId?: string }): string[] {
+function resolveAllowedFallbacks(params: { cfg: RecallConfig; agentId?: string }): string[] {
   if (params.agentId) {
     const override = resolveAgentModelFallbacksOverride(params.cfg, params.agentId);
     if (override !== undefined) {
@@ -321,7 +321,7 @@ function resolveAllowedFallbacks(params: { cfg: OpenClawConfig; agentId?: string
 }
 
 export function resolveSubagentConfiguredModelSelection(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
 }): string | undefined {
   const agentConfig = resolveAgentConfig(params.cfg, params.agentId);
@@ -353,7 +353,7 @@ function resolveModelThroughAliases(value: string, aliasIndex: ModelAliasIndex):
 }
 
 export function resolveSubagentSpawnModelSelection(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   modelOverride?: unknown;
 }): string {
@@ -378,7 +378,7 @@ export function resolveSubagentSpawnModelSelection(params: {
 
 export function buildAllowedModelSet(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     catalog: ModelCatalogEntry[];
     defaultProvider: string;
     defaultModel?: string;
@@ -404,7 +404,7 @@ export function buildAllowedModelSet(
 
 export function getModelRefStatus(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     catalog: ModelCatalogEntry[];
     ref: ModelRef;
     defaultProvider: string;
@@ -426,7 +426,7 @@ export function getModelRefStatus(
 
 function getModelRefStatusForResolve(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     catalog: ModelCatalogEntry[];
     defaultProvider: string;
     defaultModel?: string;
@@ -445,7 +445,7 @@ function getModelRefStatusForResolve(
 
 export function resolveAllowedModelRef(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     catalog: ModelCatalogEntry[];
     raw: string;
     defaultProvider: string;

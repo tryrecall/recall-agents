@@ -1,4 +1,4 @@
-profile: openclaw-check
+profile: recall-check
 provider: aws
 class: standard
 capacity:
@@ -22,7 +22,7 @@ actions:
   ref: main
   runnerLabels:
     - crabbox
-    - openclaw
+    - recall
   runnerVersion: latest
   ephemeral: true
 aws:
@@ -44,7 +44,7 @@ env:
   allow:
     - CI
     - NODE_OPTIONS
-    - OPENCLAW_*
+    - RECALL_*
 ssh:
   user: crabbox
   port: "2222"

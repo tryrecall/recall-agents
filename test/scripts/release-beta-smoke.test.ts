@@ -9,7 +9,7 @@ describe("release-beta-smoke", () => {
   it("parses workflow run urls when gh includes them in dispatch output", () => {
     expect(
       parseWorkflowRunIdFromOutput(
-        "Dispatched: https://github.com/openclaw/openclaw/actions/runs/1234567890",
+        "Dispatched: https://github.com/tryrecall/recall-agents/actions/runs/1234567890",
       ),
     ).toBe("1234567890");
   });
@@ -50,7 +50,7 @@ describe("release-beta-smoke", () => {
       "",
       "### Release verification",
       "",
-      "- npm package: https://www.npmjs.com/package/openclaw/v/2026.5.20-beta.1",
+      "- npm package: https://www.npmjs.com/package/recall/v/2026.5.20-beta.1",
       "- npm Telegram beta E2E: not supplied",
       "",
       "### Assets",
@@ -61,7 +61,7 @@ describe("release-beta-smoke", () => {
 
     const merged = mergeTelegramProofIntoReleaseBody(
       body,
-      "- npm Telegram beta E2E: https://github.com/openclaw/openclaw/actions/runs/123",
+      "- npm Telegram beta E2E: https://github.com/tryrecall/recall-agents/actions/runs/123",
     );
 
     expect(merged).toContain("actions/runs/123");
@@ -75,7 +75,7 @@ describe("release-beta-smoke", () => {
       "",
       "### Release verification",
       "",
-      "- npm package: https://www.npmjs.com/package/openclaw/v/2026.5.20-beta.1",
+      "- npm package: https://www.npmjs.com/package/recall/v/2026.5.20-beta.1",
       "",
       "### Assets",
       "",
@@ -85,7 +85,7 @@ describe("release-beta-smoke", () => {
 
     const merged = mergeTelegramProofIntoReleaseBody(
       body,
-      "- npm Telegram beta E2E: https://github.com/openclaw/openclaw/actions/runs/123",
+      "- npm Telegram beta E2E: https://github.com/tryrecall/recall-agents/actions/runs/123",
     );
 
     expect(merged.indexOf("actions/runs/123")).toBeLessThan(merged.indexOf("### Assets"));

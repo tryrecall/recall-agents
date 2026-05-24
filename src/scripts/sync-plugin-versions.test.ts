@@ -16,23 +16,23 @@ describe("syncPluginVersions", () => {
     cleanupTempDirs(tempDirs);
   });
 
-  it("preserves workspace openclaw devDependencies and plugin host floors", () => {
-    const rootDir = makeTempDir(tempDirs, "openclaw-sync-plugin-versions-");
+  it("preserves workspace recall devDependencies and plugin host floors", () => {
+    const rootDir = makeTempDir(tempDirs, "recall-sync-plugin-versions-");
 
     writeJson(path.join(rootDir, "package.json"), {
-      name: "openclaw",
+      name: "recall",
       version: "2026.4.1",
     });
     writeJson(path.join(rootDir, "extensions/imessage/package.json"), {
-      name: "@openclaw/imessage",
+      name: "@recall/imessage",
       version: "2026.3.30",
       devDependencies: {
-        openclaw: "workspace:*",
+        recall: "workspace:*",
       },
       peerDependencies: {
-        openclaw: ">=2026.3.30",
+        recall: ">=2026.3.30",
       },
-      openclaw: {
+      recall: {
         install: {
           minHostVersion: ">=2026.3.30",
         },
@@ -52,7 +52,7 @@ describe("syncPluginVersions", () => {
       version?: string;
       devDependencies?: Record<string, string>;
       peerDependencies?: Record<string, string>;
-      openclaw?: {
+      recall?: {
         install?: {
           minHostVersion?: string;
         };
@@ -65,29 +65,29 @@ describe("syncPluginVersions", () => {
       };
     };
 
-    expect(summary.updated).toContain("@openclaw/imessage");
+    expect(summary.updated).toContain("@recall/imessage");
     expect(updatedPackage.version).toBe("2026.4.1");
-    expect(updatedPackage.devDependencies?.openclaw).toBe("workspace:*");
-    expect(updatedPackage.peerDependencies?.openclaw).toBe(">=2026.4.1");
-    expect(updatedPackage.openclaw?.install?.minHostVersion).toBe(">=2026.3.30");
-    expect(updatedPackage.openclaw?.compat?.pluginApi).toBe(">=2026.4.1");
-    expect(updatedPackage.openclaw?.build?.openclawVersion).toBe("2026.4.1");
+    expect(updatedPackage.devDependencies?.recall).toBe("workspace:*");
+    expect(updatedPackage.peerDependencies?.recall).toBe(">=2026.4.1");
+    expect(updatedPackage.recall?.install?.minHostVersion).toBe(">=2026.3.30");
+    expect(updatedPackage.recall?.compat?.pluginApi).toBe(">=2026.4.1");
+    expect(updatedPackage.recall?.build?.openclawVersion).toBe("2026.4.1");
   });
 
   it("reports pending version sync without writing in check mode", () => {
-    const rootDir = makeTempDir(tempDirs, "openclaw-sync-plugin-versions-check-");
+    const rootDir = makeTempDir(tempDirs, "recall-sync-plugin-versions-check-");
 
     writeJson(path.join(rootDir, "package.json"), {
-      name: "openclaw",
+      name: "recall",
       version: "2026.4.2",
     });
     writeJson(path.join(rootDir, "extensions/discord/package.json"), {
-      name: "@openclaw/discord",
+      name: "@recall/discord",
       version: "2026.4.1",
       peerDependencies: {
-        openclaw: ">=2026.4.1",
+        recall: ">=2026.4.1",
       },
-      openclaw: {
+      recall: {
         compat: {
           pluginApi: ">=2026.4.1",
         },
@@ -100,28 +100,28 @@ describe("syncPluginVersions", () => {
     ) as {
       version?: string;
       peerDependencies?: Record<string, string>;
-      openclaw?: {
+      recall?: {
         compat?: {
           pluginApi?: string;
         };
       };
     };
 
-    expect(summary.updated).toEqual(["@openclaw/discord"]);
+    expect(summary.updated).toEqual(["@recall/discord"]);
     expect(unchangedPackage.version).toBe("2026.4.1");
-    expect(unchangedPackage.peerDependencies?.openclaw).toBe(">=2026.4.1");
-    expect(unchangedPackage.openclaw?.compat?.pluginApi).toBe(">=2026.4.1");
+    expect(unchangedPackage.peerDependencies?.recall).toBe(">=2026.4.1");
+    expect(unchangedPackage.recall?.compat?.pluginApi).toBe(">=2026.4.1");
   });
 
   it("uses the base release version for beta changelog entries", () => {
-    const rootDir = makeTempDir(tempDirs, "openclaw-sync-plugin-versions-beta-changelog-");
+    const rootDir = makeTempDir(tempDirs, "recall-sync-plugin-versions-beta-changelog-");
 
     writeJson(path.join(rootDir, "package.json"), {
-      name: "openclaw",
+      name: "recall",
       version: "2026.5.3-beta.1",
     });
     writeJson(path.join(rootDir, "extensions/matrix/package.json"), {
-      name: "@openclaw/matrix",
+      name: "@recall/matrix",
       version: "2026.5.3-beta.1",
     });
     fs.mkdirSync(path.join(rootDir, "extensions/matrix"), { recursive: true });
@@ -134,7 +134,7 @@ describe("syncPluginVersions", () => {
     const summary = syncPluginVersions(rootDir);
     const changelog = fs.readFileSync(path.join(rootDir, "extensions/matrix/CHANGELOG.md"), "utf8");
 
-    expect(summary.changelogged).toEqual(["@openclaw/matrix"]);
+    expect(summary.changelogged).toEqual(["@recall/matrix"]);
     expect(changelog).toContain("## 2026.5.3\n\n### Changes\n- Version alignment");
     expect(changelog).not.toContain("## 2026.5.3-beta.1");
 

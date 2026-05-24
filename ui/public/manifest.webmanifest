@@ -1,6 +1,6 @@
 {
-  "name": "OpenClaw Control",
-  "short_name": "OpenClaw",
+  "name": "Recall Control",
+  "short_name": "Recall",
   "description": "Multi-channel AI gateway control panel",
   "start_url": "./",
   "display": "standalone",

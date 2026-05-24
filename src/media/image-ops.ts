@@ -1,6 +1,6 @@
 import { withTempWorkspace, type TempWorkspace } from "../infra/private-temp-workspace.js";
 import { resolveSystemBin } from "../infra/resolve-system-bin.js";
-import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
+import { resolvePreferredRecallTmpDir } from "../infra/tmp-recall-dir.js";
 import { runExec } from "../process/exec.js";
 import { createLazyPromiseLoader } from "../shared/lazy-promise.js";
 
@@ -109,7 +109,7 @@ export function buildImageResizeSideGrid(maxSide: number, sideStart: number): nu
 }
 
 function getImageBackendPreference(): ImageBackendPreference {
-  const raw = process.env.OPENCLAW_IMAGE_BACKEND?.trim().toLowerCase();
+  const raw = process.env.RECALL_IMAGE_BACKEND?.trim().toLowerCase();
   switch (raw) {
     case "sharp":
     case "sips":
@@ -695,7 +695,7 @@ function readJpegExifOrientation(buffer: Buffer): number | null {
 
 async function withImageTemp<T>(fn: (workspace: TempWorkspace) => Promise<T>): Promise<T> {
   return await withTempWorkspace(
-    { rootDir: resolvePreferredOpenClawTmpDir(), prefix: "openclaw-img-" },
+    { rootDir: resolvePreferredRecallTmpDir(), prefix: "recall-img-" },
     fn,
   );
 }

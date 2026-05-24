@@ -22,7 +22,7 @@ function makeSnapshot() {
     valid: true,
     issues: [],
     legacyIssues: [],
-    path: "/tmp/openclaw.json",
+    path: "/tmp/recall.json",
   };
 }
 
@@ -171,13 +171,13 @@ describe("ensureConfigReady", () => {
     const runtime = await runEnsureConfigReady(["message"]);
 
     expect(plainErrorCalls(runtime)).toEqual([
-      "OpenClaw config is invalid",
-      "File: /tmp/openclaw.json",
+      "Recall config is invalid",
+      "File: /tmp/recall.json",
       "Problem:",
       "  - channels.quietchat: invalid",
       "",
-      `Fix: ${formatCliCommand("openclaw doctor --fix")}`,
-      `Inspect: ${formatCliCommand("openclaw config validate")}`,
+      `Fix: ${formatCliCommand("recall doctor --fix")}`,
+      `Inspect: ${formatCliCommand("recall config validate")}`,
       "Status, health, logs, and doctor commands still run with invalid config.",
     ]);
     expect(runtime.exit).toHaveBeenCalledWith(1);

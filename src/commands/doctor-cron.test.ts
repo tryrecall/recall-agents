@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import {
   collectLegacyWhatsAppCrontabHealthWarning,
   maybeRepairLegacyCronStore,
@@ -20,7 +20,7 @@ vi.mock("../terminal/note.js", () => ({
 let tempRoot: string | null = null;
 
 async function makeTempStorePath() {
-  tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-doctor-cron-"));
+  tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "recall-doctor-cron-"));
   return path.join(tempRoot, "cron", "jobs.json");
 }
 
@@ -38,7 +38,7 @@ function makePrompter(confirmResult = true) {
   };
 }
 
-function createCronConfig(storePath: string): OpenClawConfig {
+function createCronConfig(storePath: string): RecallConfig {
   return {
     cron: {
       store: storePath,
@@ -575,7 +575,7 @@ describe("legacy WhatsApp crontab health check", () => {
       readCrontab: async () => ({
         stdout: [
           "# keep comments ignored",
-          "*/5 * * * * ~/.openclaw/bin/ensure-whatsapp.sh >> ~/.openclaw/logs/whatsapp-health.log 2>&1",
+          "*/5 * * * * ~/.recall/bin/ensure-whatsapp.sh >> ~/.recall/logs/whatsapp-health.log 2>&1",
           "0 9 * * * /usr/bin/true",
           "",
         ].join("\n"),
@@ -593,7 +593,7 @@ describe("legacy WhatsApp crontab health check", () => {
       readCrontab: async () => ({
         stdout: [
           "# keep comments ignored",
-          "*/5 * * * * ~/.openclaw/bin/ensure-whatsapp.sh >> ~/.openclaw/logs/whatsapp-health.log 2>&1",
+          "*/5 * * * * ~/.recall/bin/ensure-whatsapp.sh >> ~/.recall/logs/whatsapp-health.log 2>&1",
           "0 9 * * * /usr/bin/true",
           "",
         ].join("\n"),
@@ -643,7 +643,7 @@ describe("legacy WhatsApp crontab health check", () => {
       noteLegacyWhatsAppCrontabHealthCheck({
         platform: "linux",
         readCrontab: async () => ({
-          stdout: { lines: ["*/5 * * * * ~/.openclaw/bin/ensure-whatsapp.sh"] },
+          stdout: { lines: ["*/5 * * * * ~/.recall/bin/ensure-whatsapp.sh"] },
         }),
       }),
     ).resolves.toBeUndefined();

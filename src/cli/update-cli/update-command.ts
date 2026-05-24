@@ -27,7 +27,7 @@ import { resolveConfigIncludes } from "../../config/includes.js";
 import { formatConfigIssueLines } from "../../config/issue-format.js";
 import { asResolvedSourceConfig, asRuntimeConfig } from "../../config/materialize.js";
 import { CONFIG_PATH, resolveIncludeRoots } from "../../config/paths.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import type { PluginInstallRecord } from "../../config/types.plugins.js";
 import {
   GATEWAY_SERVICE_KIND,
@@ -35,7 +35,7 @@ import {
   GATEWAY_SERVICE_RUNTIME_PID_ENV,
 } from "../../daemon/constants.js";
 import { resolveGatewayInstallEntrypoint } from "../../daemon/gateway-entrypoint.js";
-import { disableCurrentOpenClawUpdateLaunchdJob } from "../../daemon/launchd.js";
+import { disableCurrentRecallUpdateLaunchdJob } from "../../daemon/launchd.js";
 import { resolveGatewayRestartLogPath } from "../../daemon/restart-logs.js";
 import { summarizeGatewayServiceLayout } from "../../daemon/service-layout.js";
 import type { GatewayServiceCommandConfig } from "../../daemon/service-types.js";
@@ -146,25 +146,25 @@ const SERVICE_REFRESH_TIMEOUT_MS = 60_000;
 const POST_REFRESH_ALREADY_HEALTHY_ATTEMPTS = 10;
 const POST_REFRESH_ALREADY_HEALTHY_DELAY_MS = 500;
 const DEFAULT_UPDATE_STEP_TIMEOUT_MS = 30 * 60_000;
-const POST_CORE_UPDATE_ENV = "OPENCLAW_UPDATE_POST_CORE";
-const POST_CORE_UPDATE_CHANNEL_ENV = "OPENCLAW_UPDATE_POST_CORE_CHANNEL";
-const POST_CORE_UPDATE_REQUESTED_CHANNEL_ENV = "OPENCLAW_UPDATE_POST_CORE_REQUESTED_CHANNEL";
-const POST_CORE_UPDATE_RESULT_PATH_ENV = "OPENCLAW_UPDATE_POST_CORE_RESULT_PATH";
-const POST_CORE_UPDATE_INSTALL_RECORDS_PATH_ENV = "OPENCLAW_UPDATE_POST_CORE_INSTALL_RECORDS_PATH";
-const POST_CORE_UPDATE_SOURCE_CONFIG_PATH_ENV = "OPENCLAW_UPDATE_POST_CORE_SOURCE_CONFIG_PATH";
-const POST_CORE_UPDATE_STARTED_AT_ENV = "OPENCLAW_UPDATE_POST_CORE_STARTED_AT_MS";
+const POST_CORE_UPDATE_ENV = "RECALL_UPDATE_POST_CORE";
+const POST_CORE_UPDATE_CHANNEL_ENV = "RECALL_UPDATE_POST_CORE_CHANNEL";
+const POST_CORE_UPDATE_REQUESTED_CHANNEL_ENV = "RECALL_UPDATE_POST_CORE_REQUESTED_CHANNEL";
+const POST_CORE_UPDATE_RESULT_PATH_ENV = "RECALL_UPDATE_POST_CORE_RESULT_PATH";
+const POST_CORE_UPDATE_INSTALL_RECORDS_PATH_ENV = "RECALL_UPDATE_POST_CORE_INSTALL_RECORDS_PATH";
+const POST_CORE_UPDATE_SOURCE_CONFIG_PATH_ENV = "RECALL_UPDATE_POST_CORE_SOURCE_CONFIG_PATH";
+const POST_CORE_UPDATE_STARTED_AT_ENV = "RECALL_UPDATE_POST_CORE_STARTED_AT_MS";
 const POST_CORE_UPDATE_RESULT_POLL_MS = 100;
 const PRE_UPDATE_CONFIG_SNAPSHOT_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 const SERVICE_REFRESH_PATH_ENV_KEYS = [
-  "OPENCLAW_HOME",
-  "OPENCLAW_STATE_DIR",
-  "OPENCLAW_CONFIG_PATH",
+  "RECALL_HOME",
+  "RECALL_STATE_DIR",
+  "RECALL_CONFIG_PATH",
 ] as const;
 const POST_INSTALL_DOCTOR_SERVICE_ENV_KEYS = [
   ...SERVICE_REFRESH_PATH_ENV_KEYS,
-  "OPENCLAW_PROFILE",
+  "RECALL_PROFILE",
 ] as const;
-const POST_UPDATE_PLUGIN_REPAIR_GUIDANCE = "Run openclaw doctor --fix to attempt automatic repair.";
+const POST_UPDATE_PLUGIN_REPAIR_GUIDANCE = "Run recall doctor --fix to attempt automatic repair.";
 const JSON_MODE_SERVICE_STDOUT = new Writable({
   write(_chunk, _encoding, callback) {
     callback();
@@ -206,8 +206,8 @@ type PostCorePluginUpdateResult = NonNullable<
 >;
 
 type PreUpdateConfigRestoreInput = {
-  sourceConfig: OpenClawConfig;
-  authoredConfig: OpenClawConfig;
+  sourceConfig: RecallConfig;
+  authoredConfig: RecallConfig;
 };
 
 type MissingPluginInstallPayload = {
@@ -357,7 +357,7 @@ function restoreDroppedPreUpdateChannels(
   const authoredChannels = resolveRestoredAuthoredChannels({
     currentChannels: snapshot.sourceConfig.channels,
     currentAuthoredChannels: isRecord(snapshot.parsed)
-      ? (snapshot.parsed as OpenClawConfig).channels
+      ? (snapshot.parsed as RecallConfig).channels
       : snapshot.sourceConfig.channels,
     preUpdateAuthoredChannels: preUpdateConfig.authoredConfig.channels,
     restoredChannelIds,
@@ -365,7 +365,7 @@ function restoreDroppedPreUpdateChannels(
   const nextConfig = {
     ...snapshot.sourceConfig,
     channels: restoredChannels,
-  } as OpenClawConfig;
+  } as RecallConfig;
   return {
     snapshot: {
       ...createUpdatedConfigSnapshot(snapshot, nextConfig),
@@ -454,7 +454,7 @@ function resolveRestoredAuthoredChannels(params: {
 
 export async function collectMissingPluginInstallPayloads(params: {
   records: Record<string, PluginInstallRecord>;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   skipDisabledPlugins?: boolean;
   syncOfficialPluginInstalls?: boolean;
   env?: NodeJS.ProcessEnv;
@@ -517,7 +517,7 @@ function formatMissingPluginPayloadReason(entry: MissingPluginInstallPayload): s
 }
 
 function formatPostUpdatePluginInspectGuidance(pluginId: string): string {
-  return `Run openclaw plugins inspect ${pluginId} --runtime --json for details.`;
+  return `Run recall plugins inspect ${pluginId} --runtime --json for details.`;
 }
 
 function createPostUpdatePluginWarning(params: {
@@ -579,8 +579,8 @@ export function buildInvalidConfigPostCoreUpdateResult(): {
   result: PostCorePluginUpdateResult;
 } {
   const guidance = [
-    "Run `openclaw doctor` to inspect the config validation errors.",
-    "Once the config parses, rerun `openclaw update`.",
+    "Run `recall doctor` to inspect the config validation errors.",
+    "Once the config parses, rerun `recall update`.",
   ];
   const message =
     "Plugin post-update convergence skipped because the config is invalid; refusing to restart the gateway with an unverified plugin set.";
@@ -717,13 +717,13 @@ export async function recoverLaunchAgentAndRecheckGatewayHealth(params: {
 }
 
 function formatPostUpdateGatewayRecoveryLine(platform: NodeJS.Platform): string {
-  const restartCommand = replaceCliName(formatCliCommand("openclaw gateway restart"), CLI_NAME);
+  const restartCommand = replaceCliName(formatCliCommand("recall gateway restart"), CLI_NAME);
   const installCommand = replaceCliName(
-    formatCliCommand("openclaw gateway install --force"),
+    formatCliCommand("recall gateway install --force"),
     CLI_NAME,
   );
   const statusCommand = replaceCliName(
-    formatCliCommand("openclaw gateway status --deep"),
+    formatCliCommand("recall gateway status --deep"),
     CLI_NAME,
   );
   if (platform === "darwin") {
@@ -746,7 +746,7 @@ export function formatPostUpdateGatewayRecoveryInstructions(
   const beforeVersion = normalizeOptionalString(result.before?.version);
   if (isPackageManagerUpdateMode(result.mode) && beforeVersion) {
     lines.push(
-      `Rollback: reinstall OpenClaw ${beforeVersion} with the same package manager, then rerun \`${replaceCliName(formatCliCommand("openclaw gateway install --force"), CLI_NAME)}\`.`,
+      `Rollback: reinstall Recall ${beforeVersion} with the same package manager, then rerun \`${replaceCliName(formatCliCommand("recall gateway install --force"), CLI_NAME)}\`.`,
     );
   }
   return lines;
@@ -768,9 +768,9 @@ type ManagedServiceRootRedirect = {
 };
 
 function formatGatewayAncestryBlockMessage(pid: number): string {
-  return `openclaw update detected it is running inside the gateway process tree.
+  return `recall update detected it is running inside the gateway process tree.
 Gateway PID ${pid} is an ancestor of this process, so this updater cannot safely stop or restart the gateway that owns it.
-Run \`${replaceCliName(formatCliCommand("openclaw update"), CLI_NAME)}\` from a shell outside the gateway service, or stop the gateway service first and then update.`;
+Run \`${replaceCliName(formatCliCommand("recall update"), CLI_NAME)}\` from a shell outside the gateway service, or stop the gateway service first and then update.`;
 }
 
 function parsePositivePid(value: unknown): number | null {
@@ -941,10 +941,10 @@ async function maybeRestartServiceAfterFailedPackageUpdate(params: {
 function isRunningInsideGatewayService(
   env: Record<string, string | undefined> = process.env,
 ): boolean {
-  if (env.OPENCLAW_SERVICE_MARKER?.trim() !== GATEWAY_SERVICE_MARKER) {
+  if (env.RECALL_SERVICE_MARKER?.trim() !== GATEWAY_SERVICE_MARKER) {
     return false;
   }
-  const serviceKind = env.OPENCLAW_SERVICE_KIND?.trim();
+  const serviceKind = env.RECALL_SERVICE_KIND?.trim();
   return !serviceKind || serviceKind === GATEWAY_SERVICE_KIND;
 }
 
@@ -1015,13 +1015,13 @@ async function resolvePackageRuntimePreflightError(params: {
     ? `Node ${runtime.version ?? "unknown"} at ${runtime.nodeRunner}`
     : `Node ${runtime.version ?? "unknown"}`;
   return [
-    `${runtimeLabel} is too old for openclaw@${targetLabel}.`,
+    `${runtimeLabel} is too old for recall@${targetLabel}.`,
     `The requested package requires ${status.nodeEngine}.`,
     runtime.nodeRunner
-      ? "Upgrade the Node runtime that owns the managed Gateway service, then rerun `openclaw update`."
-      : "Upgrade Node to 22.19+ or Node 24, then rerun `openclaw update`.",
-    "Bare `npm i -g openclaw` can silently install an older compatible release.",
-    "After upgrading Node, use `npm i -g openclaw@latest`.",
+      ? "Upgrade the Node runtime that owns the managed Gateway service, then rerun `recall update`."
+      : "Upgrade Node to 22.19+ or Node 24, then rerun `recall update`.",
+    "Bare `npm i -g recall` can silently install an older compatible release.",
+    "After upgrading Node, use `npm i -g recall@latest`.",
   ].join("\n");
 }
 
@@ -1073,8 +1073,8 @@ function disableUpdatedPackageCompileCacheEnv(env: NodeJS.ProcessEnv): NodeJS.Pr
 
 function stripGatewayServiceMarkerEnv(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   const resolvedEnv = { ...env };
-  delete resolvedEnv.OPENCLAW_SERVICE_MARKER;
-  delete resolvedEnv.OPENCLAW_SERVICE_KIND;
+  delete resolvedEnv.RECALL_SERVICE_MARKER;
+  delete resolvedEnv.RECALL_SERVICE_KIND;
   delete resolvedEnv[GATEWAY_SERVICE_RUNTIME_PID_ENV];
   return resolvedEnv;
 }
@@ -1107,7 +1107,7 @@ export function resolvePostInstallDoctorEnv(params?: {
 }
 
 export function resolveUpdatedGatewayRestartPort(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   processEnv?: NodeJS.ProcessEnv;
   serviceEnv?: NodeJS.ProcessEnv;
 }): number {
@@ -1295,7 +1295,7 @@ async function tryInstallShellCompletion(opts: {
       if (!opts.skipPrompt) {
         defaultRuntime.log(
           theme.muted(
-            `Skipped. Run \`${replaceCliName(formatCliCommand("openclaw completion --install"), CLI_NAME)}\` later to enable.`,
+            `Skipped. Run \`${replaceCliName(formatCliCommand("recall completion --install"), CLI_NAME)}\` later to enable.`,
           ),
         );
       }
@@ -1481,12 +1481,12 @@ async function runPackageInstallUpdate(params: {
               serviceEnv: params.managedServiceEnv,
               invocationCwd: params.invocationCwd,
             }),
-            OPENCLAW_UPDATE_IN_PROGRESS: "1",
+            RECALL_UPDATE_IN_PROGRESS: "1",
             [UPDATE_DEFER_CONFIGURED_PLUGIN_INSTALL_REPAIR_ENV]: "1",
             [UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE_ENV]: "1",
             ...(candidateHostVersion === null
               ? {}
-              : { OPENCLAW_COMPATIBILITY_HOST_VERSION: candidateHostVersion }),
+              : { RECALL_COMPATIBILITY_HOST_VERSION: candidateHostVersion }),
           },
           timeoutMs: params.timeoutMs,
           progress: params.progress,
@@ -1832,7 +1832,7 @@ export async function updatePluginsAfterCoreUpdate(params: {
     if (params.restoredAuthoredChannels !== undefined) {
       nextConfig = {
         ...nextConfig,
-        channels: structuredClone(params.restoredAuthoredChannels) as OpenClawConfig["channels"],
+        channels: structuredClone(params.restoredAuthoredChannels) as RecallConfig["channels"],
       };
     }
     await commitPluginInstallRecordsWithConfig({
@@ -2033,7 +2033,7 @@ async function maybeRestartService(params: {
           ]
         : []),
       `Restart log: ${resolveGatewayRestartLogPath(params.serviceEnv ?? process.env)}`,
-      `Run \`${replaceCliName(formatCliCommand("openclaw gateway status --deep"), CLI_NAME)}\` for details.`,
+      `Run \`${replaceCliName(formatCliCommand("recall gateway status --deep"), CLI_NAME)}\` for details.`,
       ...formatPostUpdateGatewayRecoveryInstructions(params.result),
     ];
     if (params.opts.json) {
@@ -2156,7 +2156,7 @@ async function maybeRestartService(params: {
         defaultRuntime.log(theme.success("Daemon restarted successfully."));
         defaultRuntime.log("");
         await createUpdateConfigSnapshot();
-        process.env.OPENCLAW_UPDATE_IN_PROGRESS = "1";
+        process.env.RECALL_UPDATE_IN_PROGRESS = "1";
         process.env[UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE_ENV] = "1";
         try {
           const interactiveDoctor =
@@ -2167,7 +2167,7 @@ async function maybeRestartService(params: {
         } catch (err) {
           defaultRuntime.log(theme.warn(`Doctor failed: ${String(err)}`));
         } finally {
-          delete process.env.OPENCLAW_UPDATE_IN_PROGRESS;
+          delete process.env.RECALL_UPDATE_IN_PROGRESS;
           delete process.env[UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE_ENV];
         }
       }
@@ -2176,7 +2176,7 @@ async function maybeRestartService(params: {
         defaultRuntime.log(theme.warn(`Gateway: restart failed: ${String(err)}`));
         defaultRuntime.log(
           theme.muted(
-            `You may need to restart the service manually: ${replaceCliName(formatCliCommand("openclaw gateway restart"), CLI_NAME)}`,
+            `You may need to restart the service manually: ${replaceCliName(formatCliCommand("recall gateway restart"), CLI_NAME)}`,
           ),
         );
       }
@@ -2193,13 +2193,13 @@ async function maybeRestartService(params: {
     if (params.result.mode === "npm" || params.result.mode === "pnpm") {
       defaultRuntime.log(
         theme.muted(
-          `Tip: Run \`${replaceCliName(formatCliCommand("openclaw doctor"), CLI_NAME)}\`, then \`${replaceCliName(formatCliCommand("openclaw gateway restart"), CLI_NAME)}\` to apply updates to a running gateway.`,
+          `Tip: Run \`${replaceCliName(formatCliCommand("recall doctor"), CLI_NAME)}\`, then \`${replaceCliName(formatCliCommand("recall gateway restart"), CLI_NAME)}\` to apply updates to a running gateway.`,
         ),
       );
     } else {
       defaultRuntime.log(
         theme.muted(
-          `Tip: Run \`${replaceCliName(formatCliCommand("openclaw gateway restart"), CLI_NAME)}\` to apply updates to a running gateway.`,
+          `Tip: Run \`${replaceCliName(formatCliCommand("recall gateway restart"), CLI_NAME)}\` to apply updates to a running gateway.`,
         ),
       );
     }
@@ -2244,19 +2244,19 @@ type UpdateFinalizeResult = {
 };
 
 function withUpdateFinalizationEnv<T>(run: () => Promise<T>): Promise<T> {
-  const previousUpdateInProgress = process.env.OPENCLAW_UPDATE_IN_PROGRESS;
+  const previousUpdateInProgress = process.env.RECALL_UPDATE_IN_PROGRESS;
   const previousDeferConfiguredPluginInstallRepair =
     process.env[UPDATE_DEFER_CONFIGURED_PLUGIN_INSTALL_REPAIR_ENV];
   const previousParentSupportsDoctorConfigWrite =
     process.env[UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE_ENV];
-  process.env.OPENCLAW_UPDATE_IN_PROGRESS = "1";
+  process.env.RECALL_UPDATE_IN_PROGRESS = "1";
   process.env[UPDATE_DEFER_CONFIGURED_PLUGIN_INSTALL_REPAIR_ENV] = "1";
   process.env[UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE_ENV] = "1";
   return run().finally(() => {
     if (previousUpdateInProgress === undefined) {
-      delete process.env.OPENCLAW_UPDATE_IN_PROGRESS;
+      delete process.env.RECALL_UPDATE_IN_PROGRESS;
     } else {
-      process.env.OPENCLAW_UPDATE_IN_PROGRESS = previousUpdateInProgress;
+      process.env.RECALL_UPDATE_IN_PROGRESS = previousUpdateInProgress;
     }
     if (previousDeferConfiguredPluginInstallRepair === undefined) {
       delete process.env[UPDATE_DEFER_CONFIGURED_PLUGIN_INSTALL_REPAIR_ENV];
@@ -2287,7 +2287,7 @@ export async function updateFinalizeCommand(opts: UpdateFinalizeOptions): Promis
     ? {
         sourceConfig: configSnapshot.sourceConfig,
         authoredConfig: isRecord(configSnapshot.parsed)
-          ? (configSnapshot.parsed as OpenClawConfig)
+          ? (configSnapshot.parsed as RecallConfig)
           : configSnapshot.sourceConfig,
       }
     : undefined;
@@ -2409,7 +2409,7 @@ async function persistRequestedUpdateChannel(params: {
 
 function createUpdatedConfigSnapshot(
   snapshot: Awaited<ReturnType<typeof readConfigFileSnapshot>>,
-  next: OpenClawConfig,
+  next: RecallConfig,
 ): Awaited<ReturnType<typeof readConfigFileSnapshot>> {
   if (!snapshot.valid) {
     return snapshot;
@@ -2509,11 +2509,11 @@ function normalizePreUpdateConfigRestoreInput(
   const authoredConfig = parsed.authoredConfig;
   if (isRecord(sourceConfig) && isRecord(authoredConfig)) {
     return {
-      sourceConfig: sourceConfig as OpenClawConfig,
-      authoredConfig: authoredConfig as OpenClawConfig,
+      sourceConfig: sourceConfig as RecallConfig,
+      authoredConfig: authoredConfig as RecallConfig,
     };
   }
-  const authored = parsed as OpenClawConfig;
+  const authored = parsed as RecallConfig;
   return {
     sourceConfig: options?.configPath
       ? resolvePreUpdateSourceConfigFromAuthored(authored, options.configPath)
@@ -2523,9 +2523,9 @@ function normalizePreUpdateConfigRestoreInput(
 }
 
 function resolvePreUpdateSourceConfigFromAuthored(
-  authoredConfig: OpenClawConfig,
+  authoredConfig: RecallConfig,
   configPath: string,
-): OpenClawConfig {
+): RecallConfig {
   try {
     const withIncludes = resolveConfigIncludes(authoredConfig, configPath, undefined, {
       allowedRoots: resolveIncludeRoots(process.env),
@@ -2533,7 +2533,7 @@ function resolvePreUpdateSourceConfigFromAuthored(
     const resolved = resolveConfigEnvVars(withIncludes, process.env, {
       onMissing: () => undefined,
     });
-    return isRecord(resolved) ? (resolved as OpenClawConfig) : authoredConfig;
+    return isRecord(resolved) ? (resolved as RecallConfig) : authoredConfig;
   } catch {
     return authoredConfig;
   }
@@ -2736,7 +2736,7 @@ async function continuePostCoreUpdateInFreshProcess(params: {
   if (params.opts.timeout) {
     argv.push("--timeout", params.opts.timeout);
   }
-  const resultDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-update-post-core-"));
+  const resultDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-update-post-core-"));
   const resultPath = path.join(resultDir, "plugins.json");
   const installRecordsPath = path.join(resultDir, "plugin-install-records.json");
   const sourceConfigPath = path.join(resultDir, "source-config.json");
@@ -2760,7 +2760,7 @@ async function continuePostCoreUpdateInFreshProcess(params: {
         [POST_CORE_UPDATE_STARTED_AT_ENV]: String(params.updateStartedAtMs),
         ...(postCoreHostVersion === null
           ? {}
-          : { OPENCLAW_COMPATIBILITY_HOST_VERSION: postCoreHostVersion }),
+          : { RECALL_COMPATIBILITY_HOST_VERSION: postCoreHostVersion }),
         ...(params.preUpdateConfig
           ? { [POST_CORE_UPDATE_SOURCE_CONFIG_PATH_ENV]: sourceConfigPath }
           : {}),
@@ -2922,7 +2922,7 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
     return;
   }
   if (opts.dryRun !== true) {
-    await disableCurrentOpenClawUpdateLaunchdJob().catch(() => undefined);
+    await disableCurrentRecallUpdateLaunchdJob().catch(() => undefined);
     assertConfigWriteAllowedInCurrentMode();
   }
   const updateStepTimeoutMs = timeoutMs ?? DEFAULT_UPDATE_STEP_TIMEOUT_MS;
@@ -2948,7 +2948,7 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
       return;
     }
 
-    process.env.OPENCLAW_COMPATIBILITY_HOST_VERSION = (await readPackageVersion(root)) ?? VERSION;
+    process.env.RECALL_COMPATIBILITY_HOST_VERSION = (await readPackageVersion(root)) ?? VERSION;
 
     let postCoreConfigSnapshot = await readConfigFileSnapshot({ skipPluginValidation: true });
     const preUpdateSourceConfig = await readPostCorePreUpdateSourceConfig({
@@ -3049,7 +3049,7 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
     updateInstallKind === "git" ? DEFAULT_GIT_CHANNEL : DEFAULT_PACKAGE_CHANNEL;
   const channel = requestedChannel ?? storedChannel ?? defaultChannel;
   const devTargetRef =
-    channel === "dev" ? process.env.OPENCLAW_UPDATE_DEV_TARGET_REF?.trim() || undefined : undefined;
+    channel === "dev" ? process.env.RECALL_UPDATE_DEV_TARGET_REF?.trim() || undefined : undefined;
 
   const explicitTag = normalizeTag(opts.tag);
   let tag = explicitTag ?? channelToNpmTag(channel);
@@ -3078,7 +3078,7 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
         );
         defaultRuntime.log(
           theme.warn(
-            `Shell OpenClaw root differs from the managed gateway service root: ${managedServiceRootRedirect.previousRoot}`,
+            `Shell Recall root differs from the managed gateway service root: ${managedServiceRootRedirect.previousRoot}`,
           ),
         );
         defaultRuntime.log(
@@ -3269,7 +3269,7 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
 
   const showProgress = !opts.json && process.stdout.isTTY;
   if (!opts.json) {
-    defaultRuntime.log(theme.heading("Updating OpenClaw..."));
+    defaultRuntime.log(theme.heading("Updating Recall..."));
     defaultRuntime.log("");
   }
 
@@ -3303,8 +3303,8 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
       defaultRuntime.error(
         [
           "Package updates cannot run from inside the gateway service process.",
-          "That path replaces the active OpenClaw dist tree while the live gateway may still lazy-load old chunks.",
-          `Run \`${replaceCliName(formatCliCommand("openclaw update"), CLI_NAME)}\` from a shell outside the gateway service, or stop the gateway service first and then update.`,
+          "That path replaces the active Recall dist tree while the live gateway may still lazy-load old chunks.",
+          `Run \`${replaceCliName(formatCliCommand("recall update"), CLI_NAME)}\` from a shell outside the gateway service, or stop the gateway service first and then update.`,
         ].join("\n"),
       );
       defaultRuntime.exit(1);
@@ -3390,18 +3390,18 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
         ),
       );
       defaultRuntime.log(
-        theme.muted("Commit, stash, or discard the local changes, then rerun `openclaw update`."),
+        theme.muted("Commit, stash, or discard the local changes, then rerun `recall update`."),
       );
     }
     if (result.reason === "not-git-install") {
       defaultRuntime.log(
         theme.warn(
-          `Skipped: this OpenClaw install isn't a git checkout, and the package manager couldn't be detected. Update via your package manager, then run \`${replaceCliName(formatCliCommand("openclaw doctor"), CLI_NAME)}\` and \`${replaceCliName(formatCliCommand("openclaw gateway restart"), CLI_NAME)}\`.`,
+          `Skipped: this Recall install isn't a git checkout, and the package manager couldn't be detected. Update via your package manager, then run \`${replaceCliName(formatCliCommand("recall doctor"), CLI_NAME)}\` and \`${replaceCliName(formatCliCommand("recall gateway restart"), CLI_NAME)}\`.`,
         ),
       );
       defaultRuntime.log(
         theme.muted(
-          `Examples: \`${replaceCliName("npm i -g openclaw@latest", CLI_NAME)}\` or \`${replaceCliName("pnpm add -g openclaw@latest", CLI_NAME)}\``,
+          `Examples: \`${replaceCliName("npm i -g recall@latest", CLI_NAME)}\` or \`${replaceCliName("pnpm add -g recall@latest", CLI_NAME)}\``,
         ),
       );
     }
@@ -3459,7 +3459,7 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
         ? {
             sourceConfig: configSnapshot.sourceConfig,
             authoredConfig: isRecord(configSnapshot.parsed)
-              ? (configSnapshot.parsed as OpenClawConfig)
+              ? (configSnapshot.parsed as RecallConfig)
               : configSnapshot.sourceConfig,
           }
         : undefined,
@@ -3481,7 +3481,7 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
         ? {
             sourceConfig: configSnapshot.sourceConfig,
             authoredConfig: isRecord(configSnapshot.parsed)
-              ? (configSnapshot.parsed as OpenClawConfig)
+              ? (configSnapshot.parsed as RecallConfig)
               : configSnapshot.sourceConfig,
           }
         : undefined,

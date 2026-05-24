@@ -42,7 +42,7 @@ export async function runPluginsListCommand(
   if (list.length === 0) {
     runtime.log(
       theme.muted(
-        `No plugins found. Run ${formatCliCommand("openclaw plugins install <plugin>")} to add one, or ${formatCliCommand("openclaw plugins list --json")} to inspect raw discovery state.`,
+        `No plugins found. Run ${formatCliCommand("recall plugins install <plugin>")} to add one, or ${formatCliCommand("recall plugins list --json")} to inspect raw discovery state.`,
       ),
     );
     return;
@@ -67,7 +67,7 @@ export async function runPluginsListCommand(
       return {
         Name: plugin.name || plugin.id,
         ID: plugin.name && plugin.name !== plugin.id ? plugin.id : "",
-        Format: plugin.format ?? "openclaw",
+        Format: plugin.format ?? "recall",
         Status:
           plugin.status === "error"
             ? theme.error("error")

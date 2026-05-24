@@ -5,10 +5,10 @@ import { pathToFileURL } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { CommandOptions } from "../process/exec.js";
 import {
-  repairManagedNpmRootOpenClawPeer,
+  repairManagedNpmRootRecallPeer,
   removeManagedNpmRootDependency,
   readManagedNpmRootInstalledDependency,
-  readOpenClawManagedNpmRootOverrides,
+  readRecallManagedNpmRootOverrides,
   resolveManagedNpmRootDependencySpec,
   syncManagedNpmRootPeerDependencies,
   upsertManagedNpmRootDependency,
@@ -26,7 +26,7 @@ const successfulSpawn = {
 };
 
 async function makeTempRoot(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-npm-managed-root-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-npm-managed-root-"));
   tempDirs.push(dir);
   return dir;
 }
@@ -85,7 +85,7 @@ describe("managed npm root", () => {
         {
           private: true,
           dependencies: {
-            "@openclaw/discord": "2026.5.2",
+            "@recall/discord": "2026.5.2",
           },
           devDependencies: {
             fixture: "1.0.0",
@@ -98,7 +98,7 @@ describe("managed npm root", () => {
 
     await upsertManagedNpmRootDependency({
       npmRoot,
-      packageName: "@openclaw/feishu",
+      packageName: "@recall/feishu",
       dependencySpec: "2026.5.2",
     });
 
@@ -107,8 +107,8 @@ describe("managed npm root", () => {
     ).resolves.toEqual({
       private: true,
       dependencies: {
-        "@openclaw/discord": "2026.5.2",
-        "@openclaw/feishu": "2026.5.2",
+        "@recall/discord": "2026.5.2",
+        "@recall/feishu": "2026.5.2",
       },
       devDependencies: {
         fixture: "1.0.0",
@@ -116,7 +116,7 @@ describe("managed npm root", () => {
     });
   });
 
-  it("syncs OpenClaw-owned overrides without dropping unrelated local overrides", async () => {
+  it("syncs Recall-owned overrides without dropping unrelated local overrides", async () => {
     const npmRoot = await makeTempRoot();
     await fs.writeFile(
       path.join(npmRoot, "package.json"),
@@ -124,14 +124,14 @@ describe("managed npm root", () => {
         {
           private: true,
           dependencies: {
-            "@openclaw/discord": "2026.5.2",
+            "@recall/discord": "2026.5.2",
           },
           overrides: {
             axios: "1.13.6",
             "left-pad": "1.3.0",
             qs: "6.14.0",
           },
-          openclaw: {
+          recall: {
             managedOverrides: ["axios", "qs"],
           },
         },
@@ -142,7 +142,7 @@ describe("managed npm root", () => {
 
     await upsertManagedNpmRootDependency({
       npmRoot,
-      packageName: "@openclaw/feishu",
+      packageName: "@recall/feishu",
       dependencySpec: "2026.5.4",
       managedOverrides: {
         axios: "1.16.0",
@@ -159,8 +159,8 @@ describe("managed npm root", () => {
     ).resolves.toEqual({
       private: true,
       dependencies: {
-        "@openclaw/discord": "2026.5.2",
-        "@openclaw/feishu": "2026.5.4",
+        "@recall/discord": "2026.5.2",
+        "@recall/feishu": "2026.5.4",
       },
       overrides: {
         "left-pad": "1.3.0",
@@ -171,7 +171,7 @@ describe("managed npm root", () => {
           semver: "1.2.3",
         },
       },
-      openclaw: {
+      recall: {
         managedOverrides: ["axios", "nested", "node-domexception"],
       },
     });
@@ -182,7 +182,7 @@ describe("managed npm root", () => {
 
     await upsertManagedNpmRootDependency({
       npmRoot,
-      packageName: "@openclaw/feishu",
+      packageName: "@recall/feishu",
       dependencySpec: "2026.5.4",
       omitUnsupportedManagedOverrides: true,
       managedOverrides: {
@@ -204,14 +204,14 @@ describe("managed npm root", () => {
           semver: "1.2.3",
         },
       },
-      openclaw: {
+      recall: {
         managedOverrides: ["axios", "nested"],
       },
     });
   });
 
   it("reads package-level npm overrides for managed plugin installs", async () => {
-    await expect(readOpenClawManagedNpmRootOverrides()).resolves.toEqual({
+    await expect(readRecallManagedNpmRootOverrides()).resolves.toEqual({
       axios: "1.16.0",
       "fast-uri": "3.1.2",
       "follow-redirects": "1.16.0",
@@ -228,7 +228,7 @@ describe("managed npm root", () => {
       path.join(packageRoot, "package.json"),
       `${JSON.stringify(
         {
-          name: "openclaw",
+          name: "recall",
           overrides: {
             axios: "1.16.0",
           },
@@ -239,7 +239,7 @@ describe("managed npm root", () => {
     );
 
     await expect(
-      readOpenClawManagedNpmRootOverrides({
+      readRecallManagedNpmRootOverrides({
         moduleUrl: pathToFileURL(path.join(packageRoot, "dist", "install-AbCdEf.js")).toString(),
         cwd: path.join(packageRoot, "dist"),
       }),
@@ -254,7 +254,7 @@ describe("managed npm root", () => {
       path.join(packageRoot, "package.json"),
       `${JSON.stringify(
         {
-          name: "openclaw",
+          name: "recall",
           dependencies: {
             "@aws-sdk/client-bedrock-runtime": "3.1024.0",
             "node-domexception": "npm:@nolyfill/domexception@1.0.28",
@@ -277,7 +277,7 @@ describe("managed npm root", () => {
       )}\n`,
     );
 
-    await expect(readOpenClawManagedNpmRootOverrides({ packageRoot })).resolves.toEqual({
+    await expect(readRecallManagedNpmRootOverrides({ packageRoot })).resolves.toEqual({
       "@aws-sdk/client-bedrock-runtime": "3.1024.0",
       nested: {
         "optional-runtime": "2.0.0",
@@ -296,7 +296,7 @@ describe("managed npm root", () => {
     await expect(
       upsertManagedNpmRootDependency({
         npmRoot,
-        packageName: "@openclaw/feishu",
+        packageName: "@recall/feishu",
         dependencySpec: "2026.5.2",
       }),
     ).rejects.toThrow(/JSON|package\.json|not-json/i);
@@ -308,16 +308,16 @@ describe("managed npm root", () => {
     expect(
       resolveManagedNpmRootDependencySpec({
         parsedSpec: {
-          name: "@openclaw/discord",
-          raw: "@openclaw/discord@stable",
+          name: "@recall/discord",
+          raw: "@recall/discord@stable",
           selector: "stable",
           selectorKind: "tag",
           selectorIsPrerelease: false,
         },
         resolution: {
-          name: "@openclaw/discord",
+          name: "@recall/discord",
           version: "2026.5.2",
-          resolvedSpec: "@openclaw/discord@2026.5.2",
+          resolvedSpec: "@recall/discord@2026.5.2",
           resolvedAt: "2026-05-03T00:00:00.000Z",
         },
       }),
@@ -326,15 +326,15 @@ describe("managed npm root", () => {
     expect(
       resolveManagedNpmRootDependencySpec({
         parsedSpec: {
-          name: "@openclaw/discord",
-          raw: "@openclaw/discord",
+          name: "@recall/discord",
+          raw: "@recall/discord",
           selectorKind: "none",
           selectorIsPrerelease: false,
         },
         resolution: {
-          name: "@openclaw/discord",
+          name: "@recall/discord",
           version: "2026.5.2",
-          resolvedSpec: "@openclaw/discord@2026.5.2",
+          resolvedSpec: "@recall/discord@2026.5.2",
           resolvedAt: "2026-05-03T00:00:00.000Z",
         },
       }),
@@ -349,9 +349,9 @@ describe("managed npm root", () => {
         {
           lockfileVersion: 3,
           packages: {
-            "node_modules/@openclaw/discord": {
+            "node_modules/@recall/discord": {
               version: "2026.5.2",
-              resolved: "https://registry.npmjs.org/@openclaw/discord/-/discord-2026.5.2.tgz",
+              resolved: "https://registry.npmjs.org/@recall/discord/-/discord-2026.5.2.tgz",
               integrity: "sha512-discord",
             },
           },
@@ -364,11 +364,11 @@ describe("managed npm root", () => {
     await expect(
       readManagedNpmRootInstalledDependency({
         npmRoot,
-        packageName: "@openclaw/discord",
+        packageName: "@recall/discord",
       }),
     ).resolves.toEqual({
       version: "2026.5.2",
-      resolved: "https://registry.npmjs.org/@openclaw/discord/-/discord-2026.5.2.tgz",
+      resolved: "https://registry.npmjs.org/@recall/discord/-/discord-2026.5.2.tgz",
       integrity: "sha512-discord",
     });
   });
@@ -388,7 +388,7 @@ describe("managed npm root", () => {
           devDependencies: {
             "dev-plugin": "1.0.0",
           },
-          openclaw: {
+          recall: {
             managedPeerDependencies: ["old-peer"],
           },
         },
@@ -438,7 +438,7 @@ describe("managed npm root", () => {
                 peer: true,
                 version: "2.1.0",
               },
-              "node_modules/openclaw": {
+              "node_modules/recall": {
                 peer: true,
                 version: "2026.5.12",
               },
@@ -446,7 +446,7 @@ describe("managed npm root", () => {
                 peerDependencies: {
                   "existing-root": "^1.0.0",
                   "new-peer": "^2.0.0",
-                  openclaw: ">=2026.5.0",
+                  recall: ">=2026.5.0",
                 },
                 version: "1.0.0",
               },
@@ -499,7 +499,7 @@ describe("managed npm root", () => {
       devDependencies: {
         "dev-plugin": "1.0.0",
       },
-      openclaw: {
+      recall: {
         managedPeerDependencies: ["new-peer"],
       },
     });
@@ -516,7 +516,7 @@ describe("managed npm root", () => {
             plugin: "1.0.0",
             "runtime-peer": "2.0.0",
           },
-          openclaw: {
+          recall: {
             managedPeerDependencies: ["runtime-peer"],
           },
         },
@@ -544,7 +544,7 @@ describe("managed npm root", () => {
         plugin: "1.0.0",
         "runtime-peer": "2.0.0",
       },
-      openclaw: {
+      recall: {
         managedPeerDependencies: ["runtime-peer"],
       },
     });
@@ -575,7 +575,7 @@ describe("managed npm root", () => {
         return {
           code: 1,
           stdout: "",
-          stderr: "npm ERR! notarget No matching version found for openclaw@2026.5.99-beta.1",
+          stderr: "npm ERR! notarget No matching version found for recall@2026.5.99-beta.1",
           signal: null,
           killed: false,
           termination: "exit" as const,
@@ -594,7 +594,7 @@ describe("managed npm root", () => {
               },
               "node_modules/plugin": {
                 peerDependencies: {
-                  openclaw: "2026.5.99-beta.1",
+                  recall: "2026.5.99-beta.1",
                   "runtime-peer": "^2.0.0",
                 },
                 version: "1.0.0",
@@ -626,7 +626,7 @@ describe("managed npm root", () => {
         plugin: "1.0.0",
         "runtime-peer": "^2.0.0",
       },
-      openclaw: {
+      recall: {
         managedPeerDependencies: ["runtime-peer"],
       },
     });
@@ -695,7 +695,7 @@ describe("managed npm root", () => {
         plugin: "1.0.0",
         "runtime-peer": "^2.0.0",
       },
-      openclaw: {
+      recall: {
         managedPeerDependencies: ["runtime-peer"],
       },
     });
@@ -774,8 +774,8 @@ describe("managed npm root", () => {
         {
           private: true,
           dependencies: {
-            "@openclaw/discord": "2026.5.2",
-            "@openclaw/voice-call": "2026.5.2",
+            "@recall/discord": "2026.5.2",
+            "@recall/voice-call": "2026.5.2",
           },
           devDependencies: {
             fixture: "1.0.0",
@@ -788,7 +788,7 @@ describe("managed npm root", () => {
 
     await removeManagedNpmRootDependency({
       npmRoot,
-      packageName: "@openclaw/voice-call",
+      packageName: "@recall/voice-call",
     });
 
     await expect(
@@ -796,7 +796,7 @@ describe("managed npm root", () => {
     ).resolves.toEqual({
       private: true,
       dependencies: {
-        "@openclaw/discord": "2026.5.2",
+        "@recall/discord": "2026.5.2",
       },
       devDependencies: {
         fixture: "1.0.0",
@@ -804,17 +804,17 @@ describe("managed npm root", () => {
     });
   });
 
-  it("repairs stale managed openclaw peer state without dropping plugin packages", async () => {
+  it("repairs stale managed recall peer state without dropping plugin packages", async () => {
     const npmRoot = await makeTempRoot();
-    await fs.mkdir(path.join(npmRoot, "node_modules", "openclaw"), { recursive: true });
+    await fs.mkdir(path.join(npmRoot, "node_modules", "recall"), { recursive: true });
     await fs.writeFile(
       path.join(npmRoot, "package.json"),
       `${JSON.stringify(
         {
           private: true,
           dependencies: {
-            openclaw: "2026.5.4",
-            "@openclaw/discord": "2026.5.4",
+            recall: "2026.5.4",
+            "@recall/discord": "2026.5.4",
           },
         },
         null,
@@ -829,19 +829,19 @@ describe("managed npm root", () => {
           packages: {
             "": {
               dependencies: {
-                openclaw: "2026.5.4",
-                "@openclaw/discord": "2026.5.4",
+                recall: "2026.5.4",
+                "@recall/discord": "2026.5.4",
               },
             },
-            "node_modules/openclaw": {
+            "node_modules/recall": {
               version: "2026.5.4",
             },
-            "node_modules/@openclaw/discord": {
+            "node_modules/@recall/discord": {
               version: "2026.5.4",
             },
           },
           dependencies: {
-            openclaw: {
+            recall: {
               version: "2026.5.4",
             },
           },
@@ -851,20 +851,20 @@ describe("managed npm root", () => {
       )}\n`,
     );
     await fs.writeFile(
-      path.join(npmRoot, "node_modules", "openclaw", "package.json"),
-      `${JSON.stringify({ name: "openclaw", version: "2026.5.4" })}\n`,
+      path.join(npmRoot, "node_modules", "recall", "package.json"),
+      `${JSON.stringify({ name: "recall", version: "2026.5.4" })}\n`,
     );
     await fs.mkdir(path.join(npmRoot, "node_modules", ".bin"), { recursive: true });
-    await fs.writeFile(path.join(npmRoot, "node_modules", ".bin", "openclaw"), "shim");
-    await fs.writeFile(path.join(npmRoot, "node_modules", ".bin", "openclaw.cmd"), "cmd shim");
-    await fs.writeFile(path.join(npmRoot, "node_modules", ".bin", "openclaw.ps1"), "ps1 shim");
+    await fs.writeFile(path.join(npmRoot, "node_modules", ".bin", "recall"), "shim");
+    await fs.writeFile(path.join(npmRoot, "node_modules", ".bin", "recall.cmd"), "cmd shim");
+    await fs.writeFile(path.join(npmRoot, "node_modules", ".bin", "recall.ps1"), "ps1 shim");
     await fs.writeFile(
       path.join(npmRoot, "node_modules", ".package-lock.json"),
       `${JSON.stringify(
         {
           lockfileVersion: 3,
           packages: {
-            "node_modules/openclaw": {
+            "node_modules/recall": {
               version: "2026.5.4",
             },
           },
@@ -875,7 +875,7 @@ describe("managed npm root", () => {
     );
 
     const runCommand = vi.fn().mockResolvedValue(successfulSpawn);
-    await expect(repairManagedNpmRootOpenClawPeer({ npmRoot, runCommand })).resolves.toBe(true);
+    await expect(repairManagedNpmRootRecallPeer({ npmRoot, runCommand })).resolves.toBe(true);
     expect(runCommand).toHaveBeenCalledTimes(1);
     const [repairArgs, rawRepairOptions] = requireFirstMockCall(runCommand, "repair command");
     const repairOptions = requireCommandOptions(rawRepairOptions, "repair");
@@ -887,7 +887,7 @@ describe("managed npm root", () => {
       "--ignore-scripts",
       "--no-audit",
       "--no-fund",
-      "openclaw",
+      "recall",
     ]);
     expect(repairOptions?.cwd).toBe(npmRoot);
     expect(repairOptions?.timeoutMs).toBe(300_000);
@@ -897,7 +897,7 @@ describe("managed npm root", () => {
       dependencies?: Record<string, string>;
     };
     expect(manifest.dependencies).toEqual({
-      "@openclaw/discord": "2026.5.4",
+      "@recall/discord": "2026.5.4",
     });
     const lockfile = JSON.parse(
       await fs.readFile(path.join(npmRoot, "package-lock.json"), "utf8"),
@@ -906,21 +906,21 @@ describe("managed npm root", () => {
       dependencies?: Record<string, unknown>;
     };
     expect(lockfile.packages?.[""]?.dependencies).toEqual({
-      "@openclaw/discord": "2026.5.4",
+      "@recall/discord": "2026.5.4",
     });
-    expect(lockfile.packages?.["node_modules/openclaw"]).toBeUndefined();
-    expect(lockfile.packages?.["node_modules/@openclaw/discord"]?.version).toBe("2026.5.4");
-    expect(lockfile.dependencies?.openclaw).toBeUndefined();
-    await expectPathMissing(path.join(npmRoot, "node_modules", "openclaw"));
-    for (const binName of ["openclaw", "openclaw.cmd", "openclaw.ps1"]) {
+    expect(lockfile.packages?.["node_modules/recall"]).toBeUndefined();
+    expect(lockfile.packages?.["node_modules/@recall/discord"]?.version).toBe("2026.5.4");
+    expect(lockfile.dependencies?.recall).toBeUndefined();
+    await expectPathMissing(path.join(npmRoot, "node_modules", "recall"));
+    for (const binName of ["recall", "recall.cmd", "recall.ps1"]) {
       await expectPathMissing(path.join(npmRoot, "node_modules", ".bin", binName));
     }
     await expectPathMissing(path.join(npmRoot, "node_modules", ".package-lock.json"));
   });
 
-  it("does not repair the active OpenClaw host package in a root-managed install", async () => {
+  it("does not repair the active Recall host package in a root-managed install", async () => {
     const npmRoot = await makeTempRoot();
-    const hostPackageRoot = path.join(npmRoot, "node_modules", "openclaw");
+    const hostPackageRoot = path.join(npmRoot, "node_modules", "recall");
     await fs.mkdir(path.join(hostPackageRoot, "dist"), { recursive: true });
     await fs.writeFile(
       path.join(npmRoot, "package.json"),
@@ -928,8 +928,8 @@ describe("managed npm root", () => {
         {
           private: true,
           dependencies: {
-            openclaw: "2026.5.12-beta.6",
-            "@xdarkicex/openclaw-memory-libravdb": "1.4.69",
+            recall: "2026.5.12-beta.6",
+            "@xdarkicex/recall-memory-libravdb": "1.4.69",
           },
         },
         null,
@@ -944,11 +944,11 @@ describe("managed npm root", () => {
           packages: {
             "": {
               dependencies: {
-                openclaw: "2026.5.12-beta.6",
-                "@xdarkicex/openclaw-memory-libravdb": "1.4.69",
+                recall: "2026.5.12-beta.6",
+                "@xdarkicex/recall-memory-libravdb": "1.4.69",
               },
             },
-            "node_modules/openclaw": {
+            "node_modules/recall": {
               version: "2026.5.12-beta.6",
             },
           },
@@ -959,12 +959,12 @@ describe("managed npm root", () => {
     );
     await fs.writeFile(
       path.join(hostPackageRoot, "package.json"),
-      `${JSON.stringify({ name: "openclaw", version: "2026.5.12-beta.6" })}\n`,
+      `${JSON.stringify({ name: "recall", version: "2026.5.12-beta.6" })}\n`,
     );
 
     const runCommand = vi.fn().mockResolvedValue(successfulSpawn);
     await expect(
-      repairManagedNpmRootOpenClawPeer({
+      repairManagedNpmRootRecallPeer({
         npmRoot,
         packageRoot: hostPackageRoot,
         runCommand,
@@ -976,8 +976,8 @@ describe("managed npm root", () => {
       fs.readFile(path.join(npmRoot, "package.json"), "utf8").then((raw) => JSON.parse(raw)),
     ).resolves.toMatchObject({
       dependencies: {
-        openclaw: "2026.5.12-beta.6",
-        "@xdarkicex/openclaw-memory-libravdb": "1.4.69",
+        recall: "2026.5.12-beta.6",
+        "@xdarkicex/recall-memory-libravdb": "1.4.69",
       },
     });
     await expect(
@@ -987,24 +987,24 @@ describe("managed npm root", () => {
 
   it("scrubs managed ownership metadata without deleting a linked active host package", async () => {
     const npmRoot = await makeTempRoot();
-    const hostPackageRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-host-package-"));
+    const hostPackageRoot = await fs.mkdtemp(path.join(os.tmpdir(), "recall-host-package-"));
     tempDirs.push(hostPackageRoot);
     await fs.mkdir(path.join(npmRoot, "node_modules", ".bin"), { recursive: true });
     await fs.writeFile(
       path.join(hostPackageRoot, "package.json"),
-      `${JSON.stringify({ name: "openclaw", version: "2026.5.12-beta.6" })}\n`,
+      `${JSON.stringify({ name: "recall", version: "2026.5.12-beta.6" })}\n`,
     );
-    await fs.symlink(hostPackageRoot, path.join(npmRoot, "node_modules", "openclaw"), "dir");
-    await fs.writeFile(path.join(npmRoot, "node_modules", ".bin", "openclaw"), "shim");
-    await fs.writeFile(path.join(npmRoot, "node_modules", ".bin", "openclaw.cmd"), "cmd shim");
-    await fs.writeFile(path.join(npmRoot, "node_modules", ".bin", "openclaw.ps1"), "ps1 shim");
+    await fs.symlink(hostPackageRoot, path.join(npmRoot, "node_modules", "recall"), "dir");
+    await fs.writeFile(path.join(npmRoot, "node_modules", ".bin", "recall"), "shim");
+    await fs.writeFile(path.join(npmRoot, "node_modules", ".bin", "recall.cmd"), "cmd shim");
+    await fs.writeFile(path.join(npmRoot, "node_modules", ".bin", "recall.ps1"), "ps1 shim");
     await fs.writeFile(
       path.join(npmRoot, "node_modules", ".package-lock.json"),
       `${JSON.stringify(
         {
           lockfileVersion: 3,
           packages: {
-            "node_modules/openclaw": {
+            "node_modules/recall": {
               version: "2026.5.12-beta.6",
             },
           },
@@ -1019,8 +1019,8 @@ describe("managed npm root", () => {
         {
           private: true,
           dependencies: {
-            openclaw: "2026.5.12-beta.6",
-            "@xdarkicex/openclaw-memory-libravdb": "1.4.69",
+            recall: "2026.5.12-beta.6",
+            "@xdarkicex/recall-memory-libravdb": "1.4.69",
           },
         },
         null,
@@ -1035,19 +1035,19 @@ describe("managed npm root", () => {
           packages: {
             "": {
               dependencies: {
-                openclaw: "2026.5.12-beta.6",
-                "@xdarkicex/openclaw-memory-libravdb": "1.4.69",
+                recall: "2026.5.12-beta.6",
+                "@xdarkicex/recall-memory-libravdb": "1.4.69",
               },
             },
-            "node_modules/openclaw": {
+            "node_modules/recall": {
               version: "2026.5.12-beta.6",
             },
-            "node_modules/@xdarkicex/openclaw-memory-libravdb": {
+            "node_modules/@xdarkicex/recall-memory-libravdb": {
               version: "1.4.69",
             },
           },
           dependencies: {
-            openclaw: {
+            recall: {
               version: "2026.5.12-beta.6",
             },
           },
@@ -1059,7 +1059,7 @@ describe("managed npm root", () => {
 
     const runCommand = vi.fn().mockResolvedValue(successfulSpawn);
     await expect(
-      repairManagedNpmRootOpenClawPeer({
+      repairManagedNpmRootRecallPeer({
         npmRoot,
         packageRoot: hostPackageRoot,
         runCommand,
@@ -1067,7 +1067,7 @@ describe("managed npm root", () => {
     ).resolves.toBe(true);
 
     expect(runCommand).not.toHaveBeenCalled();
-    await expect(fs.realpath(path.join(npmRoot, "node_modules", "openclaw"))).resolves.toBe(
+    await expect(fs.realpath(path.join(npmRoot, "node_modules", "recall"))).resolves.toBe(
       await fs.realpath(hostPackageRoot),
     );
     await expect(
@@ -1078,7 +1078,7 @@ describe("managed npm root", () => {
       dependencies?: Record<string, string>;
     };
     expect(manifest.dependencies).toEqual({
-      "@xdarkicex/openclaw-memory-libravdb": "1.4.69",
+      "@xdarkicex/recall-memory-libravdb": "1.4.69",
     });
 
     const lockfile = JSON.parse(
@@ -1088,14 +1088,14 @@ describe("managed npm root", () => {
       dependencies?: Record<string, unknown>;
     };
     expect(lockfile.packages?.[""]?.dependencies).toEqual({
-      "@xdarkicex/openclaw-memory-libravdb": "1.4.69",
+      "@xdarkicex/recall-memory-libravdb": "1.4.69",
     });
-    expect(lockfile.packages?.["node_modules/openclaw"]).toBeUndefined();
-    expect(lockfile.packages?.["node_modules/@xdarkicex/openclaw-memory-libravdb"]?.version).toBe(
+    expect(lockfile.packages?.["node_modules/recall"]).toBeUndefined();
+    expect(lockfile.packages?.["node_modules/@xdarkicex/recall-memory-libravdb"]?.version).toBe(
       "1.4.69",
     );
-    expect(lockfile.dependencies?.openclaw).toBeUndefined();
-    for (const binName of ["openclaw", "openclaw.cmd", "openclaw.ps1"]) {
+    expect(lockfile.dependencies?.recall).toBeUndefined();
+    for (const binName of ["recall", "recall.cmd", "recall.ps1"]) {
       await expectPathMissing(path.join(npmRoot, "node_modules", ".bin", binName));
     }
     await expectPathMissing(path.join(npmRoot, "node_modules", ".package-lock.json"));

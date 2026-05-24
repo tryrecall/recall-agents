@@ -249,36 +249,36 @@ async function resolveConvexLeaseConfig(opts: Map<string, string>) {
   const fileEnv = await readEnvFile(envFile);
   const siteUrl =
     opts.get("site-url") ||
-    process.env.OPENCLAW_QA_CONVEX_SITE_URL?.trim() ||
-    fileEnv.OPENCLAW_QA_CONVEX_SITE_URL;
+    process.env.RECALL_QA_CONVEX_SITE_URL?.trim() ||
+    fileEnv.RECALL_QA_CONVEX_SITE_URL;
   const token =
     opts.get("ci-secret") ||
-    process.env.OPENCLAW_QA_CONVEX_SECRET_CI?.trim() ||
-    fileEnv.OPENCLAW_QA_CONVEX_SECRET_CI;
+    process.env.RECALL_QA_CONVEX_SECRET_CI?.trim() ||
+    fileEnv.RECALL_QA_CONVEX_SECRET_CI;
   if (!siteUrl) {
-    throw new Error("Missing OPENCLAW_QA_CONVEX_SITE_URL.");
+    throw new Error("Missing RECALL_QA_CONVEX_SITE_URL.");
   }
   if (!token) {
-    throw new Error("Missing OPENCLAW_QA_CONVEX_SECRET_CI.");
+    throw new Error("Missing RECALL_QA_CONVEX_SECRET_CI.");
   }
   return {
     siteUrl,
     token,
     leaseTtlMs: optionalPositiveInteger(
       opts.get("lease-ttl-ms") ||
-        process.env.OPENCLAW_QA_CREDENTIAL_LEASE_TTL_MS?.trim() ||
-        fileEnv.OPENCLAW_QA_CREDENTIAL_LEASE_TTL_MS,
+        process.env.RECALL_QA_CREDENTIAL_LEASE_TTL_MS?.trim() ||
+        fileEnv.RECALL_QA_CREDENTIAL_LEASE_TTL_MS,
       20 * 60 * 1_000,
     ),
     heartbeatIntervalMs: optionalPositiveInteger(
       opts.get("heartbeat-interval-ms") ||
-        process.env.OPENCLAW_QA_CREDENTIAL_HEARTBEAT_INTERVAL_MS?.trim() ||
-        fileEnv.OPENCLAW_QA_CREDENTIAL_HEARTBEAT_INTERVAL_MS,
+        process.env.RECALL_QA_CREDENTIAL_HEARTBEAT_INTERVAL_MS?.trim() ||
+        fileEnv.RECALL_QA_CREDENTIAL_HEARTBEAT_INTERVAL_MS,
       30_000,
     ),
     ownerId:
       opts.get("owner-id") ||
-      process.env.OPENCLAW_QA_CREDENTIAL_OWNER_ID?.trim() ||
+      process.env.RECALL_QA_CREDENTIAL_OWNER_ID?.trim() ||
       `telegram-user-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`,
   };
 }
@@ -366,7 +366,7 @@ async function createTelegramUserPayload(opts: Map<string, string>) {
   const config = await readJson(`${userDriverDir}/config.local.json`);
   const botCredentials = await readJson(botCredentialsFile);
   const sutToken =
-    process.env.OPENCLAW_QA_TELEGRAM_SUT_BOT_TOKEN?.trim() ||
+    process.env.RECALL_QA_TELEGRAM_SUT_BOT_TOKEN?.trim() ||
     process.env.TELEGRAM_E2E_SUT_BOT_TOKEN?.trim() ||
     (typeof botCredentials.sutBotToken === "string" ? botCredentials.sutBotToken.trim() : "") ||
     (typeof botCredentials.botAToken === "string" ? botCredentials.botAToken.trim() : "") ||
@@ -376,7 +376,7 @@ async function createTelegramUserPayload(opts: Map<string, string>) {
   }
 
   const groupId =
-    process.env.OPENCLAW_QA_TELEGRAM_GROUP_ID?.trim() ||
+    process.env.RECALL_QA_TELEGRAM_GROUP_ID?.trim() ||
     process.env.TELEGRAM_E2E_GROUP_ID?.trim() ||
     (typeof config.defaultChatId === "string" ? config.defaultChatId.trim() : "") ||
     (typeof botCredentials.groupId === "string" ? botCredentials.groupId.trim() : "");
@@ -384,7 +384,7 @@ async function createTelegramUserPayload(opts: Map<string, string>) {
     throw new Error("Missing group id in env, user-driver config, or bot credentials file.");
   }
 
-  const tempRoot = `/tmp/openclaw-telegram-user-credential-${Date.now()}-${Math.random()
+  const tempRoot = `/tmp/recall-telegram-user-credential-${Date.now()}-${Math.random()
     .toString(16)
     .slice(2)}`;
   const tdlibArchive = `${tempRoot}/tdlib.tgz`;
@@ -458,7 +458,7 @@ async function restoreTelegramUserPayload(params: {
     usage();
   }
   const payload = parseTelegramUserQaCredentialPayload(params.payload);
-  const tempRoot = `/tmp/openclaw-telegram-user-restore-${Date.now()}-${Math.random()
+  const tempRoot = `/tmp/recall-telegram-user-restore-${Date.now()}-${Math.random()
     .toString(16)
     .slice(2)}`;
   const tdlibArchive = `${tempRoot}/tdlib.tgz`;

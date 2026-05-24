@@ -6,7 +6,7 @@ import { extractPluginInstallRecordsFromInstalledPluginIndex } from "./installed
 import {
   getRuntimePluginRegistryForLoadOptions,
   isPluginRegistryLoadInFlight,
-  loadOpenClawPlugins,
+  loadRecallPlugins,
   type PluginLoadOptions,
 } from "./loader.js";
 import type { PluginMetadataRegistryView } from "./plugin-metadata-snapshot.types.js";
@@ -333,7 +333,7 @@ export function resolvePluginProviders(params: {
     if (!loadState) {
       return [];
     }
-    const registry = loadOpenClawPlugins(loadState.loadOptions);
+    const registry = loadRecallPlugins(loadState.loadOptions);
     return registry.providers.map((entry) =>
       Object.assign({}, entry.provider, { pluginId: entry.pluginId }),
     );

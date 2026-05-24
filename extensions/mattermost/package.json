@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/mattermost",
+  "name": "@recall/mattermost",
   "version": "2026.5.22",
-  "description": "OpenClaw Mattermost channel plugin",
+  "description": "Recall Mattermost channel plugin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/tryrecall/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -12,18 +12,18 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*",
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.5.22"
+    "recall": ">=2026.5.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],

@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { createSlackWebClient, createSlackWriteClient } from "@openclaw/slack/api.js";
+import { createSlackWebClient, createSlackWriteClient } from "@recall/slack/api.js";
 import type { WebClient } from "@slack/web-api";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
 import { z } from "zod";
 import { startQaGatewayChild } from "../../gateway-child.js";
 import { DEFAULT_QA_LIVE_PROVIDER_MODE } from "../../providers/index.js";
@@ -236,17 +236,17 @@ type SlackQaSummary = {
 type SlackCredentialLease = Awaited<ReturnType<typeof acquireQaCredentialLease<SlackQaRuntimeEnv>>>;
 type SlackCredentialHeartbeat = ReturnType<typeof startQaCredentialLeaseHeartbeat>;
 
-const SLACK_QA_CAPTURE_CONTENT_ENV = "OPENCLAW_QA_SLACK_CAPTURE_CONTENT";
-const SLACK_QA_APPROVAL_CHECKPOINT_DIR_ENV = "OPENCLAW_QA_SLACK_APPROVAL_CHECKPOINT_DIR";
+const SLACK_QA_CAPTURE_CONTENT_ENV = "RECALL_QA_SLACK_CAPTURE_CONTENT";
+const SLACK_QA_APPROVAL_CHECKPOINT_DIR_ENV = "RECALL_QA_SLACK_APPROVAL_CHECKPOINT_DIR";
 const SLACK_QA_APPROVAL_CHECKPOINT_TIMEOUT_MS_ENV =
-  "OPENCLAW_QA_SLACK_APPROVAL_CHECKPOINT_TIMEOUT_MS";
-const QA_REDACT_PUBLIC_METADATA_ENV = "OPENCLAW_QA_REDACT_PUBLIC_METADATA";
+  "RECALL_QA_SLACK_APPROVAL_CHECKPOINT_TIMEOUT_MS";
+const QA_REDACT_PUBLIC_METADATA_ENV = "RECALL_QA_REDACT_PUBLIC_METADATA";
 const SLACK_QA_WEB_API_TIMEOUT_MS = 45_000;
 const SLACK_QA_ENV_KEYS = [
-  "OPENCLAW_QA_SLACK_CHANNEL_ID",
-  "OPENCLAW_QA_SLACK_DRIVER_BOT_TOKEN",
-  "OPENCLAW_QA_SLACK_SUT_BOT_TOKEN",
-  "OPENCLAW_QA_SLACK_SUT_APP_TOKEN",
+  "RECALL_QA_SLACK_CHANNEL_ID",
+  "RECALL_QA_SLACK_DRIVER_BOT_TOKEN",
+  "RECALL_QA_SLACK_SUT_BOT_TOKEN",
+  "RECALL_QA_SLACK_SUT_APP_TOKEN",
 ] as const;
 
 const slackQaCredentialPayloadSchema = z.object({
@@ -322,7 +322,7 @@ const SLACK_QA_SCENARIOS: SlackQaScenarioDefinition[] = [
     standardId: "allowlist-block",
     title: "Slack non-allowlisted sender does not trigger",
     timeoutMs: 8_000,
-    configOverrides: { users: ["U_OPENCLAW_QA_NEVER_ALLOWED"] },
+    configOverrides: { users: ["U_RECALL_QA_NEVER_ALLOWED"] },
     buildRun: (sutUserId) => {
       const token = `SLACK_QA_BLOCK_${randomUUID().slice(0, 8).toUpperCase()}`;
       return {
@@ -515,7 +515,7 @@ function inferSlackCredentialSource(
   env: NodeJS.ProcessEnv = process.env,
 ): "convex" | "env" {
   const normalized =
-    value?.trim().toLowerCase() || env.OPENCLAW_QA_CREDENTIAL_SOURCE?.trim().toLowerCase();
+    value?.trim().toLowerCase() || env.RECALL_QA_CREDENTIAL_SOURCE?.trim().toLowerCase();
   return normalized === "convex" ? "convex" : "env";
 }
 
@@ -542,12 +542,12 @@ function validateSlackQaRuntimeEnv(runtimeEnv: SlackQaRuntimeEnv, label: string)
 
 function resolveSlackQaRuntimeEnv(env: NodeJS.ProcessEnv = process.env): SlackQaRuntimeEnv {
   const runtimeEnv = {
-    channelId: resolveEnvValue(env, "OPENCLAW_QA_SLACK_CHANNEL_ID"),
-    driverBotToken: resolveEnvValue(env, "OPENCLAW_QA_SLACK_DRIVER_BOT_TOKEN"),
-    sutBotToken: resolveEnvValue(env, "OPENCLAW_QA_SLACK_SUT_BOT_TOKEN"),
-    sutAppToken: resolveEnvValue(env, "OPENCLAW_QA_SLACK_SUT_APP_TOKEN"),
+    channelId: resolveEnvValue(env, "RECALL_QA_SLACK_CHANNEL_ID"),
+    driverBotToken: resolveEnvValue(env, "RECALL_QA_SLACK_DRIVER_BOT_TOKEN"),
+    sutBotToken: resolveEnvValue(env, "RECALL_QA_SLACK_SUT_BOT_TOKEN"),
+    sutAppToken: resolveEnvValue(env, "RECALL_QA_SLACK_SUT_APP_TOKEN"),
   };
-  return validateSlackQaRuntimeEnv(runtimeEnv, "OPENCLAW_QA_SLACK");
+  return validateSlackQaRuntimeEnv(runtimeEnv, "RECALL_QA_SLACK");
 }
 
 function parseSlackQaCredentialPayload(payload: unknown): SlackQaRuntimeEnv {
@@ -570,7 +570,7 @@ function findScenario(ids?: string[]) {
 }
 
 function buildSlackQaConfig(
-  baseCfg: OpenClawConfig,
+  baseCfg: RecallConfig,
   params: {
     channelId: string;
     driverBotUserId: string;
@@ -579,7 +579,7 @@ function buildSlackQaConfig(
     sutAppToken: string;
     sutBotToken: string;
   },
-): OpenClawConfig {
+): RecallConfig {
   const pluginAllow = [...new Set([...(baseCfg.plugins?.allow ?? []), "slack"])];
   const approvalOverrides = params.overrides?.approvals;
   const approvalForwardingConfig =

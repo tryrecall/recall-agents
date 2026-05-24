@@ -20,7 +20,7 @@ Availability: internal preview. The iOS app is not publicly distributed yet.
 - Gateway running on another device (macOS, Linux, or Windows via WSL2).
 - Network path:
   - Same LAN via Bonjour, **or**
-  - Tailnet via unicast DNS-SD (example domain: `openclaw.internal.`), **or**
+  - Tailnet via unicast DNS-SD (example domain: `recall.internal.`), **or**
   - Manual host/port (fallback).
 
 ## Quick start (pair + connect)
@@ -28,7 +28,7 @@ Availability: internal preview. The iOS app is not publicly distributed yet.
 1. Start the Gateway:
 
 ```bash
-openclaw gateway --port 18789
+recall gateway --port 18789
 ```
 
 2. In the iOS app, open Settings and pick a discovered gateway (or enable Manual Host and enter host/port).
@@ -36,13 +36,13 @@ openclaw gateway --port 18789
 3. Approve the pairing request on the gateway host:
 
 ```bash
-openclaw devices list
-openclaw devices approve <requestId>
+recall devices list
+recall devices approve <requestId>
 ```
 
 If the app retries pairing with changed auth details (role/scopes/public key),
 the previous pending request is superseded and a new `requestId` is created.
-Run `openclaw devices list` again before approval.
+Run `recall devices list` again before approval.
 
 Optional: if the iOS node always connects from a tightly controlled subnet, you
 can opt in to first-time node auto-approval with explicit CIDRs or exact IPs:
@@ -66,8 +66,8 @@ public-key change still require manual approval.
 4. Verify connection:
 
 ```bash
-openclaw nodes status
-openclaw gateway call node.list --params "{}"
+recall nodes status
+recall gateway call node.list --params "{}"
 ```
 
 ## Relay-backed push for official builds
@@ -127,14 +127,14 @@ compatible but does not count as a durable last-seen update.
 
 Compatibility note:
 
-- `OPENCLAW_APNS_RELAY_BASE_URL` still works as a temporary env override for the gateway.
+- `RECALL_APNS_RELAY_BASE_URL` still works as a temporary env override for the gateway.
 
 ## Authentication and trust flow
 
 The relay exists to enforce two constraints that direct APNs-on-gateway cannot provide for
 official iOS builds:
 
-- Only genuine OpenClaw iOS builds distributed through Apple can use the hosted relay.
+- Only genuine Recall iOS builds distributed through Apple can use the hosted relay.
 - A gateway can send relay-backed pushes only for iOS devices that paired with that specific
   gateway.
 
@@ -177,16 +177,16 @@ Why this design was created:
 
 - To keep production APNs credentials out of user gateways.
 - To avoid storing raw official-build APNs tokens on the gateway.
-- To allow hosted relay usage only for official/TestFlight OpenClaw builds.
+- To allow hosted relay usage only for official/TestFlight Recall builds.
 - To prevent one gateway from sending wake pushes to iOS devices owned by a different gateway.
 
 Local/manual builds remain on direct APNs. If you are testing those builds without the relay, the
 gateway still needs direct APNs credentials:
 
 ```bash
-export OPENCLAW_APNS_TEAM_ID="TEAMID"
-export OPENCLAW_APNS_KEY_ID="KEYID"
-export OPENCLAW_APNS_PRIVATE_KEY_P8="$(cat /path/to/AuthKey_KEYID.p8)"
+export RECALL_APNS_TEAM_ID="TEAMID"
+export RECALL_APNS_KEY_ID="KEYID"
+export RECALL_APNS_PRIVATE_KEY_P8="$(cat /path/to/AuthKey_KEYID.p8)"
 ```
 
 These are gateway-host runtime env vars, not Fastlane settings. `apps/ios/fastlane/.env` only stores
@@ -196,11 +196,11 @@ direct APNs delivery for local iOS builds.
 Recommended gateway-host storage:
 
 ```bash
-mkdir -p ~/.openclaw/credentials/apns
-chmod 700 ~/.openclaw/credentials/apns
-mv /path/to/AuthKey_KEYID.p8 ~/.openclaw/credentials/apns/AuthKey_KEYID.p8
-chmod 600 ~/.openclaw/credentials/apns/AuthKey_KEYID.p8
-export OPENCLAW_APNS_PRIVATE_KEY_PATH="$HOME/.openclaw/credentials/apns/AuthKey_KEYID.p8"
+mkdir -p ~/.recall/credentials/apns
+chmod 700 ~/.recall/credentials/apns
+mv /path/to/AuthKey_KEYID.p8 ~/.recall/credentials/apns/AuthKey_KEYID.p8
+chmod 600 ~/.recall/credentials/apns/AuthKey_KEYID.p8
+export RECALL_APNS_PRIVATE_KEY_PATH="$HOME/.recall/credentials/apns/AuthKey_KEYID.p8"
 ```
 
 Do not commit the `.p8` file or place it under the repo checkout.
@@ -216,7 +216,7 @@ cross-network discovery can use the configured wide-area domain without changing
 ### Tailnet (cross-network)
 
 If mDNS is blocked, use a unicast DNS-SD zone (choose a domain; example:
-`openclaw.internal.`) and Tailscale split DNS.
+`recall.internal.`) and Tailscale split DNS.
 See [Bonjour](/gateway/bonjour) for the CoreDNS example.
 
 ### Manual host/port
@@ -228,7 +228,7 @@ In Settings, enable **Manual Host** and enter the gateway host + port (default `
 The iOS node renders a WKWebView canvas. Use `node.invoke` to drive it:
 
 ```bash
-openclaw nodes invoke --node "iOS Node" --command canvas.navigate --params '{"url":"http://<gateway-host>:18789/__openclaw__/canvas/"}'
+recall nodes invoke --node "iOS Node" --command canvas.navigate --params '{"url":"http://<gateway-host>:18789/__openclaw__/canvas/"}'
 ```
 
 Notes:
@@ -242,10 +242,10 @@ Notes:
 
 The iOS app is a mobile node surface, not a Codex Computer Use backend. Codex
 Computer Use and `cua-driver mcp` control a local macOS desktop through MCP
-tools; the iOS app exposes iPhone capabilities through OpenClaw node commands
+tools; the iOS app exposes iPhone capabilities through Recall node commands
 such as `canvas.*`, `camera.*`, `screen.*`, `location.*`, and `talk.*`.
 
-Agents can still operate the iOS app through OpenClaw by invoking node
+Agents can still operate the iOS app through Recall by invoking node
 commands, but those calls go through the gateway node protocol and follow iOS
 foreground/background limits. Use [Codex Computer Use](/plugins/codex-computer-use)
 for local desktop control and this page for iOS node capabilities.
@@ -253,11 +253,11 @@ for local desktop control and this page for iOS node capabilities.
 ### Canvas eval / snapshot
 
 ```bash
-openclaw nodes invoke --node "iOS Node" --command canvas.eval --params '{"javaScript":"(() => { const {ctx} = window.__openclaw; ctx.clearRect(0,0,innerWidth,innerHeight); ctx.lineWidth=6; ctx.strokeStyle=\"#ff2d55\"; ctx.beginPath(); ctx.moveTo(40,40); ctx.lineTo(innerWidth-40, innerHeight-40); ctx.stroke(); return \"ok\"; })()"}'
+recall nodes invoke --node "iOS Node" --command canvas.eval --params '{"javaScript":"(() => { const {ctx} = window.__openclaw; ctx.clearRect(0,0,innerWidth,innerHeight); ctx.lineWidth=6; ctx.strokeStyle=\"#ff2d55\"; ctx.beginPath(); ctx.moveTo(40,40); ctx.lineTo(innerWidth-40, innerHeight-40); ctx.stroke(); return \"ok\"; })()"}'
 ```
 
 ```bash
-openclaw nodes invoke --node "iOS Node" --command canvas.snapshot --params '{"maxWidth":900,"format":"jpeg"}'
+recall nodes invoke --node "iOS Node" --command canvas.snapshot --params '{"maxWidth":900,"format":"jpeg"}'
 ```
 
 ## Voice wake + talk mode
@@ -273,7 +273,7 @@ openclaw nodes invoke --node "iOS Node" --command canvas.snapshot --params '{"ma
 
 - `NODE_BACKGROUND_UNAVAILABLE`: bring the iOS app to the foreground (canvas/camera/screen commands require it).
 - `A2UI_HOST_NOT_CONFIGURED`: the Gateway did not advertise the Canvas plugin surface URL; check `plugins.entries.canvas.config.host` in [Gateway configuration](/gateway/configuration).
-- Pairing prompt never appears: run `openclaw devices list` and approve manually.
+- Pairing prompt never appears: run `recall devices list` and approve manually.
 - Reconnect fails after reinstall: the Keychain pairing token was cleared; re-pair the node.
 
 ## Related docs

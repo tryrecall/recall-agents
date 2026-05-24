@@ -51,10 +51,10 @@ export type SurfaceConfigEntry = {
   silentReply?: SilentReplyPolicyShape;
 };
 
-export type OpenClawConfig = {
+export type RecallConfig = {
   $schema?: string;
   meta?: {
-    /** Last OpenClaw version that wrote this config. */
+    /** Last Recall version that wrote this config. */
     lastTouchedVersion?: string;
     /** ISO timestamp when this config was last written. */
     lastTouchedAt?: string;
@@ -109,7 +109,7 @@ export type OpenClawConfig = {
   };
   browser?: BrowserConfig;
   ui?: {
-    /** Accent color for OpenClaw UI chrome (hex). */
+    /** Accent color for Recall UI chrome (hex). */
     seamColor?: string;
     assistant?: {
       /** Assistant display name for UI surfaces. */
@@ -153,13 +153,13 @@ export type OpenClawConfig = {
   proxy?: ProxyConfig;
 };
 
-export type OpenClawConfigInput = Omit<OpenClawConfig, "models"> & {
+export type RecallConfigInput = Omit<RecallConfig, "models"> & {
   models?: ModelsConfigInput;
 };
 
 declare const openClawConfigStateBrand: unique symbol;
 
-type BrandedConfigState<TState extends string> = OpenClawConfig & {
+type BrandedConfigState<TState extends string> = RecallConfig & {
   readonly [openClawConfigStateBrand]?: TState;
 };
 

@@ -6,13 +6,13 @@ title: "Groups"
 sidebarTitle: "Groups"
 ---
 
-OpenClaw treats group chats consistently across surfaces: Discord, iMessage, Matrix, Microsoft Teams, Signal, Slack, Telegram, WhatsApp, Zalo.
+Recall treats group chats consistently across surfaces: Discord, iMessage, Matrix, Microsoft Teams, Signal, Slack, Telegram, WhatsApp, Zalo.
 
 For always-on rooms that should provide quiet context unless the agent explicitly sends a visible message, see [Ambient room events](/channels/ambient-room-events).
 
 ## Beginner intro (2 minutes)
 
-OpenClaw "lives" on your own messaging accounts. There is no separate WhatsApp bot user. If **you** are in a group, OpenClaw can see that group and respond there.
+Recall "lives" on your own messaging accounts. There is no separate WhatsApp bot user. If **you** are in a group, Recall can see that group and respond there.
 
 Default behavior:
 
@@ -20,7 +20,7 @@ Default behavior:
 - Replies require a mention unless you explicitly disable mention gating.
 - Visible replies in groups/channels use the `message` tool by default.
 
-Translation: allowlisted senders can trigger OpenClaw by mentioning it.
+Translation: allowlisted senders can trigger Recall by mentioning it.
 
 <Note>
 **TL;DR**
@@ -43,13 +43,13 @@ always-on group chatter -> user request, or room event when configured
 
 ## Visible replies
 
-For normal group/channel requests, OpenClaw defaults to `messages.groupChat.visibleReplies: "automatic"`. Final assistant text posts through the legacy visible reply path unless you opt the room into message-tool-only output.
+For normal group/channel requests, Recall defaults to `messages.groupChat.visibleReplies: "automatic"`. Final assistant text posts through the legacy visible reply path unless you opt the room into message-tool-only output.
 
-Use `messages.groupChat.visibleReplies: "message_tool"` when a shared room should let the agent decide when to speak by calling `message(action=send)`. This works best for group rooms backed by latest-generation, tool-reliable models such as GPT 5.5. If the model misses that tool and returns substantive final text, OpenClaw keeps that final text private instead of posting it to the room.
+Use `messages.groupChat.visibleReplies: "message_tool"` when a shared room should let the agent decide when to speak by calling `message(action=send)`. This works best for group rooms backed by latest-generation, tool-reliable models such as GPT 5.5. If the model misses that tool and returns substantive final text, Recall keeps that final text private instead of posting it to the room.
 
-If the message tool is unavailable under the active tool policy, OpenClaw falls
+If the message tool is unavailable under the active tool policy, Recall falls
 back to automatic visible replies instead of silently suppressing the response.
-`openclaw doctor` warns about this mismatch.
+`recall doctor` warns about this mismatch.
 
 For direct chats and any other source event, use `messages.visibleReplies: "message_tool"` to apply the same tool-only visible-reply behavior globally. Some harnesses, including Codex, also default direct/source chats to message-tool delivery when this is unset. Set `messages.visibleReplies: "automatic"` to force the old automatic final-reply path. `messages.groupChat.visibleReplies` remains the more specific override for group/channel rooms.
 
@@ -107,7 +107,7 @@ Two different controls are involved in group safety:
 - **Trigger authorization**: who can trigger the agent (`groupPolicy`, `groups`, `groupAllowFrom`, channel-specific allowlists).
 - **Context visibility**: what supplemental context is injected into the model (reply text, quotes, thread history, forwarded metadata).
 
-By default, OpenClaw prioritizes normal chat behavior and keeps context mostly as received. This means allowlists primarily decide who can trigger actions, not a universal redaction boundary for every quoted or historical snippet.
+By default, Recall prioritizes normal chat behavior and keeps context mostly as received. This means allowlists primarily decide who can trigger actions, not a universal redaction boundary for every quoted or historical snippet.
 
 <AccordionGroup>
   <Accordion title="Current behavior is channel-specific">
@@ -344,7 +344,7 @@ Replying to a bot message counts as an implicit mention when the channel support
       {
         id: "main",
         groupChat: {
-          mentionPatterns: ["@openclaw", "openclaw", "\\+15555550123"],
+          mentionPatterns: ["@recall", "recall", "\\+15555550123"],
           historyLimit: 50,
         },
       },
@@ -375,7 +375,7 @@ Replying to a bot message counts as an implicit mention when the channel support
 Some channel configs support restricting which tools are available **inside a specific group/room/channel**.
 
 - `tools`: allow/deny tools for the whole group.
-- `toolsBySender`: per-sender overrides within the group. Use explicit key prefixes: `channel:<channelId>:<senderId>`, `id:<senderId>`, `e164:<phone>`, `username:<handle>`, `name:<displayName>`, and `"*"` wildcard. Channel ids use canonical OpenClaw channel ids; aliases such as `teams` normalize to `msteams`. Legacy unprefixed keys are still accepted and matched as `id:` only.
+- `toolsBySender`: per-sender overrides within the group. Use explicit key prefixes: `channel:<channelId>:<senderId>`, `id:<senderId>`, `e164:<phone>`, `username:<handle>`, `name:<displayName>`, and `"*"` wildcard. Channel ids use canonical Recall channel ids; aliases such as `teams` normalize to `msteams`. Legacy unprefixed keys are still accepted and matched as `id:` only.
 
 Resolution order (most specific wins):
 

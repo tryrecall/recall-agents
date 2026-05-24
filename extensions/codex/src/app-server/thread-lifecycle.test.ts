@@ -1,4 +1,4 @@
-import type { EmbeddedRunAttemptParams } from "openclaw/plugin-sdk/agent-harness-runtime";
+import type { EmbeddedRunAttemptParams } from "recall/plugin-sdk/agent-harness-runtime";
 import { describe, expect, it } from "vitest";
 import {
   buildDeveloperInstructions,
@@ -60,12 +60,12 @@ function createAppServerOptions() {
 }
 
 describe("Codex app-server native code mode config", () => {
-  it("keeps Codex-native subagents primary while limiting OpenClaw spawn to OpenClaw delegation", () => {
+  it("keeps Codex-native subagents primary while limiting Recall spawn to Recall delegation", () => {
     const instructions = buildDeveloperInstructions(createAttemptParams({ provider: "openai" }));
 
     expect(instructions).toContain("Use Codex native `spawn_agent` for Codex subagents");
     expect(instructions).toContain(
-      "Use OpenClaw `sessions_spawn` only for OpenClaw or ACP delegation.",
+      "Use Recall `sessions_spawn` only for Recall or ACP delegation.",
     );
   });
 
@@ -81,21 +81,21 @@ describe("Codex app-server native code mode config", () => {
           name: "music_generate",
           description: "Create music",
           inputSchema: { type: "object" },
-          namespace: "openclaw",
+          namespace: "recall",
           deferLoading: true,
         },
         {
           name: "image_generate",
           description: "Create images",
           inputSchema: { type: "object" },
-          namespace: "openclaw",
+          namespace: "recall",
           deferLoading: true,
         },
       ],
     });
 
     expect(instructions).toContain(
-      "Deferred searchable OpenClaw dynamic tools available: image_generate, music_generate.",
+      "Deferred searchable Recall dynamic tools available: image_generate, music_generate.",
     );
     expect(instructions).toContain("Use `tool_search` to load exact callable specs before use.");
     expect(instructions).not.toContain("message,");
@@ -112,7 +112,7 @@ describe("Codex app-server native code mode config", () => {
       ],
     });
 
-    expect(instructions).not.toContain("Deferred searchable OpenClaw dynamic tools available");
+    expect(instructions).not.toContain("Deferred searchable Recall dynamic tools available");
   });
 
   it("keeps durable dynamic tool fingerprints independent from presentation mode", () => {
@@ -136,7 +136,7 @@ describe("Codex app-server native code mode config", () => {
         name: "message",
         description: "Load and send a visible message",
         inputSchema,
-        namespace: "openclaw",
+        namespace: "recall",
         deferLoading: true,
       },
     ]);
@@ -144,7 +144,7 @@ describe("Codex app-server native code mode config", () => {
     expect(searchableFingerprint).toBe(directFingerprint);
   });
 
-  it("keeps OpenClaw skill catalogs out of developer instructions", () => {
+  it("keeps Recall skill catalogs out of developer instructions", () => {
     const params = createAttemptParams({ provider: "openai" });
     params.skillsSnapshot = {
       prompt: "<available_skills><skill><name>demo</name></skill></available_skills>",

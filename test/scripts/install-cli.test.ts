@@ -9,7 +9,7 @@ function runInstallCliShell(script: string, env: NodeJS.ProcessEnv = {}) {
     encoding: "utf8",
     env: {
       ...process.env,
-      OPENCLAW_INSTALL_CLI_SH_NO_RUN: "1",
+      RECALL_INSTALL_CLI_SH_NO_RUN: "1",
       ...env,
     },
   });
@@ -24,19 +24,19 @@ describe("install-cli.sh", () => {
       source "${SCRIPT_PATH}"
       npm_bin() { echo npm; }
       npm() {
-        if [[ "$1" == "view" && "$2" == "openclaw" && "$3" == "dist-tags.beta" ]]; then
+        if [[ "$1" == "view" && "$2" == "recall" && "$3" == "dist-tags.beta" ]]; then
           printf '2026.5.12-beta.3\\n'
           return 0
         fi
         return 1
       }
-      OPENCLAW_VERSION=v2026.5.12-beta.3
+      RECALL_VERSION=v2026.5.12-beta.3
       printf 'tag=%s\\n' "$(resolve_git_openclaw_ref)"
-      OPENCLAW_VERSION=2026.5.12-beta.3
+      RECALL_VERSION=2026.5.12-beta.3
       printf 'semver=%s\\n' "$(resolve_git_openclaw_ref)"
-      OPENCLAW_VERSION=beta
+      RECALL_VERSION=beta
       printf 'beta=%s\\n' "$(resolve_git_openclaw_ref)"
-      OPENCLAW_VERSION=main
+      RECALL_VERSION=main
       printf 'main=%s\\n' "$(resolve_git_openclaw_ref)"
     `);
 
@@ -97,16 +97,16 @@ describe("install-cli.sh", () => {
     expect(script).toContain("env -u NPM_CONFIG_BEFORE -u npm_config_before");
   });
 
-  it("rejects OpenClaw GitHub source targets for npm installs", () => {
+  it("rejects Recall GitHub source targets for npm installs", () => {
     const result = runInstallCliShell(`
       set -euo pipefail
       source "${SCRIPT_PATH}"
-      OPENCLAW_VERSION=main
+      RECALL_VERSION=main
       install_openclaw
     `);
 
     expect(result.status).toBe(1);
-    expect(result.stdout).toContain("npm installs do not support OpenClaw GitHub source targets");
+    expect(result.stdout).toContain("npm installs do not support Recall GitHub source targets");
     expect(result.stdout).toContain("--install-method git --version main");
   });
 });

@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   resolvePluginCapabilityProvider,
   resolvePluginCapabilityProviders,
@@ -15,7 +15,7 @@ export function listRegisteredEmbeddingProviderAdapters(): EmbeddingProviderAdap
   return listRegisteredEmbeddingProviders().map((entry) => entry.adapter);
 }
 
-export function listEmbeddingProviders(cfg?: OpenClawConfig): EmbeddingProviderAdapter[] {
+export function listEmbeddingProviders(cfg?: RecallConfig): EmbeddingProviderAdapter[] {
   const registered = listRegisteredEmbeddingProviderAdapters();
   const merged = new Map(registered.map((adapter) => [adapter.id, adapter]));
   for (const adapter of resolvePluginCapabilityProviders({
@@ -31,7 +31,7 @@ export function listEmbeddingProviders(cfg?: OpenClawConfig): EmbeddingProviderA
 
 export function getEmbeddingProvider(
   id: string,
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): EmbeddingProviderAdapter | undefined {
   const registered = getRegisteredEmbeddingProvider(id);
   if (registered) {

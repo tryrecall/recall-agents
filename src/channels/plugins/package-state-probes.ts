@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import { isBundledSourceOverlayPath } from "../../plugins/bundled-source-overlays.js";
@@ -16,7 +16,7 @@ import { normalizeOptionalString } from "../../shared/string-coerce.js";
 import { loadChannelPluginModule, resolveExistingPluginModulePath } from "./module-loader.js";
 
 type ChannelPackageStateChecker = (params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   env?: NodeJS.ProcessEnv;
 }) => boolean;
 
@@ -244,7 +244,7 @@ export function listBundledChannelIdsForPackageState(
 export function hasBundledChannelPackageState(params: {
   metadataKey: ChannelPackageStateMetadataKey;
   channelId: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   env?: NodeJS.ProcessEnv;
 }): boolean {
   const requestedChannelId = normalizeOptionalString(params.channelId);

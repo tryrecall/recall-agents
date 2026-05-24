@@ -4,10 +4,10 @@ import {
   withRemoteHttpResponse,
   type MemoryEmbeddingProvider,
   type MemoryEmbeddingProviderAdapter,
-} from "openclaw/plugin-sdk/memory-core-host-engine-embeddings";
-import { buildCopilotIdeHeaders } from "openclaw/plugin-sdk/provider-auth";
-import { resolveConfiguredSecretInputString } from "openclaw/plugin-sdk/secret-input-runtime";
-import { fetchWithSsrFGuard, type SsrFPolicy } from "openclaw/plugin-sdk/ssrf-runtime";
+} from "recall/plugin-sdk/memory-core-host-engine-embeddings";
+import { buildCopilotIdeHeaders } from "recall/plugin-sdk/provider-auth";
+import { resolveConfiguredSecretInputString } from "recall/plugin-sdk/secret-input-runtime";
+import { fetchWithSsrFGuard, type SsrFPolicy } from "recall/plugin-sdk/ssrf-runtime";
 import { resolveFirstGithubToken } from "./auth.js";
 import { DEFAULT_COPILOT_API_BASE_URL, resolveCopilotApiToken } from "./token.js";
 

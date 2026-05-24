@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { normalizeMainKey } from "openclaw/plugin-sdk/routing";
-import { saveSessionStore } from "openclaw/plugin-sdk/session-store-runtime";
-import { withTempDir } from "openclaw/plugin-sdk/test-env";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { normalizeMainKey } from "recall/plugin-sdk/routing";
+import { saveSessionStore } from "recall/plugin-sdk/session-store-runtime";
+import { withTempDir } from "recall/plugin-sdk/test-env";
 import { describe, expect, it, vi } from "vitest";
 import type { WhatsAppSendResult } from "../inbound/send-result.js";
 import {
@@ -51,7 +51,7 @@ const makeMsg = (overrides: Partial<WebInboundMsg>): WebInboundMsg =>
   }) as WebInboundMsg;
 
 function getSessionSnapshotForTest(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   from: string,
   ctx?: {
     sessionKey?: string | null;
@@ -118,7 +118,7 @@ describe("isBotMentionedFromTargets", () => {
 
   it("ignores regex matches when other mentions are present", () => {
     const msg = makeMsg({
-      body: "@OpenClaw please help",
+      body: "@Recall please help",
       mentionedJids: ["19998887777@s.whatsapp.net"],
       selfE164: "+15551234567",
       selfJid: "15551234567@s.whatsapp.net",
@@ -138,7 +138,7 @@ describe("isBotMentionedFromTargets", () => {
 
   it("falls back to regex when no mentions are present", () => {
     const msg = makeMsg({
-      body: "openclaw can you help?",
+      body: "recall can you help?",
       selfE164: "+15551234567",
       selfJid: "15551234567@s.whatsapp.net",
     });
@@ -165,7 +165,7 @@ describe("isBotMentionedFromTargets", () => {
       from: "999@s.whatsapp.net",
       conversationId: "999@s.whatsapp.net",
       chatType: "direct",
-      body: "openclaw ping",
+      body: "recall ping",
       selfE164: "+999",
       selfJid: "999@s.whatsapp.net",
     });
@@ -218,7 +218,7 @@ describe("isBotMentionedFromTargets", () => {
 
 describe("resolveMentionTargets with @lid mapping", () => {
   it("uses @lid reverse mapping for mentions and self identity", async () => {
-    await withTempDir("openclaw-lid-mapping-", async (authDir) => {
+    await withTempDir("recall-lid-mapping-", async (authDir) => {
       await fs.writeFile(
         path.join(authDir, "lid-mapping-777_reverse.json"),
         JSON.stringify("+1777"),
@@ -262,7 +262,7 @@ describe("getSessionSnapshot", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 0, 18, 5, 0, 0));
     try {
-      await withTempDir("openclaw-snapshot-", async (root) => {
+      await withTempDir("recall-snapshot-", async (root) => {
         const storePath = path.join(root, "sessions.json");
         const sessionKey = "agent:main:whatsapp:dm:s1";
 
@@ -282,7 +282,7 @@ describe("getSessionSnapshot", () => {
               whatsapp: { mode: "idle", idleMinutes: 360 },
             },
           },
-        } as OpenClawConfig;
+        } as RecallConfig;
 
         const snapshot = getSessionSnapshotForTest(cfg, "whatsapp:+15550001111", {
           sessionKey,
@@ -304,13 +304,13 @@ describe("web auto-reply util", () => {
     it("returns normalized debug fields and mention outcome", () => {
       const msg = makeMsg({
         from: "777@lid",
-        body: "openclaw ping",
+        body: "recall ping",
         selfE164: "+15551234567",
         selfJid: "15551234567@s.whatsapp.net",
       });
       const result = debugMention(msg, { mentionRegexes: [/\bopenclaw\b/i] });
       expect(result.wasMentioned).toBe(true);
-      expect(result.details.bodyClean).toBe("openclaw ping");
+      expect(result.details.bodyClean).toBe("recall ping");
       expect(result.details.normalizedMentionedJids).toBeNull();
     });
 

@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
-import type { ChatCommandDefinition, CommandArgs } from "openclaw/plugin-sdk/command-auth-native";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { applyModelOverrideToSessionEntry } from "openclaw/plugin-sdk/model-session-runtime";
-import type { ResolvedAgentRoute } from "openclaw/plugin-sdk/routing";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { resolveStorePath, updateSessionStore } from "openclaw/plugin-sdk/session-store-runtime";
-import { withTimeout } from "openclaw/plugin-sdk/text-utility-runtime";
+import type { ChatCommandDefinition, CommandArgs } from "recall/plugin-sdk/command-auth-native";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { applyModelOverrideToSessionEntry } from "recall/plugin-sdk/model-session-runtime";
+import type { ResolvedAgentRoute } from "recall/plugin-sdk/routing";
+import { logVerbose } from "recall/plugin-sdk/runtime-env";
+import { resolveStorePath, updateSessionStore } from "recall/plugin-sdk/session-store-runtime";
+import { withTimeout } from "recall/plugin-sdk/text-utility-runtime";
 import type { ButtonInteraction, StringSelectMenuInteraction } from "../internal/discord.js";
 import {
   recordDiscordModelPickerRecentModel,
@@ -14,7 +14,7 @@ import {
 import type { DispatchDiscordCommandInteraction } from "./native-command-dispatch.js";
 import type { ThreadBindingManager } from "./thread-bindings.js";
 
-type DiscordConfig = NonNullable<OpenClawConfig["channels"]>["discord"];
+type DiscordConfig = NonNullable<RecallConfig["channels"]>["discord"];
 
 type DiscordModelPickerSelectionCommand = {
   prompt: string;
@@ -30,7 +30,7 @@ type DiscordModelPickerApplyResult =
   | { status: "failed"; noticeMessage: string };
 
 async function persistDiscordModelPickerOverride(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   route: ResolvedAgentRoute;
   provider: string;
   model: string;
@@ -77,7 +77,7 @@ export async function applyDiscordModelPickerSelection(params: {
   interaction: ButtonInteraction | StringSelectMenuInteraction;
   selectionCommand: DiscordModelPickerSelectionCommand;
   dispatchCommandInteraction: DispatchDiscordCommandInteraction;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   discordConfig: DiscordConfig;
   accountId: string;
   sessionPrefix: string;

@@ -1,37 +1,37 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { resolveChannelTtsVoiceDelivery } from "openclaw/plugin-sdk/channel-targets";
+import { resolveChannelTtsVoiceDelivery } from "recall/plugin-sdk/channel-targets";
 import type {
-  OpenClawConfig,
+  RecallConfig,
   ResolvedTtsPersona,
   TtsAutoMode,
   TtsConfig,
   TtsModelOverrideConfig,
   TtsProvider,
-} from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { redactSensitiveText } from "openclaw/plugin-sdk/logging-core";
-import { transcodeAudioBuffer } from "openclaw/plugin-sdk/media-runtime";
+} from "recall/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
+import { redactSensitiveText } from "recall/plugin-sdk/logging-core";
+import { transcodeAudioBuffer } from "recall/plugin-sdk/media-runtime";
 import {
   markReplyPayloadAsTtsSupplement,
   resolveSendableOutboundReplyParts,
   type ReplyPayload,
-} from "openclaw/plugin-sdk/reply-payload";
+} from "recall/plugin-sdk/reply-payload";
 import {
   getRuntimeConfigSnapshot,
   getRuntimeConfigSourceSnapshot,
   selectApplicableRuntimeConfig,
-} from "openclaw/plugin-sdk/runtime-config-snapshot";
-import { isVerbose, logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { tempWorkspaceSync, resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/sandbox";
-import { privateFileStoreSync } from "openclaw/plugin-sdk/security-runtime";
+} from "recall/plugin-sdk/runtime-config-snapshot";
+import { isVerbose, logVerbose } from "recall/plugin-sdk/runtime-env";
+import { tempWorkspaceSync, resolvePreferredRecallTmpDir } from "recall/plugin-sdk/sandbox";
+import { privateFileStoreSync } from "recall/plugin-sdk/security-runtime";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
-import { stripMarkdown } from "openclaw/plugin-sdk/text-chunking";
-import { resolveConfigDir, resolveUserPath } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "recall/plugin-sdk/string-coerce-runtime";
+import { stripMarkdown } from "recall/plugin-sdk/text-chunking";
+import { resolveConfigDir, resolveUserPath } from "recall/plugin-sdk/text-utility-runtime";
 import {
   canonicalizeSpeechProviderId,
   getSpeechProvider,
@@ -224,7 +224,7 @@ function resolveTtsPrefsPathValue(prefsPath: string | undefined): string {
   if (prefsPath?.trim()) {
     return resolveUserPath(prefsPath.trim());
   }
-  const envPath = process.env.OPENCLAW_TTS_PREFS?.trim();
+  const envPath = process.env.RECALL_TTS_PREFS?.trim();
   if (envPath) {
     return resolveUserPath(envPath);
   }
@@ -260,7 +260,7 @@ function resolveModelOverridePolicy(
   };
 }
 
-function sortSpeechProvidersForAutoSelection(cfg?: OpenClawConfig) {
+function sortSpeechProvidersForAutoSelection(cfg?: RecallConfig) {
   return listSpeechProviders(cfg).toSorted((left, right) => {
     const leftOrder = left.autoSelectOrder ?? Number.MAX_SAFE_INTEGER;
     const rightOrder = right.autoSelectOrder ?? Number.MAX_SAFE_INTEGER;
@@ -271,7 +271,7 @@ function sortSpeechProvidersForAutoSelection(cfg?: OpenClawConfig) {
   });
 }
 
-function resolveTtsRuntimeConfig(cfg: OpenClawConfig): OpenClawConfig {
+function resolveTtsRuntimeConfig(cfg: RecallConfig): RecallConfig {
   return (
     selectApplicableRuntimeConfig({
       inputConfig: cfg,
@@ -389,7 +389,7 @@ function resolveRawProviderConfig(
 function resolveLazyProviderConfig(
   config: ResolvedTtsConfig,
   providerId: string,
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): SpeechProviderConfig {
   const canonical =
     normalizeConfiguredSpeechProviderId(providerId) ?? normalizeLowercaseStringOrEmpty(providerId);
@@ -452,7 +452,7 @@ function collectDirectProviderConfigEntries(raw: TtsConfig): Record<string, Spee
 export function getResolvedSpeechProviderConfig(
   config: ResolvedTtsConfig,
   providerId: string,
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): SpeechProviderConfig {
   const effectiveCfg = cfg ? resolveTtsRuntimeConfig(cfg) : config.sourceConfig;
   const canonical =
@@ -463,7 +463,7 @@ export function getResolvedSpeechProviderConfig(
 }
 
 export function resolveTtsConfig(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   contextOrAgentId?: string | TtsConfigResolutionContext,
 ): ResolvedTtsConfig {
   cfg = resolveTtsRuntimeConfig(cfg);
@@ -526,7 +526,7 @@ export function resolveTtsAutoMode(params: {
 }
 
 function resolveEffectiveTtsAutoState(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionAuto?: string;
   agentId?: string;
   channelId?: string;
@@ -556,7 +556,7 @@ function resolveEffectiveTtsAutoState(params: {
 }
 
 export function buildTtsSystemPromptHint(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   agentId?: string,
 ): string | undefined {
   cfg = resolveTtsRuntimeConfig(cfg);
@@ -703,7 +703,7 @@ export function setTtsProvider(prefsPath: string, provider: TtsProvider): void {
 }
 
 export function resolveExplicitTtsOverrides(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   prefsPath?: string;
   provider?: string;
   modelId?: string;
@@ -857,7 +857,7 @@ function shouldDeliverTtsAsVoice(params: {
   return params.voiceCompatible === true || delivery.transcodesAudio === true;
 }
 
-export function resolveTtsProviderOrder(primary: TtsProvider, cfg?: OpenClawConfig): TtsProvider[] {
+export function resolveTtsProviderOrder(primary: TtsProvider, cfg?: RecallConfig): TtsProvider[] {
   const effectiveCfg = cfg ? resolveTtsRuntimeConfig(cfg) : undefined;
   const normalizedPrimary = canonicalizeSpeechProviderId(primary, effectiveCfg) ?? primary;
   const ordered = new Set<TtsProvider>([normalizedPrimary]);
@@ -873,7 +873,7 @@ export function resolveTtsProviderOrder(primary: TtsProvider, cfg?: OpenClawConf
 export function isTtsProviderConfigured(
   config: ResolvedTtsConfig,
   provider: TtsProvider,
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): boolean {
   const effectiveCfg = cfg ? resolveTtsRuntimeConfig(cfg) : config.sourceConfig;
   const resolvedProvider = getSpeechProvider(provider, effectiveCfg);
@@ -941,7 +941,7 @@ type TtsProviderReadyResolution =
 
 function resolveReadySpeechProvider(params: {
   provider: TtsProvider;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   config: ResolvedTtsConfig;
   persona?: ResolvedTtsPersona;
   requireTelephony?: boolean;
@@ -1011,7 +1011,7 @@ function resolveReadySpeechProvider(params: {
 async function prepareSpeechSynthesis(params: {
   provider: NonNullable<ReturnType<typeof getSpeechProvider>>;
   text: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   providerConfig: SpeechProviderConfig;
   providerOverrides?: SpeechProviderOverrides;
   persona?: ResolvedTtsPersona;
@@ -1053,7 +1053,7 @@ async function prepareSpeechSynthesis(params: {
 
 function resolveTtsRequestSetup(params: {
   text: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   prefsPath?: string;
   providerOverride?: TtsProvider;
   disableFallback?: boolean;
@@ -1062,7 +1062,7 @@ function resolveTtsRequestSetup(params: {
   accountId?: string;
 }):
   | {
-      cfg: OpenClawConfig;
+      cfg: RecallConfig;
       config: ResolvedTtsConfig;
       persona?: ResolvedTtsPersona;
       providers: TtsProvider[];
@@ -1125,7 +1125,7 @@ function resolveTtsResultVoice(
 
 export async function textToSpeech(params: {
   text: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   prefsPath?: string;
   channel?: string;
   overrides?: TtsDirectiveOverrides;
@@ -1162,7 +1162,7 @@ export async function textToSpeech(params: {
   }
 
   const temp = tempWorkspaceSync({
-    rootDir: resolvePreferredOpenClawTmpDir(),
+    rootDir: resolvePreferredRecallTmpDir(),
     prefix: "tts-",
   });
   const audioPath = temp.write(`voice-${Date.now()}${fileExtension}`, audioBuffer);
@@ -1237,7 +1237,7 @@ async function maybePreTranscodeForVoiceDelivery(params: {
 
 export async function synthesizeSpeech(params: {
   text: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   prefsPath?: string;
   channel?: string;
   overrides?: TtsDirectiveOverrides;
@@ -1381,7 +1381,7 @@ export async function synthesizeSpeech(params: {
 
 export async function streamSpeech(params: {
   text: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   prefsPath?: string;
   channel?: string;
   overrides?: TtsDirectiveOverrides;
@@ -1539,7 +1539,7 @@ export async function streamSpeech(params: {
 
 export async function textToSpeechStream(params: {
   text: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   prefsPath?: string;
   channel?: string;
   overrides?: TtsDirectiveOverrides;
@@ -1563,7 +1563,7 @@ export async function textToSpeechStream(params: {
 
 export async function textToSpeechTelephony(params: {
   text: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   prefsPath?: string;
   overrides?: TtsDirectiveOverrides;
 }): Promise<TtsTelephonyResult> {
@@ -1697,7 +1697,7 @@ export async function textToSpeechTelephony(params: {
 
 export async function listSpeechVoices(params: {
   provider: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   config?: ResolvedTtsConfig;
   apiKey?: string;
   baseUrl?: string;
@@ -1728,7 +1728,7 @@ export async function listSpeechVoices(params: {
 
 export async function maybeApplyTtsToPayload(params: {
   payload: ReplyPayload;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channel?: string;
   kind?: "tool" | "block" | "final";
   inboundAudio?: boolean;

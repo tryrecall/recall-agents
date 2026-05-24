@@ -18,7 +18,7 @@ import {
   type AcpRuntimeTurn,
   type AcpRuntimeTurnResult,
 } from "acpx/runtime";
-import { redactSensitiveText } from "openclaw/plugin-sdk/security-runtime";
+import { redactSensitiveText } from "recall/plugin-sdk/security-runtime";
 import { AcpRuntimeError, type AcpRuntime, type AcpRuntimeErrorCode } from "../runtime-api.js";
 import {
   createAcpxProcessLeaseId,
@@ -28,8 +28,8 @@ import {
   type AcpxProcessLeaseStore,
 } from "./process-lease.js";
 import {
-  cleanupOpenClawOwnedAcpxProcessTree,
-  isOpenClawLeaseAwareAcpxProcessCommand,
+  cleanupRecallOwnedAcpxProcessTree,
+  isRecallLeaseAwareAcpxProcessCommand,
   type AcpxProcessCleanupDeps,
 } from "./process-reaper.js";
 import { splitCommandParts } from "./command-line.js";
@@ -38,7 +38,7 @@ type AcpSessionStore = AcpRuntimeOptions["sessionStore"];
 type AcpSessionRecord = Parameters<AcpSessionStore["save"]>[0];
 type AcpLoadedSessionRecord = Awaited<ReturnType<AcpSessionStore["load"]>>;
 type BaseAcpxRuntimeTestOptions = ConstructorParameters<typeof BaseAcpxRuntime>[1];
-type OpenClawAcpxRuntimeOptions = AcpRuntimeOptions & {
+type RecallAcpxRuntimeOptions = AcpRuntimeOptions & {
   openclawWrapperRoot?: string;
   openclawGatewayInstanceId?: string;
   openclawProcessLeaseStore?: AcpxProcessLeaseStore;
@@ -46,14 +46,14 @@ type OpenClawAcpxRuntimeOptions = AcpRuntimeOptions & {
 type AcpxRuntimeTestOptions = Record<string, unknown> & {
   openclawProcessCleanup?: AcpxProcessCleanupDeps;
 };
-type OpenClawRuntimeTurnInput = Parameters<NonNullable<AcpRuntime["startTurn"]>>[0];
+type RecallRuntimeTurnInput = Parameters<NonNullable<AcpRuntime["startTurn"]>>[0];
 
 type ResetAwareSessionStore = AcpSessionStore & {
   markFresh: (sessionKey: string) => void;
 };
 
-function withOpenClawManagedTurnTimeout<T extends object>(input: T): T & { timeoutMs: 0 } {
-  // OpenClaw owns ACP turn deadlines. acpx treats timeout after partial agent
+function withRecallManagedTurnTimeout<T extends object>(input: T): T & { timeoutMs: 0 } {
+  // Recall owns ACP turn deadlines. acpx treats timeout after partial agent
   // output as a completed turn, which can mark background work done early.
   return {
     ...input,
@@ -165,7 +165,7 @@ function readRecordAgentPid(record: unknown): number | undefined {
   return numericPid && Number.isInteger(numericPid) && numericPid > 0 ? numericPid : undefined;
 }
 
-function readOpenClawLeaseIdFromRecord(record: unknown): string | undefined {
+function readRecallLeaseIdFromRecord(record: unknown): string | undefined {
   if (typeof record !== "object" || record === null) {
     return undefined;
   }
@@ -287,10 +287,10 @@ function createResetAwareSessionStore(
   };
 }
 
-const OPENCLAW_BRIDGE_EXECUTABLE = "openclaw";
-const OPENCLAW_BRIDGE_SUBCOMMAND = "acp";
+const RECALL_BRIDGE_EXECUTABLE = "recall";
+const RECALL_BRIDGE_SUBCOMMAND = "acp";
 const CODEX_ACP_AGENT_ID = "codex";
-const CODEX_ACP_OPENCLAW_PREFIX = "openai-codex/";
+const CODEX_ACP_RECALL_PREFIX = "openai-codex/";
 const CODEX_ACP_REASONING_EFFORTS = new Set(["low", "medium", "high", "xhigh"]);
 const CODEX_ACP_THINKING_ALIASES = new Map<string, string | undefined>([
   ["off", undefined],
@@ -402,19 +402,19 @@ function isAcpCommand(
   return scriptName === params.executableName || scriptName === `${params.executableName}-wrapper`;
 }
 
-function isOpenClawBridgeCommand(command: string | undefined): boolean {
+function isRecallBridgeCommand(command: string | undefined): boolean {
   if (!command) {
     return false;
   }
   const parts = unwrapEnvCommand(splitCommandParts(command.trim()));
-  if (basename(parts[0] ?? "") === OPENCLAW_BRIDGE_EXECUTABLE) {
-    return parts[1] === OPENCLAW_BRIDGE_SUBCOMMAND;
+  if (basename(parts[0] ?? "") === RECALL_BRIDGE_EXECUTABLE) {
+    return parts[1] === RECALL_BRIDGE_SUBCOMMAND;
   }
   if (basename(parts[0] ?? "") !== "node") {
     return false;
   }
   const scriptName = basename(parts[1] ?? "");
-  return /^openclaw(?:\.[cm]?js)?$/i.test(scriptName) && parts[2] === OPENCLAW_BRIDGE_SUBCOMMAND;
+  return /^recall(?:\.[cm]?js)?$/i.test(scriptName) && parts[2] === RECALL_BRIDGE_SUBCOMMAND;
 }
 
 function isCodexAcpCommand(command: string | undefined): boolean {
@@ -442,7 +442,7 @@ function failUnsupportedCodexAcpModel(rawModel: string, detail?: string): never 
 // acpx's `decodeAcpxRuntimeHandleState` only accepts `persistent` and `oneshot`; any other
 // value silently round-trips through the encoded handle as `persistent` and later throws
 // `SessionResumeRequiredError` on agent restart. Fail fast at this boundary instead.
-// See openclaw/openclaw#73071.
+// See tryrecall/recall-agents#73071.
 const SUPPORTED_RUNTIME_SESSION_MODES = new Set(["persistent", "oneshot"] as const);
 const WIRE_TIMEOUT_CONFIG_KEYS = new Set(["timeout", "timeout_seconds"]);
 
@@ -489,8 +489,8 @@ function normalizeCodexAcpModelOverride(
   }
 
   let value = raw;
-  if (value.toLowerCase().startsWith(CODEX_ACP_OPENCLAW_PREFIX)) {
-    value = value.slice(CODEX_ACP_OPENCLAW_PREFIX.length);
+  if (value.toLowerCase().startsWith(CODEX_ACP_RECALL_PREFIX)) {
+    value = value.slice(CODEX_ACP_RECALL_PREFIX.length);
   }
   const parts = value.split("/");
   if (parts.length > 2) {
@@ -594,7 +594,7 @@ function resolveAgentCommandForName(params: {
 }
 
 function shouldUseBridgeSafeDelegateForCommand(command: string | undefined): boolean {
-  return isOpenClawBridgeCommand(command);
+  return isRecallBridgeCommand(command);
 }
 
 function shouldUseDistinctBridgeDelegate(options: AcpRuntimeOptions): boolean {
@@ -619,7 +619,7 @@ export class AcpxRuntime implements AcpRuntime {
   private readonly launchLeaseScope = new AsyncLocalStorage<AcpxLaunchLeaseContext | undefined>();
   private readonly cwd: string;
 
-  constructor(options: OpenClawAcpxRuntimeOptions, testOptions?: AcpxRuntimeTestOptions) {
+  constructor(options: RecallAcpxRuntimeOptions, testOptions?: AcpxRuntimeTestOptions) {
     const { openclawProcessCleanup, ...delegateTestOptions } = testOptions ?? {};
     this.processCleanupDeps = openclawProcessCleanup;
     this.wrapperRoot = options.openclawWrapperRoot;
@@ -751,7 +751,7 @@ export class AcpxRuntime implements AcpRuntime {
       !this.wrapperRoot ||
       !this.gatewayInstanceId ||
       !this.processLeaseStore ||
-      !isOpenClawLeaseAwareAcpxProcessCommand({
+      !isRecallLeaseAwareAcpxProcessCommand({
         command: params.command,
         wrapperRoot: this.wrapperRoot,
       })
@@ -811,7 +811,7 @@ export class AcpxRuntime implements AcpRuntime {
     );
     return readCodexWrapperStderrTail({
       wrapperRoot: this.wrapperRoot,
-      leaseId: readOpenClawLeaseIdFromRecord(record),
+      leaseId: readRecallLeaseIdFromRecord(record),
     });
   }
 
@@ -819,7 +819,7 @@ export class AcpxRuntime implements AcpRuntime {
     handle: AcpRuntimeHandle,
     record: AcpLoadedSessionRecord,
   ): Promise<void> {
-    const leaseId = readOpenClawLeaseIdFromRecord(record);
+    const leaseId = readRecallLeaseIdFromRecord(record);
     const rootPid = readAgentPidFromRecord(record);
     const sessionKeys = [handle.sessionKey, readSessionRecordName(record)];
     const openLeases =
@@ -842,7 +842,7 @@ export class AcpxRuntime implements AcpRuntime {
         : undefined);
     if (lease && lease.gatewayInstanceId === this.gatewayInstanceId && lease.rootPid > 0) {
       await this.processLeaseStore?.markState(lease.leaseId, "closing");
-      const result = await cleanupOpenClawOwnedAcpxProcessTree({
+      const result = await cleanupRecallOwnedAcpxProcessTree({
         rootPid: lease.rootPid,
         rootCommand: readAgentCommandFromRecord(record),
         expectedLeaseId: lease.leaseId,
@@ -868,7 +868,7 @@ export class AcpxRuntime implements AcpRuntime {
     if (!rootPid || !rootCommand) {
       return;
     }
-    await cleanupOpenClawOwnedAcpxProcessTree({
+    await cleanupRecallOwnedAcpxProcessTree({
       rootPid,
       rootCommand,
       wrapperRoot: this.wrapperRoot,
@@ -952,7 +952,7 @@ export class AcpxRuntime implements AcpRuntime {
     const command = await this.resolveCommandForHandle(input.handle);
     const delegate = await this.resolveDelegateForHandle(input.handle);
     try {
-      for await (const event of delegate.runTurn(withOpenClawManagedTurnTimeout(input))) {
+      for await (const event of delegate.runTurn(withRecallManagedTurnTimeout(input))) {
         if (
           event.type !== "error" ||
           !isCodexAcpCommand(command) ||
@@ -986,7 +986,7 @@ export class AcpxRuntime implements AcpRuntime {
     }
   }
 
-  startTurn(input: OpenClawRuntimeTurnInput): AcpRuntimeTurn {
+  startTurn(input: RecallRuntimeTurnInput): AcpRuntimeTurn {
     const readCodexTurnFailureStderr = () =>
       this.readCodexTurnFailureStderr({
         handle: input.handle,
@@ -998,7 +998,7 @@ export class AcpxRuntime implements AcpRuntime {
       try {
         return {
           command,
-          turn: delegate.startTurn(withOpenClawManagedTurnTimeout(input)),
+          turn: delegate.startTurn(withRecallManagedTurnTimeout(input)),
         };
       } catch (error) {
         if (!isCodexAcpCommand(command) || !isGenericInternalAcpError(error)) {

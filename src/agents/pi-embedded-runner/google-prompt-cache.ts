@@ -14,7 +14,7 @@ import { isGooglePromptCacheEligible, resolveCacheRetention } from "./prompt-cac
 import { EmbeddedAttemptSessionTakeoverError } from "./run/attempt.session-lock.js";
 import { streamWithPayloadPatch } from "./stream-payload-utils.js";
 
-const GOOGLE_PROMPT_CACHE_CUSTOM_TYPE = "openclaw.google-prompt-cache";
+const GOOGLE_PROMPT_CACHE_CUSTOM_TYPE = "recall.google-prompt-cache";
 const GOOGLE_PROMPT_CACHE_RETRY_BACKOFF_MS = 10 * 60_000;
 const GOOGLE_PROMPT_CACHE_SHORT_REFRESH_WINDOW_MS = 30_000;
 const GOOGLE_PROMPT_CACHE_LONG_REFRESH_WINDOW_MS = 5 * 60_000;

@@ -1,4 +1,4 @@
-import { defineToolPlugin } from "openclaw/plugin-sdk/tool-plugin";
+import { defineToolPlugin } from "recall/plugin-sdk/tool-plugin";
 import { Type } from "typebox";
 import type { AnyAgentTool } from "./api.js";
 import { createLlmTaskTool, llmTaskToolDefinition } from "./src/llm-task-tool.js";

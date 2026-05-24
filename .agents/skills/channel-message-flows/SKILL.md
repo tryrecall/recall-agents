@@ -5,7 +5,7 @@ description: "Use when previewing local channel message flow fixtures."
 
 # Channel Message Flows
 
-Use this from the OpenClaw repo root to send canned channel preview flows while iterating on message UX. These are real sends/edits/deletes against the configured channel target.
+Use this from the Recall repo root to send canned channel preview flows while iterating on message UX. These are real sends/edits/deletes against the configured channel target.
 
 ## Telegram
 

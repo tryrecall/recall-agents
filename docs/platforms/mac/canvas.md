@@ -15,17 +15,17 @@ UI surfaces.
 
 Canvas state is stored under Application Support:
 
-- `~/Library/Application Support/OpenClaw/canvas/<session>/...`
+- `~/Library/Application Support/Recall/canvas/<session>/...`
 
 The Canvas panel serves those files via a **custom URL scheme**:
 
-- `openclaw-canvas://<session>/<path>`
+- `recall-canvas://<session>/<path>`
 
 Examples:
 
-- `openclaw-canvas://main/` → `<canvasRoot>/main/index.html`
-- `openclaw-canvas://main/assets/app.css` → `<canvasRoot>/main/assets/app.css`
-- `openclaw-canvas://main/widgets/todo/` → `<canvasRoot>/main/widgets/todo/index.html`
+- `recall-canvas://main/` → `<canvasRoot>/main/index.html`
+- `recall-canvas://main/assets/app.css` → `<canvasRoot>/main/assets/app.css`
+- `recall-canvas://main/widgets/todo/` → `<canvasRoot>/main/widgets/todo/index.html`
 
 If no `index.html` exists at the root, the app shows a **built-in scaffold page**.
 
@@ -51,10 +51,10 @@ Canvas is exposed via the **Gateway WebSocket**, so the agent can:
 CLI examples:
 
 ```bash
-openclaw nodes canvas present --node <id>
-openclaw nodes canvas navigate --node <id> --url "/"
-openclaw nodes canvas eval --node <id> --js "document.title"
-openclaw nodes canvas snapshot --node <id>
+recall nodes canvas present --node <id>
+recall nodes canvas navigate --node <id> --url "/"
+recall nodes canvas eval --node <id> --js "document.title"
+recall nodes canvas snapshot --node <id>
 ```
 
 Notes:
@@ -93,25 +93,25 @@ cat > /tmp/a2ui-v0.8.jsonl <<'EOFA2'
 {"beginRendering":{"surfaceId":"main","root":"root"}}
 EOFA2
 
-openclaw nodes canvas a2ui push --jsonl /tmp/a2ui-v0.8.jsonl --node <id>
+recall nodes canvas a2ui push --jsonl /tmp/a2ui-v0.8.jsonl --node <id>
 ```
 
 Quick smoke:
 
 ```bash
-openclaw nodes canvas a2ui push --node <id> --text "Hello from A2UI"
+recall nodes canvas a2ui push --node <id> --text "Hello from A2UI"
 ```
 
 ## Triggering agent runs from Canvas
 
 Canvas can trigger new agent runs via deep links:
 
-- `openclaw://agent?...`
+- `recall://agent?...`
 
 Example (in JS):
 
 ```js
-window.location.href = "openclaw://agent?message=Review%20this%20design";
+window.location.href = "recall://agent?message=Review%20this%20design";
 ```
 
 The app prompts for confirmation unless a valid key is provided.

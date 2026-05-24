@@ -1,5 +1,5 @@
 import { VERSION } from "../version.js";
-import type { OpenClawConfig } from "./types.openclaw.js";
+import type { RecallConfig } from "./types.recall.js";
 
 export const AUTO_MANAGED_CONFIG_META_FIELDS = {
   lastTouchedVersion: "lastTouchedVersion",
@@ -12,10 +12,10 @@ export const AUTO_MANAGED_CONFIG_META_PATHS = [
 ] as const;
 
 export function stampConfigWriteMetadata(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   now: string = new Date().toISOString(),
   version: string = VERSION,
-): OpenClawConfig {
+): RecallConfig {
   return {
     ...cfg,
     meta: {

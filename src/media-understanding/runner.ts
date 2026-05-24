@@ -9,13 +9,13 @@ import {
   resolveAgentModelFallbackValues,
   resolveAgentModelPrimaryValue,
 } from "../config/model-input.js";
-import type { OpenClawConfig } from "../config/types.js";
+import type { RecallConfig } from "../config/types.js";
 import type {
   MediaUnderstandingConfig,
   MediaUnderstandingModelConfig,
 } from "../config/types.tools.js";
 import { logVerbose, shouldLogVerbose } from "../globals.js";
-import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
+import { resolvePreferredRecallTmpDir } from "../infra/tmp-recall-dir.js";
 import { logWarn } from "../logger.js";
 import { resolveChannelInboundAttachmentRoots } from "../media/channel-inbound-roots.js";
 import { mergeInboundPathRoots } from "../media/inbound-path-policy.js";
@@ -71,7 +71,7 @@ async function loadModelCatalogApi(): Promise<ModelCatalogApi> {
 }
 
 function resolveLiteralProviderApiKey(
-  cfg: OpenClawConfig | undefined,
+  cfg: RecallConfig | undefined,
   providerId: string,
 ): string | null {
   const value = findNormalizedProviderValue(cfg?.models?.providers, providerId)?.apiKey;
@@ -80,7 +80,7 @@ function resolveLiteralProviderApiKey(
 
 async function hasProviderAuthAvailable(params: {
   provider: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   agentDir?: string;
   workspaceDir?: string;
 }): Promise<boolean> {
@@ -93,7 +93,7 @@ async function hasProviderAuthAvailable(params: {
 }
 
 function resolveConfiguredKeyProviderOrder(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   providerRegistry: ProviderRegistry;
   capability: MediaUnderstandingCapability;
   fallbackProviders: readonly string[];
@@ -113,7 +113,7 @@ function resolveConfiguredKeyProviderOrder(params: {
 }
 
 function resolveConfiguredImageModelId(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   providerId: string;
 }): string | undefined {
   if (isMinimaxVlmProvider(params.providerId)) {
@@ -125,7 +125,7 @@ function resolveConfiguredImageModelId(params: {
 }
 
 function resolveConfiguredImageModel(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   providerId: string;
 }): { id?: string; input?: string[] } | undefined {
   const providerCfg = findNormalizedProviderValue(
@@ -203,7 +203,7 @@ function resolveAutoMediaKeyProvidersFromRegistry(params: {
 }
 
 async function explicitImageModelVisionStatus(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   providerId: string;
   model: string;
 }): Promise<"supported" | "unsupported" | "unknown"> {
@@ -227,7 +227,7 @@ async function explicitImageModelVisionStatus(params: {
 }
 
 async function resolveAutoImageModelId(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   providerId: string;
   providerRegistry: ProviderRegistry;
   explicitModel?: string;
@@ -280,13 +280,13 @@ async function resolveAutoImageModelId(params: {
 
 export function buildProviderRegistry(
   overrides?: Record<string, MediaUnderstandingProvider>,
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): ProviderRegistry {
   return buildMediaUnderstandingRegistry(overrides, cfg);
 }
 
 export function resolveMediaAttachmentLocalRoots(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   ctx: MsgContext;
   workspaceDir?: string;
 }): readonly string[] {
@@ -412,7 +412,7 @@ async function probeAntigravityCliCandidate(command: string): Promise<string | n
     return null;
   }
   const probeDir = await fs.mkdtemp(
-    path.join(resolvePreferredOpenClawTmpDir(), "openclaw-antigravity-probe-"),
+    path.join(resolvePreferredRecallTmpDir(), "recall-antigravity-probe-"),
   );
   try {
     const { stdout } = await runExec(resolved, ["--help"], {
@@ -437,7 +437,7 @@ async function resolveAntigravityCliBinary(): Promise<string | null> {
     return cached;
   }
   const resolved = (async () => {
-    const configured = process.env.OPENCLAW_ANTIGRAVITY_CLI?.trim();
+    const configured = process.env.RECALL_ANTIGRAVITY_CLI?.trim();
     const candidates = [configured, "agy", "antigravity"].filter((value): value is string =>
       Boolean(value),
     );
@@ -564,7 +564,7 @@ async function resolveAntigravityCliEntry(
 }
 
 async function resolveKeyEntry(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentDir?: string;
   workspaceDir?: string;
   providerRegistry: ProviderRegistry;
@@ -639,7 +639,7 @@ async function resolveKeyEntry(params: {
   return null;
 }
 
-function resolveImageModelFromAgentDefaults(cfg: OpenClawConfig): MediaUnderstandingModelConfig[] {
+function resolveImageModelFromAgentDefaults(cfg: RecallConfig): MediaUnderstandingModelConfig[] {
   const refs: string[] = [];
   const primary = resolveAgentModelPrimaryValue(cfg.agents?.defaults?.imageModel);
   if (primary?.trim()) {
@@ -669,7 +669,7 @@ function resolveImageModelFromAgentDefaults(cfg: OpenClawConfig): MediaUnderstan
 }
 
 function hasExplicitImageUnderstandingConfig(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   config?: MediaUnderstandingConfig;
 }): boolean {
   return (
@@ -679,7 +679,7 @@ function hasExplicitImageUnderstandingConfig(params: {
 }
 
 async function resolveAutoEntries(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentDir?: string;
   workspaceDir?: string;
   providerRegistry: ProviderRegistry;
@@ -718,7 +718,7 @@ async function resolveAutoEntries(params: {
 }
 
 export async function resolveAutoImageModel(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentDir?: string;
   workspaceDir?: string;
   activeModel?: ActiveMediaModel;
@@ -765,7 +765,7 @@ export async function resolveAutoImageModel(params: {
 }
 
 async function resolveActiveModelEntry(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentDir?: string;
   workspaceDir?: string;
   providerRegistry: ProviderRegistry;
@@ -832,7 +832,7 @@ async function resolveActiveModelEntry(params: {
 
 async function runAttachmentEntries(params: {
   capability: MediaUnderstandingCapability;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   ctx: MsgContext;
   attachmentIndex: number;
   agentDir?: string;
@@ -927,7 +927,7 @@ function hasFailedMediaAttempt(attachments: MediaUnderstandingDecision["attachme
 
 export async function runCapability(params: {
   capability: MediaUnderstandingCapability;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   ctx: MsgContext;
   attachments: MediaAttachmentCache;
   media: MediaAttachment[];

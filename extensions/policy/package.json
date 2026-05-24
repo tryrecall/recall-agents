@@ -1,25 +1,25 @@
 {
-  "name": "@openclaw/policy",
+  "name": "@recall/policy",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw policy doctor checks for workspace conformance",
+  "description": "Recall policy doctor checks for workspace conformance",
   "type": "module",
   "dependencies": {
     "json5": "2.2.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*",
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.5.22"
+    "recall": ">=2026.5.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

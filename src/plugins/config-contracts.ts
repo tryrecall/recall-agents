@@ -1,6 +1,6 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { isRecord } from "../utils.js";
-import { discoverOpenClawPlugins, type PluginDiscoveryResult } from "./discovery.js";
+import { discoverRecallPlugins, type PluginDiscoveryResult } from "./discovery.js";
 import { loadPluginManifestRegistry } from "./manifest-registry.js";
 import type { PluginManifestConfigContracts } from "./manifest.js";
 import type { PluginOrigin } from "./plugin-origin.types.js";
@@ -107,7 +107,7 @@ export function collectPluginConfigContractMatches(params: {
 }
 
 export function resolvePluginConfigContractsById(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   fallbackToBundledMetadata?: boolean;
@@ -135,7 +135,7 @@ export function resolvePluginConfigContractsById(params: {
     }
     const discovery =
       params.discovery ??
-      discoverOpenClawPlugins({
+      discoverRecallPlugins({
         workspaceDir: params.workspaceDir,
         env: params.env,
       });

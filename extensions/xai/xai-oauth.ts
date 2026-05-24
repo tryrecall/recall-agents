@@ -1,14 +1,14 @@
 import { randomBytes } from "node:crypto";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import type { ProviderAuthContext, ProviderAuthMethod } from "openclaw/plugin-sdk/plugin-entry";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
+import type { ProviderAuthContext, ProviderAuthMethod } from "recall/plugin-sdk/plugin-entry";
 import {
   buildOauthProviderAuthResult,
   generateHexPkceVerifierChallenge,
   toFormUrlEncoded,
   type OAuthCredential,
   type ProviderAuthResult,
-} from "openclaw/plugin-sdk/provider-auth";
-import { waitForLocalOAuthCallback } from "openclaw/plugin-sdk/provider-auth-runtime";
+} from "recall/plugin-sdk/provider-auth";
+import { waitForLocalOAuthCallback } from "recall/plugin-sdk/provider-auth-runtime";
 import { applyXaiConfig, XAI_DEFAULT_MODEL_REF } from "./onboard.js";
 import { xaiUserAgent } from "./src/xai-user-agent.js";
 
@@ -190,7 +190,7 @@ export function buildXaiOAuthAuthorizeUrl(params: {
   url.searchParams.set("code_challenge", params.challenge);
   url.searchParams.set("code_challenge_method", "S256");
   url.searchParams.set("plan", "generic");
-  url.searchParams.set("referrer", "openclaw");
+  url.searchParams.set("referrer", "recall");
   return url.toString();
 }
 
@@ -588,7 +588,7 @@ export async function loginXaiOAuth(ctx: ProviderAuthContext): Promise<ProviderA
       },
       notes: [
         "xAI OAuth uses your xAI account entitlement; xAI API keys still work.",
-        "xAI may label the consent app as Grok Build because OpenClaw uses xAI's shared OAuth client.",
+        "xAI may label the consent app as Grok Build because Recall uses xAI's shared OAuth client.",
       ],
     });
   } catch (err) {
@@ -666,7 +666,7 @@ export async function loginXaiDeviceCode(ctx: ProviderAuthContext): Promise<Prov
       },
       notes: [
         "xAI device code login uses your xAI account entitlement without requiring a localhost callback.",
-        "xAI may label the consent app as Grok Build because OpenClaw uses xAI's shared OAuth client.",
+        "xAI may label the consent app as Grok Build because Recall uses xAI's shared OAuth client.",
       ],
     });
   } catch (err) {

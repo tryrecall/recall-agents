@@ -6,7 +6,7 @@ RUN apt-get update \
 
 RUN corepack enable
 
-WORKDIR /workspace/openclaw
+WORKDIR /workspace/recall
 COPY . .
 
 RUN pnpm install --frozen-lockfile

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { isCommandFlagEnabled } from "../../config/commands.js";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import type { MsgContext } from "../templating.js";
 import { handleBashChatCommand } from "./bash-command.js";
 import { requireGatewayClientScope } from "./command-gates.js";
@@ -87,10 +87,10 @@ vi.mock("../../config/config.js", () => ({
   transformConfigFileWithRetry: async (params: {
     afterWrite?: unknown;
     transform: (
-      currentConfig: OpenClawConfig,
+      currentConfig: RecallConfig,
       context: { snapshot: ConfigSnapshotMock; previousHash: string | null; attempt: number },
-    ) => Promise<{ nextConfig: OpenClawConfig; result?: unknown }> | {
-      nextConfig: OpenClawConfig;
+    ) => Promise<{ nextConfig: RecallConfig; result?: unknown }> | {
+      nextConfig: RecallConfig;
       result?: unknown;
     };
   }) => {
@@ -103,7 +103,7 @@ vi.mock("../../config/config.js", () => ({
     const afterWrite = params.afterWrite ?? { mode: "auto" };
     await replaceConfigFileMock({ nextConfig: transformed.nextConfig, afterWrite });
     return {
-      path: snapshot.path ?? "/tmp/openclaw.json",
+      path: snapshot.path ?? "/tmp/recall.json",
       previousHash,
       persistedHash: "persisted-hash",
       snapshot,
@@ -170,7 +170,7 @@ vi.mock("./debug-commands.js", () => ({
   }),
 }));
 
-function buildParams(commandBody: string, cfg: OpenClawConfig): HandleCommandsParams {
+function buildParams(commandBody: string, cfg: RecallConfig): HandleCommandsParams {
   const ctx = {
     Body: commandBody,
     CommandBody: commandBody,
@@ -262,7 +262,7 @@ describe("command gating", () => {
         CommandBody: "/bash echo hi",
         SessionKey: "agent:main:main",
       } as MsgContext,
-      cfg: { commands: { bash: false } } as OpenClawConfig,
+      cfg: { commands: { bash: false } } as RecallConfig,
       sessionKey: "agent:main:main",
       isGroup: false,
       elevated: { enabled: true, allowed: true, failures: [] },
@@ -277,7 +277,7 @@ describe("command gating", () => {
         CommandBody: "/bash echo hi",
         SessionKey: "agent:main:main",
       } as MsgContext,
-      cfg: { commands: { bash: true } } as OpenClawConfig,
+      cfg: { commands: { bash: true } } as RecallConfig,
       sessionKey: "agent:main:main",
       isGroup: false,
       elevated: {
@@ -293,7 +293,7 @@ describe("command gating", () => {
     const params = buildParams("/config show", {
       commands: { config: false, debug: false, text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as OpenClawConfig);
+    } as RecallConfig);
     params.command.senderIsOwner = true;
     const result = await handleConfigCommand(params, true);
     expect(result?.reply?.text).toContain("/config is disabled");
@@ -303,7 +303,7 @@ describe("command gating", () => {
     const params = buildParams("/debug show", {
       commands: { config: false, debug: false, text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as OpenClawConfig);
+    } as RecallConfig);
     params.command.senderIsOwner = true;
     const result = await handleDebugCommand(params, true);
     expect(result?.reply?.text).toContain("/debug is disabled");
@@ -313,14 +313,14 @@ describe("command gating", () => {
     const configParams = buildParams("/config show", {
       commands: { config: true, text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as OpenClawConfig);
+    } as RecallConfig);
     const configResult = await handleConfigCommand(configParams, true);
     expect(configResult).toEqual({ shouldContinue: false });
 
     const debugParams = buildParams("/debug show", {
       commands: { debug: true, text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as OpenClawConfig);
+    } as RecallConfig);
     const debugResult = await handleDebugCommand(debugParams, true);
     expect(debugResult).toEqual({ shouldContinue: false });
   });
@@ -333,7 +333,7 @@ describe("command gating", () => {
     const configParams = buildParams("/config show messages.ackReaction", {
       commands: { config: true, text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as OpenClawConfig);
+    } as RecallConfig);
     configParams.command.senderIsOwner = true;
     const configResult = await handleConfigCommand(configParams, true);
     expect(configResult?.reply?.text).toContain("⚙️ Config");
@@ -342,7 +342,7 @@ describe("command gating", () => {
     const debugParams = buildParams("/debug show", {
       commands: { debug: true, text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as OpenClawConfig);
+    } as RecallConfig);
     debugParams.command.senderIsOwner = true;
     const debugResult = await handleDebugCommand(debugParams, true);
     expect(debugResult?.reply?.text).toContain("Debug overrides");
@@ -352,7 +352,7 @@ describe("command gating", () => {
     const configParams = buildParams("/config show", {
       commands: { config: true, text: true },
       channels: { telegram: { allowFrom: ["*"] } },
-    } as OpenClawConfig);
+    } as RecallConfig);
     configParams.ctx.CommandSource = "native";
     configParams.command.channel = "telegram";
     configParams.command.channelId = "telegram";
@@ -366,7 +366,7 @@ describe("command gating", () => {
     const debugParams = buildParams("/debug show", {
       commands: { debug: true, text: true },
       channels: { telegram: { allowFrom: ["*"] } },
-    } as OpenClawConfig);
+    } as RecallConfig);
     debugParams.ctx.CommandSource = "native";
     debugParams.command.channel = "telegram";
     debugParams.command.channelId = "telegram";
@@ -384,7 +384,7 @@ describe("command gating", () => {
       config: true,
       debug: true,
     }) as Record<string, unknown>;
-    const cfg = { commands: inheritedCommands as never } as OpenClawConfig;
+    const cfg = { commands: inheritedCommands as never } as RecallConfig;
     expect(isCommandFlagEnabled(cfg, "bash")).toBe(false);
     expect(isCommandFlagEnabled(cfg, "config")).toBe(false);
     expect(isCommandFlagEnabled(cfg, "debug")).toBe(false);
@@ -403,7 +403,7 @@ describe("command gating", () => {
           const params = buildParams('/config set messages.ackReaction=":)"', {
             commands: { config: true, text: true },
             channels: { whatsapp: { allowFrom: ["*"], configWrites: false } },
-          } as OpenClawConfig);
+          } as RecallConfig);
           params.command.senderIsOwner = true;
           return params;
         })(),
@@ -422,7 +422,7 @@ describe("command gating", () => {
                 },
               },
             },
-          } as OpenClawConfig);
+          } as RecallConfig);
           params.ctx.Provider = "telegram";
           params.ctx.Surface = "telegram";
           params.command.channel = "telegram";
@@ -439,7 +439,7 @@ describe("command gating", () => {
           const params = buildParams('/config set channels.telegram={"enabled":false}', {
             commands: { config: true, text: true },
             channels: { telegram: { configWrites: true } },
-          } as OpenClawConfig);
+          } as RecallConfig);
           params.ctx.Provider = "telegram";
           params.ctx.Surface = "telegram";
           params.command.channel = "telegram";
@@ -476,7 +476,7 @@ describe("command gating", () => {
           },
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
     params.ctx.Provider = "telegram";
     params.ctx.Surface = "telegram";
     params.command.channel = "telegram";
@@ -563,7 +563,7 @@ describe("command gating", () => {
   });
 
   it("enforces gateway client permissions for /config commands", async () => {
-    const baseCfg = { commands: { config: true, text: true } } as OpenClawConfig;
+    const baseCfg = { commands: { config: true, text: true } } as RecallConfig;
 
     const blockedParams = buildParams('/config set messages.ackReaction=":)"', baseCfg);
     blockedParams.ctx.Provider = "webchat";
@@ -623,7 +623,7 @@ describe("command gating", () => {
     });
     const params = buildParams("/config unset messages.missing", {
       commands: { config: true, text: true },
-    } as OpenClawConfig);
+    } as RecallConfig);
     params.ctx.GatewayClientScopes = ["operator.admin"];
     params.command.senderIsOwner = true;
 

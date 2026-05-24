@@ -1,6 +1,6 @@
 import type { ReplyPayload } from "../../auto-reply/reply-payload.js";
 import type { ReplyToMode } from "../../config/types.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import type { OutboundSendDeps } from "../../infra/outbound/send-deps.js";
 import type { OutboundMediaAccess } from "../../media/load-options.js";
 import type { PollInput } from "../../polls.js";
@@ -144,7 +144,7 @@ export type MessageSendContext<TPayload = unknown, TSendResult = unknown> = {
   fail(error: unknown): Promise<void>;
 };
 
-export type ChannelMessageSendTextContext<TConfig = OpenClawConfig> = {
+export type ChannelMessageSendTextContext<TConfig = RecallConfig> = {
   cfg: TConfig;
   to: string;
   text: string;
@@ -159,7 +159,7 @@ export type ChannelMessageSendTextContext<TConfig = OpenClawConfig> = {
   gatewayClientScopes?: readonly string[];
 };
 
-export type ChannelMessageSendMediaContext<TConfig = OpenClawConfig> =
+export type ChannelMessageSendMediaContext<TConfig = RecallConfig> =
   ChannelMessageSendTextContext<TConfig> & {
     mediaUrl: string;
     mediaAccess?: OutboundMediaAccess;
@@ -170,7 +170,7 @@ export type ChannelMessageSendMediaContext<TConfig = OpenClawConfig> =
     forceDocument?: boolean;
   };
 
-export type ChannelMessageSendPayloadContext<TConfig = OpenClawConfig> =
+export type ChannelMessageSendPayloadContext<TConfig = RecallConfig> =
   ChannelMessageSendTextContext<TConfig> & {
     payload: ReplyPayload;
     mediaUrl?: string;
@@ -182,7 +182,7 @@ export type ChannelMessageSendPayloadContext<TConfig = OpenClawConfig> =
     forceDocument?: boolean;
   };
 
-export type ChannelMessageSendPollContext<TConfig = OpenClawConfig> = Omit<
+export type ChannelMessageSendPollContext<TConfig = RecallConfig> = Omit<
   ChannelMessageSendTextContext<TConfig>,
   "text" | "threadId"
 > & {
@@ -198,32 +198,32 @@ export type ChannelMessageSendResult = {
 
 export type ChannelMessageSendAttemptKind = "text" | "media" | "payload" | "poll";
 
-export type ChannelMessageSendAttemptContext<TConfig = OpenClawConfig> =
+export type ChannelMessageSendAttemptContext<TConfig = RecallConfig> =
   | (ChannelMessageSendTextContext<TConfig> & { kind: "text" })
   | (ChannelMessageSendMediaContext<TConfig> & { kind: "media" })
   | (ChannelMessageSendPayloadContext<TConfig> & { kind: "payload" })
   | (ChannelMessageSendPollContext<TConfig> & { kind: "poll" });
 
 export type ChannelMessageSendSuccessContext<
-  TConfig = OpenClawConfig,
+  TConfig = RecallConfig,
   TSendResult extends ChannelMessageSendResult = ChannelMessageSendResult,
 > = ChannelMessageSendAttemptContext<TConfig> & {
   result: TSendResult;
   attemptToken?: unknown;
 };
 
-export type ChannelMessageSendFailureContext<TConfig = OpenClawConfig> =
+export type ChannelMessageSendFailureContext<TConfig = RecallConfig> =
   ChannelMessageSendAttemptContext<TConfig> & {
     error: unknown;
     attemptToken?: unknown;
   };
 
 export type ChannelMessageSendCommitContext<
-  TConfig = OpenClawConfig,
+  TConfig = RecallConfig,
   TSendResult extends ChannelMessageSendResult = ChannelMessageSendResult,
 > = ChannelMessageSendSuccessContext<TConfig, TSendResult>;
 
-export type ChannelMessageUnknownSendContext<TConfig = OpenClawConfig> = {
+export type ChannelMessageUnknownSendContext<TConfig = RecallConfig> = {
   cfg: TConfig;
   queueId: string;
   channel: string;
@@ -256,7 +256,7 @@ export type ChannelMessageUnknownSendReconciliationResult =
     };
 
 export type ChannelMessageSendLifecycleAdapter<
-  TConfig = OpenClawConfig,
+  TConfig = RecallConfig,
   TSendResult extends ChannelMessageSendResult = ChannelMessageSendResult,
 > = {
   beforeSendAttempt?: (ctx: ChannelMessageSendAttemptContext<TConfig>) => unknown;
@@ -270,7 +270,7 @@ export type ChannelMessageSendLifecycleAdapter<
 };
 
 export type ChannelMessageSendAdapter<
-  TConfig = OpenClawConfig,
+  TConfig = RecallConfig,
   TSendResult extends ChannelMessageSendResult = ChannelMessageSendResult,
 > = {
   text?: (ctx: ChannelMessageSendTextContext<TConfig>) => Promise<TSendResult>;
@@ -347,7 +347,7 @@ export type ChannelMessageReceiveAdapterShape = {
 };
 
 export type ChannelMessageAdapterShape<
-  TConfig = OpenClawConfig,
+  TConfig = RecallConfig,
   TSendResult extends ChannelMessageSendResult = ChannelMessageSendResult,
 > = {
   id?: string;

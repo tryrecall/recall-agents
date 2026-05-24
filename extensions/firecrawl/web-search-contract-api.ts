@@ -1,7 +1,7 @@
 import {
   createWebSearchProviderContractFields,
   type WebSearchProviderPlugin,
-} from "openclaw/plugin-sdk/provider-web-search-contract";
+} from "recall/plugin-sdk/provider-web-search-contract";
 
 export function createFirecrawlWebSearchProvider(): WebSearchProviderPlugin {
   const credentialPath = "plugins.entries.firecrawl.config.webSearch.apiKey";
@@ -16,7 +16,7 @@ export function createFirecrawlWebSearchProvider(): WebSearchProviderPlugin {
     envVars: ["FIRECRAWL_API_KEY"],
     placeholder: "fc-...",
     signupUrl: "https://www.firecrawl.dev/",
-    docsUrl: "https://docs.openclaw.ai/tools/firecrawl",
+    docsUrl: "https://docs.recall.ai/tools/firecrawl",
     autoDetectOrder: 60,
     credentialPath,
     ...createWebSearchProviderContractFields({

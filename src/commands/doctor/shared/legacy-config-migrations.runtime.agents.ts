@@ -37,7 +37,7 @@ type LegacyAgentRuntimeIntent = {
 const MEMORY_SEARCH_RULE: LegacyConfigRule = {
   path: ["memorySearch"],
   message:
-    'top-level memorySearch was moved; use agents.defaults.memorySearch instead. Run "openclaw doctor --fix".',
+    'top-level memorySearch was moved; use agents.defaults.memorySearch instead. Run "recall doctor --fix".',
 };
 
 const HEARTBEAT_RULE: LegacyConfigRule = {
@@ -50,13 +50,13 @@ const LEGACY_SANDBOX_SCOPE_RULES: LegacyConfigRule[] = [
   {
     path: ["agents", "defaults", "sandbox"],
     message:
-      'agents.defaults.sandbox.perSession is legacy; use agents.defaults.sandbox.scope instead. Run "openclaw doctor --fix".',
+      'agents.defaults.sandbox.perSession is legacy; use agents.defaults.sandbox.scope instead. Run "recall doctor --fix".',
     match: (value) => hasLegacySandboxPerSession(value),
   },
   {
     path: ["agents", "list"],
     message:
-      'agents.list[].sandbox.perSession is legacy; use agents.list[].sandbox.scope instead. Run "openclaw doctor --fix".',
+      'agents.list[].sandbox.perSession is legacy; use agents.list[].sandbox.scope instead. Run "recall doctor --fix".',
     match: (value) => hasLegacyAgentListSandboxPerSession(value),
   },
 ];
@@ -65,30 +65,30 @@ const LEGACY_AGENT_RUNTIME_POLICY_RULES: LegacyConfigRule[] = [
   {
     path: ["agents", "defaults", "agentRuntime", "fallback"],
     message:
-      'agents.defaults.agentRuntime is ignored; set models.providers.<provider>.agentRuntime or a model-scoped agentRuntime instead. Run "openclaw doctor --fix".',
+      'agents.defaults.agentRuntime is ignored; set models.providers.<provider>.agentRuntime or a model-scoped agentRuntime instead. Run "recall doctor --fix".',
   },
   {
     path: ["agents", "defaults", "embeddedHarness"],
     message:
-      'agents.defaults.embeddedHarness is legacy and ignored; set provider/model runtime policy instead. Run "openclaw doctor --fix".',
+      'agents.defaults.embeddedHarness is legacy and ignored; set provider/model runtime policy instead. Run "recall doctor --fix".',
     match: (value) => getRecord(value) !== null,
   },
   {
     path: ["agents", "defaults", "agentRuntime"],
     message:
-      'agents.defaults.agentRuntime is ignored; set models.providers.<provider>.agentRuntime or a model-scoped agentRuntime instead. Run "openclaw doctor --fix".',
+      'agents.defaults.agentRuntime is ignored; set models.providers.<provider>.agentRuntime or a model-scoped agentRuntime instead. Run "recall doctor --fix".',
     match: (value) => getRecord(value) !== null,
   },
   {
     path: ["agents", "list"],
     message:
-      'agents.list[].agentRuntime is ignored; set provider/model runtime policy instead. Run "openclaw doctor --fix".',
+      'agents.list[].agentRuntime is ignored; set provider/model runtime policy instead. Run "recall doctor --fix".',
     match: (value) => hasAgentListRuntimePolicy(value),
   },
   {
     path: ["agents", "list"],
     message:
-      'agents.list[].embeddedHarness is legacy and ignored; set provider/model runtime policy instead. Run "openclaw doctor --fix".',
+      'agents.list[].embeddedHarness is legacy and ignored; set provider/model runtime policy instead. Run "recall doctor --fix".',
     match: (value) => hasLegacyAgentListEmbeddedHarness(value),
   },
 ];
@@ -97,7 +97,7 @@ const LEGACY_AGENT_LLM_TIMEOUT_RULES: LegacyConfigRule[] = [
   {
     path: ["agents", "defaults", "llm"],
     message:
-      'agents.defaults.llm is legacy; use models.providers.<id>.timeoutSeconds for slow model/provider timeouts. Run "openclaw doctor --fix".',
+      'agents.defaults.llm is legacy; use models.providers.<id>.timeoutSeconds for slow model/provider timeouts. Run "recall doctor --fix".',
     match: (value) => getRecord(value) !== null,
   },
 ];
@@ -106,19 +106,19 @@ const IGNORED_AGENT_MODEL_TIMEOUT_RULES: LegacyConfigRule[] = [
   {
     path: ["agents", "defaults", "model"],
     message:
-      'agents.defaults.model.timeoutMs is ignored; agent model config only selects primary/fallback models. Run "openclaw doctor --fix" to remove it.',
+      'agents.defaults.model.timeoutMs is ignored; agent model config only selects primary/fallback models. Run "recall doctor --fix" to remove it.',
     match: (value) => hasOwnTimeoutMs(value),
   },
   {
     path: ["agents", "defaults", "subagents", "model"],
     message:
-      'agents.defaults.subagents.model.timeoutMs is ignored; subagent model config only selects primary/fallback models. Run "openclaw doctor --fix" to remove it.',
+      'agents.defaults.subagents.model.timeoutMs is ignored; subagent model config only selects primary/fallback models. Run "recall doctor --fix" to remove it.',
     match: (value) => hasOwnTimeoutMs(value),
   },
   {
     path: ["agents", "list"],
     message:
-      'agents.list[].model.timeoutMs and agents.list[].subagents.model.timeoutMs are ignored; agent model config only selects primary/fallback models. Run "openclaw doctor --fix" to remove them.',
+      'agents.list[].model.timeoutMs and agents.list[].subagents.model.timeoutMs are ignored; agent model config only selects primary/fallback models. Run "recall doctor --fix" to remove them.',
     match: (value) => hasAgentListModelTimeout(value),
   },
 ];
@@ -127,24 +127,24 @@ const SILENT_REPLY_LEGACY_RULES: LegacyConfigRule[] = [
   {
     path: ["agents", "defaults", "silentReplyRewrite"],
     message:
-      'agents.defaults.silentReplyRewrite was removed; exact NO_REPLY is no longer rewritten to visible fallback text. Run "openclaw doctor --fix" to remove it.',
+      'agents.defaults.silentReplyRewrite was removed; exact NO_REPLY is no longer rewritten to visible fallback text. Run "recall doctor --fix" to remove it.',
   },
   {
     path: ["agents", "defaults", "silentReply"],
     message:
-      'agents.defaults.silentReply.direct was removed; direct chats never receive NO_REPLY prompt guidance. Run "openclaw doctor --fix" to remove it.',
+      'agents.defaults.silentReply.direct was removed; direct chats never receive NO_REPLY prompt guidance. Run "recall doctor --fix" to remove it.',
     match: (value) => Object.prototype.hasOwnProperty.call(getRecord(value) ?? {}, "direct"),
   },
   {
     path: ["surfaces"],
     message:
-      'surfaces.*.silentReplyRewrite was removed; exact NO_REPLY is no longer rewritten to visible fallback text. Run "openclaw doctor --fix" to remove it.',
+      'surfaces.*.silentReplyRewrite was removed; exact NO_REPLY is no longer rewritten to visible fallback text. Run "recall doctor --fix" to remove it.',
     match: (value) => hasSurfaceSilentReplyRewrite(value),
   },
   {
     path: ["surfaces"],
     message:
-      'surfaces.*.silentReply.direct was removed; direct chats never receive NO_REPLY prompt guidance. Run "openclaw doctor --fix" to remove it.',
+      'surfaces.*.silentReply.direct was removed; direct chats never receive NO_REPLY prompt guidance. Run "recall doctor --fix" to remove it.',
     match: (value) => hasSurfaceSilentReplyDirect(value),
   },
 ];

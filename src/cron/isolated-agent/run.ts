@@ -6,7 +6,7 @@ import type { SkillSnapshot } from "../../agents/skills.js";
 import type { ThinkLevel } from "../../auto-reply/thinking.js";
 import type { CliDeps } from "../../cli/outbound-send-deps.js";
 import type { AgentDefaultsConfig } from "../../config/types.agent-defaults.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { clearAgentRunContext } from "../../infra/agent-events.js";
 import {
   createSourceDeliveryPlan,
@@ -138,7 +138,7 @@ async function loadRuntimePlugins() {
   return await runtimePluginsLoader.load();
 }
 
-function hasConfiguredAuthProfiles(cfg: OpenClawConfig): boolean {
+function hasConfiguredAuthProfiles(cfg: RecallConfig): boolean {
   return (
     Boolean(cfg.auth?.profiles && Object.keys(cfg.auth.profiles).length > 0) ||
     Boolean(cfg.auth?.order && Object.keys(cfg.auth.order).length > 0)
@@ -336,7 +336,7 @@ function hasExplicitCronDeliveryTarget(plan: CronDeliveryPlan): boolean {
 }
 
 async function resolveCronDeliveryContext(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   job: CronJob;
   agentId: string;
 }) {
@@ -422,7 +422,7 @@ async function loadUsageFormatRuntime() {
 }
 
 type RunCronAgentTurnParams = {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   deps: CliDeps;
   job: CronJob;
   message: string;
@@ -441,7 +441,7 @@ type WithRunSession = (
 
 type PreparedCronRunContext = {
   input: RunCronAgentTurnParams;
-  cfgWithAgentDefaults: OpenClawConfig;
+  cfgWithAgentDefaults: RecallConfig;
   agentId: string;
   agentCfg: AgentDefaultsConfig;
   agentDir: string;
@@ -499,7 +499,7 @@ async function prepareCronRunContext(params: {
     defaults: input.cfg.agents?.defaults,
     agentConfigOverride,
   });
-  const cfgWithAgentDefaults: OpenClawConfig = {
+  const cfgWithAgentDefaults: RecallConfig = {
     ...input.cfg,
     agents: Object.assign({}, input.cfg.agents, { defaults: agentCfg }),
   };
@@ -1130,7 +1130,7 @@ function disposeCronRunContext(params: {
 }
 
 export async function runCronIsolatedAgentTurn(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   deps: CliDeps;
   job: CronJob;
   message: string;
@@ -1150,7 +1150,7 @@ export async function runCronIsolatedAgentTurn(params: {
       ? reason.trim()
       : "cron: job execution timed out";
   };
-  const isFastTestEnv = process.env.OPENCLAW_TEST_FAST === "1";
+  const isFastTestEnv = process.env.RECALL_TEST_FAST === "1";
   const prepared = await prepareCronRunContext({ input: params, isFastTestEnv });
   if (!prepared.ok) {
     return prepared.result;

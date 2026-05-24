@@ -11,23 +11,23 @@ import {
   resetAgentEventsForTest,
   type AgentEventPayload,
   type EmbeddedRunAttemptParams,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "recall/plugin-sdk/agent-harness-runtime";
 import {
   emitTrustedDiagnosticEvent,
   onInternalDiagnosticEvent,
   resetDiagnosticEventsForTest,
   waitForDiagnosticEventsDrained,
   type DiagnosticEventPayload,
-} from "openclaw/plugin-sdk/diagnostic-runtime";
+} from "recall/plugin-sdk/diagnostic-runtime";
 import {
   clearInternalHooks,
   initializeGlobalHookRunner,
   registerInternalHook,
   resetGlobalHookRunner,
-} from "openclaw/plugin-sdk/hook-runtime";
-import { clearPluginCommands, registerPluginCommand } from "openclaw/plugin-sdk/plugin-runtime";
-import { createMockPluginRegistry } from "openclaw/plugin-sdk/plugin-test-runtime";
-import { registerSandboxBackend } from "openclaw/plugin-sdk/sandbox";
+} from "recall/plugin-sdk/hook-runtime";
+import { clearPluginCommands, registerPluginCommand } from "recall/plugin-sdk/plugin-runtime";
+import { createMockPluginRegistry } from "recall/plugin-sdk/plugin-test-runtime";
+import { registerSandboxBackend } from "recall/plugin-sdk/sandbox";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import WebSocket from "ws";
 
@@ -52,7 +52,7 @@ import {
   emitDynamicToolTerminalDiagnostic,
 } from "./dynamic-tool-diagnostics.js";
 import {
-  CODEX_OPENCLAW_DYNAMIC_TOOL_NAMESPACE,
+  CODEX_RECALL_DYNAMIC_TOOL_NAMESPACE,
   createCodexDynamicToolBridge,
 } from "./dynamic-tools.js";
 import * as elicitationBridge from "./elicitation-bridge.js";
@@ -233,7 +233,7 @@ function threadStartResult(threadId = "thread-1") {
       updatedAt: 1,
       status: { type: "idle" },
       path: null,
-      cwd: tempDir || "/tmp/openclaw-codex-test",
+      cwd: tempDir || "/tmp/recall-codex-test",
       cliVersion: "0.125.0",
       source: "unknown",
       agentNickname: null,
@@ -245,7 +245,7 @@ function threadStartResult(threadId = "thread-1") {
     model: "gpt-5.4-codex",
     modelProvider: "openai",
     serviceTier: null,
-    cwd: tempDir || "/tmp/openclaw-codex-test",
+    cwd: tempDir || "/tmp/recall-codex-test",
     instructionSources: [],
     approvalPolicy: "never",
     approvalsReviewer: "user",
@@ -855,17 +855,17 @@ describe("runCodexAppServerAttempt", () => {
     clearInternalHooks();
     resetAgentEventsForTest();
     resetDiagnosticEventsForTest();
-    vi.stubEnv("OPENCLAW_TRAJECTORY", "0");
+    vi.stubEnv("RECALL_TRAJECTORY", "0");
     vi.stubEnv("CODEX_API_KEY", "");
     vi.stubEnv("OPENAI_API_KEY", "");
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-codex-run-"));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-codex-run-"));
   });
 
   afterEach(async () => {
     await drainActiveAppServerAttemptsForTest();
     await closeCodexSandboxExecServersForTests();
     resetCodexAppServerClientFactoryForTest();
-    testing.resetOpenClawCodingToolsFactoryForTests();
+    testing.resetRecallCodingToolsFactoryForTests();
     resetCodexRateLimitCacheForTests();
     nativeHookRelayTesting.clearNativeHookRelaysForTests();
     clearPluginCommands();
@@ -923,8 +923,8 @@ describe("runCodexAppServerAttempt", () => {
   it("exposes app-server-owned tools directly for forced private QA Codex runtime", () => {
     const tools = ["read", "write", "image_generate", "message"].map((name) => ({ name }));
     const privateQaCodexEnv = {
-      OPENCLAW_BUILD_PRIVATE_QA: "1",
-      OPENCLAW_QA_FORCE_RUNTIME: "codex",
+      RECALL_BUILD_PRIVATE_QA: "1",
+      RECALL_QA_FORCE_RUNTIME: "codex",
     };
 
     expect(
@@ -935,7 +935,7 @@ describe("runCodexAppServerAttempt", () => {
 
   it("limits Codex memory flush runs to managed read and write tools", async () => {
     const factoryOptions: unknown[] = [];
-    testing.setOpenClawCodingToolsFactoryForTests((options) => {
+    testing.setRecallCodingToolsFactoryForTests((options) => {
       factoryOptions.push(options);
       return [
         createRuntimeDynamicTool("read"),
@@ -991,7 +991,7 @@ describe("runCodexAppServerAttempt", () => {
           onAsyncTaskStarted?: (message: string) => Promise<void> | void;
         }
       | undefined;
-    testing.setOpenClawCodingToolsFactoryForTests((options) => {
+    testing.setRecallCodingToolsFactoryForTests((options) => {
       factoryOptions = options;
       return [
         createRuntimeDynamicTool("image_generate"),
@@ -1034,8 +1034,8 @@ describe("runCodexAppServerAttempt", () => {
     expect(runAbortController.signal.aborted).toBe(false);
   });
 
-  it("exposes OpenClaw sandbox shell tools under distinct names for non-Docker sandbox backends", async () => {
-    testing.setOpenClawCodingToolsFactoryForTests(() => [
+  it("exposes Recall sandbox shell tools under distinct names for non-Docker sandbox backends", async () => {
+    testing.setRecallCodingToolsFactoryForTests(() => [
       createRuntimeDynamicTool("read"),
       createRuntimeDynamicTool("write"),
       createRuntimeDynamicTool("edit"),
@@ -1076,8 +1076,8 @@ describe("runCodexAppServerAttempt", () => {
     );
   });
 
-  it("exposes Docker sandbox shell tools when OpenClaw sandboxing disables native Code Mode", async () => {
-    testing.setOpenClawCodingToolsFactoryForTests(() => [
+  it("exposes Docker sandbox shell tools when Recall sandboxing disables native Code Mode", async () => {
+    testing.setRecallCodingToolsFactoryForTests(() => [
       createRuntimeDynamicTool("exec"),
       createRuntimeDynamicTool("process"),
       createRuntimeDynamicTool("message"),
@@ -1118,8 +1118,8 @@ describe("runCodexAppServerAttempt", () => {
     ]);
   });
 
-  it("keeps OpenClaw shell tools for node-targeted Codex app-server runs", async () => {
-    testing.setOpenClawCodingToolsFactoryForTests(() => [
+  it("keeps Recall shell tools for node-targeted Codex app-server runs", async () => {
+    testing.setRecallCodingToolsFactoryForTests(() => [
       createRuntimeDynamicTool("exec"),
       createRuntimeDynamicTool("process"),
       createRuntimeDynamicTool("message"),
@@ -1186,7 +1186,7 @@ describe("runCodexAppServerAttempt", () => {
   });
 
   it("exposes Docker sandbox shell tools when native Code Mode cannot honor sandbox paths", async () => {
-    testing.setOpenClawCodingToolsFactoryForTests(() => [
+    testing.setRecallCodingToolsFactoryForTests(() => [
       createRuntimeDynamicTool("exec"),
       createRuntimeDynamicTool("process"),
       createRuntimeDynamicTool("message"),
@@ -1209,7 +1209,7 @@ describe("runCodexAppServerAttempt", () => {
       sandbox: {
         enabled: true,
         backendId: "docker",
-        docker: { binds: ["/tmp/openclaw-data:/data:rw"] },
+        docker: { binds: ["/tmp/recall-data:/data:rw"] },
       } as never,
       nativeToolSurfaceEnabled: false,
       runAbortController: new AbortController(),
@@ -1224,8 +1224,8 @@ describe("runCodexAppServerAttempt", () => {
     );
   });
 
-  it("starts active OpenClaw sandbox turns with Codex native execution disabled", async () => {
-    testing.setOpenClawCodingToolsFactoryForTests(() => [
+  it("starts active Recall sandbox turns with Codex native execution disabled", async () => {
+    testing.setRecallCodingToolsFactoryForTests(() => [
       createRuntimeDynamicTool("exec"),
       createRuntimeDynamicTool("process"),
       createRuntimeDynamicTool("message"),
@@ -1290,7 +1290,7 @@ describe("runCodexAppServerAttempt", () => {
     ]);
   });
 
-  it("routes native Codex execution through an OpenClaw sandbox exec-server when opted in", async () => {
+  it("routes native Codex execution through an Recall sandbox exec-server when opted in", async () => {
     const sessionFile = path.join(tempDir, "session.jsonl");
     const workspaceDir = path.join(tempDir, "workspace");
     const params = createParams(sessionFile, workspaceDir);
@@ -1368,7 +1368,7 @@ describe("runCodexAppServerAttempt", () => {
           }
         | undefined;
 
-      expect(environmentAddParams?.environmentId).toMatch(/^openclaw-sandbox-/);
+      expect(environmentAddParams?.environmentId).toMatch(/^recall-sandbox-/);
       expect(environmentAddParams?.execServerUrl).toMatch(/^ws:\/\/127\.0\.0\.1:/);
       expect(startParams?.cwd).toBe("/workspace");
       expect(startParams?.config?.["features.code_mode"]).toBe(true);
@@ -1589,7 +1589,7 @@ describe("runCodexAppServerAttempt", () => {
   });
 
   it("does not expose sandbox shell tools when sandbox routing is disabled", async () => {
-    testing.setOpenClawCodingToolsFactoryForTests(() => [
+    testing.setRecallCodingToolsFactoryForTests(() => [
       createRuntimeDynamicTool("exec"),
       createRuntimeDynamicTool("process"),
       createRuntimeDynamicTool("message"),
@@ -1620,7 +1620,7 @@ describe("runCodexAppServerAttempt", () => {
   });
 
   it("does not expose sandbox_exec without a matching process follow-up tool", async () => {
-    testing.setOpenClawCodingToolsFactoryForTests(() => [
+    testing.setRecallCodingToolsFactoryForTests(() => [
       createRuntimeDynamicTool("exec"),
       createRuntimeDynamicTool("message"),
     ]);
@@ -1650,7 +1650,7 @@ describe("runCodexAppServerAttempt", () => {
   });
 
   it("honors Codex dynamic tool excludes for sandbox shell exposure", async () => {
-    testing.setOpenClawCodingToolsFactoryForTests(() => [
+    testing.setRecallCodingToolsFactoryForTests(() => [
       createRuntimeDynamicTool("exec"),
       createRuntimeDynamicTool("process"),
       createRuntimeDynamicTool("message"),
@@ -1714,7 +1714,7 @@ describe("runCodexAppServerAttempt", () => {
     ]);
   });
 
-  it("starts Codex threads without duplicate OpenClaw workspace tools by default", async () => {
+  it("starts Codex threads without duplicate Recall workspace tools by default", async () => {
     const sessionFile = path.join(tempDir, "session.jsonl");
     const workspaceDir = path.join(tempDir, "workspace");
     const appServer = createThreadLifecycleAppServerOptions();
@@ -1897,7 +1897,7 @@ describe("runCodexAppServerAttempt", () => {
     params.authProfileStore = authProfileStore;
     params.runtimePlan = createCodexRuntimePlanFixture();
     const factoryOptions: unknown[] = [];
-    testing.setOpenClawCodingToolsFactoryForTests((options) => {
+    testing.setRecallCodingToolsFactoryForTests((options) => {
       factoryOptions.push(options);
       return [];
     });
@@ -1960,7 +1960,7 @@ describe("runCodexAppServerAttempt", () => {
     params.toolAuthProfileStore = toolAuthProfileStore;
     params.runtimePlan = createCodexRuntimePlanFixture();
     const factoryOptions: unknown[] = [];
-    testing.setOpenClawCodingToolsFactoryForTests((options) => {
+    testing.setRecallCodingToolsFactoryForTests((options) => {
       factoryOptions.push(options);
       return [];
     });
@@ -2006,7 +2006,7 @@ describe("runCodexAppServerAttempt", () => {
       },
     };
     const factoryOptions: unknown[] = [];
-    testing.setOpenClawCodingToolsFactoryForTests((options) => {
+    testing.setRecallCodingToolsFactoryForTests((options) => {
       factoryOptions.push(options);
       return [];
     });
@@ -2029,15 +2029,15 @@ describe("runCodexAppServerAttempt", () => {
   });
 
   it("enables gateway subagent binding for forced private QA Codex runs", async () => {
-    vi.stubEnv("OPENCLAW_BUILD_PRIVATE_QA", "1");
-    vi.stubEnv("OPENCLAW_QA_FORCE_RUNTIME", "codex");
+    vi.stubEnv("RECALL_BUILD_PRIVATE_QA", "1");
+    vi.stubEnv("RECALL_QA_FORCE_RUNTIME", "codex");
     const sessionFile = path.join(tempDir, "session.jsonl");
     const workspaceDir = path.join(tempDir, "workspace");
     const params = createParams(sessionFile, workspaceDir);
     params.disableTools = false;
     params.runtimePlan = createCodexRuntimePlanFixture();
     const factoryOptions: unknown[] = [];
-    testing.setOpenClawCodingToolsFactoryForTests((options) => {
+    testing.setRecallCodingToolsFactoryForTests((options) => {
       factoryOptions.push(options);
       return [createRuntimeDynamicTool("sessions_spawn")];
     });
@@ -2166,7 +2166,7 @@ describe("runCodexAppServerAttempt", () => {
     expect(testing.shouldEnableCodexAppServerNativeToolSurface(runtimePolicyParams)).toBe(false);
   });
 
-  it("disables Codex native tool surfaces whenever an OpenClaw sandbox is active", () => {
+  it("disables Codex native tool surfaces whenever an Recall sandbox is active", () => {
     const workspaceDir = path.join(tempDir, "workspace");
     const params = createParams(path.join(tempDir, "session.jsonl"), workspaceDir);
     params.disableTools = false;
@@ -2183,7 +2183,7 @@ describe("runCodexAppServerAttempt", () => {
       testing.shouldEnableCodexAppServerNativeToolSurface(params, {
         enabled: true,
         backendId: "docker",
-        docker: { binds: ["/tmp/openclaw-data:/data:rw"] },
+        docker: { binds: ["/tmp/recall-data:/data:rw"] },
       } as never),
     ).toBe(false);
 
@@ -2191,7 +2191,7 @@ describe("runCodexAppServerAttempt", () => {
       testing.shouldEnableCodexAppServerNativeToolSurface(params, {
         enabled: true,
         backendId: "docker",
-        docker: { binds: ["/tmp/openclaw-data:/tmp/openclaw-data:rw"] },
+        docker: { binds: ["/tmp/recall-data:/tmp/recall-data:rw"] },
       } as never),
     ).toBe(false);
 
@@ -2201,8 +2201,8 @@ describe("runCodexAppServerAttempt", () => {
         backendId: "docker",
         docker: {
           binds: [
-            "/tmp/openclaw-data:/tmp/openclaw-data:rw",
-            "/tmp/openclaw-data/secrets:/tmp/openclaw-data/secrets:ro",
+            "/tmp/recall-data:/tmp/recall-data:rw",
+            "/tmp/recall-data/secrets:/tmp/recall-data/secrets:ro",
           ],
         },
       } as never),
@@ -2361,13 +2361,13 @@ describe("runCodexAppServerAttempt", () => {
     expect(instructions).not.toContain("PI main command guidance.");
   });
 
-  it("keeps OpenClaw skills out of Codex developer instructions", async () => {
+  it("keeps Recall skills out of Codex developer instructions", async () => {
     const llmInput = vi.fn();
     initializeGlobalHookRunner(
       createMockPluginRegistry([{ hookName: "llm_input", handler: llmInput }]),
     );
-    vi.stubEnv("OPENCLAW_TRAJECTORY", "1");
-    vi.stubEnv("OPENCLAW_TRAJECTORY_DIR", path.join(tempDir, "trajectory"));
+    vi.stubEnv("RECALL_TRAJECTORY", "1");
+    vi.stubEnv("RECALL_TRAJECTORY_DIR", path.join(tempDir, "trajectory"));
     const sessionFile = path.join(tempDir, "session.jsonl");
     const workspaceDir = path.join(tempDir, "workspace");
     const harness = createStartedThreadHarness();
@@ -2392,7 +2392,7 @@ describe("runCodexAppServerAttempt", () => {
       input?: Array<{ text?: string }>;
     };
     const inputText = turnStartParams.input?.[0]?.text ?? "";
-    expect(inputText).toContain("## OpenClaw Skills");
+    expect(inputText).toContain("## Recall Skills");
     expect(inputText).toContain("<available_skills>");
     expect(inputText).toContain("Current user request:\nhello");
     const [llmInputPayload] = mockCall(llmInput, "llm_input") as [{ prompt?: string }, unknown];
@@ -2498,7 +2498,7 @@ describe("runCodexAppServerAttempt", () => {
     expect(dynamicToolNames).toEqual(["message"]);
   });
 
-  it("keeps searchable OpenClaw dynamic tools when code-mode-only is enabled", () => {
+  it("keeps searchable Recall dynamic tools when code-mode-only is enabled", () => {
     const tools = [
       createRuntimeDynamicTool("message"),
       createRuntimeDynamicTool("web_search"),
@@ -2520,18 +2520,18 @@ describe("runCodexAppServerAttempt", () => {
 
     expect(message).not.toHaveProperty("namespace");
     expect(message).not.toHaveProperty("deferLoading");
-    expect(webSearch?.namespace).toBe(CODEX_OPENCLAW_DYNAMIC_TOOL_NAMESPACE);
+    expect(webSearch?.namespace).toBe(CODEX_RECALL_DYNAMIC_TOOL_NAMESPACE);
     expect(webSearch?.deferLoading).toBe(true);
-    expect(heartbeat?.namespace).toBe(CODEX_OPENCLAW_DYNAMIC_TOOL_NAMESPACE);
+    expect(heartbeat?.namespace).toBe(CODEX_RECALL_DYNAMIC_TOOL_NAMESPACE);
     expect(heartbeat?.deferLoading).toBe(true);
-    expect(sessionsSpawn?.namespace).toBe(CODEX_OPENCLAW_DYNAMIC_TOOL_NAMESPACE);
+    expect(sessionsSpawn?.namespace).toBe(CODEX_RECALL_DYNAMIC_TOOL_NAMESPACE);
     expect(sessionsSpawn?.deferLoading).toBe(true);
     expect(sessionsYield).not.toHaveProperty("namespace");
     expect(sessionsYield).not.toHaveProperty("deferLoading");
   });
 
   it("registers heartbeat response durably without advertising it on normal turns", async () => {
-    testing.setOpenClawCodingToolsFactoryForTests((options) => [
+    testing.setRecallCodingToolsFactoryForTests((options) => [
       createRuntimeDynamicTool("message"),
       ...(options?.enableHeartbeatTool === true
         ? [createRuntimeDynamicTool("heartbeat_respond")]
@@ -2569,10 +2569,10 @@ describe("runCodexAppServerAttempt", () => {
     expect(registeredToolNames).toContain("message");
     expect(registeredToolNames).toContain("heartbeat_respond");
     expect(normalInstructions).toContain(
-      "Deferred searchable OpenClaw dynamic tools available: message.",
+      "Deferred searchable Recall dynamic tools available: message.",
     );
     expect(normalInstructions).not.toContain(
-      "Deferred searchable OpenClaw dynamic tools available: heartbeat_respond",
+      "Deferred searchable Recall dynamic tools available: heartbeat_respond",
     );
 
     const heartbeatBridge = createCodexToolBridgeForTest(
@@ -2591,7 +2591,7 @@ describe("runCodexAppServerAttempt", () => {
   });
 
   it("keeps the persistent dynamic schema stable across heartbeat-only turns", async () => {
-    testing.setOpenClawCodingToolsFactoryForTests((options) => [
+    testing.setRecallCodingToolsFactoryForTests((options) => [
       createRuntimeDynamicTool("message"),
       createRuntimeDynamicTool("web_search"),
       ...(options?.enableHeartbeatTool === true
@@ -2650,7 +2650,7 @@ describe("runCodexAppServerAttempt", () => {
   });
 
   it("disables Codex native tool surfaces when runtime toolsAllow is empty", async () => {
-    testing.setOpenClawCodingToolsFactoryForTests(() => [
+    testing.setRecallCodingToolsFactoryForTests(() => [
       createRuntimeDynamicTool("message"),
       createRuntimeDynamicTool("web_search"),
     ]);
@@ -2717,7 +2717,7 @@ describe("runCodexAppServerAttempt", () => {
   });
 
   it("fails closed for Codex app defaults when restricted native tools have no plugin config", async () => {
-    testing.setOpenClawCodingToolsFactoryForTests(() => [createRuntimeDynamicTool("message")]);
+    testing.setRecallCodingToolsFactoryForTests(() => [createRuntimeDynamicTool("message")]);
     const params = createParams(
       path.join(tempDir, "session.jsonl"),
       path.join(tempDir, "workspace"),
@@ -2856,7 +2856,7 @@ describe("runCodexAppServerAttempt", () => {
     params.sessionKey = "agent:main:main";
 
     expect(
-      testing.resolveOpenClawCodingToolsSessionKeys(
+      testing.resolveRecallCodingToolsSessionKeys(
         params,
         "agent:main:telegram:default:direct:1234",
       ),
@@ -2865,7 +2865,7 @@ describe("runCodexAppServerAttempt", () => {
       runSessionKey: "agent:main:main",
     });
 
-    expect(testing.resolveOpenClawCodingToolsSessionKeys(params, "agent:main:main")).toEqual({
+    expect(testing.resolveRecallCodingToolsSessionKeys(params, "agent:main:main")).toEqual({
       sessionKey: "agent:main:main",
       runSessionKey: undefined,
     });
@@ -3036,7 +3036,7 @@ describe("runCodexAppServerAttempt", () => {
       contentItems: [
         {
           type: "inputText",
-          text: "OpenClaw dynamic tool call timed out after 1ms while running tool message.",
+          text: "Recall dynamic tool call timed out after 1ms while running tool message.",
         },
       ],
     });
@@ -3070,7 +3070,7 @@ describe("runCodexAppServerAttempt", () => {
       contentItems: [
         {
           type: "inputText",
-          text: "OpenClaw dynamic tool call timed out after 1ms while waiting for process action=poll sessionId=rapid-crustacean. This is a tool RPC timeout, not a session idle timeout.",
+          text: "Recall dynamic tool call timed out after 1ms while waiting for process action=poll sessionId=rapid-crustacean. This is a tool RPC timeout, not a session idle timeout.",
         },
       ],
     });
@@ -3130,7 +3130,7 @@ describe("runCodexAppServerAttempt", () => {
     };
     expect(toolResult.success).toBe(false);
     expect(toolResult.contentItems?.[0]?.type).toBe("inputText");
-    expect(toolResult.contentItems?.[0]?.text).toMatch(/^Unknown OpenClaw tool: lookup$/u);
+    expect(toolResult.contentItems?.[0]?.text).toMatch(/^Unknown Recall tool: lookup$/u);
 
     await harness.completeTurn({ threadId: "thread-1", turnId: "turn-1" });
     await run;
@@ -3294,7 +3294,7 @@ describe("runCodexAppServerAttempt", () => {
         currentTurnHadNonTerminalDynamicToolResult: false,
         activeAppServerTurnRequests: 0,
         activeTurnItemIdsCount: 0,
-        pendingOpenClawDynamicToolCompletionIdsCount: 0,
+        pendingRecallDynamicToolCompletionIdsCount: 0,
       }),
     ).toBe(true);
     expect(
@@ -3305,7 +3305,7 @@ describe("runCodexAppServerAttempt", () => {
         currentTurnHadNonTerminalDynamicToolResult: true,
         activeAppServerTurnRequests: 0,
         activeTurnItemIdsCount: 0,
-        pendingOpenClawDynamicToolCompletionIdsCount: 0,
+        pendingRecallDynamicToolCompletionIdsCount: 0,
       }),
     ).toBe(false);
     expect(
@@ -3316,7 +3316,7 @@ describe("runCodexAppServerAttempt", () => {
         currentTurnHadNonTerminalDynamicToolResult: false,
         activeAppServerTurnRequests: 1,
         activeTurnItemIdsCount: 0,
-        pendingOpenClawDynamicToolCompletionIdsCount: 0,
+        pendingRecallDynamicToolCompletionIdsCount: 0,
       }),
     ).toBe(false);
     expect(
@@ -3327,7 +3327,7 @@ describe("runCodexAppServerAttempt", () => {
         currentTurnHadNonTerminalDynamicToolResult: false,
         activeAppServerTurnRequests: 0,
         activeTurnItemIdsCount: 0,
-        pendingOpenClawDynamicToolCompletionIdsCount: 1,
+        pendingRecallDynamicToolCompletionIdsCount: 1,
       }),
     ).toBe(false);
   });
@@ -3337,7 +3337,7 @@ describe("runCodexAppServerAttempt", () => {
       testing.resolveTerminalDynamicToolBatchAction({
         activeAppServerTurnRequests: 1,
         activeTurnItemIdsCount: 0,
-        pendingOpenClawDynamicToolCompletionIdsCount: 0,
+        pendingRecallDynamicToolCompletionIdsCount: 0,
         currentTurnHadNonTerminalDynamicToolResult: false,
         hasPendingTerminalDynamicToolRelease: true,
       }),
@@ -3346,7 +3346,7 @@ describe("runCodexAppServerAttempt", () => {
       testing.resolveTerminalDynamicToolBatchAction({
         activeAppServerTurnRequests: 0,
         activeTurnItemIdsCount: 0,
-        pendingOpenClawDynamicToolCompletionIdsCount: 1,
+        pendingRecallDynamicToolCompletionIdsCount: 1,
         currentTurnHadNonTerminalDynamicToolResult: false,
         hasPendingTerminalDynamicToolRelease: true,
       }),
@@ -3355,7 +3355,7 @@ describe("runCodexAppServerAttempt", () => {
       testing.resolveTerminalDynamicToolBatchAction({
         activeAppServerTurnRequests: 0,
         activeTurnItemIdsCount: 1,
-        pendingOpenClawDynamicToolCompletionIdsCount: 0,
+        pendingRecallDynamicToolCompletionIdsCount: 0,
         currentTurnHadNonTerminalDynamicToolResult: false,
         hasPendingTerminalDynamicToolRelease: true,
       }),
@@ -3367,7 +3367,7 @@ describe("runCodexAppServerAttempt", () => {
       testing.resolveTerminalDynamicToolBatchAction({
         activeAppServerTurnRequests: 0,
         activeTurnItemIdsCount: 0,
-        pendingOpenClawDynamicToolCompletionIdsCount: 0,
+        pendingRecallDynamicToolCompletionIdsCount: 0,
         currentTurnHadNonTerminalDynamicToolResult: true,
         hasPendingTerminalDynamicToolRelease: true,
       }),
@@ -3379,7 +3379,7 @@ describe("runCodexAppServerAttempt", () => {
       testing.resolveTerminalDynamicToolBatchAction({
         activeAppServerTurnRequests: 0,
         activeTurnItemIdsCount: 0,
-        pendingOpenClawDynamicToolCompletionIdsCount: 0,
+        pendingRecallDynamicToolCompletionIdsCount: 0,
         currentTurnHadNonTerminalDynamicToolResult: false,
         hasPendingTerminalDynamicToolRelease: true,
       }),
@@ -3391,7 +3391,7 @@ describe("runCodexAppServerAttempt", () => {
       testing.resolveTerminalDynamicToolBatchAction({
         activeAppServerTurnRequests: 0,
         activeTurnItemIdsCount: 1,
-        pendingOpenClawDynamicToolCompletionIdsCount: 0,
+        pendingRecallDynamicToolCompletionIdsCount: 0,
         currentTurnHadNonTerminalDynamicToolResult: false,
         hasPendingTerminalDynamicToolRelease: true,
       }),
@@ -3400,7 +3400,7 @@ describe("runCodexAppServerAttempt", () => {
       testing.resolveTerminalDynamicToolBatchAction({
         activeAppServerTurnRequests: 0,
         activeTurnItemIdsCount: 0,
-        pendingOpenClawDynamicToolCompletionIdsCount: 0,
+        pendingRecallDynamicToolCompletionIdsCount: 0,
         currentTurnHadNonTerminalDynamicToolResult: false,
         hasPendingTerminalDynamicToolRelease: true,
       }),
@@ -3684,7 +3684,7 @@ describe("runCodexAppServerAttempt", () => {
           contentItems: [
             {
               type: "inputText",
-              text: "OpenClaw dynamic tool call timed out after 1ms while running tool echo.",
+              text: "Recall dynamic tool call timed out after 1ms while running tool echo.",
             },
           ],
         },
@@ -3843,7 +3843,7 @@ describe("runCodexAppServerAttempt", () => {
     expect(toolResult.success).toBe(false);
     expect(toolResult.contentItems?.[0]?.type).toBe("inputText");
     expect(toolResult.contentItems?.[0]?.text).toMatch(
-      /^(Unknown OpenClaw tool: message|Action send requires a target\.)$/u,
+      /^(Unknown Recall tool: message|Action send requires a target\.)$/u,
     );
 
     const result = await run;
@@ -6076,7 +6076,7 @@ describe("runCodexAppServerAttempt", () => {
     sessionManager.appendMessage(assistantMessage("Opik default project context", Date.now() + 1));
     const harness = createStartedThreadHarness();
     const params = createParams(sessionFile, workspaceDir);
-    params.prompt = "make the default webpage openclaw";
+    params.prompt = "make the default webpage recall";
 
     const run = runCodexAppServerAttempt(params);
     await harness.waitForMethod("turn/start");
@@ -6089,11 +6089,11 @@ describe("runCodexAppServerAttempt", () => {
       (turnStart?.params as { input?: Array<{ text?: string }> } | undefined)?.input?.[0]?.text ??
       "";
 
-    expect(inputText).toContain("OpenClaw assembled context for this turn:");
+    expect(inputText).toContain("Recall assembled context for this turn:");
     expect(inputText).toContain("we are fixing the Opik default project");
     expect(inputText).toContain("Opik default project context");
     expect(inputText).toContain("Current user request:");
-    expect(inputText).toContain("make the default webpage openclaw");
+    expect(inputText).toContain("make the default webpage recall");
   });
 
   it("passes stable workspace files as Codex developer instructions and keeps MEMORY.md as turn context", async () => {
@@ -6129,7 +6129,7 @@ describe("runCodexAppServerAttempt", () => {
     };
     const config = threadStartParams.config;
 
-    expect(threadStartParams.developerInstructions).toContain("OpenClaw Agent Soul");
+    expect(threadStartParams.developerInstructions).toContain("Recall Agent Soul");
     expect(threadStartParams.developerInstructions).toContain(
       "They define who you are, how you work",
     );
@@ -6148,7 +6148,7 @@ describe("runCodexAppServerAttempt", () => {
       input?: Array<{ text?: string }>;
     };
     const inputText = turnStartParams.input?.[0]?.text ?? "";
-    expect(inputText).toContain("OpenClaw runtime context for this turn:");
+    expect(inputText).toContain("Recall runtime context for this turn:");
     expect(inputText).not.toContain("does not override Codex system/developer instructions");
     expect(inputText).not.toContain("not developer policy");
     expect(inputText).not.toContain(soulGuidance);
@@ -6310,7 +6310,7 @@ describe("runCodexAppServerAttempt", () => {
     const collaborationInstructions =
       turnStartParams.collaborationMode?.settings?.developer_instructions ?? "";
 
-    expect(collaborationInstructions).toContain("This is an OpenClaw heartbeat turn");
+    expect(collaborationInstructions).toContain("This is an Recall heartbeat turn");
     expect(collaborationInstructions).not.toContain("HEARTBEAT.md exists");
   });
 
@@ -6343,11 +6343,11 @@ describe("runCodexAppServerAttempt", () => {
     });
   });
 
-  it("keeps lightweight cron Codex turns out of OpenClaw bootstrap context", async () => {
+  it("keeps lightweight cron Codex turns out of Recall bootstrap context", async () => {
     const sessionFile = path.join(tempDir, "session.jsonl");
     const workspaceDir = path.join(tempDir, "workspace");
     const exactCommand =
-      "cd /Users/phaedrus/Projects/openclaw && /Users/phaedrus/clawd/scripts/clawsweeper-related-scan.py";
+      "cd /Users/phaedrus/Projects/recall && /Users/phaedrus/clawd/scripts/clawsweeper-related-scan.py";
     await fs.mkdir(workspaceDir, { recursive: true });
     await fs.writeFile(path.join(workspaceDir, "AGENTS.md"), "Follow AGENTS guidance.");
     await fs.writeFile(path.join(workspaceDir, "SOUL.md"), "Soul voice goes here.");
@@ -6435,7 +6435,7 @@ describe("runCodexAppServerAttempt", () => {
     expect(llmInputPayload.imagesCount).toBe(0);
     expect(llmInputPayload.historyMessages?.[0]?.role).toBe("assistant");
     expect(llmInputPayload.systemPrompt).toContain(
-      "You are a personal agent running inside OpenClaw.",
+      "You are a personal agent running inside Recall.",
     );
     expect(llmInputPayload.systemPrompt).not.toContain(CODEX_GPT5_BEHAVIOR_CONTRACT);
     expect(llmInputContext.runId).toBe("run-1");
@@ -6792,7 +6792,7 @@ describe("runCodexAppServerAttempt", () => {
     expect(nativeHookRelayTesting.getNativeHookRelayRegistrationForTests(relayId)).toBeUndefined();
   });
 
-  it("promotes implicit Codex yolo approval policy when OpenClaw tool policy exists", async () => {
+  it("promotes implicit Codex yolo approval policy when Recall tool policy exists", async () => {
     initializeGlobalHookRunner(
       createMockPluginRegistry([{ hookName: "before_tool_call", handler: vi.fn() }]),
     );
@@ -6814,7 +6814,7 @@ describe("runCodexAppServerAttempt", () => {
   it("keeps implicit Codex yolo approval policy when untrusted approvals are disallowed", () => {
     const appServer = resolveCodexAppServerRuntimeOptions({ env: {}, requirementsToml: null });
 
-    const resolved = testing.resolveCodexAppServerForOpenClawToolPolicy({
+    const resolved = testing.resolveCodexAppServerForRecallToolPolicy({
       appServer,
       pluginConfig: readCodexPluginConfig({}),
       env: {},
@@ -6825,7 +6825,7 @@ describe("runCodexAppServerAttempt", () => {
     expect(resolved.approvalPolicy).toBe("never");
   });
 
-  it("keeps explicit Codex yolo mode unpromoted when OpenClaw tool policy exists", async () => {
+  it("keeps explicit Codex yolo mode unpromoted when Recall tool policy exists", async () => {
     initializeGlobalHookRunner(
       createMockPluginRegistry([{ hookName: "before_tool_call", handler: vi.fn() }]),
     );
@@ -6850,8 +6850,8 @@ describe("runCodexAppServerAttempt", () => {
     initializeGlobalHookRunner(
       createMockPluginRegistry([{ hookName: "before_tool_call", handler: vi.fn() }]),
     );
-    vi.stubEnv("OPENCLAW_CODEX_APP_SERVER_MODE", " ");
-    vi.stubEnv("OPENCLAW_CODEX_APP_SERVER_APPROVAL_POLICY", "always");
+    vi.stubEnv("RECALL_CODEX_APP_SERVER_MODE", " ");
+    vi.stubEnv("RECALL_CODEX_APP_SERVER_APPROVAL_POLICY", "always");
     const sessionFile = path.join(tempDir, "session.jsonl");
     const workspaceDir = path.join(tempDir, "workspace");
     const harness = createStartedThreadHarness();
@@ -8344,7 +8344,7 @@ describe("runCodexAppServerAttempt", () => {
   });
 
   it("releases completion when a projector callback throws during turn/completed", async () => {
-    // Regression for openclaw/openclaw#67996: a throw inside the projector's
+    // Regression for tryrecall/recall-agents#67996: a throw inside the projector's
     // turn/completed handler must not strand resolveCompletion, otherwise the
     // gateway session lane stays locked and every follow-up message queues
     // behind a run that will never resolve.
@@ -10281,7 +10281,7 @@ describe("runCodexAppServerAttempt", () => {
       "features.hooks": true,
       "hooks.PreToolUse": [
         {
-          hooks: [{ type: "command", command: "openclaw-native-hook-relay", timeout: 5 }],
+          hooks: [{ type: "command", command: "recall-native-hook-relay", timeout: 5 }],
         },
       ],
     };
@@ -11011,7 +11011,7 @@ describe("runCodexAppServerAttempt", () => {
     expect(serialized).not.toContain("/tmp/codex-home");
   });
 
-  it("builds resume and turn params from the currently selected OpenClaw model", () => {
+  it("builds resume and turn params from the currently selected Recall model", () => {
     const params = createParams("/tmp/session.jsonl", "/tmp/workspace");
     const appServer = {
       start: {
@@ -11079,7 +11079,7 @@ describe("runCodexAppServerAttempt", () => {
     expect(heartbeatCollaborationMode.settings.model).toBe("gpt-5.4-codex");
     expect(heartbeatCollaborationMode.settings.reasoning_effort).toBe("medium");
     expect(heartbeatCollaborationMode.settings.developer_instructions).toContain(
-      "This is an OpenClaw heartbeat turn. Apply these instructions only to this heartbeat wake",
+      "This is an Recall heartbeat turn. Apply these instructions only to this heartbeat wake",
     );
     expect(heartbeatCollaborationMode.settings.developer_instructions).toContain(
       "Use heartbeats to create useful proactive progress",
@@ -11109,7 +11109,7 @@ describe("runCodexAppServerAttempt", () => {
     expect(cronCollaborationMode.settings.model).toBe("gpt-5.4-codex");
     expect(cronCollaborationMode.settings.reasoning_effort).toBe("medium");
     expect(cronCollaborationMode.settings.developer_instructions).toContain(
-      "This is an OpenClaw cron automation turn",
+      "This is an Recall cron automation turn",
     );
     expect(cronCollaborationMode.settings.developer_instructions).toContain(
       "If it asks you to run an exact command, run that command before doing any investigation",

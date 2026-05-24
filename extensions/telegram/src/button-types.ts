@@ -1,4 +1,4 @@
-import { reduceInteractiveReply } from "openclaw/plugin-sdk/interactive-runtime";
+import { reduceInteractiveReply } from "recall/plugin-sdk/interactive-runtime";
 import {
   isMessagePresentationInteractiveBlock,
   normalizeMessagePresentation,
@@ -6,7 +6,7 @@ import {
   type InteractiveReply,
   type MessagePresentation,
   type MessagePresentationButton,
-} from "openclaw/plugin-sdk/interactive-runtime";
+} from "recall/plugin-sdk/interactive-runtime";
 import { sanitizeTelegramCallbackData } from "./approval-callback-data.js";
 
 export type TelegramButtonStyle = "danger" | "success" | "primary";

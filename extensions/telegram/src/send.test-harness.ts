@@ -1,11 +1,11 @@
-import { resolveMarkdownTableMode } from "openclaw/plugin-sdk/markdown-table-runtime";
+import { resolveMarkdownTableMode } from "recall/plugin-sdk/markdown-table-runtime";
 import {
   buildOutboundMediaLoadOptions,
   isGifMedia,
   kindFromMime,
   normalizePollInput,
-} from "openclaw/plugin-sdk/media-runtime";
-import type { MockFn } from "openclaw/plugin-sdk/plugin-test-runtime";
+} from "recall/plugin-sdk/media-runtime";
+import type { MockFn } from "recall/plugin-sdk/plugin-test-runtime";
 import { beforeEach, vi } from "vitest";
 
 const { botApi, botConfigUseSpy, botCtorSpy } = vi.hoisted(() => ({
@@ -50,7 +50,7 @@ const { probeVideoDimensions } = vi.hoisted(() => ({
 const { loadConfig, resolveStorePath } = vi.hoisted(() => ({
   loadConfig: vi.fn(() => ({})),
   resolveStorePath: vi.fn(
-    (storePath?: string) => storePath ?? "/tmp/openclaw-telegram-send-tests.json",
+    (storePath?: string) => storePath ?? "/tmp/recall-telegram-send-tests.json",
   ),
 }));
 
@@ -99,7 +99,7 @@ type TelegramSendTestMocks = {
   probeVideoDimensions: MockFn;
 };
 
-vi.mock("openclaw/plugin-sdk/web-media", () => ({
+vi.mock("recall/plugin-sdk/web-media", () => ({
   loadWebMedia,
 }));
 
@@ -147,9 +147,9 @@ vi.mock("undici", () => ({
   setGlobalDispatcher: undiciSetGlobalDispatcher,
 }));
 
-vi.mock("openclaw/plugin-sdk/plugin-config-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/plugin-config-runtime")>(
-    "openclaw/plugin-sdk/plugin-config-runtime",
+vi.mock("recall/plugin-sdk/plugin-config-runtime", async () => {
+  const actual = await vi.importActual<typeof import("recall/plugin-sdk/plugin-config-runtime")>(
+    "recall/plugin-sdk/plugin-config-runtime",
   );
   return {
     ...actual,
@@ -192,7 +192,7 @@ export function getTelegramSendTestMocks(): TelegramSendTestMocks {
 export function installTelegramSendTestHooks() {
   beforeEach(() => {
     loadConfig.mockReturnValue({});
-    resolveStorePath.mockReturnValue("/tmp/openclaw-telegram-send-tests.json");
+    resolveStorePath.mockReturnValue("/tmp/recall-telegram-send-tests.json");
     loadWebMedia.mockReset();
     probeVideoDimensions.mockReset();
     probeVideoDimensions.mockResolvedValue(undefined);

@@ -23,7 +23,7 @@ function parseArgs(args: string[]): Options {
     switch (arg) {
       case "--help":
       case "-h":
-        process.stdout.write(`Usage: openclaw qa coverage [options]
+        process.stdout.write(`Usage: recall qa coverage [options]
 
 Options:
   --json                Print machine-readable JSON

@@ -7,7 +7,7 @@ const resolveLsofCommandSyncMock = vi.hoisted(() => vi.fn());
 const resolveGatewayPortMock = vi.hoisted(() => vi.fn());
 
 vi.mock("node:child_process", async () => {
-  const { mockNodeChildProcessSpawnSync } = await import("openclaw/plugin-sdk/test-node-mocks");
+  const { mockNodeChildProcessSpawnSync } = await import("recall/plugin-sdk/test-node-mocks");
   return mockNodeChildProcessSpawnSync(spawnSyncMock);
 });
 
@@ -26,7 +26,7 @@ vi.mock("../config/paths.js", async () => {
 let testing: typeof import("./restart-stale-pids.js").testing;
 let cleanStaleGatewayProcessesSync: typeof import("./restart-stale-pids.js").cleanStaleGatewayProcessesSync;
 let findGatewayPidsOnPortSync: typeof import("./restart-stale-pids.js").findGatewayPidsOnPortSync;
-let triggerOpenClawRestart: typeof import("./restart.js").triggerOpenClawRestart;
+let triggerRecallRestart: typeof import("./restart.js").triggerRecallRestart;
 
 let currentTimeMs = 0;
 const envSnapshot = captureFullEnv();
@@ -34,7 +34,7 @@ const envSnapshot = captureFullEnv();
 beforeAll(async () => {
   ({ testing, cleanStaleGatewayProcessesSync, findGatewayPidsOnPortSync } =
     await import("./restart-stale-pids.js"));
-  ({ triggerOpenClawRestart } = await import("./restart.js"));
+  ({ triggerRecallRestart } = await import("./restart.js"));
 });
 
 beforeEach(() => {
@@ -71,7 +71,7 @@ function requireFirstSpawnSyncCall(): [unknown, unknown, unknown] {
 }
 
 describe.runIf(process.platform !== "win32")("findGatewayPidsOnPortSync", () => {
-  it("parses lsof output and filters non-openclaw/current processes", () => {
+  it("parses lsof output and filters non-recall/current processes", () => {
     const gatewayPidA = process.pid + 1000;
     const gatewayPidB = process.pid + 2000;
     const foreignPid = process.pid + 3000;
@@ -86,7 +86,7 @@ describe.runIf(process.platform !== "win32")("findGatewayPidsOnPortSync", () => 
         `p${foreignPid}`,
         "cnode",
         `p${gatewayPidB}`,
-        "cOpenClaw",
+        "cRecall",
       ].join("\n"),
     });
 
@@ -194,13 +194,13 @@ describe.runIf(process.platform !== "win32")("cleanStaleGatewayProcessesSync", (
   });
 });
 
-describe("triggerOpenClawRestart", () => {
+describe("triggerRecallRestart", () => {
   it("does not kickstart after bootstrap registers an unloaded LaunchAgent", () => {
     setPlatform("darwin");
     delete process.env.VITEST;
     delete process.env.NODE_ENV;
     process.env.HOME = "/Users/test";
-    process.env.OPENCLAW_PROFILE = "default";
+    process.env.RECALL_PROFILE = "default";
     const uid = typeof process.getuid === "function" ? process.getuid() : 501;
     spawnSyncMock.mockImplementation((command: string, args: string[]) => {
       if (command === "/usr/sbin/lsof") {
@@ -215,14 +215,14 @@ describe("triggerOpenClawRestart", () => {
       return { error: undefined, status: 1, stdout: "" };
     });
 
-    const result = triggerOpenClawRestart();
+    const result = triggerRecallRestart();
 
     expect(result).toEqual({
       ok: true,
       method: "launchctl",
       tried: [
-        `launchctl kickstart -k gui/${uid}/ai.openclaw.gateway`,
-        `launchctl bootstrap gui/${uid} /Users/test/Library/LaunchAgents/ai.openclaw.gateway.plist`,
+        `launchctl kickstart -k gui/${uid}/ai.recall.gateway`,
+        `launchctl bootstrap gui/${uid} /Users/test/Library/LaunchAgents/ai.recall.gateway.plist`,
       ],
     });
   });
@@ -232,7 +232,7 @@ describe("triggerOpenClawRestart", () => {
     delete process.env.VITEST;
     delete process.env.NODE_ENV;
     process.env.HOME = "/Users/test";
-    process.env.OPENCLAW_PROFILE = "default";
+    process.env.RECALL_PROFILE = "default";
     const uid = typeof process.getuid === "function" ? process.getuid() : 501;
     spawnSyncMock.mockImplementation((command: string, args: string[]) => {
       if (command === "/usr/sbin/lsof") {
@@ -250,15 +250,15 @@ describe("triggerOpenClawRestart", () => {
       return { error: undefined, status: 1, stdout: "" };
     });
 
-    const result = triggerOpenClawRestart();
+    const result = triggerRecallRestart();
 
     expect(result).toEqual({
       ok: true,
       method: "launchctl",
       tried: [
-        `launchctl kickstart -k gui/${uid}/ai.openclaw.gateway`,
-        `launchctl bootstrap gui/${uid} /Users/test/Library/LaunchAgents/ai.openclaw.gateway.plist`,
-        `launchctl kickstart gui/${uid}/ai.openclaw.gateway`,
+        `launchctl kickstart -k gui/${uid}/ai.recall.gateway`,
+        `launchctl bootstrap gui/${uid} /Users/test/Library/LaunchAgents/ai.recall.gateway.plist`,
+        `launchctl kickstart gui/${uid}/ai.recall.gateway`,
       ],
     });
   });

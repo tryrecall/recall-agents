@@ -1,9 +1,9 @@
-import { normalizeOpenClawProviderIndex } from "./normalize.js";
-import { OPENCLAW_PROVIDER_INDEX } from "./openclaw-provider-index.js";
-import type { OpenClawProviderIndex } from "./types.js";
+import { normalizeRecallProviderIndex } from "./normalize.js";
+import { RECALL_PROVIDER_INDEX } from "./recall-provider-index.js";
+import type { RecallProviderIndex } from "./types.js";
 
-export function loadOpenClawProviderIndex(
-  source: unknown = OPENCLAW_PROVIDER_INDEX,
-): OpenClawProviderIndex {
-  return normalizeOpenClawProviderIndex(source) ?? { version: 1, providers: {} };
+export function loadRecallProviderIndex(
+  source: unknown = RECALL_PROVIDER_INDEX,
+): RecallProviderIndex {
+  return normalizeRecallProviderIndex(source) ?? { version: 1, providers: {} };
 }

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { resolveIsNixMode } from "../config/paths.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   getActiveDiagnosticsTimelineSpan,
   measureDiagnosticsTimelineSpanSync,
@@ -54,15 +54,15 @@ export function clearLoadPluginMetadataSnapshotMemo(): void {
 const MEMO_RELEVANT_ENV_KEYS = [
   "APPDATA",
   "HOME",
-  "OPENCLAW_BUNDLED_PLUGINS_DIR",
-  "OPENCLAW_COMPATIBILITY_HOST_VERSION",
-  "OPENCLAW_CONFIG_PATH",
-  "OPENCLAW_DISABLE_BUNDLED_PLUGINS",
-  "OPENCLAW_DISABLE_BUNDLED_SOURCE_OVERLAYS",
-  "OPENCLAW_DISABLE_PERSISTED_PLUGIN_REGISTRY",
-  "OPENCLAW_HOME",
-  "OPENCLAW_NIX_MODE",
-  "OPENCLAW_STATE_DIR",
+  "RECALL_BUNDLED_PLUGINS_DIR",
+  "RECALL_COMPATIBILITY_HOST_VERSION",
+  "RECALL_CONFIG_PATH",
+  "RECALL_DISABLE_BUNDLED_PLUGINS",
+  "RECALL_DISABLE_BUNDLED_SOURCE_OVERLAYS",
+  "RECALL_DISABLE_PERSISTED_PLUGIN_REGISTRY",
+  "RECALL_HOME",
+  "RECALL_NIX_MODE",
+  "RECALL_STATE_DIR",
   "USERPROFILE",
   "XDG_CONFIG_HOME",
 ] as const;
@@ -222,7 +222,7 @@ function installRecordPathFingerprints(
           watchedFiles,
         ),
         watchedFileFingerprint(
-          resolvedInstallPath ? path.join(resolvedInstallPath, "openclaw.plugin.json") : undefined,
+          resolvedInstallPath ? path.join(resolvedInstallPath, "recall.plugin.json") : undefined,
           watchedFiles,
         ),
         watchedFileFingerprint(resolvedSourcePath, watchedFiles),
@@ -231,7 +231,7 @@ function installRecordPathFingerprints(
           watchedFiles,
         ),
         watchedFileFingerprint(
-          resolvedSourcePath ? path.join(resolvedSourcePath, "openclaw.plugin.json") : undefined,
+          resolvedSourcePath ? path.join(resolvedSourcePath, "recall.plugin.json") : undefined,
           watchedFiles,
         ),
       ];
@@ -260,7 +260,7 @@ function managedNpmDependencyMetadataFingerprints(
         packageName,
         dependencySpec,
         watchedFileFingerprint(path.join(packageDir, "package.json"), watchedFiles),
-        watchedFileFingerprint(path.join(packageDir, "openclaw.plugin.json"), watchedFiles),
+        watchedFileFingerprint(path.join(packageDir, "recall.plugin.json"), watchedFiles),
       ];
     });
 }
@@ -339,7 +339,7 @@ function resolvePersistedRegistryFastMemoFingerprint(params: {
   preferPersisted?: boolean;
   stateDir?: string;
 }): Record<string, unknown> {
-  const disabledByEnv = params.env.OPENCLAW_DISABLE_PERSISTED_PLUGIN_REGISTRY?.trim().toLowerCase();
+  const disabledByEnv = params.env.RECALL_DISABLE_PERSISTED_PLUGIN_REGISTRY?.trim().toLowerCase();
   const disabled =
     params.preferPersisted === false ||
     (Boolean(disabledByEnv) &&
@@ -594,7 +594,7 @@ export function isPluginMetadataSnapshotCompatible(params: {
     PluginMetadataSnapshot,
     "configFingerprint" | "index" | "policyHash" | "workspaceDir"
   >;
-  config: OpenClawConfig;
+  config: RecallConfig;
   env?: NodeJS.ProcessEnv;
   workspaceDir?: string;
   index?: InstalledPluginIndex;

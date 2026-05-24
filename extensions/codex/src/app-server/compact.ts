@@ -8,7 +8,7 @@ import {
   runHarnessContextEngineMaintenance,
   type CompactEmbeddedPiSessionParams,
   type EmbeddedPiCompactResult,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "recall/plugin-sdk/agent-harness-runtime";
 import {
   defaultCodexAppServerClientFactory,
   type CodexAppServerClientFactory,
@@ -51,7 +51,7 @@ export async function maybeCompactCodexAppServerSession(
   if (activeContextEngine?.info.ownsCompaction) {
     return await compactOwningContextEngine(params, activeContextEngine);
   }
-  warnIfIgnoringOpenClawCompactionOverrides(params);
+  warnIfIgnoringRecallCompactionOverrides(params);
   const nativeResult = await compactCodexNativeThread(params, options);
   if (activeContextEngine && nativeResult?.ok && nativeResult.compacted) {
     try {
@@ -200,7 +200,7 @@ function mergeContextEngineCompactionDetails(
   return extra;
 }
 
-function warnIfIgnoringOpenClawCompactionOverrides(params: CompactEmbeddedPiSessionParams): void {
+function warnIfIgnoringRecallCompactionOverrides(params: CompactEmbeddedPiSessionParams): void {
   const activeContextEngine = isActiveHarnessContextEngine(params.contextEngine)
     ? params.contextEngine
     : undefined;
@@ -214,7 +214,7 @@ function warnIfIgnoringOpenClawCompactionOverrides(params: CompactEmbeddedPiSess
   }
   warnedIgnoredCompactionOverrides.add(warningKey);
   embeddedAgentLog.warn(
-    "ignoring OpenClaw compaction overrides for Codex app-server compaction; Codex uses native server-side compaction",
+    "ignoring Recall compaction overrides for Codex app-server compaction; Codex uses native server-side compaction",
     {
       sessionId: params.sessionId,
       sessionKey: params.sessionKey,
@@ -696,7 +696,7 @@ function readNativeCompactionCompletion(
 }
 
 function resolveCompactionWaitTimeoutMs(): number {
-  const raw = process.env.OPENCLAW_CODEX_COMPACTION_WAIT_TIMEOUT_MS?.trim();
+  const raw = process.env.RECALL_CODEX_COMPACTION_WAIT_TIMEOUT_MS?.trim();
   const parsed = raw ? Number.parseInt(raw, 10) : Number.NaN;
   if (Number.isFinite(parsed) && parsed > 0) {
     return parsed;

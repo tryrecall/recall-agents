@@ -1,29 +1,29 @@
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
 import type {
   ProviderAuthContext,
   ProviderAuthResult,
   ProviderResolveDynamicModelContext,
   ProviderRuntimeModel,
-} from "openclaw/plugin-sdk/plugin-entry";
+} from "recall/plugin-sdk/plugin-entry";
 import {
   CODEX_CLI_PROFILE_ID,
   createProviderApiKeyAuthMethod,
   ensureAuthProfileStoreForLocalUpdate,
   listProfilesForProvider,
   type OAuthCredential,
-} from "openclaw/plugin-sdk/provider-auth";
-import { buildOauthProviderAuthResult } from "openclaw/plugin-sdk/provider-auth";
+} from "recall/plugin-sdk/provider-auth";
+import { buildOauthProviderAuthResult } from "recall/plugin-sdk/provider-auth";
 import {
   DEFAULT_CONTEXT_TOKENS,
   normalizeModelCompat,
   normalizeProviderId,
   type ProviderPlugin,
-} from "openclaw/plugin-sdk/provider-model-shared";
-import { fetchCodexUsage } from "openclaw/plugin-sdk/provider-usage";
+} from "recall/plugin-sdk/provider-model-shared";
+import { fetchCodexUsage } from "recall/plugin-sdk/provider-usage";
 import {
   normalizeLowercaseStringOrEmpty,
   readStringValue,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/string-coerce-runtime";
 import {
   OPENAI_CODEX_DEVICE_PAIRING_HINT,
   OPENAI_CODEX_DEVICE_PAIRING_LABEL,
@@ -155,7 +155,7 @@ function matchesOpenAICodexImageCapableModel(modelId: string, modelName?: string
  * Restore native `["text", "image"]` input capability on resolved Codex rows
  * for the known modern model IDs (gpt-5.4, gpt-5.4-mini, gpt-5.4-pro, gpt-5.5,
  * gpt-5.5-pro). Persisted/configured model rows can omit the `input` field
- * entirely when they were written by older OpenClaw versions. When that row wins
+ * entirely when they were written by older Recall versions. When that row wins
  * the catalog merge, `modelSupportsInput(entry, "image")` returns false and the
  * gateway's `chat.send` handler offloads inbound images as `media://inbound/<id>`
  * claim-check URIs instead of inlining them.
@@ -494,7 +494,7 @@ async function runOpenAICodexDeviceCode(ctx: ProviderAuthContext) {
     spin.stop("OpenAI device code failed");
     ctx.runtime.error(formatErrorMessage(error));
     await ctx.prompter.note(
-      "Trouble with device code login? See https://docs.openclaw.ai/start/faq",
+      "Trouble with device code login? See https://docs.recall.ai/start/faq",
       "OAuth help",
     );
     throw error;
@@ -505,7 +505,7 @@ function buildOpenAICodexAuthDoctorHint(ctx: { profileId?: string }) {
   if (ctx.profileId !== CODEX_CLI_PROFILE_ID) {
     return undefined;
   }
-  return "Deprecated profile. Run `openclaw models auth login --provider openai-codex` or `openclaw configure`.";
+  return "Deprecated profile. Run `recall models auth login --provider openai-codex` or `recall configure`.";
 }
 
 export function buildOpenAICodexProviderPlugin(): ProviderPlugin {

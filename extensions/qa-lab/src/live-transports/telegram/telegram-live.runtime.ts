@@ -3,10 +3,10 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
-import { resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/temp-path";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
+import { fetchWithSsrFGuard } from "recall/plugin-sdk/ssrf-runtime";
+import { resolvePreferredRecallTmpDir } from "recall/plugin-sdk/temp-path";
 import { z } from "zod";
 import { startQaGatewayChild } from "../../gateway-child.js";
 import { DEFAULT_QA_LIVE_PROVIDER_MODE } from "../../providers/index.js";
@@ -299,13 +299,13 @@ const TELEGRAM_QA_SCENARIOS: TelegramQaScenarioDefinition[] = [
     id: "telegram-status-command",
     title: "Telegram status command reply",
     rationale: "Recent Telegram group regressions broke /status while normal chat still worked.",
-    regressionRefs: ["openclaw/openclaw#74698"],
+    regressionRefs: ["tryrecall/recall-agents#74698"],
     timeoutMs: 45_000,
     buildRun: (sutUsername) =>
       telegramQaStepRun({
         expectReply: true,
         input: `/status@${sutUsername}`,
-        expectedTextIncludes: ["OpenClaw", "Model:", "Session:", "Activation:"],
+        expectedTextIncludes: ["Recall", "Model:", "Session:", "Activation:"],
       }),
   },
   {
@@ -326,7 +326,7 @@ const TELEGRAM_QA_SCENARIOS: TelegramQaScenarioDefinition[] = [
           driverGroupAuthorization: "allow",
           expectReply: true,
           input: `/status@${sutUsername}`,
-          expectedTextIncludes: ["OpenClaw", "Session:"],
+          expectedTextIncludes: ["Recall", "Session:"],
         },
         {
           expectReply: true,
@@ -350,7 +350,7 @@ const TELEGRAM_QA_SCENARIOS: TelegramQaScenarioDefinition[] = [
     buildRun: () =>
       telegramQaStepRun({
         expectReply: false,
-        input: "/status@OpenClawQaOtherBot",
+        input: "/status@RecallQaOtherBot",
       }),
   },
   {
@@ -417,7 +417,7 @@ const TELEGRAM_QA_SCENARIOS: TelegramQaScenarioDefinition[] = [
     defaultEnabled: false,
     defaultProviderModes: ["mock-openai"],
     rationale: "Opt-in regression guard for duplicate final replies from Telegram streaming paths.",
-    regressionRefs: ["openclaw/openclaw#39905"],
+    regressionRefs: ["tryrecall/recall-agents#39905"],
     timeoutMs: 75_000,
     buildRun: (sutUsername) =>
       telegramQaStepRun({
@@ -435,7 +435,7 @@ const TELEGRAM_QA_SCENARIOS: TelegramQaScenarioDefinition[] = [
     title: "Telegram long final reuses the preview message",
     defaultProviderModes: ["mock-openai"],
     rationale: "Regression guard for long streamed finals leaving stale preview messages behind.",
-    regressionRefs: ["openclaw/openclaw#39905"],
+    regressionRefs: ["tryrecall/recall-agents#39905"],
     timeoutMs: 60_000,
     buildRun: (sutUsername) =>
       telegramQaStepRun({
@@ -454,7 +454,7 @@ const TELEGRAM_QA_SCENARIOS: TelegramQaScenarioDefinition[] = [
     title: "Telegram three-chunk final keeps only final chunks",
     defaultEnabled: false,
     rationale: "Opt-in stress probe for Telegram long final chunk accounting.",
-    regressionRefs: ["openclaw/openclaw#39905"],
+    regressionRefs: ["tryrecall/recall-agents#39905"],
     timeoutMs: 60_000,
     buildRun: (sutUsername) =>
       telegramQaStepRun({
@@ -494,13 +494,13 @@ const TELEGRAM_QA_STANDARD_SCENARIO_IDS = collectLiveTransportStandardScenarioCo
 });
 
 const TELEGRAM_QA_ENV_KEYS = [
-  "OPENCLAW_QA_TELEGRAM_GROUP_ID",
-  "OPENCLAW_QA_TELEGRAM_DRIVER_BOT_TOKEN",
-  "OPENCLAW_QA_TELEGRAM_SUT_BOT_TOKEN",
+  "RECALL_QA_TELEGRAM_GROUP_ID",
+  "RECALL_QA_TELEGRAM_DRIVER_BOT_TOKEN",
+  "RECALL_QA_TELEGRAM_SUT_BOT_TOKEN",
 ] as const;
-const TELEGRAM_QA_CAPTURE_CONTENT_ENV = "OPENCLAW_QA_TELEGRAM_CAPTURE_CONTENT";
-const QA_REDACT_PUBLIC_METADATA_ENV = "OPENCLAW_QA_REDACT_PUBLIC_METADATA";
-const QA_SUITE_PROGRESS_ENV = "OPENCLAW_QA_SUITE_PROGRESS";
+const TELEGRAM_QA_CAPTURE_CONTENT_ENV = "RECALL_QA_TELEGRAM_CAPTURE_CONTENT";
+const QA_REDACT_PUBLIC_METADATA_ENV = "RECALL_QA_REDACT_PUBLIC_METADATA";
+const QA_SUITE_PROGRESS_ENV = "RECALL_QA_SUITE_PROGRESS";
 const TELEGRAM_QA_PROGRESS_DETAIL_LIMIT = 240;
 const TELEGRAM_QA_PROGRESS_PREFIX = "[qa-telegram-live]";
 const execFileAsync = promisify(execFile);
@@ -573,7 +573,7 @@ function parsePositiveTelegramQaEnvMs(env: NodeJS.ProcessEnv, name: string, fall
 function resolveTelegramQaCanaryTimeoutMs(env: NodeJS.ProcessEnv = process.env) {
   return parsePositiveTelegramQaEnvMs(
     env,
-    "OPENCLAW_QA_TELEGRAM_CANARY_TIMEOUT_MS",
+    "RECALL_QA_TELEGRAM_CANARY_TIMEOUT_MS",
     DEFAULT_TELEGRAM_QA_CANARY_TIMEOUT_MS,
   );
 }
@@ -582,7 +582,7 @@ function resolveTelegramQaScenarioTimeoutMs(
   fallbackMs: number,
   env: NodeJS.ProcessEnv = process.env,
 ) {
-  return parsePositiveTelegramQaEnvMs(env, "OPENCLAW_QA_TELEGRAM_SCENARIO_TIMEOUT_MS", fallbackMs);
+  return parsePositiveTelegramQaEnvMs(env, "RECALL_QA_TELEGRAM_SCENARIO_TIMEOUT_MS", fallbackMs);
 }
 
 function formatTelegramQaTimeoutSeconds(timeoutMs: number) {
@@ -619,14 +619,14 @@ function formatTelegramQaProgressDetails(details: string): string {
 }
 
 function resolveTelegramQaRuntimeEnv(env: NodeJS.ProcessEnv = process.env): TelegramQaRuntimeEnv {
-  const groupId = resolveEnvValue(env, "OPENCLAW_QA_TELEGRAM_GROUP_ID");
+  const groupId = resolveEnvValue(env, "RECALL_QA_TELEGRAM_GROUP_ID");
   if (!/^-?\d+$/u.test(groupId)) {
-    throw new Error("OPENCLAW_QA_TELEGRAM_GROUP_ID must be a numeric Telegram chat id.");
+    throw new Error("RECALL_QA_TELEGRAM_GROUP_ID must be a numeric Telegram chat id.");
   }
   return {
     groupId,
-    driverToken: resolveEnvValue(env, "OPENCLAW_QA_TELEGRAM_DRIVER_BOT_TOKEN"),
-    sutToken: resolveEnvValue(env, "OPENCLAW_QA_TELEGRAM_SUT_BOT_TOKEN"),
+    driverToken: resolveEnvValue(env, "RECALL_QA_TELEGRAM_DRIVER_BOT_TOKEN"),
+    sutToken: resolveEnvValue(env, "RECALL_QA_TELEGRAM_SUT_BOT_TOKEN"),
   };
 }
 
@@ -694,14 +694,14 @@ function normalizeTelegramObservedMessage(update: TelegramUpdate): TelegramObser
 }
 
 function buildTelegramQaConfig(
-  baseCfg: OpenClawConfig,
+  baseCfg: RecallConfig,
   params: {
     groupId: string;
     sutToken: string;
     driverBotId: number;
     sutAccountId: string;
   },
-): OpenClawConfig {
+): RecallConfig {
   const pluginAllow = [...new Set([...(baseCfg.plugins?.allow ?? []), "telegram"])];
   const pluginEntries = {
     ...baseCfg.plugins?.entries,
@@ -1542,29 +1542,29 @@ function canaryFailureMessage(params: {
   ].join("\n");
 }
 
-async function runInstalledOpenClawTelegramOnboardingPreflight(params: {
+async function runInstalledRecallTelegramOnboardingPreflight(params: {
   openClawCommand: string;
   providerMode: ReturnType<typeof normalizeQaProviderMode>;
   sutToken: string;
 }) {
   const tempRoot = await fs.mkdtemp(
-    path.join(resolvePreferredOpenClawTmpDir(), "openclaw-npm-telegram-"),
+    path.join(resolvePreferredRecallTmpDir(), "recall-npm-telegram-"),
   );
   const homeDir = path.join(tempRoot, "home");
-  const stateDir = path.join(homeDir, ".openclaw");
+  const stateDir = path.join(homeDir, ".recall");
   await fs.mkdir(stateDir, { recursive: true });
   const tokenPath = path.join(tempRoot, "sut-token.txt");
   await fs.writeFile(tokenPath, params.sutToken, { encoding: "utf8", mode: 0o600 });
   const env = {
     ...process.env,
     HOME: homeDir,
-    OPENCLAW_HOME: stateDir,
-    OPENCLAW_CONFIG_PATH: path.join(stateDir, "openclaw.json"),
-    OPENCLAW_STATE_DIR: stateDir,
-    OPENCLAW_GATEWAY_TOKEN: "npm-telegram-live-onboard",
+    RECALL_HOME: stateDir,
+    RECALL_CONFIG_PATH: path.join(stateDir, "recall.json"),
+    RECALL_STATE_DIR: stateDir,
+    RECALL_GATEWAY_TOKEN: "npm-telegram-live-onboard",
     ...(params.providerMode === "live-frontier"
       ? {}
-      : { OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? "sk-openclaw-npm-telegram-preflight" }),
+      : { OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? "sk-recall-npm-telegram-preflight" }),
   };
   try {
     await execFileAsync(
@@ -1605,7 +1605,7 @@ async function runInstalledOpenClawTelegramOnboardingPreflight(params: {
 export async function runTelegramQaLive(params: {
   repoRoot?: string;
   outputDir?: string;
-  sutOpenClawCommand?: string;
+  sutRecallCommand?: string;
   preflightInstalledOnboarding?: boolean;
   providerMode?: QaProviderModeInput;
   primaryModel?: string;
@@ -1666,10 +1666,10 @@ export async function runTelegramQaLive(params: {
   let preservedGatewayDebugArtifacts = false;
   let canaryFailure: string | null = null;
   try {
-    if (params.sutOpenClawCommand && params.preflightInstalledOnboarding === true) {
+    if (params.sutRecallCommand && params.preflightInstalledOnboarding === true) {
       writeTelegramQaProgress(progressEnabled, "installed package onboarding preflight start");
-      await runInstalledOpenClawTelegramOnboardingPreflight({
-        openClawCommand: params.sutOpenClawCommand,
+      await runInstalledRecallTelegramOnboardingPreflight({
+        openClawCommand: params.sutRecallCommand,
         providerMode,
         sutToken: runtimeEnv.sutToken,
       });
@@ -1694,9 +1694,9 @@ export async function runTelegramQaLive(params: {
 
     const gatewayHarness = await startQaLiveLaneGateway({
       repoRoot,
-      command: params.sutOpenClawCommand
+      command: params.sutRecallCommand
         ? {
-            executablePath: params.sutOpenClawCommand,
+            executablePath: params.sutRecallCommand,
             usePackagedPlugins: true,
           }
         : undefined,
@@ -1933,7 +1933,7 @@ export async function runTelegramQaLive(params: {
 
   const finishedAt = new Date().toISOString();
   const publishedCleanupIssues = redactPublicMetadata
-    ? cleanupIssues.map(() => "details redacted (OPENCLAW_QA_REDACT_PUBLIC_METADATA=1)")
+    ? cleanupIssues.map(() => "details redacted (RECALL_QA_REDACT_PUBLIC_METADATA=1)")
     : cleanupIssues;
   const passedCount = scenarioResults.filter((entry) => entry.status === "pass").length;
   const failedCount = scenarioResults.filter((entry) => entry.status === "fail").length;

@@ -7,7 +7,7 @@ import {
   resolveContextConfigProviderForRuntime,
 } from "../../agents/openai-codex-routing.js";
 import { normalizeProviderId } from "../../agents/provider-id.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { logVerbose } from "../../globals.js";
 import { createLazyImportLoader } from "../../shared/lazy-promise.js";
 import {
@@ -27,7 +27,7 @@ function loadCompactRuntime(): Promise<typeof import("./commands-compact.runtime
 function extractCompactInstructions(params: {
   rawBody?: string;
   ctx: import("../templating.js").MsgContext;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId?: string;
   isGroup: boolean;
 }): string | undefined {
@@ -84,7 +84,7 @@ function formatCompactionReason(reason?: string): string | undefined {
 }
 
 function resolveManualCompactContextTokenBudget(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   provider?: string;
   model?: string;
   agentId: string;

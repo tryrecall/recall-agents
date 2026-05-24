@@ -1,3 +1,3 @@
-import { describeProviderWizardChoiceResolutionContract } from "openclaw/plugin-sdk/provider-test-contracts";
+import { describeProviderWizardChoiceResolutionContract } from "recall/plugin-sdk/provider-test-contracts";
 
 describeProviderWizardChoiceResolutionContract();

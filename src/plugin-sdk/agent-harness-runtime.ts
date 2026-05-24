@@ -65,7 +65,7 @@ export type {
   AgentToolResultMiddlewareOptions,
   AgentToolResultMiddlewareResult,
   AgentToolResultMiddlewareRuntime,
-  OpenClawAgentToolResult,
+  RecallAgentToolResult,
 } from "../plugins/agent-tool-result-middleware-types.js";
 export type {
   CodexAppServerExtensionContext,
@@ -81,7 +81,7 @@ export type {
   NativeHookRelayRegistrationHandle,
 } from "../agents/harness/native-hook-relay.js";
 
-export { VERSION as OPENCLAW_VERSION } from "../version.js";
+export { VERSION as RECALL_VERSION } from "../version.js";
 export { formatErrorMessage } from "../infra/errors.js";
 export { formatApprovalDisplayPath } from "../infra/approval-display-paths.js";
 export { buildAgentHookContextChannelFields } from "../plugins/hook-agent-context.js";
@@ -110,7 +110,7 @@ export {
   filterToolResultMediaUrls,
 } from "../agents/pi-embedded-subscribe.tools.js";
 export { normalizeUsage } from "../agents/usage.js";
-export { resolveOpenClawAgentDir } from "./agent-dir-compat.js";
+export { resolveRecallAgentDir } from "./agent-dir-compat.js";
 export {
   resolveAgentDir,
   resolveDefaultAgentDir,
@@ -288,7 +288,7 @@ export type AgentHarnessTerminalOutcomeClassification = NonNullable<
  * should advance fallback. Deliberate silent replies such as NO_REPLY count as
  * intentional output, while whitespace-only text remains fallback-eligible.
  * This is intentionally SDK-level so plugin harness adapters such as Codex
- * preserve the same OpenClaw-owned fallback signals as the built-in PI path
+ * preserve the same Recall-owned fallback signals as the built-in PI path
  * without re-implementing terminal-result policy.
  */
 export function classifyAgentHarnessTerminalOutcome(

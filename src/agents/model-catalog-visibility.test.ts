@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { resolveVisibleModelCatalog } from "./model-catalog-visibility.js";
 import type { ModelCatalogEntry } from "./model-catalog.types.js";
 
@@ -10,7 +10,7 @@ describe("resolveVisibleModelCatalog", () => {
       { provider: "anthropic", id: "claude-test", name: "Claude Test" },
       { provider: "openai", id: "gpt-test", name: "GPT Test" },
     ];
-    const cfg = {} as OpenClawConfig;
+    const cfg = {} as RecallConfig;
 
     const result = await resolveVisibleModelCatalog({
       cfg,
@@ -45,7 +45,7 @@ describe("resolveVisibleModelCatalog", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const result = await resolveVisibleModelCatalog({
       cfg,
@@ -77,7 +77,7 @@ describe("resolveVisibleModelCatalog", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const result = await resolveVisibleModelCatalog({
       cfg,

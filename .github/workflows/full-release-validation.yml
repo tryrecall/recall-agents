@@ -142,7 +142,7 @@ jobs:
         env:
           TARGET_REF: ${{ inputs.ref }}
         run: |
-          bash workflow/scripts/github/resolve-openclaw-ref.sh \
+          bash workflow/scripts/github/resolve-recall-ref.sh \
             --ref "$TARGET_REF" \
             --github-output "$GITHUB_OUTPUT"
 
@@ -187,7 +187,7 @@ jobs:
               echo "- Plugin prerelease: skipped by rerun group"
             fi
             if [[ "$RERUN_GROUP" == "all" || "$RERUN_GROUP" == "release-checks" || "$RERUN_GROUP" == "install-smoke" || "$RERUN_GROUP" == "cross-os" || "$RERUN_GROUP" == "live-e2e" || "$RERUN_GROUP" == "package" || "$RERUN_GROUP" == "qa" || "$RERUN_GROUP" == "qa-parity" || "$RERUN_GROUP" == "qa-live" ]]; then
-              echo "- Release/live/Docker/package/QA: \`OpenClaw Release Checks\`"
+              echo "- Release/live/Docker/package/QA: \`Recall Release Checks\`"
             else
               echo "- Release/live/Docker/package/QA: skipped by rerun group"
             fi
@@ -241,7 +241,7 @@ jobs:
           set -euo pipefail
           timeout --foreground --kill-after=30s 35m docker build \
             --target runtime-assets \
-            --build-arg OPENCLAW_EXTENSIONS="matrix" \
+            --build-arg RECALL_EXTENSIONS="matrix" \
             .
 
   normal_ci:
@@ -677,7 +677,7 @@ jobs:
             echo "conclusion=${conclusion}" >> "$GITHUB_OUTPUT"
             if [[ "$conclusion" != "success" ]]; then
               jq '.jobs[] | select(.conclusion != "success" and .conclusion != "skipped") | {name, conclusion, url}' <<< "$run_json" || true
-              if [[ "$workflow" == "openclaw-release-checks.yml" && "$CHILD_WORKFLOW_REF" =~ ^tideclaw/alpha/[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{4}Z$ ]]; then
+              if [[ "$workflow" == "recall-release-checks.yml" && "$CHILD_WORKFLOW_REF" =~ ^tideclaw/alpha/[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{4}Z$ ]]; then
                 if release_checks_advisory_only "$run_json"; then
                   echo "::warning::${workflow} ended with ${conclusion}, but Verify release checks accepted Tideclaw alpha advisory lanes."
                   return 0
@@ -744,7 +744,7 @@ jobs:
             args+=(-f codex_plugin_spec="$CODEX_PLUGIN_SPEC")
           fi
 
-          dispatch_and_wait openclaw-release-checks.yml "${args[@]}"
+          dispatch_and_wait recall-release-checks.yml "${args[@]}"
 
   prepare_release_package:
     name: Prepare release package artifact
@@ -786,11 +786,11 @@ jobs:
           PACKAGE_REF: ${{ needs.resolve_target.outputs.sha }}
         run: |
           set -euo pipefail
-          node scripts/resolve-openclaw-package-candidate.mjs \
+          node scripts/resolve-recall-package-candidate.mjs \
             --source ref \
             --package-ref "$PACKAGE_REF" \
             --output-dir .artifacts/docker-e2e-package \
-            --output-name openclaw-current.tgz \
+            --output-name recall-current.tgz \
             --metadata .artifacts/docker-e2e-package/package-candidate.json \
             --github-output "$GITHUB_OUTPUT"
           digest="$(node -p "JSON.parse(require('fs').readFileSync('.artifacts/docker-e2e-package/package-candidate.json', 'utf8')).sha256")"
@@ -812,7 +812,7 @@ jobs:
         with:
           name: release-package-under-test
           path: |
-            .artifacts/docker-e2e-package/openclaw-current.tgz
+            .artifacts/docker-e2e-package/recall-current.tgz
             .artifacts/docker-e2e-package/package-candidate.json
           if-no-files-found: error
 
@@ -867,7 +867,7 @@ jobs:
 
           before_json="$(gh_with_retry run list --workflow npm-telegram-beta-e2e.yml --event workflow_dispatch --limit 100 --json databaseId --jq '[.[].databaseId]')"
 
-          args=(-f package_spec="${PACKAGE_SPEC:-openclaw@beta}" -f harness_ref="$TARGET_SHA" -f provider_mode="$PROVIDER_MODE")
+          args=(-f package_spec="${PACKAGE_SPEC:-recall@beta}" -f harness_ref="$TARGET_SHA" -f provider_mode="$PROVIDER_MODE")
           if [[ -z "${PACKAGE_SPEC// }" ]]; then
             if [[ "$PREPARE_PACKAGE_RESULT" != "success" || -z "${PACKAGE_ARTIFACT_NAME// }" ]]; then
               echo "Full release Telegram requires either npm_telegram_package_spec or a prepared release-package-under-test artifact." >&2
@@ -1258,7 +1258,7 @@ jobs:
 
       - name: Request private evidence update
         env:
-          RELEASE_PRIVATE_DISPATCH_TOKEN: ${{ secrets.OPENCLAW_RELEASES_PRIVATE_DISPATCH_TOKEN }}
+          RELEASE_PRIVATE_DISPATCH_TOKEN: ${{ secrets.RECALL_RELEASES_PRIVATE_DISPATCH_TOKEN }}
           TARGET_REF: ${{ inputs.ref }}
           PACKAGE_SPEC: ${{ inputs.evidence_package_spec || inputs.npm_telegram_package_spec }}
           GITHUB_RUN_ID_VALUE: ${{ github.run_id }}
@@ -1270,7 +1270,7 @@ jobs:
             exit 0
           fi
           if [[ -z "${RELEASE_PRIVATE_DISPATCH_TOKEN// }" ]]; then
-            echo "OPENCLAW_RELEASES_PRIVATE_DISPATCH_TOKEN is not configured; skipping automatic private evidence update."
+            echo "RECALL_RELEASES_PRIVATE_DISPATCH_TOKEN is not configured; skipping automatic private evidence update."
             exit 0
           fi
 
@@ -1278,13 +1278,13 @@ jobs:
           if [[ -z "${evidence_package_spec// }" ]]; then
             tag_ref="${TARGET_REF#refs/tags/}"
             if [[ "$tag_ref" =~ ^v([0-9]{4}\.[1-9][0-9]*\.[1-9][0-9]*((-(alpha|beta)\.[1-9][0-9]*)|(-[1-9][0-9]*))?)$ ]]; then
-              evidence_package_spec="openclaw@${BASH_REMATCH[1]}"
+              evidence_package_spec="recall@${BASH_REMATCH[1]}"
             fi
           fi
 
           release_id="${TARGET_REF#refs/tags/}"
           release_id="${release_id#v}"
-          if [[ "$evidence_package_spec" =~ ^openclaw@(.+)$ ]]; then
+          if [[ "$evidence_package_spec" =~ ^recall@(.+)$ ]]; then
             release_id="${BASH_REMATCH[1]}"
           fi
           release_id="$(printf '%s' "$release_id" | tr '/:@ ' '----' | tr -cd 'A-Za-z0-9._-')"
@@ -1317,16 +1317,16 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${RELEASE_PRIVATE_DISPATCH_TOKEN}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/openclaw/releases-private/dispatches \
+            https://api.github.com/repos/recall/releases-private/dispatches \
             -d "$payload"; then
             echo "::warning::Automatic private release evidence dispatch failed; child workflow validation remains authoritative."
             {
               echo "### Private release evidence dispatch failed"
               echo
-              echo "Child workflow validation remains authoritative. Backfill durable evidence from \`openclaw/releases-private\`:"
+              echo "Child workflow validation remains authoritative. Backfill durable evidence from \`recall/releases-private\`:"
               echo
               echo "\`\`\`bash"
-              echo "gh workflow run openclaw-release-evidence-from-full-validation.yml --repo openclaw/releases-private --ref main -f full_validation_run_id=${GITHUB_RUN_ID_VALUE} -f release_id=${release_id} -f release_ref=${TARGET_REF} -f package_spec=${evidence_package_spec}"
+              echo "gh workflow run recall-release-evidence-from-full-validation.yml --repo recall/releases-private --ref main -f full_validation_run_id=${GITHUB_RUN_ID_VALUE} -f release_id=${release_id} -f release_ref=${TARGET_REF} -f package_spec=${evidence_package_spec}"
               echo "\`\`\`"
             } >> "$GITHUB_STEP_SUMMARY"
           fi

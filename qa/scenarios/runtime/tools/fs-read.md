@@ -10,7 +10,7 @@ coverage:
     - tools.fs.read
 objective: Verify file read behavior is tracked across Pi and Codex while Codex owns read natively.
 successCriteria:
-  - Pi may expose OpenClaw read while Codex app-server mode may omit duplicate OpenClaw dynamic read.
+  - Pi may expose Recall read while Codex app-server mode may omit duplicate Recall dynamic read.
   - Mock provider read plans are reported as fixture intent, not as actual runtime tool calls.
   - The row stays report-only until failure-path injection proves native Codex read behavior directly.
 docsRefs:

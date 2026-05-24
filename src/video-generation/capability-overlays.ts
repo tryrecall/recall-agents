@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { resolveVideoGenerationModeCapabilities } from "./capabilities.js";
 import type { GenerateVideoParams } from "./runtime-types.js";
 import type {
@@ -134,7 +134,7 @@ export async function resolveProviderWithModelCapabilities(params: {
   provider: VideoGenerationProvider;
   providerId: string;
   model: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentDir?: string;
   authStore?: GenerateVideoParams["authStore"];
   timeoutMs?: number;

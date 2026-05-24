@@ -13,7 +13,7 @@ import {
   assertLiveImageProbeReply,
   buildLiveCronProbeMessage,
   createLiveCronProbeSpec,
-  runOpenClawCliJson,
+  runRecallCliJson,
   type CronListJob,
 } from "./live-agent-probes.js";
 import { getActiveMcpLoopbackRuntime } from "./mcp-http.js";
@@ -27,8 +27,8 @@ const CLI_CRON_MCP_PROBE_VERIFY_POLL_MS = 2_000;
 
 function shouldLogCliCronProbe(): boolean {
   return (
-    isTruthyEnvValue(process.env.OPENCLAW_LIVE_CLI_BACKEND_DEBUG) ||
-    isTruthyEnvValue(process.env.OPENCLAW_CLI_BACKEND_LOG_OUTPUT)
+    isTruthyEnvValue(process.env.RECALL_LIVE_CLI_BACKEND_DEBUG) ||
+    isTruthyEnvValue(process.env.RECALL_CLI_BACKEND_LOG_OUTPUT)
   );
 }
 
@@ -80,7 +80,7 @@ async function removeCliCronJobBestEffort(params: {
   env: NodeJS.ProcessEnv;
 }): Promise<void> {
   try {
-    await runOpenClawCliJson(
+    await runRecallCliJson(
       [
         "cron",
         "rm",
@@ -181,10 +181,10 @@ async function callLoopbackJsonRpc(params: {
     "x-session-key": params.sessionKey,
   };
   if (params.messageProvider) {
-    headers["x-openclaw-message-channel"] = params.messageProvider;
+    headers["x-recall-message-channel"] = params.messageProvider;
   }
   if (params.accountId) {
-    headers["x-openclaw-account-id"] = params.accountId;
+    headers["x-recall-account-id"] = params.accountId;
   }
   const response = await fetch(`http://127.0.0.1:${runtime.port}/mcp`, {
     method: "POST",

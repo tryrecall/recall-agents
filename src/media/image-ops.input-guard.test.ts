@@ -98,8 +98,8 @@ describe("image input pixel guard", () => {
   });
 
   it("fails closed when sips cannot determine image dimensions", async () => {
-    const previousBackend = process.env.OPENCLAW_IMAGE_BACKEND;
-    process.env.OPENCLAW_IMAGE_BACKEND = "sips";
+    const previousBackend = process.env.RECALL_IMAGE_BACKEND;
+    process.env.RECALL_IMAGE_BACKEND = "sips";
     try {
       await expect(
         resizeToJpeg({
@@ -110,9 +110,9 @@ describe("image input pixel guard", () => {
       ).rejects.toThrow(/unable to determine image dimensions/i);
     } finally {
       if (previousBackend === undefined) {
-        delete process.env.OPENCLAW_IMAGE_BACKEND;
+        delete process.env.RECALL_IMAGE_BACKEND;
       } else {
-        process.env.OPENCLAW_IMAGE_BACKEND = previousBackend;
+        process.env.RECALL_IMAGE_BACKEND = previousBackend;
       }
     }
   });
@@ -140,8 +140,8 @@ describe("image input pixel guard", () => {
   const itIfFfmpeg = resolveSystemBin("ffmpeg", { trust: "standard" }) ? it : it.skip;
 
   itIfFfmpeg("honors enlargement when the ffmpeg fallback is selected", async () => {
-    const previousBackend = process.env.OPENCLAW_IMAGE_BACKEND;
-    process.env.OPENCLAW_IMAGE_BACKEND = "ffmpeg";
+    const previousBackend = process.env.RECALL_IMAGE_BACKEND;
+    process.env.RECALL_IMAGE_BACKEND = "ffmpeg";
     try {
       const out = await resizeToJpeg({
         buffer: Buffer.from(PNG_1X1_BASE64, "base64"),
@@ -153,9 +153,9 @@ describe("image input pixel guard", () => {
       await expect(getImageMetadata(out)).resolves.toEqual({ width: 4, height: 4 });
     } finally {
       if (previousBackend === undefined) {
-        delete process.env.OPENCLAW_IMAGE_BACKEND;
+        delete process.env.RECALL_IMAGE_BACKEND;
       } else {
-        process.env.OPENCLAW_IMAGE_BACKEND = previousBackend;
+        process.env.RECALL_IMAGE_BACKEND = previousBackend;
       }
     }
   });
@@ -163,7 +163,7 @@ describe("image input pixel guard", () => {
   const itIfMac = process.platform === "darwin" ? it : it.skip;
 
   itIfMac("converts macOS-generated HEIC images to JPEG", async () => {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-heic-convert-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-heic-convert-"));
     try {
       const pngPath = path.join(tempDir, "input.png");
       const heicPath = path.join(tempDir, "input.heic");

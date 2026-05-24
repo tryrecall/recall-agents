@@ -50,16 +50,16 @@ describe("trajectory metadata", () => {
     const originalArgv = process.argv;
     process.argv = [
       "node",
-      "/Users/tester/project/openclaw.js",
+      "/Users/tester/project/recall.js",
       "--api-key",
       "super-secret",
-      "--config=/Users/tester/.openclaw/openclaw.json",
+      "--config=/Users/tester/.tryrecall/recall-agents.json",
     ];
     try {
       const metadata = buildTrajectoryRunMetadata({
         env: {
           HOME: "/Users/tester",
-          OPENCLAW_STATE_DIR: "/Users/tester/.openclaw",
+          RECALL_STATE_DIR: "/Users/tester/.recall",
         },
         workspaceDir: "/Users/tester/project",
         sessionFile: "/Users/tester/project/session.jsonl",
@@ -74,12 +74,12 @@ describe("trajectory metadata", () => {
       };
       expect(harness.invocation).toEqual([
         "node",
-        "~/project/openclaw.js",
+        "~/project/recall.js",
         "--api-key",
         "<redacted>",
-        "--config=$OPENCLAW_STATE_DIR/openclaw.json",
+        "--config=$RECALL_STATE_DIR/recall.json",
       ]);
-      expect(harness.entrypoint).toBe("~/project/openclaw.js");
+      expect(harness.entrypoint).toBe("~/project/recall.js");
       expect(harness.workspaceDir).toBe("~/project");
       expect(harness.sessionFile).toBe("~/project/session.jsonl");
     } finally {
@@ -252,7 +252,7 @@ describe("trajectory metadata", () => {
   });
 
   it("redactPathForSupport returns empty string for null/undefined input", () => {
-    const ctx: SupportRedactionContext = { env: {}, stateDir: "/tmp/.openclaw" };
+    const ctx: SupportRedactionContext = { env: {}, stateDir: "/tmp/.recall" };
     expect(redactPathForSupport(undefined, ctx)).toBe("");
     expect(redactPathForSupport(null, ctx)).toBe("");
   });

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { runCommandWithTimeout } from "../process/exec.js";
 import { discoverGatewayBeacons } from "./bonjour-discovery.js";
 
-const WIDE_AREA_DOMAIN = "openclaw.internal.";
+const WIDE_AREA_DOMAIN = "recall.internal.";
 
 type BeaconRecord = {
   domain?: string;
@@ -256,7 +256,7 @@ describe("bonjour-discovery", () => {
               `"transport=gateway"`,
               `"sshPort=22"`,
               `"tailnetDns=peters-mac-studio-1.sheep-coho.ts.net"`,
-              `"cliPath=/opt/homebrew/bin/openclaw"`,
+              `"cliPath=/opt/homebrew/bin/recall"`,
               "",
             ].join(" "),
             stderr: "",
@@ -288,7 +288,7 @@ describe("bonjour-discovery", () => {
     expect(beacon.tailnetDns).toBe("peters-mac-studio-1.sheep-coho.ts.net");
     expect(beacon.gatewayPort).toBe(18789);
     expect(beacon.sshPort).toBe(22);
-    expect(beacon.cliPath).toBe("/opt/homebrew/bin/openclaw");
+    expect(beacon.cliPath).toBe("/opt/homebrew/bin/recall");
 
     expect(calls.map((c) => c.argv.slice(0, 2).join(" "))).toContain("tailscale status");
     expect(calls.map((c) => c.argv[0])).toContain("dig");
@@ -310,7 +310,7 @@ describe("bonjour-discovery", () => {
     await discoverGatewayBeacons({
       platform: "darwin",
       timeoutMs: 1,
-      domains: ["local", "openclaw.internal"],
+      domains: ["local", "recall.internal"],
       run: run as unknown as typeof runCommandWithTimeout,
     });
 
@@ -320,7 +320,7 @@ describe("bonjour-discovery", () => {
       (c) => c[3],
     );
     expect(browseDomains).toContain("local.");
-    expect(browseDomains).toContain("openclaw.internal.");
+    expect(browseDomains).toContain("recall.internal.");
 
     calls.length = 0;
     await discoverGatewayBeacons({

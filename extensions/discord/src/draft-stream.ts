@@ -1,5 +1,5 @@
-import { createFinalizableDraftLifecycle } from "openclaw/plugin-sdk/channel-lifecycle";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import { createFinalizableDraftLifecycle } from "recall/plugin-sdk/channel-lifecycle";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
 import {
   createChannelMessage,
   deleteChannelMessage,

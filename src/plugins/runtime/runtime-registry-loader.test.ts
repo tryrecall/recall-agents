@@ -2,7 +2,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createEmptyPluginRegistry } from "../registry.js";
 
 const mocks = vi.hoisted(() => ({
-  loadOpenClawPlugins: vi.fn<typeof import("../loader.js").loadOpenClawPlugins>(),
+  loadRecallPlugins: vi.fn<typeof import("../loader.js").loadRecallPlugins>(),
   resolveCompatibleRuntimePluginRegistry:
     vi.fn<typeof import("../loader.js").resolveCompatibleRuntimePluginRegistry>(),
   resolveRuntimePluginRegistry: vi.fn<typeof import("../loader.js").resolveRuntimePluginRegistry>(),
@@ -36,7 +36,7 @@ function requireRecord(value: unknown, label: string): Record<string, unknown> {
 }
 
 function loadOptions(index = 0) {
-  return requireRecord(mocks.loadOpenClawPlugins.mock.calls[index]?.[0], `load options ${index}`);
+  return requireRecord(mocks.loadRecallPlugins.mock.calls[index]?.[0], `load options ${index}`);
 }
 
 function configuredChannelOptions(index = 0) {
@@ -62,8 +62,8 @@ function pluginEntries(config: Record<string, unknown>) {
 }
 
 vi.mock("../loader.js", () => ({
-  loadOpenClawPlugins: (...args: Parameters<typeof mocks.loadOpenClawPlugins>) =>
-    mocks.loadOpenClawPlugins(...args),
+  loadRecallPlugins: (...args: Parameters<typeof mocks.loadRecallPlugins>) =>
+    mocks.loadRecallPlugins(...args),
   resolveCompatibleRuntimePluginRegistry: (
     ...args: Parameters<typeof mocks.resolveCompatibleRuntimePluginRegistry>
   ) => mocks.resolveCompatibleRuntimePluginRegistry(...args),
@@ -115,7 +115,7 @@ describe("ensurePluginRegistryLoaded", () => {
   });
 
   beforeEach(() => {
-    mocks.loadOpenClawPlugins.mockReset();
+    mocks.loadRecallPlugins.mockReset();
     mocks.resolveCompatibleRuntimePluginRegistry.mockReset();
     mocks.resolveRuntimePluginRegistry.mockReset();
     mocks.getActivePluginRegistry.mockReset();
@@ -130,9 +130,9 @@ describe("ensurePluginRegistryLoaded", () => {
 
     mocks.getActivePluginRegistry.mockReturnValue(null);
     mocks.resolveCompatibleRuntimePluginRegistry.mockReturnValue(undefined);
-    mocks.loadOpenClawPlugins.mockReturnValue(createEmptyPluginRegistry());
+    mocks.loadRecallPlugins.mockReturnValue(createEmptyPluginRegistry());
     mocks.resolveRuntimePluginRegistry.mockImplementation(
-      (...args: Parameters<typeof mocks.loadOpenClawPlugins>) => mocks.loadOpenClawPlugins(...args),
+      (...args: Parameters<typeof mocks.loadRecallPlugins>) => mocks.loadRecallPlugins(...args),
     );
     mocks.applyPluginAutoEnable.mockImplementation((params) => ({
       config:
@@ -165,7 +165,7 @@ describe("ensurePluginRegistryLoaded", () => {
         },
       },
     };
-    const env = { HOME: "/tmp/openclaw-home" } as NodeJS.ProcessEnv;
+    const env = { HOME: "/tmp/recall-home" } as NodeJS.ProcessEnv;
 
     mocks.resolveConfiguredChannelPluginIds.mockReturnValue(["demo-channel"]);
     ensurePluginRegistryLoaded({
@@ -242,7 +242,7 @@ describe("ensurePluginRegistryLoaded", () => {
       onlyPluginIds: ["demo-b"],
     });
 
-    expect(mocks.loadOpenClawPlugins).toHaveBeenCalledTimes(2);
+    expect(mocks.loadRecallPlugins).toHaveBeenCalledTimes(2);
     expect(loadOptions(0).onlyPluginIds).toEqual(["demo-a"]);
     expect(loadOptions(1).onlyPluginIds).toEqual(["demo-b"]);
   });
@@ -313,7 +313,7 @@ describe("ensurePluginRegistryLoaded", () => {
       plugins: { enabled: true },
       channels: { "demo-channel-a": { enabled: true } },
     };
-    const env = { HOME: "/tmp/openclaw-home" } as NodeJS.ProcessEnv;
+    const env = { HOME: "/tmp/recall-home" } as NodeJS.ProcessEnv;
 
     mocks.resolveEffectivePluginIds.mockReturnValue(["demo-effective", "demo-hook"]);
 
@@ -362,6 +362,6 @@ describe("ensurePluginRegistryLoaded", () => {
     });
 
     expect(mocks.resolveRuntimePluginRegistry).not.toHaveBeenCalled();
-    expect(mocks.loadOpenClawPlugins).not.toHaveBeenCalled();
+    expect(mocks.loadRecallPlugins).not.toHaveBeenCalled();
   });
 });

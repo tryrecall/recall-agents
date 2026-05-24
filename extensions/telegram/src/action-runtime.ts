@@ -1,5 +1,5 @@
 import type { AgentToolResult } from "@earendil-works/pi-agent-core";
-import { readBooleanParam } from "openclaw/plugin-sdk/boolean-param";
+import { readBooleanParam } from "recall/plugin-sdk/boolean-param";
 import {
   jsonResult,
   readNumberParam,
@@ -9,13 +9,13 @@ import {
   readStringParam,
   resolvePollMaxSelections,
   resolveReactionMessageId,
-} from "openclaw/plugin-sdk/channel-actions";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+} from "recall/plugin-sdk/channel-actions";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
 import {
   normalizeMessagePresentation,
   renderMessagePresentationFallbackText,
-} from "openclaw/plugin-sdk/interactive-runtime";
-import type { MessagePresentation } from "openclaw/plugin-sdk/interactive-runtime";
+} from "recall/plugin-sdk/interactive-runtime";
+import type { MessagePresentation } from "recall/plugin-sdk/interactive-runtime";
 import { createTelegramActionGate, resolveTelegramPollActionGateState } from "./accounts.js";
 import { resolveTelegramInlineButtons } from "./button-types.js";
 import { notifyTelegramInboundEventOutboundSuccess } from "./inbound-event-delivery.js";
@@ -204,7 +204,7 @@ function normalizeTelegramDeliveryPin(params: Record<string, unknown>) {
 
 async function maybePinTelegramActionSend(params: {
   args: Record<string, unknown>;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string;
   to: string;
   messageId?: string;
@@ -237,7 +237,7 @@ async function maybePinTelegramActionSend(params: {
 
 export async function handleTelegramAction(
   params: Record<string, unknown>,
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   options?: {
     mediaLocalRoots?: readonly string[];
     mediaReadFile?: (filePath: string) => Promise<Buffer>;

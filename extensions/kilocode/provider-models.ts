@@ -1,11 +1,11 @@
-import { readProviderJsonArrayFieldResponse } from "openclaw/plugin-sdk/provider-http";
-import type { ModelDefinitionConfig } from "openclaw/plugin-sdk/provider-model-shared";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/runtime-env";
+import { readProviderJsonArrayFieldResponse } from "recall/plugin-sdk/provider-http";
+import type { ModelDefinitionConfig } from "recall/plugin-sdk/provider-model-shared";
+import { createSubsystemLogger } from "recall/plugin-sdk/runtime-env";
 import {
   fetchWithSsrFGuard,
   ssrfPolicyFromHttpBaseUrlAllowedHostname,
-} from "openclaw/plugin-sdk/ssrf-runtime";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/ssrf-runtime";
+import { normalizeLowercaseStringOrEmpty } from "recall/plugin-sdk/string-coerce-runtime";
 
 const log = createSubsystemLogger("kilocode-models");
 

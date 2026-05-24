@@ -1,40 +1,40 @@
 import fs from "node:fs/promises";
-import { resolveHumanDelayConfig } from "openclaw/plugin-sdk/agent-runtime";
-import { logTypingFailure } from "openclaw/plugin-sdk/channel-feedback";
+import { resolveHumanDelayConfig } from "recall/plugin-sdk/agent-runtime";
+import { logTypingFailure } from "recall/plugin-sdk/channel-feedback";
 import {
   createChannelInboundDebouncer,
   shouldDebounceTextInbound,
-} from "openclaw/plugin-sdk/channel-inbound";
+} from "recall/plugin-sdk/channel-inbound";
 import {
   deliverInboundReplyWithMessageSendContext,
   createChannelMessageReplyPipeline,
-} from "openclaw/plugin-sdk/channel-message";
-import { createChannelPairingChallengeIssuer } from "openclaw/plugin-sdk/channel-pairing";
+} from "recall/plugin-sdk/channel-message";
+import { createChannelPairingChallengeIssuer } from "recall/plugin-sdk/channel-pairing";
 import {
   readChannelAllowFromStore,
   upsertChannelPairingRequest,
-} from "openclaw/plugin-sdk/conversation-runtime";
-import { recordInboundSession } from "openclaw/plugin-sdk/conversation-runtime";
-import { normalizeScpRemoteHost } from "openclaw/plugin-sdk/host-runtime";
-import { runInboundReplyTurn } from "openclaw/plugin-sdk/inbound-reply-dispatch";
-import { isInboundPathAllowed, kindFromMime } from "openclaw/plugin-sdk/media-runtime";
-import { DEFAULT_GROUP_HISTORY_LIMIT, type HistoryEntry } from "openclaw/plugin-sdk/reply-history";
-import { resolveTextChunkLimit } from "openclaw/plugin-sdk/reply-runtime";
-import { dispatchInboundMessage } from "openclaw/plugin-sdk/reply-runtime";
-import { createReplyDispatcherWithTyping } from "openclaw/plugin-sdk/reply-runtime";
-import { settleReplyDispatcher } from "openclaw/plugin-sdk/reply-runtime";
-import { resolveInboundLastRouteSessionKey } from "openclaw/plugin-sdk/routing";
-import { getRuntimeConfig } from "openclaw/plugin-sdk/runtime-config-snapshot";
-import { danger, logVerbose, shouldLogVerbose, warn } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/conversation-runtime";
+import { recordInboundSession } from "recall/plugin-sdk/conversation-runtime";
+import { normalizeScpRemoteHost } from "recall/plugin-sdk/host-runtime";
+import { runInboundReplyTurn } from "recall/plugin-sdk/inbound-reply-dispatch";
+import { isInboundPathAllowed, kindFromMime } from "recall/plugin-sdk/media-runtime";
+import { DEFAULT_GROUP_HISTORY_LIMIT, type HistoryEntry } from "recall/plugin-sdk/reply-history";
+import { resolveTextChunkLimit } from "recall/plugin-sdk/reply-runtime";
+import { dispatchInboundMessage } from "recall/plugin-sdk/reply-runtime";
+import { createReplyDispatcherWithTyping } from "recall/plugin-sdk/reply-runtime";
+import { settleReplyDispatcher } from "recall/plugin-sdk/reply-runtime";
+import { resolveInboundLastRouteSessionKey } from "recall/plugin-sdk/routing";
+import { getRuntimeConfig } from "recall/plugin-sdk/runtime-config-snapshot";
+import { danger, logVerbose, shouldLogVerbose, warn } from "recall/plugin-sdk/runtime-env";
 import {
   resolveOpenProviderRuntimeGroupPolicy,
   resolveDefaultGroupPolicy,
   warnMissingProviderGroupPolicyFallbackOnce,
-} from "openclaw/plugin-sdk/runtime-group-policy";
-import { resolvePinnedMainDmOwnerFromAllowlist } from "openclaw/plugin-sdk/security-runtime";
-import { readSessionUpdatedAt, resolveStorePath } from "openclaw/plugin-sdk/session-store-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
-import { waitForTransportReady } from "openclaw/plugin-sdk/transport-ready-runtime";
+} from "recall/plugin-sdk/runtime-group-policy";
+import { resolvePinnedMainDmOwnerFromAllowlist } from "recall/plugin-sdk/security-runtime";
+import { readSessionUpdatedAt, resolveStorePath } from "recall/plugin-sdk/session-store-runtime";
+import { truncateUtf16Safe } from "recall/plugin-sdk/text-utility-runtime";
+import { waitForTransportReady } from "recall/plugin-sdk/transport-ready-runtime";
 import { resolveIMessageAccount } from "../accounts.js";
 import { markIMessageChatRead, sendIMessageTyping } from "../chat.js";
 import { createIMessageRpcClient, type IMessageRpcClient } from "../client.js";

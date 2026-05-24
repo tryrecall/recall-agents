@@ -8,7 +8,7 @@ import {
   type NativeHookRelayProcessResponse,
   type NativeHookRelayRegistrationHandle,
   runBeforeToolCallHook,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "recall/plugin-sdk/agent-harness-runtime";
 import { formatCodexDisplayText } from "../command-formatters.js";
 import {
   approvalRequestExplicitlyUnavailable,
@@ -76,7 +76,7 @@ export async function handleCodexAppServerApprovalRequest(params: {
   });
 
   try {
-    const policyOutcome = await runOpenClawToolPolicyForApprovalRequest({
+    const policyOutcome = await runRecallToolPolicyForApprovalRequest({
       method: params.method,
       requestParams,
       paramsForRun: params.paramsForRun,
@@ -297,7 +297,7 @@ function buildApprovalContext(params: {
 type ApprovalContext = ReturnType<typeof buildApprovalContext>;
 type ApprovalPolicyOutcome = { outcome: "denied"; reason: string } | { outcome: "no-decision" };
 
-async function runOpenClawToolPolicyForApprovalRequest(params: {
+async function runRecallToolPolicyForApprovalRequest(params: {
   method: string;
   requestParams: JsonObject | undefined;
   paramsForRun: EmbeddedRunAttemptParams;
@@ -305,7 +305,7 @@ async function runOpenClawToolPolicyForApprovalRequest(params: {
   nativeHookRelay?: Pick<NativeHookRelayRegistrationHandle, "allowedEvents" | "relayId">;
   signal?: AbortSignal;
 }): Promise<ApprovalPolicyOutcome | undefined> {
-  const policyRequest = buildOpenClawToolPolicyRequest(params.method, params.requestParams);
+  const policyRequest = buildRecallToolPolicyRequest(params.method, params.requestParams);
   if (!policyRequest) {
     return undefined;
   }
@@ -354,7 +354,7 @@ async function runOpenClawToolPolicyForApprovalRequest(params: {
     return {
       outcome: "denied",
       reason:
-        "OpenClaw tool policy rewrote Codex app-server approval params; refusing original request.",
+        "Recall tool policy rewrote Codex app-server approval params; refusing original request.",
     };
   }
   return undefined;
@@ -421,7 +421,7 @@ async function runNativeRelayToolPolicyForApprovalRequest(params: {
     return {
       handled: true,
       blocked: true,
-      reason: `OpenClaw native hook relay unavailable for Codex app-server approval: ${formatCodexDisplayText(
+      reason: `Recall native hook relay unavailable for Codex app-server approval: ${formatCodexDisplayText(
         formatErrorMessage(error),
       )}`,
     };
@@ -463,7 +463,7 @@ function readNativeRelayPreToolUseDecision(
       reason:
         sanitizeRelayDecisionReason(response?.stderr) ||
         sanitizeRelayDecisionReason(response?.stdout) ||
-        "OpenClaw native hook relay failed for Codex app-server approval.",
+        "Recall native hook relay failed for Codex app-server approval.",
     };
   }
   const stdout = response.stdout?.trim();
@@ -477,7 +477,7 @@ function readNativeRelayPreToolUseDecision(
       blocked: true,
       reason:
         readString(output, "permissionDecisionReason") ||
-        "OpenClaw native hook policy denied Codex app-server approval.",
+        "Recall native hook policy denied Codex app-server approval.",
     };
   }
   // The app-server bridge invokes the relay in report mode, where the relay
@@ -485,8 +485,8 @@ function readNativeRelayPreToolUseDecision(
   return {
     blocked: true,
     reason: output
-      ? "OpenClaw native hook relay returned a non-deny Codex app-server approval decision."
-      : "OpenClaw native hook relay returned an unreadable Codex app-server approval result.",
+      ? "Recall native hook relay returned a non-deny Codex app-server approval decision."
+      : "Recall native hook relay returned an unreadable Codex app-server approval result.",
   };
 }
 
@@ -504,7 +504,7 @@ function sanitizeRelayDecisionReason(value: string | undefined): string | undefi
   return preview.text;
 }
 
-function buildOpenClawToolPolicyRequest(
+function buildRecallToolPolicyRequest(
   method: string,
   requestParams: JsonObject | undefined,
 ): { toolName: string; params: JsonObject } | undefined {
@@ -619,7 +619,7 @@ function requestedPermissions(requestParams: JsonObject | undefined): JsonObject
 function unsupportedApprovalResponse(): JsonValue {
   return {
     decision: "decline",
-    reason: "OpenClaw codex app-server bridge does not grant native approvals yet.",
+    reason: "Recall codex app-server bridge does not grant native approvals yet.",
   };
 }
 

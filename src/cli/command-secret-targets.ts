@@ -1,5 +1,5 @@
 import { listReadOnlyChannelPluginsForConfig } from "../channels/plugins/read-only.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type {
   PluginWebFetchProviderEntry,
   PluginWebSearchProviderEntry,
@@ -164,14 +164,14 @@ function isConfiguredSecretCandidate(value: unknown): boolean {
   return value !== undefined && value !== null;
 }
 
-function resolveFetchConfig(config: OpenClawConfig): Record<string, unknown> | undefined {
+function resolveFetchConfig(config: RecallConfig): Record<string, unknown> | undefined {
   const fetch = config.tools?.web?.fetch;
   return fetch && typeof fetch === "object" && !Array.isArray(fetch)
     ? (fetch as Record<string, unknown>)
     : undefined;
 }
 
-function resolveSearchConfig(config: OpenClawConfig): Record<string, unknown> | undefined {
+function resolveSearchConfig(config: RecallConfig): Record<string, unknown> | undefined {
   const search = config.tools?.web?.search;
   return search && typeof search === "object" && !Array.isArray(search)
     ? (search as Record<string, unknown>)
@@ -238,7 +238,7 @@ function addConfigPathTargets(params: {
 }
 
 function addConfiguredConfigPathTargets(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   path: string;
   targetIds: Set<string>;
   targetPaths: Set<string>;
@@ -273,7 +273,7 @@ function modelProviderCredentialFallbackPathForWebSearchProvider(
 }
 
 function discoverForcedActivePaths(
-  config: OpenClawConfig,
+  config: RecallConfig,
   targetIds: ReadonlySet<string>,
   allowedPaths?: ReadonlySet<string>,
 ): Set<string> | undefined {
@@ -288,7 +288,7 @@ function discoverForcedActivePaths(
 }
 
 function discoverConfiguredAllowedPaths(
-  config: OpenClawConfig,
+  config: RecallConfig,
   targetIds: ReadonlySet<string>,
 ): Set<string> | undefined {
   const allowedPaths = new Set<string>();
@@ -299,7 +299,7 @@ function discoverConfiguredAllowedPaths(
 }
 
 function mergeConfiguredAllowedPaths(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   baseTargetIds: ReadonlySet<string>;
   concreteFallbackPaths: ReadonlySet<string>;
 }): Set<string> | undefined {
@@ -314,7 +314,7 @@ function mergeConfiguredAllowedPaths(params: {
 }
 
 function resolveSelectedWebFetchProviderId(
-  config: OpenClawConfig,
+  config: RecallConfig,
   providerId?: string | null,
 ): string | undefined {
   return (
@@ -323,7 +323,7 @@ function resolveSelectedWebFetchProviderId(
 }
 
 function resolveSelectedWebSearchProviderId(
-  config: OpenClawConfig,
+  config: RecallConfig,
   providerId?: string | null,
 ): string | undefined {
   return (
@@ -332,10 +332,10 @@ function resolveSelectedWebSearchProviderId(
 }
 
 function withSelectedWebProviderForDiscovery(
-  config: OpenClawConfig,
+  config: RecallConfig,
   kind: "search" | "fetch",
   providerId: string | undefined,
-): OpenClawConfig {
+): RecallConfig {
   if (!providerId) {
     return config;
   }
@@ -352,7 +352,7 @@ function withSelectedWebProviderForDiscovery(
 
 function hasConfiguredFetchCredential(params: {
   provider: PluginWebFetchProviderEntry;
-  config: OpenClawConfig;
+  config: RecallConfig;
 }): boolean {
   return (
     isConfiguredSecretCandidate(params.provider.getConfiguredCredentialValue?.(params.config)) ||
@@ -364,7 +364,7 @@ function hasConfiguredFetchCredential(params: {
 
 function hasConfiguredSearchCredential(params: {
   provider: PluginWebSearchProviderEntry;
-  config: OpenClawConfig;
+  config: RecallConfig;
 }): boolean {
   return (
     isConfiguredSecretCandidate(params.provider.getConfiguredCredentialValue?.(params.config)) ||
@@ -375,7 +375,7 @@ function hasConfiguredSearchCredential(params: {
 }
 
 function addConfiguredSearchCredentialTargetIds(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   provider: PluginWebSearchProviderEntry;
   targetIds: Set<string>;
   targetPaths: Set<string>;
@@ -406,7 +406,7 @@ function addConfiguredSearchCredentialTargetIds(params: {
 }
 
 function addConfiguredFetchCredentialTargetIds(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   provider: PluginWebFetchProviderEntry;
   targetIds: Set<string>;
   targetPaths: Set<string>;
@@ -434,7 +434,7 @@ function addConfiguredFetchCredentialTargetIds(params: {
 }
 
 function getCapabilityWebSearchSelectedProviderTargetIds(
-  config: OpenClawConfig,
+  config: RecallConfig,
   providerId?: string | null,
 ): SelectedProviderTargetIds {
   const selectedProviderId = resolveSelectedWebSearchProviderId(config, providerId);
@@ -531,7 +531,7 @@ function getCapabilityWebSearchSelectedProviderTargetIds(
 }
 
 function getCapabilityWebFetchSelectedProviderTargetIds(
-  config: OpenClawConfig,
+  config: RecallConfig,
   providerId?: string | null,
 ): SelectedProviderTargetIds {
   const selectedProviderId = resolveSelectedWebFetchProviderId(config, providerId);
@@ -607,7 +607,7 @@ function getCapabilityWebFetchSelectedProviderTargetIds(
   };
 }
 
-function getCapabilityWebSearchAutoDetectTargets(config: OpenClawConfig): CommandSecretTargetScope {
+function getCapabilityWebSearchAutoDetectTargets(config: RecallConfig): CommandSecretTargetScope {
   const baseTargetIds = getCapabilityWebSearchCommandSecretTargetIds();
   const targetIds = new Set(baseTargetIds);
   const fallbackTargetIds = new Set<string>();
@@ -650,7 +650,7 @@ function getCapabilityWebSearchAutoDetectTargets(config: OpenClawConfig): Comman
   };
 }
 
-function getCapabilityWebFetchAutoDetectTargets(config: OpenClawConfig): CommandSecretTargetScope {
+function getCapabilityWebFetchAutoDetectTargets(config: RecallConfig): CommandSecretTargetScope {
   const baseTargetIds = getCapabilityWebFetchCommandSecretTargetIds();
   const targetIds = new Set(baseTargetIds);
   const fallbackTargetIds = new Set<string>();
@@ -720,7 +720,7 @@ function isScopedChannelSecretTargetEntry(params: {
   const allowedPrefix = `channels.${channelId}.`;
   return (
     params.entry.id.startsWith(allowedPrefix) &&
-    params.entry.configFile === "openclaw.json" &&
+    params.entry.configFile === "recall.json" &&
     typeof params.entry.pathPattern === "string" &&
     params.entry.pathPattern.startsWith(allowedPrefix) &&
     (params.entry.refPathPattern === undefined ||
@@ -729,7 +729,7 @@ function isScopedChannelSecretTargetEntry(params: {
 }
 
 function getConfiguredChannelSecretTargetIds(
-  config: OpenClawConfig,
+  config: RecallConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): string[] {
   const targetIds = new Set<string>();
@@ -805,7 +805,7 @@ function pathTargetsScopedChannelAccount(params: {
 }
 
 export function getScopedChannelsCommandSecretTargets(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   channel?: string | null;
   accountId?: string | null;
 }): {
@@ -843,7 +843,7 @@ export function getChannelsCommandSecretTargetIds(): Set<string> {
 }
 
 export function getConfiguredChannelsCommandSecretTargetIds(
-  config: OpenClawConfig,
+  config: RecallConfig,
   env?: NodeJS.ProcessEnv,
 ): Set<string> {
   return toTargetIdSet(getConfiguredChannelSecretTargetIds(config, env));
@@ -875,7 +875,7 @@ export function getCapabilityWebFetchCommandSecretTargetIds(): Set<string> {
 }
 
 export function getCapabilityWebFetchCommandSecretTargets(
-  config: OpenClawConfig,
+  config: RecallConfig,
   options?: {
     providerId?: string | null;
   },
@@ -916,7 +916,7 @@ export function getCapabilityWebSearchCommandSecretTargetIds(): Set<string> {
 }
 
 export function getCapabilityWebSearchCommandSecretTargets(
-  config: OpenClawConfig,
+  config: RecallConfig,
   options?: {
     providerId?: string | null;
   },
@@ -953,7 +953,7 @@ export function getCapabilityWebSearchCommandSecretTargets(
 }
 
 export function getStatusCommandSecretTargetIds(
-  config?: OpenClawConfig,
+  config?: RecallConfig,
   env?: NodeJS.ProcessEnv,
 ): Set<string> {
   const channelTargetIds = config

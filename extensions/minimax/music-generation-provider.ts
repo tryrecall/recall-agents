@@ -1,17 +1,17 @@
-import { extensionForMime } from "openclaw/plugin-sdk/media-mime";
+import { extensionForMime } from "recall/plugin-sdk/media-mime";
 import type {
   GeneratedMusicAsset,
   MusicGenerationProvider,
-} from "openclaw/plugin-sdk/music-generation";
-import { isProviderApiKeyConfigured } from "openclaw/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "openclaw/plugin-sdk/provider-auth-runtime";
+} from "recall/plugin-sdk/music-generation";
+import { isProviderApiKeyConfigured } from "recall/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "recall/plugin-sdk/provider-auth-runtime";
 import {
   assertOkOrThrowHttpError,
   fetchProviderDownloadResponse,
   postJsonRequest,
   resolveProviderHttpRequestConfig,
-} from "openclaw/plugin-sdk/provider-http";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/provider-http";
+import { normalizeOptionalString } from "recall/plugin-sdk/string-coerce-runtime";
 
 const DEFAULT_MINIMAX_MUSIC_BASE_URL = "https://api.minimax.io";
 const DEFAULT_MINIMAX_MUSIC_MODEL = "music-2.6";

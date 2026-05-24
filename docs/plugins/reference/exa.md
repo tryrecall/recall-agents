@@ -11,8 +11,8 @@ Adds web search provider support.
 
 ## Distribution
 
-- Package: `@openclaw/exa-plugin`
-- Install route: included in OpenClaw
+- Package: `@recall/exa-plugin`
+- Install route: included in Recall
 
 ## Surface
 

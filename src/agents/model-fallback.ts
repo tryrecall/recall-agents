@@ -2,7 +2,7 @@ import {
   resolveAgentModelFallbackValues,
   resolveAgentModelPrimaryValue,
 } from "../config/model-input.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { emitFailoverEvent } from "../infra/diagnostic-events.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
@@ -98,7 +98,7 @@ export type ModelFallbackRunOptions = {
 };
 
 type ModelFallbackRuntimeContext = {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   agentId?: string;
   sessionKey?: string;
   resolveAgentHarnessRuntimeOverride?: (provider: string, model: string) => string | undefined;
@@ -340,7 +340,7 @@ function sameModelCandidate(a: ModelCandidate, b: ModelCandidate): boolean {
   return a.provider === b.provider && a.model === b.model;
 }
 
-function isCliAgentRuntime(runtime: string | undefined, cfg: OpenClawConfig | undefined): boolean {
+function isCliAgentRuntime(runtime: string | undefined, cfg: RecallConfig | undefined): boolean {
   const normalized = normalizeOptionalString(runtime);
   if (!normalized) {
     return false;
@@ -474,7 +474,7 @@ function throwFallbackFailureSummary(params: {
   formatAttempt: (attempt: FallbackAttempt) => string;
   soonestCooldownExpiry?: number | null;
   attribution?: FailoverAttribution;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   agentDir?: string;
 }): never {
   if (params.attempts.length <= 1 && params.lastError) {
@@ -508,7 +508,7 @@ function resolveFallbackSoonestCooldownExpiry(params: {
   authRuntime: ModelFallbackAuthRuntime | null;
   authStore: AuthProfileStore | null;
   agentDir?: string;
-  cfg: OpenClawConfig | undefined;
+  cfg: RecallConfig | undefined;
   candidates: ModelCandidate[];
 }): number | null {
   if (!params.authRuntime || !params.authStore) {
@@ -548,7 +548,7 @@ function resolveFallbackSoonestCooldownExpiry(params: {
 
 function resolveImageFallbackCandidates(
   params: {
-    cfg: OpenClawConfig | undefined;
+    cfg: RecallConfig | undefined;
     defaultProvider: string;
     modelOverride?: string;
   } & ModelManifestNormalizationContext,
@@ -603,7 +603,7 @@ function resolveImageFallbackCandidates(
   return candidates;
 }
 
-function resolveImageFallbackDefaultProvider(cfg: OpenClawConfig | undefined): string {
+function resolveImageFallbackDefaultProvider(cfg: RecallConfig | undefined): string {
   const configuredPrimary = resolveAgentModelPrimaryValue(cfg?.agents?.defaults?.imageModel);
   if (configuredPrimary?.trim()) {
     const aliasIndex = buildModelAliasIndex({
@@ -631,7 +631,7 @@ export const testing = {
 
 function resolveFallbackCandidates(
   params: {
-    cfg: OpenClawConfig | undefined;
+    cfg: RecallConfig | undefined;
     provider: string;
     model: string;
     /** Optional explicit fallbacks list; when provided (even empty), replaces agents.defaults.model.fallbacks. */
@@ -904,7 +904,7 @@ function resolveCooldownDecision(params: {
 
 export async function runWithModelFallback<T>(
   params: {
-    cfg: OpenClawConfig | undefined;
+    cfg: RecallConfig | undefined;
     provider: string;
     model: string;
     runId?: string;
@@ -1333,7 +1333,7 @@ export async function runWithModelFallback<T>(
 }
 
 export async function runWithImageModelFallback<T>(params: {
-  cfg: OpenClawConfig | undefined;
+  cfg: RecallConfig | undefined;
   modelOverride?: string;
   run: (provider: string, model: string) => Promise<T>;
   onError?: ModelFallbackErrorHandler;

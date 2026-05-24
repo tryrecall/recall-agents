@@ -1,4 +1,4 @@
-import { missingTargetError } from "openclaw/plugin-sdk/channel-feedback";
+import { missingTargetError } from "recall/plugin-sdk/channel-feedback";
 import {
   isWhatsAppGroupJid,
   isWhatsAppNewsletterJid,

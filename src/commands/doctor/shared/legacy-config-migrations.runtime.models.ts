@@ -33,7 +33,7 @@ function hasInvalidThinkingFormat(providers: unknown): boolean {
 const INVALID_THINKING_FORMAT_RULE: LegacyConfigRule = {
   path: ["models", "providers"],
   message:
-    'models.providers.<id>.models[*].compat.thinkingFormat has an unrecognized value; run "openclaw doctor --fix" to remove it and restore the runtime default.',
+    'models.providers.<id>.models[*].compat.thinkingFormat has an unrecognized value; run "recall doctor --fix" to remove it and restore the runtime default.',
   match: (value) => hasInvalidThinkingFormat(value),
 };
 

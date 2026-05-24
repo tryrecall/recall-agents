@@ -1,8 +1,8 @@
-import type { DmPolicy, OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { DmPolicy, RecallConfig } from "recall/plugin-sdk/config-contracts";
 import {
   expandAllowFromWithAccessGroups,
   parseAccessGroupAllowFromEntry,
-} from "openclaw/plugin-sdk/security-runtime";
+} from "recall/plugin-sdk/security-runtime";
 import {
   isSenderAllowed,
   normalizeAllowFrom,
@@ -11,7 +11,7 @@ import {
 } from "./bot-access.js";
 
 export async function expandTelegramAllowFromWithAccessGroups(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   allowFrom?: Array<string | number>;
   accountId?: string;
   senderId?: string;
@@ -41,7 +41,7 @@ export async function expandTelegramAllowFromWithAccessGroups(params: {
 }
 
 export async function resolveTelegramDmAllow(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   allowFrom?: Array<string | number>;
   groupAllowOverride?: Array<string | number>;
   storeAllowFrom?: string[];

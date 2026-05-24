@@ -1,4 +1,4 @@
 interface:
-  display_name: "OpenClaw Release CI"
-  short_description: "Verify and debug OpenClaw release validation runs"
-  default_prompt: "Use $openclaw-release-ci to preflight provider secrets, watch full release validation, summarize child runs, and triage only failing release lanes."
+  display_name: "Recall Release CI"
+  short_description: "Verify and debug Recall release validation runs"
+  default_prompt: "Use $recall-release-ci to preflight provider secrets, watch full release validation, summarize child runs, and triage only failing release lanes."

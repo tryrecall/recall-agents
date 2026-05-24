@@ -1,14 +1,14 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
-import { embeddedAgentLog } from "openclaw/plugin-sdk/agent-harness-runtime";
-import type { SandboxContext } from "openclaw/plugin-sdk/sandbox";
+import { embeddedAgentLog } from "recall/plugin-sdk/agent-harness-runtime";
+import type { SandboxContext } from "recall/plugin-sdk/sandbox";
 import type { WebSocket } from "ws";
 import type { JsonObject, JsonValue } from "../protocol.js";
 import { readHttpHeaders, requireNumber, requireObject, requireString } from "./json-rpc.js";
 import { requireBackend } from "./runtime.js";
-import type { HttpHeader, OpenClawExecServer } from "./types.js";
+import type { HttpHeader, RecallExecServer } from "./types.js";
 
 export async function httpRequest(
-  execServer: OpenClawExecServer,
+  execServer: RecallExecServer,
   socket: WebSocket,
   params: JsonValue | undefined,
 ): Promise<JsonObject> {
@@ -45,7 +45,7 @@ type SandboxHttpRequest = {
 };
 
 async function runSandboxHttpRequest(
-  execServer: OpenClawExecServer,
+  execServer: RecallExecServer,
   params: SandboxHttpRequest,
 ): Promise<JsonObject & { status: number; headers: HttpHeader[]; bodyBase64: string }> {
   const backend = requireBackend(execServer);
@@ -74,7 +74,7 @@ async function runSandboxHttpRequest(
 }
 
 async function runStreamingSandboxHttpRequest(
-  execServer: OpenClawExecServer,
+  execServer: RecallExecServer,
   socket: WebSocket,
   requestId: string,
   params: SandboxHttpRequest,
@@ -88,7 +88,7 @@ async function runStreamingSandboxHttpRequest(
   });
   const [command, ...args] = execSpec.argv;
   if (!command) {
-    throw new Error("OpenClaw sandbox HTTP exec spec did not provide a command.");
+    throw new Error("Recall sandbox HTTP exec spec did not provide a command.");
   }
 
   const child = spawn(command, args, {
@@ -210,7 +210,7 @@ function readStreamingSandboxHttpResponse(params: {
 }
 
 const SANDBOX_HTTP_REQUEST_SCRIPT = String.raw`
-tmp=$(mktemp "$TMPDIR/openclaw-http.XXXXXX.py" 2>/dev/null || mktemp "/tmp/openclaw-http.XXXXXX.py") || exit 1
+tmp=$(mktemp "$TMPDIR/recall-http.XXXXXX.py" 2>/dev/null || mktemp "/tmp/recall-http.XXXXXX.py") || exit 1
 trap 'rm -f "$tmp"' EXIT
 cat > "$tmp" <<'PY'
 import base64

@@ -19,7 +19,7 @@ const moduleLoaders: PluginModuleLoaderCache = new Map();
 const loadedFacadeModules = new Map<string, unknown>();
 const loadedFacadePluginIds = new Set<string>();
 let facadeLoaderSourceTransformFactory: PluginModuleLoaderFactory | undefined;
-let cachedOpenClawPackageRoot: string | undefined;
+let cachedRecallPackageRoot: string | undefined;
 
 function getSourceTransformFactory() {
   if (facadeLoaderSourceTransformFactory) {
@@ -30,16 +30,16 @@ function getSourceTransformFactory() {
   return facadeLoaderSourceTransformFactory;
 }
 
-function getOpenClawPackageRoot() {
-  if (cachedOpenClawPackageRoot) {
-    return cachedOpenClawPackageRoot;
+function getRecallPackageRoot() {
+  if (cachedRecallPackageRoot) {
+    return cachedRecallPackageRoot;
   }
-  cachedOpenClawPackageRoot =
+  cachedRecallPackageRoot =
     resolveLoaderPackageRoot({
       modulePath: fileURLToPath(import.meta.url),
       moduleUrl: import.meta.url,
     }) ?? fileURLToPath(new URL("../..", import.meta.url));
-  return cachedOpenClawPackageRoot;
+  return cachedRecallPackageRoot;
 }
 
 function resolveFacadeModuleLocation(params: {
@@ -51,7 +51,7 @@ function resolveFacadeModuleLocation(params: {
   return resolveBundledFacadeModuleLocation({
     ...params,
     currentModulePath: CURRENT_MODULE_PATH,
-    packageRoot: getOpenClawPackageRoot(),
+    packageRoot: getRecallPackageRoot(),
     bundledPluginsDir,
   });
 }
@@ -149,8 +149,8 @@ export function loadFacadeModuleAtLocationSync<T extends object>(params: {
     absolutePath: location.modulePath,
     rootPath: location.boundaryRoot,
     boundaryLabel:
-      location.boundaryRoot === getOpenClawPackageRoot()
-        ? "OpenClaw package root"
+      location.boundaryRoot === getRecallPackageRoot()
+        ? "Recall package root"
         : (() => {
             const bundledDir = resolveBundledPluginsDir();
             return bundledDir && path.resolve(location.boundaryRoot) === path.resolve(bundledDir)
@@ -228,8 +228,8 @@ export async function loadBundledPluginPublicSurfaceModule<T extends object>(par
     absolutePath: preparedLocation.modulePath,
     rootPath: preparedLocation.boundaryRoot,
     boundaryLabel:
-      preparedLocation.boundaryRoot === getOpenClawPackageRoot()
-        ? "OpenClaw package root"
+      preparedLocation.boundaryRoot === getRecallPackageRoot()
+        ? "Recall package root"
         : "plugin root",
     rejectHardlinks: false,
   });
@@ -266,7 +266,7 @@ export function resetFacadeLoaderStateForTest(): void {
   loadedFacadePluginIds.clear();
   moduleLoaders.clear();
   facadeLoaderSourceTransformFactory = undefined;
-  cachedOpenClawPackageRoot = undefined;
+  cachedRecallPackageRoot = undefined;
 }
 
 export function setFacadeLoaderSourceTransformFactoryForTest(

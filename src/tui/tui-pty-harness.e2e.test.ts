@@ -77,12 +77,12 @@ async function writePtyInput(
   data: string,
   opts: { delay?: boolean } = {},
 ): Promise<void> {
-  const delayMs = readPositiveIntegerEnv("OPENCLAW_TUI_PTY_TYPE_DELAY_MS");
+  const delayMs = readPositiveIntegerEnv("RECALL_TUI_PTY_TYPE_DELAY_MS");
   if (!delayMs || opts.delay === false) {
     pty.write(data);
     return;
   }
-  const chunkSize = readPositiveIntegerEnv("OPENCLAW_TUI_PTY_TYPE_CHUNK_SIZE") ?? 1;
+  const chunkSize = readPositiveIntegerEnv("RECALL_TUI_PTY_TYPE_CHUNK_SIZE") ?? 1;
   for (let idx = 0; idx < data.length; idx += chunkSize) {
     pty.write(data.slice(idx, idx + chunkSize));
     if (idx + chunkSize < data.length) {
@@ -92,7 +92,7 @@ async function writePtyInput(
 }
 
 function mirrorPtyOutput(data: string) {
-  const mirrorPath = process.env.OPENCLAW_TUI_PTY_MIRROR_PATH;
+  const mirrorPath = process.env.RECALL_TUI_PTY_MIRROR_PATH;
   if (!mirrorPath) {
     return;
   }
@@ -104,8 +104,8 @@ function startPty(command: string, args: string[], opts: { cwd: string; env: Nod
   let exitEvent: PtyExitEvent | null = null;
   const pty = spawnPty(command, args, {
     name: "xterm-256color",
-    cols: readPtyDimensionEnv("OPENCLAW_TUI_PTY_COLS", 100),
-    rows: readPtyDimensionEnv("OPENCLAW_TUI_PTY_ROWS", 30),
+    cols: readPtyDimensionEnv("RECALL_TUI_PTY_COLS", 100),
+    rows: readPtyDimensionEnv("RECALL_TUI_PTY_ROWS", 30),
     cwd: opts.cwd,
     env: {
       ...process.env,
@@ -220,10 +220,10 @@ async function writeTuiPtyFixtureScript(dir: string) {
       import type { TuiBackend } from ${JSON.stringify(tuiModuleUrl.replace("/tui.ts", "/tui-backend.ts"))};
       import { runTui } from ${JSON.stringify(tuiModuleUrl)};
 
-      const actionLogPath = process.env.OPENCLAW_TUI_PTY_LOG_PATH;
-      const gatewayStatus = process.env.OPENCLAW_TUI_PTY_GATEWAY_STATUS ?? "fixture gateway ok";
+      const actionLogPath = process.env.RECALL_TUI_PTY_LOG_PATH;
+      const gatewayStatus = process.env.RECALL_TUI_PTY_GATEWAY_STATUS ?? "fixture gateway ok";
       let currentModel = "fixture-provider/fixture-model";
-      let fastMode = process.env.OPENCLAW_TUI_PTY_FAST_MODE === "true";
+      let fastMode = process.env.RECALL_TUI_PTY_FAST_MODE === "true";
 
       function record(method: string, payload?: unknown) {
         if (!actionLogPath) {
@@ -410,7 +410,7 @@ async function writeTuiPtyFixtureScript(dir: string) {
           },
           deliver: false,
           historyLimit: 5,
-          title: "openclaw tui pty fixture",
+          title: "recall tui pty fixture",
         });
       }
 
@@ -425,14 +425,14 @@ async function writeTuiPtyFixtureScript(dir: string) {
 }
 
 async function startTuiFixture(opts: { env?: NodeJS.ProcessEnv } = {}) {
-  const tempDir = await mkdtemp(path.join(tmpdir(), "openclaw-tui-pty-"));
+  const tempDir = await mkdtemp(path.join(tmpdir(), "recall-tui-pty-"));
   const scriptPath = await writeTuiPtyFixtureScript(tempDir);
   const logPath = path.join(tempDir, "fixture-log.jsonl");
   const run = startPty(process.execPath, ["--import", "tsx", scriptPath], {
     cwd: process.cwd(),
     env: {
-      OPENCLAW_THEME: "dark",
-      OPENCLAW_TUI_PTY_LOG_PATH: logPath,
+      RECALL_THEME: "dark",
+      RECALL_TUI_PTY_LOG_PATH: logPath,
       NO_COLOR: undefined,
       ...opts.env,
     },

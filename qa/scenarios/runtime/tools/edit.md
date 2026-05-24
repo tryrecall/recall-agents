@@ -10,7 +10,7 @@ coverage:
     - tools.edit
 objective: Verify targeted edit behavior is tracked across Pi and Codex while Codex owns edit natively.
 successCriteria:
-  - Pi may expose OpenClaw edit while Codex app-server mode may omit duplicate OpenClaw dynamic edit.
+  - Pi may expose Recall edit while Codex app-server mode may omit duplicate Recall dynamic edit.
   - Mock provider edit plans are reported as fixture intent, not as actual runtime tool calls.
   - The row stays report-only until the fixture validates native Codex edit behavior directly.
 docsRefs:
@@ -32,11 +32,11 @@ execution:
       tracking: "#80319"
       codexDefaultImpact: P4
       qaImpact: P1
-      action: split native edit behavior from OpenClaw dynamic tool parity
-      reason: Codex app-server intentionally owns edit natively; the fixture must not require OpenClaw dynamic edit exposure.
+      action: split native edit behavior from Recall dynamic tool parity
+      reason: Codex app-server intentionally owns edit natively; the fixture must not require Recall dynamic edit exposure.
     knownHarnessGap:
       issue: "#80319"
-      reason: QA tool-defaults currently needs native edit behavior coverage instead of OpenClaw dynamic edit exposure.
+      reason: QA tool-defaults currently needs native edit behavior coverage instead of Recall dynamic edit exposure.
     promptSnippet: "target=edit"
     failurePromptSnippet: "failure target=edit"
 ```

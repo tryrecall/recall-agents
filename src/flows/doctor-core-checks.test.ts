@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import type { SkillStatusEntry } from "../agents/skills-status.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   CORE_HEALTH_CHECKS,
   createCoreHealthChecks,
@@ -24,8 +24,8 @@ function createSkill(overrides: Partial<SkillStatusEntry> = {}): SkillStatusEntr
     description: "Missing tool",
     source: "workspace",
     bundled: false,
-    filePath: "/tmp/openclaw-test-workspace/skills/missing-tool/SKILL.md",
-    baseDir: "/tmp/openclaw-test-workspace/skills/missing-tool",
+    filePath: "/tmp/recall-test-workspace/skills/missing-tool/SKILL.md",
+    baseDir: "/tmp/recall-test-workspace/skills/missing-tool",
     skillKey: "missing-tool",
     always: false,
     disabled: false,
@@ -36,14 +36,14 @@ function createSkill(overrides: Partial<SkillStatusEntry> = {}): SkillStatusEntr
     userInvocable: true,
     commandVisible: false,
     requirements: {
-      bins: ["openclaw-test-missing-skill-bin"],
+      bins: ["recall-test-missing-skill-bin"],
       anyBins: [],
       env: [],
       config: [],
       os: [],
     },
     missing: {
-      bins: ["openclaw-test-missing-skill-bin"],
+      bins: ["recall-test-missing-skill-bin"],
       anyBins: [],
       env: [],
       config: [],
@@ -144,10 +144,10 @@ describe("registerCoreHealthChecks", () => {
 
   it("converts unavailable skills into repair-capable health findings", async () => {
     const unavailableSkill = createSkill();
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       agents: {
         defaults: {
-          workspace: "/tmp/openclaw-test-workspace",
+          workspace: "/tmp/recall-test-workspace",
           skills: ["missing-tool"],
         },
       },
@@ -169,7 +169,7 @@ describe("registerCoreHealthChecks", () => {
       mode: "lint",
       runtime,
       cfg,
-      cwd: "/tmp/openclaw-test-workspace",
+      cwd: "/tmp/recall-test-workspace",
     });
     expect(findings).toContainEqual(
       expect.objectContaining({
@@ -184,7 +184,7 @@ describe("registerCoreHealthChecks", () => {
           mode: "fix",
           runtime,
           cfg,
-          cwd: "/tmp/openclaw-test-workspace",
+          cwd: "/tmp/recall-test-workspace",
         },
         { paths: ["skills.entries.other-tool.enabled"] },
       ),
@@ -195,7 +195,7 @@ describe("registerCoreHealthChecks", () => {
           mode: "fix",
           runtime,
           cfg,
-          cwd: "/tmp/openclaw-test-workspace",
+          cwd: "/tmp/recall-test-workspace",
         },
         { paths: ["skills.entries.missing-tool.enabled"] },
       ),
@@ -210,7 +210,7 @@ describe("registerCoreHealthChecks", () => {
         mode: "fix",
         runtime,
         cfg,
-        cwd: "/tmp/openclaw-test-workspace",
+        cwd: "/tmp/recall-test-workspace",
       },
       findings,
     );
@@ -277,7 +277,7 @@ describe("registerCoreHealthChecks", () => {
             return [
               [
                 "- Tip: back up the workspace in a private git repo (GitHub or GitLab).",
-                "- Keep ~/.openclaw out of git; it contains credentials and session history.",
+                "- Keep ~/.recall out of git; it contains credentials and session history.",
               ].join("\n"),
               "Memory system not found in workspace.",
             ];
@@ -293,11 +293,11 @@ describe("registerCoreHealthChecks", () => {
       cfg: {
         agents: {
           defaults: {
-            workspace: "/tmp/openclaw-test-workspace",
+            workspace: "/tmp/recall-test-workspace",
           },
         },
       },
-      cwd: "/tmp/openclaw-test-workspace",
+      cwd: "/tmp/recall-test-workspace",
     });
 
     expect(findings).toContainEqual(

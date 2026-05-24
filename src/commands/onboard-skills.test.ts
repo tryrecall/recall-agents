@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
 
@@ -68,7 +68,7 @@ function createBundledSkill(params: {
   return {
     name: params.name,
     description: params.description,
-    source: "openclaw-bundled",
+    source: "recall-bundled",
     bundled: true,
     filePath: `/tmp/skills/${params.name}`,
     baseDir: `/tmp/skills/${params.name}`,
@@ -163,7 +163,7 @@ describe("setupSkills", () => {
       mocks.isContainerEnvironment.mockReturnValue(true);
 
       const { prompter, notes } = createPrompter({});
-      await setupSkills({} as OpenClawConfig, "/tmp/ws", runtime, prompter);
+      await setupSkills({} as RecallConfig, "/tmp/ws", runtime, prompter);
 
       expect(prompter.multiselect).not.toHaveBeenCalled();
       expect(mocks.installSkill).not.toHaveBeenCalled();
@@ -190,7 +190,7 @@ describe("setupSkills", () => {
       mocks.resolveBrewExecutable.mockReturnValue("/home/linuxbrew/.linuxbrew/bin/brew");
 
       const { prompter, notes } = createPrompter({ multiselect: ["video-frames"] });
-      await setupSkills({} as OpenClawConfig, "/tmp/ws", runtime, prompter);
+      await setupSkills({} as RecallConfig, "/tmp/ws", runtime, prompter);
 
       expect(prompter.multiselect).toHaveBeenCalled();
       expect(mocks.installSkill).toHaveBeenCalledWith(
@@ -225,7 +225,7 @@ describe("setupSkills", () => {
     ]);
 
     const { prompter, notes } = createPrompter({ multiselect: ["__skip__"] });
-    await setupSkills({} as OpenClawConfig, "/tmp/ws", runtime, prompter);
+    await setupSkills({} as RecallConfig, "/tmp/ws", runtime, prompter);
 
     // OS-mismatched skill should be counted as unsupported, not installable/missing.
     expect(notes.find((n) => n.title === "Skills status")).toStrictEqual({
@@ -257,7 +257,7 @@ describe("setupSkills", () => {
     ]);
 
     const { prompter, notes } = createPrompter({ multiselect: ["video-frames"] });
-    await setupSkills({} as OpenClawConfig, "/tmp/ws", runtime, prompter);
+    await setupSkills({} as RecallConfig, "/tmp/ws", runtime, prompter);
 
     const brewNote = notes.find((n) => n.title === "Homebrew recommended");
     expect(brewNote?.title).toBe("Homebrew recommended");

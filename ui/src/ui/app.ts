@@ -136,7 +136,7 @@ import type { NostrProfileFormState } from "./views/channels.nostr-profile-form.
 
 declare global {
   interface Window {
-    __OPENCLAW_CONTROL_UI_BASE_PATH__?: string;
+    __RECALL_CONTROL_UI_BASE_PATH__?: string;
   }
 }
 
@@ -156,7 +156,7 @@ function resolveOnboardingMode(): boolean {
   return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
 }
 
-export class OpenClawApp extends LitElement {
+export class RecallApp extends LitElement {
   readonly i18nController = new I18nController(this);
   clientInstanceId = generateUUID();
   connectGeneration = 0;
@@ -1101,7 +1101,7 @@ export class OpenClawApp extends LitElement {
           }
         },
         onTranscript: (entry) => {
-          this.realtimeTalkTranscript = `${entry.role === "user" ? "You" : "OpenClaw"}: ${entry.text}`;
+          this.realtimeTalkTranscript = `${entry.role === "user" ? "You" : "Recall"}: ${entry.text}`;
           this.realtimeTalkConversationState = updateRealtimeTalkConversation(
             this.realtimeTalkConversationState,
             entry,
@@ -1353,6 +1353,6 @@ export class OpenClawApp extends LitElement {
   }
 }
 
-if (!customElements.get("openclaw-app")) {
-  customElements.define("openclaw-app", OpenClawApp);
+if (!customElements.get("recall-app")) {
+  customElements.define("recall-app", RecallApp);
 }

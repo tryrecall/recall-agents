@@ -1,4 +1,4 @@
-import { buildChannelConfigSchema } from "openclaw/plugin-sdk/channel-config-primitives";
+import { buildChannelConfigSchema } from "recall/plugin-sdk/channel-config-primitives";
 import {
   AllowFromListSchema,
   buildNestedDmConfigSchema,
@@ -6,8 +6,8 @@ import {
   GroupPolicySchema,
   MarkdownConfigSchema,
   ToolPolicySchema,
-} from "openclaw/plugin-sdk/channel-config-schema";
-import { buildSecretInputSchema } from "openclaw/plugin-sdk/secret-input";
+} from "recall/plugin-sdk/channel-config-schema";
+import { buildSecretInputSchema } from "recall/plugin-sdk/secret-input";
 import { z } from "zod";
 import { matrixChannelConfigUiHints } from "./config-ui-hints.js";
 

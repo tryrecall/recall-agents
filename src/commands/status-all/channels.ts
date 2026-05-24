@@ -18,7 +18,7 @@ import {
   hasRuntimeCredentialAvailable,
   markConfiguredUnavailableCredentialStatusesAvailable,
 } from "../../channels/status/read-model.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { listExplicitConfiguredChannelIdsForConfig } from "../../plugins/channel-plugin-ids.js";
 import { resolveMissingOfficialExternalChannelPluginRepairHint } from "../../plugins/official-external-plugin-repair-hints.js";
 import { asRecord } from "../../shared/record-coerce.js";
@@ -44,8 +44,8 @@ type ChannelAccountRow = ChannelAccountTokenSummaryRow & {
 
 type ResolvedChannelAccountRowParams = {
   plugin: ChannelPlugin;
-  cfg: OpenClawConfig;
-  sourceConfig: OpenClawConfig;
+  cfg: RecallConfig;
+  sourceConfig: RecallConfig;
   accountId: string;
 };
 
@@ -92,7 +92,7 @@ const formatAccountLabel = (params: { accountId: string; name?: string }) => {
 
 const buildAccountNotes = (params: {
   plugin: ChannelPlugin;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   entry: ChannelAccountRow;
   liveCredentialAvailable?: boolean;
 }) => {
@@ -204,16 +204,16 @@ function formatLoadFailureDetail(message: string): string {
   const reason = isLikelyDependencyTreeCorruption(message)
     ? "dependency tree corrupted"
     : "registration failed";
-  return `plugin load failed: ${reason}; run openclaw doctor --fix`;
+  return `plugin load failed: ${reason}; run recall doctor --fix`;
 }
 
 // `status --all` channels table.
 // Keep this generic: channel-specific rules belong in the channel plugin.
 export async function buildChannelsTable(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   opts?: {
     showSecrets?: boolean;
-    sourceConfig?: OpenClawConfig;
+    sourceConfig?: RecallConfig;
     includeSetupFallbackPlugins?: boolean;
     liveChannelStatus?: unknown;
   },

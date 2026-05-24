@@ -172,9 +172,9 @@ vi.mock("./sdk-runtime.js", () => ({
   }),
 }));
 
-vi.mock("openclaw/plugin-sdk/routing", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/routing")>(
-    "openclaw/plugin-sdk/routing",
+vi.mock("recall/plugin-sdk/routing", async () => {
+  const actual = await vi.importActual<typeof import("recall/plugin-sdk/routing")>(
+    "recall/plugin-sdk/routing",
   );
   return {
     ...actual,
@@ -182,9 +182,9 @@ vi.mock("openclaw/plugin-sdk/routing", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/agent-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/agent-runtime")>(
-    "openclaw/plugin-sdk/agent-runtime",
+vi.mock("recall/plugin-sdk/agent-runtime", async () => {
+  const actual = await vi.importActual<typeof import("recall/plugin-sdk/agent-runtime")>(
+    "recall/plugin-sdk/agent-runtime",
   );
   return {
     ...actual,
@@ -192,19 +192,19 @@ vi.mock("openclaw/plugin-sdk/agent-runtime", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/realtime-bootstrap-context", async () => {
+vi.mock("recall/plugin-sdk/realtime-bootstrap-context", async () => {
   const actual = await vi.importActual<
-    typeof import("openclaw/plugin-sdk/realtime-bootstrap-context")
-  >("openclaw/plugin-sdk/realtime-bootstrap-context");
+    typeof import("recall/plugin-sdk/realtime-bootstrap-context")
+  >("recall/plugin-sdk/realtime-bootstrap-context");
   return {
     ...actual,
     resolveRealtimeBootstrapContextInstructions: resolveRealtimeBootstrapContextInstructionsMock,
   };
 });
 
-vi.mock("openclaw/plugin-sdk/runtime-env", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/runtime-env")>(
-    "openclaw/plugin-sdk/runtime-env",
+vi.mock("recall/plugin-sdk/runtime-env", async () => {
+  const actual = await vi.importActual<typeof import("recall/plugin-sdk/runtime-env")>(
+    "recall/plugin-sdk/runtime-env",
   );
   return {
     ...actual,
@@ -212,9 +212,9 @@ vi.mock("openclaw/plugin-sdk/runtime-env", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/realtime-voice", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/realtime-voice")>(
-    "openclaw/plugin-sdk/realtime-voice",
+vi.mock("recall/plugin-sdk/realtime-voice", async () => {
+  const actual = await vi.importActual<typeof import("recall/plugin-sdk/realtime-voice")>(
+    "recall/plugin-sdk/realtime-voice",
   );
   return {
     ...actual,
@@ -1696,7 +1696,7 @@ describe("DiscordVoiceManager", () => {
         }
       | undefined;
     expect(bridgeParams?.autoRespondToAudio).toBe(false);
-    expect(bridgeParams?.instructions).toContain("same OpenClaw agent");
+    expect(bridgeParams?.instructions).toContain("same Recall agent");
     expect(bridgeParams?.tools?.map((tool) => tool.name)).toContain("openclaw_agent_consult");
 
     bridgeParams?.onToolCall?.(
@@ -1774,7 +1774,7 @@ describe("DiscordVoiceManager", () => {
         name: "openclaw_agent_consult",
         args: {
           question: [
-            "Speak this exact OpenClaw answer to the Discord voice channel, without adding, removing, or rephrasing words.",
+            "Speak this exact Recall answer to the Discord voice channel, without adding, removing, or rephrasing words.",
             'Answer: "direct internal answer"',
           ].join("\n"),
         },
@@ -2488,7 +2488,7 @@ describe("DiscordVoiceManager", () => {
       "call-late",
       {
         status: "already_delivered",
-        message: "OpenClaw already delivered this answer to Discord voice.",
+        message: "Recall already delivered this answer to Discord voice.",
       },
       { suppressResponse: true },
     );
@@ -2559,7 +2559,7 @@ describe("DiscordVoiceManager", () => {
         "call-late",
         {
           status: "already_delivered",
-          message: "OpenClaw already delivered this answer to Discord voice.",
+          message: "Recall already delivered this answer to Discord voice.",
         },
         { suppressResponse: true },
       ),
@@ -2733,7 +2733,7 @@ describe("DiscordVoiceManager", () => {
       "call-new",
       {
         status: "already_delivered",
-        message: "OpenClaw already delivered this answer to Discord voice.",
+        message: "Recall already delivered this answer to Discord voice.",
       },
       { suppressResponse: true },
     );
@@ -2889,7 +2889,7 @@ describe("DiscordVoiceManager", () => {
       sessionKey: "agent:main:discord:channel:1001",
     });
     resolveRealtimeBootstrapContextInstructionsMock.mockResolvedValue(
-      "OpenClaw realtime voice profile context:\n\n### IDENTITY.md\nName: Wilfred",
+      "Recall realtime voice profile context:\n\n### IDENTITY.md\nName: Wilfred",
     );
     const manager = createManager({
       groupPolicy: "open",
@@ -2917,7 +2917,7 @@ describe("DiscordVoiceManager", () => {
           instructions?: string;
         }
       | undefined;
-    expect(bridgeParams?.instructions).toContain("OpenClaw realtime voice profile context");
+    expect(bridgeParams?.instructions).toContain("Recall realtime voice profile context");
     expect(bridgeParams?.instructions).toContain("Name: Wilfred");
     expect(bridgeParams?.instructions).toContain("Call openclaw_agent_consult");
   });

@@ -291,7 +291,7 @@ describe("runCliAgent spawn path", () => {
     expect(allArgs).toContain("You are a helpful assistant.");
   });
 
-  it("includes the OpenClaw skills prompt in CLI system prompts", () => {
+  it("includes the Recall skills prompt in CLI system prompts", () => {
     const systemPrompt = buildSystemPrompt({
       workspaceDir: "/tmp",
       modelDisplay: "claude-cli/sonnet",
@@ -348,7 +348,7 @@ describe("runCliAgent spawn path", () => {
     supervisorSpawnMock.mockImplementationOnce(async (...args: unknown[]) => {
       const input = (args[0] ?? {}) as { argv?: string[] };
       systemPromptPath = requireArgAfter(input.argv, "--append-system-prompt-file");
-      expect(systemPromptPath).toContain("openclaw-cli-system-prompt-");
+      expect(systemPromptPath).toContain("recall-cli-system-prompt-");
       await expect(fs.readFile(systemPromptPath, "utf-8")).resolves.toBe(
         "You are a helpful assistant.",
       );
@@ -423,8 +423,8 @@ describe("runCliAgent spawn path", () => {
     expect(requireArgAfter(input.argv, "--effort")).toBe("high");
   });
 
-  it("passes OpenClaw skills to Claude as a session plugin", async () => {
-    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-cli-skills-"));
+  it("passes Recall skills to Claude as a session plugin", async () => {
+    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-cli-skills-"));
     const skillDir = path.join(workspaceDir, "skills", "weather");
     await fs.mkdir(skillDir, { recursive: true });
     await fs.writeFile(
@@ -447,7 +447,7 @@ describe("runCliAgent spawn path", () => {
       const manifest = JSON.parse(
         await fs.readFile(path.join(pluginDir, ".claude-plugin", "plugin.json"), "utf-8"),
       ) as { name?: string; skills?: string };
-      expect(manifest.name).toBe("openclaw-skills");
+      expect(manifest.name).toBe("recall-skills");
       expect(manifest.skills).toBe("./skills");
       await expect(
         fs.readFile(path.join(pluginDir, "skills", "weather", "SKILL.md"), "utf-8"),
@@ -555,7 +555,7 @@ describe("runCliAgent spawn path", () => {
 
   it("ignores legacy claudeSessionId on the compat wrapper", () => {
     const params = buildRunClaudeCliAgentParams({
-      sessionId: "openclaw-session",
+      sessionId: "recall-session",
       sessionFile: "/tmp/session.jsonl",
       workspaceDir: "/tmp",
       prompt: "hi",
@@ -573,7 +573,7 @@ describe("runCliAgent spawn path", () => {
 
   it("forwards channel context through the compat wrapper", () => {
     const params = buildRunClaudeCliAgentParams({
-      sessionId: "openclaw-session",
+      sessionId: "recall-session",
       sessionFile: "/tmp/session.jsonl",
       workspaceDir: "/tmp",
       prompt: "hi",
@@ -589,7 +589,7 @@ describe("runCliAgent spawn path", () => {
 
   it("forwards static extra system prompt through the compat wrapper", () => {
     const params = buildRunClaudeCliAgentParams({
-      sessionId: "openclaw-session",
+      sessionId: "recall-session",
       sessionFile: "/tmp/session.jsonl",
       workspaceDir: "/tmp",
       prompt: "hi",
@@ -605,7 +605,7 @@ describe("runCliAgent spawn path", () => {
 
   it("forwards cron jobId through the compat wrapper", () => {
     const params = buildRunClaudeCliAgentParams({
-      sessionId: "openclaw-session",
+      sessionId: "recall-session",
       sessionFile: "/tmp/session.jsonl",
       workspaceDir: "/tmp",
       prompt: "hi",
@@ -1433,7 +1433,7 @@ describe("runCliAgent spawn path", () => {
         "--resume",
         "claude-session",
         "--session-id",
-        "openclaw-session",
+        "recall-session",
         "--append-system-prompt",
         "old prompt",
         "--append-system-prompt-file",
@@ -1447,7 +1447,7 @@ describe("runCliAgent spawn path", () => {
     expect(args).toContain("--resume");
     expect(args).toContain("claude-session");
     expect(args).not.toContain("--session-id");
-    expect(args).not.toContain("openclaw-session");
+    expect(args).not.toContain("recall-session");
     expect(args).not.toContain("--append-system-prompt-file");
     expect(args).not.toContain("/tmp/system-prompt.md");
     expect(args).not.toContain("--append-system-prompt");
@@ -1805,7 +1805,7 @@ describe("runCliAgent spawn path", () => {
   });
 
   it("restarts Claude live sessions when selected skills change", async () => {
-    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-live-skills-"));
+    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-live-skills-"));
     const weatherDir = path.join(workspaceDir, "skills", "weather");
     const gitDir = path.join(workspaceDir, "skills", "git");
     await fs.mkdir(weatherDir, { recursive: true });
@@ -2187,7 +2187,7 @@ describe("runCliAgent spawn path", () => {
 
   it("can preserve selected clearEnv keys for live CLI backend probes", async () => {
     try {
-      process.env.OPENCLAW_LIVE_CLI_BACKEND_PRESERVE_ENV = '["SAFE_CLEAR"]';
+      process.env.RECALL_LIVE_CLI_BACKEND_PRESERVE_ENV = '["SAFE_CLEAR"]';
       process.env.SAFE_CLEAR = "from-base";
       mockSuccessfulCliRun();
       await executePreparedCliRun(
@@ -2208,7 +2208,7 @@ describe("runCliAgent spawn path", () => {
       expect(input.env?.SAFE_CLEAR).toBe("from-base");
       expect(input.env?.SAFE_DROP).toBeUndefined();
     } finally {
-      delete process.env.OPENCLAW_LIVE_CLI_BACKEND_PRESERVE_ENV;
+      delete process.env.RECALL_LIVE_CLI_BACKEND_PRESERVE_ENV;
       delete process.env.SAFE_CLEAR;
     }
   });
@@ -2370,7 +2370,7 @@ describe("runCliAgent spawn path", () => {
 
   it("loads workspace bootstrap files into the Claude CLI system prompt", async () => {
     const workspaceDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "openclaw-cli-bootstrap-context-"),
+      path.join(os.tmpdir(), "recall-cli-bootstrap-context-"),
     );
 
     await fs.writeFile(

@@ -1,11 +1,11 @@
-import { resolveApprovalApprovers } from "openclaw/plugin-sdk/approval-auth-runtime";
+import { resolveApprovalApprovers } from "recall/plugin-sdk/approval-auth-runtime";
 import {
   createChannelExecApprovalProfile,
   isChannelExecApprovalTargetRecipient,
-} from "openclaw/plugin-sdk/approval-client-runtime";
-import { doesApprovalRequestMatchChannelAccount } from "openclaw/plugin-sdk/approval-native-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { normalizeStringifiedOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/approval-client-runtime";
+import { doesApprovalRequestMatchChannelAccount } from "recall/plugin-sdk/approval-native-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { normalizeStringifiedOptionalString } from "recall/plugin-sdk/string-coerce-runtime";
 import { resolveSlackAccount } from "./accounts.js";
 
 function normalizeSlackUserLikeId(value: string): string | undefined {
@@ -29,7 +29,7 @@ export function normalizeSlackApproverId(value: string | number): string | undef
   return normalizeSlackUserLikeId(trimmed);
 }
 
-function resolveSlackOwnerApprovers(cfg: OpenClawConfig): string[] {
+function resolveSlackOwnerApprovers(cfg: RecallConfig): string[] {
   const ownerAllowFrom = cfg.commands?.ownerAllowFrom;
   if (!Array.isArray(ownerAllowFrom) || ownerAllowFrom.length === 0) {
     return [];
@@ -40,7 +40,7 @@ function resolveSlackOwnerApprovers(cfg: OpenClawConfig): string[] {
   });
 }
 export function getSlackExecApprovalApprovers(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId?: string | null;
 }): string[] {
   const account = resolveSlackAccount(params).config;
@@ -51,7 +51,7 @@ export function getSlackExecApprovalApprovers(params: {
 }
 
 export function isSlackExecApprovalTargetRecipient(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   senderId?: string | null;
   accountId?: string | null;
 }): boolean {

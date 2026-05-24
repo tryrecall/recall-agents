@@ -8,7 +8,7 @@ import {
   getReplyPayloadTtsSupplement,
   isReplyPayloadTtsSupplement,
   resolveSendableOutboundReplyParts,
-} from "openclaw/plugin-sdk/reply-payload";
+} from "recall/plugin-sdk/reply-payload";
 import { resolveAgentWorkspaceDir, resolveSessionAgentId } from "../../agents/agent-scope.js";
 import { resolveDefaultModelForAgent } from "../../agents/model-selection.js";
 import { rewriteTranscriptEntriesInSessionFile } from "../../agents/pi-embedded-runner/transcript-rewrite.js";
@@ -24,7 +24,7 @@ import type { MsgContext, TemplateContext } from "../../auto-reply/templating.js
 import { extractCanvasFromText } from "../../chat/canvas-render.js";
 import { resolveSessionFilePath } from "../../config/sessions.js";
 import { streamSessionTranscriptLines } from "../../config/sessions/transcript-stream.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import {
   measureDiagnosticsTimelineSpan,
   measureDiagnosticsTimelineSpanSync,
@@ -973,7 +973,7 @@ function stripTrailingOffloadedMediaMarkers(message: string, refs: OffloadedRef[
 async function prestageMediaPathOffloads(params: {
   offloadedRefs: OffloadedRef[];
   includeImageRefs?: boolean;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionKey: string;
   agentId: string;
 }): Promise<{ paths: string[]; types: string[]; workspaceDir?: string }> {
@@ -1102,7 +1102,7 @@ async function rewriteChatSendUserTurnMediaPaths(params: {
   sessionKey: string;
   message: string;
   savedImages: SavedMedia[];
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
 }) {
   const mediaFields = resolveChatSendTranscriptMediaFields(params.savedImages);
   if (!("MediaPath" in mediaFields)) {
@@ -1468,7 +1468,7 @@ async function appendAssistantTranscriptMessage(params: {
     runId: string;
   };
   ttsSupplement?: GatewayInjectedTtsSupplementMarker;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
 }): Promise<TranscriptAppendResult> {
   const transcriptPath = resolveTranscriptPath({
     sessionId: params.sessionId,
@@ -2441,7 +2441,7 @@ export const chatHandlers: GatewayRequestHandlers = {
               modelOverrideFallbacks = imageModelPlan.modelOverrideFallbacks;
             }
             // Bound plugin sessions own the real recipient model, so keep image
-            // attachments even when the parent OpenClaw session model is text-only.
+            // attachments even when the parent Recall session model is text-only.
             const supportsImages =
               imageModelPlan.kind === "inline-session" ||
               imageModelPlan.kind === "inline-image-model" ||

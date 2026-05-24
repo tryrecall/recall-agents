@@ -1,5 +1,5 @@
 import type { InboundEventKind } from "../channels/inbound-event/kind.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   buildMcpToolSchema,
   type McpLoopbackTool,
@@ -14,12 +14,12 @@ type CachedScopedTools = {
   agentId: string | undefined;
   tools: McpLoopbackTool[];
   toolSchema: McpToolSchemaEntry[];
-  configRef: OpenClawConfig;
+  configRef: RecallConfig;
   time: number;
 };
 
 export function resolveMcpLoopbackScopedTools(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionKey: string;
   messageProvider: string | undefined;
   accountId: string | undefined;
@@ -46,7 +46,7 @@ export class McpLoopbackToolCache {
   #entries = new Map<string, CachedScopedTools>();
 
   resolve(params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     sessionKey: string;
     messageProvider: string | undefined;
     accountId: string | undefined;

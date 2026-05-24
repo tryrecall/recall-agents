@@ -10,7 +10,7 @@ coverage:
     - tools.fs.write
 objective: Verify file write behavior is tracked across Pi and Codex while Codex owns write natively.
 successCriteria:
-  - Pi may expose OpenClaw write while Codex app-server mode may omit duplicate OpenClaw dynamic write.
+  - Pi may expose Recall write while Codex app-server mode may omit duplicate Recall dynamic write.
   - Mock provider write plans are reported as fixture intent, not as actual runtime tool calls.
   - The row stays report-only until the fixture validates native Codex write behavior directly.
 docsRefs:
@@ -32,11 +32,11 @@ execution:
       tracking: "#80319"
       codexDefaultImpact: P4
       qaImpact: P1
-      action: split native write behavior from OpenClaw dynamic tool parity
-      reason: Codex app-server intentionally owns write natively; the fixture must not require OpenClaw dynamic write exposure.
+      action: split native write behavior from Recall dynamic tool parity
+      reason: Codex app-server intentionally owns write natively; the fixture must not require Recall dynamic write exposure.
     knownHarnessGap:
       issue: "#80319"
-      reason: QA tool-defaults currently needs native write behavior coverage instead of OpenClaw dynamic write exposure.
+      reason: QA tool-defaults currently needs native write behavior coverage instead of Recall dynamic write exposure.
     promptSnippet: "target=write"
     failurePromptSnippet: "failure target=write"
 ```

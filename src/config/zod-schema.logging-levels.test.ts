@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { OpenClawSchema } from "./zod-schema.js";
+import { RecallSchema } from "./zod-schema.js";
 
-describe("OpenClawSchema logging levels", () => {
+describe("RecallSchema logging levels", () => {
   it("accepts valid logging level values for level and consoleLevel", () => {
-    const result = OpenClawSchema.safeParse({
+    const result = RecallSchema.safeParse({
       logging: {
         level: "debug",
         consoleLevel: "warn",
@@ -14,12 +14,12 @@ describe("OpenClawSchema logging levels", () => {
   });
 
   it("rejects invalid logging level values", () => {
-    const invalidLevel = OpenClawSchema.safeParse({
+    const invalidLevel = RecallSchema.safeParse({
       logging: {
         level: "loud",
       },
     });
-    const invalidConsoleLevel = OpenClawSchema.safeParse({
+    const invalidConsoleLevel = RecallSchema.safeParse({
       logging: {
         consoleLevel: "verbose",
       },

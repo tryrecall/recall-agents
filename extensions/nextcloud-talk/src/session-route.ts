@@ -1,9 +1,9 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { buildOutboundBaseSessionKey } from "openclaw/plugin-sdk/routing";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { buildOutboundBaseSessionKey } from "recall/plugin-sdk/routing";
 import { stripNextcloudTalkTargetPrefix } from "./normalize.js";
 
 type NextcloudTalkOutboundSessionRouteParams = {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   accountId?: string | null;
   target: string;

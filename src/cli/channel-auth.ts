@@ -5,7 +5,7 @@ import {
   normalizeChannelId,
 } from "../channels/plugins/index.js";
 import { resolveInstallableChannelPlugin } from "../commands/channel-setup/channel-plugin-resolution.js";
-import { getRuntimeConfig, readConfigFileSnapshot, type OpenClawConfig } from "../config/config.js";
+import { getRuntimeConfig, readConfigFileSnapshot, type RecallConfig } from "../config/config.js";
 import { applyPluginAutoEnable } from "../config/plugin-auto-enable.js";
 import { callGateway } from "../gateway/call.js";
 import { setVerbose } from "../globals.js";
@@ -32,7 +32,7 @@ function supportsChannelAuthMode(plugin: ChannelPlugin, mode: ChannelAuthMode): 
   return mode === "login" ? Boolean(plugin.auth?.login) : Boolean(plugin.gateway?.logoutAccount);
 }
 
-function isConfiguredAuthPlugin(plugin: ChannelPlugin, cfg: OpenClawConfig): boolean {
+function isConfiguredAuthPlugin(plugin: ChannelPlugin, cfg: RecallConfig): boolean {
   const key = plugin.id;
   if (isBlockedObjectKey(key)) {
     return false;
@@ -66,7 +66,7 @@ function isConfiguredAuthPlugin(plugin: ChannelPlugin, cfg: OpenClawConfig): boo
   return false;
 }
 
-function resolveConfiguredAuthChannelInput(cfg: OpenClawConfig, mode: ChannelAuthMode): string {
+function resolveConfiguredAuthChannelInput(cfg: RecallConfig, mode: ChannelAuthMode): string {
   const configured = listChannelPlugins()
     .filter((plugin): plugin is ChannelPlugin => supportsChannelAuthMode(plugin, mode))
     .filter((plugin) => isConfiguredAuthPlugin(plugin, cfg))
@@ -77,7 +77,7 @@ function resolveConfiguredAuthChannelInput(cfg: OpenClawConfig, mode: ChannelAut
   }
   if (configured.length === 0) {
     throw new Error(
-      `No configured channel supports ${mode}. Run ${formatCliCommand("openclaw channels status")} to inspect channels or ${formatCliCommand("openclaw channels add --channel <channel>")} to add one.`,
+      `No configured channel supports ${mode}. Run ${formatCliCommand("recall channels status")} to inspect channels or ${formatCliCommand("recall channels add --channel <channel>")} to add one.`,
     );
   }
   const safeIds = configured.map(sanitizeForLog);
@@ -89,10 +89,10 @@ function resolveConfiguredAuthChannelInput(cfg: OpenClawConfig, mode: ChannelAut
 async function resolveChannelPluginForMode(
   opts: ChannelAuthOptions,
   mode: ChannelAuthMode,
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   runtime: RuntimeEnv,
 ): Promise<{
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   configChanged: boolean;
   channelInput: string;
   channelId: string;
@@ -113,7 +113,7 @@ async function resolveChannelPluginForMode(
   const channelId = resolved.channelId ?? normalizedChannelId;
   if (!channelId) {
     throw new Error(
-      `Unsupported channel "${channelInput}". Run ${formatCliCommand("openclaw channels list")} to see available channels.`,
+      `Unsupported channel "${channelInput}". Run ${formatCliCommand("recall channels list")} to see available channels.`,
     );
   }
   const plugin = resolved.plugin;
@@ -122,7 +122,7 @@ async function resolveChannelPluginForMode(
       formatUnsupportedChannelActionMessage({
         channel: channelId,
         action: mode,
-        inspectCommand: "openclaw channels status --channel " + channelId,
+        inspectCommand: "recall channels status --channel " + channelId,
       }),
     );
   }
@@ -138,7 +138,7 @@ async function resolveChannelPluginForMode(
 function resolveAccountContext(
   plugin: ChannelPlugin,
   opts: ChannelAuthOptions,
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
 ) {
   const accountId =
     normalizeOptionalString(opts.account) || resolveChannelDefaultAccountId({ plugin, cfg });
@@ -146,7 +146,7 @@ function resolveAccountContext(
 }
 
 async function reconcileGatewayRuntimeAfterLocalLogin(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   plugin: ChannelPlugin;
   channelId: string;
   accountId: string;
@@ -181,7 +181,7 @@ async function reconcileGatewayRuntimeAfterLocalLogin(params: {
 }
 
 async function logoutViaGatewayRuntime(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channelId: string;
   accountId: string;
   runtime: RuntimeEnv;
@@ -236,7 +236,7 @@ export async function runChannelLogin(
       formatUnsupportedChannelActionMessage({
         channel: channelInput,
         action: "login",
-        inspectCommand: "openclaw channels status --channel " + channelInput,
+        inspectCommand: "recall channels status --channel " + channelInput,
       }),
     );
   }
@@ -285,7 +285,7 @@ export async function runChannelLogout(
       formatUnsupportedChannelActionMessage({
         channel: channelInput,
         action: "logout",
-        inspectCommand: "openclaw channels status --channel " + channelInput,
+        inspectCommand: "recall channels status --channel " + channelInput,
       }),
     );
   }

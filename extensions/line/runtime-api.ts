@@ -4,28 +4,28 @@
 export type {
   ChannelAccountSnapshot,
   ChannelPlugin,
-  OpenClawConfig,
-  OpenClawPluginApi,
+  RecallConfig,
+  RecallPluginApi,
   PluginRuntime,
-} from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/core";
 export type {
   ChannelGatewayContext,
   ChannelStatusIssue,
-} from "openclaw/plugin-sdk/channel-contract";
-export { clearAccountEntryFields } from "openclaw/plugin-sdk/core";
-export { buildChannelConfigSchema } from "openclaw/plugin-sdk/channel-config-schema";
-export type { ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
-export type { ChannelSetupDmPolicy, ChannelSetupWizard } from "openclaw/plugin-sdk/setup";
+} from "recall/plugin-sdk/channel-contract";
+export { clearAccountEntryFields } from "recall/plugin-sdk/core";
+export { buildChannelConfigSchema } from "recall/plugin-sdk/channel-config-schema";
+export type { ReplyPayload } from "recall/plugin-sdk/reply-runtime";
+export type { ChannelSetupDmPolicy, ChannelSetupWizard } from "recall/plugin-sdk/setup";
 export {
   buildComputedAccountStatusSnapshot,
   buildTokenChannelStatusSummary,
-} from "openclaw/plugin-sdk/status-helpers";
+} from "recall/plugin-sdk/status-helpers";
 export {
   DEFAULT_ACCOUNT_ID,
   formatDocsLink,
   setSetupChannelEnabled,
   splitSetupEntries,
-} from "openclaw/plugin-sdk/setup";
+} from "recall/plugin-sdk/setup";
 export { setLineRuntime } from "./src/runtime.js";
 export { firstDefined, normalizeAllowFrom } from "./src/bot-access.js";
 export { downloadLineMedia } from "./src/download.js";

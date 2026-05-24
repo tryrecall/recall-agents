@@ -38,7 +38,7 @@ afterEach(async () => {
 });
 
 async function createTempSessionFile(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-attempt-session-lock-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-attempt-session-lock-"));
   tempDirs.push(dir);
   const sessionFile = path.join(dir, "session.jsonl");
   await fs.writeFile(sessionFile, '{"type":"session"}\n', "utf8");
@@ -233,7 +233,7 @@ describe("embedded attempt session lock lifecycle", () => {
       message: {
         role: "assistant",
         content: [{ type: "text", text: "mirrored media delivery" }],
-        provider: "openclaw",
+        provider: "recall",
         model: "delivery-mirror",
       },
     });
@@ -270,7 +270,7 @@ describe("embedded attempt session lock lifecycle", () => {
       message: {
         role: "assistant",
         content: [{ type: "text", text: "mirrored migrated media delivery" }],
-        provider: "openclaw",
+        provider: "recall",
         model: "delivery-mirror",
       },
     });

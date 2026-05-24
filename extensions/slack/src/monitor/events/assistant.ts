@@ -1,6 +1,6 @@
 import type { Block, KnownBlock } from "@slack/web-api";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { danger, logVerbose } from "openclaw/plugin-sdk/runtime-env";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
+import { danger, logVerbose } from "recall/plugin-sdk/runtime-env";
 import { buildSlackAssistantThreadMetadata } from "../context.js";
 import type {
   SlackMonitorContext,

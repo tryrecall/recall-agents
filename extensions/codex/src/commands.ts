@@ -1,8 +1,8 @@
 import type {
-  OpenClawPluginCommandDefinition,
+  RecallPluginCommandDefinition,
   PluginCommandContext,
   PluginCommandResult,
-} from "openclaw/plugin-sdk/plugin-entry";
+} from "recall/plugin-sdk/plugin-entry";
 import { describeControlFailure } from "./app-server/capabilities.js";
 import { formatCodexDisplayText } from "./command-formatters.js";
 import type { CodexCommandDeps } from "./command-handlers.js";
@@ -21,14 +21,14 @@ type CodexCommandInternalOptions = CodexCommandOptions & {
   loadSubcommandHandler?: () => Promise<CodexSubcommandHandler>;
 };
 
-export function createCodexCommand(options: CodexCommandOptions): OpenClawPluginCommandDefinition {
+export function createCodexCommand(options: CodexCommandOptions): RecallPluginCommandDefinition {
   return {
     name: "codex",
     description: "Inspect and control the Codex app-server harness",
     ownership: "reserved",
     agentPromptGuidance: [
       {
-        text: "Native Codex app-server plugin is available (`/codex ...`). For Codex bind/control/thread/resume/steer/stop requests, prefer `/codex bind`, `/codex threads`, `/codex resume`, `/codex steer`, and `/codex stop` over ACP. When OpenClaw sandboxing is active, native Codex execution modes are unavailable; use normal Codex harness turns.",
+        text: "Native Codex app-server plugin is available (`/codex ...`). For Codex bind/control/thread/resume/steer/stop requests, prefer `/codex bind`, `/codex threads`, `/codex resume`, `/codex steer`, and `/codex stop` over ACP. When Recall sandboxing is active, native Codex execution modes are unavailable; use normal Codex harness turns.",
         surfaces: ["pi_main"],
       },
       {

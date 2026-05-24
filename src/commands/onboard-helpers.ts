@@ -7,7 +7,7 @@ import { resolveAgentModelPrimaryValue } from "../config/model-input.js";
 import { resolveConfigPath } from "../config/paths.js";
 import { resolveSessionTranscriptsDirForAgent } from "../config/sessions/paths.js";
 import type { OptionalBootstrapFileName } from "../config/types.agent-defaults.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { resolveControlUiLinks } from "../gateway/control-ui-links.js";
 import { normalizeControlUiBasePath } from "../gateway/control-ui-shared.js";
 import { probeGateway } from "../gateway/probe.js";
@@ -41,7 +41,7 @@ export function guardCancel<T>(value: T | symbol, runtime: RuntimeEnv): T {
   return value;
 }
 
-export function summarizeExistingConfig(config: OpenClawConfig): string {
+export function summarizeExistingConfig(config: RecallConfig): string {
   const rows: string[] = [];
   const defaults = config.agents?.defaults;
   if (defaults?.workspace) {
@@ -63,7 +63,7 @@ export function summarizeExistingConfig(config: OpenClawConfig): string {
   return rows.length ? rows.join("\n") : "No key settings detected.";
 }
 
-function summarizeGatewayConfig(config: OpenClawConfig): string | null {
+function summarizeGatewayConfig(config: RecallConfig): string | null {
   const gateway = config.gateway;
   if (
     !gateway?.mode &&
@@ -163,9 +163,9 @@ export function printWizardHeader(runtime: RuntimeEnv) {
 }
 
 export function applyWizardMetadata(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   params: { command: string; mode: OnboardMode },
-): OpenClawConfig {
+): RecallConfig {
   const commit =
     normalizeOptionalString(process.env.GIT_COMMIT) ?? normalizeOptionalString(process.env.GIT_SHA);
   return {
@@ -202,8 +202,8 @@ export function formatControlUiSshHint(params: {
     "BYOH note: lan, tailnet, and custom bind are currently IPv4-only.",
     "If your host is IPv6-only, use an IPv4 sidecar or proxy in front of the Gateway.",
     "Docs:",
-    "https://docs.openclaw.ai/gateway/remote",
-    "https://docs.openclaw.ai/web/control-ui",
+    "https://docs.recall.ai/gateway/remote",
+    "https://docs.recall.ai/web/control-ui",
   ]
     .filter(Boolean)
     .join("\n");

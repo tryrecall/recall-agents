@@ -9,7 +9,7 @@ import { isNixMode } from "../config/paths.js";
 import { applyPluginAutoEnable } from "../config/plugin-auto-enable.js";
 import { applyConfigOverrides } from "../config/runtime-overrides.js";
 import type { GatewayAuthConfig, GatewayTailscaleConfig } from "../config/types.gateway.js";
-import type { ConfigFileSnapshot, OpenClawConfig } from "../config/types.openclaw.js";
+import type { ConfigFileSnapshot, RecallConfig } from "../config/types.recall.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import type { PluginMetadataSnapshot } from "../plugins/plugin-metadata-snapshot.js";
 import {
@@ -54,7 +54,7 @@ type RuntimeSecretsActivationParams = {
 };
 
 export type ActivateRuntimeSecrets = ((
-  config: OpenClawConfig,
+  config: RecallConfig,
   params: RuntimeSecretsActivationParams,
 ) => Promise<PreparedRuntimeSecretsSnapshot>) & {
   activatePreparedSnapshot?: (
@@ -131,7 +131,7 @@ export async function loadGatewayStartupConfigSnapshot(params: {
 
 function withRuntimeConfig(
   snapshot: ConfigFileSnapshot,
-  runtimeConfig: OpenClawConfig,
+  runtimeConfig: RecallConfig,
 ): ConfigFileSnapshot {
   return {
     ...snapshot,
@@ -145,7 +145,7 @@ export function createRuntimeSecretsActivator(params: {
   emitStateEvent: (
     code: GatewaySecretsStateEventCode,
     message: string,
-    cfg: OpenClawConfig,
+    cfg: RecallConfig,
   ) => void;
   prepareRuntimeSecretsSnapshot?: PrepareRuntimeSecretsSnapshot;
   activateRuntimeSecretsSnapshot?: ActivateRuntimeSecretsSnapshot;
@@ -209,7 +209,7 @@ export function createRuntimeSecretsActivator(params: {
   const handleSecretsActivationError = (
     err: unknown,
     activationParams: RuntimeSecretsActivationParams,
-    eventConfig: OpenClawConfig,
+    eventConfig: RecallConfig,
   ): never => {
     const details = String(err);
     if (!secretsDegraded) {
@@ -368,13 +368,13 @@ export async function prepareGatewayStartupConfig(params: {
     });
     return preflightPrepared.config;
   });
-  const canReusePreflightPreparedSnapshot = (config: OpenClawConfig): boolean =>
+  const canReusePreflightPreparedSnapshot = (config: RecallConfig): boolean =>
     Boolean(
       preflightPrepared &&
       params.activateRuntimeSecrets.activatePreparedSnapshot &&
       isDeepStrictEqual(pruneSkippedStartupSecretSurfaces(config), preflightPrepared.sourceConfig),
     );
-  const activateStartupSecrets = async (config: OpenClawConfig) => {
+  const activateStartupSecrets = async (config: RecallConfig) => {
     if (preflightPrepared && canReusePreflightPreparedSnapshot(config)) {
       return await params.activateRuntimeSecrets.activatePreparedSnapshot!(preflightPrepared, {
         reason: "startup",
@@ -428,7 +428,7 @@ export async function prepareGatewayStartupConfig(params: {
   };
 }
 
-function hasActiveGatewayAuthSecretRef(config: OpenClawConfig): boolean {
+function hasActiveGatewayAuthSecretRef(config: RecallConfig): boolean {
   const states = evaluateGatewayAuthSurfaceStates({
     config,
     defaults: config.secrets?.defaults,
@@ -440,10 +440,10 @@ function hasActiveGatewayAuthSecretRef(config: OpenClawConfig): boolean {
   });
 }
 
-function pruneSkippedStartupSecretSurfaces(config: OpenClawConfig): OpenClawConfig {
+function pruneSkippedStartupSecretSurfaces(config: RecallConfig): RecallConfig {
   const skipChannels =
-    isTruthyEnvValue(process.env.OPENCLAW_SKIP_CHANNELS) ||
-    isTruthyEnvValue(process.env.OPENCLAW_SKIP_PROVIDERS);
+    isTruthyEnvValue(process.env.RECALL_SKIP_CHANNELS) ||
+    isTruthyEnvValue(process.env.RECALL_SKIP_PROVIDERS);
   if (!skipChannels || !config.channels) {
     return config;
   }
@@ -453,7 +453,7 @@ function pruneSkippedStartupSecretSurfaces(config: OpenClawConfig): OpenClawConf
   };
 }
 
-function assertRuntimeGatewayAuthNotKnownWeak(config: OpenClawConfig): void {
+function assertRuntimeGatewayAuthNotKnownWeak(config: RecallConfig): void {
   assertGatewayAuthNotKnownWeak(
     resolveGatewayAuth({
       authConfig: config.gateway?.auth,
@@ -465,7 +465,7 @@ function assertRuntimeGatewayAuthNotKnownWeak(config: OpenClawConfig): void {
 
 function logGatewayAuthSurfaceDiagnostics(
   prepared: {
-    sourceConfig: OpenClawConfig;
+    sourceConfig: RecallConfig;
     warnings: Array<{ code: string; path: string; message: string }>;
   },
   logSecrets: GatewayStartupLog,
@@ -496,9 +496,9 @@ function logGatewayAuthSurfaceDiagnostics(
 }
 
 function applyGatewayAuthOverridesForStartupPreflight(
-  config: OpenClawConfig,
+  config: RecallConfig,
   overrides: GatewayStartupConfigOverrides,
-): OpenClawConfig {
+): RecallConfig {
   if (!overrides.auth && !overrides.tailscale) {
     return config;
   }

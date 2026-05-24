@@ -67,7 +67,7 @@ type AttemptSpawnWorkspaceHoisted = {
   ensureGlobalUndiciDispatcherStreamTimeoutsMock: UnknownMock;
   ensureGlobalUndiciStreamTimeoutsMock: UnknownMock;
   buildEmbeddedMessageActionDiscoveryInputMock: UnknownMock;
-  createOpenClawCodingToolsMock: UnknownMock;
+  createRecallCodingToolsMock: UnknownMock;
   subscribeEmbeddedPiSessionMock: Mock<SubscribeEmbeddedPiSessionFn>;
   acquireSessionWriteLockMock: Mock<AcquireSessionWriteLockFn>;
   installToolResultContextGuardMock: UnknownMock;
@@ -137,7 +137,7 @@ const hoisted = vi.hoisted((): AttemptSpawnWorkspaceHoisted => {
   const ensureGlobalUndiciDispatcherStreamTimeoutsMock = vi.fn();
   const ensureGlobalUndiciStreamTimeoutsMock = vi.fn();
   const buildEmbeddedMessageActionDiscoveryInputMock = vi.fn((params: unknown) => params);
-  const createOpenClawCodingToolsMock = vi.fn(() => []);
+  const createRecallCodingToolsMock = vi.fn(() => []);
   const installToolResultContextGuardMock = vi.fn(() => () => {});
   const installContextEngineLoopHookMock = vi.fn(() => () => {});
   const flushPendingToolResultsAfterIdleMock = vi.fn(async () => {});
@@ -205,7 +205,7 @@ const hoisted = vi.hoisted((): AttemptSpawnWorkspaceHoisted => {
     ensureGlobalUndiciDispatcherStreamTimeoutsMock,
     ensureGlobalUndiciStreamTimeoutsMock,
     buildEmbeddedMessageActionDiscoveryInputMock,
-    createOpenClawCodingToolsMock,
+    createRecallCodingToolsMock,
     subscribeEmbeddedPiSessionMock,
     acquireSessionWriteLockMock,
     installToolResultContextGuardMock,
@@ -387,7 +387,7 @@ vi.mock("../context-engine-maintenance.js", () => ({
 }));
 
 vi.mock("../../docs-path.js", () => ({
-  resolveOpenClawReferencePaths: async () => ({ docsPath: undefined, sourcePath: undefined }),
+  resolveRecallReferencePaths: async () => ({ docsPath: undefined, sourcePath: undefined }),
 }));
 
 vi.mock("../../pi-project-settings.js", () => ({
@@ -548,8 +548,8 @@ vi.mock("../../cache-trace.js", () => ({
 }));
 
 vi.mock("../../pi-tools.js", () => ({
-  createOpenClawCodingTools: (options?: { workspaceDir?: string; spawnWorkspaceDir?: string }) =>
-    hoisted.createOpenClawCodingToolsMock(options),
+  createRecallCodingTools: (options?: { workspaceDir?: string; spawnWorkspaceDir?: string }) =>
+    hoisted.createRecallCodingToolsMock(options),
   resolveProcessToolScopeKey: ({
     scopeKey,
     sessionKey,
@@ -661,7 +661,7 @@ vi.mock("../cache-ttl.js", () => ({
   appendCacheTtlTimestamp: (
     sessionManager: { appendCustomEntry?: (customType: string, data: unknown) => void },
     data: unknown,
-  ) => sessionManager.appendCustomEntry?.("openclaw.cache-ttl", data),
+  ) => sessionManager.appendCustomEntry?.("recall.cache-ttl", data),
   isCacheTtlEligibleProvider: (provider?: string) => provider === "anthropic",
   readLastCacheTtlTimestamp: (
     sessionManager: {
@@ -672,7 +672,7 @@ vi.mock("../cache-ttl.js", () => ({
     const calls = sessionManager.appendCustomEntry?.mock?.calls ?? [];
     for (let index = calls.length - 1; index >= 0; index -= 1) {
       const [customType, data] = calls[index] ?? [];
-      if (customType !== "openclaw.cache-ttl") {
+      if (customType !== "recall.cache-ttl") {
         continue;
       }
       const entry = data as
@@ -902,7 +902,7 @@ export function resetEmbeddedAttemptHarness(
   hoisted.buildEmbeddedMessageActionDiscoveryInputMock
     .mockReset()
     .mockImplementation((params) => params);
-  hoisted.createOpenClawCodingToolsMock.mockReset().mockImplementation((...args: unknown[]) => {
+  hoisted.createRecallCodingToolsMock.mockReset().mockImplementation((...args: unknown[]) => {
     const options = args[0] as
       | {
           workspaceDir?: string;
@@ -1150,8 +1150,8 @@ export async function createContextEngineAttemptRunner(params: {
   trajectory?: boolean;
 }) {
   const { maintain: rawMaintain, ...contextEngineRest } = params.contextEngine;
-  const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-ctx-engine-workspace-"));
-  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-ctx-engine-agent-"));
+  const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-ctx-engine-workspace-"));
+  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-ctx-engine-agent-"));
   const sessionFile = path.join(workspaceDir, "session.jsonl");
   params.tempPaths.push(workspaceDir, agentDir);
   await fs.writeFile(sessionFile, "", "utf8");
@@ -1185,9 +1185,9 @@ export async function createContextEngineAttemptRunner(params: {
       }),
   }));
 
-  const previousTrajectoryEnv = process.env.OPENCLAW_TRAJECTORY;
+  const previousTrajectoryEnv = process.env.RECALL_TRAJECTORY;
   if (params.trajectory !== true) {
-    process.env.OPENCLAW_TRAJECTORY = "0";
+    process.env.RECALL_TRAJECTORY = "0";
   }
   try {
     return await (
@@ -1238,9 +1238,9 @@ export async function createContextEngineAttemptRunner(params: {
     });
   } finally {
     if (previousTrajectoryEnv === undefined) {
-      delete process.env.OPENCLAW_TRAJECTORY;
+      delete process.env.RECALL_TRAJECTORY;
     } else {
-      process.env.OPENCLAW_TRAJECTORY = previousTrajectoryEnv;
+      process.env.RECALL_TRAJECTORY = previousTrajectoryEnv;
     }
   }
 }

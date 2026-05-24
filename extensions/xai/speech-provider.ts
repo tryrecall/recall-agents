@@ -1,9 +1,9 @@
 import {
   isProviderAuthProfileConfigured,
-  type OpenClawConfig,
-} from "openclaw/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "openclaw/plugin-sdk/provider-auth-runtime";
-import { normalizeResolvedSecretInputString } from "openclaw/plugin-sdk/secret-input";
+  type RecallConfig,
+} from "recall/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "recall/plugin-sdk/provider-auth-runtime";
+import { normalizeResolvedSecretInputString } from "recall/plugin-sdk/secret-input";
 import {
   asFiniteNumber,
   trimToUndefined,
@@ -12,8 +12,8 @@ import {
   type SpeechProviderOverrides,
   type SpeechProviderPlugin,
   type SpeechSynthesisTarget,
-} from "openclaw/plugin-sdk/speech";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/speech";
+import { normalizeLowercaseStringOrEmpty } from "recall/plugin-sdk/string-coerce-runtime";
 import {
   isValidXaiTtsVoice,
   normalizeXaiLanguageCode,
@@ -258,7 +258,7 @@ export function buildXaiSpeechProvider(): SpeechProviderPlugin {
 // 3. xAI OAuth auth profile (cfg-scoped)
 async function resolveXaiAudioApiKey(
   configApiKey: string | undefined,
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
 ): Promise<string> {
   const direct = trimToUndefined(configApiKey) ?? trimToUndefined(process.env.XAI_API_KEY);
   if (direct) {
@@ -270,6 +270,6 @@ async function resolveXaiAudioApiKey(
     return oauthKey;
   }
   throw new Error(
-    "xAI credentials missing for TTS. Sign in with `openclaw onboard --auth-choice xai-oauth`, or run `openclaw onboard --auth-choice xai-api-key`, or set XAI_API_KEY.",
+    "xAI credentials missing for TTS. Sign in with `recall onboard --auth-choice xai-oauth`, or run `recall onboard --auth-choice xai-api-key`, or set XAI_API_KEY.",
   );
 }

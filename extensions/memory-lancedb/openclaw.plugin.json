@@ -40,7 +40,7 @@
     },
     "dbPath": {
       "label": "Database Path",
-      "placeholder": "~/.openclaw/memory/lancedb",
+      "placeholder": "~/.recall/memory/lancedb",
       "advanced": true
     },
     "autoCapture": {

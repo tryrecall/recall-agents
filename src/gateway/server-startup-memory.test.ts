@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import type { MemoryQmdUpdateConfig } from "../config/types.memory.js";
 
 const { getMemorySearchManagerMock } = vi.hoisted(() => ({
@@ -13,13 +13,13 @@ vi.mock("../plugins/memory-runtime.js", () => ({
 import { startGatewayMemoryBackend } from "./server-startup-memory.js";
 
 function createQmdConfig(
-  agents: OpenClawConfig["agents"],
+  agents: RecallConfig["agents"],
   update: MemoryQmdUpdateConfig = { startup: "immediate" },
-): OpenClawConfig {
+): RecallConfig {
   return {
     agents,
     memory: { backend: "qmd", qmd: { update } },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
 function createGatewayLogMock() {
@@ -43,7 +43,7 @@ describe("startGatewayMemoryBackend", () => {
     const cfg = {
       agents: { list: [{ id: "main", default: true }] },
       memory: { backend: "builtin" },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const log = { info: vi.fn(), warn: vi.fn() };
 
     await startGatewayMemoryBackend({ cfg, log });
@@ -57,7 +57,7 @@ describe("startGatewayMemoryBackend", () => {
     const cfg = {
       agents: { list: [{ id: "main", default: true }] },
       memory: { backend: "qmd", qmd: {} },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const log = createGatewayLogMock();
 
     await startGatewayMemoryBackend({ cfg, log });
@@ -185,7 +185,7 @@ describe("startGatewayMemoryBackend", () => {
           update: { startup: "immediate", onBoot: false, interval: "0s", embedInterval: "0s" },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const log = createGatewayLogMock();
 
     await startGatewayMemoryBackend({ cfg, log });

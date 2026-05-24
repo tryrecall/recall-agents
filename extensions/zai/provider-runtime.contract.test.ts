@@ -1,3 +1,3 @@
-import { describeZAIProviderRuntimeContract } from "openclaw/plugin-sdk/provider-test-contracts";
+import { describeZAIProviderRuntimeContract } from "recall/plugin-sdk/provider-test-contracts";
 
 describeZAIProviderRuntimeContract(() => import("./index.js"));

@@ -12,7 +12,7 @@ export type AgentPromptRenderContext = {
   runtimeCapabilities?: readonly string[];
 };
 
-export function buildOpenClawToolFallbackText(params: {
+export function buildRecallToolFallbackText(params: {
   surface: AgentPromptSurfaceKind;
   execToolName: string;
   processToolName: string;
@@ -26,7 +26,7 @@ export function buildOpenClawToolFallbackText(params: {
       "- apply_patch: apply multi-file patches",
       `- ${params.execToolName}: run shell commands (supports background via yieldMs/background)`,
       `- ${params.processToolName}: manage background exec sessions`,
-      "- browser: control OpenClaw's dedicated browser",
+      "- browser: control Recall's dedicated browser",
       "- canvas: present/eval/snapshot the Canvas",
       "- nodes: list/describe/notify/camera/screen on paired nodes",
       "- cron: manage cron jobs and wake events (use for reminders; when scheduling a reminder, write the systemEvent text as something that will read like a reminder when it fires, and mention that it is a reminder depending on the time gap between setting and firing; include recent context in reminder text if appropriate)",
@@ -40,10 +40,10 @@ export function buildOpenClawToolFallbackText(params: {
     ].join("\n");
   }
 
-  return "No OpenClaw tool list is injected for this runtime prompt surface. Use only tools exposed directly by the active backend.";
+  return "No Recall tool list is injected for this runtime prompt surface. Use only tools exposed directly by the active backend.";
 }
 
-export function shouldRenderOpenClawToolWorkflowHints(params: {
+export function shouldRenderRecallToolWorkflowHints(params: {
   surface: AgentPromptSurfaceKind;
   hasToolList: boolean;
 }): boolean {

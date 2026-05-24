@@ -235,22 +235,22 @@ describe("detectImageReferences", () => {
     // Multi-file format uses separate brackets on separate lines
     const refs = expectImageReferenceCount(
       `[media attached: 2 files]
-[media attached 1/2: /Users/tyleryust/.openclaw/media/IMG_6430.jpeg (image/jpeg)]
-[media attached 2/2: /Users/tyleryust/.openclaw/media/IMG_6431.jpeg (image/jpeg)]
+[media attached 1/2: /Users/tyleryust/.recall/media/IMG_6430.jpeg (image/jpeg)]
+[media attached 2/2: /Users/tyleryust/.recall/media/IMG_6431.jpeg (image/jpeg)]
 what about these images?`,
       2,
     );
 
     expect(refs).toStrictEqual([
       {
-        raw: "/Users/tyleryust/.openclaw/media/IMG_6430.jpeg",
+        raw: "/Users/tyleryust/.recall/media/IMG_6430.jpeg",
         type: "path",
-        resolved: "/Users/tyleryust/.openclaw/media/IMG_6430.jpeg",
+        resolved: "/Users/tyleryust/.recall/media/IMG_6430.jpeg",
       },
       {
-        raw: "/Users/tyleryust/.openclaw/media/IMG_6431.jpeg",
+        raw: "/Users/tyleryust/.recall/media/IMG_6431.jpeg",
         type: "path",
-        resolved: "/Users/tyleryust/.openclaw/media/IMG_6431.jpeg",
+        resolved: "/Users/tyleryust/.recall/media/IMG_6431.jpeg",
       },
     ]);
   });
@@ -300,13 +300,13 @@ what is this?`);
   it("handles paths with spaces in filename", () => {
     // URL after | is https, not a local path, so only the local path should be detected
     const ref =
-      expectSingleImageReference(`[media attached: /Users/test/.openclaw/media/ChatGPT Image Apr 21, 2025.png (image/png) | https://example.com/same.png]
+      expectSingleImageReference(`[media attached: /Users/test/.recall/media/ChatGPT Image Apr 21, 2025.png (image/png) | https://example.com/same.png]
 what is this?`);
 
     expect(ref).toStrictEqual({
-      raw: "/Users/test/.openclaw/media/ChatGPT Image Apr 21, 2025.png",
+      raw: "/Users/test/.recall/media/ChatGPT Image Apr 21, 2025.png",
       type: "path",
-      resolved: "/Users/test/.openclaw/media/ChatGPT Image Apr 21, 2025.png",
+      resolved: "/Users/test/.recall/media/ChatGPT Image Apr 21, 2025.png",
     });
   });
 
@@ -353,7 +353,7 @@ describe("loadImageFromRef", () => {
   it("allows sandbox-validated host paths outside default media roots", async () => {
     const homeDir = os.homedir();
     await fs.mkdir(homeDir, { recursive: true });
-    const sandboxParent = await fs.mkdtemp(path.join(homeDir, "openclaw-sandbox-image-"));
+    const sandboxParent = await fs.mkdtemp(path.join(homeDir, "recall-sandbox-image-"));
     try {
       const sandboxRoot = path.join(sandboxParent, "sandbox");
       await fs.mkdir(sandboxRoot, { recursive: true });
@@ -423,7 +423,7 @@ describe("detectAndLoadPromptImages", () => {
   });
 
   it("skips generated media-note refs already supplied inline", async () => {
-    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-native-image-dedupe-"));
+    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-native-image-dedupe-"));
     const imagePath = path.join(stateDir, "photo.png");
     const pngB64 =
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=";
@@ -507,7 +507,7 @@ describe("detectAndLoadPromptImages", () => {
   });
 
   it("blocks prompt image refs outside workspace when sandbox workspaceOnly is enabled", async () => {
-    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-native-image-sandbox-"));
+    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-native-image-sandbox-"));
     const sandboxRoot = path.join(stateDir, "sandbox");
     const agentRoot = path.join(stateDir, "agent");
     await fs.mkdir(sandboxRoot, { recursive: true });
@@ -540,7 +540,7 @@ describe("detectAndLoadPromptImages", () => {
   });
 
   it("loads managed inbound absolute paths when workspaceOnly is enabled", async () => {
-    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-native-image-managed-"));
+    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-native-image-managed-"));
     const workspaceDir = path.join(stateDir, "workspace-agent");
     const inboundDir = path.join(stateDir, "media", "inbound");
     await fs.mkdir(workspaceDir, { recursive: true });
@@ -549,7 +549,7 @@ describe("detectAndLoadPromptImages", () => {
     const pngB64 =
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/woAAn8B9FD5fHAAAAAASUVORK5CYII=";
     await fs.writeFile(imagePath, Buffer.from(pngB64, "base64"));
-    vi.stubEnv("OPENCLAW_STATE_DIR", stateDir);
+    vi.stubEnv("RECALL_STATE_DIR", stateDir);
 
     try {
       const result = await detectAndLoadPromptImages({

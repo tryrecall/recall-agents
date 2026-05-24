@@ -1,5 +1,5 @@
 import type { SkillStatusEntry, SkillStatusReport } from "../agents/skills-status.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 
 export function collectUnavailableAgentSkills(report: SkillStatusReport): SkillStatusEntry[] {
   return report.skills.filter(
@@ -12,9 +12,9 @@ export function collectUnavailableAgentSkills(report: SkillStatusReport): SkillS
 }
 
 export function disableUnavailableSkillsInConfig(
-  config: OpenClawConfig,
+  config: RecallConfig,
   skills: readonly SkillStatusEntry[],
-): OpenClawConfig {
+): RecallConfig {
   if (skills.length === 0) {
     return config;
   }

@@ -1,15 +1,15 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { isStrictAgenticExecutionContractActive } from "./execution-contract.js";
 import type { AnyAgentTool } from "./tools/common.js";
 
-export function collectPresentOpenClawTools(
+export function collectPresentRecallTools(
   candidates: readonly (AnyAgentTool | null | undefined)[],
 ): AnyAgentTool[] {
   return candidates.filter((tool): tool is AnyAgentTool => tool !== null && tool !== undefined);
 }
 
-export function isUpdatePlanToolEnabledForOpenClawTools(params: {
-  config?: OpenClawConfig;
+export function isUpdatePlanToolEnabledForRecallTools(params: {
+  config?: RecallConfig;
   agentSessionKey?: string;
   agentId?: string | null;
   modelProvider?: string;

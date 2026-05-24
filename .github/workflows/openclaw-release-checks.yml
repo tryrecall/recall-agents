@@ -1,4 +1,4 @@
-name: OpenClaw Release Checks
+name: Recall Release Checks
 
 on:
   workflow_dispatch:
@@ -85,13 +85,13 @@ on:
         type: string
 
 concurrency:
-  group: openclaw-release-checks-${{ inputs.expected_sha || inputs.ref }}-${{ inputs.rerun_group }}
+  group: recall-release-checks-${{ inputs.expected_sha || inputs.ref }}-${{ inputs.rerun_group }}
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/heads/tideclaw/alpha/') }}
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
   NODE_VERSION: "24.15.0"
-  OPENCLAW_CI_OPENAI_MODEL: ${{ vars.OPENCLAW_CI_OPENAI_MODEL || 'openai/gpt-5.5' }}
+  RECALL_CI_OPENAI_MODEL: ${{ vars.RECALL_CI_OPENAI_MODEL || 'openai/gpt-5.5' }}
 
 jobs:
   resolve_target:
@@ -165,7 +165,7 @@ jobs:
           RELEASE_REF: ${{ inputs.ref }}
           EXPECTED_SHA: ${{ inputs.expected_sha }}
         run: |
-          bash workflow/scripts/github/resolve-openclaw-ref.sh \
+          bash workflow/scripts/github/resolve-recall-ref.sh \
             --ref "$RELEASE_REF" \
             --expected-sha "$EXPECTED_SHA" \
             --fallback-ok \
@@ -215,7 +215,7 @@ jobs:
             exit 0
           fi
 
-          echo "Ref '${RELEASE_REF}' resolved to ${SELECTED_SHA}, but that commit is not reachable from an OpenClaw branch or release tag." >&2
+          echo "Ref '${RELEASE_REF}' resolved to ${SELECTED_SHA}, but that commit is not reachable from an Recall branch or release tag." >&2
           echo "Secret-bearing release checks only run repository-owned branch/tag history, not arbitrary unreferenced commits." >&2
           exit 1
 
@@ -282,9 +282,9 @@ jobs:
           RELEASE_RERUN_GROUP_INPUT: ${{ inputs.rerun_group }}
           RELEASE_LIVE_SUITE_FILTER_INPUT: ${{ inputs.live_suite_filter }}
           RELEASE_CROSS_OS_SUITE_FILTER_INPUT: ${{ inputs.cross_os_suite_filter }}
-          RELEASE_QA_DISCORD_LIVE_CI_ENABLED: ${{ vars.OPENCLAW_RELEASE_QA_DISCORD_LIVE_CI_ENABLED || 'false' }}
-          RELEASE_QA_WHATSAPP_LIVE_CI_ENABLED: ${{ vars.OPENCLAW_RELEASE_QA_WHATSAPP_LIVE_CI_ENABLED || 'false' }}
-          RELEASE_QA_SLACK_LIVE_CI_ENABLED: ${{ vars.OPENCLAW_RELEASE_QA_SLACK_LIVE_CI_ENABLED || 'false' }}
+          RELEASE_QA_DISCORD_LIVE_CI_ENABLED: ${{ vars.RECALL_RELEASE_QA_DISCORD_LIVE_CI_ENABLED || 'false' }}
+          RELEASE_QA_WHATSAPP_LIVE_CI_ENABLED: ${{ vars.RECALL_RELEASE_QA_WHATSAPP_LIVE_CI_ENABLED || 'false' }}
+          RELEASE_QA_SLACK_LIVE_CI_ENABLED: ${{ vars.RECALL_RELEASE_QA_SLACK_LIVE_CI_ENABLED || 'false' }}
           RELEASE_PACKAGE_SPEC_INPUT: ${{ inputs.release_package_spec }}
           RELEASE_PACKAGE_ACCEPTANCE_PACKAGE_SPEC_INPUT: ${{ inputs.package_acceptance_package_spec }}
           RELEASE_CODEX_PLUGIN_SPEC_INPUT: ${{ inputs.codex_plugin_spec }}
@@ -334,8 +334,8 @@ jobs:
             run_release_soak=true
           fi
           codex_plugin_spec="$RELEASE_CODEX_PLUGIN_SPEC_INPUT"
-          if [[ -z "${codex_plugin_spec// }" && "$RELEASE_PACKAGE_SPEC_INPUT" =~ ^openclaw@(.+)$ ]]; then
-            codex_plugin_spec="npm:@openclaw/codex@${BASH_REMATCH[1]}"
+          if [[ -z "${codex_plugin_spec// }" && "$RELEASE_PACKAGE_SPEC_INPUT" =~ ^recall@(.+)$ ]]; then
+            codex_plugin_spec="npm:@recall/codex@${BASH_REMATCH[1]}"
           fi
 
           filter="$(printf '%s' "$RELEASE_LIVE_SUITE_FILTER_INPUT" | tr '[:upper:]' '[:lower:]')"
@@ -523,10 +523,10 @@ jobs:
             source_args=(--source npm --package-spec "$RELEASE_PACKAGE_SPEC")
             package_label="$RELEASE_PACKAGE_SPEC"
           fi
-          node scripts/resolve-openclaw-package-candidate.mjs \
+          node scripts/resolve-recall-package-candidate.mjs \
             "${source_args[@]}" \
             --output-dir .artifacts/docker-e2e-package \
-            --output-name openclaw-current.tgz \
+            --output-name recall-current.tgz \
             --metadata .artifacts/docker-e2e-package/package-candidate.json \
             --github-output "$GITHUB_OUTPUT"
           digest="$(node -p "JSON.parse(require('fs').readFileSync('.artifacts/docker-e2e-package/package-candidate.json', 'utf8')).sha256")"
@@ -548,7 +548,7 @@ jobs:
         with:
           name: release-package-under-test
           path: |
-            .artifacts/docker-e2e-package/openclaw-current.tgz
+            .artifacts/docker-e2e-package/recall-current.tgz
             .artifacts/docker-e2e-package/package-candidate.json
           retention-days: 14
           if-no-files-found: error
@@ -568,7 +568,7 @@ jobs:
     needs: [resolve_target, prepare_release_package]
     if: contains(fromJSON('["all","cross-os"]'), needs.resolve_target.outputs.rerun_group)
     permissions: read-all
-    uses: ./.github/workflows/openclaw-cross-os-release-checks-reusable.yml
+    uses: ./.github/workflows/recall-cross-os-release-checks-reusable.yml
     with:
       advisory: ${{ startsWith(github.ref, 'refs/heads/tideclaw/alpha/') }}
       ref: ${{ needs.resolve_target.outputs.revision }}
@@ -576,7 +576,7 @@ jobs:
       mode: ${{ needs.resolve_target.outputs.mode }}
       suite_filter: ${{ needs.resolve_target.outputs.cross_os_suite_filter }}
       candidate_artifact_name: ${{ needs.prepare_release_package.outputs.artifact_name }}
-      candidate_file_name: openclaw-current.tgz
+      candidate_file_name: recall-current.tgz
       candidate_version: ${{ needs.prepare_release_package.outputs.package_version }}
       candidate_source_sha: ${{ needs.prepare_release_package.outputs.source_sha }}
       openai_model: openai/gpt-5.5
@@ -587,9 +587,9 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
-      OPENCLAW_DISCORD_SMOKE_BOT_TOKEN: ${{ secrets.OPENCLAW_DISCORD_SMOKE_BOT_TOKEN }}
-      OPENCLAW_DISCORD_SMOKE_GUILD_ID: ${{ secrets.OPENCLAW_DISCORD_SMOKE_GUILD_ID }}
-      OPENCLAW_DISCORD_SMOKE_CHANNEL_ID: ${{ secrets.OPENCLAW_DISCORD_SMOKE_CHANNEL_ID }}
+      RECALL_DISCORD_SMOKE_BOT_TOKEN: ${{ secrets.RECALL_DISCORD_SMOKE_BOT_TOKEN }}
+      RECALL_DISCORD_SMOKE_GUILD_ID: ${{ secrets.RECALL_DISCORD_SMOKE_GUILD_ID }}
+      RECALL_DISCORD_SMOKE_CHANNEL_ID: ${{ secrets.RECALL_DISCORD_SMOKE_CHANNEL_ID }}
 
   live_repo_e2e_release_checks:
     name: Run repo/live E2E validation
@@ -600,7 +600,7 @@ jobs:
       contents: read
       packages: write
       pull-requests: read
-    uses: ./.github/workflows/openclaw-live-and-e2e-checks-reusable.yml
+    uses: ./.github/workflows/recall-live-and-e2e-checks-reusable.yml
     with:
       advisory: ${{ startsWith(github.ref, 'refs/heads/tideclaw/alpha/') }}
       ref: ${{ needs.resolve_target.outputs.revision }}
@@ -628,11 +628,11 @@ jobs:
       MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
       OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
       OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
-      OPENCLAW_LIVE_BROWSER_CDP_URL: ${{ secrets.OPENCLAW_LIVE_BROWSER_CDP_URL }}
-      OPENCLAW_LIVE_SETUP_TOKEN: ${{ secrets.OPENCLAW_LIVE_SETUP_TOKEN }}
-      OPENCLAW_LIVE_SETUP_TOKEN_MODEL: ${{ secrets.OPENCLAW_LIVE_SETUP_TOKEN_MODEL }}
-      OPENCLAW_LIVE_SETUP_TOKEN_PROFILE: ${{ secrets.OPENCLAW_LIVE_SETUP_TOKEN_PROFILE }}
-      OPENCLAW_LIVE_SETUP_TOKEN_VALUE: ${{ secrets.OPENCLAW_LIVE_SETUP_TOKEN_VALUE }}
+      RECALL_LIVE_BROWSER_CDP_URL: ${{ secrets.RECALL_LIVE_BROWSER_CDP_URL }}
+      RECALL_LIVE_SETUP_TOKEN: ${{ secrets.RECALL_LIVE_SETUP_TOKEN }}
+      RECALL_LIVE_SETUP_TOKEN_MODEL: ${{ secrets.RECALL_LIVE_SETUP_TOKEN_MODEL }}
+      RECALL_LIVE_SETUP_TOKEN_PROFILE: ${{ secrets.RECALL_LIVE_SETUP_TOKEN_PROFILE }}
+      RECALL_LIVE_SETUP_TOKEN_VALUE: ${{ secrets.RECALL_LIVE_SETUP_TOKEN_VALUE }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -648,13 +648,13 @@ jobs:
       BYTEPLUS_ACCESS_KEY_ID: ${{ secrets.BYTEPLUS_ACCESS_KEY_ID }}
       BYTEPLUS_SECRET_ACCESS_KEY: ${{ secrets.BYTEPLUS_SECRET_ACCESS_KEY }}
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-      OPENCLAW_CODEX_AUTH_JSON: ${{ secrets.OPENCLAW_CODEX_AUTH_JSON }}
-      OPENCLAW_CODEX_CONFIG_TOML: ${{ secrets.OPENCLAW_CODEX_CONFIG_TOML }}
-      OPENCLAW_CLAUDE_JSON: ${{ secrets.OPENCLAW_CLAUDE_JSON }}
-      OPENCLAW_CLAUDE_CREDENTIALS_JSON: ${{ secrets.OPENCLAW_CLAUDE_CREDENTIALS_JSON }}
-      OPENCLAW_CLAUDE_SETTINGS_JSON: ${{ secrets.OPENCLAW_CLAUDE_SETTINGS_JSON }}
-      OPENCLAW_CLAUDE_SETTINGS_LOCAL_JSON: ${{ secrets.OPENCLAW_CLAUDE_SETTINGS_LOCAL_JSON }}
-      OPENCLAW_GEMINI_SETTINGS_JSON: ${{ secrets.OPENCLAW_GEMINI_SETTINGS_JSON }}
+      RECALL_CODEX_AUTH_JSON: ${{ secrets.RECALL_CODEX_AUTH_JSON }}
+      RECALL_CODEX_CONFIG_TOML: ${{ secrets.RECALL_CODEX_CONFIG_TOML }}
+      RECALL_CLAUDE_JSON: ${{ secrets.RECALL_CLAUDE_JSON }}
+      RECALL_CLAUDE_CREDENTIALS_JSON: ${{ secrets.RECALL_CLAUDE_CREDENTIALS_JSON }}
+      RECALL_CLAUDE_SETTINGS_JSON: ${{ secrets.RECALL_CLAUDE_SETTINGS_JSON }}
+      RECALL_CLAUDE_SETTINGS_LOCAL_JSON: ${{ secrets.RECALL_CLAUDE_SETTINGS_LOCAL_JSON }}
+      RECALL_GEMINI_SETTINGS_JSON: ${{ secrets.RECALL_GEMINI_SETTINGS_JSON }}
       FIREWORKS_API_KEY: ${{ secrets.FIREWORKS_API_KEY }}
 
   docker_e2e_release_checks:
@@ -666,7 +666,7 @@ jobs:
       contents: read
       packages: write
       pull-requests: read
-    uses: ./.github/workflows/openclaw-live-and-e2e-checks-reusable.yml
+    uses: ./.github/workflows/recall-live-and-e2e-checks-reusable.yml
     with:
       advisory: ${{ startsWith(github.ref, 'refs/heads/tideclaw/alpha/') }}
       ref: ${{ needs.resolve_target.outputs.revision }}
@@ -693,7 +693,7 @@ jobs:
       advisory: false
       workflow_ref: ${{ github.ref_name }}
       source: ${{ (needs.resolve_target.outputs.package_acceptance_package_spec != '' || needs.resolve_target.outputs.release_package_spec != '') && 'npm' || 'artifact' }}
-      package_spec: ${{ needs.resolve_target.outputs.package_acceptance_package_spec || needs.resolve_target.outputs.release_package_spec || 'openclaw@beta' }}
+      package_spec: ${{ needs.resolve_target.outputs.package_acceptance_package_spec || needs.resolve_target.outputs.release_package_spec || 'recall@beta' }}
       artifact_name: ${{ needs.prepare_release_package.outputs.artifact_name }}
       package_sha256: ${{ (needs.resolve_target.outputs.package_acceptance_package_spec == '' && needs.resolve_target.outputs.release_package_spec == '') && needs.prepare_release_package.outputs.package_sha256 || '' }}
       suite_profile: custom
@@ -720,11 +720,11 @@ jobs:
       MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
       OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
       OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
-      OPENCLAW_LIVE_BROWSER_CDP_URL: ${{ secrets.OPENCLAW_LIVE_BROWSER_CDP_URL }}
-      OPENCLAW_LIVE_SETUP_TOKEN: ${{ secrets.OPENCLAW_LIVE_SETUP_TOKEN }}
-      OPENCLAW_LIVE_SETUP_TOKEN_MODEL: ${{ secrets.OPENCLAW_LIVE_SETUP_TOKEN_MODEL }}
-      OPENCLAW_LIVE_SETUP_TOKEN_PROFILE: ${{ secrets.OPENCLAW_LIVE_SETUP_TOKEN_PROFILE }}
-      OPENCLAW_LIVE_SETUP_TOKEN_VALUE: ${{ secrets.OPENCLAW_LIVE_SETUP_TOKEN_VALUE }}
+      RECALL_LIVE_BROWSER_CDP_URL: ${{ secrets.RECALL_LIVE_BROWSER_CDP_URL }}
+      RECALL_LIVE_SETUP_TOKEN: ${{ secrets.RECALL_LIVE_SETUP_TOKEN }}
+      RECALL_LIVE_SETUP_TOKEN_MODEL: ${{ secrets.RECALL_LIVE_SETUP_TOKEN_MODEL }}
+      RECALL_LIVE_SETUP_TOKEN_PROFILE: ${{ secrets.RECALL_LIVE_SETUP_TOKEN_PROFILE }}
+      RECALL_LIVE_SETUP_TOKEN_VALUE: ${{ secrets.RECALL_LIVE_SETUP_TOKEN_VALUE }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -740,16 +740,16 @@ jobs:
       BYTEPLUS_ACCESS_KEY_ID: ${{ secrets.BYTEPLUS_ACCESS_KEY_ID }}
       BYTEPLUS_SECRET_ACCESS_KEY: ${{ secrets.BYTEPLUS_SECRET_ACCESS_KEY }}
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-      OPENCLAW_CODEX_AUTH_JSON: ${{ secrets.OPENCLAW_CODEX_AUTH_JSON }}
-      OPENCLAW_CODEX_CONFIG_TOML: ${{ secrets.OPENCLAW_CODEX_CONFIG_TOML }}
-      OPENCLAW_CLAUDE_JSON: ${{ secrets.OPENCLAW_CLAUDE_JSON }}
-      OPENCLAW_CLAUDE_CREDENTIALS_JSON: ${{ secrets.OPENCLAW_CLAUDE_CREDENTIALS_JSON }}
-      OPENCLAW_CLAUDE_SETTINGS_JSON: ${{ secrets.OPENCLAW_CLAUDE_SETTINGS_JSON }}
-      OPENCLAW_CLAUDE_SETTINGS_LOCAL_JSON: ${{ secrets.OPENCLAW_CLAUDE_SETTINGS_LOCAL_JSON }}
-      OPENCLAW_GEMINI_SETTINGS_JSON: ${{ secrets.OPENCLAW_GEMINI_SETTINGS_JSON }}
+      RECALL_CODEX_AUTH_JSON: ${{ secrets.RECALL_CODEX_AUTH_JSON }}
+      RECALL_CODEX_CONFIG_TOML: ${{ secrets.RECALL_CODEX_CONFIG_TOML }}
+      RECALL_CLAUDE_JSON: ${{ secrets.RECALL_CLAUDE_JSON }}
+      RECALL_CLAUDE_CREDENTIALS_JSON: ${{ secrets.RECALL_CLAUDE_CREDENTIALS_JSON }}
+      RECALL_CLAUDE_SETTINGS_JSON: ${{ secrets.RECALL_CLAUDE_SETTINGS_JSON }}
+      RECALL_CLAUDE_SETTINGS_LOCAL_JSON: ${{ secrets.RECALL_CLAUDE_SETTINGS_LOCAL_JSON }}
+      RECALL_GEMINI_SETTINGS_JSON: ${{ secrets.RECALL_GEMINI_SETTINGS_JSON }}
       FIREWORKS_API_KEY: ${{ secrets.FIREWORKS_API_KEY }}
-      OPENCLAW_QA_CONVEX_SITE_URL: ${{ secrets.OPENCLAW_QA_CONVEX_SITE_URL }}
-      OPENCLAW_QA_CONVEX_SECRET_CI: ${{ secrets.OPENCLAW_QA_CONVEX_SECRET_CI }}
+      RECALL_QA_CONVEX_SITE_URL: ${{ secrets.RECALL_QA_CONVEX_SITE_URL }}
+      RECALL_QA_CONVEX_SECRET_CI: ${{ secrets.RECALL_QA_CONVEX_SECRET_CI }}
 
   qa_lab_parity_lane_release_checks:
     name: Run QA Lab parity lane (${{ matrix.lane }})
@@ -770,15 +770,15 @@ jobs:
             output_dir: anthropic-baseline
     env:
       QA_PARITY_CONCURRENCY: "1"
-      OPENCLAW_QA_TRANSPORT_READY_TIMEOUT_MS: "180000"
+      RECALL_QA_TRANSPORT_READY_TIMEOUT_MS: "180000"
       OPENAI_API_KEY: ""
       ANTHROPIC_API_KEY: ""
-      OPENCLAW_LIVE_OPENAI_KEY: ""
-      OPENCLAW_LIVE_ANTHROPIC_KEY: ""
-      OPENCLAW_LIVE_GEMINI_KEY: ""
-      OPENCLAW_LIVE_SETUP_TOKEN_VALUE: ""
-      OPENCLAW_BUILD_PRIVATE_QA: "1"
-      OPENCLAW_ENABLE_PRIVATE_QA_CLI: "1"
+      RECALL_LIVE_OPENAI_KEY: ""
+      RECALL_LIVE_ANTHROPIC_KEY: ""
+      RECALL_LIVE_GEMINI_KEY: ""
+      RECALL_LIVE_SETUP_TOKEN_VALUE: ""
+      RECALL_BUILD_PRIVATE_QA: "1"
+      RECALL_ENABLE_PRIVATE_QA_CLI: "1"
     steps:
       - name: Checkout selected ref
         uses: actions/checkout@v6
@@ -807,7 +807,7 @@ jobs:
 
           case "${QA_PARITY_LANE}" in
             candidate)
-              model="${OPENCLAW_CI_OPENAI_MODEL}"
+              model="${RECALL_CI_OPENAI_MODEL}"
               alt_model="openai/gpt-5.5-alt"
               ;;
             baseline)
@@ -820,7 +820,7 @@ jobs:
               ;;
           esac
 
-          pnpm openclaw qa suite \
+          pnpm recall qa suite \
             --provider-mode mock-openai \
             --parity-pack agentic \
             --concurrency "${QA_PARITY_CONCURRENCY}" \
@@ -848,8 +848,8 @@ jobs:
       contents: read
       actions: read
     env:
-      OPENCLAW_BUILD_PRIVATE_QA: "1"
-      OPENCLAW_ENABLE_PRIVATE_QA_CLI: "1"
+      RECALL_BUILD_PRIVATE_QA: "1"
+      RECALL_ENABLE_PRIVATE_QA_CLI: "1"
     steps:
       - name: Checkout selected ref
         uses: actions/checkout@v6
@@ -878,11 +878,11 @@ jobs:
 
       - name: Generate parity report
         run: |
-          pnpm openclaw qa parity-report \
+          pnpm recall qa parity-report \
             --repo-root . \
             --candidate-summary .artifacts/qa-e2e/openai-candidate/qa-suite-summary.json \
             --baseline-summary .artifacts/qa-e2e/anthropic-baseline/qa-suite-summary.json \
-            --candidate-label "${OPENCLAW_CI_OPENAI_MODEL}" \
+            --candidate-label "${RECALL_CI_OPENAI_MODEL}" \
             --baseline-label anthropic/claude-opus-4-7 \
             --output-dir .artifacts/qa-e2e/parity
 
@@ -906,15 +906,15 @@ jobs:
       contents: read
     env:
       QA_PARITY_CONCURRENCY: "1"
-      OPENCLAW_QA_TRANSPORT_READY_TIMEOUT_MS: "180000"
+      RECALL_QA_TRANSPORT_READY_TIMEOUT_MS: "180000"
       OPENAI_API_KEY: ""
       ANTHROPIC_API_KEY: ""
-      OPENCLAW_LIVE_OPENAI_KEY: ""
-      OPENCLAW_LIVE_ANTHROPIC_KEY: ""
-      OPENCLAW_LIVE_GEMINI_KEY: ""
-      OPENCLAW_LIVE_SETUP_TOKEN_VALUE: ""
-      OPENCLAW_BUILD_PRIVATE_QA: "1"
-      OPENCLAW_ENABLE_PRIVATE_QA_CLI: "1"
+      RECALL_LIVE_OPENAI_KEY: ""
+      RECALL_LIVE_ANTHROPIC_KEY: ""
+      RECALL_LIVE_GEMINI_KEY: ""
+      RECALL_LIVE_SETUP_TOKEN_VALUE: ""
+      RECALL_BUILD_PRIVATE_QA: "1"
+      RECALL_ENABLE_PRIVATE_QA_CLI: "1"
     steps:
       - name: Checkout selected ref
         uses: actions/checkout@v6
@@ -938,11 +938,11 @@ jobs:
         id: runtime_parity_lane
         run: |
           set -euo pipefail
-          pnpm openclaw qa suite \
+          pnpm recall qa suite \
             --provider-mode mock-openai \
             --parity-pack agentic \
             --concurrency "${QA_PARITY_CONCURRENCY}" \
-            --model "${OPENCLAW_CI_OPENAI_MODEL}" \
+            --model "${RECALL_CI_OPENAI_MODEL}" \
             --alt-model "openai/gpt-5.5-alt" \
             --runtime-pair pi,codex \
             --output-dir ".artifacts/qa-e2e/runtime-parity"
@@ -951,11 +951,11 @@ jobs:
         if: ${{ always() && steps.runtime_parity_lane.outcome != 'skipped' && steps.runtime_parity_lane.outcome != 'cancelled' }}
         run: |
           set -euo pipefail
-          pnpm openclaw qa suite \
+          pnpm recall qa suite \
             --provider-mode mock-openai \
             --runtime-parity-tier standard \
             --concurrency "${QA_PARITY_CONCURRENCY}" \
-            --model "${OPENCLAW_CI_OPENAI_MODEL}" \
+            --model "${RECALL_CI_OPENAI_MODEL}" \
             --alt-model "openai/gpt-5.5-alt" \
             --runtime-pair pi,codex \
             --output-dir ".artifacts/qa-e2e/runtime-parity-standard"
@@ -965,11 +965,11 @@ jobs:
         if: ${{ always() && needs.resolve_target.outputs.run_release_soak == 'true' && steps.runtime_parity_lane.outcome != 'skipped' && steps.runtime_parity_lane.outcome != 'cancelled' }}
         run: |
           set -euo pipefail
-          pnpm openclaw qa suite \
+          pnpm recall qa suite \
             --provider-mode mock-openai \
             --runtime-parity-tier soak \
             --concurrency "${QA_PARITY_CONCURRENCY}" \
-            --model "${OPENCLAW_CI_OPENAI_MODEL}" \
+            --model "${RECALL_CI_OPENAI_MODEL}" \
             --alt-model "openai/gpt-5.5-alt" \
             --runtime-pair pi,codex \
             --output-dir ".artifacts/qa-e2e/runtime-parity-soak"
@@ -978,7 +978,7 @@ jobs:
         if: always()
         run: |
           set -euo pipefail
-          pnpm openclaw qa parity-report \
+          pnpm recall qa parity-report \
             --repo-root . \
             --runtime-axis \
             --summary .artifacts/qa-e2e/runtime-parity/qa-suite-summary.json \
@@ -988,7 +988,7 @@ jobs:
         if: always()
         run: |
           set -euo pipefail
-          pnpm openclaw qa parity-report \
+          pnpm recall qa parity-report \
             --repo-root . \
             --runtime-axis \
             --summary .artifacts/qa-e2e/runtime-parity-standard/qa-suite-summary.json \
@@ -1003,7 +1003,7 @@ jobs:
             echo "No soak runtime parity summary was produced."
             exit 0
           fi
-          pnpm openclaw qa parity-report \
+          pnpm recall qa parity-report \
             --repo-root . \
             --runtime-axis \
             --summary "$summary" \
@@ -1028,8 +1028,8 @@ jobs:
       contents: read
       actions: read
     env:
-      OPENCLAW_BUILD_PRIVATE_QA: "1"
-      OPENCLAW_ENABLE_PRIVATE_QA_CLI: "1"
+      RECALL_BUILD_PRIVATE_QA: "1"
+      RECALL_ENABLE_PRIVATE_QA_CLI: "1"
     steps:
       - name: Checkout selected ref
         uses: actions/checkout@v6
@@ -1053,7 +1053,7 @@ jobs:
       - name: Enforce standard runtime tool coverage
         run: |
           set -euo pipefail
-          pnpm openclaw qa coverage \
+          pnpm recall qa coverage \
             --repo-root . \
             --tools \
             --summary .artifacts/qa-e2e/runtime-parity-standard/qa-suite-summary.json \
@@ -1080,8 +1080,8 @@ jobs:
       pull-requests: read
     environment: qa-live-shared
     env:
-      OPENCLAW_BUILD_PRIVATE_QA: "1"
-      OPENCLAW_ENABLE_PRIVATE_QA_CLI: "1"
+      RECALL_BUILD_PRIVATE_QA: "1"
+      RECALL_ENABLE_PRIVATE_QA_CLI: "1"
     steps:
       - name: Checkout selected ref
         uses: actions/checkout@v6
@@ -1105,9 +1105,9 @@ jobs:
         id: run_lane
         shell: bash
         env:
-          OPENCLAW_QA_REDACT_PUBLIC_METADATA: "1"
-          OPENCLAW_QA_MATRIX_CANARY_TIMEOUT_MS: "90000"
-          OPENCLAW_QA_MATRIX_NO_REPLY_WINDOW_MS: "3000"
+          RECALL_QA_REDACT_PUBLIC_METADATA: "1"
+          RECALL_QA_MATRIX_CANARY_TIMEOUT_MS: "90000"
+          RECALL_QA_MATRIX_NO_REPLY_WINDOW_MS: "3000"
         run: |
           set -euo pipefail
 
@@ -1122,13 +1122,13 @@ jobs:
             --profile fast \
             --fast
           )
-          if pnpm openclaw qa matrix --help 2>/dev/null | grep -F -q -- "--fail-fast"; then
+          if pnpm recall qa matrix --help 2>/dev/null | grep -F -q -- "--fail-fast"; then
             matrix_args+=(--fail-fast)
           fi
 
           for attempt in 1 2; do
             attempt_output_dir="${output_dir}/attempt-${attempt}"
-            if pnpm openclaw qa matrix --output-dir "${attempt_output_dir}" "${matrix_args[@]}"; then
+            if pnpm recall qa matrix --output-dir "${attempt_output_dir}" "${matrix_args[@]}"; then
               exit 0
             fi
             if [[ "${attempt}" == "2" ]]; then
@@ -1159,8 +1159,8 @@ jobs:
       pull-requests: read
     environment: qa-live-shared
     env:
-      OPENCLAW_BUILD_PRIVATE_QA: "1"
-      OPENCLAW_ENABLE_PRIVATE_QA_CLI: "1"
+      RECALL_BUILD_PRIVATE_QA: "1"
+      RECALL_ENABLE_PRIVATE_QA_CLI: "1"
     steps:
       - name: Checkout selected ref
         uses: actions/checkout@v6
@@ -1177,8 +1177,8 @@ jobs:
 
       - name: Validate required QA credential env
         env:
-          OPENCLAW_QA_CONVEX_SITE_URL: ${{ secrets.OPENCLAW_QA_CONVEX_SITE_URL }}
-          OPENCLAW_QA_CONVEX_SECRET_CI: ${{ secrets.OPENCLAW_QA_CONVEX_SECRET_CI }}
+          RECALL_QA_CONVEX_SITE_URL: ${{ secrets.RECALL_QA_CONVEX_SITE_URL }}
+          RECALL_QA_CONVEX_SECRET_CI: ${{ secrets.RECALL_QA_CONVEX_SECRET_CI }}
         shell: bash
         run: |
           set -euo pipefail
@@ -1191,8 +1191,8 @@ jobs:
             fi
           }
 
-          require_var OPENCLAW_QA_CONVEX_SITE_URL
-          require_var OPENCLAW_QA_CONVEX_SECRET_CI
+          require_var RECALL_QA_CONVEX_SITE_URL
+          require_var RECALL_QA_CONVEX_SECRET_CI
 
       - name: Build private QA runtime
         env:
@@ -1203,10 +1203,10 @@ jobs:
         id: run_lane
         shell: bash
         env:
-          OPENCLAW_QA_CONVEX_SITE_URL: ${{ secrets.OPENCLAW_QA_CONVEX_SITE_URL }}
-          OPENCLAW_QA_CONVEX_SECRET_CI: ${{ secrets.OPENCLAW_QA_CONVEX_SECRET_CI }}
-          OPENCLAW_QA_REDACT_PUBLIC_METADATA: "1"
-          OPENCLAW_QA_TELEGRAM_CAPTURE_CONTENT: "1"
+          RECALL_QA_CONVEX_SITE_URL: ${{ secrets.RECALL_QA_CONVEX_SITE_URL }}
+          RECALL_QA_CONVEX_SECRET_CI: ${{ secrets.RECALL_QA_CONVEX_SECRET_CI }}
+          RECALL_QA_REDACT_PUBLIC_METADATA: "1"
+          RECALL_QA_TELEGRAM_CAPTURE_CONTENT: "1"
         run: |
           set -euo pipefail
 
@@ -1215,7 +1215,7 @@ jobs:
 
           for attempt in 1 2; do
             attempt_output_dir="${output_dir}/attempt-${attempt}"
-            if pnpm openclaw qa telegram \
+            if pnpm recall qa telegram \
               --repo-root . \
               --output-dir "${attempt_output_dir}" \
               --provider-mode mock-openai \
@@ -1245,7 +1245,7 @@ jobs:
   qa_live_discord_release_checks:
     name: Run QA Lab live Discord lane
     needs: [resolve_target]
-    if: contains(fromJSON('["all","qa","qa-live"]'), needs.resolve_target.outputs.rerun_group) && needs.resolve_target.outputs.qa_live_discord_enabled == 'true' && vars.OPENCLAW_RELEASE_QA_DISCORD_LIVE_CI_ENABLED == 'true'
+    if: contains(fromJSON('["all","qa","qa-live"]'), needs.resolve_target.outputs.rerun_group) && needs.resolve_target.outputs.qa_live_discord_enabled == 'true' && vars.RECALL_RELEASE_QA_DISCORD_LIVE_CI_ENABLED == 'true'
     continue-on-error: true
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -1254,8 +1254,8 @@ jobs:
       pull-requests: read
     environment: qa-live-shared
     env:
-      OPENCLAW_BUILD_PRIVATE_QA: "1"
-      OPENCLAW_ENABLE_PRIVATE_QA_CLI: "1"
+      RECALL_BUILD_PRIVATE_QA: "1"
+      RECALL_ENABLE_PRIVATE_QA_CLI: "1"
     steps:
       - name: Checkout selected ref
         uses: actions/checkout@v6
@@ -1272,8 +1272,8 @@ jobs:
 
       - name: Validate required QA credential env
         env:
-          OPENCLAW_QA_CONVEX_SITE_URL: ${{ secrets.OPENCLAW_QA_CONVEX_SITE_URL }}
-          OPENCLAW_QA_CONVEX_SECRET_CI: ${{ secrets.OPENCLAW_QA_CONVEX_SECRET_CI }}
+          RECALL_QA_CONVEX_SITE_URL: ${{ secrets.RECALL_QA_CONVEX_SITE_URL }}
+          RECALL_QA_CONVEX_SECRET_CI: ${{ secrets.RECALL_QA_CONVEX_SECRET_CI }}
         shell: bash
         run: |
           set -euo pipefail
@@ -1286,8 +1286,8 @@ jobs:
             fi
           }
 
-          require_var OPENCLAW_QA_CONVEX_SITE_URL
-          require_var OPENCLAW_QA_CONVEX_SECRET_CI
+          require_var RECALL_QA_CONVEX_SITE_URL
+          require_var RECALL_QA_CONVEX_SECRET_CI
 
       - name: Build private QA runtime
         env:
@@ -1298,10 +1298,10 @@ jobs:
         id: run_lane
         shell: bash
         env:
-          OPENCLAW_QA_CONVEX_SITE_URL: ${{ secrets.OPENCLAW_QA_CONVEX_SITE_URL }}
-          OPENCLAW_QA_CONVEX_SECRET_CI: ${{ secrets.OPENCLAW_QA_CONVEX_SECRET_CI }}
-          OPENCLAW_QA_REDACT_PUBLIC_METADATA: "1"
-          OPENCLAW_QA_DISCORD_CAPTURE_CONTENT: "1"
+          RECALL_QA_CONVEX_SITE_URL: ${{ secrets.RECALL_QA_CONVEX_SITE_URL }}
+          RECALL_QA_CONVEX_SECRET_CI: ${{ secrets.RECALL_QA_CONVEX_SECRET_CI }}
+          RECALL_QA_REDACT_PUBLIC_METADATA: "1"
+          RECALL_QA_DISCORD_CAPTURE_CONTENT: "1"
         run: |
           set -euo pipefail
 
@@ -1310,7 +1310,7 @@ jobs:
 
           for attempt in 1 2; do
             attempt_output_dir="${output_dir}/attempt-${attempt}"
-            if pnpm openclaw qa discord \
+            if pnpm recall qa discord \
               --repo-root . \
               --output-dir "${attempt_output_dir}" \
               --provider-mode mock-openai \
@@ -1340,7 +1340,7 @@ jobs:
   qa_live_whatsapp_release_checks:
     name: Run QA Lab live WhatsApp lane
     needs: [resolve_target]
-    if: contains(fromJSON('["all","qa","qa-live"]'), needs.resolve_target.outputs.rerun_group) && needs.resolve_target.outputs.qa_live_whatsapp_enabled == 'true' && vars.OPENCLAW_RELEASE_QA_WHATSAPP_LIVE_CI_ENABLED == 'true'
+    if: contains(fromJSON('["all","qa","qa-live"]'), needs.resolve_target.outputs.rerun_group) && needs.resolve_target.outputs.qa_live_whatsapp_enabled == 'true' && vars.RECALL_RELEASE_QA_WHATSAPP_LIVE_CI_ENABLED == 'true'
     continue-on-error: true
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -1352,8 +1352,8 @@ jobs:
       pull-requests: read
     environment: qa-live-shared
     env:
-      OPENCLAW_BUILD_PRIVATE_QA: "1"
-      OPENCLAW_ENABLE_PRIVATE_QA_CLI: "1"
+      RECALL_BUILD_PRIVATE_QA: "1"
+      RECALL_ENABLE_PRIVATE_QA_CLI: "1"
     steps:
       - name: Checkout selected ref
         uses: actions/checkout@v6
@@ -1370,8 +1370,8 @@ jobs:
 
       - name: Validate required QA credential env
         env:
-          OPENCLAW_QA_CONVEX_SITE_URL: ${{ secrets.OPENCLAW_QA_CONVEX_SITE_URL }}
-          OPENCLAW_QA_CONVEX_SECRET_CI: ${{ secrets.OPENCLAW_QA_CONVEX_SECRET_CI }}
+          RECALL_QA_CONVEX_SITE_URL: ${{ secrets.RECALL_QA_CONVEX_SITE_URL }}
+          RECALL_QA_CONVEX_SECRET_CI: ${{ secrets.RECALL_QA_CONVEX_SECRET_CI }}
         shell: bash
         run: |
           set -euo pipefail
@@ -1384,8 +1384,8 @@ jobs:
             fi
           }
 
-          require_var OPENCLAW_QA_CONVEX_SITE_URL
-          require_var OPENCLAW_QA_CONVEX_SECRET_CI
+          require_var RECALL_QA_CONVEX_SITE_URL
+          require_var RECALL_QA_CONVEX_SECRET_CI
 
       - name: Build private QA runtime
         env:
@@ -1396,10 +1396,10 @@ jobs:
         id: run_lane
         shell: bash
         env:
-          OPENCLAW_QA_CONVEX_SITE_URL: ${{ secrets.OPENCLAW_QA_CONVEX_SITE_URL }}
-          OPENCLAW_QA_CONVEX_SECRET_CI: ${{ secrets.OPENCLAW_QA_CONVEX_SECRET_CI }}
-          OPENCLAW_QA_REDACT_PUBLIC_METADATA: "1"
-          OPENCLAW_QA_WHATSAPP_CAPTURE_CONTENT: "1"
+          RECALL_QA_CONVEX_SITE_URL: ${{ secrets.RECALL_QA_CONVEX_SITE_URL }}
+          RECALL_QA_CONVEX_SECRET_CI: ${{ secrets.RECALL_QA_CONVEX_SECRET_CI }}
+          RECALL_QA_REDACT_PUBLIC_METADATA: "1"
+          RECALL_QA_WHATSAPP_CAPTURE_CONTENT: "1"
         run: |
           set -euo pipefail
 
@@ -1408,7 +1408,7 @@ jobs:
 
           for attempt in 1 2; do
             attempt_output_dir="${output_dir}/attempt-${attempt}"
-            if pnpm openclaw qa whatsapp \
+            if pnpm recall qa whatsapp \
               --repo-root . \
               --output-dir "${attempt_output_dir}" \
               --provider-mode mock-openai \
@@ -1438,7 +1438,7 @@ jobs:
   qa_live_slack_release_checks:
     name: Run QA Lab live Slack lane
     needs: [resolve_target]
-    if: contains(fromJSON('["all","qa","qa-live"]'), needs.resolve_target.outputs.rerun_group) && needs.resolve_target.outputs.qa_live_slack_enabled == 'true' && vars.OPENCLAW_RELEASE_QA_SLACK_LIVE_CI_ENABLED == 'true'
+    if: contains(fromJSON('["all","qa","qa-live"]'), needs.resolve_target.outputs.rerun_group) && needs.resolve_target.outputs.qa_live_slack_enabled == 'true' && vars.RECALL_RELEASE_QA_SLACK_LIVE_CI_ENABLED == 'true'
     continue-on-error: true
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -1447,8 +1447,8 @@ jobs:
       pull-requests: read
     environment: qa-live-shared
     env:
-      OPENCLAW_BUILD_PRIVATE_QA: "1"
-      OPENCLAW_ENABLE_PRIVATE_QA_CLI: "1"
+      RECALL_BUILD_PRIVATE_QA: "1"
+      RECALL_ENABLE_PRIVATE_QA_CLI: "1"
     steps:
       - name: Checkout selected ref
         uses: actions/checkout@v6
@@ -1465,8 +1465,8 @@ jobs:
 
       - name: Validate required QA credential env
         env:
-          OPENCLAW_QA_CONVEX_SITE_URL: ${{ secrets.OPENCLAW_QA_CONVEX_SITE_URL }}
-          OPENCLAW_QA_CONVEX_SECRET_CI: ${{ secrets.OPENCLAW_QA_CONVEX_SECRET_CI }}
+          RECALL_QA_CONVEX_SITE_URL: ${{ secrets.RECALL_QA_CONVEX_SITE_URL }}
+          RECALL_QA_CONVEX_SECRET_CI: ${{ secrets.RECALL_QA_CONVEX_SECRET_CI }}
         shell: bash
         run: |
           set -euo pipefail
@@ -1479,8 +1479,8 @@ jobs:
             fi
           }
 
-          require_var OPENCLAW_QA_CONVEX_SITE_URL
-          require_var OPENCLAW_QA_CONVEX_SECRET_CI
+          require_var RECALL_QA_CONVEX_SITE_URL
+          require_var RECALL_QA_CONVEX_SECRET_CI
 
       - name: Build private QA runtime
         env:
@@ -1491,10 +1491,10 @@ jobs:
         id: run_lane
         shell: bash
         env:
-          OPENCLAW_QA_CONVEX_SITE_URL: ${{ secrets.OPENCLAW_QA_CONVEX_SITE_URL }}
-          OPENCLAW_QA_CONVEX_SECRET_CI: ${{ secrets.OPENCLAW_QA_CONVEX_SECRET_CI }}
-          OPENCLAW_QA_REDACT_PUBLIC_METADATA: "1"
-          OPENCLAW_QA_SLACK_CAPTURE_CONTENT: "1"
+          RECALL_QA_CONVEX_SITE_URL: ${{ secrets.RECALL_QA_CONVEX_SITE_URL }}
+          RECALL_QA_CONVEX_SECRET_CI: ${{ secrets.RECALL_QA_CONVEX_SECRET_CI }}
+          RECALL_QA_REDACT_PUBLIC_METADATA: "1"
+          RECALL_QA_SLACK_CAPTURE_CONTENT: "1"
         run: |
           set -euo pipefail
 
@@ -1503,7 +1503,7 @@ jobs:
 
           for attempt in 1 2; do
             attempt_output_dir="${output_dir}/attempt-${attempt}"
-            if pnpm openclaw qa slack \
+            if pnpm recall qa slack \
               --repo-root . \
               --output-dir "${attempt_output_dir}" \
               --provider-mode mock-openai \

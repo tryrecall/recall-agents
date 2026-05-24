@@ -63,7 +63,7 @@ async function expectCurrentPidOwnsLock(params: {
 async function withTempSessionLockFile(
   run: (params: { root: string; sessionFile: string; lockPath: string }) => Promise<void>,
 ) {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-"));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-"));
   try {
     const sessionFile = path.join(root, "sessions.json");
     await run({ root, sessionFile, lockPath: `${sessionFile}.lock` });
@@ -96,7 +96,7 @@ async function withSymlinkedSessionPaths(
     return;
   }
 
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-"));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-"));
   try {
     const realDir = path.join(root, "real");
     const linkDir = path.join(root, "link");
@@ -249,7 +249,7 @@ describe("acquireSessionWriteLock", () => {
   });
 
   it("reclaims stale lock files", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-"));
     try {
       const sessionFile = path.join(root, "sessions.json");
       const lockPath = `${sessionFile}.lock`;
@@ -266,7 +266,7 @@ describe("acquireSessionWriteLock", () => {
   });
 
   it("does not reclaim fresh malformed lock files during contention", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-"));
     try {
       const sessionFile = path.join(root, "sessions.json");
       const lockPath = `${sessionFile}.lock`;
@@ -372,7 +372,7 @@ describe("acquireSessionWriteLock", () => {
   });
 
   it("watchdog releases stale in-process locks", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-"));
     const stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
     try {
       const sessionFile = path.join(root, "session.jsonl");
@@ -464,9 +464,9 @@ describe("acquireSessionWriteLock", () => {
         },
         {
           env: {
-            OPENCLAW_SESSION_WRITE_LOCK_ACQUIRE_TIMEOUT_MS: "120000",
-            OPENCLAW_SESSION_WRITE_LOCK_STALE_MS: "60000",
-            OPENCLAW_SESSION_WRITE_LOCK_MAX_HOLD_MS: "50000",
+            RECALL_SESSION_WRITE_LOCK_ACQUIRE_TIMEOUT_MS: "120000",
+            RECALL_SESSION_WRITE_LOCK_STALE_MS: "60000",
+            RECALL_SESSION_WRITE_LOCK_MAX_HOLD_MS: "50000",
           },
         },
       ),
@@ -478,7 +478,7 @@ describe("acquireSessionWriteLock", () => {
   });
 
   it("uses resolved stale policy when cleaning stale lock files", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-policy-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-policy-"));
     const sessionsDir = path.join(root, "sessions");
     await fs.mkdir(sessionsDir, { recursive: true });
     const nowMs = Date.now();
@@ -499,17 +499,17 @@ describe("acquireSessionWriteLock", () => {
         config: { session: { writeLock: { staleMs: 30_000 } } },
         nowMs,
         removeStale: false,
-        readOwnerProcessArgs: () => ["node", "/opt/openclaw/openclaw.mjs", "doctor"],
+        readOwnerProcessArgs: () => ["node", "/opt/tryrecall/recall-agents.mjs", "doctor"],
       });
       expect(configOnly.locks[0]?.stale).toBe(true);
 
       const envOverride = await cleanStaleLockFiles({
         sessionsDir,
         config: { session: { writeLock: { staleMs: 30_000 } } },
-        env: { OPENCLAW_SESSION_WRITE_LOCK_STALE_MS: "60000" },
+        env: { RECALL_SESSION_WRITE_LOCK_STALE_MS: "60000" },
         nowMs,
         removeStale: false,
-        readOwnerProcessArgs: () => ["node", "/opt/openclaw/openclaw.mjs", "doctor"],
+        readOwnerProcessArgs: () => ["node", "/opt/tryrecall/recall-agents.mjs", "doctor"],
       });
       expect(envOverride.locks[0]?.stale).toBe(false);
     } finally {
@@ -517,8 +517,8 @@ describe("acquireSessionWriteLock", () => {
     }
   });
 
-  it("does not clean live OpenClaw locks just because holder max hold expired", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-policy-"));
+  it("does not clean live Recall locks just because holder max hold expired", async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-policy-"));
     const sessionsDir = path.join(root, "sessions");
     await fs.mkdir(sessionsDir, { recursive: true });
     const nowMs = Date.now();
@@ -540,7 +540,7 @@ describe("acquireSessionWriteLock", () => {
         staleMs: 60_000,
         nowMs,
         removeStale: true,
-        readOwnerProcessArgs: () => ["node", "/opt/openclaw/openclaw.mjs", "agent"],
+        readOwnerProcessArgs: () => ["node", "/opt/tryrecall/recall-agents.mjs", "agent"],
       });
 
       expect(lockCleanupRecords(result.locks)).toEqual([
@@ -567,7 +567,7 @@ describe("acquireSessionWriteLock", () => {
   });
 
   it("cleans stale .jsonl lock files in sessions directories", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-"));
     const sessionsDir = path.join(root, "sessions");
     await fs.mkdir(sessionsDir, { recursive: true });
 
@@ -607,7 +607,7 @@ describe("acquireSessionWriteLock", () => {
         staleMs: 30_000,
         nowMs,
         removeStale: true,
-        readOwnerProcessArgs: () => ["node", "/opt/openclaw/openclaw.mjs", "agent"],
+        readOwnerProcessArgs: () => ["node", "/opt/tryrecall/recall-agents.mjs", "agent"],
       });
 
       expect(result.locks).toHaveLength(3);
@@ -654,8 +654,8 @@ describe("acquireSessionWriteLock", () => {
     }
   });
 
-  it("cleans fresh live .jsonl lock files owned by a non-OpenClaw process", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-"));
+  it("cleans fresh live .jsonl lock files owned by a non-Recall process", async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-"));
     const sessionsDir = path.join(root, "sessions");
     await fs.mkdir(sessionsDir, { recursive: true });
 
@@ -685,7 +685,7 @@ describe("acquireSessionWriteLock", () => {
           name: "false-live.jsonl.lock",
           removed: true,
           stale: true,
-          staleReasons: ["non-openclaw-owner"],
+          staleReasons: ["non-recall-owner"],
         },
       ]);
       expect(lockCleanupRecords(result.cleaned)).toEqual([
@@ -693,7 +693,7 @@ describe("acquireSessionWriteLock", () => {
           name: "false-live.jsonl.lock",
           removed: true,
           stale: true,
-          staleReasons: ["non-openclaw-owner"],
+          staleReasons: ["non-recall-owner"],
         },
       ]);
       await expect(fs.access(falseLiveLock)).rejects.toThrow();
@@ -702,8 +702,8 @@ describe("acquireSessionWriteLock", () => {
     }
   });
 
-  it("cleans fresh live .jsonl lock files owned by generic non-OpenClaw entrypoints", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-"));
+  it("cleans fresh live .jsonl lock files owned by generic non-Recall entrypoints", async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-"));
     const sessionsDir = path.join(root, "sessions");
     await fs.mkdir(sessionsDir, { recursive: true });
 
@@ -733,7 +733,7 @@ describe("acquireSessionWriteLock", () => {
           name: "false-live-generic-entry.jsonl.lock",
           removed: true,
           stale: true,
-          staleReasons: ["non-openclaw-owner"],
+          staleReasons: ["non-recall-owner"],
         },
       ]);
       await expect(fs.access(falseLiveLock)).rejects.toThrow();
@@ -742,13 +742,13 @@ describe("acquireSessionWriteLock", () => {
     }
   });
 
-  it("keeps fresh live .jsonl lock files with OpenClaw or unknown owners", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-"));
+  it("keeps fresh live .jsonl lock files with Recall or unknown owners", async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-"));
     const sessionsDir = path.join(root, "sessions");
     await fs.mkdir(sessionsDir, { recursive: true });
 
     const nowMs = Date.now();
-    const openclawLock = path.join(sessionsDir, "openclaw-live.jsonl.lock");
+    const openclawLock = path.join(sessionsDir, "recall-live.jsonl.lock");
     const gatewayLock = path.join(sessionsDir, "gateway-live.jsonl.lock");
     const unknownLock = path.join(sessionsDir, "unknown-live.jsonl.lock");
 
@@ -766,7 +766,7 @@ describe("acquireSessionWriteLock", () => {
         staleMs: 30_000,
         nowMs,
         removeStale: true,
-        readOwnerProcessArgs: () => ["node", "/opt/openclaw/openclaw.mjs", "agent"],
+        readOwnerProcessArgs: () => ["node", "/opt/tryrecall/recall-agents.mjs", "agent"],
       });
 
       expect(openclawResult.cleaned).toEqual([]);
@@ -818,7 +818,7 @@ describe("acquireSessionWriteLock", () => {
 
   it("cleans untracked current-process .jsonl lock files with matching starttime", async () => {
     pinCurrentProcessStartTimeForTest();
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-"));
     const sessionsDir = path.join(root, "sessions");
     await fs.mkdir(sessionsDir, { recursive: true });
 
@@ -900,7 +900,7 @@ describe("acquireSessionWriteLock", () => {
     process.kill = ((_pid: number, _signal?: NodeJS.Signals) => true) as typeof process.kill;
     try {
       for (const signal of signals) {
-        const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-cleanup-"));
+        const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-cleanup-"));
         try {
           const sessionFile = path.join(root, "sessions.json");
           const lockPath = `${sessionFile}.lock`;
@@ -977,7 +977,7 @@ describe("acquireSessionWriteLock", () => {
     expect(testing.cleanupSignals).toContain("SIGABRT");
   });
   it("cleans up locks on SIGINT without removing other handlers", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-lock-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-lock-"));
     const originalKill = process.kill.bind(process);
     const killCalls: Array<NodeJS.Signals | undefined> = [];
     let otherHandlerCalled = false;

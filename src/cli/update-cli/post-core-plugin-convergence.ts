@@ -1,10 +1,10 @@
 import { repairMissingConfiguredPluginInstalls } from "../../commands/doctor/shared/missing-configured-plugin-install.js";
 import { UPDATE_POST_CORE_CONVERGENCE_ENV } from "../../commands/doctor/shared/update-phase.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import type { PluginInstallRecord } from "../../config/types.plugins.js";
 import { normalizePluginsConfig, resolveEffectiveEnableState } from "../../plugins/config-state.js";
 import { resolveDefaultPluginNpmDir } from "../../plugins/install-paths.js";
-import { relinkOpenClawPeerDependenciesInManagedNpmRoot } from "../../plugins/plugin-peer-link.js";
+import { relinkRecallPeerDependenciesInManagedNpmRoot } from "../../plugins/plugin-peer-link.js";
 import { pruneStaleLocalBundledPluginInstallRecords } from "../../plugins/stale-local-bundled-plugin-install-records.js";
 import {
   resolveTrustedSourceLinkedOfficialClawHubSpec,
@@ -41,15 +41,15 @@ export type PostCoreConvergenceResult = {
   installRecords: Record<string, PluginInstallRecord>;
 };
 
-const REPAIR_GUIDANCE = "Run `openclaw doctor --fix` to retry plugin repair.";
+const REPAIR_GUIDANCE = "Run `recall doctor --fix` to retry plugin repair.";
 const inspectGuidance = (pluginId: string) =>
-  `Run \`openclaw plugins inspect ${pluginId} --runtime --json\` for details.`;
+  `Run \`recall plugins inspect ${pluginId} --runtime --json\` for details.`;
 
-async function repairManagedNpmOpenClawPeerLinks(params: {
+async function repairManagedNpmRecallPeerLinks(params: {
   env: NodeJS.ProcessEnv;
 }): Promise<{ changes: string[]; warnings: PostCoreConvergenceWarning[] }> {
   try {
-    const result = await relinkOpenClawPeerDependenciesInManagedNpmRoot({
+    const result = await relinkRecallPeerDependenciesInManagedNpmRoot({
       npmRoot: resolveDefaultPluginNpmDir(params.env),
       logger: {},
     });
@@ -57,13 +57,13 @@ async function repairManagedNpmOpenClawPeerLinks(params: {
       changes:
         result.repaired > 0
           ? [
-              `Repaired OpenClaw host peer link(s) for ${result.repaired} managed npm plugin package(s).`,
+              `Repaired Recall host peer link(s) for ${result.repaired} managed npm plugin package(s).`,
             ]
           : [],
       warnings: [],
     };
   } catch (err) {
-    const message = `Failed to repair managed npm OpenClaw host peer links: ${err instanceof Error ? err.message : String(err)}`;
+    const message = `Failed to repair managed npm Recall host peer links: ${err instanceof Error ? err.message : String(err)}`;
     return {
       changes: [],
       warnings: [
@@ -84,7 +84,7 @@ async function repairManagedNpmOpenClawPeerLinks(params: {
  * never restart with a configured plugin whose payload is unloadable.
  */
 export async function runPostCorePluginConvergence(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   env: NodeJS.ProcessEnv;
   /**
    * Optional in-memory install records from earlier post-core steps (e.g.
@@ -98,7 +98,7 @@ export async function runPostCorePluginConvergence(params: {
 }): Promise<PostCoreConvergenceResult> {
   const env: NodeJS.ProcessEnv = {
     ...params.env,
-    OPENCLAW_COMPATIBILITY_HOST_VERSION: VERSION,
+    RECALL_COMPATIBILITY_HOST_VERSION: VERSION,
     [UPDATE_POST_CORE_CONVERGENCE_ENV]: "1",
   };
   const prunedBaseline = params.baselineInstallRecords
@@ -119,7 +119,7 @@ export async function runPostCorePluginConvergence(params: {
     message,
     guidance: [REPAIR_GUIDANCE],
   }));
-  const peerLinkRepair = await repairManagedNpmOpenClawPeerLinks({ env });
+  const peerLinkRepair = await repairManagedNpmRecallPeerLinks({ env });
   warnings.push(...peerLinkRepair.warnings);
 
   const records: Record<string, PluginInstallRecord> = repair.records;
@@ -169,7 +169,7 @@ export async function runPostCorePluginConvergence(params: {
  * enable state is the right precision boundary.
  */
 export function filterRecordsToActive(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   records: Record<string, PluginInstallRecord>;
 }): Record<string, PluginInstallRecord> {
   const normalizedPluginConfig = normalizePluginsConfig(params.cfg.plugins);

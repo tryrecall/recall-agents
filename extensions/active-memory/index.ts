@@ -10,17 +10,17 @@ import {
   resolveAgentEffectiveModelPrimary,
   resolveAgentWorkspaceDir,
   resolveDefaultModelForAgent,
-} from "openclaw/plugin-sdk/agent-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { closeActiveMemorySearchManager } from "openclaw/plugin-sdk/memory-host-search";
+} from "recall/plugin-sdk/agent-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { closeActiveMemorySearchManager } from "recall/plugin-sdk/memory-host-search";
 import {
   resolveLivePluginConfigObject,
   resolvePluginConfigObject,
-} from "openclaw/plugin-sdk/plugin-config-runtime";
-import { definePluginEntry, type OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
-import { parseAgentSessionKey, parseThreadSessionSuffix } from "openclaw/plugin-sdk/routing";
-import { isPathInside, replaceFileAtomic } from "openclaw/plugin-sdk/security-runtime";
-import { tempWorkspace, resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/temp-path";
+} from "recall/plugin-sdk/plugin-config-runtime";
+import { definePluginEntry, type RecallPluginApi } from "recall/plugin-sdk/plugin-entry";
+import { parseAgentSessionKey, parseThreadSessionSuffix } from "recall/plugin-sdk/routing";
+import { isPathInside, replaceFileAtomic } from "recall/plugin-sdk/security-runtime";
+import { tempWorkspace, resolvePreferredRecallTmpDir } from "recall/plugin-sdk/temp-path";
 
 const DEFAULT_TIMEOUT_MS = 15_000;
 const DEFAULT_AGENT_ID = "main";
@@ -463,13 +463,13 @@ function isReservedActiveMemoryToolsAllowEntry(value: string): boolean {
   return normalized.startsWith("group:") || ACTIVE_MEMORY_RESERVED_TOOLS_ALLOW.has(normalized);
 }
 
-function resolveDefaultToolsAllow(cfg: OpenClawConfig | undefined): string[] {
+function resolveDefaultToolsAllow(cfg: RecallConfig | undefined): string[] {
   return cfg?.plugins?.slots?.memory === "memory-lancedb"
     ? [...LANCEDB_ACTIVE_MEMORY_TOOLS_ALLOW]
     : [...DEFAULT_ACTIVE_MEMORY_TOOLS_ALLOW];
 }
 
-function resolveToolsAllow(params: { pluginToolsAllow: unknown; cfg?: OpenClawConfig }): string[] {
+function resolveToolsAllow(params: { pluginToolsAllow: unknown; cfg?: RecallConfig }): string[] {
   return (
     normalizeConfiguredToolsAllow(params.pluginToolsAllow) ?? resolveDefaultToolsAllow(params.cfg)
   );
@@ -510,7 +510,7 @@ function toSafeTranscriptAgentDirName(agentId: string): string {
   return encoded ? encoded : "unknown-agent";
 }
 
-function resolvePersistentTranscriptBaseDir(api: OpenClawPluginApi, agentId: string): string {
+function resolvePersistentTranscriptBaseDir(api: RecallPluginApi, agentId: string): string {
   return path.join(
     api.runtime.state.resolveStateDir(),
     "plugins",
@@ -529,7 +529,7 @@ function requireTransientWorkspaceDir(tempDir: string | undefined): string {
 }
 
 function resolveCanonicalSessionKeyFromSessionId(params: {
-  api: OpenClawPluginApi;
+  api: RecallPluginApi;
   agentId: string;
   sessionId?: string;
 }): string | undefined {
@@ -603,7 +603,7 @@ function isMissingRegisteredMemoryToolsError(
 }
 
 function resolveRecallRunChannelContext(params: {
-  api: OpenClawPluginApi;
+  api: RecallPluginApi;
   agentId: string;
   sessionKey?: string;
   sessionId?: string;
@@ -693,7 +693,7 @@ function resolveRecallRunChannelContext(params: {
   }
 }
 
-function resolveToggleStatePath(api: OpenClawPluginApi): string {
+function resolveToggleStatePath(api: RecallPluginApi): string {
   return path.join(
     api.runtime.state.resolveStateDir(),
     "plugins",
@@ -745,7 +745,7 @@ async function writeToggleStore(statePath: string, store: ActiveMemoryToggleStor
 }
 
 async function isSessionActiveMemoryDisabled(params: {
-  api: OpenClawPluginApi;
+  api: RecallPluginApi;
   sessionKey?: string;
 }): Promise<boolean> {
   const sessionKey = params.sessionKey?.trim();
@@ -764,7 +764,7 @@ async function isSessionActiveMemoryDisabled(params: {
 }
 
 async function setSessionActiveMemoryDisabled(params: {
-  api: OpenClawPluginApi;
+  api: RecallPluginApi;
   sessionKey: string;
   disabled: boolean;
 }): Promise<void> {
@@ -782,7 +782,7 @@ async function setSessionActiveMemoryDisabled(params: {
 }
 
 function resolveCommandSessionKey(params: {
-  api: OpenClawPluginApi;
+  api: RecallPluginApi;
   config: ResolvedActiveRecallPluginConfig;
   sessionKey?: string;
   sessionId?: string;
@@ -820,7 +820,7 @@ function formatActiveMemoryCommandHelp(): string {
   ].join("\n");
 }
 
-function isActiveMemoryGloballyEnabled(cfg: OpenClawConfig): boolean {
+function isActiveMemoryGloballyEnabled(cfg: RecallConfig): boolean {
   const entry = asRecord(cfg.plugins?.entries?.["active-memory"]);
   if (entry?.enabled === false) {
     return false;
@@ -830,9 +830,9 @@ function isActiveMemoryGloballyEnabled(cfg: OpenClawConfig): boolean {
 }
 
 function updateActiveMemoryGlobalEnabledInConfig(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   enabled: boolean,
-): OpenClawConfig {
+): RecallConfig {
   const entries = { ...cfg.plugins?.entries };
   const existingEntry = asRecord(entries["active-memory"]) ?? {};
   const existingConfig = asRecord(existingEntry.config) ?? {};
@@ -863,7 +863,7 @@ const ACTIVE_MEMORY_GLOBAL_MUTATION_ADMIN_REQUIRED_TEXT =
 
 function normalizePluginConfig(
   pluginConfig: unknown,
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): ResolvedActiveRecallPluginConfig {
   const raw = (
     pluginConfig && typeof pluginConfig === "object" ? pluginConfig : {}
@@ -939,9 +939,9 @@ function normalizePluginConfig(
 }
 
 function applyActiveMemoryRuntimeConfigSnapshot(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   pluginConfig: ResolvedActiveRecallPluginConfig,
-): OpenClawConfig {
+): RecallConfig {
   const existingEntry = asRecord(cfg.plugins?.entries?.["active-memory"]);
   const existingPluginConfig = asRecord(existingEntry?.config);
   return {
@@ -965,19 +965,19 @@ function applyActiveMemoryRuntimeConfigSnapshot(
   };
 }
 
-function resolveActiveMemoryCleanupConfig(api: OpenClawPluginApi): OpenClawConfig | undefined {
+function resolveActiveMemoryCleanupConfig(api: RecallPluginApi): RecallConfig | undefined {
   try {
     return (
-      (api.runtime.config?.current?.() as OpenClawConfig | undefined) ??
-      (api.config as OpenClawConfig | undefined)
+      (api.runtime.config?.current?.() as RecallConfig | undefined) ??
+      (api.config as RecallConfig | undefined)
     );
   } catch {
-    return api.config as OpenClawConfig | undefined;
+    return api.config as RecallConfig | undefined;
   }
 }
 
 function scheduleMemorySearchCleanupAfterTimeout(
-  api: OpenClawPluginApi,
+  api: RecallPluginApi,
   logPrefix: string,
   agentId: string,
 ): void {
@@ -1558,7 +1558,7 @@ function sanitizeDebugText(text: string): string {
 }
 
 async function persistPluginStatusLines(params: {
-  api: OpenClawPluginApi;
+  api: RecallPluginApi;
   agentId: string;
   sessionKey?: string;
   statusLine?: string;
@@ -2417,7 +2417,7 @@ function parseModelCandidate(modelRef: string | undefined, defaultProvider = DEF
 }
 
 function getModelRef(
-  api: OpenClawPluginApi,
+  api: RecallPluginApi,
   agentId: string,
   config: ResolvedActiveRecallPluginConfig,
   ctx?: {
@@ -2449,7 +2449,7 @@ function getModelRef(
 }
 
 async function runRecallSubagent(params: {
-  api: OpenClawPluginApi;
+  api: RecallPluginApi;
   config: ResolvedActiveRecallPluginConfig;
   agentId: string;
   sessionKey?: string;
@@ -2495,8 +2495,8 @@ async function runRecallSubagent(params: {
   const transientWorkspace = params.config.persistTranscripts
     ? undefined
     : await tempWorkspace({
-        rootDir: resolvePreferredOpenClawTmpDir(),
-        prefix: "openclaw-active-memory-",
+        rootDir: resolvePreferredRecallTmpDir(),
+        prefix: "recall-active-memory-",
       });
   const tempDir = transientWorkspace?.dir;
   const persistedDir = params.config.persistTranscripts
@@ -2613,7 +2613,7 @@ async function runRecallSubagent(params: {
 }
 
 async function maybeResolveActiveRecall(params: {
-  api: OpenClawPluginApi;
+  api: RecallPluginApi;
   config: ResolvedActiveRecallPluginConfig;
   agentId: string;
   sessionKey?: string;
@@ -2910,15 +2910,15 @@ export default definePluginEntry({
   id: "active-memory",
   name: "Active Memory",
   description: "Proactively surfaces relevant memory before eligible conversational replies.",
-  register(api: OpenClawPluginApi) {
-    const readCurrentConfig = (): OpenClawConfig | undefined => {
+  register(api: RecallPluginApi) {
+    const readCurrentConfig = (): RecallConfig | undefined => {
       try {
         return (
-          (api.runtime.config?.current?.() as OpenClawConfig | undefined) ??
-          (api.config as OpenClawConfig | undefined)
+          (api.runtime.config?.current?.() as RecallConfig | undefined) ??
+          (api.config as RecallConfig | undefined)
         );
       } catch {
-        return api.config as OpenClawConfig | undefined;
+        return api.config as RecallConfig | undefined;
       }
     };
     let config = normalizePluginConfig(api.pluginConfig, readCurrentConfig());
@@ -2944,7 +2944,7 @@ export default definePluginEntry({
     const refreshLiveConfigFromRuntime = () => {
       const livePluginConfig = resolveLivePluginConfigObject(
         api.runtime.config?.current
-          ? () => api.runtime.config.current() as OpenClawConfig
+          ? () => api.runtime.config.current() as RecallConfig
           : undefined,
         "active-memory",
         api.pluginConfig as Record<string, unknown>,
@@ -2966,7 +2966,7 @@ export default definePluginEntry({
           return { text: formatActiveMemoryCommandHelp() };
         }
         if (isGlobal) {
-          const currentConfig = api.runtime.config.current() as OpenClawConfig;
+          const currentConfig = api.runtime.config.current() as RecallConfig;
           if (action === "status") {
             return {
               text: `Active Memory: ${isActiveMemoryGloballyEnabled(currentConfig) ? "on" : "off"} globally.`,

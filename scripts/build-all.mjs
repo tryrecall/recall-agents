@@ -172,7 +172,7 @@ export function resolveBuildAllStep(step, params = {}) {
   const env = resolveStepEnv(step, params.env ?? process.env, platform);
   if (step.kind === "pnpm") {
     const nodeFallbackArgs =
-      env.OPENCLAW_BUILD_ALL_NO_PNPM === "1" ? PNPM_STEP_NODE_FALLBACKS.get(step.label) : undefined;
+      env.RECALL_BUILD_ALL_NO_PNPM === "1" ? PNPM_STEP_NODE_FALLBACKS.get(step.label) : undefined;
     if (nodeFallbackArgs) {
       return {
         command: params.nodeExecPath ?? nodeBin,
@@ -398,7 +398,7 @@ if (isMainModule()) {
   const profile = process.argv[2] ?? "full";
   for (const step of resolveBuildAllSteps(profile)) {
     const cacheState = resolveBuildAllStepCacheState(step);
-    if (process.env.OPENCLAW_BUILD_CACHE !== "0" && cacheState.fresh) {
+    if (process.env.RECALL_BUILD_CACHE !== "0" && cacheState.fresh) {
       restoreBuildAllStepCacheOutputs(cacheState);
       console.error(`[build-all] ${step.label} (cached)`);
       continue;

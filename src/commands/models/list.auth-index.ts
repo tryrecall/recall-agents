@@ -17,7 +17,7 @@ import {
 import { resolveProviderAuthAliasMap } from "../../agents/provider-auth-aliases.js";
 import { normalizeProviderIdForAuth } from "../../agents/provider-id.js";
 import { resolveAgentModelPrimaryValue } from "../../config/model-input.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import type { PluginMetadataSnapshot } from "../../plugins/plugin-metadata-snapshot.types.js";
 import { loadPluginRegistrySnapshotWithMetadata } from "../../plugins/plugin-registry.js";
 
@@ -27,7 +27,7 @@ export type ModelListAuthIndex = {
 };
 
 export type CreateModelListAuthIndexParams = {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   authStore: AuthProfileStore;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
@@ -44,7 +44,7 @@ function normalizeAuthProvider(
 }
 
 function listValidatedSyntheticAuthProviderRefs(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
   metadataSnapshot?: PluginMetadataSnapshot;

@@ -1,5 +1,5 @@
 import type { GatewayTailscaleMode } from "../config/types.gateway.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { resolveCronStorePath } from "../cron/store.js";
 import type { PluginRegistry } from "../plugins/registry-types.js";
 
@@ -23,7 +23,7 @@ async function measureStartup<T>(
 
 export async function startGatewayPluginDiscovery(params: {
   minimalTestGateway: boolean;
-  cfgAtStart: OpenClawConfig;
+  cfgAtStart: RecallConfig;
   port: number;
   gatewayTls: { enabled: boolean; fingerprintSha256?: string };
   gatewayDirectReachable: boolean;
@@ -65,7 +65,7 @@ export async function startGatewayPluginDiscovery(params: {
 
 export async function startGatewayEarlyRuntime(params: {
   minimalTestGateway: boolean;
-  cfgAtStart: OpenClawConfig;
+  cfgAtStart: RecallConfig;
   port: number;
   gatewayTls: { enabled: boolean; fingerprintSha256?: string };
   gatewayDirectReachable: boolean;
@@ -99,7 +99,7 @@ export async function startGatewayEarlyRuntime(params: {
   skillsRefreshDelayMs: number;
   getSkillsRefreshTimer: () => ReturnType<typeof setTimeout> | null;
   setSkillsRefreshTimer: (timer: ReturnType<typeof setTimeout> | null) => void;
-  getRuntimeConfig: () => OpenClawConfig;
+  getRuntimeConfig: () => RecallConfig;
   startupTrace?: GatewayStartupTrace;
 }) {
   const bonjourStop = await measureStartup(params.startupTrace, "runtime.early.discovery", () =>

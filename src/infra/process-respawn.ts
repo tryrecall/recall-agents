@@ -2,7 +2,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { normalizeOptionalLowercaseString } from "../shared/string-coerce.js";
 import { isContainerEnvironment } from "./container-environment.js";
 import { formatErrorMessage } from "./errors.js";
-import { triggerOpenClawRestart } from "./restart.js";
+import { triggerRecallRestart } from "./restart.js";
 import { detectRespawnSupervisor } from "./supervisor-markers.js";
 
 type RespawnMode = "spawned" | "supervised" | "disabled" | "failed";
@@ -42,14 +42,14 @@ function spawnDetachedGatewayProcess(opts: GatewayRespawnOptions = {}): {
 /**
  * Attempt to restart this process with a fresh PID.
  * - supervised environments (launchd/systemd/schtasks): caller should exit and let supervisor restart
- * - OPENCLAW_NO_RESPAWN=1: caller should keep in-process restart behavior (tests/dev)
+ * - RECALL_NO_RESPAWN=1: caller should keep in-process restart behavior (tests/dev)
  * - unmanaged environments: caller should keep in-process restart behavior so
  *   custom supervisors keep tracking the same gateway PID
  */
 export function restartGatewayProcessWithFreshPid(
   _opts: GatewayRespawnOptions = {},
 ): GatewayRespawnResult {
-  if (isTruthy(process.env.OPENCLAW_NO_RESPAWN)) {
+  if (isTruthy(process.env.RECALL_NO_RESPAWN)) {
     return { mode: "disabled" };
   }
   const supervisor = detectRespawnSupervisor(process.env);
@@ -58,7 +58,7 @@ export function restartGatewayProcessWithFreshPid(
     // Avoid detached kickstart/start handoffs here so restart timing stays tied
     // to launchd's native supervision rather than a second helper process.
     if (supervisor === "schtasks") {
-      const restart = triggerOpenClawRestart();
+      const restart = triggerRecallRestart();
       if (!restart.ok) {
         return {
           mode: "failed",
@@ -100,13 +100,13 @@ export function restartGatewayProcessWithFreshPid(
 export function respawnGatewayProcessForUpdate(
   opts: GatewayRespawnOptions = {},
 ): GatewayUpdateRespawnResult {
-  if (isTruthy(process.env.OPENCLAW_NO_RESPAWN)) {
-    return { mode: "disabled", detail: "OPENCLAW_NO_RESPAWN" };
+  if (isTruthy(process.env.RECALL_NO_RESPAWN)) {
+    return { mode: "disabled", detail: "RECALL_NO_RESPAWN" };
   }
   const supervisor = detectRespawnSupervisor(process.env);
   if (supervisor) {
     if (supervisor === "schtasks") {
-      const restart = triggerOpenClawRestart();
+      const restart = triggerRecallRestart();
       if (!restart.ok) {
         return {
           mode: "failed",

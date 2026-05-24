@@ -3,7 +3,7 @@ import {
   resolveAgentModelPrimaryValue,
 } from "../config/model-input.js";
 import type { AgentModelConfig } from "../config/types.agents-shared.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { PluginMetadataSnapshot } from "../plugins/plugin-metadata-snapshot.types.js";
 import { listProfilesForProvider } from "./auth-profiles/profile-list.js";
 import type { AuthProfileStore } from "./auth-profiles/types.js";
@@ -43,11 +43,11 @@ function hasExplicitToolModelConfig(modelConfig: AgentModelConfig | undefined): 
   return hasToolModelConfig(coerceFactoryToolModelConfig(modelConfig));
 }
 
-function hasExplicitImageModelConfig(config: OpenClawConfig | undefined): boolean {
+function hasExplicitImageModelConfig(config: RecallConfig | undefined): boolean {
   return hasExplicitToolModelConfig(config?.agents?.defaults?.imageModel);
 }
 
-function hasExplicitPdfModelConfig(config: OpenClawConfig | undefined): boolean {
+function hasExplicitPdfModelConfig(config: RecallConfig | undefined): boolean {
   return (
     hasExplicitToolModelConfig(config?.agents?.defaults?.pdfModel) ||
     hasExplicitImageModelConfig(config)
@@ -99,7 +99,7 @@ function mergeBuiltInFactoryAllowlist(...lists: Array<string[] | undefined>): st
 }
 
 export function resolveImageToolFactoryAvailable(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentDir?: string;
   workspaceDir?: string;
   modelHasVision?: boolean;
@@ -131,7 +131,7 @@ export function resolveImageToolFactoryAvailable(params: {
 }
 
 function hasConfiguredVisionModelAuthSignal(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   snapshot: Pick<PluginMetadataSnapshot, "index" | "plugins">;
   authStore?: AuthProfileStore;
 }): boolean {
@@ -164,7 +164,7 @@ function hasConfiguredVisionModelAuthSignal(params: {
 }
 
 export function resolveOptionalMediaToolFactoryPlan(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   workspaceDir?: string;
   authStore?: AuthProfileStore;
   toolAllowlist?: string[];

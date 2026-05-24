@@ -11,7 +11,7 @@ import {
 const DEFAULT_DISCOVERY_ADVERTISE_TIMEOUT_MS = 5_000;
 
 function resolveDiscoveryAdvertiseTimeoutMs(env: NodeJS.ProcessEnv): number {
-  const raw = env.OPENCLAW_GATEWAY_DISCOVERY_ADVERTISE_TIMEOUT_MS?.trim();
+  const raw = env.RECALL_GATEWAY_DISCOVERY_ADVERTISE_TIMEOUT_MS?.trim();
   if (!raw) {
     return DEFAULT_DISCOVERY_ADVERTISE_TIMEOUT_MS;
   }
@@ -41,7 +41,7 @@ export async function startGatewayDiscovery(params: {
   // Local discovery can be disabled via config (mdnsMode: off) or env var.
   const localDiscoveryEnabled =
     mdnsMode !== "off" &&
-    !isTruthyEnvValue(process.env.OPENCLAW_DISABLE_BONJOUR) &&
+    !isTruthyEnvValue(process.env.RECALL_DISABLE_BONJOUR) &&
     process.env.NODE_ENV !== "test" &&
     !process.env.VITEST;
   const mdnsMinimal = mdnsMode !== "full";
@@ -51,7 +51,7 @@ export async function startGatewayDiscovery(params: {
   const tailnetDns = needsTailnetDns
     ? await resolveTailnetDnsHint({ enabled: tailscaleEnabled })
     : undefined;
-  const sshPortEnv = mdnsMinimal ? undefined : process.env.OPENCLAW_SSH_PORT?.trim();
+  const sshPortEnv = mdnsMinimal ? undefined : process.env.RECALL_SSH_PORT?.trim();
   const sshPortParsed = sshPortEnv ? Number.parseInt(sshPortEnv, 10) : Number.NaN;
   const sshPort = Number.isFinite(sshPortParsed) && sshPortParsed > 0 ? sshPortParsed : undefined;
   const cliPath = mdnsMinimal ? undefined : resolveBonjourCliPath();

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import { addSession, resetProcessRegistryForTests } from "../bash-process-registry.js";
 import { createProcessSessionFixture } from "../bash-process-registry.test-helpers.js";
 import {
@@ -24,7 +24,7 @@ describe("buildEmbeddedCompactionRuntimeContext", () => {
       authProfileId: "openai:p1",
       workspaceDir: "/tmp/workspace",
       agentDir: "/tmp/agent",
-      config: {} as OpenClawConfig,
+      config: {} as RecallConfig,
       senderIsOwner: true,
       senderId: "user-123",
       provider: "openai-codex",
@@ -85,7 +85,7 @@ describe("buildEmbeddedCompactionRuntimeContext", () => {
       agentDir: "/tmp/agent",
       config: {
         agents: { defaults: { compaction: { model: "anthropic/claude-opus-4-6" } } },
-      } as OpenClawConfig,
+      } as RecallConfig,
       provider: "ollama",
       modelId: "minimax-m2.7:cloud",
       authProfileId: "ollama:default",
@@ -102,7 +102,7 @@ describe("buildEmbeddedCompactionRuntimeContext", () => {
       agentDir: "/tmp/agent",
       config: {
         agents: { defaults: { compaction: { model: "gpt-4o" } } },
-      } as OpenClawConfig,
+      } as RecallConfig,
       provider: "openai",
       modelId: "gpt-3.5-turbo",
       authProfileId: "openai:p1",
@@ -117,7 +117,7 @@ describe("buildEmbeddedCompactionRuntimeContext", () => {
     const result = buildEmbeddedCompactionRuntimeContext({
       workspaceDir: "/tmp/workspace",
       agentDir: "/tmp/agent",
-      config: {} as OpenClawConfig,
+      config: {} as RecallConfig,
       provider: "ollama",
       modelId: "minimax-m2.7:cloud",
       authProfileId: "ollama:default",
@@ -151,7 +151,7 @@ describe("buildEmbeddedCompactionRuntimeContext", () => {
       sessionKey: "agent:main:thread:1",
       workspaceDir: "/tmp/workspace",
       agentDir: "/tmp/agent",
-      config: {} as OpenClawConfig,
+      config: {} as RecallConfig,
     });
 
     try {
@@ -186,7 +186,7 @@ describe("buildEmbeddedCompactionRuntimeContext", () => {
     const result = buildEmbeddedCompactionRuntimeContext({
       workspaceDir: "/tmp/workspace",
       agentDir: "/tmp/agent",
-      config: {} as OpenClawConfig,
+      config: {} as RecallConfig,
     });
 
     expect(result.activeProcessSessions).toBeUndefined();
@@ -197,7 +197,7 @@ describe("buildEmbeddedCompactionRuntimeContext", () => {
       resolveEmbeddedCompactionTarget({
         config: {
           agents: { defaults: { compaction: { model: "anthropic/" } } },
-        } as OpenClawConfig,
+        } as RecallConfig,
         provider: "openai-codex",
         modelId: "gpt-5.4",
         authProfileId: "openai:p1",

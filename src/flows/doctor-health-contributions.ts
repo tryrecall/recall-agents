@@ -5,7 +5,7 @@ import {
   isLegacyParentWritableUpdateDoctorPass,
   UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE_ENV,
 } from "../commands/doctor/shared/update-phase.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { buildGatewayConnectionDetails } from "../gateway/call.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { FlowContribution } from "./types.js";
@@ -18,7 +18,7 @@ export {
 type DoctorFlowMode = "local" | "remote";
 
 type DoctorConfigResult = {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   path?: string;
   shouldWriteConfig?: boolean;
   sourceConfigValid?: boolean;
@@ -32,8 +32,8 @@ type DoctorHealthFlowContext = {
   options: DoctorOptions;
   prompter: DoctorPrompter;
   configResult: DoctorConfigResult;
-  cfg: OpenClawConfig;
-  cfgForPersistence: OpenClawConfig;
+  cfg: RecallConfig;
+  cfgForPersistence: RecallConfig;
   sourceConfigValid: boolean;
   configPath: string;
   env?: NodeJS.ProcessEnv;
@@ -51,11 +51,11 @@ type DoctorHealthContribution = FlowContribution & {
 };
 
 function isUpdateDoctorRun(env: NodeJS.ProcessEnv | Record<string, string | undefined>): boolean {
-  const value = env.OPENCLAW_UPDATE_IN_PROGRESS;
+  const value = env.RECALL_UPDATE_IN_PROGRESS;
   return value === "1" || value === "true";
 }
 
-function resolveDoctorMode(cfg: OpenClawConfig): DoctorFlowMode {
+function resolveDoctorMode(cfg: RecallConfig): DoctorFlowMode {
   return cfg.gateway?.mode === "remote" ? "remote" : "local";
 }
 
@@ -70,7 +70,7 @@ function isTruthyEnvValue(value: string | undefined): boolean {
 export function shouldSkipLegacyUpdateDoctorConfigWrite(params: {
   env: NodeJS.ProcessEnv;
 }): boolean {
-  if (!isTruthyEnvValue(params.env.OPENCLAW_UPDATE_IN_PROGRESS)) {
+  if (!isTruthyEnvValue(params.env.RECALL_UPDATE_IN_PROGRESS)) {
     return false;
   }
   if (isTruthyEnvValue(params.env[UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE_ENV])) {
@@ -108,11 +108,11 @@ async function runGatewayConfigHealth(ctx: DoctorHealthFlowContext): Promise<voi
   if (!ctx.cfg.gateway?.mode) {
     const lines = [
       "gateway.mode is unset; gateway start will be blocked.",
-      `Fix: run ${formatCliCommand("openclaw configure")} and set Gateway mode (local/remote).`,
-      `Or set directly: ${formatCliCommand("openclaw config set gateway.mode local")}`,
+      `Fix: run ${formatCliCommand("recall configure")} and set Gateway mode (local/remote).`,
+      `Or set directly: ${formatCliCommand("recall config set gateway.mode local")}`,
     ];
     if (!fs.existsSync(ctx.configPath)) {
-      lines.push(`Missing config: run ${formatCliCommand("openclaw setup")} first.`);
+      lines.push(`Missing config: run ${formatCliCommand("recall setup")} first.`);
     }
     note(lines.join("\n"), "Gateway");
   }
@@ -121,8 +121,8 @@ async function runGatewayConfigHealth(ctx: DoctorHealthFlowContext): Promise<voi
       [
         "gateway.auth.token and gateway.auth.password are both configured while gateway.auth.mode is unset.",
         "Set an explicit mode to avoid ambiguous auth selection and startup/runtime failures.",
-        `Set token mode: ${formatCliCommand("openclaw config set gateway.auth.mode token")}`,
-        `Set password mode: ${formatCliCommand("openclaw config set gateway.auth.mode password")}`,
+        `Set token mode: ${formatCliCommand("recall config set gateway.auth.mode token")}`,
+        `Set password mode: ${formatCliCommand("recall config set gateway.auth.mode password")}`,
       ].join("\n"),
       "Gateway auth",
     );
@@ -435,7 +435,7 @@ async function runGatewayServicesHealth(ctx: DoctorHealthFlowContext): Promise<v
   const {
     noteMacLaunchAgentOverrides,
     noteMacLaunchctlGatewayEnvOverrides,
-    noteMacStaleOpenClawUpdateLaunchdJobs,
+    noteMacStaleRecallUpdateLaunchdJobs,
   } = await import("../commands/doctor-platform-notes.js");
   await maybeScanExtraGatewayServices(ctx.options, ctx.runtime, ctx.prompter);
   await maybeRepairGatewayServiceConfig(
@@ -445,7 +445,7 @@ async function runGatewayServicesHealth(ctx: DoctorHealthFlowContext): Promise<v
     ctx.prompter,
   );
   await noteMacLaunchAgentOverrides();
-  await noteMacStaleOpenClawUpdateLaunchdJobs();
+  await noteMacStaleRecallUpdateLaunchdJobs();
   await noteMacLaunchctlGatewayEnvOverrides(ctx.cfg);
 }
 
@@ -698,7 +698,7 @@ async function runWriteConfigHealth(ctx: DoctorHealthFlowContext): Promise<void>
     return;
   }
   if (!ctx.prompter.shouldRepair) {
-    ctx.runtime.log(`Run "${formatCliCommand("openclaw doctor --fix")}" to apply changes.`);
+    ctx.runtime.log(`Run "${formatCliCommand("recall doctor --fix")}" to apply changes.`);
   }
 }
 

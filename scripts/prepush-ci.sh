@@ -17,7 +17,7 @@ run_step() {
 run_protocol_ci_mirror() {
   local targets=(
     "dist/protocol.schema.json"
-    "apps/shared/OpenClawKit/Sources/OpenClawProtocol/GatewayModels.swift"
+    "apps/shared/OpenClawKit/Sources/RecallProtocol/GatewayModels.swift"
   )
   local before after
   before="$(git diff --no-ext-diff -- "${targets[@]}" || true)"
@@ -58,15 +58,15 @@ run_linux_ci_mirror() {
   run_step node scripts/run-vitest.mjs run --config test/vitest/vitest.extensions.config.ts --maxWorkers=1
   run_step env CI=true node scripts/run-vitest.mjs run --config test/vitest/vitest.unit.config.ts --maxWorkers=1
 
-  log_step "OPENCLAW_VITEST_MAX_WORKERS=${OPENCLAW_VITEST_MAX_WORKERS:-1} NODE_OPTIONS=${NODE_OPTIONS:---max-old-space-size=6144} pnpm test"
-  OPENCLAW_VITEST_MAX_WORKERS="${OPENCLAW_VITEST_MAX_WORKERS:-1}" \
+  log_step "RECALL_VITEST_MAX_WORKERS=${RECALL_VITEST_MAX_WORKERS:-1} NODE_OPTIONS=${NODE_OPTIONS:---max-old-space-size=6144} pnpm test"
+  RECALL_VITEST_MAX_WORKERS="${RECALL_VITEST_MAX_WORKERS:-1}" \
   NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=6144}" \
     pnpm test
 }
 
 run_macos_ci_mirror() {
-  if [[ "${OPENCLAW_PREPUSH_SKIP_MACOS:-0}" == "1" ]]; then
-    log_step "Skipping macOS mirror because OPENCLAW_PREPUSH_SKIP_MACOS=1"
+  if [[ "${RECALL_PREPUSH_SKIP_MACOS:-0}" == "1" ]]; then
+    log_step "Skipping macOS mirror because RECALL_PREPUSH_SKIP_MACOS=1"
     return 0
   fi
 
@@ -81,7 +81,7 @@ run_macos_ci_mirror() {
   fi
 
   run_step swiftlint lint --config config/swiftlint.yml
-  run_step swiftformat --lint apps/macos/Sources --config config/swiftformat --exclude '**/OpenClawProtocol,**/HostEnvSecurityPolicy.generated.swift'
+  run_step swiftformat --lint apps/macos/Sources --config config/swiftformat --exclude '**/RecallProtocol,**/HostEnvSecurityPolicy.generated.swift'
   run_step swift build --package-path apps/macos --configuration release
   run_step swift test --package-path apps/macos --parallel
 }

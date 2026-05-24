@@ -1,5 +1,5 @@
 ---
-summary: "CLI reference for `openclaw skills` (search/install/update/list/info/check)"
+summary: "CLI reference for `recall skills` (search/install/update/list/info/check)"
 read_when:
   - You want to see which skills are available and ready to run
   - You want to search ClawHub or install skills from ClawHub, Git, or local directories
@@ -7,7 +7,7 @@ read_when:
 title: "Skills"
 ---
 
-# `openclaw skills`
+# `recall skills`
 
 Inspect local skills, search ClawHub, install skills from ClawHub/Git/local directories, and update
 ClawHub-tracked installs.
@@ -21,32 +21,32 @@ Related:
 ## Commands
 
 ```bash
-openclaw skills search "calendar"
-openclaw skills search --limit 20 --json
-openclaw skills install <slug>
-openclaw skills install <slug> --version <version>
-openclaw skills install git:owner/repo
-openclaw skills install git:owner/repo@main
-openclaw skills install ./path/to/skill --as custom-name
-openclaw skills install <slug> --force
-openclaw skills install <slug> --agent <id>
-openclaw skills install <slug> --global
-openclaw skills update <slug>
-openclaw skills update <slug> --global
-openclaw skills update --all
-openclaw skills update --all --agent <id>
-openclaw skills update --all --global
-openclaw skills list
-openclaw skills list --eligible
-openclaw skills list --json
-openclaw skills list --verbose
-openclaw skills list --agent <id>
-openclaw skills info <name>
-openclaw skills info <name> --json
-openclaw skills info <name> --agent <id>
-openclaw skills check
-openclaw skills check --agent <id>
-openclaw skills check --json
+recall skills search "calendar"
+recall skills search --limit 20 --json
+recall skills install <slug>
+recall skills install <slug> --version <version>
+recall skills install git:owner/repo
+recall skills install git:owner/repo@main
+recall skills install ./path/to/skill --as custom-name
+recall skills install <slug> --force
+recall skills install <slug> --agent <id>
+recall skills install <slug> --global
+recall skills update <slug>
+recall skills update <slug> --global
+recall skills update --all
+recall skills update --all --agent <id>
+recall skills update --all --global
+recall skills list
+recall skills list --eligible
+recall skills list --json
+recall skills list --verbose
+recall skills list --agent <id>
+recall skills info <name>
+recall skills info <name> --json
+recall skills info <name> --agent <id>
+recall skills check
+recall skills check --agent <id>
+recall skills check --json
 ```
 
 `search` and `update` use ClawHub directly. `install <slug>` installs a ClawHub
@@ -62,7 +62,7 @@ Git and local directory installs expect `SKILL.md` at the source root. The
 install slug comes from `SKILL.md` frontmatter `name` when it is valid, then the
 source directory or repository name; use `--as <slug>` to override it. `--version`
 is ClawHub-only. Skill installs do not support npm package specs or zip/archive
-paths, and `openclaw skills update` updates ClawHub-tracked installs only.
+paths, and `recall skills update` updates ClawHub-tracked installs only.
 
 Gateway-backed skill dependency installs triggered from onboarding or Skills
 settings use the separate `skills.install` request path instead.

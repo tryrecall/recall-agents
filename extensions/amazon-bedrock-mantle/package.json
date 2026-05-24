@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/amazon-bedrock-mantle-provider",
+  "name": "@recall/amazon-bedrock-mantle-provider",
   "version": "2026.5.22",
-  "description": "OpenClaw Amazon Bedrock Mantle (OpenAI-compatible) provider plugin",
+  "description": "Recall Amazon Bedrock Mantle (OpenAI-compatible) provider plugin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/tryrecall/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -13,14 +13,14 @@
     "@earendil-works/pi-ai": "0.75.4"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "npmSpec": "@openclaw/amazon-bedrock-mantle-provider",
+      "npmSpec": "@recall/amazon-bedrock-mantle-provider",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.5.12-beta.1"
     },

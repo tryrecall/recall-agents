@@ -1,9 +1,9 @@
 import type {
   ProviderDefaultThinkingPolicyContext,
   ProviderThinkingProfile,
-} from "openclaw/plugin-sdk/core";
-import { buildProviderReplayFamilyHooks } from "openclaw/plugin-sdk/provider-model-shared";
-import { buildProviderToolCompatFamilyHooks } from "openclaw/plugin-sdk/provider-tools";
+} from "recall/plugin-sdk/core";
+import { buildProviderReplayFamilyHooks } from "recall/plugin-sdk/provider-model-shared";
+import { buildProviderToolCompatFamilyHooks } from "recall/plugin-sdk/provider-tools";
 import { resolveGoogleThinkingProfile } from "./provider-policy.js";
 import { createGoogleThinkingStreamWrapper } from "./thinking-api.js";
 

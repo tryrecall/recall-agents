@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 import path from "node:path";
-import { readJsonFileWithFallback, writeJsonFileAtomically } from "openclaw/plugin-sdk/json-store";
-import { resolveStateDir } from "openclaw/plugin-sdk/state-paths";
-import { resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/temp-path";
+import { readJsonFileWithFallback, writeJsonFileAtomically } from "recall/plugin-sdk/json-store";
+import { resolveStateDir } from "recall/plugin-sdk/state-paths";
+import { resolvePreferredRecallTmpDir } from "recall/plugin-sdk/temp-path";
 
 // iMessage inbound catchup. When the gateway is offline (crash, restart, mac
 // sleep, machine off), `imsg watch` resumes from current state and ignores
@@ -14,7 +14,7 @@ import { resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/temp-path";
 // `dispatch` callback so `evaluateIMessageInbound` + `dispatchInboundMessage`
 // runs unchanged on replayed rows.
 //
-// See https://github.com/openclaw/openclaw/issues/78649 for design discussion.
+// See https://github.com/tryrecall/recall-agents/issues/78649 for design discussion.
 
 const DEFAULT_MAX_AGE_MINUTES = 120;
 const MAX_MAX_AGE_MINUTES = 12 * 60;
@@ -92,15 +92,15 @@ export type IMessageCatchupSummary = {
 };
 
 function resolveStateDirFromEnv(env: NodeJS.ProcessEnv = process.env): string {
-  if (env.OPENCLAW_STATE_DIR?.trim()) {
+  if (env.RECALL_STATE_DIR?.trim()) {
     return resolveStateDir(env);
   }
   // Default test isolation: per-pid tmpdir. Mirrors the BB catchup pattern so
   // the tmpdir-path-guard test that flags dynamic template-literal suffixes
   // on os.tmpdir() paths stays green.
   if (env.VITEST || env.NODE_ENV === "test") {
-    const name = "openclaw-vitest-" + process.pid;
-    return path.join(resolvePreferredOpenClawTmpDir(), name);
+    const name = "recall-vitest-" + process.pid;
+    return path.join(resolvePreferredRecallTmpDir(), name);
   }
   return resolveStateDir(env);
 }
@@ -133,9 +133,9 @@ function sanitizeFailureRetriesInput(raw: unknown): Record<string, number> {
 
 /**
  * Cursor file path: `<openclawStateDir>/imessage/catchup/<safePrefix>__<sha256[:12]>.json`.
- * `openclawStateDir` resolves through `OPENCLAW_STATE_DIR` (or the plugin-sdk default,
- * `~/.openclaw`). On a default install the cursor lands at
- * `~/.openclaw/imessage/catchup/<safePrefix>__<sha256[:12]>.json`.
+ * `openclawStateDir` resolves through `RECALL_STATE_DIR` (or the plugin-sdk default,
+ * `~/.recall`). On a default install the cursor lands at
+ * `~/.recall/imessage/catchup/<safePrefix>__<sha256[:12]>.json`.
  */
 export async function loadIMessageCatchupCursor(
   accountId: string,

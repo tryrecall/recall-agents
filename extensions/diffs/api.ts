@@ -1,10 +1,10 @@
-export type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+export type { RecallConfig } from "recall/plugin-sdk/config-contracts";
 export {
   definePluginEntry,
   type AnyAgentTool,
-  type OpenClawPluginApi,
-  type OpenClawPluginConfigSchema,
-  type OpenClawPluginToolContext,
+  type RecallPluginApi,
+  type RecallPluginConfigSchema,
+  type RecallPluginToolContext,
   type PluginLogger,
-} from "openclaw/plugin-sdk/plugin-entry";
-export { resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/temp-path";
+} from "recall/plugin-sdk/plugin-entry";
+export { resolvePreferredRecallTmpDir } from "recall/plugin-sdk/temp-path";

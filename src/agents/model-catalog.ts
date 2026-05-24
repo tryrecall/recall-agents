@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { getRuntimeConfig } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { planManifestModelCatalogRows } from "../model-catalog/manifest-planner.js";
 import { getCurrentPluginMetadataSnapshot } from "../plugins/current-plugin-metadata-snapshot.js";
@@ -28,7 +28,7 @@ import {
   buildConfiguredModelCatalog,
   hasConfiguredProviderModelRows,
 } from "./model-selection-shared.js";
-import { ensureOpenClawModelsJson } from "./models-config.js";
+import { ensureRecallModelsJson } from "./models-config.js";
 import { normalizeProviderId } from "./provider-id.js";
 
 const log = createSubsystemLogger("model-catalog");
@@ -73,7 +73,7 @@ const modelSuppressionLoader = createLazyImportLoader(
 );
 
 function shouldLogModelCatalogTiming(): boolean {
-  return process.env.OPENCLAW_DEBUG_INGRESS_TIMING === "1";
+  return process.env.RECALL_DEBUG_INGRESS_TIMING === "1";
 }
 
 function loadModelSuppression() {
@@ -131,7 +131,7 @@ function appendCatalogEntriesIfAbsent(
 }
 
 export function loadManifestModelCatalog(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   fallbackToMetadataScan?: boolean;
@@ -262,7 +262,7 @@ function normalizePersistedModelCatalogEntry(
 }
 
 async function loadReadOnlyPersistedModelCatalog(params?: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   metadataSnapshot?: PluginMetadataSnapshot;
 }): Promise<ModelCatalogEntry[]> {
   const cfg = params?.config ?? getRuntimeConfig();
@@ -326,7 +326,7 @@ async function loadReadOnlyPersistedModelCatalog(params?: {
   return sortModelCatalogEntries(models);
 }
 
-function hasConfiguredProviderRowsNeedingManifestLookup(cfg: OpenClawConfig): boolean {
+function hasConfiguredProviderRowsNeedingManifestLookup(cfg: RecallConfig): boolean {
   const providers = cfg.models?.providers;
   if (!providers || typeof providers !== "object") {
     return false;
@@ -338,7 +338,7 @@ function hasConfiguredProviderRowsNeedingManifestLookup(cfg: OpenClawConfig): bo
 }
 
 function loadReadOnlyStaticModelCatalog(params?: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   metadataSnapshot?: PluginMetadataSnapshot;
 }): ModelCatalogEntry[] {
   const cfg = params?.config ?? getRuntimeConfig();
@@ -378,7 +378,7 @@ function loadReadOnlyStaticModelCatalog(params?: {
 }
 
 export async function loadModelCatalog(params?: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   useCache?: boolean;
   readOnly?: boolean;
   metadataSnapshot?: PluginMetadataSnapshot;
@@ -426,7 +426,7 @@ export async function loadModelCatalog(params?: {
         return manifestPlugins;
       };
       if (!readOnly) {
-        await ensureOpenClawModelsJson(cfg);
+        await ensureRecallModelsJson(cfg);
         logStage("models-json-ready");
       }
       // IMPORTANT: keep the dynamic import *inside* the try/catch.

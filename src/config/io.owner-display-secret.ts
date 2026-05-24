@@ -1,15 +1,15 @@
-import type { OpenClawConfig } from "./types.openclaw.js";
+import type { RecallConfig } from "./types.recall.js";
 
 export type OwnerDisplaySecretRuntimeState = {
   pendingByPath: Map<string, string>;
 };
 
 export function retainGeneratedOwnerDisplaySecret(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   configPath: string;
   generatedSecret?: string;
   state: OwnerDisplaySecretRuntimeState;
-}): OpenClawConfig {
+}): RecallConfig {
   const { config, configPath, generatedSecret, state } = params;
   if (!generatedSecret) {
     state.pendingByPath.delete(configPath);

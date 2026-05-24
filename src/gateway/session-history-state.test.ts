@@ -468,9 +468,9 @@ describe("SessionHistorySseState", () => {
             {
               type: "text",
               text: [
-                "<<<BEGIN_OPENCLAW_INTERNAL_CONTEXT>>>",
+                "<<<BEGIN_RECALL_INTERNAL_CONTEXT>>>",
                 "secret runtime context",
-                "<<<END_OPENCLAW_INTERNAL_CONTEXT>>>",
+                "<<<END_RECALL_INTERNAL_CONTEXT>>>",
                 "",
                 "visible ask",
               ].join("\n"),
@@ -500,9 +500,9 @@ describe("SessionHistorySseState", () => {
             {
               type: "text",
               text: [
-                "<<<BEGIN_OPENCLAW_INTERNAL_CONTEXT>>>",
+                "<<<BEGIN_RECALL_INTERNAL_CONTEXT>>>",
                 "subagent completion payload",
-                "<<<END_OPENCLAW_INTERNAL_CONTEXT>>>",
+                "<<<END_RECALL_INTERNAL_CONTEXT>>>",
               ].join("\n"),
             },
           ],
@@ -530,7 +530,7 @@ describe("SessionHistorySseState", () => {
       rawMessages: [
         {
           role: "custom",
-          customType: "openclaw.runtime-context",
+          customType: "recall.runtime-context",
           content: "secret runtime context",
           display: false,
           __openclaw: { seq: 1 },
@@ -563,10 +563,10 @@ describe("SessionHistorySseState", () => {
               type: "text",
               text: [
                 "[Inter-session message] sourceSession=agent:main:subagent:child sourceChannel=webchat sourceTool=subagent_announce isUser=false",
-                "This content was routed by OpenClaw from another session or internal tool.",
-                "<<<BEGIN_OPENCLAW_INTERNAL_CONTEXT>>>",
+                "This content was routed by Recall from another session or internal tool.",
+                "<<<BEGIN_RECALL_INTERNAL_CONTEXT>>>",
                 "subagent completion payload",
-                "<<<END_OPENCLAW_INTERNAL_CONTEXT>>>",
+                "<<<END_RECALL_INTERNAL_CONTEXT>>>",
               ].join("\n"),
             },
           ],
@@ -662,7 +662,7 @@ describe("SessionHistorySseState", () => {
       state.appendInlineMessage({
         message: {
           role: "custom",
-          customType: "openclaw.runtime-context",
+          customType: "recall.runtime-context",
           content: "secret runtime context",
           display: false,
         },
@@ -676,9 +676,9 @@ describe("SessionHistorySseState", () => {
             {
               type: "text",
               text: [
-                "<<<BEGIN_OPENCLAW_INTERNAL_CONTEXT>>>",
+                "<<<BEGIN_RECALL_INTERNAL_CONTEXT>>>",
                 "runtime details",
-                "<<<END_OPENCLAW_INTERNAL_CONTEXT>>>",
+                "<<<END_RECALL_INTERNAL_CONTEXT>>>",
               ].join("\n"),
             },
           ],

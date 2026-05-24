@@ -1,17 +1,17 @@
 ---
-summary: "CLI reference for `openclaw cron` (schedule and run background jobs)"
+summary: "CLI reference for `recall cron` (schedule and run background jobs)"
 read_when:
   - You want scheduled jobs and wakeups
   - You are debugging cron execution and logs
 title: "Cron"
 ---
 
-# `openclaw cron`
+# `recall cron`
 
 Manage cron jobs for the Gateway scheduler.
 
 <Tip>
-Run `openclaw cron --help` for the full command surface. See [Cron jobs](/automation/cron-jobs) for the conceptual guide.
+Run `recall cron --help` for the full command surface. See [Cron jobs](/automation/cron-jobs) for the conceptual guide.
 </Tip>
 
 ## Sessions
@@ -33,7 +33,7 @@ Run `openclaw cron --help` for the full command surface. See [Cron jobs](/automa
 
 ## Delivery
 
-`openclaw cron list` and `openclaw cron show <job-id>` preview the resolved delivery route. For `channel: "last"`, the preview shows whether the route resolved from the main or current session, or will fail closed.
+`recall cron list` and `recall cron show <job-id>` preview the resolved delivery route. For `channel: "last"`, the preview shows whether the route resolved from the main or current session, or will fail closed.
 
 Provider-prefixed targets can disambiguate unresolved announce channels. For example, `to: "telegram:123"` selects Telegram when `delivery.channel` is omitted or `last`. Only prefixes advertised by the loaded plugin are provider selectors. If `delivery.channel` is explicit, the prefix must match that channel; `channel: "whatsapp"` with `to: "telegram:123"` is rejected. Service prefixes such as `imessage:` and `sms:` remain channel-owned target syntax.
 
@@ -70,8 +70,8 @@ Note: isolated cron runs treat run-level agent failures as job errors even when
 no reply payload is produced, so model/provider failures still increment error
 counters and trigger failure notifications.
 
-If an isolated run times out before the first model request, `openclaw cron show`
-and `openclaw cron runs` include a phase-specific error such as
+If an isolated run times out before the first model request, `recall cron show`
+and `recall cron runs` include a phase-specific error such as
 `setup timed out before runner start` or
 `stalled before first model call (last phase: context-engine)`.
 For CLI-backed providers, the pre-model watchdog stays active until the external
@@ -92,7 +92,7 @@ One-shot jobs delete after success by default. Use `--keep-after-run` to preserv
 
 Recurring jobs use exponential retry backoff after consecutive errors: 30s, 1m, 5m, 15m, 60m. The schedule returns to normal after the next successful run.
 
-Skipped runs are tracked separately from execution errors. They do not affect retry backoff, but `openclaw cron edit <job-id> --failure-alert-include-skipped` can opt failure alerts into repeated skipped-run notifications.
+Skipped runs are tracked separately from execution errors. They do not affect retry backoff, but `recall cron edit <job-id> --failure-alert-include-skipped` can opt failure alerts into repeated skipped-run notifications.
 
 For isolated jobs that target a local configured model provider, cron runs a lightweight provider preflight before starting the agent turn. Loopback, private-network, and `.local` `api: "ollama"` providers are probed at `/api/tags`; local OpenAI-compatible providers such as vLLM, SGLang, and LM Studio are probed at `/models`. If the endpoint is unreachable, the run is recorded as `skipped` and retried on a later schedule; matching dead endpoints are cached for 5 minutes to avoid many jobs hammering the same local server.
 
@@ -100,17 +100,17 @@ Note: cron job definitions live in `jobs.json`, while pending runtime state live
 
 ### Manual runs
 
-`openclaw cron run <job-id>` force-runs by default and returns as soon as the manual run is queued. Successful responses include `{ ok: true, enqueued: true, runId }`. Use the returned `runId` to inspect the later result:
+`recall cron run <job-id>` force-runs by default and returns as soon as the manual run is queued. Successful responses include `{ ok: true, enqueued: true, runId }`. Use the returned `runId` to inspect the later result:
 
 ```bash
-openclaw cron run <job-id>
-openclaw cron runs --id <job-id> --run-id <run-id>
+recall cron run <job-id>
+recall cron runs --id <job-id> --run-id <run-id>
 ```
 
 Add `--wait` when a script should block until that exact queued run records a terminal status:
 
 ```bash
-openclaw cron run <job-id> --wait --wait-timeout 10m --poll-interval 2s
+recall cron run <job-id> --wait --wait-timeout 10m --poll-interval 2s
 ```
 
 With `--wait`, the CLI still calls `cron.run` first, then polls `cron.runs` for the returned `runId`. The command exits `0` only when the run finishes with status `ok`. It exits non-zero when the run finishes with `error` or `skipped`, when the Gateway response does not include a `runId`, or when `--wait-timeout` expires. `--poll-interval` must be greater than zero.
@@ -132,9 +132,9 @@ Cron `--model` is a **job primary**, not a chat-session `/model` override. That 
 - Configured model fallbacks still apply when the selected job model fails.
 - Per-job payload `fallbacks` replaces the configured fallback list when present.
 - An empty per-job fallback list (`fallbacks: []` in the job payload/API) makes the cron run strict.
-- When a job has `--model` but no fallback list is configured, OpenClaw passes an explicit empty fallback override so the agent primary is not appended as a hidden retry target.
+- When a job has `--model` but no fallback list is configured, Recall passes an explicit empty fallback override so the agent primary is not appended as a hidden retry target.
 
-`openclaw doctor` reports jobs that already have `payload.model` set, including provider namespace counts and mismatches against `agents.defaults.model`. Use that check when auth, provider, or billing behavior looks different between live chat and scheduled jobs.
+`recall doctor` reports jobs that already have `payload.model` set, including provider namespace counts and mismatches against `agents.defaults.model`. Use that check when auth, provider, or billing behavior looks different between live chat and scheduled jobs.
 
 ### Isolated cron model precedence
 
@@ -176,12 +176,12 @@ Cron does not classify final-output prose or approval-looking refusal phrases as
 Retention and pruning are controlled in config:
 
 - `cron.sessionRetention` (default `24h`) prunes completed isolated run sessions.
-- `cron.runLog.maxBytes` and `cron.runLog.keepLines` prune `~/.openclaw/cron/runs/<jobId>.jsonl`.
+- `cron.runLog.maxBytes` and `cron.runLog.keepLines` prune `~/.recall/cron/runs/<jobId>.jsonl`.
 
 ## Migrating older jobs
 
 <Note>
-If you have cron jobs from before the current delivery and store format, run `openclaw doctor --fix`. Doctor normalizes legacy cron fields (`jobId`, `schedule.cron`, top-level delivery fields including legacy `threadId`, payload `provider` delivery aliases) and migrates simple `notify: true` webhook fallback jobs to explicit webhook delivery when `cron.webhook` is configured.
+If you have cron jobs from before the current delivery and store format, run `recall doctor --fix`. Doctor normalizes legacy cron fields (`jobId`, `schedule.cron`, top-level delivery fields including legacy `threadId`, payload `provider` delivery aliases) and migrates simple `notify: true` webhook fallback jobs to explicit webhook delivery when `cron.webhook` is configured.
 </Note>
 
 ## Common edits
@@ -189,37 +189,37 @@ If you have cron jobs from before the current delivery and store format, run `op
 Update delivery settings without changing the message:
 
 ```bash
-openclaw cron edit <job-id> --announce --channel telegram --to "123456789"
+recall cron edit <job-id> --announce --channel telegram --to "123456789"
 ```
 
 Disable delivery for an isolated job:
 
 ```bash
-openclaw cron edit <job-id> --no-deliver
+recall cron edit <job-id> --no-deliver
 ```
 
 Enable lightweight bootstrap context for an isolated job:
 
 ```bash
-openclaw cron edit <job-id> --light-context
+recall cron edit <job-id> --light-context
 ```
 
 Announce to a specific channel:
 
 ```bash
-openclaw cron edit <job-id> --announce --channel slack --to "channel:C1234567890"
+recall cron edit <job-id> --announce --channel slack --to "channel:C1234567890"
 ```
 
 Announce to a Telegram forum topic:
 
 ```bash
-openclaw cron edit <job-id> --announce --channel telegram --to "-1001234567890" --thread-id 42
+recall cron edit <job-id> --announce --channel telegram --to "-1001234567890" --thread-id 42
 ```
 
 Create an isolated job with lightweight bootstrap context:
 
 ```bash
-openclaw cron add \
+recall cron add \
   --name "Lightweight morning brief" \
   --cron "0 7 * * *" \
   --session isolated \
@@ -235,21 +235,21 @@ openclaw cron add \
 Manual run and inspection:
 
 ```bash
-openclaw cron list
-openclaw cron list --agent ops
-openclaw cron get <job-id>
-openclaw cron show <job-id>
-openclaw cron run <job-id>
-openclaw cron run <job-id> --due
-openclaw cron run <job-id> --wait --wait-timeout 10m
-openclaw cron run <job-id> --wait --wait-timeout 10m --poll-interval 2s
-openclaw cron runs --id <job-id> --limit 50
-openclaw cron runs --id <job-id> --run-id <run-id>
+recall cron list
+recall cron list --agent ops
+recall cron get <job-id>
+recall cron show <job-id>
+recall cron run <job-id>
+recall cron run <job-id> --due
+recall cron run <job-id> --wait --wait-timeout 10m
+recall cron run <job-id> --wait --wait-timeout 10m --poll-interval 2s
+recall cron runs --id <job-id> --limit 50
+recall cron runs --id <job-id> --run-id <run-id>
 ```
 
-`openclaw cron list` shows all matching jobs by default. Pass `--agent <id>` to show only jobs whose effective normalized agent id matches; jobs without a stored agent id count as the configured default agent.
+`recall cron list` shows all matching jobs by default. Pass `--agent <id>` to show only jobs whose effective normalized agent id matches; jobs without a stored agent id count as the configured default agent.
 
-`openclaw cron get <job-id>` returns the stored job JSON directly. Use `cron show <job-id>` when you want the human-readable view with delivery-route preview.
+`recall cron get <job-id>` returns the stored job JSON directly. Use `cron show <job-id>` when you want the human-readable view with delivery-route preview.
 
 `cron list --json` and `cron show <job-id> --json` include a top-level `status` field on each job, computed from `enabled`, `state.runningAtMs`, and `state.lastRunStatus`. Values: `disabled`, `running`, `ok`, `error`, `skipped`, or `idle`. This mirrors the human-readable status column so external tooling can read job state without re-deriving it.
 
@@ -258,21 +258,21 @@ openclaw cron runs --id <job-id> --run-id <run-id>
 Agent and session retargeting:
 
 ```bash
-openclaw cron edit <job-id> --agent ops
-openclaw cron edit <job-id> --clear-agent
-openclaw cron edit <job-id> --session current
-openclaw cron edit <job-id> --session "session:daily-brief"
+recall cron edit <job-id> --agent ops
+recall cron edit <job-id> --clear-agent
+recall cron edit <job-id> --session current
+recall cron edit <job-id> --session "session:daily-brief"
 ```
 
-`openclaw cron add` warns when `--agent` is omitted on agent-turn jobs and falls back to the default agent (`main`). Pass `--agent <id>` at create time to pin a specific agent.
+`recall cron add` warns when `--agent` is omitted on agent-turn jobs and falls back to the default agent (`main`). Pass `--agent <id>` at create time to pin a specific agent.
 
 Delivery tweaks:
 
 ```bash
-openclaw cron edit <job-id> --announce --channel slack --to "channel:C1234567890"
-openclaw cron edit <job-id> --best-effort-deliver
-openclaw cron edit <job-id> --no-best-effort-deliver
-openclaw cron edit <job-id> --no-deliver
+recall cron edit <job-id> --announce --channel slack --to "channel:C1234567890"
+recall cron edit <job-id> --best-effort-deliver
+recall cron edit <job-id> --no-best-effort-deliver
+recall cron edit <job-id> --no-deliver
 ```
 
 ## Related

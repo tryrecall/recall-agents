@@ -1,8 +1,8 @@
 {
-  "name": "@openclaw/memory-core",
+  "name": "@recall/memory-core",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw core memory search plugin",
+  "description": "Recall core memory search plugin",
   "type": "module",
   "dependencies": {
     "chokidar": "5.0.0",
@@ -10,18 +10,18 @@
     "typebox": "1.1.38"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*",
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.5.22"
+    "recall": ">=2026.5.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

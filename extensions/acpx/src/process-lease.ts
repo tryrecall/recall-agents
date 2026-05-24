@@ -1,12 +1,12 @@
 import { randomUUID, createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { readJsonFileWithFallback, writeJsonFileAtomically } from "openclaw/plugin-sdk/json-store";
+import { readJsonFileWithFallback, writeJsonFileAtomically } from "recall/plugin-sdk/json-store";
 
-export const OPENCLAW_ACPX_LEASE_ID_ENV = "OPENCLAW_ACPX_LEASE_ID";
-export const OPENCLAW_GATEWAY_INSTANCE_ID_ENV = "OPENCLAW_GATEWAY_INSTANCE_ID";
-export const OPENCLAW_ACPX_LEASE_ID_ARG = "--openclaw-acpx-lease-id";
-export const OPENCLAW_GATEWAY_INSTANCE_ID_ARG = "--openclaw-gateway-instance-id";
+export const RECALL_ACPX_LEASE_ID_ENV = "RECALL_ACPX_LEASE_ID";
+export const RECALL_GATEWAY_INSTANCE_ID_ENV = "RECALL_GATEWAY_INSTANCE_ID";
+export const RECALL_ACPX_LEASE_ID_ARG = "--recall-acpx-lease-id";
+export const RECALL_GATEWAY_INSTANCE_ID_ARG = "--recall-gateway-instance-id";
 
 export type AcpxProcessLeaseState = "open" | "closing" | "closed" | "lost";
 
@@ -154,9 +154,9 @@ function appendAcpxLeaseArgs(params: {
 }): string {
   return [
     params.command,
-    OPENCLAW_ACPX_LEASE_ID_ARG,
+    RECALL_ACPX_LEASE_ID_ARG,
     quoteEnvValue(params.leaseId),
-    OPENCLAW_GATEWAY_INSTANCE_ID_ARG,
+    RECALL_GATEWAY_INSTANCE_ID_ARG,
     quoteEnvValue(params.gatewayInstanceId),
   ].join(" ");
 }
@@ -172,8 +172,8 @@ export function withAcpxLeaseEnvironment(params: {
   }
   return [
     "env",
-    `${OPENCLAW_ACPX_LEASE_ID_ENV}=${quoteEnvValue(params.leaseId)}`,
-    `${OPENCLAW_GATEWAY_INSTANCE_ID_ENV}=${quoteEnvValue(params.gatewayInstanceId)}`,
+    `${RECALL_ACPX_LEASE_ID_ENV}=${quoteEnvValue(params.leaseId)}`,
+    `${RECALL_GATEWAY_INSTANCE_ID_ENV}=${quoteEnvValue(params.gatewayInstanceId)}`,
     appendAcpxLeaseArgs(params),
   ].join(" ");
 }

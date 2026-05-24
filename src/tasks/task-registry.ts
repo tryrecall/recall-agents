@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { createRequire } from "node:module";
 import { shouldRouteCompletionThroughRequesterSession } from "../auto-reply/reply/completion-delivery-policy.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { onAgentEvent } from "../infra/agent-events.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { requestHeartbeat } from "../infra/heartbeat-wake.js";
@@ -71,10 +71,10 @@ type TaskRegistryDeliveryRuntime = Pick<
   "sendMessage"
 >;
 const TASK_REGISTRY_DELIVERY_RUNTIME_OVERRIDE_KEY = Symbol.for(
-  "openclaw.taskRegistry.deliveryRuntimeOverride",
+  "recall.taskRegistry.deliveryRuntimeOverride",
 );
 const TASK_REGISTRY_CONTROL_RUNTIME_OVERRIDE_KEY = Symbol.for(
-  "openclaw.taskRegistry.controlRuntimeOverride",
+  "recall.taskRegistry.controlRuntimeOverride",
 );
 const require = createRequire(import.meta.url);
 const TASK_REGISTRY_CONTROL_RUNTIME_CANDIDATES = [
@@ -1870,7 +1870,7 @@ export function linkTaskToFlowById(params: { taskId: string; flowId: string }): 
 }
 
 export async function cancelTaskById(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   taskId: string;
   reason?: string;
 }): Promise<{ found: boolean; cancelled: boolean; reason?: string; task?: TaskRecord }> {
@@ -1908,7 +1908,7 @@ export async function cancelTaskById(params: {
       }
       if (!childSessionKey) {
         // Codex native subagents are mirrored from the Codex app server and do
-        // not have OpenClaw child sessions to terminate. Cancellation clears
+        // not have Recall child sessions to terminate. Cancellation clears
         // the stale task-registry record only.
       } else if (task.runtime === "acp") {
         const { getAcpSessionManager } = await loadTaskRegistryControlRuntime();

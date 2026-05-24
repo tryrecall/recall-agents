@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
-import { resolveSendableOutboundReplyParts } from "openclaw/plugin-sdk/reply-payload";
+import { resolveSendableOutboundReplyParts } from "recall/plugin-sdk/reply-payload";
 import { listAgentIds, resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import type { CliDeps } from "../cli/deps.types.js";
 import { withProgress } from "../cli/progress.js";
 import { getRuntimeConfig } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   callGateway,
   isGatewayTransportError,
@@ -104,7 +104,7 @@ function protectJsonStdout(opts: Pick<AgentCliOpts, "json">): void {
   }
 }
 
-function parseTimeoutSeconds(opts: { cfg: OpenClawConfig; timeout?: string }) {
+function parseTimeoutSeconds(opts: { cfg: RecallConfig; timeout?: string }) {
   const raw =
     opts.timeout !== undefined
       ? Number.parseInt(opts.timeout, 10)
@@ -508,12 +508,12 @@ async function agentViaGatewayCommand(
   const explicitSessionKey = opts.sessionKey?.trim();
   if (!body) {
     throw new Error(
-      `Missing message. Use ${formatCliCommand('openclaw agent --message "..." --agent <id>')} or pass --to/--session-key/--session-id for an existing conversation.`,
+      `Missing message. Use ${formatCliCommand('recall agent --message "..." --agent <id>')} or pass --to/--session-key/--session-id for an existing conversation.`,
     );
   }
   if (!opts.to && !opts.sessionId && !opts.agent && !explicitSessionKey) {
     throw new Error(
-      `No target session selected. Use --agent <id>, --session-key <key>, --session-id <id>, or --to <E.164>. Run ${formatCliCommand("openclaw agents list")} to see agents.`,
+      `No target session selected. Use --agent <id>, --session-key <key>, --session-id <id>, or --to <E.164>. Run ${formatCliCommand("recall agents list")} to see agents.`,
     );
   }
 
@@ -524,7 +524,7 @@ async function agentViaGatewayCommand(
     const knownAgents = listAgentIds(cfg);
     if (!knownAgents.includes(agentId)) {
       throw new Error(
-        `Unknown agent id "${agentIdRaw}". Use "${formatCliCommand("openclaw agents list")}" to see configured agents.`,
+        `Unknown agent id "${agentIdRaw}". Use "${formatCliCommand("recall agents list")}" to see configured agents.`,
       );
     }
   }

@@ -9,7 +9,7 @@ import { appendUntrustedContext } from "./untrusted-context.js";
 
 const REPLY_MEDIA_HINT =
   "To send an image back, prefer the message tool (media/path/filePath). If you must inline, use MEDIA:https://example.com/image.jpg (spaces ok, quote if needed) or a safe relative path like MEDIA:./image.jpg. Absolute and ~ paths only work when they stay inside your allowed file-read boundary; host file:// URLs are blocked. Keep caption in the text body.";
-const ROOM_EVENT_PROMPT = "[OpenClaw room event]";
+const ROOM_EVENT_PROMPT = "[Recall room event]";
 const ROOM_EVENT_VISIBLE_REPLY_CONTRACT = "message_tool_only";
 
 export function buildReplyPromptBodies(params: {
@@ -132,7 +132,7 @@ function resolveRoomEventBody(params: ReplyPromptEnvelopeBaseParams): string {
 function buildRoomEventContext(params: ReplyPromptEnvelopeBaseParams): string {
   const roomEventBody = resolveRoomEventBody(params);
   return [
-    "[OpenClaw room event]",
+    "[Recall room event]",
     "inbound_event_kind: room_event",
     `visible_reply_contract: ${ROOM_EVENT_VISIBLE_REPLY_CONTRACT}`,
     params.inboundUserContext.trim() ? `Room context:\n${params.inboundUserContext.trim()}` : "",
@@ -172,7 +172,7 @@ export function buildReplyPromptEnvelopeBase(
   const transcriptBody = params.isHeartbeat
     ? HEARTBEAT_TRANSCRIPT_PROMPT
     : params.isBareSessionReset
-      ? softResetTail || `[OpenClaw session ${params.startupAction}]`
+      ? softResetTail || `[Recall session ${params.startupAction}]`
       : isRoomEvent
         ? ""
         : params.hasUserBody

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { filterLocalModelLeanTools, isLocalModelLeanEnabled } from "./local-model-lean.js";
 import type { AnyAgentTool } from "./pi-tools.types.js";
 
@@ -9,7 +9,7 @@ function tools(names: string[]): AnyAgentTool[] {
 
 describe("local model lean tool filtering", () => {
   it("filters heavyweight tools for one configured agent", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       agents: {
         list: [
           {
@@ -33,7 +33,7 @@ describe("local model lean tool filtering", () => {
   });
 
   it("lets an agent opt out of an inherited global lean setting", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       agents: {
         defaults: {
           experimental: {
@@ -62,7 +62,7 @@ describe("local model lean tool filtering", () => {
   });
 
   it("inherits global lean mode when an agent experimental block omits the flag", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       agents: {
         defaults: {
           experimental: {
@@ -89,7 +89,7 @@ describe("local model lean tool filtering", () => {
   });
 
   it("keeps global lean mode for an agent id without an agent entry", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       agents: {
         defaults: {
           experimental: {
@@ -110,7 +110,7 @@ describe("local model lean tool filtering", () => {
   });
 
   it("uses the configured default agent when no agent id is explicit", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       agents: {
         list: [
           {
@@ -134,7 +134,7 @@ describe("local model lean tool filtering", () => {
   });
 
   it("uses the agent from an agent session key", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       agents: {
         list: [
           {

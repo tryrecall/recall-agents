@@ -1,4 +1,4 @@
-import { createSetupTranslator } from "openclaw/plugin-sdk/setup-runtime";
+import { createSetupTranslator } from "recall/plugin-sdk/setup-runtime";
 import {
   applyTlonSetupConfig,
   createTlonSetupWizardBase,

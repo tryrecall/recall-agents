@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import {
   listMediaGenerationProviderModels,
   synthesizeMediaGenerationCatalogEntries,
@@ -21,7 +21,7 @@ type MediaGenerateProvider = {
   defaultModel?: string;
   models?: readonly string[];
   capabilities: unknown;
-  isConfigured?: (ctx: { cfg?: OpenClawConfig; agentDir?: string }) => boolean;
+  isConfigured?: (ctx: { cfg?: RecallConfig; agentDir?: string }) => boolean;
 };
 
 type MediaGenerateListProviderDetails<TProvider extends MediaGenerateProvider> = {
@@ -44,7 +44,7 @@ export function createMediaGenerateProviderListActionResult<
   kind: MediaGenerationCatalogKind;
   providers: TProvider[];
   emptyText: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   workspaceDir?: string;
   agentDir?: string;
   authStore?: AuthProfileStore;

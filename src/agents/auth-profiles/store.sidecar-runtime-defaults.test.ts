@@ -16,13 +16,13 @@ import {
 const PROFILE_ID = "openai-codex:default";
 const SEED = "legacy-seed";
 const SIDECAR_REF = {
-  source: "openclaw-credentials" as const,
+  source: "recall-credentials" as const,
   provider: "openai-codex" as const,
   id: "0123456789abcdef0123456789abcdef",
 };
 
 const envBackup: Record<string, string | undefined> = {};
-const envKeys = ["OPENCLAW_STATE_DIR", "OPENCLAW_OAUTH_DIR", "OPENCLAW_AUTH_PROFILE_SECRET_KEY"];
+const envKeys = ["RECALL_STATE_DIR", "RECALL_OAUTH_DIR", "RECALL_AUTH_PROFILE_SECRET_KEY"];
 const tempDirs: string[] = [];
 
 beforeEach(() => {
@@ -47,11 +47,11 @@ afterEach(() => {
 });
 
 function setUpSidecarFixture(): { agentDir: string } {
-  const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-sidecar-runtime-defaults-"));
+  const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-sidecar-runtime-defaults-"));
   tempDirs.push(stateDir);
-  process.env.OPENCLAW_STATE_DIR = stateDir;
-  delete process.env.OPENCLAW_OAUTH_DIR;
-  process.env.OPENCLAW_AUTH_PROFILE_SECRET_KEY = SEED;
+  process.env.RECALL_STATE_DIR = stateDir;
+  delete process.env.RECALL_OAUTH_DIR;
+  process.env.RECALL_AUTH_PROFILE_SECRET_KEY = SEED;
 
   const agentDir = path.join(stateDir, "agents", "main", "agent");
   fs.mkdirSync(agentDir, { recursive: true });

@@ -1,8 +1,8 @@
 import { normalizeAgentId } from "../routing/session-key.js";
-import type { OpenClawConfig } from "./types.openclaw.js";
+import type { RecallConfig } from "./types.recall.js";
 
 export function resolveExecCommandHighlighting(params: {
-  config?: OpenClawConfig | null;
+  config?: RecallConfig | null;
   agentId?: string | null;
 }): boolean {
   const config = params.config ?? {};

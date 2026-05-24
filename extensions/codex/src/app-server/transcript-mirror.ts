@@ -9,7 +9,7 @@ import {
   type AgentMessage,
   type EmbeddedRunAttemptParams,
   type SessionWriteLockAcquireTimeoutConfig,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "recall/plugin-sdk/agent-harness-runtime";
 
 type MirroredAgentMessage = Extract<AgentMessage, { role: "user" | "assistant" | "toolResult" }>;
 

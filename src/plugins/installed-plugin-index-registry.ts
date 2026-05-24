@@ -1,5 +1,5 @@
 import { normalizePluginsConfig } from "./config-state.js";
-import { discoverOpenClawPlugins, type PluginCandidate } from "./discovery.js";
+import { discoverRecallPlugins, type PluginCandidate } from "./discovery.js";
 import { loadInstalledPluginIndexInstallRecordsSync } from "./installed-plugin-index-record-reader.js";
 import type { LoadInstalledPluginIndexParams } from "./installed-plugin-index-types.js";
 import { loadPluginManifestRegistry, type PluginManifestRegistry } from "./manifest-registry.js";
@@ -27,7 +27,7 @@ export function resolveInstalledPluginIndexRegistry(params: LoadInstalledPluginI
     params.installRecords ?? loadInstalledPluginIndexInstallRecordsSync({ env: params.env });
   const discovery =
     params.discovery ??
-    discoverOpenClawPlugins({
+    discoverRecallPlugins({
       workspaceDir: params.workspaceDir,
       extraPaths: normalized.loadPaths,
       env: params.env,

@@ -1,5 +1,5 @@
 ---
-summary: "How OpenClaw separates model providers, models, channels, and agent runtimes"
+summary: "How Recall separates model providers, models, channels, and agent runtimes"
 title: "Agent runtimes"
 read_when:
   - You are choosing between PI, Codex, ACP, or another native agent runtime
@@ -9,29 +9,29 @@ read_when:
 
 An **agent runtime** is the component that owns one prepared model loop: it
 receives the prompt, drives model output, handles native tool calls, and returns
-the finished turn to OpenClaw.
+the finished turn to Recall.
 
 Runtimes are easy to confuse with providers because both show up near model
 configuration. They are different layers:
 
 | Layer         | Examples                              | What it means                                                       |
 | ------------- | ------------------------------------- | ------------------------------------------------------------------- |
-| Provider      | `openai`, `anthropic`, `openai-codex` | How OpenClaw authenticates, discovers models, and names model refs. |
+| Provider      | `openai`, `anthropic`, `openai-codex` | How Recall authenticates, discovers models, and names model refs. |
 | Model         | `gpt-5.5`, `claude-opus-4-6`          | The model selected for the agent turn.                              |
 | Agent runtime | `pi`, `codex`, `claude-cli`           | The low level loop or backend that executes the prepared turn.      |
-| Channel       | Telegram, Discord, Slack, WhatsApp    | Where messages enter and leave OpenClaw.                            |
+| Channel       | Telegram, Discord, Slack, WhatsApp    | Where messages enter and leave Recall.                            |
 
 You will also see the word **harness** in code. A harness is the implementation
 that provides an agent runtime. For example, the bundled Codex harness
 implements the `codex` runtime. Public config uses `agentRuntime.id` on
 provider or model entries; whole-agent runtime keys are legacy and ignored.
-`openclaw doctor --fix` removes old whole-agent runtime pins and rewrites
+`recall doctor --fix` removes old whole-agent runtime pins and rewrites
 legacy runtime model refs to canonical provider/model refs plus model-scoped
 runtime policy where needed.
 
 There are two runtime families:
 
-- **Embedded harnesses** run inside OpenClaw's prepared agent loop. Today this
+- **Embedded harnesses** run inside Recall's prepared agent loop. Today this
   is the built-in `pi` runtime plus registered plugin harnesses such as
   `codex`.
 - **CLI backends** run a local CLI process while keeping the model ref
@@ -44,7 +44,7 @@ There are two runtime families:
 
 Most confusion comes from several different surfaces sharing the Codex name:
 
-| Surface                                          | OpenClaw name/config                 | What it does                                                                                                   |
+| Surface                                          | Recall name/config                 | What it does                                                                                                   |
 | ------------------------------------------------ | ------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
 | Native Codex app-server runtime                  | `openai/*` model refs                | Runs OpenAI embedded agent turns through Codex app-server. This is the usual ChatGPT/Codex subscription setup. |
 | Codex OAuth auth profiles                        | `openai-codex` auth provider         | Stores ChatGPT/Codex subscription auth that the Codex app-server harness consumes.                             |
@@ -53,7 +53,7 @@ Most confusion comes from several different surfaces sharing the Codex name:
 | OpenAI Platform API route for non-agent surfaces | `openai/*` plus API-key auth         | Used for direct OpenAI APIs such as images, embeddings, speech, and realtime.                                  |
 
 Those surfaces are intentionally independent. Enabling the `codex` plugin makes
-the native app-server features available; `openclaw doctor --fix` owns legacy
+the native app-server features available; `recall doctor --fix` owns legacy
 `openai-codex/*` route repair and stale session pin cleanup. Selecting
 `openai/*` for an agent model now means "run this through Codex" unless a
 non-agent OpenAI API surface is being used.
@@ -71,9 +71,9 @@ the model ref as `openai/*` and selects the `codex` runtime:
 }
 ```
 
-That means OpenClaw selects an OpenAI model ref, then asks the Codex app-server
+That means Recall selects an OpenAI model ref, then asks the Codex app-server
 runtime to run the embedded agent turn. It does not mean "use API billing," and
-it does not mean the channel, model provider catalog, or OpenClaw session store
+it does not mean the channel, model provider catalog, or Recall session store
 becomes Codex.
 
 When the bundled `codex` plugin is enabled, natural-language Codex control
@@ -94,11 +94,11 @@ This is the agent-facing decision tree:
    `agentRuntime.id: "pi"`. A selected `openai-codex` auth profile is routed
    internally through PI's legacy Codex-auth transport.
 4. If legacy config still contains **`openai-codex/*` model refs**, repair it to
-   `openai/<model>` with `openclaw doctor --fix`; doctor keeps the Codex auth
+   `openai/<model>` with `recall doctor --fix`; doctor keeps the Codex auth
    route by adding provider/model-scoped `agentRuntime.id: "codex"` where the
    old model ref implied it.
    Legacy **`codex-cli/*` model refs** repair to the same `openai/<model>` Codex
-   app-server route; OpenClaw no longer keeps a bundled Codex CLI backend.
+   app-server route; Recall no longer keeps a bundled Codex CLI backend.
 5. If the user explicitly says **ACP**, **acpx**, or **Codex ACP adapter**, use
    ACP with `runtime: "acp"` and `agentId: "codex"`.
 6. If the request is for **Claude Code, Gemini CLI, OpenCode, Cursor, Droid, or
@@ -119,25 +119,25 @@ contract, see [Codex harness runtime](/plugins/codex-harness-runtime#v1-support-
 
 Different runtimes own different amounts of the loop.
 
-| Surface                     | OpenClaw PI embedded                    | Codex app-server                                                            |
+| Surface                     | Recall PI embedded                    | Codex app-server                                                            |
 | --------------------------- | --------------------------------------- | --------------------------------------------------------------------------- |
-| Model loop owner            | OpenClaw through the PI embedded runner | Codex app-server                                                            |
-| Canonical thread state      | OpenClaw transcript                     | Codex thread, plus OpenClaw transcript mirror                               |
-| OpenClaw dynamic tools      | Native OpenClaw tool loop               | Bridged through the Codex adapter                                           |
-| Native shell and file tools | PI/OpenClaw path                        | Codex-native tools, bridged through native hooks where supported            |
-| Context engine              | Native OpenClaw context assembly        | OpenClaw projects assembled context into the Codex turn                     |
-| Compaction                  | OpenClaw or selected context engine     | Codex-native compaction, with OpenClaw notifications and mirror maintenance |
-| Channel delivery            | OpenClaw                                | OpenClaw                                                                    |
+| Model loop owner            | Recall through the PI embedded runner | Codex app-server                                                            |
+| Canonical thread state      | Recall transcript                     | Codex thread, plus Recall transcript mirror                               |
+| Recall dynamic tools      | Native Recall tool loop               | Bridged through the Codex adapter                                           |
+| Native shell and file tools | PI/Recall path                        | Codex-native tools, bridged through native hooks where supported            |
+| Context engine              | Native Recall context assembly        | Recall projects assembled context into the Codex turn                     |
+| Compaction                  | Recall or selected context engine     | Codex-native compaction, with Recall notifications and mirror maintenance |
+| Channel delivery            | Recall                                | Recall                                                                    |
 
 This ownership split is the main design rule:
 
-- If OpenClaw owns the surface, OpenClaw can provide normal plugin hook behavior.
-- If the native runtime owns the surface, OpenClaw needs runtime events or native hooks.
-- If the native runtime owns canonical thread state, OpenClaw should mirror and project context, not rewrite unsupported internals.
+- If Recall owns the surface, Recall can provide normal plugin hook behavior.
+- If the native runtime owns the surface, Recall needs runtime events or native hooks.
+- If the native runtime owns canonical thread state, Recall should mirror and project context, not rewrite unsupported internals.
 
 ## Runtime selection
 
-OpenClaw chooses an embedded runtime after provider and model resolution:
+Recall chooses an embedded runtime after provider and model resolution:
 
 1. Model-scoped runtime policy wins. This can live in a configured provider
    model entry or in `agents.defaults.models["provider/model"].agentRuntime` /
@@ -149,15 +149,15 @@ OpenClaw chooses an embedded runtime after provider and model resolution:
    `models.providers.<provider>.agentRuntime`.
 3. In `auto` mode, registered plugin runtimes can claim supported provider/model
    pairs.
-4. If no runtime claims a turn in `auto` mode, OpenClaw uses PI as the
+4. If no runtime claims a turn in `auto` mode, Recall uses PI as the
    compatibility runtime. Use an explicit runtime id when the run must be
    strict.
 
 Whole-session and whole-agent runtime pins are ignored. That includes
-`OPENCLAW_AGENT_RUNTIME`, session `agentHarnessId`/`agentRuntimeOverride` state,
+`RECALL_AGENT_RUNTIME`, session `agentHarnessId`/`agentRuntimeOverride` state,
 `agents.defaults.agentRuntime`, and `agents.list[].agentRuntime`. Run
-`openclaw doctor --fix` to remove stale whole-agent runtime config and convert
-legacy runtime model refs where OpenClaw can preserve the intent.
+`recall doctor --fix` to remove stale whole-agent runtime config and convert
+legacy runtime model refs where Recall can preserve the intent.
 
 Explicit provider/model plugin runtimes fail closed. For example,
 `agentRuntime.id: "codex"` on a provider or model means Codex or a clear
@@ -193,25 +193,25 @@ backend.
 models are the exception: unset runtime and `auto` both resolve to the Codex
 harness. Explicit PI runtime config remains an opt-in compatibility route for
 `openai/*` agent turns; when paired with a selected `openai-codex` auth profile,
-OpenClaw routes PI internally through the legacy Codex-auth transport while
+Recall routes PI internally through the legacy Codex-auth transport while
 keeping the public model ref as `openai/*`. Stale OpenAI PI session pins are
-ignored by runtime selection and can be cleaned with `openclaw doctor --fix`.
+ignored by runtime selection and can be cleaned with `recall doctor --fix`.
 
-If `openclaw doctor` warns that the `codex` plugin is enabled while
+If `recall doctor` warns that the `codex` plugin is enabled while
 `openai-codex/*` remains in config, treat that as legacy route state. Run
-`openclaw doctor --fix` to rewrite it to `openai/*` with the Codex runtime.
+`recall doctor --fix` to rewrite it to `openai/*` with the Codex runtime.
 
 ## Compatibility contract
 
-When a runtime is not PI, it should document what OpenClaw surfaces it supports.
+When a runtime is not PI, it should document what Recall surfaces it supports.
 Use this shape for runtime docs:
 
 | Question                               | Why it matters                                                                                    |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | Who owns the model loop?               | Determines where retries, tool continuation, and final answer decisions happen.                   |
-| Who owns canonical thread history?     | Determines whether OpenClaw can edit history or only mirror it.                                   |
-| Do OpenClaw dynamic tools work?        | Messaging, sessions, cron, and OpenClaw-owned tools rely on this.                                 |
-| Do dynamic tool hooks work?            | Plugins expect `before_tool_call`, `after_tool_call`, and middleware around OpenClaw-owned tools. |
+| Who owns canonical thread history?     | Determines whether Recall can edit history or only mirror it.                                   |
+| Do Recall dynamic tools work?        | Messaging, sessions, cron, and Recall-owned tools rely on this.                                 |
+| Do dynamic tool hooks work?            | Plugins expect `before_tool_call`, `after_tool_call`, and middleware around Recall-owned tools. |
 | Do native tool hooks work?             | Shell, patch, and runtime-owned tools need native hook support for policy and observation.        |
 | Does the context engine lifecycle run? | Memory and context plugins depend on assemble, ingest, after-turn, and compaction lifecycle.      |
 | What compaction data is exposed?       | Some plugins only need notifications, while others need kept/dropped metadata.                    |

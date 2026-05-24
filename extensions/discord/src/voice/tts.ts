@@ -4,10 +4,10 @@ import {
   resolveTtsConfig,
   resolveTtsPrefsPath,
   type ResolvedTtsConfig,
-} from "openclaw/plugin-sdk/agent-runtime";
-import type { OpenClawConfig, TtsConfig } from "openclaw/plugin-sdk/config-contracts";
-import { parseTtsDirectives } from "openclaw/plugin-sdk/speech";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/agent-runtime";
+import type { RecallConfig, TtsConfig } from "recall/plugin-sdk/config-contracts";
+import { parseTtsDirectives } from "recall/plugin-sdk/speech";
+import { normalizeOptionalString } from "recall/plugin-sdk/string-coerce-runtime";
 import { getDiscordRuntime } from "../runtime.js";
 import { sanitizeVoiceReplyTextForSpeech } from "./sanitize.js";
 
@@ -65,8 +65,8 @@ function mergeTtsConfig(base: TtsConfig, override?: TtsConfig): TtsConfig {
   };
 }
 
-function resolveVoiceTtsConfig(params: { cfg: OpenClawConfig; override?: TtsConfig }): {
-  cfg: OpenClawConfig;
+function resolveVoiceTtsConfig(params: { cfg: RecallConfig; override?: TtsConfig }): {
+  cfg: RecallConfig;
   resolved: ResolvedTtsConfig;
 } {
   if (!params.override) {
@@ -86,7 +86,7 @@ function resolveVoiceTtsConfig(params: { cfg: OpenClawConfig; override?: TtsConf
 }
 
 export async function transcribeVoiceAudio(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   filePath: string;
 }): Promise<string | undefined> {
@@ -100,7 +100,7 @@ export async function transcribeVoiceAudio(params: {
 }
 
 export async function synthesizeVoiceReplyAudio(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   override?: TtsConfig;
   replyText: string;
   speakerLabel: string;

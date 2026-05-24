@@ -20,7 +20,7 @@ describe("CLI startup benchmark script spawners", () => {
   });
 
   it("does not require unrelated fixture cases for a narrowed preset", () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-bench-budget-test-"));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-bench-budget-test-"));
     try {
       const baselinePath = path.join(tmpDir, "baseline.json");
       const reportPath = path.join(tmpDir, "current.json");

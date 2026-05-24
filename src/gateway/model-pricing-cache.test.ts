@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { modelKey } from "../agents/model-selection.js";
 import type { normalizeProviderModelIdWithRuntime } from "../agents/provider-model-normalization.runtime.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { resetLogger, setLoggerOverride } from "../logging/logger.js";
 import { loggingState } from "../logging/state.js";
 import type { PluginManifestRecord, PluginManifestRegistry } from "../plugins/manifest-registry.js";
@@ -21,7 +21,7 @@ const normalizeProviderModelIdWithRuntimeMock = vi.hoisted(() =>
 const pluginManifestRegistryMocks = vi.hoisted(() => ({
   manifestRegistry: undefined as PluginManifestRegistry | undefined,
   loadPluginManifestRegistryForInstalledIndex: vi.fn(),
-  listOpenClawPluginManifestMetadata: vi.fn(),
+  listRecallPluginManifestMetadata: vi.fn(),
 }));
 
 vi.mock("../agents/provider-model-normalization.runtime.js", () => {
@@ -48,11 +48,11 @@ vi.mock("../plugins/manifest-metadata-scan.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../plugins/manifest-metadata-scan.js")>();
   return {
     ...actual,
-    listOpenClawPluginManifestMetadata: (
-      params?: Parameters<typeof actual.listOpenClawPluginManifestMetadata>[0],
+    listRecallPluginManifestMetadata: (
+      params?: Parameters<typeof actual.listRecallPluginManifestMetadata>[0],
     ) => {
-      pluginManifestRegistryMocks.listOpenClawPluginManifestMetadata(params);
-      return actual.listOpenClawPluginManifestMetadata(params);
+      pluginManifestRegistryMocks.listRecallPluginManifestMetadata(params);
+      return actual.listRecallPluginManifestMetadata(params);
     },
   };
 });
@@ -100,7 +100,7 @@ describe("model-pricing-cache", () => {
     resetGatewayModelPricingCacheForTest();
     pluginManifestRegistryMocks.manifestRegistry = undefined;
     pluginManifestRegistryMocks.loadPluginManifestRegistryForInstalledIndex.mockClear();
-    pluginManifestRegistryMocks.listOpenClawPluginManifestMetadata.mockClear();
+    pluginManifestRegistryMocks.listRecallPluginManifestMetadata.mockClear();
     normalizeProviderModelIdWithRuntimeMock.mockClear();
   });
 
@@ -157,7 +157,7 @@ describe("model-pricing-cache", () => {
           summaryModel: "openai/gpt-5.4",
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const refs = collectConfiguredModelPricingRefs(config).map((ref) =>
       modelKey(ref.provider, ref.model),
@@ -193,7 +193,7 @@ describe("model-pricing-cache", () => {
           },
         },
       },
-    } as OpenClawConfig).map((ref) => modelKey(ref.provider, ref.model));
+    } as RecallConfig).map((ref) => modelKey(ref.provider, ref.model));
 
     expect(refs).toContain("tavily/search-preview");
   });
@@ -229,7 +229,7 @@ describe("model-pricing-cache", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const fetchImpl = vi.fn<typeof fetch>();
 
     await refreshGatewayModelPricingCache({ config, fetchImpl });
@@ -276,7 +276,7 @@ describe("model-pricing-cache", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const fetchImpl = vi.fn<typeof fetch>();
 
     await refreshGatewayModelPricingCache({
@@ -344,7 +344,7 @@ describe("model-pricing-cache", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const fetchImpl = vi.fn<typeof fetch>();
 
     await refreshGatewayModelPricingCache({ config, fetchImpl });
@@ -352,7 +352,7 @@ describe("model-pricing-cache", () => {
     expect(
       pluginManifestRegistryMocks.loadPluginManifestRegistryForInstalledIndex,
     ).not.toHaveBeenCalled();
-    expect(pluginManifestRegistryMocks.listOpenClawPluginManifestMetadata).not.toHaveBeenCalled();
+    expect(pluginManifestRegistryMocks.listRecallPluginManifestMetadata).not.toHaveBeenCalled();
     expect(normalizeProviderModelIdWithRuntimeMock).not.toHaveBeenCalled();
     expect(fetchImpl).not.toHaveBeenCalled();
     expect(getCachedGatewayModelPricing({ provider: "custom", model: "gpt-local" })).toEqual({
@@ -387,7 +387,7 @@ describe("model-pricing-cache", () => {
       tools: {
         subagents: { model: { primary: "my-local-gpu/qwen2.5-coder:7b" } },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const fetchImpl = vi.fn<typeof fetch>();
 
     await refreshGatewayModelPricingCache({ config, fetchImpl });
@@ -414,7 +414,7 @@ describe("model-pricing-cache", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const failingFetch = withFetchPreconnect(async (input: RequestInfo | URL) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
       if (url.includes("openrouter.ai")) {
@@ -468,7 +468,7 @@ describe("model-pricing-cache", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const fetchImpl = withFetchPreconnect(async (input: RequestInfo | URL) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
       if (url.includes("openrouter.ai")) {
@@ -522,7 +522,7 @@ describe("model-pricing-cache", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as RecallConfig;
       const fetchImpl = withFetchPreconnect(async (input: RequestInfo | URL) => {
         const url =
           typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
@@ -595,7 +595,7 @@ describe("model-pricing-cache", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const fetchImpl = vi.fn<typeof fetch>();
 
     await refreshGatewayModelPricingCache({ config, fetchImpl });
@@ -623,7 +623,7 @@ describe("model-pricing-cache", () => {
           },
         ],
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const fetchImpl = withFetchPreconnect(async (input: RequestInfo | URL) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
@@ -708,7 +708,7 @@ describe("model-pricing-cache", () => {
           model: { primary: "openrouter/auto" },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const fetchImpl = withFetchPreconnect(async (input: RequestInfo | URL) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
@@ -755,7 +755,7 @@ describe("model-pricing-cache", () => {
           model: { primary: "volcengine/doubao-seed-2-0-pro" },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const fetchImpl = withFetchPreconnect(async (input: RequestInfo | URL) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
@@ -834,7 +834,7 @@ describe("model-pricing-cache", () => {
           model: { primary: "volcengine/doubao-open" },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const fetchImpl = withFetchPreconnect(async (input: RequestInfo | URL) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
@@ -896,7 +896,7 @@ describe("model-pricing-cache", () => {
           model: { primary: "dashscope/qwen-plus" },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const fetchImpl = withFetchPreconnect(async (input: RequestInfo | URL) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
@@ -973,7 +973,7 @@ describe("model-pricing-cache", () => {
           model: { primary: "anthropic/claude-opus-4-6" },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const fetchImpl = withFetchPreconnect(async (input: RequestInfo | URL) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
@@ -1020,7 +1020,7 @@ describe("model-pricing-cache", () => {
           model: { primary: "anthropic/claude-opus-4-6" },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const fetchImpl = withFetchPreconnect(
       vi.fn(async (input: RequestInfo | URL) => {
         const url =
@@ -1053,7 +1053,7 @@ describe("model-pricing-cache", () => {
           model: { primary: "anthropic/claude-opus-4-6" },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const abortedUrls: string[] = [];
     const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
     const fetchImpl = withFetchPreconnect(
@@ -1102,7 +1102,7 @@ describe("model-pricing-cache", () => {
         },
       },
       models: { pricing: { enabled: false } },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const fetchImpl = withFetchPreconnect(vi.fn());
 
     const stop = startGatewayModelPricingRefresh({ config, fetchImpl });
@@ -1120,7 +1120,7 @@ describe("model-pricing-cache", () => {
         },
       },
       models: { pricing: { enabled: false } },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const fetchImpl = withFetchPreconnect(vi.fn());
 
     await refreshGatewayModelPricingCache({ config, fetchImpl });
@@ -1144,7 +1144,7 @@ describe("model-pricing-cache", () => {
           model: { primary: "anthropic/claude-opus-4-6" },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const timeoutError = new DOMException(
       "The operation was aborted due to timeout",
       "TimeoutError",
@@ -1178,7 +1178,7 @@ describe("model-pricing-cache", () => {
           model: { primary: "kimi/kimi-k2.6" },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const fetchImpl = withFetchPreconnect(async (input: RequestInfo | URL) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
@@ -1233,7 +1233,7 @@ function createManifestRecord(overrides: Partial<PluginManifestRecord>): PluginM
     origin: "global",
     rootDir: "/tmp/plugin",
     source: "/tmp/plugin/index.js",
-    manifestPath: "/tmp/plugin/openclaw.plugin.json",
+    manifestPath: "/tmp/plugin/recall.plugin.json",
     ...overrides,
   };
 }

@@ -5,7 +5,7 @@ import {
   migrateSessionEntries,
   parseSessionEntries,
 } from "@earendil-works/pi-coding-agent";
-import type { AgentMessage } from "openclaw/plugin-sdk/agent-harness-runtime";
+import type { AgentMessage } from "recall/plugin-sdk/agent-harness-runtime";
 import { sanitizeCodexHistoryImagePayloads } from "./image-payload-sanitizer.js";
 
 function isMissingFileError(error: unknown): boolean {

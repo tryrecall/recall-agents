@@ -4,30 +4,30 @@ export type {
   ChannelDirectoryEntry,
   ChatType,
   HistoryEntry,
-  OpenClawConfig,
-  OpenClawPluginApi,
+  RecallConfig,
+  RecallPluginApi,
   ReplyPayload,
-} from "openclaw/plugin-sdk/core";
-export type { RuntimeEnv } from "openclaw/plugin-sdk/runtime";
-export { buildAgentMediaPayload } from "openclaw/plugin-sdk/agent-media-payload";
-export { resolveAllowlistMatchSimple } from "openclaw/plugin-sdk/allow-from";
-export { logInboundDrop } from "openclaw/plugin-sdk/channel-inbound";
-export { createChannelPairingController } from "openclaw/plugin-sdk/channel-pairing";
-export { createChannelMessageReplyPipeline } from "openclaw/plugin-sdk/channel-message";
-export { logTypingFailure } from "openclaw/plugin-sdk/channel-feedback";
+} from "recall/plugin-sdk/core";
+export type { RuntimeEnv } from "recall/plugin-sdk/runtime";
+export { buildAgentMediaPayload } from "recall/plugin-sdk/agent-media-payload";
+export { resolveAllowlistMatchSimple } from "recall/plugin-sdk/allow-from";
+export { logInboundDrop } from "recall/plugin-sdk/channel-inbound";
+export { createChannelPairingController } from "recall/plugin-sdk/channel-pairing";
+export { createChannelMessageReplyPipeline } from "recall/plugin-sdk/channel-message";
+export { logTypingFailure } from "recall/plugin-sdk/channel-feedback";
 export {
   listSkillCommandsForAgents,
   resolveControlCommandGate,
-} from "openclaw/plugin-sdk/command-auth-native";
-export { buildModelsProviderData } from "openclaw/plugin-sdk/models-provider-runtime";
-export { isDangerousNameMatchingEnabled } from "openclaw/plugin-sdk/dangerous-name-runtime";
+} from "recall/plugin-sdk/command-auth-native";
+export { buildModelsProviderData } from "recall/plugin-sdk/models-provider-runtime";
+export { isDangerousNameMatchingEnabled } from "recall/plugin-sdk/dangerous-name-runtime";
 export {
   resolveAllowlistProviderRuntimeGroupPolicy,
   resolveDefaultGroupPolicy,
   warnMissingProviderGroupPolicyFallbackOnce,
-} from "openclaw/plugin-sdk/runtime-group-policy";
-export { resolveChannelMediaMaxBytes } from "openclaw/plugin-sdk/media-runtime";
-export { loadOutboundMediaFromUrl } from "openclaw/plugin-sdk/outbound-media";
+} from "recall/plugin-sdk/runtime-group-policy";
+export { resolveChannelMediaMaxBytes } from "recall/plugin-sdk/media-runtime";
+export { loadOutboundMediaFromUrl } from "recall/plugin-sdk/outbound-media";
 // Legacy map-helper exports stay for older plugin consumers. New message-turn
 // code should use createChannelHistoryWindow.
 export {
@@ -36,14 +36,14 @@ export {
   buildInboundHistoryFromMap,
   buildPendingHistoryContextFromMap,
   recordPendingHistoryEntryIfEnabled,
-} from "openclaw/plugin-sdk/reply-history";
-export { registerPluginHttpRoute } from "openclaw/plugin-sdk/webhook-targets";
+} from "recall/plugin-sdk/reply-history";
+export { registerPluginHttpRoute } from "recall/plugin-sdk/webhook-targets";
 export {
   isRequestBodyLimitError,
   readRequestBodyWithLimit,
-} from "openclaw/plugin-sdk/webhook-ingress";
+} from "recall/plugin-sdk/webhook-ingress";
 export {
   isTrustedProxyAddress,
   parseStrictPositiveInteger,
   resolveClientIp,
-} from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/core";

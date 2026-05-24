@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { SILENT_REPLY_TOKEN } from "../../auto-reply/tokens.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { clearAgentRunContext, registerAgentRunContext } from "../../infra/agent-events.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
@@ -75,7 +75,7 @@ type FailMediaGenerationTaskRunParams = {
 };
 
 type WakeMediaGenerationTaskCompletionParams = {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   handle: MediaGenerationTaskHandle | null;
   status: "ok" | "error";
   statusLabel: string;
@@ -354,7 +354,7 @@ export function scheduleMediaGenerationTaskCompletion<
   handle: MediaGenerationTaskHandle | null;
   scheduleBackgroundWork: MediaGenerateBackgroundScheduler;
   progressSummary: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   toolName: string;
   run: () => Promise<T>;
   onWakeFailure: (message: string, meta?: Record<string, unknown>) => void;
@@ -420,7 +420,7 @@ export function scheduleMediaGenerationTaskCompletion<
 }
 
 async function wakeMediaGenerationTaskCompletion(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   handle: MediaGenerationTaskHandle | null;
   status: "ok" | "error";
   statusLabel: string;
@@ -513,7 +513,7 @@ async function wakeMediaGenerationTaskCompletion(params: {
 }
 
 async function tryDeliverMediaGenerationFailureDirect(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   handle: MediaGenerationTaskHandle;
   toolName: string;
   completionLabel: string;

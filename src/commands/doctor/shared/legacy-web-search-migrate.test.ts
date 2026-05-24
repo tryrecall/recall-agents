@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../../../config/config.js";
+import type { RecallConfig } from "../../../config/config.js";
 import {
   listLegacyWebSearchConfigPaths,
   migrateLegacyWebSearchConfig,
@@ -7,7 +7,7 @@ import {
 
 describe("legacy web search config", () => {
   it("migrates legacy provider config through bundled web search ownership metadata", () => {
-    const res = migrateLegacyWebSearchConfig<OpenClawConfig>({
+    const res = migrateLegacyWebSearchConfig<RecallConfig>({
       tools: {
         web: {
           search: {
@@ -63,7 +63,7 @@ describe("legacy web search config", () => {
   });
 
   it("preserves unrelated record-valued web search config", () => {
-    const res = migrateLegacyWebSearchConfig<OpenClawConfig>({
+    const res = migrateLegacyWebSearchConfig<RecallConfig>({
       tools: {
         web: {
           search: {
@@ -100,7 +100,7 @@ describe("legacy web search config", () => {
   });
 
   it("drops dangerous record keys while preserving unrelated web search config", () => {
-    const res = migrateLegacyWebSearchConfig<OpenClawConfig>({
+    const res = migrateLegacyWebSearchConfig<RecallConfig>({
       tools: {
         web: {
           search: {

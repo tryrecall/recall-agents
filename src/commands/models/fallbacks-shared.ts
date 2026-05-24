@@ -3,7 +3,7 @@ import { formatCliCommand } from "../../cli/command-format.js";
 import { logConfigUpdated } from "../../config/logging.js";
 import { resolveAgentModelFallbackValues, toAgentModelListLike } from "../../config/model-input.js";
 import type { AgentModelEntryConfig } from "../../config/types.agent-defaults.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { type RuntimeEnv, writeRuntimeJson } from "../../runtime.js";
 import { loadModelsConfig } from "./load-config.js";
 import {
@@ -21,18 +21,18 @@ type DefaultsFallbackKey = "model" | "imageModel";
 
 function listCommandForFallbackKey(key: DefaultsFallbackKey): string {
   return key === "imageModel"
-    ? "openclaw models image-fallbacks list"
-    : "openclaw models fallbacks list";
+    ? "recall models image-fallbacks list"
+    : "recall models fallbacks list";
 }
 
-function getFallbacks(cfg: OpenClawConfig, key: DefaultsFallbackKey): string[] {
+function getFallbacks(cfg: RecallConfig, key: DefaultsFallbackKey): string[] {
   return resolveAgentModelFallbackValues(cfg.agents?.defaults?.[key]);
 }
 
 function patchDefaultsFallbacks(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   params: { key: DefaultsFallbackKey; fallbacks: string[]; models?: Record<string, unknown> },
-): OpenClawConfig {
+): RecallConfig {
   const existing = toAgentModelListLike(cfg.agents?.defaults?.[params.key]);
   return {
     ...cfg,

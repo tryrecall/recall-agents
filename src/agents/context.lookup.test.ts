@@ -13,7 +13,7 @@ const contextTestState = vi.hoisted(() => {
   const state = {
     loadConfigImpl: () => ({}) as unknown,
     discoveredModels: [] as DiscoveredModel[],
-    ensureOpenClawModelsJson: vi.fn(async () => {}),
+    ensureRecallModelsJson: vi.fn(async () => {}),
     discoverAuthStorage: vi.fn(() => ({})),
     discoverModels: vi.fn(
       (_authStorage: unknown, _agentDir: string, _options?: { normalizeModels?: boolean }) => ({
@@ -29,7 +29,7 @@ vi.mock("../config/config.js", () => ({
 }));
 
 vi.mock("./models-config.runtime.js", () => ({
-  ensureOpenClawModelsJson: contextTestState.ensureOpenClawModelsJson,
+  ensureRecallModelsJson: contextTestState.ensureRecallModelsJson,
 }));
 
 vi.mock("./pi-model-discovery-runtime.js", () => ({
@@ -43,8 +43,8 @@ function mockContextDeps(params: {
 }) {
   contextTestState.loadConfigImpl = params.getRuntimeConfig;
   contextTestState.discoveredModels = params.discoveredModels ?? [];
-  contextTestState.ensureOpenClawModelsJson.mockClear();
-  return { ensureOpenClawModelsJson: contextTestState.ensureOpenClawModelsJson };
+  contextTestState.ensureRecallModelsJson.mockClear();
+  return { ensureRecallModelsJson: contextTestState.ensureRecallModelsJson };
 }
 
 function mockContextModuleDeps(loadConfigImpl: () => unknown) {
@@ -111,7 +111,7 @@ describe("lookupContextTokens", () => {
   beforeEach(() => {
     contextTestState.loadConfigImpl = () => ({});
     contextTestState.discoveredModels = [];
-    contextTestState.ensureOpenClawModelsJson.mockClear();
+    contextTestState.ensureRecallModelsJson.mockClear();
     contextTestState.discoverAuthStorage.mockClear();
     contextTestState.discoverModels.mockClear();
     contextModule.resetContextWindowCacheForTest();
@@ -269,7 +269,7 @@ describe("lookupContextTokens", () => {
     expect(discoverCall[0]).toEqual({});
     expect(typeof discoverAgentDir).toBe("string");
     expect(
-      path.normalize(discoverAgentDir).endsWith(path.join(".openclaw", "agents", "main", "agent")),
+      path.normalize(discoverAgentDir).endsWith(path.join(".recall", "agents", "main", "agent")),
     ).toBe(true);
     expect(discoverCall[2]).toEqual({ normalizeModels: false });
     expect(lookupContextTokens("anthropic/claude-opus-4.7-20260219")).toBe(1_048_576);

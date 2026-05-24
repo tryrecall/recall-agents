@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { trimToUndefined, type ExplicitGatewayAuth } from "./credentials.js";
 
 function hasExplicitGatewayConnectionAuth(auth?: ExplicitGatewayAuth): boolean {
@@ -6,7 +6,7 @@ function hasExplicitGatewayConnectionAuth(auth?: ExplicitGatewayAuth): boolean {
 }
 
 export function canSkipGatewayConfigLoad(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   urlOverride?: string;
   explicitAuth?: ExplicitGatewayAuth;
 }): boolean {

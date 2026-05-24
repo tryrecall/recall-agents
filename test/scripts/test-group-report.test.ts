@@ -275,8 +275,8 @@ describe("scripts/test-group-report arg parsing", () => {
 
 describe("scripts/test-group-report run plans", () => {
   it("preserves full-suite shard file args and unique report labels", () => {
-    const previousParallel = process.env.OPENCLAW_TEST_PROJECTS_PARALLEL;
-    process.env.OPENCLAW_TEST_PROJECTS_PARALLEL = "6";
+    const previousParallel = process.env.RECALL_TEST_PROJECTS_PARALLEL;
+    process.env.RECALL_TEST_PROJECTS_PARALLEL = "6";
     try {
       const plans = resolveRunPlans(parseTestGroupReportArgs(["--full-suite"]));
       const gatewayServerPlans = plans.filter(
@@ -293,9 +293,9 @@ describe("scripts/test-group-report run plans", () => {
       );
     } finally {
       if (previousParallel === undefined) {
-        delete process.env.OPENCLAW_TEST_PROJECTS_PARALLEL;
+        delete process.env.RECALL_TEST_PROJECTS_PARALLEL;
       } else {
-        process.env.OPENCLAW_TEST_PROJECTS_PARALLEL = previousParallel;
+        process.env.RECALL_TEST_PROJECTS_PARALLEL = previousParallel;
       }
     }
   });

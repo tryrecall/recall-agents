@@ -16,13 +16,13 @@ import {
   buildCopilotIdeHeaders,
 } from "../agents/copilot-dynamic-headers.js";
 import { resolveEnvApiKey } from "../agents/model-auth-env.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
 import { loadJsonFile, saveJsonFile } from "../infra/json-file.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 import { resolveProviderEndpoint } from "./provider-model-shared.js";
 
-export type { OpenClawConfig } from "../config/config.js";
+export type { RecallConfig } from "../config/config.js";
 export type { SecretInput } from "../config/types.secrets.js";
 export type { SecretInputMode } from "../plugins/provider-auth-types.js";
 export type { ProviderAuthResult } from "../plugins/types.js";
@@ -84,7 +84,7 @@ export { createProviderApiKeyAuthMethod } from "../plugins/provider-api-key-auth
 export { coerceSecretRef, hasConfiguredSecretInput } from "../config/types.secrets.js";
 export { resolveDefaultSecretProviderAlias } from "../secrets/ref-contract.js";
 export { resolveRequiredHomeDir } from "../infra/home-dir.js";
-export { resolveOpenClawAgentDir } from "./agent-dir-compat.js";
+export { resolveRecallAgentDir } from "./agent-dir-compat.js";
 export {
   normalizeOptionalSecretInput,
   normalizeSecretInput,
@@ -285,7 +285,7 @@ export function isProviderApiKeyConfigured(params: {
 
 export function listUsableProviderAuthProfileIds(params: {
   provider: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   agentDir?: string;
   allowKeychainPrompt?: boolean;
 }): { agentDir: string; profileIds: string[] } {
@@ -299,7 +299,7 @@ export function listUsableProviderAuthProfileIds(params: {
 
 export function isProviderAuthProfileConfigured(params: {
   provider: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   agentDir?: string;
   allowKeychainPrompt?: boolean;
 }): boolean {
@@ -308,7 +308,7 @@ export function isProviderAuthProfileConfigured(params: {
 
 export async function resolveProviderAuthProfileApiKey(params: {
   provider: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   agentDir?: string;
   allowKeychainPrompt?: boolean;
 }): Promise<string | undefined> {
@@ -332,7 +332,7 @@ export async function resolveProviderAuthProfileApiKey(params: {
 
 function resolveUsableProviderAuthProfiles(params: {
   provider: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   agentDir?: string;
   allowKeychainPrompt?: boolean;
 }): { agentDir: string; profileIds: string[]; store: AuthProfileStore } {

@@ -1,8 +1,8 @@
 import { format } from "node:util";
-import { CHANNEL_APPROVAL_NATIVE_RUNTIME_CONTEXT_CAPABILITY } from "openclaw/plugin-sdk/approval-handler-adapter-runtime";
-import type { ChannelRuntimeSurface } from "openclaw/plugin-sdk/channel-contract";
-import { waitUntilAbort } from "openclaw/plugin-sdk/channel-lifecycle";
-import { registerChannelRuntimeContext } from "openclaw/plugin-sdk/channel-runtime-context";
+import { CHANNEL_APPROVAL_NATIVE_RUNTIME_CONTEXT_CAPABILITY } from "recall/plugin-sdk/approval-handler-adapter-runtime";
+import type { ChannelRuntimeSurface } from "recall/plugin-sdk/channel-contract";
+import { waitUntilAbort } from "recall/plugin-sdk/channel-lifecycle";
+import { registerChannelRuntimeContext } from "recall/plugin-sdk/channel-runtime-context";
 import {
   GROUP_POLICY_BLOCKED_LABEL,
   resolveThreadBindingIdleTimeoutMsForChannel,
@@ -64,7 +64,7 @@ export type MonitorMatrixOpts = {
   initialSyncLimit?: number;
   replyToMode?: ReplyToMode;
   accountId?: string | null;
-  setStatus?: (next: import("openclaw/plugin-sdk/channel-contract").ChannelAccountSnapshot) => void;
+  setStatus?: (next: import("recall/plugin-sdk/channel-contract").ChannelAccountSnapshot) => void;
 };
 
 function isMatrixStreamingConfig(

@@ -13,49 +13,49 @@ const mocks = vi.hoisted(() => {
     }) satisfies AnyAgentTool;
 
   return {
-    createOpenClawToolsOptions: vi.fn(),
+    createRecallToolsOptions: vi.fn(),
     stubTool,
   };
 });
 
-vi.mock("./openclaw-tools.js", () => ({
-  createOpenClawTools: (options: unknown) => {
-    mocks.createOpenClawToolsOptions(options);
+vi.mock("./recall-tools.js", () => ({
+  createRecallTools: (options: unknown) => {
+    mocks.createRecallToolsOptions(options);
     return [mocks.stubTool("cron")];
   },
 }));
 
 import "./test-helpers/fast-bash-tools.js";
 import "./test-helpers/fast-coding-tools.js";
-import { createOpenClawCodingTools } from "./pi-tools.js";
+import { createRecallCodingTools } from "./pi-tools.js";
 
-function firstOpenClawToolsOptions(): { cronSelfRemoveOnlyJobId?: string } | undefined {
-  return mocks.createOpenClawToolsOptions.mock.calls[0]?.[0] as
+function firstRecallToolsOptions(): { cronSelfRemoveOnlyJobId?: string } | undefined {
+  return mocks.createRecallToolsOptions.mock.calls[0]?.[0] as
     | { cronSelfRemoveOnlyJobId?: string }
     | undefined;
 }
 
-describe("createOpenClawCodingTools cron scope", () => {
+describe("createRecallCodingTools cron scope", () => {
   beforeEach(() => {
-    mocks.createOpenClawToolsOptions.mockClear();
+    mocks.createRecallToolsOptions.mockClear();
   });
 
   it("scopes cron-triggered jobs to self-removal", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createRecallCodingTools({
       trigger: "cron",
       jobId: "job-current",
     });
 
     expect(tools.map((tool) => tool.name)).toContain("cron");
-    expect(firstOpenClawToolsOptions()?.cronSelfRemoveOnlyJobId).toBe("job-current");
+    expect(firstRecallToolsOptions()?.cronSelfRemoveOnlyJobId).toBe("job-current");
   });
 
   it("does not scope non-cron sessions", () => {
-    createOpenClawCodingTools({
+    createRecallCodingTools({
       trigger: "user",
       jobId: "job-current",
     });
 
-    expect(firstOpenClawToolsOptions()?.cronSelfRemoveOnlyJobId).toBeUndefined();
+    expect(firstRecallToolsOptions()?.cronSelfRemoveOnlyJobId).toBeUndefined();
   });
 });

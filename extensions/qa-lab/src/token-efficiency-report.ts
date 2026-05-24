@@ -248,7 +248,7 @@ export function buildTokenEfficiencyReport(
 
 export function renderTokenEfficiencyMarkdownReport(report: TokenEfficiencyReport): string {
   const lines = [
-    `# OpenClaw Runtime Token Efficiency - ${report.runtimePair[0]} vs ${report.runtimePair[1]}`,
+    `# Recall Runtime Token Efficiency - ${report.runtimePair[0]} vs ${report.runtimePair[1]}`,
     "",
     `- Generated at: ${report.generatedAt}`,
     ...(report.providerMode ? [`- Provider mode: ${report.providerMode}`] : []),

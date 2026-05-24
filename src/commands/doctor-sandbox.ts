@@ -14,7 +14,7 @@ import {
   type LegacySandboxRegistryMigrationResult,
 } from "../agents/sandbox/registry.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { runCommandWithTimeout, runExec } from "../process/exec.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { note } from "../terminal/note.js";
@@ -108,12 +108,12 @@ async function runCodexBwrapNamespaceProbe(
   }
 }
 
-function codexBwrapNeedsNetworkNamespaceProbe(cfg: OpenClawConfig): boolean {
+function codexBwrapNeedsNetworkNamespaceProbe(cfg: RecallConfig): boolean {
   const network = cfg.agents?.defaults?.sandbox?.docker?.network?.trim().toLowerCase();
   return network === undefined || network === "" || network === "none";
 }
 
-async function probeCodexBwrapNamespaces(cfg: OpenClawConfig): Promise<CodexBwrapNamespaceProbe> {
+async function probeCodexBwrapNamespaces(cfg: RecallConfig): Promise<CodexBwrapNamespaceProbe> {
   if (process.platform !== "linux") {
     return { ok: true };
   }
@@ -133,7 +133,7 @@ async function probeCodexBwrapNamespaces(cfg: OpenClawConfig): Promise<CodexBwra
   ]);
 }
 
-async function noteCodexBwrapNamespaceWarning(cfg: OpenClawConfig): Promise<void> {
+async function noteCodexBwrapNamespaceWarning(cfg: RecallConfig): Promise<void> {
   const probe = await probeCodexBwrapNamespaces(cfg);
   if (probe.ok) {
     return;
@@ -153,8 +153,8 @@ async function noteCodexBwrapNamespaceWarning(cfg: OpenClawConfig): Promise<void
     `Probe command: ${probe.command}`,
     `Probe result: ${probe.reason}`,
     "",
-    "Fix the host namespace policy for the OpenClaw service user, then restart the gateway.",
-    "Prefer an AppArmor profile that grants the required namespaces to the OpenClaw service process.",
+    "Fix the host namespace policy for the Recall service user, then restart the gateway.",
+    "Prefer an AppArmor profile that grants the required namespaces to the Recall service process.",
     "`kernel.apparmor_restrict_unprivileged_userns=0` is a host-wide fallback with security tradeoffs; use it only when that host posture is acceptable.",
     "Do not add broad Docker container privileges just to satisfy nested bwrap; that weakens the outer sandbox.",
   ];
@@ -180,22 +180,22 @@ async function dockerImageExists(image: string): Promise<boolean> {
   }
 }
 
-function resolveSandboxDockerImage(cfg: OpenClawConfig): string {
+function resolveSandboxDockerImage(cfg: RecallConfig): string {
   const image = cfg.agents?.defaults?.sandbox?.docker?.image?.trim();
   return image ? image : DEFAULT_SANDBOX_IMAGE;
 }
 
-function resolveSandboxBackend(cfg: OpenClawConfig): string {
+function resolveSandboxBackend(cfg: RecallConfig): string {
   const backend = cfg.agents?.defaults?.sandbox?.backend?.trim();
   return backend || "docker";
 }
 
-function resolveSandboxBrowserImage(cfg: OpenClawConfig): string {
+function resolveSandboxBrowserImage(cfg: RecallConfig): string {
   const image = cfg.agents?.defaults?.sandbox?.browser?.image?.trim();
   return image ? image : DEFAULT_SANDBOX_BROWSER_IMAGE;
 }
 
-function updateSandboxDockerImage(cfg: OpenClawConfig, image: string): OpenClawConfig {
+function updateSandboxDockerImage(cfg: RecallConfig, image: string): RecallConfig {
   return {
     ...cfg,
     agents: {
@@ -214,7 +214,7 @@ function updateSandboxDockerImage(cfg: OpenClawConfig, image: string): OpenClawC
   };
 }
 
-function updateSandboxBrowserImage(cfg: OpenClawConfig, image: string): OpenClawConfig {
+function updateSandboxBrowserImage(cfg: RecallConfig, image: string): RecallConfig {
   return {
     ...cfg,
     agents: {
@@ -272,10 +272,10 @@ async function handleMissingSandboxImage(
 }
 
 export async function maybeRepairSandboxImages(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   runtime: RuntimeEnv,
   prompter: DoctorPrompter,
-): Promise<OpenClawConfig> {
+): Promise<RecallConfig> {
   const sandbox = cfg.agents?.defaults?.sandbox;
   const mode = sandbox?.mode ?? "off";
   if (!sandbox || mode === "off") {
@@ -301,7 +301,7 @@ export async function maybeRepairSandboxImages(
       "",
       "Options:",
       "- Install Docker and restart the gateway",
-      "- Disable sandbox mode: openclaw config set agents.defaults.sandbox.mode off",
+      "- Disable sandbox mode: recall config set agents.defaults.sandbox.mode off",
     ];
     note(lines.join("\n"), "Sandbox");
     return cfg;
@@ -385,7 +385,7 @@ export async function maybeRepairSandboxRegistryFiles(prompter: DoctorPrompter):
       [
         "Legacy sandbox registry files detected.",
         ...legacyFiles.map(formatLegacyRegistryInspectionLine),
-        `Run ${formatCliCommand("openclaw doctor --fix")} to migrate them to sharded registry files.`,
+        `Run ${formatCliCommand("recall doctor --fix")} to migrate them to sharded registry files.`,
       ].join("\n"),
       "Sandbox",
     );
@@ -401,7 +401,7 @@ export async function maybeRepairSandboxRegistryFiles(prompter: DoctorPrompter):
   }
 }
 
-export function noteSandboxScopeWarnings(cfg: OpenClawConfig) {
+export function noteSandboxScopeWarnings(cfg: RecallConfig) {
   const globalSandbox = cfg.agents?.defaults?.sandbox;
   const agents = Array.isArray(cfg.agents?.list) ? cfg.agents.list : [];
   const warnings: string[] = [];

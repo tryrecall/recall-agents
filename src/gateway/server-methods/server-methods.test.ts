@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { emitAgentEvent } from "../../infra/agent-events.js";
 import { formatZonedTimestamp } from "../../infra/format-time/format-datetime.js";
 import {
@@ -697,7 +697,7 @@ describe("projectRecentChatDisplayMessages", () => {
         { role: "assistant", content: "ANNOUNCE_SKIP", timestamp: 4 },
         {
           role: "custom",
-          customType: "openclaw.runtime-context",
+          customType: "recall.runtime-context",
           content: "hidden runtime context",
           display: false,
           timestamp: 5,
@@ -713,13 +713,13 @@ describe("projectRecentChatDisplayMessages", () => {
     const mediaOnly = {
       role: "user",
       content: "",
-      MediaPath: "/tmp/openclaw/user-upload.png",
+      MediaPath: "/tmp/recall/user-upload.png",
       timestamp: 1,
     };
     const multiMediaOnly = {
       role: "user",
       content: "",
-      MediaPaths: ["/tmp/openclaw/first.png", "/tmp/openclaw/second.jpg"],
+      MediaPaths: ["/tmp/recall/first.png", "/tmp/recall/second.jpg"],
       timestamp: 2,
     };
     const result = projectRecentChatDisplayMessages([
@@ -1243,7 +1243,7 @@ describe("exec approval handlers", () => {
     });
   }
 
-  function createExecApprovalFixture(opts?: { config?: OpenClawConfig }) {
+  function createExecApprovalFixture(opts?: { config?: RecallConfig }) {
     const manager = new ExecApprovalManager();
     const handlers = createExecApprovalHandlers(manager);
     const broadcasts: Array<{ event: string; payload: unknown }> = [];
@@ -2999,16 +2999,16 @@ describe("logs.tail", () => {
   });
 
   it("falls back to latest rolling log file when today is missing", async () => {
-    const tempDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), "openclaw-logs-"));
-    const older = path.join(tempDir, "openclaw-2026-01-20.log");
-    const newer = path.join(tempDir, "openclaw-2026-01-21.log");
+    const tempDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), "recall-logs-"));
+    const older = path.join(tempDir, "recall-2026-01-20.log");
+    const newer = path.join(tempDir, "recall-2026-01-21.log");
 
     await fsPromises.writeFile(older, '{"msg":"old"}\n');
     await fsPromises.writeFile(newer, '{"msg":"new"}\n');
     await fsPromises.utimes(older, new Date(0), new Date(0));
     await fsPromises.utimes(newer, new Date(), new Date());
 
-    setLoggerOverride({ file: path.join(tempDir, "openclaw-2026-01-22.log") });
+    setLoggerOverride({ file: path.join(tempDir, "recall-2026-01-22.log") });
 
     const respond = vi.fn();
     await logsHandlers["logs.tail"]({
@@ -3031,8 +3031,8 @@ describe("logs.tail", () => {
   });
 
   it("redacts sensitive CLI tokens from returned lines", async () => {
-    const tempDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), "openclaw-logs-"));
-    const file = path.join(tempDir, "openclaw-2026-01-22.log");
+    const tempDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), "recall-logs-"));
+    const file = path.join(tempDir, "recall-2026-01-22.log");
 
     await fsPromises.writeFile(
       file,

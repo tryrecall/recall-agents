@@ -2,7 +2,7 @@ import { EventEmitter } from "node:events";
 import fsSync from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { resetLogger, setLoggerOverride } from "openclaw/plugin-sdk/runtime-env";
+import { resetLogger, setLoggerOverride } from "recall/plugin-sdk/runtime-env";
 import { afterEach, beforeEach, expect, vi } from "vitest";
 import {
   loadConfigMock,
@@ -63,10 +63,10 @@ export function getRecordChannelActivityMock(): AnyMockFn {
   return channelActivityMocks.recordChannelActivity;
 }
 
-vi.mock("openclaw/plugin-sdk/channel-activity-runtime", async () => {
+vi.mock("recall/plugin-sdk/channel-activity-runtime", async () => {
   const actual = await vi.importActual<
-    typeof import("openclaw/plugin-sdk/channel-activity-runtime")
-  >("openclaw/plugin-sdk/channel-activity-runtime");
+    typeof import("recall/plugin-sdk/channel-activity-runtime")
+  >("recall/plugin-sdk/channel-activity-runtime");
   return {
     ...actual,
     recordChannelActivity: (...args: unknown[]) =>
@@ -196,7 +196,7 @@ function expectInboxPairingReplyText(
   const code = text.match(/Pairing code:\s*```[\r\n]+([A-Z2-9]{6,})/)?.[1];
   expect(code).toBeDefined();
   const resolvedCode = params.code ?? code ?? "";
-  expect(text).toContain("OpenClaw: access not configured.");
+  expect(text).toContain("Recall: access not configured.");
   expect(text).toContain(params.idLine);
   expect(text).toContain("Pairing code:");
   expect(text).toContain(`\n\`\`\`\n${resolvedCode}\n\`\`\`\n`);
@@ -306,7 +306,7 @@ export function installWebMonitorInboxUnitTestHooks(opts?: { authDir?: boolean }
     }
     resetWebInboundDedupe();
     if (createAuthDir) {
-      authDir = fsSync.mkdtempSync(path.join(os.tmpdir(), "openclaw-auth-"));
+      authDir = fsSync.mkdtempSync(path.join(os.tmpdir(), "recall-auth-"));
     } else {
       authDir = undefined;
     }

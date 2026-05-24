@@ -13,7 +13,7 @@ type CreateSessionsSpawnTool =
   (typeof import("./tools/sessions-spawn-tool.js"))["createSessionsSpawnTool"];
 type SubagentRegistryTesting = (typeof import("./subagent-registry.js"))["testing"];
 type SubagentSpawnTesting = (typeof import("./subagent-spawn.js"))["testing"];
-type CreateOpenClawToolsOpts = Parameters<CreateSessionsSpawnTool>[0];
+type CreateRecallToolsOpts = Parameters<CreateSessionsSpawnTool>[0];
 type GatewayRequest = { method?: string; params?: unknown; timeoutMs?: number };
 type AgentWaitCall = { runId?: string; timeoutMs?: number };
 type TestSessionEntry = {
@@ -185,7 +185,7 @@ export function setSessionsSpawnAnnounceFlowOverride(next: RunSubagentAnnounceFl
   hoisted.state.runSubagentAnnounceFlowOverride = next;
 }
 
-export async function getSessionsSpawnTool(opts: CreateOpenClawToolsOpts) {
+export async function getSessionsSpawnTool(opts: CreateRecallToolsOpts) {
   if (!cachedSubagentSpawnTesting || !cachedSubagentRegistryTesting) {
     const [{ testing: subagentSpawnTesting }, { testing: subagentRegistryTesting }] =
       await Promise.all([import("./subagent-spawn.js"), import("./subagent-registry.js")]);
@@ -365,7 +365,7 @@ vi.mock("../config/sessions.js", () => ({
     cfg?: { session?: { mainKey?: string } };
     agentId: string;
   }) => `agent:${params.agentId}:${params.cfg?.session?.mainKey ?? "main"}`,
-  resolveStorePath: () => "/tmp/openclaw-sessions-spawn-test-store.json",
+  resolveStorePath: () => "/tmp/recall-sessions-spawn-test-store.json",
   updateSessionStore: async (
     _storePath: string,
     mutator: (store: typeof hoisted.sessionStore) => void | Promise<void>,

@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { CURRENT_SESSION_VERSION } from "@earendil-works/pi-coding-agent";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { registerLegacyContextEngine } from "../../context-engine/legacy.registration.js";
 import {
   registerContextEngine,
@@ -84,16 +84,16 @@ const mockBuildActiveMusicGenerationTaskPromptContextForSession = vi.mocked(
 function createTestMcpLoopbackServerConfig(port: number) {
   return {
     mcpServers: {
-      openclaw: {
+      recall: {
         type: "http",
         url: `http://127.0.0.1:${port}/mcp`,
         headers: {
-          Authorization: "Bearer ${OPENCLAW_MCP_TOKEN}",
-          "x-session-key": "${OPENCLAW_MCP_SESSION_KEY}",
-          "x-openclaw-agent-id": "${OPENCLAW_MCP_AGENT_ID}",
-          "x-openclaw-account-id": "${OPENCLAW_MCP_ACCOUNT_ID}",
-          "x-openclaw-message-channel": "${OPENCLAW_MCP_MESSAGE_CHANNEL}",
-          "x-openclaw-inbound-event-kind": "${OPENCLAW_MCP_INBOUND_EVENT_KIND}",
+          Authorization: "Bearer ${RECALL_MCP_TOKEN}",
+          "x-session-key": "${RECALL_MCP_SESSION_KEY}",
+          "x-recall-agent-id": "${RECALL_MCP_AGENT_ID}",
+          "x-recall-account-id": "${RECALL_MCP_ACCOUNT_ID}",
+          "x-recall-message-channel": "${RECALL_MCP_MESSAGE_CHANNEL}",
+          "x-recall-inbound-event-kind": "${RECALL_MCP_INBOUND_EVENT_KIND}",
         },
       },
     },
@@ -113,7 +113,7 @@ function createCliBackendConfig(
     bundleMcp?: boolean;
     reseedFromRawTranscriptWhenUncompacted?: boolean;
   } = {},
-): OpenClawConfig {
+): RecallConfig {
   return {
     agents: {
       defaults: {
@@ -139,12 +139,12 @@ function createCliBackendConfig(
         },
       },
     },
-  } satisfies OpenClawConfig;
+  } satisfies RecallConfig;
 }
 
 function createSessionFile() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-cli-prepare-"));
-  vi.stubEnv("OPENCLAW_STATE_DIR", dir);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-cli-prepare-"));
+  vi.stubEnv("RECALL_STATE_DIR", dir);
   const sessionFile = path.join(dir, "agents", "main", "sessions", "session-test.jsonl");
   fs.mkdirSync(path.dirname(sessionFile), { recursive: true });
   fs.writeFileSync(
@@ -202,7 +202,7 @@ describe("shouldSkipLocalCliCredentialEpoch", () => {
         senderIsOwner ? runtime.ownerToken : runtime.nonOwnerToken,
       ),
       resolveMcpLoopbackScopedTools: vi.fn(() => ({ agentId: "main", tools: [] })),
-      resolveOpenClawReferencePaths: vi.fn(async () => ({ docsPath: null, sourcePath: null })),
+      resolveRecallReferencePaths: vi.fn(async () => ({ docsPath: null, sourcePath: null })),
     });
     mockGetGlobalHookRunner.mockReturnValue(null);
     getRuntimeConfigMock.mockReturnValue({});
@@ -613,7 +613,7 @@ describe("shouldSkipLocalCliCredentialEpoch", () => {
     });
     registerContextEngine(engineId, factory);
     setCliRunnerPrepareTestDeps({
-      resolveOpenClawReferencePaths: vi.fn(async () => {
+      resolveRecallReferencePaths: vi.fn(async () => {
         throw new Error("reference path lookup failed");
       }),
     });
@@ -753,7 +753,7 @@ describe("shouldSkipLocalCliCredentialEpoch", () => {
         list: [{ id: "main", default: true, agentDir: runtimeAgentDir }],
       },
       plugins: { slots: { contextEngine: engineId } },
-    } satisfies OpenClawConfig;
+    } satisfies RecallConfig;
     const factory = vi.fn((_ctx: unknown): ContextEngine => {
       return {
         info: { id: engineId, name: "CLI runtime config engine" },
@@ -1259,8 +1259,8 @@ describe("shouldSkipLocalCliCredentialEpoch", () => {
       });
 
       expect(context.preparedBackend.env).toMatchObject({
-        OPENCLAW_MCP_MESSAGE_CHANNEL: "telegram",
-        OPENCLAW_MCP_INBOUND_EVENT_KIND: "room_event",
+        RECALL_MCP_MESSAGE_CHANNEL: "telegram",
+        RECALL_MCP_INBOUND_EVENT_KIND: "room_event",
       });
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });

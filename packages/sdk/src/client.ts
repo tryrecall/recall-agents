@@ -12,8 +12,8 @@ import type {
   EnvironmentsListResult,
   GatewayEvent,
   GatewayRequestOptions,
-  OpenClawEvent,
-  OpenClawTransport,
+  RecallEvent,
+  RecallTransport,
   RunCreateParams,
   RunResult,
   RunTimestamp,
@@ -32,16 +32,16 @@ const MAX_REPLAY_RUNS = 100;
 const MAX_REPLAY_EVENTS_PER_RUN = 500;
 const MAX_NORMALIZED_REPLAY_EVENTS = 2000;
 
-export type OpenClawOptions = {
+export type RecallOptions = {
   gateway?: "auto" | (string & {});
   url?: string;
   token?: string;
   password?: string;
   requestTimeoutMs?: number;
-  transport?: OpenClawTransport;
+  transport?: RecallTransport;
 };
 
-function resolveGatewayUrl(options: OpenClawOptions): string | undefined {
+function resolveGatewayUrl(options: RecallOptions): string | undefined {
   if (options.url) {
     return options.url;
   }
@@ -157,7 +157,7 @@ function assertNoUnsupportedRunOptions(params: AgentRunParams): void {
     return;
   }
   throw new Error(
-    `OpenClaw Gateway does not support per-run SDK option${
+    `Recall Gateway does not support per-run SDK option${
       unsupported.length === 1 ? "" : "s"
     } yet: ${unsupported.join(", ")}`,
   );
@@ -184,7 +184,7 @@ function buildAgentParams(params: AgentRunParams): Record<string, unknown> {
 }
 
 function unsupportedGatewayApi(api: string): never {
-  throw new Error(`${api} is not supported by the current OpenClaw Gateway yet`);
+  throw new Error(`${api} is not supported by the current Recall Gateway yet`);
 }
 
 type ChatProjectionState = "delta" | "final";
@@ -212,7 +212,7 @@ function requireArtifactQueryScope(api: string, params: unknown): ArtifactQuery 
   return params;
 }
 
-function readChatProjection(event: OpenClawEvent): ChatProjection | undefined {
+function readChatProjection(event: RecallEvent): ChatProjection | undefined {
   const raw = event.raw;
   if (event.type !== "raw" || raw?.event !== "chat") {
     return undefined;
@@ -249,11 +249,11 @@ function readChatProjectionReplace(payload: Record<string, unknown>): boolean {
   return payload.replace === true;
 }
 
-function isAssistantRunEvent(event: OpenClawEvent): boolean {
+function isAssistantRunEvent(event: RecallEvent): boolean {
   return event.type === "assistant.delta" || event.type === "assistant.message";
 }
 
-function isTerminalRunEvent(event: OpenClawEvent): boolean {
+function isTerminalRunEvent(event: RecallEvent): boolean {
   return (
     event.type === "run.completed" ||
     event.type === "run.failed" ||
@@ -263,10 +263,10 @@ function isTerminalRunEvent(event: OpenClawEvent): boolean {
 }
 
 function normalizeChatProjectionEvent(
-  event: OpenClawEvent,
+  event: RecallEvent,
   projection: ChatProjection,
   previousText: string | undefined,
-): OpenClawEvent {
+): RecallEvent {
   const text = readChatProjectionText(projection.payload);
   const deltaText = readChatProjectionDeltaText(projection.payload);
   const hasPreviousText = previousText !== undefined;
@@ -287,7 +287,7 @@ function normalizeChatProjectionEvent(
   };
 }
 
-export class OpenClaw {
+export class Recall {
   readonly agents: AgentsNamespace;
   readonly sessions: SessionsNamespace;
   readonly runs: RunsNamespace;
@@ -298,16 +298,16 @@ export class OpenClaw {
   readonly approvals: ApprovalsNamespace;
   readonly environments: EnvironmentsNamespace;
 
-  private readonly transport: OpenClawTransport;
-  private readonly normalizedEvents = new EventHub<OpenClawEvent>({
+  private readonly transport: RecallTransport;
+  private readonly normalizedEvents = new EventHub<RecallEvent>({
     replayLimit: MAX_NORMALIZED_REPLAY_EVENTS,
   });
-  private readonly replayByRunId = new Map<string, OpenClawEvent[]>();
+  private readonly replayByRunId = new Map<string, RecallEvent[]>();
   private connected = false;
   private eventPumpPromise: Promise<void> | null = null;
   private eventPumpReady: Promise<void> | null = null;
 
-  constructor(options: OpenClawOptions = {}) {
+  constructor(options: RecallOptions = {}) {
     this.transport =
       options.transport ??
       new GatewayClientTransport({
@@ -357,14 +357,14 @@ export class OpenClaw {
     return await this.transport.request<T>(method, params, options);
   }
 
-  events(filter?: (event: OpenClawEvent) => boolean): AsyncIterable<OpenClawEvent> {
+  events(filter?: (event: RecallEvent) => boolean): AsyncIterable<RecallEvent> {
     return this.iterateEvents(filter);
   }
 
   runEvents(
     runId: string,
-    filter?: (event: OpenClawEvent) => boolean,
-  ): AsyncIterable<OpenClawEvent> {
+    filter?: (event: RecallEvent) => boolean,
+  ): AsyncIterable<RecallEvent> {
     return this.iterateRunEvents(runId, filter);
   }
 
@@ -373,8 +373,8 @@ export class OpenClaw {
   }
 
   private async *iterateEvents(
-    filter?: (event: OpenClawEvent) => boolean,
-  ): AsyncIterable<OpenClawEvent> {
+    filter?: (event: RecallEvent) => boolean,
+  ): AsyncIterable<RecallEvent> {
     await this.connect();
     for await (const event of this.normalizedEvents.stream(filter)) {
       yield event;
@@ -383,14 +383,14 @@ export class OpenClaw {
 
   private async *iterateRunEvents(
     runId: string,
-    filter?: (event: OpenClawEvent) => boolean,
-  ): AsyncIterable<OpenClawEvent> {
+    filter?: (event: RecallEvent) => boolean,
+  ): AsyncIterable<RecallEvent> {
     await this.connect();
     const replayEvents = this.replaySnapshot(runId);
     let hasCanonicalAssistantRunEvent = replayEvents.some(isAssistantRunEvent);
     let hasTerminalRunEvent = replayEvents.some(isTerminalRunEvent);
     let previousChatProjectionText: string | undefined;
-    const toRunStreamEvent = (event: OpenClawEvent): OpenClawEvent | undefined => {
+    const toRunStreamEvent = (event: RecallEvent): RecallEvent | undefined => {
       const chatProjection = readChatProjection(event);
       if (chatProjection?.state === "delta") {
         if (hasCanonicalAssistantRunEvent) {
@@ -422,7 +422,7 @@ export class OpenClaw {
       }
       return event;
     };
-    const matches = (event: OpenClawEvent) => event.runId === runId;
+    const matches = (event: RecallEvent) => event.runId === runId;
     const liveSource = this.normalizedEvents.stream(matches, { replay: true });
     const live = liveSource[Symbol.asyncIterator]();
     let nextLive = live.next();
@@ -502,7 +502,7 @@ export class OpenClaw {
     return this.eventPumpReady;
   }
 
-  private recordReplayEvent(event: OpenClawEvent): void {
+  private recordReplayEvent(event: RecallEvent): void {
     if (!event.runId) {
       return;
     }
@@ -523,14 +523,14 @@ export class OpenClaw {
     }
   }
 
-  private replaySnapshot(runId: string): OpenClawEvent[] {
+  private replaySnapshot(runId: string): RecallEvent[] {
     return [...(this.replayByRunId.get(runId) ?? [])];
   }
 }
 
 export class Agent {
   constructor(
-    private readonly client: OpenClaw,
+    private readonly client: Recall,
     readonly id: string,
   ) {}
 
@@ -550,12 +550,12 @@ export class Agent {
 
 export class Run {
   constructor(
-    private readonly client: OpenClaw,
+    private readonly client: Recall,
     readonly id: string,
     readonly sessionKey?: string,
   ) {}
 
-  events(filter?: (event: OpenClawEvent) => boolean): AsyncIterable<OpenClawEvent> {
+  events(filter?: (event: RecallEvent) => boolean): AsyncIterable<RecallEvent> {
     return this.client.runEvents(this.id, filter);
   }
 
@@ -596,7 +596,7 @@ export class Run {
 
 export class Session {
   constructor(
-    private readonly client: OpenClaw,
+    private readonly client: Recall,
     readonly key: string,
     readonly info?: unknown,
   ) {}
@@ -630,7 +630,7 @@ export class Session {
 }
 
 export class AgentsNamespace {
-  constructor(private readonly client: OpenClaw) {}
+  constructor(private readonly client: Recall) {}
 
   async list(params?: Record<string, unknown>): Promise<unknown> {
     return await this.client.request("agents.list", params);
@@ -654,7 +654,7 @@ export class AgentsNamespace {
 }
 
 export class SessionsNamespace {
-  constructor(private readonly client: OpenClaw) {}
+  constructor(private readonly client: Recall) {}
 
   async list(params?: Record<string, unknown>): Promise<unknown> {
     return await this.client.request("sessions.list", params);
@@ -686,7 +686,7 @@ export class SessionsNamespace {
 }
 
 export class RunsNamespace {
-  constructor(private readonly client: OpenClaw) {}
+  constructor(private readonly client: Recall) {}
 
   async create(params: RunCreateParams): Promise<Run> {
     const raw = await this.client.request("agent", buildAgentParams(params), {
@@ -705,7 +705,7 @@ export class RunsNamespace {
     return new Run(this.client, runId);
   }
 
-  events(runId: string): AsyncIterable<OpenClawEvent> {
+  events(runId: string): AsyncIterable<RecallEvent> {
     return new Run(this.client, runId).events();
   }
 
@@ -720,7 +720,7 @@ export class RunsNamespace {
 
 class RpcNamespace {
   constructor(
-    protected readonly client: OpenClaw,
+    protected readonly client: Recall,
     private readonly prefix: string,
   ) {}
 
@@ -734,7 +734,7 @@ class RpcNamespace {
 }
 
 export class TasksNamespace extends RpcNamespace {
-  constructor(client: OpenClaw) {
+  constructor(client: Recall) {
     super(client, "tasks");
   }
 
@@ -755,7 +755,7 @@ export class TasksNamespace extends RpcNamespace {
 }
 
 export class ModelsNamespace extends RpcNamespace {
-  constructor(client: OpenClaw) {
+  constructor(client: Recall) {
     super(client, "models");
   }
 
@@ -769,7 +769,7 @@ export class ModelsNamespace extends RpcNamespace {
 }
 
 export class ToolsNamespace extends RpcNamespace {
-  constructor(client: OpenClaw) {
+  constructor(client: Recall) {
     super(client, "tools");
   }
 
@@ -794,7 +794,7 @@ export class ToolsNamespace extends RpcNamespace {
 }
 
 export class ArtifactsNamespace extends RpcNamespace {
-  constructor(client: OpenClaw) {
+  constructor(client: Recall) {
     super(client, "artifacts");
   }
 
@@ -818,7 +818,7 @@ export class ArtifactsNamespace extends RpcNamespace {
 }
 
 export class ApprovalsNamespace {
-  constructor(private readonly client: OpenClaw) {}
+  constructor(private readonly client: Recall) {}
 
   async list(params?: unknown): Promise<unknown> {
     return await this.client.request("exec.approval.list", params);
@@ -830,7 +830,7 @@ export class ApprovalsNamespace {
 }
 
 export class EnvironmentsNamespace extends RpcNamespace {
-  constructor(client: OpenClaw) {
+  constructor(client: Recall) {
     super(client, "environments");
   }
 

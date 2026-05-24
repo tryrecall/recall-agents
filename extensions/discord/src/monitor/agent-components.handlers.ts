@@ -1,4 +1,4 @@
-import { logError } from "openclaw/plugin-sdk/logging-core";
+import { logError } from "recall/plugin-sdk/logging-core";
 import {
   resolveDiscordComponentEntryWithPersistence,
   resolveDiscordModalEntryWithPersistence,

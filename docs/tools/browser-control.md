@@ -1,14 +1,14 @@
 ---
-summary: "OpenClaw browser control API, CLI reference, and scripting actions"
+summary: "Recall browser control API, CLI reference, and scripting actions"
 read_when:
   - Scripting or debugging the agent browser via the local control API
-  - Looking for the `openclaw browser` CLI reference
+  - Looking for the `recall browser` CLI reference
   - Adding custom browser automation with snapshots and refs
 title: "Browser control API"
 ---
 
 For setup, configuration, and troubleshooting, see [Browser](/tools/browser).
-This page is the reference for the local control HTTP API, the `openclaw browser`
+This page is the reference for the local control HTTP API, the `recall browser`
 CLI, and scripting patterns (snapshots, refs, waits, debug flows).
 
 ## Control API (optional)
@@ -32,12 +32,12 @@ For local integrations only, the Gateway exposes a small loopback HTTP API:
 All endpoints accept `?profile=<name>`. `POST /start?headless=true` requests a
 one-shot headless launch for local managed profiles without changing persisted
 browser config; attach-only, remote CDP, and existing-session profiles reject
-that override because OpenClaw does not launch those browser processes.
+that override because Recall does not launch those browser processes.
 
 If shared-secret gateway auth is configured, browser HTTP routes require auth too:
 
 - `Authorization: Bearer <gateway token>`
-- `x-openclaw-password: <gateway password>` or HTTP Basic auth with that password
+- `x-recall-password: <gateway password>` or HTTP Basic auth with that password
 
 Notes:
 
@@ -80,7 +80,7 @@ What still works without Playwright:
   `--depth`, `--efficient`) when a per-tab CDP WebSocket is available. This is
   a fallback for inspection and ref discovery; Playwright remains the primary
   action engine.
-- Page screenshots for the managed `openclaw` browser when a per-tab CDP
+- Page screenshots for the managed `recall` browser when a per-tab CDP
   WebSocket is available
 - Page screenshots for `existing-session` / Chrome MCP profiles
 - `existing-session` ref-based screenshots (`--ref`) from snapshot output
@@ -98,7 +98,7 @@ not supported for element screenshots`.
 
 If you see `Playwright is not available in this gateway build`, the packaged
 Gateway is missing the core browser runtime dependency. Reinstall or update
-OpenClaw, then restart the gateway. For Docker, also install the Chromium
+Recall, then restart the gateway. For Docker, also install the Chromium
 browser binaries as shown below.
 
 #### Docker Playwright install
@@ -107,19 +107,19 @@ If your Gateway runs in Docker, avoid `npx playwright` (npm override conflicts).
 For custom images, bake Chromium into the image:
 
 ```bash
-OPENCLAW_INSTALL_BROWSER=1 ./scripts/docker/setup.sh
+RECALL_INSTALL_BROWSER=1 ./scripts/docker/setup.sh
 ```
 
 For an existing image, install through the bundled CLI instead:
 
 ```bash
-docker compose run --rm openclaw-cli \
+docker compose run --rm recall-cli \
   node /app/node_modules/playwright-core/cli.js install chromium
 ```
 
 To persist browser downloads, set `PLAYWRIGHT_BROWSERS_PATH` (for example,
 `/home/node/.cache/ms-playwright`) and make sure `/home/node` is persisted via
-`OPENCLAW_HOME_VOLUME` or a bind mount. OpenClaw auto-detects the persisted
+`RECALL_HOME_VOLUME` or a bind mount. Recall auto-detects the persisted
 Chromium on Linux. See [Docker](/install/docker).
 
 ## How it works (internal)
@@ -135,18 +135,18 @@ All commands accept `--browser-profile <name>` to target a specific profile, and
 <Accordion title="Basics: status, tabs, open/focus/close">
 
 ```bash
-openclaw browser status
-openclaw browser start
-openclaw browser start --headless # one-shot local managed headless launch
-openclaw browser stop            # also clears emulation on attach-only/remote CDP
-openclaw browser tabs
-openclaw browser tab             # shortcut for current tab
-openclaw browser tab new
-openclaw browser tab select 2
-openclaw browser tab close 2
-openclaw browser open https://example.com
-openclaw browser focus abcd1234
-openclaw browser close abcd1234
+recall browser status
+recall browser start
+recall browser start --headless # one-shot local managed headless launch
+recall browser stop            # also clears emulation on attach-only/remote CDP
+recall browser tabs
+recall browser tab             # shortcut for current tab
+recall browser tab new
+recall browser tab select 2
+recall browser tab close 2
+recall browser open https://example.com
+recall browser focus abcd1234
+recall browser close abcd1234
 ```
 
 </Accordion>
@@ -154,23 +154,23 @@ openclaw browser close abcd1234
 <Accordion title="Inspection: screenshot, snapshot, console, errors, requests">
 
 ```bash
-openclaw browser screenshot
-openclaw browser screenshot --full-page
-openclaw browser screenshot --ref 12        # or --ref e12
-openclaw browser screenshot --labels
-openclaw browser snapshot
-openclaw browser snapshot --format aria --limit 200
-openclaw browser snapshot --interactive --compact --depth 6
-openclaw browser snapshot --efficient
-openclaw browser snapshot --labels
-openclaw browser snapshot --urls
-openclaw browser snapshot --selector "#main" --interactive
-openclaw browser snapshot --frame "iframe#main" --interactive
-openclaw browser console --level error
-openclaw browser errors --clear
-openclaw browser requests --filter api --clear
-openclaw browser pdf
-openclaw browser responsebody "**/api" --max-chars 5000
+recall browser screenshot
+recall browser screenshot --full-page
+recall browser screenshot --ref 12        # or --ref e12
+recall browser screenshot --labels
+recall browser snapshot
+recall browser snapshot --format aria --limit 200
+recall browser snapshot --interactive --compact --depth 6
+recall browser snapshot --efficient
+recall browser snapshot --labels
+recall browser snapshot --urls
+recall browser snapshot --selector "#main" --interactive
+recall browser snapshot --frame "iframe#main" --interactive
+recall browser console --level error
+recall browser errors --clear
+recall browser requests --filter api --clear
+recall browser pdf
+recall browser responsebody "**/api" --max-chars 5000
 ```
 
 </Accordion>
@@ -178,29 +178,29 @@ openclaw browser responsebody "**/api" --max-chars 5000
 <Accordion title="Actions: navigate, click, type, drag, wait, evaluate">
 
 ```bash
-openclaw browser navigate https://example.com
-openclaw browser resize 1280 720
-openclaw browser click 12 --double           # or e12 for role refs
-openclaw browser click-coords 120 340        # viewport coordinates
-openclaw browser type 23 "hello" --submit
-openclaw browser press Enter
-openclaw browser hover 44
-openclaw browser scrollintoview e12
-openclaw browser drag 10 11
-openclaw browser select 9 OptionA OptionB
-openclaw browser download e12 report.pdf
-openclaw browser waitfordownload report.pdf
-openclaw browser upload /tmp/openclaw/uploads/file.pdf
-openclaw browser fill --fields '[{"ref":"1","type":"text","value":"Ada"}]'
-openclaw browser dialog --accept
-openclaw browser dialog --dismiss --dialog-id d1
-openclaw browser wait --text "Done"
-openclaw browser wait "#main" --url "**/dash" --load networkidle --fn "window.ready===true"
-openclaw browser evaluate --fn '(el) => el.textContent' --ref 7
-openclaw browser evaluate --timeout-ms 30000 --fn 'async () => { await window.ready; return true; }'
-openclaw browser highlight e12
-openclaw browser trace start
-openclaw browser trace stop
+recall browser navigate https://example.com
+recall browser resize 1280 720
+recall browser click 12 --double           # or e12 for role refs
+recall browser click-coords 120 340        # viewport coordinates
+recall browser type 23 "hello" --submit
+recall browser press Enter
+recall browser hover 44
+recall browser scrollintoview e12
+recall browser drag 10 11
+recall browser select 9 OptionA OptionB
+recall browser download e12 report.pdf
+recall browser waitfordownload report.pdf
+recall browser upload /tmp/recall/uploads/file.pdf
+recall browser fill --fields '[{"ref":"1","type":"text","value":"Ada"}]'
+recall browser dialog --accept
+recall browser dialog --dismiss --dialog-id d1
+recall browser wait --text "Done"
+recall browser wait "#main" --url "**/dash" --load networkidle --fn "window.ready===true"
+recall browser evaluate --fn '(el) => el.textContent' --ref 7
+recall browser evaluate --timeout-ms 30000 --fn 'async () => { await window.ready; return true; }'
+recall browser highlight e12
+recall browser trace start
+recall browser trace stop
 ```
 
 </Accordion>
@@ -208,20 +208,20 @@ openclaw browser trace stop
 <Accordion title="State: cookies, storage, offline, headers, geo, device">
 
 ```bash
-openclaw browser cookies
-openclaw browser cookies set session abc123 --url "https://example.com"
-openclaw browser cookies clear
-openclaw browser storage local get
-openclaw browser storage local set theme dark
-openclaw browser storage session clear
-openclaw browser set offline on
-openclaw browser set headers --headers-json '{"X-Debug":"1"}'
-openclaw browser set credentials user pass            # --clear to remove
-openclaw browser set geo 37.7749 -122.4194 --origin "https://example.com"
-openclaw browser set media dark
-openclaw browser set timezone America/New_York
-openclaw browser set locale en-US
-openclaw browser set device "iPhone 14"
+recall browser cookies
+recall browser cookies set session abc123 --url "https://example.com"
+recall browser cookies clear
+recall browser storage local get
+recall browser storage local set theme dark
+recall browser storage session clear
+recall browser set offline on
+recall browser set headers --headers-json '{"X-Debug":"1"}'
+recall browser set credentials user pass            # --clear to remove
+recall browser set geo 37.7749 -122.4194 --origin "https://example.com"
+recall browser set media dark
+recall browser set timezone America/New_York
+recall browser set locale en-US
+recall browser set device "iPhone 14"
 ```
 
 </Accordion>
@@ -230,12 +230,12 @@ openclaw browser set device "iPhone 14"
 
 Notes:
 
-- `upload` and `dialog` are **arming** calls; run them before the click/press that triggers the chooser/dialog. If an action opens a modal, the action response includes `blockedByDialog` and `browserState.dialogs.pending`; pass that `dialogId` to respond directly. Dialogs handled outside OpenClaw appear under `browserState.dialogs.recent`.
+- `upload` and `dialog` are **arming** calls; run them before the click/press that triggers the chooser/dialog. If an action opens a modal, the action response includes `blockedByDialog` and `browserState.dialogs.pending`; pass that `dialogId` to respond directly. Dialogs handled outside Recall appear under `browserState.dialogs.recent`.
 - `click`/`type`/etc require a `ref` from `snapshot` (numeric `12`, role ref `e12`, or actionable ARIA ref `ax12`). CSS selectors are intentionally not supported for actions. Use `click-coords` when the visible viewport position is the only reliable target.
-- Download, trace, and upload paths are constrained to OpenClaw temp roots: `/tmp/openclaw{,/downloads,/uploads}` (fallback: `${os.tmpdir()}/openclaw/...`).
+- Download, trace, and upload paths are constrained to Recall temp roots: `/tmp/recall{,/downloads,/uploads}` (fallback: `${os.tmpdir()}/recall/...`).
 - `upload` can also set file inputs directly via `--input-ref` or `--element`.
 
-Stable tab ids and labels survive Chromium raw-target replacement when OpenClaw
+Stable tab ids and labels survive Chromium raw-target replacement when Recall
 can prove the replacement tab, such as same URL or a single old tab becoming a
 single new tab after form submission. Raw target ids are still volatile; prefer
 `suggestedTargetId` from `tabs` in scripts.
@@ -243,7 +243,7 @@ single new tab after form submission. Raw target ids are still volatile; prefer
 Snapshot flags at a glance:
 
 - `--format ai` (default with Playwright): AI snapshot with numeric refs (`aria-ref="<n>"`).
-- `--format aria`: accessibility tree with `axN` refs. When Playwright is available, OpenClaw binds refs with backend DOM ids to the live page so follow-up actions can use them; otherwise treat the output as inspection-only.
+- `--format aria`: accessibility tree with `axN` refs. When Playwright is available, Recall binds refs with backend DOM ids to the live page so follow-up actions can use them; otherwise treat the output as inspection-only.
 - `--efficient` (or `--mode efficient`): compact role snapshot preset. Set `browser.snapshotDefaults.mode: "efficient"` to make this the default (see [Gateway configuration](/gateway/configuration-reference#browser)).
 - `--interactive`, `--compact`, `--depth`, `--selector` force a role snapshot with `ref=e12` refs. `--frame "<iframe>"` scopes role snapshots to an iframe.
 - `--labels` adds a viewport-only screenshot with overlayed ref labels (prints `MEDIA:<path>`).
@@ -251,24 +251,24 @@ Snapshot flags at a glance:
 
 ## Snapshots and refs
 
-OpenClaw supports two "snapshot" styles:
+Recall supports two "snapshot" styles:
 
-- **AI snapshot (numeric refs)**: `openclaw browser snapshot` (default; `--format ai`)
+- **AI snapshot (numeric refs)**: `recall browser snapshot` (default; `--format ai`)
   - Output: a text snapshot that includes numeric refs.
-  - Actions: `openclaw browser click 12`, `openclaw browser type 23 "hello"`.
+  - Actions: `recall browser click 12`, `recall browser type 23 "hello"`.
   - Internally, the ref is resolved via Playwright's `aria-ref`.
 
-- **Role snapshot (role refs like `e12`)**: `openclaw browser snapshot --interactive` (or `--compact`, `--depth`, `--selector`, `--frame`)
+- **Role snapshot (role refs like `e12`)**: `recall browser snapshot --interactive` (or `--compact`, `--depth`, `--selector`, `--frame`)
   - Output: a role-based list/tree with `[ref=e12]` (and optional `[nth=1]`).
-  - Actions: `openclaw browser click e12`, `openclaw browser highlight e12`.
+  - Actions: `recall browser click e12`, `recall browser highlight e12`.
   - Internally, the ref is resolved via `getByRole(...)` (plus `nth()` for duplicates).
   - Add `--labels` to include a viewport screenshot with overlayed `e12` labels.
   - Add `--urls` when link text is ambiguous and the agent needs concrete
     navigation targets.
 
-- **ARIA snapshot (ARIA refs like `ax12`)**: `openclaw browser snapshot --format aria`
+- **ARIA snapshot (ARIA refs like `ax12`)**: `recall browser snapshot --format aria`
   - Output: the accessibility tree as structured nodes.
-  - Actions: `openclaw browser click ax12` works when the snapshot path can bind
+  - Actions: `recall browser click ax12` works when the snapshot path can bind
     the ref through Playwright and Chrome backend DOM ids.
 - If Playwright is unavailable, ARIA snapshots can still be useful for
   inspection, but refs may not be actionable. Re-snapshot with `--format ai`
@@ -293,18 +293,18 @@ Ref behavior:
 You can wait on more than just time/text:
 
 - Wait for URL (globs supported by Playwright):
-  - `openclaw browser wait --url "**/dash"`
+  - `recall browser wait --url "**/dash"`
 - Wait for load state:
-  - `openclaw browser wait --load networkidle`
+  - `recall browser wait --load networkidle`
 - Wait for a JS predicate:
-  - `openclaw browser wait --fn "window.ready===true"`
+  - `recall browser wait --fn "window.ready===true"`
 - Wait for a selector to become visible:
-  - `openclaw browser wait "#main"`
+  - `recall browser wait "#main"`
 
 These can be combined:
 
 ```bash
-openclaw browser wait "#main" \
+recall browser wait "#main" \
   --url "**/dash" \
   --load networkidle \
   --fn "window.ready===true" \
@@ -315,16 +315,16 @@ openclaw browser wait "#main" \
 
 When an action fails (e.g. "not visible", "strict mode violation", "covered"):
 
-1. `openclaw browser snapshot --interactive`
+1. `recall browser snapshot --interactive`
 2. Use `click <ref>` / `type <ref>` (prefer role refs in interactive mode)
-3. If it still fails: `openclaw browser highlight <ref>` to see what Playwright is targeting
+3. If it still fails: `recall browser highlight <ref>` to see what Playwright is targeting
 4. If the page behaves oddly:
-   - `openclaw browser errors --clear`
-   - `openclaw browser requests --filter api --clear`
+   - `recall browser errors --clear`
+   - `recall browser requests --filter api --clear`
 5. For deep debugging: record a trace:
-   - `openclaw browser trace start`
+   - `recall browser trace start`
    - reproduce the issue
-   - `openclaw browser trace stop` (prints `TRACE:<path>`)
+   - `recall browser trace stop` (prints `TRACE:<path>`)
 
 ## JSON output
 
@@ -333,10 +333,10 @@ When an action fails (e.g. "not visible", "strict mode violation", "covered"):
 Examples:
 
 ```bash
-openclaw browser status --json
-openclaw browser snapshot --interactive --json
-openclaw browser requests --filter api --json
-openclaw browser cookies --json
+recall browser status --json
+recall browser snapshot --interactive --json
+recall browser requests --filter api --json
+recall browser cookies --json
 ```
 
 Role snapshots in JSON include `refs` plus a small `stats` block (lines/chars/refs/interactive) so tools can reason about payload size and density.
@@ -359,11 +359,11 @@ These are useful for "make the site behave like X" workflows:
 
 ## Security and privacy
 
-- The openclaw browser profile may contain logged-in sessions; treat it as sensitive.
-- `browser act kind=evaluate` / `openclaw browser evaluate` and `wait --fn`
+- The recall browser profile may contain logged-in sessions; treat it as sensitive.
+- `browser act kind=evaluate` / `recall browser evaluate` and `wait --fn`
   execute arbitrary JavaScript in the page context. Prompt injection can steer
   this. Disable it with `browser.evaluateEnabled=false` if you do not need it.
-- Use `openclaw browser evaluate --timeout-ms <ms>` when the page-side function
+- Use `recall browser evaluate --timeout-ms <ms>` when the page-side function
   may need longer than the default evaluate timeout.
 - For logins and anti-bot notes (X/Twitter, etc.), see [Browser login + X/Twitter posting](/tools/browser-login).
 - Keep the Gateway/node host private (loopback or tailnet-only).

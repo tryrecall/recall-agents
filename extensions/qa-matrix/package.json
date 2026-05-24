@@ -1,26 +1,26 @@
 {
-  "name": "@openclaw/qa-matrix",
+  "name": "@recall/qa-matrix",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw Matrix QA runner plugin",
+  "description": "Recall Matrix QA runner plugin",
   "type": "module",
   "dependencies": {
     "undici": "8.3.0"
   },
   "devDependencies": {
-    "@openclaw/matrix": "workspace:*",
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@recall/matrix": "workspace:*",
+    "@recall/plugin-sdk": "workspace:*",
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.5.22"
+    "recall": ">=2026.5.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# OpenClaw CLI installer (non-interactive, no onboarding)
-# Usage: curl -fsSL --proto '=https' --tlsv1.2 https://openclaw.ai/install-cli.sh | bash -s -- [--json] [--prefix <path>] [--version <ver>] [--node-version <ver>] [--onboard]
+# Recall CLI installer (non-interactive, no onboarding)
+# Usage: curl -fsSL --proto '=https' --tlsv1.2 https://recall.ai/install-cli.sh | bash -s -- [--json] [--prefix <path>] [--version <ver>] [--node-version <ver>] [--onboard]
 
 ensure_home_env() {
   if [[ -n "${HOME:-}" && "${HOME}" != "/" && -d "${HOME}" ]]; then
@@ -29,14 +29,14 @@ ensure_home_env() {
 
 ensure_home_env
 
-PREFIX="${OPENCLAW_PREFIX:-${HOME}/.openclaw}"
-OPENCLAW_VERSION="${OPENCLAW_VERSION:-latest}"
-NODE_VERSION="${OPENCLAW_NODE_VERSION:-22.22.0}"
+PREFIX="${RECALL_PREFIX:-${HOME}/.recall}"
+RECALL_VERSION="${RECALL_VERSION:-latest}"
+NODE_VERSION="${RECALL_NODE_VERSION:-22.22.0}"
 SHARP_IGNORE_GLOBAL_LIBVIPS="${SHARP_IGNORE_GLOBAL_LIBVIPS:-1}"
-NPM_LOGLEVEL="${OPENCLAW_NPM_LOGLEVEL:-error}"
-INSTALL_METHOD="${OPENCLAW_INSTALL_METHOD:-npm}"
-GIT_DIR="${OPENCLAW_GIT_DIR:-${HOME}/openclaw}"
-GIT_UPDATE="${OPENCLAW_GIT_UPDATE:-1}"
+NPM_LOGLEVEL="${RECALL_NPM_LOGLEVEL:-error}"
+INSTALL_METHOD="${RECALL_INSTALL_METHOD:-npm}"
+GIT_DIR="${RECALL_GIT_DIR:-${HOME}/recall}"
+GIT_UPDATE="${RECALL_GIT_UPDATE:-1}"
 JSON=0
 RUN_ONBOARD=0
 SET_NPM_PREFIX=0
@@ -46,24 +46,24 @@ print_usage() {
   cat <<EOF
 Usage: install-cli.sh [options]
   --json                              Emit NDJSON events (no human output)
-  --prefix <path>                     Install prefix (default: ~/.openclaw)
+  --prefix <path>                     Install prefix (default: ~/.recall)
   --install-method, --method npm|git  Install via npm (default) or from a git checkout
   --npm                               Shortcut for --install-method npm
   --git, --github                     Shortcut for --install-method git
-  --git-dir, --dir <path>             Checkout directory (default: ~/openclaw)
-  --version <ver>                     OpenClaw version (default: latest)
+  --git-dir, --dir <path>             Checkout directory (default: ~/recall)
+  --version <ver>                     Recall version (default: latest)
   --node-version <ver>                Node version (default: 22.22.0)
-  --onboard                           Run "openclaw onboard" after install
+  --onboard                           Run "recall onboard" after install
   --no-onboard                        Skip onboarding (default)
   --set-npm-prefix                    Force npm prefix to ~/.npm-global if current prefix is not writable (Linux)
 
 Environment variables:
   SHARP_IGNORE_GLOBAL_LIBVIPS=0|1    Default: 1 (avoid sharp building against global libvips)
-  OPENCLAW_NPM_LOGLEVEL=error|warn|notice  Default: error (hide npm deprecation noise)
-  OPENCLAW_INSTALL_METHOD=git|npm
-  OPENCLAW_VERSION=latest|next|<semver>
-  OPENCLAW_GIT_DIR=...
-  OPENCLAW_GIT_UPDATE=0|1
+  RECALL_NPM_LOGLEVEL=error|warn|notice  Default: error (hide npm deprecation noise)
+  RECALL_INSTALL_METHOD=git|npm
+  RECALL_VERSION=latest|next|<semver>
+  RECALL_GIT_DIR=...
+  RECALL_GIT_UPDATE=0|1
 EOF
 }
 
@@ -100,7 +100,7 @@ download_file() {
 }
 
 cleanup_legacy_submodules() {
-  local repo_dir="${1:-${OPENCLAW_GIT_DIR:-${HOME}/openclaw}}"
+  local repo_dir="${1:-${RECALL_GIT_DIR:-${HOME}/recall}}"
   local legacy_dir="${repo_dir}/Peekaboo"
   if [[ -d "$legacy_dir" ]]; then
     emit_json "{\"event\":\"step\",\"name\":\"legacy-submodule\",\"status\":\"start\",\"path\":\"${legacy_dir//\"/\\\"}\"}"
@@ -224,7 +224,7 @@ parse_args() {
         shift 2
         ;;
       --version)
-        OPENCLAW_VERSION="$2"
+        RECALL_VERSION="$2"
         shift 2
         ;;
       --node-version)
@@ -372,26 +372,26 @@ is_openclaw_source_package_install_spec() {
   local value="${1:-}"
   local normalized_value=""
   normalized_value="$(to_lowercase_ascii "$value")"
-  normalized_value="${normalized_value#openclaw@}"
+  normalized_value="${normalized_value#recall@}"
 
   [[ "$normalized_value" == "main" ]] && return 0
-  [[ "$normalized_value" =~ ^github:openclaw/openclaw($|[#/]) ]] && return 0
+  [[ "$normalized_value" =~ ^github:tryrecall/recall-agents($|[#/]) ]] && return 0
 
   normalized_value="${normalized_value#git+}"
-  [[ "$normalized_value" =~ ^https?://github\.com/openclaw/openclaw(\.git)?($|[?#]) ]] && return 0
-  [[ "$normalized_value" =~ ^ssh://git@github\.com[:/]openclaw/openclaw(\.git)?($|[?#]) ]] && return 0
-  [[ "$normalized_value" =~ ^git://github\.com/openclaw/openclaw(\.git)?($|[?#]) ]] && return 0
-  [[ "$normalized_value" =~ ^git@github\.com:openclaw/openclaw(\.git)?($|[?#]) ]] && return 0
+  [[ "$normalized_value" =~ ^https?://github\.com/tryrecall/recall-agents(\.git)?($|[?#]) ]] && return 0
+  [[ "$normalized_value" =~ ^ssh://git@github\.com[:/]tryrecall/recall-agents(\.git)?($|[?#]) ]] && return 0
+  [[ "$normalized_value" =~ ^git://github\.com/tryrecall/recall-agents(\.git)?($|[?#]) ]] && return 0
+  [[ "$normalized_value" =~ ^git@github\.com:tryrecall/recall-agents(\.git)?($|[?#]) ]] && return 0
   return 1
 }
 
 resolve_git_openclaw_ref() {
-  local requested="${OPENCLAW_VERSION:-latest}"
+  local requested="${RECALL_VERSION:-latest}"
   local resolved_version=""
 
   case "$requested" in
     ""|latest)
-      resolved_version="$("$(npm_bin)" view "openclaw" "dist-tags.${requested:-latest}" 2>/dev/null || true)"
+      resolved_version="$("$(npm_bin)" view "recall" "dist-tags.${requested:-latest}" 2>/dev/null || true)"
       if [[ -n "$resolved_version" ]]; then
         echo "v${resolved_version}"
         return 0
@@ -400,7 +400,7 @@ resolve_git_openclaw_ref() {
       return 0
       ;;
     next|beta)
-      resolved_version="$("$(npm_bin)" view "openclaw" "dist-tags.${requested:-latest}" 2>/dev/null || true)"
+      resolved_version="$("$(npm_bin)" view "recall" "dist-tags.${requested:-latest}" 2>/dev/null || true)"
       if [[ -n "$resolved_version" ]]; then
         echo "v${resolved_version}"
         return 0
@@ -644,9 +644,9 @@ fix_npm_prefix_if_needed() {
 }
 
 install_openclaw() {
-  local requested="${OPENCLAW_VERSION:-latest}"
+  local requested="${RECALL_VERSION:-latest}"
   if is_openclaw_source_package_install_spec "$requested"; then
-    fail "npm installs do not support OpenClaw GitHub source targets like '${requested}'. Use --install-method git --version main, latest, beta, an exact version, or a built .tgz package."
+    fail "npm installs do not support Recall GitHub source targets like '${requested}'. Use --install-method git --version main, latest, beta, an exact version, or a built .tgz package."
   fi
   local freshness_flag="--min-release-age=0"
   local min_release_age=""
@@ -664,32 +664,32 @@ install_openclaw() {
     --no-audit
     "$freshness_flag"
   )
-  emit_json "{\"event\":\"step\",\"name\":\"openclaw\",\"status\":\"start\",\"version\":\"${requested}\"}"
-  log "Installing OpenClaw (${requested})..."
+  emit_json "{\"event\":\"step\",\"name\":\"recall\",\"status\":\"start\",\"version\":\"${requested}\"}"
+  log "Installing Recall (${requested})..."
   if [[ "$SET_NPM_PREFIX" -eq 1 ]]; then
     fix_npm_prefix_if_needed
   fi
 
   if [[ "${requested}" == "latest" ]]; then
-    if ! env -u NPM_CONFIG_BEFORE -u npm_config_before -u NPM_CONFIG_MIN_RELEASE_AGE -u npm_config_min_release_age -u npm_config_min-release-age "SHARP_IGNORE_GLOBAL_LIBVIPS=$SHARP_IGNORE_GLOBAL_LIBVIPS" "$(npm_bin)" install -g --prefix "$(node_dir)" "${npm_args[@]}" "openclaw@latest"; then
-      log "npm install openclaw@latest failed; retrying openclaw@next"
-      emit_json "{\"event\":\"step\",\"name\":\"openclaw\",\"status\":\"retry\",\"version\":\"next\"}"
-      env -u NPM_CONFIG_BEFORE -u npm_config_before -u NPM_CONFIG_MIN_RELEASE_AGE -u npm_config_min_release_age -u npm_config_min-release-age "SHARP_IGNORE_GLOBAL_LIBVIPS=$SHARP_IGNORE_GLOBAL_LIBVIPS" "$(npm_bin)" install -g --prefix "$(node_dir)" "${npm_args[@]}" "openclaw@next"
+    if ! env -u NPM_CONFIG_BEFORE -u npm_config_before -u NPM_CONFIG_MIN_RELEASE_AGE -u npm_config_min_release_age -u npm_config_min-release-age "SHARP_IGNORE_GLOBAL_LIBVIPS=$SHARP_IGNORE_GLOBAL_LIBVIPS" "$(npm_bin)" install -g --prefix "$(node_dir)" "${npm_args[@]}" "recall@latest"; then
+      log "npm install recall@latest failed; retrying recall@next"
+      emit_json "{\"event\":\"step\",\"name\":\"recall\",\"status\":\"retry\",\"version\":\"next\"}"
+      env -u NPM_CONFIG_BEFORE -u npm_config_before -u NPM_CONFIG_MIN_RELEASE_AGE -u npm_config_min_release_age -u npm_config_min-release-age "SHARP_IGNORE_GLOBAL_LIBVIPS=$SHARP_IGNORE_GLOBAL_LIBVIPS" "$(npm_bin)" install -g --prefix "$(node_dir)" "${npm_args[@]}" "recall@next"
       requested="next"
     fi
   else
-    env -u NPM_CONFIG_BEFORE -u npm_config_before -u NPM_CONFIG_MIN_RELEASE_AGE -u npm_config_min_release_age -u npm_config_min-release-age "SHARP_IGNORE_GLOBAL_LIBVIPS=$SHARP_IGNORE_GLOBAL_LIBVIPS" "$(npm_bin)" install -g --prefix "$(node_dir)" "${npm_args[@]}" "openclaw@${requested}"
+    env -u NPM_CONFIG_BEFORE -u npm_config_before -u NPM_CONFIG_MIN_RELEASE_AGE -u npm_config_min_release_age -u npm_config_min-release-age "SHARP_IGNORE_GLOBAL_LIBVIPS=$SHARP_IGNORE_GLOBAL_LIBVIPS" "$(npm_bin)" install -g --prefix "$(node_dir)" "${npm_args[@]}" "recall@${requested}"
   fi
 
   mkdir -p "${PREFIX}/bin"
-  rm -f "${PREFIX}/bin/openclaw"
-  cat > "${PREFIX}/bin/openclaw" <<EOF
+  rm -f "${PREFIX}/bin/recall"
+  cat > "${PREFIX}/bin/recall" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
-exec "${PREFIX}/tools/node/bin/node" "$(node_dir)/lib/node_modules/openclaw/dist/entry.js" "\$@"
+exec "${PREFIX}/tools/node/bin/node" "$(node_dir)/lib/node_modules/recall/dist/entry.js" "\$@"
 EOF
-  chmod +x "${PREFIX}/bin/openclaw"
-  emit_json "{\"event\":\"step\",\"name\":\"openclaw\",\"status\":\"ok\",\"version\":\"${requested}\"}"
+  chmod +x "${PREFIX}/bin/recall"
+  emit_json "{\"event\":\"step\",\"name\":\"recall\",\"status\":\"ok\",\"version\":\"${requested}\"}"
 }
 
 ensure_pnpm_git_prepare_allowlist() {
@@ -725,7 +725,7 @@ ensure_pnpm_git_prepare_allowlist() {
 
 install_openclaw_from_git() {
   local repo_dir="$1"
-  local repo_url="https://github.com/openclaw/openclaw.git"
+  local repo_url="https://github.com/tryrecall/recall-agents.git"
 
   if [[ -z "$repo_dir" ]]; then
     fail "Git install dir cannot be empty"
@@ -736,7 +736,7 @@ install_openclaw_from_git() {
   mkdir -p "$(dirname "$repo_dir")"
   repo_dir="$(cd "$(dirname "$repo_dir")" && pwd)/$(basename "$repo_dir")"
 
-  emit_json "{\"event\":\"step\",\"name\":\"openclaw\",\"status\":\"start\",\"method\":\"git\",\"repo\":\"${repo_url//\"/\\\"}\"}"
+  emit_json "{\"event\":\"step\",\"name\":\"recall\",\"status\":\"start\",\"method\":\"git\",\"repo\":\"${repo_url//\"/\\\"}\"}"
   if [[ -d "$repo_dir/.git" ]]; then
     log "Installing Openclaw from git checkout: ${repo_dir}"
   else
@@ -782,19 +782,19 @@ install_openclaw_from_git() {
   run_pnpm -C "$repo_dir" build
 
   mkdir -p "${PREFIX}/bin"
-  cat > "${PREFIX}/bin/openclaw" <<EOF
+  cat > "${PREFIX}/bin/recall" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 exec "${PREFIX}/tools/node/bin/node" "${repo_dir}/dist/entry.js" "\$@"
 EOF
-  chmod +x "${PREFIX}/bin/openclaw"
-  emit_json "{\"event\":\"step\",\"name\":\"openclaw\",\"status\":\"ok\",\"method\":\"git\"}"
+  chmod +x "${PREFIX}/bin/recall"
+  emit_json "{\"event\":\"step\",\"name\":\"recall\",\"status\":\"ok\",\"method\":\"git\"}"
 }
 
 resolve_openclaw_version() {
   local version=""
-  if [[ -x "${PREFIX}/bin/openclaw" ]]; then
-    version="$("${PREFIX}/bin/openclaw" --version 2>/dev/null | head -n 1 | tr -d '\r')"
+  if [[ -x "${PREFIX}/bin/recall" ]]; then
+    version="$("${PREFIX}/bin/recall" --version 2>/dev/null | head -n 1 | tr -d '\r')"
   fi
   echo "$version"
 }
@@ -825,7 +825,7 @@ try {
 }
 
 refresh_gateway_service_if_loaded() {
-  local claw="${PREFIX}/bin/openclaw"
+  local claw="${PREFIX}/bin/recall"
   if [[ ! -x "$claw" ]]; then
     return 0
   fi
@@ -857,7 +857,7 @@ refresh_gateway_service_if_loaded() {
 main() {
   parse_args "$@"
 
-  if [[ "${OPENCLAW_NO_ONBOARD:-0}" == "1" ]]; then
+  if [[ "${RECALL_NO_ONBOARD:-0}" == "1" ]]; then
     RUN_ONBOARD=0
   fi
 
@@ -885,17 +885,17 @@ main() {
   installed_version="$(resolve_openclaw_version)"
   if [[ -n "$installed_version" ]]; then
     emit_json "{\"event\":\"done\",\"ok\":true,\"version\":\"${installed_version//\"/\\\"}\"}"
-    log "OpenClaw installed (${installed_version})."
+    log "Recall installed (${installed_version})."
   else
     emit_json "{\"event\":\"done\",\"ok\":true}"
-    log "OpenClaw installed."
+    log "Recall installed."
   fi
 
   if [[ "$RUN_ONBOARD" -eq 1 ]]; then
-    "${PREFIX}/bin/openclaw" onboard
+    "${PREFIX}/bin/recall" onboard
   fi
 }
 
-if [[ "${OPENCLAW_INSTALL_CLI_SH_NO_RUN:-0}" != "1" ]]; then
+if [[ "${RECALL_INSTALL_CLI_SH_NO_RUN:-0}" != "1" ]]; then
   main "$@"
 fi

@@ -27,7 +27,7 @@ vi.mock("../cli/deps.js", () => ({
 
 vi.mock("../config/sessions.js", () => ({
   resolveAgentMainSessionKey: () => "agent:main:main",
-  resolveStorePath: () => "/tmp/openclaw-sessions.json",
+  resolveStorePath: () => "/tmp/recall-sessions.json",
   updateSessionStore: vi.fn(),
 }));
 
@@ -75,7 +75,7 @@ vi.mock("../gateway/session-utils.js", () => ({
   listAgentsForGateway: () => [],
   listSessionsFromStoreAsync: async () => ({ sessions: [] }),
   loadCombinedSessionStoreForGateway: () => ({
-    storePath: "/tmp/openclaw-sessions.json",
+    storePath: "/tmp/recall-sessions.json",
     store: {},
   }),
   loadSessionEntry: (sessionKey: string) => ({
@@ -87,7 +87,7 @@ vi.mock("../gateway/session-utils.js", () => ({
   readSessionMessagesAsync: async () => [],
   resolveGatewaySessionStoreTarget: ({ key }: { key: string }) => ({
     canonicalKey: key,
-    storePath: "/tmp/openclaw-sessions.json",
+    storePath: "/tmp/recall-sessions.json",
   }),
   resolveSessionModelRef: () => ({ provider: "openai", model: "gpt-5.4" }),
 }));
@@ -340,8 +340,8 @@ describe("EmbeddedTuiBackend", () => {
   });
 
   it("aborts local post-turn maintenance when stop grace elapses", async () => {
-    const previous = process.env.OPENCLAW_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS;
-    process.env.OPENCLAW_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS = "5";
+    const previous = process.env.RECALL_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS;
+    process.env.RECALL_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS = "5";
     try {
       const { EmbeddedTuiBackend } = await import("./embedded-backend.js");
       const pending = deferred<{
@@ -383,9 +383,9 @@ describe("EmbeddedTuiBackend", () => {
       expect(isEmbeddedMode()).toBe(false);
     } finally {
       if (previous === undefined) {
-        delete process.env.OPENCLAW_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS;
+        delete process.env.RECALL_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS;
       } else {
-        process.env.OPENCLAW_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS = previous;
+        process.env.RECALL_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS = previous;
       }
     }
   });
@@ -490,8 +490,8 @@ describe("EmbeddedTuiBackend", () => {
   });
 
   it("fails a queued local send when the previous finishing run does not settle", async () => {
-    const previous = process.env.OPENCLAW_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS;
-    process.env.OPENCLAW_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS = "5";
+    const previous = process.env.RECALL_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS;
+    process.env.RECALL_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS = "5";
     try {
       const { EmbeddedTuiBackend } = await import("./embedded-backend.js");
       const first = deferred<{
@@ -547,16 +547,16 @@ describe("EmbeddedTuiBackend", () => {
       ).toBe(true);
     } finally {
       if (previous === undefined) {
-        delete process.env.OPENCLAW_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS;
+        delete process.env.RECALL_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS;
       } else {
-        process.env.OPENCLAW_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS = previous;
+        process.env.RECALL_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS = previous;
       }
     }
   });
 
   it("fails a queued local send immediately when shutdown grace is zero", async () => {
-    const previous = process.env.OPENCLAW_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS;
-    process.env.OPENCLAW_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS = "0";
+    const previous = process.env.RECALL_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS;
+    process.env.RECALL_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS = "0";
     try {
       const { EmbeddedTuiBackend } = await import("./embedded-backend.js");
       const first = deferred<{
@@ -605,9 +605,9 @@ describe("EmbeddedTuiBackend", () => {
       ).toBe(true);
     } finally {
       if (previous === undefined) {
-        delete process.env.OPENCLAW_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS;
+        delete process.env.RECALL_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS;
       } else {
-        process.env.OPENCLAW_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS = previous;
+        process.env.RECALL_TUI_LOCAL_RUN_SHUTDOWN_GRACE_MS = previous;
       }
     }
   });

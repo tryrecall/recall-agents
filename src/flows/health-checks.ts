@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { RuntimeEnv } from "../runtime.js";
 
 export type HealthFindingSeverity = "info" | "warning" | "error";
@@ -46,7 +46,7 @@ export type HealthCheckMode = "doctor" | "lint" | "fix";
 export interface HealthCheckContext {
   readonly mode: HealthCheckMode;
   readonly runtime: RuntimeEnv;
-  readonly cfg: OpenClawConfig;
+  readonly cfg: RecallConfig;
   readonly cwd?: string;
   readonly configPath?: string;
 }
@@ -75,7 +75,7 @@ export interface HealthRepairEffect {
 export interface HealthRepairResult {
   readonly status?: "repaired" | "skipped" | "failed";
   readonly reason?: string;
-  readonly config?: OpenClawConfig;
+  readonly config?: RecallConfig;
   readonly changes: readonly string[];
   readonly warnings?: readonly string[];
   readonly diffs?: readonly HealthRepairDiff[];

@@ -1,5 +1,5 @@
 import { resolveRuntimeConfigCacheKey } from "../config/runtime-snapshot.js";
-import type { OpenClawConfig } from "../config/types.js";
+import type { RecallConfig } from "../config/types.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
 import { buildMediaUnderstandingManifestMetadataRegistry } from "./manifest-metadata.js";
 import {
@@ -41,7 +41,7 @@ function cacheConfigRegistry(
   return registry;
 }
 
-function resolveDefaultRegistry(cfg?: OpenClawConfig, workspaceDir?: string) {
+function resolveDefaultRegistry(cfg?: RecallConfig, workspaceDir?: string) {
   if (!cfg) {
     defaultRegistryCache ??= buildMediaUnderstandingManifestMetadataRegistry();
     return defaultRegistryCache;
@@ -65,7 +65,7 @@ function providerHasDeclaredCapability(
 }
 
 function resolveConfiguredImageProviderModel(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   providerId: string;
 }): string | undefined {
   const normalizedProviderId = normalizeMediaProviderId(params.providerId);
@@ -89,7 +89,7 @@ function resolveConfiguredImageProviderModel(params: {
   return undefined;
 }
 
-function resolveConfiguredImageProviderIds(cfg?: OpenClawConfig): string[] {
+function resolveConfiguredImageProviderIds(cfg?: RecallConfig): string[] {
   const providers = cfg?.models?.providers;
   if (!providers || typeof providers !== "object") {
     return [];
@@ -138,7 +138,7 @@ function insertConfiguredImageProviders(params: {
 export function resolveDefaultMediaModel(params: {
   providerId: string;
   capability: MediaUnderstandingCapability;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   workspaceDir?: string;
   providerRegistry?: Map<string, MediaUnderstandingProvider>;
   includeConfiguredImageModels?: boolean;
@@ -169,7 +169,7 @@ export function resolveDefaultMediaModel(params: {
 
 export function resolveAutoMediaKeyProviders(params: {
   capability: MediaUnderstandingCapability;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   workspaceDir?: string;
   providerRegistry?: Map<string, MediaUnderstandingProvider>;
 }): string[] {
@@ -207,7 +207,7 @@ export function resolveAutoMediaKeyProviders(params: {
 
 export function providerSupportsNativePdfDocument(params: {
   providerId: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   workspaceDir?: string;
   providerRegistry?: Map<string, MediaUnderstandingProvider>;
 }): boolean {

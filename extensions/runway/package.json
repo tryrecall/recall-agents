@@ -1,13 +1,13 @@
 {
-  "name": "@openclaw/runway-provider",
+  "name": "@recall/runway-provider",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw Runway video provider plugin",
+  "description": "Recall Runway video provider plugin",
   "type": "module",
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

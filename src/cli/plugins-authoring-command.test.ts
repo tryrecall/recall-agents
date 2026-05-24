@@ -144,14 +144,14 @@ describe("plugin authoring commands", () => {
         metadata,
         entry: "./src/index.ts",
         manifest,
-        packageManifest: { version: "1.2.3", openclaw: { extensions: ["./src/index.ts"] } },
+        packageManifest: { version: "1.2.3", recall: { extensions: ["./src/index.ts"] } },
       }),
     ).toEqual([]);
   });
 
   it("drops stale manifest-owned tool metadata when no generated metadata remains", () => {
     const metadata = createDemoMetadata();
-    const packageManifest = { version: "1.2.3", openclaw: { extensions: ["./src/index.ts"] } };
+    const packageManifest = { version: "1.2.3", recall: { extensions: ["./src/index.ts"] } };
     const manifest = buildToolPluginManifest({
       metadata,
       packageManifest,
@@ -180,13 +180,13 @@ describe("plugin authoring commands", () => {
       buildToolPluginPackageManifest({
         packageManifest: {
           name: "demo",
-          openclaw: { setupEntry: "./setup.ts", extensions: ["./src/other.ts"] },
+          recall: { setupEntry: "./setup.ts", extensions: ["./src/other.ts"] },
         },
         entry: "./src/index.ts",
       }),
     ).toEqual({
       name: "demo",
-      openclaw: {
+      recall: {
         setupEntry: "./setup.ts",
         extensions: ["./src/index.ts"],
       },
@@ -195,7 +195,7 @@ describe("plugin authoring commands", () => {
 
   it("validates manifest tools and package entry metadata", () => {
     const metadata = createDemoMetadata();
-    const packageManifest = { version: "1.2.3", openclaw: { extensions: ["./src/index.ts"] } };
+    const packageManifest = { version: "1.2.3", recall: { extensions: ["./src/index.ts"] } };
 
     expect(
       validateToolPluginProject({
@@ -219,34 +219,34 @@ describe("plugin authoring commands", () => {
           configSchema: {},
           contracts: { tools: ["other_tool"] },
         },
-        packageManifest: { openclaw: { extensions: ["./src/index.ts"] } },
+        packageManifest: { recall: { extensions: ["./src/index.ts"] } },
       }),
     ).toEqual([
-      "openclaw.plugin.json generated metadata is stale. Run openclaw plugins build.",
-      "openclaw.plugin.json contracts.tools is missing: demo_echo",
-      "openclaw.plugin.json contracts.tools has no matching defineToolPlugin tool: other_tool",
+      "recall.plugin.json generated metadata is stale. Run recall plugins build.",
+      "recall.plugin.json contracts.tools is missing: demo_echo",
+      "recall.plugin.json contracts.tools has no matching defineToolPlugin tool: other_tool",
     ]);
   });
 
   it("reports missing entries with an author-facing path", async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-plugin-missing-"));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-plugin-missing-"));
 
     await expect(
       loadToolPlugin({ rootDir: tmpDir, entryPath: path.join(tmpDir, "dist/index.js") }),
     ).rejects.toThrow("plugin entry not found: ./dist/index.js");
   });
 
-  it("loads source entries that import the OpenClaw plugin SDK package subpath", async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-plugin-source-"));
+  it("loads source entries that import the Recall plugin SDK package subpath", async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-plugin-source-"));
     const sourceDir = path.join(tmpDir, "src");
     fs.mkdirSync(sourceDir, { recursive: true });
     fs.writeFileSync(
       path.join(tmpDir, "package.json"),
       JSON.stringify(
         {
-          name: "openclaw-plugin-source-demo",
+          name: "recall-plugin-source-demo",
           type: "module",
-          openclaw: { extensions: ["./src/index.ts"] },
+          recall: { extensions: ["./src/index.ts"] },
         },
         null,
         2,
@@ -254,7 +254,7 @@ describe("plugin authoring commands", () => {
     );
     fs.writeFileSync(
       path.join(sourceDir, "index.ts"),
-      `import { defineToolPlugin } from "openclaw/plugin-sdk/tool-plugin";
+      `import { defineToolPlugin } from "recall/plugin-sdk/tool-plugin";
 
 export default defineToolPlugin({
   id: "source-demo",
@@ -282,7 +282,7 @@ export default defineToolPlugin({
   });
 
   it("scaffolds a dist-entry tool plugin project", async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-plugin-init-"));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-plugin-init-"));
     const projectDir = path.join(tmpDir, "stock-quotes");
 
     await runPluginsInitCommand("stock-quotes", {
@@ -300,23 +300,23 @@ export default defineToolPlugin({
         typebox: "^1.1.38",
       },
       peerDependencies: {
-        openclaw: ">=2026.5.17",
+        recall: ">=2026.5.17",
       },
       devDependencies: {
-        openclaw: "latest",
+        recall: "latest",
         typescript: "^5.9.0",
         vitest: "^3.2.0",
       },
       scripts: {
-        "plugin:build": "npm run build && openclaw plugins build --entry ./dist/index.js",
-        "plugin:validate": "npm run build && openclaw plugins validate --entry ./dist/index.js",
+        "plugin:build": "npm run build && recall plugins build --entry ./dist/index.js",
+        "plugin:validate": "npm run build && recall plugins validate --entry ./dist/index.js",
       },
-      openclaw: {
+      recall: {
         extensions: ["./dist/index.js"],
       },
     });
     expect(
-      JSON.parse(fs.readFileSync(path.join(projectDir, "openclaw.plugin.json"), "utf8")),
+      JSON.parse(fs.readFileSync(path.join(projectDir, "recall.plugin.json"), "utf8")),
     ).toMatchObject({
       id: "stock-quotes",
       name: 'Stock "Quotes"',

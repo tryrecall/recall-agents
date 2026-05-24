@@ -1,4 +1,4 @@
-import { createPluginRuntimeMock } from "openclaw/plugin-sdk/channel-test-helpers";
+import { createPluginRuntimeMock } from "recall/plugin-sdk/channel-test-helpers";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PluginRuntime, RuntimeEnv } from "../runtime-api.js";
 import type { ResolvedNextcloudTalkAccount } from "./accounts.js";
@@ -200,7 +200,7 @@ describe("nextcloud-talk inbound behavior", () => {
 
   it("drops unmentioned group traffic before dispatch", async () => {
     installRuntime({
-      buildMentionRegexes: vi.fn(() => [/@openclaw/i]),
+      buildMentionRegexes: vi.fn(() => [/@recall/i]),
       matchesMentionPatterns: vi.fn(() => false),
     });
     createChannelPairingControllerMock.mockReturnValue({
@@ -233,7 +233,7 @@ describe("nextcloud-talk inbound behavior", () => {
   });
 
   it("blocks unauthorized group text control commands even when room sender access allows chat", async () => {
-    const buildMentionRegexes = vi.fn(() => [/@openclaw/i]);
+    const buildMentionRegexes = vi.fn(() => [/@recall/i]);
     const coreRuntime = installRuntime({
       buildMentionRegexes,
       hasControlCommand: vi.fn(() => true),
@@ -251,7 +251,7 @@ describe("nextcloud-talk inbound behavior", () => {
         roomToken: "room-group",
         roomName: "Ops",
         isGroupChat: true,
-        text: "/openclaw reload",
+        text: "/recall reload",
       }),
       account: createAccount({
         config: {

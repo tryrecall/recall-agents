@@ -1,6 +1,6 @@
-import { buildManifestModelProviderConfig } from "openclaw/plugin-sdk/provider-catalog-shared";
-import type { ModelProviderConfig } from "openclaw/plugin-sdk/provider-model-shared";
-import manifest from "./openclaw.plugin.json" with { type: "json" };
+import { buildManifestModelProviderConfig } from "recall/plugin-sdk/provider-catalog-shared";
+import type { ModelProviderConfig } from "recall/plugin-sdk/provider-model-shared";
+import manifest from "./recall.plugin.json" with { type: "json" };
 
 export const XIAOMI_DEFAULT_MODEL_ID = "mimo-v2-flash";
 

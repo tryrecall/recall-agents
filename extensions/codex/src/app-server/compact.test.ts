@@ -4,7 +4,7 @@ import path from "node:path";
 import {
   embeddedAgentLog,
   type HarnessContextEngine as ContextEngine,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "recall/plugin-sdk/agent-harness-runtime";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CodexAppServerClientFactory } from "./client-factory.js";
 import type { CodexAppServerClient } from "./client.js";
@@ -91,7 +91,7 @@ function compactDetails(result: CompactResult): Record<string, unknown> {
 
 describe("maybeCompactCodexAppServerSession", () => {
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-codex-compact-"));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-codex-compact-"));
   });
 
   afterEach(async () => {
@@ -145,7 +145,7 @@ describe("maybeCompactCodexAppServerSession", () => {
     expect(details.tokenUsageSource).toBe("thread/tokenUsage/updated");
   });
 
-  it("blocks native app-server compaction when the current OpenClaw session is sandboxed", async () => {
+  it("blocks native app-server compaction when the current Recall session is sandboxed", async () => {
     const fake = createFakeCodexClient();
     setCodexAppServerClientFactoryForTest(async () => fake.client);
     const sessionFile = await writeTestBinding();
@@ -155,7 +155,7 @@ describe("maybeCompactCodexAppServerSession", () => {
     expect(result.ok).toBe(false);
     expect(result.compacted).toBe(false);
     expect(result.reason).toContain(
-      "Codex-native native compaction is unavailable because OpenClaw sandboxing is active for this session.",
+      "Codex-native native compaction is unavailable because Recall sandboxing is active for this session.",
     );
     expect(fake.request).not.toHaveBeenCalled();
   });
@@ -170,7 +170,7 @@ describe("maybeCompactCodexAppServerSession", () => {
     expect(result.ok).toBe(false);
     expect(result.compacted).toBe(false);
     expect(result.reason).toContain(
-      "Codex-native native compaction is unavailable because OpenClaw exec host=node is active for this session.",
+      "Codex-native native compaction is unavailable because Recall exec host=node is active for this session.",
     );
     expect(fake.request).not.toHaveBeenCalled();
   });
@@ -356,8 +356,8 @@ describe("maybeCompactCodexAppServerSession", () => {
   });
 
   it("restarts the Codex app-server and retries when native compaction times out", async () => {
-    const previousTimeout = process.env.OPENCLAW_CODEX_COMPACTION_WAIT_TIMEOUT_MS;
-    process.env.OPENCLAW_CODEX_COMPACTION_WAIT_TIMEOUT_MS = "100";
+    const previousTimeout = process.env.RECALL_CODEX_COMPACTION_WAIT_TIMEOUT_MS;
+    process.env.RECALL_CODEX_COMPACTION_WAIT_TIMEOUT_MS = "100";
     const warn = vi.spyOn(embeddedAgentLog, "warn").mockImplementation(() => undefined);
     try {
       const first = createFakeCodexClient();
@@ -430,15 +430,15 @@ describe("maybeCompactCodexAppServerSession", () => {
       );
     } finally {
       if (previousTimeout === undefined) {
-        delete process.env.OPENCLAW_CODEX_COMPACTION_WAIT_TIMEOUT_MS;
+        delete process.env.RECALL_CODEX_COMPACTION_WAIT_TIMEOUT_MS;
       } else {
-        process.env.OPENCLAW_CODEX_COMPACTION_WAIT_TIMEOUT_MS = previousTimeout;
+        process.env.RECALL_CODEX_COMPACTION_WAIT_TIMEOUT_MS = previousTimeout;
       }
       warn.mockRestore();
     }
   });
 
-  it("warns when stale OpenClaw compaction overrides are ignored", async () => {
+  it("warns when stale Recall compaction overrides are ignored", async () => {
     const warn = vi.spyOn(embeddedAgentLog, "warn").mockImplementation(() => undefined);
     const fake = createFakeCodexClient();
     setCodexAppServerClientFactoryForTest(async () => fake.client);
@@ -470,7 +470,7 @@ describe("maybeCompactCodexAppServerSession", () => {
     await pendingResult;
 
     expect(warn).toHaveBeenCalledWith(
-      "ignoring OpenClaw compaction overrides for Codex app-server compaction; Codex uses native server-side compaction",
+      "ignoring Recall compaction overrides for Codex app-server compaction; Codex uses native server-side compaction",
       {
         sessionId: "session-1",
         sessionKey: "agent:main:session-1",
@@ -515,7 +515,7 @@ describe("maybeCompactCodexAppServerSession", () => {
     await pendingResult;
 
     expect(warn).toHaveBeenCalledWith(
-      "ignoring OpenClaw compaction overrides for Codex app-server compaction; Codex uses native server-side compaction",
+      "ignoring Recall compaction overrides for Codex app-server compaction; Codex uses native server-side compaction",
       {
         sessionId: "session-1",
         sessionKey: "agent:nik:session-1",
@@ -564,7 +564,7 @@ describe("maybeCompactCodexAppServerSession", () => {
     await pendingResult;
 
     expect(warn).toHaveBeenCalledWith(
-      "ignoring OpenClaw compaction overrides for Codex app-server compaction; Codex uses native server-side compaction",
+      "ignoring Recall compaction overrides for Codex app-server compaction; Codex uses native server-side compaction",
       {
         sessionId: "session-1",
         sessionKey: "agent:nik:session-1",
@@ -608,7 +608,7 @@ describe("maybeCompactCodexAppServerSession", () => {
     });
 
     expect(warn).not.toHaveBeenCalledWith(
-      "ignoring OpenClaw compaction overrides for Codex app-server compaction; Codex uses native server-side compaction",
+      "ignoring Recall compaction overrides for Codex app-server compaction; Codex uses native server-side compaction",
       expect.anything(),
     );
     warn.mockRestore();
@@ -655,7 +655,7 @@ describe("maybeCompactCodexAppServerSession", () => {
     });
 
     expect(warn).not.toHaveBeenCalledWith(
-      "ignoring OpenClaw compaction overrides for Codex app-server compaction; Codex uses native server-side compaction",
+      "ignoring Recall compaction overrides for Codex app-server compaction; Codex uses native server-side compaction",
       expect.anything(),
     );
     warn.mockRestore();

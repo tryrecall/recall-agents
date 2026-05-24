@@ -114,7 +114,7 @@ async function yieldTranscriptScan(): Promise<void> {
   await new Promise<void>((resolve) => setImmediate(resolve));
 }
 
-export function attachOpenClawTranscriptMeta(
+export function attachRecallTranscriptMeta(
   message: unknown,
   meta: Record<string, unknown>,
 ): unknown {
@@ -626,7 +626,7 @@ export function readRecentSessionMessagesWithStats(
   const messages = readRecentSessionMessages(sessionId, storePath, sessionFile, opts);
   const firstSeq = Math.max(1, totalMessages - messages.length + 1);
   const messagesWithSeq = messages.map((message, index) =>
-    attachOpenClawTranscriptMeta(message, { seq: firstSeq + index }),
+    attachRecallTranscriptMeta(message, { seq: firstSeq + index }),
   );
   return { messages: messagesWithSeq, totalMessages };
 }
@@ -673,7 +673,7 @@ export async function readRecentSessionMessagesWithStatsAsync(
   const messages = await readRecentSessionMessagesAsync(sessionId, storePath, sessionFile, opts);
   const firstSeq = Math.max(1, totalMessages - messages.length + 1);
   const messagesWithSeq = messages.map((message, index) =>
-    attachOpenClawTranscriptMeta(message, { seq: firstSeq + index }),
+    attachRecallTranscriptMeta(message, { seq: firstSeq + index }),
   );
   return { messages: messagesWithSeq, totalMessages };
 }
@@ -720,7 +720,7 @@ function parsedSessionEntryToMessage(parsed: unknown, seq: number): unknown {
   }
   const entry = parsed as Record<string, unknown>;
   if (entry.message) {
-    return attachOpenClawTranscriptMeta(entry.message, {
+    return attachRecallTranscriptMeta(entry.message, {
       ...(typeof entry.id === "string" ? { id: entry.id } : {}),
       seq,
     });
@@ -1203,7 +1203,7 @@ function extractTranscriptTokenEstimateFromLine(line: string): {
           ? parsed.model.trim()
           : undefined;
     const isDeliveryMirror =
-      role === "assistant" && modelProvider === "openclaw" && model === "delivery-mirror";
+      role === "assistant" && modelProvider === "recall" && model === "delivery-mirror";
     if (isDeliveryMirror) {
       return null;
     }
@@ -1260,7 +1260,7 @@ function extractUsageSnapshotFromTranscriptLine(
         : typeof parsed.model === "string"
           ? parsed.model.trim()
           : undefined;
-    const isDeliveryMirror = modelProvider === "openclaw" && model === "delivery-mirror";
+    const isDeliveryMirror = modelProvider === "recall" && model === "delivery-mirror";
     const hasMeaningfulUsage =
       hasNonzeroUsage(usage) ||
       typeof totalTokens === "number" ||

@@ -27,14 +27,14 @@ execution:
     toolCoverage:
       family: sessions_spawn
       actualTool: sessions_spawn
-      bucket: openclaw-dynamic-integration
-      expectedLayer: openclaw-dynamic
-      capabilityLayer: openclaw-dynamic-direct
+      bucket: recall-dynamic-integration
+      expectedLayer: recall-dynamic
+      capabilityLayer: recall-dynamic-direct
       required: true
       codexDefaultImpact: P4
       qaImpact: P1
       action: hard gate in the standard direct-loading tier
-      reason: sessions_spawn is an OpenClaw integration tool and must stay visible and callable under Pi and Codex direct runtime parity.
+      reason: sessions_spawn is an Recall integration tool and must stay visible and callable under Pi and Codex direct runtime parity.
     promptSnippet: "target=sessions_spawn"
     failurePromptSnippet: "failure target=sessions_spawn"
 ```

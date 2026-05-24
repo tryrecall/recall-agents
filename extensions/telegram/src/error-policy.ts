@@ -3,7 +3,7 @@ import type {
   TelegramDirectConfig,
   TelegramGroupConfig,
   TelegramTopicConfig,
-} from "openclaw/plugin-sdk/config-contracts";
+} from "recall/plugin-sdk/config-contracts";
 
 type TelegramErrorPolicy = "always" | "once" | "silent";
 

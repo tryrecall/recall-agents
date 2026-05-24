@@ -7,7 +7,7 @@ export {
   parseNonNegativeByteSize,
   resolveSessionTranscriptsDirForAgent,
   resolveStateDir,
-} from "./openclaw-runtime.js";
+} from "./recall-runtime.js";
 export type {
   MemoryBackend,
   MemoryCitationsMode,
@@ -16,7 +16,7 @@ export type {
   MemoryQmdMcporterConfig,
   MemoryQmdSearchMode,
   MemorySearchConfig,
-  OpenClawConfig,
+  RecallConfig,
   SecretInput,
   SessionSendPolicyConfig,
-} from "./openclaw-runtime.js";
+} from "./recall-runtime.js";

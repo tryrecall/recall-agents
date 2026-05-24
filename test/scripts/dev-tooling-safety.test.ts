@@ -48,8 +48,8 @@ describe("dev tooling safety helpers", () => {
   });
 
   it("redacts home paths and masks opaque ids", () => {
-    expect(redactHomePath("/home/alice/.openclaw/state.json", "/home/alice")).toBe(
-      "~/.openclaw/state.json",
+    expect(redactHomePath("/home/alice/.recall/state.json", "/home/alice")).toBe(
+      "~/.recall/state.json",
     );
     expect(maskIdentifier("session-key-abcdef123456")).toBe("sessio...3456");
   });

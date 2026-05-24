@@ -1,1 +1,1 @@
-export { resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/temp-path";
+export { resolvePreferredRecallTmpDir } from "recall/plugin-sdk/temp-path";

@@ -4,7 +4,7 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SessionEntry } from "../../config/sessions.js";
 import { appendSessionTranscriptMessage } from "../../config/sessions/transcript-append.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { FailoverError } from "../failover-error.js";
 import { runEmbeddedPiAgent, type EmbeddedPiRunResult } from "../pi-embedded.js";
 import { persistCliTurnTranscript, runAgentAttempt } from "./attempt-execution.js";
@@ -134,7 +134,7 @@ describe("CLI attempt execution", () => {
   let storePath: string;
 
   beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-cli-attempt-"));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-cli-attempt-"));
     storePath = path.join(tmpDir, "sessions.json");
     runCliAgentMock.mockReset();
     runEmbeddedPiAgentMock.mockReset();
@@ -160,7 +160,7 @@ describe("CLI attempt execution", () => {
       providerOverride: "claude-cli",
       originalProvider: "claude-cli",
       modelOverride: "opus",
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       sessionEntry: params.sessionEntry,
       sessionId: params.sessionEntry.sessionId,
       sessionKey: params.sessionKey,
@@ -258,7 +258,7 @@ describe("CLI attempt execution", () => {
       providerOverride: "claude-cli",
       originalProvider: "claude-cli",
       modelOverride: "opus",
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey,
@@ -370,7 +370,7 @@ describe("CLI attempt execution", () => {
     const homeDir = path.join(tmpDir, "home");
     process.env.HOME = homeDir;
     const sessionEntry: SessionEntry = {
-      sessionId: "openclaw-session-123",
+      sessionId: "recall-session-123",
       updatedAt: Date.now(),
       cliSessionBindings: {
         "claude-cli": {
@@ -428,7 +428,7 @@ describe("CLI attempt execution", () => {
       "utf-8",
     );
     const sessionEntry: SessionEntry = {
-      sessionId: "openclaw-session-456",
+      sessionId: "recall-session-456",
       updatedAt: Date.now(),
       cliSessionBindings: {
         "claude-cli": {
@@ -464,7 +464,7 @@ describe("CLI attempt execution", () => {
   it("passes session-bound OpenAI Codex auth profile to codex-cli aliases", async () => {
     const sessionKey = "agent:main:direct:codex-cli-auth-alias";
     const sessionEntry: SessionEntry = {
-      sessionId: "openclaw-session-codex",
+      sessionId: "recall-session-codex",
       updatedAt: Date.now(),
       authProfileOverride: "openai-codex:work",
       authProfileOverrideSource: "user",
@@ -477,7 +477,7 @@ describe("CLI attempt execution", () => {
       providerOverride: "codex-cli",
       originalProvider: "codex-cli",
       modelOverride: "gpt-5.4",
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey,
@@ -685,7 +685,7 @@ describe("CLI attempt execution", () => {
     expect(validEntries.filter((entry) => entry.type === "message")).toHaveLength(1);
   });
 
-  it("embedded assistant gap-fill skips trailing openclaw.cache-ttl custom entries (regression for #83427)", async () => {
+  it("embedded assistant gap-fill skips trailing recall.cache-ttl custom entries (regression for #83427)", async () => {
     const sessionKey = "agent:main:subagent:embedded-gap-fill-cache-ttl";
     const sessionEntry: SessionEntry = {
       sessionId: "session-embedded-gap-fill-cache-ttl",
@@ -724,7 +724,7 @@ describe("CLI attempt execution", () => {
       sessionFile,
       `${JSON.stringify({
         type: "custom",
-        customType: "openclaw.cache-ttl",
+        customType: "recall.cache-ttl",
         timestamp: new Date().toISOString(),
         data: {
           provider: "anthropic",
@@ -793,7 +793,7 @@ describe("CLI attempt execution", () => {
     expect(path.isAbsolute(sessionFile)).toBe(true);
     expect(
       sessionFile.endsWith(
-        path.join(".openclaw", "agents", "main", "sessions", `${sessionEntry.sessionId}.jsonl`),
+        path.join(".recall", "agents", "main", "sessions", `${sessionEntry.sessionId}.jsonl`),
       ),
     ).toBe(true);
 
@@ -842,9 +842,9 @@ describe("CLI attempt execution", () => {
 
     const updatedEntry = await persistCliTurnTranscript({
       body: [
-        "<<<BEGIN_OPENCLAW_INTERNAL_CONTEXT>>>",
+        "<<<BEGIN_RECALL_INTERNAL_CONTEXT>>>",
         "secret runtime context",
-        "<<<END_OPENCLAW_INTERNAL_CONTEXT>>>",
+        "<<<END_RECALL_INTERNAL_CONTEXT>>>",
         "",
         "visible ask",
       ].join("\n"),
@@ -870,7 +870,7 @@ describe("CLI attempt execution", () => {
   it("forwards separate user trigger, channel, and provider context to CLI runs", async () => {
     const sessionKey = "agent:main:direct:claude-channel-context";
     const sessionEntry: SessionEntry = {
-      sessionId: "openclaw-session-channel",
+      sessionId: "recall-session-channel",
       updatedAt: Date.now(),
     };
     const sessionStore: Record<string, SessionEntry> = { [sessionKey]: sessionEntry };
@@ -881,7 +881,7 @@ describe("CLI attempt execution", () => {
       providerOverride: "claude-cli",
       originalProvider: "claude-cli",
       modelOverride: "opus",
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey,
@@ -920,7 +920,7 @@ describe("CLI attempt execution", () => {
   it("forwards runtime toolsAllow into CLI attempts so the CLI harness can fail closed", async () => {
     const sessionKey = "agent:main:direct:claude-tools-allow";
     const sessionEntry: SessionEntry = {
-      sessionId: "openclaw-session-cli-tools-allow",
+      sessionId: "recall-session-cli-tools-allow",
       updatedAt: Date.now(),
     };
     const sessionStore: Record<string, SessionEntry> = { [sessionKey]: sessionEntry };
@@ -931,7 +931,7 @@ describe("CLI attempt execution", () => {
       providerOverride: "claude-cli",
       originalProvider: "claude-cli",
       modelOverride: "opus",
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey,
@@ -968,7 +968,7 @@ describe("CLI attempt execution", () => {
   it("routes canonical Anthropic models through the configured Claude CLI runtime", async () => {
     const sessionKey = "agent:main:direct:canonical-claude-cli";
     const sessionEntry: SessionEntry = {
-      sessionId: "openclaw-session-canonical-cli",
+      sessionId: "recall-session-canonical-cli",
       updatedAt: Date.now(),
     };
     const sessionStore: Record<string, SessionEntry> = { [sessionKey]: sessionEntry };
@@ -987,7 +987,7 @@ describe("CLI attempt execution", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey,
@@ -1023,7 +1023,7 @@ describe("CLI attempt execution", () => {
   it("routes provider-qualified Anthropic shorthand through the configured Claude CLI runtime", async () => {
     const sessionKey = "agent:main:direct:shorthand-claude-cli";
     const sessionEntry: SessionEntry = {
-      sessionId: "openclaw-session-shorthand-cli",
+      sessionId: "recall-session-shorthand-cli",
       updatedAt: Date.now(),
     };
     const sessionStore: Record<string, SessionEntry> = { [sessionKey]: sessionEntry };
@@ -1042,7 +1042,7 @@ describe("CLI attempt execution", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey,
@@ -1078,7 +1078,7 @@ describe("CLI attempt execution", () => {
   it("routes canonical OpenAI models through the configured embedded Codex runtime", async () => {
     const sessionKey = "agent:main:direct:canonical-codex-cli";
     const sessionEntry: SessionEntry = {
-      sessionId: "openclaw-session-canonical-codex-cli",
+      sessionId: "recall-session-canonical-codex-cli",
       updatedAt: Date.now(),
     };
     const sessionStore: Record<string, SessionEntry> = { [sessionKey]: sessionEntry };
@@ -1104,7 +1104,7 @@ describe("CLI attempt execution", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey,
@@ -1141,7 +1141,7 @@ describe("CLI attempt execution", () => {
     const { clearAgentHarnesses, registerAgentHarness } = await import("../harness/registry.js");
     const sessionKey = "agent:main:direct:openai-codex-api-key";
     const sessionEntry: SessionEntry = {
-      sessionId: "openclaw-session-openai-codex-api-key",
+      sessionId: "recall-session-openai-codex-api-key",
       updatedAt: Date.now(),
       authProfileOverride: "openai:backup",
       authProfileOverrideSource: "user",
@@ -1182,7 +1182,7 @@ describe("CLI attempt execution", () => {
         providerOverride: "openai",
         originalProvider: "openai",
         modelOverride: "gpt-5.4",
-        cfg: {} as OpenClawConfig,
+        cfg: {} as RecallConfig,
         sessionEntry,
         sessionId: sessionEntry.sessionId,
         sessionKey,
@@ -1222,7 +1222,7 @@ describe("CLI attempt execution", () => {
   it("keeps one-shot model runs on the raw embedded provider path", async () => {
     const sessionKey = "agent:main:direct:model-run-raw";
     const sessionEntry: SessionEntry = {
-      sessionId: "openclaw-session-model-run-raw",
+      sessionId: "recall-session-model-run-raw",
       updatedAt: Date.now(),
     };
     const sessionStore: Record<string, SessionEntry> = { [sessionKey]: sessionEntry };
@@ -1241,7 +1241,7 @@ describe("CLI attempt execution", () => {
             agentRuntime: { id: "claude-cli" },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey,
@@ -1294,7 +1294,7 @@ describe("CLI attempt execution", () => {
   it("forwards trusted elevated defaults to embedded agent runs", async () => {
     const sessionKey = "agent:main:telegram:direct:123";
     const sessionEntry: SessionEntry = {
-      sessionId: "openclaw-session-elevated-followup",
+      sessionId: "recall-session-elevated-followup",
       updatedAt: Date.now(),
     };
     const sessionStore: Record<string, SessionEntry> = { [sessionKey]: sessionEntry };
@@ -1312,7 +1312,7 @@ describe("CLI attempt execution", () => {
       providerOverride: "openai",
       originalProvider: "openai",
       modelOverride: "gpt-5.4",
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey,
@@ -1350,7 +1350,7 @@ describe("CLI attempt execution", () => {
   it("forwards one-shot CLI cleanup to CLI providers", async () => {
     const sessionKey = "agent:main:direct:cleanup-claude-cli";
     const sessionEntry: SessionEntry = {
-      sessionId: "openclaw-session-cleanup-cli",
+      sessionId: "recall-session-cleanup-cli",
       updatedAt: Date.now(),
     };
     const sessionStore: Record<string, SessionEntry> = { [sessionKey]: sessionEntry };
@@ -1361,7 +1361,7 @@ describe("CLI attempt execution", () => {
       providerOverride: "claude-cli",
       originalProvider: "claude-cli",
       modelOverride: "claude-opus-4-7",
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey,
@@ -1402,7 +1402,7 @@ describe("embedded attempt harness pinning", () => {
   let tmpDir: string;
 
   beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-embedded-attempt-"));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-embedded-attempt-"));
     runCliAgentMock.mockReset();
     runEmbeddedPiAgentMock.mockReset();
   });
@@ -1424,7 +1424,7 @@ describe("embedded attempt harness pinning", () => {
       providerOverride: "openai",
       originalProvider: "openai",
       modelOverride: "gpt-5.4",
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey: "agent:main:main",
@@ -1465,7 +1465,7 @@ describe("embedded attempt harness pinning", () => {
       providerOverride: "minimax",
       originalProvider: "minimax",
       modelOverride: "minimax-m2.7",
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey: "agent:main:main",
@@ -1505,7 +1505,7 @@ describe("embedded attempt harness pinning", () => {
       providerOverride: "openai",
       originalProvider: "openai",
       modelOverride: "gpt-5.4",
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey: "agent:main:main",
@@ -1557,7 +1557,7 @@ describe("embedded attempt harness pinning", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey: "agent:main:main",
@@ -1621,7 +1621,7 @@ describe("embedded attempt harness pinning", () => {
         providerOverride: "openai",
         originalProvider: "openai",
         modelOverride: "gpt-5.4",
-        cfg: {} as OpenClawConfig,
+        cfg: {} as RecallConfig,
         sessionEntry,
         sessionId: sessionEntry.sessionId,
         sessionKey: "agent:main:main",
@@ -1668,7 +1668,7 @@ describe("embedded attempt harness pinning", () => {
       providerOverride: "openai",
       originalProvider: "openai",
       modelOverride: "gpt-5.4",
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey: "agent:main:main",
@@ -1709,7 +1709,7 @@ describe("embedded attempt harness pinning", () => {
       providerOverride: "openai",
       originalProvider: "openai",
       modelOverride: "gpt-5.4",
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey: "agent:main:main",
@@ -1764,7 +1764,7 @@ describe("embedded attempt harness pinning", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey: "agent:main:main",
@@ -1817,7 +1817,7 @@ describe("embedded attempt harness pinning", () => {
             agentRuntime: { id: "claude-cli" },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       sessionEntry,
       sessionId: sessionEntry.sessionId,
       sessionKey: "agent:main:main",

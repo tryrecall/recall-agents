@@ -1,16 +1,16 @@
 {
-  "name": "@openclaw/firecrawl-plugin",
+  "name": "@recall/firecrawl-plugin",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw Firecrawl plugin",
+  "description": "Recall Firecrawl plugin",
   "type": "module",
   "dependencies": {
     "typebox": "1.1.38"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

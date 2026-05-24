@@ -65,8 +65,8 @@ describe("runCronIsolatedAgentTurn toolsAllow passthrough", () => {
   let previousFastTestEnv: string | undefined;
 
   beforeEach(() => {
-    previousFastTestEnv = process.env.OPENCLAW_TEST_FAST;
-    vi.stubEnv("OPENCLAW_TEST_FAST", "1");
+    previousFastTestEnv = process.env.RECALL_TEST_FAST;
+    vi.stubEnv("RECALL_TEST_FAST", "1");
     resetRunCronIsolatedAgentTurnHarness();
     resolveDeliveryTargetMock.mockResolvedValue({
       channel: "forum",
@@ -83,10 +83,10 @@ describe("runCronIsolatedAgentTurn toolsAllow passthrough", () => {
   afterEach(() => {
     if (previousFastTestEnv == null) {
       vi.unstubAllEnvs();
-      delete process.env.OPENCLAW_TEST_FAST;
+      delete process.env.RECALL_TEST_FAST;
       return;
     }
-    vi.stubEnv("OPENCLAW_TEST_FAST", previousFastTestEnv);
+    vi.stubEnv("RECALL_TEST_FAST", previousFastTestEnv);
   });
 
   it(

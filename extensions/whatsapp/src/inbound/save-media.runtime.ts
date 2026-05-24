@@ -1,1 +1,1 @@
-export { saveMediaBuffer } from "openclaw/plugin-sdk/media-store";
+export { saveMediaBuffer } from "recall/plugin-sdk/media-store";

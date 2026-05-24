@@ -51,16 +51,16 @@ import {
   type ContextEngineProjection,
   type NativeHookRelayEvent,
   type NativeHookRelayRegistrationHandle,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
-import { markAuthProfileBlockedUntil, resolveAgentDir } from "openclaw/plugin-sdk/agent-runtime";
+} from "recall/plugin-sdk/agent-harness-runtime";
+import { markAuthProfileBlockedUntil, resolveAgentDir } from "recall/plugin-sdk/agent-runtime";
 import {
   emitTrustedDiagnosticEvent,
   hasPendingInternalDiagnosticEvent,
   onInternalDiagnosticEvent,
   type DiagnosticEventPayload,
-} from "openclaw/plugin-sdk/diagnostic-runtime";
-import { isToolAllowed } from "openclaw/plugin-sdk/sandbox";
-import { pathExists } from "openclaw/plugin-sdk/security-runtime";
+} from "recall/plugin-sdk/diagnostic-runtime";
+import { isToolAllowed } from "recall/plugin-sdk/sandbox";
+import { pathExists } from "recall/plugin-sdk/security-runtime";
 import { defaultCodexAppInventoryCache } from "./app-inventory-cache.js";
 import { handleCodexAppServerApprovalRequest } from "./approval-bridge.js";
 import {
@@ -247,12 +247,12 @@ const CODEX_BOOTSTRAP_CONTEXT_ORDER = new Map<string, number>([
   ["heartbeat.md", 70],
 ]);
 
-type OpenClawCodingToolsOptions = NonNullable<
-  Parameters<(typeof import("openclaw/plugin-sdk/agent-harness"))["createOpenClawCodingTools"]>[0]
+type RecallCodingToolsOptions = NonNullable<
+  Parameters<(typeof import("recall/plugin-sdk/agent-harness"))["createRecallCodingTools"]>[0]
 >;
-type OpenClawCodingToolsFactory =
-  (typeof import("openclaw/plugin-sdk/agent-harness"))["createOpenClawCodingTools"];
-type OpenClawDynamicTool = ReturnType<OpenClawCodingToolsFactory>[number];
+type RecallCodingToolsFactory =
+  (typeof import("recall/plugin-sdk/agent-harness"))["createRecallCodingTools"];
+type RecallDynamicTool = ReturnType<RecallCodingToolsFactory>[number];
 type CodexBootstrapContext = Awaited<ReturnType<typeof resolveBootstrapContextForRun>>;
 type CodexBootstrapFile = CodexBootstrapContext["bootstrapFiles"][number];
 type CodexSystemPromptReport = NonNullable<EmbeddedRunAttemptResult["systemPromptReport"]>;
@@ -266,7 +266,7 @@ type CodexWorkspaceBootstrapContext = CodexBootstrapContext & {
   heartbeatCollaborationInstructions?: string;
 };
 
-let openClawCodingToolsFactoryForTests: OpenClawCodingToolsFactory | undefined;
+let openClawCodingToolsFactoryForTests: RecallCodingToolsFactory | undefined;
 
 function emitCodexAppServerEvent(
   params: EmbeddedRunAttemptParams,
@@ -411,7 +411,7 @@ function formatDynamicToolTimeoutDetails(params: {
 
   if (tool !== "process" || !isJsonObject(params.call.arguments)) {
     return {
-      responseMessage: `OpenClaw dynamic tool call timed out after ${params.timeoutMs}ms while running tool ${tool}.`,
+      responseMessage: `Recall dynamic tool call timed out after ${params.timeoutMs}ms while running tool ${tool}.`,
       consoleMessage: `codex dynamic tool timeout: tool=${tool} toolTimeoutMs=${params.timeoutMs}; per-tool-call watchdog, not session idle`,
       meta: baseMeta,
     };
@@ -434,7 +434,7 @@ function formatDynamicToolTimeoutDetails(params: {
       : " while waiting for the process tool";
 
   return {
-    responseMessage: `OpenClaw dynamic tool call timed out after ${params.timeoutMs}ms${responseTarget}. This is a tool RPC timeout, not a session idle timeout.`,
+    responseMessage: `Recall dynamic tool call timed out after ${params.timeoutMs}ms${responseTarget}. This is a tool RPC timeout, not a session idle timeout.`,
     consoleMessage: `codex process tool timeout:${actionPart}${sessionPart} toolTimeoutMs=${params.timeoutMs}${requestedPart}; per-tool-call watchdog, not session idle${retryHint}`,
     meta: {
       ...baseMeta,
@@ -549,9 +549,9 @@ function toCodexTextInput(text: string): CodexUserInput {
   return { type: "text", text, text_elements: [] };
 }
 
-type OpenClawSandboxContext = Awaited<ReturnType<typeof resolveSandboxContext>>;
+type RecallSandboxContext = Awaited<ReturnType<typeof resolveSandboxContext>>;
 
-function resolveCodexAppServerForOpenClawToolPolicy(params: {
+function resolveCodexAppServerForRecallToolPolicy(params: {
   appServer: CodexAppServerRuntimeOptions;
   pluginConfig: CodexPluginConfig;
   env: NodeJS.ProcessEnv;
@@ -567,10 +567,10 @@ function resolveCodexAppServerForOpenClawToolPolicy(params: {
   }
   const explicitMode =
     params.pluginConfig.appServer?.mode !== undefined ||
-    isCodexAppServerPolicyMode(params.env.OPENCLAW_CODEX_APP_SERVER_MODE);
+    isCodexAppServerPolicyMode(params.env.RECALL_CODEX_APP_SERVER_MODE);
   const explicitApprovalPolicy =
     params.pluginConfig.appServer?.approvalPolicy !== undefined ||
-    isCodexAppServerApprovalPolicy(params.env.OPENCLAW_CODEX_APP_SERVER_APPROVAL_POLICY);
+    isCodexAppServerApprovalPolicy(params.env.RECALL_CODEX_APP_SERVER_APPROVAL_POLICY);
   if (explicitMode || explicitApprovalPolicy) {
     return params.appServer;
   }
@@ -891,7 +891,7 @@ export async function runCodexAppServerAttempt(
       : sandbox.workspaceDir
     : resolvedWorkspace;
   await fs.mkdir(effectiveWorkspace, { recursive: true });
-  const appServer = resolveCodexAppServerForOpenClawToolPolicy({
+  const appServer = resolveCodexAppServerForRecallToolPolicy({
     appServer: configuredAppServer,
     pluginConfig,
     env: process.env,
@@ -1204,7 +1204,7 @@ export async function runCodexAppServerAttempt(
     }),
     workspaceBootstrapContext.developerInstructions,
   );
-  const openClawPromptContext = buildCodexOpenClawPromptContext({
+  const openClawPromptContext = buildCodexRecallPromptContext({
     params,
     skillsPrompt: params.skillsSnapshot?.prompt,
     workspacePromptContext: workspaceBootstrapContext.promptContext,
@@ -1327,7 +1327,7 @@ export async function runCodexAppServerAttempt(
     });
   let promptBuild = await buildPromptFromCurrentInputs();
   const decorateCodexTurnPromptText = (prompt: string) =>
-    prependCodexOpenClawPromptContext(prompt, openClawPromptContext);
+    prependCodexRecallPromptContext(prompt, openClawPromptContext);
   let codexTurnPromptText = decorateCodexTurnPromptText(promptBuild.prompt);
   const refreshCodexTurnPromptText = () => {
     codexTurnPromptText = decorateCodexTurnPromptText(promptBuild.prompt);
@@ -1617,7 +1617,7 @@ export async function runCodexAppServerAttempt(
               !startupSandboxEnvironment
             ) {
               throw new Error(
-                "Codex app-server did not register an OpenClaw sandbox exec-server environment.",
+                "Codex app-server did not register an Recall sandbox exec-server environment.",
               );
             }
           } catch (error) {
@@ -1634,7 +1634,7 @@ export async function runCodexAppServerAttempt(
             nativeToolSurfaceEnabled,
           });
           const startupSandboxPolicy = startupSandboxEnvironment
-            ? resolveCodexExternalSandboxPolicyForOpenClawSandbox(sandbox)
+            ? resolveCodexExternalSandboxPolicyForRecallSandbox(sandbox)
             : undefined;
           const buildThreadLifecycleParams = () =>
             ({
@@ -1834,7 +1834,7 @@ export async function runCodexAppServerAttempt(
   let turnAttemptLastProgressDetails: Record<string, unknown> | undefined;
   let nativeHookRelayLastRenewedAt = 0;
   let activeAppServerTurnRequests = 0;
-  const pendingOpenClawDynamicToolCompletionIds = new Set<string>();
+  const pendingRecallDynamicToolCompletionIds = new Set<string>();
   const activeTurnItemIds = new Set<string>();
   let turnCrossedToolHandoff = false;
   let pendingTerminalDynamicToolRelease:
@@ -2190,7 +2190,7 @@ export async function runCodexAppServerAttempt(
         currentTurnHadNonTerminalDynamicToolResult,
         activeAppServerTurnRequests,
         activeTurnItemIdsCount: activeTurnItemIds.size,
-        pendingOpenClawDynamicToolCompletionIdsCount: pendingOpenClawDynamicToolCompletionIds.size,
+        pendingRecallDynamicToolCompletionIdsCount: pendingRecallDynamicToolCompletionIds.size,
       })
     ) {
       return;
@@ -2236,7 +2236,7 @@ export async function runCodexAppServerAttempt(
       const action = resolveTerminalDynamicToolBatchAction({
         activeAppServerTurnRequests,
         activeTurnItemIdsCount: activeTurnItemIds.size,
-        pendingOpenClawDynamicToolCompletionIdsCount: pendingOpenClawDynamicToolCompletionIds.size,
+        pendingRecallDynamicToolCompletionIdsCount: pendingRecallDynamicToolCompletionIds.size,
         currentTurnHadNonTerminalDynamicToolResult,
         hasPendingTerminalDynamicToolRelease: pendingTerminalDynamicToolRelease !== undefined,
       });
@@ -2367,9 +2367,9 @@ export async function runCodexAppServerAttempt(
       turnAssistantCompletionIdleWatchArmed &&
       notification.method === "item/completed" &&
       activeTurnItemIds.size === 0;
-    const trackedDynamicToolCompletion = isPendingOpenClawDynamicToolCompletionNotification(
+    const trackedDynamicToolCompletion = isPendingRecallDynamicToolCompletionNotification(
       notification,
-      pendingOpenClawDynamicToolCompletionIds,
+      pendingRecallDynamicToolCompletionIds,
     );
     const rawToolOutputCompletion = isRawToolOutputCompletionNotification(notification);
     if (
@@ -2434,8 +2434,8 @@ export async function runCodexAppServerAttempt(
       !shouldRearmCompletionIdleWatchAfterLastCurrentTurnItem
     ) {
       // The short completion-idle watchdog guards blind gaps after Codex
-      // accepts a turn or after OpenClaw hands a turn-scoped request result
-      // back to Codex. Bookkeeping that closes the just-served OpenClaw
+      // accepts a turn or after Recall hands a turn-scoped request result
+      // back to Codex. Bookkeeping that closes the just-served Recall
       // dynamic tool item is still part of that handoff, so keep the short
       // watchdog armed for that notification.
       disarmTurnCompletionIdleWatch();
@@ -2443,13 +2443,13 @@ export async function runCodexAppServerAttempt(
     if (trackedDynamicToolCompletion) {
       const itemId = readNotificationItemId(notification);
       if (itemId) {
-        pendingOpenClawDynamicToolCompletionIds.delete(itemId);
+        pendingRecallDynamicToolCompletionIds.delete(itemId);
         scheduleTerminalDynamicToolReleaseCheck();
       }
     }
     // Determine terminal-turn status before invoking the projector so a throw
     // inside projector.handleNotification still releases the session lane.
-    // See openclaw/openclaw#67996.
+    // See tryrecall/recall-agents#67996.
     const isTurnAbortMarker =
       isCurrentTurnNotification &&
       isCodexTurnAbortMarkerNotification(notification, {
@@ -2594,7 +2594,7 @@ export async function runCodexAppServerAttempt(
       armCompletionWatchOnResponse = true;
       markCurrentTurnRequestProgress();
       turnCrossedToolHandoff = true;
-      pendingOpenClawDynamicToolCompletionIds.add(call.callId);
+      pendingRecallDynamicToolCompletionIds.add(call.callId);
       trajectoryRecorder?.recordEvent("tool.call", {
         threadId: call.threadId,
         turnId: call.turnId,
@@ -2722,7 +2722,7 @@ export async function runCodexAppServerAttempt(
           });
         }
         if (response.terminate === true) {
-          pendingOpenClawDynamicToolCompletionIds.delete(call.callId);
+          pendingRecallDynamicToolCompletionIds.delete(call.callId);
           scheduleTurnReleaseAfterTerminalDynamicTool({
             call,
             response,
@@ -3373,7 +3373,7 @@ async function handleDynamicToolCallWithTimeout(params: {
   onTimeout?: () => void;
 }): Promise<CodexDynamicToolCallResponse> {
   if (params.signal.aborted) {
-    return failedDynamicToolResponse("OpenClaw dynamic tool call aborted before execution.");
+    return failedDynamicToolResponse("Recall dynamic tool call aborted before execution.");
   }
 
   const controller = new AbortController();
@@ -3381,7 +3381,7 @@ async function handleDynamicToolCallWithTimeout(params: {
   let timedOut = false;
   let resolveAbort: ((response: CodexDynamicToolCallResponse) => void) | undefined;
   const abortFromRun = () => {
-    const message = "OpenClaw dynamic tool call aborted.";
+    const message = "Recall dynamic tool call aborted.";
     controller.abort(params.signal.reason ?? new Error(message));
     resolveAbort?.(failedDynamicToolResponse(message, { sideEffectEvidence: true }));
   };
@@ -3427,7 +3427,7 @@ async function handleDynamicToolCallWithTimeout(params: {
     params.signal.removeEventListener("abort", abortFromRun);
     resolveAbort = undefined;
     if (!timedOut && !controller.signal.aborted) {
-      controller.abort(new Error("OpenClaw dynamic tool call finished."));
+      controller.abort(new Error("Recall dynamic tool call finished."));
     }
   }
 }
@@ -3476,7 +3476,7 @@ type TerminalDynamicToolReleaseState = {
   currentTurnHadNonTerminalDynamicToolResult: boolean;
   activeAppServerTurnRequests: number;
   activeTurnItemIdsCount: number;
-  pendingOpenClawDynamicToolCompletionIdsCount: number;
+  pendingRecallDynamicToolCompletionIdsCount: number;
 };
 
 function shouldReleaseTurnAfterTerminalDynamicTool(
@@ -3489,7 +3489,7 @@ function shouldReleaseTurnAfterTerminalDynamicTool(
     !state.currentTurnHadNonTerminalDynamicToolResult &&
     state.activeAppServerTurnRequests === 0 &&
     state.activeTurnItemIdsCount === 0 &&
-    state.pendingOpenClawDynamicToolCompletionIdsCount === 0
+    state.pendingRecallDynamicToolCompletionIdsCount === 0
   );
 }
 
@@ -3502,7 +3502,7 @@ type TerminalDynamicToolBatchAction =
 type TerminalDynamicToolBatchState = {
   activeAppServerTurnRequests: number;
   activeTurnItemIdsCount: number;
-  pendingOpenClawDynamicToolCompletionIdsCount: number;
+  pendingRecallDynamicToolCompletionIdsCount: number;
   currentTurnHadNonTerminalDynamicToolResult: boolean;
   hasPendingTerminalDynamicToolRelease: boolean;
 };
@@ -3513,7 +3513,7 @@ function resolveTerminalDynamicToolBatchAction(
   if (
     state.activeAppServerTurnRequests > 0 ||
     state.activeTurnItemIdsCount > 0 ||
-    state.pendingOpenClawDynamicToolCompletionIdsCount > 0
+    state.pendingRecallDynamicToolCompletionIdsCount > 0
   ) {
     return "wait";
   }
@@ -3707,7 +3707,7 @@ function resolveCodexNativeHookRelayEvents(params: {
   // Codex emits PermissionRequest before the app-server approval reviewer has
   // resolved the command. In native approval modes, let Codex's app-server
   // approval bridge own the real escalation instead of surfacing a stale
-  // pre-guardian OpenClaw plugin approval prompt.
+  // pre-guardian Recall plugin approval prompt.
   return params.appServer.approvalPolicy === "never"
     ? CODEX_NATIVE_HOOK_RELAY_EVENTS
     : CODEX_NATIVE_HOOK_RELAY_EVENTS_WITH_APP_SERVER_APPROVALS;
@@ -3736,7 +3736,7 @@ function buildCodexNativeHookRelayId(params: {
   sessionKey: string | undefined;
 }): string {
   const hash = createHash("sha256");
-  hash.update("openclaw:codex:native-hook-relay:v1");
+  hash.update("recall:codex:native-hook-relay:v1");
   hash.update("\0");
   hash.update(params.agentId?.trim() || "");
   hash.update("\0");
@@ -3773,7 +3773,7 @@ function buildCodexPluginThreadConfigEligibilityLogData(params: {
       .toSorted(),
     enabledPluginConfigKeys: params.enabledPluginConfigKeys,
     appCacheKeyFingerprint: fingerprintCodexLogValue(
-      "openclaw:codex:plugin-app-cache-key:v1",
+      "recall:codex:plugin-app-cache-key:v1",
       params.pluginAppCacheKey,
     ),
     authProfileId: params.startupAuthProfileId,
@@ -3866,10 +3866,10 @@ type DynamicToolBuildParams = {
   onYieldDetected: () => void;
 };
 
-function resolveOpenClawCodingToolsSessionKeys(
+function resolveRecallCodingToolsSessionKeys(
   params: EmbeddedRunAttemptParams,
   sandboxSessionKey: string,
-): Pick<OpenClawCodingToolsOptions, "sessionKey" | "runSessionKey"> {
+): Pick<RecallCodingToolsOptions, "sessionKey" | "runSessionKey"> {
   return {
     sessionKey: sandboxSessionKey,
     runSessionKey:
@@ -3897,11 +3897,11 @@ async function buildDynamicTools(input: DynamicToolBuildParams) {
   }
   const modelHasVision = params.model.input?.includes("image") ?? false;
   const agentDir = params.agentDir ?? resolveAgentDir(params.config ?? {}, input.sessionAgentId);
-  const createOpenClawCodingTools =
+  const createRecallCodingTools =
     openClawCodingToolsFactoryForTests ??
-    (await import("openclaw/plugin-sdk/agent-harness")).createOpenClawCodingTools;
-  const sessionKeys = resolveOpenClawCodingToolsSessionKeys(params, input.sandboxSessionKey);
-  const allTools = createOpenClawCodingTools({
+    (await import("recall/plugin-sdk/agent-harness")).createRecallCodingTools;
+  const sessionKeys = resolveRecallCodingToolsSessionKeys(params, input.sandboxSessionKey);
+  const allTools = createRecallCodingTools({
     agentId: input.sessionAgentId,
     ...buildEmbeddedAttemptToolRunContext(params),
     exec: {
@@ -3940,7 +3940,7 @@ async function buildDynamicTools(input: DynamicToolBuildParams) {
     modelId: params.modelId,
     modelCompat:
       params.model.compat && typeof params.model.compat === "object"
-        ? (params.model.compat as OpenClawCodingToolsOptions["modelCompat"])
+        ? (params.model.compat as RecallCodingToolsOptions["modelCompat"])
         : undefined,
     modelApi: params.model.api,
     modelContextWindowTokens: params.model.contextWindow,
@@ -4029,7 +4029,7 @@ function includeForcedCodexDynamicToolAllow(
 
 function shouldEnableCodexAppServerNativeToolSurface(
   params: EmbeddedRunAttemptParams,
-  sandbox?: OpenClawSandboxContext,
+  sandbox?: RecallSandboxContext,
   options: {
     agentId?: string;
     runtimeSessionKey?: string;
@@ -4053,7 +4053,7 @@ function shouldEnableCodexAppServerNativeToolSurface(
     return canCodexAppServerNativeToolSurfaceHonorSandbox(sandbox, options);
   }
   // Codex native code mode exposes its shell/file surface as one app-server
-  // capability, so narrow OpenClaw allowlists must fail closed rather than
+  // capability, so narrow Recall allowlists must fail closed rather than
   // widening `message` or `web_search` into shell access.
   return (
     hasWildcardCodexToolsAllow(toolsAllow) &&
@@ -4066,7 +4066,7 @@ function isCodexNativeExecutionBlockedByNodeExecHost(
   options: {
     agentId?: string;
     runtimeSessionKey?: string;
-    sandbox?: OpenClawSandboxContext;
+    sandbox?: RecallSandboxContext;
   } = {},
 ): boolean {
   return !resolveCodexNativeExecutionPolicy({
@@ -4093,7 +4093,7 @@ function resolveCodexRuntimePolicySessionKey(
 }
 
 function canCodexAppServerNativeToolSurfaceHonorSandbox(
-  sandbox: OpenClawSandboxContext | undefined,
+  sandbox: RecallSandboxContext | undefined,
   options: { sandboxExecServerEnabled?: boolean } = {},
 ): boolean {
   if (!sandbox?.enabled) {
@@ -4108,7 +4108,7 @@ function canCodexAppServerNativeToolSurfaceHonorSandbox(
   }
   // Codex app-server native shell, filesystem, and user MCP execution are owned
   // by the app-server process. Without the explicit exec-server integration,
-  // active OpenClaw sandboxing must disable the native surface and route shell
+  // active Recall sandboxing must disable the native surface and route shell
   // access through sandbox-backed dynamic tools instead.
   return false;
 }
@@ -4134,7 +4134,7 @@ function filterCodexMemoryFlushDynamicTools<T extends { name: string }>(tools: T
 }
 
 function shouldRequireCodexSandboxExecServerEnvironment(params: {
-  sandbox?: OpenClawSandboxContext;
+  sandbox?: RecallSandboxContext;
   nativeToolSurfaceEnabled: boolean;
   sandboxExecServerEnabled: boolean;
 }): boolean {
@@ -4160,17 +4160,17 @@ function resolveCodexAppServerExecutionCwd(params: {
     : params.effectiveWorkspace;
 }
 
-function resolveCodexExternalSandboxPolicyForOpenClawSandbox(
-  sandbox: OpenClawSandboxContext | undefined,
+function resolveCodexExternalSandboxPolicyForRecallSandbox(
+  sandbox: RecallSandboxContext | undefined,
 ): CodexSandboxPolicy {
   return {
     type: "externalSandbox",
-    networkAccess: codexNetworkAccessForOpenClawSandbox(sandbox) ? "enabled" : "restricted",
+    networkAccess: codexNetworkAccessForRecallSandbox(sandbox) ? "enabled" : "restricted",
   };
 }
 
-function codexNetworkAccessForOpenClawSandbox(
-  sandbox: OpenClawSandboxContext | undefined,
+function codexNetworkAccessForRecallSandbox(
+  sandbox: RecallSandboxContext | undefined,
 ): boolean {
   if (sandbox?.backendId !== "docker") {
     return true;
@@ -4191,10 +4191,10 @@ function disableCodexPluginThreadConfig(pluginConfig?: unknown): CodexPluginConf
 }
 
 function addSandboxShellDynamicToolsIfAvailable(
-  filteredTools: OpenClawDynamicTool[],
-  allTools: OpenClawDynamicTool[],
+  filteredTools: RecallDynamicTool[],
+  allTools: RecallDynamicTool[],
   input: DynamicToolBuildParams,
-): OpenClawDynamicTool[] {
+): RecallDynamicTool[] {
   if (
     !shouldExposeSandboxExecDynamicTool(input) ||
     isSandboxShellDynamicToolExcluded(input.pluginConfig)
@@ -4208,11 +4208,11 @@ function addSandboxShellDynamicToolsIfAvailable(
   if (!execTool || !processTool) {
     return filteredTools;
   }
-  const sandboxExecTool: OpenClawDynamicTool = {
+  const sandboxExecTool: RecallDynamicTool = {
     ...execTool,
     name: "sandbox_exec",
     description:
-      "Run a shell command through OpenClaw's configured sandbox backend for this session. Use when OpenClaw sandboxing is active or when a command must execute in the sandbox backend, such as an SSH-backed sandbox or Docker container-path bind layout. Use Codex's native shell only when no OpenClaw sandbox is active and native Code Mode is available.",
+      "Run a shell command through Recall's configured sandbox backend for this session. Use when Recall sandboxing is active or when a command must execute in the sandbox backend, such as an SSH-backed sandbox or Docker container-path bind layout. Use Codex's native shell only when no Recall sandbox is active and native Code Mode is available.",
     execute: async (toolCallId, args, signal, onUpdate) => {
       const result = await execTool.execute(toolCallId, args, signal, onUpdate);
       return {
@@ -4230,11 +4230,11 @@ function addSandboxShellDynamicToolsIfAvailable(
       };
     },
   };
-  const sandboxProcessTool: OpenClawDynamicTool = {
+  const sandboxProcessTool: RecallDynamicTool = {
     ...processTool,
     name: "sandbox_process",
     description:
-      "Manage sandbox_exec sessions that were started through OpenClaw's configured sandbox backend for this session: list, poll, log, write, send-keys, submit, paste, kill, clear, or remove. Use only for sandbox_exec follow-up; use Codex's native shell session handling only when no OpenClaw sandbox is active and native Code Mode is available.",
+      "Manage sandbox_exec sessions that were started through Recall's configured sandbox backend for this session: list, poll, log, write, send-keys, submit, paste, kill, clear, or remove. Use only for sandbox_exec follow-up; use Codex's native shell session handling only when no Recall sandbox is active and native Code Mode is available.",
   };
   return [...filteredTools, sandboxExecTool, sandboxProcessTool];
 }
@@ -4269,10 +4269,10 @@ function isSandboxShellDynamicToolExcluded(config: CodexPluginConfig): boolean {
 }
 
 function addNodeShellDynamicToolsIfNeeded(
-  filteredTools: OpenClawDynamicTool[],
-  allTools: OpenClawDynamicTool[],
+  filteredTools: RecallDynamicTool[],
+  allTools: RecallDynamicTool[],
   input: DynamicToolBuildParams,
-): OpenClawDynamicTool[] {
+): RecallDynamicTool[] {
   if (
     isCodexMemoryFlushRun(input.params) ||
     !isCodexNativeExecutionBlockedByNodeExecHost(input.params, {
@@ -4845,15 +4845,15 @@ function readNotificationItemId(notification: CodexServerNotification): string |
   );
 }
 
-function isPendingOpenClawDynamicToolCompletionNotification(
+function isPendingRecallDynamicToolCompletionNotification(
   notification: CodexServerNotification,
-  pendingOpenClawDynamicToolCompletionIds: ReadonlySet<string>,
+  pendingRecallDynamicToolCompletionIds: ReadonlySet<string>,
 ): boolean {
   if (notification.method !== "item/completed" || !isJsonObject(notification.params)) {
     return false;
   }
   const itemId = readNotificationItemId(notification);
-  if (!itemId || !pendingOpenClawDynamicToolCompletionIds.has(itemId)) {
+  if (!itemId || !pendingRecallDynamicToolCompletionIds.has(itemId)) {
     return false;
   }
   const item = isJsonObject(notification.params.item) ? notification.params.item : undefined;
@@ -5097,7 +5097,7 @@ async function buildCodexWorkspaceBootstrapContext(params: {
       }),
     );
     const promptContextFiles = selectCodexWorkspacePromptContextFiles(contextFiles);
-    const developerInstructionFiles = shouldInjectCodexOpenClawPromptContext(params.params)
+    const developerInstructionFiles = shouldInjectCodexRecallPromptContext(params.params)
       ? selectCodexWorkspaceDeveloperInstructionFiles(contextFiles)
       : [];
     const heartbeatReferenceFiles = selectCodexWorkspaceHeartbeatReferenceFiles(contextFiles);
@@ -5309,34 +5309,34 @@ function readNonEmptyString(value: unknown): string | undefined {
   return typeof value === "string" && value.trim().length > 0 ? value : undefined;
 }
 
-function buildCodexOpenClawPromptContext(params: {
+function buildCodexRecallPromptContext(params: {
   params: EmbeddedRunAttemptParams;
   skillsPrompt?: string;
   workspacePromptContext?: string;
 }): string | undefined {
-  if (!shouldInjectCodexOpenClawPromptContext(params.params)) {
+  if (!shouldInjectCodexRecallPromptContext(params.params)) {
     return undefined;
   }
   const sections = [
     params.skillsPrompt?.trim()
-      ? ["## OpenClaw Skills", "", params.skillsPrompt.trim()].join("\n")
+      ? ["## Recall Skills", "", params.skillsPrompt.trim()].join("\n")
       : undefined,
     params.workspacePromptContext?.trim()
-      ? ["## OpenClaw Workspace Context", "", params.workspacePromptContext.trim()].join("\n")
+      ? ["## Recall Workspace Context", "", params.workspacePromptContext.trim()].join("\n")
       : undefined,
   ].filter(isNonEmptyString);
   if (sections.length === 0) {
     return undefined;
   }
   return [
-    "OpenClaw runtime context for this turn:",
-    "Treat this OpenClaw-provided context as supporting project/user reference for the current request.",
+    "Recall runtime context for this turn:",
+    "Treat this Recall-provided context as supporting project/user reference for the current request.",
     "",
     ...sections,
   ].join("\n");
 }
 
-function shouldInjectCodexOpenClawPromptContext(params: EmbeddedRunAttemptParams): boolean {
+function shouldInjectCodexRecallPromptContext(params: EmbeddedRunAttemptParams): boolean {
   // Lightweight cron runs are commonly exact commands. Keep the user input byte-for-byte
   // to avoid changing command intent while Codex keeps its native project-doc loader.
   return !(
@@ -5344,11 +5344,11 @@ function shouldInjectCodexOpenClawPromptContext(params: EmbeddedRunAttemptParams
   );
 }
 
-function prependCodexOpenClawPromptContext(prompt: string, context: string | undefined): string {
+function prependCodexRecallPromptContext(prompt: string, context: string | undefined): string {
   if (!context?.trim()) {
     return prompt;
   }
-  const promptSection = prompt.startsWith("OpenClaw assembled context for this turn:")
+  const promptSection = prompt.startsWith("Recall assembled context for this turn:")
     ? prompt
     : ["Current user request:", prompt].join("\n");
   return [context.trim(), "", promptSection].join("\n");
@@ -5362,7 +5362,7 @@ function renderCodexWorkspaceBootstrapPromptContext(
     return undefined;
   }
   const lines = [
-    "OpenClaw loaded these user-editable workspace files for the current turn. Codex loads AGENTS.md natively. SOUL.md, IDENTITY.md, TOOLS.md, and USER.md are provided separately as Codex developer instructions. HEARTBEAT.md is handled by heartbeat collaboration-mode guidance. Those files are not repeated here.",
+    "Recall loaded these user-editable workspace files for the current turn. Codex loads AGENTS.md natively. SOUL.md, IDENTITY.md, TOOLS.md, and USER.md are provided separately as Codex developer instructions. HEARTBEAT.md is handled by heartbeat collaboration-mode guidance. Those files are not repeated here.",
     "",
     "# Project Context",
     "",
@@ -5415,9 +5415,9 @@ function renderCodexWorkspaceDeveloperInstructions(
     return undefined;
   }
   const lines = [
-    "## OpenClaw Agent Soul",
+    "## Recall Agent Soul",
     "",
-    "OpenClaw loaded these workspace instruction files from the active agent workspace. They define who you are, how you work, what tools are available, and the human you work alongside. Internalize and follow them accordingly.",
+    "Recall loaded these workspace instruction files from the active agent workspace. They define who you are, how you work, what tools are available, and the human you work alongside. Internalize and follow them accordingly.",
     "",
   ];
   for (const file of files) {
@@ -5446,7 +5446,7 @@ function renderCodexWorkspaceHeartbeatReference(files: EmbeddedContextFile[]): s
     return undefined;
   }
   const lines = [
-    "## OpenClaw Heartbeat Workspace",
+    "## Recall Heartbeat Workspace",
     "",
     "HEARTBEAT.md exists in the active agent workspace. Read it before proceeding with this heartbeat, then decide what action is appropriate.",
     "",
@@ -5657,10 +5657,10 @@ export const testing = {
   resolveDynamicToolCallTimeoutMs,
   resolveCodexDynamicToolsLoading,
   rotateOversizedCodexAppServerStartupBinding,
-  resolveCodexAppServerForOpenClawToolPolicy,
+  resolveCodexAppServerForRecallToolPolicy,
   resolveCodexAppServerHookChannelId,
   buildCodexAppServerPromptTimeoutOutcome,
-  resolveOpenClawCodingToolsSessionKeys,
+  resolveRecallCodingToolsSessionKeys,
   shouldProjectMirroredHistoryForCodexStart,
   shouldEnableCodexAppServerNativeToolSurface,
   shouldForceMessageTool,
@@ -5669,10 +5669,10 @@ export const testing = {
   hasPendingDynamicToolTerminalDiagnostic,
   buildCodexPluginThreadConfigEligibilityLogData,
   withCodexStartupTimeout,
-  setOpenClawCodingToolsFactoryForTests(factory: OpenClawCodingToolsFactory): void {
+  setRecallCodingToolsFactoryForTests(factory: RecallCodingToolsFactory): void {
     openClawCodingToolsFactoryForTests = factory;
   },
-  resetOpenClawCodingToolsFactoryForTests(): void {
+  resetRecallCodingToolsFactoryForTests(): void {
     openClawCodingToolsFactoryForTests = undefined;
   },
 } as const;

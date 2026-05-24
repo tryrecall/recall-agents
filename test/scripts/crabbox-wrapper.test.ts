@@ -8,7 +8,7 @@ const tempDirs: string[] = [];
 const repoRoot = process.cwd();
 
 function makeFakeCrabbox(helpText: string): string {
-  const binDir = mkdtempSync(path.join(tmpdir(), "openclaw-fake-crabbox-"));
+  const binDir = mkdtempSync(path.join(tmpdir(), "recall-fake-crabbox-"));
   tempDirs.push(binDir);
   const crabboxPath = path.join(binDir, "crabbox");
   const script = [
@@ -35,13 +35,13 @@ function makeFakeCrabbox(helpText: string): string {
 }
 
 function makeFakeGit(responses: Record<string, { status?: number; stdout?: string; stderr?: string }>): string {
-  const binDir = mkdtempSync(path.join(tmpdir(), "openclaw-fake-git-"));
+  const binDir = mkdtempSync(path.join(tmpdir(), "recall-fake-git-"));
   tempDirs.push(binDir);
   const gitPath = path.join(binDir, "git");
   const script = [
     "#!/usr/bin/env node",
     "const fs = require('node:fs');",
-    "const responses = new Map(Object.entries(JSON.parse(process.env.OPENCLAW_FAKE_GIT_RESPONSES || '{}')));",
+    "const responses = new Map(Object.entries(JSON.parse(process.env.RECALL_FAKE_GIT_RESPONSES || '{}')));",
     "const args = process.argv.slice(2);",
     "if (args[0] === 'worktree' && args[1] === 'add') { fs.mkdirSync(args[3], { recursive: true }); process.exit(0); }",
     "if (args[0] === '-C' && args[2] === 'sparse-checkout' && args[3] === 'disable') { process.exit(0); }",
@@ -72,7 +72,7 @@ function runWrapper(
       ...process.env,
       PATH: [binDir, gitBinDir, process.env.PATH ?? ""].filter(Boolean).join(path.delimiter),
       ...(options.gitResponses
-        ? { OPENCLAW_FAKE_GIT_RESPONSES: JSON.stringify(options.gitResponses) }
+        ? { RECALL_FAKE_GIT_RESPONSES: JSON.stringify(options.gitResponses) }
         : {}),
     },
   });
@@ -213,7 +213,7 @@ describe("scripts/crabbox-wrapper", () => {
     expect(result.status).toBe(0);
     expect(result.stdout).not.toContain('"--no-sync"');
     expect(result.stderr).toContain("syncing from temporary full checkout");
-    expect(parseFakeCrabboxOutput(result).cwd).toContain("openclaw-crabbox-sync-");
+    expect(parseFakeCrabboxOutput(result).cwd).toContain("recall-crabbox-sync-");
   });
 
   it("uses a temporary full checkout when clean sparse branches differ from the Blacksmith ref", () => {
@@ -231,7 +231,7 @@ describe("scripts/crabbox-wrapper", () => {
     expect(result.status).toBe(0);
     expect(result.stdout).not.toContain('"--no-sync"');
     expect(result.stderr).toContain("syncing from temporary full checkout");
-    expect(parseFakeCrabboxOutput(result).cwd).toContain("openclaw-crabbox-sync-");
+    expect(parseFakeCrabboxOutput(result).cwd).toContain("recall-crabbox-sync-");
   });
 
   it("keeps sparse dirty worktrees on the original checkout", () => {
@@ -278,7 +278,7 @@ describe("scripts/crabbox-wrapper", () => {
 
     const output = parseFakeCrabboxOutput(result);
     expect(result.status).toBe(0);
-    expect(output.cwd).toContain("openclaw-crabbox-sync-");
+    expect(output.cwd).toContain("recall-crabbox-sync-");
     expect(output.args).toContain(`--capture-stdout=${path.join(repoRoot, ".artifacts/stdout.log")}`);
     expect(output.args).toContain(path.join(repoRoot, ".artifacts/stderr.log"));
     expect(output.args).toContain(`/tmp/proof=${path.join(repoRoot, ".artifacts/proof")}`);
@@ -305,6 +305,6 @@ describe("scripts/crabbox-wrapper", () => {
 
     expect(result.status).toBe(0);
     expect(result.stderr).toContain("syncing from temporary full checkout");
-    expect(parseFakeCrabboxOutput(result).cwd).toContain("openclaw-crabbox-sync-");
+    expect(parseFakeCrabboxOutput(result).cwd).toContain("recall-crabbox-sync-");
   });
 });

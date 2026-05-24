@@ -1,12 +1,12 @@
 {
-  "name": "@openclaw/irc",
+  "name": "@recall/irc",
   "version": "2026.5.22",
-  "description": "OpenClaw IRC channel plugin",
+  "description": "Recall IRC channel plugin",
   "type": "module",
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],

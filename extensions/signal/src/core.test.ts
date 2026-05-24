@@ -1,9 +1,9 @@
 import {
   createMessageReceiptFromOutboundResults,
   verifyChannelMessageAdapterCapabilityProofs,
-} from "openclaw/plugin-sdk/channel-message";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { createPluginSetupWizardStatus } from "openclaw/plugin-sdk/plugin-test-runtime";
+} from "recall/plugin-sdk/channel-message";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { createPluginSetupWizardStatus } from "recall/plugin-sdk/plugin-test-runtime";
 import { describe, expect, it, vi } from "vitest";
 import { signalPlugin } from "./channel.js";
 import * as clientModule from "./client-adapter.js";
@@ -202,7 +202,7 @@ describe("probeSignal", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       accountOverrides: {},
     });
 
@@ -240,7 +240,7 @@ describe("signal outbound", () => {
       proofs: {
         text: async () => {
           const result = await signalPlugin.message?.send?.text?.({
-            cfg: {} as OpenClawConfig,
+            cfg: {} as RecallConfig,
             to: "signal:+15555550123",
             text: "hello",
             deps,
@@ -256,7 +256,7 @@ describe("signal outbound", () => {
         },
         media: async () => {
           const result = await signalPlugin.message?.send?.media?.({
-            cfg: {} as OpenClawConfig,
+            cfg: {} as RecallConfig,
             to: "signal:+15555550123",
             text: "image",
             mediaUrl: "https://example.com/image.png",
@@ -398,7 +398,7 @@ describe("signal setup parsing", () => {
   });
 
   it("uses configured defaultAccount for omitted DM policy account context", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         signal: {
           defaultAccount: "work",
@@ -428,7 +428,7 @@ describe("signal setup parsing", () => {
   });
 
   it('writes open policy state to the named account and stores inherited allowFrom with "*"', () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       channels: {
         signal: {
           allowFrom: ["+15555550123"],

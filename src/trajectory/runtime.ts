@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { sanitizeDiagnosticPayload } from "../agents/payload-redaction.js";
 import { getQueuedFileWriter, type QueuedFileWriter } from "../agents/queued-file-writer.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { redactSecrets } from "../logging/redact.js";
 import { parseBooleanValue } from "../utils/boolean.js";
 import { safeJsonStringify } from "../utils/safe-json.js";
@@ -26,7 +26,7 @@ export {
 } from "./paths.js";
 
 type TrajectoryRuntimeInit = {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   env?: NodeJS.ProcessEnv;
   maxRuntimeFileBytes?: number;
   runId?: string;
@@ -85,7 +85,7 @@ function writeTrajectoryPointerBestEffort(params: {
         fd,
         `${JSON.stringify(
           {
-            traceSchema: "openclaw-trajectory-pointer",
+            traceSchema: "recall-trajectory-pointer",
             schemaVersion: 1,
             sessionId: params.sessionId,
             runtimeFile: params.filePath,
@@ -257,8 +257,8 @@ export function createTrajectoryRuntimeRecorder(
 ): TrajectoryRuntimeRecorder | null {
   const env = params.env ?? process.env;
   // Trajectory capture is now default-on. The env var remains as an explicit
-  // override so operators can still disable recording with OPENCLAW_TRAJECTORY=0.
-  const enabled = parseBooleanValue(env.OPENCLAW_TRAJECTORY) ?? true;
+  // override so operators can still disable recording with RECALL_TRAJECTORY=0.
+  const enabled = parseBooleanValue(env.RECALL_TRAJECTORY) ?? true;
   if (!enabled) {
     return null;
   }
@@ -323,7 +323,7 @@ export function createTrajectoryRuntimeRecorder(
   const buildEventLine = (type: string, data?: Record<string, unknown>): string | undefined => {
     const nextSeq = seq + 1;
     const event: TrajectoryEvent = {
-      traceSchema: "openclaw-trajectory",
+      traceSchema: "recall-trajectory",
       schemaVersion: 1,
       traceId,
       source: "runtime",

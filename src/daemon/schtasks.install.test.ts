@@ -33,10 +33,10 @@ describe("installScheduledTask", () => {
   async function withUserProfileDir(
     run: (tmpDir: string, env: Record<string, string>) => Promise<void>,
   ) {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-schtasks-install-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-schtasks-install-"));
     const env = {
       USERPROFILE: tmpDir,
-      OPENCLAW_PROFILE: "default",
+      RECALL_PROFILE: "default",
     };
     try {
       await run(tmpDir, env);
@@ -56,11 +56,11 @@ describe("installScheduledTask", () => {
 
   function expectInitialTaskQueries(): void {
     expect(schtasksCalls[0]).toEqual(["/Query"]);
-    expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "OpenClaw Gateway"]);
+    expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "Recall Gateway"]);
   }
 
   function expectTaskRunCall(index: number): void {
-    expect(schtasksCalls[index]).toEqual(["/Run", "/TN", "OpenClaw Gateway"]);
+    expect(schtasksCalls[index]).toEqual(["/Run", "/TN", "Recall Gateway"]);
   }
 
   it("writes quoted set assignments and escapes metacharacters", async () => {
@@ -133,9 +133,9 @@ describe("installScheduledTask", () => {
       });
 
       expect(schtasksCalls[0]).toEqual(["/Query"]);
-      expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "OpenClaw Gateway"]);
+      expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "Recall Gateway"]);
       expect(schtasksCalls[2]?.[0]).toBe("/Change");
-      expect(schtasksCalls[3]).toEqual(["/Run", "/TN", "OpenClaw Gateway"]);
+      expect(schtasksCalls[3]).toEqual(["/Run", "/TN", "Recall Gateway"]);
     });
   });
 
@@ -191,7 +191,7 @@ describe("installScheduledTask", () => {
         ...env,
         USERDOMAIN: "WORKSTATION",
         USERNAME: "alice",
-        OPENCLAW_WINDOWS_TASK_HIDDEN_LAUNCHER: "1",
+        RECALL_WINDOWS_TASK_HIDDEN_LAUNCHER: "1",
       });
       const launcherPath = scriptPath.replace(/\.cmd$/i, ".vbs");
       const launcher = await fs.readFile(launcherPath, "utf8");
@@ -205,7 +205,7 @@ describe("installScheduledTask", () => {
         "/RL",
         "LIMITED",
         "/TN",
-        "OpenClaw Gateway",
+        "Recall Gateway",
         "/TR",
         expect.stringContaining("gateway.vbs"),
         "/RU",
@@ -228,7 +228,7 @@ describe("installScheduledTask", () => {
         ...env,
         USERDOMAIN: "WORKSTATION",
         USERNAME: "alice",
-        OPENCLAW_WINDOWS_TASK_HIDDEN_LAUNCHER: "true",
+        RECALL_WINDOWS_TASK_HIDDEN_LAUNCHER: "true",
       });
       const launcherPath = scriptPath.replace(/\.cmd$/i, ".vbs");
 
@@ -236,7 +236,7 @@ describe("installScheduledTask", () => {
       expect(schtasksCalls[2]).toEqual([
         "/Change",
         "/TN",
-        "OpenClaw Gateway",
+        "Recall Gateway",
         "/TR",
         expect.stringContaining("gateway.vbs"),
       ]);
@@ -304,13 +304,13 @@ describe("installScheduledTask", () => {
         programArguments: ["node", "gateway.js"],
         environment: {
           PATH: "C:\\Windows\\System32;C:\\Program Files\\Docker\\Docker\\resources\\bin",
-          OPENCLAW_GATEWAY_PORT: "18789",
+          RECALL_GATEWAY_PORT: "18789",
         },
       });
 
       const script = await fs.readFile(scriptPath, "utf8");
       expect(script).not.toContain('set "PATH=');
-      expect(script).toContain('set "OPENCLAW_GATEWAY_PORT=18789"');
+      expect(script).toContain('set "RECALL_GATEWAY_PORT=18789"');
     });
   });
 
@@ -321,7 +321,7 @@ describe("installScheduledTask", () => {
         stdout: new PassThrough(),
         programArguments: ["node", "gateway.js"],
         environment: {
-          OPENCLAW_SERVICE_MANAGED_ENV_KEYS: "TAVILY_API_KEY",
+          RECALL_SERVICE_MANAGED_ENV_KEYS: "TAVILY_API_KEY",
           TAVILY_API_KEY: "old-inline-value",
         },
       });
@@ -330,11 +330,11 @@ describe("installScheduledTask", () => {
       expect(command).toStrictEqual({
         programArguments: ["node", "gateway.js"],
         environment: {
-          OPENCLAW_SERVICE_MANAGED_ENV_KEYS: "TAVILY_API_KEY",
+          RECALL_SERVICE_MANAGED_ENV_KEYS: "TAVILY_API_KEY",
           TAVILY_API_KEY: "old-inline-value",
         },
         environmentValueSources: {
-          OPENCLAW_SERVICE_MANAGED_ENV_KEYS: "inline",
+          RECALL_SERVICE_MANAGED_ENV_KEYS: "inline",
           TAVILY_API_KEY: "inline",
         },
         sourcePath: scriptPath,

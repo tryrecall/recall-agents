@@ -31,7 +31,7 @@ import {
   type SessionEntry,
   type SessionScope,
 } from "../../config/sessions/types.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import type { TtsAutoMode } from "../../config/types.tts.js";
 import {
   forgetActiveSessionForShutdown,
@@ -119,7 +119,7 @@ function resolveExplicitSessionEndReason(matchedResetTriggerLower?: string): Rep
 }
 
 function resolveSessionDefaultAccountId(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channelRaw?: string;
   accountIdRaw?: string;
   persistedLastAccountId?: string;
@@ -187,7 +187,7 @@ export type SessionInitResult = {
 };
 
 function resolveSessionConversationBindingContext(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   ctx: MsgContext,
 ): {
   channel: string;
@@ -213,7 +213,7 @@ function resolveSessionConversationBindingContext(
 }
 
 function resolveBoundConversationSessionKey(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   ctx: MsgContext;
   bindingContext?: {
     channel: string;
@@ -246,7 +246,7 @@ function resolveBoundConversationSessionKey(params: {
 
 export async function initSessionState(params: {
   ctx: MsgContext;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   commandAuthorized: boolean;
 }): Promise<SessionInitResult> {
   const { ctx, cfg, commandAuthorized } = params;
@@ -289,7 +289,7 @@ export async function initSessionState(params: {
     : DEFAULT_RESET_TRIGGERS;
   const sessionScope = sessionCfg?.scope ?? "per-sender";
   const storePath = resolveStorePath(sessionCfg?.store, { agentId });
-  const ingressTimingEnabled = process.env.OPENCLAW_DEBUG_INGRESS_TIMING === "1";
+  const ingressTimingEnabled = process.env.RECALL_DEBUG_INGRESS_TIMING === "1";
 
   // CRITICAL: Skip cache to ensure fresh data when resolving session identity.
   // Stale cache (especially with multiple gateway processes or on Windows where

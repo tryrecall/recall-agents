@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { listSupportedMusicGenerationModes } from "../../music-generation/capabilities.js";
 import { listRuntimeMusicGenerationProviders } from "../../music-generation/runtime.js";
 import type { AuthProfileStore } from "../auth-profiles/types.js";
@@ -57,7 +57,7 @@ function summarizeMusicGenerationCapabilities(
 }
 
 export function createMusicGenerateListActionResult(
-  config?: OpenClawConfig,
+  config?: RecallConfig,
   options?: { workspaceDir?: string; agentDir?: string; authStore?: AuthProfileStore },
 ): MusicGenerateActionResult {
   const providers = listRuntimeMusicGenerationProviders({ config });

@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { isLoopbackIpAddress } from "../shared/net/ip.js";
 import { resolveGatewayClientBootstrap } from "./client-bootstrap.js";
 import { startGatewayClientWhenEventLoopReady } from "./client-start-readiness.js";
@@ -35,7 +35,7 @@ export async function createOperatorApprovalsGatewayClient(
     | "onHelloOk"
     | "onReconnectPaused"
   > & {
-    config: OpenClawConfig;
+    config: RecallConfig;
     gatewayUrl?: string;
   },
 ): Promise<GatewayClient> {
@@ -72,7 +72,7 @@ export async function createOperatorApprovalsGatewayClient(
 
 export async function withOperatorApprovalsGatewayClient<T>(
   params: {
-    config: OpenClawConfig;
+    config: RecallConfig;
     gatewayUrl?: string;
     clientDisplayName: string;
   },

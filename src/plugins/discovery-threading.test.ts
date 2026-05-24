@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PluginDiscoveryResult } from "./discovery.js";
 
-const discoverOpenClawPluginsMock = vi.fn();
+const discoverRecallPluginsMock = vi.fn();
 
 vi.mock("./discovery.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./discovery.js")>();
   return {
     ...actual,
-    discoverOpenClawPlugins: (...args: unknown[]) => discoverOpenClawPluginsMock(...args),
+    discoverRecallPlugins: (...args: unknown[]) => discoverRecallPluginsMock(...args),
   };
 });
 
@@ -19,36 +19,36 @@ const emptyDiscovery: PluginDiscoveryResult = { candidates: [], diagnostics: [] 
 
 describe("discovery threading", () => {
   beforeEach(() => {
-    discoverOpenClawPluginsMock.mockReset();
-    discoverOpenClawPluginsMock.mockReturnValue(emptyDiscovery);
+    discoverRecallPluginsMock.mockReset();
+    discoverRecallPluginsMock.mockReturnValue(emptyDiscovery);
   });
 
   describe("loadPluginManifestRegistry", () => {
-    it("skips internal discoverOpenClawPlugins when discovery is supplied", () => {
+    it("skips internal discoverRecallPlugins when discovery is supplied", () => {
       loadPluginManifestRegistry({ discovery: emptyDiscovery });
-      expect(discoverOpenClawPluginsMock).not.toHaveBeenCalled();
+      expect(discoverRecallPluginsMock).not.toHaveBeenCalled();
     });
 
-    it("calls discoverOpenClawPlugins when neither discovery nor candidates supplied", () => {
+    it("calls discoverRecallPlugins when neither discovery nor candidates supplied", () => {
       loadPluginManifestRegistry({});
-      expect(discoverOpenClawPluginsMock).toHaveBeenCalledTimes(1);
+      expect(discoverRecallPluginsMock).toHaveBeenCalledTimes(1);
     });
 
     it("prefers explicit candidates over discovery when both are supplied", () => {
       loadPluginManifestRegistry({ candidates: [], diagnostics: [], discovery: emptyDiscovery });
-      expect(discoverOpenClawPluginsMock).not.toHaveBeenCalled();
+      expect(discoverRecallPluginsMock).not.toHaveBeenCalled();
     });
   });
 
   describe("resolveInstalledPluginIndexRegistry", () => {
-    it("skips internal discoverOpenClawPlugins when discovery is supplied", () => {
+    it("skips internal discoverRecallPlugins when discovery is supplied", () => {
       resolveInstalledPluginIndexRegistry({ discovery: emptyDiscovery, installRecords: {} });
-      expect(discoverOpenClawPluginsMock).not.toHaveBeenCalled();
+      expect(discoverRecallPluginsMock).not.toHaveBeenCalled();
     });
 
-    it("calls discoverOpenClawPlugins when neither discovery nor candidates supplied", () => {
+    it("calls discoverRecallPlugins when neither discovery nor candidates supplied", () => {
       resolveInstalledPluginIndexRegistry({ installRecords: {} });
-      expect(discoverOpenClawPluginsMock).toHaveBeenCalledTimes(1);
+      expect(discoverRecallPluginsMock).toHaveBeenCalledTimes(1);
     });
 
     it("prefers explicit candidates over discovery when both are supplied", () => {
@@ -57,7 +57,7 @@ describe("discovery threading", () => {
         discovery: emptyDiscovery,
         installRecords: {},
       });
-      expect(discoverOpenClawPluginsMock).not.toHaveBeenCalled();
+      expect(discoverRecallPluginsMock).not.toHaveBeenCalled();
     });
   });
 });

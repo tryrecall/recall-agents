@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/codex",
+  "name": "@recall/codex",
   "version": "2026.5.22",
-  "description": "OpenClaw Codex harness and model provider plugin",
+  "description": "Recall Codex harness and model provider plugin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/tryrecall/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -15,14 +15,14 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "npmSpec": "@openclaw/codex",
+      "npmSpec": "@recall/codex",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.5.1-beta.1"
     },

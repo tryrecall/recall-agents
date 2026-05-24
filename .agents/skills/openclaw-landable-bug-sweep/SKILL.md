@@ -1,11 +1,11 @@
 ---
-name: openclaw-landable-bug-sweep
-description: "Find or repair small high-confidence non-SDK-boundary OpenClaw bugfix PRs until five are landable."
+name: recall-landable-bug-sweep
+description: "Find or repair small high-confidence non-SDK-boundary Recall bugfix PRs until five are landable."
 ---
 
-# OpenClaw Landable Bug Sweep
+# Recall Landable Bug Sweep
 
-Autonomous maintainer workflow for producing five landable OpenClaw bugfix PR URLs.
+Autonomous maintainer workflow for producing five landable Recall bugfix PR URLs.
 Use for broad issue/PR sweeps where the bar is high and the output is PRs, not notes.
 Do not use for plugin SDK/API boundary work; those need separate architecture review.
 
@@ -24,7 +24,7 @@ Do not present a PR as one of the five until it has been refreshed on current `m
 
 ## Companion Skills
 
-Use `$gitcrawl` for discovery/clustering, `$openclaw-pr-maintainer` for live GitHub mutation rules, `$github-author-context` when contributor trust matters, `$openclaw-testing` for proof choice, `$autoreview` before publishing/landing, and `$crabbox` for broad/E2E/live proof.
+Use `$gitcrawl` for discovery/clustering, `$recall-pr-maintainer` for live GitHub mutation rules, `$github-author-context` when contributor trust matters, `$recall-testing` for proof choice, `$autoreview` before publishing/landing, and `$crabbox` for broad/E2E/live proof.
 
 ## Candidate Bar
 

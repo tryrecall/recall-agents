@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { OpenClawConfig } from "../config/types.js";
+import type { RecallConfig } from "../config/types.js";
 import type { RealtimeVoiceProviderPlugin } from "../plugins/types.js";
 import {
   REALTIME_VOICE_AGENT_CONSULT_TOOL_NAME,
@@ -116,7 +116,7 @@ type RelaySession = {
 type CreateTalkRealtimeRelaySessionParams = {
   context: GatewayRequestContext;
   connId: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   provider: RealtimeVoiceProviderPlugin;
   providerConfig: RealtimeVoiceProviderConfig;
   instructions: string;
@@ -240,14 +240,14 @@ function consultQuestionsMatch(left: string | undefined, right: string | undefin
 
 function buildForcedConsultCheckingPrompt(): string {
   return [
-    "Briefly tell the person that you are checking with OpenClaw.",
-    "Do not answer the request yet. Wait for the OpenClaw result before giving the actual answer.",
+    "Briefly tell the person that you are checking with Recall.",
+    "Do not answer the request yet. Wait for the Recall result before giving the actual answer.",
   ].join(" ");
 }
 
 function buildForcedConsultSpeechPrompt(text: string): string {
   return [
-    "OpenClaw finished checking. Speak this result naturally and concisely.",
+    "Recall finished checking. Speak this result naturally and concisely.",
     "Do not mention tool calls, JSON, or internal routing.",
     "",
     text,
@@ -257,7 +257,7 @@ function buildForcedConsultSpeechPrompt(text: string): string {
 function buildAlreadyDeliveredToolResult(): Record<string, string> {
   return {
     status: "already_delivered",
-    message: "OpenClaw already delivered this consult result internally. Do not repeat it.",
+    message: "Recall already delivered this consult result internally. Do not repeat it.",
   };
 }
 
@@ -635,7 +635,7 @@ function scheduleForcedAgentConsult(session: RelaySession | undefined, question:
       args: {
         question,
         context:
-          "The realtime provider produced a final user transcript without invoking openclaw_agent_consult, so OpenClaw is forcing the consult for realtime Talk.",
+          "The realtime provider produced a final user transcript without invoking openclaw_agent_consult, so Recall is forcing the consult for realtime Talk.",
         responseStyle: "Reply in a concise spoken tone.",
       },
       talkEvent: session.talk.emit({

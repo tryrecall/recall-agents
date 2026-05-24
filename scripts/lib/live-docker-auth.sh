@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-OPENCLAW_DOCKER_LIVE_AUTH_ALL=(.factory .gemini .minimax)
-OPENCLAW_DOCKER_LIVE_AUTH_FILES_ALL=(
+RECALL_DOCKER_LIVE_AUTH_ALL=(.factory .gemini .minimax)
+RECALL_DOCKER_LIVE_AUTH_FILES_ALL=(
   .codex/auth.json
   .codex/config.toml
   .claude.json
@@ -34,11 +34,11 @@ openclaw_live_is_ci() {
 }
 
 openclaw_live_default_profile_file() {
-  if [[ -n "${OPENCLAW_PROFILE_FILE:-}" ]]; then
-    printf '%s\n' "$OPENCLAW_PROFILE_FILE"
+  if [[ -n "${RECALL_PROFILE_FILE:-}" ]]; then
+    printf '%s\n' "$RECALL_PROFILE_FILE"
     return 0
   fi
-  local testbox_profile="$HOME/.openclaw-testbox-live.profile"
+  local testbox_profile="$HOME/.recall-testbox-live.profile"
   if [[ -f "$testbox_profile" ]]; then
     printf '%s\n' "$testbox_profile"
     return 0
@@ -120,11 +120,11 @@ openclaw_live_collect_auth_dirs_from_csv() {
 
 openclaw_live_collect_auth_dirs_from_override() {
   local raw token normalized
-  raw="$(openclaw_live_trim "${OPENCLAW_DOCKER_AUTH_DIRS:-}")"
+  raw="$(openclaw_live_trim "${RECALL_DOCKER_AUTH_DIRS:-}")"
   [[ -n "$raw" ]] || return 1
   case "$raw" in
     all)
-      printf '%s\n' "${OPENCLAW_DOCKER_LIVE_AUTH_ALL[@]}"
+      printf '%s\n' "${RECALL_DOCKER_LIVE_AUTH_ALL[@]}"
       return 0
       ;;
     none)
@@ -143,7 +143,7 @@ openclaw_live_collect_auth_dirs() {
   if openclaw_live_collect_auth_dirs_from_override; then
     return 0
   fi
-  printf '%s\n' "${OPENCLAW_DOCKER_LIVE_AUTH_ALL[@]}"
+  printf '%s\n' "${RECALL_DOCKER_LIVE_AUTH_ALL[@]}"
 }
 
 openclaw_live_collect_auth_files_from_csv() {
@@ -160,11 +160,11 @@ openclaw_live_collect_auth_files_from_csv() {
 
 openclaw_live_collect_auth_files_from_override() {
   local raw
-  raw="$(openclaw_live_trim "${OPENCLAW_DOCKER_AUTH_DIRS:-}")"
+  raw="$(openclaw_live_trim "${RECALL_DOCKER_AUTH_DIRS:-}")"
   [[ -n "$raw" ]] || return 1
   case "$raw" in
     all)
-      printf '%s\n' "${OPENCLAW_DOCKER_LIVE_AUTH_FILES_ALL[@]}"
+      printf '%s\n' "${RECALL_DOCKER_LIVE_AUTH_FILES_ALL[@]}"
       return 0
       ;;
     none)
@@ -178,7 +178,7 @@ openclaw_live_collect_auth_files() {
   if openclaw_live_collect_auth_files_from_override; then
     return 0
   fi
-  printf '%s\n' "${OPENCLAW_DOCKER_LIVE_AUTH_FILES_ALL[@]}"
+  printf '%s\n' "${RECALL_DOCKER_LIVE_AUTH_FILES_ALL[@]}"
 }
 
 openclaw_live_join_csv() {

@@ -55,7 +55,7 @@ function runEnsureNode(root: string, requested: string, extraEnv: NodeJS.Process
 
 describe("setup-pnpm-store-cache ensure-node", () => {
   it("uses a matching active node", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-ensure-node-"));
+    const root = mkdtempSync(join(tmpdir(), "recall-ensure-node-"));
     try {
       const activeBin = join(root, "active", "bin");
       const activeNode = writeFakeNode(activeBin, "24.15.0");
@@ -73,7 +73,7 @@ describe("setup-pnpm-store-cache ensure-node", () => {
   });
 
   it("repairs PATH from the toolcache when setup-node leaves an old node active", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-ensure-node-"));
+    const root = mkdtempSync(join(tmpdir(), "recall-ensure-node-"));
     try {
       const activeBin = join(root, "active", "bin");
       writeFakeNode(activeBin, "20.20.0");
@@ -93,7 +93,7 @@ describe("setup-pnpm-store-cache ensure-node", () => {
   });
 
   it("accepts major wildcard requests when selecting a toolcache node", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-ensure-node-"));
+    const root = mkdtempSync(join(tmpdir(), "recall-ensure-node-"));
     try {
       const activeBin = join(root, "active", "bin");
       writeFakeNode(activeBin, "20.20.0");
@@ -112,7 +112,7 @@ describe("setup-pnpm-store-cache ensure-node", () => {
   });
 
   it("fails clearly when no matching node is available", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-ensure-node-"));
+    const root = mkdtempSync(join(tmpdir(), "recall-ensure-node-"));
     try {
       const activeBin = join(root, "active", "bin");
       writeFakeNode(activeBin, "20.20.0");

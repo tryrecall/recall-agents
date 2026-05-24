@@ -1,5 +1,5 @@
 import type { ChildProcessWithoutNullStreams } from "node:child_process";
-import type { SandboxContext } from "openclaw/plugin-sdk/sandbox";
+import type { SandboxContext } from "recall/plugin-sdk/sandbox";
 import type { WebSocketServer } from "ws";
 import type { JsonObject, JsonValue } from "../protocol.js";
 
@@ -69,7 +69,7 @@ export type ManagedProcess = {
   evictProcess: () => void;
 };
 
-export type OpenClawExecServer = {
+export type RecallExecServer = {
   environmentId: string;
   authPath: string;
   refCount: number;

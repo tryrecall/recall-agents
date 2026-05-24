@@ -6,10 +6,10 @@ import {
   type SilentReplyPolicyShape,
 } from "../shared/silent-reply-policy.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
-import type { OpenClawConfig } from "./types.openclaw.js";
+import type { RecallConfig } from "./types.recall.js";
 
 type ResolveSilentReplyParams = {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   sessionKey?: string;
   surface?: string;
   conversationType?: SilentReplyConversationType;

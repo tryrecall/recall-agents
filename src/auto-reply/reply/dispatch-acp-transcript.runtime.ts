@@ -7,10 +7,10 @@ import {
   resolveStorePath,
 } from "../../config/sessions.js";
 import type { SessionAcpMeta } from "../../config/sessions/types.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 
 export async function persistAcpDispatchTranscript(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionKey: string;
   promptText: string;
   finalText: string;

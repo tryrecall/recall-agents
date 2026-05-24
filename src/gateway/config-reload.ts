@@ -3,7 +3,7 @@ import { bumpSkillsSnapshotVersion } from "../agents/skills/refresh-state.js";
 import type { ConfigWriteNotification } from "../config/io.js";
 import { formatConfigIssueLines } from "../config/issue-format.js";
 import { resolveConfigWriteFollowUp } from "../config/runtime-snapshot.js";
-import type { ConfigFileSnapshot, OpenClawConfig } from "../config/types.openclaw.js";
+import type { ConfigFileSnapshot, RecallConfig } from "../config/types.recall.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 import {
   loadInstalledPluginIndexInstallRecords,
@@ -75,7 +75,7 @@ type GatewayConfigReloader = {
 
 type PluginInstallRecords = Record<string, PluginInstallRecord>;
 
-function asPluginInstallConfig(records: PluginInstallRecords): OpenClawConfig {
+function asPluginInstallConfig(records: PluginInstallRecords): RecallConfig {
   return {
     plugins: {
       installs: records,
@@ -84,12 +84,12 @@ function asPluginInstallConfig(records: PluginInstallRecords): OpenClawConfig {
 }
 
 export function startGatewayConfigReloader(opts: {
-  initialConfig: OpenClawConfig;
-  initialCompareConfig?: OpenClawConfig;
+  initialConfig: RecallConfig;
+  initialCompareConfig?: RecallConfig;
   initialInternalWriteHash?: string | null;
   readSnapshot: () => Promise<ConfigFileSnapshot>;
-  onHotReload: (plan: GatewayReloadPlan, nextConfig: OpenClawConfig) => Promise<void>;
-  onRestart: (plan: GatewayReloadPlan, nextConfig: OpenClawConfig) => void | Promise<void>;
+  onHotReload: (plan: GatewayReloadPlan, nextConfig: RecallConfig) => Promise<void>;
+  onRestart: (plan: GatewayReloadPlan, nextConfig: RecallConfig) => void | Promise<void>;
   promoteSnapshot?: (snapshot: ConfigFileSnapshot, reason: string) => Promise<boolean>;
   initialPluginInstallRecords?: PluginInstallRecords;
   readPluginInstallRecords?: () => Promise<PluginInstallRecords>;
@@ -111,8 +111,8 @@ export function startGatewayConfigReloader(opts: {
   let restartQueued = false;
   let missingConfigRetries = 0;
   let pendingInProcessConfig: {
-    config: OpenClawConfig;
-    compareConfig: OpenClawConfig;
+    config: RecallConfig;
+    compareConfig: RecallConfig;
     persistedHash: string;
     afterWrite?: ConfigWriteNotification["afterWrite"];
   } | null = null;
@@ -136,7 +136,7 @@ export function startGatewayConfigReloader(opts: {
   const schedule = () => {
     scheduleAfter(settings.debounceMs);
   };
-  const queueRestart = (plan: GatewayReloadPlan, nextConfig: OpenClawConfig) => {
+  const queueRestart = (plan: GatewayReloadPlan, nextConfig: RecallConfig) => {
     if (restartQueued) {
       return;
     }
@@ -180,8 +180,8 @@ export function startGatewayConfigReloader(opts: {
   };
 
   const applySnapshot = async (
-    nextConfig: OpenClawConfig,
-    nextCompareConfig: OpenClawConfig,
+    nextConfig: RecallConfig,
+    nextCompareConfig: RecallConfig,
     afterWrite?: ConfigWriteNotification["afterWrite"],
   ) => {
     const configChangedPaths = diffConfigPaths(currentCompareConfig, nextCompareConfig);

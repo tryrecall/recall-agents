@@ -2,8 +2,8 @@
 # Reproduces the multi-node-install update bug.
 #
 # Sets up two independent Node installations inside a Docker container, installs
-# OpenClaw under node-A, registers the gateway service pointing at node-A, then
-# switches PATH so node-B comes first and runs `openclaw update`. Verifies that:
+# Recall under node-A, registers the gateway service pointing at node-A, then
+# switches PATH so node-B comes first and runs `recall update`. Verifies that:
 #
 # 1. The update targets the wrong install root (node-B npm prefix) or produces
 #    a gateway service definition pointing at node-B while the package lives
@@ -13,23 +13,23 @@
 # Usage:
 #   ./scripts/e2e/multi-node-update-docker.sh
 #
-# Requires: Docker, a built openclaw-current.tgz (or will build one).
+# Requires: Docker, a built recall-current.tgz (or will build one).
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 source "$ROOT_DIR/scripts/lib/docker-e2e-image.sh"
 source "$ROOT_DIR/scripts/lib/docker-e2e-package.sh"
 
-IMAGE_NAME="openclaw-multi-node-update-e2e"
-DOCKER_RUN_TIMEOUT="${OPENCLAW_MULTI_NODE_DOCKER_TIMEOUT:-300s}"
-ARTIFACT_DIR="${OPENCLAW_MULTI_NODE_ARTIFACT_DIR:-$ROOT_DIR/.artifacts/multi-node-update}"
+IMAGE_NAME="recall-multi-node-update-e2e"
+DOCKER_RUN_TIMEOUT="${RECALL_MULTI_NODE_DOCKER_TIMEOUT:-300s}"
+ARTIFACT_DIR="${RECALL_MULTI_NODE_ARTIFACT_DIR:-$ROOT_DIR/.artifacts/multi-node-update}"
 
 mkdir -p "$ARTIFACT_DIR"
 chmod -R a+rwX "$ARTIFACT_DIR" || true
 
 # Build the bare e2e image and prepare the package tarball.
-docker_e2e_build_or_reuse "$IMAGE_NAME" multi-node-update "$ROOT_DIR/scripts/e2e/Dockerfile" "$ROOT_DIR" "bare" "${OPENCLAW_SKIP_DOCKER_BUILD:-0}"
-PACKAGE_TGZ="$(docker_e2e_prepare_package_tgz multi-node-update "${OPENCLAW_CURRENT_PACKAGE_TGZ:-}")"
+docker_e2e_build_or_reuse "$IMAGE_NAME" multi-node-update "$ROOT_DIR/scripts/e2e/Dockerfile" "$ROOT_DIR" "bare" "${RECALL_SKIP_DOCKER_BUILD:-0}"
+PACKAGE_TGZ="$(docker_e2e_prepare_package_tgz multi-node-update "${RECALL_CURRENT_PACKAGE_TGZ:-}")"
 docker_e2e_package_mount_args "$PACKAGE_TGZ"
 
 echo "=== Running multi-node-update Docker E2E ==="
@@ -38,11 +38,11 @@ CONTAINER_EXIT=0
 docker_e2e_run_with_harness \
   -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
   -e CI=true \
-  -e OPENCLAW_NO_ONBOARD=1 \
-  -e OPENCLAW_NO_PROMPT=1 \
-  -e OPENCLAW_SKIP_PROVIDERS=1 \
-  -e OPENCLAW_SKIP_CHANNELS=1 \
-  -e OPENCLAW_DISABLE_BONJOUR=1 \
+  -e RECALL_NO_ONBOARD=1 \
+  -e RECALL_NO_PROMPT=1 \
+  -e RECALL_SKIP_PROVIDERS=1 \
+  -e RECALL_SKIP_CHANNELS=1 \
+  -e RECALL_DISABLE_BONJOUR=1 \
   -e OPENAI_API_KEY=sk-multi-node-test \
   -v "$ARTIFACT_DIR:/tmp/artifacts" \
   "${DOCKER_E2E_PACKAGE_ARGS[@]}" \
@@ -91,9 +91,9 @@ NODE_B_VERSION="$("$NODE_B" --version)"
 echo "node-B: $NODE_B ($NODE_B_VERSION)"
 
 echo ""
-echo "── Step 2: Install OpenClaw under node-A ──"
+echo "── Step 2: Install Recall under node-A ──"
 
-# Use node-A to install openclaw with npm prefix A.
+# Use node-A to install recall with npm prefix A.
 export npm_config_prefix="$NPM_PREFIX_A"
 export NPM_CONFIG_PREFIX="$NPM_PREFIX_A"
 export npm_config_loglevel=error
@@ -101,16 +101,16 @@ export npm_config_fund=false
 export npm_config_audit=false
 export PATH="$NPM_PREFIX_A/bin:$NODE_A_DIR:$PATH"
 
-echo "Installing OpenClaw package under node-A prefix: $NPM_PREFIX_A"
-npm install -g /tmp/openclaw-current.tgz --no-fund --no-audit >"$ARTIFACTS/install-a.log" 2>&1
-echo "Installed. Checking openclaw location..."
+echo "Installing Recall package under node-A prefix: $NPM_PREFIX_A"
+npm install -g /tmp/recall-current.tgz --no-fund --no-audit >"$ARTIFACTS/install-a.log" 2>&1
+echo "Installed. Checking recall location..."
 
-OPENCLAW_A="$(command -v openclaw)"
-echo "openclaw binary: $OPENCLAW_A"
-echo "openclaw version: $(openclaw --version 2>/dev/null || echo unknown)"
+RECALL_A="$(command -v recall)"
+echo "recall binary: $RECALL_A"
+echo "recall version: $(recall --version 2>/dev/null || echo unknown)"
 
 # Record the package root for node-A install.
-PACKAGE_ROOT_A="$NPM_PREFIX_A/lib/node_modules/openclaw"
+PACKAGE_ROOT_A="$NPM_PREFIX_A/lib/node_modules/recall"
 echo "Package root A: $PACKAGE_ROOT_A"
 ls -la "$PACKAGE_ROOT_A/package.json" 2>/dev/null || echo "WARNING: package.json not found at A"
 
@@ -119,7 +119,7 @@ echo "── Step 3: Install the systemd service (gateway) using node-A ──"
 
 # Create a systemctl shim since we are in Docker (no real systemd).
 SHIM_DIR="/usr/local/bin"
-GATEWAY_UNIT_PATH="/root/.config/systemd/user/openclaw-gateway.service"
+GATEWAY_UNIT_PATH="/root/.config/systemd/user/recall-gateway.service"
 SYSTEMCTL_LOG="$ARTIFACTS/systemctl-shim.log"
 GATEWAY_DAEMON_LOG="$ARTIFACTS/gateway-daemon.log"
 GATEWAY_PID_FILE="$ARTIFACTS/gateway.pid"
@@ -212,7 +212,7 @@ echo "Installing gateway service..."
 mkdir -p "$(dirname "$GATEWAY_UNIT_PATH")"
 # gateway install may exit non-zero because our systemctl shim cannot fully
 # restart, but the unit file gets written before the restart step.
-openclaw gateway install --json >"$ARTIFACTS/gateway-install.json" 2>"$ARTIFACTS/gateway-install.err" || true
+recall gateway install --json >"$ARTIFACTS/gateway-install.json" 2>"$ARTIFACTS/gateway-install.err" || true
 
 echo ""
 echo "── Step 4: Inspect what node path was baked into the service ──"
@@ -238,25 +238,25 @@ echo "── Step 5: Switch PATH so node-B comes first ──"
 # Simulate the user scenario: their PATH changes (e.g. they installed
 # a second Node via nvm, brew, etc.) and the new node-B comes first.
 # Crucially, node-B has its own working npm with its own global prefix,
-# but openclaw is NOT installed there.
+# but recall is NOT installed there.
 export PATH="$NPM_PREFIX_B/bin:$NODE_B_ROOT/bin:$NPM_PREFIX_A/bin:$NODE_A_DIR:$PATH"
 
 # Verify node-B npm works independently.
 echo "node-B npm prefix: $($NODE_B_ROOT/bin/node $NODE_B_ROOT/bin/npm prefix -g 2>/dev/null || echo unknown)"
 echo "which node: $(command -v node)"
-echo "which openclaw: $(command -v openclaw)"
+echo "which recall: $(command -v recall)"
 echo "process.execPath will be: $(node -e "console.log(process.execPath)")"
 
 echo ""
-echo "── Step 6: Run openclaw update (this is the bug) ──"
+echo "── Step 6: Run recall update (this is the bug) ──"
 
 # Run the update WITH restart so that the update flow re-runs
 # `gateway install --force` and bakes the current process.execPath
 # (now node-B) into the service unit. This is where the split happens.
-echo "Running openclaw update --yes --json..."
+echo "Running recall update --yes --json..."
 UPDATE_EXIT=0
-openclaw update --yes --json \
-  --tag /tmp/openclaw-current.tgz \
+recall update --yes --json \
+  --tag /tmp/recall-current.tgz \
   >"$ARTIFACTS/update.json" 2>"$ARTIFACTS/update.err" || UPDATE_EXIT=$?
 
 echo ""
@@ -267,7 +267,7 @@ cat "$ARTIFACTS/update.err" 2>/dev/null | tail -10 || true
 # The update may fail during restart (systemctl shim limitations) but it must
 # have at least attempted the package install. Check that it ran past early exit.
 if [ "$UPDATE_EXIT" -ne 0 ] && ! grep -q "gateway" "$ARTIFACTS/update.err" 2>/dev/null; then
-  echo "FAIL: openclaw update failed before reaching the package install step"
+  echo "FAIL: recall update failed before reaching the package install step"
   cat "$ARTIFACTS/update.err" 2>/dev/null || true
   exit 1
 fi
@@ -302,7 +302,7 @@ echo ""
 # Check 1: Did the baked node path change from A to B?
 if [ "$BAKED_NODE_AFTER" = "$NODE_B" ] && [ "$BAKED_NODE_BEFORE" != "$NODE_B" ]; then
   echo "BUG CONFIRMED: Gateway service now points at node-B ($NODE_B)"
-  echo "   but OpenClaw package is still under node-A prefix ($PACKAGE_ROOT_A)."
+  echo "   but Recall package is still under node-A prefix ($PACKAGE_ROOT_A)."
   echo "   The gateway will use node-B to run an entrypoint that may reference"
   echo "   node-A dependencies or may not exist under node-B global prefix."
 elif [ "$BAKED_NODE_AFTER" = "$BAKED_NODE_BEFORE" ]; then
@@ -311,11 +311,11 @@ else
   echo "CHANGED: Node path changed from $BAKED_NODE_BEFORE to $BAKED_NODE_AFTER"
 fi
 
-# Check 2: Is the OpenClaw package installed under node-B npm prefix?
-if [ -f "$NPM_PREFIX_B/lib/node_modules/openclaw/package.json" ]; then
-  echo "WARNING: OpenClaw was ALSO installed under node-B prefix (split install)"
+# Check 2: Is the Recall package installed under node-B npm prefix?
+if [ -f "$NPM_PREFIX_B/lib/node_modules/recall/package.json" ]; then
+  echo "WARNING: Recall was ALSO installed under node-B prefix (split install)"
 else
-  echo "OK: OpenClaw is NOT under node-B prefix (expected: only under node-A)"
+  echo "OK: Recall is NOT under node-B prefix (expected: only under node-A)"
 fi
 
 # Check 3: Does the entrypoint in the unit file actually exist?
@@ -331,7 +331,7 @@ fi
 
 # Check 4: Were there any warnings about split install in the update output?
 if [ -f "$ARTIFACTS/update.err" ]; then
-  if grep -qi "Shell OpenClaw root differs" "$ARTIFACTS/update.err" 2>/dev/null; then
+  if grep -qi "Shell Recall root differs" "$ARTIFACTS/update.err" 2>/dev/null; then
     echo "OK: Update warned about split root"
   fi
   if grep -qi "Managed gateway service Node" "$ARTIFACTS/update.err" 2>/dev/null; then
@@ -349,7 +349,7 @@ if [ -f "$GATEWAY_UNIT_PATH" ]; then
   if [ -s "$GATEWAY_PID_FILE" ] && kill -0 "$(cat "$GATEWAY_PID_FILE" 2>/dev/null)" 2>/dev/null; then
     echo "OK: Gateway started (pid $(cat "$GATEWAY_PID_FILE"))"
     # Try a health probe.
-    if openclaw gateway status --json >"$ARTIFACTS/status.json" 2>&1; then
+    if recall gateway status --json >"$ARTIFACTS/status.json" 2>&1; then
       echo "OK: Gateway status probe succeeded"
     else
       echo "WARNING: Gateway status probe failed"
@@ -374,7 +374,7 @@ EXIT_CODE=0
 if [ "$BAKED_NODE_AFTER" = "$NODE_B" ] && [ "$BAKED_NODE_BEFORE" != "$NODE_B" ]; then
   EXIT_CODE=1
 fi
-if [ -f "$NPM_PREFIX_B/lib/node_modules/openclaw/package.json" ]; then
+if [ -f "$NPM_PREFIX_B/lib/node_modules/recall/package.json" ]; then
   EXIT_CODE=1
 fi
 if [ -f "$GATEWAY_UNIT_PATH" ]; then

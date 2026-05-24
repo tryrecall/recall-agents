@@ -1,5 +1,5 @@
 import type { AuthProfileStore } from "../agents/auth-profiles/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 
 type MediaUnderstandingKind = "audio.transcription" | "video.description" | "image.description";
 
@@ -135,7 +135,7 @@ export type ImageDescriptionRequest = {
   authStore?: AuthProfileStore;
   agentDir: string;
   workspaceDir?: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   model: string;
   provider: string;
 };
@@ -158,7 +158,7 @@ export type ImagesDescriptionRequest = {
   authStore?: AuthProfileStore;
   agentDir: string;
   workspaceDir?: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
 };
 
 export type ImageDescriptionResult = {
@@ -199,7 +199,7 @@ export type StructuredExtractionRequest = {
   preferredProfile?: string;
   authStore?: AuthProfileStore;
   agentDir: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   model: string;
   provider: string;
 };

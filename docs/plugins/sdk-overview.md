@@ -4,7 +4,7 @@ title: "Plugin SDK overview"
 sidebarTitle: "Plugin SDK overview"
 read_when:
   - You need to know which SDK subpath to import from
-  - You want a reference for all registration methods on OpenClawPluginApi
+  - You want a reference for all registration methods on RecallPluginApi
   - You are looking up a specific SDK export
 ---
 
@@ -12,10 +12,10 @@ The plugin SDK is the typed contract between plugins and core. This page is the
 reference for **what to import** and **what you can register**.
 
 <Note>
-  This page is for plugin authors using `openclaw/plugin-sdk/*` inside
-  OpenClaw. For external apps, scripts, dashboards, CI jobs, and IDE extensions
+  This page is for plugin authors using `recall/plugin-sdk/*` inside
+  Recall. For external apps, scripts, dashboards, CI jobs, and IDE extensions
   that want to run agents through the Gateway, use the
-  [OpenClaw App SDK](/concepts/openclaw-sdk) and the `@openclaw/sdk` package
+  [Recall App SDK](/concepts/recall-sdk) and the `@recall/sdk` package
   instead.
 </Note>
 
@@ -28,19 +28,19 @@ Looking for a how-to guide instead? Start with [Building plugins](/plugins/build
 Always import from a specific subpath:
 
 ```typescript
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
-import { defineChannelPluginEntry } from "openclaw/plugin-sdk/channel-core";
+import { definePluginEntry } from "recall/plugin-sdk/plugin-entry";
+import { defineChannelPluginEntry } from "recall/plugin-sdk/channel-core";
 ```
 
 Each subpath is a small, self-contained module. This keeps startup fast and
 prevents circular dependency issues. For channel-specific entry/build helpers,
-prefer `openclaw/plugin-sdk/channel-core`; keep `openclaw/plugin-sdk/core` for
+prefer `recall/plugin-sdk/channel-core`; keep `recall/plugin-sdk/core` for
 the broader umbrella surface and shared helpers such as
 `buildChannelConfigSchema`.
 
 For channel config, publish the channel-owned JSON Schema through
-`openclaw.plugin.json#channelConfigs`. The `plugin-sdk/channel-config-schema`
-subpath is for shared schema primitives and the generic builder. OpenClaw's
+`recall.plugin.json#channelConfigs`. The `plugin-sdk/channel-config-schema`
+subpath is for shared schema primitives and the generic builder. Recall's
 bundled plugins use `plugin-sdk/bundled-channel-config-schema` for retained
 bundled-channel schemas. Deprecated compatibility exports remain on
 `plugin-sdk/channel-config-schema-legacy`; neither bundled schema subpath is a
@@ -48,7 +48,7 @@ pattern for new plugins.
 
 <Warning>
   Do not import provider- or channel-branded convenience seams (for example
-  `openclaw/plugin-sdk/slack`, `.../discord`, `.../signal`, `.../whatsapp`).
+  `recall/plugin-sdk/slack`, `.../discord`, `.../signal`, `.../whatsapp`).
   Bundled plugins compose generic SDK subpaths inside their own `api.ts` /
   `runtime-api.ts` barrels; core consumers should either use those plugin-local
   barrels or add a narrow generic SDK contract when a need is truly
@@ -59,7 +59,7 @@ map when they have tracked owner usage. They exist for bundled-plugin
 maintenance only and are not recommended import paths for new third-party
 plugins.
 
-`openclaw/plugin-sdk/discord` and `openclaw/plugin-sdk/telegram-account` are
+`recall/plugin-sdk/discord` and `recall/plugin-sdk/telegram-account` are
 also kept as deprecated compatibility facades for tracked owner usage. Do not
 copy those import paths into new plugins; use injected runtime helpers and
 generic channel SDK subpaths instead.
@@ -84,7 +84,7 @@ deprecated re-export barrels are tracked in
 
 ## Registration API
 
-The `register(api)` callback receives an `OpenClawPluginApi` object with these
+The `register(api)` callback receives an `RecallPluginApi` object with these
 methods:
 
 ### Capability registration
@@ -156,7 +156,7 @@ guidance remain available to non-Codex prompt surfaces for compatibility.
 | `api.registerGatewayMethod(name, handler)`     | Gateway RPC method                      |
 | `api.registerGatewayDiscoveryService(service)` | Local Gateway discovery advertiser      |
 | `api.registerCli(registrar, opts?)`            | CLI subcommand                          |
-| `api.registerNodeCliFeature(registrar, opts?)` | Node feature CLI under `openclaw nodes` |
+| `api.registerNodeCliFeature(registrar, opts?)` | Node feature CLI under `recall nodes` |
 | `api.registerService(service)`                 | Background service                      |
 | `api.registerInteractiveHandler(registration)` | Interactive handler                     |
 | `api.registerAgentToolResultMiddleware(...)`   | Runtime tool-result middleware          |
@@ -255,7 +255,7 @@ Examples of non-Plan consumers:
 
 Bundled plugins must declare `contracts.agentToolResultMiddleware` for each
 targeted runtime, for example `["pi", "codex"]`. External plugins
-cannot register this middleware; keep normal OpenClaw plugin hooks for work
+cannot register this middleware; keep normal Recall plugin hooks for work
 that does not need pre-model tool-result timing. The old Pi-only embedded
 extension factory registration path has been removed.
 </Accordion>
@@ -263,7 +263,7 @@ extension factory registration path has been removed.
 ### Gateway discovery registration
 
 `api.registerGatewayDiscoveryService(...)` lets a plugin advertise the active
-Gateway on a local discovery transport such as mDNS/Bonjour. OpenClaw calls the
+Gateway on a local discovery transport such as mDNS/Bonjour. Recall calls the
 service during Gateway startup when local discovery is enabled, passes the
 current Gateway ports and non-secret TXT hint data, and calls the returned
 `stop` handler during Gateway shutdown.
@@ -299,7 +299,7 @@ own trust.
 For paired-node features, prefer
 `api.registerNodeCliFeature(registrar, opts?)`. It is a small wrapper around
 `api.registerCli(..., { parentPath: ["nodes"] })` and makes commands such as
-`openclaw nodes canvas` explicit plugin-owned node features.
+`recall nodes canvas` explicit plugin-owned node features.
 
 If you want a plugin command to stay lazy-loaded in the normal root CLI path,
 provide `descriptors` that cover every top-level command root exposed by that
@@ -355,12 +355,12 @@ AI CLI backend such as `claude-cli` or `my-cli`.
 
 - The backend `id` becomes the provider prefix in model refs like `my-cli/gpt-5`.
 - The backend `config` uses the same shape as `agents.defaults.cliBackends.<id>`.
-- User config still wins. OpenClaw merges `agents.defaults.cliBackends.<id>` over the
+- User config still wins. Recall merges `agents.defaults.cliBackends.<id>` over the
   plugin default before running the CLI.
 - Use `normalizeConfig` when a backend needs compatibility rewrites after merge
   (for example normalizing old flag shapes).
 - Use `resolveExecutionArgs` for request-scoped argv rewrites that belong to
-  the CLI dialect, such as mapping OpenClaw thinking levels to a native effort
+  the CLI dialect, such as mapping Recall thinking levels to a native effort
   flag.
 
 For an end-to-end authoring guide, see
@@ -385,7 +385,7 @@ For an end-to-end authoring guide, see
 - `registerMemoryCapability` is the preferred exclusive memory-plugin API.
 - `registerMemoryCapability` may also expose `publicArtifacts.listArtifacts(...)`
   so companion plugins can consume exported memory artifacts through
-  `openclaw/plugin-sdk/memory-host-core` instead of reaching into a specific
+  `recall/plugin-sdk/memory-host-core` instead of reaching into a specific
   memory plugin's private layout.
 - `registerMemoryPromptSection`, `registerMemoryFlushPlan`, and
   `registerMemoryRuntime` are legacy-compatible exclusive memory-plugin APIs.
@@ -421,7 +421,7 @@ semantics.
 - `message_received`: use the typed `threadId` field when you need inbound thread/topic routing. Keep `metadata` for channel-specific extras.
 - `message_sending`: use typed `replyToId` / `threadId` routing fields before falling back to channel-specific `metadata`.
 - `gateway_start`: use `ctx.config`, `ctx.workspaceDir`, and `ctx.getCron?.()` for gateway-owned startup state instead of relying on internal `gateway:startup` hooks.
-- `cron_changed`: observe gateway-owned cron lifecycle changes. Use `event.job?.state?.nextRunAtMs` and `ctx.getCron?.()` when syncing external wake schedulers, and keep OpenClaw as the source of truth for due checks and execution.
+- `cron_changed`: observe gateway-owned cron lifecycle changes. Use `event.job?.state?.nextRunAtMs` and `ctx.getCron?.()` when syncing external wake schedulers, and keep Recall as the source of truth for due checks and execution.
 
 ### API object fields
 
@@ -433,7 +433,7 @@ semantics.
 | `api.description`        | `string?`                 | Plugin description (optional)                                                               |
 | `api.source`             | `string`                  | Plugin source path                                                                          |
 | `api.rootDir`            | `string?`                 | Plugin root directory (optional)                                                            |
-| `api.config`             | `OpenClawConfig`          | Current config snapshot (active in-memory runtime snapshot when available)                  |
+| `api.config`             | `RecallConfig`          | Current config snapshot (active in-memory runtime snapshot when available)                  |
 | `api.pluginConfig`       | `Record<string, unknown>` | Plugin-specific config from `plugins.entries.<id>.config`                                   |
 | `api.runtime`            | `PluginRuntime`           | [Runtime helpers](/plugins/sdk-runtime)                                                     |
 | `api.logger`             | `PluginLogger`            | Scoped logger (`debug`, `info`, `warn`, `error`)                                            |
@@ -453,16 +453,16 @@ my-plugin/
 ```
 
 <Warning>
-  Never import your own plugin through `openclaw/plugin-sdk/<your-plugin>`
+  Never import your own plugin through `recall/plugin-sdk/<your-plugin>`
   from production code. Route internal imports through `./api.ts` or
   `./runtime-api.ts`. The SDK path is the external contract only.
 </Warning>
 
 Facade-loaded bundled plugin public surfaces (`api.ts`, `runtime-api.ts`,
 `index.ts`, `setup-entry.ts`, and similar public entry files) prefer the
-active runtime config snapshot when OpenClaw is already running. If no runtime
+active runtime config snapshot when Recall is already running. If no runtime
 snapshot exists yet, they fall back to the resolved config file on disk.
-Packaged bundled plugin facades should be loaded through OpenClaw's plugin
+Packaged bundled plugin facades should be loaded through Recall's plugin
 facade loaders; direct imports from `dist/extensions/...` bypass the manifest
 and runtime sidecar checks that packaged installs use for plugin-owned code.
 
@@ -472,15 +472,15 @@ subpath yet. Bundled examples:
 
 - **Anthropic**: public `api.ts` / `contract-api.ts` seam for Claude
   beta-header and `service_tier` stream helpers.
-- **`@openclaw/openai-provider`**: `api.ts` exports provider builders,
+- **`@recall/openai-provider`**: `api.ts` exports provider builders,
   default-model helpers, and realtime provider builders.
-- **`@openclaw/openrouter-provider`**: `api.ts` exports the provider builder
+- **`@recall/openrouter-provider`**: `api.ts` exports the provider builder
   plus onboarding/config helpers.
 
 <Warning>
-  Extension production code should also avoid `openclaw/plugin-sdk/<other-plugin>`
+  Extension production code should also avoid `recall/plugin-sdk/<other-plugin>`
   imports. If a helper is truly shared, promote it to a neutral SDK subpath
-  such as `openclaw/plugin-sdk/speech`, `.../provider-model-shared`, or another
+  such as `recall/plugin-sdk/speech`, `.../provider-model-shared`, or another
   capability-oriented surface instead of coupling two plugins together.
 </Warning>
 

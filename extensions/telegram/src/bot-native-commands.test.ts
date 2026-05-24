@@ -1,5 +1,5 @@
-import type { OpenClawConfig, TelegramAccountConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import type { RecallConfig, TelegramAccountConfig } from "recall/plugin-sdk/config-contracts";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime-env";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createCommandBot,
@@ -26,7 +26,7 @@ type TelegramInlineKeyboardReplyMarkup = {
 };
 type PlugCommandHarnessParams = {
   botHarness?: CommandBotHarness;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   command?: Record<string, unknown>;
   args?: string;
   result?: Record<string, unknown>;
@@ -161,7 +161,7 @@ describe("registerTelegramNativeCommands", () => {
   });
 
   it("scopes skill commands when account binding exists", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       agents: {
         list: [{ id: "main", default: true }, { id: "butler" }],
       },
@@ -182,7 +182,7 @@ describe("registerTelegramNativeCommands", () => {
   });
 
   it("scopes skill commands to default agent without a matching binding (#15599)", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       agents: {
         list: [{ id: "main", default: true }, { id: "butler" }],
       },
@@ -285,7 +285,7 @@ describe("registerTelegramNativeCommands", () => {
   });
 
   it("resolves plugin commands with the Telegram runtime config", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       commands: { native: true },
       channels: {
         telegram: {
@@ -372,7 +372,7 @@ describe("registerTelegramNativeCommands", () => {
 
   it("passes agent-scoped media roots for plugin command replies with media", async () => {
     const mediaMaxBytes = 50 * 1024 * 1024;
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       agents: {
         list: [{ id: "main", default: true }, { id: "work" }],
       },
@@ -395,7 +395,7 @@ describe("registerTelegramNativeCommands", () => {
     const deliverParams = firstDeliverRepliesParams();
     expect(deliverParams.mediaMaxBytes).toBe(mediaMaxBytes);
     const mediaLocalRoots = deliverParams.mediaLocalRoots as Array<string> | undefined;
-    expect(mediaLocalRoots?.some((root) => /[\\/]\.openclaw[\\/]workspace-work$/.test(root))).toBe(
+    expect(mediaLocalRoots?.some((root) => /[\\/]\.recall[\\/]workspace-work$/.test(root))).toBe(
       true,
     );
     expect(sendMessage).not.toHaveBeenCalledWith(123, "Command not found.");

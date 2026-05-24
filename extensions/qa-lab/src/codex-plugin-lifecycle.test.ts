@@ -79,7 +79,7 @@ describe("codex plugin lifecycle: OAuth-only with mixed profiles", () => {
   });
 });
 
-describe("codex plugin lifecycle: pinned-old codex plugin with new OpenClaw", () => {
+describe("codex plugin lifecycle: pinned-old codex plugin with new Recall", () => {
   it("blocks with a precise update remediation when the plugin is older than the host", async () => {
     const agentDir = await createAgentDir("qa-codex-plugin-old-");
     await seedCodexPluginAt("2026.5.19", agentDir);
@@ -93,12 +93,12 @@ describe("codex plugin lifecycle: pinned-old codex plugin with new OpenClaw", ()
 
     expect(result.status).toBe("blocked");
     expect(result.remediation).toBe(
-      'Codex plugin version 2026.5.19 is older than OpenClaw 2026.5.21. Run "openclaw plugins update codex" or unpin codex, then rerun "openclaw doctor --fix".',
+      'Codex plugin version 2026.5.19 is older than Recall 2026.5.21. Run "recall plugins update codex" or unpin codex, then rerun "recall doctor --fix".',
     );
   });
 });
 
-describe("codex plugin lifecycle: pinned-new codex plugin with old OpenClaw", () => {
+describe("codex plugin lifecycle: pinned-new codex plugin with old Recall", () => {
   it("blocks with a precise host-upgrade remediation when the plugin is newer than the host", async () => {
     const agentDir = await createAgentDir("qa-codex-plugin-new-");
     await seedCodexPluginAt("2026.5.22", agentDir);
@@ -112,7 +112,7 @@ describe("codex plugin lifecycle: pinned-new codex plugin with old OpenClaw", ()
 
     expect(result.status).toBe("blocked");
     expect(result.remediation).toBe(
-      "Codex plugin version 2026.5.22 requires a newer OpenClaw host than 2026.5.21. Upgrade OpenClaw or install a codex plugin version pinned to 2026.5.21.",
+      "Codex plugin version 2026.5.22 requires a newer Recall host than 2026.5.21. Upgrade Recall or install a codex plugin version pinned to 2026.5.21.",
     );
   });
 });

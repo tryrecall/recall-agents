@@ -2,7 +2,7 @@ import {
   resolveAckReaction,
   shouldAckReaction as shouldAckReactionGate,
   type AckReactionScope,
-} from "openclaw/plugin-sdk/channel-feedback";
+} from "recall/plugin-sdk/channel-feedback";
 import {
   buildChannelInboundEventContext,
   buildMentionRegexes,
@@ -14,25 +14,25 @@ import {
   resolveEnvelopeFormatOptions,
   resolveUnmentionedGroupInboundPolicy,
   toInboundMediaFacts,
-} from "openclaw/plugin-sdk/channel-inbound";
-import { resolveChannelMessageSourceReplyDeliveryMode } from "openclaw/plugin-sdk/channel-message";
-import { hasControlCommand } from "openclaw/plugin-sdk/command-detection";
-import { isAbortRequestText } from "openclaw/plugin-sdk/command-primitives-runtime";
-import { shouldHandleTextCommands } from "openclaw/plugin-sdk/command-surface";
-import { ensureConfiguredBindingRouteReady } from "openclaw/plugin-sdk/conversation-runtime";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { recordDroppedChannelTurnHistory } from "openclaw/plugin-sdk/inbound-reply-dispatch";
-import { mimeTypeFromFilePath } from "openclaw/plugin-sdk/media-mime";
-import { createChannelHistoryWindow } from "openclaw/plugin-sdk/reply-history";
-import type { FinalizedMsgContext } from "openclaw/plugin-sdk/reply-runtime";
-import { resolveInboundLastRouteSessionKey } from "openclaw/plugin-sdk/routing";
-import { logVerbose, shouldLogVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { resolvePinnedMainDmOwnerFromAllowlist } from "openclaw/plugin-sdk/security-runtime";
+} from "recall/plugin-sdk/channel-inbound";
+import { resolveChannelMessageSourceReplyDeliveryMode } from "recall/plugin-sdk/channel-message";
+import { hasControlCommand } from "recall/plugin-sdk/command-detection";
+import { isAbortRequestText } from "recall/plugin-sdk/command-primitives-runtime";
+import { shouldHandleTextCommands } from "recall/plugin-sdk/command-surface";
+import { ensureConfiguredBindingRouteReady } from "recall/plugin-sdk/conversation-runtime";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
+import { recordDroppedChannelTurnHistory } from "recall/plugin-sdk/inbound-reply-dispatch";
+import { mimeTypeFromFilePath } from "recall/plugin-sdk/media-mime";
+import { createChannelHistoryWindow } from "recall/plugin-sdk/reply-history";
+import type { FinalizedMsgContext } from "recall/plugin-sdk/reply-runtime";
+import { resolveInboundLastRouteSessionKey } from "recall/plugin-sdk/routing";
+import { logVerbose, shouldLogVerbose } from "recall/plugin-sdk/runtime-env";
+import { resolvePinnedMainDmOwnerFromAllowlist } from "recall/plugin-sdk/security-runtime";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
-import { enqueueSystemEvent } from "openclaw/plugin-sdk/system-event-runtime";
+} from "recall/plugin-sdk/string-coerce-runtime";
+import { enqueueSystemEvent } from "recall/plugin-sdk/system-event-runtime";
 import { resolveSlackReplyToMode } from "../../account-reply-mode.js";
 import type { ResolvedSlackAccount } from "../../accounts.js";
 import { reactSlackMessage } from "../../actions.js";

@@ -5,7 +5,7 @@ import { HEARTBEAT_RESPONSE_TOOL_NAME } from "../auto-reply/heartbeat-tool-respo
 import type { InboundEventKind } from "../channels/inbound-event/kind.js";
 import { resolveExecCommandHighlighting } from "../config/exec-command-highlighting.js";
 import type { ModelCompatConfig } from "../config/types.models.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { DiagnosticTraceContext } from "../infra/diagnostic-trace-context.js";
 import { resolveEventSessionRoutingPolicy } from "../infra/event-session-routing.js";
 import { resolveMergedSafeBinProfileFixtures } from "../infra/exec-safe-bin-runtime-policy.js";
@@ -29,8 +29,8 @@ import { shouldSuppressManagedWebSearchTool } from "./codex-native-web-search.js
 import { resolveImageSanitizationLimits } from "./image-sanitization.js";
 import { filterLocalModelLeanTools } from "./local-model-lean.js";
 import type { ModelAuthMode } from "./model-auth.js";
-import { resolveOpenClawPluginToolsForOptions } from "./openclaw-plugin-tools.js";
-import { createOpenClawTools } from "./openclaw-tools.js";
+import { resolveRecallPluginToolsForOptions } from "./recall-plugin-tools.js";
+import { createRecallTools } from "./recall-tools.js";
 import { wrapToolWithAbortSignal } from "./pi-tools.abort.js";
 import {
   type ToolOutcomeObserver,
@@ -49,7 +49,7 @@ import {
   assertRequiredParams,
   createHostWorkspaceEditTool,
   createHostWorkspaceWriteTool,
-  createOpenClawReadTool,
+  createRecallReadTool,
   createSandboxedEditTool,
   createSandboxedReadTool,
   createSandboxedWriteTool,
@@ -231,7 +231,7 @@ export function resolveProcessToolScopeKey(params: {
 function applyModelProviderToolPolicy(
   tools: AnyAgentTool[],
   params?: {
-    config?: OpenClawConfig;
+    config?: RecallConfig;
     modelProvider?: string;
     modelApi?: string;
     modelId?: string;
@@ -292,7 +292,7 @@ function isApplyPatchAllowedForModel(params: {
   });
 }
 
-function resolveExecConfig(params: { cfg?: OpenClawConfig; agentId?: string }) {
+function resolveExecConfig(params: { cfg?: RecallConfig; agentId?: string }) {
   const cfg = params.cfg;
   const globalExec = cfg?.tools?.exec;
   const agentExec =
@@ -336,15 +336,15 @@ export const testing = {
   applyModelProviderToolPolicy,
 } as const;
 
-export type OpenClawCodingToolConstructionPlan = {
+export type RecallCodingToolConstructionPlan = {
   includeBaseCodingTools: boolean;
   includeShellTools: boolean;
   includeChannelTools: boolean;
-  includeOpenClawTools: boolean;
+  includeRecallTools: boolean;
   includePluginTools: boolean;
 };
 
-export function createOpenClawCodingTools(options?: {
+export function createRecallCodingTools(options?: {
   agentId?: string;
   exec?: ExecToolDefaults & ProcessToolDefaults;
   messageProvider?: string;
@@ -380,7 +380,7 @@ export function createOpenClawCodingTools(options?: {
    * Defaults to workspaceDir when not set.
    */
   spawnWorkspaceDir?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   abortSignal?: AbortSignal;
   /** Disable hook-owned diagnostics when an outer runtime owns tool diagnostics. */
   emitBeforeToolCallDiagnostics?: boolean;
@@ -397,7 +397,7 @@ export function createOpenClawCodingTools(options?: {
   modelContextWindowTokens?: number;
   /** Resolved runtime model compatibility hints. */
   modelCompat?: ModelCompatConfig;
-  /** If false, keep OpenClaw web_search even when a provider-native search tool is active. */
+  /** If false, keep Recall web_search even when a provider-native search tool is active. */
   suppressManagedWebSearch?: boolean;
   /**
    * Auth mode for the current provider. We only need this for Anthropic OAuth
@@ -458,7 +458,7 @@ export function createOpenClawCodingTools(options?: {
   /** Runtime-local Tool Search catalog ref shared with PI attempt compaction. */
   toolSearchCatalogRef?: ToolSearchCatalogRef;
   /** Limits which tool families are materialized before the shared policy pipeline runs. */
-  toolConstructionPlan?: OpenClawCodingToolConstructionPlan;
+  toolConstructionPlan?: RecallCodingToolConstructionPlan;
   /** Trusted sender identity bit for command/channel-action auth; does not filter model tools. */
   senderIsOwner?: boolean;
   /** Auth profiles already loaded for this run; used for prompt-time tool availability. */
@@ -638,12 +638,12 @@ export function createOpenClawCodingTools(options?: {
     includeBaseCodingTools: includeCoreTools,
     includeShellTools: includeCoreTools,
     includeChannelTools: includeCoreTools,
-    includeOpenClawTools: includeCoreTools,
+    includeRecallTools: includeCoreTools,
     includePluginTools: true,
   };
   const includeBaseCodingTools = includeCoreTools && toolConstructionPlan.includeBaseCodingTools;
   const includeShellTools = includeCoreTools && toolConstructionPlan.includeShellTools;
-  const includeOpenClawTools = includeCoreTools && toolConstructionPlan.includeOpenClawTools;
+  const includeRecallTools = includeCoreTools && toolConstructionPlan.includeRecallTools;
   const includeChannelTools = toolConstructionPlan.includeChannelTools;
   const includePluginTools = toolConstructionPlan.includePluginTools;
   const workspaceOnly = fsPolicy.workspaceOnly;
@@ -689,7 +689,7 @@ export function createOpenClawCodingTools(options?: {
           continue;
         }
         const freshReadTool = createReadTool(workspaceRoot);
-        const wrapped = createOpenClawReadTool(freshReadTool, {
+        const wrapped = createRecallReadTool(freshReadTool, {
           modelContextWindowTokens: options?.modelContextWindowTokens,
           imageSanitization,
         });
@@ -840,9 +840,9 @@ export function createOpenClawCodingTools(options?: {
     options?.runtimeToolAllowlist ? { allow: options.runtimeToolAllowlist } : undefined,
   ].some(hasRestrictiveAllowPolicy);
   const pluginToolsOnly =
-    includeOpenClawTools || !includePluginTools
+    includeRecallTools || !includePluginTools
       ? []
-      : resolveOpenClawPluginToolsForOptions({
+      : resolveRecallPluginToolsForOptions({
           options: {
             agentSessionKey: options?.sessionKey,
             agentChannel: resolveGatewayMessageChannel(options?.messageProvider),
@@ -918,8 +918,8 @@ export function createOpenClawCodingTools(options?: {
     ...(processTool ? [processTool as unknown as AnyAgentTool] : []),
     // Channel docking: include channel-defined agent tools (login, etc.).
     ...(includeChannelTools ? listChannelAgentTools({ cfg: options?.config }) : []),
-    ...(includeOpenClawTools
-      ? createOpenClawTools({
+    ...(includeRecallTools
+      ? createRecallTools({
           sandboxBrowserBridgeUrl: sandbox?.browser?.bridgeUrl,
           allowHostBrowserControl: sandbox ? sandbox.browserAllowHostControl : true,
           agentSessionKey: options?.sessionKey,
@@ -977,7 +977,7 @@ export function createOpenClawCodingTools(options?: {
       : pluginToolsOnly),
     ...toolSearchTools,
   ];
-  options?.recordToolPrepStage?.("openclaw-tools");
+  options?.recordToolPrepStage?.("recall-tools");
   const toolsForMemoryFlush: AnyAgentTool[] = isMemoryFlushRun && memoryFlushWritePath ? [] : tools;
   if (isMemoryFlushRun && memoryFlushWritePath) {
     for (const tool of tools) {

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { resolveOpenClawToolsForMcp } from "./openclaw-tools-serve.js";
+import { resolveRecallToolsForMcp } from "./recall-tools-serve.js";
 import { createPluginToolsMcpHandlers } from "./plugin-tools-handlers.js";
 
-describe("OpenClaw tools MCP server", () => {
+describe("Recall tools MCP server", () => {
   it("exposes cron", async () => {
-    const handlers = createPluginToolsMcpHandlers(resolveOpenClawToolsForMcp());
+    const handlers = createPluginToolsMcpHandlers(resolveRecallToolsForMcp());
 
     const listed = await handlers.listTools();
     expect(listed.tools.map((tool) => tool.name)).toContain("cron");

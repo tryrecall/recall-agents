@@ -6,17 +6,17 @@ import { PROTOCOL_VERSION } from "../../../../dist/gateway/protocol/index.js";
 import { renderBitmapTextPngBase64 } from "../../../../test/helpers/live-image-probe.ts";
 
 const port = process.env.PORT;
-const token = process.env.OPENCLAW_GATEWAY_TOKEN;
+const token = process.env.RECALL_GATEWAY_TOKEN;
 const appServerLog =
-  process.env.OPENCLAW_CODEX_MEDIA_PATH_APP_SERVER_LOG ??
-  "/tmp/openclaw-codex-media-path-app-server.jsonl";
+  process.env.RECALL_CODEX_MEDIA_PATH_APP_SERVER_LOG ??
+  "/tmp/recall-codex-media-path-app-server.jsonl";
 const timeoutSeconds = Number.parseInt(
-  process.env.OPENCLAW_CODEX_MEDIA_PATH_TIMEOUT_SECONDS ?? "180",
+  process.env.RECALL_CODEX_MEDIA_PATH_TIMEOUT_SECONDS ?? "180",
   10,
 );
 
 if (!port || !token) {
-  throw new Error("missing PORT/OPENCLAW_GATEWAY_TOKEN");
+  throw new Error("missing PORT/RECALL_GATEWAY_TOKEN");
 }
 
 function assert(condition, message) {

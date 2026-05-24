@@ -1,16 +1,16 @@
 {
-  "name": "@openclaw/kimi-provider",
+  "name": "@recall/kimi-provider",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw Kimi provider plugin",
+  "description": "Recall Kimi provider plugin",
   "type": "module",
   "dependencies": {
     "@earendil-works/pi-ai": "0.75.4"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

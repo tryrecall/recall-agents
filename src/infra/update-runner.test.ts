@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { bundledDistPluginFile } from "openclaw/plugin-sdk/test-fixtures";
+import { bundledDistPluginFile } from "recall/plugin-sdk/test-fixtures";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { BUNDLED_RUNTIME_SIDECAR_PATHS } from "../plugins/runtime-sidecar-paths.js";
 import { createSuiteTempRootTracker } from "../test-helpers/temp-dir.js";
@@ -14,7 +14,7 @@ import { runGatewayUpdate } from "./update-runner.js";
 type CommandResponse = { stdout?: string; stderr?: string; code?: number | null };
 type CommandResult = { stdout: string; stderr: string; code: number | null };
 const TELEGRAM_RUNTIME_API = bundledDistPluginFile("telegram", "runtime-api.js");
-const fixtureRootTracker = createSuiteTempRootTracker({ prefix: "openclaw-update-" });
+const fixtureRootTracker = createSuiteTempRootTracker({ prefix: "recall-update-" });
 
 function toCommandResult(response?: CommandResponse): CommandResult {
   return {
@@ -35,7 +35,7 @@ function createRunner(responses: Record<string, CommandResponse>) {
 }
 
 describe("runGatewayUpdate", () => {
-  const preflightPrefixPattern = /(?:openclaw-update-preflight-|ocu-pf-)/;
+  const preflightPrefixPattern = /(?:recall-update-preflight-|ocu-pf-)/;
 
   let tempDir: string;
 
@@ -49,7 +49,7 @@ describe("runGatewayUpdate", () => {
 
   beforeEach(async () => {
     tempDir = await fixtureRootTracker.make("case");
-    await fs.writeFile(path.join(tempDir, "openclaw.mjs"), "export {};\n", "utf-8");
+    await fs.writeFile(path.join(tempDir, "recall.mjs"), "export {};\n", "utf-8");
   });
 
   afterEach(async () => {
@@ -65,7 +65,7 @@ describe("runGatewayUpdate", () => {
     const calls: string[] = [];
     let uiBuildCount = 0;
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorKey = `${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`;
+    const doctorKey = `${doctorNodePath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive --fix`;
 
     const runCommand = async (argv: string[]) => {
       const key = argv.join(" ");
@@ -117,7 +117,7 @@ describe("runGatewayUpdate", () => {
 
   async function setupGitCheckout(options?: { packageManager?: string }) {
     await fs.mkdir(path.join(tempDir, ".git"));
-    const pkg: Record<string, string> = { name: "openclaw", version: "1.0.0" };
+    const pkg: Record<string, string> = { name: "recall", version: "1.0.0" };
     if (options?.packageManager) {
       pkg.packageManager = options.packageManager;
     }
@@ -245,7 +245,7 @@ describe("runGatewayUpdate", () => {
     await fs.mkdir(pkgRoot, { recursive: true });
     await fs.writeFile(
       path.join(pkgRoot, "package.json"),
-      JSON.stringify({ name: "openclaw", version }),
+      JSON.stringify({ name: "recall", version }),
       "utf-8",
     );
     await writeBundledRuntimeSidecars(pkgRoot);
@@ -256,7 +256,7 @@ describe("runGatewayUpdate", () => {
     await fs.mkdir(pkgRoot, { recursive: true });
     await fs.writeFile(
       path.join(pkgRoot, "package.json"),
-      JSON.stringify({ name: "openclaw", version }),
+      JSON.stringify({ name: "recall", version }),
       "utf-8",
     );
     await writeBundledRuntimeSidecars(pkgRoot);
@@ -281,7 +281,7 @@ describe("runGatewayUpdate", () => {
 
   async function createGlobalPackageFixture(rootDir: string) {
     const nodeModules = path.join(rootDir, "node_modules");
-    const pkgRoot = path.join(nodeModules, "openclaw");
+    const pkgRoot = path.join(nodeModules, "recall");
     await seedGlobalPackageRoot(pkgRoot);
     return { nodeModules, pkgRoot };
   }
@@ -318,8 +318,8 @@ describe("runGatewayUpdate", () => {
     onBaseInstall?: () => Promise<CommandResult>;
     onOmitOptionalInstall?: () => Promise<CommandResult>;
   }) {
-    const baseInstallKey = npmGlobalInstallCommand("openclaw@latest");
-    const omitOptionalInstallKey = npmGlobalInstallCommand("openclaw@latest", ["--omit=optional"]);
+    const baseInstallKey = npmGlobalInstallCommand("recall@latest");
+    const omitOptionalInstallKey = npmGlobalInstallCommand("recall@latest", ["--omit=optional"]);
 
     return async (argv: string[]): Promise<CommandResult> => {
       const key = normalizeNpmFreshnessArgs(argv).join(" ");
@@ -458,7 +458,7 @@ describe("runGatewayUpdate", () => {
       installCommand: "pnpm install",
       buildCommand: "pnpm build",
       uiBuildCommand: "pnpm ui:build",
-      doctorCommand: `${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`,
+      doctorCommand: `${doctorNodePath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive --fix`,
       onCommand: (key, options) => {
         if (key === "pnpm install") {
           installEnvs.push(options?.env ?? {});
@@ -484,7 +484,7 @@ describe("runGatewayUpdate", () => {
     const stableTag = "v1.0.1-1";
     let doctorEnv: NodeJS.ProcessEnv | undefined;
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive --fix`;
     const { runCommand } = createGitInstallRunner({
       stableTag,
       installCommand: "pnpm install",
@@ -505,9 +505,9 @@ describe("runGatewayUpdate", () => {
     });
 
     expect(result.status).toBe("ok");
-    expect(doctorEnv?.OPENCLAW_UPDATE_IN_PROGRESS).toBe("1");
-    expect(doctorEnv?.OPENCLAW_UPDATE_DEFER_CONFIGURED_PLUGIN_INSTALL_REPAIR).toBe("1");
-    expect(doctorEnv?.OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE).toBe("1");
+    expect(doctorEnv?.RECALL_UPDATE_IN_PROGRESS).toBe("1");
+    expect(doctorEnv?.RECALL_UPDATE_DEFER_CONFIGURED_PLUGIN_INSTALL_REPAIR).toBe("1");
+    expect(doctorEnv?.RECALL_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE).toBe("1");
   });
 
   it("uses pnpm highest resolution mode for dev preflight installs", async () => {
@@ -515,7 +515,7 @@ describe("runGatewayUpdate", () => {
     const upstreamSha = "upstream123";
     const installEnvs: NodeJS.ProcessEnv[] = [];
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive --fix`;
 
     const runCommand = async (
       argv: string[],
@@ -634,7 +634,7 @@ describe("runGatewayUpdate", () => {
       "pnpm install": { stdout: "" },
       "pnpm build": { stdout: "" },
       "pnpm ui:build": { stdout: "" },
-      [`${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`]: {
+      [`${doctorNodePath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive --fix`]: {
         stdout: "",
       },
     });
@@ -654,11 +654,11 @@ describe("runGatewayUpdate", () => {
       installCommand: "pnpm install",
       buildCommand: "pnpm build",
       uiBuildCommand: "pnpm ui:build",
-      doctorCommand: `${process.execPath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive`,
+      doctorCommand: `${process.execPath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive`,
       onCommand: (key, options) => {
         if (key === "pnpm --version") {
           const envPath = options?.env?.PATH ?? options?.env?.Path ?? "";
-          if (envPath.includes("openclaw-update-pnpm-")) {
+          if (envPath.includes("recall-update-pnpm-")) {
             return { stdout: "11.0.0" };
           }
           throw new Error("spawn pnpm ENOENT");
@@ -696,7 +696,7 @@ describe("runGatewayUpdate", () => {
       installCommand: "pnpm install",
       buildCommand: "pnpm build",
       uiBuildCommand: "pnpm ui:build",
-      doctorCommand: `${process.execPath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive`,
+      doctorCommand: `${process.execPath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive`,
       onCommand: (key) => {
         if (key === "pnpm --version") {
           pnpmVersionChecks += 1;
@@ -734,7 +734,7 @@ describe("runGatewayUpdate", () => {
     const pnpmEnvPaths: string[] = [];
     const upstreamSha = "upstream123";
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive --fix`;
 
     const runCommand = async (
       argv: string[],
@@ -769,7 +769,7 @@ describe("runGatewayUpdate", () => {
       }
       if (key === "pnpm --version") {
         const envPath = options?.env?.PATH ?? options?.env?.Path ?? "";
-        if (envPath.includes("openclaw-update-pnpm-")) {
+        if (envPath.includes("recall-update-pnpm-")) {
           pnpmEnvPaths.push(envPath);
           return { stdout: "11.0.0", stderr: "", code: 0 };
         }
@@ -838,7 +838,7 @@ describe("runGatewayUpdate", () => {
     expect(calls).toContain("pnpm build");
     expect(calls).not.toContain("pnpm lint");
     expect(calls).toContain("pnpm ui:build");
-    expect(pnpmEnvPaths.filter((envPath) => envPath.includes("openclaw-update-pnpm-"))).not.toEqual(
+    expect(pnpmEnvPaths.filter((envPath) => envPath.includes("recall-update-pnpm-"))).not.toEqual(
       [],
     );
   });
@@ -849,7 +849,7 @@ describe("runGatewayUpdate", () => {
     const lintEnv: NodeJS.ProcessEnv[] = [];
     const upstreamSha = "upstream123";
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive --fix`;
 
     const runCommand = async (
       argv: string[],
@@ -925,16 +925,16 @@ describe("runGatewayUpdate", () => {
       return { stdout: "", stderr: "", code: 0 };
     };
 
-    const result = await withEnvAsync({ OPENCLAW_UPDATE_PREFLIGHT_LINT: "1" }, async () =>
+    const result = await withEnvAsync({ RECALL_UPDATE_PREFLIGHT_LINT: "1" }, async () =>
       runWithCommand(runCommand, { channel: "dev" }),
     );
 
     expect(result.status).toBe("ok");
     expect(calls).toContain("pnpm lint");
     expect(lintEnv).toHaveLength(1);
-    expect(lintEnv[0]?.OPENCLAW_LOCAL_CHECK).toBe("1");
-    expect(lintEnv[0]?.OPENCLAW_LOCAL_CHECK_MODE).toBe("throttled");
-    expect(lintEnv[0]?.OPENCLAW_OXLINT_SHARDS_SERIAL).toBe("1");
+    expect(lintEnv[0]?.RECALL_LOCAL_CHECK).toBe("1");
+    expect(lintEnv[0]?.RECALL_LOCAL_CHECK_MODE).toBe("throttled");
+    expect(lintEnv[0]?.RECALL_OXLINT_SHARDS_SERIAL).toBe("1");
   });
 
   it("retries windows pnpm git installs with --ignore-scripts for dev updates", async () => {
@@ -942,7 +942,7 @@ describe("runGatewayUpdate", () => {
     const calls: string[] = [];
     const upstreamSha = "upstream123";
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive --fix`;
     let preflightInstallAttempts = 0;
     let preflightIgnoreScriptsAttempts = 0;
     let finalInstallAttempts = 0;
@@ -998,7 +998,7 @@ describe("runGatewayUpdate", () => {
           return { stdout: "", stderr: "", code: 0 };
         }
         if (key === "pnpm install") {
-          if (options?.cwd && /(?:openclaw-update-preflight-|ocu-pf-)/.test(options.cwd)) {
+          if (options?.cwd && /(?:recall-update-preflight-|ocu-pf-)/.test(options.cwd)) {
             preflightInstallAttempts += 1;
             return preflightInstallAttempts === 1
               ? { stdout: "", stderr: "sharp: Please add node-gyp to your dependencies", code: 1 }
@@ -1012,7 +1012,7 @@ describe("runGatewayUpdate", () => {
           }
         }
         if (key === "pnpm install --ignore-scripts") {
-          if (options?.cwd && /(?:openclaw-update-preflight-|ocu-pf-)/.test(options.cwd)) {
+          if (options?.cwd && /(?:recall-update-preflight-|ocu-pf-)/.test(options.cwd)) {
             preflightIgnoreScriptsAttempts += 1;
           }
           return { stdout: "", stderr: "", code: 0 };
@@ -1059,7 +1059,7 @@ describe("runGatewayUpdate", () => {
     const cleanupTimeouts: Array<number | undefined> = [];
     const upstreamSha = "upstream123";
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive --fix`;
 
     await withMockedWindowsPlatform(async () => {
       const runCommand = async (
@@ -1158,7 +1158,7 @@ describe("runGatewayUpdate", () => {
     const cleanupTimeouts: Array<number | undefined> = [];
     const upstreamSha = "upstream123";
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive --fix`;
 
     const runCommand = async (
       argv: string[],
@@ -1252,7 +1252,7 @@ describe("runGatewayUpdate", () => {
     const upstreamSha = "upstream123";
     const buildNodeOptions: string[] = [];
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive --fix`;
 
     const runCommand = async (
       argv: string[],
@@ -1342,7 +1342,7 @@ describe("runGatewayUpdate", () => {
     const calls: string[] = [];
     const targetSha = "f2fdb9d1253ce3f227ccaa6cb0e3b664a32be4ee";
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive --fix`;
 
     const runCommand = async (
       argv: string[],
@@ -1422,7 +1422,7 @@ describe("runGatewayUpdate", () => {
     const calls: string[] = [];
     const targetSha = "2222222222222222222222222222222222222222";
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "openclaw.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "recall.mjs")} doctor --non-interactive --fix`;
 
     const runCommand = async (
       argv: string[],
@@ -1505,7 +1505,7 @@ describe("runGatewayUpdate", () => {
     const targetSha = "3333333333333333333333333333333333333333";
     const gitRoot = await fs.realpath(tempDir).catch(() => tempDir);
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(gitRoot, "openclaw.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(gitRoot, "recall.mjs")} doctor --non-interactive --fix`;
 
     const runCommand = async (
       argv: string[],
@@ -1643,7 +1643,7 @@ describe("runGatewayUpdate", () => {
   it("skips update when no git root", async () => {
     await fs.writeFile(
       path.join(tempDir, "package.json"),
-      JSON.stringify({ name: "openclaw", packageManager: "pnpm@8.0.0" }),
+      JSON.stringify({ name: "recall", packageManager: "pnpm@8.0.0" }),
       "utf-8",
     );
     await fs.writeFile(path.join(tempDir, "pnpm-lock.yaml"), "", "utf-8");
@@ -1669,7 +1669,7 @@ describe("runGatewayUpdate", () => {
     tag?: string;
   }): Promise<{ calls: string[]; result: Awaited<ReturnType<typeof runGatewayUpdate>> }> {
     const nodeModules = path.join(tempDir, "node_modules");
-    const pkgRoot = path.join(nodeModules, "openclaw");
+    const pkgRoot = path.join(nodeModules, "recall");
     await seedGlobalPackageRoot(pkgRoot);
 
     const { calls, runCommand } = createGlobalInstallHarness({
@@ -1679,7 +1679,7 @@ describe("runGatewayUpdate", () => {
       onInstall: async () => {
         await fs.writeFile(
           path.join(pkgRoot, "package.json"),
-          JSON.stringify({ name: "openclaw", version: "2.0.0" }),
+          JSON.stringify({ name: "recall", version: "2.0.0" }),
           "utf-8",
         );
       },
@@ -1733,9 +1733,9 @@ describe("runGatewayUpdate", () => {
         if (!destination) {
           return { stdout: "", stderr: "missing pack destination", code: 1 };
         }
-        await fs.writeFile(path.join(destination, "openclaw-2.0.0.tgz"), "packed\n", "utf-8");
+        await fs.writeFile(path.join(destination, "recall-2.0.0.tgz"), "packed\n", "utf-8");
         return {
-          stdout: JSON.stringify([{ filename: "openclaw-2.0.0.tgz" }]),
+          stdout: JSON.stringify([{ filename: "recall-2.0.0.tgz" }]),
           stderr: "",
           code: 0,
         };
@@ -1754,8 +1754,8 @@ describe("runGatewayUpdate", () => {
         if (installCommandMatches(params.installCommand, normalizedInstallCommand)) {
           const packageRoot =
             process.platform === "win32"
-              ? path.join(installPrefix, "node_modules", "openclaw")
-              : path.join(installPrefix, "lib", "node_modules", "openclaw");
+              ? path.join(installPrefix, "node_modules", "recall")
+              : path.join(installPrefix, "lib", "node_modules", "recall");
           await params.onInstall?.({
             ...options,
             installPrefix,
@@ -1772,16 +1772,16 @@ describe("runGatewayUpdate", () => {
   it.each([
     {
       title: "updates global npm installs when detected",
-      expectedInstallCommand: npmGlobalInstallCommand("openclaw@latest"),
+      expectedInstallCommand: npmGlobalInstallCommand("recall@latest"),
     },
     {
       title: "uses update channel for global npm installs when tag is omitted",
-      expectedInstallCommand: npmGlobalInstallCommand("openclaw@beta"),
+      expectedInstallCommand: npmGlobalInstallCommand("recall@beta"),
       channel: "beta" as const,
     },
     {
       title: "updates global npm installs with tag override",
-      expectedInstallCommand: npmGlobalInstallCommand("openclaw@beta"),
+      expectedInstallCommand: npmGlobalInstallCommand("recall@beta"),
       tag: "beta",
     },
   ])("$title", async ({ expectedInstallCommand, channel, tag }) => {
@@ -1799,13 +1799,13 @@ describe("runGatewayUpdate", () => {
   });
 
   it("updates global npm installs from the GitHub main package spec", async () => {
-    const sourceSpec = "github:openclaw/openclaw#main";
+    const sourceSpec = "github:tryrecall/recall-agents#main";
     const { calls, result } = await runNpmGlobalUpdateCase({
       expectedInstallCommand: (argv) =>
         argv[0] === "npm" &&
         argv[1] === "i" &&
         argv[2] === "-g" &&
-        path.basename(argv[3] ?? "") === "openclaw-2.0.0.tgz" &&
+        path.basename(argv[3] ?? "") === "recall-2.0.0.tgz" &&
         argv.slice(4).join(" ") === "--no-fund --no-audit --loglevel=error --min-release-age=0",
       tag: "main",
     });
@@ -1816,21 +1816,21 @@ describe("runGatewayUpdate", () => {
     expect(
       calls.some((call) => call.startsWith(`npm pack ${sourceSpec} --pack-destination `)),
     ).toBe(true);
-    const installCall = calls.find((call) => call.includes("openclaw-2.0.0.tgz"));
+    const installCall = calls.find((call) => call.includes("recall-2.0.0.tgz"));
     expect(installCall).toContain("--no-fund --no-audit --loglevel=error --min-release-age=0");
     expect(installCall).not.toContain(sourceSpec);
   });
 
   it("runs doctor after global npm updates before reporting success", async () => {
     const nodeModules = path.join(tempDir, "node_modules");
-    const pkgRoot = path.join(nodeModules, "openclaw");
+    const pkgRoot = path.join(nodeModules, "recall");
     await seedGlobalPackageRoot(pkgRoot);
 
     let doctorEnv: NodeJS.ProcessEnv | undefined;
     const { calls, runCommand } = createGlobalInstallHarness({
       pkgRoot,
       npmRootOutput: nodeModules,
-      installCommand: npmGlobalInstallCommand("openclaw@latest"),
+      installCommand: npmGlobalInstallCommand("recall@latest"),
       onInstall: async () => {
         await writeGlobalPackageVersion(pkgRoot);
         await writeGatewayEntrypoint(pkgRoot);
@@ -1856,21 +1856,21 @@ describe("runGatewayUpdate", () => {
 
     expect(result.status).toBe("ok");
     expect(calls).toContain(doctorCommand);
-    expect(result.steps.map((step) => step.name)).toContain("openclaw doctor");
-    expect(doctorEnv?.OPENCLAW_UPDATE_IN_PROGRESS).toBe("1");
-    expect(doctorEnv?.OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE).toBe("1");
-    expect(doctorEnv?.OPENCLAW_COMPATIBILITY_HOST_VERSION).toBe("2.0.0");
+    expect(result.steps.map((step) => step.name)).toContain("recall doctor");
+    expect(doctorEnv?.RECALL_UPDATE_IN_PROGRESS).toBe("1");
+    expect(doctorEnv?.RECALL_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE).toBe("1");
+    expect(doctorEnv?.RECALL_COMPATIBILITY_HOST_VERSION).toBe("2.0.0");
   });
 
   it("fails global npm updates when post-update doctor fails", async () => {
     const nodeModules = path.join(tempDir, "node_modules");
-    const pkgRoot = path.join(nodeModules, "openclaw");
+    const pkgRoot = path.join(nodeModules, "recall");
     await seedGlobalPackageRoot(pkgRoot);
 
     const { calls, runCommand } = createGlobalInstallHarness({
       pkgRoot,
       npmRootOutput: nodeModules,
-      installCommand: npmGlobalInstallCommand("openclaw@latest"),
+      installCommand: npmGlobalInstallCommand("recall@latest"),
       onInstall: async () => {
         await writeGlobalPackageVersion(pkgRoot);
         await writeGatewayEntrypoint(pkgRoot);
@@ -1897,7 +1897,7 @@ describe("runGatewayUpdate", () => {
     expect(result.reason).toBe("doctor-failed");
     expect(calls).toContain(doctorCommand);
     const lastStep = result.steps.at(-1);
-    expect(lastStep?.name).toBe("openclaw doctor");
+    expect(lastStep?.name).toBe("recall doctor");
     expect(lastStep?.exitCode).toBe(1);
     expect(lastStep?.stderrTail).toBe("doctor refused migration");
   });
@@ -1907,7 +1907,7 @@ describe("runGatewayUpdate", () => {
     const { calls, runCommand } = createGlobalInstallHarness({
       pkgRoot,
       npmRootOutput: nodeModules,
-      installCommand: npmGlobalInstallCommand("openclaw@latest"),
+      installCommand: npmGlobalInstallCommand("recall@latest"),
       gitRootMode: "missing",
       onInstall: async () => writeGlobalPackageVersion(pkgRoot),
     });
@@ -1916,13 +1916,13 @@ describe("runGatewayUpdate", () => {
 
     expect(result.status).toBe("ok");
     expect(result.mode).toBe("npm");
-    expect(calls).toContain(npmGlobalInstallCommand("openclaw@latest"));
+    expect(calls).toContain(npmGlobalInstallCommand("recall@latest"));
   });
 
   it("cleans stale npm rename dirs before global update", async () => {
     const nodeModules = path.join(tempDir, "node_modules");
-    const pkgRoot = path.join(nodeModules, "openclaw");
-    const staleDir = path.join(nodeModules, ".openclaw-stale");
+    const pkgRoot = path.join(nodeModules, "recall");
+    const staleDir = path.join(nodeModules, ".recall-stale");
     await fs.mkdir(staleDir, { recursive: true });
     await seedGlobalPackageRoot(pkgRoot);
 
@@ -1945,7 +1945,7 @@ describe("runGatewayUpdate", () => {
 
   it("retries global npm update with --omit=optional when initial install fails", async () => {
     const nodeModules = path.join(tempDir, "node_modules");
-    const pkgRoot = path.join(nodeModules, "openclaw");
+    const pkgRoot = path.join(nodeModules, "recall");
     await seedGlobalPackageRoot(pkgRoot);
 
     let firstAttempt = true;
@@ -1975,7 +1975,7 @@ describe("runGatewayUpdate", () => {
 
   it("fails global npm update when the installed version misses the requested correction", async () => {
     const { calls, result } = await runNpmGlobalUpdateCase({
-      expectedInstallCommand: npmGlobalInstallCommand("openclaw@2026.3.23-2"),
+      expectedInstallCommand: npmGlobalInstallCommand("recall@2026.3.23-2"),
       tag: "2026.3.23-2",
     });
 
@@ -1985,12 +1985,12 @@ describe("runGatewayUpdate", () => {
     expect(result.steps.at(-1)?.stderrTail).toContain(
       "expected installed version 2026.3.23-2, found 2.0.0",
     );
-    expect(calls).toContain(npmGlobalInstallCommand("openclaw@2026.3.23-2"));
+    expect(calls).toContain(npmGlobalInstallCommand("recall@2026.3.23-2"));
   });
 
   it("fails global npm update when bundled runtime sidecars are missing after install", async () => {
     const { nodeModules, pkgRoot } = await createGlobalPackageFixture(tempDir);
-    const expectedInstallCommand = npmGlobalInstallCommand("openclaw@latest");
+    const expectedInstallCommand = npmGlobalInstallCommand("recall@latest");
     const { runCommand } = createGlobalInstallHarness({
       pkgRoot,
       npmRootOutput: nodeModules,
@@ -1998,7 +1998,7 @@ describe("runGatewayUpdate", () => {
       onInstall: async () => {
         await fs.writeFile(
           path.join(pkgRoot, "package.json"),
-          JSON.stringify({ name: "openclaw", version: "2.0.0" }),
+          JSON.stringify({ name: "recall", version: "2.0.0" }),
           "utf-8",
         );
         await writeBundledRuntimeSidecars(pkgRoot);
@@ -2023,7 +2023,7 @@ describe("runGatewayUpdate", () => {
     const localAppData = path.join(tempDir, "local-app-data");
     const portableGitMingw = path.join(
       localAppData,
-      "OpenClaw",
+      "Recall",
       "deps",
       "portable-git",
       "mingw64",
@@ -2031,7 +2031,7 @@ describe("runGatewayUpdate", () => {
     );
     const portableGitUsr = path.join(
       localAppData,
-      "OpenClaw",
+      "Recall",
       "deps",
       "portable-git",
       "usr",
@@ -2045,7 +2045,7 @@ describe("runGatewayUpdate", () => {
     const { runCommand } = createGlobalInstallHarness({
       pkgRoot,
       npmRootOutput: nodeModules,
-      installCommand: npmGlobalInstallCommand("openclaw@latest"),
+      installCommand: npmGlobalInstallCommand("recall@latest"),
       onInstall: async (options) => {
         installEnv = options?.env;
         await writeGlobalPackageVersion(options?.packageRoot ?? pkgRoot);
@@ -2071,20 +2071,20 @@ describe("runGatewayUpdate", () => {
   it("reports staged npm swap failures as global install failures", async () => {
     const prefix = path.join(tempDir, "npm-prefix");
     const nodeModules = path.join(prefix, "lib", "node_modules");
-    const pkgRoot = path.join(nodeModules, "openclaw");
+    const pkgRoot = path.join(nodeModules, "recall");
     await seedGlobalPackageRoot(pkgRoot);
     await fs.writeFile(path.join(prefix, "bin"), "not a directory", "utf-8");
 
     const { runCommand } = createGlobalInstallHarness({
       pkgRoot,
       npmRootOutput: nodeModules,
-      installCommand: npmGlobalInstallCommand("openclaw@latest"),
+      installCommand: npmGlobalInstallCommand("recall@latest"),
       onInstall: async (options) => {
         await writeGlobalPackageVersion(options?.packageRoot ?? pkgRoot);
         if (options?.installPrefix) {
           const binDir = path.join(options.installPrefix, "bin");
           await fs.mkdir(binDir, { recursive: true });
-          await fs.writeFile(path.join(binDir, "openclaw"), "#!/bin/sh\n", "utf-8");
+          await fs.writeFile(path.join(binDir, "recall"), "#!/bin/sh\n", "utf-8");
         }
       },
     });
@@ -2104,7 +2104,7 @@ describe("runGatewayUpdate", () => {
   it("uses clean staged npm swaps for pnpm installs that resolve to an npm global root", async () => {
     const prefix = path.join(tempDir, "npm-prefix");
     const nodeModules = path.join(prefix, "lib", "node_modules");
-    const pkgRoot = path.join(nodeModules, "openclaw");
+    const pkgRoot = path.join(nodeModules, "recall");
     const staleInstallChunk = path.join(pkgRoot, "dist", "install-C_GuuNz6.js");
     await seedGlobalPackageRoot(pkgRoot);
     await fs.writeFile(
@@ -2116,7 +2116,7 @@ describe("runGatewayUpdate", () => {
     const { calls, runCommand } = createGlobalInstallHarness({
       pkgRoot,
       pnpmRootOutput: nodeModules,
-      installCommand: npmGlobalInstallCommand("openclaw@latest"),
+      installCommand: npmGlobalInstallCommand("recall@latest"),
       onInstall: async (options) => {
         await writeGlobalPackageVersion(options?.packageRoot ?? pkgRoot);
       },
@@ -2137,10 +2137,10 @@ describe("runGatewayUpdate", () => {
     await expect(fs.access(staleInstallChunk)).rejects.toHaveProperty("code", "ENOENT");
   });
 
-  it("uses OPENCLAW_UPDATE_PACKAGE_SPEC for global package updates", async () => {
+  it("uses RECALL_UPDATE_PACKAGE_SPEC for global package updates", async () => {
     const { nodeModules, pkgRoot } = await createGlobalPackageFixture(tempDir);
     const expectedInstallCommand = npmGlobalInstallCommand(
-      "http://10.211.55.2:8138/openclaw-next.tgz",
+      "http://10.211.55.2:8138/recall-next.tgz",
     );
     const { calls, runCommand } = createGlobalInstallHarness({
       pkgRoot,
@@ -2150,7 +2150,7 @@ describe("runGatewayUpdate", () => {
     });
 
     await withEnvAsync(
-      { OPENCLAW_UPDATE_PACKAGE_SPEC: "http://10.211.55.2:8138/openclaw-next.tgz" },
+      { RECALL_UPDATE_PACKAGE_SPEC: "http://10.211.55.2:8138/recall-next.tgz" },
       async () => {
         const result = await runWithCommand(runCommand, { cwd: pkgRoot });
         expect(result.status).toBe("ok");
@@ -2169,7 +2169,7 @@ describe("runGatewayUpdate", () => {
 
       const { calls, runCommand } = createGlobalInstallHarness({
         pkgRoot,
-        installCommand: "bun add -g openclaw@latest",
+        installCommand: "bun add -g recall@latest",
         onInstall: async () => {
           await writeGlobalPackageVersion(pkgRoot);
         },
@@ -2181,11 +2181,11 @@ describe("runGatewayUpdate", () => {
       expect(result.mode).toBe("bun");
       expect(result.before?.version).toBe("1.0.0");
       expect(result.after?.version).toBe("2.0.0");
-      expect(calls).toContain("bun add -g openclaw@latest");
+      expect(calls).toContain("bun add -g recall@latest");
     });
   });
 
-  it("rejects git roots that are not a openclaw checkout", async () => {
+  it("rejects git roots that are not a recall checkout", async () => {
     await fs.mkdir(path.join(tempDir, ".git"));
     const cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(tempDir);
     const { runner, calls } = createRunner({
@@ -2197,13 +2197,13 @@ describe("runGatewayUpdate", () => {
     cwdSpy.mockRestore();
 
     expect(result.status).toBe("error");
-    expect(result.reason).toBe("not-openclaw-root");
+    expect(result.reason).toBe("not-recall-root");
     expect(calls.filter((call) => call.includes("status --porcelain"))).toEqual([]);
   });
 
-  it("fails with a clear reason when openclaw.mjs is missing", async () => {
+  it("fails with a clear reason when recall.mjs is missing", async () => {
     await setupGitCheckout({ packageManager: "pnpm@8.0.0" });
-    await fs.rm(path.join(tempDir, "openclaw.mjs"), { force: true });
+    await fs.rm(path.join(tempDir, "recall.mjs"), { force: true });
 
     const stableTag = "v1.0.1-1";
     const { runner } = createRunner({
@@ -2217,7 +2217,7 @@ describe("runGatewayUpdate", () => {
 
     expect(result.status).toBe("error");
     expect(result.reason).toBe("doctor-entry-missing");
-    expect(result.steps.some((step) => step.name === "openclaw doctor entry")).toBe(true);
+    expect(result.steps.some((step) => step.name === "recall doctor entry")).toBe(true);
     expect(result.steps.at(-1)?.name).toMatch(/^git rollback/);
   });
 

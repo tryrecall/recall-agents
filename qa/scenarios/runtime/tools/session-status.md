@@ -27,14 +27,14 @@ execution:
     toolCoverage:
       family: session_status
       actualTool: session_status
-      bucket: openclaw-dynamic-integration
-      expectedLayer: openclaw-dynamic
-      capabilityLayer: openclaw-dynamic-direct
+      bucket: recall-dynamic-integration
+      expectedLayer: recall-dynamic
+      capabilityLayer: recall-dynamic-direct
       required: true
       codexDefaultImpact: P4
       qaImpact: P1
       action: hard gate in the standard direct-loading tier
-      reason: session_status is an OpenClaw integration tool and must stay visible and callable under Pi and Codex direct runtime parity.
+      reason: session_status is an Recall integration tool and must stay visible and callable under Pi and Codex direct runtime parity.
     promptSnippet: "target=session_status"
     failurePromptSnippet: "failure target=session_status"
 ```

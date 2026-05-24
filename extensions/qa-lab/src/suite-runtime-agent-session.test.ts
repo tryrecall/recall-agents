@@ -51,7 +51,7 @@ describe("qa suite runtime agent session helpers", () => {
   it("retries transient session store lock timeouts while creating sessions", async () => {
     const lockTimeoutError = Object.assign(
       new Error("SessionWriteLockTimeoutError: session file locked"),
-      { code: "OPENCLAW_SESSION_WRITE_LOCK_TIMEOUT" },
+      { code: "RECALL_SESSION_WRITE_LOCK_TIMEOUT" },
     );
     gatewayCall
       .mockRejectedValueOnce(lockTimeoutError)

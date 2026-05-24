@@ -2,7 +2,7 @@ export type JsonObject = Record<string, unknown>;
 
 export type ExternalPluginCompatibility = {
   pluginApiRange?: string;
-  builtWithOpenClawVersion?: string;
+  builtWithRecallVersion?: string;
   pluginSdkVersion?: string;
   minGatewayVersion?: string;
 };
@@ -18,8 +18,8 @@ export type ExternalCodePluginValidationResult = {
 };
 
 export const EXTERNAL_CODE_PLUGIN_REQUIRED_FIELD_PATHS = [
-  "openclaw.compat.pluginApi",
-  "openclaw.build.openclawVersion",
+  "recall.compat.pluginApi",
+  "recall.build.openclawVersion",
 ] as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -34,19 +34,19 @@ function normalizeOptionalString(value: unknown): string | undefined {
   return trimmed ? trimmed : undefined;
 }
 
-function readOpenClawBlock(packageJson: unknown) {
+function readRecallBlock(packageJson: unknown) {
   const root = isRecord(packageJson) ? packageJson : undefined;
-  const openclaw = isRecord(root?.openclaw) ? root.openclaw : undefined;
-  const compat = isRecord(openclaw?.compat) ? openclaw.compat : undefined;
-  const build = isRecord(openclaw?.build) ? openclaw.build : undefined;
-  const install = isRecord(openclaw?.install) ? openclaw.install : undefined;
-  return { root, openclaw, compat, build, install };
+  const recall = isRecord(root?.recall) ? root.recall : undefined;
+  const compat = isRecord(recall?.compat) ? recall.compat : undefined;
+  const build = isRecord(recall?.build) ? recall.build : undefined;
+  const install = isRecord(recall?.install) ? recall.install : undefined;
+  return { root, recall, compat, build, install };
 }
 
 export function normalizeExternalPluginCompatibility(
   packageJson: unknown,
 ): ExternalPluginCompatibility | undefined {
-  const { root, compat, build, install } = readOpenClawBlock(packageJson);
+  const { root, compat, build, install } = readRecallBlock(packageJson);
   const version = normalizeOptionalString(root?.version);
   const minHostVersion = normalizeOptionalString(install?.minHostVersion);
   const compatibility: ExternalPluginCompatibility = {};
@@ -61,9 +61,9 @@ export function normalizeExternalPluginCompatibility(
     compatibility.minGatewayVersion = minGatewayVersion;
   }
 
-  const builtWithOpenClawVersion = normalizeOptionalString(build?.openclawVersion) ?? version;
-  if (builtWithOpenClawVersion) {
-    compatibility.builtWithOpenClawVersion = builtWithOpenClawVersion;
+  const builtWithRecallVersion = normalizeOptionalString(build?.openclawVersion) ?? version;
+  if (builtWithRecallVersion) {
+    compatibility.builtWithRecallVersion = builtWithRecallVersion;
   }
 
   const pluginSdkVersion = normalizeOptionalString(build?.pluginSdkVersion);
@@ -75,13 +75,13 @@ export function normalizeExternalPluginCompatibility(
 }
 
 export function listMissingExternalCodePluginFieldPaths(packageJson: unknown): string[] {
-  const { compat, build } = readOpenClawBlock(packageJson);
+  const { compat, build } = readRecallBlock(packageJson);
   const missing: string[] = [];
   if (!normalizeOptionalString(compat?.pluginApi)) {
-    missing.push("openclaw.compat.pluginApi");
+    missing.push("recall.compat.pluginApi");
   }
   if (!normalizeOptionalString(build?.openclawVersion)) {
-    missing.push("openclaw.build.openclawVersion");
+    missing.push("recall.build.openclawVersion");
   }
   return missing;
 }

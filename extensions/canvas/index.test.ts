@@ -1,5 +1,5 @@
-import type { AnyAgentTool, OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
-import { createTestPluginApi } from "openclaw/plugin-sdk/plugin-test-api";
+import type { AnyAgentTool, RecallPluginApi } from "recall/plugin-sdk/plugin-entry";
+import { createTestPluginApi } from "recall/plugin-sdk/plugin-test-api";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import canvasPlugin from "./index.js";
 
@@ -45,13 +45,13 @@ vi.mock("./src/tool.js", () => ({
 }));
 
 function registerCanvas() {
-  const routes: Array<Parameters<OpenClawPluginApi["registerHttpRoute"]>[0]> = [];
-  const services: Array<Parameters<OpenClawPluginApi["registerService"]>[0]> = [];
-  const resolvers: Array<Parameters<OpenClawPluginApi["registerHostedMediaResolver"]>[0]> = [];
-  const tools: Array<Parameters<OpenClawPluginApi["registerTool"]>[0]> = [];
+  const routes: Array<Parameters<RecallPluginApi["registerHttpRoute"]>[0]> = [];
+  const services: Array<Parameters<RecallPluginApi["registerService"]>[0]> = [];
+  const resolvers: Array<Parameters<RecallPluginApi["registerHostedMediaResolver"]>[0]> = [];
+  const tools: Array<Parameters<RecallPluginApi["registerTool"]>[0]> = [];
   const cliFeatures: Array<{
-    registrar: Parameters<OpenClawPluginApi["registerNodeCliFeature"]>[0];
-    opts: Parameters<OpenClawPluginApi["registerNodeCliFeature"]>[1];
+    registrar: Parameters<RecallPluginApi["registerNodeCliFeature"]>[0];
+    opts: Parameters<RecallPluginApi["registerNodeCliFeature"]>[1];
   }> = [];
   canvasPlugin.register?.(
     createTestPluginApi({

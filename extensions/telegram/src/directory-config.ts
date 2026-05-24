@@ -1,7 +1,7 @@
-import { normalizeAccountId } from "openclaw/plugin-sdk/account-core";
-import { mapAllowFromEntries } from "openclaw/plugin-sdk/channel-config-helpers";
-import type { OpenClawConfig, TelegramAccountConfig } from "openclaw/plugin-sdk/config-contracts";
-import { createResolvedDirectoryEntriesLister } from "openclaw/plugin-sdk/directory-config-runtime";
+import { normalizeAccountId } from "recall/plugin-sdk/account-core";
+import { mapAllowFromEntries } from "recall/plugin-sdk/channel-config-helpers";
+import type { RecallConfig, TelegramAccountConfig } from "recall/plugin-sdk/config-contracts";
+import { createResolvedDirectoryEntriesLister } from "recall/plugin-sdk/directory-config-runtime";
 import { mergeTelegramAccountConfig } from "./account-config.js";
 import { resolveDefaultTelegramAccountSelection } from "./account-selection.js";
 
@@ -10,7 +10,7 @@ type TelegramDirectoryAccount = {
 };
 
 function resolveTelegramDirectoryAccount(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   accountId?: string | null,
 ): TelegramDirectoryAccount {
   const resolvedAccountId = accountId?.trim()

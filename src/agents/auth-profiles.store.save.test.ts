@@ -37,7 +37,7 @@ function expectProfileFields(profile: unknown, expected: Record<string, unknown>
 describe("saveAuthProfileStore", () => {
   it("strips plaintext when keyRef/tokenRef are present", async () => {
     const structuredCloneSpy = vi.spyOn(globalThis, "structuredClone");
-    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-save-"));
+    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-auth-save-"));
     try {
       const store: AuthProfileStore = {
         version: 1,
@@ -94,10 +94,10 @@ describe("saveAuthProfileStore", () => {
   });
 
   it("preserves legacy oauthRef only as doctor migration metadata during saves", async () => {
-    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-save-oauth-ref-"));
+    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-auth-save-oauth-ref-"));
     const authPath = resolveAuthStorePath(agentDir);
     const oauthRef = {
-      source: "openclaw-credentials",
+      source: "recall-credentials",
       provider: "openai-codex",
       id: "0123456789abcdef0123456789abcdef",
     };
@@ -172,14 +172,14 @@ describe("saveAuthProfileStore", () => {
   });
 
   it("keeps rehydrated legacy oauthRef sidecar tokens runtime-only during ordinary saves", async () => {
-    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-save-oauth-ref-"));
+    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-auth-save-oauth-ref-"));
     const authPath = resolveAuthStorePath(agentDir);
-    const previousOAuthDir = process.env.OPENCLAW_OAUTH_DIR;
-    const previousSecretKey = process.env.OPENCLAW_AUTH_PROFILE_SECRET_KEY;
-    process.env.OPENCLAW_OAUTH_DIR = path.join(agentDir, "credentials");
-    process.env.OPENCLAW_AUTH_PROFILE_SECRET_KEY = "legacy-seed";
+    const previousOAuthDir = process.env.RECALL_OAUTH_DIR;
+    const previousSecretKey = process.env.RECALL_AUTH_PROFILE_SECRET_KEY;
+    process.env.RECALL_OAUTH_DIR = path.join(agentDir, "credentials");
+    process.env.RECALL_AUTH_PROFILE_SECRET_KEY = "legacy-seed";
     const oauthRef = {
-      source: "openclaw-credentials" as const,
+      source: "recall-credentials" as const,
       provider: "openai-codex" as const,
       id: "0123456789abcdef0123456789abcdef",
     };
@@ -234,7 +234,7 @@ describe("saveAuthProfileStore", () => {
         refresh: "legacy-refresh-token",
       });
 
-      delete process.env.OPENCLAW_AUTH_PROFILE_SECRET_KEY;
+      delete process.env.RECALL_AUTH_PROFILE_SECRET_KEY;
       const clonedRuntimeStore = JSON.parse(JSON.stringify(runtimeStore)) as AuthProfileStore;
       saveAuthProfileStore(clonedRuntimeStore, agentDir);
 
@@ -246,14 +246,14 @@ describe("saveAuthProfileStore", () => {
       expect(parsed.profiles["openai-codex:default"]).not.toHaveProperty("refresh");
     } finally {
       if (previousOAuthDir === undefined) {
-        delete process.env.OPENCLAW_OAUTH_DIR;
+        delete process.env.RECALL_OAUTH_DIR;
       } else {
-        process.env.OPENCLAW_OAUTH_DIR = previousOAuthDir;
+        process.env.RECALL_OAUTH_DIR = previousOAuthDir;
       }
       if (previousSecretKey === undefined) {
-        delete process.env.OPENCLAW_AUTH_PROFILE_SECRET_KEY;
+        delete process.env.RECALL_AUTH_PROFILE_SECRET_KEY;
       } else {
-        process.env.OPENCLAW_AUTH_PROFILE_SECRET_KEY = previousSecretKey;
+        process.env.RECALL_AUTH_PROFILE_SECRET_KEY = previousSecretKey;
       }
       clearRuntimeAuthProfileStoreSnapshots();
       await fs.rm(agentDir, { recursive: true, force: true });
@@ -261,13 +261,13 @@ describe("saveAuthProfileStore", () => {
   });
 
   it("writes refreshed legacy sidecar tokens inline when they replace runtime sidecar material", async () => {
-    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-save-oauth-ref-"));
+    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-auth-save-oauth-ref-"));
     const authPath = resolveAuthStorePath(agentDir);
-    const previousOAuthDir = process.env.OPENCLAW_OAUTH_DIR;
-    process.env.OPENCLAW_OAUTH_DIR = path.join(agentDir, "credentials");
+    const previousOAuthDir = process.env.RECALL_OAUTH_DIR;
+    process.env.RECALL_OAUTH_DIR = path.join(agentDir, "credentials");
     const profileId = "openai-codex:default";
     const oauthRef = {
-      source: "openclaw-credentials",
+      source: "recall-credentials",
       provider: "openai-codex",
       id: "0123456789abcdef0123456789abcdef",
     };
@@ -330,9 +330,9 @@ describe("saveAuthProfileStore", () => {
       expect(parsed.profiles[profileId]?.refresh).toBe("refreshed-refresh-token");
     } finally {
       if (previousOAuthDir === undefined) {
-        delete process.env.OPENCLAW_OAUTH_DIR;
+        delete process.env.RECALL_OAUTH_DIR;
       } else {
-        process.env.OPENCLAW_OAUTH_DIR = previousOAuthDir;
+        process.env.RECALL_OAUTH_DIR = previousOAuthDir;
       }
       clearRuntimeAuthProfileStoreSnapshots();
       await fs.rm(agentDir, { recursive: true, force: true });
@@ -340,7 +340,7 @@ describe("saveAuthProfileStore", () => {
   });
 
   it("refreshes the runtime snapshot when a saved store rotates oauth tokens", async () => {
-    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-save-runtime-"));
+    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-auth-save-runtime-"));
     try {
       replaceRuntimeAuthProfileStoreSnapshots([
         {
@@ -399,7 +399,7 @@ describe("saveAuthProfileStore", () => {
   });
 
   it("writes runtime scheduling state to auth-state.json only", async () => {
-    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-save-state-"));
+    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-auth-save-state-"));
     try {
       const store: AuthProfileStore = {
         version: 1,
@@ -456,12 +456,12 @@ describe("saveAuthProfileStore", () => {
   });
 
   it("does not persist unchanged inherited main OAuth when saving secondary local updates", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-save-inherited-"));
-    const stateDir = path.join(root, ".openclaw");
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-auth-save-inherited-"));
+    const stateDir = path.join(root, ".recall");
     const childAgentDir = path.join(stateDir, "agents", "worker", "agent");
     const childAuthPath = resolveAuthStorePath(childAgentDir);
-    vi.stubEnv("OPENCLAW_STATE_DIR", stateDir);
-    vi.stubEnv("OPENCLAW_AGENT_DIR", "");
+    vi.stubEnv("RECALL_STATE_DIR", stateDir);
+    vi.stubEnv("RECALL_AGENT_DIR", "");
     try {
       saveAuthProfileStore({
         version: 1,
@@ -526,12 +526,12 @@ describe("saveAuthProfileStore", () => {
   });
 
   it("does not persist stale inherited main OAuth after main refreshes", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-save-stale-inherited-"));
-    const stateDir = path.join(root, ".openclaw");
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-auth-save-stale-inherited-"));
+    const stateDir = path.join(root, ".recall");
     const childAgentDir = path.join(stateDir, "agents", "worker", "agent");
     const childAuthPath = resolveAuthStorePath(childAgentDir);
-    vi.stubEnv("OPENCLAW_STATE_DIR", stateDir);
-    vi.stubEnv("OPENCLAW_AGENT_DIR", "");
+    vi.stubEnv("RECALL_STATE_DIR", stateDir);
+    vi.stubEnv("RECALL_AGENT_DIR", "");
     try {
       saveAuthProfileStore({
         version: 1,
@@ -599,12 +599,12 @@ describe("saveAuthProfileStore", () => {
   });
 
   it("preserves inherited main OAuth in active secondary runtime snapshots", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-save-snapshot-"));
-    const stateDir = path.join(root, ".openclaw");
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-auth-save-snapshot-"));
+    const stateDir = path.join(root, ".recall");
     const childAgentDir = path.join(stateDir, "agents", "worker", "agent");
     const childAuthPath = resolveAuthStorePath(childAgentDir);
-    vi.stubEnv("OPENCLAW_STATE_DIR", stateDir);
-    vi.stubEnv("OPENCLAW_AGENT_DIR", "");
+    vi.stubEnv("RECALL_STATE_DIR", stateDir);
+    vi.stubEnv("RECALL_AGENT_DIR", "");
     try {
       saveAuthProfileStore({
         version: 1,

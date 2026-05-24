@@ -1,10 +1,10 @@
 import type { DatabaseSync } from "node:sqlite";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
 import {
   createSubsystemLogger,
-  type OpenClawConfig,
-} from "openclaw/plugin-sdk/memory-core-host-engine-foundation";
-import type { MemorySyncProgressUpdate } from "openclaw/plugin-sdk/memory-core-host-engine-storage";
+  type RecallConfig,
+} from "recall/plugin-sdk/memory-core-host-engine-foundation";
+import type { MemorySyncProgressUpdate } from "recall/plugin-sdk/memory-core-host-engine-storage";
 
 const log = createSubsystemLogger("memory");
 
@@ -170,7 +170,7 @@ export function enqueueMemoryTargetedSessionSync(
 export function createMemorySyncControlConfigForTests(
   workspaceDir: string,
   indexPath: string,
-): OpenClawConfig {
+): RecallConfig {
   return {
     agents: {
       defaults: {
@@ -186,5 +186,5 @@ export function createMemorySyncControlConfigForTests(
       },
       list: [{ id: "main", default: true }],
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }

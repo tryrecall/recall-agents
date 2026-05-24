@@ -1,28 +1,28 @@
 import { readdirSync, rmSync } from "node:fs";
 import path from "node:path";
-import { buildChannelInboundEventContext } from "openclaw/plugin-sdk/channel-inbound";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { MockFn } from "openclaw/plugin-sdk/plugin-test-runtime";
-import type { GetReplyOptions, MsgContext } from "openclaw/plugin-sdk/reply-runtime";
+import { buildChannelInboundEventContext } from "recall/plugin-sdk/channel-inbound";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import type { MockFn } from "recall/plugin-sdk/plugin-test-runtime";
+import type { GetReplyOptions, MsgContext } from "recall/plugin-sdk/reply-runtime";
 import { beforeEach, vi } from "vitest";
 import type { TelegramBotDeps } from "./bot-deps.js";
 
 type AnyMock = ReturnType<typeof vi.fn>;
 type AnyAsyncMock = ReturnType<typeof vi.fn>;
 type GetRuntimeConfigFn =
-  typeof import("openclaw/plugin-sdk/runtime-config-snapshot").getRuntimeConfig;
+  typeof import("recall/plugin-sdk/runtime-config-snapshot").getRuntimeConfig;
 type LoadSessionStoreFn =
-  typeof import("openclaw/plugin-sdk/session-store-runtime").loadSessionStore;
+  typeof import("recall/plugin-sdk/session-store-runtime").loadSessionStore;
 type ResolveStorePathFn =
-  typeof import("openclaw/plugin-sdk/session-store-runtime").resolveStorePath;
+  typeof import("recall/plugin-sdk/session-store-runtime").resolveStorePath;
 type ReadSessionUpdatedAtFn =
-  typeof import("openclaw/plugin-sdk/session-store-runtime").readSessionUpdatedAt;
+  typeof import("recall/plugin-sdk/session-store-runtime").readSessionUpdatedAt;
 type SessionStore = ReturnType<LoadSessionStoreFn>;
 type TelegramBotRuntimeForTest = NonNullable<
   Parameters<typeof import("./bot.js").setTelegramBotRuntimeForTest>[0]
 >;
 type DispatchReplyWithBufferedBlockDispatcherFn =
-  typeof import("openclaw/plugin-sdk/reply-dispatch-runtime").dispatchReplyWithBufferedBlockDispatcher;
+  typeof import("recall/plugin-sdk/reply-dispatch-runtime").dispatchReplyWithBufferedBlockDispatcher;
 type DispatchReplyWithBufferedBlockDispatcherResult = Awaited<
   ReturnType<DispatchReplyWithBufferedBlockDispatcherFn>
 >;
@@ -35,7 +35,7 @@ type ReplyPayloadLike = {
 };
 
 const { sessionStorePath } = vi.hoisted(() => ({
-  sessionStorePath: `/tmp/openclaw-telegram-${process.pid}-${process.env.VITEST_POOL_ID ?? "0"}.json`,
+  sessionStorePath: `/tmp/recall-telegram-${process.pid}-${process.env.VITEST_POOL_ID ?? "0"}.json`,
 }));
 
 const { loadWebMedia } = vi.hoisted((): { loadWebMedia: AnyMock } => ({
@@ -46,7 +46,7 @@ export function getLoadWebMediaMock(): AnyMock {
   return loadWebMedia;
 }
 
-vi.mock("openclaw/plugin-sdk/web-media", () => ({
+vi.mock("recall/plugin-sdk/web-media", () => ({
   loadWebMedia,
 }));
 
@@ -126,7 +126,7 @@ const replySpyHoisted = vi.hoisted(() => ({
     (
       ctx: MsgContext,
       opts?: GetReplyOptions,
-      configOverride?: OpenClawConfig,
+      configOverride?: RecallConfig,
     ) => Promise<ReplyPayloadLike | ReplyPayloadLike[] | undefined>
   >,
 }));
@@ -206,7 +206,7 @@ function normalizeLowercaseStringOrEmptyForTest(value: string | undefined): stri
   return value?.trim().toLowerCase() ?? "";
 }
 
-function resolveDefaultModelForAgentForTest(params: { cfg: OpenClawConfig }): {
+function resolveDefaultModelForAgentForTest(params: { cfg: RecallConfig }): {
   provider: string;
   model: string;
 } {
@@ -221,7 +221,7 @@ function resolveDefaultModelForAgentForTest(params: { cfg: OpenClawConfig }): {
   };
 }
 
-function createModelsProviderDataFromConfig(cfg: OpenClawConfig): {
+function createModelsProviderDataFromConfig(cfg: RecallConfig): {
   byProvider: Map<string, Set<string>>;
   providers: string[];
   resolvedDefault: { provider: string; model: string };
@@ -417,7 +417,7 @@ export const getOnHandler = (event: string) => {
   return handler as (ctx: Record<string, unknown>) => Promise<void>;
 };
 
-const DEFAULT_TELEGRAM_TEST_CONFIG: OpenClawConfig = {
+const DEFAULT_TELEGRAM_TEST_CONFIG: RecallConfig = {
   agents: {
     defaults: {
       envelopeTimezone: "utc",
@@ -564,7 +564,7 @@ beforeEach(() => {
   listSkillCommandsForAgents.mockReset();
   listSkillCommandsForAgents.mockReturnValue([]);
   buildModelsProviderData.mockReset();
-  buildModelsProviderData.mockImplementation(async (cfg: OpenClawConfig) => {
+  buildModelsProviderData.mockImplementation(async (cfg: RecallConfig) => {
     return createModelsProviderDataFromConfig(cfg);
   });
   middlewareUseSpy.mockReset();

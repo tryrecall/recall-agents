@@ -67,7 +67,7 @@ function resolveManagedProxyUrl(env: ManagedProxyTlsEnv = process.env): string |
   if (activeProxyUrl) {
     return activeProxyUrl.href;
   }
-  if (env["OPENCLAW_PROXY_ACTIVE"] !== "1") {
+  if (env["RECALL_PROXY_ACTIVE"] !== "1") {
     return undefined;
   }
   return normalizeProxyUrl(resolveEnvHttpProxyUrl("https", env));
@@ -90,7 +90,7 @@ export function resolveActiveManagedProxyTlsOptions(
   }
   const proxyCaFile = resolveManagedProxyCaFileForUrl({
     proxyUrl: managedProxyUrl,
-    caFileOverride: env["OPENCLAW_PROXY_CA_FILE"],
+    caFileOverride: env["RECALL_PROXY_CA_FILE"],
   });
   try {
     return loadManagedProxyTlsOptionsSync(proxyCaFile);

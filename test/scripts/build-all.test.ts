@@ -34,7 +34,7 @@ function withBuildCacheFixture(
     };
   }) => void,
 ) {
-  const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-build-cache-"));
+  const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-build-cache-"));
   try {
     const inputPath = path.join(rootDir, "src/input.ts");
     const outputPath = path.join(rootDir, "dist/output.js");
@@ -105,7 +105,7 @@ describe("resolveBuildAllStep", () => {
 
     const result = resolveBuildAllStep(step, {
       nodeExecPath: "/custom/node",
-      env: { OPENCLAW_BUILD_ALL_NO_PNPM: "1" },
+      env: { RECALL_BUILD_ALL_NO_PNPM: "1" },
     });
 
     expect(result).toEqual({
@@ -113,7 +113,7 @@ describe("resolveBuildAllStep", () => {
       args: ["scripts/bundled-plugin-assets.mjs", "--phase", "build"],
       options: {
         stdio: "inherit",
-        env: { OPENCLAW_BUILD_ALL_NO_PNPM: "1" },
+        env: { RECALL_BUILD_ALL_NO_PNPM: "1" },
       },
     });
   });

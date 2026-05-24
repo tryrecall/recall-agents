@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/core";
+import type { RecallConfig } from "recall/plugin-sdk/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { VoiceCallConfig } from "./config.js";
 import type { CoreConfig } from "./core-bridge.js";
@@ -289,7 +289,7 @@ describe("createVoiceCallRuntime lifecycle", () => {
           openai: { enabled: true },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     await createVoiceCallRuntime({
       config: createBaseConfig(),
@@ -547,7 +547,7 @@ describe("createVoiceCallRuntime lifecycle", () => {
     mocks.resolveRealtimeFastContextConsult.mockResolvedValue({
       handled: true,
       result: {
-        text: "Fast OpenClaw memory or session context found.\nThe caller's basement lights are on.",
+        text: "Fast Recall memory or session context found.\nThe caller's basement lights are on.",
       },
     });
 

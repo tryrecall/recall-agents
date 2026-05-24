@@ -69,20 +69,20 @@ function createAgentRuntime(payloads: Array<Record<string, unknown>>) {
     meta: { durationMs: 12, aborted: false },
   }));
   const resolveAgentDir = vi.fn((_cfg: CoreConfig, agentId: string) => {
-    return `/tmp/openclaw/agents/${agentId}`;
+    return `/tmp/recall/agents/${agentId}`;
   });
   const resolveAgentWorkspaceDir = vi.fn((_cfg: CoreConfig, agentId: string) => {
-    return `/tmp/openclaw/workspace/${agentId}`;
+    return `/tmp/recall/workspace/${agentId}`;
   });
   const resolveAgentIdentity = vi.fn((_cfg: CoreConfig, agentId: string) => ({
     name: `${agentId} tester`,
   }));
   const resolveStorePath = vi.fn((_store: string | undefined, params: { agentId?: string }) => {
-    return `/tmp/openclaw/${params.agentId ?? "main"}/sessions.json`;
+    return `/tmp/recall/${params.agentId ?? "main"}/sessions.json`;
   });
   const resolveSessionFilePath = vi.fn(
     (_sessionId: string, _entry: unknown, params: { agentId?: string }) => {
-      return `/tmp/openclaw/${params.agentId ?? "main"}/sessions/session.jsonl`;
+      return `/tmp/recall/${params.agentId ?? "main"}/sessions/session.jsonl`;
     },
   );
 
@@ -263,7 +263,7 @@ describe("generateVoiceResponse", () => {
       "session entry patch",
     );
     expect(patchSessionEntryCall[0]).toMatchObject({
-      storePath: "/tmp/openclaw/main/sessions.json",
+      storePath: "/tmp/recall/main/sessions.json",
       sessionKey: "voice:15550001111",
       replaceEntry: true,
     });
@@ -343,11 +343,11 @@ describe("generateVoiceResponse", () => {
       },
     );
     const args = requireEmbeddedAgentArgs(runEmbeddedPiAgent);
-    expect(args.agentDir).toBe("/tmp/openclaw/agents/main");
+    expect(args.agentDir).toBe("/tmp/recall/agents/main");
     expect(args.agentId).toBe("main");
     expect(args.sandboxSessionKey).toBe("agent:main:voice:15550001111");
-    expect(args.workspaceDir).toBe("/tmp/openclaw/workspace/main");
-    expect(args.sessionFile).toBe("/tmp/openclaw/main/sessions/session.jsonl");
+    expect(args.workspaceDir).toBe("/tmp/recall/workspace/main");
+    expect(args.sessionFile).toBe("/tmp/recall/main/sessions/session.jsonl");
   });
 
   it("uses the configured voice response agent workspace", async () => {
@@ -393,11 +393,11 @@ describe("generateVoiceResponse", () => {
       },
     );
     const args = requireEmbeddedAgentArgs(runEmbeddedPiAgent);
-    expect(args.agentDir).toBe("/tmp/openclaw/agents/voice");
+    expect(args.agentDir).toBe("/tmp/recall/agents/voice");
     expect(args.agentId).toBe("voice");
     expect(args.sandboxSessionKey).toBe("agent:voice:voice:15550001111");
-    expect(args.workspaceDir).toBe("/tmp/openclaw/workspace/voice");
-    expect(args.sessionFile).toBe("/tmp/openclaw/voice/sessions/session.jsonl");
+    expect(args.workspaceDir).toBe("/tmp/recall/workspace/voice");
+    expect(args.sessionFile).toBe("/tmp/recall/voice/sessions/session.jsonl");
   });
 
   it("passes the routed voice agent explicit tool allowlist to the embedded run", async () => {

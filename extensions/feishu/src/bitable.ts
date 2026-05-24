@@ -1,7 +1,7 @@
 import type * as Lark from "@larksuiteoapi/node-sdk";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
 import { Type, type TSchema } from "typebox";
-import type { OpenClawPluginApi } from "../runtime-api.js";
+import type { RecallPluginApi } from "../runtime-api.js";
 import { listEnabledFeishuAccounts } from "./accounts.js";
 import { createFeishuToolClient } from "./tool-account.js";
 
@@ -570,7 +570,7 @@ const UpdateRecordSchema = Type.Object({
 
 // ============ Tool Registration ============
 
-export function registerFeishuBitableTools(api: OpenClawPluginApi) {
+export function registerFeishuBitableTools(api: RecallPluginApi) {
   if (!api.config) {
     return;
   }

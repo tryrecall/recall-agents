@@ -6,17 +6,17 @@ import type {
   WAMessage,
   WASocket,
 } from "baileys";
-import { recordChannelActivity } from "openclaw/plugin-sdk/channel-activity-runtime";
-import { formatLocationText } from "openclaw/plugin-sdk/channel-inbound";
-import { createInboundDebouncer } from "openclaw/plugin-sdk/channel-inbound-debounce";
-import { getChildLogger } from "openclaw/plugin-sdk/logging-core";
-import { defaultRuntime } from "openclaw/plugin-sdk/runtime-env";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/runtime-env";
+import { recordChannelActivity } from "recall/plugin-sdk/channel-activity-runtime";
+import { formatLocationText } from "recall/plugin-sdk/channel-inbound";
+import { createInboundDebouncer } from "recall/plugin-sdk/channel-inbound-debounce";
+import { getChildLogger } from "recall/plugin-sdk/logging-core";
+import { defaultRuntime } from "recall/plugin-sdk/runtime-env";
+import { createSubsystemLogger } from "recall/plugin-sdk/runtime-env";
 import { readWebSelfIdentityForDecision, WhatsAppAuthUnstableError } from "../auth-store.js";
 import { getPrimaryIdentityId, resolveComparableIdentity } from "../identity.js";
 import { cacheInboundMessageMeta } from "../quoted-message.js";
 import { DEFAULT_RECONNECT_POLICY, computeBackoff, sleepWithAbort } from "../reconnect.js";
-import type { OpenClawConfig } from "../runtime-api.js";
+import type { RecallConfig } from "../runtime-api.js";
 import { createWaSocket, formatError, getStatusCode, waitForWaConnection } from "../session.js";
 import { resolveWhatsAppSocketTiming } from "../socket-timing.js";
 import { resolveJidToE164 } from "../text-runtime.js";
@@ -135,8 +135,8 @@ function isNonEmptyString(value: string | undefined): value is string {
 }
 
 type MonitorWebInboxOptions = {
-  cfg: OpenClawConfig;
-  loadConfig?: () => OpenClawConfig;
+  cfg: RecallConfig;
+  loadConfig?: () => RecallConfig;
   verbose: boolean;
   accountId: string;
   authDir: string;

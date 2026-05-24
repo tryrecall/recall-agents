@@ -189,7 +189,7 @@ async function main() {
   if (!options.skipQa) {
     steps.push(
       runStep("qa suite", pnpmCommand(), [
-        "openclaw",
+        "recall",
         "qa",
         "suite",
         "--provider-mode",

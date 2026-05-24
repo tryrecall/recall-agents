@@ -1,5 +1,5 @@
-import { assertOkOrThrowProviderError } from "openclaw/plugin-sdk/provider-http";
-import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
+import { assertOkOrThrowProviderError } from "recall/plugin-sdk/provider-http";
+import { fetchWithSsrFGuard } from "recall/plugin-sdk/ssrf-runtime";
 import { normalizeGradiumBaseUrl } from "./shared.js";
 
 export async function gradiumTTS(params: {

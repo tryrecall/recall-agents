@@ -9,7 +9,7 @@ import {
   updateSessionStore,
   rewriteSessionFileForNewSessionId,
 } from "../../config/sessions.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { resolveAgentIdFromSessionKey } from "../../routing/session-key.js";
 import { createLazyImportLoader } from "../../shared/lazy-promise.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
@@ -52,7 +52,7 @@ function removeLifecycleStateFromMetadataPatch(entry: SessionEntry): SessionEntr
 }
 
 export async function updateSessionStoreAfterAgentRun(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   contextTokensOverride?: number;
   sessionId: string;
   sessionKey: string;

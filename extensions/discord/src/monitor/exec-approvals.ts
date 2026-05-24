@@ -1,10 +1,10 @@
 import { ButtonStyle } from "discord-api-types/v10";
-import { resolveApprovalOverGateway } from "openclaw/plugin-sdk/approval-gateway-runtime";
-import type { ExecApprovalDecision } from "openclaw/plugin-sdk/approval-runtime";
+import { resolveApprovalOverGateway } from "recall/plugin-sdk/approval-gateway-runtime";
+import type { ExecApprovalDecision } from "recall/plugin-sdk/approval-runtime";
 import type {
   DiscordExecApprovalConfig,
-  OpenClawConfig,
-} from "openclaw/plugin-sdk/config-contracts";
+  RecallConfig,
+} from "recall/plugin-sdk/config-contracts";
 import { Button, type ButtonInteraction, type ComponentData } from "../internal/discord.js";
 export { buildExecApprovalCustomId } from "../approval-handler.runtime.js";
 import { getDiscordExecApprovalApprovers } from "../exec-approvals.js";
@@ -128,7 +128,7 @@ export function createExecApprovalButton(ctx: ExecApprovalButtonContext): Button
 }
 
 export function createDiscordExecApprovalButtonContext(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId: string;
   config: DiscordExecApprovalConfig;
   gatewayUrl?: string;

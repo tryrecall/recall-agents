@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-INSTALL_URL="${OPENCLAW_INSTALL_URL:-https://openclaw.bot/install.sh}"
-SMOKE_MODE="${OPENCLAW_INSTALL_SMOKE_MODE:-install}"
-SMOKE_PREVIOUS_VERSION="${OPENCLAW_INSTALL_SMOKE_PREVIOUS:-}"
-SKIP_PREVIOUS="${OPENCLAW_INSTALL_SMOKE_SKIP_PREVIOUS:-0}"
-DEFAULT_PACKAGE="openclaw"
-PACKAGE_NAME="${OPENCLAW_INSTALL_PACKAGE:-$DEFAULT_PACKAGE}"
-FRESH_VERSION="${OPENCLAW_INSTALL_FRESH_VERSION:-}"
-FRESH_TAG_URL="${OPENCLAW_INSTALL_FRESH_TAG_URL:-}"
-UPDATE_BASELINE_VERSION="${OPENCLAW_INSTALL_UPDATE_BASELINE:-latest}"
-UPDATE_BASELINE_TAG_URL="${OPENCLAW_INSTALL_UPDATE_BASELINE_TAG_URL:-}"
-UPDATE_EXPECT_VERSION="${OPENCLAW_INSTALL_UPDATE_EXPECT_VERSION:-}"
-UPDATE_TAG_URL="${OPENCLAW_INSTALL_UPDATE_TAG_URL:-}"
-FRESHNESS_VERSION="${OPENCLAW_INSTALL_FRESHNESS_VERSION:-latest}"
+INSTALL_URL="${RECALL_INSTALL_URL:-https://recall.bot/install.sh}"
+SMOKE_MODE="${RECALL_INSTALL_SMOKE_MODE:-install}"
+SMOKE_PREVIOUS_VERSION="${RECALL_INSTALL_SMOKE_PREVIOUS:-}"
+SKIP_PREVIOUS="${RECALL_INSTALL_SMOKE_SKIP_PREVIOUS:-0}"
+DEFAULT_PACKAGE="recall"
+PACKAGE_NAME="${RECALL_INSTALL_PACKAGE:-$DEFAULT_PACKAGE}"
+FRESH_VERSION="${RECALL_INSTALL_FRESH_VERSION:-}"
+FRESH_TAG_URL="${RECALL_INSTALL_FRESH_TAG_URL:-}"
+UPDATE_BASELINE_VERSION="${RECALL_INSTALL_UPDATE_BASELINE:-latest}"
+UPDATE_BASELINE_TAG_URL="${RECALL_INSTALL_UPDATE_BASELINE_TAG_URL:-}"
+UPDATE_EXPECT_VERSION="${RECALL_INSTALL_UPDATE_EXPECT_VERSION:-}"
+UPDATE_TAG_URL="${RECALL_INSTALL_UPDATE_TAG_URL:-}"
+FRESHNESS_VERSION="${RECALL_INSTALL_FRESHNESS_VERSION:-latest}"
 # npm min-release-age is days; 10000 keeps the control failure independent of normal release cadence.
-FRESHNESS_MIN_RELEASE_AGE="${OPENCLAW_INSTALL_FRESHNESS_MIN_RELEASE_AGE:-10000}"
-FRESHNESS_NPM_VERSION="${OPENCLAW_INSTALL_FRESHNESS_NPM_VERSION:-11.14.1}"
-HEARTBEAT_INTERVAL="${OPENCLAW_INSTALL_SMOKE_HEARTBEAT_INTERVAL:-60}"
-INSTALL_COMMAND_TIMEOUT="${OPENCLAW_INSTALL_SMOKE_COMMAND_TIMEOUT:-900}"
+FRESHNESS_MIN_RELEASE_AGE="${RECALL_INSTALL_FRESHNESS_MIN_RELEASE_AGE:-10000}"
+FRESHNESS_NPM_VERSION="${RECALL_INSTALL_FRESHNESS_NPM_VERSION:-11.14.1}"
+HEARTBEAT_INTERVAL="${RECALL_INSTALL_SMOKE_HEARTBEAT_INTERVAL:-60}"
+INSTALL_COMMAND_TIMEOUT="${RECALL_INSTALL_SMOKE_COMMAND_TIMEOUT:-900}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # shellcheck source=../install-sh-common/cli-verify.sh
@@ -115,9 +115,9 @@ run_with_heartbeat() {
 
 is_self_swapped_package_process_exit() {
   local stderr="$1"
-  [[ "$stderr" == *"[openclaw] Failed to start CLI:"* ]] &&
+  [[ "$stderr" == *"[recall] Failed to start CLI:"* ]] &&
     [[ "$stderr" == *"ERR_MODULE_NOT_FOUND"* ]] &&
-    [[ "$stderr" == *"/node_modules/openclaw/dist/"* ]]
+    [[ "$stderr" == *"/node_modules/recall/dist/"* ]]
 }
 
 npm_install_global() {
@@ -157,15 +157,15 @@ run_install_smoke() {
     print_install_audit "fresh install"
 
     echo "==> Verify installed version"
-    if [[ -n "${OPENCLAW_INSTALL_LATEST_OUT:-}" ]]; then
+    if [[ -n "${RECALL_INSTALL_LATEST_OUT:-}" ]]; then
       # Non-root installer smoke uses the public install script path, which
       # resolves npm "latest" rather than this host-served candidate tarball.
       local latest_npm_version
       latest_npm_version="$(quiet_npm view "$PACKAGE_NAME" version 2>/dev/null || true)"
       if [[ -n "$latest_npm_version" ]]; then
-        printf "%s" "$latest_npm_version" > "${OPENCLAW_INSTALL_LATEST_OUT:-}"
+        printf "%s" "$latest_npm_version" > "${RECALL_INSTALL_LATEST_OUT:-}"
       else
-        printf "%s" "$FRESH_VERSION" > "${OPENCLAW_INSTALL_LATEST_OUT:-}"
+        printf "%s" "$FRESH_VERSION" > "${RECALL_INSTALL_LATEST_OUT:-}"
       fi
     fi
     verify_installed_cli "$PACKAGE_NAME" "$FRESH_VERSION"
@@ -212,7 +212,7 @@ NODE
   echo "package=$PACKAGE_NAME latest=$LATEST_VERSION previous=$PREVIOUS_VERSION"
 
   if [[ "$SKIP_PREVIOUS" == "1" ]]; then
-    echo "==> Skip preinstall previous (OPENCLAW_INSTALL_SMOKE_SKIP_PREVIOUS=1)"
+    echo "==> Skip preinstall previous (RECALL_INSTALL_SMOKE_SKIP_PREVIOUS=1)"
   else
     echo "==> Preinstall previous (forces installer upgrade path)"
     npm_install_global "preinstall previous release" "${PACKAGE_NAME}@${PREVIOUS_VERSION}"
@@ -223,8 +223,8 @@ NODE
   curl -fsSL "$INSTALL_URL" | bash -s -- --no-prompt
 
   echo "==> Verify installed version"
-  if [[ -n "${OPENCLAW_INSTALL_LATEST_OUT:-}" ]]; then
-    printf "%s" "$LATEST_VERSION" > "${OPENCLAW_INSTALL_LATEST_OUT:-}"
+  if [[ -n "${RECALL_INSTALL_LATEST_OUT:-}" ]]; then
+    printf "%s" "$LATEST_VERSION" > "${RECALL_INSTALL_LATEST_OUT:-}"
   fi
   verify_installed_cli "$PACKAGE_NAME" "$LATEST_VERSION"
 
@@ -233,11 +233,11 @@ NODE
 
 run_update_smoke() {
   if [[ -z "$UPDATE_EXPECT_VERSION" ]]; then
-    echo "ERROR: OPENCLAW_INSTALL_UPDATE_EXPECT_VERSION is required for update mode" >&2
+    echo "ERROR: RECALL_INSTALL_UPDATE_EXPECT_VERSION is required for update mode" >&2
     return 1
   fi
   if [[ -z "$UPDATE_TAG_URL" ]]; then
-    echo "ERROR: OPENCLAW_INSTALL_UPDATE_TAG_URL is required for update mode" >&2
+    echo "ERROR: RECALL_INSTALL_UPDATE_TAG_URL is required for update mode" >&2
     return 1
   fi
 
@@ -253,16 +253,16 @@ run_update_smoke() {
   print_install_audit "baseline install"
   verify_installed_cli "$PACKAGE_NAME" "$UPDATE_BASELINE_VERSION"
 
-  echo "==> Run openclaw update from host-served tgz"
+  echo "==> Run recall update from host-served tgz"
   local update_status
   local update_stderr_file
   local update_stderr
   update_stderr_file="$(mktemp)"
   set +e
   UPDATE_JSON="$(
-    run_with_heartbeat "openclaw update" \
-      env npm_config_omit=optional NPM_CONFIG_OMIT=optional OPENCLAW_ALLOW_ROOT=1 \
-      openclaw update --tag "$UPDATE_TAG_URL" --yes --json 2>"$update_stderr_file"
+    run_with_heartbeat "recall update" \
+      env npm_config_omit=optional NPM_CONFIG_OMIT=optional RECALL_ALLOW_ROOT=1 \
+      recall update --tag "$UPDATE_TAG_URL" --yes --json 2>"$update_stderr_file"
   )"
   update_status=$?
   set -e
@@ -276,7 +276,7 @@ run_update_smoke() {
     if is_self_swapped_package_process_exit "$update_stderr"; then
       echo "WARN: legacy updater process exited after self-swap; validating update JSON and installed CLI" >&2
     else
-      echo "ERROR: openclaw update failed with exit code $update_status" >&2
+      echo "ERROR: recall update failed with exit code $update_status" >&2
       return "$update_status"
     fi
   fi
@@ -362,11 +362,11 @@ NODE
 
 run_npm_global_smoke() {
   if [[ -z "$UPDATE_EXPECT_VERSION" ]]; then
-    echo "ERROR: OPENCLAW_INSTALL_UPDATE_EXPECT_VERSION is required for npm-global mode" >&2
+    echo "ERROR: RECALL_INSTALL_UPDATE_EXPECT_VERSION is required for npm-global mode" >&2
     return 1
   fi
   if [[ -z "$UPDATE_TAG_URL" ]]; then
-    echo "ERROR: OPENCLAW_INSTALL_UPDATE_TAG_URL is required for npm-global mode" >&2
+    echo "ERROR: RECALL_INSTALL_UPDATE_TAG_URL is required for npm-global mode" >&2
     return 1
   fi
 
@@ -452,8 +452,8 @@ run_freshness_smoke() {
   env \
     HOME="$policy_home" \
     NPM_CONFIG_USERCONFIG="${policy_home}/.npmrc" \
-    OPENCLAW_NO_ONBOARD=1 \
-    OPENCLAW_NO_PROMPT=1 \
+    RECALL_NO_ONBOARD=1 \
+    RECALL_NO_PROMPT=1 \
     bash -c 'curl -fsSL "$1" | bash -s -- --install-method npm --version "$2" --no-prompt --no-onboard' \
     _ "$INSTALL_URL" "$FRESHNESS_VERSION"
 
@@ -478,7 +478,7 @@ case "$SMOKE_MODE" in
     run_freshness_smoke
     ;;
   *)
-    echo "ERROR: unsupported OPENCLAW_INSTALL_SMOKE_MODE=$SMOKE_MODE" >&2
+    echo "ERROR: unsupported RECALL_INSTALL_SMOKE_MODE=$SMOKE_MODE" >&2
     exit 1
     ;;
 esac

@@ -65,7 +65,7 @@ export async function startControlUiE2eServer(): Promise<ControlUiE2eServer> {
     clearScreen: false,
     configFile: false,
     define: {
-      OPENCLAW_CONTROL_UI_BUILD_ID: JSON.stringify("e2e"),
+      RECALL_CONTROL_UI_BUILD_ID: JSON.stringify("e2e"),
     },
     logLevel: "error",
     optimizeDeps: {
@@ -122,7 +122,7 @@ function normalizeScenario(
   const sessionKey = scenario.sessionKey?.trim() || "main";
   return {
     assistantAgentId: scenario.assistantAgentId?.trim() || defaultAgentId,
-    assistantName: scenario.assistantName?.trim() || "OpenClaw",
+    assistantName: scenario.assistantName?.trim() || "Recall",
     defaultAgentId,
     historyMessages: scenario.historyMessages ?? [],
     methodResponses: scenario.methodResponses ?? {},

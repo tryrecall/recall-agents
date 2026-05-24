@@ -612,7 +612,7 @@ function renderMessageMeta(meta: GroupMeta | null) {
   `;
 }
 
-const SKIP_DELETE_CONFIRM_KEY = "openclaw:skipDeleteConfirm";
+const SKIP_DELETE_CONFIRM_KEY = "recall:skipDeleteConfirm";
 const DELETE_CONFIRM_VIEWPORT_MARGIN_PX = 8;
 const DELETE_CONFIRM_TRIGGER_GAP_PX = 6;
 
@@ -1028,7 +1028,7 @@ async function resolveManagedOutgoingImageBlobUrl(
         headers.set("Authorization", `Bearer ${authToken}`);
       }
       if (requesterSessionKey) {
-        headers.set("x-openclaw-requester-session-key", requesterSessionKey);
+        headers.set("x-recall-requester-session-key", requesterSessionKey);
       }
       const res = await fetch(fetchUrl, {
         method: "GET",

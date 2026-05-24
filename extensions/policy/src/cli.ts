@@ -9,7 +9,7 @@ import {
   resolveDefaultAgentId,
   type HealthCheckContext,
   type HealthFinding,
-} from "openclaw/plugin-sdk/health";
+} from "recall/plugin-sdk/health";
 import { POLICY_CHECK_IDS, evaluatePolicy } from "./doctor/register.js";
 import { createPolicyAttestation } from "./policy-state.js";
 

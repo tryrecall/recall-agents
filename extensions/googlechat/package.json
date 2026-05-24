@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/googlechat",
+  "name": "@recall/googlechat",
   "version": "2026.5.22",
-  "description": "OpenClaw Google Chat channel plugin",
+  "description": "Recall Google Chat channel plugin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/tryrecall/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -13,18 +13,18 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*",
+    "recall": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.5.22"
+    "recall": ">=2026.5.22"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "recall": {
       "optional": true
     }
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
@@ -70,7 +70,7 @@
       ]
     },
     "install": {
-      "npmSpec": "@openclaw/googlechat",
+      "npmSpec": "@recall/googlechat",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.10"
     },

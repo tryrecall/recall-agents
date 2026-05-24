@@ -1,23 +1,23 @@
 ---
-summary: "Create your first OpenClaw plugin in minutes"
+summary: "Create your first Recall plugin in minutes"
 title: "Building plugins"
 sidebarTitle: "Getting Started"
 doc-schema-version: 1
 read_when:
-  - You want to create a new OpenClaw plugin
+  - You want to create a new Recall plugin
   - You need a quick-start for plugin development
   - You are choosing between channel, provider, CLI backend, tool, or hook docs
 ---
 
-Plugins extend OpenClaw without changing core. A plugin can add a messaging
+Plugins extend Recall without changing core. A plugin can add a messaging
 channel, model provider, local CLI backend, agent tool, hook, media provider,
 or another plugin-owned capability.
 
-You do not need to add an external plugin to the OpenClaw repository. Publish
+You do not need to add an external plugin to the Recall repository. Publish
 the package to [ClawHub](/clawhub) and users install it with:
 
 ```bash
-openclaw plugins install clawhub:<package-name>
+recall plugins install clawhub:<package-name>
 ```
 
 Bare package specs still install from npm during the launch cutover. Use the
@@ -28,20 +28,20 @@ Bare package specs still install from npm during the launch cutover. Use the
 - Use Node 22.19 or newer and a package manager such as `npm` or `pnpm`.
 - Be familiar with TypeScript ESM modules.
 - For in-repo bundled plugin work, clone the repository and run `pnpm install`.
-  Source-checkout plugin development is pnpm-only because OpenClaw loads bundled
+  Source-checkout plugin development is pnpm-only because Recall loads bundled
   plugins from `extensions/*` workspace packages.
 
 ## Choose the plugin shape
 
 <CardGroup cols={2}>
   <Card title="Channel plugin" icon="messages-square" href="/plugins/sdk-channel-plugins">
-    Connect OpenClaw to a messaging platform.
+    Connect Recall to a messaging platform.
   </Card>
   <Card title="Provider plugin" icon="cpu" href="/plugins/sdk-provider-plugins">
     Add a model, media, search, fetch, speech, or realtime provider.
   </Card>
   <Card title="CLI backend plugin" icon="terminal" href="/plugins/cli-backend-plugins">
-    Run a local AI CLI through OpenClaw model fallback.
+    Run a local AI CLI through Recall model fallback.
   </Card>
   <Card title="Tool plugin" icon="wrench" href="/plugins/tool-plugins">
     Register agent tools.
@@ -60,10 +60,10 @@ local proof.
 
 ```json package.json
 {
-  "name": "@myorg/openclaw-my-plugin",
+  "name": "@myorg/recall-my-plugin",
   "version": "1.0.0",
   "type": "module",
-  "openclaw": {
+  "recall": {
     "extensions": ["./index.ts"],
     "compat": {
       "pluginApi": ">=2026.3.24-beta.2",
@@ -77,11 +77,11 @@ local proof.
 }
 ```
 
-```json openclaw.plugin.json
+```json recall.plugin.json
 {
   "id": "my-plugin",
   "name": "My Plugin",
-  "description": "Adds a custom tool to OpenClaw",
+  "description": "Adds a custom tool to Recall",
   "contracts": {
     "tools": ["my_tool"]
   },
@@ -102,7 +102,7 @@ local proof.
     point contract.
 
     Every plugin needs a manifest, even when it has no config. Runtime tools
-    must appear in `contracts.tools` so OpenClaw can discover ownership without
+    must appear in `contracts.tools` so Recall can discover ownership without
     eagerly loading every plugin runtime. Set `activation.onStartup`
     intentionally. This example starts on Gateway startup.
 
@@ -113,12 +113,12 @@ local proof.
   <Step title="Register the tool">
     ```typescript index.ts
     import { Type } from "typebox";
-    import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+    import { definePluginEntry } from "recall/plugin-sdk/plugin-entry";
 
     export default definePluginEntry({
       id: "my-plugin",
       name: "My Plugin",
-      description: "Adds a custom tool to OpenClaw",
+      description: "Adds a custom tool to Recall",
       register(api) {
         api.registerTool({
           name: "my_tool",
@@ -143,14 +143,14 @@ local proof.
     For an installed or external plugin, inspect the loaded runtime:
 
     ```bash
-    openclaw plugins inspect my-plugin --runtime --json
+    recall plugins inspect my-plugin --runtime --json
     ```
 
     If the plugin registers a CLI command, run that command too. For example,
     a demo command should have an execution proof such as
-    `openclaw demo-plugin ping`.
+    `recall demo-plugin ping`.
 
-    For a bundled plugin in this repository, OpenClaw discovers source-checkout
+    For a bundled plugin in this repository, Recall discovers source-checkout
     plugin packages from the `extensions/*` workspace. Run the closest targeted
     test:
 
@@ -177,7 +177,7 @@ local proof.
     Install the published package through ClawHub:
 
     ```bash
-    openclaw plugins install clawhub:your-org/your-plugin
+    recall plugins install clawhub:your-org/your-plugin
     ```
 
   </Step>
@@ -241,13 +241,13 @@ Tool factories receive a runtime-supplied context object. Use `ctx.activeModel`
 when a tool needs to log, display, or adapt to the active model for the current
 turn. The object can include `provider`, `modelId`, and `modelRef`. Treat it as
 informational runtime metadata, not as a security boundary against the local
-operator, installed plugin code, or a modified OpenClaw runtime. Sensitive local
+operator, installed plugin code, or a modified Recall runtime. Sensitive local
 tools should still require an explicit plugin or operator opt-in and fail closed
 when active-model metadata is missing or unsuitable.
 
 The manifest declares ownership and discovery; execution still calls the live
 registered tool implementation. Keep `toolMetadata.<tool>.optional: true`
-aligned with `api.registerTool(..., { optional: true })` so OpenClaw can avoid
+aligned with `api.registerTool(..., { optional: true })` so Recall can avoid
 loading that plugin runtime until the tool is explicitly allowlisted.
 
 ## Import conventions
@@ -255,14 +255,14 @@ loading that plugin runtime until the tool is explicitly allowlisted.
 Import from focused SDK subpaths:
 
 ```typescript
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
-import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
+import { definePluginEntry } from "recall/plugin-sdk/plugin-entry";
+import { createPluginRuntimeStore } from "recall/plugin-sdk/runtime-store";
 ```
 
 Do not import from the deprecated root barrel:
 
 ```typescript
-import { definePluginEntry } from "openclaw/plugin-sdk";
+import { definePluginEntry } from "recall/plugin-sdk";
 ```
 
 Within your plugin package, use local barrel files such as `api.ts` and
@@ -274,15 +274,15 @@ Custom Gateway RPC methods are an advanced entry point. Keep them on a
 plugin-specific prefix; core admin namespaces such as `config.*`,
 `exec.approvals.*`, `operator.admin.*`, `wizard.*`, and `update.*` stay reserved
 and resolve to `operator.admin`. The
-`openclaw/plugin-sdk/gateway-method-runtime` bridge is reserved for plugin HTTP
+`recall/plugin-sdk/gateway-method-runtime` bridge is reserved for plugin HTTP
 routes that declare `contracts.gatewayMethodDispatch: ["authenticated-request"]`.
 
 For the full import map, see [Plugin SDK overview](/plugins/sdk-overview).
 
 ## Pre-submission checklist
 
-<Check>**package.json** has correct `openclaw` metadata</Check>
-<Check>**openclaw.plugin.json** manifest is present and valid</Check>
+<Check>**package.json** has correct `recall` metadata</Check>
+<Check>**recall.plugin.json** manifest is present and valid</Check>
 <Check>Entry point uses `defineChannelPluginEntry` or `definePluginEntry`</Check>
 <Check>All imports use focused `plugin-sdk/<subpath>` paths</Check>
 <Check>Internal imports use local modules, not SDK self-imports</Check>
@@ -291,7 +291,7 @@ For the full import map, see [Plugin SDK overview](/plugins/sdk-overview).
 
 ## Test against beta releases
 
-1. Watch for GitHub release tags on [openclaw/openclaw](https://github.com/openclaw/openclaw/releases) and subscribe via `Watch` > `Releases`. Beta tags look like `v2026.3.N-beta.1`. You can also turn on notifications for the official OpenClaw X account [@openclaw](https://x.com/openclaw) for release announcements.
+1. Watch for GitHub release tags on [tryrecall/recall-agents](https://github.com/tryrecall/recall-agents/releases) and subscribe via `Watch` > `Releases`. Beta tags look like `v2026.3.N-beta.1`. You can also turn on notifications for the official Recall X account [@recall](https://x.com/recall) for release announcements.
 2. Test your plugin against the beta tag as soon as it appears. The window before stable is typically only a few hours.
 3. Post in your plugin's thread in the `plugin-forum` Discord channel after testing with either `all good` or what broke. If you do not have a thread yet, create one.
 4. If something breaks, open or update an issue titled `Beta blocker: <plugin-name> - <summary>` and apply the `beta-blocker` label. Put the issue link in your thread.

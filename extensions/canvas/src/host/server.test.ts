@@ -3,7 +3,7 @@ import type { IncomingMessage } from "node:http";
 import os from "node:os";
 import path from "node:path";
 import type { Duplex } from "node:stream";
-import { defaultRuntime } from "openclaw/plugin-sdk/runtime-env";
+import { defaultRuntime } from "recall/plugin-sdk/runtime-env";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   A2UI_PATH,
@@ -161,7 +161,7 @@ describe("canvas host", () => {
     ({ createCanvasHostHandler, startCanvasHost } = await import("./server.js"));
     const wsModule = await vi.importActual<typeof import("ws")>("ws");
     WebSocketServerClass = wsModule.WebSocketServer;
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-canvas-fixtures-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "recall-canvas-fixtures-"));
   });
 
   beforeEach(() => {
@@ -390,7 +390,7 @@ describe("canvas host", () => {
       const res = await captureA2uiResponse(`${A2UI_PATH}/`);
       const html = res.body;
       expect(res.status).toBe(200);
-      expect(html).toContain("openclaw-a2ui-host");
+      expect(html).toContain("recall-a2ui-host");
       expect(html).toContain("openclawCanvasA2UIAction");
 
       const bundleRes = await captureA2uiResponse(`${A2UI_PATH}/a2ui.bundle.js`);

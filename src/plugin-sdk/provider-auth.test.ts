@@ -42,7 +42,7 @@ describe("provider auth profile helpers", () => {
     );
 
     vi.doMock("../agents/agent-scope-config.js", () => ({
-      resolveDefaultAgentDir: () => "/tmp/openclaw-agent",
+      resolveDefaultAgentDir: () => "/tmp/recall-agent",
     }));
     vi.doMock("../agents/auth-profiles/oauth.js", () => ({
       resolveApiKeyForProfile,
@@ -78,7 +78,7 @@ describe("provider auth profile helpers", () => {
     );
     expect(resolveApiKeyForProfile).toHaveBeenCalledWith(
       expect.objectContaining({
-        agentDir: "/tmp/openclaw-agent",
+        agentDir: "/tmp/recall-agent",
         profileId: "openai-codex:default",
         store: fallbackStore,
       }),

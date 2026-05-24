@@ -9,7 +9,7 @@ export {
   listRegisteredMemoryEmbeddingProviders,
   resolveCanonicalRootMemoryFile,
   shouldSkipRootMemoryAuxiliaryPath,
-} from "./openclaw-runtime.js";
+} from "./recall-runtime.js";
 export type {
   MemoryEmbeddingBatchChunk,
   MemoryEmbeddingBatchOptions,
@@ -26,5 +26,5 @@ export type {
   MemoryPluginPublicArtifactsProvider,
   MemoryPluginRuntime,
   MemoryPromptSectionBuilder,
-  OpenClawPluginApi,
-} from "./openclaw-runtime.js";
+  RecallPluginApi,
+} from "./recall-runtime.js";

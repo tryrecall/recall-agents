@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   NODE_BROWSER_PROXY_COMMAND,
   NODE_SYSTEM_NOTIFY_COMMAND,
@@ -313,7 +313,7 @@ function hasTalkSurface(node?: NodeCommandPolicyNode): boolean {
 }
 
 function resolveNodeCommandAllowlistInternal(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   node?: NodeCommandPolicyNode,
   options?: { includeDesktopHostCommands?: boolean },
 ): Set<string> {
@@ -353,14 +353,14 @@ function resolveNodeCommandAllowlistInternal(
 }
 
 export function resolveNodeCommandAllowlist(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   node?: NodeCommandPolicyNode,
 ): Set<string> {
   return resolveNodeCommandAllowlistInternal(cfg, node);
 }
 
 export function resolveNodePairingCommandAllowlist(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   node?: NodeCommandPolicyNode,
 ): Set<string> {
   return resolveNodeCommandAllowlistInternal(cfg, node, {

@@ -86,7 +86,7 @@ export type PluginRuntimeChannel = {
   reply: {
     dispatchReplyWithBufferedBlockDispatcher: DispatchReplyWithBufferedBlockDispatcher;
     /**
-     * @deprecated Prefer `openclaw/plugin-sdk/channel-message` adapters plus
+     * @deprecated Prefer `recall/plugin-sdk/channel-message` adapters plus
      * `dispatchReplyWithBufferedBlockDispatcher` or channel turn helpers.
      * This is a low-level legacy dispatcher escape hatch.
      */
@@ -108,7 +108,7 @@ export type PluginRuntimeChannel = {
     settleReplyDispatcher: typeof import("../../auto-reply/dispatch-dispatcher.js").settleReplyDispatcher;
     /**
      * @deprecated Prefer `buildChannelInboundEventContext` /
-     * `buildChannelTurnContext` from `openclaw/plugin-sdk/channel-inbound` so
+     * `buildChannelTurnContext` from `recall/plugin-sdk/channel-inbound` so
      * inbound event metadata is carried into reply dispatch.
      */
     finalizeInboundContext: typeof import("../../auto-reply/reply/inbound-context.js").finalizeInboundContext;

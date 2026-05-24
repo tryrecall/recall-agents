@@ -23,7 +23,7 @@ import {
   resolveSupportedThinkingLevel,
 } from "../auto-reply/thinking.js";
 import type { SessionEntry } from "../config/sessions.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { normalizeExecTarget } from "../infra/exec-approvals.js";
 import {
   isAcpSessionKey,
@@ -72,7 +72,7 @@ function normalizeExecAsk(raw: string): "off" | "on-miss" | "always" | undefined
 }
 
 function shouldPreserveSessionAuthProfileOverride(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   entry: SessionEntry;
   currentProvider: string;
   provider: string;
@@ -129,7 +129,7 @@ function normalizeSubagentControlScope(raw: string): "children" | "none" | undef
 }
 
 export async function applySessionsPatchToStore(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   store: Record<string, SessionEntry>;
   storeKey: string;
   patch: SessionsPatchParams;

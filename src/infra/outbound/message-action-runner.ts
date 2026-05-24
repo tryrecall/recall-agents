@@ -1,5 +1,5 @@
 import type { AgentToolResult } from "@earendil-works/pi-agent-core";
-import { resolveSendableOutboundReplyParts } from "openclaw/plugin-sdk/reply-payload";
+import { resolveSendableOutboundReplyParts } from "recall/plugin-sdk/reply-payload";
 import { resolveSessionAgentId } from "../../agents/agent-scope.js";
 import {
   readNumberParam,
@@ -18,7 +18,7 @@ import type {
   ChannelMessageActionName,
   ChannelThreadingToolContext,
 } from "../../channels/plugins/types.public.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import {
   hasInteractiveReplyBlocks,
   hasMessagePresentationBlocks,
@@ -107,7 +107,7 @@ function loadMessageActionGatewayRuntime() {
 }
 
 export type RunMessageActionParams = {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   action: ChannelMessageActionName;
   params: Record<string, unknown>;
   defaultAccountId?: string;
@@ -259,7 +259,7 @@ function applyCrossContextMessageDecoration({
 }
 
 async function maybeApplyCrossContextMarker(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channel: ChannelId;
   action: ChannelMessageActionName;
   target: string;
@@ -293,7 +293,7 @@ async function maybeApplyCrossContextMarker(params: {
 }
 
 async function resolveChannel(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   params: Record<string, unknown>,
   toolContext?: { currentChannelProvider?: string },
 ) {
@@ -347,7 +347,7 @@ function inferPeerKindForAccountBinding(channel: ChannelId, target: string): Cha
 }
 
 function resolveTargetBoundAccountId(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channel: ChannelId;
   args: Record<string, unknown>;
   agentId?: string;
@@ -383,7 +383,7 @@ function resolveTargetBoundAccountId(params: {
 }
 
 async function resolveActionTarget(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channel: ChannelId;
   action: ChannelMessageActionName;
   args: Record<string, unknown>;
@@ -424,7 +424,7 @@ function sanitizeGroupTargetId(target: string): string {
 }
 
 async function resolveResolvedTargetOrThrow(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channel: ChannelId;
   input: string;
   accountId?: string;
@@ -449,7 +449,7 @@ async function resolveResolvedTargetOrThrow(params: {
 }
 
 type ResolvedActionContext = {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   params: Record<string, unknown>;
   channel: ChannelId;
   mediaAccess: OutboundMediaAccess;
@@ -557,7 +557,7 @@ function shouldUseInternalSourceReplySink(
 }
 
 async function runGatewayPluginMessageActionOrNull(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   params: Record<string, unknown>;
   channel: ChannelId;
   action: ChannelMessageActionName;
@@ -738,7 +738,7 @@ async function handleInternalSourceReplySendAction(
 }
 
 async function buildSendPayloadParts(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   actionParams: Record<string, unknown>;
   input: RunMessageActionParams;
   channel?: ChannelId;

@@ -1,7 +1,7 @@
 import type { Block, KnownBlock, WebClient } from "@slack/web-api";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { requireRuntimeConfig } from "openclaw/plugin-sdk/plugin-config-runtime";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { requireRuntimeConfig } from "recall/plugin-sdk/plugin-config-runtime";
+import { logVerbose } from "recall/plugin-sdk/runtime-env";
 import { z } from "zod";
 import { resolveSlackAccount } from "./accounts.js";
 import { validateSlackBlocksArray } from "./blocks-input.js";
@@ -13,7 +13,7 @@ import { sendMessageSlack } from "./send.js";
 import { resolveSlackBotToken } from "./token.js";
 
 export type SlackActionClientOpts = {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   accountId?: string;
   token?: string;
   client?: WebClient;
@@ -44,7 +44,7 @@ export type SlackPin = {
   file?: { id?: string; name?: string };
 };
 
-function resolveToken(explicit?: string, accountId?: string, cfg?: OpenClawConfig): string {
+function resolveToken(explicit?: string, accountId?: string, cfg?: RecallConfig): string {
   if (explicit?.trim()) {
     const token = resolveSlackBotToken(explicit);
     if (token) {
@@ -235,7 +235,7 @@ export async function sendSlackMessage(
   to: string,
   content: string,
   opts: Omit<SlackActionClientOpts, "cfg"> & {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     mediaUrl?: string;
     mediaAccess?: {
       localRoots?: readonly string[];

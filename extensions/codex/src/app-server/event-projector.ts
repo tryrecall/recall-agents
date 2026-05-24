@@ -19,8 +19,8 @@ import {
   type MessagingToolSend,
   type MessagingToolSourceReplyPayload,
   type ToolProgressDetailMode,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
-import { emitTrustedDiagnosticEvent } from "openclaw/plugin-sdk/diagnostic-runtime";
+} from "recall/plugin-sdk/agent-harness-runtime";
+import { emitTrustedDiagnosticEvent } from "recall/plugin-sdk/diagnostic-runtime";
 import { resolveCodexLocalRuntimeAttribution } from "./local-runtime-attribution.js";
 import {
   readCodexNotificationThreadId,
@@ -275,7 +275,7 @@ export class CodexAppServerEventProjector {
       ? []
       : [attachCodexMirrorIdentity(buildCodexUserPromptMessage(this.params), `${turnId}:prompt`)];
     // Codex owns the canonical thread. These mirror records keep enough local
-    // context for OpenClaw history, search, and future harness switching.
+    // context for Recall history, search, and future harness switching.
     if (reasoningText) {
       messagesSnapshot.push(
         attachCodexMirrorIdentity(
@@ -1800,7 +1800,7 @@ function shouldSuppressChannelProgressForItem(item: CodexThreadItem): boolean {
   if (shouldSynthesizeToolProgressForItem(item)) {
     return true;
   }
-  // Dynamic OpenClaw tool requests are emitted at the item/tool/call request
+  // Dynamic Recall tool requests are emitted at the item/tool/call request
   // boundary in run-attempt.ts. Re-emitting item notifications to channels can
   // duplicate start/result progress when the app-server sends both signals.
   return item.type === "dynamicToolCall";

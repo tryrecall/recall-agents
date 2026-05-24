@@ -1,11 +1,11 @@
-import { formatErrorMessage } from "openclaw/plugin-sdk/agent-harness-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "recall/plugin-sdk/agent-harness-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
 import type {
   PluginConversationBindingResolvedEvent,
   PluginHookInboundClaimContext,
   PluginHookInboundClaimEvent,
-} from "openclaw/plugin-sdk/plugin-entry";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-payload";
+} from "recall/plugin-sdk/plugin-entry";
+import type { ReplyPayload } from "recall/plugin-sdk/reply-payload";
 import { resolveCodexAppServerAuthProfileIdForAgent } from "./app-server/auth-bridge.js";
 import { CODEX_CONTROL_METHODS } from "./app-server/capabilities.js";
 import {
@@ -57,7 +57,7 @@ export {
 
 type CodexConversationRunOptions = {
   pluginConfig?: unknown;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   timeoutMs?: number;
   resumeCodexCliSessionOnNode?: ResumeCodexCliSessionOnNodeFn;
 };
@@ -89,7 +89,7 @@ type CodexConversationGlobalState = {
   queues: Map<string, Promise<void>>;
 };
 
-const CODEX_CONVERSATION_GLOBAL_STATE = Symbol.for("openclaw.codex.conversationBinding");
+const CODEX_CONVERSATION_GLOBAL_STATE = Symbol.for("recall.codex.conversationBinding");
 
 function getGlobalState(): CodexConversationGlobalState {
   const globalState = globalThis as typeof globalThis & {
@@ -357,7 +357,7 @@ async function createThread(params: {
         ? { serviceTier: params.serviceTier ?? runtime.serviceTier }
         : {}),
       developerInstructions:
-        "This Codex thread is bound to an OpenClaw conversation. Answer normally; OpenClaw will deliver your final response back to the conversation.",
+        "This Codex thread is bound to an Recall conversation. Answer normally; Recall will deliver your final response back to the conversation.",
       experimentalRawEvents: true,
       persistExtendedHistory: true,
     },
@@ -421,7 +421,7 @@ async function runBoundTurn(params: {
           contentItems: [
             {
               type: "inputText",
-              text: "OpenClaw native Codex conversation binding does not expose dynamic OpenClaw tools yet.",
+              text: "Recall native Codex conversation binding does not expose dynamic Recall tools yet.",
             },
           ],
           success: false,
@@ -434,7 +434,7 @@ async function runBoundTurn(params: {
         return {
           decision: "decline",
           reason:
-            "OpenClaw native Codex conversation binding cannot route interactive approvals yet; use the Codex harness or explicit /acp spawn codex for that workflow.",
+            "Recall native Codex conversation binding cannot route interactive approvals yet; use the Codex harness or explicit /acp spawn codex for that workflow.",
         };
       }
       if (request.method === "item/permissions/requestApproval") {
@@ -444,7 +444,7 @@ async function runBoundTurn(params: {
         return {
           decision: "decline",
           reason:
-            "OpenClaw native Codex conversation binding cannot route interactive approvals yet; use the Codex harness or explicit /acp spawn codex for that workflow.",
+            "Recall native Codex conversation binding cannot route interactive approvals yet; use the Codex harness or explicit /acp spawn codex for that workflow.",
         };
       }
       return undefined;

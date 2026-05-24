@@ -3,13 +3,13 @@ import {
   type MessageReceipt,
   type MessageReceiptPartKind,
   type MessageReceiptSourceResult,
-} from "openclaw/plugin-sdk/channel-message";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { resolveMarkdownTableMode } from "openclaw/plugin-sdk/markdown-table-runtime";
-import { kindFromMime, resolveOutboundAttachmentFromUrl } from "openclaw/plugin-sdk/media-runtime";
-import { requireRuntimeConfig } from "openclaw/plugin-sdk/plugin-config-runtime";
-import { convertMarkdownTables } from "openclaw/plugin-sdk/text-chunking";
-import { stripInlineDirectiveTagsForDelivery } from "openclaw/plugin-sdk/text-chunking";
+} from "recall/plugin-sdk/channel-message";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { resolveMarkdownTableMode } from "recall/plugin-sdk/markdown-table-runtime";
+import { kindFromMime, resolveOutboundAttachmentFromUrl } from "recall/plugin-sdk/media-runtime";
+import { requireRuntimeConfig } from "recall/plugin-sdk/plugin-config-runtime";
+import { convertMarkdownTables } from "recall/plugin-sdk/text-chunking";
+import { stripInlineDirectiveTagsForDelivery } from "recall/plugin-sdk/text-chunking";
 import { resolveIMessageAccount, type ResolvedIMessageAccount } from "./accounts.js";
 import { createIMessageRpcClient, type IMessageRpcClient } from "./client.js";
 import { extractMarkdownFormatRuns } from "./markdown-format.js";
@@ -31,7 +31,7 @@ type IMessageSendOpts = {
   timeoutMs?: number;
   chatId?: number;
   client?: IMessageRpcClient;
-  config: OpenClawConfig;
+  config: RecallConfig;
   account?: ResolvedIMessageAccount;
   resolveAttachmentImpl?: (
     mediaUrl: string,

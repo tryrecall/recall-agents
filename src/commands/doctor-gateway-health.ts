@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { buildGatewayConnectionDetails, callGateway } from "../gateway/call.js";
 import type { DoctorMemoryStatusPayload } from "../gateway/server-methods/doctor.js";
 import { collectChannelStatusIssues } from "../infra/channels-status-issues.js";
@@ -33,17 +33,17 @@ function noteCliGatewayVersionSkew(status: StatusSummary | undefined): void {
   }
   note(
     [
-      `This command is OpenClaw ${VERSION}; the running Gateway is OpenClaw ${gatewayVersion}.`,
-      "Check `openclaw --version`, `which openclaw`, and `openclaw gateway status --deep`.",
-      "If this mismatch is unexpected, update PATH so `openclaw` points to the version you want, or reinstall the Gateway service from that same OpenClaw install.",
+      `This command is Recall ${VERSION}; the running Gateway is Recall ${gatewayVersion}.`,
+      "Check `recall --version`, `which recall`, and `recall gateway status --deep`.",
+      "If this mismatch is unexpected, update PATH so `recall` points to the version you want, or reinstall the Gateway service from that same Recall install.",
     ].join("\n"),
-    "OpenClaw version mismatch",
+    "Recall version mismatch",
   );
 }
 
 export async function checkGatewayHealth(params: {
   runtime: RuntimeEnv;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   timeoutMs?: number;
 }): Promise<{ healthOk: boolean; status?: StatusSummary }> {
   const gatewayDetails = buildGatewayConnectionDetails({ config: params.cfg });
@@ -100,7 +100,7 @@ export async function checkGatewayHealth(params: {
 }
 
 export async function probeGatewayMemoryStatus(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   timeoutMs?: number;
 }): Promise<GatewayMemoryProbe> {
   const timeoutMs =

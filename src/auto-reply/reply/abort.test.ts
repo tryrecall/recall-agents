@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SubagentRunRecord } from "../../agents/subagent-registry.js";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import {
   testing as abortTesting,
   getAbortMemory,
@@ -102,14 +102,14 @@ describe("abort detection", () => {
     sessionIdsByKey?: Record<string, string>;
     nowMs?: number;
   }) {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-abort-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-abort-"));
     const storePath = path.join(root, "sessions.json");
     const cfg = {
       session: { store: storePath },
       ...(typeof params?.commandsTextEnabled === "boolean"
         ? { commands: { text: params.commandsTextEnabled } }
         : {}),
-    } as OpenClawConfig;
+    } as RecallConfig;
     if (params?.sessionIdsByKey) {
       await writeSessionStore(storePath, params.sessionIdsByKey, params.nowMs);
     }
@@ -117,7 +117,7 @@ describe("abort detection", () => {
   }
 
   async function runStopCommand(params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     sessionKey?: string;
     parentSessionKey?: string;
     from: string;
@@ -151,7 +151,7 @@ describe("abort detection", () => {
 
   function enqueueQueuedFollowupRun(params: {
     root: string;
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     sessionId: string;
     sessionKey: string;
   }) {
@@ -229,8 +229,8 @@ describe("abort detection", () => {
       "wait",
       "exit",
       "interrupt",
-      "stop openclaw",
-      "openclaw stop",
+      "stop recall",
+      "recall stop",
       "stop action",
       "stop current action",
       "stop run",
@@ -245,7 +245,7 @@ describe("abort detection", () => {
       "please stop",
       "stop please",
       "STOP OPENCLAW",
-      "stop openclaw!!!",
+      "stop recall!!!",
       "stop don’t do anything",
       "detente",
       "detén",
@@ -289,7 +289,7 @@ describe("abort detection", () => {
     expect(isAbortRequestText("Stop")).toBe(true);
     expect(isAbortRequestText("STOP")).toBe(true);
     expect(isAbortRequestText("stop action")).toBe(true);
-    expect(isAbortRequestText("stop openclaw!!!")).toBe(true);
+    expect(isAbortRequestText("stop recall!!!")).toBe(true);
     expect(isAbortRequestText("停下来")).toBe(true);
     expect(isAbortRequestText("暂停")).toBe(true);
     expect(isAbortRequestText("やめて")).toBe(true);
@@ -1222,7 +1222,7 @@ describe("abort detection", () => {
     });
 
     const result = stopSubagentsForRequester({
-      cfg: {} as OpenClawConfig,
+      cfg: {} as RecallConfig,
       requesterSessionKey: oldParentKey,
     });
 

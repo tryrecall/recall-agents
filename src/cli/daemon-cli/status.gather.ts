@@ -7,14 +7,14 @@ import {
   resolveStateDir,
 } from "../../config/config.js";
 import type {
-  OpenClawConfig,
+  RecallConfig,
   ConfigFileSnapshot,
   GatewayBindMode,
   GatewayControlUiConfig,
 } from "../../config/types.js";
 import { readLastGatewayErrorLine } from "../../daemon/diagnostics.js";
 import type { FindExtraGatewayServicesOptions } from "../../daemon/inspect.js";
-import type { StaleOpenClawUpdateLaunchdJob } from "../../daemon/launchd.js";
+import type { StaleRecallUpdateLaunchdJob } from "../../daemon/launchd.js";
 import type { ServiceConfigAudit } from "../../daemon/service-audit.js";
 import type { GatewayServiceRuntime } from "../../daemon/service-runtime.js";
 import { resolveGatewayService } from "../../daemon/service.js";
@@ -72,8 +72,8 @@ type PortStatusSummary = {
 
 type DaemonConfigContext = {
   mergedDaemonEnv: Record<string, string | undefined>;
-  cliCfg: OpenClawConfig;
-  daemonCfg: OpenClawConfig;
+  cliCfg: RecallConfig;
+  daemonCfg: RecallConfig;
   cliConfigSummary: ConfigSummary;
   daemonConfigSummary: ConfigSummary;
   configMismatch: boolean;
@@ -81,7 +81,7 @@ type DaemonConfigContext = {
 
 type StatusConfigRead = {
   summary: ConfigSummary;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   mode: "fast" | "full";
 };
 
@@ -137,18 +137,18 @@ function loadRestartHealthModule() {
   return restartHealthModuleLoader.load();
 }
 
-function resolveSnapshotRuntimeConfig(snapshot: ConfigFileSnapshot | null): OpenClawConfig | null {
+function resolveSnapshotRuntimeConfig(snapshot: ConfigFileSnapshot | null): RecallConfig | null {
   if (!snapshot?.valid || !snapshot.runtimeConfig) {
     return null;
   }
   return snapshot.runtimeConfig;
 }
 
-function coerceStatusConfig(value: unknown): OpenClawConfig {
+function coerceStatusConfig(value: unknown): RecallConfig {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return {};
   }
-  return value as OpenClawConfig;
+  return value as RecallConfig;
 }
 
 function hasOwnKey(value: unknown, key: string): boolean {
@@ -277,7 +277,7 @@ export type DaemonStatus = {
     runtime?: GatewayServiceRuntime;
     configAudit?: ServiceConfigAudit;
     restartHandoff?: GatewayRestartHandoff;
-    staleUpdateLaunchdJobs?: StaleOpenClawUpdateLaunchdJob[];
+    staleUpdateLaunchdJobs?: StaleRecallUpdateLaunchdJob[];
   };
   config?: {
     cli: ConfigSummary;
@@ -386,8 +386,8 @@ async function loadDaemonConfigContext(
 }
 
 async function resolveGatewayStatusSummary(params: {
-  daemonCfg: OpenClawConfig;
-  cliCfg: OpenClawConfig;
+  daemonCfg: RecallConfig;
+  cliCfg: RecallConfig;
   mergedDaemonEnv: Record<string, string | undefined>;
   commandProgramArguments?: string[];
   rpcUrlOverride?: string;
@@ -555,7 +555,7 @@ export async function gatherDaemonStatus(
   const staleUpdateLaunchdJobs =
     opts.deep && process.platform === "darwin"
       ? await loadLaunchdModule()
-          .then(({ findStaleOpenClawUpdateLaunchdJobs }) => findStaleOpenClawUpdateLaunchdJobs())
+          .then(({ findStaleRecallUpdateLaunchdJobs }) => findStaleRecallUpdateLaunchdJobs())
           .catch(() => [])
       : [];
 

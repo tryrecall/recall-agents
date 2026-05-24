@@ -6,7 +6,7 @@ import {
   listRegisteredAgentHarnesses,
   restoreRegisteredAgentHarnesses,
 } from "../agents/harness/registry.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 import type { GatewayRequestHandler } from "../gateway/server-methods/types.js";
 import { openRootFileSync } from "../infra/boundary-file-read.js";
@@ -51,7 +51,7 @@ import {
 } from "./config-state.js";
 import { isPluginEnabledByDefaultForPlatform } from "./default-enablement.js";
 import {
-  discoverOpenClawPlugins,
+  discoverRecallPlugins,
   type PluginCandidate,
   type PluginDiscoveryResult,
 } from "./discovery.js";
@@ -129,8 +129,8 @@ import {
   normalizePluginIdScope,
   serializePluginIdScope,
 } from "./plugin-scope.js";
-import { ensureOpenClawPluginSdkAlias } from "./plugin-sdk-dist-alias.js";
-import { installOpenClawPluginSdkNativeResolver } from "./plugin-sdk-native-resolver.js";
+import { ensureRecallPluginSdkAlias } from "./plugin-sdk-dist-alias.js";
+import { installRecallPluginSdkNativeResolver } from "./plugin-sdk-native-resolver.js";
 import { createEmptyPluginRegistry } from "./registry-empty.js";
 import type { PluginRegistryParams } from "./registry-types.js";
 import { createPluginRegistry, type PluginRecord, type PluginRegistry } from "./registry.js";
@@ -160,9 +160,9 @@ import {
 import { hasKind, kindsEqual } from "./slots.js";
 import { encodeStartupTraceSegment } from "./startup-trace-segment.js";
 import type {
-  OpenClawPluginApi,
-  OpenClawPluginDefinition,
-  OpenClawPluginModule,
+  RecallPluginApi,
+  RecallPluginDefinition,
+  RecallPluginModule,
   PluginLogger,
   PluginRegistrationMode,
 } from "./types.js";
@@ -171,8 +171,8 @@ export type PluginLoadResult = PluginRegistry;
 export { PluginLoadReentryError } from "./loader-cache-state.js";
 
 export type PluginLoadOptions = {
-  config?: OpenClawConfig;
-  activationSourceConfig?: OpenClawConfig;
+  config?: RecallConfig;
+  activationSourceConfig?: RecallConfig;
   autoEnabledReasons?: Readonly<Record<string, string[]>>;
   workspaceDir?: string;
   installRecords?: Record<string, PluginInstallRecord>;
@@ -231,7 +231,7 @@ const CLI_METADATA_ENTRY_BASENAMES = [
 ] as const;
 
 function resolveDreamingSidecarEngineId(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   memorySlot: string | null | undefined;
 }): string | null {
   const normalizedMemorySlot = normalizeLowercaseStringOrEmpty(params.memorySlot);
@@ -479,8 +479,8 @@ function restorePluginRegistry(registry: PluginRegistry, snapshot: PluginRegistr
   registry.coreGatewayMethodNames = snapshot.coreGatewayMethodNames;
 }
 
-function createGuardedPluginRegistrationApi(api: OpenClawPluginApi): {
-  api: OpenClawPluginApi;
+function createGuardedPluginRegistrationApi(api: RecallPluginApi): {
+  api: RecallPluginApi;
   close: () => void;
 } {
   let closed = false;
@@ -514,8 +514,8 @@ function createGuardedPluginRegistrationApi(api: OpenClawPluginApi): {
 }
 
 function runPluginRegisterSync(
-  register: NonNullable<OpenClawPluginDefinition["register"]>,
-  api: Parameters<NonNullable<OpenClawPluginDefinition["register"]>>[0],
+  register: NonNullable<RecallPluginDefinition["register"]>,
+  api: Parameters<NonNullable<RecallPluginDefinition["register"]>>[0],
 ): void {
   const guarded = createGuardedPluginRegistrationApi(api);
   try {
@@ -532,7 +532,7 @@ function runPluginRegisterSync(
 function createPluginModuleLoader(options: Pick<PluginLoadOptions, "pluginSdkResolution">) {
   const moduleLoaders: PluginModuleLoaderCache = createPluginModuleLoaderCache();
   const createLoaderForModule = (modulePath: string) => {
-    installOpenClawPluginSdkNativeResolver({
+    installRecallPluginSdkNativeResolver({
       argv1: process.argv[1],
       moduleUrl: import.meta.url,
       pluginModulePath: modulePath,
@@ -622,7 +622,7 @@ export const testing = {
   resolvePluginSdkAliasCandidateOrder,
   resolvePluginSdkAliasFile,
   resolvePluginRuntimeModulePath,
-  ensureOpenClawPluginSdkAlias,
+  ensureRecallPluginSdkAlias,
   shouldLoadChannelPluginInSetupRuntime,
   shouldPreferNativeModuleLoad,
   toSafeImportPath,
@@ -1034,7 +1034,7 @@ function resolvePluginRegistrationPlan(params: {
   validateOnly: boolean;
   shouldActivate: boolean;
   manifestRecord: PluginManifestRecord;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   env: NodeJS.ProcessEnv;
   preferSetupRuntimeForChannelPlugins: boolean;
   toolDiscovery: boolean;
@@ -1350,12 +1350,12 @@ export function resolveRuntimePluginRegistry(
     return compatible;
   }
   // Helper/runtime callers should not recurse into the same snapshot load while
-  // plugin registration is still in flight. Let direct loadOpenClawPlugins(...)
+  // plugin registration is still in flight. Let direct loadRecallPlugins(...)
   // callers surface the hard error instead.
   if (isPluginRegistryLoadInFlight(options)) {
     return undefined;
   }
-  return loadOpenClawPlugins(options);
+  return loadRecallPlugins(options);
 }
 
 export function getRuntimePluginRegistryForLoadOptions(
@@ -1444,8 +1444,8 @@ function isEmptyPluginConfigJsonSchema(schema: Record<string, unknown>): boolean
 }
 
 function resolvePluginModuleExport(moduleExport: unknown): {
-  definition?: OpenClawPluginDefinition;
-  register?: OpenClawPluginDefinition["register"];
+  definition?: RecallPluginDefinition;
+  register?: RecallPluginDefinition["register"];
 } {
   const seen = new Set<unknown>();
   const candidates: unknown[] = [unwrapDefaultModuleExport(moduleExport), moduleExport];
@@ -1457,11 +1457,11 @@ function resolvePluginModuleExport(moduleExport: unknown): {
     seen.add(resolved);
     if (typeof resolved === "function") {
       return {
-        register: resolved as OpenClawPluginDefinition["register"],
+        register: resolved as RecallPluginDefinition["register"],
       };
     }
     if (resolved && typeof resolved === "object") {
-      const def = resolved as OpenClawPluginDefinition;
+      const def = resolved as RecallPluginDefinition;
       const register = def.register ?? def.activate;
       if (typeof register === "function") {
         return { definition: def, register };
@@ -1476,11 +1476,11 @@ function resolvePluginModuleExport(moduleExport: unknown): {
   const resolved = candidates[0];
   if (typeof resolved === "function") {
     return {
-      register: resolved as OpenClawPluginDefinition["register"],
+      register: resolved as RecallPluginDefinition["register"],
     };
   }
   if (resolved && typeof resolved === "object") {
-    const def = resolved as OpenClawPluginDefinition;
+    const def = resolved as RecallPluginDefinition;
     const register = def.register ?? def.activate;
     return { definition: def, register };
   }
@@ -1534,7 +1534,7 @@ function activatePluginRegistry(
   }
 }
 
-export function loadOpenClawPlugins(options: PluginLoadOptions = {}): PluginRegistry {
+export function loadRecallPlugins(options: PluginLoadOptions = {}): PluginRegistry {
   const requestedOnlyPluginIds = normalizePluginIdScope(options.onlyPluginIds);
   const requestedOnlyPluginIdSet = createPluginIdScopeSet(requestedOnlyPluginIds);
   if (requestedOnlyPluginIdSet && requestedOnlyPluginIdSet.size === 0) {
@@ -1725,7 +1725,7 @@ export function loadOpenClawPlugins(options: PluginLoadOptions = {}): PluginRegi
           diagnostics: [] as PluginDiagnostic[],
         }
       : (options.discovery ??
-        discoverOpenClawPlugins({
+        discoverRecallPlugins({
           workspaceDir: options.workspaceDir,
           extraPaths: normalized.loadPaths,
           env,
@@ -1969,7 +1969,7 @@ export function loadOpenClawPlugins(options: PluginLoadOptions = {}): PluginRegi
             level: "warn",
             pluginId: record.id,
             source: record.source,
-            message: `bundle capability detected but not wired into OpenClaw yet: ${capability}`,
+            message: `bundle capability detected but not wired into Recall yet: ${capability}`,
           });
         }
         if (
@@ -2110,7 +2110,7 @@ export function loadOpenClawPlugins(options: PluginLoadOptions = {}): PluginRegi
       const safeSource = opened.path;
       fs.closeSync(opened.fd);
 
-      let mod: OpenClawPluginModule | null = null;
+      let mod: RecallPluginModule | null = null;
       let moduleLoadMs = 0;
       let moduleLoadFailed = false;
       const beforeModuleLoad = performance.now();
@@ -2123,7 +2123,7 @@ export function loadOpenClawPlugins(options: PluginLoadOptions = {}): PluginRegi
         mod = withProfile(
           { pluginId: record.id, source: safeSource },
           registrationMode,
-          () => loadPluginModule(safeSource) as OpenClawPluginModule,
+          () => loadPluginModule(safeSource) as RecallPluginModule,
         );
       } catch (err) {
         recordPluginError({
@@ -2210,12 +2210,12 @@ export function loadOpenClawPlugins(options: PluginLoadOptions = {}): PluginRegi
             }
             const safeRuntimeSource = runtimeOpened.path;
             fs.closeSync(runtimeOpened.fd);
-            let runtimeMod: OpenClawPluginModule | null = null;
+            let runtimeMod: RecallPluginModule | null = null;
             try {
               runtimeMod = withProfile(
                 { pluginId: record.id, source: safeRuntimeSource },
                 "load-setup-runtime-entry",
-                () => loadPluginModule(safeRuntimeSource) as OpenClawPluginModule,
+                () => loadPluginModule(safeRuntimeSource) as RecallPluginModule,
               );
             } catch (err) {
               recordPluginError({
@@ -2536,7 +2536,7 @@ export function loadOpenClawPlugins(options: PluginLoadOptions = {}): PluginRegi
         logger.warn(
           `[plugins] ${failedPlugins.length} plugin(s) failed to initialize (${formatPluginFailureSummary(
             failedPlugins,
-          )}). Run 'openclaw plugins list' for details.`,
+          )}). Run 'recall plugins list' for details.`,
         );
       }
     }
@@ -2569,7 +2569,7 @@ export function loadOpenClawPlugins(options: PluginLoadOptions = {}): PluginRegi
   }
 }
 
-export async function loadOpenClawPluginCliRegistry(
+export async function loadRecallPluginCliRegistry(
   options: PluginLoadOptions = {},
 ): Promise<PluginRegistry> {
   const {
@@ -2600,7 +2600,7 @@ export async function loadOpenClawPluginCliRegistry(
 
   const discovery =
     options.discovery ??
-    discoverOpenClawPlugins({
+    discoverRecallPlugins({
       workspaceDir: options.workspaceDir,
       extraPaths: normalized.loadPaths,
       env,
@@ -2821,12 +2821,12 @@ export async function loadOpenClawPluginCliRegistry(
     const safeSource = opened.path;
     fs.closeSync(opened.fd);
 
-    let mod: OpenClawPluginModule | null = null;
+    let mod: RecallPluginModule | null = null;
     try {
       mod = withProfile(
         { pluginId: record.id, source: safeSource },
         "cli-metadata",
-        () => loadPluginModule(safeSource) as OpenClawPluginModule,
+        () => loadPluginModule(safeSource) as RecallPluginModule,
       );
     } catch (err) {
       recordPluginError({

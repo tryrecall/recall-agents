@@ -12,7 +12,7 @@ import {
 import { resolveAgentModelFallbackValues } from "../config/model-input.js";
 import type { SessionEntry } from "../config/sessions.js";
 import { updateSessionStore } from "../config/sessions/store.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { listPluginDoctorSessionRouteStateOwners } from "../plugins/doctor-contract-registry.js";
 import type { DoctorSessionRouteStateOwner } from "../plugins/doctor-session-route-state-owner-types.js";
 import { parseAgentSessionKey } from "../sessions/session-key-utils.js";
@@ -56,12 +56,12 @@ function repairExample(repair: DoctorSessionRouteStateRepair): string {
   return `${repair.key} (${repair.reasons.join(", ")})`;
 }
 
-function resolveSessionAgentId(cfg: OpenClawConfig, sessionKey: string): string {
+function resolveSessionAgentId(cfg: RecallConfig, sessionKey: string): string {
   return parseAgentSessionKey(sessionKey)?.agentId ?? resolveDefaultAgentId(cfg);
 }
 
 export function resolveConfiguredDoctorSessionStateRoute(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionKey: string;
   env?: NodeJS.ProcessEnv;
 }): DoctorSessionRouteState {
@@ -98,7 +98,7 @@ export function resolveConfiguredDoctorSessionStateRoute(params: {
 }
 
 function resolvePluginDoctorSessionRouteStateOwners(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   env?: NodeJS.ProcessEnv;
 }): DoctorSessionRouteStateOwner[] {
   return listPluginDoctorSessionRouteStateOwners({ config: params.cfg, env: params.env });
@@ -444,7 +444,7 @@ function groupRepairsByOwner(
 }
 
 export async function runPluginSessionStateDoctorRepairs(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   store: Record<string, SessionEntry>;
   absoluteStorePath: string;
   prompter: DoctorPrompterLike;

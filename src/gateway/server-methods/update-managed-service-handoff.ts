@@ -13,9 +13,9 @@ import type { UpdateRestartSentinelMeta } from "../../infra/update-restart-senti
 
 const PARENT_EXIT_GRACE_MS = 60_000;
 const SERVICE_IDENTITY_ENV_VARS = new Set<string>([
-  "OPENCLAW_LAUNCHD_LABEL",
-  "OPENCLAW_SYSTEMD_UNIT",
-  "OPENCLAW_WINDOWS_TASK_NAME",
+  "RECALL_LAUNCHD_LABEL",
+  "RECALL_SYSTEMD_UNIT",
+  "RECALL_WINDOWS_TASK_NAME",
 ] as const);
 
 const HANDOFF_SCRIPT = String.raw`
@@ -279,11 +279,11 @@ function resolveUpdateCliArgv(params: {
   if (execPath && !isNodeLikeRuntime(execPath)) {
     return [execPath, ...updateArgs];
   }
-  return ["openclaw", ...updateArgs];
+  return ["recall", ...updateArgs];
 }
 
 export function formatManagedServiceUpdateCommand(timeoutMs?: number): string {
-  const args = ["openclaw", "update", "--yes"];
+  const args = ["recall", "update", "--yes"];
   if (typeof timeoutMs === "number" && Number.isFinite(timeoutMs)) {
     args.push("--timeout", String(Math.max(1, Math.ceil(timeoutMs / 1000))));
   }
@@ -366,7 +366,7 @@ export async function startManagedServiceUpdateHandoff(params: {
   const env = {
     ...stripSupervisorHintEnv(params.env ?? process.env),
     [CONTROL_PLANE_UPDATE_SENTINEL_META_ENV]: metaPath,
-    OPENCLAW_UPDATE_RUN_HANDOFF: "1",
+    RECALL_UPDATE_RUN_HANDOFF: "1",
   };
   const child = spawn(params.execPath ?? process.execPath, [scriptPath, paramsPath], {
     cwd: handoffCwd,

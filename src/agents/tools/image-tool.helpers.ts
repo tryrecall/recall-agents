@@ -1,5 +1,5 @@
 import type { AssistantMessage } from "@earendil-works/pi-ai";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { estimateBase64DecodedBytes } from "../../media/base64.js";
 import { normalizeLowercaseStringOrEmpty } from "../../shared/string-coerce.js";
 import { isMinimaxVlmProvider } from "../minimax-vlm.js";
@@ -131,7 +131,7 @@ export function coerceImageAssistantText(params: {
   throw new Error(`Image model returned no text (${params.provider}/${params.model}).`);
 }
 
-export function coerceImageModelConfig(cfg?: OpenClawConfig): ImageModelConfig {
+export function coerceImageModelConfig(cfg?: RecallConfig): ImageModelConfig {
   return coerceToolModelConfig(cfg?.agents?.defaults?.imageModel);
 }
 
@@ -162,7 +162,7 @@ function modelIdMatchesProviderlessRef(params: {
   return false;
 }
 
-function findConfiguredImageModelMatches(params: { cfg?: OpenClawConfig; ref: string }): string[] {
+function findConfiguredImageModelMatches(params: { cfg?: RecallConfig; ref: string }): string[] {
   const providers = params.cfg?.models?.providers;
   if (!providers || typeof providers !== "object") {
     return [];
@@ -189,7 +189,7 @@ function findConfiguredImageModelMatches(params: { cfg?: OpenClawConfig; ref: st
 }
 
 function resolveProviderlessConfiguredImageModelRef(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   ref: string;
 }): string {
   const ref = params.ref.trim();
@@ -212,7 +212,7 @@ function resolveProviderlessConfiguredImageModelRef(params: {
 }
 
 export function resolveConfiguredImageModelRefs(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   imageModelConfig: ImageModelConfig;
 }): ImageModelConfig {
   const primary = params.imageModelConfig.primary?.trim();
@@ -236,7 +236,7 @@ export function resolveConfiguredImageModelRefs(params: {
 }
 
 export function resolveProviderVisionModelFromConfig(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   provider: string;
 }): string | null {
   if (isMinimaxVlmProvider(params.provider)) {

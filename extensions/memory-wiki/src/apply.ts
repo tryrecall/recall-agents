@@ -2,8 +2,8 @@ import path from "node:path";
 import {
   replaceManagedMarkdownBlock,
   withTrailingNewline,
-} from "openclaw/plugin-sdk/memory-host-markdown";
-import { root as fsRoot } from "openclaw/plugin-sdk/security-runtime";
+} from "recall/plugin-sdk/memory-host-markdown";
+import { root as fsRoot } from "recall/plugin-sdk/security-runtime";
 import { compileMemoryWikiVault, type CompileMemoryWikiResult } from "./compile.js";
 import type { ResolvedMemoryWikiConfig } from "./config.js";
 import {
@@ -21,10 +21,10 @@ import {
 } from "./query.js";
 import { initializeMemoryWikiVault } from "./vault.js";
 
-const GENERATED_START = "<!-- openclaw:wiki:generated:start -->";
-const GENERATED_END = "<!-- openclaw:wiki:generated:end -->";
-const HUMAN_START = "<!-- openclaw:human:start -->";
-const HUMAN_END = "<!-- openclaw:human:end -->";
+const GENERATED_START = "<!-- recall:wiki:generated:start -->";
+const GENERATED_END = "<!-- recall:wiki:generated:end -->";
+const HUMAN_START = "<!-- recall:human:start -->";
+const HUMAN_END = "<!-- recall:human:end -->";
 
 type CreateSynthesisMemoryWikiMutation = {
   op: "create_synthesis";

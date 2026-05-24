@@ -122,7 +122,7 @@ function requireRecord(value: unknown, label: string): Record<string, unknown> {
 
 function expectMessageFields(
   message: unknown,
-  fields: { role?: string; content?: unknown; openclaw?: Record<string, unknown> },
+  fields: { role?: string; content?: unknown; recall?: Record<string, unknown> },
 ) {
   const record = requireRecord(message, "message");
   if ("role" in fields) {
@@ -131,9 +131,9 @@ function expectMessageFields(
   if ("content" in fields) {
     expect(record.content).toEqual(fields.content);
   }
-  if (fields.openclaw) {
+  if (fields.recall) {
     const metadata = requireRecord(record["__openclaw"], "message metadata");
-    for (const [key, value] of Object.entries(fields.openclaw)) {
+    for (const [key, value] of Object.entries(fields.recall)) {
       expect(metadata[key]).toEqual(value);
     }
   }
@@ -150,7 +150,7 @@ describe("readFirstUserMessageFromTranscript", () => {
   let tmpDir: string;
   let storePath: string;
 
-  registerTempSessionStore("openclaw-session-fs-test-", (nextTmpDir, nextStorePath) => {
+  registerTempSessionStore("recall-session-fs-test-", (nextTmpDir, nextStorePath) => {
     tmpDir = nextTmpDir;
     storePath = nextStorePath;
   });
@@ -278,7 +278,7 @@ describe("shared transcript read behaviors", () => {
   let tmpDir: string;
   let storePath: string;
 
-  registerTempSessionStore("openclaw-session-fs-test-", (nextTmpDir, nextStorePath) => {
+  registerTempSessionStore("recall-session-fs-test-", (nextTmpDir, nextStorePath) => {
     tmpDir = nextTmpDir;
     storePath = nextStorePath;
   });
@@ -322,7 +322,7 @@ describe("readSessionTitleFieldsFromTranscript cache", () => {
   let tmpDir: string;
   let storePath: string;
 
-  registerTempSessionStore("openclaw-session-fs-test-", (nextTmpDir, nextStorePath) => {
+  registerTempSessionStore("recall-session-fs-test-", (nextTmpDir, nextStorePath) => {
     tmpDir = nextTmpDir;
     storePath = nextStorePath;
   });
@@ -391,7 +391,7 @@ describe("readSessionMessages", () => {
   let tmpDir: string;
   let storePath: string;
 
-  registerTempSessionStore("openclaw-session-fs-test-", (nextTmpDir, nextStorePath) => {
+  registerTempSessionStore("recall-session-fs-test-", (nextTmpDir, nextStorePath) => {
     tmpDir = nextTmpDir;
     storePath = nextStorePath;
   });
@@ -445,8 +445,8 @@ describe("readSessionMessages", () => {
     });
 
     expect(out).toHaveLength(2);
-    expectMessageFields(out[0], { role: "user", content: "recent", openclaw: { seq: 3 } });
-    expectMessageFields(out[1], { role: "assistant", content: "latest", openclaw: { seq: 4 } });
+    expectMessageFields(out[0], { role: "user", content: "recent", recall: { seq: 3 } });
+    expectMessageFields(out[1], { role: "assistant", content: "latest", recall: { seq: 4 } });
   });
 
   test("bounds recent-message reads for large append-only transcripts", () => {
@@ -497,8 +497,8 @@ describe("readSessionMessages", () => {
 
     expect(result.totalMessages).toBe(4);
     expect(result.messages).toHaveLength(2);
-    expectMessageFields(result.messages[0], { content: "recent", openclaw: { seq: 3 } });
-    expectMessageFields(result.messages[1], { content: "latest", openclaw: { seq: 4 } });
+    expectMessageFields(result.messages[0], { content: "recent", recall: { seq: 3 } });
+    expectMessageFields(result.messages[1], { content: "latest", recall: { seq: 4 } });
   });
 
   test("preserves real sequence metadata for async bounded recent-message reads", async () => {
@@ -525,8 +525,8 @@ describe("readSessionMessages", () => {
 
       expect(result.totalMessages).toBe(4);
       expect(result.messages).toHaveLength(2);
-      expectMessageFields(result.messages[0], { content: "recent", openclaw: { seq: 3 } });
-      expectMessageFields(result.messages[1], { content: "latest", openclaw: { seq: 4 } });
+      expectMessageFields(result.messages[0], { content: "recent", recall: { seq: 3 } });
+      expectMessageFields(result.messages[1], { content: "latest", recall: { seq: 4 } });
       expect(readFileSpy).not.toHaveBeenCalled();
     } finally {
       readFileSpy.mockRestore();
@@ -690,7 +690,7 @@ describe("readSessionMessages", () => {
         "active branch",
         "latest active",
       ]);
-      expectMessageFields(messages[2], { openclaw: { id: "user-2", seq: 3 } });
+      expectMessageFields(messages[2], { recall: { id: "user-2", seq: 3 } });
       expect(sessionManagerOpenSpy).not.toHaveBeenCalled();
       expect(readFileSpy).not.toHaveBeenCalled();
     } finally {
@@ -731,7 +731,7 @@ describe("readSessionMessages", () => {
     expect(messages.map((message) => (message as { content?: unknown }).content)).toEqual([
       "reachable orphan tail",
     ]);
-    expectMessageFields(messages[0], { openclaw: { id: "orphan-tail", seq: 1 } });
+    expectMessageFields(messages[0], { recall: { id: "orphan-tail", seq: 1 } });
   });
 
   test("keeps legacy async parents when tree transcripts reference pre-v3 rows", async () => {
@@ -761,8 +761,8 @@ describe("readSessionMessages", () => {
       "legacy hello",
       "tree hello",
     ]);
-    expectMessageFields(messages[0], { openclaw: { id: "legacy-user", seq: 1 } });
-    expectMessageFields(messages[1], { openclaw: { id: "tree-assistant", seq: 2 } });
+    expectMessageFields(messages[0], { recall: { id: "legacy-user", seq: 1 } });
+    expectMessageFields(messages[1], { recall: { id: "tree-assistant", seq: 2 } });
   });
 
   test("caches async transcript indexes by file stats", async () => {
@@ -950,7 +950,7 @@ describe("readSessionMessages", () => {
           role: "assistant",
           content: [{ type: "text", text: "clean answer" }],
           api: "chat",
-          provider: "openclaw",
+          provider: "recall",
           model: "test",
           usage: {},
           stopReason: "stop",
@@ -968,11 +968,11 @@ describe("readSessionMessages", () => {
       const out = readSessionMessages(sessionId, storePath, sessionFile);
       expect(out).toHaveLength(2);
       expect(out).toHaveLength(2);
-      expectMessageFields(out[0], { role: "user", content: "clean prompt", openclaw: { seq: 1 } });
+      expectMessageFields(out[0], { role: "user", content: "clean prompt", recall: { seq: 1 } });
       expectMessageFields(out[1], {
         role: "assistant",
         content: [{ type: "text", text: "clean answer" }],
-        openclaw: { seq: 2 },
+        recall: { seq: 2 },
       });
       expect(JSON.stringify(out)).not.toContain("original wrapped prompt");
       expect(sessionManagerOpenSpy).not.toHaveBeenCalled();
@@ -1256,7 +1256,7 @@ describe("readSessionPreviewItemsFromTranscript", () => {
   let tmpDir: string;
   let storePath: string;
 
-  registerTempSessionStore("openclaw-session-preview-test-", (nextTmpDir, nextStorePath) => {
+  registerTempSessionStore("recall-session-preview-test-", (nextTmpDir, nextStorePath) => {
     tmpDir = nextTmpDir;
     storePath = nextStorePath;
   });
@@ -1399,7 +1399,7 @@ describe("readLatestSessionUsageFromTranscript", () => {
   let tmpDir: string;
   let storePath: string;
 
-  registerTempSessionStore("openclaw-session-usage-test-", (nextTmpDir, nextStorePath) => {
+  registerTempSessionStore("recall-session-usage-test-", (nextTmpDir, nextStorePath) => {
     tmpDir = nextTmpDir;
     storePath = nextStorePath;
   });
@@ -1424,7 +1424,7 @@ describe("readLatestSessionUsageFromTranscript", () => {
       {
         message: {
           role: "assistant",
-          provider: "openclaw",
+          provider: "recall",
           model: "delivery-mirror",
           usage: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
         },
@@ -1680,14 +1680,14 @@ describe("resolveSessionTranscriptCandidates", () => {
     vi.unstubAllEnvs();
   });
 
-  test("fallback candidate uses OPENCLAW_HOME instead of os.homedir()", () => {
-    vi.stubEnv("OPENCLAW_HOME", "/srv/openclaw-home");
+  test("fallback candidate uses RECALL_HOME instead of os.homedir()", () => {
+    vi.stubEnv("RECALL_HOME", "/srv/recall-home");
     vi.stubEnv("HOME", "/home/other");
 
     const candidates = resolveSessionTranscriptCandidates("sess-1", undefined);
     const fallback = candidates[candidates.length - 1];
     expect(fallback).toBe(
-      path.join(path.resolve("/srv/openclaw-home"), ".openclaw", "sessions", "sess-1.jsonl"),
+      path.join(path.resolve("/srv/recall-home"), ".recall", "sessions", "sess-1.jsonl"),
     );
   });
 });
@@ -1695,8 +1695,8 @@ describe("resolveSessionTranscriptCandidates", () => {
 describe("resolveSessionTranscriptCandidates safety", () => {
   test.each([
     {
-      storePath: "/tmp/openclaw/agents/main/sessions/sessions.json",
-      sessionFile: "/tmp/openclaw/agents/ops/sessions/sess-safe.jsonl",
+      storePath: "/tmp/recall/agents/main/sessions/sessions.json",
+      sessionFile: "/tmp/recall/agents/ops/sessions/sess-safe.jsonl",
     },
     {
       storePath: "/srv/custom/agents/main/sessions/sessions.json",
@@ -1713,14 +1713,14 @@ describe("resolveSessionTranscriptCandidates safety", () => {
   test("drops unsafe session IDs instead of producing traversal paths", () => {
     const candidates = resolveSessionTranscriptCandidates(
       "../etc/passwd",
-      "/tmp/openclaw/agents/main/sessions/sessions.json",
+      "/tmp/recall/agents/main/sessions/sessions.json",
     );
 
     expect(candidates).toStrictEqual([]);
   });
 
   test("drops unsafe sessionFile candidates and keeps safe fallbacks", () => {
-    const storePath = "/tmp/openclaw/agents/main/sessions/sessions.json";
+    const storePath = "/tmp/recall/agents/main/sessions/sessions.json";
     const candidates = resolveSessionTranscriptCandidates(
       "sess-safe",
       storePath,
@@ -1734,24 +1734,24 @@ describe("resolveSessionTranscriptCandidates safety", () => {
   });
 
   test("prefers the current sessionId transcript before a stale sessionFile candidate", () => {
-    const storePath = "/tmp/openclaw/agents/main/sessions/sessions.json";
+    const storePath = "/tmp/recall/agents/main/sessions/sessions.json";
     const candidates = resolveSessionTranscriptCandidates(
       "11111111-1111-4111-8111-111111111111",
       storePath,
-      "/tmp/openclaw/agents/main/sessions/22222222-2222-4222-8222-222222222222.jsonl",
+      "/tmp/recall/agents/main/sessions/22222222-2222-4222-8222-222222222222.jsonl",
     );
 
     expect(candidates[0]).toBe(
-      path.resolve("/tmp/openclaw/agents/main/sessions/11111111-1111-4111-8111-111111111111.jsonl"),
+      path.resolve("/tmp/recall/agents/main/sessions/11111111-1111-4111-8111-111111111111.jsonl"),
     );
     expect(candidates).toContain(
-      path.resolve("/tmp/openclaw/agents/main/sessions/22222222-2222-4222-8222-222222222222.jsonl"),
+      path.resolve("/tmp/recall/agents/main/sessions/22222222-2222-4222-8222-222222222222.jsonl"),
     );
   });
 
   test("keeps explicit custom sessionFile ahead of synthesized fallback", () => {
-    const storePath = "/tmp/openclaw/agents/main/sessions/sessions.json";
-    const sessionFile = "/tmp/openclaw/agents/main/sessions/custom-transcript.jsonl";
+    const storePath = "/tmp/recall/agents/main/sessions/sessions.json";
+    const sessionFile = "/tmp/recall/agents/main/sessions/custom-transcript.jsonl";
     const candidates = resolveSessionTranscriptCandidates(
       "11111111-1111-4111-8111-111111111111",
       storePath,
@@ -1762,8 +1762,8 @@ describe("resolveSessionTranscriptCandidates safety", () => {
   });
 
   test("keeps custom topic-like transcript paths ahead of synthesized fallback", () => {
-    const storePath = "/tmp/openclaw/agents/main/sessions/sessions.json";
-    const sessionFile = "/tmp/openclaw/agents/main/sessions/custom-topic-notes.jsonl";
+    const storePath = "/tmp/recall/agents/main/sessions/sessions.json";
+    const sessionFile = "/tmp/recall/agents/main/sessions/custom-topic-notes.jsonl";
     const candidates = resolveSessionTranscriptCandidates(
       "11111111-1111-4111-8111-111111111111",
       storePath,
@@ -1774,33 +1774,33 @@ describe("resolveSessionTranscriptCandidates safety", () => {
   });
 
   test("keeps forked transcript paths ahead of synthesized fallback", () => {
-    const storePath = "/tmp/openclaw/agents/main/sessions/sessions.json";
+    const storePath = "/tmp/recall/agents/main/sessions/sessions.json";
     const sessionId = "11111111-1111-4111-8111-111111111111";
     const sessionFile =
-      "/tmp/openclaw/agents/main/sessions/2026-03-23T16-30-00-000Z_11111111-1111-4111-8111-111111111111.jsonl";
+      "/tmp/recall/agents/main/sessions/2026-03-23T16-30-00-000Z_11111111-1111-4111-8111-111111111111.jsonl";
     const candidates = resolveSessionTranscriptCandidates(sessionId, storePath, sessionFile);
 
     expect(candidates[0]).toBe(path.resolve(sessionFile));
   });
 
   test("keeps timestamped custom transcript paths ahead of synthesized fallback", () => {
-    const storePath = "/tmp/openclaw/agents/main/sessions/sessions.json";
+    const storePath = "/tmp/recall/agents/main/sessions/sessions.json";
     const sessionId = "11111111-1111-4111-8111-111111111111";
-    const sessionFile = "/tmp/openclaw/agents/main/sessions/2026-03-23T16-30-00-000Z_notes.jsonl";
+    const sessionFile = "/tmp/recall/agents/main/sessions/2026-03-23T16-30-00-000Z_notes.jsonl";
     const candidates = resolveSessionTranscriptCandidates(sessionId, storePath, sessionFile);
 
     expect(candidates[0]).toBe(path.resolve(sessionFile));
   });
 
   test("still treats generated topic transcripts from another session as stale", () => {
-    const storePath = "/tmp/openclaw/agents/main/sessions/sessions.json";
+    const storePath = "/tmp/recall/agents/main/sessions/sessions.json";
     const sessionId = "11111111-1111-4111-8111-111111111111";
     const staleSessionFile =
-      "/tmp/openclaw/agents/main/sessions/22222222-2222-4222-8222-222222222222-topic-thread.jsonl";
+      "/tmp/recall/agents/main/sessions/22222222-2222-4222-8222-222222222222-topic-thread.jsonl";
     const candidates = resolveSessionTranscriptCandidates(sessionId, storePath, staleSessionFile);
 
     expect(candidates[0]).toBe(
-      path.resolve("/tmp/openclaw/agents/main/sessions/11111111-1111-4111-8111-111111111111.jsonl"),
+      path.resolve("/tmp/recall/agents/main/sessions/11111111-1111-4111-8111-111111111111.jsonl"),
     );
     expect(candidates).toContain(path.resolve(staleSessionFile));
   });
@@ -1810,13 +1810,13 @@ describe("archiveSessionTranscripts", () => {
   let tmpDir: string;
   let storePath: string;
 
-  registerTempSessionStore("openclaw-archive-test-", (nextTmpDir, nextStorePath) => {
+  registerTempSessionStore("recall-archive-test-", (nextTmpDir, nextStorePath) => {
     tmpDir = nextTmpDir;
     storePath = nextStorePath;
   });
 
   beforeAll(() => {
-    vi.stubEnv("OPENCLAW_HOME", tmpDir);
+    vi.stubEnv("RECALL_HOME", tmpDir);
   });
 
   afterAll(() => {
@@ -1885,7 +1885,7 @@ describe("oversized transcript line guards", () => {
   let tmpDir: string;
   let storePath: string;
 
-  registerTempSessionStore("openclaw-session-fs-oversized-", (nextTmpDir, nextStorePath) => {
+  registerTempSessionStore("recall-session-fs-oversized-", (nextTmpDir, nextStorePath) => {
     tmpDir = nextTmpDir;
     storePath = nextStorePath;
   });

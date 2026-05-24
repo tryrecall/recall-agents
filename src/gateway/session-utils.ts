@@ -55,7 +55,7 @@ import {
   type SessionStoreTarget,
   type SessionScope,
 } from "../config/sessions.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { openRootFileSync } from "../infra/boundary-file-read.js";
 import { projectPluginSessionExtensionsSync } from "../plugins/host-hook-state.js";
 import {
@@ -102,7 +102,7 @@ import type {
 export {
   archiveFileOnDisk,
   archiveSessionTranscripts,
-  attachOpenClawTranscriptMeta,
+  attachRecallTranscriptMeta,
   capArrayByJsonBytes,
   readFirstUserMessageFromTranscript,
   readLatestSessionUsageFromTranscriptAsync,
@@ -143,7 +143,7 @@ function tryResolveExistingPath(value: string): string | null {
 }
 
 function resolveIdentityAvatarUrl(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   agentId: string,
   avatar: string | undefined,
 ): string | undefined {
@@ -329,7 +329,7 @@ function buildCompactionCheckpointPreview(
 function resolveModelCostConfigCached(
   provider: string | undefined,
   model: string | undefined,
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   rowContext?: SessionListRowContext,
 ): ModelCostConfig | undefined {
   if (!rowContext) {
@@ -345,7 +345,7 @@ function resolveModelCostConfigCached(
 }
 
 function resolveEstimatedSessionCostUsd(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   provider?: string;
   model?: string;
   entry?: Pick<
@@ -565,7 +565,7 @@ function createSessionRowModelCacheKey(provider: string | undefined, model: stri
 }
 
 function resolveSessionSelectedModelRef(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   entry?: SessionEntry;
   agentId: string;
   rowContext?: SessionListRowContext;
@@ -600,7 +600,7 @@ function resolveSessionSelectedModelRef(params: {
 }
 
 function resolveSessionRowThinkingMetadata(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   provider: string;
   model: string;
@@ -675,7 +675,7 @@ function resolveChildSessionKeys(
 }
 
 function resolveTranscriptUsageFallback(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   key: string;
   entry?: SessionEntry;
   storePath: string;
@@ -747,7 +747,7 @@ function resolveTranscriptUsageFallback(params: {
  * keys, or when the owning agent still exists (#65524).
  */
 export function resolveDeletedAgentIdFromSessionKey(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   sessionKey: string,
 ): string | null {
   const parsed = parseAgentSessionKey(sessionKey);
@@ -889,7 +889,7 @@ export function pruneLegacyStoreKeys(params: {
 }
 
 export function migrateAndPruneGatewaySessionStoreKey(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   key: string;
   store: Record<string, SessionEntry>;
 }) {
@@ -967,7 +967,7 @@ function listExistingAgentIdsFromDisk(): string[] {
   }
 }
 
-function listConfiguredAgentIds(cfg: OpenClawConfig): string[] {
+function listConfiguredAgentIds(cfg: RecallConfig): string[] {
   const ids = new Set<string>();
   const defaultId = normalizeAgentId(resolveDefaultAgentId(cfg));
   ids.add(defaultId);
@@ -1008,7 +1008,7 @@ function normalizeFallbackList(values: readonly string[]): string[] {
 }
 
 function resolveGatewayAgentModel(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   agentId: string,
 ): GatewayAgentRow["model"] | undefined {
   const primary = resolveAgentEffectiveModelPrimary(cfg, agentId)?.trim();
@@ -1024,7 +1024,7 @@ function resolveGatewayAgentModel(
   };
 }
 
-export function listAgentsForGateway(cfg: OpenClawConfig): {
+export function listAgentsForGateway(cfg: RecallConfig): {
   defaultId: string;
   mainKey: string;
   scope: SessionScope;
@@ -1098,7 +1098,7 @@ export function listAgentsForGateway(cfg: OpenClawConfig): {
 }
 
 function buildGatewaySessionStoreScanTargets(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   key: string;
   canonicalKey: string;
   agentId: string;
@@ -1121,7 +1121,7 @@ function buildGatewaySessionStoreScanTargets(params: {
 }
 
 function resolveGatewaySessionStoreCandidates(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   agentId: string,
 ): SessionStoreTarget[] {
   const storeConfig = cfg.session?.store;
@@ -1143,7 +1143,7 @@ function resolveGatewaySessionStoreCandidates(
 }
 
 function resolveGatewaySessionStoreLookup(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   key: string;
   canonicalKey: string;
   agentId: string;
@@ -1193,7 +1193,7 @@ function resolveGatewaySessionStoreLookup(params: {
 }
 
 function resolveExplicitDeletedLegacyMainStoreTarget(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   key: string;
   scanLegacyKeys?: boolean;
 }): {
@@ -1270,7 +1270,7 @@ function resolveExplicitDeletedLegacyMainStoreTarget(params: {
 }
 
 export function resolveGatewaySessionStoreTarget(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   key: string;
   agentId?: string;
   scanLegacyKeys?: boolean;
@@ -1344,7 +1344,7 @@ export function resolveGatewaySessionStoreTarget(params: {
 export { loadCombinedSessionStoreForGateway } from "../config/sessions/combined-store-gateway.js";
 
 export function resolveGatewaySessionThinkingDefault(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   provider: string;
   model: string;
   agentId?: string;
@@ -1365,7 +1365,7 @@ export function resolveGatewaySessionThinkingDefault(params: {
 }
 
 export function getSessionDefaults(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   modelCatalog?: ModelCatalogEntry[],
   options?: { allowPluginNormalization?: boolean },
 ): GatewaySessionsDefaults {
@@ -1396,7 +1396,7 @@ export function getSessionDefaults(
 }
 
 export function resolveSessionModelRef(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   entry?:
     | SessionEntry
     | Pick<SessionEntry, "model" | "modelProvider" | "modelOverride" | "providerOverride">,
@@ -1522,7 +1522,7 @@ export async function resolveGatewayModelSupportsImages(params: {
 }
 
 export function resolveSessionModelIdentityRef(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   entry?:
     | SessionEntry
     | Pick<SessionEntry, "model" | "modelProvider" | "modelOverride" | "providerOverride">,
@@ -1578,7 +1578,7 @@ export function resolveSessionModelIdentityRef(
 }
 
 function resolveSessionDisplayModelIdentityRefCached(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   provider?: string;
   model?: string;
@@ -1602,7 +1602,7 @@ function resolveSessionDisplayModelIdentityRefCached(params: {
 }
 
 export function resolveSessionDisplayModelIdentityRef(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   provider?: string;
   model?: string;
@@ -1641,7 +1641,7 @@ export function resolveSessionDisplayModelIdentityRef(params: {
 }
 
 export function buildGatewaySessionRow(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   storePath: string;
   store: Record<string, SessionEntry>;
   key: string;
@@ -1990,7 +1990,7 @@ function addSessionListSearchModelFields(
 }
 
 function resolveSessionListSearchModelFields(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   key: string;
   entry?: SessionEntry;
   rowContext?: SessionListRowContext;
@@ -2147,7 +2147,7 @@ function sortAndLimitSessionEntries(
 }
 
 function filterSessionEntries(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   store: Record<string, SessionEntry>;
   opts: import("./protocol/index.js").SessionsListParams;
   now: number;
@@ -2255,7 +2255,7 @@ function filterSessionEntries(params: {
 }
 
 function selectSessionEntries(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   store: Record<string, SessionEntry>;
   opts: import("./protocol/index.js").SessionsListParams;
   now: number;
@@ -2282,7 +2282,7 @@ function selectSessionEntries(params: {
 }
 
 export function filterAndSortSessionEntries(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   store: Record<string, SessionEntry>;
   opts: import("./protocol/index.js").SessionsListParams;
   now: number;
@@ -2292,7 +2292,7 @@ export function filterAndSortSessionEntries(params: {
 }
 
 export function listSessionsFromStore(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   storePath: string;
   store: Record<string, SessionEntry>;
   modelCatalog?: ModelCatalogEntry[];
@@ -2367,7 +2367,7 @@ export function listSessionsFromStore(params: {
  * loop responsive for WebSocket heartbeats, channel I/O, and concurrent RPC.
  */
 export async function listSessionsFromStoreAsync(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   storePath: string;
   store: Record<string, SessionEntry>;
   modelCatalog?: ModelCatalogEntry[];

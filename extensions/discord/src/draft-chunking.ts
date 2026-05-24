@@ -1,15 +1,15 @@
-import { resolveChannelStreamingPreviewChunk } from "openclaw/plugin-sdk/channel-streaming";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { resolveTextChunkLimit } from "openclaw/plugin-sdk/reply-chunking";
-import { resolveAccountEntry } from "openclaw/plugin-sdk/routing";
-import { normalizeAccountId } from "openclaw/plugin-sdk/routing";
+import { resolveChannelStreamingPreviewChunk } from "recall/plugin-sdk/channel-streaming";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { resolveTextChunkLimit } from "recall/plugin-sdk/reply-chunking";
+import { resolveAccountEntry } from "recall/plugin-sdk/routing";
+import { normalizeAccountId } from "recall/plugin-sdk/routing";
 import { DISCORD_TEXT_CHUNK_LIMIT } from "./outbound-adapter.js";
 
 const DEFAULT_DISCORD_DRAFT_STREAM_MIN = 200;
 const DEFAULT_DISCORD_DRAFT_STREAM_MAX = 800;
 
 export function resolveDiscordDraftStreamingChunking(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   accountId?: string | null,
 ): {
   minChars: number;

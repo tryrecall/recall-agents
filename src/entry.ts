@@ -7,20 +7,20 @@ import { applyCliProfileEnv, parseCliProfileArgs } from "./cli/profile.js";
 import type { RootHelpRenderOptions } from "./cli/program/root-help.js";
 import { normalizeWindowsArgv } from "./cli/windows-argv.js";
 import {
-  enableOpenClawCompileCache,
+  enableRecallCompileCache,
   resolveEntryInstallRoot,
-  respawnWithoutOpenClawCompileCacheIfNeeded,
+  respawnWithoutRecallCompileCacheIfNeeded,
 } from "./entry.compile-cache.js";
 import { buildCliRespawnPlan, runCliRespawnPlan } from "./entry.respawn.js";
 import { tryHandleRootVersionFastPath } from "./entry.version-fast-path.js";
 import { isTruthyEnvValue, normalizeEnv } from "./infra/env.js";
 import { isMainModule } from "./infra/is-main.js";
-import { ensureOpenClawExecMarkerOnProcess } from "./infra/openclaw-exec-env.js";
+import { ensureRecallExecMarkerOnProcess } from "./infra/recall-exec-env.js";
 import { installProcessWarningFilter } from "./infra/warning-filter.js";
 
 const ENTRY_WRAPPER_PAIRS = [
-  { wrapperBasename: "openclaw.mjs", entryBasename: "entry.js" },
-  { wrapperBasename: "openclaw.js", entryBasename: "entry.js" },
+  { wrapperBasename: "recall.mjs", entryBasename: "entry.js" },
+  { wrapperBasename: "recall.js", entryBasename: "entry.js" },
 ] as const;
 
 type PrecomputedCommandHelpName = "browser" | "secrets" | "nodes";
@@ -38,7 +38,7 @@ function shouldForceReadOnlyAuthStore(argv: string[]): boolean {
 
 function createGatewayEntryStartupTrace(argv: string[]) {
   const enabled =
-    isTruthyEnvValue(process.env.OPENCLAW_GATEWAY_STARTUP_TRACE) &&
+    isTruthyEnvValue(process.env.RECALL_GATEWAY_STARTUP_TRACE) &&
     argv.slice(2).includes("gateway");
   const started = performance.now();
   let last = started;
@@ -86,23 +86,23 @@ if (
 } else {
   const entryFile = fileURLToPath(import.meta.url);
   const installRoot = resolveEntryInstallRoot(entryFile);
-  const waitingForCompileCacheRespawn = respawnWithoutOpenClawCompileCacheIfNeeded({
+  const waitingForCompileCacheRespawn = respawnWithoutRecallCompileCacheIfNeeded({
     currentFile: entryFile,
     installRoot,
   });
   if (!waitingForCompileCacheRespawn) {
-    process.title = "openclaw";
-    ensureOpenClawExecMarkerOnProcess();
+    process.title = "recall";
+    ensureRecallExecMarkerOnProcess();
     installProcessWarningFilter();
     normalizeEnv();
 
-    enableOpenClawCompileCache({
+    enableRecallCompileCache({
       installRoot,
     });
     gatewayEntryStartupTrace.mark("bootstrap");
 
     if (shouldForceReadOnlyAuthStore(process.argv)) {
-      process.env.OPENCLAW_AUTH_STORE_READONLY = "1";
+      process.env.RECALL_AUTH_STORE_READONLY = "1";
     }
 
     if (process.argv.includes("--no-color")) {
@@ -126,20 +126,20 @@ if (
     if (!ensureCliRespawnReady()) {
       const parsedContainer = parseCliContainerArgs(process.argv);
       if (!parsedContainer.ok) {
-        console.error(`[openclaw] ${parsedContainer.error}`);
+        console.error(`[recall] ${parsedContainer.error}`);
         process.exit(2);
       }
 
       const parsed = parseCliProfileArgs(parsedContainer.argv);
       if (!parsed.ok) {
         // Keep it simple; Commander will handle rich help/errors after we strip flags.
-        console.error(`[openclaw] ${parsed.error}`);
+        console.error(`[recall] ${parsed.error}`);
         process.exit(2);
       }
 
       const containerTargetName = resolveCliContainerTarget(process.argv);
       if (containerTargetName && parsed.profile) {
-        console.error("[openclaw] --container cannot be combined with --profile/--dev");
+        console.error("[recall] --container cannot be combined with --profile/--dev");
         process.exit(2);
       }
 
@@ -179,7 +179,7 @@ export async function tryHandleRootHelpFastPath(
     deps.onError ??
     ((error: unknown) => {
       console.error(
-        "[openclaw] Failed to display help:",
+        "[recall] Failed to display help:",
         error instanceof Error ? (error.stack ?? error.message) : error,
       );
       process.exitCode = 1;
@@ -236,7 +236,7 @@ export async function tryHandlePrecomputedCommandHelpFastPath(
   } = {},
 ): Promise<boolean> {
   const env = deps.env ?? process.env;
-  if (env.OPENCLAW_DISABLE_CLI_STARTUP_HELP_FAST_PATH === "1") {
+  if (env.RECALL_DISABLE_CLI_STARTUP_HELP_FAST_PATH === "1") {
     return false;
   }
   if (resolveCliContainerTarget(argv, env)) {

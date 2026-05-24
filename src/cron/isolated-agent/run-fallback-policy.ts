@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import type { CronJob } from "../types.js";
 import {
   resolveEffectiveModelFallbacks,
@@ -6,7 +6,7 @@ import {
 } from "./run-execution.runtime.js";
 
 export function resolveCronFallbacksOverride(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   job: CronJob;
   agentId: string;
   useSubagentFallbacks?: boolean;

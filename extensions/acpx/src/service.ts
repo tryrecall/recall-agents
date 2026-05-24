@@ -2,12 +2,12 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { inspect } from "node:util";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
 import type {
   AcpRuntime,
   AcpRuntimeEvent,
-  OpenClawPluginService,
-  OpenClawPluginServiceContext,
+  RecallPluginService,
+  RecallPluginServiceContext,
   PluginLogger,
 } from "../runtime-api.js";
 import { registerAcpRuntimeBackend, unregisterAcpRuntimeBackend } from "../runtime-api.js";
@@ -20,8 +20,8 @@ import {
 } from "./config.js";
 import { createAcpxProcessLeaseStore, type AcpxProcessLeaseStore } from "./process-lease.js";
 import {
-  cleanupOpenClawOwnedAcpxProcessTree,
-  reapStaleOpenClawOwnedAcpxOrphans,
+  cleanupRecallOwnedAcpxProcessTree,
+  reapStaleRecallOwnedAcpxOrphans,
   type AcpxProcessCleanupDeps,
 } from "./process-reaper.js";
 
@@ -38,8 +38,8 @@ type AcpRuntimeTurnInput = Parameters<AcpRuntime["runTurn"]>[0];
 type AcpRuntimeTurn = ReturnType<NonNullable<AcpRuntime["startTurn"]>>;
 type AcpRuntimeTurnResult = Awaited<AcpRuntimeTurn["result"]>;
 
-const ENABLE_STARTUP_PROBE_ENV = "OPENCLAW_ACPX_RUNTIME_STARTUP_PROBE";
-const SKIP_RUNTIME_PROBE_ENV = "OPENCLAW_SKIP_ACPX_RUNTIME_PROBE";
+const ENABLE_STARTUP_PROBE_ENV = "RECALL_ACPX_RUNTIME_STARTUP_PROBE";
+const SKIP_RUNTIME_PROBE_ENV = "RECALL_SKIP_ACPX_RUNTIME_PROBE";
 const ACPX_BACKEND_ID = "acpx";
 
 type AcpxRuntimeModule = typeof import("./runtime.js");
@@ -364,7 +364,7 @@ function normalizeProbeAgent(value: string | undefined): string | undefined {
   return normalized ? normalized : undefined;
 }
 
-function resolveAllowedAgentsProbeAgent(ctx: OpenClawPluginServiceContext): string | undefined {
+function resolveAllowedAgentsProbeAgent(ctx: RecallPluginServiceContext): string | undefined {
   for (const agent of ctx.config.acp?.allowedAgents ?? []) {
     const normalized = normalizeProbeAgent(agent);
     if (normalized) {
@@ -375,7 +375,7 @@ function resolveAllowedAgentsProbeAgent(ctx: OpenClawPluginServiceContext): stri
 }
 
 async function measureAcpxStartup<T>(
-  ctx: OpenClawPluginServiceContext,
+  ctx: RecallPluginServiceContext,
   name: string,
   run: () => T | Promise<T>,
 ): Promise<T> {
@@ -383,7 +383,7 @@ async function measureAcpxStartup<T>(
 }
 
 function detailAcpxStartup(
-  ctx: OpenClawPluginServiceContext,
+  ctx: RecallPluginServiceContext,
   name: string,
   metrics: ReadonlyArray<readonly [string, number | string]>,
 ): void {
@@ -460,7 +460,7 @@ async function reapOpenAcpxProcessLeases(params: {
       await params.leaseStore.markState(lease.leaseId, "closing");
       let result = pendingLeaseRootResults.get(lease.wrapperRoot);
       if (!result) {
-        result = await reapStaleOpenClawOwnedAcpxOrphans({
+        result = await reapStaleRecallOwnedAcpxOrphans({
           wrapperRoot: lease.wrapperRoot,
           deps: params.deps,
         });
@@ -475,7 +475,7 @@ async function reapOpenAcpxProcessLeases(params: {
       continue;
     }
     await params.leaseStore.markState(lease.leaseId, "closing");
-    const result = await cleanupOpenClawOwnedAcpxProcessTree({
+    const result = await cleanupRecallOwnedAcpxProcessTree({
       rootPid: lease.rootPid,
       expectedLeaseId: lease.leaseId,
       expectedGatewayInstanceId: lease.gatewayInstanceId,
@@ -494,15 +494,15 @@ async function reapOpenAcpxProcessLeases(params: {
 
 export function createAcpxRuntimeService(
   params: CreateAcpxRuntimeServiceParams = {},
-): OpenClawPluginService {
+): RecallPluginService {
   let runtime: AcpxRuntimeLike | null = null;
   let lifecycleRevision = 0;
 
   return {
     id: "acpx-runtime",
-    async start(ctx: OpenClawPluginServiceContext): Promise<void> {
-      if (process.env.OPENCLAW_SKIP_ACPX_RUNTIME === "1") {
-        ctx.logger.info("skipping embedded acpx runtime backend (OPENCLAW_SKIP_ACPX_RUNTIME=1)");
+    async start(ctx: RecallPluginServiceContext): Promise<void> {
+      if (process.env.RECALL_SKIP_ACPX_RUNTIME === "1") {
+        ctx.logger.info("skipping embedded acpx runtime backend (RECALL_SKIP_ACPX_RUNTIME=1)");
         return;
       }
 
@@ -541,7 +541,7 @@ export function createAcpxRuntimeService(
       );
       if (startupReap.terminatedPids.length > 0) {
         ctx.logger.info(
-          `reaped ${startupReap.terminatedPids.length} stale OpenClaw-owned ACPX process${startupReap.terminatedPids.length === 1 ? "" : "es"}`,
+          `reaped ${startupReap.terminatedPids.length} stale Recall-owned ACPX process${startupReap.terminatedPids.length === 1 ? "" : "es"}`,
         );
       }
       warnOnIgnoredLegacyCompatibilityConfig({
@@ -621,7 +621,7 @@ export function createAcpxRuntimeService(
         ctx.logger.warn(`embedded acpx runtime setup failed: ${formatErrorMessage(err)}`);
       }
     },
-    async stop(_ctx: OpenClawPluginServiceContext): Promise<void> {
+    async stop(_ctx: RecallPluginServiceContext): Promise<void> {
       lifecycleRevision += 1;
       unregisterAcpRuntimeBackend(ACPX_BACKEND_ID);
       runtime = null;

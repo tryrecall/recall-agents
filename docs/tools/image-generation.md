@@ -10,10 +10,10 @@ sidebarTitle: "Image generation"
 
 The `image_generate` tool lets the agent create and edit images using your
 configured providers. In chat sessions, image generation runs asynchronously:
-OpenClaw records a background task, returns the task id immediately, and wakes
+Recall records a background task, returns the task id immediately, and wakes
 the agent when the provider finishes. The completion agent must send generated
 images through the `message` tool. If the requester session is inactive and
-some generated images are still missing from message-tool delivery, OpenClaw
+some generated images are still missing from message-tool delivery, Recall
 sends an idempotent direct fallback with only the missing images.
 
 <Note>
@@ -45,7 +45,7 @@ or sign in with OpenAI Codex OAuth.
     ```
 
     Codex OAuth uses the same `openai/gpt-image-2` model ref. When an
-    `openai-codex` OAuth profile is configured, OpenClaw routes image
+    `openai-codex` OAuth profile is configured, Recall routes image
     requests through that OAuth profile instead of first trying
     `OPENAI_API_KEY`. Explicit `models.providers.openai` config (API key,
     custom/Azure base URL) opts back into the direct OpenAI Images API
@@ -177,7 +177,7 @@ current session:
 
 <Note>
 Not all providers support all parameters. When a fallback provider supports a
-nearby geometry option instead of the exact requested one, OpenClaw remaps to
+nearby geometry option instead of the exact requested one, Recall remaps to
 the closest supported size, aspect ratio, or resolution before submission.
 Unsupported output hints are dropped for providers that do not declare
 support and reported in the tool result. Tool results report the applied
@@ -209,7 +209,7 @@ translation.
 
 ### Provider selection order
 
-OpenClaw tries providers in this order:
+Recall tries providers in this order:
 
 1. **`model` parameter** from the tool call (if the agent specifies one).
 2. **`imageGenerationModel.primary`** from config.
@@ -228,7 +228,7 @@ from each attempt.
     not continue to configured primary/fallback or auto-detected providers.
   </Accordion>
   <Accordion title="Auto-detection is auth-aware">
-    A provider default only enters the candidate list when OpenClaw can
+    A provider default only enters the candidate list when Recall can
     actually authenticate that provider. Set
     `agents.defaults.mediaGenerationAutoProviderFallback: false` to use only
     explicit `model`, `primary`, and `fallbacks` entries.
@@ -240,7 +240,7 @@ from each attempt.
     defaults. Google and OpenRouter hosted image providers use 180 second
     defaults; xAI and Azure OpenAI image generation use 600 seconds. Codex
     dynamic-tool calls use a 120 second `image_generate` bridge default and
-    honor the same timeout budget when configured, bounded by OpenClaw's 600000
+    honor the same timeout budget when configured, bounded by Recall's 600000
     ms dynamic-tool bridge maximum.
   </Accordion>
   <Accordion title="Inspect at runtime">
@@ -268,11 +268,11 @@ ComfyUI support 1.
 <AccordionGroup>
   <Accordion title="OpenAI gpt-image-2 (and gpt-image-1.5)">
     OpenAI image generation defaults to `openai/gpt-image-2`. If an
-    `openai-codex` OAuth profile is configured, OpenClaw reuses the same
+    `openai-codex` OAuth profile is configured, Recall reuses the same
     OAuth profile used by Codex subscription chat models and sends the
     image request through the Codex Responses backend. Legacy Codex base
     URLs such as `https://chatgpt.com/backend-api` are canonicalized to
-    `https://chatgpt.com/backend-api/codex` for image requests. OpenClaw
+    `https://chatgpt.com/backend-api/codex` for image requests. Recall
     does **not** silently fall back to `OPENAI_API_KEY` for that request -
     to force direct OpenAI Images API routing, configure
     `models.providers.openai` explicitly with an API key, custom base URL,
@@ -285,9 +285,9 @@ ComfyUI support 1.
 
     `gpt-image-2` supports both text-to-image generation and
     reference-image editing through the same `image_generate` tool.
-    OpenClaw forwards `prompt`, `count`, `size`, `quality`, `outputFormat`,
+    Recall forwards `prompt`, `count`, `size`, `quality`, `outputFormat`,
     and reference images to OpenAI. OpenAI does **not** receive
-    `aspectRatio` or `resolution` directly; when possible OpenClaw maps
+    `aspectRatio` or `resolution` directly; when possible Recall maps
     those into a supported `size`, otherwise the tool reports them as
     ignored overrides.
 
@@ -308,7 +308,7 @@ ComfyUI support 1.
 
     `openai.background` accepts `transparent`, `opaque`, or `auto`;
     transparent outputs require `outputFormat` `png` or `webp` and a
-    transparency-capable OpenAI image model. OpenClaw routes default
+    transparency-capable OpenAI image model. Recall routes default
     `gpt-image-2` transparent-background requests to `gpt-image-1.5`.
     `openai.outputCompression` applies to JPEG/WebP outputs.
 
@@ -339,7 +339,7 @@ ComfyUI support 1.
     }
     ```
 
-    OpenClaw forwards `prompt`, `count`, reference images, and
+    Recall forwards `prompt`, `count`, reference images, and
     Gemini-compatible `aspectRatio` / `resolution` hints to OpenRouter.
     Current built-in OpenRouter image model shortcuts include
     `google/gemini-3.1-flash-image-preview`,
@@ -364,9 +364,9 @@ ComfyUI support 1.
     - References: one `image` or up to five `images`
     - Aspect ratios: `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `2:3`, `3:2`
     - Resolutions: `1K`, `2K`
-    - Outputs: returned as OpenClaw-managed image attachments
+    - Outputs: returned as Recall-managed image attachments
 
-    OpenClaw intentionally does not expose xAI-native `quality`, `mask`,
+    Recall intentionally does not expose xAI-native `quality`, `mask`,
     `user`, or extra native-only aspect ratios until those controls exist
     in the shared cross-provider `image_generate` contract.
 
@@ -378,7 +378,7 @@ ComfyUI support 1.
 <Tabs>
   <Tab title="Generate (4K landscape)">
 ```text
-/tool image_generate action=generate model=openai/gpt-image-2 prompt="A clean editorial poster for OpenClaw image generation" size=3840x2160 count=1
+/tool image_generate action=generate model=openai/gpt-image-2 prompt="A clean editorial poster for Recall image generation" size=3840x2160 count=1
 ```
   </Tab>
   <Tab title="Generate (transparent PNG)">
@@ -389,7 +389,7 @@ ComfyUI support 1.
 Equivalent CLI:
 
 ```bash
-openclaw infer image generate \
+recall infer image generate \
   --model openai/gpt-image-1.5 \
   --output-format png \
   --background transparent \
@@ -416,7 +416,7 @@ openclaw infer image generate \
 </Tabs>
 
 The same `--output-format` and `--background` flags are available on
-`openclaw infer image edit`; `--openai-background` remains as an
+`recall infer image edit`; `--openai-background` remains as an
 OpenAI-specific alias. Bundled providers other than OpenAI do not declare
 explicit background control today, so `background: "transparent"` is reported
 as ignored for them.

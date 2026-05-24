@@ -9,7 +9,7 @@ export {
 } from "./windows-spawn.js";
 export type {
   AnyAgentTool,
-  OpenClawPluginApi,
-  OpenClawPluginToolContext,
-  OpenClawPluginToolFactory,
+  RecallPluginApi,
+  RecallPluginToolContext,
+  RecallPluginToolFactory,
 } from "../plugins/types.js";

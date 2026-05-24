@@ -1,8 +1,8 @@
 import type { AgentToolResult } from "@earendil-works/pi-agent-core";
-import { readBooleanParam } from "openclaw/plugin-sdk/boolean-param";
-import { isSingleUseReplyToMode } from "openclaw/plugin-sdk/reply-reference";
-import { resolveOpenProviderRuntimeGroupPolicy } from "openclaw/plugin-sdk/runtime-group-policy";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { readBooleanParam } from "recall/plugin-sdk/boolean-param";
+import { isSingleUseReplyToMode } from "recall/plugin-sdk/reply-reference";
+import { resolveOpenProviderRuntimeGroupPolicy } from "recall/plugin-sdk/runtime-group-policy";
+import { normalizeLowercaseStringOrEmpty } from "recall/plugin-sdk/string-coerce-runtime";
 import type { ResolvedSlackAccount } from "./accounts.js";
 import { parseSlackBlocksInput } from "./blocks-input.js";
 import { resolveSlackChannelConfig } from "./monitor/channel-config.js";
@@ -14,7 +14,7 @@ import {
   readNumberParam,
   readReactionParams,
   readStringParam,
-  type OpenClawConfig,
+  type RecallConfig,
   withNormalizedTimestamp,
 } from "./runtime-api.js";
 import { parseSlackTarget, resolveSlackChannelId } from "./targets.js";
@@ -165,7 +165,7 @@ function isImageContentType(value: string | undefined): boolean {
 
 function assertSlackReadTargetAllowed(params: {
   account: ResolvedSlackAccount;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   channelId: string;
 }) {
   const channels = params.account.config.channels;
@@ -201,7 +201,7 @@ function assertSlackReadTargetAllowed(params: {
 
 export async function handleSlackAction(
   params: Record<string, unknown>,
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   context?: SlackActionContext,
 ): Promise<AgentToolResult<unknown>> {
   const resolveChannelId = () =>

@@ -1,18 +1,18 @@
-export type { ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
-export type { OpenClawConfig, GroupPolicy } from "openclaw/plugin-sdk/config-contracts";
-export type { MarkdownTableMode } from "openclaw/plugin-sdk/config-contracts";
-export type { BaseTokenResolution } from "openclaw/plugin-sdk/channel-contract";
+export type { ReplyPayload } from "recall/plugin-sdk/reply-runtime";
+export type { RecallConfig, GroupPolicy } from "recall/plugin-sdk/config-contracts";
+export type { MarkdownTableMode } from "recall/plugin-sdk/config-contracts";
+export type { BaseTokenResolution } from "recall/plugin-sdk/channel-contract";
 export type {
   BaseProbeResult,
   ChannelAccountSnapshot,
   ChannelMessageActionAdapter,
   ChannelMessageActionName,
   ChannelStatusIssue,
-} from "openclaw/plugin-sdk/channel-contract";
-export type { SecretInput } from "openclaw/plugin-sdk/secret-input";
-export type { ChannelPlugin, PluginRuntime, WizardPrompter } from "openclaw/plugin-sdk/core";
-export type { RuntimeEnv } from "openclaw/plugin-sdk/runtime";
-export type { OutboundReplyPayload } from "openclaw/plugin-sdk/reply-payload";
+} from "recall/plugin-sdk/channel-contract";
+export type { SecretInput } from "recall/plugin-sdk/secret-input";
+export type { ChannelPlugin, PluginRuntime, WizardPrompter } from "recall/plugin-sdk/core";
+export type { RuntimeEnv } from "recall/plugin-sdk/runtime";
+export type { OutboundReplyPayload } from "recall/plugin-sdk/reply-payload";
 export {
   DEFAULT_ACCOUNT_ID,
   buildChannelConfigSchema,
@@ -22,7 +22,7 @@ export {
   normalizeAccountId,
   readStringParam,
   resolveClientIp,
-} from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/core";
 export {
   applyAccountNameToChannelSection,
   applySetupAccountConfigPatch,
@@ -32,39 +32,39 @@ export {
   promptSingleChannelSecretInput,
   runSingleChannelSecretStep,
   setTopLevelChannelDmPolicyWithAllowFrom,
-} from "openclaw/plugin-sdk/setup";
+} from "recall/plugin-sdk/setup";
 export {
   buildSecretInputSchema,
   hasConfiguredSecretInput,
   normalizeResolvedSecretInputString,
   normalizeSecretInputString,
-} from "openclaw/plugin-sdk/secret-input";
+} from "recall/plugin-sdk/secret-input";
 export {
   buildTokenChannelStatusSummary,
   PAIRING_APPROVED_MESSAGE,
-} from "openclaw/plugin-sdk/channel-status";
-export { buildBaseAccountStatusSnapshot } from "openclaw/plugin-sdk/status-helpers";
-export { chunkTextForOutbound } from "openclaw/plugin-sdk/text-chunking";
+} from "recall/plugin-sdk/channel-status";
+export { buildBaseAccountStatusSnapshot } from "recall/plugin-sdk/status-helpers";
+export { chunkTextForOutbound } from "recall/plugin-sdk/text-chunking";
 export {
   formatAllowFromLowercase,
   isNormalizedSenderAllowed,
-} from "openclaw/plugin-sdk/allow-from";
-export { addWildcardAllowFrom } from "openclaw/plugin-sdk/setup";
-export { resolveOpenProviderRuntimeGroupPolicy } from "openclaw/plugin-sdk/runtime-group-policy";
+} from "recall/plugin-sdk/allow-from";
+export { addWildcardAllowFrom } from "recall/plugin-sdk/setup";
+export { resolveOpenProviderRuntimeGroupPolicy } from "recall/plugin-sdk/runtime-group-policy";
 export {
   warnMissingProviderGroupPolicyFallbackOnce,
   resolveDefaultGroupPolicy,
-} from "openclaw/plugin-sdk/runtime-group-policy";
-export { createChannelPairingController } from "openclaw/plugin-sdk/channel-pairing";
-export { createChannelMessageReplyPipeline } from "openclaw/plugin-sdk/channel-message";
-export { logTypingFailure } from "openclaw/plugin-sdk/channel-feedback";
+} from "recall/plugin-sdk/runtime-group-policy";
+export { createChannelPairingController } from "recall/plugin-sdk/channel-pairing";
+export { createChannelMessageReplyPipeline } from "recall/plugin-sdk/channel-message";
+export { logTypingFailure } from "recall/plugin-sdk/channel-feedback";
 export {
   deliverTextOrMediaReply,
   isNumericTargetId,
   sendPayloadWithChunkedTextAndMedia,
-} from "openclaw/plugin-sdk/reply-payload";
-export { resolveInboundRouteEnvelopeBuilderWithRuntime } from "openclaw/plugin-sdk/inbound-envelope";
-export { waitForAbortSignal } from "openclaw/plugin-sdk/runtime";
+} from "recall/plugin-sdk/reply-payload";
+export { resolveInboundRouteEnvelopeBuilderWithRuntime } from "recall/plugin-sdk/inbound-envelope";
+export { waitForAbortSignal } from "recall/plugin-sdk/runtime";
 export {
   applyBasicWebhookRequestGuards,
   createFixedWindowRateLimiter,
@@ -78,8 +78,8 @@ export {
   WEBHOOK_ANOMALY_COUNTER_DEFAULTS,
   WEBHOOK_RATE_LIMIT_DEFAULTS,
   withResolvedWebhookRequestPipeline,
-} from "openclaw/plugin-sdk/webhook-ingress";
+} from "recall/plugin-sdk/webhook-ingress";
 export type {
   RegisterWebhookPluginRouteOptions,
   RegisterWebhookTargetOptions,
-} from "openclaw/plugin-sdk/webhook-ingress";
+} from "recall/plugin-sdk/webhook-ingress";

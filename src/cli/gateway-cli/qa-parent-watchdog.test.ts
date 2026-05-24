@@ -34,11 +34,11 @@ describe("installQaParentWatchdog", () => {
     const handle = installQaParentWatchdog({
       chdir,
       clearInterval: clearIntervalMock,
-      cwd: () => "/tmp/openclaw-qa-suite-test",
+      cwd: () => "/tmp/recall-qa-suite-test",
       env: {
         [QA_PARENT_PID_ENV]: "12345",
-        [QA_STAGED_RUNTIME_ROOT_ENV]: "/repo/.artifacts/qa-runtime/openclaw-qa-suite-test",
-        [QA_TEMP_ROOT_ENV]: "/tmp/openclaw-qa-suite-test",
+        [QA_STAGED_RUNTIME_ROOT_ENV]: "/repo/.artifacts/qa-runtime/recall-qa-suite-test",
+        [QA_TEMP_ROOT_ENV]: "/tmp/recall-qa-suite-test",
       },
       exit,
       kill,
@@ -61,8 +61,8 @@ describe("installQaParentWatchdog", () => {
     expect(clearIntervalMock).toHaveBeenCalledWith(timer);
     await vi.waitFor(() => {
       expect(chdir).toHaveBeenCalledWith("/tmp");
-      expect(rm).toHaveBeenCalledWith("/tmp/openclaw-qa-suite-test");
-      expect(rm).toHaveBeenCalledWith("/repo/.artifacts/qa-runtime/openclaw-qa-suite-test");
+      expect(rm).toHaveBeenCalledWith("/tmp/recall-qa-suite-test");
+      expect(rm).toHaveBeenCalledWith("/repo/.artifacts/qa-runtime/recall-qa-suite-test");
       expect(exit).toHaveBeenCalledWith(0);
     });
   });

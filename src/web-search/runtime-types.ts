@@ -1,18 +1,18 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type {
   PluginWebSearchProviderEntry,
   WebSearchProviderToolDefinition,
 } from "../plugins/web-provider-types.js";
 import type { RuntimeWebSearchMetadata } from "../secrets/runtime-web-tools.types.js";
 
-type WebSearchConfig = NonNullable<OpenClawConfig["tools"]>["web"] extends infer Web
+type WebSearchConfig = NonNullable<RecallConfig["tools"]>["web"] extends infer Web
   ? Web extends { search?: infer Search }
     ? Search
     : undefined
   : undefined;
 
 export type ResolveWebSearchDefinitionParams = {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentDir?: string;
   sandboxed?: boolean;
   runtimeWebSearch?: RuntimeWebSearchMetadata;
@@ -32,7 +32,7 @@ export type RunWebSearchResult = {
 };
 
 export type ListWebSearchProvidersParams = {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
 };
 
 export type RuntimeWebSearchProviderEntry = PluginWebSearchProviderEntry;

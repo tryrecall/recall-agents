@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url";
 import JSZip from "jszip";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { resolveStateDir } from "../config/paths.js";
-import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
+import { resolvePreferredRecallTmpDir } from "../infra/tmp-recall-dir.js";
 import { createEmptyPluginRegistry } from "../plugins/registry-empty.js";
 import { resetPluginRuntimeStateForTest, setActivePluginRegistry } from "../plugins/runtime.js";
 
@@ -42,7 +42,7 @@ function installCanvasMediaResolver() {
 beforeAll(async () => {
   ({ LocalMediaAccessError, loadWebMedia, loadWebMediaRaw, optimizeImageToJpeg } =
     await import("./web-media.js"));
-  fixtureRoot = await fs.mkdtemp(path.join(resolvePreferredOpenClawTmpDir(), "web-media-core-"));
+  fixtureRoot = await fs.mkdtemp(path.join(resolvePreferredRecallTmpDir(), "web-media-core-"));
   tinyPngFile = path.join(fixtureRoot, "tiny.png");
   await fs.writeFile(tinyPngFile, Buffer.from(TINY_PNG_BASE64, "base64"));
   workspaceDir = path.join(fixtureRoot, "workspace");
@@ -382,7 +382,7 @@ describe("loadWebMedia", () => {
   });
 
   it("resolves home-relative local media paths through allowed local roots", async () => {
-    vi.stubEnv("OPENCLAW_HOME", fixtureRoot);
+    vi.stubEnv("RECALL_HOME", fixtureRoot);
     try {
       const result = await loadWebMedia("~/workspace/chart.png", {
         maxBytes: 1024 * 1024,

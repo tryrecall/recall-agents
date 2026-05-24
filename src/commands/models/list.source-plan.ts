@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import type { NormalizedModelCatalogRow } from "../../model-catalog/index.js";
 import type { PluginMetadataSnapshot } from "../../plugins/plugin-metadata-snapshot.types.js";
 
@@ -47,7 +47,7 @@ export async function planAllModelListSources(params: {
   all?: boolean;
   enableCascade?: boolean;
   providerFilter?: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   metadataSnapshot?: PluginMetadataSnapshot;
 }): Promise<ModelListSourcePlan> {
   const enableCascade = params.enableCascade ?? params.all;

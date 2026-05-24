@@ -1,3 +1,3 @@
-export { resolveMarkdownTableMode } from "openclaw/plugin-sdk/markdown-table-runtime";
-export { chunkTextWithMode, resolveChunkMode } from "openclaw/plugin-sdk/reply-runtime";
-export { convertMarkdownTables } from "openclaw/plugin-sdk/text-chunking";
+export { resolveMarkdownTableMode } from "recall/plugin-sdk/markdown-table-runtime";
+export { chunkTextWithMode, resolveChunkMode } from "recall/plugin-sdk/reply-runtime";
+export { convertMarkdownTables } from "recall/plugin-sdk/text-chunking";

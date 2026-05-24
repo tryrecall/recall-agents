@@ -1,17 +1,17 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
 import {
   registerSessionBindingAdapter,
   unregisterSessionBindingAdapter,
   type SessionBindingAdapter,
   type SessionBindingRecord,
-} from "openclaw/plugin-sdk/conversation-runtime";
+} from "recall/plugin-sdk/conversation-runtime";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const resolveConfiguredBindingRouteMock = vi.hoisted(() => vi.fn());
 
-vi.mock("openclaw/plugin-sdk/conversation-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/conversation-runtime")>(
-    "openclaw/plugin-sdk/conversation-runtime",
+vi.mock("recall/plugin-sdk/conversation-runtime", async () => {
+  const actual = await vi.importActual<typeof import("recall/plugin-sdk/conversation-runtime")>(
+    "recall/plugin-sdk/conversation-runtime",
   );
   return {
     ...actual,
@@ -35,7 +35,7 @@ function buildCtx(overrides?: {
       channels: {
         slack: { enabled: true, replyToMode },
       },
-    } as OpenClawConfig,
+    } as RecallConfig,
     teamId: "T1",
     threadInheritParent: false,
     threadHistoryScope: "thread",
@@ -398,7 +398,7 @@ describe("thread-level session keys", () => {
       account,
       message: buildChannelMessage({
         channel: "C0AHZFCAS1K",
-        text: "https://github.com/openclaw/openclaw/issues/50621",
+        text: "https://github.com/tryrecall/recall-agents/issues/50621",
         ts: "1777244714.000100",
         thread_ts: rootTs,
         parent_user_id: "U1",
@@ -441,7 +441,7 @@ describe("thread-level session keys", () => {
       account,
       message: buildChannelMessage({
         channel: "C0AHZFCAS1K",
-        text: "https://github.com/openclaw/openclaw/issues/50621",
+        text: "https://github.com/tryrecall/recall-agents/issues/50621",
         ts: "1777244714.000100",
         thread_ts: rootTs,
       }),

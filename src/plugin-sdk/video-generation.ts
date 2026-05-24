@@ -4,7 +4,7 @@
 // emitted declaration surface stays stable for package-boundary consumers.
 
 import type { AuthProfileStore } from "../agents/auth-profiles/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type {
   GeneratedVideoAsset as CoreGeneratedVideoAsset,
   VideoGenerationAssetRole as CoreVideoGenerationAssetRole,
@@ -63,14 +63,14 @@ export type VideoGenerationSourceAsset = {
 };
 
 export type VideoGenerationProviderConfiguredContext = {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   agentDir?: string;
 };
 
 export type VideoGenerationModelCapabilitiesContext = {
   provider: string;
   model: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentDir?: string;
   authStore?: AuthProfileStore;
   timeoutMs?: number;
@@ -80,7 +80,7 @@ export type VideoGenerationRequest = {
   provider: string;
   model: string;
   prompt: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentDir?: string;
   authStore?: AuthProfileStore;
   timeoutMs?: number;

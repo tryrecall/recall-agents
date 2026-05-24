@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MsgContext } from "../auto-reply/templating.js";
-import type { OpenClawConfig } from "../config/types.js";
+import type { RecallConfig } from "../config/types.js";
 import {
   withBundledPluginAllowlistCompat,
   withBundledPluginEnablementCompat,
@@ -67,7 +67,7 @@ let runCapability: typeof import("./runner.js").runCapability;
 
 function setCompatibleActiveMediaUnderstandingRegistry(
   pluginRegistry: ReturnType<typeof createEmptyPluginRegistry>,
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
 ) {
   const pluginIds = loadPluginManifestRegistry({
     config: cfg,
@@ -141,7 +141,7 @@ describe("runCapability image skip", () => {
     const ctx: MsgContext = { MediaPath: "/tmp/image.png", MediaType: "image/png" };
     const media = normalizeMediaAttachments(ctx);
     const cache = createMediaAttachmentCache(media);
-    const cfg = {} as OpenClawConfig;
+    const cfg = {} as RecallConfig;
 
     try {
       const result = await runCapability({
@@ -173,13 +173,13 @@ describe("runCapability image skip", () => {
   it("uses explicit media image models instead of native vision skip", async () => {
     await withMediaFixture(
       {
-        filePrefix: "openclaw-image-explicit-vision",
+        filePrefix: "recall-image-explicit-vision",
         extension: "png",
         mediaType: "image/png",
         fileContents: Buffer.from("image"),
       },
       async ({ ctx, media, cache }) => {
-        const cfg = {} as OpenClawConfig;
+        const cfg = {} as RecallConfig;
 
         const result = await runCapability({
           capability: "image",
@@ -219,14 +219,14 @@ describe("runCapability image skip", () => {
   it("lets per-request image prompts override entry prompts", async () => {
     await withMediaFixture(
       {
-        filePrefix: "openclaw-image-request-prompt",
+        filePrefix: "recall-image-request-prompt",
         extension: "png",
         mediaType: "image/png",
         fileContents: Buffer.from("image"),
       },
       async ({ ctx, media, cache }) => {
         let seenPrompt: string | undefined;
-        const cfg = {} as OpenClawConfig;
+        const cfg = {} as RecallConfig;
 
         const result = await runCapability({
           capability: "image",
@@ -274,7 +274,7 @@ describe("runCapability image skip", () => {
           imageModel: { primary: "openrouter/google/gemini-2.5-flash" },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     await expect(
       resolveAutoImageModel({
@@ -316,7 +316,7 @@ describe("runCapability image skip", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const pluginRegistry = createEmptyPluginRegistry();
     pluginRegistry.mediaUnderstandingProviders.push({
       pluginId: "minimax",
@@ -370,7 +370,7 @@ describe("runCapability image skip", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const pluginRegistry = createEmptyPluginRegistry();
     pluginRegistry.mediaUnderstandingProviders.push({
       pluginId: "minimax",
@@ -388,7 +388,7 @@ describe("runCapability image skip", () => {
     try {
       await withMediaFixture(
         {
-          filePrefix: "openclaw-minimax-vlm-no-native-skip",
+          filePrefix: "recall-minimax-vlm-no-native-skip",
           extension: "png",
           mediaType: "image/png",
           fileContents: Buffer.from("image"),
@@ -433,7 +433,7 @@ describe("runCapability image skip", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const pluginRegistry = createEmptyPluginRegistry();
     pluginRegistry.mediaUnderstandingProviders.push({
       pluginId: "minimax",
@@ -454,7 +454,7 @@ describe("runCapability image skip", () => {
     try {
       await withMediaFixture(
         {
-          filePrefix: "openclaw-minimax-cn-provider",
+          filePrefix: "recall-minimax-cn-provider",
           extension: "png",
           mediaType: "image/png",
           fileContents: Buffer.from("image"),
@@ -491,7 +491,7 @@ describe("runCapability image skip", () => {
     let seenModel: string | undefined;
     await withMediaFixture(
       {
-        filePrefix: "openclaw-minimax-vlm-default",
+        filePrefix: "recall-minimax-vlm-default",
         extension: "png",
         mediaType: "image/png",
         fileContents: Buffer.from("image"),
@@ -517,7 +517,7 @@ describe("runCapability image skip", () => {
               },
             },
           },
-        } as OpenClawConfig;
+        } as RecallConfig;
 
         const result = await runCapability({
           capability: "image",
@@ -562,7 +562,7 @@ describe("runCapability image skip", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const providerRegistry = new Map<string, MediaUnderstandingProvider>([
       [
         "google",
@@ -579,7 +579,7 @@ describe("runCapability image skip", () => {
 
     await withMediaFixture(
       {
-        filePrefix: "openclaw-gemini-media-alias",
+        filePrefix: "recall-gemini-media-alias",
         extension: "png",
         mediaType: "image/png",
         fileContents: Buffer.from("image"),
@@ -610,7 +610,7 @@ describe("runCapability image skip", () => {
 
   it("canonicalizes non-MiniMax active media aliases for auto image resolution", async () => {
     vi.stubEnv("GEMINI_API_KEY", "test-gemini-key");
-    const cfg = {} as OpenClawConfig;
+    const cfg = {} as RecallConfig;
     const pluginRegistry = createEmptyPluginRegistry();
     pluginRegistry.mediaUnderstandingProviders.push({
       pluginId: "google",
@@ -643,7 +643,7 @@ describe("runCapability image skip", () => {
 
   it("uses active OpenRouter image models for auto image resolution", async () => {
     vi.stubEnv("OPENROUTER_API_KEY", "test-openrouter-key");
-    const cfg = {} as OpenClawConfig;
+    const cfg = {} as RecallConfig;
     const pluginRegistry = createEmptyPluginRegistry();
     pluginRegistry.mediaUnderstandingProviders.push({
       pluginId: "openrouter",
@@ -677,13 +677,13 @@ describe("runCapability image skip", () => {
     const hasAvailableAuthForProvider = vi.mocked(modelAuth.hasAvailableAuthForProvider);
     hasAvailableAuthForProvider.mockClear();
     hasAvailableAuthForProvider.mockImplementation(
-      async (params) => params.workspaceDir === "/tmp/openclaw-workspace",
+      async (params) => params.workspaceDir === "/tmp/recall-workspace",
     );
 
     try {
       await withMediaFixture(
         {
-          filePrefix: "openclaw-image-workspace-auth",
+          filePrefix: "recall-image-workspace-auth",
           extension: "png",
           mediaType: "image/png",
           fileContents: Buffer.from("image"),
@@ -691,12 +691,12 @@ describe("runCapability image skip", () => {
         async ({ ctx, media, cache }) => {
           const result = await runCapability({
             capability: "image",
-            cfg: {} as OpenClawConfig,
+            cfg: {} as RecallConfig,
             ctx,
             attachments: cache,
             media,
-            agentDir: "/tmp/openclaw-agent",
-            workspaceDir: "/tmp/openclaw-workspace",
+            agentDir: "/tmp/recall-agent",
+            workspaceDir: "/tmp/recall-workspace",
             providerRegistry: new Map([
               [
                 "workspace-vision",
@@ -722,8 +722,8 @@ describe("runCapability image skip", () => {
           expect(hasAvailableAuthForProvider).toHaveBeenCalledWith(
             expect.objectContaining({
               provider: "workspace-vision",
-              agentDir: "/tmp/openclaw-agent",
-              workspaceDir: "/tmp/openclaw-workspace",
+              agentDir: "/tmp/recall-agent",
+              workspaceDir: "/tmp/recall-workspace",
             }),
           );
         },
@@ -737,7 +737,7 @@ describe("runCapability image skip", () => {
     let seenModel: string | undefined;
     await withMediaFixture(
       {
-        filePrefix: "openclaw-image-openrouter",
+        filePrefix: "recall-image-openrouter",
         extension: "png",
         mediaType: "image/png",
         fileContents: Buffer.from("image"),
@@ -752,7 +752,7 @@ describe("runCapability image skip", () => {
               },
             },
           },
-        } as unknown as OpenClawConfig;
+        } as unknown as RecallConfig;
 
         const result = await runCapability({
           capability: "image",
@@ -789,7 +789,7 @@ describe("runCapability image skip", () => {
   it("skips configured image providers without an auto-resolvable model", async () => {
     await withMediaFixture(
       {
-        filePrefix: "openclaw-image-custom-skip",
+        filePrefix: "recall-image-custom-skip",
         extension: "png",
         mediaType: "image/png",
         fileContents: Buffer.from("image"),
@@ -804,7 +804,7 @@ describe("runCapability image skip", () => {
               },
             },
           },
-        } as unknown as OpenClawConfig;
+        } as unknown as RecallConfig;
 
         const result = await runCapability({
           capability: "image",

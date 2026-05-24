@@ -1,4 +1,4 @@
-import { createOpenClawTools } from "../../agents/openclaw-tools.runtime.js";
+import { createRecallTools } from "../../agents/recall-tools.runtime.js";
 import {
   resolveEffectiveToolPolicy,
   resolveGroupToolPolicy,
@@ -25,7 +25,7 @@ import {
   resolveToolProfilePolicy,
 } from "../../agents/tool-policy.js";
 import type { SessionEntry } from "../../config/sessions.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { logVerbose } from "../../globals.js";
 import { getPluginToolMeta } from "../../plugins/tools.js";
 import { resolveGatewayMessageChannel } from "../../utils/message-channel.js";
@@ -39,7 +39,7 @@ import { extractExplicitGroupId } from "./group-id.js";
  */
 export function resolveSkillDispatchTools(params: {
   ctx: MsgContext;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   agentDir?: string;
   sessionEntry?: SessionEntry;
@@ -135,7 +135,7 @@ export function resolveSkillDispatchTools(params: {
     inheritedToolPolicy,
   ];
   const inheritedToolAllowlist: string[] = [];
-  const tools = createOpenClawTools({
+  const tools = createRecallTools({
     agentSessionKey: params.sessionKey,
     agentChannel: channel,
     agentAccountId: params.ctx.AccountId,

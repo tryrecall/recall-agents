@@ -2,8 +2,8 @@ import {
   getAcpRuntimeBackend,
   unregisterAcpRuntimeBackend,
   type AcpRuntime,
-} from "openclaw/plugin-sdk/acp-runtime-backend";
-import type { OpenClawPluginService, OpenClawPluginServiceContext } from "openclaw/plugin-sdk/core";
+} from "recall/plugin-sdk/acp-runtime-backend";
+import type { RecallPluginService, RecallPluginServiceContext } from "recall/plugin-sdk/core";
 
 const ACPX_BACKEND_ID = "acpx";
 
@@ -13,10 +13,10 @@ type CreateAcpxRuntimeServiceParams = NonNullable<
 >;
 
 type DeferredServiceState = {
-  ctx: OpenClawPluginServiceContext | null;
+  ctx: RecallPluginServiceContext | null;
   params: CreateAcpxRuntimeServiceParams;
   realRuntime: AcpRuntime | null;
-  realService: OpenClawPluginService | null;
+  realService: RecallPluginService | null;
   startPromise: Promise<AcpRuntime> | null;
 };
 
@@ -38,7 +38,7 @@ async function startRealService(state: DeferredServiceState): Promise<AcpRuntime
     const { createAcpxRuntimeService } = await loadServiceModule();
     const service = createAcpxRuntimeService(state.params);
     state.realService = service;
-    await service.start(state.ctx as OpenClawPluginServiceContext);
+    await service.start(state.ctx as RecallPluginServiceContext);
     const backend = getAcpRuntimeBackend(ACPX_BACKEND_ID);
     if (!backend?.runtime) {
       throw new Error("ACPX runtime service did not register an ACP backend");
@@ -51,7 +51,7 @@ async function startRealService(state: DeferredServiceState): Promise<AcpRuntime
 
 export function createAcpxRuntimeService(
   params: CreateAcpxRuntimeServiceParams = {},
-): OpenClawPluginService {
+): RecallPluginService {
   const state: DeferredServiceState = {
     ctx: null,
     params,
@@ -63,8 +63,8 @@ export function createAcpxRuntimeService(
   return {
     id: "acpx-runtime",
     async start(ctx) {
-      if (process.env.OPENCLAW_SKIP_ACPX_RUNTIME === "1") {
-        ctx.logger.info("skipping embedded acpx runtime backend (OPENCLAW_SKIP_ACPX_RUNTIME=1)");
+      if (process.env.RECALL_SKIP_ACPX_RUNTIME === "1") {
+        ctx.logger.info("skipping embedded acpx runtime backend (RECALL_SKIP_ACPX_RUNTIME=1)");
         return;
       }
 

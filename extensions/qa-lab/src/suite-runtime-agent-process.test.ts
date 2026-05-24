@@ -122,7 +122,7 @@ describe("qa suite runtime agent process helpers", () => {
         repoRoot: "/repo",
         gateway: {
           tempRoot: "/tmp/runtime",
-          runtimeEnv: { PATH: "/usr/bin", OPENCLAW_STATE_DIR: "/tmp/default-state" },
+          runtimeEnv: { PATH: "/usr/bin", RECALL_STATE_DIR: "/tmp/default-state" },
         },
         primaryModel: "openai/gpt-5.5",
         alternateModel: "openai/gpt-5.5-mini",
@@ -131,8 +131,8 @@ describe("qa suite runtime agent process helpers", () => {
       ["crestodian", "-m", "overview"],
       {
         env: {
-          OPENCLAW_STATE_DIR: "/tmp/isolated-state",
-          OPENCLAW_CONFIG_PATH: "/tmp/isolated-state/openclaw.json",
+          RECALL_STATE_DIR: "/tmp/isolated-state",
+          RECALL_CONFIG_PATH: "/tmp/isolated-state/recall.json",
         },
       },
     );
@@ -152,8 +152,8 @@ describe("qa suite runtime agent process helpers", () => {
     ]);
     const spawnEnv = (spawnCall?.[2] as { env?: Record<string, string> } | undefined)?.env;
     expect(spawnEnv?.PATH).toBe("/usr/bin");
-    expect(spawnEnv?.OPENCLAW_STATE_DIR).toBe("/tmp/isolated-state");
-    expect(spawnEnv?.OPENCLAW_CONFIG_PATH).toBe("/tmp/isolated-state/openclaw.json");
+    expect(spawnEnv?.RECALL_STATE_DIR).toBe("/tmp/isolated-state");
+    expect(spawnEnv?.RECALL_CONFIG_PATH).toBe("/tmp/isolated-state/recall.json");
   });
 
   it("parses json qa cli output when requested", async () => {

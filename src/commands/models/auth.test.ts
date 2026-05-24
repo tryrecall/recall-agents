@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import type { ProviderPlugin } from "../../plugins/types.js";
 import type { RuntimeEnv } from "../../runtime.js";
 
@@ -80,7 +80,7 @@ vi.mock("../../agents/auth-profiles/usage.js", () => ({
 
 vi.mock("../../plugins/provider-auth-helpers.js", () => ({
   applyAuthProfileConfig: (
-    cfg: OpenClawConfig,
+    cfg: RecallConfig,
     params: {
       profileId: string;
       provider: string;
@@ -88,7 +88,7 @@ vi.mock("../../plugins/provider-auth-helpers.js", () => ({
       email?: string;
       displayName?: string;
     },
-  ): OpenClawConfig => ({
+  ): RecallConfig => ({
     ...cfg,
     auth: {
       ...cfg.auth,
@@ -211,7 +211,7 @@ vi.mock("../../plugins/provider-auth-choice-helpers.js", async (importOriginal) 
       );
     }),
     applyProviderAuthConfigPatch: vi.fn(
-      (cfg: OpenClawConfig, patch: unknown, options?: { replaceDefaultModels?: boolean }) => {
+      (cfg: RecallConfig, patch: unknown, options?: { replaceDefaultModels?: boolean }) => {
         const merged = mergePatch(cfg, patch);
         if (!options?.replaceDefaultModels) {
           return merged;
@@ -232,7 +232,7 @@ vi.mock("../../plugins/provider-auth-choice-helpers.js", async (importOriginal) 
           : merged;
       },
     ),
-    applyDefaultModel: vi.fn((cfg: OpenClawConfig, model: string) => ({
+    applyDefaultModel: vi.fn((cfg: RecallConfig, model: string) => ({
       ...cfg,
       agents: {
         ...cfg.agents,
@@ -339,8 +339,8 @@ function createProvider(params: {
 
 describe("modelsAuthLoginCommand", () => {
   let restoreStdin: (() => void) | null = null;
-  let currentConfig: OpenClawConfig;
-  let lastUpdatedConfig: OpenClawConfig | null;
+  let currentConfig: RecallConfig;
+  let lastUpdatedConfig: RecallConfig | null;
   let runProviderAuth: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
@@ -361,9 +361,9 @@ describe("modelsAuthLoginCommand", () => {
     mocks.promoteAuthProfileInOrder.mockReset();
 
     mocks.resolveDefaultAgentId.mockReturnValue("main");
-    mocks.resolveAgentDir.mockReturnValue("/tmp/openclaw/agents/main");
-    mocks.resolveAgentWorkspaceDir.mockReturnValue("/tmp/openclaw/workspace");
-    mocks.resolveDefaultAgentWorkspaceDir.mockReturnValue("/tmp/openclaw/workspace");
+    mocks.resolveAgentDir.mockReturnValue("/tmp/recall/agents/main");
+    mocks.resolveAgentWorkspaceDir.mockReturnValue("/tmp/recall/workspace");
+    mocks.resolveDefaultAgentWorkspaceDir.mockReturnValue("/tmp/recall/workspace");
     mocks.isRemoteEnvironment.mockReturnValue(false);
     mocks.resolvePluginSetupProvider.mockReturnValue(undefined);
     mocks.resolvePluginSetupRegistry.mockReturnValue({
@@ -375,7 +375,7 @@ describe("modelsAuthLoginCommand", () => {
     });
     mocks.loadValidConfigOrThrow.mockImplementation(async () => currentConfig);
     mocks.updateConfig.mockImplementation(
-      async (mutator: (cfg: OpenClawConfig) => OpenClawConfig) => {
+      async (mutator: (cfg: RecallConfig) => RecallConfig) => {
         lastUpdatedConfig = mutator(currentConfig);
         currentConfig = lastUpdatedConfig;
         return lastUpdatedConfig;
@@ -421,15 +421,15 @@ describe("modelsAuthLoginCommand", () => {
   function useCoderAgentConfig() {
     currentConfig = {
       agents: {
-        list: [{ id: "main" }, { id: "coder", workspace: "/tmp/openclaw/workspaces/coder" }],
+        list: [{ id: "main" }, { id: "coder", workspace: "/tmp/recall/workspaces/coder" }],
       },
     };
     const originalConfig = currentConfig;
-    mocks.resolveAgentDir.mockImplementation((_cfg: OpenClawConfig, agentId: string) =>
-      agentId === "coder" ? "/tmp/openclaw/agents/coder" : "/tmp/openclaw/agents/main",
+    mocks.resolveAgentDir.mockImplementation((_cfg: RecallConfig, agentId: string) =>
+      agentId === "coder" ? "/tmp/recall/agents/coder" : "/tmp/recall/agents/main",
     );
-    mocks.resolveAgentWorkspaceDir.mockImplementation((_cfg: OpenClawConfig, agentId: string) =>
-      agentId === "coder" ? "/tmp/openclaw/workspaces/coder" : "/tmp/openclaw/workspace",
+    mocks.resolveAgentWorkspaceDir.mockImplementation((_cfg: RecallConfig, agentId: string) =>
+      agentId === "coder" ? "/tmp/recall/workspaces/coder" : "/tmp/recall/workspace",
     );
     return originalConfig;
   }
@@ -456,7 +456,7 @@ describe("modelsAuthLoginCommand", () => {
 
     await modelsAuthLoginCommand({ provider: "openai-codex" }, runtime);
 
-    expect(mocks.loadAuthProfileStoreForRuntime).toHaveBeenCalledWith("/tmp/openclaw/agents/main", {
+    expect(mocks.loadAuthProfileStoreForRuntime).toHaveBeenCalledWith("/tmp/recall/agents/main", {
       externalCli: {
         mode: "scoped",
         allowKeychainPrompt: false,
@@ -466,7 +466,7 @@ describe("modelsAuthLoginCommand", () => {
     expect(mocks.clearAuthProfileCooldown).toHaveBeenCalledWith({
       store: fakeStore,
       profileId: "openai-codex:user@example.com",
-      agentDir: "/tmp/openclaw/agents/main",
+      agentDir: "/tmp/recall/agents/main",
     });
     expect(mocks.clearAuthProfileCooldown.mock.invocationCallOrder[0]).toBeLessThan(
       runProviderAuth.mock.invocationCallOrder[0],
@@ -476,9 +476,9 @@ describe("modelsAuthLoginCommand", () => {
     expect(upsertCall.profileId).toBe("openai-codex:user@example.com");
     expect(upsertCall.credential?.type).toBe("oauth");
     expect(upsertCall.credential?.provider).toBe("openai-codex");
-    expect(upsertCall.agentDir).toBe("/tmp/openclaw/agents/main");
+    expect(upsertCall.agentDir).toBe("/tmp/recall/agents/main");
     expect(mocks.promoteAuthProfileInOrder).toHaveBeenCalledWith({
-      agentDir: "/tmp/openclaw/agents/main",
+      agentDir: "/tmp/recall/agents/main",
       provider: "openai-codex",
       profileId: "openai-codex:user@example.com",
     });
@@ -492,7 +492,7 @@ describe("modelsAuthLoginCommand", () => {
       "Default model available: openai-codex/gpt-5.5 (use --set-default to apply)",
     );
     expect(runtime.log).toHaveBeenCalledWith(
-      "Tip: Codex-capable models can use native Codex web search. Enable it with openclaw configure --section web (recommended mode: cached). Docs: https://docs.openclaw.ai/tools/web",
+      "Tip: Codex-capable models can use native Codex web search. Enable it with recall configure --section web (recommended mode: cached). Docs: https://docs.recall.ai/tools/web",
     );
   });
 
@@ -589,7 +589,7 @@ describe("modelsAuthLoginCommand", () => {
     expect(mocks.resolvePluginSetupProvider).toHaveBeenCalledWith({
       provider: "openai",
       config: initialConfig,
-      workspaceDir: "/tmp/openclaw/workspace",
+      workspaceDir: "/tmp/recall/workspace",
     });
     expect(runOauthAuth).toHaveBeenCalledOnce();
     expect(runApiKeyAuth).not.toHaveBeenCalled();
@@ -597,12 +597,12 @@ describe("modelsAuthLoginCommand", () => {
     expect(mocks.clearAuthProfileCooldown).toHaveBeenCalledWith({
       store: fakeStore,
       profileId: "openai:api-key-backup",
-      agentDir: "/tmp/openclaw/agents/main",
+      agentDir: "/tmp/recall/agents/main",
     });
     expect(mocks.clearAuthProfileCooldown).toHaveBeenCalledWith({
       store: fakeStore,
       profileId: "openai-codex:user@example.com",
-      agentDir: "/tmp/openclaw/agents/main",
+      agentDir: "/tmp/recall/agents/main",
     });
   });
 
@@ -758,7 +758,7 @@ describe("modelsAuthLoginCommand", () => {
     expect(mocks.resolveDefaultAgentId).not.toHaveBeenCalled();
     expect(mocks.resolveAgentDir).toHaveBeenCalledWith(originalConfig, "coder");
     expect(mocks.loadAuthProfileStoreForRuntime).toHaveBeenCalledWith(
-      "/tmp/openclaw/agents/coder",
+      "/tmp/recall/agents/coder",
       {
         externalCli: {
           mode: "scoped",
@@ -768,11 +768,11 @@ describe("modelsAuthLoginCommand", () => {
       },
     );
     const authRunCall = readMockCallArg(runProviderAuth) as AuthRunCall;
-    expect(authRunCall.agentDir).toBe("/tmp/openclaw/agents/coder");
-    expect(authRunCall.workspaceDir).toBe("/tmp/openclaw/workspaces/coder");
+    expect(authRunCall.agentDir).toBe("/tmp/recall/agents/coder");
+    expect(authRunCall.workspaceDir).toBe("/tmp/recall/workspaces/coder");
     expect(
       (readMockCallArg(mocks.upsertAuthProfileWithLock) as UpsertAuthProfileCall).agentDir,
-    ).toBe("/tmp/openclaw/agents/coder");
+    ).toBe("/tmp/recall/agents/coder");
   });
 
   it("loads the owning plugin for an explicit provider even in a clean config", async () => {
@@ -819,7 +819,7 @@ describe("modelsAuthLoginCommand", () => {
       mocks.resolvePluginProviders,
     ) as ResolvePluginProvidersCall;
     expect(providerResolutionCall.config).toEqual({});
-    expect(providerResolutionCall.workspaceDir).toBe("/tmp/openclaw/workspace");
+    expect(providerResolutionCall.workspaceDir).toBe("/tmp/recall/workspace");
     expect(providerResolutionCall.bundledProviderAllowlistCompat).toBe(true);
     expect(providerResolutionCall.bundledProviderVitestCompat).toBe(true);
     expect(providerResolutionCall.includeUntrustedWorkspacePlugins).toBe(false);
@@ -862,8 +862,8 @@ describe("modelsAuthLoginCommand", () => {
     const runApiKeyAuth = vi.fn();
     const runClaudeCliMigration = vi.fn().mockImplementation(async (ctx) => {
       expect(ctx.config).toEqual(currentConfig);
-      expect(ctx.agentDir).toBe("/tmp/openclaw/agents/main");
-      expect(ctx.workspaceDir).toBe("/tmp/openclaw/workspace");
+      expect(ctx.agentDir).toBe("/tmp/recall/agents/main");
+      expect(ctx.workspaceDir).toBe("/tmp/recall/workspace");
       expect(ctx.prompter.note).toBe(note);
       expect(ctx.prompter.select).toBe(select);
       expect(ctx.runtime).toBe(runtime);
@@ -951,12 +951,12 @@ describe("modelsAuthLoginCommand", () => {
     expect(mocks.clearAuthProfileCooldown).toHaveBeenNthCalledWith(1, {
       store: fakeStore,
       profileId: "anthropic:claude-cli",
-      agentDir: "/tmp/openclaw/agents/main",
+      agentDir: "/tmp/recall/agents/main",
     });
     expect(mocks.clearAuthProfileCooldown).toHaveBeenNthCalledWith(2, {
       store: fakeStore,
       profileId: "anthropic:legacy",
-      agentDir: "/tmp/openclaw/agents/main",
+      agentDir: "/tmp/recall/agents/main",
     });
     expect(
       mocks.clearAuthProfileCooldown.mock.invocationCallOrder.every(
@@ -1140,7 +1140,7 @@ describe("modelsAuthLoginCommand", () => {
     const runtime = createRuntime();
 
     await expect(modelsAuthLoginCommand({ provider: "anthropic" }, runtime)).rejects.toThrow(
-      'Unknown provider "anthropic". Loaded providers: openai-codex. Verify plugins via `openclaw plugins list --json`.',
+      'Unknown provider "anthropic". Loaded providers: openai-codex. Verify plugins via `recall plugins list --json`.',
     );
   });
 
@@ -1181,16 +1181,16 @@ describe("modelsAuthLoginCommand", () => {
         provider: "anthropic",
         token: `sk-ant-oat01-${"a".repeat(80)}`,
       },
-      agentDir: "/tmp/openclaw/agents/main",
+      agentDir: "/tmp/recall/agents/main",
     });
     expect(runtime.log).toHaveBeenCalledWith(
-      "Anthropic setup-token auth is supported in OpenClaw.",
+      "Anthropic setup-token auth is supported in Recall.",
     );
     expect(runtime.log).toHaveBeenCalledWith(
-      "OpenClaw prefers Claude CLI reuse when it is available on the host.",
+      "Recall prefers Claude CLI reuse when it is available on the host.",
     );
     expect(runtime.log).toHaveBeenCalledWith(
-      "Anthropic staff told us this OpenClaw path is allowed again.",
+      "Anthropic staff told us this Recall path is allowed again.",
     );
   });
 
@@ -1209,7 +1209,7 @@ describe("modelsAuthLoginCommand", () => {
         provider: "openai",
         token: "openai-token",
       },
-      agentDir: "/tmp/openclaw/agents/coder",
+      agentDir: "/tmp/recall/agents/coder",
     });
   });
 
@@ -1232,7 +1232,7 @@ describe("modelsAuthLoginCommand", () => {
     ).rejects.toThrow("paste-api-key --provider openai-codex");
 
     expect(validateMessages).toEqual([
-      "That looks like an OpenAI API key. Use openclaw models auth paste-api-key --provider openai-codex for API-key auth.",
+      "That looks like an OpenAI API key. Use recall models auth paste-api-key --provider openai-codex for API-key auth.",
     ]);
     expect(mocks.upsertAuthProfileWithLock).not.toHaveBeenCalled();
     expect(mocks.updateConfig).not.toHaveBeenCalled();
@@ -1281,7 +1281,7 @@ describe("modelsAuthLoginCommand", () => {
         provider: "openai-codex",
         key: "sk-openai-codex-api-key-value",
       },
-      agentDir: "/tmp/openclaw/agents/coder",
+      agentDir: "/tmp/recall/agents/coder",
     });
     expect(lastUpdatedConfig?.auth?.profiles?.["openai-codex:manual"]).toEqual({
       provider: "openai-codex",
@@ -1307,7 +1307,7 @@ describe("modelsAuthLoginCommand", () => {
         provider: "openai-codex",
         key: "sk-openai-codex-api-key-value",
       },
-      agentDir: "/tmp/openclaw/agents/main",
+      agentDir: "/tmp/recall/agents/main",
     });
     expect(lastUpdatedConfig?.auth?.profiles?.["openai-codex:manual"]).toEqual({
       provider: "openai-codex",
@@ -1330,7 +1330,7 @@ describe("modelsAuthLoginCommand", () => {
         provider: "openai-codex",
         key: "sk-openai-codex-api-key-value",
       },
-      agentDir: "/tmp/openclaw/agents/main",
+      agentDir: "/tmp/recall/agents/main",
     });
     expect(lastUpdatedConfig?.auth?.profiles?.["openai-codex:manual"]).toEqual({
       provider: "openai-codex",
@@ -1358,7 +1358,7 @@ describe("modelsAuthLoginCommand", () => {
     ).rejects.toThrow("paste-token --provider openai-codex");
 
     expect(validateMessages).toEqual([
-      "That looks like token or OAuth material, not an OpenAI API key. Use openclaw models auth paste-token --provider openai-codex for token auth material.",
+      "That looks like token or OAuth material, not an OpenAI API key. Use recall models auth paste-token --provider openai-codex for token auth material.",
     ]);
     expect(mocks.upsertAuthProfileWithLock).not.toHaveBeenCalled();
     expect(mocks.updateConfig).not.toHaveBeenCalled();
@@ -1371,7 +1371,7 @@ describe("modelsAuthLoginCommand", () => {
     await expect(
       modelsAuthPasteTokenCommand({ provider: "openai", agent: "missing" }, runtime),
     ).rejects.toThrow(
-      'Unknown agent id "missing". Use "openclaw agents list" to see configured agents.',
+      'Unknown agent id "missing". Use "recall agents list" to see configured agents.',
     );
 
     expect(mocks.clackText).not.toHaveBeenCalled();
@@ -1418,7 +1418,7 @@ describe("modelsAuthLoginCommand", () => {
         provider: "moonshot",
         token: "moonshot-token",
       },
-      agentDir: "/tmp/openclaw/agents/main",
+      agentDir: "/tmp/recall/agents/main",
     });
   });
 
@@ -1456,11 +1456,11 @@ describe("modelsAuthLoginCommand", () => {
 
     expect(mocks.resolveDefaultAgentId).not.toHaveBeenCalled();
     const tokenAuthCall = readMockCallArg(runTokenAuth) as AuthRunCall;
-    expect(tokenAuthCall.agentDir).toBe("/tmp/openclaw/agents/coder");
-    expect(tokenAuthCall.workspaceDir).toBe("/tmp/openclaw/workspaces/coder");
+    expect(tokenAuthCall.agentDir).toBe("/tmp/recall/agents/coder");
+    expect(tokenAuthCall.workspaceDir).toBe("/tmp/recall/workspaces/coder");
     expect(
       (readMockCallArg(mocks.upsertAuthProfileWithLock) as UpsertAuthProfileCall).agentDir,
-    ).toBe("/tmp/openclaw/agents/coder");
+    ).toBe("/tmp/recall/agents/coder");
   });
 
   it("uses the requested agent store for interactive token auth add", async () => {
@@ -1498,11 +1498,11 @@ describe("modelsAuthLoginCommand", () => {
 
     expect(mocks.resolveDefaultAgentId).not.toHaveBeenCalled();
     const tokenAuthCall = readMockCallArg(runTokenAuth) as AuthRunCall;
-    expect(tokenAuthCall.agentDir).toBe("/tmp/openclaw/agents/coder");
-    expect(tokenAuthCall.workspaceDir).toBe("/tmp/openclaw/workspaces/coder");
+    expect(tokenAuthCall.agentDir).toBe("/tmp/recall/agents/coder");
+    expect(tokenAuthCall.workspaceDir).toBe("/tmp/recall/workspaces/coder");
     expect(
       (readMockCallArg(mocks.upsertAuthProfileWithLock) as UpsertAuthProfileCall).agentDir,
-    ).toBe("/tmp/openclaw/agents/coder");
+    ).toBe("/tmp/recall/agents/coder");
   });
 
   it("keeps the requested agent store when interactive auth add falls back to paste-token", async () => {
@@ -1526,7 +1526,7 @@ describe("modelsAuthLoginCommand", () => {
         provider: "openai",
         token: "openai-token",
       },
-      agentDir: "/tmp/openclaw/agents/coder",
+      agentDir: "/tmp/recall/agents/coder",
     });
   });
 });

@@ -15,7 +15,7 @@ type ModuleWithResolver = typeof Module & {
   _resolveFilename?: ResolveFilename;
 };
 
-export type InstallOpenClawPluginSdkNativeResolverOptions = {
+export type InstallRecallPluginSdkNativeResolverOptions = {
   modulePath?: string;
   pluginModulePath?: string;
   allowedParentRoots?: readonly string[];
@@ -26,13 +26,13 @@ export type InstallOpenClawPluginSdkNativeResolverOptions = {
 
 const moduleWithResolver = Module as ModuleWithResolver;
 const nodeResolveFilenameProperty = "_resolveFilename" as const;
-const PLUGIN_SDK_PACKAGE_PREFIXES = ["openclaw/plugin-sdk", "@openclaw/plugin-sdk"] as const;
+const PLUGIN_SDK_PACKAGE_PREFIXES = ["recall/plugin-sdk", "@recall/plugin-sdk"] as const;
 const pluginSdkNativeAliases = new Map<string, string>();
 const allowedParentRoots = new Set<string>();
 let installed = false;
 let previousResolveFilename: ResolveFilename | undefined;
 
-function resolveLoaderModulePath(options: InstallOpenClawPluginSdkNativeResolverOptions): string {
+function resolveLoaderModulePath(options: InstallRecallPluginSdkNativeResolverOptions): string {
   return options.modulePath ?? fileURLToPath(options.moduleUrl ?? import.meta.url);
 }
 
@@ -80,7 +80,7 @@ function addAllowedParentRoot(root: string): void {
   allowedParentRoots.add(normalizePathForBoundary(root));
 }
 
-function registerAllowedParentRoots(options: InstallOpenClawPluginSdkNativeResolverOptions): void {
+function registerAllowedParentRoots(options: InstallRecallPluginSdkNativeResolverOptions): void {
   if (options.pluginModulePath) {
     addAllowedParentRoot(findNearestPackageRoot(options.pluginModulePath));
   }
@@ -103,7 +103,7 @@ function canResolveForParent(parent: NodeJS.Module | undefined): boolean {
 }
 
 function listPluginSdkNativeAliases(
-  options: InstallOpenClawPluginSdkNativeResolverOptions,
+  options: InstallRecallPluginSdkNativeResolverOptions,
 ): Array<readonly [string, string]> {
   const modulePath = resolveLoaderModulePath(options);
   return Object.entries(
@@ -144,8 +144,8 @@ function installResolver(): void {
   installed = true;
 }
 
-export function installOpenClawPluginSdkNativeResolver(
-  options: InstallOpenClawPluginSdkNativeResolverOptions = {},
+export function installRecallPluginSdkNativeResolver(
+  options: InstallRecallPluginSdkNativeResolverOptions = {},
 ): string[] {
   for (const [specifier, target] of listPluginSdkNativeAliases(options)) {
     pluginSdkNativeAliases.set(specifier, target);
@@ -155,7 +155,7 @@ export function installOpenClawPluginSdkNativeResolver(
   return [...pluginSdkNativeAliases.keys()].toSorted();
 }
 
-export function resetOpenClawPluginSdkNativeResolverForTest(): void {
+export function resetRecallPluginSdkNativeResolverForTest(): void {
   pluginSdkNativeAliases.clear();
   allowedParentRoots.clear();
   if (installed && previousResolveFilename) {

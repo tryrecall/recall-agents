@@ -10,7 +10,7 @@ coverage:
     - tools.apply-patch
 objective: Verify apply_patch behavior is tracked across Pi and Codex while Codex owns patching natively.
 successCriteria:
-  - Pi may expose OpenClaw apply_patch while Codex app-server mode may omit duplicate OpenClaw dynamic apply_patch.
+  - Pi may expose Recall apply_patch while Codex app-server mode may omit duplicate Recall dynamic apply_patch.
   - Mock provider apply_patch plans are reported as fixture intent, not as actual runtime tool calls.
   - The row stays report-only until fault injection uses valid patch-shaped inputs.
 docsRefs:
@@ -36,7 +36,7 @@ execution:
       reason: Codex app-server intentionally owns apply_patch natively; this fixture still needs valid patch-shaped fault injection before it can prove product behavior.
     knownHarnessGap:
       issue: "#80320"
-      reason: Codex-native apply_patch is intentionally not an OpenClaw dynamic tool; QA fault injection still uses synthetic failure-path inputs.
+      reason: Codex-native apply_patch is intentionally not an Recall dynamic tool; QA fault injection still uses synthetic failure-path inputs.
     promptSnippet: "target=apply_patch"
     failurePromptSnippet: "failure target=apply_patch"
 ```

@@ -4,12 +4,12 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
-  installOpenClawPluginSdkNativeResolver,
-  resetOpenClawPluginSdkNativeResolverForTest,
+  installRecallPluginSdkNativeResolver,
+  resetRecallPluginSdkNativeResolverForTest,
 } from "./plugin-sdk-native-resolver.js";
 
 afterEach(() => {
-  resetOpenClawPluginSdkNativeResolverForTest();
+  resetRecallPluginSdkNativeResolverForTest();
 });
 
 function writeJsonFile(targetPath: string, value: unknown): void {
@@ -17,12 +17,12 @@ function writeJsonFile(targetPath: string, value: unknown): void {
   fs.writeFileSync(targetPath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
 }
 
-function writeFakeOpenClawPackage(root: string): { distRoot: string; loaderModulePath: string } {
+function writeFakeRecallPackage(root: string): { distRoot: string; loaderModulePath: string } {
   writeJsonFile(path.join(root, "package.json"), {
-    name: "openclaw",
+    name: "recall",
     type: "module",
     bin: {
-      openclaw: "./openclaw.mjs",
+      recall: "./recall.mjs",
     },
     exports: {
       "./cli-entry": "./dist/cli-entry.js",
@@ -31,7 +31,7 @@ function writeFakeOpenClawPackage(root: string): { distRoot: string; loaderModul
       "./plugin-sdk/source-only": "./dist/plugin-sdk/source-only.js",
     },
   });
-  fs.writeFileSync(path.join(root, "openclaw.mjs"), "#!/usr/bin/env node\n", "utf8");
+  fs.writeFileSync(path.join(root, "recall.mjs"), "#!/usr/bin/env node\n", "utf8");
   const distRoot = path.join(root, "dist");
   const pluginSdkDir = path.join(distRoot, "plugin-sdk");
   fs.mkdirSync(pluginSdkDir, { recursive: true });
@@ -58,31 +58,31 @@ function writeExternalPluginEntry(root: string): string {
   return entry;
 }
 
-describe("installOpenClawPluginSdkNativeResolver", () => {
+describe("installRecallPluginSdkNativeResolver", () => {
   it("keeps native aliases on JS dist artifacts when source files exist", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-sdk-native-source-resolver-"));
-    const { loaderModulePath } = writeFakeOpenClawPackage(root);
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "recall-sdk-native-source-resolver-"));
+    const { loaderModulePath } = writeFakeRecallPackage(root);
     const sourceChannelMessagePath = path.join(root, "src", "plugin-sdk", "channel-message.ts");
     fs.mkdirSync(path.dirname(sourceChannelMessagePath), { recursive: true });
     fs.writeFileSync(sourceChannelMessagePath, "export const sourceOnly = true;\n", "utf8");
     const externalPluginEntry = writeExternalPluginEntry(path.join(root, "external-plugin"));
 
-    const installedAliases = installOpenClawPluginSdkNativeResolver({
+    const installedAliases = installRecallPluginSdkNativeResolver({
       modulePath: loaderModulePath,
       pluginModulePath: externalPluginEntry,
       pluginSdkResolution: "src",
     });
 
-    expect(installedAliases).toContain("openclaw/plugin-sdk/channel-message");
+    expect(installedAliases).toContain("recall/plugin-sdk/channel-message");
     const requireFromPlugin = createRequire(externalPluginEntry);
-    expect(fs.realpathSync(requireFromPlugin.resolve("openclaw/plugin-sdk/channel-message"))).toBe(
+    expect(fs.realpathSync(requireFromPlugin.resolve("recall/plugin-sdk/channel-message"))).toBe(
       fs.realpathSync(path.join(root, "dist", "plugin-sdk", "channel-message.js")),
     );
   });
 
-  it("lets built external plugins resolve OpenClaw SDK subpaths with createRequire", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-sdk-native-resolver-"));
-    const { distRoot, loaderModulePath } = writeFakeOpenClawPackage(root);
+  it("lets built external plugins resolve Recall SDK subpaths with createRequire", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "recall-sdk-native-resolver-"));
+    const { distRoot, loaderModulePath } = writeFakeRecallPackage(root);
     const externalPluginEntry = writeExternalPluginEntry(path.join(root, "external-plugin"));
 
     const distMode = fs.statSync(distRoot).mode;
@@ -91,24 +91,24 @@ describe("installOpenClawPluginSdkNativeResolver", () => {
     }
 
     try {
-      const installedAliases = installOpenClawPluginSdkNativeResolver({
+      const installedAliases = installRecallPluginSdkNativeResolver({
         modulePath: loaderModulePath,
         pluginModulePath: externalPluginEntry,
         pluginSdkResolution: "dist",
       });
 
-      expect(installedAliases).toContain("openclaw/plugin-sdk/channel-message");
+      expect(installedAliases).toContain("recall/plugin-sdk/channel-message");
       expect(fs.existsSync(path.join(distRoot, "extensions"))).toBe(false);
       const requireFromPlugin = createRequire(externalPluginEntry);
       expect(
-        fs.realpathSync(requireFromPlugin.resolve("openclaw/plugin-sdk/channel-message")),
+        fs.realpathSync(requireFromPlugin.resolve("recall/plugin-sdk/channel-message")),
       ).toBe(fs.realpathSync(path.join(root, "dist", "plugin-sdk", "channel-message.js")));
-      const sdk = requireFromPlugin("openclaw/plugin-sdk/channel-message") as {
+      const sdk = requireFromPlugin("recall/plugin-sdk/channel-message") as {
         defineChannelMessageAdapter?: () => string;
       };
 
       expect(sdk.defineChannelMessageAdapter?.()).toBe("adapter");
-      expect(() => requireFromPlugin.resolve("openclaw/not-plugin-sdk/channel-message")).toThrow();
+      expect(() => requireFromPlugin.resolve("recall/not-plugin-sdk/channel-message")).toThrow();
     } finally {
       if (process.platform !== "win32") {
         fs.chmodSync(distRoot, distMode);
@@ -117,15 +117,15 @@ describe("installOpenClawPluginSdkNativeResolver", () => {
   });
 
   it("does not resolve SDK aliases for parents outside registered plugin roots", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-sdk-native-guard-"));
-    const { loaderModulePath } = writeFakeOpenClawPackage(root);
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "recall-sdk-native-guard-"));
+    const { loaderModulePath } = writeFakeRecallPackage(root);
     const externalPluginEntry = writeExternalPluginEntry(path.join(root, "external-plugin"));
-    const unrelatedRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-sdk-native-outside-"));
+    const unrelatedRoot = fs.mkdtempSync(path.join(os.tmpdir(), "recall-sdk-native-outside-"));
     const unrelatedEntry = path.join(unrelatedRoot, "runtime-api.js");
     fs.mkdirSync(path.dirname(unrelatedEntry), { recursive: true });
     fs.writeFileSync(unrelatedEntry, "export default {};\n", "utf8");
 
-    installOpenClawPluginSdkNativeResolver({
+    installRecallPluginSdkNativeResolver({
       modulePath: loaderModulePath,
       pluginModulePath: externalPluginEntry,
       pluginSdkResolution: "dist",
@@ -133,27 +133,27 @@ describe("installOpenClawPluginSdkNativeResolver", () => {
 
     const requireFromPlugin = createRequire(externalPluginEntry);
     const requireFromOutside = createRequire(unrelatedEntry);
-    expect(requireFromPlugin.resolve("openclaw/plugin-sdk/channel-message")).toBeTruthy();
-    expect(() => requireFromOutside.resolve("openclaw/plugin-sdk/channel-message")).toThrow();
+    expect(requireFromPlugin.resolve("recall/plugin-sdk/channel-message")).toBeTruthy();
+    expect(() => requireFromOutside.resolve("recall/plugin-sdk/channel-message")).toThrow();
   });
 
   it("does not register source-only SDK subpaths for native resolution", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-sdk-native-source-only-"));
-    const { loaderModulePath } = writeFakeOpenClawPackage(root);
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "recall-sdk-native-source-only-"));
+    const { loaderModulePath } = writeFakeRecallPackage(root);
     const sourceOnlyPath = path.join(root, "src", "plugin-sdk", "source-only.ts");
     fs.mkdirSync(path.dirname(sourceOnlyPath), { recursive: true });
     fs.writeFileSync(sourceOnlyPath, "export const sourceOnly = true;\n", "utf8");
     const externalPluginEntry = writeExternalPluginEntry(path.join(root, "external-plugin"));
 
-    const installedAliases = installOpenClawPluginSdkNativeResolver({
+    const installedAliases = installRecallPluginSdkNativeResolver({
       modulePath: loaderModulePath,
       pluginModulePath: externalPluginEntry,
       pluginSdkResolution: "src",
     });
 
-    expect(installedAliases).toContain("openclaw/plugin-sdk/channel-message");
-    expect(installedAliases).not.toContain("openclaw/plugin-sdk/source-only");
+    expect(installedAliases).toContain("recall/plugin-sdk/channel-message");
+    expect(installedAliases).not.toContain("recall/plugin-sdk/source-only");
     const requireFromPlugin = createRequire(externalPluginEntry);
-    expect(() => requireFromPlugin.resolve("openclaw/plugin-sdk/source-only")).toThrow();
+    expect(() => requireFromPlugin.resolve("recall/plugin-sdk/source-only")).toThrow();
   });
 });

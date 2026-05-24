@@ -1,4 +1,4 @@
-import { listOpenClawPluginManifestMetadata } from "../plugins/manifest-metadata-scan.js";
+import { listRecallPluginManifestMetadata } from "../plugins/manifest-metadata-scan.js";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
@@ -123,8 +123,8 @@ function readCompatBoolean(
   return typeof value === "boolean" ? value : undefined;
 }
 
-const OPENCLAW_ATTRIBUTION_PRODUCT = "OpenClaw";
-const OPENCLAW_ATTRIBUTION_ORIGINATOR = "openclaw";
+const RECALL_ATTRIBUTION_PRODUCT = "Recall";
+const RECALL_ATTRIBUTION_ORIGINATOR = "recall";
 const OPENROUTER_ATTRIBUTION_CATEGORIES =
   "cli-agent,cloud-agent,programming-app,creative-writing,writing-assistant,general-chat,personal-agent";
 
@@ -173,8 +173,8 @@ type ManifestProviderRequestCacheEntry = {
 let manifestProviderEndpointCache: ManifestProviderEndpointCacheEntry[] | null = null;
 let manifestProviderRequestCache: Map<string, ManifestProviderRequestCacheEntry> | null = null;
 
-function formatOpenClawUserAgent(version: string): string {
-  return `${OPENCLAW_ATTRIBUTION_ORIGINATOR}/${version}`;
+function formatRecallUserAgent(version: string): string {
+  return `${RECALL_ATTRIBUTION_ORIGINATOR}/${version}`;
 }
 
 function tryParseHostname(value: string): string | undefined {
@@ -322,7 +322,7 @@ function readManifestProviderRequests(
 
 function collectManifestProviderEndpoints(): ManifestProviderEndpointCacheEntry[] {
   const entries: ManifestProviderEndpointCacheEntry[] = [];
-  for (const { manifest } of listOpenClawPluginManifestMetadata()) {
+  for (const { manifest } of listRecallPluginManifestMetadata()) {
     entries.push(...readManifestProviderEndpoints(manifest));
   }
   return entries;
@@ -330,7 +330,7 @@ function collectManifestProviderEndpoints(): ManifestProviderEndpointCacheEntry[
 
 function collectManifestProviderRequests(): Map<string, ManifestProviderRequestCacheEntry> {
   const entries = new Map<string, ManifestProviderRequestCacheEntry>();
-  for (const { manifest } of listOpenClawPluginManifestMetadata()) {
+  for (const { manifest } of listRecallPluginManifestMetadata()) {
     for (const [provider, request] of readManifestProviderRequests(manifest)) {
       entries.set(provider, request);
     }
@@ -459,7 +459,7 @@ export function resolveProviderAttributionIdentity(
   env: RuntimeVersionEnv = process.env as RuntimeVersionEnv,
 ): ProviderAttributionIdentity {
   return {
-    product: OPENCLAW_ATTRIBUTION_PRODUCT,
+    product: RECALL_ATTRIBUTION_PRODUCT,
     version: resolveRuntimeServiceVersion(env),
   };
 }
@@ -474,10 +474,10 @@ function buildOpenRouterAttributionPolicy(
     verification: "vendor-documented",
     hook: "request-headers",
     docsUrl: "https://openrouter.ai/docs/app-attribution",
-    reviewNote: "Documented app attribution headers. Verified in OpenClaw runtime wrapper.",
+    reviewNote: "Documented app attribution headers. Verified in Recall runtime wrapper.",
     ...identity,
     headers: {
-      "HTTP-Referer": "https://openclaw.ai",
+      "HTTP-Referer": "https://recall.ai",
       "X-OpenRouter-Title": identity.product,
       "X-OpenRouter-Categories": OPENROUTER_ATTRIBUTION_CATEGORIES,
     },
@@ -496,7 +496,7 @@ function buildNvidiaAttributionPolicy(
       "NVIDIA NIM billing invoke-origin attribution header. Applied only on verified NVIDIA routes.",
     ...resolveProviderAttributionIdentity(env),
     headers: {
-      "X-BILLING-INVOKE-ORIGIN": OPENCLAW_ATTRIBUTION_PRODUCT,
+      "X-BILLING-INVOKE-ORIGIN": RECALL_ATTRIBUTION_PRODUCT,
     },
   };
 }
@@ -514,9 +514,9 @@ function buildOpenAIAttributionPolicy(
       "OpenAI native traffic supports hidden originator/User-Agent attribution. Verified against the Codex wire contract.",
     ...identity,
     headers: {
-      originator: OPENCLAW_ATTRIBUTION_ORIGINATOR,
+      originator: RECALL_ATTRIBUTION_ORIGINATOR,
       version: identity.version,
-      "User-Agent": formatOpenClawUserAgent(identity.version),
+      "User-Agent": formatRecallUserAgent(identity.version),
     },
   };
 }
@@ -534,9 +534,9 @@ function buildOpenAICodexAttributionPolicy(
       "OpenAI Codex ChatGPT-backed traffic supports the same hidden originator/User-Agent attribution contract.",
     ...identity,
     headers: {
-      originator: OPENCLAW_ATTRIBUTION_ORIGINATOR,
+      originator: RECALL_ATTRIBUTION_ORIGINATOR,
       version: identity.version,
-      "User-Agent": formatOpenClawUserAgent(identity.version),
+      "User-Agent": formatRecallUserAgent(identity.version),
     },
   };
 }
@@ -551,12 +551,12 @@ function buildXaiAttributionPolicy(
     verification: "vendor-hidden-api-spec",
     hook: "request-headers",
     reviewNote:
-      "xAI api.x.ai accepts a standard openclaw User-Agent. Companion originator/version headers mirror the OpenAI attribution shape for consistency; they are not validated against an xAI-specific spec and are expected to be ignored by xAI's OpenAI-compatible surface.",
+      "xAI api.x.ai accepts a standard recall User-Agent. Companion originator/version headers mirror the OpenAI attribution shape for consistency; they are not validated against an xAI-specific spec and are expected to be ignored by xAI's OpenAI-compatible surface.",
     ...identity,
     headers: {
-      originator: OPENCLAW_ATTRIBUTION_ORIGINATOR,
+      originator: RECALL_ATTRIBUTION_ORIGINATOR,
       version: identity.version,
-      "User-Agent": formatOpenClawUserAgent(identity.version),
+      "User-Agent": formatRecallUserAgent(identity.version),
     },
   };
 }

@@ -1,9 +1,9 @@
-import { resolveApprovalOverGateway } from "openclaw/plugin-sdk/approval-gateway-runtime";
-import type { ExecApprovalReplyDecision } from "openclaw/plugin-sdk/approval-reply-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import { resolveApprovalOverGateway } from "recall/plugin-sdk/approval-gateway-runtime";
+import type { ExecApprovalReplyDecision } from "recall/plugin-sdk/approval-reply-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
 
 export type ResolveTelegramExecApprovalParams = {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   approvalId: string;
   decision: ExecApprovalReplyDecision;
   senderId?: string | null;

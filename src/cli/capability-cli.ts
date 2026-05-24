@@ -27,7 +27,7 @@ import {
   setRuntimeConfigSnapshot,
 } from "../config/config.js";
 import { resolveAgentModelPrimaryValue } from "../config/model-input.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { callGateway, randomIdempotencyKey } from "../gateway/call.js";
 import { buildGatewayConnectionDetailsWithResolvers } from "../gateway/connection-details.js";
 import { isLoopbackHost } from "../gateway/net.js";
@@ -107,7 +107,7 @@ import { collectOption } from "./program/helpers.js";
 type CapabilityTransport = "local" | "gateway";
 const IMAGE_OUTPUT_FORMATS = ["png", "jpeg", "webp"] as const;
 const IMAGE_BACKGROUNDS = ["transparent", "opaque", "auto"] as const;
-const LOCAL_MODEL_RUN_SYSTEM_PROMPT = "You are a personal assistant running inside OpenClaw.";
+const LOCAL_MODEL_RUN_SYSTEM_PROMPT = "You are a personal assistant running inside Recall.";
 const HEIC_MODEL_RUN_MIMES = new Set(["image/heic", "image/heif"]);
 
 type CapabilityMetadata = {
@@ -478,14 +478,14 @@ function resolveSelectedProviderFromModelRef(modelRef: string | undefined): stri
   return resolveModelRefOverride(modelRef).provider;
 }
 
-function getAuthProfileIdsForProvider(cfg: OpenClawConfig, providerId: string): string[] {
+function getAuthProfileIdsForProvider(cfg: RecallConfig, providerId: string): string[] {
   const agentDir = resolveAgentDir(cfg, resolveDefaultAgentId(cfg));
   const store = loadAuthProfileStoreForRuntime(agentDir);
   return listProfilesForProvider(store, providerId);
 }
 
 function providerHasGenericConfig(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   providerId: string;
   envVars?: string[];
 }): boolean {
@@ -578,7 +578,7 @@ function resolveModelRefOverride(raw: string | undefined): { provider?: string; 
 
 async function canonicalizeModelRunRef(params: {
   raw: string | undefined;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   preserveAuthProfile: boolean;
 }): Promise<string | undefined> {
   return await canonicalizeCaseOnlyCatalogModelRef({
@@ -1586,8 +1586,8 @@ async function resolveLocalCapabilityRuntimeConfig(params: {
   allowedPaths?: Set<string>;
   forcedActivePaths?: Set<string>;
   optionalActivePaths?: Set<string>;
-  config?: OpenClawConfig;
-}): Promise<OpenClawConfig> {
+  config?: RecallConfig;
+}): Promise<RecallConfig> {
   const cfg = params.config ?? getRuntimeConfig();
   const sourceConfig = getRuntimeConfigSourceSnapshot();
   const { effectiveConfig } = await resolveCommandConfigWithSecrets({
@@ -1776,7 +1776,7 @@ export function registerCapabilityCli(program: Command) {
     .addHelpText(
       "after",
       () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/infer", "docs.openclaw.ai/cli/infer")}\n`,
+        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/infer", "docs.recall.ai/cli/infer")}\n`,
     );
 
   registerCapabilityListAndInspect(capability);

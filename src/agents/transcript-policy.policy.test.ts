@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { resolveTranscriptPolicy } from "./transcript-policy.js";
 
 vi.mock("../plugins/provider-hook-runtime.js", () => ({
@@ -21,19 +21,19 @@ const MISTRAL_PLUGIN_CONFIG = {
       mistral: { enabled: true },
     },
   },
-} as OpenClawConfig;
+} as RecallConfig;
 
 function createProviderRuntimeSmokeContext(): {
-  config: OpenClawConfig;
+  config: RecallConfig;
   env: NodeJS.ProcessEnv;
   workspaceDir: string;
 } {
   const env = { ...process.env };
-  delete env.OPENCLAW_BUNDLED_PLUGINS_DIR;
-  delete env.OPENCLAW_SKIP_PROVIDERS;
-  delete env.OPENCLAW_SKIP_CHANNELS;
-  delete env.OPENCLAW_SKIP_CRON;
-  delete env.OPENCLAW_TEST_MINIMAL_GATEWAY;
+  delete env.RECALL_BUNDLED_PLUGINS_DIR;
+  delete env.RECALL_SKIP_PROVIDERS;
+  delete env.RECALL_SKIP_CHANNELS;
+  delete env.RECALL_SKIP_CRON;
+  delete env.RECALL_TEST_MINIMAL_GATEWAY;
   return {
     config: {},
     env,

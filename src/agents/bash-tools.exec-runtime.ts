@@ -120,7 +120,7 @@ export const DEFAULT_MAX_OUTPUT = clampWithDefault(
   200_000,
 );
 export const DEFAULT_PENDING_MAX_OUTPUT = clampWithDefault(
-  readEnvInt("OPENCLAW_BASH_PENDING_MAX_OUTPUT_CHARS"),
+  readEnvInt("RECALL_BASH_PENDING_MAX_OUTPUT_CHARS"),
   30_000,
   1_000,
   200_000,
@@ -515,8 +515,8 @@ export function formatExecFailureReason(params: {
       return "Command not executable (permission denied)";
     case "overall-timeout":
       return typeof params.timeoutSec === "number" && params.timeoutSec > 0
-        ? `Command timed out after ${params.timeoutSec} seconds. If this command is expected to take longer, re-run with a higher timeout (e.g., exec timeout=300). If it should keep running, start it with exec background=true or yieldMs so OpenClaw can register a pollable process session. Do not rely on shell backgrounding with a trailing &.`
-        : "Command timed out. If this command is expected to take longer, re-run with a higher timeout (e.g., exec timeout=300). If it should keep running, start it with exec background=true or yieldMs so OpenClaw can register a pollable process session. Do not rely on shell backgrounding with a trailing &.";
+        ? `Command timed out after ${params.timeoutSec} seconds. If this command is expected to take longer, re-run with a higher timeout (e.g., exec timeout=300). If it should keep running, start it with exec background=true or yieldMs so Recall can register a pollable process session. Do not rely on shell backgrounding with a trailing &.`
+        : "Command timed out. If this command is expected to take longer, re-run with a higher timeout (e.g., exec timeout=300). If it should keep running, start it with exec background=true or yieldMs so Recall can register a pollable process session. Do not rely on shell backgrounding with a trailing &.";
     case "no-output-timeout":
       return "Command timed out waiting for output";
     case "signal":
@@ -619,9 +619,9 @@ function wrapPosixCommandWithPathPrepend(
   }
 
   // Pass the prepend string safely via a temporary environment variable.
-  env.OPENCLAW_PREPEND_PATH = pathPrepend.join(path.delimiter);
+  env.RECALL_PREPEND_PATH = pathPrepend.join(path.delimiter);
 
-  return `export PATH="\${OPENCLAW_PREPEND_PATH}\${PATH:+:$PATH}"; unset OPENCLAW_PREPEND_PATH; ${command}`;
+  return `export PATH="\${RECALL_PREPEND_PATH}\${PATH:+:$PATH}"; unset RECALL_PREPEND_PATH; ${command}`;
 }
 
 export async function runExecProcess(opts: {
@@ -664,7 +664,7 @@ export async function runExecProcess(opts: {
   const supervisor = getProcessSupervisor();
   const shellRuntimeEnv: Record<string, string> = {
     ...opts.env,
-    OPENCLAW_SHELL: "exec",
+    RECALL_SHELL: "exec",
   };
 
   const session: ProcessSession = {

@@ -64,7 +64,7 @@ describe("release candidate checklist", () => {
   it("extracts a workflow run id from gh dispatch output", () => {
     expect(
       parseRunIdFromDispatchOutput(
-        "https://github.com/openclaw/openclaw/actions/runs/25922042055\n",
+        "https://github.com/tryrecall/recall-agents/actions/runs/25922042055\n",
       ),
     ).toBe("25922042055");
   });
@@ -72,10 +72,10 @@ describe("release candidate checklist", () => {
   it("falls back to a single compatible artifact from the same run", () => {
     expect(
       resolveArtifactName(
-        [{ name: "openclaw-npm-preflight-dba00", expired: false }],
-        "openclaw-npm-preflight-v2026.5.16-beta.2",
-        "openclaw-npm-preflight-",
+        [{ name: "recall-npm-preflight-dba00", expired: false }],
+        "recall-npm-preflight-v2026.5.16-beta.2",
+        "recall-npm-preflight-",
       ),
-    ).toBe("openclaw-npm-preflight-dba00");
+    ).toBe("recall-npm-preflight-dba00");
   });
 });

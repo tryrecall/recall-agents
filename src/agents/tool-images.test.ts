@@ -6,15 +6,15 @@ describe("tool image sanitizing", () => {
   const unavailableImageBackend = process.platform === "win32" ? "sips" : "windows-native";
 
   async function withUnavailableImageBackend<T>(fn: () => Promise<T>): Promise<T> {
-    const previousBackend = process.env.OPENCLAW_IMAGE_BACKEND;
-    process.env.OPENCLAW_IMAGE_BACKEND = unavailableImageBackend;
+    const previousBackend = process.env.RECALL_IMAGE_BACKEND;
+    process.env.RECALL_IMAGE_BACKEND = unavailableImageBackend;
     try {
       return await fn();
     } finally {
       if (previousBackend === undefined) {
-        delete process.env.OPENCLAW_IMAGE_BACKEND;
+        delete process.env.RECALL_IMAGE_BACKEND;
       } else {
-        process.env.OPENCLAW_IMAGE_BACKEND = previousBackend;
+        process.env.RECALL_IMAGE_BACKEND = previousBackend;
       }
     }
   }

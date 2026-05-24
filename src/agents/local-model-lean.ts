@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { normalizeAgentId, parseAgentSessionKey } from "../routing/session-key.js";
 import { resolveAgentConfig, resolveDefaultAgentId } from "./agent-scope-config.js";
 import type { AnyAgentTool } from "./pi-tools.types.js";
@@ -6,7 +6,7 @@ import type { AnyAgentTool } from "./pi-tools.types.js";
 const LOCAL_MODEL_LEAN_DENY_TOOL_NAMES = new Set(["browser", "cron", "message"]);
 
 function resolveLocalModelLeanAgentId(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   sessionKey?: string;
 }): string | undefined {
@@ -25,7 +25,7 @@ function resolveLocalModelLeanAgentId(params: {
 }
 
 export function isLocalModelLeanEnabled(params: {
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   sessionKey?: string;
 }): boolean {
@@ -40,7 +40,7 @@ export function isLocalModelLeanEnabled(params: {
 
 export function filterLocalModelLeanTools(params: {
   tools: AnyAgentTool[];
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   sessionKey?: string;
 }): AnyAgentTool[] {

@@ -35,9 +35,9 @@ export function createChangedCheckChildEnv(baseEnv = process.env) {
   const resolvedBaseEnv = resolveLocalHeavyCheckEnv(baseEnv);
   return {
     ...resolvedBaseEnv,
-    OPENCLAW_OXLINT_SKIP_LOCK: "1",
-    OPENCLAW_TEST_HEAVY_CHECK_LOCK_HELD: "1",
-    OPENCLAW_TSGO_HEAVY_CHECK_LOCK_HELD: "1",
+    RECALL_OXLINT_SKIP_LOCK: "1",
+    RECALL_TEST_HEAVY_CHECK_LOCK_HELD: "1",
+    RECALL_TSGO_HEAVY_CHECK_LOCK_HELD: "1",
   };
 }
 
@@ -76,10 +76,10 @@ export function shouldSkipAppLintForMissingSwiftlint(options = {}) {
 }
 
 export function shouldDelegateChangedCheckToCrabbox(argv = [], env = process.env) {
-  if (!isTruthyEnvFlag(env.OPENCLAW_TESTBOX)) {
+  if (!isTruthyEnvFlag(env.RECALL_TESTBOX)) {
     return false;
   }
-  if (isTruthyEnvFlag(env.OPENCLAW_TESTBOX_REMOTE_RUN)) {
+  if (isTruthyEnvFlag(env.RECALL_TESTBOX_REMOTE_RUN)) {
     return false;
   }
   if (isTruthyEnvFlag(env.CI) || isTruthyEnvFlag(env.GITHUB_ACTIONS)) {
@@ -98,7 +98,7 @@ export function buildChangedCheckCrabboxArgs(argv = []) {
     "--provider",
     "blacksmith-testbox",
     "--blacksmith-org",
-    "openclaw",
+    "recall",
     "--blacksmith-workflow",
     ".github/workflows/ci-check-testbox.yml",
     "--blacksmith-job",
@@ -113,11 +113,11 @@ export function buildChangedCheckCrabboxArgs(argv = []) {
     "--",
     "CI=1",
     "NODE_OPTIONS=--max-old-space-size=4096",
-    "OPENCLAW_TEST_PROJECTS_PARALLEL=6",
-    "OPENCLAW_VITEST_MAX_WORKERS=1",
-    "OPENCLAW_VITEST_NO_OUTPUT_TIMEOUT_MS=900000",
-    "OPENCLAW_TESTBOX=1",
-    "OPENCLAW_TESTBOX_REMOTE_RUN=1",
+    "RECALL_TEST_PROJECTS_PARALLEL=6",
+    "RECALL_VITEST_MAX_WORKERS=1",
+    "RECALL_VITEST_NO_OUTPUT_TIMEOUT_MS=900000",
+    "RECALL_TESTBOX=1",
+    "RECALL_TESTBOX_REMOTE_RUN=1",
     "corepack",
     "pnpm",
     "check:changed",
@@ -153,7 +153,7 @@ export function createShrinkwrapGuardCommand(paths) {
 
 export async function runChangedCheckViaCrabbox(argv = [], env = process.env) {
   console.error(
-    "[check:changed] OPENCLAW_TESTBOX=1 set; delegating to Blacksmith Testbox via `pnpm crabbox:run`.",
+    "[check:changed] RECALL_TESTBOX=1 set; delegating to Blacksmith Testbox via `pnpm crabbox:run`.",
   );
   return await runManagedCommand({
     bin: "pnpm",
@@ -297,8 +297,8 @@ export function createChangedCheckPlan(result, options = {}) {
     addCommand("live Docker shell syntax", "bash", ["-n", ...LIVE_DOCKER_AUTH_SHELL_TARGETS]);
     addCommand("live Docker scheduler dry run", "node", ["scripts/test-docker-all.mjs"], {
       ...baseEnv,
-      OPENCLAW_DOCKER_ALL_DRY_RUN: "1",
-      OPENCLAW_DOCKER_ALL_LIVE_MODE: "only",
+      RECALL_DOCKER_ALL_DRY_RUN: "1",
+      RECALL_DOCKER_ALL_LIVE_MODE: "only",
     });
   }
 
@@ -378,7 +378,7 @@ async function runPlanCommand(command, timings) {
 export function createPnpmManagedCommand(command, env = process.env) {
   const commandEnv = command.env ?? resolveLocalHeavyCheckEnv(env);
   if (
-    isTruthyEnvFlag(commandEnv.OPENCLAW_TESTBOX_REMOTE_RUN) ||
+    isTruthyEnvFlag(commandEnv.RECALL_TESTBOX_REMOTE_RUN) ||
     isTruthyEnvFlag(commandEnv.CI) ||
     isTruthyEnvFlag(commandEnv.GITHUB_ACTIONS)
   ) {
@@ -405,7 +405,7 @@ function ensureCorepackPnpmShimDir() {
   if (corepackPnpmShimDir) {
     return corepackPnpmShimDir;
   }
-  const dir = mkdtempSync(path.join(tmpdir(), "openclaw-corepack-pnpm-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "recall-corepack-pnpm-"));
   const pnpmPath = path.join(dir, "pnpm");
   writeFileSync(pnpmPath, '#!/bin/sh\nexec corepack pnpm "$@"\n', "utf8");
   chmodSync(pnpmPath, 0o755);

@@ -5,7 +5,7 @@ import {
   replaceConfigFile,
 } from "../../config/config.js";
 import { extractDeliveryInfo } from "../../config/sessions.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import {
   formatDoctorNonInteractiveHint,
   type RestartSentinelPayload,
@@ -49,7 +49,7 @@ function normalizeTrustedProxyAuthForCompare(auth: ReturnType<typeof resolveGate
   };
 }
 
-export function didSharedGatewayAuthChange(prev: OpenClawConfig, next: OpenClawConfig): boolean {
+export function didSharedGatewayAuthChange(prev: RecallConfig, next: RecallConfig): boolean {
   const prevResolvedAuth = resolveGatewayAuth({
     authConfig: prev.gateway?.auth,
     env: process.env,
@@ -93,8 +93,8 @@ export function didSharedGatewayAuthChange(prev: OpenClawConfig, next: OpenClawC
 }
 
 export function didActiveSharedGatewayAuthChange(params: {
-  fallbackPrev: OpenClawConfig;
-  next: OpenClawConfig;
+  fallbackPrev: RecallConfig;
+  next: RecallConfig;
 }): boolean {
   return didSharedGatewayAuthChange(
     getActiveSecretsRuntimeSnapshot()?.config ?? params.fallbackPrev,
@@ -116,7 +116,7 @@ function queueSharedGatewayAuthDisconnect(
 
 function queueSharedGatewayAuthGenerationRefresh(
   shouldRefresh: boolean,
-  nextConfig: OpenClawConfig,
+  nextConfig: RecallConfig,
   context?: GatewayRequestContext,
 ): void {
   if (!shouldRefresh) {
@@ -129,7 +129,7 @@ function queueSharedGatewayAuthGenerationRefresh(
 
 function shouldScheduleDirectConfigRestart(params: {
   changedPaths: string[];
-  nextConfig: OpenClawConfig;
+  nextConfig: RecallConfig;
 }): boolean {
   const reloadSettings = resolveGatewayReloadSettings(params.nextConfig);
   if (reloadSettings.mode === "off") {
@@ -209,10 +209,10 @@ async function tryWriteRestartSentinelPayload(
 export async function commitGatewayConfigWrite(params: {
   snapshot: ConfigWriteSnapshot;
   writeOptions: ConfigWriteOptions;
-  nextConfig: OpenClawConfig;
+  nextConfig: RecallConfig;
   context?: GatewayRequestContext;
   disconnectSharedAuthClients?: boolean;
-}): Promise<{ path: string; config: OpenClawConfig; queueFollowUp: () => void }> {
+}): Promise<{ path: string; config: RecallConfig; queueFollowUp: () => void }> {
   const result = await replaceConfigFile({
     nextConfig: params.nextConfig,
     writeOptions: {
@@ -240,7 +240,7 @@ export async function resolveGatewayConfigRestartWriteResult(params: {
   mode: "config.patch" | "config.apply";
   configPath: string;
   changedPaths: string[];
-  nextConfig: OpenClawConfig;
+  nextConfig: RecallConfig;
   actor: ControlPlaneActor;
   context?: GatewayRequestContext;
 }): Promise<{

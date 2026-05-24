@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 
 const mocks = vi.hoisted(() => ({
   ensurePluginRegistryLoaded: vi.fn(),
@@ -52,7 +52,7 @@ describe("ensureSelectedAgentHarnessPlugin", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       agentHarnessRuntimeOverride: "codex",
       workspaceDir: "/tmp/workspace",
     });
@@ -79,7 +79,7 @@ describe("ensureSelectedAgentHarnessPlugin", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       workspaceDir: "/tmp/workspace",
     });
 
@@ -103,7 +103,7 @@ describe("ensureSelectedAgentHarnessPlugin", () => {
             codex: { enabled: true },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       workspaceDir: "/tmp/workspace",
     });
 
@@ -140,7 +140,7 @@ describe("ensureSelectedAgentHarnessPlugin", () => {
             codex: { enabled: true },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       workspaceDir: "/tmp/workspace",
     });
 
@@ -174,7 +174,7 @@ describe("ensureSelectedAgentHarnessPlugin", () => {
             telegram: { enabled: true },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       workspaceDir: "/tmp/workspace",
     });
 
@@ -211,7 +211,7 @@ describe("ensureSelectedAgentHarnessPlugin", () => {
             telegram: { enabled: true },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       workspaceDir: "/tmp/workspace",
     });
 
@@ -273,7 +273,7 @@ describe("ensureSelectedAgentHarnessPlugin", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       workspaceDir: "/tmp/workspace",
     });
 

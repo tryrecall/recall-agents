@@ -1,8 +1,8 @@
 {
-  "name": "@openclaw/browser-plugin",
+  "name": "@recall/browser-plugin",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw browser tool plugin",
+  "description": "Recall browser tool plugin",
   "type": "module",
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",
@@ -13,10 +13,10 @@
     "ws": "8.20.1"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
+    "@recall/plugin-sdk": "workspace:*",
     "undici": "8.3.0"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

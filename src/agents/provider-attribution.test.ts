@@ -104,20 +104,20 @@ import {
 } from "./provider-attribution.js";
 
 describe("provider attribution", () => {
-  it("resolves the canonical OpenClaw product and runtime version", () => {
+  it("resolves the canonical Recall product and runtime version", () => {
     const identity = resolveProviderAttributionIdentity({
-      OPENCLAW_VERSION: "2026.3.99",
+      RECALL_VERSION: "2026.3.99",
     });
 
     expect(identity).toEqual({
-      product: "OpenClaw",
+      product: "Recall",
       version: "2026.3.99",
     });
   });
 
   it("returns a documented OpenRouter attribution policy", () => {
     const policy = resolveProviderAttributionPolicy("openrouter", {
-      OPENCLAW_VERSION: "2026.3.22",
+      RECALL_VERSION: "2026.3.22",
     });
 
     expect(policy).toEqual({
@@ -126,12 +126,12 @@ describe("provider attribution", () => {
       verification: "vendor-documented",
       hook: "request-headers",
       docsUrl: "https://openrouter.ai/docs/app-attribution",
-      reviewNote: "Documented app attribution headers. Verified in OpenClaw runtime wrapper.",
-      product: "OpenClaw",
+      reviewNote: "Documented app attribution headers. Verified in Recall runtime wrapper.",
+      product: "Recall",
       version: "2026.3.22",
       headers: {
-        "HTTP-Referer": "https://openclaw.ai",
-        "X-OpenRouter-Title": "OpenClaw",
+        "HTTP-Referer": "https://recall.ai",
+        "X-OpenRouter-Title": "Recall",
         "X-OpenRouter-Categories":
           "cli-agent,cloud-agent,programming-app,creative-writing,writing-assistant,general-chat,personal-agent",
       },
@@ -140,7 +140,7 @@ describe("provider attribution", () => {
 
   it("returns a documented NVIDIA attribution policy", () => {
     const policy = resolveProviderAttributionPolicy("nvidia", {
-      OPENCLAW_VERSION: "2026.3.22",
+      RECALL_VERSION: "2026.3.22",
     });
 
     expect(policy).toEqual({
@@ -150,56 +150,56 @@ describe("provider attribution", () => {
       hook: "request-headers",
       reviewNote:
         "NVIDIA NIM billing invoke-origin attribution header. Applied only on verified NVIDIA routes.",
-      product: "OpenClaw",
+      product: "Recall",
       version: "2026.3.22",
       headers: {
-        "X-BILLING-INVOKE-ORIGIN": "OpenClaw",
+        "X-BILLING-INVOKE-ORIGIN": "Recall",
       },
     });
-    expect(resolveProviderAttributionHeaders("NVIDIA", { OPENCLAW_VERSION: "2026.3.22" })).toEqual({
-      "X-BILLING-INVOKE-ORIGIN": "OpenClaw",
+    expect(resolveProviderAttributionHeaders("NVIDIA", { RECALL_VERSION: "2026.3.22" })).toEqual({
+      "X-BILLING-INVOKE-ORIGIN": "Recall",
     });
   });
 
   it("normalizes aliases when resolving provider headers", () => {
     expect(
       resolveProviderAttributionHeaders("OpenRouter", {
-        OPENCLAW_VERSION: "2026.3.22",
+        RECALL_VERSION: "2026.3.22",
       }),
     ).toEqual({
-      "HTTP-Referer": "https://openclaw.ai",
-      "X-OpenRouter-Title": "OpenClaw",
+      "HTTP-Referer": "https://recall.ai",
+      "X-OpenRouter-Title": "Recall",
       "X-OpenRouter-Categories":
         "cli-agent,cloud-agent,programming-app,creative-writing,writing-assistant,general-chat,personal-agent",
     });
   });
 
   it("returns a hidden-spec OpenAI attribution policy", () => {
-    expect(resolveProviderAttributionPolicy("openai", { OPENCLAW_VERSION: "2026.3.22" })).toEqual({
+    expect(resolveProviderAttributionPolicy("openai", { RECALL_VERSION: "2026.3.22" })).toEqual({
       provider: "openai",
       enabledByDefault: true,
       verification: "vendor-hidden-api-spec",
       hook: "request-headers",
       reviewNote:
         "OpenAI native traffic supports hidden originator/User-Agent attribution. Verified against the Codex wire contract.",
-      product: "OpenClaw",
+      product: "Recall",
       version: "2026.3.22",
       headers: {
-        originator: "openclaw",
+        originator: "recall",
         version: "2026.3.22",
-        "User-Agent": "openclaw/2026.3.22",
+        "User-Agent": "recall/2026.3.22",
       },
     });
-    expect(resolveProviderAttributionHeaders("openai", { OPENCLAW_VERSION: "2026.3.22" })).toEqual({
-      originator: "openclaw",
+    expect(resolveProviderAttributionHeaders("openai", { RECALL_VERSION: "2026.3.22" })).toEqual({
+      originator: "recall",
       version: "2026.3.22",
-      "User-Agent": "openclaw/2026.3.22",
+      "User-Agent": "recall/2026.3.22",
     });
   });
 
   it("returns a hidden-spec OpenAI Codex attribution policy", () => {
     expect(
-      resolveProviderAttributionPolicy("openai-codex", { OPENCLAW_VERSION: "2026.3.22" }),
+      resolveProviderAttributionPolicy("openai-codex", { RECALL_VERSION: "2026.3.22" }),
     ).toEqual({
       provider: "openai-codex",
       enabledByDefault: true,
@@ -207,42 +207,42 @@ describe("provider attribution", () => {
       hook: "request-headers",
       reviewNote:
         "OpenAI Codex ChatGPT-backed traffic supports the same hidden originator/User-Agent attribution contract.",
-      product: "OpenClaw",
+      product: "Recall",
       version: "2026.3.22",
       headers: {
-        originator: "openclaw",
+        originator: "recall",
         version: "2026.3.22",
-        "User-Agent": "openclaw/2026.3.22",
+        "User-Agent": "recall/2026.3.22",
       },
     });
   });
 
   it("returns a hidden-spec xAI attribution policy", () => {
-    expect(resolveProviderAttributionPolicy("xai", { OPENCLAW_VERSION: "2026.3.22" })).toEqual({
+    expect(resolveProviderAttributionPolicy("xai", { RECALL_VERSION: "2026.3.22" })).toEqual({
       provider: "xai",
       enabledByDefault: true,
       verification: "vendor-hidden-api-spec",
       hook: "request-headers",
       reviewNote:
-        "xAI api.x.ai accepts a standard openclaw User-Agent. Companion originator/version headers mirror the OpenAI attribution shape for consistency; they are not validated against an xAI-specific spec and are expected to be ignored by xAI's OpenAI-compatible surface.",
-      product: "OpenClaw",
+        "xAI api.x.ai accepts a standard recall User-Agent. Companion originator/version headers mirror the OpenAI attribution shape for consistency; they are not validated against an xAI-specific spec and are expected to be ignored by xAI's OpenAI-compatible surface.",
+      product: "Recall",
       version: "2026.3.22",
       headers: {
-        originator: "openclaw",
+        originator: "recall",
         version: "2026.3.22",
-        "User-Agent": "openclaw/2026.3.22",
+        "User-Agent": "recall/2026.3.22",
       },
     });
-    expect(resolveProviderAttributionHeaders("xai", { OPENCLAW_VERSION: "2026.3.22" })).toEqual({
-      originator: "openclaw",
+    expect(resolveProviderAttributionHeaders("xai", { RECALL_VERSION: "2026.3.22" })).toEqual({
+      originator: "recall",
       version: "2026.3.22",
-      "User-Agent": "openclaw/2026.3.22",
+      "User-Agent": "recall/2026.3.22",
     });
   });
 
   it("lists the current attribution support matrix", () => {
     expect(
-      listProviderAttributionPolicies({ OPENCLAW_VERSION: "2026.3.22" }).map((policy) => [
+      listProviderAttributionPolicies({ RECALL_VERSION: "2026.3.22" }).map((policy) => [
         policy.provider,
         policy.enabledByDefault,
         policy.verification,
@@ -272,7 +272,7 @@ describe("provider attribution", () => {
           transport: "stream",
           capability: "llm",
         },
-        { OPENCLAW_VERSION: "2026.3.22" },
+        { RECALL_VERSION: "2026.3.22" },
       ),
       {
         endpointClass: "xai-native",
@@ -289,12 +289,12 @@ describe("provider attribution", () => {
           transport: "stream",
           capability: "llm",
         },
-        { OPENCLAW_VERSION: "2026.3.22" },
+        { RECALL_VERSION: "2026.3.22" },
       ),
     ).toEqual({
-      originator: "openclaw",
+      originator: "recall",
       version: "2026.3.22",
-      "User-Agent": "openclaw/2026.3.22",
+      "User-Agent": "recall/2026.3.22",
     });
 
     expectRecordFields(
@@ -305,7 +305,7 @@ describe("provider attribution", () => {
           transport: "stream",
           capability: "llm",
         },
-        { OPENCLAW_VERSION: "2026.3.22" },
+        { RECALL_VERSION: "2026.3.22" },
       ),
       {
         endpointClass: "default",
@@ -323,7 +323,7 @@ describe("provider attribution", () => {
           transport: "stream",
           capability: "llm",
         },
-        { OPENCLAW_VERSION: "2026.3.22" },
+        { RECALL_VERSION: "2026.3.22" },
       ),
       {
         endpointClass: "custom",
@@ -343,7 +343,7 @@ describe("provider attribution", () => {
           transport: "stream",
           capability: "llm",
         },
-        { OPENCLAW_VERSION: "2026.3.22" },
+        { RECALL_VERSION: "2026.3.22" },
       ),
       {
         endpointClass: "openai-public",
@@ -364,7 +364,7 @@ describe("provider attribution", () => {
           transport: "stream",
           capability: "llm",
         },
-        { OPENCLAW_VERSION: "2026.3.22" },
+        { RECALL_VERSION: "2026.3.22" },
       ),
       {
         endpointClass: "custom",
@@ -571,7 +571,7 @@ describe("provider attribution", () => {
         capability: "llm",
       }),
     ).toEqual({
-      "X-BILLING-INVOKE-ORIGIN": "OpenClaw",
+      "X-BILLING-INVOKE-ORIGIN": "Recall",
     });
 
     expect(

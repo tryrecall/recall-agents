@@ -54,6 +54,6 @@ describe("proxy cli", () => {
   ])("rejects invalid numeric option %s", (args, expected) => {
     const program = createProgram();
 
-    expect(() => program.parse(["node", "openclaw", ...args])).toThrow(expected);
+    expect(() => program.parse(["node", "recall", ...args])).toThrow(expected);
   });
 });

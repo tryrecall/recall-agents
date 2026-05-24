@@ -1,16 +1,16 @@
 {
-  "name": "@openclaw/signal",
+  "name": "@recall/signal",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw Signal channel plugin",
+  "description": "Recall Signal channel plugin",
   "type": "module",
   "dependencies": {
     "ws": "8.20.1"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],

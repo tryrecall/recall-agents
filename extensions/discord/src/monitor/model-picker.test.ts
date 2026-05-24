@@ -22,7 +22,7 @@ import { createModelsProviderData } from "./model-picker.test-utils.js";
 
 const buildModelsProviderDataMock = vi.hoisted(() => vi.fn());
 
-vi.mock("openclaw/plugin-sdk/models-provider-runtime", () => ({
+vi.mock("recall/plugin-sdk/models-provider-runtime", () => ({
   buildModelsProviderData: buildModelsProviderDataMock,
 }));
 
@@ -551,8 +551,8 @@ describe("Discord model picker rendering", () => {
           },
           {
             id: "pi",
-            label: "OpenClaw Pi Default",
-            description: "Use the built-in OpenClaw Pi runtime.",
+            label: "Recall Pi Default",
+            description: "Use the built-in Recall Pi runtime.",
           },
         ],
       ],
@@ -608,8 +608,8 @@ describe("Discord model picker rendering", () => {
           },
           {
             id: "pi",
-            label: "OpenClaw Pi Default",
-            description: "Use the built-in OpenClaw Pi runtime.",
+            label: "Recall Pi Default",
+            description: "Use the built-in Recall Pi runtime.",
           },
         ],
       ],

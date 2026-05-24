@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import {
   buildTalkTestProviderConfig,
   readTalkTestProviderApiKey as readTalkProviderApiKey,
@@ -36,7 +36,7 @@ beforeEach(() => {
 });
 
 describe("resolveCommandSecretRefsViaGateway", () => {
-  function makeTalkProviderApiKeySecretRefConfig(envKey: string): OpenClawConfig {
+  function makeTalkProviderApiKeySecretRefConfig(envKey: string): RecallConfig {
     return buildTalkTestProviderConfig({ source: "env", provider: "default", id: envKey });
   }
 
@@ -100,7 +100,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
   it("returns config unchanged when no target SecretRefs are configured", async () => {
     const config = {
       ...buildTalkTestProviderConfig("plain"), // pragma: allowlist secret
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
     const result = await resolveCommandSecretRefsViaGateway({
       config,
       commandName: "memory status",
@@ -125,7 +125,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
           },
         ],
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const result = await resolveCommandSecretRefsViaGateway({
       config,
@@ -243,7 +243,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               },
             },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         commandName: "message",
         targetIds: new Set(["channels.discord.accounts.*.token"]),
         allowedPaths: new Set(["channels.discord.accounts.ops.token"]),
@@ -345,7 +345,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               },
             },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         commandName: "message",
         targetIds: new Set(["channels.discord.accounts.*.token"]),
         allowedPaths: new Set(["channels.discord.accounts.ops.token"]),
@@ -405,7 +405,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
                 },
               },
             },
-          } as unknown as OpenClawConfig,
+          } as unknown as RecallConfig,
           commandName: "infer web search",
           targetIds: new Set(["plugins.entries.firecrawl.config.webSearch.apiKey"]),
           allowedPaths: new Set(["plugins.entries.firecrawl.config.webSearch.apiKey"]),
@@ -459,7 +459,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               default: { source: "env" },
             },
           },
-        } as unknown as OpenClawConfig,
+        } as unknown as RecallConfig,
         commandName: "memory status",
         targetIds: new Set(["talk.providers.*.apiKey"]),
       });
@@ -516,7 +516,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
                 },
               },
             },
-          } as unknown as OpenClawConfig,
+          } as unknown as RecallConfig,
           commandName: "agent",
           targetIds: new Set(["plugins.entries.google.config.webSearch.apiKey"]),
         });
@@ -571,7 +571,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
                 },
               },
             },
-          } as unknown as OpenClawConfig,
+          } as unknown as RecallConfig,
           commandName: "agent",
           targetIds: new Set(["plugins.entries.firecrawl.config.webFetch.apiKey"]),
         });
@@ -606,7 +606,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               },
             },
           },
-        } as unknown as OpenClawConfig,
+        } as unknown as RecallConfig,
         commandName: "infer web fetch",
         targetIds: new Set(["tools.web.fetch.firecrawl.apiKey"]),
       });
@@ -636,7 +636,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               },
             },
           },
-        } as unknown as OpenClawConfig,
+        } as unknown as RecallConfig,
         commandName: "infer web search",
         targetIds: new Set(["tools.web.search.apiKey"]),
         forcedActivePaths: new Set(["tools.web.search.apiKey"]),
@@ -680,7 +680,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               },
             },
           },
-        } as unknown as OpenClawConfig,
+        } as unknown as RecallConfig,
         commandName: "infer web fetch",
         targetIds: new Set(["plugins.entries.firecrawl.config.webSearch.apiKey"]),
         allowedPaths: new Set(["plugins.entries.firecrawl.config.webSearch.apiKey"]),
@@ -733,7 +733,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               },
             },
           },
-        } as unknown as OpenClawConfig,
+        } as unknown as RecallConfig,
         commandName: "infer web fetch",
         targetIds: new Set(["plugins.entries.firecrawl.config.webSearch.apiKey"]),
         allowedPaths: new Set(["plugins.entries.firecrawl.config.webSearch.apiKey"]),
@@ -773,7 +773,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               },
             },
           },
-        } as unknown as OpenClawConfig,
+        } as unknown as RecallConfig,
         commandName: "infer web search",
         targetIds: new Set(["models.providers.*.apiKey"]),
         allowedPaths: new Set(["models.providers.google.apiKey"]),
@@ -827,7 +827,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               },
             },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         commandName: "agent",
         targetIds: new Set(["plugins.entries.google.config.webSearch.apiKey"]),
       });
@@ -982,7 +982,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
           },
         ],
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     const result = await resolveCommandSecretRefsViaGateway({
       config,
@@ -1125,7 +1125,7 @@ describe("resolveCommandSecretRefsViaGateway", () => {
               password: { source: "env", provider: "default", id: gatewayEnvKey },
             },
           },
-        } as unknown as OpenClawConfig,
+        } as unknown as RecallConfig,
         commandName: "status",
         targetIds: new Set(["talk.providers.*.apiKey"]),
         mode: "read_only_status",

@@ -46,7 +46,7 @@ function renderSummary(report, options) {
       .map(([status, count]) => `${status}: ${value(count)}`)
       .join(", ") || "unknown";
 
-  lines.push(`# OpenClaw Performance Report`);
+  lines.push(`# Recall Performance Report`);
   lines.push("");
   lines.push(`- Lane: ${options.lane}`);
   lines.push(`- Run: ${value(report.runId)}`);

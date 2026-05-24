@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { embeddedAgentLog, formatErrorMessage } from "openclaw/plugin-sdk/agent-harness-runtime";
+import { embeddedAgentLog, formatErrorMessage } from "recall/plugin-sdk/agent-harness-runtime";
 import {
   createAgentHarnessTaskRuntime,
   deliverAgentHarnessTaskCompletion,
@@ -9,7 +9,7 @@ import {
   type AgentHarnessTaskRuntimeScope,
   type AgentHarnessTaskRuntime,
   type AgentHarnessTaskRecord,
-} from "openclaw/plugin-sdk/agent-harness-task-runtime";
+} from "recall/plugin-sdk/agent-harness-task-runtime";
 import type { CodexAppServerClient } from "./client.js";
 import {
   extractCodexNativeSubagentCompletions,

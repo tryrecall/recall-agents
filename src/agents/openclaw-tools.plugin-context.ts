@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { normalizeDeliveryContext } from "../utils/delivery-context.js";
 import type { GatewayMessageChannel } from "../utils/message-channel.js";
 import { resolveAgentWorkspaceDir, resolveSessionAgentIds } from "./agent-scope.js";
@@ -6,7 +6,7 @@ import { modelKey } from "./model-ref-shared.js";
 import type { ToolFsPolicy } from "./tool-fs-policy.js";
 import { resolveWorkspaceRoot } from "./workspace-dir.js";
 
-export type OpenClawPluginToolOptions = {
+export type RecallPluginToolOptions = {
   agentSessionKey?: string;
   agentChannel?: GatewayMessageChannel;
   agentAccountId?: string;
@@ -14,7 +14,7 @@ export type OpenClawPluginToolOptions = {
   agentThreadId?: string | number;
   agentDir?: string;
   workspaceDir?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   fsPolicy?: ToolFsPolicy;
   modelProvider?: string;
   modelId?: string;
@@ -27,11 +27,11 @@ export type OpenClawPluginToolOptions = {
   allowGatewaySubagentBinding?: boolean;
 };
 
-export function resolveOpenClawPluginToolInputs(params: {
-  options?: OpenClawPluginToolOptions;
-  resolvedConfig?: OpenClawConfig;
-  runtimeConfig?: OpenClawConfig;
-  getRuntimeConfig?: () => OpenClawConfig | undefined;
+export function resolveRecallPluginToolInputs(params: {
+  options?: RecallPluginToolOptions;
+  resolvedConfig?: RecallConfig;
+  runtimeConfig?: RecallConfig;
+  getRuntimeConfig?: () => RecallConfig | undefined;
 }) {
   const { options, resolvedConfig, runtimeConfig, getRuntimeConfig } = params;
   const { sessionAgentId } = resolveSessionAgentIds({

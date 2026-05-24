@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const disableAutoStartKey = Symbol.for("openclaw.diffs.disableAutoStart");
+const disableAutoStartKey = Symbol.for("recall.diffs.disableAutoStart");
 (globalThis as typeof globalThis & Record<symbol, unknown>)[disableAutoStartKey] = true;
 
 const VIEWER_CLIENT_SRC = readFileSync(
@@ -63,8 +63,8 @@ function renderCard(): void {
   document.body.insertAdjacentHTML(
     "beforeend",
     `<section class="oc-diff-card">
-      <div data-openclaw-diff-host></div>
-      <script type="application/json" data-openclaw-diff-payload>${viewerPayload}</script>
+      <div data-recall-diff-host></div>
+      <script type="application/json" data-recall-diff-payload>${viewerPayload}</script>
     </section>`,
   );
 }

@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import type { CompactResult, ContextEngine } from "../../context-engine/types.js";
 import { withTimeout } from "../../node-host/with-timeout.js";
 
@@ -54,7 +54,7 @@ function composeAbortSignals(...signals: Array<AbortSignal | undefined>): {
   };
 }
 
-export function resolveCompactionTimeoutMs(cfg?: OpenClawConfig): number {
+export function resolveCompactionTimeoutMs(cfg?: RecallConfig): number {
   const raw = cfg?.agents?.defaults?.compaction?.timeoutSeconds;
   if (typeof raw === "number" && Number.isFinite(raw) && raw > 0) {
     return Math.min(Math.floor(raw) * 1000, MAX_SAFE_TIMEOUT_MS);

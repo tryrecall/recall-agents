@@ -80,18 +80,18 @@ requester chat when the run finishes.
     - Agent turns that need child results should call `sessions_yield` after spawning required work. That ends the current turn and lets completion events arrive as the next model-visible message.
     - Completion is push-based. Once spawned, do **not** poll `/subagents list`, `sessions_list`, or `sessions_history` in a loop just to wait for it to finish; inspect status only on-demand for debugging or intervention.
     - Child output is a report/evidence for the requester agent to synthesize. It is not user-authored instruction text and cannot override system, developer, or user policy.
-    - On completion, OpenClaw best-effort closes tracked browser tabs/processes opened by that sub-agent session before the announce cleanup flow continues.
+    - On completion, Recall best-effort closes tracked browser tabs/processes opened by that sub-agent session before the announce cleanup flow continues.
 
   </Accordion>
   <Accordion title="Manual-spawn delivery resilience">
-    - OpenClaw hands completions back to the requester session through an `agent` turn with a stable idempotency key.
-    - If the requester run is still active, OpenClaw first tries to wake/steer that run instead of starting a second visible reply path.
-    - If an active requester cannot be woken, OpenClaw falls back to a requester-agent handoff with the same completion context instead of dropping the announce.
-    - If the requester-agent completion handoff fails or produces no visible output, OpenClaw treats delivery as failed and falls back to queue routing/retry. It does not raw-send the child result directly to the external chat.
+    - Recall hands completions back to the requester session through an `agent` turn with a stable idempotency key.
+    - If the requester run is still active, Recall first tries to wake/steer that run instead of starting a second visible reply path.
+    - If an active requester cannot be woken, Recall falls back to a requester-agent handoff with the same completion context instead of dropping the announce.
+    - If the requester-agent completion handoff fails or produces no visible output, Recall treats delivery as failed and falls back to queue routing/retry. It does not raw-send the child result directly to the external chat.
     - Group and channel completion handoffs follow the same message-tool-only visible reply policy as normal group/channel turns, so the requester agent must use the message tool when required.
     - If direct handoff cannot be used, it falls back to queue routing.
     - If queue routing is still not available, the announce is retried with a short exponential backoff before final give-up.
-    - Completion delivery keeps the resolved requester route: thread-bound or conversation-bound completion routes win when available; if the completion origin only provides a channel, OpenClaw fills the missing target/account from the requester session's resolved route (`lastChannel` / `lastTo` / `lastAccountId`) so direct delivery still works.
+    - Completion delivery keeps the resolved requester route: thread-bound or conversation-bound completion routes win when available; if the completion origin only provides a channel, Recall fills the missing target/account from the requester session's resolved route (`lastChannel` / `lastTo` / `lastAccountId`) so direct delivery still works.
 
   </Accordion>
   <Accordion title="Completion handoff metadata">
@@ -111,7 +111,7 @@ requester chat when the run finishes.
     - Use `info`/`log` to inspect details and output after completion.
     - `/subagents spawn` is one-shot mode (`mode: "run"`). For persistent thread-bound sessions, use `sessions_spawn` with `thread: true` and `mode: "session"`.
     - For ACP harness sessions (Claude Code, Gemini CLI, OpenCode, or explicit Codex ACP/acpx), use `sessions_spawn` with `runtime: "acp"` when the tool advertises that runtime. See [ACP delivery model](/tools/acp-agents#delivery-model) when debugging completions or agent-to-agent loops. When the `codex` plugin is enabled, Codex chat/thread control should prefer `/codex ...` over ACP unless the user explicitly asks for ACP/acpx.
-    - OpenClaw hides `runtime: "acp"` until ACP is enabled, the requester is not sandboxed, and a backend plugin such as `acpx` is loaded. `runtime: "acp"` expects an external ACP harness id, or an `agents.list[]` entry with `runtime.type="acp"`; use the default sub-agent runtime for normal OpenClaw config agents from `agents_list`.
+    - Recall hides `runtime: "acp"` until ACP is enabled, the requester is not sandboxed, and a backend plugin such as `acpx` is loaded. `runtime: "acp"` expects an external ACP harness id, or an `agents.list[]` entry with `runtime.type="acp"`; use the default sub-agent runtime for normal Recall config agents from `agents_list`.
 
   </Accordion>
 </AccordionGroup>
@@ -147,7 +147,7 @@ session to confirm the effective tool list.
 
 - **Model:** inherits the caller unless you set `agents.defaults.subagents.model` (or per-agent `agents.list[].subagents.model`); an explicit `sessions_spawn.model` still wins.
 - **Thinking:** inherits the caller unless you set `agents.defaults.subagents.thinking` (or per-agent `agents.list[].subagents.thinking`); an explicit `sessions_spawn.thinking` still wins.
-- **Run timeout:** if `sessions_spawn.runTimeoutSeconds` is omitted, OpenClaw uses `agents.defaults.subagents.runTimeoutSeconds` when set; otherwise it falls back to `0` (no timeout).
+- **Run timeout:** if `sessions_spawn.runTimeoutSeconds` is omitted, Recall uses `agents.defaults.subagents.runTimeoutSeconds` when set; otherwise it falls back to `0` (no timeout).
 - **Task delivery:** native sub-agents receive the delegated task in their first visible `[Subagent Task]` message. The sub-agent system prompt carries runtime rules and routing context, not a hidden duplicate of the task.
 
 ### Delegation prompt mode
@@ -265,7 +265,7 @@ it. Some minimal or custom tool profiles may expose `sessions_spawn` and
 `subagents` without exposing `sessions_yield`; in that case, do not invent
 a polling loop just to wait for completion.
 
-When active children exist, OpenClaw injects a compact runtime-generated
+When active children exist, Recall injects a compact runtime-generated
 `Active Subagents` prompt block into normal turns so the requester can see
 the current child sessions, run ids, statuses, labels, tasks, and
 `taskName` aliases without polling. The task and label fields in that
@@ -305,7 +305,7 @@ persistent thread-bound subagent sessions (`sessions_spawn` with
     `sessions_spawn` with `thread: true` (and optionally `mode: "session"`).
   </Step>
   <Step title="Bind">
-    OpenClaw creates or binds a thread to that session target in the active channel.
+    Recall creates or binds a thread to that session target in the active channel.
   </Step>
   <Step title="Route follow-ups">
     Replies and follow-up messages in that thread route to the bound session.
@@ -365,7 +365,7 @@ app-server, and other configured native runtimes.
 `allowAgents` entries must point at configured agent ids in `agents.list[]`.
 `["*"]` means any configured target agent plus the requester. If an agent config
 is deleted but its id remains in `allowAgents`, `sessions_spawn` rejects that id
-and `agents_list` omits it. Run `openclaw doctor --fix` to clean stale
+and `agents_list` omits it. Run `recall doctor --fix` to clean stale
 allowlist entries, or add a minimal `agents.list[]` entry when the target should
 remain spawnable while inheriting defaults.
 
@@ -479,7 +479,7 @@ Delivery depends on requester depth:
 
 - Top-level requester sessions use a follow-up `agent` call with external delivery (`deliver=true`).
 - Nested requester subagent sessions receive an internal follow-up injection (`deliver=false`) so the orchestrator can synthesize child results in-session.
-- If a nested requester subagent session is gone, OpenClaw falls back to that session's requester when available.
+- If a nested requester subagent session is gone, Recall falls back to that session's requester when available.
 
 For top-level requester sessions, completion-mode direct delivery first
 resolves any bound conversation/thread route and hook override, then fills
@@ -535,7 +535,7 @@ should be rewritten in normal assistant voice.
 ## Tool policy
 
 Sub-agents use the same profile and tool-policy pipeline as the parent or
-target agent first. After that, OpenClaw applies the sub-agent restriction
+target agent first. After that, Recall applies the sub-agent restriction
 layer.
 
 With no restrictive `tools.profile`, sub-agents get **all tools except
@@ -605,7 +605,7 @@ Sub-agents use a dedicated in-process queue lane:
 
 ## Liveness and recovery
 
-OpenClaw does not treat `endedAt` absence as permanent proof that a
+Recall does not treat `endedAt` absence as permanent proof that a
 sub-agent is still alive. Unended runs older than the stale-run window
 stop counting as active/pending in `/subagents list`, status summaries,
 descendant completion gating, and per-session concurrency checks.
@@ -618,10 +618,10 @@ clearing the aborted marker.
 
 Automatic restart recovery is bounded per child session. If the same
 sub-agent child is accepted for orphan recovery repeatedly inside the
-rapid re-wedge window, OpenClaw persists a recovery tombstone on that
+rapid re-wedge window, Recall persists a recovery tombstone on that
 session and stops auto-resuming it on later restarts. Run
-`openclaw tasks maintenance --apply` to reconcile the task record, or
-`openclaw doctor --fix` to clear stale aborted recovery flags on
+`recall tasks maintenance --apply` to reconcile the task record, or
+`recall doctor --fix` to clear stale aborted recovery flags on
 tombstoned sessions.
 
 <Note>

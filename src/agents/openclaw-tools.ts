@@ -1,7 +1,7 @@
 import type { SourceReplyDeliveryMode } from "../auto-reply/get-reply-options.types.js";
 import type { InboundEventKind } from "../channels/inbound-event/kind.js";
 import { selectApplicableRuntimeConfig } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { callGateway } from "../gateway/call.js";
 import { isEmbeddedMode } from "../infra/embedded-mode.js";
 import { getActiveSecretsRuntimeSnapshot } from "../secrets/runtime-state.js";
@@ -10,18 +10,18 @@ import { normalizeDeliveryContext } from "../utils/delivery-context.js";
 import type { GatewayMessageChannel } from "../utils/message-channel.js";
 import { resolveAgentWorkspaceDir, resolveSessionAgentIds } from "./agent-scope.js";
 import type { AuthProfileStore } from "./auth-profiles/types.js";
-import { resolveOpenClawPluginToolsForOptions } from "./openclaw-plugin-tools.js";
+import { resolveRecallPluginToolsForOptions } from "./recall-plugin-tools.js";
 import {
   isToolExplicitlyAllowedByFactoryPolicy,
   mergeFactoryPolicyList,
   resolveImageToolFactoryAvailable,
   resolveOptionalMediaToolFactoryPlan,
-} from "./openclaw-tools.media-factory-plan.js";
-import { applyNodesToolWorkspaceGuard } from "./openclaw-tools.nodes-workspace-guard.js";
+} from "./recall-tools.media-factory-plan.js";
+import { applyNodesToolWorkspaceGuard } from "./recall-tools.nodes-workspace-guard.js";
 import {
-  collectPresentOpenClawTools,
-  isUpdatePlanToolEnabledForOpenClawTools,
-} from "./openclaw-tools.registration.js";
+  collectPresentRecallTools,
+  isUpdatePlanToolEnabledForRecallTools,
+} from "./recall-tools.registration.js";
 import {
   type HookContext,
   isToolWrappedWithBeforeToolCallHook,
@@ -57,18 +57,18 @@ import { createVideoGenerateTool } from "./tools/video-generate-tool.js";
 import { createWebFetchTool, createWebSearchTool } from "./tools/web-tools.js";
 import { resolveWorkspaceRoot } from "./workspace-dir.js";
 
-type OpenClawToolsDeps = {
+type RecallToolsDeps = {
   callGateway: typeof callGateway;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
 };
 
-const defaultOpenClawToolsDeps: OpenClawToolsDeps = {
+const defaultRecallToolsDeps: RecallToolsDeps = {
   callGateway,
 };
 
-let openClawToolsDeps: OpenClawToolsDeps = defaultOpenClawToolsDeps;
+let openClawToolsDeps: RecallToolsDeps = defaultRecallToolsDeps;
 
-export function createOpenClawTools(
+export function createRecallTools(
   options?: {
     sandboxBrowserBridgeUrl?: string;
     allowHostBrowserControl?: boolean;
@@ -92,7 +92,7 @@ export function createOpenClawTools(
     sandboxFsBridge?: SandboxFsBridge;
     fsPolicy?: ToolFsPolicy;
     sandboxed?: boolean;
-    config?: OpenClawConfig;
+    config?: RecallConfig;
     pluginToolAllowlist?: string[];
     pluginToolDenylist?: string[];
     /** Current channel ID for auto-threading. */
@@ -185,7 +185,7 @@ export function createOpenClawTools(
   const spawnWorkspaceDir = resolveWorkspaceRoot(
     options?.spawnWorkspaceDir ?? options?.workspaceDir ?? inferredWorkspaceDir,
   );
-  options?.recordToolPrepStage?.("openclaw-tools:session-workspace");
+  options?.recordToolPrepStage?.("recall-tools:session-workspace");
   const deliveryContext = normalizeDeliveryContext({
     channel: options?.agentChannel,
     to: options?.agentTo,
@@ -223,7 +223,7 @@ export function createOpenClawTools(
         deferAutoModelResolution: true,
       })
     : null;
-  options?.recordToolPrepStage?.("openclaw-tools:image-tool");
+  options?.recordToolPrepStage?.("recall-tools:image-tool");
   const imageGenerateTool = optionalMediaTools.imageGenerate
     ? createImageGenerateTool({
         config: options?.config,
@@ -237,7 +237,7 @@ export function createOpenClawTools(
         onAsyncTaskStarted: options?.onAsyncTaskStarted,
       })
     : null;
-  options?.recordToolPrepStage?.("openclaw-tools:image-generate-tool");
+  options?.recordToolPrepStage?.("recall-tools:image-generate-tool");
   const videoGenerateTool = optionalMediaTools.videoGenerate
     ? createVideoGenerateTool({
         config: options?.config,
@@ -251,7 +251,7 @@ export function createOpenClawTools(
         onAsyncTaskStarted: options?.onAsyncTaskStarted,
       })
     : null;
-  options?.recordToolPrepStage?.("openclaw-tools:video-generate-tool");
+  options?.recordToolPrepStage?.("recall-tools:video-generate-tool");
   const musicGenerateTool = optionalMediaTools.musicGenerate
     ? createMusicGenerateTool({
         config: options?.config,
@@ -265,7 +265,7 @@ export function createOpenClawTools(
         onAsyncTaskStarted: options?.onAsyncTaskStarted,
       })
     : null;
-  options?.recordToolPrepStage?.("openclaw-tools:music-generate-tool");
+  options?.recordToolPrepStage?.("recall-tools:music-generate-tool");
   const pdfTool =
     optionalMediaTools.pdf && options?.agentDir?.trim()
       ? createPdfTool({
@@ -278,7 +278,7 @@ export function createOpenClawTools(
           deferAutoModelResolution: true,
         })
       : null;
-  options?.recordToolPrepStage?.("openclaw-tools:pdf-tool");
+  options?.recordToolPrepStage?.("recall-tools:pdf-tool");
   const webSearchTool = createWebSearchTool({
     config: options?.config,
     agentDir: options?.agentDir,
@@ -286,14 +286,14 @@ export function createOpenClawTools(
     runtimeWebSearch: runtimeWebTools?.search,
     lateBindRuntimeConfig: true,
   });
-  options?.recordToolPrepStage?.("openclaw-tools:web-search-tool");
+  options?.recordToolPrepStage?.("recall-tools:web-search-tool");
   const webFetchTool = createWebFetchTool({
     config: options?.config,
     sandboxed: options?.sandboxed,
     runtimeWebFetch: runtimeWebTools?.fetch,
     lateBindRuntimeConfig: true,
   });
-  options?.recordToolPrepStage?.("openclaw-tools:web-fetch-tool");
+  options?.recordToolPrepStage?.("recall-tools:web-fetch-tool");
   const messageTool = options?.disableMessageTool
     ? null
     : createMessageTool({
@@ -319,7 +319,7 @@ export function createOpenClawTools(
         senderIsOwner: options?.senderIsOwner,
       });
   const heartbeatTool = options?.enableHeartbeatTool ? createHeartbeatResponseTool() : null;
-  options?.recordToolPrepStage?.("openclaw-tools:message-tool");
+  options?.recordToolPrepStage?.("recall-tools:message-tool");
   const nodesToolBase = createNodesTool({
     agentSessionKey: options?.agentSessionKey,
     agentChannel: options?.agentChannel,
@@ -336,7 +336,7 @@ export function createOpenClawTools(
     sandboxRoot: options?.sandboxRoot,
     workspaceDir,
   });
-  options?.recordToolPrepStage?.("openclaw-tools:nodes-tool");
+  options?.recordToolPrepStage?.("recall-tools:nodes-tool");
   const embedded = isEmbeddedMode();
   const explicitFactoryAllowlist = mergeFactoryPolicyList(
     resolvedConfig?.tools?.allow,
@@ -366,7 +366,7 @@ export function createOpenClawTools(
       allowlist: explicitFactoryAllowlist,
       denylist: explicitFactoryDenylist,
     }) ||
-    isUpdatePlanToolEnabledForOpenClawTools({
+    isUpdatePlanToolEnabledForRecallTools({
       config: resolvedConfig,
       agentSessionKey: options?.agentSessionKey,
       agentId: options?.requesterAgentIdOverride,
@@ -392,14 +392,14 @@ export function createOpenClawTools(
           }),
         ]),
     ...(messageTool && includeMessageTool ? [messageTool] : []),
-    ...collectPresentOpenClawTools([heartbeatTool]),
+    ...collectPresentRecallTools([heartbeatTool]),
     createTtsTool({
       agentChannel: options?.agentChannel,
       config: resolvedConfig,
       agentId: sessionAgentId,
       agentAccountId: options?.agentAccountId,
     }),
-    ...collectPresentOpenClawTools([imageGenerateTool, musicGenerateTool, videoGenerateTool]),
+    ...collectPresentRecallTools([imageGenerateTool, musicGenerateTool, videoGenerateTool]),
     ...(embedded
       ? []
       : [
@@ -473,9 +473,9 @@ export function createOpenClawTools(
       activeModelProvider: options?.modelProvider,
       activeModelId: options?.modelId,
     }),
-    ...collectPresentOpenClawTools([webSearchTool, webFetchTool, imageTool, pdfTool]),
+    ...collectPresentRecallTools([webSearchTool, webFetchTool, imageTool, pdfTool]),
   ];
-  options?.recordToolPrepStage?.("openclaw-tools:core-tool-list");
+  options?.recordToolPrepStage?.("recall-tools:core-tool-list");
   let allTools = tools;
   if (!options?.disablePluginTools) {
     const existingToolNames = new Set<string>();
@@ -484,13 +484,13 @@ export function createOpenClawTools(
     }
     allTools = [
       ...tools,
-      ...resolveOpenClawPluginToolsForOptions({
+      ...resolveRecallPluginToolsForOptions({
         options,
         resolvedConfig,
         existingToolNames,
       }),
     ];
-    options?.recordToolPrepStage?.("openclaw-tools:plugin-tools");
+    options?.recordToolPrepStage?.("recall-tools:plugin-tools");
   }
 
   if (options?.wrapBeforeToolCallHook === false) {
@@ -509,7 +509,7 @@ export function createOpenClawTools(
     ...defaultHookContext,
     ...options?.beforeToolCallHookContext,
   };
-  options?.recordToolPrepStage?.("openclaw-tools:tool-hooks");
+  options?.recordToolPrepStage?.("recall-tools:tool-hooks");
   return allTools.map((tool) =>
     isToolWrappedWithBeforeToolCallHook(tool)
       ? tool
@@ -519,13 +519,13 @@ export function createOpenClawTools(
 
 export const testing = {
   resolveOptionalMediaToolFactoryPlan,
-  setDepsForTest(overrides?: Partial<OpenClawToolsDeps>) {
+  setDepsForTest(overrides?: Partial<RecallToolsDeps>) {
     openClawToolsDeps = overrides
       ? {
-          ...defaultOpenClawToolsDeps,
+          ...defaultRecallToolsDeps,
           ...overrides,
         }
-      : defaultOpenClawToolsDeps;
+      : defaultRecallToolsDeps;
   },
 };
 export { testing as __testing };

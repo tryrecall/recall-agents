@@ -261,7 +261,7 @@ describe("appendAssistantMessageToSessionTranscript", () => {
     expect(event?.sessionKey).toBe(sessionKey);
     expect(event?.messageId).toBeTypeOf("string");
     expect(message?.role).toBe("assistant");
-    expect(message?.provider).toBe("openclaw");
+    expect(message?.provider).toBe("recall");
     expect(message?.model).toBe("delivery-mirror");
     expect(message?.content).toEqual([{ type: "text", text: "Hello from delivery mirror!" }]);
     emitSpy.mockRestore();
@@ -367,7 +367,7 @@ describe("appendAssistantMessageToSessionTranscript", () => {
     }
   });
 
-  it("skips transcript-only OpenClaw assistant entries when reading latest assistant text", async () => {
+  it("skips transcript-only Recall assistant entries when reading latest assistant text", async () => {
     writeTranscriptStore();
 
     const finalResult = await appendExactAssistantMessageToSessionTranscript({
@@ -390,7 +390,7 @@ describe("appendAssistantMessageToSessionTranscript", () => {
       storePath: fixture.storePath(),
       message: createExactAssistantMessage({
         text: "Injected transcript text",
-        provider: "openclaw",
+        provider: "recall",
         model: "gateway-injected",
       }),
     });
@@ -402,7 +402,7 @@ describe("appendAssistantMessageToSessionTranscript", () => {
     expect(latestAssistantText?.text).toBe("Complete final answer");
   });
 
-  it("does not report transcript-only OpenClaw assistant entries as latest assistant text", async () => {
+  it("does not report transcript-only Recall assistant entries as latest assistant text", async () => {
     writeTranscriptStore();
 
     const mirrorResult = await appendAssistantMessageToSessionTranscript({
@@ -421,7 +421,7 @@ describe("appendAssistantMessageToSessionTranscript", () => {
     expect(latestAssistantText).toBeUndefined();
   });
 
-  it("keeps transcript-only OpenClaw assistant entries available to the tail reader", async () => {
+  it("keeps transcript-only Recall assistant entries available to the tail reader", async () => {
     writeTranscriptStore();
 
     const mirrorResult = await appendAssistantMessageToSessionTranscript({
@@ -441,8 +441,8 @@ describe("appendAssistantMessageToSessionTranscript", () => {
     expect(tailAssistantText?.text).toBe("Tail delivery mirror");
   });
 
-  it("scans past trailing non-assistant entries (e.g. openclaw.cache-ttl) to find the latest assistant text", async () => {
-    // Regression for openclaw/openclaw#83427: the cache-ttl custom entry was
+  it("scans past trailing non-assistant entries (e.g. recall.cache-ttl) to find the latest assistant text", async () => {
+    // Regression for tryrecall/recall-agents#83427: the cache-ttl custom entry was
     // emitted after the canonical assistant turn, and the tail reader returned
     // undefined on the first non-assistant line, so the gap-fill check in
     // persistTextTurnTranscript wrote a duplicate `api: "cli"` assistant
@@ -465,7 +465,7 @@ describe("appendAssistantMessageToSessionTranscript", () => {
 
     const cacheTtlEntry = `${JSON.stringify({
       type: "custom",
-      customType: "openclaw.cache-ttl",
+      customType: "recall.cache-ttl",
       timestamp: new Date().toISOString(),
       data: {
         provider: "anthropic",
@@ -513,7 +513,7 @@ describe("appendAssistantMessageToSessionTranscript", () => {
       expect(lines.length).toBe(4);
 
       const messageLine = JSON.parse(lines[3]);
-      expect(messageLine.message.provider).toBe("openclaw");
+      expect(messageLine.message.provider).toBe("recall");
       expect(messageLine.message.model).toBe("delivery-mirror");
       expect(messageLine.message.content[0].text).toBe("Repeated answer");
     }
@@ -689,7 +689,7 @@ describe("appendAssistantMessageToSessionTranscript", () => {
             textSignature: JSON.stringify({ v: 1, id: "item_final", phase: "final_answer" }),
           },
         ],
-        provider: "openclaw",
+        provider: "recall",
         model: "delivery-mirror",
       }),
     });
@@ -723,7 +723,7 @@ describe("appendAssistantMessageToSessionTranscript", () => {
       updateMode: "file-only",
       message: createExactAssistantMessage({
         text: "Done.",
-        provider: "openclaw",
+        provider: "recall",
         model: "delivery-mirror",
       }),
     });

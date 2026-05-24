@@ -37,13 +37,13 @@ export type ResolvedGlobalInstallTarget = ResolvedGlobalInstallCommand & {
   directNodeModulesRoot?: boolean;
 };
 
-const PRIMARY_PACKAGE_NAME = "openclaw";
+const PRIMARY_PACKAGE_NAME = "recall";
 const ALL_PACKAGE_NAMES = [PRIMARY_PACKAGE_NAME] as const;
 const GLOBAL_RENAME_PREFIX = ".";
-export const OPENCLAW_MAIN_PACKAGE_SPEC = "github:openclaw/openclaw#main";
+export const RECALL_MAIN_PACKAGE_SPEC = "github:tryrecall/recall-agents#main";
 const COREPACK_ENABLE_DOWNLOAD_PROMPT_DEFAULT = "0";
 const NPM_GLOBAL_INSTALL_QUIET_FLAGS = ["--no-fund", "--no-audit", "--loglevel=error"] as const;
-const PNPM_OPENCLAW_BUILD_ALLOWLIST_FLAG = `--allow-build=${PRIMARY_PACKAGE_NAME}`;
+const PNPM_RECALL_BUILD_ALLOWLIST_FLAG = `--allow-build=${PRIMARY_PACKAGE_NAME}`;
 const FIRST_PACKAGED_DIST_INVENTORY_VERSION = { major: 2026, minor: 4, patch: 15 };
 const OMITTED_PRIVATE_QA_BUNDLED_PLUGIN_ROOTS = new Set([
   "dist/extensions/qa-channel",
@@ -94,7 +94,7 @@ function stripPrimaryPackageAlias(spec: string): string {
     : normalized;
 }
 
-function isPnpmOpenClawSourceInstallSpec(spec: string): boolean {
+function isPnpmRecallSourceInstallSpec(spec: string): boolean {
   const target = stripPrimaryPackageAlias(spec);
   return (
     /^github:/i.test(target) ||
@@ -254,7 +254,7 @@ async function collectCriticalInstalledPackageDistPaths(packageRoot: string): Pr
       }
       if (
         (await pathExists(path.join(packageRoot, pluginRoot, "package.json"))) ||
-        (await pathExists(path.join(packageRoot, pluginRoot, "openclaw.plugin.json")))
+        (await pathExists(path.join(packageRoot, pluginRoot, "recall.plugin.json")))
       ) {
         expectedFiles.add(relativePath);
       }
@@ -313,7 +313,7 @@ async function resolvePortableGitPathPrepend(): Promise<string[]> {
   if (!localAppData) {
     return [];
   }
-  const portableGitRoot = path.join(localAppData, "OpenClaw", "deps", "portable-git");
+  const portableGitRoot = path.join(localAppData, "Recall", "deps", "portable-git");
   const candidates = [
     path.join(portableGitRoot, "mingw64", "bin"),
     path.join(portableGitRoot, "usr", "bin"),
@@ -352,14 +352,14 @@ export function resolveGlobalInstallSpec(params: {
   env?: NodeJS.ProcessEnv;
 }): string {
   const override =
-    params.env?.OPENCLAW_UPDATE_PACKAGE_SPEC?.trim() ||
-    process.env.OPENCLAW_UPDATE_PACKAGE_SPEC?.trim();
+    params.env?.RECALL_UPDATE_PACKAGE_SPEC?.trim() ||
+    process.env.RECALL_UPDATE_PACKAGE_SPEC?.trim();
   if (override) {
     return override;
   }
   const target = normalizePackageTarget(params.tag);
   if (isMainPackageTarget(target)) {
-    return OPENCLAW_MAIN_PACKAGE_SPEC;
+    return RECALL_MAIN_PACKAGE_SPEC;
   }
   if (isExplicitPackageInstallSpec(target)) {
     return target;
@@ -782,7 +782,7 @@ export function globalInstallArgs(
       "add",
       "-g",
       ...(installPrefix ? ["--global-dir", installPrefix] : []),
-      ...(isPnpmOpenClawSourceInstallSpec(spec) ? [PNPM_OPENCLAW_BUILD_ALLOWLIST_FLAG] : []),
+      ...(isPnpmRecallSourceInstallSpec(spec) ? [PNPM_RECALL_BUILD_ALLOWLIST_FLAG] : []),
       spec,
     ];
   }

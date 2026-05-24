@@ -5,7 +5,7 @@ function bundledPluginFile(pluginId: string, relativePath: string, suffix = ""):
 }
 
 const rootEntries = [
-  "openclaw.mjs!",
+  "recall.mjs!",
   "src/index.ts!",
   "src/entry.ts!",
   "src/cli/daemon-cli.ts!",
@@ -48,7 +48,7 @@ const bundledPluginIgnoredRuntimeDependencies = [
   "json5",
   "lit",
   "linkedom",
-  "openclaw",
+  "recall",
   "pdfjs-dist",
 ] as const;
 
@@ -145,7 +145,7 @@ const config = {
     ".": {
       entry: rootEntries,
       ignoreDependencies: [
-        "@openclaw/*",
+        "@recall/*",
         "playwright-core",
         "sqlite-vec",
         "tree-sitter-bash",

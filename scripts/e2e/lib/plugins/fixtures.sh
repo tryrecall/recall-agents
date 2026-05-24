@@ -1,9 +1,9 @@
-OPENCLAW_PLUGINS_FIXTURE_PID_FILES=()
+RECALL_PLUGINS_FIXTURE_PID_FILES=()
 
 openclaw_plugins_cleanup_fixture_servers() {
   local pid_file
   local pid
-  for pid_file in "${OPENCLAW_PLUGINS_FIXTURE_PID_FILES[@]:-}"; do
+  for pid_file in "${RECALL_PLUGINS_FIXTURE_PID_FILES[@]:-}"; do
     [[ -f "$pid_file" ]] || continue
     pid="$(cat "$pid_file" 2>/dev/null || true)"
     if [[ "$pid" =~ ^[0-9]+$ ]]; then
@@ -15,7 +15,7 @@ openclaw_plugins_cleanup_fixture_servers() {
 
 openclaw_plugins_register_fixture_pid_file() {
   local pid_file="$1"
-  OPENCLAW_PLUGINS_FIXTURE_PID_FILES+=("$pid_file")
+  RECALL_PLUGINS_FIXTURE_PID_FILES+=("$pid_file")
   trap openclaw_plugins_cleanup_fixture_servers EXIT
 }
 
@@ -122,7 +122,7 @@ import fs from "node:fs";
 
 const packageJsonPath = process.argv[2];
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
-packageJson.openclaw.extensions = ["./index.js", " "];
+packageJson.recall.extensions = ["./index.js", " "];
 fs.writeFileSync(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`, "utf8");
 NODE
   tar -czf "$output_tgz" -C "$pack_dir" package

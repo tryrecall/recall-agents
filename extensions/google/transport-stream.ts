@@ -7,7 +7,7 @@ import {
   type SimpleStreamOptions,
   type ThinkingLevel,
 } from "@earendil-works/pi-ai";
-import { createProviderHttpError } from "openclaw/plugin-sdk/provider-http";
+import { createProviderHttpError } from "recall/plugin-sdk/provider-http";
 import {
   buildGuardedModelFetch,
   coerceTransportToolCallArguments,
@@ -20,8 +20,8 @@ import {
   stripSystemPromptCacheBoundary,
   transformTransportMessages,
   type WritableTransportStream,
-} from "openclaw/plugin-sdk/provider-transport-runtime";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/provider-transport-runtime";
+import { normalizeLowercaseStringOrEmpty } from "recall/plugin-sdk/string-coerce-runtime";
 import { parseGeminiAuth } from "./gemini-auth.js";
 import { normalizeGoogleApiBaseUrl } from "./provider-policy.js";
 import {
@@ -39,7 +39,7 @@ import {
 } from "./vertex-adc.js";
 
 type CanonicalGoogleTransportApi = "google-generative-ai" | "google-vertex";
-type GoogleTransportApi = CanonicalGoogleTransportApi | "openclaw-google-generative-ai-transport";
+type GoogleTransportApi = CanonicalGoogleTransportApi | "recall-google-generative-ai-transport";
 
 type GoogleTransportModel = Model<GoogleTransportApi> & {
   headers?: Record<string, string>;
@@ -76,7 +76,7 @@ type GoogleGenerateContentRequest = {
 };
 
 const GOOGLE_GEMINI3_FIRST_RESPONSE_RETRY_DEFAULT_MS = 45_000;
-const GOOGLE_GEMINI3_FIRST_RESPONSE_RETRY_ENV = "OPENCLAW_GOOGLE_GEMINI_FIRST_RESPONSE_RETRY_MS";
+const GOOGLE_GEMINI3_FIRST_RESPONSE_RETRY_ENV = "RECALL_GOOGLE_GEMINI_FIRST_RESPONSE_RETRY_MS";
 
 type GoogleTransportContentBlock =
   | { type: "text"; text: string; textSignature?: string }
@@ -244,7 +244,7 @@ function normalizeGoogleTransportRouteApi(
 ): CanonicalGoogleTransportApi | undefined {
   switch (api) {
     case "google-generative-ai":
-    case "openclaw-google-generative-ai-transport":
+    case "recall-google-generative-ai-transport":
       return "google-generative-ai";
     case "google-vertex":
       return "google-vertex";

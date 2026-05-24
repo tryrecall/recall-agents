@@ -59,17 +59,17 @@ describe("Session Store Cache", () => {
     clearSessionStoreCacheForTest();
 
     // Reset environment variable
-    delete process.env.OPENCLAW_SESSION_CACHE_TTL_MS;
+    delete process.env.RECALL_SESSION_CACHE_TTL_MS;
   });
 
   afterEach(() => {
     clearSessionStoreCacheForTest();
-    delete process.env.OPENCLAW_SESSION_CACHE_TTL_MS;
-    delete process.env.OPENCLAW_SESSION_SERIALIZED_CACHE_MAX_BYTES;
+    delete process.env.RECALL_SESSION_CACHE_TTL_MS;
+    delete process.env.RECALL_SESSION_SERIALIZED_CACHE_MAX_BYTES;
   });
 
   it("bounds the serialized session store cache by total bytes", () => {
-    process.env.OPENCLAW_SESSION_SERIALIZED_CACHE_MAX_BYTES = "64";
+    process.env.RECALL_SESSION_SERIALIZED_CACHE_MAX_BYTES = "64";
     clearSessionStoreCacheForTest();
 
     setSerializedSessionStore("store:1", "a".repeat(40));
@@ -519,8 +519,8 @@ describe("Session Store Cache", () => {
     expect(loaded2["session:1"].displayName).toBe("Updated Session 1");
   });
 
-  it("should respect OPENCLAW_SESSION_CACHE_TTL_MS=0 to disable cache", async () => {
-    process.env.OPENCLAW_SESSION_CACHE_TTL_MS = "0";
+  it("should respect RECALL_SESSION_CACHE_TTL_MS=0 to disable cache", async () => {
+    process.env.RECALL_SESSION_CACHE_TTL_MS = "0";
     clearSessionStoreCacheForTest();
 
     const testStore = createSingleSessionStore();

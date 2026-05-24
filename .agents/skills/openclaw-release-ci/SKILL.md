@@ -1,11 +1,11 @@
 ---
-name: openclaw-release-ci
-description: "Run, watch, debug, and summarize OpenClaw full release CI, release checks, live provider gates, install/update proofs, and release-secret preflights."
+name: recall-release-ci
+description: "Run, watch, debug, and summarize Recall full release CI, release checks, live provider gates, install/update proofs, and release-secret preflights."
 ---
 
-# OpenClaw Release CI
+# Recall Release CI
 
-Use this with `$openclaw-release-maintainer` and `$openclaw-testing` when a release candidate needs full validation, install/update proof, live provider checks, or CI recovery.
+Use this with `$recall-release-maintainer` and `$recall-testing` when a release candidate needs full validation, install/update proof, live provider checks, or CI recovery.
 
 ## Guardrails
 
@@ -22,7 +22,7 @@ Use this with `$openclaw-release-maintainer` and `$openclaw-testing` when a rele
 Before full release validation:
 
 ```bash
-node .agents/skills/openclaw-release-ci/scripts/verify-provider-secrets.mjs --required openai,anthropic,fireworks
+node .agents/skills/recall-release-ci/scripts/verify-provider-secrets.mjs --required openai,anthropic,fireworks
 gh api rate_limit --jq '.resources.core'
 git status --short --branch
 git rev-parse HEAD
@@ -39,7 +39,7 @@ Prefer the trusted workflow on `main`, target the exact release SHA:
 
 ```bash
 gh workflow run full-release-validation.yml \
-  --repo openclaw/openclaw \
+  --repo tryrecall/recall-agents \
   --ref main \
   -f ref=<release-sha> \
   -f provider=openai \
@@ -55,13 +55,13 @@ Use `release_profile=stable` unless the operator explicitly asks for the broad a
 Use the summary helper instead of repeated raw polling:
 
 ```bash
-node .agents/skills/openclaw-release-ci/scripts/release-ci-summary.mjs <full-release-run-id>
+node .agents/skills/recall-release-ci/scripts/release-ci-summary.mjs <full-release-run-id>
 ```
 
 Then watch only when useful:
 
 ```bash
-gh run watch <full-release-run-id> --repo openclaw/openclaw --exit-status
+gh run watch <full-release-run-id> --repo tryrecall/recall-agents --exit-status
 ```
 
 Stop watchers before ending the turn or switching strategy.
@@ -71,7 +71,7 @@ Stop watchers before ending the turn or switching strategy.
 1. Confirm parent SHA and child run IDs.
 2. List failed jobs only:
    ```bash
-   gh run view <child-run-id> --repo openclaw/openclaw --json jobs \
+   gh run view <child-run-id> --repo tryrecall/recall-agents --json jobs \
      --jq '.jobs[] | select(.conclusion=="failure" or .conclusion=="timed_out" or .conclusion=="cancelled") | [.databaseId,.name,.conclusion,.url] | @tsv'
    ```
 3. Fetch one failed job log. If rate-limited, note reset time and avoid more REST calls.

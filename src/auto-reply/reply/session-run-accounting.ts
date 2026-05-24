@@ -1,5 +1,5 @@
 import { deriveSessionTotalTokens, type NormalizedUsage } from "../../agents/usage.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { incrementCompactionCount } from "./session-updates.js";
 import { persistSessionUsageUpdate } from "./session-usage.js";
 
@@ -10,7 +10,7 @@ type IncrementRunCompactionCountParams = Omit<
   "tokensAfter"
 > & {
   amount?: number;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   compactionTokensAfter?: number;
   lastCallUsage?: NormalizedUsage;
   contextTokensUsed?: number;

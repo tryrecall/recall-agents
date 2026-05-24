@@ -1,8 +1,8 @@
-import { createChannelPairingChallengeIssuer } from "openclaw/plugin-sdk/channel-pairing";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { upsertChannelPairingRequest } from "openclaw/plugin-sdk/conversation-runtime";
-import { defaultRuntime } from "openclaw/plugin-sdk/runtime-env";
-import { warnMissingProviderGroupPolicyFallbackOnce } from "openclaw/plugin-sdk/runtime-group-policy";
+import { createChannelPairingChallengeIssuer } from "recall/plugin-sdk/channel-pairing";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { upsertChannelPairingRequest } from "recall/plugin-sdk/conversation-runtime";
+import { defaultRuntime } from "recall/plugin-sdk/runtime-env";
+import { warnMissingProviderGroupPolicyFallbackOnce } from "recall/plugin-sdk/runtime-group-policy";
 import { resolveWhatsAppInboundPolicy, resolveWhatsAppIngressAccess } from "../inbound-policy.js";
 
 export type InboundAccessControlResult = {
@@ -22,7 +22,7 @@ function logWhatsAppVerbose(enabled: boolean | undefined, message: string) {
 }
 
 export async function checkInboundAccessControl(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId: string;
   from: string;
   selfE164: string | null;

@@ -131,7 +131,7 @@ describe("registerMaintenanceCommands doctor action", () => {
 
     expect(doctorCommand).not.toHaveBeenCalled();
     expect(runtime.error).toHaveBeenCalledWith(
-      "doctor lint options require --lint. Use `openclaw doctor --lint ...`.",
+      "doctor lint options require --lint. Use `recall doctor --lint ...`.",
     );
     expect(runtime.exit).toHaveBeenCalledWith(2);
   });
@@ -151,7 +151,7 @@ describe("registerMaintenanceCommands doctor action", () => {
     expect(doctorCommand).not.toHaveBeenCalled();
     expect(runDoctorLintCli).not.toHaveBeenCalled();
     expect(runtime.error).toHaveBeenCalledWith(
-      "doctor lint options require --lint. Use `openclaw doctor --lint ...`.",
+      "doctor lint options require --lint. Use `recall doctor --lint ...`.",
     );
     expect(runtime.exit).toHaveBeenCalledWith(2);
   });

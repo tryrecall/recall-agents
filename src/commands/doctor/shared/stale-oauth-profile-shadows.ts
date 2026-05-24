@@ -16,7 +16,7 @@ import { loadPersistedAuthProfileStore } from "../../../agents/auth-profiles/per
 import { saveAuthProfileStore } from "../../../agents/auth-profiles/store.js";
 import type { AuthProfileStore, OAuthCredential } from "../../../agents/auth-profiles/types.js";
 import { resolveStateDir } from "../../../config/paths.js";
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { RecallConfig } from "../../../config/types.recall.js";
 import { withFileLock } from "../../../infra/file-lock.js";
 import { shortenHomePath } from "../../../utils.js";
 
@@ -26,7 +26,7 @@ type StaleOAuthProfileShadow = {
   profileId: string;
 };
 
-const LEGACY_OAUTH_REF_SOURCE = "openclaw-credentials";
+const LEGACY_OAUTH_REF_SOURCE = "recall-credentials";
 const LEGACY_OAUTH_REF_PROVIDER = "openai-codex";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -87,7 +87,7 @@ async function collectStateAgentDirs(env: NodeJS.ProcessEnv): Promise<string[]> 
 }
 
 async function collectCandidateAgentDirs(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   env: NodeJS.ProcessEnv,
 ): Promise<string[]> {
   const dirs = new Set<string>();
@@ -130,7 +130,7 @@ function shouldRemoveLocalOAuthShadow(params: {
 }
 
 export async function scanStaleOAuthProfileShadows(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   env?: NodeJS.ProcessEnv;
   now?: number;
 }): Promise<StaleOAuthProfileShadow[]> {
@@ -273,7 +273,7 @@ export function collectStaleOAuthProfileShadowWarnings(params: {
 }
 
 export async function repairStaleOAuthProfileShadows(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   env?: NodeJS.ProcessEnv;
   now?: number;
 }): Promise<{ changes: string[]; warnings: string[] }> {

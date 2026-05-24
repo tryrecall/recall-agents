@@ -1,5 +1,5 @@
 import { resolveAgentModelFallbackValues } from "../config/model-input.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { resolveAgentModelFallbacksOverride } from "./agent-scope.js";
 import type { ModelCatalogEntry } from "./model-catalog.types.js";
 import type { ModelManifestNormalizationContext } from "./model-selection-normalize.js";
@@ -8,7 +8,7 @@ import {
   type ModelVisibilityPolicy,
 } from "./model-selection-shared.js";
 
-function resolveAllowedFallbacks(params: { cfg: OpenClawConfig; agentId?: string }): string[] {
+function resolveAllowedFallbacks(params: { cfg: RecallConfig; agentId?: string }): string[] {
   if (params.agentId) {
     const override = resolveAgentModelFallbacksOverride(params.cfg, params.agentId);
     if (override !== undefined) {
@@ -20,7 +20,7 @@ function resolveAllowedFallbacks(params: { cfg: OpenClawConfig; agentId?: string
 
 export function createModelVisibilityPolicy(
   params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     catalog: ModelCatalogEntry[];
     defaultProvider: string;
     defaultModel?: string;

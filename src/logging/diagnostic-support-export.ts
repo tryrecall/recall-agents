@@ -35,7 +35,7 @@ export const DIAGNOSTIC_SUPPORT_EXPORT_VERSION = 1;
 
 const DEFAULT_LOG_LIMIT = 5000;
 const DEFAULT_LOG_MAX_BYTES = 1_000_000;
-const SUPPORT_EXPORT_PREFIX = "openclaw-diagnostics-";
+const SUPPORT_EXPORT_PREFIX = "recall-diagnostics-";
 const SUPPORT_EXPORT_SUFFIX = ".zip";
 type Awaitable<T> = T | Promise<T>;
 type SupportSnapshotReader = () => Awaitable<unknown>;
@@ -362,7 +362,7 @@ function readStabilityBundle(
   stateDir: string,
 ): ReadDiagnosticStabilityBundleResult {
   if (target === false) {
-    return { status: "missing", dir: "$OPENCLAW_STATE_DIR/logs/stability" };
+    return { status: "missing", dir: "$RECALL_STATE_DIR/logs/stability" };
   }
   if (target === undefined || target === "latest") {
     return readLatestDiagnosticStabilityBundleSync({ stateDir });
@@ -478,14 +478,14 @@ function renderSummary(params: {
     return `${label} snapshot skipped`;
   };
   return [
-    "# OpenClaw Diagnostics Export",
+    "# Recall Diagnostics Export",
     "",
     "Attach this zip to the bug report. It is designed for maintainers to inspect without asking for raw logs first.",
     "",
     "## Generated",
     "",
     `Generated: ${params.generatedAt}`,
-    `OpenClaw: ${VERSION}`,
+    `Recall: ${VERSION}`,
     "",
     "## Contents",
     "",
@@ -502,7 +502,7 @@ function renderSummary(params: {
     "- `config/sanitized.json`: config values with credentials, private identifiers, and prompt text redacted",
     "- `status/gateway-status.json`: sanitized service/connectivity snapshot",
     "- `health/gateway-health.json`: sanitized Gateway health snapshot",
-    "- `logs/openclaw-sanitized.jsonl`: sanitized log summaries and metadata",
+    "- `logs/recall-sanitized.jsonl`: sanitized log summaries and metadata",
     "- `stability/latest.json`: newest payload-free stability bundle, when available",
     "",
     "## Privacy",
@@ -610,7 +610,7 @@ export async function buildDiagnosticSupportExport(
     jsonSupportBundleFile("config/shape.json", config.shape),
     jsonSupportBundleFile("config/sanitized.json", config.sanitized ?? null),
     jsonlSupportBundleFile(
-      "logs/openclaw-sanitized.jsonl",
+      "logs/recall-sanitized.jsonl",
       logTail.lines.map((line) => JSON.stringify(line)),
     ),
   ];

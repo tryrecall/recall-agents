@@ -4,16 +4,16 @@ import {
   resolveEnvelopeFormatOptions,
   toHistoryMediaEntries,
   toInboundMediaFacts,
-} from "openclaw/plugin-sdk/channel-inbound";
-import { resolveChannelContextVisibilityMode } from "openclaw/plugin-sdk/context-visibility-runtime";
-import { resolvePinnedMainDmOwnerFromAllowlist } from "openclaw/plugin-sdk/conversation-runtime";
-import { isDangerousNameMatchingEnabled } from "openclaw/plugin-sdk/dangerous-name-runtime";
-import { createChannelHistoryWindow } from "openclaw/plugin-sdk/reply-history";
-import { buildAgentSessionKey, resolveThreadSessionKeys } from "openclaw/plugin-sdk/routing";
-import { danger, logVerbose, shouldLogVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { evaluateSupplementalContextVisibility } from "openclaw/plugin-sdk/security-runtime";
-import { readSessionUpdatedAt, resolveStorePath } from "openclaw/plugin-sdk/session-store-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "recall/plugin-sdk/channel-inbound";
+import { resolveChannelContextVisibilityMode } from "recall/plugin-sdk/context-visibility-runtime";
+import { resolvePinnedMainDmOwnerFromAllowlist } from "recall/plugin-sdk/conversation-runtime";
+import { isDangerousNameMatchingEnabled } from "recall/plugin-sdk/dangerous-name-runtime";
+import { createChannelHistoryWindow } from "recall/plugin-sdk/reply-history";
+import { buildAgentSessionKey, resolveThreadSessionKeys } from "recall/plugin-sdk/routing";
+import { danger, logVerbose, shouldLogVerbose } from "recall/plugin-sdk/runtime-env";
+import { evaluateSupplementalContextVisibility } from "recall/plugin-sdk/security-runtime";
+import { readSessionUpdatedAt, resolveStorePath } from "recall/plugin-sdk/session-store-runtime";
+import { truncateUtf16Safe } from "recall/plugin-sdk/text-utility-runtime";
 import { resolveDiscordConversationIdentity } from "../conversation-identity.js";
 import { ChannelType } from "../internal/discord.js";
 import { normalizeDiscordAllowList, normalizeDiscordSlug } from "./allow-list.js";

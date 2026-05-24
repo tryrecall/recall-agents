@@ -1,9 +1,9 @@
 import {
   CLAUDE_CLI_PROFILE_ID,
-  type OpenClawConfig,
+  type RecallConfig,
   type ProviderAuthResult,
-} from "openclaw/plugin-sdk/provider-auth";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/provider-auth";
+import { normalizeLowercaseStringOrEmpty } from "recall/plugin-sdk/string-coerce-runtime";
 import { resolveClaudeCliAnthropicModelRefs } from "./claude-model-refs.js";
 import {
   readClaudeCliCredentialsForSetup,
@@ -11,10 +11,10 @@ import {
 } from "./cli-auth-seam.js";
 import { CLAUDE_CLI_BACKEND_ID, CLAUDE_CLI_DEFAULT_ALLOWLIST_REFS } from "./cli-shared.js";
 
-type AgentDefaultsModel = NonNullable<NonNullable<OpenClawConfig["agents"]>["defaults"]>["model"];
-type AgentDefaultsModels = NonNullable<NonNullable<OpenClawConfig["agents"]>["defaults"]>["models"];
+type AgentDefaultsModel = NonNullable<NonNullable<RecallConfig["agents"]>["defaults"]>["model"];
+type AgentDefaultsModels = NonNullable<NonNullable<RecallConfig["agents"]>["defaults"]>["models"];
 type AgentDefaultsRuntimePolicy = NonNullable<
-  NonNullable<OpenClawConfig["agents"]>["defaults"]
+  NonNullable<RecallConfig["agents"]>["defaults"]
 >["agentRuntime"];
 type ClaudeCliCredential = NonNullable<ReturnType<typeof readClaudeCliCredentialsForSetup>>;
 
@@ -225,7 +225,7 @@ function buildClaudeCliAuthProfiles(
 }
 
 export function buildAnthropicCliMigrationResult(
-  config: OpenClawConfig,
+  config: RecallConfig,
   credential?: ClaudeCliCredential | null,
 ): ProviderAuthResult {
   const defaults = config.agents?.defaults;

@@ -1,4 +1,4 @@
-import { pluginRegistrationContractCases } from "openclaw/plugin-sdk/plugin-test-contracts";
-import { describePluginRegistrationContract } from "openclaw/plugin-sdk/plugin-test-contracts";
+import { pluginRegistrationContractCases } from "recall/plugin-sdk/plugin-test-contracts";
+import { describePluginRegistrationContract } from "recall/plugin-sdk/plugin-test-contracts";
 
 describePluginRegistrationContract(pluginRegistrationContractCases.google);

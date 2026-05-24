@@ -1,7 +1,7 @@
 import {
   createWebSearchProviderContractFields,
   type WebSearchProviderPlugin,
-} from "openclaw/plugin-sdk/provider-web-search-config-contract";
+} from "recall/plugin-sdk/provider-web-search-config-contract";
 
 export function createXaiWebSearchProvider(): WebSearchProviderPlugin {
   const credentialPath = "plugins.entries.xai.config.webSearch.apiKey";
@@ -16,7 +16,7 @@ export function createXaiWebSearchProvider(): WebSearchProviderPlugin {
     authProviderId: "xai",
     placeholder: "xai-...",
     signupUrl: "https://console.x.ai/",
-    docsUrl: "https://docs.openclaw.ai/tools/web",
+    docsUrl: "https://docs.recall.ai/tools/web",
     autoDetectOrder: 30,
     credentialPath,
     ...createWebSearchProviderContractFields({

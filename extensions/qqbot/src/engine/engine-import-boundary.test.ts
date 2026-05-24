@@ -1,8 +1,8 @@
 /**
  * Engine import boundary test.
  *
- * Ensures that engine/ sources only import from `openclaw/plugin-sdk/*`
- * and never reach into other openclaw internals directly.
+ * Ensures that engine/ sources only import from `recall/plugin-sdk/*`
+ * and never reach into other recall internals directly.
  */
 
 import fs from "node:fs";
@@ -34,24 +34,24 @@ function walkSourceFiles(dir: string, files: string[] = []): string[] {
 }
 
 /**
- * Extract all `openclaw/...` import specifiers from source text.
- * Matches: import ... from "openclaw/...", import("openclaw/...")
+ * Extract all `recall/...` import specifiers from source text.
+ * Matches: import ... from "recall/...", import("recall/...")
  */
 function findOpenclawImports(source: string): string[] {
   return [
-    ...source.matchAll(/from\s+["'](openclaw\/[^"']+)["']/g),
-    ...source.matchAll(/import\(\s*["'](openclaw\/[^"']+)["']\s*\)/g),
+    ...source.matchAll(/from\s+["'](recall\/[^"']+)["']/g),
+    ...source.matchAll(/import\(\s*["'](recall\/[^"']+)["']\s*\)/g),
   ].map((match) => match[1]);
 }
 
-/** Check if an import specifier is an allowed openclaw/plugin-sdk subpath. */
-const ALLOWED_PREFIX = ["openclaw", "plugin-sdk"].join("/");
+/** Check if an import specifier is an allowed recall/plugin-sdk subpath. */
+const ALLOWED_PREFIX = ["recall", "plugin-sdk"].join("/");
 function isAllowedImport(specifier: string): boolean {
   return specifier.startsWith(ALLOWED_PREFIX);
 }
 
 describe("engine import boundary", () => {
-  it("only imports from openclaw/plugin-sdk, never from other openclaw internals", () => {
+  it("only imports from recall/plugin-sdk, never from other recall internals", () => {
     const sourceFiles = walkSourceFiles(ENGINE_DIR);
     const offenders: Array<{ file: string; imports: string[] }> = [];
 

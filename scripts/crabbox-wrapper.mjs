@@ -384,7 +384,7 @@ function shouldUseFullCheckoutForCleanSparseBlacksmithSync(commandArgs, provider
 }
 
 function prepareFullCheckoutForSync() {
-  const dir = mkdtempSync(resolve(tmpdir(), "openclaw-crabbox-sync-"));
+  const dir = mkdtempSync(resolve(tmpdir(), "recall-crabbox-sync-"));
   let active = false;
   const add = gitOutput(["worktree", "add", "--detach", dir, "HEAD"]);
   if (add.status !== 0) {
@@ -581,7 +581,7 @@ if (args[0] === "run" && provider === "aws" && runtimeEntrypoint) {
     ? `pnpm crabbox:hydrate -- --id ${id}`
     : "pnpm crabbox:warmup, then pnpm crabbox:hydrate -- --id <id>";
   console.error(
-    `[crabbox] warning: provider=aws raw boxes may lack Node/Corepack/pnpm for ${runtimeEntrypoint}; hydrate first (${hydrate}) or pass --provider blacksmith-testbox for OpenClaw CI-like proof; not switching providers automatically`,
+    `[crabbox] warning: provider=aws raw boxes may lack Node/Corepack/pnpm for ${runtimeEntrypoint}; hydrate first (${hydrate}) or pass --provider blacksmith-testbox for Recall CI-like proof; not switching providers automatically`,
   );
 }
 
@@ -593,7 +593,7 @@ if (
 ) {
   childEnv.CRABBOX_LOCAL_CONTAINER_DOCKER_SOCKET = "1";
   console.error(
-    "[crabbox] provider=docker enabling host Docker socket pass-through for OpenClaw Docker tests",
+    "[crabbox] provider=docker enabling host Docker socket pass-through for Recall Docker tests",
   );
 }
 if (
@@ -602,9 +602,9 @@ if (
   !childEnv.CRABBOX_LOCAL_CONTAINER_WORK_ROOT &&
   !hasOption(args, "--local-container-work-root")
 ) {
-  childEnv.CRABBOX_LOCAL_CONTAINER_WORK_ROOT = "/tmp/openclaw-crabbox-docker-work";
+  childEnv.CRABBOX_LOCAL_CONTAINER_WORK_ROOT = "/tmp/recall-crabbox-docker-work";
   console.error(
-    "[crabbox] provider=docker using short host-visible work root for OpenClaw Docker tests",
+    "[crabbox] provider=docker using short host-visible work root for Recall Docker tests",
   );
 }
 

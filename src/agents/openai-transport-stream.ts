@@ -1304,7 +1304,7 @@ function createResponsesFirstEventTimeoutError(model: Model<Api>, timeoutMs: num
   return new Error(
     `Azure OpenAI Responses stream did not deliver a first event within ${timeoutMs}ms after HTTP streaming headers. ` +
       `provider=${model.provider} model=${model.id}. ` +
-      "The provider may be stalled while parsing the tool payload; retry with a smaller tool surface or enable OPENCLAW_DEBUG_MODEL_PAYLOAD=tools to inspect exposed tools.",
+      "The provider may be stalled while parsing the tool payload; retry with a smaller tool surface or enable RECALL_DEBUG_MODEL_PAYLOAD=tools to inspect exposed tools.",
   );
 }
 
@@ -2770,7 +2770,7 @@ function getCompletionsContentDeltas(content: unknown): CompletionsReasoningDelt
   if (!text) {
     return [];
   }
-  // Preserve provider reasoning as OpenClaw thinking blocks so channel/UI
+  // Preserve provider reasoning as Recall thinking blocks so channel/UI
   // surfaces can decide whether to show it instead of leaking it as answer text.
   if (type.includes("thinking") || type.includes("reasoning")) {
     return [{ kind: "thinking", signature: "content", text }];

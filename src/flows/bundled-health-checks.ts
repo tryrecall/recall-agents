@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { normalizePluginsConfig } from "../plugins/config-state.js";
 import { passesManifestOwnerBasePolicy } from "../plugins/manifest-owner-policy.js";
 import { loadBundledPluginPublicArtifactModuleSync } from "../plugins/public-surface-loader.js";
@@ -8,7 +8,7 @@ type BundledHealthApi = {
   registerPolicyDoctorChecks?: (host: { registerHealthCheck: typeof registerHealthCheck }) => void;
 };
 
-export function registerBundledHealthChecks(params: { cfg: OpenClawConfig; cwd?: string }): void {
+export function registerBundledHealthChecks(params: { cfg: RecallConfig; cwd?: string }): void {
   if (!shouldRegisterPolicyHealth(params)) {
     return;
   }
@@ -18,7 +18,7 @@ export function registerBundledHealthChecks(params: { cfg: OpenClawConfig; cwd?:
   }).registerPolicyDoctorChecks?.({ registerHealthCheck });
 }
 
-function shouldRegisterPolicyHealth(params: { cfg: OpenClawConfig; cwd?: string }): boolean {
+function shouldRegisterPolicyHealth(params: { cfg: RecallConfig; cwd?: string }): boolean {
   const entry = params.cfg.plugins?.entries?.policy;
   const config = isRecord(entry?.config) ? entry.config : {};
   if (entry === undefined || entry.enabled === false || config.enabled === false) {

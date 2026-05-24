@@ -81,22 +81,22 @@ async function createDockerSetupSandbox(): Promise<DockerSetupSandbox> {
   await writeFile(dockerfilePath, "FROM scratch\n");
   await writeFile(
     composePath,
-    "services:\n  openclaw-gateway:\n    image: noop\n  openclaw-cli:\n    image: noop\n",
+    "services:\n  recall-gateway:\n    image: noop\n  recall-cli:\n    image: noop\n",
   );
   await writeDockerStub(binDir, logPath);
 
   return { rootDir, scriptPath, logPath, binDir };
 }
 
-const sandboxRootTracker = createSuiteTempRootTracker({ prefix: "openclaw-docker-setup-" });
+const sandboxRootTracker = createSuiteTempRootTracker({ prefix: "recall-docker-setup-" });
 
 const prestartContainerEnvFlags = [
   "-e HOME=/home/node",
-  "-e OPENCLAW_HOME=/home/node",
-  "-e OPENCLAW_STATE_DIR=/home/node/.openclaw",
-  "-e OPENCLAW_CONFIG_PATH=/home/node/.openclaw/openclaw.json",
-  "-e OPENCLAW_CONFIG_DIR=/home/node/.openclaw",
-  "-e OPENCLAW_WORKSPACE_DIR=/home/node/.openclaw/workspace",
+  "-e RECALL_HOME=/home/node",
+  "-e RECALL_STATE_DIR=/home/node/.recall",
+  "-e RECALL_CONFIG_PATH=/home/node/.tryrecall/recall-agents.json",
+  "-e RECALL_CONFIG_DIR=/home/node/.recall",
+  "-e RECALL_WORKSPACE_DIR=/home/node/.recall/workspace",
 ].join(" ");
 
 function createEnv(
@@ -110,10 +110,10 @@ function createEnv(
     LC_ALL: process.env.LC_ALL,
     TMPDIR: process.env.TMPDIR,
     DOCKER_STUB_LOG: sandbox.logPath,
-    OPENCLAW_GATEWAY_TOKEN: "test-token",
-    OPENCLAW_CONFIG_DIR: join(sandbox.rootDir, "config"),
-    OPENCLAW_WORKSPACE_DIR: join(sandbox.rootDir, "openclaw"),
-    OPENCLAW_AUTH_PROFILE_SECRET_DIR: join(sandbox.rootDir, "auth-profile-secrets"),
+    RECALL_GATEWAY_TOKEN: "test-token",
+    RECALL_CONFIG_DIR: join(sandbox.rootDir, "config"),
+    RECALL_WORKSPACE_DIR: join(sandbox.rootDir, "recall"),
+    RECALL_AUTH_PROFILE_SECRET_DIR: join(sandbox.rootDir, "auth-profile-secrets"),
   };
 
   for (const [key, value] of Object.entries(overrides)) {
@@ -175,7 +175,7 @@ function collectMatchingLines(lines: string[], predicate: (line: string) => bool
 }
 
 function isGatewayStartLine(line: string) {
-  return line.includes("compose") && line.includes(" up -d") && line.includes("openclaw-gateway");
+  return line.includes("compose") && line.includes(" up -d") && line.includes("recall-gateway");
 }
 
 function findGatewayStartLineIndex(lines: string[]) {
@@ -193,9 +193,9 @@ async function runDockerSetupWithUnsetGatewayToken(
   await prepare?.(configDir);
 
   const result = runDockerSetup(sandbox, {
-    OPENCLAW_GATEWAY_TOKEN: undefined,
-    OPENCLAW_CONFIG_DIR: configDir,
-    OPENCLAW_WORKSPACE_DIR: workspaceDir,
+    RECALL_GATEWAY_TOKEN: undefined,
+    RECALL_CONFIG_DIR: configDir,
+    RECALL_WORKSPACE_DIR: workspaceDir,
   });
   const envFile = await readFile(join(sandbox.rootDir, ".env"), "utf8");
 
@@ -259,111 +259,111 @@ describe("scripts/docker/setup.sh", () => {
     const activeSandbox = requireSandbox(sandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_DOCKER_APT_PACKAGES: "curl wget",
-      OPENCLAW_EXTRA_MOUNTS: undefined,
-      OPENCLAW_HOME_VOLUME: "openclaw-home",
+      RECALL_DOCKER_APT_PACKAGES: "curl wget",
+      RECALL_EXTRA_MOUNTS: undefined,
+      RECALL_HOME_VOLUME: "recall-home",
     });
     expect(result.status).toBe(0);
     const envFile = await readFile(join(activeSandbox.rootDir, ".env"), "utf8");
-    expect(envFile).toContain("OPENCLAW_IMAGE_APT_PACKAGES=curl wget");
-    expect(envFile).toContain("OPENCLAW_EXTRA_MOUNTS=");
-    expect(envFile).toContain("OPENCLAW_HOME_VOLUME=openclaw-home"); // pragma: allowlist secret
-    expect(envFile).toContain("OPENCLAW_DISABLE_BONJOUR=");
+    expect(envFile).toContain("RECALL_IMAGE_APT_PACKAGES=curl wget");
+    expect(envFile).toContain("RECALL_EXTRA_MOUNTS=");
+    expect(envFile).toContain("RECALL_HOME_VOLUME=recall-home"); // pragma: allowlist secret
+    expect(envFile).toContain("RECALL_DISABLE_BONJOUR=");
     expect(envFile).toContain(
-      `OPENCLAW_AUTH_PROFILE_SECRET_DIR=${join(activeSandbox.rootDir, "auth-profile-secrets")}`,
+      `RECALL_AUTH_PROFILE_SECRET_DIR=${join(activeSandbox.rootDir, "auth-profile-secrets")}`,
     );
     const extraCompose = await readFile(
       join(activeSandbox.rootDir, "docker-compose.extra.yml"),
       "utf8",
     );
-    expect(extraCompose).toContain("openclaw-home:/home/node");
+    expect(extraCompose).toContain("recall-home:/home/node");
     expect(extraCompose).toContain(
-      `${join(activeSandbox.rootDir, "auth-profile-secrets")}:/home/node/.config/openclaw`,
+      `${join(activeSandbox.rootDir, "auth-profile-secrets")}:/home/node/.config/recall`,
     );
     expect(extraCompose).toContain("volumes:");
-    expect(extraCompose).toContain("openclaw-home:");
+    expect(extraCompose).toContain("recall-home:");
     const log = await readDockerLog(activeSandbox);
-    expect(log).toContain("--build-arg OPENCLAW_IMAGE_APT_PACKAGES=curl wget");
+    expect(log).toContain("--build-arg RECALL_IMAGE_APT_PACKAGES=curl wget");
     expect(log).toContain(
-      `run --rm --no-deps ${prestartContainerEnvFlags} --entrypoint node openclaw-gateway dist/index.js onboard --mode local --no-install-daemon --gateway-auth token --gateway-token-ref-env OPENCLAW_GATEWAY_TOKEN --skip-ui --suppress-gateway-token-output`,
+      `run --rm --no-deps ${prestartContainerEnvFlags} --entrypoint node recall-gateway dist/index.js onboard --mode local --no-install-daemon --gateway-auth token --gateway-token-ref-env RECALL_GATEWAY_TOKEN --skip-ui --suppress-gateway-token-output`,
     );
     expect(result.stdout).toContain("Gateway token: stored in Docker environment/config");
     expect(result.stdout).not.toContain("test-token");
     expect(result.stdout).not.toContain("#token=");
     expect(log).toContain(
-      `run --rm --no-deps ${prestartContainerEnvFlags} --entrypoint node openclaw-gateway dist/index.js config set --batch-json [{"path":"gateway.mode","value":"local"},{"path":"gateway.bind","value":"lan"},{"path":"gateway.controlUi.allowedOrigins","value":["http://localhost:18789","http://127.0.0.1:18789"]}]`,
+      `run --rm --no-deps ${prestartContainerEnvFlags} --entrypoint node recall-gateway dist/index.js config set --batch-json [{"path":"gateway.mode","value":"local"},{"path":"gateway.bind","value":"lan"},{"path":"gateway.controlUi.allowedOrigins","value":["http://localhost:18789","http://127.0.0.1:18789"]}]`,
     );
-    expect(log).not.toContain("run --rm openclaw-cli onboard --mode local --no-install-daemon");
+    expect(log).not.toContain("run --rm recall-cli onboard --mode local --no-install-daemon");
   });
 
   it("persists explicit Docker Bonjour opt-in overrides", async () => {
     const activeSandbox = requireSandbox(sandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_DISABLE_BONJOUR: "0",
+      RECALL_DISABLE_BONJOUR: "0",
     });
 
     expect(result.status).toBe(0);
     const envFile = await readFile(join(activeSandbox.rootDir, ".env"), "utf8");
-    expect(envFile).toContain("OPENCLAW_DISABLE_BONJOUR=0");
+    expect(envFile).toContain("RECALL_DISABLE_BONJOUR=0");
   });
 
-  it("normalizes legacy OPENCLAW_DOCKER_APT_PACKAGES into OPENCLAW_IMAGE_APT_PACKAGES", async () => {
+  it("normalizes legacy RECALL_DOCKER_APT_PACKAGES into RECALL_IMAGE_APT_PACKAGES", async () => {
     const activeSandbox = requireSandbox(sandbox);
     await resetDockerLog(activeSandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_DOCKER_APT_PACKAGES: "curl wget",
+      RECALL_DOCKER_APT_PACKAGES: "curl wget",
     });
     expect(result.status).toBe(0);
 
     const envFile = await readFile(join(activeSandbox.rootDir, ".env"), "utf8");
-    expect(envFile).toContain("OPENCLAW_IMAGE_APT_PACKAGES=curl wget");
-    expect(envFile).not.toContain("OPENCLAW_DOCKER_APT_PACKAGES");
+    expect(envFile).toContain("RECALL_IMAGE_APT_PACKAGES=curl wget");
+    expect(envFile).not.toContain("RECALL_DOCKER_APT_PACKAGES");
 
     const log = await readDockerLog(activeSandbox);
-    expect(log).toContain("--build-arg OPENCLAW_IMAGE_APT_PACKAGES=curl wget");
-    expect(log).not.toContain("--build-arg OPENCLAW_DOCKER_APT_PACKAGES");
+    expect(log).toContain("--build-arg RECALL_IMAGE_APT_PACKAGES=curl wget");
+    expect(log).not.toContain("--build-arg RECALL_DOCKER_APT_PACKAGES");
   });
 
-  it("prefers OPENCLAW_IMAGE_APT_PACKAGES over legacy OPENCLAW_DOCKER_APT_PACKAGES", async () => {
+  it("prefers RECALL_IMAGE_APT_PACKAGES over legacy RECALL_DOCKER_APT_PACKAGES", async () => {
     const activeSandbox = requireSandbox(sandbox);
     await resetDockerLog(activeSandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_IMAGE_APT_PACKAGES: "curl wget httpie",
-      OPENCLAW_DOCKER_APT_PACKAGES: "curl wget",
+      RECALL_IMAGE_APT_PACKAGES: "curl wget httpie",
+      RECALL_DOCKER_APT_PACKAGES: "curl wget",
     });
     expect(result.status).toBe(0);
 
     const envFile = await readFile(join(activeSandbox.rootDir, ".env"), "utf8");
-    expect(envFile).toContain("OPENCLAW_IMAGE_APT_PACKAGES=curl wget httpie");
-    expect(envFile).not.toContain("OPENCLAW_DOCKER_APT_PACKAGES");
+    expect(envFile).toContain("RECALL_IMAGE_APT_PACKAGES=curl wget httpie");
+    expect(envFile).not.toContain("RECALL_DOCKER_APT_PACKAGES");
 
     const log = await readDockerLog(activeSandbox);
-    expect(log).toContain("--build-arg OPENCLAW_IMAGE_APT_PACKAGES=curl wget httpie");
-    expect(log).not.toMatch(/--build-arg OPENCLAW_IMAGE_APT_PACKAGES=curl wget(?! httpie)/);
+    expect(log).toContain("--build-arg RECALL_IMAGE_APT_PACKAGES=curl wget httpie");
+    expect(log).not.toMatch(/--build-arg RECALL_IMAGE_APT_PACKAGES=curl wget(?! httpie)/);
   });
 
-  it("explicitly empty OPENCLAW_IMAGE_APT_PACKAGES suppresses legacy fallback", async () => {
+  it("explicitly empty RECALL_IMAGE_APT_PACKAGES suppresses legacy fallback", async () => {
     const activeSandbox = requireSandbox(sandbox);
     await resetDockerLog(activeSandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_IMAGE_APT_PACKAGES: "",
-      OPENCLAW_DOCKER_APT_PACKAGES: "curl wget",
+      RECALL_IMAGE_APT_PACKAGES: "",
+      RECALL_DOCKER_APT_PACKAGES: "curl wget",
     });
     expect(result.status).toBe(0);
 
     const envFile = await readFile(join(activeSandbox.rootDir, ".env"), "utf8");
-    expect(envFile).toContain("OPENCLAW_IMAGE_APT_PACKAGES=");
+    expect(envFile).toContain("RECALL_IMAGE_APT_PACKAGES=");
     expect(envFile).not.toContain("curl wget");
 
     const log = await readDockerLog(activeSandbox);
-    expect(log).not.toContain("--build-arg OPENCLAW_IMAGE_APT_PACKAGES=curl wget");
+    expect(log).not.toContain("--build-arg RECALL_IMAGE_APT_PACKAGES=curl wget");
   });
 
-  it("avoids shared-network openclaw-cli before the gateway is started", async () => {
+  it("avoids shared-network recall-cli before the gateway is started", async () => {
     const activeSandbox = requireSandbox(sandbox);
 
     await resetDockerLog(activeSandbox);
@@ -386,10 +386,10 @@ describe("scripts/docker/setup.sh", () => {
 
     await resetDockerLog(activeSandbox);
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_HOME: "/mnt/c/Users/Trevor",
-      OPENCLAW_STATE_DIR: "/mnt/c/Users/Trevor/.openclaw",
-      OPENCLAW_CONFIG_PATH: "/mnt/c/Users/Trevor/.openclaw/openclaw.json",
-      OPENCLAW_SKIP_ONBOARDING: "1",
+      RECALL_HOME: "/mnt/c/Users/Trevor",
+      RECALL_STATE_DIR: "/mnt/c/Users/Trevor/.recall",
+      RECALL_CONFIG_PATH: "/mnt/c/Users/Trevor/.tryrecall/recall-agents.json",
+      RECALL_SKIP_ONBOARDING: "1",
     });
     expect(result.status).toBe(0);
 
@@ -417,7 +417,7 @@ describe("scripts/docker/setup.sh", () => {
     await resetDockerLog(activeSandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_SANDBOX: "1",
+      RECALL_SANDBOX: "1",
     });
 
     expect(result.status).toBe(0);
@@ -438,8 +438,8 @@ describe("scripts/docker/setup.sh", () => {
     const workspaceDir = join(activeSandbox.rootDir, "workspace-identity");
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_CONFIG_DIR: configDir,
-      OPENCLAW_WORKSPACE_DIR: workspaceDir,
+      RECALL_CONFIG_DIR: configDir,
+      RECALL_WORKSPACE_DIR: workspaceDir,
     });
 
     expect(result.status).toBe(0);
@@ -447,16 +447,16 @@ describe("scripts/docker/setup.sh", () => {
     expect(identityDirStat.isDirectory()).toBe(true);
   });
 
-  it("writes OPENCLAW_TZ into .env when given a real IANA timezone", async () => {
+  it("writes RECALL_TZ into .env when given a real IANA timezone", async () => {
     const activeSandbox = requireSandbox(sandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_TZ: "Asia/Shanghai",
+      RECALL_TZ: "Asia/Shanghai",
     });
 
     expect(result.status).toBe(0);
     const envFile = await readFile(join(activeSandbox.rootDir, ".env"), "utf8");
-    expect(envFile).toContain("OPENCLAW_TZ=Asia/Shanghai");
+    expect(envFile).toContain("RECALL_TZ=Asia/Shanghai");
   });
 
   it("precreates agent data dirs to avoid EACCES in container", async () => {
@@ -465,8 +465,8 @@ describe("scripts/docker/setup.sh", () => {
     const workspaceDir = join(activeSandbox.rootDir, "workspace-agent-dirs");
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_CONFIG_DIR: configDir,
-      OPENCLAW_WORKSPACE_DIR: workspaceDir,
+      RECALL_CONFIG_DIR: configDir,
+      RECALL_WORKSPACE_DIR: workspaceDir,
     });
 
     expect(result.status).toBe(0);
@@ -481,7 +481,7 @@ describe("scripts/docker/setup.sh", () => {
     const onboardIdx = log.indexOf("onboard");
     expect(chownIdx).toBeGreaterThanOrEqual(0);
     expect(onboardIdx).toBeGreaterThan(chownIdx);
-    expect(log).toContain("run --rm --no-deps --user root --entrypoint sh openclaw-gateway -c");
+    expect(log).toContain("run --rm --no-deps --user root --entrypoint sh recall-gateway -c");
   });
 
   it("precreates auth profile secret key dir outside the mounted state dir", async () => {
@@ -491,9 +491,9 @@ describe("scripts/docker/setup.sh", () => {
     const secretDir = join(activeSandbox.rootDir, "auth-profile-secret-key");
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_CONFIG_DIR: configDir,
-      OPENCLAW_WORKSPACE_DIR: workspaceDir,
-      OPENCLAW_AUTH_PROFILE_SECRET_DIR: secretDir,
+      RECALL_CONFIG_DIR: configDir,
+      RECALL_WORKSPACE_DIR: workspaceDir,
+      RECALL_AUTH_PROFILE_SECRET_DIR: secretDir,
     });
 
     expect(result.status).toBe(0);
@@ -502,31 +502,31 @@ describe("scripts/docker/setup.sh", () => {
     expect(secretDir.startsWith(`${configDir}/`)).toBe(false);
 
     const log = await readDockerLog(activeSandbox);
-    expect(log).toContain("find /home/node/.config/openclaw -xdev");
+    expect(log).toContain("find /home/node/.config/recall -xdev");
   });
 
-  it("reuses existing config token when OPENCLAW_GATEWAY_TOKEN is unset", async () => {
+  it("reuses existing config token when RECALL_GATEWAY_TOKEN is unset", async () => {
     const activeSandbox = requireSandbox(sandbox);
     const { result, envFile } = await runDockerSetupWithUnsetGatewayToken(
       activeSandbox,
       "token-reuse",
       async (configDir) => {
         await writeFile(
-          join(configDir, "openclaw.json"),
+          join(configDir, "recall.json"),
           JSON.stringify({ gateway: { auth: { mode: "token", token: "config-token-123" } } }),
         );
       },
     );
 
     expect(result.status).toBe(0);
-    expect(envFile).toContain("OPENCLAW_GATEWAY_TOKEN=config-token-123"); // pragma: allowlist secret
+    expect(envFile).toContain("RECALL_GATEWAY_TOKEN=config-token-123"); // pragma: allowlist secret
   });
 
-  it("reuses existing .env token when OPENCLAW_GATEWAY_TOKEN and config token are unset", async () => {
+  it("reuses existing .env token when RECALL_GATEWAY_TOKEN and config token are unset", async () => {
     const activeSandbox = requireSandbox(sandbox);
     await writeFile(
       join(activeSandbox.rootDir, ".env"),
-      "OPENCLAW_GATEWAY_TOKEN=dotenv-token-123\nOPENCLAW_GATEWAY_PORT=18789\n", // pragma: allowlist secret
+      "RECALL_GATEWAY_TOKEN=dotenv-token-123\nRECALL_GATEWAY_PORT=18789\n", // pragma: allowlist secret
     );
     const { result, envFile } = await runDockerSetupWithUnsetGatewayToken(
       activeSandbox,
@@ -534,7 +534,7 @@ describe("scripts/docker/setup.sh", () => {
     );
 
     expect(result.status).toBe(0);
-    expect(envFile).toContain("OPENCLAW_GATEWAY_TOKEN=dotenv-token-123"); // pragma: allowlist secret
+    expect(envFile).toContain("RECALL_GATEWAY_TOKEN=dotenv-token-123"); // pragma: allowlist secret
     expect(result.stderr).toBe("");
   });
 
@@ -543,9 +543,9 @@ describe("scripts/docker/setup.sh", () => {
     await writeFile(
       join(activeSandbox.rootDir, ".env"),
       [
-        "OPENCLAW_GATEWAY_TOKEN=",
-        "OPENCLAW_GATEWAY_TOKEN=first-token",
-        "OPENCLAW_GATEWAY_TOKEN=last=token=value\r", // pragma: allowlist secret
+        "RECALL_GATEWAY_TOKEN=",
+        "RECALL_GATEWAY_TOKEN=first-token",
+        "RECALL_GATEWAY_TOKEN=last=token=value\r", // pragma: allowlist secret
       ].join("\n"),
     );
     const { result, envFile } = await runDockerSetupWithUnsetGatewayToken(
@@ -554,26 +554,26 @@ describe("scripts/docker/setup.sh", () => {
     );
 
     expect(result.status).toBe(0);
-    expect(envFile).toContain("OPENCLAW_GATEWAY_TOKEN=last=token=value"); // pragma: allowlist secret
-    expect(envFile).not.toContain("OPENCLAW_GATEWAY_TOKEN=first-token");
+    expect(envFile).toContain("RECALL_GATEWAY_TOKEN=last=token=value"); // pragma: allowlist secret
+    expect(envFile).not.toContain("RECALL_GATEWAY_TOKEN=first-token");
     expect(envFile).not.toContain("\r");
   });
 
-  it("treats OPENCLAW_SANDBOX=0 as disabled", async () => {
+  it("treats RECALL_SANDBOX=0 as disabled", async () => {
     const activeSandbox = requireSandbox(sandbox);
     await resetDockerLog(activeSandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_SANDBOX: "0",
+      RECALL_SANDBOX: "0",
     });
 
     expect(result.status).toBe(0);
     const envFile = await readFile(join(activeSandbox.rootDir, ".env"), "utf8");
-    expect(envFile).toContain("OPENCLAW_SANDBOX=");
+    expect(envFile).toContain("RECALL_SANDBOX=");
 
     const log = await readDockerLog(activeSandbox);
-    expect(log).toContain("--build-arg OPENCLAW_INSTALL_DOCKER_CLI=");
-    expect(log).not.toContain("--build-arg OPENCLAW_INSTALL_DOCKER_CLI=1");
+    expect(log).toContain("--build-arg RECALL_INSTALL_DOCKER_CLI=");
+    expect(log).not.toContain("--build-arg RECALL_INSTALL_DOCKER_CLI=1");
     expect(log).toContain("config set agents.defaults.sandbox.mode off");
   });
 
@@ -582,12 +582,12 @@ describe("scripts/docker/setup.sh", () => {
     await resetDockerLog(activeSandbox);
     await writeFile(
       join(activeSandbox.rootDir, "docker-compose.sandbox.yml"),
-      "services:\n  openclaw-gateway:\n    volumes:\n      - /var/run/docker.sock:/var/run/docker.sock\n",
+      "services:\n  recall-gateway:\n    volumes:\n      - /var/run/docker.sock:/var/run/docker.sock\n",
     );
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_SANDBOX: "1",
-      DOCKER_STUB_FAIL_MATCH: "--entrypoint docker openclaw-gateway --version",
+      RECALL_SANDBOX: "1",
+      DOCKER_STUB_FAIL_MATCH: "--entrypoint docker recall-gateway --version",
     });
 
     expect(result.status).toBe(0);
@@ -604,8 +604,8 @@ describe("scripts/docker/setup.sh", () => {
 
     await withUnixSocket(socketPath, async () => {
       const result = runDockerSetup(activeSandbox, {
-        OPENCLAW_SANDBOX: "1",
-        OPENCLAW_DOCKER_SOCKET: socketPath,
+        RECALL_SANDBOX: "1",
+        RECALL_DOCKER_SOCKET: socketPath,
         DOCKER_STUB_FAIL_MATCH: "config set agents.defaults.sandbox.scope",
       });
 
@@ -619,70 +619,70 @@ describe("scripts/docker/setup.sh", () => {
       );
       expect(gatewayStarts).toHaveLength(2);
       expect(log).toContain(
-        "run --rm --no-deps openclaw-cli config set agents.defaults.sandbox.mode non-main",
+        "run --rm --no-deps recall-cli config set agents.defaults.sandbox.mode non-main",
       );
       expect(log).toContain("config set agents.defaults.sandbox.mode off");
       const forceRecreateLine = log
         .split("\n")
-        .find((line) => line.includes("up -d --force-recreate openclaw-gateway"));
+        .find((line) => line.includes("up -d --force-recreate recall-gateway"));
       expect(forceRecreateLine).toBe(
-        `compose compose -f ${join(activeSandbox.rootDir, "docker-compose.yml")} up -d --force-recreate openclaw-gateway`,
+        `compose compose -f ${join(activeSandbox.rootDir, "docker-compose.yml")} up -d --force-recreate recall-gateway`,
       );
       expect(forceRecreateLine).not.toContain("docker-compose.sandbox.yml");
       await expectMissingPath(join(activeSandbox.rootDir, "docker-compose.sandbox.yml"));
     });
   });
 
-  it("rejects injected multiline OPENCLAW_EXTRA_MOUNTS values", () => {
+  it("rejects injected multiline RECALL_EXTRA_MOUNTS values", () => {
     const activeSandbox = requireSandbox(sandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_EXTRA_MOUNTS: "/tmp:/tmp\n  evil-service:\n    image: alpine",
+      RECALL_EXTRA_MOUNTS: "/tmp:/tmp\n  evil-service:\n    image: alpine",
     });
 
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("OPENCLAW_EXTRA_MOUNTS cannot contain control characters");
+    expect(result.stderr).toContain("RECALL_EXTRA_MOUNTS cannot contain control characters");
   });
 
-  it("rejects invalid OPENCLAW_EXTRA_MOUNTS mount format", () => {
+  it("rejects invalid RECALL_EXTRA_MOUNTS mount format", () => {
     const activeSandbox = requireSandbox(sandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_EXTRA_MOUNTS: "bad mount spec",
+      RECALL_EXTRA_MOUNTS: "bad mount spec",
     });
 
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain("Invalid mount format");
   });
 
-  it("rejects invalid OPENCLAW_HOME_VOLUME names", () => {
+  it("rejects invalid RECALL_HOME_VOLUME names", () => {
     const activeSandbox = requireSandbox(sandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_HOME_VOLUME: "bad name",
+      RECALL_HOME_VOLUME: "bad name",
     });
 
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("OPENCLAW_HOME_VOLUME must match");
+    expect(result.stderr).toContain("RECALL_HOME_VOLUME must match");
   });
 
-  it("rejects OPENCLAW_TZ values that are not present in zoneinfo", () => {
+  it("rejects RECALL_TZ values that are not present in zoneinfo", () => {
     const activeSandbox = requireSandbox(sandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_TZ: "Nope/Bad",
+      RECALL_TZ: "Nope/Bad",
     });
 
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("OPENCLAW_TZ must match a timezone in /usr/share/zoneinfo");
+    expect(result.stderr).toContain("RECALL_TZ must match a timezone in /usr/share/zoneinfo");
   });
 
-  it("skips onboarding when OPENCLAW_SKIP_ONBOARDING is set", async () => {
+  it("skips onboarding when RECALL_SKIP_ONBOARDING is set", async () => {
     const activeSandbox = requireSandbox(sandbox);
     await resetDockerLog(activeSandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_SKIP_ONBOARDING: "1",
+      RECALL_SKIP_ONBOARDING: "1",
     });
 
     expect(result.status).toBe(0);
@@ -693,24 +693,24 @@ describe("scripts/docker/setup.sh", () => {
     expect(log).toContain('"path":"gateway.mode","value":"local"');
     expect(log).toContain('"path":"gateway.bind","value":"lan"');
     const envFile = await readFile(join(activeSandbox.rootDir, ".env"), "utf8");
-    expect(envFile).toContain("OPENCLAW_SKIP_ONBOARDING=1");
+    expect(envFile).toContain("RECALL_SKIP_ONBOARDING=1");
   });
 
-  it("treats OPENCLAW_SKIP_ONBOARDING=0 as disabled and runs onboarding", async () => {
+  it("treats RECALL_SKIP_ONBOARDING=0 as disabled and runs onboarding", async () => {
     const activeSandbox = requireSandbox(sandbox);
     await resetDockerLog(activeSandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      OPENCLAW_SKIP_ONBOARDING: "0",
+      RECALL_SKIP_ONBOARDING: "0",
     });
 
     expect(result.status).toBe(0);
     const log = await readDockerLog(activeSandbox);
     expect(log).toContain(
-      "onboard --mode local --no-install-daemon --gateway-auth token --gateway-token-ref-env OPENCLAW_GATEWAY_TOKEN --skip-ui --suppress-gateway-token-output",
+      "onboard --mode local --no-install-daemon --gateway-auth token --gateway-token-ref-env RECALL_GATEWAY_TOKEN --skip-ui --suppress-gateway-token-output",
     );
     const envFile = await readFile(join(activeSandbox.rootDir, ".env"), "utf8");
-    expect(envFile).toMatch(/OPENCLAW_SKIP_ONBOARDING=\n/);
+    expect(envFile).toMatch(/RECALL_SKIP_ONBOARDING=\n/);
   });
 
   it("avoids associative arrays so the script remains Bash 3.2-compatible", async () => {
@@ -752,19 +752,19 @@ describe("scripts/docker/setup.sh", () => {
   it("keeps docker-compose gateway Bonjour advertising in auto mode by default", async () => {
     const compose = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
     expect(
-      compose.match(/OPENCLAW_DISABLE_BONJOUR: \$\{OPENCLAW_DISABLE_BONJOUR:-\}/g),
+      compose.match(/RECALL_DISABLE_BONJOUR: \$\{RECALL_DISABLE_BONJOUR:-\}/g),
     ).toHaveLength(1);
   });
 
   it("keeps docker-compose CLI network namespace settings in sync", async () => {
     const compose = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
-    expect(compose).toContain('network_mode: "service:openclaw-gateway"');
-    expect(compose).toContain("depends_on:\n      - openclaw-gateway");
+    expect(compose).toContain('network_mode: "service:recall-gateway"');
+    expect(compose).toContain("depends_on:\n      - recall-gateway");
   });
 
   it("keeps docker-compose gateway token env defaults aligned across services", async () => {
     const compose = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
-    expect(compose.match(/OPENCLAW_GATEWAY_TOKEN: \$\{OPENCLAW_GATEWAY_TOKEN:-\}/g)).toHaveLength(
+    expect(compose.match(/RECALL_GATEWAY_TOKEN: \$\{RECALL_GATEWAY_TOKEN:-\}/g)).toHaveLength(
       2,
     );
   });
@@ -773,7 +773,7 @@ describe("scripts/docker/setup.sh", () => {
     const compose = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
     expect(
       compose.split(
-        "${OPENCLAW_AUTH_PROFILE_SECRET_DIR:-${HOME:-/tmp}/.openclaw-auth-profile-secrets}:/home/node/.config/openclaw",
+        "${RECALL_AUTH_PROFILE_SECRET_DIR:-${HOME:-/tmp}/.recall-auth-profile-secrets}:/home/node/.config/recall",
       ),
     ).toHaveLength(3);
   });
@@ -785,7 +785,7 @@ describe("scripts/docker/setup.sh", () => {
 
   it("keeps docker-compose timezone env defaults aligned across services", async () => {
     const compose = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
-    expect(compose.match(/TZ: \$\{OPENCLAW_TZ:-UTC\}/g)).toHaveLength(2);
+    expect(compose.match(/TZ: \$\{RECALL_TZ:-UTC\}/g)).toHaveLength(2);
   });
 
   it("pins container-side state, workspace, and config dirs on both services so host .env paths cannot leak (#77436)", async () => {
@@ -793,29 +793,29 @@ describe("scripts/docker/setup.sh", () => {
     // Both gateway and CLI services must override env_file values with the
     // canonical container paths so host-style paths written to `.env` cannot
     // reach runtime code inside Linux Docker.
-    expect(compose.match(/OPENCLAW_HOME: \/home\/node$/gm)).toHaveLength(2);
-    expect(compose.match(/OPENCLAW_STATE_DIR: \/home\/node\/\.openclaw$/gm)).toHaveLength(2);
+    expect(compose.match(/RECALL_HOME: \/home\/node$/gm)).toHaveLength(2);
+    expect(compose.match(/RECALL_STATE_DIR: \/home\/node\/\.recall$/gm)).toHaveLength(2);
     expect(
-      compose.match(/OPENCLAW_CONFIG_PATH: \/home\/node\/\.openclaw\/openclaw\.json$/gm),
+      compose.match(/RECALL_CONFIG_PATH: \/home\/node\/\.recall\/recall\.json$/gm),
     ).toHaveLength(2);
-    expect(compose.match(/OPENCLAW_CONFIG_DIR: \/home\/node\/\.openclaw$/gm)).toHaveLength(2);
+    expect(compose.match(/RECALL_CONFIG_DIR: \/home\/node\/\.recall$/gm)).toHaveLength(2);
     expect(
-      compose.match(/OPENCLAW_WORKSPACE_DIR: \/home\/node\/\.openclaw\/workspace$/gm),
+      compose.match(/RECALL_WORKSPACE_DIR: \/home\/node\/\.recall\/workspace$/gm),
     ).toHaveLength(2);
   });
 
-  it("Dockerfile ARG OPENCLAW_IMAGE_APT_PACKAGES must not have a default value", async () => {
-    // If the ARG has a default (e.g. ARG OPENCLAW_IMAGE_APT_PACKAGES=""), Docker treats it as
+  it("Dockerfile ARG RECALL_IMAGE_APT_PACKAGES must not have a default value", async () => {
+    // If the ARG has a default (e.g. ARG RECALL_IMAGE_APT_PACKAGES=""), Docker treats it as
     // "set" even when no --build-arg is passed. That breaks the RUN fallback expression
-    // ${OPENCLAW_IMAGE_APT_PACKAGES-$OPENCLAW_DOCKER_APT_PACKAGES} because the variable is
-    // never truly unset, so legacy-only callers using --build-arg OPENCLAW_DOCKER_APT_PACKAGES
+    // ${RECALL_IMAGE_APT_PACKAGES-$RECALL_DOCKER_APT_PACKAGES} because the variable is
+    // never truly unset, so legacy-only callers using --build-arg RECALL_DOCKER_APT_PACKAGES
     // get nothing installed — a backward-compat regression.
     const dockerfile = await readFile(join(repoRoot, "Dockerfile"), "utf8");
     const argLine = dockerfile
       .split("\n")
-      .find((line) => line.startsWith("ARG OPENCLAW_IMAGE_APT_PACKAGES"));
+      .find((line) => line.startsWith("ARG RECALL_IMAGE_APT_PACKAGES"));
     expect(argLine).toBeDefined();
-    // Must be bare `ARG OPENCLAW_IMAGE_APT_PACKAGES` with no default assignment
-    expect(argLine).toBe("ARG OPENCLAW_IMAGE_APT_PACKAGES");
+    // Must be bare `ARG RECALL_IMAGE_APT_PACKAGES` with no default assignment
+    expect(argLine).toBe("ARG RECALL_IMAGE_APT_PACKAGES");
   });
 });

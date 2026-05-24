@@ -1,6 +1,6 @@
-import { resolveDirectStatusReplyForSession } from "openclaw/plugin-sdk/command-status-runtime";
-import * as pluginRuntime from "openclaw/plugin-sdk/plugin-runtime";
-import { dispatchReplyWithDispatcher } from "openclaw/plugin-sdk/reply-dispatch-runtime";
+import { resolveDirectStatusReplyForSession } from "recall/plugin-sdk/command-status-runtime";
+import * as pluginRuntime from "recall/plugin-sdk/plugin-runtime";
+import { dispatchReplyWithDispatcher } from "recall/plugin-sdk/reply-dispatch-runtime";
 import { resolveDiscordNativeInteractionRouteState } from "./native-command-route.js";
 
 export const nativeCommandRuntime = {

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
-import { normalizeProviderId } from "openclaw/plugin-sdk/provider-model-shared";
-import { coerceSecretRef } from "openclaw/plugin-sdk/secret-input";
+import { normalizeProviderId } from "recall/plugin-sdk/provider-model-shared";
+import { coerceSecretRef } from "recall/plugin-sdk/secret-input";
 
 export type PolicyAttestation = {
   readonly checkedAt: string;
@@ -256,7 +256,7 @@ export function scanPolicyChannels(cfg: Record<string, unknown>): readonly Polic
       } = {
         id,
         provider: id,
-        source: `oc://openclaw.config/channels/${id}`,
+        source: `oc://recall.config/channels/${id}`,
       };
       if (isRecord(value) && typeof value.enabled === "boolean") {
         entry.enabled = value.enabled;
@@ -280,7 +280,7 @@ export function scanPolicyMcpServers(
       } = {
         id,
         transport: mcpServerTransport(value),
-        source: `oc://openclaw.config/mcp/servers/${ocPathSegment(id)}`,
+        source: `oc://recall.config/mcp/servers/${ocPathSegment(id)}`,
       };
       if (isRecord(value)) {
         if (typeof value.command === "string") {
@@ -301,7 +301,7 @@ export function scanPolicyModelProviders(
     .toSorted((a, b) => a.localeCompare(b))
     .map((id) => ({
       id: normalizeProviderId(id),
-      source: `oc://openclaw.config/models/providers/${id}`,
+      source: `oc://recall.config/models/providers/${id}`,
     }));
 }
 
@@ -310,7 +310,7 @@ export function scanPolicyModelRefs(
 ): readonly PolicyModelRefEvidence[] {
   const refs: PolicyModelRefEvidence[] = [];
   if (isRecord(cfg.agents)) {
-    collectModelRefsFromRecord(refs, cfg.agents, "oc://openclaw.config/agents");
+    collectModelRefsFromRecord(refs, cfg.agents, "oc://recall.config/agents");
     collectModelRefsFromAgentAllowlist(refs, cfg.agents);
   }
   return refs.toSorted(
@@ -324,37 +324,37 @@ export function scanPolicyNetwork(cfg: Record<string, unknown>): readonly Policy
       cfg,
       "browser-private-network",
       ["browser", "ssrfPolicy", "dangerouslyAllowPrivateNetwork"],
-      "oc://openclaw.config/browser/ssrfPolicy/dangerouslyAllowPrivateNetwork",
+      "oc://recall.config/browser/ssrfPolicy/dangerouslyAllowPrivateNetwork",
     ),
     networkBooleanEvidence(
       cfg,
       "browser-private-network-legacy",
       ["browser", "ssrfPolicy", "allowPrivateNetwork"],
-      "oc://openclaw.config/browser/ssrfPolicy/allowPrivateNetwork",
+      "oc://recall.config/browser/ssrfPolicy/allowPrivateNetwork",
     ),
     networkBooleanEvidence(
       cfg,
       "web-fetch-private-network",
       ["tools", "web", "fetch", "ssrfPolicy", "dangerouslyAllowPrivateNetwork"],
-      "oc://openclaw.config/tools/web/fetch/ssrfPolicy/dangerouslyAllowPrivateNetwork",
+      "oc://recall.config/tools/web/fetch/ssrfPolicy/dangerouslyAllowPrivateNetwork",
     ),
     networkBooleanEvidence(
       cfg,
       "web-fetch-private-network-legacy",
       ["tools", "web", "fetch", "ssrfPolicy", "allowPrivateNetwork"],
-      "oc://openclaw.config/tools/web/fetch/ssrfPolicy/allowPrivateNetwork",
+      "oc://recall.config/tools/web/fetch/ssrfPolicy/allowPrivateNetwork",
     ),
     networkBooleanEvidence(
       cfg,
       "web-fetch-rfc2544-benchmark-range",
       ["tools", "web", "fetch", "ssrfPolicy", "allowRfc2544BenchmarkRange"],
-      "oc://openclaw.config/tools/web/fetch/ssrfPolicy/allowRfc2544BenchmarkRange",
+      "oc://recall.config/tools/web/fetch/ssrfPolicy/allowRfc2544BenchmarkRange",
     ),
     networkBooleanEvidence(
       cfg,
       "web-fetch-ipv6-unique-local-range",
       ["tools", "web", "fetch", "ssrfPolicy", "allowIpv6UniqueLocalRange"],
-      "oc://openclaw.config/tools/web/fetch/ssrfPolicy/allowIpv6UniqueLocalRange",
+      "oc://recall.config/tools/web/fetch/ssrfPolicy/allowIpv6UniqueLocalRange",
     ),
   ].filter((entry): entry is PolicyNetworkEvidence => entry !== undefined);
 }
@@ -373,7 +373,7 @@ export function scanPolicyGatewayExposure(
   entries.push({
     id: bind === undefined ? "gateway-bind-default" : "gateway-bind",
     kind: "bind",
-    source: "oc://openclaw.config/gateway/bind",
+    source: "oc://recall.config/gateway/bind",
     value: bind ?? (tailscaleForcesLoopback ? "loopback" : "runtime-default"),
     nonLoopback:
       bind === undefined
@@ -387,7 +387,7 @@ export function scanPolicyGatewayExposure(
     entries.push({
       id: "gateway-custom-bind-host",
       kind: "bind",
-      source: "oc://openclaw.config/gateway/customBindHost",
+      source: "oc://recall.config/gateway/customBindHost",
       value: customBindHost,
       nonLoopback: isRuntimeNonLoopbackCustomBindHost(customBindHost),
     });
@@ -397,14 +397,14 @@ export function scanPolicyGatewayExposure(
   entries.push({
     id: "gateway-auth-mode",
     kind: "auth",
-    source: "oc://openclaw.config/gateway/auth/mode",
+    source: "oc://recall.config/gateway/auth/mode",
     value: typeof auth.mode === "string" ? auth.mode : "token",
     explicit: typeof auth.mode === "string",
   });
   entries.push({
     id: "gateway-auth-rate-limit",
     kind: "authRateLimit",
-    source: "oc://openclaw.config/gateway/auth/rateLimit",
+    source: "oc://recall.config/gateway/auth/rateLimit",
     value: isRecord(auth.rateLimit),
     explicit: isRecord(auth.rateLimit),
   });
@@ -415,35 +415,35 @@ export function scanPolicyGatewayExposure(
     "gateway-control-ui-enabled",
     "controlUi",
     controlUi.enabled,
-    "oc://openclaw.config/gateway/controlUi/enabled",
+    "oc://recall.config/gateway/controlUi/enabled",
   );
   pushGatewayBooleanEvidence(
     entries,
     "gateway-control-ui-insecure-auth",
     "controlUi",
     controlUi.allowInsecureAuth,
-    "oc://openclaw.config/gateway/controlUi/allowInsecureAuth",
+    "oc://recall.config/gateway/controlUi/allowInsecureAuth",
   );
   pushGatewayBooleanEvidence(
     entries,
     "gateway-control-ui-device-auth-disabled",
     "controlUi",
     controlUi.dangerouslyDisableDeviceAuth,
-    "oc://openclaw.config/gateway/controlUi/dangerouslyDisableDeviceAuth",
+    "oc://recall.config/gateway/controlUi/dangerouslyDisableDeviceAuth",
   );
   pushGatewayBooleanEvidence(
     entries,
     "gateway-control-ui-host-origin-fallback",
     "controlUi",
     controlUi.dangerouslyAllowHostHeaderOriginFallback,
-    "oc://openclaw.config/gateway/controlUi/dangerouslyAllowHostHeaderOriginFallback",
+    "oc://recall.config/gateway/controlUi/dangerouslyAllowHostHeaderOriginFallback",
   );
 
   if (typeof tailscale.mode === "string") {
     entries.push({
       id: "gateway-tailscale-mode",
       kind: "tailscale",
-      source: "oc://openclaw.config/gateway/tailscale/mode",
+      source: "oc://recall.config/gateway/tailscale/mode",
       value: tailscale.mode,
     });
   }
@@ -451,7 +451,7 @@ export function scanPolicyGatewayExposure(
     entries.push({
       id: "gateway-tailscale-preserve-funnel",
       kind: "tailscale",
-      source: "oc://openclaw.config/gateway/tailscale/preserveFunnel",
+      source: "oc://recall.config/gateway/tailscale/preserveFunnel",
       value: "funnel",
     });
   }
@@ -461,14 +461,14 @@ export function scanPolicyGatewayExposure(
     entries.push({
       id: "gateway-mode-remote",
       kind: "remote",
-      source: "oc://openclaw.config/gateway/mode",
+      source: "oc://recall.config/gateway/mode",
       value: "remote",
     });
     if (typeof remote.url === "string" && remote.url.trim() !== "") {
       entries.push({
         id: "gateway-remote-url",
         kind: "remote",
-        source: "oc://openclaw.config/gateway/remote/url",
+        source: "oc://recall.config/gateway/remote/url",
         value: true,
       });
     }
@@ -496,10 +496,10 @@ export function scanPolicyAgentWorkspace(
     inheritedSandbox: {},
     tools: defaultTools,
     inheritedTools: {},
-    workspaceSourceBase: "oc://openclaw.config/agents/defaults",
-    inheritedWorkspaceSourceBase: "oc://openclaw.config/agents/defaults",
-    toolsSourceBase: "oc://openclaw.config/tools",
-    inheritedToolsSourceBase: "oc://openclaw.config/tools",
+    workspaceSourceBase: "oc://recall.config/agents/defaults",
+    inheritedWorkspaceSourceBase: "oc://recall.config/agents/defaults",
+    toolsSourceBase: "oc://recall.config/tools",
+    inheritedToolsSourceBase: "oc://recall.config/tools",
   });
 
   const list = Array.isArray(agents.list) ? agents.list : [];
@@ -519,10 +519,10 @@ export function scanPolicyAgentWorkspace(
       inheritedSandbox: defaultSandbox,
       tools,
       inheritedTools: defaultTools,
-      workspaceSourceBase: `oc://openclaw.config/agents/list/#${index}`,
-      inheritedWorkspaceSourceBase: "oc://openclaw.config/agents/defaults",
-      toolsSourceBase: `oc://openclaw.config/agents/list/#${index}/tools`,
-      inheritedToolsSourceBase: "oc://openclaw.config/tools",
+      workspaceSourceBase: `oc://recall.config/agents/list/#${index}`,
+      inheritedWorkspaceSourceBase: "oc://recall.config/agents/defaults",
+      toolsSourceBase: `oc://recall.config/agents/list/#${index}/tools`,
+      inheritedToolsSourceBase: "oc://recall.config/tools",
     });
   });
   return entries.toSorted((a, b) => a.source.localeCompare(b.source) || a.id.localeCompare(b.id));
@@ -550,7 +550,7 @@ export function scanPolicyAuthProfiles(
         mode?: string;
       } = {
         id,
-        source: `oc://openclaw.config/auth/profiles/${ocPathSegment(id)}`,
+        source: `oc://recall.config/auth/profiles/${ocPathSegment(id)}`,
         validMetadata: isValidAuthProfileMetadata(value),
       };
       if (isRecord(value)) {
@@ -579,7 +579,7 @@ function scanPolicySecretProviders(cfg: Record<string, unknown>): readonly Polic
     } = {
       id,
       kind: "provider",
-      source: `oc://openclaw.config/secrets/providers/${ocPathSegment(id)}`,
+      source: `oc://recall.config/secrets/providers/${ocPathSegment(id)}`,
     };
     if (isRecord(value) && typeof value.source === "string") {
       entry.providerSource = value.source;
@@ -634,7 +634,7 @@ function collectSecretInputs(
 }
 
 function configPathSource(path: readonly string[]): string {
-  return `oc://openclaw.config/${path.map(ocPathSegment).join("/")}`;
+  return `oc://recall.config/${path.map(ocPathSegment).join("/")}`;
 }
 
 function isSecretInputPath(path: readonly string[]): boolean {
@@ -703,7 +703,7 @@ function pushAgentWorkspaceEvidence(
       ? `${params.workspaceSourceBase}/sandbox/mode`
       : inheritedSandboxMode !== undefined
         ? `${params.inheritedWorkspaceSourceBase}/sandbox/mode`
-        : "oc://openclaw.config/agents/defaults/sandbox/mode";
+        : "oc://recall.config/agents/defaults/sandbox/mode";
   const explicitWorkspaceAccess = readString(params.sandbox.workspaceAccess);
   const inheritedWorkspaceAccess = readString(params.inheritedSandbox.workspaceAccess);
   entries.push({
@@ -714,7 +714,7 @@ function pushAgentWorkspaceEvidence(
         ? `${params.workspaceSourceBase}/sandbox/workspaceAccess`
         : inheritedWorkspaceAccess !== undefined
           ? `${params.inheritedWorkspaceSourceBase}/sandbox/workspaceAccess`
-          : "oc://openclaw.config/agents/defaults/sandbox/workspaceAccess",
+          : "oc://recall.config/agents/defaults/sandbox/workspaceAccess",
     scope: params.scope,
     ...(params.agentId === undefined ? {} : { agentId: params.agentId }),
     value: explicitWorkspaceAccess ?? inheritedWorkspaceAccess ?? "none",
@@ -1186,7 +1186,7 @@ function pushGatewayHttpEndpointEvidence(
   if (!isRecord(config)) {
     return;
   }
-  const source = `oc://openclaw.config/gateway/http/endpoints/${endpoint}`;
+  const source = `oc://recall.config/gateway/http/endpoints/${endpoint}`;
   const enabled = config.enabled === true;
   if (enabled) {
     entries.push({
@@ -1326,7 +1326,7 @@ function collectModelRefsFromAgentAllowlist(
     collectModelRefsFromModelMap(
       refs,
       defaults.models,
-      "oc://openclaw.config/agents/defaults/models",
+      "oc://recall.config/agents/defaults/models",
     );
   }
 
@@ -1341,7 +1341,7 @@ function collectModelRefsFromAgentAllowlist(
     collectModelRefsFromModelMap(
       refs,
       agent.models,
-      `oc://openclaw.config/agents/list/#${index}/models`,
+      `oc://recall.config/agents/list/#${index}/models`,
     );
   }
 }

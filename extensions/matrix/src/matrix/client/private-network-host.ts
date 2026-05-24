@@ -1,1 +1,1 @@
-export { isPrivateOrLoopbackHost } from "openclaw/plugin-sdk/ssrf-runtime";
+export { isPrivateOrLoopbackHost } from "recall/plugin-sdk/ssrf-runtime";

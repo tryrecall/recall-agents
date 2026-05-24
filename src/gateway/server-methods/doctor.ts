@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../../agents/agent-scope.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import {
   isSameMemoryDreamingDay,
   resolveMemoryDeepDreamingConfig,
@@ -256,7 +256,7 @@ async function listWorkspaceDailyFiles(memoryDir: string): Promise<string[]> {
 }
 
 function resolveDreamingConfig(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
 ): Omit<
   DoctorMemoryDreamingPayload,
   | "shortTermCount"
@@ -887,7 +887,7 @@ function shouldProbeMemoryEmbeddings(params: unknown): boolean {
 const SKIPPED_MEMORY_EMBEDDING_PROBE = {
   ok: false,
   checked: false,
-  error: "memory embedding readiness not checked; run `openclaw memory status --deep` to probe",
+  error: "memory embedding readiness not checked; run `recall memory status --deep` to probe",
 } as const;
 
 export const doctorHandlers: GatewayRequestHandlers = {

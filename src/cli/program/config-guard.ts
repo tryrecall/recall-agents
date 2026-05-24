@@ -108,7 +108,7 @@ export async function ensureConfigReady(params: {
   const heading = (value: string) => colorize(rich, theme.heading, value);
   const commandText = (value: string) => colorize(rich, theme.command, value);
 
-  params.runtime.error(heading("OpenClaw config is invalid"));
+  params.runtime.error(heading("Recall config is invalid"));
   params.runtime.error(`${muted("File:")} ${muted(shortenHomePath(snapshot.path))}`);
   if (issues.length > 0) {
     params.runtime.error(muted("Problem:"));
@@ -120,10 +120,10 @@ export async function ensureConfigReady(params: {
   }
   params.runtime.error("");
   params.runtime.error(
-    `${muted("Fix:")} ${commandText(formatCliCommand("openclaw doctor --fix"))}`,
+    `${muted("Fix:")} ${commandText(formatCliCommand("recall doctor --fix"))}`,
   );
   params.runtime.error(
-    `${muted("Inspect:")} ${commandText(formatCliCommand("openclaw config validate"))}`,
+    `${muted("Inspect:")} ${commandText(formatCliCommand("recall config validate"))}`,
   );
   params.runtime.error(
     muted("Status, health, logs, and doctor commands still run with invalid config."),

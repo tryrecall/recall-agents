@@ -1,16 +1,16 @@
-export const OPENCLAW_CLI_ENV_VAR = "OPENCLAW_CLI";
-export const OPENCLAW_CLI_ENV_VALUE = "1";
+export const RECALL_CLI_ENV_VAR = "RECALL_CLI";
+export const RECALL_CLI_ENV_VALUE = "1";
 
-export function markOpenClawExecEnv<T extends Record<string, string | undefined>>(env: T): T {
+export function markRecallExecEnv<T extends Record<string, string | undefined>>(env: T): T {
   return {
     ...env,
-    [OPENCLAW_CLI_ENV_VAR]: OPENCLAW_CLI_ENV_VALUE,
+    [RECALL_CLI_ENV_VAR]: RECALL_CLI_ENV_VALUE,
   };
 }
 
-export function ensureOpenClawExecMarkerOnProcess(
+export function ensureRecallExecMarkerOnProcess(
   env: NodeJS.ProcessEnv = process.env,
 ): NodeJS.ProcessEnv {
-  env[OPENCLAW_CLI_ENV_VAR] = OPENCLAW_CLI_ENV_VALUE;
+  env[RECALL_CLI_ENV_VAR] = RECALL_CLI_ENV_VALUE;
   return env;
 }

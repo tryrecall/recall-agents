@@ -1,7 +1,7 @@
 export {
   isPotentialTruncatedFinal,
   selectLongerFinalText,
-} from "openclaw/plugin-sdk/channel-streaming";
+} from "recall/plugin-sdk/channel-streaming";
 export {
   createLaneTextDeliverer,
   type DraftLaneState,

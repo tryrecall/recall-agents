@@ -1,17 +1,17 @@
 import fs from "node:fs/promises";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
 import {
   createSubsystemLogger,
   resolveAgentContextLimits,
   resolveAgentWorkspaceDir,
   resolveGlobalSingleton,
   resolveMemorySearchSyncConfig,
-  type OpenClawConfig,
-} from "openclaw/plugin-sdk/memory-core-host-engine-foundation";
+  type RecallConfig,
+} from "recall/plugin-sdk/memory-core-host-engine-foundation";
 import {
   checkQmdBinaryAvailability,
   resolveQmdBinaryUnavailableReason,
-} from "openclaw/plugin-sdk/memory-core-host-engine-qmd";
+} from "recall/plugin-sdk/memory-core-host-engine-qmd";
 import {
   resolveMemoryBackendConfig,
   type MemoryEmbeddingProbeResult,
@@ -20,10 +20,10 @@ import {
   type MemorySource,
   type MemorySyncProgressUpdate,
   type ResolvedQmdConfig,
-} from "openclaw/plugin-sdk/memory-core-host-engine-storage";
-import { normalizeAgentId } from "openclaw/plugin-sdk/routing";
+} from "recall/plugin-sdk/memory-core-host-engine-storage";
+import { normalizeAgentId } from "recall/plugin-sdk/routing";
 
-const MEMORY_SEARCH_MANAGER_CACHE_KEY = Symbol.for("openclaw.memorySearchManagerCache");
+const MEMORY_SEARCH_MANAGER_CACHE_KEY = Symbol.for("recall.memorySearchManagerCache");
 type Maybe<T> = T | null;
 type QmdManagerRuntimeConfig = {
   workspaceDir: string;
@@ -149,7 +149,7 @@ function clearQmdManagerOpenFailure(scopeKey: string, identityKey: string): void
 }
 
 export async function getMemorySearchManager(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   purpose?: MemorySearchManagerPurpose;
 }): Promise<MemorySearchManagerResult> {
@@ -315,7 +315,7 @@ export async function getMemorySearchManager(params: {
 }
 
 async function getBuiltinMemorySearchManager(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
   purpose?: MemorySearchManagerPurpose;
 }): Promise<MemorySearchManagerResult> {
@@ -406,7 +406,7 @@ export async function closeAllMemorySearchManagers(): Promise<void> {
 }
 
 export async function closeMemorySearchManager(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId: string;
 }): Promise<void> {
   const normalizedAgentId = normalizeAgentId(params.agentId);
@@ -650,7 +650,7 @@ function buildQmdManagerIdentityKey(
 }
 
 function resolveQmdManagerRuntimeConfig(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   agentId: string,
 ): QmdManagerRuntimeConfig {
   return {

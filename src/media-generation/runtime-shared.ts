@@ -9,7 +9,7 @@ import {
   resolveAgentModelPrimaryValue,
 } from "../config/model-input.js";
 import type { AgentModelConfig } from "../config/types.agents-shared.js";
-import type { OpenClawConfig } from "../config/types.js";
+import type { RecallConfig } from "../config/types.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { getProviderEnvVars as getDefaultProviderEnvVars } from "../secrets/provider-env-vars.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
@@ -80,7 +80,7 @@ type CapabilityProviderCandidate = {
   aliases?: readonly string[];
   defaultModel?: string | null;
   models?: readonly string[];
-  isConfigured?: (ctx: { cfg?: OpenClawConfig; agentDir?: string }) => boolean;
+  isConfigured?: (ctx: { cfg?: RecallConfig; agentDir?: string }) => boolean;
 };
 
 type ParsedAspectRatio = {
@@ -96,7 +96,7 @@ type ParsedSize = {
   area: number;
 };
 
-function resolveCurrentDefaultProviderId(cfg?: OpenClawConfig): string {
+function resolveCurrentDefaultProviderId(cfg?: RecallConfig): string {
   const configured = resolveAgentModelPrimaryValue(cfg?.agents?.defaults?.model);
   const trimmed = normalizeOptionalString(configured);
   if (!trimmed) {
@@ -112,7 +112,7 @@ function resolveCurrentDefaultProviderId(cfg?: OpenClawConfig): string {
 
 function isCapabilityProviderConfigured(params: {
   provider: CapabilityProviderCandidate;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   agentDir?: string;
 }): boolean {
   if (params.provider.isConfigured) {
@@ -135,9 +135,9 @@ function isCapabilityProviderConfigured(params: {
 }
 
 function resolveAutoCapabilityFallbackRefs(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentDir?: string;
-  listProviders: (cfg?: OpenClawConfig) => CapabilityProviderCandidate[];
+  listProviders: (cfg?: RecallConfig) => CapabilityProviderCandidate[];
 }): string[] {
   const providerDefaults = new Map<string, { ref: string; aliases: string[] }>();
   for (const provider of params.listProviders(params.cfg)) {
@@ -209,12 +209,12 @@ function hasCapabilityProviderId(params: {
 }
 
 export function resolveCapabilityModelCandidates(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   modelConfig: AgentModelConfig | undefined;
   modelOverride?: string;
   parseModelRef: (raw: string | undefined) => ParsedProviderModelRef | null;
   agentDir?: string;
-  listProviders?: (cfg?: OpenClawConfig) => CapabilityProviderCandidate[];
+  listProviders?: (cfg?: RecallConfig) => CapabilityProviderCandidate[];
   autoProviderFallback?: boolean;
 }): ParsedProviderModelRef[] {
   const candidates: ParsedProviderModelRef[] = [];

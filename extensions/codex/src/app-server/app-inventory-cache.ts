@@ -1,4 +1,4 @@
-import { embeddedAgentLog } from "openclaw/plugin-sdk/agent-harness-runtime";
+import { embeddedAgentLog } from "recall/plugin-sdk/agent-harness-runtime";
 import type { JsonValue, v2 } from "./protocol.js";
 
 export const CODEX_APP_INVENTORY_CACHE_TTL_MS = 60 * 60 * 1_000;

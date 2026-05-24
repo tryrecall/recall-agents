@@ -5,7 +5,7 @@ import type {
   ChannelThreadingToolContext,
 } from "../../channels/plugins/types.public.js";
 import { appendAssistantMessageToSessionTranscript } from "../../config/sessions.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
@@ -16,7 +16,7 @@ type SourceReplyTranscriptMirrorParams = {
   action: string;
   channel: string;
   actionParams: Record<string, unknown>;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionKey?: string;
   agentId?: string;
   toolContext?: ChannelThreadingToolContext;

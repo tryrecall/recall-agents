@@ -20,15 +20,15 @@ export async function registerNodesCli(program: Command, argv: readonly string[]
       "after",
       () =>
         `\n${theme.heading("Examples:")}\n${formatHelpExamples([
-          ["openclaw nodes status", "List known nodes with live status."],
-          ["openclaw nodes pairing pending", "Show pending node pairing requests."],
-          ["openclaw nodes remove --node <id|name|ip>", "Remove a stale paired node entry."],
+          ["recall nodes status", "List known nodes with live status."],
+          ["recall nodes pairing pending", "Show pending node pairing requests."],
+          ["recall nodes remove --node <id|name|ip>", "Remove a stale paired node entry."],
           [
-            'openclaw nodes invoke --node <id> --command system.which --params \'{"name":"uname"}\'',
+            'recall nodes invoke --node <id> --command system.which --params \'{"name":"uname"}\'',
             "Invoke a node command directly.",
           ],
-          ["openclaw nodes camera snap --node <id>", "Capture a photo from a node camera."],
-        ])}\n\n${theme.muted("Docs:")} ${formatDocsLink("/cli/nodes", "docs.openclaw.ai/cli/nodes")}\n`,
+          ["recall nodes camera snap --node <id>", "Capture a photo from a node camera."],
+        ])}\n\n${theme.muted("Docs:")} ${formatDocsLink("/cli/nodes", "docs.recall.ai/cli/nodes")}\n`,
     );
 
   registerNodesStatusCommands(nodes);

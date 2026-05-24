@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
-import { resolveAgentDir, resolveSessionAgentIds } from "openclaw/plugin-sdk/agent-runtime";
-import type { PluginCommandContext, PluginCommandResult } from "openclaw/plugin-sdk/plugin-entry";
+import { resolveAgentDir, resolveSessionAgentIds } from "recall/plugin-sdk/agent-runtime";
+import type { PluginCommandContext, PluginCommandResult } from "recall/plugin-sdk/plugin-entry";
 import { CODEX_CONTROL_METHODS, type CodexControlMethod } from "./app-server/capabilities.js";
 import {
   installCodexComputerUse,
@@ -203,7 +203,7 @@ type PendingCodexDiagnosticsConfirmation = {
   createdAt: number;
 };
 
-const CODEX_DIAGNOSTICS_SOURCE = "openclaw-diagnostics";
+const CODEX_DIAGNOSTICS_SOURCE = "recall-diagnostics";
 const CODEX_DIAGNOSTICS_REASON_MAX_CHARS = 2048;
 const CODEX_DIAGNOSTICS_COOLDOWN_MS = 60_000;
 const CODEX_DIAGNOSTICS_ERROR_MAX_CHARS = 500;
@@ -256,7 +256,7 @@ export async function handleCodexSubcommand(
       return {
         text:
           "Codex sub-plugin management is not wired up (codexPluginsManagementIo dep is undefined). " +
-          "Edit ~/.openclaw/openclaw.json or use `openclaw config patch` until the runtime exposes the IO.",
+          "Edit ~/.tryrecall/recall-agents.json or use `recall config patch` until the runtime exposes the IO.",
       };
     }
     return await handleCodexPluginsSubcommand(ctx, rest, deps.codexPluginsManagementIo);
@@ -528,7 +528,7 @@ async function bindConversation(
   }
   if (!ctx.sessionFile) {
     return {
-      text: "Cannot bind Codex because this command did not include an OpenClaw session file.",
+      text: "Cannot bind Codex because this command did not include an Recall session file.",
     };
   }
   const scope = resolveCodexConversationControlScope(ctx);
@@ -682,7 +682,7 @@ async function resumeThread(
     return "Usage: /codex resume <thread-id>";
   }
   if (!ctx.sessionFile) {
-    return "Cannot attach a Codex thread because this command did not include an OpenClaw session file.";
+    return "Cannot attach a Codex thread because this command did not include an Recall session file.";
   }
   const response = await deps.codexControlRequest(
     pluginConfig,
@@ -700,7 +700,7 @@ async function resumeThread(
     model: isJsonObject(response) ? readString(response, "model") : undefined,
     modelProvider: isJsonObject(response) ? readString(response, "modelProvider") : undefined,
   });
-  return `Attached this OpenClaw session to Codex thread ${formatCodexDisplayText(
+  return `Attached this Recall session to Codex thread ${formatCodexDisplayText(
     effectiveThreadId,
   )}.`;
 }
@@ -753,7 +753,7 @@ async function stopConversationTurn(
 ): Promise<string> {
   const target = await resolveControlTarget(ctx);
   if (!target) {
-    return "Cannot stop Codex because this command did not include an OpenClaw session file.";
+    return "Cannot stop Codex because this command did not include an Recall session file.";
   }
   return (
     await deps.stopCodexConversationTurn({
@@ -773,7 +773,7 @@ async function steerConversationTurn(
 ): Promise<string> {
   const target = await resolveControlTarget(ctx);
   if (!target) {
-    return "Cannot steer Codex because this command did not include an OpenClaw session file.";
+    return "Cannot steer Codex because this command did not include an Recall session file.";
   }
   return (
     await deps.steerCodexConversationTurn({
@@ -797,7 +797,7 @@ async function setConversationModel(
   }
   const target = await resolveControlTarget(ctx);
   if (!target) {
-    return "Cannot set Codex model because this command did not include an OpenClaw session file.";
+    return "Cannot set Codex model because this command did not include an Recall session file.";
   }
   const [model = ""] = args;
   const normalized = model.trim();
@@ -830,7 +830,7 @@ async function setConversationFastMode(
   }
   const target = await resolveControlTarget(ctx);
   if (!target) {
-    return "Cannot set Codex fast mode because this command did not include an OpenClaw session file.";
+    return "Cannot set Codex fast mode because this command did not include an Recall session file.";
   }
   const value = args[0];
   const parsed = parseCodexFastModeArg(value);
@@ -857,7 +857,7 @@ async function setConversationPermissions(
   }
   const target = await resolveControlTarget(ctx);
   if (!target) {
-    return "Cannot set Codex permissions because this command did not include an OpenClaw session file.";
+    return "Cannot set Codex permissions because this command did not include an Recall session file.";
   }
   const value = args[0];
   const parsed = parseCodexPermissionsModeArg(value);
@@ -950,14 +950,14 @@ async function requestCodexDiagnosticsFeedbackApproval(
 ): Promise<PluginCommandResult> {
   if (!(await hasAnyCodexDiagnosticsSessionFile(ctx))) {
     return {
-      text: "Cannot send Codex diagnostics because this command did not include an OpenClaw session file.",
+      text: "Cannot send Codex diagnostics because this command did not include an Recall session file.",
     };
   }
   const targets = await resolveCodexDiagnosticsTargets(deps, ctx);
   if (targets.length === 0) {
     return {
       text: [
-        "No Codex thread is attached to this OpenClaw session yet.",
+        "No Codex thread is attached to this Recall session yet.",
         "Use /codex threads to find a thread, then /codex resume <thread-id> before sending diagnostics.",
       ].join("\n"),
     };
@@ -1019,12 +1019,12 @@ async function previewCodexDiagnosticsFeedbackApproval(
   note: string,
 ): Promise<string> {
   if (!(await hasAnyCodexDiagnosticsSessionFile(ctx))) {
-    return "Cannot send Codex diagnostics because this command did not include an OpenClaw session file.";
+    return "Cannot send Codex diagnostics because this command did not include an Recall session file.";
   }
   const targets = await resolveCodexDiagnosticsTargets(deps, ctx);
   if (targets.length === 0) {
     return [
-      "No Codex thread is attached to this OpenClaw session yet.",
+      "No Codex thread is attached to this Recall session yet.",
       "Use /codex threads to find a thread, then /codex resume <thread-id> before sending diagnostics.",
     ].join("\n");
   }
@@ -1039,7 +1039,7 @@ async function previewCodexDiagnosticsFeedbackApproval(
   return [
     targets.length === 1 ? "Codex runtime thread detected." : "Codex runtime threads detected.",
     `Approving diagnostics will also send ${targets.length === 1 ? "this thread's feedback bundle" : "these threads' feedback bundles"} to OpenAI servers.`,
-    "The completed diagnostics reply will list the OpenClaw session ids and Codex thread ids that were sent.",
+    "The completed diagnostics reply will list the Recall session ids and Codex thread ids that were sent.",
     ...(displayReason ? [`Note: ${displayReason}`] : []),
     "Included: Codex logs and spawned Codex subthreads when available.",
   ].join("\n");
@@ -1070,7 +1070,7 @@ async function confirmCodexDiagnosticsFeedback(
   }
   deletePendingCodexDiagnosticsConfirmation(token);
   if (!pending.privateRouted && !(await hasAnyCodexDiagnosticsSessionFile(ctx))) {
-    return "Cannot send Codex diagnostics because this command did not include an OpenClaw session file.";
+    return "Cannot send Codex diagnostics because this command did not include an Recall session file.";
   }
   const currentTargets = pending.privateRouted
     ? await resolvePendingCodexDiagnosticsTargets(deps, pending.targets)
@@ -1120,12 +1120,12 @@ async function sendCodexDiagnosticsFeedbackForContext(
   note: string,
 ): Promise<string> {
   if (!(await hasAnyCodexDiagnosticsSessionFile(ctx))) {
-    return "Cannot send Codex diagnostics because this command did not include an OpenClaw session file.";
+    return "Cannot send Codex diagnostics because this command did not include an Recall session file.";
   }
   const targets = await resolveCodexDiagnosticsTargets(deps, ctx);
   if (targets.length === 0) {
     return [
-      "No Codex thread is attached to this OpenClaw session yet.",
+      "No Codex thread is attached to this Recall session yet.",
       "Use /codex threads to find a thread, then /codex resume <thread-id> before sending diagnostics.",
     ].join("\n");
   }
@@ -1141,7 +1141,7 @@ async function sendCodexDiagnosticsFeedbackForTargets(
 ): Promise<string> {
   if (targets.length === 0) {
     return [
-      "No Codex thread is attached to this OpenClaw session yet.",
+      "No Codex thread is attached to this Recall session yet.",
       "Use /codex threads to find a thread, then /codex resume <thread-id> before sending diagnostics.",
     ].join("\n");
   }
@@ -1310,10 +1310,10 @@ function formatCodexDiagnosticsTargetBlock(
     lines.push(`Channel: ${formatCodexValueForDisplay(target.channel)}`);
   }
   if (target.sessionKey) {
-    lines.push(`OpenClaw session key: ${formatCodexCopyableValueForDisplay(target.sessionKey)}`);
+    lines.push(`Recall session key: ${formatCodexCopyableValueForDisplay(target.sessionKey)}`);
   }
   if (target.sessionId) {
-    lines.push(`OpenClaw session id: ${formatCodexCopyableValueForDisplay(target.sessionId)}`);
+    lines.push(`Recall session id: ${formatCodexCopyableValueForDisplay(target.sessionId)}`);
   }
   lines.push(`Codex thread id: ${formatCodexCopyableValueForDisplay(target.threadId)}`);
   lines.push(`Inspect locally: ${formatCodexResumeCommandForDisplay(target.threadId)}`);
@@ -1327,7 +1327,7 @@ function formatCodexDiagnosticsTargetLine(target: CodexDiagnosticsTarget): strin
   }
   const sessionLabel = target.sessionId || target.sessionKey;
   if (sessionLabel) {
-    parts.push(`OpenClaw session ${formatCodexValueForDisplay(sessionLabel)}`);
+    parts.push(`Recall session ${formatCodexValueForDisplay(sessionLabel)}`);
   }
   parts.push(`Codex thread ${formatCodexThreadIdForDisplay(target.threadId)}`);
   return `- ${parts.join(", ")}`;
@@ -1768,14 +1768,14 @@ async function startThreadAction(
   }
   const target = await resolveControlTarget(ctx);
   if (!target) {
-    return `Cannot start Codex ${label} because this command did not include an OpenClaw session file.`;
+    return `Cannot start Codex ${label} because this command did not include an Recall session file.`;
   }
   const binding = await deps.readCodexAppServerBinding(target.sessionFile, {
     agentDir: target.agentDir,
     config: ctx.config,
   });
   if (!binding?.threadId) {
-    return `No Codex thread is attached to this OpenClaw session yet.`;
+    return `No Codex thread is attached to this Recall session yet.`;
   }
   if (method === CODEX_CONTROL_METHODS.review) {
     await deps.codexControlRequest(

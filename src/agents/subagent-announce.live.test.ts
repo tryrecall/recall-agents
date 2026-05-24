@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   clearRuntimeConfigSnapshot,
   getRuntimeConfig,
-  type OpenClawConfig,
+  type RecallConfig,
 } from "../config/config.js";
 import { callGateway as realCallGateway } from "../gateway/call.js";
 import { GatewayClient } from "../gateway/client.js";
@@ -15,9 +15,9 @@ import { extractPayloadText } from "../gateway/test-helpers.agent-results.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import { clearCurrentPluginMetadataSnapshot } from "../plugins/current-plugin-metadata-snapshot.js";
 import {
-  createOpenClawTestState,
-  type OpenClawTestState,
-} from "../test-utils/openclaw-test-state.js";
+  createRecallTestState,
+  type RecallTestState,
+} from "../test-utils/recall-test-state.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
 import { isLiveTestEnabled } from "./live-test-helpers.js";
 import { testing as subagentAnnounceDeliveryTesting } from "./subagent-announce-delivery.js";
@@ -25,7 +25,7 @@ import { testing as subagentAnnounceTesting } from "./subagent-announce.js";
 import { resolveSubagentController, steerControlledSubagentRun } from "./subagent-control.js";
 import { listSubagentRunsForRequester } from "./subagent-registry.js";
 
-const LIVE = isLiveTestEnabled() && isTruthyEnvValue(process.env.OPENCLAW_LIVE_SUBAGENT_E2E);
+const LIVE = isLiveTestEnabled() && isTruthyEnvValue(process.env.RECALL_LIVE_SUBAGENT_E2E);
 const describeLive = LIVE ? describe : describe.skip;
 
 type AgentPayload = {
@@ -49,10 +49,10 @@ type LiveSubagentModelConfig = {
   provider: "openai" | "google";
   requiredEnv: "OPENAI_API_KEY" | "GEMINI_API_KEY" | "GOOGLE_API_KEY";
 };
-type LiveSubagentModelProviders = NonNullable<NonNullable<OpenClawConfig["models"]>["providers"]>;
+type LiveSubagentModelProviders = NonNullable<NonNullable<RecallConfig["models"]>["providers"]>;
 
 function resolveLiveSubagentModelConfig(): LiveSubagentModelConfig {
-  const modelKey = process.env.OPENCLAW_LIVE_SUBAGENT_E2E_MODEL?.trim() || "openai/gpt-5.5";
+  const modelKey = process.env.RECALL_LIVE_SUBAGENT_E2E_MODEL?.trim() || "openai/gpt-5.5";
   if (modelKey.startsWith("google/")) {
     return {
       modelKey,
@@ -73,10 +73,10 @@ function liveSubagentConfig(
   port: number,
   token: string,
   options?: {
-    queue?: NonNullable<OpenClawConfig["messages"]>["queue"];
+    queue?: NonNullable<RecallConfig["messages"]>["queue"];
     toolAllow?: string[];
   },
-): OpenClawConfig {
+): RecallConfig {
   const providerConfig = resolveLiveSubagentModelConfig();
   const modelId = modelKey.replace(/^(openai|google)\//u, "");
   const providers: LiveSubagentModelProviders = {};
@@ -200,7 +200,7 @@ function createGatewayClient(params: {
 }
 
 describeLive("subagent announce live", () => {
-  let state: OpenClawTestState | undefined;
+  let state: RecallTestState | undefined;
   let server: GatewayServer | undefined;
   let client: GatewayClient | undefined;
 
@@ -220,9 +220,9 @@ describeLive("subagent announce live", () => {
   it(
     "keeps issue 82913 busy-parent completion announce pending until transcript delivery",
     async () => {
-      if (!isTruthyEnvValue(process.env.OPENCLAW_SUBAGENT_ISSUE_82913_REPRO)) {
+      if (!isTruthyEnvValue(process.env.RECALL_SUBAGENT_ISSUE_82913_REPRO)) {
         console.warn(
-          "[issue-82913] skip: set OPENCLAW_SUBAGENT_ISSUE_82913_REPRO=1 to run this focused repro",
+          "[issue-82913] skip: set RECALL_SUBAGENT_ISSUE_82913_REPRO=1 to run this focused repro",
         );
         return;
       }
@@ -237,21 +237,21 @@ describeLive("subagent announce live", () => {
       const parentToken = `ISSUE_82913_PARENT_SAW_${nonce}`;
       const sessionKey = `agent:main:issue-82913-${nonce.toLowerCase()}`;
 
-      state = await createOpenClawTestState({
+      state = await createRecallTestState({
         label: "subagent-issue-82913-live",
         layout: "split",
         env: {
-          OPENCLAW_SKIP_CHANNELS: "1",
-          OPENCLAW_SKIP_CRON: "1",
-          OPENCLAW_SKIP_BROWSER_CONTROL_SERVER: "1",
-          OPENCLAW_SKIP_CANVAS_HOST: "1",
-          OPENCLAW_TEST_MINIMAL_GATEWAY: "1",
-          OPENCLAW_DISABLE_BUNDLED_PLUGINS: undefined,
-          OPENCLAW_DISABLE_PERSISTED_PLUGIN_REGISTRY: "1",
-          OPENCLAW_BUNDLED_PLUGINS_DIR: path.resolve("extensions"),
-          OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
-          OPENCLAW_PLUGIN_CATALOG_PATHS: undefined,
-          OPENCLAW_PLUGINS_PATHS: undefined,
+          RECALL_SKIP_CHANNELS: "1",
+          RECALL_SKIP_CRON: "1",
+          RECALL_SKIP_BROWSER_CONTROL_SERVER: "1",
+          RECALL_SKIP_CANVAS_HOST: "1",
+          RECALL_TEST_MINIMAL_GATEWAY: "1",
+          RECALL_DISABLE_BUNDLED_PLUGINS: undefined,
+          RECALL_DISABLE_PERSISTED_PLUGIN_REGISTRY: "1",
+          RECALL_BUNDLED_PLUGINS_DIR: path.resolve("extensions"),
+          RECALL_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
+          RECALL_PLUGIN_CATALOG_PATHS: undefined,
+          RECALL_PLUGINS_PATHS: undefined,
         },
       });
       await state.writeConfig(
@@ -281,7 +281,7 @@ describeLive("subagent announce live", () => {
           deliver: false,
           timeout: 240,
           message: [
-            "Run this exact OpenClaw busy-parent subagent scenario. Use tool calls, not prose.",
+            "Run this exact Recall busy-parent subagent scenario. Use tool calls, not prose.",
             `Use nonce ${nonce}.`,
             `Step 1: call sessions_spawn with exactly this JSON input: ${JSON.stringify({
               task: `Reply exactly ${childToken} and nothing else.`,
@@ -417,21 +417,21 @@ describeLive("subagent announce live", () => {
         }),
       });
 
-      state = await createOpenClawTestState({
+      state = await createRecallTestState({
         label: "subagent-announce-live",
         layout: "split",
         env: {
-          OPENCLAW_SKIP_CHANNELS: "1",
-          OPENCLAW_SKIP_CRON: "1",
-          OPENCLAW_SKIP_BROWSER_CONTROL_SERVER: "1",
-          OPENCLAW_SKIP_CANVAS_HOST: "1",
-          OPENCLAW_TEST_MINIMAL_GATEWAY: "1",
-          OPENCLAW_DISABLE_BUNDLED_PLUGINS: undefined,
-          OPENCLAW_DISABLE_PERSISTED_PLUGIN_REGISTRY: "1",
-          OPENCLAW_BUNDLED_PLUGINS_DIR: path.resolve("extensions"),
-          OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
-          OPENCLAW_PLUGIN_CATALOG_PATHS: undefined,
-          OPENCLAW_PLUGINS_PATHS: undefined,
+          RECALL_SKIP_CHANNELS: "1",
+          RECALL_SKIP_CRON: "1",
+          RECALL_SKIP_BROWSER_CONTROL_SERVER: "1",
+          RECALL_SKIP_CANVAS_HOST: "1",
+          RECALL_TEST_MINIMAL_GATEWAY: "1",
+          RECALL_DISABLE_BUNDLED_PLUGINS: undefined,
+          RECALL_DISABLE_PERSISTED_PLUGIN_REGISTRY: "1",
+          RECALL_BUNDLED_PLUGINS_DIR: path.resolve("extensions"),
+          RECALL_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
+          RECALL_PLUGIN_CATALOG_PATHS: undefined,
+          RECALL_PLUGINS_PATHS: undefined,
         },
       });
       await state.writeConfig(liveSubagentConfig(modelKey, state.workspaceDir, port, token));
@@ -454,7 +454,7 @@ describeLive("subagent announce live", () => {
           deliver: false,
           timeout: 180,
           message: [
-            "Run this exact OpenClaw subagent steering scenario. Use tool calls, not prose.",
+            "Run this exact Recall subagent steering scenario. Use tool calls, not prose.",
             `Use nonce ${nonce}.`,
             `Step 1: call sessions_spawn with exactly this JSON input: ${JSON.stringify({
               task: childTask,
@@ -540,7 +540,7 @@ describeLive("subagent announce live", () => {
       const modelConfig = resolveLiveSubagentModelConfig();
       if (!modelConfig.modelKey.startsWith("google/")) {
         console.warn(
-          "[subagent-stress] skip: set OPENCLAW_LIVE_SUBAGENT_E2E_MODEL=google/gemini-3.1-pro-preview",
+          "[subagent-stress] skip: set RECALL_LIVE_SUBAGENT_E2E_MODEL=google/gemini-3.1-pro-preview",
         );
         return;
       }
@@ -553,34 +553,34 @@ describeLive("subagent announce live", () => {
       const childTokens = [1, 2, 3].map((index) => `GEMINI_STRESS_${nonce}_${index}`);
       const parentToken = `GEMINI_STRESS_PARENT_${nonce}`;
 
-      state = await createOpenClawTestState({
+      state = await createRecallTestState({
         label: "subagent-gemini-stress-live",
         layout: "split",
         env: {
-          OPENCLAW_SKIP_CHANNELS: "1",
-          OPENCLAW_SKIP_CRON: "1",
-          OPENCLAW_SKIP_BROWSER_CONTROL_SERVER: "1",
-          OPENCLAW_SKIP_CANVAS_HOST: "1",
-          OPENCLAW_TEST_MINIMAL_GATEWAY: "1",
-          OPENCLAW_DISABLE_BUNDLED_PLUGINS: undefined,
-          OPENCLAW_DISABLE_PERSISTED_PLUGIN_REGISTRY: "1",
-          OPENCLAW_BUNDLED_PLUGINS_DIR: path.resolve("extensions"),
-          OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
-          OPENCLAW_PLUGIN_CATALOG_PATHS: undefined,
-          OPENCLAW_PLUGINS_PATHS: undefined,
-          OPENCLAW_DEBUG_MODEL_TRANSPORT: "1",
-          OPENCLAW_DEBUG_MODEL_PAYLOAD: "tools",
-          OPENCLAW_DEBUG_SSE: "events",
+          RECALL_SKIP_CHANNELS: "1",
+          RECALL_SKIP_CRON: "1",
+          RECALL_SKIP_BROWSER_CONTROL_SERVER: "1",
+          RECALL_SKIP_CANVAS_HOST: "1",
+          RECALL_TEST_MINIMAL_GATEWAY: "1",
+          RECALL_DISABLE_BUNDLED_PLUGINS: undefined,
+          RECALL_DISABLE_PERSISTED_PLUGIN_REGISTRY: "1",
+          RECALL_BUNDLED_PLUGINS_DIR: path.resolve("extensions"),
+          RECALL_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
+          RECALL_PLUGIN_CATALOG_PATHS: undefined,
+          RECALL_PLUGINS_PATHS: undefined,
+          RECALL_DEBUG_MODEL_TRANSPORT: "1",
+          RECALL_DEBUG_MODEL_PAYLOAD: "tools",
+          RECALL_DEBUG_SSE: "events",
         },
       });
       await fs.writeFile(
         path.join(state.workspaceDir, "package.json"),
-        `${JSON.stringify({ name: "openclaw-gemini-stress-live", private: true }, null, 2)}\n`,
+        `${JSON.stringify({ name: "recall-gemini-stress-live", private: true }, null, 2)}\n`,
         "utf8",
       );
       await fs.writeFile(
         path.join(state.workspaceDir, "AGENTS.md"),
-        "OpenClaw live stress test workspace. Keep responses concise.\n",
+        "Recall live stress test workspace. Keep responses concise.\n",
         "utf8",
       );
       await state.writeConfig(
@@ -615,7 +615,7 @@ describeLive("subagent announce live", () => {
           deliver: false,
           timeout: 420,
           message: [
-            "Run this exact OpenClaw Gemini subagent stress scenario. Use tool calls, not prose.",
+            "Run this exact Recall Gemini subagent stress scenario. Use tool calls, not prose.",
             `Use nonce ${nonce}.`,
             "Spawn all three children before waiting for any child result.",
             ...childTokens.map((childToken, index) => {
@@ -626,7 +626,7 @@ describeLive("subagent announce live", () => {
                     `You are stress child ${childNumber}.`,
                     "Use available tools for a tiny multi-tool check.",
                     "First read package.json if the read tool is available.",
-                    "Then run a tiny shell command if the bash tool is available: printf openclaw.",
+                    "Then run a tiny shell command if the bash tool is available: printf recall.",
                     "If web_search or memory_search is available, use at most one small query.",
                     `After the tool work, reply exactly ${childToken}.`,
                   ].join(" "),

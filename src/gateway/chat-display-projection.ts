@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { OPENCLAW_RUNTIME_CONTEXT_CUSTOM_TYPE } from "../agents/internal-runtime-context.js";
+import { RECALL_RUNTIME_CONTEXT_CUSTOM_TYPE } from "../agents/internal-runtime-context.js";
 import { isHeartbeatOkResponse, isHeartbeatUserMessage } from "../auto-reply/heartbeat-filter.js";
 import { HEARTBEAT_PROMPT } from "../auto-reply/heartbeat.js";
 import {
@@ -1100,7 +1100,7 @@ function isDisplayHiddenProjectedMessage(message: Record<string, unknown>): bool
   if (message.display === false) {
     return true;
   }
-  return message.role === "custom" && message.customType === OPENCLAW_RUNTIME_CONTEXT_CUSTOM_TYPE;
+  return message.role === "custom" && message.customType === RECALL_RUNTIME_CONTEXT_CUSTOM_TYPE;
 }
 
 function shouldHideProjectedHistoryMessage(message: Record<string, unknown>): boolean {

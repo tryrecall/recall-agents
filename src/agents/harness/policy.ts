@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { resolveModelRuntimePolicy } from "../model-runtime-policy.js";
 import {
   isOpenAICodexProvider,
@@ -17,7 +17,7 @@ export type AgentHarnessPolicy = {
 export function resolveAgentHarnessPolicy(params: {
   provider?: string;
   modelId?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   sessionKey?: string;
   env?: NodeJS.ProcessEnv;

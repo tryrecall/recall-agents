@@ -9,12 +9,12 @@ function requireEnv(name) {
   return value;
 }
 
-const configPath = requireEnv("OPENCLAW_CONFIG_PATH");
-const stateDir = requireEnv("OPENCLAW_STATE_DIR");
-const workspaceDir = requireEnv("OPENCLAW_TEST_WORKSPACE_DIR");
-const token = requireEnv("OPENCLAW_GATEWAY_TOKEN");
+const configPath = requireEnv("RECALL_CONFIG_PATH");
+const stateDir = requireEnv("RECALL_STATE_DIR");
+const workspaceDir = requireEnv("RECALL_TEST_WORKSPACE_DIR");
+const token = requireEnv("RECALL_GATEWAY_TOKEN");
 const timeoutSeconds = Number.parseInt(
-  process.env.OPENCLAW_CODEX_MEDIA_PATH_TIMEOUT_SECONDS ?? "180",
+  process.env.RECALL_CODEX_MEDIA_PATH_TIMEOUT_SECONDS ?? "180",
   10,
 );
 

@@ -52,7 +52,7 @@ import {
   type SessionEntry,
   updateSessionStore,
 } from "../../config/sessions.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { registerAgentRunContext } from "../../infra/agent-events.js";
 import { formatUncaughtError } from "../../infra/errors.js";
 import {
@@ -225,7 +225,7 @@ async function runSessionResetFromAgent(params: {
 }
 
 function resolveSessionRuntimeWorkspace(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionKey: string;
   sessionEntry?: SessionEntry;
   spawnedBy?: string;
@@ -245,7 +245,7 @@ function resolveSessionRuntimeWorkspace(params: {
 }
 
 function shouldSkipStartupContextForSpawnedSandbox(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionKey: string;
   spawnedBy?: string;
 }): boolean {
@@ -1129,7 +1129,7 @@ export const agentHandlers: GatewayRequestHandlers = {
       let resolvedSessionId = requestedSessionId;
       let sessionEntry: SessionEntry | undefined;
       let bestEffortDeliver = requestedBestEffortDeliver ?? false;
-      let cfgForAgent: OpenClawConfig | undefined;
+      let cfgForAgent: RecallConfig | undefined;
       let resolvedSessionKey = requestedSessionKey;
       let isNewSession = false;
       let skipTimestampInjection = false;
@@ -1215,7 +1215,7 @@ export const agentHandlers: GatewayRequestHandlers = {
       // Inject timestamp into user-authored messages that don't already have one.
       // Channel messages (Discord, Telegram, etc.) get timestamps via envelope
       // formatting in a separate code path — they never reach this handler.
-      // See: https://github.com/openclaw/openclaw/issues/3658
+      // See: https://github.com/tryrecall/recall-agents/issues/3658
       if (!skipTimestampInjection && !isRawModelRun && inputProvenance?.kind !== "inter_session") {
         message = injectTimestamp(message, timestampOptsFromConfig(cfg));
       }

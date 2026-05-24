@@ -1,8 +1,8 @@
-import { buildChannelInboundEventContext } from "openclaw/plugin-sdk/channel-inbound";
+import { buildChannelInboundEventContext } from "recall/plugin-sdk/channel-inbound";
 import type { BuildTelegramMessageContextParams, TelegramMediaRef } from "./bot-message-context.js";
 
 export const baseTelegramMessageContextConfig = {
-  agents: { defaults: { model: "anthropic/claude-opus-4-5", workspace: "/tmp/openclaw" } },
+  agents: { defaults: { model: "anthropic/claude-opus-4-5", workspace: "/tmp/recall" } },
   channels: { telegram: { dmPolicy: "open", allowFrom: ["*"] } },
   messages: { groupChat: { mentionPatterns: [] } },
 } as never;
@@ -16,7 +16,7 @@ type BuildTelegramMessageContextForTestParams = {
   cfg?: Record<string, unknown>;
   accountId?: string;
   historyLimit?: number;
-  groupHistories?: Map<string, import("openclaw/plugin-sdk/reply-history").HistoryEntry[]>;
+  groupHistories?: Map<string, import("recall/plugin-sdk/reply-history").HistoryEntry[]>;
   ackReactionScope?: BuildTelegramMessageContextParams["ackReactionScope"];
   botApi?: Record<string, unknown>;
   runtime?: BuildTelegramMessageContextParams["runtime"];
@@ -33,7 +33,7 @@ const telegramMessageContextSessionRuntimeForTest = {
   resolveInboundLastRouteSessionKey: ({ route, sessionKey }) =>
     route.lastRoutePolicy === "main" ? route.mainSessionKey : sessionKey,
   resolvePinnedMainDmOwnerFromAllowlist: () => null,
-  resolveStorePath: () => "/tmp/openclaw/session-store.json",
+  resolveStorePath: () => "/tmp/recall/session-store.json",
 } satisfies NonNullable<BuildTelegramMessageContextParams["sessionRuntime"]>;
 
 export async function buildTelegramMessageContextForTest(

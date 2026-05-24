@@ -18,8 +18,8 @@ describe("renderQrTerminal", () => {
   });
 
   it("delegates terminal rendering to qrcode", async () => {
-    await expect(renderQrTerminal("openclaw")).resolves.toBe("ASCII-QR");
-    expect(toString).toHaveBeenCalledWith("openclaw", {
+    await expect(renderQrTerminal("recall")).resolves.toBe("ASCII-QR");
+    expect(toString).toHaveBeenCalledWith("recall", {
       small: false,
       type: "terminal",
     });

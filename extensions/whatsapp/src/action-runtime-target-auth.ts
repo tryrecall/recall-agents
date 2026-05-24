@@ -1,10 +1,10 @@
-import { ToolAuthorizationError } from "openclaw/plugin-sdk/channel-actions";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import { ToolAuthorizationError } from "recall/plugin-sdk/channel-actions";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
 import { resolveWhatsAppAccount } from "./accounts.js";
 import { resolveWhatsAppOutboundTarget } from "./resolve-outbound-target.js";
 
 export function resolveAuthorizedWhatsAppOutboundTarget(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   chatJid: string;
   accountId?: string;
   actionLabel: string;

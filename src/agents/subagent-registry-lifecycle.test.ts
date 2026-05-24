@@ -229,7 +229,7 @@ async function runNoReplyMirrorScenario(params: {
     messages: [
       {
         role: "assistant",
-        provider: "openclaw",
+        provider: "recall",
         model: "delivery-mirror",
         content: text,
         timestamp: params.timestamp,

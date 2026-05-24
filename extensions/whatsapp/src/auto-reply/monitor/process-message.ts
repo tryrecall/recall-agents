@@ -2,9 +2,9 @@ import {
   logAckFailure,
   removeAckReactionHandleAfterReply,
   type AckReactionHandle,
-} from "openclaw/plugin-sdk/channel-feedback";
-import type { CommandTurnContext } from "openclaw/plugin-sdk/channel-inbound";
-import { recordInboundSession } from "openclaw/plugin-sdk/conversation-runtime";
+} from "recall/plugin-sdk/channel-feedback";
+import type { CommandTurnContext } from "recall/plugin-sdk/channel-inbound";
+import { recordInboundSession } from "recall/plugin-sdk/conversation-runtime";
 import {
   createInternalHookEvent,
   deriveInboundMessageHookContext,
@@ -13,10 +13,10 @@ import {
   toPluginMessageContext,
   toPluginMessageReceivedEvent,
   triggerInternalHook,
-} from "openclaw/plugin-sdk/hook-runtime";
-import { runInboundReplyTurn } from "openclaw/plugin-sdk/inbound-reply-dispatch";
-import { getGlobalHookRunner } from "openclaw/plugin-sdk/plugin-runtime";
-import { resolveBatchedReplyThreadingPolicy } from "openclaw/plugin-sdk/reply-reference";
+} from "recall/plugin-sdk/hook-runtime";
+import { runInboundReplyTurn } from "recall/plugin-sdk/inbound-reply-dispatch";
+import { getGlobalHookRunner } from "recall/plugin-sdk/plugin-runtime";
+import { resolveBatchedReplyThreadingPolicy } from "recall/plugin-sdk/reply-reference";
 import { getPrimaryIdentityId, getSelfIdentity, getSenderIdentity } from "../../identity.js";
 import {
   resolveWhatsAppCommandAuthorized,

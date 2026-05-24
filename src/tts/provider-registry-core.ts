@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.js";
+import type { RecallConfig } from "../config/types.js";
 import {
   buildCapabilityProviderMaps,
   normalizeCapabilityProviderId,
@@ -7,8 +7,8 @@ import type { SpeechProviderPlugin } from "../plugins/types.js";
 import type { SpeechProviderId } from "./provider-types.js";
 
 export type SpeechProviderRegistryResolver = {
-  getProvider: (providerId: string, cfg?: OpenClawConfig) => SpeechProviderPlugin | undefined;
-  listProviders: (cfg?: OpenClawConfig) => SpeechProviderPlugin[];
+  getProvider: (providerId: string, cfg?: RecallConfig) => SpeechProviderPlugin | undefined;
+  listProviders: (cfg?: RecallConfig) => SpeechProviderPlugin[];
 };
 
 export function normalizeSpeechProviderId(
@@ -18,16 +18,16 @@ export function normalizeSpeechProviderId(
 }
 
 export function createSpeechProviderRegistry(resolver: SpeechProviderRegistryResolver) {
-  const buildResolvedProviderMaps = (cfg?: OpenClawConfig) =>
+  const buildResolvedProviderMaps = (cfg?: RecallConfig) =>
     buildCapabilityProviderMaps(resolver.listProviders(cfg));
 
-  const listProviders = (cfg?: OpenClawConfig): SpeechProviderPlugin[] => [
+  const listProviders = (cfg?: RecallConfig): SpeechProviderPlugin[] => [
     ...buildResolvedProviderMaps(cfg).canonical.values(),
   ];
 
   const getProvider = (
     providerId: string | undefined,
-    cfg?: OpenClawConfig,
+    cfg?: RecallConfig,
   ): SpeechProviderPlugin | undefined => {
     const normalized = normalizeSpeechProviderId(providerId);
     if (!normalized) {
@@ -41,7 +41,7 @@ export function createSpeechProviderRegistry(resolver: SpeechProviderRegistryRes
 
   const canonicalizeProviderId = (
     providerId: string | undefined,
-    cfg?: OpenClawConfig,
+    cfg?: RecallConfig,
   ): SpeechProviderId | undefined => {
     const normalized = normalizeSpeechProviderId(providerId);
     if (!normalized) {

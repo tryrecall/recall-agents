@@ -21,7 +21,7 @@ import {
   type SessionEntry,
   updateSessionStore,
 } from "../../config/sessions.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { logVerbose } from "../../globals.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { isAcpSessionKey, parseAgentSessionKey } from "../../routing/session-key.js";
@@ -153,7 +153,7 @@ export function resolveSessionEntryForKey(
 }
 
 function resolveStoredSessionId(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionKey: string;
 }): string | undefined {
   const agentId = resolveSessionAgentId({
@@ -171,7 +171,7 @@ function resolveStoredSessionId(params: {
 
 function resolveBoundAcpAbortTargetSessionKey(params: {
   ctx: FinalizedMsgContext;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   activeSessionKey: string;
 }): string | undefined {
   const bindingContext = resolveConversationBindingContextFromMessage({
@@ -194,7 +194,7 @@ function resolveBoundAcpAbortTargetSessionKey(params: {
 }
 
 function normalizeRequesterSessionKey(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   key: string | undefined,
 ): string | undefined {
   const cleaned = normalizeOptionalString(key);
@@ -206,7 +206,7 @@ function normalizeRequesterSessionKey(
 }
 
 export function stopSubagentsForRequester(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   requesterSessionKey?: string;
 }): { stopped: number } {
   const requesterKey = normalizeRequesterSessionKey(params.cfg, params.requesterSessionKey);
@@ -294,7 +294,7 @@ export function stopSubagentsForRequester(params: {
 
 export async function tryFastAbortFromMessage(params: {
   ctx: FinalizedMsgContext;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
 }): Promise<{ handled: boolean; aborted: boolean; stoppedSubagents?: number }> {
   const { ctx, cfg } = params;
   const commandSessionKey =

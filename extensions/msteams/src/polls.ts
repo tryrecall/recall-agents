@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { isRecord, normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { isRecord, normalizeOptionalString } from "recall/plugin-sdk/string-coerce-runtime";
 import { resolveMSTeamsStorePath } from "./storage.js";
 import { readJsonFile, withFileLock, writeJsonFile } from "./store-fs.js";
 
@@ -101,11 +101,11 @@ export function extractMSTeamsPollVote(
   const pollId =
     readNestedString(value, ["openclawPollId"]) ??
     readNestedString(value, ["pollId"]) ??
-    readNestedString(value, ["openclaw", "pollId"]) ??
-    readNestedString(value, ["openclaw", "poll", "id"]) ??
+    readNestedString(value, ["recall", "pollId"]) ??
+    readNestedString(value, ["recall", "poll", "id"]) ??
     readNestedString(value, ["data", "openclawPollId"]) ??
     readNestedString(value, ["data", "pollId"]) ??
-    readNestedString(value, ["data", "openclaw", "pollId"]);
+    readNestedString(value, ["data", "recall", "pollId"]);
   if (!pollId) {
     return null;
   }
@@ -187,7 +187,7 @@ export function buildMSTeamsPollCard(params: {
         },
         msteams: {
           type: "messageBack",
-          text: "openclaw poll vote",
+          text: "recall poll vote",
           displayText: "Vote recorded",
           value: { openclawPollId: pollId, pollId },
         },

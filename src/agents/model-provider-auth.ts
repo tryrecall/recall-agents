@@ -1,5 +1,5 @@
 import { hashRuntimeConfigValue } from "../config/runtime-snapshot.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   listAgentIds,
   resolveAgentDir,
@@ -39,7 +39,7 @@ type PreparedProviderAuthState = {
 // warmCurrentProviderAuthState at gateway startup / on reload; consulted by
 // hasAuthForModelProvider on every model-listing call.
 let currentProviderAuthStates: ReadonlyMap<string, PreparedProviderAuthState> | null = null;
-const configFingerprintCache = new WeakMap<OpenClawConfig, string>();
+const configFingerprintCache = new WeakMap<RecallConfig, string>();
 // Generation counter guards against an in-flight warm publishing stale
 // state after a subsequent warm or clear has invalidated it.
 let currentProviderAuthStateGeneration = 0;
@@ -51,7 +51,7 @@ export function clearCurrentProviderAuthState(): void {
 
 function resolvePreparedStateForCaller(params: {
   states: ReadonlyMap<string, PreparedProviderAuthState> | null;
-  cfg: OpenClawConfig | undefined;
+  cfg: RecallConfig | undefined;
   callerAgentId: string | undefined;
 }): PreparedProviderAuthState | null {
   if (!params.states) {
@@ -67,7 +67,7 @@ function resolvePreparedStateForCaller(params: {
   return params.states.get(resolveDefaultAgentId(params.cfg)) ?? null;
 }
 
-function resolveProviderAuthConfigFingerprint(cfg: OpenClawConfig | undefined): string | null {
+function resolveProviderAuthConfigFingerprint(cfg: RecallConfig | undefined): string | null {
   if (!cfg) {
     return null;
   }
@@ -82,7 +82,7 @@ function resolveProviderAuthConfigFingerprint(cfg: OpenClawConfig | undefined): 
 
 export async function hasAuthForModelProvider(params: {
   provider: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   workspaceDir?: string;
   agentId?: string;
   env?: NodeJS.ProcessEnv;
@@ -160,7 +160,7 @@ export async function hasAuthForModelProvider(params: {
 }
 
 export function createProviderAuthChecker(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   workspaceDir?: string;
   agentId?: string;
   env?: NodeJS.ProcessEnv;
@@ -196,7 +196,7 @@ export function createProviderAuthChecker(params: {
 }
 
 export async function warmCurrentProviderAuthState(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   options: { isCancelled?: () => boolean } = {},
 ): Promise<void> {
   // Claim a fresh generation; any concurrent warm or clear bumps this and

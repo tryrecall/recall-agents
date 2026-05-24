@@ -13,8 +13,8 @@ import (
 const (
 	workflowVersion          = 16
 	docsI18nEngineName       = "codex"
-	envDocsI18nProvider      = "OPENCLAW_DOCS_I18N_PROVIDER"
-	envDocsI18nModel         = "OPENCLAW_DOCS_I18N_MODEL"
+	envDocsI18nProvider      = "RECALL_DOCS_I18N_PROVIDER"
+	envDocsI18nModel         = "RECALL_DOCS_I18N_MODEL"
 	defaultOpenAIModel       = "gpt-5.5"
 	defaultFallbackProvider  = "openai"
 	defaultFallbackModelName = defaultOpenAIModel

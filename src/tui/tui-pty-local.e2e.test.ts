@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { spawn as spawnPty, type PtyExitEvent, type PtyHandle } from "@lydell/node-pty";
 import { afterEach, describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 
 type KillablePtyHandle = PtyHandle & {
   kill?: (signal?: string) => void;
@@ -49,12 +49,12 @@ async function writePtyInput(
   data: string,
   opts: { delay?: boolean } = {},
 ): Promise<void> {
-  const delayMs = readPositiveIntegerEnv("OPENCLAW_TUI_PTY_TYPE_DELAY_MS");
+  const delayMs = readPositiveIntegerEnv("RECALL_TUI_PTY_TYPE_DELAY_MS");
   if (!delayMs || opts.delay === false) {
     pty.write(data);
     return;
   }
-  const chunkSize = readPositiveIntegerEnv("OPENCLAW_TUI_PTY_TYPE_CHUNK_SIZE") ?? 1;
+  const chunkSize = readPositiveIntegerEnv("RECALL_TUI_PTY_TYPE_CHUNK_SIZE") ?? 1;
   for (let idx = 0; idx < data.length; idx += chunkSize) {
     pty.write(data.slice(idx, idx + chunkSize));
     if (idx + chunkSize < data.length) {
@@ -93,7 +93,7 @@ function waitFor<T>(params: {
 }
 
 function mirrorPtyOutput(data: string) {
-  const mirrorPath = process.env.OPENCLAW_TUI_PTY_MIRROR_PATH;
+  const mirrorPath = process.env.RECALL_TUI_PTY_MIRROR_PATH;
   if (!mirrorPath) {
     return;
   }
@@ -105,8 +105,8 @@ function startPty(command: string, args: string[], opts: { cwd: string; env: Nod
   let exitEvent: PtyExitEvent | null = null;
   const pty = spawnPty(command, args, {
     name: "xterm-256color",
-    cols: readPtyDimensionEnv("OPENCLAW_TUI_PTY_COLS", 100),
-    rows: readPtyDimensionEnv("OPENCLAW_TUI_PTY_ROWS", 30),
+    cols: readPtyDimensionEnv("RECALL_TUI_PTY_COLS", 100),
+    rows: readPtyDimensionEnv("RECALL_TUI_PTY_ROWS", 30),
     cwd: opts.cwd,
     env: {
       ...process.env,
@@ -321,19 +321,19 @@ function buildLocalModeConfig(params: { workspaceDir: string; providerBaseUrl: s
       auth: { mode: "token", token: "tui-pty-local" },
     },
     discovery: { mdns: { mode: "off" } },
-  } satisfies OpenClawConfig;
+  } satisfies RecallConfig;
 }
 
 async function startLocalModeTui() {
   const replyText = "LOCAL_PTY_RESPONSE";
-  const tempDir = await mkdtemp(path.join(tmpdir(), "openclaw-tui-pty-local-"));
+  const tempDir = await mkdtemp(path.join(tmpdir(), "recall-tui-pty-local-"));
   const workspaceDir = path.join(tempDir, "workspace");
   const homeDir = path.join(tempDir, "home");
   const stateDir = path.join(tempDir, "state");
   const xdgConfigHome = path.join(tempDir, "xdg-config");
   const xdgDataHome = path.join(tempDir, "xdg-data");
   const xdgCacheHome = path.join(tempDir, "xdg-cache");
-  const configPath = path.join(tempDir, "openclaw.json");
+  const configPath = path.join(tempDir, "recall.json");
   const mockModel = await startMockModelServer(replyText);
   await Promise.all([
     mkdir(workspaceDir, { recursive: true }),
@@ -353,14 +353,14 @@ async function startLocalModeTui() {
     cwd: process.cwd(),
     env: {
       HOME: homeDir,
-      OPENCLAW_HOME: homeDir,
-      OPENCLAW_CONFIG_PATH: configPath,
-      OPENCLAW_STATE_DIR: stateDir,
+      RECALL_HOME: homeDir,
+      RECALL_CONFIG_PATH: configPath,
+      RECALL_STATE_DIR: stateDir,
       XDG_CONFIG_HOME: xdgConfigHome,
       XDG_DATA_HOME: xdgDataHome,
       XDG_CACHE_HOME: xdgCacheHome,
-      OPENCLAW_THEME: "dark",
-      OPENCLAW_CODEX_DISCOVERY_LIVE: "0",
+      RECALL_THEME: "dark",
+      RECALL_CODEX_DISCOVERY_LIVE: "0",
       NO_COLOR: undefined,
     },
   });

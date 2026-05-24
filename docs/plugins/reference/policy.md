@@ -11,8 +11,8 @@ Adds policy-backed doctor checks for workspace conformance.
 
 ## Distribution
 
-- Package: `@openclaw/policy`
-- Install route: included in OpenClaw
+- Package: `@recall/policy`
+- Install route: included in Recall
 
 ## Surface
 

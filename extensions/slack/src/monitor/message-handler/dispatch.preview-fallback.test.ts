@@ -272,11 +272,11 @@ function createPreparedSlackMessage(params?: {
   } as never;
 }
 
-vi.mock("openclaw/plugin-sdk/agent-runtime", () => ({
+vi.mock("recall/plugin-sdk/agent-runtime", () => ({
   resolveHumanDelayConfig: () => undefined,
 }));
 
-vi.mock("openclaw/plugin-sdk/channel-feedback", () => ({
+vi.mock("recall/plugin-sdk/channel-feedback", () => ({
   DEFAULT_TIMING: {
     doneHoldMs: 0,
     errorHoldMs: 0,
@@ -294,8 +294,8 @@ vi.mock("../conversation.runtime.js", () => ({
   recordInboundSession: recordInboundSessionMock,
 }));
 
-vi.mock("openclaw/plugin-sdk/channel-message", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/channel-message")>();
+vi.mock("recall/plugin-sdk/channel-message", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/channel-message")>();
   return {
     ...actual,
     createChannelMessageReplyPipeline: (params: {
@@ -344,7 +344,7 @@ vi.mock("openclaw/plugin-sdk/channel-message", async (importOriginal) => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/channel-streaming", () => ({
+vi.mock("recall/plugin-sdk/channel-streaming", () => ({
   buildChannelProgressDraftLine: (params: {
     progressText?: string;
     summary?: string;
@@ -522,18 +522,18 @@ vi.mock("openclaw/plugin-sdk/channel-streaming", () => ({
     Boolean(name && !["message", "react", "reaction"].includes(name.toLowerCase())),
 }));
 
-vi.mock("openclaw/plugin-sdk/outbound-runtime", () => ({
+vi.mock("recall/plugin-sdk/outbound-runtime", () => ({
   resolveAgentOutboundIdentity: () => undefined,
 }));
 
-vi.mock("openclaw/plugin-sdk/reply-history", () => ({
+vi.mock("recall/plugin-sdk/reply-history", () => ({
   clearHistoryEntriesIfEnabled: () => {},
   createChannelHistoryWindow: () => ({
     clear: () => {},
   }),
 }));
 
-vi.mock("openclaw/plugin-sdk/reply-payload", () => ({
+vi.mock("recall/plugin-sdk/reply-payload", () => ({
   buildTtsSupplementMediaPayload: (payload: {
     text?: string;
     mediaUrl?: string;
@@ -578,17 +578,17 @@ vi.mock("openclaw/plugin-sdk/reply-payload", () => ({
   },
 }));
 
-vi.mock("openclaw/plugin-sdk/runtime-env", () => ({
+vi.mock("recall/plugin-sdk/runtime-env", () => ({
   danger: (message: string) => message,
   logVerbose: () => {},
   shouldLogVerbose: () => false,
 }));
 
-vi.mock("openclaw/plugin-sdk/security-runtime", () => ({
+vi.mock("recall/plugin-sdk/security-runtime", () => ({
   resolvePinnedMainDmOwnerFromAllowlist: () => mockedPinnedMainDmOwner,
 }));
 
-vi.mock("openclaw/plugin-sdk/string-coerce-runtime", () => ({
+vi.mock("recall/plugin-sdk/string-coerce-runtime", () => ({
   normalizeOptionalLowercaseString: (value?: string) => value?.toLowerCase(),
   normalizeOptionalString: (value?: string) => value,
 }));
@@ -659,7 +659,7 @@ vi.mock("../allow-list.js", () => ({
 }));
 
 vi.mock("../config.runtime.js", () => ({
-  resolveStorePath: () => "/tmp/openclaw-store.json",
+  resolveStorePath: () => "/tmp/recall-store.json",
   updateLastRoute: updateLastRouteMock,
 }));
 
@@ -1015,7 +1015,7 @@ describe("dispatchPreparedSlackMessage preview fallback", () => {
     );
 
     expect(updateLastRouteMock).toHaveBeenCalledWith({
-      storePath: "/tmp/openclaw-store.json",
+      storePath: "/tmp/recall-store.json",
       sessionKey: "agent:main:slack:direct:u1",
       deliveryContext: {
         channel: "slack",
@@ -1056,7 +1056,7 @@ describe("dispatchPreparedSlackMessage preview fallback", () => {
     );
 
     expect(updateLastRouteMock).toHaveBeenCalledWith({
-      storePath: "/tmp/openclaw-store.json",
+      storePath: "/tmp/recall-store.json",
       sessionKey: "agent:main:main",
       deliveryContext: {
         channel: "slack",
@@ -1096,7 +1096,7 @@ describe("dispatchPreparedSlackMessage preview fallback", () => {
     );
 
     expect(updateLastRouteMock).toHaveBeenCalledWith({
-      storePath: "/tmp/openclaw-store.json",
+      storePath: "/tmp/recall-store.json",
       sessionKey: "agent:main:main",
       deliveryContext: {
         channel: "slack",

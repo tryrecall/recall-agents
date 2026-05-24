@@ -242,8 +242,8 @@ export function registerMantisCli(qa: Command) {
     .description("Verify the Mantis Discord bot can see the guild/channel, post, and react")
     .option("--repo-root <path>", "Repository root to target when running from a neutral cwd")
     .option("--output-dir <path>", "Mantis Discord smoke artifact directory")
-    .option("--guild-id <id>", "Override OPENCLAW_QA_DISCORD_GUILD_ID")
-    .option("--channel-id <id>", "Override OPENCLAW_QA_DISCORD_CHANNEL_ID")
+    .option("--guild-id <id>", "Override RECALL_QA_DISCORD_GUILD_ID")
+    .option("--channel-id <id>", "Override RECALL_QA_DISCORD_CHANNEL_ID")
     .option("--token-env <name>", "Env var containing the Mantis Discord bot token")
     .option("--token-file <path>", "File containing the Mantis Discord bot token")
     .option("--token-file-env <name>", "Env var containing the Mantis Discord bot token file path")
@@ -326,7 +326,7 @@ export function registerMantisCli(qa: Command) {
     .option("--ttl <duration>", "Crabbox maximum lease lifetime")
     .option("--keep-lease", "Keep a lease created by this run after a passing smoke")
     .option("--no-keep-lease", "Stop a lease created by this run after a passing smoke")
-    .option("--gateway-setup", "Start a persistent OpenClaw Slack gateway inside the VNC VM")
+    .option("--gateway-setup", "Start a persistent Recall Slack gateway inside the VNC VM")
     .option(
       "--approval-checkpoints",
       "Run Slack approval scenarios with visual checkpoint screenshot acknowledgements",
@@ -380,7 +380,7 @@ export function registerMantisCli(qa: Command) {
   mantis
     .command("telegram-desktop-builder")
     .description(
-      "Lease or reuse a Crabbox VNC desktop, install Telegram Desktop, configure OpenClaw Telegram with a bot token, and capture screenshot/video artifacts",
+      "Lease or reuse a Crabbox VNC desktop, install Telegram Desktop, configure Recall Telegram with a bot token, and capture screenshot/video artifacts",
     )
     .option("--repo-root <path>", "Repository root to target when running from a neutral cwd")
     .option("--output-dir <path>", "Mantis Telegram desktop builder artifact directory")
@@ -393,7 +393,7 @@ export function registerMantisCli(qa: Command) {
     .option("--ttl <duration>", "Crabbox maximum lease lifetime")
     .option("--keep-lease", "Keep a lease created by this run after a passing builder run")
     .option("--no-keep-lease", "Stop a lease created by this run after a passing builder run")
-    .option("--no-gateway-setup", "Install Telegram Desktop only; do not configure OpenClaw")
+    .option("--no-gateway-setup", "Install Telegram Desktop only; do not configure Recall")
     .option("--credential-source <source>", "Credential source for Telegram setup: env or convex")
     .option("--credential-role <role>", "Credential role for convex auth")
     .option("--hydrate-mode <mode>", "Remote hydrate mode: source or prehydrated")

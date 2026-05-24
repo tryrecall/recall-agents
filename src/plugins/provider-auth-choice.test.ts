@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createWizardPrompter } from "../../test/helpers/wizard-prompter.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { createNonExitingRuntime } from "../runtime.js";
 import type { ProviderPlugin } from "./types.js";
 
@@ -54,7 +54,7 @@ describe("applyAuthChoicePluginProvider", () => {
         }) as never,
     });
     ensureCodexRuntimePluginForModelSelection.mockImplementation(
-      async ({ cfg }: { cfg: OpenClawConfig }) => ({
+      async ({ cfg }: { cfg: RecallConfig }) => ({
         installed: true,
         cfg: {
           ...cfg,
@@ -69,7 +69,7 @@ describe("applyAuthChoicePluginProvider", () => {
       }),
     );
     offerPostInstallMigrations.mockImplementation(
-      async ({ config }: { config: OpenClawConfig }) => ({
+      async ({ config }: { config: RecallConfig }) => ({
         config: {
           ...config,
           plugins: {

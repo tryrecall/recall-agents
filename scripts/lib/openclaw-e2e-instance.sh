@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 # Shared in-container lifecycle helpers for Docker/Bash E2E lanes.
-openclaw_e2e_eval_test_state_from_b64() { eval "$(printf '%s' "${1:?missing OpenClaw test-state script}" | base64 -d)"; }
+openclaw_e2e_eval_test_state_from_b64() { eval "$(printf '%s' "${1:?missing Recall test-state script}" | base64 -d)"; }
 openclaw_e2e_resolve_entrypoint() {
   local entry
   for entry in dist/index.mjs dist/index.js; do
     [ -f "$entry" ] && { printf '%s\n' "$entry"; return 0; }
   done
-  echo "OpenClaw entrypoint not found under dist/" >&2
+  echo "Recall entrypoint not found under dist/" >&2
   return 1
 }
 openclaw_e2e_package_root() {
   local prefix="${1:-}"
   if [ -n "$prefix" ]; then
-    printf '%s/lib/node_modules/openclaw\n' "$prefix"
+    printf '%s/lib/node_modules/recall\n' "$prefix"
     return 0
   fi
-  printf '%s/openclaw\n' "$(npm root -g)"
+  printf '%s/recall\n' "$(npm root -g)"
 }
 openclaw_e2e_package_entrypoint() {
   local root="${1:?missing package root}"
@@ -23,14 +23,14 @@ openclaw_e2e_package_entrypoint() {
   for entry in "$root/dist/index.mjs" "$root/dist/index.js"; do
     [ -f "$entry" ] && { printf '%s\n' "$entry"; return 0; }
   done
-  echo "OpenClaw package entrypoint not found under $root/dist/" >&2
+  echo "Recall package entrypoint not found under $root/dist/" >&2
   return 1
 }
 openclaw_e2e_install_package() {
   local log_file="$1"
-  local label="${2:-mounted OpenClaw package}"
+  local label="${2:-mounted Recall package}"
   local prefix="${3:-}"
-  local package_tgz="${OPENCLAW_CURRENT_PACKAGE_TGZ:?missing OPENCLAW_CURRENT_PACKAGE_TGZ}"
+  local package_tgz="${RECALL_CURRENT_PACKAGE_TGZ:?missing RECALL_CURRENT_PACKAGE_TGZ}"
   local args=(-g)
   if [ -n "$prefix" ]; then
     args+=("--prefix" "$prefix")
@@ -78,20 +78,20 @@ openclaw_e2e_assert_dep_present() {
   exit 1
 }
 openclaw_e2e_write_state_env() {
-  local target="${1:-/tmp/openclaw-test-state-env}"
+  local target="${1:-/tmp/recall-test-state-env}"
   {
     printf 'export HOME=%q\n' "$HOME"
-    printf 'export OPENCLAW_HOME=%q\n' "$OPENCLAW_HOME"
-    printf 'export OPENCLAW_STATE_DIR=%q\n' "$OPENCLAW_STATE_DIR"
-    printf 'export OPENCLAW_CONFIG_PATH=%q\n' "$OPENCLAW_CONFIG_PATH"
-    printf 'export OPENCLAW_AGENT_DIR=%q\n' "${OPENCLAW_AGENT_DIR-}"
+    printf 'export RECALL_HOME=%q\n' "$RECALL_HOME"
+    printf 'export RECALL_STATE_DIR=%q\n' "$RECALL_STATE_DIR"
+    printf 'export RECALL_CONFIG_PATH=%q\n' "$RECALL_CONFIG_PATH"
+    printf 'export RECALL_AGENT_DIR=%q\n' "${RECALL_AGENT_DIR-}"
     printf 'export PI_CODING_AGENT_DIR=%q\n' "${PI_CODING_AGENT_DIR-}"
   } >"$target"
 }
 openclaw_e2e_install_trash_shim() {
-  export PATH="/tmp/openclaw-bin:$PATH"
-  mkdir -p /tmp/openclaw-bin
-  cat >/tmp/openclaw-bin/trash <<'TRASH'
+  export PATH="/tmp/recall-bin:$PATH"
+  mkdir -p /tmp/recall-bin
+  cat >/tmp/recall-bin/trash <<'TRASH'
 #!/usr/bin/env bash
 set -euo pipefail
 trash_dir="$HOME/.Trash"
@@ -104,7 +104,7 @@ for target in "$@"; do
   mv "$target" "$dest"
 done
 TRASH
-  chmod +x /tmp/openclaw-bin/trash
+  chmod +x /tmp/recall-bin/trash
 }
 openclaw_e2e_run_script_with_pty() {
   local command="$1"
@@ -201,7 +201,7 @@ openclaw_e2e_assert_log_not_contains() {
   ! grep -q "$2" "$1" || { echo "Unexpected log output: $2"; exit 1; }
 }
 openclaw_e2e_run_logged() {
-  local label="$1" log_path="/tmp/openclaw-onboard-${1}.log"
+  local label="$1" log_path="/tmp/recall-onboard-${1}.log"
   shift
   "$@" >"$log_path" 2>&1 || { cat "$log_path"; exit 1; }
 }
@@ -209,6 +209,6 @@ openclaw_e2e_dump_logs() {
   local path
   for path in "$@"; do
     [ -f "$path" ] || continue
-    echo "--- $path ---"; tail -n "${OPENCLAW_E2E_LOG_TAIL_LINES:-120}" "$path" || true
+    echo "--- $path ---"; tail -n "${RECALL_E2E_LOG_TAIL_LINES:-120}" "$path" || true
   done
 }

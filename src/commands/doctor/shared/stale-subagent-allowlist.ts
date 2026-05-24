@@ -1,5 +1,5 @@
 import { listAgentIds } from "../../../agents/agent-scope-config.js";
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { RecallConfig } from "../../../config/types.recall.js";
 import { normalizeAgentId } from "../../../routing/session-key.js";
 import { normalizeOptionalString } from "../../../shared/string-coerce.js";
 
@@ -17,7 +17,7 @@ function normalizeOptionalAgentId(value: string | undefined | null): string | un
   return normalizeAgentId(trimmed);
 }
 
-function collectConfiguredSubagentTargetIds(cfg: OpenClawConfig): Set<string> {
+function collectConfiguredSubagentTargetIds(cfg: RecallConfig): Set<string> {
   const ids = new Set<string>(listAgentIds(cfg));
   for (const agent of cfg.agents?.list ?? []) {
     if (agent.runtime?.type !== "acp") {
@@ -81,7 +81,7 @@ function collectStaleAllowlistEntries(params: {
 }
 
 export function scanStaleSubagentAllowlistReferences(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
 ): StaleSubagentAllowlistHit[] {
   const configuredTargetIds = collectConfiguredSubagentTargetIds(cfg);
   const hits: StaleSubagentAllowlistHit[] = [];
@@ -131,8 +131,8 @@ function filterAllowAgents(params: {
   });
 }
 
-export function maybeRepairStaleSubagentAllowlists(cfg: OpenClawConfig): {
-  config: OpenClawConfig;
+export function maybeRepairStaleSubagentAllowlists(cfg: RecallConfig): {
+  config: RecallConfig;
   changes: string[];
 } {
   const hits = scanStaleSubagentAllowlistReferences(cfg);

@@ -1,5 +1,5 @@
 ---
-summary: "Install, configure, and manage OpenClaw plugins"
+summary: "Install, configure, and manage Recall plugins"
 read_when:
   - Installing or configuring plugins
   - Understanding plugin discovery and load rules
@@ -9,7 +9,7 @@ sidebarTitle: "Getting Started"
 doc-schema-version: 1
 ---
 
-Plugins extend OpenClaw with channels, model providers, agent harnesses, tools,
+Plugins extend Recall with channels, model providers, agent harnesses, tools,
 skills, speech, realtime transcription, voice, media understanding, generation,
 web fetch, web search, and other runtime capabilities.
 
@@ -23,7 +23,7 @@ inventory of bundled, official external, and source-only plugins, see
 
 Before installing a plugin, make sure you have:
 
-- an OpenClaw checkout or installation with the `openclaw` CLI available
+- an Recall checkout or installation with the `recall` CLI available
 - network access to the selected source, such as ClawHub, npm, or a git host
 - any plugin-specific credentials, config keys, or operating-system tools named
   by that plugin's setup docs
@@ -36,7 +36,7 @@ Before installing a plugin, make sure you have:
     Search [ClawHub](/clawhub) for public plugin packages:
 
     ```bash
-    openclaw plugins search "calendar"
+    recall plugins search "calendar"
     ```
 
     ClawHub is the primary discovery surface for community plugins. During the
@@ -48,17 +48,17 @@ Before installing a plugin, make sure you have:
   <Step title="Install the plugin">
     ```bash
     # From ClawHub.
-    openclaw plugins install clawhub:<package>
+    recall plugins install clawhub:<package>
 
     # From npm.
-    openclaw plugins install npm:<package>
+    recall plugins install npm:<package>
 
     # From git.
-    openclaw plugins install git:github.com/<owner>/<repo>@<ref>
+    recall plugins install git:github.com/<owner>/<repo>@<ref>
 
     # From a local development checkout.
-    openclaw plugins install ./my-plugin
-    openclaw plugins install --link ./my-plugin
+    recall plugins install ./my-plugin
+    recall plugins install --link ./my-plugin
     ```
 
     Treat plugin installs like running code. Prefer pinned versions when you
@@ -71,12 +71,12 @@ Before installing a plugin, make sure you have:
     Enable the plugin when it is not already enabled:
 
     ```bash
-    openclaw plugins enable <plugin-id>
+    recall plugins enable <plugin-id>
     ```
 
     If your config uses a restrictive `plugins.allow` list, the installed plugin
     id must be present there before the plugin can load.
-    `openclaw plugins install` adds the installed id to an existing
+    `recall plugins install` adds the installed id to an existing
     `plugins.allow` list and removes the same id from `plugins.deny` so the
     explicit install can load after restart.
 
@@ -85,12 +85,12 @@ Before installing a plugin, make sure you have:
   <Step title="Let the Gateway reload">
     Installing, updating, or uninstalling plugin code requires a Gateway
     restart. When a managed Gateway is already running with config reload
-    enabled, OpenClaw detects the changed plugin install record and restarts the
+    enabled, Recall detects the changed plugin install record and restarts the
     Gateway automatically. If the Gateway is not managed or reload is disabled,
     restart it yourself:
 
     ```bash
-    openclaw gateway restart
+    recall gateway restart
     ```
 
     Enable and disable operations update config and refresh the cold registry.
@@ -101,7 +101,7 @@ Before installing a plugin, make sure you have:
 
   <Step title="Verify runtime registration">
     ```bash
-    openclaw plugins inspect <plugin-id> --runtime --json
+    recall plugins inspect <plugin-id> --runtime --json
     ```
 
     Use `--runtime` when you need to prove registered tools, hooks, services,
@@ -117,18 +117,18 @@ Before installing a plugin, make sure you have:
 
 | Source      | Use when                                                                       | Example                                                        |
 | ----------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------- |
-| ClawHub     | You want OpenClaw-native discovery, scans, version metadata, and install hints | `openclaw plugins install clawhub:<package>`                   |
-| npm         | You need direct npm registry or dist-tag workflows                             | `openclaw plugins install npm:<package>`                       |
-| git         | You need a branch, tag, or commit from a repository                            | `openclaw plugins install git:github.com/<owner>/<repo>@<ref>` |
-| local path  | You are developing or testing a plugin on the same machine                     | `openclaw plugins install --link ./my-plugin`                  |
-| marketplace | You are installing a Claude-compatible marketplace plugin                      | `openclaw plugins install <plugin> --marketplace <source>`     |
+| ClawHub     | You want Recall-native discovery, scans, version metadata, and install hints | `recall plugins install clawhub:<package>`                   |
+| npm         | You need direct npm registry or dist-tag workflows                             | `recall plugins install npm:<package>`                       |
+| git         | You need a branch, tag, or commit from a repository                            | `recall plugins install git:github.com/<owner>/<repo>@<ref>` |
+| local path  | You are developing or testing a plugin on the same machine                     | `recall plugins install --link ./my-plugin`                  |
+| marketplace | You are installing a Claude-compatible marketplace plugin                      | `recall plugins install <plugin> --marketplace <source>`     |
 
 Bare package specs have special compatibility behavior. If the bare name matches
-a bundled plugin id, OpenClaw uses that bundled source. If it matches an
-official external plugin id, OpenClaw uses the official package catalog. Other
+a bundled plugin id, Recall uses that bundled source. If it matches an
+official external plugin id, Recall uses the official package catalog. Other
 ordinary bare package specs install through npm during the launch cutover. Use
 `clawhub:`, `npm:`, `git:`, or `npm-pack:` when you need deterministic source
-selection. See [`openclaw plugins`](/cli/plugins#install) for the full command
+selection. See [`recall plugins`](/cli/plugins#install) for the full command
 contract.
 
 ### Configure plugin policy
@@ -178,97 +178,97 @@ Key policy rules:
   `codex` plugin owns Codex app-server runtime for canonical `openai/*` agent
   refs, explicit `agentRuntime.id: "codex"`, and legacy `codex/*` refs.
 
-Run `openclaw doctor` or `openclaw doctor --fix` when config validation reports
+Run `recall doctor` or `recall doctor --fix` when config validation reports
 stale plugin ids, allowlist/tool mismatches, or legacy bundled plugin paths.
 
 ## Understand plugin formats
 
-OpenClaw recognizes two plugin formats:
+Recall recognizes two plugin formats:
 
 | Format                 | How it loads                                                                 | Use when                                                               |
 | ---------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Native OpenClaw plugin | `openclaw.plugin.json` plus a runtime module loaded in process               | You are installing or building OpenClaw-specific runtime capabilities  |
-| Compatible bundle      | Codex, Claude, or Cursor plugin layout mapped into OpenClaw plugin inventory | You are reusing compatible skills, commands, hooks, or bundle metadata |
+| Native Recall plugin | `recall.plugin.json` plus a runtime module loaded in process               | You are installing or building Recall-specific runtime capabilities  |
+| Compatible bundle      | Codex, Claude, or Cursor plugin layout mapped into Recall plugin inventory | You are reusing compatible skills, commands, hooks, or bundle metadata |
 
-Both formats appear in `openclaw plugins list`, `openclaw plugins inspect`,
-`openclaw plugins enable`, and `openclaw plugins disable`. See
+Both formats appear in `recall plugins list`, `recall plugins inspect`,
+`recall plugins enable`, and `recall plugins disable`. See
 [Plugin bundles](/plugins/bundles) for the bundle compatibility boundary and
 [Building plugins](/plugins/building-plugins) for native plugin authoring.
 
 ## Verify the active Gateway
 
-`openclaw plugins list` and plain `openclaw plugins inspect` read cold config,
+`recall plugins list` and plain `recall plugins inspect` read cold config,
 manifest, and registry state. They do not prove that an already-running Gateway
 has imported the same plugin code.
 
 When a plugin appears installed but live chat traffic does not use it:
 
 ```bash
-openclaw gateway status --deep --require-rpc
-openclaw plugins inspect <plugin-id> --runtime --json
-openclaw gateway restart
+recall gateway status --deep --require-rpc
+recall plugins inspect <plugin-id> --runtime --json
+recall gateway restart
 ```
 
 Managed Gateways restart automatically after plugin install, update, and
 uninstall changes that alter plugin source. On VPS or container installs, make
-sure any manual restart targets the actual `openclaw gateway run` child that
+sure any manual restart targets the actual `recall gateway run` child that
 serves your channels, not only a wrapper or supervisor.
 
 ## Troubleshooting
 
 | Symptom                                                        | Check                                                                                                                                      | Fix                                                                                                     |
 | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| Plugin appears in `plugins list` but runtime hooks do not run  | Use `openclaw plugins inspect <id> --runtime --json` and confirm the active Gateway with `gateway status --deep --require-rpc`             | Restart the live Gateway after install, update, config, or source changes                               |
-| Duplicate channel or tool ownership diagnostics appear         | Run `openclaw plugins list --enabled --verbose`, inspect each suspected plugin with `--runtime --json`, and compare channel/tool ownership | Disable one owner, remove stale installs, or use manifest `preferOver` for intentional replacement      |
+| Plugin appears in `plugins list` but runtime hooks do not run  | Use `recall plugins inspect <id> --runtime --json` and confirm the active Gateway with `gateway status --deep --require-rpc`             | Restart the live Gateway after install, update, config, or source changes                               |
+| Duplicate channel or tool ownership diagnostics appear         | Run `recall plugins list --enabled --verbose`, inspect each suspected plugin with `--runtime --json`, and compare channel/tool ownership | Disable one owner, remove stale installs, or use manifest `preferOver` for intentional replacement      |
 | Config says a plugin is missing                                | Check [Plugin inventory](/plugins/plugin-inventory) for whether it is bundled, official external, or source-only                           | Install the external package, enable the bundled plugin, or remove stale config                         |
-| Config is invalid during install                               | Read the validation message and run `openclaw doctor --fix` when it points to stale plugin state                                           | Doctor can quarantine invalid plugin config by disabling the entry and removing the invalid payload     |
-| Plugin path is blocked for suspicious ownership or permissions | Inspect the diagnostic before the config error                                                                                             | Fix filesystem ownership/permissions, then run `openclaw plugins registry --refresh`                    |
-| `OPENCLAW_NIX_MODE=1` blocks lifecycle commands                | Confirm the install is managed by Nix                                                                                                      | Change plugin selection in the Nix source instead of using plugin mutator commands                      |
-| Dependency import fails at runtime                             | Check whether the plugin was installed through npm/git/ClawHub or loaded from a local path                                                 | Run `openclaw plugins update <id>`, reinstall the source, or install local plugin dependencies yourself |
+| Config is invalid during install                               | Read the validation message and run `recall doctor --fix` when it points to stale plugin state                                           | Doctor can quarantine invalid plugin config by disabling the entry and removing the invalid payload     |
+| Plugin path is blocked for suspicious ownership or permissions | Inspect the diagnostic before the config error                                                                                             | Fix filesystem ownership/permissions, then run `recall plugins registry --refresh`                    |
+| `RECALL_NIX_MODE=1` blocks lifecycle commands                | Confirm the install is managed by Nix                                                                                                      | Change plugin selection in the Nix source instead of using plugin mutator commands                      |
+| Dependency import fails at runtime                             | Check whether the plugin was installed through npm/git/ClawHub or loaded from a local path                                                 | Run `recall plugins update <id>`, reinstall the source, or install local plugin dependencies yourself |
 
 When stale plugin config still names a no-longer-discoverable channel plugin,
 Gateway startup skips that plugin-backed channel instead of blocking every
-other channel. Run `openclaw doctor --fix` to remove stale plugin and channel
+other channel. Run `recall doctor --fix` to remove stale plugin and channel
 entries. Unknown channel keys without stale-plugin evidence still fail
 validation so typos stay visible.
 
 For intentional channel replacement, the preferred plugin should declare
 `channelConfigs.<channel-id>.preferOver` with the legacy or lower-priority
-plugin id. If both plugins are explicitly enabled, OpenClaw keeps that request
+plugin id. If both plugins are explicitly enabled, Recall keeps that request
 and reports duplicate channel or tool diagnostics instead of silently choosing
 one owner.
 
 If an installed package reports that it `requires compiled runtime output for
 TypeScript entry ...`, the package was published without the JavaScript files
-OpenClaw needs at runtime. Update or reinstall after the publisher ships
+Recall needs at runtime. Update or reinstall after the publisher ships
 compiled JavaScript, or disable/uninstall the plugin until then.
 
 ### Blocked plugin path ownership
 
 If plugin diagnostics say
 `blocked plugin candidate: suspicious ownership (... uid=1000, expected uid=0 or root)`
-and config validation follows with `plugin present but blocked`, OpenClaw found
+and config validation follows with `plugin present but blocked`, Recall found
 plugin files owned by a different Unix user than the process that is loading
 them. Keep the plugin config in place; fix the filesystem ownership or run
-OpenClaw as the same user that owns the state directory.
+Recall as the same user that owns the state directory.
 
 For Docker installs, the official image runs as `node` (uid `1000`), so the
-host bind-mounted OpenClaw config and workspace directories should normally be
+host bind-mounted Recall config and workspace directories should normally be
 owned by uid `1000`:
 
 ```bash
-sudo chown -R 1000:1000 /path/to/openclaw-config /path/to/openclaw-workspace
+sudo chown -R 1000:1000 /path/to/recall-config /path/to/recall-workspace
 ```
 
-If you intentionally run OpenClaw as root, repair the managed plugin root to
+If you intentionally run Recall as root, repair the managed plugin root to
 root ownership instead:
 
 ```bash
-sudo chown -R root:root /path/to/openclaw-config/npm
+sudo chown -R root:root /path/to/recall-config/npm
 ```
 
-After fixing ownership, rerun `openclaw doctor --fix` or
-`openclaw plugins registry --refresh` so the persisted plugin registry matches
+After fixing ownership, rerun `recall doctor --fix` or
+`recall plugins registry --refresh` so the persisted plugin registry matches
 the repaired files.
 
 ### Slow plugin tool setup
@@ -277,8 +277,8 @@ If agent turns appear to stall while preparing tools, enable trace logging and
 check for plugin tool factory timing lines:
 
 ```bash
-openclaw config set logging.level trace
-openclaw logs --follow
+recall config set logging.level trace
+recall logs --follow
 ```
 
 Look for:
@@ -292,7 +292,7 @@ including plugin id, declared tool names, result shape, and whether the tool is
 optional. Slow lines are promoted to warnings when a single factory takes at
 least 1s or total plugin tool factory prep takes at least 5s.
 
-OpenClaw caches successful plugin tool factory results for repeated resolutions
+Recall caches successful plugin tool factory results for repeated resolutions
 with the same effective request context. The cache key includes the effective
 runtime config, workspace, agent/session ids, sandbox policy, browser settings,
 delivery context, requester identity, and ownership state, so factories that
@@ -303,7 +303,7 @@ definitions.
 If one plugin dominates the timing, inspect its runtime registrations:
 
 ```bash
-openclaw plugins inspect <plugin-id> --runtime --json
+recall plugins inspect <plugin-id> --runtime --json
 ```
 
 Then update, reinstall, or disable that plugin. Plugin authors should move
@@ -317,7 +317,7 @@ reload behavior, and legacy cleanup, see
 ## Related
 
 - [Manage plugins](/plugins/manage-plugins) - command examples for list, install, update, uninstall, and publish
-- [`openclaw plugins`](/cli/plugins) - full CLI reference
+- [`recall plugins`](/cli/plugins) - full CLI reference
 - [Plugin inventory](/plugins/plugin-inventory) - generated bundled and external plugin list
 - [Plugin reference](/plugins/reference) - generated per-plugin reference pages
 - [Community plugins](/plugins/community) - ClawHub discovery and docs PR policy

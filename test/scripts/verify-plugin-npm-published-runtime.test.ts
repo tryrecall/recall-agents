@@ -5,18 +5,18 @@ describe("collectPluginNpmPublishedRuntimeErrors", () => {
   it("flags published plugin packages with TypeScript entries and no compiled runtime output", () => {
     expect(
       collectPluginNpmPublishedRuntimeErrors({
-        spec: "@openclaw/discord@2026.5.2",
+        spec: "@recall/discord@2026.5.2",
         packageJson: {
-          name: "@openclaw/discord",
+          name: "@recall/discord",
           version: "2026.5.2",
-          openclaw: {
+          recall: {
             extensions: ["./index.ts"],
           },
         },
         files: ["package.json", "index.ts"],
       }),
     ).toEqual([
-      "@openclaw/discord@2026.5.2 requires compiled runtime output for TypeScript entry ./index.ts: expected ./dist/index.js, ./dist/index.mjs, ./dist/index.cjs, ./index.js, ./index.mjs, ./index.cjs",
+      "@recall/discord@2026.5.2 requires compiled runtime output for TypeScript entry ./index.ts: expected ./dist/index.js, ./dist/index.mjs, ./dist/index.cjs, ./index.js, ./index.mjs, ./index.cjs",
     ]);
   });
 
@@ -24,9 +24,9 @@ describe("collectPluginNpmPublishedRuntimeErrors", () => {
     expect(
       collectPluginNpmPublishedRuntimeErrors({
         packageJson: {
-          name: "@openclaw/zalo",
+          name: "@recall/zalo",
           version: "2026.5.3",
-          openclaw: {
+          recall: {
             extensions: ["./index.ts"],
             runtimeExtensions: ["./dist/index.js"],
           },
@@ -40,25 +40,25 @@ describe("collectPluginNpmPublishedRuntimeErrors", () => {
     expect(
       collectPluginNpmPublishedRuntimeErrors({
         packageJson: {
-          name: "@openclaw/line",
+          name: "@recall/line",
           version: "2026.5.3",
-          openclaw: {
+          recall: {
             extensions: ["./src/index.ts"],
             runtimeExtensions: ["./dist/index.js"],
           },
         },
         files: ["package.json", "src/index.ts"],
       }),
-    ).toEqual(["@openclaw/line@2026.5.3 runtime extension entry not found: ./dist/index.js"]);
+    ).toEqual(["@recall/line@2026.5.3 runtime extension entry not found: ./dist/index.js"]);
   });
 
   it("flags runtimeExtensions length mismatches", () => {
     expect(
       collectPluginNpmPublishedRuntimeErrors({
         packageJson: {
-          name: "@openclaw/acpx",
+          name: "@recall/acpx",
           version: "2026.5.3",
-          openclaw: {
+          recall: {
             extensions: ["./index.ts", "./tools.ts"],
             runtimeExtensions: ["./dist/index.js"],
           },
@@ -66,7 +66,7 @@ describe("collectPluginNpmPublishedRuntimeErrors", () => {
         files: ["package.json", "dist/index.js"],
       }),
     ).toEqual([
-      "@openclaw/acpx@2026.5.3 package.json openclaw.runtimeExtensions length (1) must match openclaw.extensions length (2)",
+      "@recall/acpx@2026.5.3 package.json recall.runtimeExtensions length (1) must match recall.extensions length (2)",
     ]);
   });
 
@@ -74,9 +74,9 @@ describe("collectPluginNpmPublishedRuntimeErrors", () => {
     expect(
       collectPluginNpmPublishedRuntimeErrors({
         packageJson: {
-          name: "@openclaw/whatsapp",
+          name: "@recall/whatsapp",
           version: "2026.5.3",
-          openclaw: {
+          recall: {
             extensions: ["./src/index.ts"],
             runtimeExtensions: [" "],
           },
@@ -84,7 +84,7 @@ describe("collectPluginNpmPublishedRuntimeErrors", () => {
         files: ["package.json", "src/index.ts", "dist/index.js"],
       }),
     ).toEqual([
-      "@openclaw/whatsapp@2026.5.3 package.json openclaw.runtimeExtensions[0] must be a non-empty string",
+      "@recall/whatsapp@2026.5.3 package.json recall.runtimeExtensions[0] must be a non-empty string",
     ]);
   });
 
@@ -92,9 +92,9 @@ describe("collectPluginNpmPublishedRuntimeErrors", () => {
     expect(
       collectPluginNpmPublishedRuntimeErrors({
         packageJson: {
-          name: "@openclaw/line",
+          name: "@recall/line",
           version: "2026.5.3",
-          openclaw: {
+          recall: {
             extensions: ["./index.ts"],
             runtimeExtensions: ["./dist/index.js"],
             setupEntry: "./setup-entry.ts",
@@ -103,7 +103,7 @@ describe("collectPluginNpmPublishedRuntimeErrors", () => {
         files: ["package.json", "index.ts", "dist/index.js", "setup-entry.ts"],
       }),
     ).toEqual([
-      "@openclaw/line@2026.5.3 requires compiled runtime output for TypeScript entry ./setup-entry.ts: expected ./dist/setup-entry.js, ./dist/setup-entry.mjs, ./dist/setup-entry.cjs, ./setup-entry.js, ./setup-entry.mjs, ./setup-entry.cjs",
+      "@recall/line@2026.5.3 requires compiled runtime output for TypeScript entry ./setup-entry.ts: expected ./dist/setup-entry.js, ./dist/setup-entry.mjs, ./dist/setup-entry.cjs, ./setup-entry.js, ./setup-entry.mjs, ./setup-entry.cjs",
     ]);
   });
 
@@ -111,9 +111,9 @@ describe("collectPluginNpmPublishedRuntimeErrors", () => {
     expect(
       collectPluginNpmPublishedRuntimeErrors({
         packageJson: {
-          name: "@openclaw/qqbot",
+          name: "@recall/qqbot",
           version: "2026.5.3",
-          openclaw: {
+          recall: {
             extensions: ["./index.ts"],
             runtimeExtensions: ["./dist/index.js"],
             setupEntry: "./setup-entry.ts",
@@ -129,9 +129,9 @@ describe("collectPluginNpmPublishedRuntimeErrors", () => {
     expect(
       collectPluginNpmPublishedRuntimeErrors({
         packageJson: {
-          name: "@openclaw/matrix",
+          name: "@recall/matrix",
           version: "2026.5.3",
-          openclaw: {
+          recall: {
             extensions: ["./index.ts"],
             runtimeExtensions: ["./dist/index.js"],
             setupEntry: "./setup-entry.ts",
@@ -140,16 +140,16 @@ describe("collectPluginNpmPublishedRuntimeErrors", () => {
         },
         files: ["package.json", "dist/index.js"],
       }),
-    ).toEqual(["@openclaw/matrix@2026.5.3 runtime setup entry not found: ./dist/setup-entry.js"]);
+    ).toEqual(["@recall/matrix@2026.5.3 runtime setup entry not found: ./dist/setup-entry.js"]);
   });
 
   it("flags runtimeSetupEntry without setupEntry", () => {
     expect(
       collectPluginNpmPublishedRuntimeErrors({
         packageJson: {
-          name: "@openclaw/twitch",
+          name: "@recall/twitch",
           version: "2026.5.3",
-          openclaw: {
+          recall: {
             extensions: ["./index.ts"],
             runtimeExtensions: ["./dist/index.js"],
             runtimeSetupEntry: "./dist/setup-entry.js",
@@ -158,7 +158,7 @@ describe("collectPluginNpmPublishedRuntimeErrors", () => {
         files: ["package.json", "dist/index.js", "dist/setup-entry.js"],
       }),
     ).toEqual([
-      "@openclaw/twitch@2026.5.3 package.json openclaw.runtimeSetupEntry requires openclaw.setupEntry",
+      "@recall/twitch@2026.5.3 package.json recall.runtimeSetupEntry requires recall.setupEntry",
     ]);
   });
 });

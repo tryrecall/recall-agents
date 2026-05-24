@@ -34,8 +34,8 @@ export type SessionLockOwnerProcessArgsReader = (pid: number) => string[] | null
 
 const CLEANUP_SIGNALS = ["SIGINT", "SIGTERM", "SIGQUIT", "SIGABRT"] as const;
 type CleanupSignal = (typeof CLEANUP_SIGNALS)[number];
-const CLEANUP_STATE_KEY = Symbol.for("openclaw.sessionWriteLockCleanupState");
-const WATCHDOG_STATE_KEY = Symbol.for("openclaw.sessionWriteLockWatchdogState");
+const CLEANUP_STATE_KEY = Symbol.for("recall.sessionWriteLockCleanupState");
+const WATCHDOG_STATE_KEY = Symbol.for("recall.sessionWriteLockWatchdogState");
 
 export const DEFAULT_SESSION_WRITE_LOCK_STALE_MS = 30 * 60 * 1000;
 export const DEFAULT_SESSION_WRITE_LOCK_MAX_HOLD_MS = 5 * 60 * 1000;
@@ -64,7 +64,7 @@ type LockInspectionDetails = Pick<
   "pid" | "pidAlive" | "createdAt" | "ageMs" | "stale" | "staleReasons"
 >;
 
-const SESSION_LOCKS = createFileLockManager("openclaw.session-write-lock");
+const SESSION_LOCKS = createFileLockManager("recall.session-write-lock");
 let resolveProcessStartTimeForLock = getProcessStartTime;
 
 function isFileLockError(error: unknown, code: string): boolean {
@@ -84,9 +84,9 @@ export type SessionWriteLockAcquireTimeoutConfig = {
 type SessionWriteLockMsKey = "acquireTimeoutMs" | "staleMs" | "maxHoldMs";
 
 const SESSION_WRITE_LOCK_ENV: Record<SessionWriteLockMsKey, string> = {
-  acquireTimeoutMs: "OPENCLAW_SESSION_WRITE_LOCK_ACQUIRE_TIMEOUT_MS",
-  staleMs: "OPENCLAW_SESSION_WRITE_LOCK_STALE_MS",
-  maxHoldMs: "OPENCLAW_SESSION_WRITE_LOCK_MAX_HOLD_MS",
+  acquireTimeoutMs: "RECALL_SESSION_WRITE_LOCK_ACQUIRE_TIMEOUT_MS",
+  staleMs: "RECALL_SESSION_WRITE_LOCK_STALE_MS",
+  maxHoldMs: "RECALL_SESSION_WRITE_LOCK_MAX_HOLD_MS",
 };
 
 function readPositiveMsEnv(
@@ -285,7 +285,7 @@ function stopWatchdogTimer(): void {
 }
 
 function shouldStartBackgroundWatchdog(): boolean {
-  return process.env.VITEST !== "true" || process.env.OPENCLAW_TEST_SESSION_LOCK_WATCHDOG === "1";
+  return process.env.VITEST !== "true" || process.env.RECALL_TEST_SESSION_LOCK_WATCHDOG === "1";
 }
 
 function ensureWatchdogStarted(intervalMs: number): void {
@@ -403,22 +403,22 @@ function normalizeOwnerProcessArg(arg: string): string {
   return arg.trim().replaceAll("\\", "/").toLowerCase();
 }
 
-function isOpenClawSessionOwnerArgv(args: string[]): boolean {
+function isRecallSessionOwnerArgv(args: string[]): boolean {
   const normalized = args.map(normalizeOwnerProcessArg).filter(Boolean);
   if (normalized.length === 0) {
     return false;
   }
   const exe = (normalized[0] ?? "").replace(/\.(bat|cmd|exe)$/i, "");
-  if (exe === "openclaw" || exe.endsWith("/openclaw") || exe.endsWith("/openclaw-gateway")) {
+  if (exe === "recall" || exe.endsWith("/recall") || exe.endsWith("/recall-gateway")) {
     return true;
   }
   if (
     normalized.some(
       (arg) =>
-        arg === "openclaw" ||
-        arg.endsWith("/openclaw") ||
-        arg === "openclaw.mjs" ||
-        arg.endsWith("/openclaw.mjs"),
+        arg === "recall" ||
+        arg.endsWith("/recall") ||
+        arg === "recall.mjs" ||
+        arg.endsWith("/recall.mjs"),
     )
   ) {
     return true;
@@ -431,9 +431,9 @@ function isOpenClawSessionOwnerArgv(args: string[]): boolean {
     "src/entry.ts",
     "src/index.ts",
   ];
-  const hasOpenClawCommandToken = normalized.some((arg) => arg === "gateway" || arg === "agent");
+  const hasRecallCommandToken = normalized.some((arg) => arg === "gateway" || arg === "agent");
   return normalized.some(
-    (arg) => entryCandidates.some((entry) => arg.endsWith(entry)) && hasOpenClawCommandToken,
+    (arg) => entryCandidates.some((entry) => arg.endsWith(entry)) && hasRecallCommandToken,
   );
 }
 
@@ -507,7 +507,7 @@ function inspectLockPayload(
   };
 }
 
-function shouldTreatAsNonOpenClawOwner(params: {
+function shouldTreatAsNonRecallOwner(params: {
   payload: LockFilePayload | null;
   inspected: LockInspectionDetails;
   heldByThisProcess: boolean;
@@ -527,7 +527,7 @@ function shouldTreatAsNonOpenClawOwner(params: {
   if (!args || args.every((arg) => !arg.trim())) {
     return false;
   }
-  return !isOpenClawSessionOwnerArgv(args);
+  return !isRecallSessionOwnerArgv(args);
 }
 
 function lockInspectionNeedsMtimeStaleFallback(details: LockInspectionDetails): boolean {
@@ -620,7 +620,7 @@ function inspectLockPayloadForSession(params: {
   }
 
   if (
-    shouldTreatAsNonOpenClawOwner({
+    shouldTreatAsNonRecallOwner({
       payload: params.payload,
       inspected,
       heldByThisProcess: params.heldByThisProcess,
@@ -630,7 +630,7 @@ function inspectLockPayloadForSession(params: {
     return {
       ...inspected,
       stale: true,
-      staleReasons: [...inspected.staleReasons, "non-openclaw-owner"],
+      staleReasons: [...inspected.staleReasons, "non-recall-owner"],
     };
   }
 

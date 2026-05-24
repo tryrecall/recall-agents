@@ -5,7 +5,7 @@ import {
   resolveStorePath,
   type SessionEntry,
 } from "../config/sessions.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { SubagentRunOutcome } from "./subagent-announce-output.js";
 import {
   SUBAGENT_ENDED_REASON_COMPLETE,
@@ -58,7 +58,7 @@ function findSessionEntryByKey(store: Record<string, SessionEntry>, sessionKey: 
 export function loadSubagentSessionEntry(params: {
   childSessionKey: string;
   storeCache?: SubagentSessionStoreCache;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
 }): SessionEntry | undefined {
   const key = params.childSessionKey.trim();
   if (!key) {
@@ -144,7 +144,7 @@ export function resolveSubagentSessionCompletion(params: {
   fallbackEndedAt: number;
   notBeforeMs?: number;
   storeCache?: SubagentSessionStoreCache;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
 }): SubagentSessionCompletion | null {
   return resolveCompletionFromSessionEntry(
     loadSubagentSessionEntry({

@@ -1,1 +1,1 @@
-export { writeSkill } from "openclaw/plugin-sdk/test-fixtures";
+export { writeSkill } from "recall/plugin-sdk/test-fixtures";

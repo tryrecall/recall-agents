@@ -26,9 +26,9 @@ describe("parallels npm update smoke", () => {
     const script = readFileSync(SCRIPT_PATH, "utf8");
 
     expect(script).toContain("--beta-validation [target]");
-    expect(script).toContain("resolveOpenClawRegistryVersion");
+    expect(script).toContain("resolveRecallRegistryVersion");
     expect(script).toContain("this.options.updateTarget = version");
-    expect(script).toContain("this.options.freshTargetSpec = `openclaw@${version}`");
+    expect(script).toContain("this.options.freshTargetSpec = `recall@${version}`");
     expect(script).toContain("runFreshTargetInstalls");
     expect(script).toContain("freshTargetStatus");
   });
@@ -58,8 +58,8 @@ describe("parallels npm update smoke", () => {
 
     expect(script).toContain("runWindowsBackgroundPowerShell");
     expect(transports).toContain("runWindowsBackgroundPowerShell");
-    expect(transports).toContain("__OPENCLAW_BACKGROUND_EXIT__");
-    expect(transports).toContain("__OPENCLAW_BACKGROUND_DONE__");
+    expect(transports).toContain("__RECALL_BACKGROUND_EXIT__");
+    expect(transports).toContain("__RECALL_BACKGROUND_DONE__");
     expect(transports).toContain("${options.label} timed out");
   });
 
@@ -77,18 +77,18 @@ describe("parallels npm update smoke", () => {
     expect(script).toContain("scrub_future_plugin_entries");
     expect(script).toContain("delete plugins.entries.feishu");
     expect(script).toContain("delete plugins.entries.whatsapp");
-    expect(script).toContain("Remove-FuturePluginEntries\nStop-OpenClawGatewayProcesses");
+    expect(script).toContain("Remove-FuturePluginEntries\nStop-RecallGatewayProcesses");
     expect(script).toContain("scrub_future_plugin_entries\nstop_openclaw_gateway_processes");
-    expect(script).toContain("Invoke-WithScopedEnv @{ OPENCLAW_DISABLE_BUNDLED_PLUGINS = '1'");
+    expect(script).toContain("Invoke-WithScopedEnv @{ RECALL_DISABLE_BUNDLED_PLUGINS = '1'");
     expect(script).toContain(
-      "OPENCLAW_DISABLE_BUNDLED_PLUGINS=1 /opt/homebrew/bin/openclaw update --tag",
+      "RECALL_DISABLE_BUNDLED_PLUGINS=1 /opt/homebrew/bin/recall update --tag",
     );
-    expect(script).toContain("OPENCLAW_DISABLE_BUNDLED_PLUGINS=1 openclaw update --tag");
+    expect(script).toContain("RECALL_DISABLE_BUNDLED_PLUGINS=1 recall update --tag");
     expect(script).toContain(
-      "OPENCLAW_DISABLE_BUNDLED_PLUGINS=1 /opt/homebrew/bin/openclaw gateway stop",
+      "RECALL_DISABLE_BUNDLED_PLUGINS=1 /opt/homebrew/bin/recall gateway stop",
     );
     expect(script).toContain(
-      "OPENCLAW_DISABLE_BUNDLED_PLUGINS=1 OPENCLAW_ALLOW_ROOT=1 openclaw gateway stop",
+      "RECALL_DISABLE_BUNDLED_PLUGINS=1 RECALL_ALLOW_ROOT=1 recall gateway stop",
     );
   });
 
@@ -99,11 +99,11 @@ describe("parallels npm update smoke", () => {
       updateTarget: "2026.5.3-beta.2",
     });
 
-    const updateIndex = script.indexOf("Invoke-OpenClaw update --tag");
-    const scopedIndex = script.indexOf("Invoke-WithScopedEnv @{ OPENCLAW_DISABLE_BUNDLED_PLUGINS");
-    const versionIndex = script.indexOf("Invoke-OpenClaw --version", scopedIndex);
-    const restartIndex = script.indexOf("Invoke-OpenClaw gateway restart");
-    const agentIndex = script.indexOf("Invoke-OpenClaw agent --local");
+    const updateIndex = script.indexOf("Invoke-Recall update --tag");
+    const scopedIndex = script.indexOf("Invoke-WithScopedEnv @{ RECALL_DISABLE_BUNDLED_PLUGINS");
+    const versionIndex = script.indexOf("Invoke-Recall --version", scopedIndex);
+    const restartIndex = script.indexOf("Invoke-Recall gateway restart");
+    const agentIndex = script.indexOf("Invoke-Recall agent --local");
 
     expect(updateIndex).toBeGreaterThanOrEqual(0);
     expect(scopedIndex).toBeGreaterThanOrEqual(0);
@@ -111,7 +111,7 @@ describe("parallels npm update smoke", () => {
     expect(versionIndex).toBeGreaterThan(updateIndex);
     expect(restartIndex).toBeGreaterThan(updateIndex);
     expect(agentIndex).toBeGreaterThan(updateIndex);
-    expect(script).not.toContain("$env:OPENCLAW_DISABLE_BUNDLED_PLUGINS = '1'");
+    expect(script).not.toContain("$env:RECALL_DISABLE_BUNDLED_PLUGINS = '1'");
   });
 
   it("generates a .NET-safe Windows stale import regex in the update-failure guard", () => {
@@ -133,13 +133,13 @@ describe("parallels npm update smoke", () => {
     expect(staleImportLine).toContain("$updateText -match 'ERR_MODULE_NOT_FOUND'");
     expect(staleImportLine).toContain(`$updateText -match '${staleImportPattern}'`);
     expect(staleImportPattern).toBe(
-      String.raw`node_modules\\openclaw\\dist\\[^\\]+-[A-Za-z0-9_-]+\.js`,
+      String.raw`node_modules\\recall\\dist\\[^\\]+-[A-Za-z0-9_-]+\.js`,
     );
-    expect(staleImportPattern).not.toContain("node_modules\\openclaw\\dist\\");
+    expect(staleImportPattern).not.toContain("node_modules\\recall\\dist\\");
     expect(staleImportPattern.match(/\\\\/g)).toHaveLength(4);
-    const representativeUpdateFailure = String.raw`Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\runner\AppData\Roaming\npm\node_modules\openclaw\dist\main-a1_B2.js' imported from C:\Users\runner\AppData\Roaming\npm\node_modules\openclaw\dist\cli.js`;
+    const representativeUpdateFailure = String.raw`Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\runner\AppData\Roaming\npm\node_modules\recall\dist\main-a1_B2.js' imported from C:\Users\runner\AppData\Roaming\npm\node_modules\recall\dist\cli.js`;
     const generatedRegex = new RegExp(staleImportPattern);
     expect(generatedRegex.test(representativeUpdateFailure)).toBe(true);
-    expect(generatedRegex.test(String.raw`node_modules\openclaw\dist\main.js`)).toBe(false);
+    expect(generatedRegex.test(String.raw`node_modules\recall\dist\main.js`)).toBe(false);
   });
 });

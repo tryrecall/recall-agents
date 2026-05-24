@@ -2,14 +2,14 @@
 name: discrawl
 description: "Discord archive: search, sync freshness, DMs, channel slices, SQL counts, and Discrawl repo work."
 metadata:
-  openclaw:
-    homepage: https://github.com/openclaw/discrawl
+  recall:
+    homepage: https://github.com/recall/discrawl
     requires:
       bins:
         - discrawl
     install:
       - kind: go
-        module: github.com/openclaw/discrawl/cmd/discrawl@latest
+        module: github.com/recall/discrawl/cmd/discrawl@latest
         bins:
           - discrawl
 ---

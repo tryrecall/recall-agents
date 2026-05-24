@@ -1,5 +1,5 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime-env";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { RequestClient } from "../internal/discord.js";
 
@@ -12,9 +12,9 @@ const sendDurableMessageBatchMock = vi.hoisted(() =>
 const sendMessageDiscordMock = vi.hoisted(() => vi.fn());
 const sendVoiceMessageDiscordMock = vi.hoisted(() => vi.fn());
 
-vi.mock("openclaw/plugin-sdk/channel-message", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/channel-message")>(
-    "openclaw/plugin-sdk/channel-message",
+vi.mock("recall/plugin-sdk/channel-message", async () => {
+  const actual = await vi.importActual<typeof import("recall/plugin-sdk/channel-message")>(
+    "recall/plugin-sdk/channel-message",
   );
   return {
     ...actual,
@@ -34,7 +34,7 @@ vi.mock("../send.js", async () => {
 let deliverDiscordReply: typeof import("./reply-delivery.js").deliverDiscordReply;
 
 type DeliverParams = Record<string, unknown> & {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   formatting?: unknown;
   deps?: Record<string, (...args: unknown[]) => Promise<unknown>>;
 };
@@ -82,7 +82,7 @@ describe("deliverDiscordReply", () => {
   const runtime = {} as RuntimeEnv;
   const cfg = {
     channels: { discord: { token: "test-token" } },
-  } as OpenClawConfig;
+  } as RecallConfig;
 
   beforeAll(async () => {
     ({ deliverDiscordReply } = await import("./reply-delivery.js"));
@@ -348,7 +348,7 @@ describe("deliverDiscordReply", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     await deliverDiscordReply({
       replies: [{ text: "formatted" }],
@@ -390,7 +390,7 @@ describe("deliverDiscordReply", () => {
       cfg,
       textLimit: 2000,
       replyToMode: "off",
-      mediaLocalRoots: ["/tmp/openclaw-media"],
+      mediaLocalRoots: ["/tmp/recall-media"],
       kind: "final",
     });
 
@@ -398,7 +398,7 @@ describe("deliverDiscordReply", () => {
     expect(params.payloads).toEqual(replies);
     expect(params.replyToId).toBeUndefined();
     expect(params.replyToMode).toBe("off");
-    expect(params.mediaAccess).toEqual({ localRoots: ["/tmp/openclaw-media"] });
+    expect(params.mediaAccess).toEqual({ localRoots: ["/tmp/recall-media"] });
   });
 
   it("bridges Discord voice sends through the outbound dependency bag", async () => {

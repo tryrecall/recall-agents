@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import type {
   PluginWebFetchProviderEntry,
   PluginWebSearchProviderEntry,
@@ -115,8 +115,8 @@ vi.mock("../plugins/installed-plugin-index-records.js", async () => {
   };
 });
 
-function asConfig(value: unknown): OpenClawConfig {
-  return value as OpenClawConfig;
+function asConfig(value: unknown): RecallConfig {
+  return value as RecallConfig;
 }
 
 function providerPluginId(provider: ProviderUnderTest): string {
@@ -145,7 +145,7 @@ function ensureRecord(target: Record<string, unknown>, key: string): Record<stri
 }
 
 function setConfiguredProviderKey(
-  configTarget: OpenClawConfig,
+  configTarget: RecallConfig,
   pluginId: string,
   value: unknown,
 ): void {
@@ -157,7 +157,7 @@ function setConfiguredProviderKey(
   webSearch.apiKey = value;
 }
 
-function setConfiguredFetchProviderKey(configTarget: OpenClawConfig, value: unknown): void {
+function setConfiguredFetchProviderKey(configTarget: RecallConfig, value: unknown): void {
   const plugins = ensureRecord(configTarget as Record<string, unknown>, "plugins");
   const entries = ensureRecord(plugins, "entries");
   const pluginEntry = ensureRecord(entries, "firecrawl");
@@ -292,7 +292,7 @@ function buildTestWebFetchProviders(): PluginWebFetchProviderEntry[] {
   ];
 }
 
-async function runRuntimeWebTools(params: { config: OpenClawConfig; env?: NodeJS.ProcessEnv }) {
+async function runRuntimeWebTools(params: { config: RecallConfig; env?: NodeJS.ProcessEnv }) {
   const sourceConfig = structuredClone(params.config);
   const resolvedConfig = structuredClone(params.config);
   const context = createResolverContext({
@@ -310,7 +310,7 @@ async function runRuntimeWebTools(params: { config: OpenClawConfig; env?: NodeJS
 function createProviderSecretRefConfig(
   provider: ProviderUnderTest,
   envRefId: string,
-): OpenClawConfig {
+): RecallConfig {
   return asConfig({
     tools: {
       web: {
@@ -335,7 +335,7 @@ function createProviderSecretRefConfig(
   });
 }
 
-function readProviderKey(config: OpenClawConfig, provider: ProviderUnderTest): unknown {
+function readProviderKey(config: RecallConfig, provider: ProviderUnderTest): unknown {
   const pluginConfig = config.plugins?.entries?.[providerPluginId(provider)]?.config as
     | { webSearch?: { apiKey?: unknown } }
     | undefined;
@@ -1352,7 +1352,7 @@ describe("runtime web tools resolution", () => {
     loadInstalledPluginIndexInstallRecordsSyncMock.mockReturnValue({
       "external-search": {
         source: "npm",
-        spec: "@openclaw/external-search",
+        spec: "@recall/external-search",
       },
     });
 
@@ -1400,7 +1400,7 @@ describe("runtime web tools resolution", () => {
     loadInstalledPluginIndexInstallRecordsSyncMock.mockReturnValue({
       "external-fetch": {
         source: "npm",
-        spec: "@openclaw/external-fetch",
+        spec: "@recall/external-fetch",
       },
     });
 
@@ -1723,7 +1723,7 @@ describe("runtime web tools resolution", () => {
 
     beforeEach(() => {
       loadInstalledPluginIndexInstallRecordsSyncMock.mockReturnValue({
-        brave: { source: "npm", spec: "@openclaw/brave-search" },
+        brave: { source: "npm", spec: "@recall/brave-search" },
       });
       resolveManifestContractOwnerPluginIdMock.mockImplementation(externalBraveImpl);
     });

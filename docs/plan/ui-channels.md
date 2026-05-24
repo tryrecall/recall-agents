@@ -172,7 +172,7 @@ type ChannelOutboundAdapter = {
   deliveryCapabilities?: ChannelDeliveryCapabilities;
 
   pinDeliveredMessage?: (params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     accountId?: string | null;
     to: string;
     threadId?: string | number | null;

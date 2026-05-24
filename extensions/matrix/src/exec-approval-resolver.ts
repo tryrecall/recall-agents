@@ -1,12 +1,12 @@
-import { resolveApprovalOverGateway } from "openclaw/plugin-sdk/approval-gateway-runtime";
-import type { ExecApprovalReplyDecision } from "openclaw/plugin-sdk/approval-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { isApprovalNotFoundError } from "openclaw/plugin-sdk/error-runtime";
+import { resolveApprovalOverGateway } from "recall/plugin-sdk/approval-gateway-runtime";
+import type { ExecApprovalReplyDecision } from "recall/plugin-sdk/approval-runtime";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { isApprovalNotFoundError } from "recall/plugin-sdk/error-runtime";
 
 export { isApprovalNotFoundError };
 
 export async function resolveMatrixApproval(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   approvalId: string;
   decision: ExecApprovalReplyDecision;
   senderId?: string | null;

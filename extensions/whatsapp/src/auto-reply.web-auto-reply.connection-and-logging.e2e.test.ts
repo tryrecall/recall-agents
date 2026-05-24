@@ -2,10 +2,10 @@ import "./test-helpers.js";
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { escapeRegExp, formatEnvelopeTimestamp } from "openclaw/plugin-sdk/channel-test-helpers";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { setLoggerOverride } from "openclaw/plugin-sdk/runtime-env";
-import { withEnvAsync } from "openclaw/plugin-sdk/test-env";
+import { escapeRegExp, formatEnvelopeTimestamp } from "recall/plugin-sdk/channel-test-helpers";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { setLoggerOverride } from "recall/plugin-sdk/runtime-env";
+import { withEnvAsync } from "recall/plugin-sdk/test-env";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { getActiveWebListener } from "./active-listener.js";
 import { WhatsAppAuthUnstableError, resolveWebCredsPath } from "./auth-store.js";
@@ -42,7 +42,7 @@ const deliveryQueueMocks = vi.hoisted(() => ({
   drainPendingDeliveries: vi.fn(async (_opts: unknown) => undefined),
 }));
 
-vi.mock("openclaw/plugin-sdk/delivery-queue-runtime", () => ({
+vi.mock("recall/plugin-sdk/delivery-queue-runtime", () => ({
   drainPendingDeliveries: deliveryQueueMocks.drainPendingDeliveries,
 }));
 
@@ -849,7 +849,7 @@ describe("web auto-reply connection", () => {
           },
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     await monitorWebChannel(
       false,
@@ -881,7 +881,7 @@ describe("web auto-reply connection", () => {
           },
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     await monitorWebChannel(
       false,
@@ -917,7 +917,7 @@ describe("web auto-reply connection", () => {
           },
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
     setRuntimeConfigSourceSnapshotMock(null);
 
     await monitorWebChannel(
@@ -996,11 +996,11 @@ describe("web auto-reply connection", () => {
         const firstPattern = escapeRegExp(firstTimestamp);
         const secondPattern = escapeRegExp(secondTimestamp);
         expect(firstArgs.Body).toMatch(
-          new RegExp(`\\[WhatsApp \\+1 (\\+\\d+[smhd] )?${firstPattern}\\] \\[openclaw\\] first`),
+          new RegExp(`\\[WhatsApp \\+1 (\\+\\d+[smhd] )?${firstPattern}\\] \\[recall\\] first`),
         );
         expect(firstArgs.Body).not.toContain("second");
         expect(secondArgs.Body).toMatch(
-          new RegExp(`\\[WhatsApp \\+1 (\\+\\d+[smhd] )?${secondPattern}\\] \\[openclaw\\] second`),
+          new RegExp(`\\[WhatsApp \\+1 (\\+\\d+[smhd] )?${secondPattern}\\] \\[recall\\] second`),
         );
         expect(secondArgs.Body).not.toContain("first");
         expect(process.getMaxListeners?.()).toBeGreaterThanOrEqual(50);
@@ -1014,7 +1014,7 @@ describe("web auto-reply connection", () => {
 
   it("emits heartbeat logs with connection metadata", async () => {
     vi.useFakeTimers();
-    const logPath = `/tmp/openclaw-heartbeat-${crypto.randomUUID()}.log`;
+    const logPath = `/tmp/recall-heartbeat-${crypto.randomUUID()}.log`;
     setLoggerOverride({ level: "trace", file: logPath });
 
     const runtime = {
@@ -1056,7 +1056,7 @@ describe("web auto-reply connection", () => {
   });
 
   it("logs outbound replies to file", async () => {
-    const logPath = `/tmp/openclaw-log-test-${crypto.randomUUID()}.log`;
+    const logPath = `/tmp/recall-log-test-${crypto.randomUUID()}.log`;
     setLoggerOverride({ level: "trace", file: logPath });
 
     const capture = createWebListenerFactoryCapture();
@@ -1106,7 +1106,7 @@ describe("web auto-reply connection", () => {
       return { text: "final reply" };
     });
 
-    const mockConfig: OpenClawConfig = {
+    const mockConfig: RecallConfig = {
       channels: { whatsapp: { allowFrom: ["*"] } },
     };
 

@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { SecretInput } from "../config/types.secrets.js";
 
 export type EmbeddingInput =
@@ -36,7 +36,7 @@ export type EmbeddingProvider = {
 };
 
 export type EmbeddingProviderCreateOptions = {
-  config: OpenClawConfig;
+  config: RecallConfig;
   agentDir?: string;
   provider?: string;
   remote?: {
@@ -72,7 +72,7 @@ export type RegisteredEmbeddingProvider = {
   ownerPluginId?: string;
 };
 
-const EMBEDDING_PROVIDERS_KEY = Symbol.for("openclaw.embeddingProviders");
+const EMBEDDING_PROVIDERS_KEY = Symbol.for("recall.embeddingProviders");
 
 function getEmbeddingProviders(): Map<string, RegisteredEmbeddingProvider> {
   const globalStore = globalThis as Record<PropertyKey, unknown>;

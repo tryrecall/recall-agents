@@ -44,9 +44,9 @@ export function createPackageManagerWarningMessage(packageManager) {
   }
 
   return [
-    `[openclaw] warning: detected ${packageManager} for install lifecycle.`,
-    "[openclaw] this repo works best with pnpm; npm-compatible installs are slower and much larger here.",
-    "[openclaw] prefer: corepack pnpm install",
+    `[recall] warning: detected ${packageManager} for install lifecycle.`,
+    "[recall] this repo works best with pnpm; npm-compatible installs are slower and much larger here.",
+    "[recall] prefer: corepack pnpm install",
   ].join("\n");
 }
 

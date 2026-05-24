@@ -42,7 +42,7 @@ export type SkillSourceInstallResult =
     }
   | { ok: false; error: string };
 
-const SKILL_SOURCE_ORIGIN_RELATIVE_PATH = path.join(".openclaw", "source-origin.json");
+const SKILL_SOURCE_ORIGIN_RELATIVE_PATH = path.join(".recall", "source-origin.json");
 const DEFAULT_GIT_TIMEOUT_MS = 120_000;
 
 function createGitCommandEnv(): NodeJS.ProcessEnv {
@@ -256,7 +256,7 @@ async function installGitSkill(params: {
     return { ok: false, error: `Unsupported git skill spec: ${params.spec}` };
   }
 
-  return await withTempDir("openclaw-git-skill-", async (tmpDir) => {
+  return await withTempDir("recall-git-skill-", async (tmpDir) => {
     const repoDir = path.join(tmpDir, "repo");
     const exportDir = path.join(tmpDir, "export");
     params.logger?.info?.(

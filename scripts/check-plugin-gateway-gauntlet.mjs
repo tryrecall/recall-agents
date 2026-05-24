@@ -36,8 +36,8 @@ function parseArgs(argv) {
       new Date().toISOString().replace(/[:.]/g, "-"),
     ),
     pluginIds: [],
-    shardTotal: readOptionalPositiveIntEnv("OPENCLAW_PLUGIN_GATEWAY_GAUNTLET_TOTAL") ?? 1,
-    shardIndex: readOptionalNonNegativeIntEnv("OPENCLAW_PLUGIN_GATEWAY_GAUNTLET_INDEX") ?? 0,
+    shardTotal: readOptionalPositiveIntEnv("RECALL_PLUGIN_GATEWAY_GAUNTLET_TOTAL") ?? 1,
+    shardIndex: readOptionalNonNegativeIntEnv("RECALL_PLUGIN_GATEWAY_GAUNTLET_INDEX") ?? 0,
     limit: undefined,
     skipPrebuild: false,
     skipLifecycle: false,
@@ -57,7 +57,7 @@ function parseArgs(argv) {
     buildTimeoutMs: 600_000,
     qaTimeoutMs: 900_000,
   };
-  const envIds = normalizeCsv(process.env.OPENCLAW_PLUGIN_GATEWAY_GAUNTLET_IDS);
+  const envIds = normalizeCsv(process.env.RECALL_PLUGIN_GATEWAY_GAUNTLET_IDS);
   options.pluginIds.push(...envIds);
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -276,10 +276,10 @@ function createIsolatedEnv(repoRoot, runRoot) {
     XDG_CONFIG_HOME: path.join(home, ".config"),
     XDG_CACHE_HOME: path.join(home, ".cache"),
     XDG_DATA_HOME: path.join(home, ".local", "share"),
-    OPENCLAW_STATE_DIR: stateDir,
-    OPENCLAW_CONFIG_PATH: path.join(stateDir, "openclaw.json"),
-    OPENCLAW_LOG_DIR: path.join(runRoot, "logs"),
-    OPENCLAW_QA_SUITE_PROGRESS: process.env.OPENCLAW_QA_SUITE_PROGRESS ?? "1",
+    RECALL_STATE_DIR: stateDir,
+    RECALL_CONFIG_PATH: path.join(stateDir, "recall.json"),
+    RECALL_LOG_DIR: path.join(runRoot, "logs"),
+    RECALL_QA_SUITE_PROGRESS: process.env.RECALL_QA_SUITE_PROGRESS ?? "1",
     PATH: process.env.PATH,
     PWD: repoRoot,
   };
@@ -497,7 +497,7 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
   const repoRoot = path.resolve(options.repoRoot);
   fs.mkdirSync(options.outputDir, { recursive: true });
-  const runRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-plugin-gauntlet-"));
+  const runRoot = fs.mkdtempSync(path.join(os.tmpdir(), "recall-plugin-gauntlet-"));
   const env = createIsolatedEnv(repoRoot, runRoot);
   const matrix = discoverBundledPluginManifests(repoRoot);
   const selectedPlugins = selectPluginEntries(matrix, {

@@ -1,12 +1,12 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { resolveStateDir } from "openclaw/plugin-sdk/state-paths";
-import { resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/temp-path";
-import { captureEnv } from "openclaw/plugin-sdk/test-env";
-import { mockPinnedHostnameResolution } from "openclaw/plugin-sdk/test-env";
-import { withMockedWindowsPlatform, withRestoredMocks } from "openclaw/plugin-sdk/test-node-mocks";
-import { optimizeImageToPng } from "openclaw/plugin-sdk/web-media";
+import { resolveStateDir } from "recall/plugin-sdk/state-paths";
+import { resolvePreferredRecallTmpDir } from "recall/plugin-sdk/temp-path";
+import { captureEnv } from "recall/plugin-sdk/test-env";
+import { mockPinnedHostnameResolution } from "recall/plugin-sdk/test-env";
+import { withMockedWindowsPlatform, withRestoredMocks } from "recall/plugin-sdk/test-node-mocks";
+import { optimizeImageToPng } from "recall/plugin-sdk/web-media";
 import sharp from "sharp";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import {
@@ -67,7 +67,7 @@ async function expectLocalMediaAccessCode(promise: Promise<unknown>, code: strin
 
 beforeAll(async () => {
   fixtureRoot = await fs.mkdtemp(
-    path.join(resolvePreferredOpenClawTmpDir(), "openclaw-media-test-"),
+    path.join(resolvePreferredRecallTmpDir(), "recall-media-test-"),
   );
   largeJpegBuffer = await sharp({
     create: {
@@ -125,14 +125,14 @@ afterEach(() => {
 
 describe("web media loading", () => {
   beforeAll(() => {
-    // Ensure state dir is stable and not influenced by other tests that stub OPENCLAW_STATE_DIR.
-    // Also keep it outside the OpenClaw temp root so default localRoots doesn't accidentally make all state readable.
-    stateDirSnapshot = captureEnv(["OPENCLAW_STATE_DIR"]);
-    process.env.OPENCLAW_STATE_DIR = path.join(
+    // Ensure state dir is stable and not influenced by other tests that stub RECALL_STATE_DIR.
+    // Also keep it outside the Recall temp root so default localRoots doesn't accidentally make all state readable.
+    stateDirSnapshot = captureEnv(["RECALL_STATE_DIR"]);
+    process.env.RECALL_STATE_DIR = path.join(
       path.parse(os.tmpdir()).root,
       "var",
       "lib",
-      "openclaw-media-state-test",
+      "recall-media-state-test",
     );
   });
 
@@ -341,7 +341,7 @@ describe("local media root guard", () => {
 
   it("allows local paths under an explicit root", async () => {
     const result = await loadWebMedia(tinyPngFile, 1024 * 1024, {
-      localRoots: [resolvePreferredOpenClawTmpDir()],
+      localRoots: [resolvePreferredRecallTmpDir()],
     });
     expect(result.kind).toBe("image");
   });
@@ -352,7 +352,7 @@ describe("local media root guard", () => {
     try {
       await expectLocalMediaAccessCode(
         loadWebMedia("file://attacker/share/evil.png", 1024 * 1024, {
-          localRoots: [resolvePreferredOpenClawTmpDir()],
+          localRoots: [resolvePreferredRecallTmpDir()],
         }),
         "invalid-file-url",
       );
@@ -367,9 +367,9 @@ describe("local media root guard", () => {
     const actualStat = await fs.stat(tinyPngFile);
     const zeroDev = typeof actualLstat.dev === "bigint" ? 0n : 0;
     // Resolve before mocking platform: under `win32` the helper returns the
-    // os.tmpdir() fallback rather than the POSIX `/tmp/openclaw` root that
+    // os.tmpdir() fallback rather than the POSIX `/tmp/recall` root that
     // actually holds `tinyPngFile` on this Linux test runner (#60713).
-    const realTmpRoot = resolvePreferredOpenClawTmpDir();
+    const realTmpRoot = resolvePreferredRecallTmpDir();
 
     await withMockedWindowsPlatform(async () => {
       const lstatSpy = vi
@@ -394,7 +394,7 @@ describe("local media root guard", () => {
       await withRestoredMocks([realpathSpy], async () => {
         await expectLocalMediaAccessCode(
           loadWebMedia("\\\\attacker\\share\\evil.png", 1024 * 1024, {
-            localRoots: [resolvePreferredOpenClawTmpDir()],
+            localRoots: [resolvePreferredRecallTmpDir()],
           }),
           "network-path-not-allowed",
         );
@@ -431,7 +431,7 @@ describe("local media root guard", () => {
     );
   });
 
-  it("allows default OpenClaw state workspace and sandbox roots", async () => {
+  it("allows default Recall state workspace and sandbox roots", async () => {
     const stateDir = resolveStateDir();
     const readFile = vi.fn(async () => Buffer.from("generated-media"));
 
@@ -454,7 +454,7 @@ describe("local media root guard", () => {
     expect(sandboxResult.kind).toBeUndefined();
   });
 
-  it("rejects default OpenClaw state per-agent workspace-* roots without explicit local roots", async () => {
+  it("rejects default Recall state per-agent workspace-* roots without explicit local roots", async () => {
     const stateDir = resolveStateDir();
     const readFile = vi.fn(async () => Buffer.from("generated-media"));
 

@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
+import { resolvePreferredRecallTmpDir } from "../infra/tmp-recall-dir.js";
 import { resizeToJpeg } from "./image-ops.js";
 
 const PNG_1X1_BASE64 =
@@ -11,7 +11,7 @@ describe("image-ops temp dir", () => {
   let createdTempDir = "";
 
   beforeEach(() => {
-    process.env.OPENCLAW_IMAGE_BACKEND = "sips";
+    process.env.RECALL_IMAGE_BACKEND = "sips";
     const originalMkdtemp = fs.mkdtemp.bind(fs);
     vi.spyOn(fs, "mkdtemp").mockImplementation(async (prefix) => {
       createdTempDir = await originalMkdtemp(prefix);
@@ -20,14 +20,14 @@ describe("image-ops temp dir", () => {
   });
 
   afterEach(() => {
-    delete process.env.OPENCLAW_IMAGE_BACKEND;
+    delete process.env.RECALL_IMAGE_BACKEND;
     vi.restoreAllMocks();
   });
 
   it.skipIf(process.platform !== "darwin")(
-    "creates sips temp dirs under the secured OpenClaw tmp root",
+    "creates sips temp dirs under the secured Recall tmp root",
     async () => {
-      const secureRoot = await fs.realpath(resolvePreferredOpenClawTmpDir());
+      const secureRoot = await fs.realpath(resolvePreferredRecallTmpDir());
 
       await resizeToJpeg({
         buffer: Buffer.from(PNG_1X1_BASE64, "base64"),
@@ -42,7 +42,7 @@ describe("image-ops temp dir", () => {
       }
       const [prefix] = mkdtempCall;
       expect(typeof prefix).toBe("string");
-      const uuidPrefix = path.join(secureRoot, "openclaw-img-");
+      const uuidPrefix = path.join(secureRoot, "recall-img-");
       expect(prefix?.startsWith(uuidPrefix)).toBe(true);
       expect(prefix?.endsWith("-")).toBe(true);
       const uuid = prefix?.slice(uuidPrefix.length, -1) ?? "";

@@ -71,12 +71,12 @@ describe("resolveCommandConfigWithSecrets", () => {
       commandName: "message",
       targetIds: new Set(["channels.telegram.token"]),
       autoEnable: true,
-      env: { OPENCLAW_AUTO_ENABLE: "1" } as NodeJS.ProcessEnv,
+      env: { RECALL_AUTO_ENABLE: "1" } as NodeJS.ProcessEnv,
     });
 
     expect(mocks.applyPluginAutoEnable).toHaveBeenCalledWith({
       config: resolvedConfig,
-      env: { OPENCLAW_AUTO_ENABLE: "1" },
+      env: { RECALL_AUTO_ENABLE: "1" },
     });
     expect(result.effectiveConfig).toBe(effectiveConfig);
   });

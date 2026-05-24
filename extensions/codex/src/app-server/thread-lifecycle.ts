@@ -2,9 +2,9 @@ import {
   embeddedAgentLog,
   isActiveHarnessContextEngine,
   type EmbeddedRunAttemptParams,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
-import { buildCodexUserMcpServersThreadConfigPatch } from "openclaw/plugin-sdk/codex-mcp-projection";
-import { listRegisteredPluginAgentPromptGuidance } from "openclaw/plugin-sdk/plugin-runtime";
+} from "recall/plugin-sdk/agent-harness-runtime";
+import { buildCodexUserMcpServersThreadConfigPatch } from "recall/plugin-sdk/codex-mcp-projection";
+import { listRegisteredPluginAgentPromptGuidance } from "recall/plugin-sdk/plugin-runtime";
 import { CODEX_GPT5_HEARTBEAT_PROMPT_OVERLAY } from "../../prompt-overlay.js";
 import { isModernCodexModel } from "../../provider.js";
 import { isCodexAppServerConnectionClosedError, type CodexAppServerClient } from "./client.js";
@@ -604,7 +604,7 @@ export function buildThreadStartParams(
     approvalsReviewer: options.appServer.approvalsReviewer,
     sandbox: options.appServer.sandbox,
     ...(options.appServer.serviceTier ? { serviceTier: options.appServer.serviceTier } : {}),
-    serviceName: "OpenClaw",
+    serviceName: "Recall",
     config: buildCodexRuntimeThreadConfigForRun(params, options.config, {
       nativeCodeModeEnabled: options.nativeCodeModeEnabled,
       nativeCodeModeOnlyEnabled: options.nativeCodeModeOnlyEnabled,
@@ -784,7 +784,7 @@ function buildTurnScopedCollaborationInstructions(
 
 function buildCronCollaborationInstructions(): string {
   return [
-    "This is an OpenClaw cron automation turn. Apply these instructions only to this scheduled job; ordinary chat turns should stay in Codex Default mode.",
+    "This is an Recall cron automation turn. Apply these instructions only to this scheduled job; ordinary chat turns should stay in Codex Default mode.",
     "Execute the cron payload directly. If it asks you to run an exact command, run that command before doing any investigation, planning, memory review, or workspace bootstrap.",
     "Use context already provided by the runtime, but do not spend time loading or re-reading workspace bootstrap, memory, or project-doc files before executing the cron payload. Inspect those files only if the payload asks for them or the command fails and they are needed to diagnose it.",
     "Keep output concise and automation-oriented. Prefer the final command result or a short failure summary over status narration.",
@@ -793,8 +793,8 @@ function buildCronCollaborationInstructions(): string {
 
 function buildHeartbeatCollaborationInstructions(): string {
   return [
-    "This is an OpenClaw heartbeat turn. Apply these instructions only to this heartbeat wake; ordinary chat turns should stay in Codex Default mode.",
-    "When you are ready to end the heartbeat, prefer the structured `heartbeat_respond` tool so OpenClaw can record the wake outcome and notification decision. If `heartbeat_respond` is not already available and `tool_search` is available, search for `heartbeat_respond`, load it, then call it. Use `notify=false` when nothing should visibly interrupt the user.",
+    "This is an Recall heartbeat turn. Apply these instructions only to this heartbeat wake; ordinary chat turns should stay in Codex Default mode.",
+    "When you are ready to end the heartbeat, prefer the structured `heartbeat_respond` tool so Recall can record the wake outcome and notification decision. If `heartbeat_respond` is not already available and `tool_search` is available, search for `heartbeat_respond`, load it, then call it. Use `notify=false` when nothing should visibly interrupt the user.",
     CODEX_GPT5_HEARTBEAT_PROMPT_OVERLAY,
   ].join("\n\n");
 }
@@ -896,9 +896,9 @@ export function buildDeveloperInstructions(
     includeLegacyGlobalGuidance: false,
   }).join("\n");
   const sections = [
-    "You are a personal agent running inside OpenClaw. OpenClaw has dynamic tools for OpenClaw-owned messaging, cron, sessions, media, gateway, and nodes.",
+    "You are a personal agent running inside Recall. Recall has dynamic tools for Recall-owned messaging, cron, sessions, media, gateway, and nodes.",
     buildDeferredDynamicToolManifest(options.dynamicTools),
-    "Use Codex native `spawn_agent` for Codex subagents. Use OpenClaw `sessions_spawn` only for OpenClaw or ACP delegation.",
+    "Use Codex native `spawn_agent` for Codex subagents. Use Recall `sessions_spawn` only for Recall or ACP delegation.",
     buildVisibleReplyInstruction(params, options.dynamicTools),
     nativeCommandGuidance,
     params.extraSystemPrompt,
@@ -920,7 +920,7 @@ function buildDeferredDynamicToolManifest(
   if (deferredToolNames.length === 0) {
     return undefined;
   }
-  return `Deferred searchable OpenClaw dynamic tools available: ${deferredToolNames.join(", ")}. Use \`tool_search\` to load exact callable specs before use.`;
+  return `Deferred searchable Recall dynamic tools available: ${deferredToolNames.join(", ")}. Use \`tool_search\` to load exact callable specs before use.`;
 }
 
 function buildVisibleReplyInstruction(
@@ -963,7 +963,7 @@ export function resolveCodexAppServerModelProvider(params: {
   const normalized = params.provider.trim();
   const normalizedLower = normalized.toLowerCase();
   if (!normalized || normalizedLower === "codex") {
-    // `codex` is OpenClaw's virtual provider; let Codex app-server keep its
+    // `codex` is Recall's virtual provider; let Codex app-server keep its
     // native provider/auth selection instead of forcing the legacy OpenAI path.
     return undefined;
   }
@@ -971,7 +971,7 @@ export function resolveCodexAppServerModelProvider(params: {
     isCodexAppServerNativeAuthProfile(params) &&
     (normalizedLower === "openai" || normalizedLower === "openai-codex")
   ) {
-    // When OpenClaw is forwarding ChatGPT/Codex OAuth, `openai` is Codex's
+    // When Recall is forwarding ChatGPT/Codex OAuth, `openai` is Codex's
     // native provider id, not a public OpenAI API-key choice. Omit the override
     // so app-server keeps its configured provider/auth pair for this session.
     return undefined;

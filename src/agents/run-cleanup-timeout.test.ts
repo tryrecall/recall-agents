@@ -50,7 +50,7 @@ describe("agent cleanup timeout", () => {
       cleanup,
       log,
       env: {
-        OPENCLAW_TRAJECTORY_FLUSH_TIMEOUT_MS: "25000",
+        RECALL_TRAJECTORY_FLUSH_TIMEOUT_MS: "25000",
       },
     });
 
@@ -177,7 +177,7 @@ describe("agent cleanup timeout", () => {
       cleanup,
       log,
       env: {
-        OPENCLAW_AGENT_CLEANUP_TIMEOUT_MS: "1500",
+        RECALL_AGENT_CLEANUP_TIMEOUT_MS: "1500",
       },
     });
 
@@ -195,8 +195,8 @@ describe("agent cleanup timeout", () => {
         step: "pi-trajectory-flush",
         timeoutMs: 2_000,
         env: {
-          OPENCLAW_TRAJECTORY_FLUSH_TIMEOUT_MS: "25000",
-          OPENCLAW_AGENT_CLEANUP_TIMEOUT_MS: "15000",
+          RECALL_TRAJECTORY_FLUSH_TIMEOUT_MS: "25000",
+          RECALL_AGENT_CLEANUP_TIMEOUT_MS: "15000",
         },
       }),
     ).toBe(2_000);
@@ -208,7 +208,7 @@ describe("agent cleanup timeout", () => {
         step: "pi-trajectory-flush",
         timeoutMs: 0,
         env: {
-          OPENCLAW_TRAJECTORY_FLUSH_TIMEOUT_MS: "25000",
+          RECALL_TRAJECTORY_FLUSH_TIMEOUT_MS: "25000",
         },
       }),
     ).toBe(1);
@@ -219,8 +219,8 @@ describe("agent cleanup timeout", () => {
       resolveAgentCleanupStepTimeoutMs({
         step: "pi-trajectory-flush",
         env: {
-          OPENCLAW_TRAJECTORY_FLUSH_TIMEOUT_MS: "0",
-          OPENCLAW_AGENT_CLEANUP_TIMEOUT_MS: "not-a-number",
+          RECALL_TRAJECTORY_FLUSH_TIMEOUT_MS: "0",
+          RECALL_AGENT_CLEANUP_TIMEOUT_MS: "not-a-number",
         },
       }),
     ).toBe(AGENT_CLEANUP_STEP_TIMEOUT_MS);

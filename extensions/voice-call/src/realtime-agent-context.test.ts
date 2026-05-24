@@ -14,7 +14,7 @@ afterEach(async () => {
 });
 
 async function createWorkspace(): Promise<string> {
-  const workspaceDir = await mkdtemp(path.join(tmpdir(), "openclaw-voice-context-"));
+  const workspaceDir = await mkdtemp(path.join(tmpdir(), "recall-voice-context-"));
   tempDirs.push(workspaceDir);
   return workspaceDir;
 }
@@ -86,7 +86,7 @@ describe("buildRealtimeVoiceInstructions", () => {
       agentRuntime: createAgentRuntime(workspaceDir),
     });
 
-    expect(instructions).toContain("OpenClaw agent voice context:");
+    expect(instructions).toContain("Recall agent voice context:");
     expect(instructions).toContain("Consult behavior:");
     expect(instructions).toContain("Call openclaw_agent_consult before answering requests");
     expect(instructions).toContain("- Agent id: voice");

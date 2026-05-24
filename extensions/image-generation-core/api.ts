@@ -1,4 +1,4 @@
-export type { AuthProfileStore } from "openclaw/plugin-sdk/image-generation-core";
+export type { AuthProfileStore } from "recall/plugin-sdk/image-generation-core";
 export {
   buildNoCapabilityModelConfiguredMessage,
   createSubsystemLogger,
@@ -15,7 +15,7 @@ export {
   resolveApiKeyForProvider,
   resolveCapabilityModelCandidates,
   throwCapabilityGenerationFailure,
-} from "openclaw/plugin-sdk/image-generation-core";
+} from "recall/plugin-sdk/image-generation-core";
 export type {
   FallbackAttempt,
   GeneratedImageAsset,
@@ -26,5 +26,5 @@ export type {
   ImageGenerationResolution,
   ImageGenerationResult,
   ImageGenerationSourceImage,
-  OpenClawConfig,
-} from "openclaw/plugin-sdk/image-generation-core";
+  RecallConfig,
+} from "recall/plugin-sdk/image-generation-core";

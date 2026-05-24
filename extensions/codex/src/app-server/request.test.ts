@@ -24,7 +24,7 @@ describe("requestCodexAppServerJson sandbox guard", () => {
         sessionKey: "sandboxed-session",
       }),
     ).rejects.toThrow(
-      "Codex-native app-server method `command/exec` is unavailable because OpenClaw sandboxing is active for this session.",
+      "Codex-native app-server method `command/exec` is unavailable because Recall sandboxing is active for this session.",
     );
 
     expect(sharedClientMocks.getSharedCodexAppServerClient).not.toHaveBeenCalled();
@@ -39,7 +39,7 @@ describe("requestCodexAppServerJson sandbox guard", () => {
         sessionKey: "node-session",
       }),
     ).rejects.toThrow(
-      "Codex-native app-server method `command/exec` is unavailable because OpenClaw exec host=node is active for this session.",
+      "Codex-native app-server method `command/exec` is unavailable because Recall exec host=node is active for this session.",
     );
 
     expect(sharedClientMocks.getSharedCodexAppServerClient).not.toHaveBeenCalled();
@@ -70,7 +70,7 @@ describe("requestCodexAppServerJson sandbox guard", () => {
         sessionKey: "node-session",
       }),
     ).rejects.toThrow(
-      "Codex-native app-server method `process/spawn` is unavailable because OpenClaw exec host=node is active for this session.",
+      "Codex-native app-server method `process/spawn` is unavailable because Recall exec host=node is active for this session.",
     );
 
     expect(sharedClientMocks.getSharedCodexAppServerClient).not.toHaveBeenCalled();
@@ -84,7 +84,7 @@ describe("requestCodexAppServerJson sandbox guard", () => {
         config: { tools: { exec: { host: "node", node: "worker-1" } } },
       }),
     ).rejects.toThrow(
-      "Codex-native app-server method `command/exec` is unavailable because OpenClaw exec host=node is active for this session.",
+      "Codex-native app-server method `command/exec` is unavailable because Recall exec host=node is active for this session.",
     );
 
     expect(sharedClientMocks.getSharedCodexAppServerClient).not.toHaveBeenCalled();
@@ -98,7 +98,7 @@ describe("requestCodexAppServerJson sandbox guard", () => {
         config: { tools: { exec: { host: "node", node: "worker-1" } } },
       }),
     ).rejects.toThrow(
-      "Codex-native app-server method `config/mcpServer/reload` is unavailable because OpenClaw exec host=node is active for this session.",
+      "Codex-native app-server method `config/mcpServer/reload` is unavailable because Recall exec host=node is active for this session.",
     );
 
     expect(sharedClientMocks.getSharedCodexAppServerClient).not.toHaveBeenCalled();
@@ -125,7 +125,7 @@ describe("requestCodexAppServerJson sandbox guard", () => {
     sharedClientMocks.getSharedCodexAppServerClient.mockResolvedValue({ request });
     const params = {
       cwd: "/workspace",
-      environments: [{ environmentId: "openclaw-sandbox-abc123", cwd: "/workspace" }],
+      environments: [{ environmentId: "recall-sandbox-abc123", cwd: "/workspace" }],
     };
 
     await expect(
@@ -143,7 +143,7 @@ describe("requestCodexAppServerJson sandbox guard", () => {
   it("blocks thread starts with sandbox environments when exec host=node is active", async () => {
     const params = {
       cwd: "/workspace",
-      environments: [{ environmentId: "openclaw-sandbox-abc123", cwd: "/workspace" }],
+      environments: [{ environmentId: "recall-sandbox-abc123", cwd: "/workspace" }],
     };
 
     await expect(
@@ -157,7 +157,7 @@ describe("requestCodexAppServerJson sandbox guard", () => {
         sessionKey: "node-session",
       }),
     ).rejects.toThrow(
-      "Codex-native app-server method `thread/start` is unavailable because OpenClaw exec host=node is active for this session.",
+      "Codex-native app-server method `thread/start` is unavailable because Recall exec host=node is active for this session.",
     );
 
     expect(sharedClientMocks.getSharedCodexAppServerClient).not.toHaveBeenCalled();

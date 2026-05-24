@@ -42,7 +42,7 @@ function createGatewayAudit({
       programArguments: ["/usr/bin/node", "gateway"],
       environment: {
         PATH: path,
-        ...(serviceToken ? { OPENCLAW_GATEWAY_TOKEN: serviceToken } : {}),
+        ...(serviceToken ? { RECALL_GATEWAY_TOKEN: serviceToken } : {}),
         ...extraEnvironment,
       },
       ...(environmentValueSources ? { environmentValueSources } : {}),
@@ -102,7 +102,7 @@ describe("auditGatewayServiceConfig", () => {
   });
 
   it("accepts Linux minimal PATH with user directories", async () => {
-    const env = { HOME: "/tmp/openclaw-testuser", PNPM_HOME: "/opt/pnpm" };
+    const env = { HOME: "/tmp/recall-testuser", PNPM_HOME: "/opt/pnpm" };
     const minimalPath = buildMinimalServicePath({ platform: "linux", env });
     const audit = await auditGatewayServiceConfig({
       env,
@@ -122,7 +122,7 @@ describe("auditGatewayServiceConfig", () => {
   });
 
   it("accepts canonical macOS gateway service PATH without user-bin defaults", async () => {
-    const home = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-service-audit-home-"));
+    const home = await fs.mkdtemp(path.join(os.tmpdir(), "recall-service-audit-home-"));
     try {
       const servicePath = buildMinimalServicePath({ platform: "darwin", env: { HOME: home } });
       expect(servicePath).toBe(
@@ -145,7 +145,7 @@ describe("auditGatewayServiceConfig", () => {
   });
 
   it("requires Homebrew directories in canonical macOS gateway service PATH", async () => {
-    const home = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-service-audit-home-"));
+    const home = await fs.mkdtemp(path.join(os.tmpdir(), "recall-service-audit-home-"));
     try {
       const audit = await auditGatewayServiceConfig({
         env: { HOME: home },
@@ -168,7 +168,7 @@ describe("auditGatewayServiceConfig", () => {
 
   it("still requires explicit env-configured tool roots in gateway service PATH", async () => {
     const audit = await auditGatewayServiceConfig({
-      env: { HOME: "/tmp/openclaw-testuser", PNPM_HOME: "/opt/pnpm" },
+      env: { HOME: "/tmp/recall-testuser", PNPM_HOME: "/opt/pnpm" },
       platform: "linux",
       command: {
         programArguments: ["/usr/bin/node", "gateway"],
@@ -183,7 +183,7 @@ describe("auditGatewayServiceConfig", () => {
   });
 
   it("flags stale Linux version-manager and package-manager PATH entries", async () => {
-    const env = { HOME: "/tmp/openclaw-testuser-nonminimal" };
+    const env = { HOME: "/tmp/recall-testuser-nonminimal" };
     const minimalPath = buildMinimalServicePath({ platform: "linux", env });
     const staleEntries = [
       `${env.HOME}/.volta/bin`,
@@ -212,7 +212,7 @@ describe("auditGatewayServiceConfig", () => {
     expect(issue?.detail).toContain("/opt/pnpm/bin");
   });
 
-  it("accepts an expected active OpenClaw bin even when it looks package-managed", async () => {
+  it("accepts an expected active Recall bin even when it looks package-managed", async () => {
     const expectedServicePath = [
       "/opt/homebrew/opt/node/bin",
       "/Users/testuser/Library/pnpm",
@@ -232,7 +232,7 @@ describe("auditGatewayServiceConfig", () => {
       command: {
         programArguments: [
           "/opt/homebrew/opt/node/bin/node",
-          "/opt/openclaw/dist/index.js",
+          "/opt/recall/dist/index.js",
           "gateway",
         ],
         environment: { PATH: expectedServicePath },
@@ -263,7 +263,7 @@ describe("auditGatewayServiceConfig", () => {
       command: {
         programArguments: [
           "/opt/homebrew/opt/node/bin/node",
-          "/opt/openclaw/dist/index.js",
+          "/opt/recall/dist/index.js",
           "gateway",
         ],
         environment: { PATH: `${expectedServicePath}:/Users/testuser/.asdf/shims` },
@@ -279,8 +279,8 @@ describe("auditGatewayServiceConfig", () => {
 
   it("accepts Linux fnm aliases/default without requiring the legacy current symlink", async () => {
     const env = {
-      HOME: "/tmp/openclaw-testuser",
-      FNM_DIR: "/tmp/openclaw-testuser/.local/share/fnm",
+      HOME: "/tmp/recall-testuser",
+      FNM_DIR: "/tmp/recall-testuser/.local/share/fnm",
     };
     const pathParts = buildMinimalServicePath({ platform: "linux", env })
       .split(":")
@@ -301,8 +301,8 @@ describe("auditGatewayServiceConfig", () => {
 
   it("accepts Linux fnm current symlink without requiring aliases/default", async () => {
     const env = {
-      HOME: "/tmp/openclaw-testuser",
-      FNM_DIR: "/tmp/openclaw-testuser/.local/share/fnm",
+      HOME: "/tmp/recall-testuser",
+      FNM_DIR: "/tmp/recall-testuser/.local/share/fnm",
     };
     const pathParts = buildMinimalServicePath({ platform: "linux", env })
       .split(":")
@@ -398,7 +398,7 @@ describe("auditGatewayServiceConfig", () => {
       expectedGatewayToken: "new-token",
       serviceToken: "old-token",
       environmentValueSources: {
-        OPENCLAW_GATEWAY_TOKEN: "file",
+        RECALL_GATEWAY_TOKEN: "file",
       },
     });
     expectTokenAudit(audit, { embedded: false, mismatch: false });
@@ -409,7 +409,7 @@ describe("auditGatewayServiceConfig", () => {
       expectedGatewayToken: "new-token",
       serviceToken: "old-token",
       environmentValueSources: {
-        OPENCLAW_GATEWAY_TOKEN: "inline-and-file",
+        RECALL_GATEWAY_TOKEN: "inline-and-file",
       },
     });
     expectTokenAudit(audit, { embedded: true, mismatch: true });
@@ -418,7 +418,7 @@ describe("auditGatewayServiceConfig", () => {
   it("flags inline managed service env values from the service key list", async () => {
     const audit = await createGatewayAudit({
       extraEnvironment: {
-        OPENCLAW_SERVICE_MANAGED_ENV_KEYS: "TAVILY_API_KEY,OPENROUTER_API_KEY",
+        RECALL_SERVICE_MANAGED_ENV_KEYS: "TAVILY_API_KEY,OPENROUTER_API_KEY",
         TAVILY_API_KEY: "tvly-test",
         OPENROUTER_API_KEY: "or-test",
       },
@@ -567,7 +567,7 @@ describe("checkTokenDrift", () => {
       code: SERVICE_AUDIT_CODES.gatewayTokenDrift,
       message:
         "Config token differs from service token. The daemon will use the old token after restart.",
-      detail: "Run `openclaw gateway install --force` to sync the token.",
+      detail: "Run `recall gateway install --force` to sync the token.",
       level: "recommended",
     });
   });

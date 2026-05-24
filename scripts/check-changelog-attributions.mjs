@@ -6,20 +6,20 @@ import { fileURLToPath } from "node:url";
 
 export const FORBIDDEN_CHANGELOG_THANKS_HANDLES = [
   "codex",
-  "openclaw",
+  "recall",
   "steipete",
   "clawsweeper",
-  "openclaw-clawsweeper",
+  "recall-clawsweeper",
   "clawsweeper[bot]",
-  "openclaw-clawsweeper[bot]",
+  "recall-clawsweeper[bot]",
 ];
 export const FORBIDDEN_CHANGELOG_THANKS_HANDLE_PREFIXES = ["app/"];
 export const FORBIDDEN_CHANGELOG_THANKS_HANDLE_SUFFIXES = ["[bot]"];
 export const CHANGELOG_THANKS_REQUIRE_HUMAN_CREDIT_HANDLES = [
   "clawsweeper",
-  "openclaw-clawsweeper",
+  "recall-clawsweeper",
   "clawsweeper[bot]",
-  "openclaw-clawsweeper[bot]",
+  "recall-clawsweeper[bot]",
 ];
 export const CHANGELOG_THANKS_REQUIRE_HUMAN_CREDIT_HANDLE_PREFIXES = ["app/"];
 export const CHANGELOG_THANKS_REQUIRE_HUMAN_CREDIT_HANDLE_SUFFIXES = ["[bot]"];

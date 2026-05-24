@@ -1,8 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { openClawRootFs, openClawRootFsSync } from "./openclaw-root.fs.runtime.js";
+import { openClawRootFs, openClawRootFsSync } from "./recall-root.fs.runtime.js";
 
-const CORE_PACKAGE_NAMES = new Set(["openclaw"]);
+const CORE_PACKAGE_NAMES = new Set(["recall"]);
 const packageNameCache = new Map<string, string | null>();
 const packageRootCache = new Map<string, string | null>();
 const argv1CandidateCache = new Map<string, string[]>();
@@ -106,7 +106,7 @@ function candidateDirsFromArgv1(argv1: string): string[] {
   return [...deduped];
 }
 
-export async function resolveOpenClawPackageRoot(opts: {
+export async function resolveRecallPackageRoot(opts: {
   cwd?: string;
   argv1?: string;
   moduleUrl?: string;
@@ -128,7 +128,7 @@ export async function resolveOpenClawPackageRoot(opts: {
   return null;
 }
 
-export function resolveOpenClawPackageRootSync(opts: {
+export function resolveRecallPackageRootSync(opts: {
   cwd?: string;
   argv1?: string;
   moduleUrl?: string;
@@ -189,7 +189,7 @@ function createPackageRootCacheKey(candidates: readonly string[]): string {
 }
 
 export const testing = {
-  clearOpenClawPackageRootCaches(): void {
+  clearRecallPackageRootCaches(): void {
     packageNameCache.clear();
     packageRootCache.clear();
     argv1CandidateCache.clear();

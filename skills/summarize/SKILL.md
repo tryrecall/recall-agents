@@ -4,7 +4,7 @@ description: "Summarize or transcribe URLs, YouTube/videos, podcasts, articles, 
 homepage: https://summarize.sh
 metadata:
   {
-    "openclaw":
+    "recall":
       {
         "emoji": "🧾",
         "requires": { "bins": ["summarize"] },

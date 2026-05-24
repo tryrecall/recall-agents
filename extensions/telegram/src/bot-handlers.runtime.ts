@@ -1,44 +1,44 @@
 import type { Message, ReactionTypeEmoji } from "grammy/types";
-import { parseExecApprovalCommandText } from "openclaw/plugin-sdk/approval-reply-runtime";
-import { resolveChannelConfigWrites } from "openclaw/plugin-sdk/channel-config-helpers";
+import { parseExecApprovalCommandText } from "recall/plugin-sdk/approval-reply-runtime";
+import { resolveChannelConfigWrites } from "recall/plugin-sdk/channel-config-helpers";
 import {
   buildMentionRegexes,
   implicitMentionKindWhen,
   matchesMentionWithExplicit,
   resolveInboundMentionDecision,
   shouldDebounceTextInbound,
-} from "openclaw/plugin-sdk/channel-inbound";
+} from "recall/plugin-sdk/channel-inbound";
 import {
   createInboundDebouncer,
   resolveInboundDebounceMs,
-} from "openclaw/plugin-sdk/channel-inbound-debounce";
-import { resolveStoredModelOverride } from "openclaw/plugin-sdk/command-auth-native";
-import { hasControlCommand } from "openclaw/plugin-sdk/command-detection";
-import { isAbortRequestText } from "openclaw/plugin-sdk/command-primitives-runtime";
-import { buildCommandsMessagePaginated } from "openclaw/plugin-sdk/command-status";
-import type { DmPolicy, OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+} from "recall/plugin-sdk/channel-inbound-debounce";
+import { resolveStoredModelOverride } from "recall/plugin-sdk/command-auth-native";
+import { hasControlCommand } from "recall/plugin-sdk/command-detection";
+import { isAbortRequestText } from "recall/plugin-sdk/command-primitives-runtime";
+import { buildCommandsMessagePaginated } from "recall/plugin-sdk/command-status";
+import type { DmPolicy, RecallConfig } from "recall/plugin-sdk/config-contracts";
 import type {
   TelegramDirectConfig,
   TelegramGroupConfig,
   TelegramTopicConfig,
-} from "openclaw/plugin-sdk/config-contracts";
-import { mutateConfigFile } from "openclaw/plugin-sdk/config-mutation";
+} from "recall/plugin-sdk/config-contracts";
+import { mutateConfigFile } from "recall/plugin-sdk/config-mutation";
 import {
   buildPluginBindingResolvedText,
   parsePluginBindingApprovalCustomId,
   resolvePluginConversationBindingApproval,
-} from "openclaw/plugin-sdk/conversation-runtime";
-import { isApprovalNotFoundError } from "openclaw/plugin-sdk/error-runtime";
-import { applyModelOverrideToSessionEntry } from "openclaw/plugin-sdk/model-session-runtime";
-import { formatModelsAvailableHeader } from "openclaw/plugin-sdk/models-provider-runtime";
-import { resolveAgentRoute } from "openclaw/plugin-sdk/routing";
-import { resolveThreadSessionKeys } from "openclaw/plugin-sdk/routing";
-import { danger, logVerbose, warn } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/conversation-runtime";
+import { isApprovalNotFoundError } from "recall/plugin-sdk/error-runtime";
+import { applyModelOverrideToSessionEntry } from "recall/plugin-sdk/model-session-runtime";
+import { formatModelsAvailableHeader } from "recall/plugin-sdk/models-provider-runtime";
+import { resolveAgentRoute } from "recall/plugin-sdk/routing";
+import { resolveThreadSessionKeys } from "recall/plugin-sdk/routing";
+import { danger, logVerbose, warn } from "recall/plugin-sdk/runtime-env";
 import {
   loadSessionStore,
   resolveSessionStoreEntry,
   updateSessionStore,
-} from "openclaw/plugin-sdk/session-store-runtime";
+} from "recall/plugin-sdk/session-store-runtime";
 import { expandTelegramAllowFromWithAccessGroups } from "./access-groups.js";
 import { resolveTelegramAccount, resolveTelegramMediaRuntimeOptions } from "./accounts.js";
 import { withTelegramApiErrorLogging } from "./api-logging.js";
@@ -591,7 +591,7 @@ export const registerTelegramHandlers = ({
     messageThreadId?: number;
     resolvedThreadId?: number;
     senderId?: string | number;
-    runtimeCfg?: OpenClawConfig;
+    runtimeCfg?: RecallConfig;
   }): {
     agentId: string;
     sessionEntry: ReturnType<typeof resolveSessionStoreEntry>["existing"];
@@ -1442,7 +1442,7 @@ export const registerTelegramHandlers = ({
     senderId: string;
     senderUsername: string;
     context: TelegramEventAuthorizationContext;
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
   }): Promise<boolean> => {
     const { chatId, isGroup, senderId, senderUsername, context, cfg } = params;
     const dmAllowFrom = context.groupAllowOverride ?? allowFrom;
@@ -2584,7 +2584,7 @@ export const registerTelegramHandlers = ({
               : `changed to <b>${escapeHtml(selection.provider)}/${escapeHtml(selection.model)}</b>`;
             const scopeText = isDefaultSelection
               ? "Session selection cleared. Runtime unchanged. New replies use the agent's configured default."
-              : `Session-only model selection. Runtime unchanged. Use /model ${escapeHtml(selection.provider)}/${escapeHtml(selection.model)} --runtime &lt;runtime&gt; to switch harnesses. The agent default in openclaw.json is unchanged; /reset or a new session may return to that default.`;
+              : `Session-only model selection. Runtime unchanged. Use /model ${escapeHtml(selection.provider)}/${escapeHtml(selection.model)} --runtime &lt;runtime&gt; to switch harnesses. The agent default in recall.json is unchanged; /reset or a new session may return to that default.`;
             await editMessageWithButtons(
               `✅ Model ${actionText}\n\n${scopeText}`,
               [], // Empty buttons = remove inline keyboard

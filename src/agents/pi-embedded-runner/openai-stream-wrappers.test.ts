@@ -508,7 +508,7 @@ describe("createOpenAIThinkingLevelWrapper", () => {
 });
 
 describe("createOpenAIAttributionHeadersWrapper", () => {
-  it("routes native Codex traffic through the OpenClaw transport so attribution survives PI defaults", () => {
+  it("routes native Codex traffic through the Recall transport so attribution survives PI defaults", () => {
     let codexCalls = 0;
     let capturedHeaders: Record<string, string> | undefined;
     const codexTransport: StreamFn = (_model, _context, options) => {
@@ -535,8 +535,8 @@ describe("createOpenAIAttributionHeadersWrapper", () => {
     );
 
     expect(codexCalls).toBe(1);
-    expect(capturedHeaders?.originator).toBe("openclaw");
-    expect(capturedHeaders?.["User-Agent"]).toMatch(/^openclaw\//);
+    expect(capturedHeaders?.originator).toBe("recall");
+    expect(capturedHeaders?.["User-Agent"]).toMatch(/^recall\//);
   });
 
   it("keeps existing wrapped Codex streams so runtime OAuth injection is preserved", () => {
@@ -579,7 +579,7 @@ describe("createOpenAIAttributionHeadersWrapper", () => {
     expect(upstreamCalls).toBe(1);
     expect(codexCalls).toBe(0);
     expect(capturedOptions?.apiKey).toBe("oauth-bearer-token");
-    expect(capturedOptions?.headers?.originator).toBe("openclaw");
-    expect(capturedOptions?.headers?.["User-Agent"]).toMatch(/^openclaw\//);
+    expect(capturedOptions?.headers?.originator).toBe("recall");
+    expect(capturedOptions?.headers?.["User-Agent"]).toMatch(/^recall\//);
   });
 });

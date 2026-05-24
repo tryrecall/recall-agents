@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   clearCurrentPluginMetadataSnapshotState,
   getCurrentPluginMetadataSnapshotState,
@@ -14,7 +14,7 @@ import type { PluginMetadataSnapshot } from "./plugin-metadata-snapshot.types.js
 type CurrentPluginMetadataSnapshotState = ReturnType<typeof getCurrentPluginMetadataSnapshotState>;
 
 export function resolvePluginMetadataControlPlaneFingerprint(
-  config?: OpenClawConfig,
+  config?: RecallConfig,
   options: Omit<ResolvePluginControlPlaneContextParams, "config"> = {},
 ): string {
   return resolvePluginControlPlaneFingerprint({
@@ -34,8 +34,8 @@ export function isReusableCurrentPluginMetadataSnapshot(
 export function setCurrentPluginMetadataSnapshot(
   snapshot: PluginMetadataSnapshot | undefined,
   options: {
-    config?: OpenClawConfig;
-    compatibleConfigs?: readonly OpenClawConfig[];
+    config?: RecallConfig;
+    compatibleConfigs?: readonly RecallConfig[];
     env?: NodeJS.ProcessEnv;
     workspaceDir?: string;
   } = {},
@@ -93,7 +93,7 @@ export function restoreCurrentPluginMetadataSnapshotState(
 
 export function getCurrentPluginMetadataSnapshot(
   params: {
-    config?: OpenClawConfig;
+    config?: RecallConfig;
     env?: NodeJS.ProcessEnv;
     workspaceDir?: string;
     allowWorkspaceScopedSnapshot?: boolean;

@@ -5,7 +5,7 @@ import { Worker } from "node:worker_threads";
 import type { AgentToolUpdateCallback } from "@earendil-works/pi-agent-core";
 import type { ToolDefinition } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { resolveAgentConfig } from "./agent-scope-config.js";
 import {
   CODE_MODE_EXEC_TOOL_NAME,
@@ -141,7 +141,7 @@ function normalizeCodeModeRawConfig(value: unknown): Record<string, unknown> | u
   return isRecord(codeMode) ? codeMode : undefined;
 }
 
-function readCodeModeRawConfig(config?: OpenClawConfig, agentId?: string): Record<string, unknown> {
+function readCodeModeRawConfig(config?: RecallConfig, agentId?: string): Record<string, unknown> {
   const tools = isRecord(config?.tools) ? config.tools : undefined;
   const globalRaw = normalizeCodeModeRawConfig(tools?.codeMode) ?? {};
   const agentRaw =
@@ -173,7 +173,7 @@ function readLanguages(value: unknown): CodeModeLanguage[] {
   return languages.length > 0 ? [...new Set(languages)] : ["javascript", "typescript"];
 }
 
-export function resolveCodeModeConfig(config?: OpenClawConfig, agentId?: string): CodeModeConfig {
+export function resolveCodeModeConfig(config?: RecallConfig, agentId?: string): CodeModeConfig {
   const raw = readCodeModeRawConfig(config, agentId);
   const maxSearchLimit = clampInteger(
     readPositiveInteger(raw.maxSearchLimit, DEFAULT_MAX_SEARCH_LIMIT),
@@ -847,7 +847,7 @@ export function createCodeModeTools(ctx: CodeModeToolContext): AnyAgentTool[] {
     name: CODE_MODE_EXEC_TOOL_NAME,
     label: "exec",
     description:
-      'Run JavaScript or TypeScript in OpenClaw code mode. Node.js modules and `require`/`import` are NOT available; for any shell, file, network, or external action, use enabled catalog tools allowed by policy from inside your code: `tools.search(query)` to find catalog entries, `tools.describe(entry.id)` for the input schema, then `tools.call(entry.id, args)`. The `language` field accepts only "javascript" or "typescript"; do not pass "bash", "shell", or other values.',
+      'Run JavaScript or TypeScript in Recall code mode. Node.js modules and `require`/`import` are NOT available; for any shell, file, network, or external action, use enabled catalog tools allowed by policy from inside your code: `tools.search(query)` to find catalog entries, `tools.describe(entry.id)` for the input schema, then `tools.call(entry.id, args)`. The `language` field accepts only "javascript" or "typescript"; do not pass "bash", "shell", or other values.',
     parameters: Type.Object({
       code: Type.Optional(
         Type.String({
@@ -887,7 +887,7 @@ export function createCodeModeTools(ctx: CodeModeToolContext): AnyAgentTool[] {
   const waitTool = markCodeModeControlTool({
     name: CODE_MODE_WAIT_TOOL_NAME,
     label: "wait",
-    description: "Resume a suspended OpenClaw code mode run returned by exec.",
+    description: "Resume a suspended Recall code mode run returned by exec.",
     parameters: Type.Object({
       runId: Type.String({ description: "Code mode run id returned by exec." }),
     }),
@@ -912,7 +912,7 @@ export function createCodeModeTools(ctx: CodeModeToolContext): AnyAgentTool[] {
 
 export function applyCodeModeCatalog(params: {
   tools: AnyAgentTool[];
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   sessionId?: string;
   sessionKey?: string;
   agentId?: string;
@@ -947,7 +947,7 @@ export function applyCodeModeCatalog(params: {
 
 export function addClientToolsToCodeModeCatalog(params: {
   tools: ToolDefinition[];
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   sessionId?: string;
   sessionKey?: string;
   agentId?: string;

@@ -4,7 +4,7 @@ import path from "node:path";
 import { isAcpRuntimeSpawnAvailable } from "../acp/runtime/availability.js";
 import { resolveThreadBindingSpawnPolicy } from "../channels/thread-bindings-policy.js";
 import type { SessionEntry } from "../config/sessions/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { SubagentSpawnPreparation } from "../context-engine/types.js";
 import { stringifyRouteThreadId } from "../plugin-sdk/channel-route.js";
 import { listRegisteredPluginAgentPromptGuidance } from "../plugins/command-registry-state.js";
@@ -93,7 +93,7 @@ export type {
 
 export { decodeStrictBase64 };
 
-function resolveConfiguredAgentIds(cfg: OpenClawConfig): string[] {
+function resolveConfiguredAgentIds(cfg: RecallConfig): string[] {
   return listAgentIds(cfg);
 }
 
@@ -284,7 +284,7 @@ function loadSubagentConfig() {
 }
 
 async function persistInitialChildSessionRuntimeModel(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   childSessionKey: string;
   resolvedModel?: string;
 }): Promise<string | undefined> {
@@ -346,7 +346,7 @@ type PreparedSpawnContext =
   | { status: "error"; error: string };
 
 async function prepareSubagentSessionContext(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   contextMode: SpawnSubagentContextMode;
   requesterAgentId: string;
   targetAgentId: string;
@@ -401,7 +401,7 @@ async function prepareSubagentSessionContext(params: {
       });
       if (!fork) {
         throw new Error(
-          'context="fork" requested but OpenClaw could not fork the requester transcript.',
+          'context="fork" requested but Recall could not fork the requester transcript.',
         );
       }
       pruneLegacyStoreKeys({
@@ -431,7 +431,7 @@ async function prepareSubagentSessionContext(params: {
         }
         return {
           status: "error",
-          error: 'context="fork" requested but OpenClaw could not prepare forked context.',
+          error: 'context="fork" requested but Recall could not prepare forked context.',
         };
       }
       return {
@@ -455,7 +455,7 @@ async function prepareSubagentSessionContext(params: {
 }
 
 async function prepareContextEngineSubagentSpawn(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   context: PreparedSpawnContext & { status: "ok" };
   requesterInternalKey: string;
   childSessionKey: string;
@@ -572,7 +572,7 @@ function resolveSpawnMode(params: {
 function resolveSubagentContextMode(params: {
   requestedContext?: SpawnSubagentContextMode;
   threadRequested: boolean;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   requester: {
     channel?: string;
     accountId?: string;

@@ -77,30 +77,30 @@ const OTLP_SIGNAL_PATHS = new Map<string, OtlpSignal>([
   ["/v1/logs", "logs"],
 ]);
 const REQUIRED_SPAN_NAMES = [
-  "openclaw.run",
-  "openclaw.harness.run",
-  "openclaw.model.call",
-  "openclaw.context.assembled",
-  "openclaw.message.delivery",
+  "recall.run",
+  "recall.harness.run",
+  "recall.model.call",
+  "recall.context.assembled",
+  "recall.message.delivery",
 ] as const;
 const REQUIRED_METRIC_NAMES = [
-  "openclaw.harness.duration_ms",
+  "recall.harness.duration_ms",
 ] as const;
 const DISALLOWED_ATTRIBUTE_KEYS = new Set([
-  "openclaw.runId",
-  "openclaw.chatId",
-  "openclaw.messageId",
-  "openclaw.sessionKey",
-  "openclaw.sessionId",
-  "openclaw.callId",
-  "openclaw.toolCallId",
-  "openclaw.run_id",
-  "openclaw.chat_id",
-  "openclaw.message_id",
-  "openclaw.session_key",
-  "openclaw.session_id",
-  "openclaw.call_id",
-  "openclaw.tool_call_id",
+  "recall.runId",
+  "recall.chatId",
+  "recall.messageId",
+  "recall.sessionKey",
+  "recall.sessionId",
+  "recall.callId",
+  "recall.toolCallId",
+  "recall.run_id",
+  "recall.chat_id",
+  "recall.message_id",
+  "recall.session_key",
+  "recall.session_id",
+  "recall.call_id",
+  "recall.tool_call_id",
 ]);
 const DISALLOWED_BODY_NEEDLES = [
   "OTEL-QA-SECRET",
@@ -613,10 +613,10 @@ function openClawEntryArgs(): string[] {
   if (existsSync(path.join(process.cwd(), "scripts", "run-node.mjs"))) {
     return ["scripts/run-node.mjs"];
   }
-  return ["openclaw.mjs"];
+  return ["recall.mjs"];
 }
 
-function spawnOpenClaw(args: string[], env: NodeJS.ProcessEnv): ChildProcess {
+function spawnRecall(args: string[], env: NodeJS.ProcessEnv): ChildProcess {
   return spawn(process.execPath, [...openClawEntryArgs(), ...args], {
     env,
     stdio: ["ignore", "pipe", "pipe"],
@@ -637,9 +637,9 @@ function buildQaEnv(port: number): NodeJS.ProcessEnv {
   env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = `http://127.0.0.1:${port}/v1/traces`;
   env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = `http://127.0.0.1:${port}/v1/metrics`;
   env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = `http://127.0.0.1:${port}/v1/logs`;
-  env.OTEL_SERVICE_NAME = "openclaw-qa-lab-otel-smoke";
+  env.OTEL_SERVICE_NAME = "recall-qa-lab-otel-smoke";
   env.OTEL_SEMCONV_STABILITY_OPT_IN = "gen_ai_latest_experimental";
-  env.OPENCLAW_QA_SUITE_PROGRESS = env.OPENCLAW_QA_SUITE_PROGRESS ?? "1";
+  env.RECALL_QA_SUITE_PROGRESS = env.RECALL_QA_SUITE_PROGRESS ?? "1";
   return env;
 }
 
@@ -754,7 +754,7 @@ function assertSmoke(params: {
 
   const attributeKeys = collectAttributeKeys(params.spans);
   const disallowed = [...DISALLOWED_ATTRIBUTE_KEYS].filter((key) => attributeKeys.has(key));
-  const contentKeys = [...attributeKeys].filter((key) => key.startsWith("openclaw.content."));
+  const contentKeys = [...attributeKeys].filter((key) => key.startsWith("recall.content."));
   if (disallowed.length > 0) {
     failures.push(`raw diagnostic id attributes exported: ${disallowed.join(", ")}`);
   }
@@ -762,17 +762,17 @@ function assertSmoke(params: {
     failures.push(`content attributes exported with capture disabled: ${contentKeys.join(", ")}`);
   }
 
-  const modelSpans = params.spans.filter((span) => span.name === "openclaw.model.call");
+  const modelSpans = params.spans.filter((span) => span.name === "recall.model.call");
   const modelErrorSpans = modelSpans.filter((span) => {
     const serialized = JSON.stringify(span.attributes);
     return (
       Object.hasOwn(span.attributes, "error.type") ||
-      Object.hasOwn(span.attributes, "openclaw.errorCategory") ||
+      Object.hasOwn(span.attributes, "recall.errorCategory") ||
       serialized.includes("StreamAbandoned")
     );
   });
   if (modelSpans.length === 0) {
-    failures.push("no openclaw.model.call span was exported");
+    failures.push("no recall.model.call span was exported");
   }
   if (modelErrorSpans.length > 0) {
     failures.push("successful QA run exported model-call error attributes");
@@ -829,7 +829,7 @@ async function main() {
 
   let childExitCode = 1;
   try {
-    const child = spawnOpenClaw(buildQaArgs(options), buildQaEnv(port));
+    const child = spawnRecall(buildQaArgs(options), buildQaEnv(port));
     child.stdout?.on("data", (chunk) => process.stdout.write(chunk));
     child.stderr?.on("data", (chunk) => process.stderr.write(chunk));
     childExitCode = await waitForChild(child);

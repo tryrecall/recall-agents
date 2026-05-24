@@ -9,7 +9,7 @@ import {
   type GhConfigDiscoveryResult,
 } from "../agents/skills/gh-config-discovery.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { note } from "../terminal/note.js";
 import type { DoctorPrompter } from "./doctor-prompter.js";
 import {
@@ -92,17 +92,17 @@ export function formatUnavailableSkillDoctorLines(skills: SkillStatusEntry[]): s
     lines.push(`- ${skill.name}: ${formatMissingSummary(skill)}`);
     lines.push(...formatInstallHints(skill));
   }
-  lines.push(`Disable unused skills: ${formatCliCommand("openclaw doctor --fix")}`);
+  lines.push(`Disable unused skills: ${formatCliCommand("recall doctor --fix")}`);
   lines.push(
-    `Inspect details: ${formatCliCommand("openclaw skills check --agent <id>")} or ${formatCliCommand("openclaw skills info <name> --agent <id>")}`,
+    `Inspect details: ${formatCliCommand("recall skills check --agent <id>")} or ${formatCliCommand("recall skills info <name> --agent <id>")}`,
   );
   return lines;
 }
 
 export async function maybeRepairSkillReadiness(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   prompter: DoctorPrompter;
-}): Promise<OpenClawConfig> {
+}): Promise<RecallConfig> {
   const agentId = resolveDefaultAgentId(params.cfg);
   const workspaceDir = resolveAgentWorkspaceDir(params.cfg, agentId);
   const report = buildWorkspaceSkillStatus(workspaceDir, {

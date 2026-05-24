@@ -1,8 +1,8 @@
-import { mapAllowlistResolutionInputs } from "openclaw/plugin-sdk/allow-from";
+import { mapAllowlistResolutionInputs } from "recall/plugin-sdk/allow-from";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/string-coerce-runtime";
 import { searchGraphUsers } from "./graph-users.js";
 import {
   listChannelsForTeam,

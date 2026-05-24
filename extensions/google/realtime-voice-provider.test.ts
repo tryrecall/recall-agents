@@ -1,4 +1,4 @@
-import { REALTIME_VOICE_AUDIO_FORMAT_PCM16_24KHZ } from "openclaw/plugin-sdk/realtime-voice";
+import { REALTIME_VOICE_AUDIO_FORMAT_PCM16_24KHZ } from "recall/plugin-sdk/realtime-voice";
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { buildGoogleRealtimeVoiceProvider } from "./realtime-voice-provider.js";
 
@@ -215,7 +215,7 @@ describe("buildGoogleRealtimeVoiceProvider", () => {
         {
           type: "function",
           name: "openclaw_agent_consult",
-          description: "Ask OpenClaw",
+          description: "Ask Recall",
           parameters: {
             type: "object",
             properties: {
@@ -285,7 +285,7 @@ describe("buildGoogleRealtimeVoiceProvider", () => {
       required: ["query"],
     });
     expect(declarations[1]?.name).toBe("openclaw_agent_consult");
-    expect(declarations[1]?.description).toBe("Ask OpenClaw");
+    expect(declarations[1]?.description).toBe("Ask Recall");
     expect(declarations[1]?.parametersJsonSchema).toEqual({
       type: "object",
       properties: {
@@ -327,7 +327,7 @@ describe("buildGoogleRealtimeVoiceProvider", () => {
         {
           type: "function",
           name: "openclaw_agent_consult",
-          description: "Ask OpenClaw",
+          description: "Ask Recall",
           parameters: {
             type: "object",
             properties: {

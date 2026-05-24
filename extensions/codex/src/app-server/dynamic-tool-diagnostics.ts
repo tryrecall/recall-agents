@@ -1,4 +1,4 @@
-import { emitTrustedDiagnosticEvent } from "openclaw/plugin-sdk/diagnostic-runtime";
+import { emitTrustedDiagnosticEvent } from "recall/plugin-sdk/diagnostic-runtime";
 import type { CodexDynamicToolCallParams, CodexDynamicToolCallResponse } from "./protocol.js";
 
 type DynamicToolDiagnosticContext = {

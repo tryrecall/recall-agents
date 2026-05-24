@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   resolveDisplaySessionKey,
   resolveInternalSessionKey,
@@ -13,7 +13,7 @@ export type SubagentSpawnOwnership = {
 };
 
 export function resolveSubagentSpawnOwnership(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentSessionKey?: string;
   completionOwnerKey?: string;
 }): SubagentSpawnOwnership {

@@ -1,5 +1,5 @@
 ---
-summary: "Adds Xiaomi model provider support to OpenClaw."
+summary: "Adds Xiaomi model provider support to Recall."
 read_when:
   - You are installing, configuring, or auditing the xiaomi plugin
 title: "Xiaomi plugin"
@@ -7,12 +7,12 @@ title: "Xiaomi plugin"
 
 # Xiaomi plugin
 
-Adds Xiaomi model provider support to OpenClaw.
+Adds Xiaomi model provider support to Recall.
 
 ## Distribution
 
-- Package: `@openclaw/xiaomi-provider`
-- Install route: included in OpenClaw
+- Package: `@recall/xiaomi-provider`
+- Install route: included in Recall
 
 ## Surface
 

@@ -130,7 +130,7 @@ type SessionFileFingerprint =
       ctimeNs: bigint;
     };
 
-const TRANSCRIPT_ONLY_OPENCLAW_ASSISTANT_MODELS = new Set(["delivery-mirror", "gateway-injected"]);
+const TRANSCRIPT_ONLY_RECALL_ASSISTANT_MODELS = new Set(["delivery-mirror", "gateway-injected"]);
 const MAX_BENIGN_SESSION_FENCE_ADVANCE_BYTES = 1024 * 1024;
 const MAX_BENIGN_SESSION_FENCE_REWRITE_BYTES = 8 * 1024 * 1024;
 const MAX_BENIGN_SESSION_FENCE_REWRITE_RESULT_BYTES =
@@ -179,7 +179,7 @@ function isJsonRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function isTranscriptOnlyOpenClawAssistantLine(line: string): boolean {
+function isTranscriptOnlyRecallAssistantLine(line: string): boolean {
   try {
     const parsed = JSON.parse(line) as unknown;
     if (!isJsonRecord(parsed)) {
@@ -191,9 +191,9 @@ function isTranscriptOnlyOpenClawAssistantLine(line: string): boolean {
     }
     return (
       message.role === "assistant" &&
-      message.provider === "openclaw" &&
+      message.provider === "recall" &&
       typeof message.model === "string" &&
-      TRANSCRIPT_ONLY_OPENCLAW_ASSISTANT_MODELS.has(message.model)
+      TRANSCRIPT_ONLY_RECALL_ASSISTANT_MODELS.has(message.model)
     );
   } catch {
     return false;
@@ -340,7 +340,7 @@ async function sessionFenceAdvanceIsBenign(params: {
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
-  return lines.length > 0 && lines.every(isTranscriptOnlyOpenClawAssistantLine);
+  return lines.length > 0 && lines.every(isTranscriptOnlyRecallAssistantLine);
 }
 
 async function sessionFenceRewriteIsBenign(params: {
@@ -385,7 +385,7 @@ async function sessionFenceRewriteIsBenign(params: {
     expectedParentId = lineMatch.nextPreviousId ?? expectedParentId;
   }
   const appendedLines = currentLines.slice(previousLines.length);
-  return appendedLines.every(isTranscriptOnlyOpenClawAssistantLine);
+  return appendedLines.every(isTranscriptOnlyRecallAssistantLine);
 }
 
 type OwnedSessionFileWrite = {
@@ -398,9 +398,9 @@ type TrustedSessionFileState = {
   fingerprint: SessionFileFingerprint;
 };
 
-// Controllers in the same OpenClaw process can legitimately take turns writing
+// Controllers in the same Recall process can legitimately take turns writing
 // the same session file while another attempt is released for model I/O. Track
-// only fingerprints that changed while OpenClaw held the write lock so the
+// only fingerprints that changed while Recall held the write lock so the
 // takeover fence can distinguish those locked in-process writes from unowned
 // external file changes.
 const ownedSessionFileWrites = new Map<string, OwnedSessionFileWrite>();

@@ -25,7 +25,7 @@ function appendClawHubHint(output: string, json?: boolean): string {
   if (json) {
     return output;
   }
-  return `${output}\n\nTip: use \`openclaw skills search\`, \`openclaw skills install\`, and \`openclaw skills update\` for ClawHub-backed skills.`;
+  return `${output}\n\nTip: use \`recall skills search\`, \`recall skills install\`, and \`recall skills update\` for ClawHub-backed skills.`;
 }
 
 function formatSkillStatus(skill: SkillStatusEntry): string {
@@ -188,7 +188,7 @@ export function formatSkillsList(report: SkillStatusReport, opts: SkillsListOpti
 
   if (skills.length === 0) {
     const message = opts.eligible
-      ? `No eligible skills found. Run \`${formatCliCommand("openclaw skills list")}\` to see all skills.`
+      ? `No eligible skills found. Run \`${formatCliCommand("recall skills list")}\` to see all skills.`
       : "No skills found.";
     return appendClawHubHint(message, opts.json);
   }
@@ -249,7 +249,7 @@ export function formatSkillInfo(
       );
     }
     return appendClawHubHint(
-      `Skill "${safeRequestedName}" not found. Run \`${formatCliCommand("openclaw skills list")}\` to see available skills.`,
+      `Skill "${safeRequestedName}" not found. Run \`${formatCliCommand("recall skills list")}\` to see available skills.`,
       opts.json,
     );
   }
@@ -364,10 +364,10 @@ export function formatSkillInfo(
       `  Save via UI: ${theme.muted("Control UI → Skills → ")}${safeName}${theme.muted(" → Save key")}`,
     );
     lines.push(
-      `  Save via CLI: ${formatCliCommand(`openclaw config set skills.entries.${safeSkillKey}.apiKey YOUR_KEY`)}`,
+      `  Save via CLI: ${formatCliCommand(`recall config set skills.entries.${safeSkillKey}.apiKey YOUR_KEY`)}`,
     );
     lines.push(
-      `  Stored in: ${theme.muted("$OPENCLAW_CONFIG_PATH")} ${theme.muted("(default: ~/.openclaw/openclaw.json)")}`,
+      `  Stored in: ${theme.muted("$RECALL_CONFIG_PATH")} ${theme.muted("(default: ~/.tryrecall/recall-agents.json)")}`,
     );
   }
 

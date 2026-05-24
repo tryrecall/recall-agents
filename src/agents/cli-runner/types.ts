@@ -6,7 +6,7 @@ import type { InboundEventKind } from "../../channels/inbound-event/kind.js";
 import type { CliSessionBinding } from "../../config/sessions.js";
 import type { SessionSystemPromptReport } from "../../config/sessions/types.js";
 import type { CliBackendConfig } from "../../config/types.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import type { ContextEngine } from "../../context-engine/types.js";
 import type { PromptImageOrderEntry } from "../../media/prompt-image-order.js";
 import type { InputProvenance } from "../../sessions/input-provenance.js";
@@ -28,7 +28,7 @@ export type RunCliAgentParams = {
   trigger?: EmbeddedRunTrigger;
   sessionFile: string;
   workspaceDir: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   prompt: string;
   transcriptPrompt?: string;
   currentInboundEventKind?: InboundEventKind;
@@ -118,7 +118,7 @@ export type PreparedCliRunContext = {
   preparedBackend: CliPreparedBackend;
   reusableCliSession: CliReusableSession;
   hadSessionFile: boolean;
-  contextEngineConfig: OpenClawConfig;
+  contextEngineConfig: RecallConfig;
   contextEngine?: ContextEngine;
   contextEngineTurnPrompt?: string;
   contextEngineDeferredTurnMaintenance?: Promise<void>;

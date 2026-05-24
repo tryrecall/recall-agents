@@ -1,12 +1,12 @@
-import type { OpenClawPluginApi } from "./types.js";
+import type { RecallPluginApi } from "./types.js";
 
 type PluginApiFacadeFields = Pick<
-  OpenClawPluginApi,
+  RecallPluginApi,
   "agent" | "lifecycle" | "runContext" | "session"
 >;
-export type OpenClawPluginApiWithoutFacades = Omit<OpenClawPluginApi, keyof PluginApiFacadeFields>;
+export type RecallPluginApiWithoutFacades = Omit<RecallPluginApi, keyof PluginApiFacadeFields>;
 type PluginApiFacadeSource = Pick<
-  OpenClawPluginApi,
+  RecallPluginApi,
   | "clearRunContext"
   | "emitAgentEvent"
   | "enqueueNextTurnInjection"

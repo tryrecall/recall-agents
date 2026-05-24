@@ -120,8 +120,8 @@ function textMentionsSecurityAuditSuppressions(value: string): boolean {
 
 function isReadOnlySecurityAuditSuppressionInspection(argv: string[]): boolean {
   const command = normalizeCommandName(argv[0]);
-  let offset = command === "pnpm" && argv[1] === "openclaw" ? 1 : 0;
-  if (normalizeCommandName(argv[offset]) !== "openclaw") {
+  let offset = command === "pnpm" && argv[1] === "recall" ? 1 : 0;
+  if (normalizeCommandName(argv[offset]) !== "recall") {
     return false;
   }
   offset += 1;
@@ -292,7 +292,7 @@ function formatDiagnosticsExportSuccess(aggregated: string): string {
       lines.push(`Generated at: ${manifest.generatedAt}`);
     }
     if (typeof manifest.openclawVersion === "string") {
-      lines.push(`OpenClaw version: ${manifest.openclawVersion}`);
+      lines.push(`Recall version: ${manifest.openclawVersion}`);
     }
     const contents = formatDiagnosticsContents(manifest);
     if (contents.length > 0) {

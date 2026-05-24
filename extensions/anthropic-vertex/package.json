@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/anthropic-vertex-provider",
+  "name": "@recall/anthropic-vertex-provider",
   "version": "2026.5.22",
-  "description": "OpenClaw Anthropic Vertex provider plugin",
+  "description": "Recall Anthropic Vertex provider plugin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/tryrecall/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -13,14 +13,14 @@
     "@earendil-works/pi-ai": "0.75.4"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "npmSpec": "@openclaw/anthropic-vertex-provider",
+      "npmSpec": "@recall/anthropic-vertex-provider",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.5.12-beta.1"
     },

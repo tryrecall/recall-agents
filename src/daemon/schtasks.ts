@@ -28,11 +28,11 @@ import type {
 } from "./service-types.js";
 
 function resolveTaskName(env: GatewayServiceEnv): string {
-  const override = env.OPENCLAW_WINDOWS_TASK_NAME?.trim();
+  const override = env.RECALL_WINDOWS_TASK_NAME?.trim();
   if (override) {
     return override;
   }
-  return resolveGatewayWindowsTaskName(env.OPENCLAW_PROFILE);
+  return resolveGatewayWindowsTaskName(env.RECALL_PROFILE);
 }
 
 function shouldFallbackToStartupEntry(params: { code: number; detail: string }): boolean {
@@ -46,14 +46,14 @@ function shouldFallbackToStartupEntry(params: { code: number; detail: string }):
 }
 
 export function resolveTaskScriptPath(env: GatewayServiceEnv): string {
-  const override = env.OPENCLAW_TASK_SCRIPT?.trim();
+  const override = env.RECALL_TASK_SCRIPT?.trim();
   if (override) {
     return override;
   }
-  const scriptName = env.OPENCLAW_TASK_SCRIPT_NAME?.trim() || "gateway.cmd";
+  const scriptName = env.RECALL_TASK_SCRIPT_NAME?.trim() || "gateway.cmd";
   if (/[/\\]|\.\./.test(scriptName)) {
     throw new Error(
-      `OPENCLAW_TASK_SCRIPT_NAME must be a file name only, not a path: ${scriptName}`,
+      `RECALL_TASK_SCRIPT_NAME must be a file name only, not a path: ${scriptName}`,
     );
   }
   const stateDir = resolveGatewayStateDir(env);
@@ -125,7 +125,7 @@ function resolveTaskUser(env: GatewayServiceEnv): string | null {
 }
 
 function shouldUseHiddenWindowsTaskLauncher(env: GatewayServiceEnv): boolean {
-  const value = normalizeLowercaseStringOrEmpty(env.OPENCLAW_WINDOWS_TASK_HIDDEN_LAUNCHER);
+  const value = normalizeLowercaseStringOrEmpty(env.RECALL_WINDOWS_TASK_HIDDEN_LAUNCHER);
   return value === "1" || value === "true" || value === "yes";
 }
 
@@ -399,7 +399,7 @@ async function launchFallbackTaskScript(env: GatewayServiceEnv): Promise<void> {
 }
 
 function resolveConfiguredGatewayPort(env: GatewayServiceEnv): number | null {
-  const raw = env.OPENCLAW_GATEWAY_PORT?.trim();
+  const raw = env.RECALL_GATEWAY_PORT?.trim();
   if (!raw) {
     return null;
   }
@@ -443,7 +443,7 @@ async function resolveScheduledTaskPort(env: GatewayServiceEnv): Promise<number 
   const command = await readScheduledTaskCommand(env).catch(() => null);
   return (
     parsePortFromProgramArguments(command?.programArguments) ??
-    parsePositivePort(command?.environment?.OPENCLAW_GATEWAY_PORT) ??
+    parsePositivePort(command?.environment?.RECALL_GATEWAY_PORT) ??
     resolveConfiguredGatewayPort(env)
   );
 }
@@ -883,7 +883,7 @@ async function activateScheduledTask(params: {
   taskLaunchPath: string;
   description?: string;
 }) {
-  const taskDescription = params.description ?? "OpenClaw Gateway";
+  const taskDescription = params.description ?? "Recall Gateway";
 
   const taskName = resolveTaskName(params.env);
   const quotedLaunchPath = quoteSchtasksArg(params.taskLaunchPath);

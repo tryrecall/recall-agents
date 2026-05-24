@@ -1,5 +1,5 @@
 ---
-summary: "Adds the Clickclack channel surface for sending and receiving OpenClaw messages."
+summary: "Adds the Clickclack channel surface for sending and receiving Recall messages."
 read_when:
   - You are installing, configuring, or auditing the clickclack plugin
 title: "Clickclack plugin"
@@ -7,12 +7,12 @@ title: "Clickclack plugin"
 
 # Clickclack plugin
 
-Adds the Clickclack channel surface for sending and receiving OpenClaw messages.
+Adds the Clickclack channel surface for sending and receiving Recall messages.
 
 ## Distribution
 
-- Package: `@openclaw/clickclack`
-- Install route: included in OpenClaw
+- Package: `@recall/clickclack`
+- Install route: included in Recall
 
 ## Surface
 

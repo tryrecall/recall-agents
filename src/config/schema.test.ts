@@ -3,7 +3,7 @@ import { SENSITIVE_URL_HINT_TAG } from "../shared/net/redact-sensitive-url.js";
 import { buildConfigSchema, lookupConfigSchema } from "./schema.js";
 import { applyDerivedTags, CONFIG_TAGS, deriveTagsForPath } from "./schema.tags.js";
 import { ToolsSchema } from "./zod-schema.agent-runtime.js";
-import { OpenClawSchema } from "./zod-schema.js";
+import { RecallSchema } from "./zod-schema.js";
 
 describe("config schema", () => {
   type SchemaInput = NonNullable<Parameters<typeof buildConfigSchema>[0]>;
@@ -147,7 +147,7 @@ describe("config schema", () => {
 
   it("rejects empty Codex MCP agent scopes", () => {
     expect(() =>
-      OpenClawSchema.parse({
+      RecallSchema.parse({
         mcp: {
           servers: {
             scoped: {
@@ -160,7 +160,7 @@ describe("config schema", () => {
       }),
     ).toThrow();
     expect(() =>
-      OpenClawSchema.parse({
+      RecallSchema.parse({
         mcp: {
           servers: {
             scoped: {
@@ -173,7 +173,7 @@ describe("config schema", () => {
       }),
     ).toThrow();
     expect(() =>
-      OpenClawSchema.parse({
+      RecallSchema.parse({
         mcp: {
           servers: {
             scoped: {
@@ -324,7 +324,7 @@ describe("config schema", () => {
     expect(defaultsHint?.help).toContain("imessage");
     expect(defaultsHint?.help).toContain("last");
     expect(defaultsHint?.help).not.toContain("wecom");
-    expect(defaultsHint?.help).not.toContain("openclaw-weixin");
+    expect(defaultsHint?.help).not.toContain("recall-weixin");
     expect(defaultsHint?.help).not.toContain("yuanbao");
     expect(listHint?.help).toContain("imessage");
   });
@@ -394,7 +394,7 @@ describe("config schema", () => {
   });
 
   it("keeps per-agent model overrides limited to model selection", () => {
-    const result = OpenClawSchema.safeParse({
+    const result = RecallSchema.safeParse({
       agents: {
         list: [
           {
@@ -412,7 +412,7 @@ describe("config schema", () => {
   });
 
   it("rejects per-agent subagent model timeout config", () => {
-    const result = OpenClawSchema.safeParse({
+    const result = RecallSchema.safeParse({
       agents: {
         list: [
           {
@@ -439,7 +439,7 @@ describe("config schema", () => {
     });
     expect(tools?.exec?.commandHighlighting).toBe(false);
 
-    const config = OpenClawSchema.parse({
+    const config = RecallSchema.parse({
       agents: {
         list: [
           {
@@ -554,7 +554,7 @@ describe("config schema", () => {
   });
 
   it("accepts WhatsApp Web Baileys socket timing in the runtime zod schema", () => {
-    const parsed = OpenClawSchema.parse({
+    const parsed = RecallSchema.parse({
       web: {
         whatsapp: {
           keepAliveIntervalMs: 15_000,

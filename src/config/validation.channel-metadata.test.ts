@@ -78,7 +78,7 @@ function createExternalFeishuSchemaRegistry(): PluginManifestRegistry {
     diagnostics: [],
     plugins: [
       createPluginManifestRecord({
-        id: "openclaw-lark",
+        id: "recall-lark",
         origin: "global",
         channels: ["feishu"],
         channelConfigs: {
@@ -130,7 +130,7 @@ function createPluginManifestRecord(
     channels: [],
     cliBackends: [],
     hooks: [],
-    manifestPath: `/tmp/${overrides.id}/openclaw.plugin.json`,
+    manifestPath: `/tmp/${overrides.id}/recall.plugin.json`,
     origin: "bundled",
     providers: [],
     rootDir: `/tmp/${overrides.id}`,
@@ -171,7 +171,7 @@ vi.mock("../channels/plugins/legacy-config.js", () => ({
 }));
 
 vi.mock("./zod-schema.js", () => ({
-  OpenClawSchema: {
+  RecallSchema: {
     safeParse: (raw: unknown) => ({ success: true, data: raw }),
   },
 }));
@@ -264,7 +264,7 @@ describe("validateConfigObjectRawWithPlugins channel metadata", () => {
           appId: "app-id",
           appSecret: "secret",
           replyMode: "thread",
-          footer: "OpenClaw",
+          footer: "Recall",
         },
       },
     });
@@ -290,7 +290,7 @@ describe("validateConfigObjectRawWithPlugins channel metadata", () => {
         }),
       );
       expect(result.issues[0]?.message).not.toContain("Telegram groups");
-      expect(result.issues[0]?.message).not.toContain("openclaw doctor --fix");
+      expect(result.issues[0]?.message).not.toContain("recall doctor --fix");
     }
   });
 });

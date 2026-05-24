@@ -1,9 +1,9 @@
-import { defineSingleProviderPluginEntry } from "openclaw/plugin-sdk/provider-entry";
+import { defineSingleProviderPluginEntry } from "recall/plugin-sdk/provider-entry";
 import {
   applyModelCompatPatch,
   buildProviderReplayFamilyHooks,
-} from "openclaw/plugin-sdk/provider-model-shared";
-import { PROVIDER_LABELS } from "openclaw/plugin-sdk/provider-usage";
+} from "recall/plugin-sdk/provider-model-shared";
+import { PROVIDER_LABELS } from "recall/plugin-sdk/provider-usage";
 import { applyXiaomiConfig, XIAOMI_DEFAULT_MODEL_REF } from "./onboard.js";
 import { buildXiaomiProvider } from "./provider-catalog.js";
 import { buildXiaomiSpeechProvider } from "./speech-provider.js";

@@ -1,11 +1,11 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
 import {
   createWebSearchProviderContractFields,
   mergeScopedSearchConfig,
   resolveProviderWebSearchPluginConfig,
   type WebSearchProviderPlugin,
   type WebSearchProviderToolDefinition,
-} from "openclaw/plugin-sdk/provider-web-search-config-contract";
+} from "recall/plugin-sdk/provider-web-search-config-contract";
 import {
   resolveGeminiApiKey,
   resolveGeminiBaseUrl,
@@ -71,14 +71,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function resolveGoogleModelProviderConfig(
-  config?: OpenClawConfig,
+  config?: RecallConfig,
 ): Record<string, unknown> | undefined {
   const provider = config?.models?.providers?.google;
   return isRecord(provider) ? provider : undefined;
 }
 
 function getGoogleModelProviderCredentialFallback(
-  config?: OpenClawConfig,
+  config?: RecallConfig,
 ): { path: string; value: unknown } | undefined {
   const provider = resolveGoogleModelProviderConfig(config);
   return provider && provider.apiKey !== undefined
@@ -88,7 +88,7 @@ function getGoogleModelProviderCredentialFallback(
 
 function withGoogleModelProviderFallbacks(
   searchConfig: Record<string, unknown> | undefined,
-  config?: OpenClawConfig,
+  config?: RecallConfig,
 ): Record<string, unknown> | undefined {
   const provider = resolveGoogleModelProviderConfig(config);
   if (!provider || (provider.apiKey === undefined && provider.baseUrl === undefined)) {
@@ -124,7 +124,7 @@ export function createGeminiWebSearchProvider(): WebSearchProviderPlugin {
     envVars: ["GEMINI_API_KEY"],
     placeholder: "AIza...",
     signupUrl: "https://aistudio.google.com/apikey",
-    docsUrl: "https://docs.openclaw.ai/tools/web",
+    docsUrl: "https://docs.recall.ai/tools/web",
     autoDetectOrder: 20,
     credentialPath: GEMINI_CREDENTIAL_PATH,
     ...contractFields,

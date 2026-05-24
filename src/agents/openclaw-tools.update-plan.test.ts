@@ -1,25 +1,25 @@
 import { afterEach, describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import { setEmbeddedMode } from "../infra/embedded-mode.js";
-import { createOpenClawTools } from "./openclaw-tools.js";
-import { isUpdatePlanToolEnabledForOpenClawTools } from "./openclaw-tools.registration.js";
+import { createRecallTools } from "./recall-tools.js";
+import { isUpdatePlanToolEnabledForRecallTools } from "./recall-tools.registration.js";
 import { isToolWrappedWithBeforeToolCallHook } from "./pi-tools.before-tool-call.js";
 import { createUpdatePlanTool } from "./tools/update-plan-tool.js";
 
-type UpdatePlanGatingParams = Parameters<typeof isUpdatePlanToolEnabledForOpenClawTools>[0];
+type UpdatePlanGatingParams = Parameters<typeof isUpdatePlanToolEnabledForRecallTools>[0];
 
 function expectUpdatePlanEnabled(params: UpdatePlanGatingParams, expected: boolean): void {
-  expect(isUpdatePlanToolEnabledForOpenClawTools(params)).toBe(expected);
+  expect(isUpdatePlanToolEnabledForRecallTools(params)).toBe(expected);
 }
 
-function toolNames(tools: ReturnType<typeof createOpenClawTools>): string[] {
+function toolNames(tools: ReturnType<typeof createRecallTools>): string[] {
   return tools.map((tool) => tool.name);
 }
 
 function expectToolNamed(
-  tools: ReturnType<typeof createOpenClawTools>,
+  tools: ReturnType<typeof createRecallTools>,
   name: string,
-): ReturnType<typeof createOpenClawTools>[number] {
+): ReturnType<typeof createRecallTools>[number] {
   const tool = tools.find((candidate) => candidate.name === name);
   if (!tool) {
     throw new Error(`Expected tool ${name} to be registered`);
@@ -28,7 +28,7 @@ function expectToolNamed(
 }
 
 function openAiGpt5Params(
-  config: OpenClawConfig,
+  config: RecallConfig,
   overrides: Partial<UpdatePlanGatingParams> = {},
 ): UpdatePlanGatingParams {
   const params: UpdatePlanGatingParams = {
@@ -44,24 +44,24 @@ function openAiGpt5Params(
   return params;
 }
 
-describe("openclaw-tools update_plan gating", () => {
+describe("recall-tools update_plan gating", () => {
   afterEach(() => {
     setEmbeddedMode(false);
   });
 
   it("keeps update_plan disabled by default", () => {
-    expectUpdatePlanEnabled({ config: {} as OpenClawConfig }, false);
+    expectUpdatePlanEnabled({ config: {} as RecallConfig }, false);
   });
 
   it("does not expose update_plan from default tool construction", () => {
-    const defaultTools = createOpenClawTools({
-      config: {} as OpenClawConfig,
+    const defaultTools = createRecallTools({
+      config: {} as RecallConfig,
       disablePluginTools: true,
       modelProvider: "anthropic",
       modelId: "claude-sonnet-4-6",
     });
-    const emptyAllowlistTools = createOpenClawTools({
-      config: {} as OpenClawConfig,
+    const emptyAllowlistTools = createRecallTools({
+      config: {} as RecallConfig,
       disablePluginTools: true,
       pluginToolAllowlist: [],
       modelProvider: "anthropic",
@@ -73,12 +73,12 @@ describe("openclaw-tools update_plan gating", () => {
   });
 
   it("wraps constructed tools with before-tool-call hooks by default", () => {
-    const tools = createOpenClawTools({
-      config: {} as OpenClawConfig,
+    const tools = createRecallTools({
+      config: {} as RecallConfig,
       disablePluginTools: true,
     });
-    const unwrappedTools = createOpenClawTools({
-      config: {} as OpenClawConfig,
+    const unwrappedTools = createRecallTools({
+      config: {} as RecallConfig,
       disablePluginTools: true,
       wrapBeforeToolCallHook: false,
     });
@@ -91,8 +91,8 @@ describe("openclaw-tools update_plan gating", () => {
 
   it("keeps message tool in embedded message-tool-only completions", () => {
     setEmbeddedMode(true);
-    const tools = createOpenClawTools({
-      config: {} as OpenClawConfig,
+    const tools = createRecallTools({
+      config: {} as RecallConfig,
       disablePluginTools: true,
       sourceReplyDeliveryMode: "message_tool_only",
     });
@@ -102,17 +102,17 @@ describe("openclaw-tools update_plan gating", () => {
 
   it("keeps explicitly allowed message tool in embedded completions", () => {
     setEmbeddedMode(true);
-    const fromRuntimeAllowlist = createOpenClawTools({
-      config: {} as OpenClawConfig,
+    const fromRuntimeAllowlist = createRecallTools({
+      config: {} as RecallConfig,
       disablePluginTools: true,
       pluginToolAllowlist: ["message"],
     });
-    const fromGlobalAlsoAllow = createOpenClawTools({
-      config: { tools: { profile: "minimal", alsoAllow: ["message"] } } as OpenClawConfig,
+    const fromGlobalAlsoAllow = createRecallTools({
+      config: { tools: { profile: "minimal", alsoAllow: ["message"] } } as RecallConfig,
       disablePluginTools: true,
     });
-    const denied = createOpenClawTools({
-      config: {} as OpenClawConfig,
+    const denied = createRecallTools({
+      config: {} as RecallConfig,
       disablePluginTools: true,
       pluginToolAllowlist: ["message"],
       pluginToolDenylist: ["message"],
@@ -125,12 +125,12 @@ describe("openclaw-tools update_plan gating", () => {
 
   it("keeps subagent spawn available for trusted embedded gateway-bound runs", () => {
     setEmbeddedMode(true);
-    const defaultTools = createOpenClawTools({
-      config: {} as OpenClawConfig,
+    const defaultTools = createRecallTools({
+      config: {} as RecallConfig,
       disablePluginTools: true,
     });
-    const gatewayBoundTools = createOpenClawTools({
-      config: {} as OpenClawConfig,
+    const gatewayBoundTools = createRecallTools({
+      config: {} as RecallConfig,
       disablePluginTools: true,
       allowGatewaySubagentBinding: true,
     });
@@ -148,15 +148,15 @@ describe("openclaw-tools update_plan gating", () => {
           planTool: true,
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expectUpdatePlanEnabled({ config }, true);
     expect(createUpdatePlanTool().displaySummary).toBe("Track short work plan.");
   });
 
   it("registers update_plan when the runtime allowlist explicitly requests it", () => {
-    const tools = createOpenClawTools({
-      config: {} as OpenClawConfig,
+    const tools = createRecallTools({
+      config: {} as RecallConfig,
       disablePluginTools: true,
       pluginToolAllowlist: ["update_plan"],
       modelProvider: "anthropic",
@@ -167,8 +167,8 @@ describe("openclaw-tools update_plan gating", () => {
   });
 
   it("registers update_plan when a config allowlist group includes it", () => {
-    const tools = createOpenClawTools({
-      config: { tools: { allow: ["group:agents"] } } as OpenClawConfig,
+    const tools = createRecallTools({
+      config: { tools: { allow: ["group:agents"] } } as RecallConfig,
       disablePluginTools: true,
       modelProvider: "anthropic",
       modelId: "claude-sonnet-4-6",
@@ -178,8 +178,8 @@ describe("openclaw-tools update_plan gating", () => {
   });
 
   it("registers update_plan when a runtime allowlist group includes it", () => {
-    const tools = createOpenClawTools({
-      config: {} as OpenClawConfig,
+    const tools = createRecallTools({
+      config: {} as RecallConfig,
       disablePluginTools: true,
       pluginToolAllowlist: ["group:agents"],
       modelProvider: "anthropic",
@@ -190,8 +190,8 @@ describe("openclaw-tools update_plan gating", () => {
   });
 
   it("respects deny policy while constructing update_plan for grouped allowlists", () => {
-    const tools = createOpenClawTools({
-      config: {} as OpenClawConfig,
+    const tools = createRecallTools({
+      config: {} as RecallConfig,
       disablePluginTools: true,
       pluginToolAllowlist: ["group:agents"],
       pluginToolDenylist: ["update_plan"],
@@ -212,7 +212,7 @@ describe("openclaw-tools update_plan gating", () => {
       agents: {
         list: [{ id: "main" }],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expectUpdatePlanEnabled(openAiGpt5Params(cfg), true);
     expectUpdatePlanEnabled(openAiGpt5Params(cfg, { modelProvider: "openai-codex" }), true);
@@ -230,7 +230,7 @@ describe("openclaw-tools update_plan gating", () => {
         },
         list: [{ id: "main" }],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expectUpdatePlanEnabled(openAiGpt5Params(cfg), false);
   });
@@ -240,7 +240,7 @@ describe("openclaw-tools update_plan gating", () => {
       agents: {
         list: [{ id: "main" }],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expectUpdatePlanEnabled(
       openAiGpt5Params(cfg, { modelProvider: "anthropic", modelId: "claude-sonnet-4-6" }),
@@ -259,7 +259,7 @@ describe("openclaw-tools update_plan gating", () => {
         },
         list: [{ id: "main" }],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expectUpdatePlanEnabled(openAiGpt5Params(cfg), true);
   });
@@ -274,7 +274,7 @@ describe("openclaw-tools update_plan gating", () => {
         },
         list: [{ id: "main" }],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expectUpdatePlanEnabled(
       openAiGpt5Params(cfg, { modelProvider: "anthropic", modelId: "claude-sonnet-4-6" }),
@@ -298,7 +298,7 @@ describe("openclaw-tools update_plan gating", () => {
         },
         list: [{ id: "main" }],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expectUpdatePlanEnabled(openAiGpt5Params(cfg), false);
   });
@@ -321,7 +321,7 @@ describe("openclaw-tools update_plan gating", () => {
           },
         ],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expectUpdatePlanEnabled(openAiGpt5Params(cfg, { agentId: "research" }), true);
   });
@@ -346,7 +346,7 @@ describe("openclaw-tools update_plan gating", () => {
           },
         ],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     expectUpdatePlanEnabled(openAiGpt5Params(cfg, { agentId: "main" }), false);
     expectUpdatePlanEnabled(openAiGpt5Params(cfg, { agentId: "research" }), true);

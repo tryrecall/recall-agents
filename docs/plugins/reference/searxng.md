@@ -11,8 +11,8 @@ Adds web search provider support.
 
 ## Distribution
 
-- Package: `@openclaw/searxng-plugin`
-- Install route: included in OpenClaw
+- Package: `@recall/searxng-plugin`
+- Install route: included in Recall
 
 ## Surface
 

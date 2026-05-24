@@ -8,7 +8,7 @@ import {
   resolveSessionWriteLockOptions,
 } from "../../agents/session-write-lock.js";
 import { redactTranscriptMessage } from "../../agents/transcript-redact.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { redactSecrets } from "../../logging/redact.js";
 import { resolveOwnedSessionTranscriptWriteLockRunner } from "./transcript-write-context.js";
 
@@ -240,7 +240,7 @@ type AppendSessionTranscriptMessageParams<TMessage = unknown> = {
   sessionId?: string;
   cwd?: string;
   useRawWhenLinear?: boolean;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
 };
 
 function isTranscriptAgentMessage(value: unknown): value is AgentMessage {

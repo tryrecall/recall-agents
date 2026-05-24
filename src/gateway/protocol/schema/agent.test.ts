@@ -18,19 +18,19 @@ const musicCompletionEvent: AgentInternalEvent = {
   childSessionKey: "music_generate:task-123",
   childSessionId: "task-123",
   announceType: "music generation task",
-  taskLabel: "OpenClaw release anthem",
+  taskLabel: "Recall release anthem",
   status: "ok",
   statusLabel: "completed successfully",
   result: "Generated 1 track.",
   attachments: [
     {
       type: "audio",
-      path: "/tmp/openclaw/generated-release-anthem.mp3",
+      path: "/tmp/recall/generated-release-anthem.mp3",
       mimeType: "audio/mpeg",
       name: "generated-release-anthem.mp3",
     },
   ],
-  mediaUrls: ["/tmp/openclaw/generated-release-anthem.mp3"],
+  mediaUrls: ["/tmp/recall/generated-release-anthem.mp3"],
   replyInstruction: "Deliver the generated music.",
 };
 

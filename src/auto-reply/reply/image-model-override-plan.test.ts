@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { resolveImageModelOverridePlan } from "./image-model-override-plan.js";
 
 function buildConfig(params: {
-  imageModel?: NonNullable<NonNullable<OpenClawConfig["agents"]>["defaults"]>["imageModel"];
+  imageModel?: NonNullable<NonNullable<RecallConfig["agents"]>["defaults"]>["imageModel"];
   models?: Record<string, object>;
-}): OpenClawConfig {
+}): RecallConfig {
   return {
     agents: {
       defaults: {
@@ -13,7 +13,7 @@ function buildConfig(params: {
         ...(params.models ? { models: params.models } : {}),
       },
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
 describe("resolveImageModelOverridePlan", () => {

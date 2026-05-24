@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { scrubDoctorErrorMessage } from "./doctor-error-message.js";
 import { listHealthChecks } from "./health-check-registry.js";
 import type {
@@ -16,7 +16,7 @@ export interface DoctorRepairRunOptions {
 }
 
 export interface DoctorRepairRunResult {
-  readonly config: OpenClawConfig;
+  readonly config: RecallConfig;
   readonly findings: readonly HealthFinding[];
   readonly remainingFindings: readonly HealthFinding[];
   readonly changes: readonly string[];

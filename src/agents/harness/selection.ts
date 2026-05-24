@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import type { CompactEmbeddedPiSessionParams } from "../pi-embedded-runner/compact.types.js";
@@ -73,7 +73,7 @@ function listPluginAgentHarnesses(): AgentHarness[] {
 export function resolveAvailableAgentHarnessPolicy(params: {
   provider?: string;
   modelId?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   sessionKey?: string;
   env?: NodeJS.ProcessEnv;
@@ -109,7 +109,7 @@ function compareHarnessSupport(
 export function selectAgentHarness(params: {
   provider: string;
   modelId?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   sessionKey?: string;
   agentHarnessId?: string;
@@ -121,7 +121,7 @@ export function selectAgentHarness(params: {
 function selectAgentHarnessDecision(params: {
   provider: string;
   modelId?: string;
-  config?: OpenClawConfig;
+  config?: RecallConfig;
   agentId?: string;
   sessionKey?: string;
   agentHarnessId?: string;

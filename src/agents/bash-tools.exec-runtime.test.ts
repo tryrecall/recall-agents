@@ -720,7 +720,7 @@ describe("buildExecExitOutcome", () => {
 });
 
 describe("runExecProcess POSIX command wrapper", () => {
-  it("wraps command with PATH export if OPENCLAW_PREPEND_PATH is present", async () => {
+  it("wraps command with PATH export if RECALL_PREPEND_PATH is present", async () => {
     if (process.platform === "win32") {
       return;
     }
@@ -759,7 +759,7 @@ describe("runExecProcess POSIX command wrapper", () => {
 
     const commandStr = spawnCall.argv.join(" ");
     expect(commandStr).toContain(
-      'export PATH="${OPENCLAW_PREPEND_PATH}${PATH:+:$PATH}"; unset OPENCLAW_PREPEND_PATH; echo test',
+      'export PATH="${RECALL_PREPEND_PATH}${PATH:+:$PATH}"; unset RECALL_PREPEND_PATH; echo test',
     );
   });
 

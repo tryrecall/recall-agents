@@ -14,7 +14,7 @@ import { attachModelProviderRequestTransport } from "./provider-request-config.j
 import {
   buildTransportAwareSimpleStreamFn,
   createBoundaryAwareStreamFnForModel,
-  createOpenClawTransportStreamFnForModel,
+  createRecallTransportStreamFnForModel,
   isTransportAwareApiSupported,
   prepareTransportAwareSimpleModel,
   resolveTransportAwareSimpleApi,
@@ -384,8 +384,8 @@ describe("openai transport stream", () => {
   });
 
   it("summarizes model payload tools with full names when requested", () => {
-    const previous = process.env.OPENCLAW_DEBUG_MODEL_PAYLOAD;
-    process.env.OPENCLAW_DEBUG_MODEL_PAYLOAD = "tools";
+    const previous = process.env.RECALL_DEBUG_MODEL_PAYLOAD;
+    process.env.RECALL_DEBUG_MODEL_PAYLOAD = "tools";
     try {
       expect(
         testing.summarizeResponsesTools([
@@ -395,16 +395,16 @@ describe("openai transport stream", () => {
       ).toBe("count=2 names=exec,wait");
     } finally {
       if (previous === undefined) {
-        delete process.env.OPENCLAW_DEBUG_MODEL_PAYLOAD;
+        delete process.env.RECALL_DEBUG_MODEL_PAYLOAD;
       } else {
-        process.env.OPENCLAW_DEBUG_MODEL_PAYLOAD = previous;
+        process.env.RECALL_DEBUG_MODEL_PAYLOAD = previous;
       }
     }
   });
 
   it("redacts full model payload debug summaries", () => {
-    const previous = process.env.OPENCLAW_DEBUG_MODEL_PAYLOAD;
-    process.env.OPENCLAW_DEBUG_MODEL_PAYLOAD = "full-redacted";
+    const previous = process.env.RECALL_DEBUG_MODEL_PAYLOAD;
+    process.env.RECALL_DEBUG_MODEL_PAYLOAD = "full-redacted";
     try {
       const summary = testing.summarizeResponsesPayload({
         model: "gpt-5.5",
@@ -418,14 +418,14 @@ describe("openai transport stream", () => {
       expect(summary).not.toContain("sk-abcdefghijklmnopqrstuvwxyz");
     } finally {
       if (previous === undefined) {
-        delete process.env.OPENCLAW_DEBUG_MODEL_PAYLOAD;
+        delete process.env.RECALL_DEBUG_MODEL_PAYLOAD;
       } else {
-        process.env.OPENCLAW_DEBUG_MODEL_PAYLOAD = previous;
+        process.env.RECALL_DEBUG_MODEL_PAYLOAD = previous;
       }
     }
   });
 
-  it("enforces the code mode responses tool surface before requests leave OpenClaw", () => {
+  it("enforces the code mode responses tool surface before requests leave Recall", () => {
     const payload = {
       tools: [
         { type: "function", name: "exec" },
@@ -447,8 +447,8 @@ describe("openai transport stream", () => {
     ).toThrow(/Code mode payload tool surface violation/);
   });
 
-  it("adds OpenClaw attribution to native OpenAI transport headers and protects it from pi", () => {
-    vi.stubEnv("OPENCLAW_VERSION", "2026.3.22");
+  it("adds Recall attribution to native OpenAI transport headers and protects it from pi", () => {
+    vi.stubEnv("RECALL_VERSION", "2026.3.22");
     const headers = testing.buildOpenAIClientHeaders(
       {
         id: "gpt-5.4",
@@ -476,16 +476,16 @@ describe("openai transport stream", () => {
     );
 
     expectRecordFields(headers, {
-      originator: "openclaw",
+      originator: "recall",
       version: "2026.3.22",
-      "User-Agent": "openclaw/2026.3.22",
+      "User-Agent": "recall/2026.3.22",
       "X-Provider": "model",
       "X-Caller": "request",
     });
   });
 
-  it("adds OpenClaw attribution to native OpenAI Codex transport headers", () => {
-    vi.stubEnv("OPENCLAW_VERSION", "2026.3.22");
+  it("adds Recall attribution to native OpenAI Codex transport headers", () => {
+    vi.stubEnv("RECALL_VERSION", "2026.3.22");
     const headers = testing.buildOpenAIClientHeaders(
       {
         id: "gpt-5.4-codex",
@@ -507,9 +507,9 @@ describe("openai transport stream", () => {
     );
 
     expectRecordFields(headers, {
-      originator: "openclaw",
+      originator: "recall",
       version: "2026.3.22",
-      "User-Agent": "openclaw/2026.3.22",
+      "User-Agent": "recall/2026.3.22",
     });
   });
 
@@ -606,7 +606,7 @@ describe("openai transport stream", () => {
       } satisfies Model<"openai-responses">),
     ).toBeTypeOf("function");
     expect(
-      createOpenClawTransportStreamFnForModel({
+      createRecallTransportStreamFnForModel({
         id: "gpt-5.4",
         name: "GPT-5.4",
         api: "openai-responses",
@@ -673,9 +673,9 @@ describe("openai transport stream", () => {
 
     const prepared = prepareTransportAwareSimpleModel(model);
 
-    expect(resolveTransportAwareSimpleApi(model.api)).toBe("openclaw-openai-responses-transport");
+    expect(resolveTransportAwareSimpleApi(model.api)).toBe("recall-openai-responses-transport");
     expectRecordFields(prepared, {
-      api: "openclaw-openai-responses-transport",
+      api: "recall-openai-responses-transport",
       provider: "openai",
       id: "gpt-5.4",
     });
@@ -706,9 +706,9 @@ describe("openai transport stream", () => {
 
     const prepared = prepareTransportAwareSimpleModel(model);
 
-    expect(resolveTransportAwareSimpleApi(model.api)).toBe("openclaw-openai-responses-transport");
+    expect(resolveTransportAwareSimpleApi(model.api)).toBe("recall-openai-responses-transport");
     expectRecordFields(prepared, {
-      api: "openclaw-openai-responses-transport",
+      api: "recall-openai-responses-transport",
       provider: "openai-codex",
       id: "codex-mini-latest",
     });
@@ -739,9 +739,9 @@ describe("openai transport stream", () => {
 
     const prepared = prepareTransportAwareSimpleModel(model);
 
-    expect(resolveTransportAwareSimpleApi(model.api)).toBe("openclaw-anthropic-messages-transport");
+    expect(resolveTransportAwareSimpleApi(model.api)).toBe("recall-anthropic-messages-transport");
     expectRecordFields(prepared, {
-      api: "openclaw-anthropic-messages-transport",
+      api: "recall-anthropic-messages-transport",
       provider: "anthropic",
       id: "claude-sonnet-4-6",
     });
@@ -771,7 +771,7 @@ describe("openai transport stream", () => {
     );
 
     expect(resolveTransportAwareSimpleApi(model.api)).toBe(
-      "openclaw-google-generative-ai-transport",
+      "recall-google-generative-ai-transport",
     );
   });
 
@@ -797,9 +797,9 @@ describe("openai transport stream", () => {
       },
     );
 
-    expect(resolveTransportAwareSimpleApi(model.api)).toBe("openclaw-openai-responses-transport");
+    expect(resolveTransportAwareSimpleApi(model.api)).toBe("recall-openai-responses-transport");
     expectRecordFields(prepareTransportAwareSimpleModel(model), {
-      api: "openclaw-openai-responses-transport",
+      api: "recall-openai-responses-transport",
       provider: "github-copilot",
       id: "gpt-5.4",
     });
@@ -828,9 +828,9 @@ describe("openai transport stream", () => {
       },
     );
 
-    expect(resolveTransportAwareSimpleApi(model.api)).toBe("openclaw-anthropic-messages-transport");
+    expect(resolveTransportAwareSimpleApi(model.api)).toBe("recall-anthropic-messages-transport");
     expectRecordFields(prepareTransportAwareSimpleModel(model), {
-      api: "openclaw-anthropic-messages-transport",
+      api: "recall-anthropic-messages-transport",
       provider: "github-copilot",
       id: "claude-sonnet-4.6",
     });

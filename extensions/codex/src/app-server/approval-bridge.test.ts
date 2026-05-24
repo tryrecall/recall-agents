@@ -4,12 +4,12 @@ import {
   invokeNativeHookRelay,
   runBeforeToolCallHook,
   type EmbeddedRunAttemptParams,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "recall/plugin-sdk/agent-harness-runtime";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { buildApprovalResponse, handleCodexAppServerApprovalRequest } from "./approval-bridge.js";
 
-vi.mock("openclaw/plugin-sdk/agent-harness-runtime", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("openclaw/plugin-sdk/agent-harness-runtime")>()),
+vi.mock("recall/plugin-sdk/agent-harness-runtime", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("recall/plugin-sdk/agent-harness-runtime")>()),
   callGatewayTool: vi.fn(),
   hasNativeHookRelayInvocation: vi.fn(() => false),
   invokeNativeHookRelay: vi.fn(),
@@ -137,7 +137,7 @@ describe("Codex app-server approval bridge", () => {
     expect(gatewayCallMethod()).toBe("plugin.approval.request");
     expect(typeof gatewayCallAt(0)[1]).toBe("object");
     const requestPayload = gatewayRequestPayload();
-    expect(requestPayload.pluginId).toBe("openclaw-codex-app-server");
+    expect(requestPayload.pluginId).toBe("recall-codex-app-server");
     expect(requestPayload.title).toBe("Codex app-server command approval");
     expect(requestPayload.twoPhase).toBe(true);
     expect(requestPayload.turnSourceChannel).toBe("telegram");
@@ -167,7 +167,7 @@ describe("Codex app-server approval bridge", () => {
     findApprovalEvent(params, { status: "approved", approvalId: "plugin:approval-1" });
   });
 
-  it("normalizes prefixed channel targets for OpenClaw tool policy context", async () => {
+  it("normalizes prefixed channel targets for Recall tool policy context", async () => {
     const params = createParams();
     params.messageChannel = "telegram";
     params.messageProvider = "telegram";
@@ -199,7 +199,7 @@ describe("Codex app-server approval bridge", () => {
     expect(gatewayRequestPayload().turnSourceTo).toBe("telegram:-100123");
   });
 
-  it("denies command approvals before prompting when OpenClaw tool policy blocks", async () => {
+  it("denies command approvals before prompting when Recall tool policy blocks", async () => {
     const params = createParams();
     mockRunBeforeToolCallHook.mockResolvedValueOnce({
       blocked: true,
@@ -409,7 +409,7 @@ describe("Codex app-server approval bridge", () => {
     findApprovalEvent(params, {
       status: "denied",
       message:
-        "OpenClaw native hook relay returned an unreadable Codex app-server approval result.",
+        "Recall native hook relay returned an unreadable Codex app-server approval result.",
     });
   });
 
@@ -451,7 +451,7 @@ describe("Codex app-server approval bridge", () => {
     expect(mockCallGatewayTool).not.toHaveBeenCalled();
     findApprovalEvent(params, {
       status: "denied",
-      message: "OpenClaw native hook relay returned a non-deny Codex app-server approval decision.",
+      message: "Recall native hook relay returned a non-deny Codex app-server approval decision.",
     });
   });
 
@@ -519,7 +519,7 @@ describe("Codex app-server approval bridge", () => {
     findApprovalEvent(params, {
       status: "denied",
       message:
-        "OpenClaw native hook relay unavailable for Codex app-server approval: native hook relay not found",
+        "Recall native hook relay unavailable for Codex app-server approval: native hook relay not found",
     });
   });
 
@@ -572,7 +572,7 @@ describe("Codex app-server approval bridge", () => {
     ]);
   });
 
-  it("denies command approvals when OpenClaw tool policy rewrites params", async () => {
+  it("denies command approvals when Recall tool policy rewrites params", async () => {
     const params = createParams();
     mockRunBeforeToolCallHook.mockResolvedValueOnce({
       blocked: false,
@@ -605,11 +605,11 @@ describe("Codex app-server approval bridge", () => {
     findApprovalEvent(params, {
       status: "denied",
       message:
-        "OpenClaw tool policy rewrote Codex app-server approval params; refusing original request.",
+        "Recall tool policy rewrote Codex app-server approval params; refusing original request.",
     });
   });
 
-  it("denies command approvals when OpenClaw tool policy requires approval", async () => {
+  it("denies command approvals when Recall tool policy requires approval", async () => {
     const params = createParams();
     mockRunBeforeToolCallHook.mockResolvedValueOnce({
       blocked: true,
@@ -1105,7 +1105,7 @@ describe("Codex app-server approval bridge", () => {
 
     expect(result).toEqual({
       decision: "decline",
-      reason: "OpenClaw codex app-server bridge does not grant native approvals yet.",
+      reason: "Recall codex app-server bridge does not grant native approvals yet.",
     });
     expect(mockCallGatewayTool).not.toHaveBeenCalled();
     expect(params.onAgentEvent).not.toHaveBeenCalled();
@@ -1466,7 +1466,7 @@ describe("Codex app-server approval bridge", () => {
     });
     expect(buildApprovalResponse("future/requestApproval", undefined, "approved-once")).toEqual({
       decision: "decline",
-      reason: "OpenClaw codex app-server bridge does not grant native approvals yet.",
+      reason: "Recall codex app-server bridge does not grant native approvals yet.",
     });
   });
 });

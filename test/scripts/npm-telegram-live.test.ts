@@ -15,20 +15,20 @@ describe("package Telegram live Docker E2E", () => {
   it("supports npm-specific Convex credential aliases", () => {
     const script = readFileSync(DOCKER_SCRIPT_PATH, "utf8");
 
-    expect(script).toContain("OPENCLAW_NPM_TELEGRAM_CREDENTIAL_SOURCE");
-    expect(script).toContain("OPENCLAW_NPM_TELEGRAM_CREDENTIAL_ROLE");
-    expect(script).toContain('docker_env+=(-e OPENCLAW_QA_CREDENTIAL_SOURCE="$credential_source")');
-    expect(script).toContain('docker_env+=(-e OPENCLAW_QA_CREDENTIAL_ROLE="$credential_role")');
+    expect(script).toContain("RECALL_NPM_TELEGRAM_CREDENTIAL_SOURCE");
+    expect(script).toContain("RECALL_NPM_TELEGRAM_CREDENTIAL_ROLE");
+    expect(script).toContain('docker_env+=(-e RECALL_QA_CREDENTIAL_SOURCE="$credential_source")');
+    expect(script).toContain('docker_env+=(-e RECALL_QA_CREDENTIAL_ROLE="$credential_role")');
   });
 
   it("defaults CI runs to Convex when broker credentials are present", () => {
     const script = readFileSync(DOCKER_SCRIPT_PATH, "utf8");
 
     expect(script).toContain(
-      'if [ -n "${CI:-}" ] && [ -n "${OPENCLAW_QA_CONVEX_SITE_URL:-}" ]; then',
+      'if [ -n "${CI:-}" ] && [ -n "${RECALL_QA_CONVEX_SITE_URL:-}" ]; then',
     );
-    expect(script).toContain("OPENCLAW_QA_CONVEX_SECRET_CI");
-    expect(script).toContain("OPENCLAW_QA_CONVEX_SECRET_MAINTAINER");
+    expect(script).toContain("RECALL_QA_CONVEX_SECRET_CI");
+    expect(script).toContain("RECALL_QA_CONVEX_SECRET_MAINTAINER");
     expect(script).toContain('printf "convex"');
   });
 
@@ -52,8 +52,8 @@ describe("package Telegram live Docker E2E", () => {
   it("can install a resolved package tarball instead of a registry spec", () => {
     const script = readFileSync(DOCKER_SCRIPT_PATH, "utf8");
 
-    expect(script).toContain("OPENCLAW_NPM_TELEGRAM_PACKAGE_TGZ");
-    expect(script).toContain("OPENCLAW_CURRENT_PACKAGE_TGZ");
+    expect(script).toContain("RECALL_NPM_TELEGRAM_PACKAGE_TGZ");
+    expect(script).toContain("RECALL_CURRENT_PACKAGE_TGZ");
     expect(script).toContain(
       'package_mount_args=(-v "$resolved_package_tgz:$package_install_source:ro")',
     );
@@ -80,11 +80,11 @@ describe("package Telegram live Docker E2E", () => {
     expect(script).toContain('-v "$ROOT_DIR/extensions/qa-lab:/app/extensions/qa-lab:ro"');
     expect(script).not.toContain('ln -sfnT /app/extensions "$openclaw_package_dir/extensions"');
     expect(script).toContain("node scripts/e2e/lib/npm-telegram-live/prepare-package.mjs");
-    expect(script).toContain("/app/node_modules/openclaw/package.json");
+    expect(script).toContain("/app/node_modules/recall/package.json");
     expect(preparePackage).toContain('pkg.exports["./plugin-sdk/gateway-runtime"]');
     expect(preparePackage).toContain('"./dist/plugin-sdk/gateway-runtime.js"');
-    expect(gatewayRpcClient).toContain('from "openclaw/plugin-sdk/gateway-runtime"');
-    expect(qaRuntimeApi).toContain('from "openclaw/plugin-sdk/gateway-runtime"');
+    expect(gatewayRpcClient).toContain('from "recall/plugin-sdk/gateway-runtime"');
+    expect(qaRuntimeApi).toContain('from "recall/plugin-sdk/gateway-runtime"');
   });
 
   it("exposes installed package dependencies to the mounted QA harness", () => {
@@ -92,7 +92,7 @@ describe("package Telegram live Docker E2E", () => {
 
     expect(script).toContain("link_installed_package_dependency()");
     expect(script).toContain(
-      'local source="/npm-global/lib/node_modules/openclaw/node_modules/$name"',
+      'local source="/npm-global/lib/node_modules/recall/node_modules/$name"',
     );
     expect(script).toContain('ln -sfn "$source" "$target"');
     expect(script).toContain('link_installed_package_dependency "$dependency"');
@@ -104,14 +104,14 @@ describe("package Telegram live Docker E2E", () => {
   it("lets npm-specific credential aliases override shared QA env", () => {
     expect(
       testing.resolveCredentialSource({
-        OPENCLAW_NPM_TELEGRAM_CREDENTIAL_SOURCE: "convex",
-        OPENCLAW_QA_CREDENTIAL_SOURCE: "env",
+        RECALL_NPM_TELEGRAM_CREDENTIAL_SOURCE: "convex",
+        RECALL_QA_CREDENTIAL_SOURCE: "env",
       }),
     ).toBe("convex");
     expect(
       testing.resolveCredentialRole({
-        OPENCLAW_NPM_TELEGRAM_CREDENTIAL_ROLE: "ci",
-        OPENCLAW_QA_CREDENTIAL_ROLE: "maintainer",
+        RECALL_NPM_TELEGRAM_CREDENTIAL_ROLE: "ci",
+        RECALL_QA_CREDENTIAL_ROLE: "maintainer",
       }),
     ).toBe("ci");
   });

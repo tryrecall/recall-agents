@@ -1,13 +1,13 @@
 ---
-summary: "fal image, video, and music generation setup in OpenClaw"
+summary: "fal image, video, and music generation setup in Recall"
 title: "Fal"
 read_when:
-  - You want to use fal image generation in OpenClaw
+  - You want to use fal image generation in Recall
   - You need the FAL_KEY auth flow
   - You want fal defaults for image_generate, video_generate, or music_generate
 ---
 
-OpenClaw ships a bundled `fal` provider for hosted image, video, and music
+Recall ships a bundled `fal` provider for hosted image, video, and music
 generation.
 
 | Property | Value                                                         |
@@ -21,7 +21,7 @@ generation.
 <Steps>
   <Step title="Set the API key">
     ```bash
-    openclaw onboard --auth-choice fal-api-key
+    recall onboard --auth-choice fal-api-key
     ```
   </Step>
   <Step title="Set a default image model">
@@ -60,7 +60,7 @@ aspect-ratio hints.
 </Warning>
 
 Use `outputFormat: "png"` when you want PNG output. fal does not declare an
-explicit transparent-background control in OpenClaw, so `background:
+explicit transparent-background control in Recall, so `background:
 "transparent"` is reported as an ignored override for fal models.
 
 To use fal as the default image provider:
@@ -182,7 +182,7 @@ ACE-Step and Stable Audio are prompt-to-audio endpoints; choose them with the
 `model` override when you want those model families.
 
 <Tip>
-Use `openclaw models list --provider fal` to see the full list of available fal
+Use `recall models list --provider fal` to see the full list of available fal
 models, including any recently added entries.
 </Tip>
 

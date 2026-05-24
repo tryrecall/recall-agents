@@ -9,7 +9,7 @@ import {
 } from "../agents/model-selection.js";
 import { resolvePluginWebSearchConfig } from "../config/plugin-web-search-config.js";
 import type { ModelDefinitionConfig } from "../config/types.models.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { planManifestModelCatalogRows, type ModelCatalogCost } from "../model-catalog/index.js";
 import { isInstalledPluginEnabled } from "../plugins/installed-plugin-index.js";
@@ -54,7 +54,7 @@ type OpenRouterModelPayload = {
 };
 
 type GatewayModelPricingRefreshParams = {
-  config: OpenClawConfig;
+  config: RecallConfig;
   env?: NodeJS.ProcessEnv;
   fetchImpl?: typeof fetch;
   workspaceDir?: string;
@@ -104,7 +104,7 @@ function clearRefreshTimer(): void {
 }
 
 function getPricingModelNormalizationOptions(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   manifestRegistry?: PluginManifestRegistry;
 }): PricingModelNormalizationOptions {
   const allowPluginBackedNormalization = params.config.plugins?.enabled !== false;
@@ -417,7 +417,7 @@ function normalizeExternalPricingPolicy(
 function filterActiveManifestRegistry(params: {
   registry: PluginManifestRegistry;
   index: PluginRegistrySnapshot;
-  config: OpenClawConfig;
+  config: RecallConfig;
 }): PluginManifestRegistry {
   return {
     diagnostics: params.registry.diagnostics,
@@ -428,7 +428,7 @@ function filterActiveManifestRegistry(params: {
 }
 
 function resolveModelPricingManifestMetadata(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   env?: NodeJS.ProcessEnv;
   workspaceDir?: string;
   pluginMetadataSnapshot?: PluginMetadataRegistryView;
@@ -712,7 +712,7 @@ function addProviderModelPair(params: {
 }
 
 function addConfiguredWebSearchPluginModels(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   aliasIndex: ReturnType<typeof buildModelAliasIndex>;
   refs: Map<string, ModelRef>;
   manifestRegistry: PluginManifestRegistry;
@@ -772,7 +772,7 @@ function isPrivateOrLoopbackBaseUrl(baseUrl: string | undefined): boolean {
 }
 
 function findConfiguredProviderModel(
-  config: OpenClawConfig,
+  config: RecallConfig,
   ref: ModelRef,
   options: PricingModelNormalizationOptions = {
     allowManifestNormalization: true,
@@ -791,7 +791,7 @@ function findConfiguredProviderModel(
 }
 
 function getConfiguredModelPricing(
-  config: OpenClawConfig,
+  config: RecallConfig,
   ref: ModelRef,
   options: PricingModelNormalizationOptions = {
     allowManifestNormalization: true,
@@ -802,7 +802,7 @@ function getConfiguredModelPricing(
 }
 
 function hasPrivateOrLoopbackConfiguredEndpoint(
-  config: OpenClawConfig,
+  config: RecallConfig,
   ref: ModelRef,
   options: PricingModelNormalizationOptions = {
     allowManifestNormalization: true,
@@ -818,7 +818,7 @@ function hasPrivateOrLoopbackConfiguredEndpoint(
 }
 
 function shouldFetchExternalPricingForRef(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   ref: ModelRef;
   policies: ReadonlyMap<string, ExternalPricingPolicy>;
   seededPricing: ReadonlyMap<string, CachedModelPricing>;
@@ -845,7 +845,7 @@ function shouldFetchExternalPricingForRef(params: {
 }
 
 function filterExternalPricingRefs(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   refs: ModelRef[];
   policies: ReadonlyMap<string, ExternalPricingPolicy>;
   seededPricing: ReadonlyMap<string, CachedModelPricing>;
@@ -867,7 +867,7 @@ function filterExternalPricingRefs(params: {
 }
 
 export function collectConfiguredModelPricingRefs(
-  config: OpenClawConfig,
+  config: RecallConfig,
   options: { manifestRegistry?: PluginManifestRegistry } = {},
 ): ModelRef[] {
   const manifestRegistry =
@@ -1141,7 +1141,7 @@ function scheduleRefresh(
 }
 
 function collectSeededPricing(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   refs: readonly ModelRef[];
   catalogPricing: ReadonlyMap<string, CachedModelPricing>;
   allowManifestNormalization: boolean;

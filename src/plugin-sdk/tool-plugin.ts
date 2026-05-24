@@ -7,16 +7,16 @@ import {
   buildJsonPluginConfigSchema,
   definePluginEntry,
   type AnyAgentTool,
-  type OpenClawPluginApi,
-  type OpenClawPluginToolContext,
+  type RecallPluginApi,
+  type RecallPluginToolContext,
 } from "./plugin-entry.js";
 
 const EMPTY_TOOL_PLUGIN_CONFIG_SCHEMA = Type.Object({}, { additionalProperties: false });
 
-export const toolPluginMetadataSymbol = Symbol.for("openclaw.plugin-sdk.tool-plugin.metadata");
+export const toolPluginMetadataSymbol = Symbol.for("recall.plugin-sdk.tool-plugin.metadata");
 
 export type ToolPluginExecutionContext = {
-  api: OpenClawPluginApi;
+  api: RecallPluginApi;
   signal?: AbortSignal;
   toolCallId: string;
   onUpdate?: AgentToolUpdateCallback<unknown>;
@@ -31,9 +31,9 @@ type ToolPluginToolFactory<TConfig> = <TParamsSchema extends TSchema>(
 ) => DefinedToolPluginTool;
 
 export type ToolPluginFactoryContext<TConfig> = {
-  api: OpenClawPluginApi;
+  api: RecallPluginApi;
   config: TConfig;
-  toolContext: OpenClawPluginToolContext;
+  toolContext: RecallPluginToolContext;
 };
 
 type ToolPluginToolDefinitionBase<TParamsSchema extends TSchema> = {

@@ -1,7 +1,7 @@
 import { monitorEventLoopDelay, performance } from "node:perf_hooks";
 import { getRuntimeConfig } from "../config/config.js";
 import { resolveAllAgentSessionStoreTargetsSync } from "../config/sessions/targets.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   areDiagnosticsEnabledForProcess,
   emitDiagnosticEvent,
@@ -121,14 +121,14 @@ type SampleDiagnosticLiveness = (
 ) => DiagnosticLivenessSample | null;
 
 type StartDiagnosticHeartbeatOptions = {
-  getConfig?: () => OpenClawConfig;
+  getConfig?: () => RecallConfig;
   emitMemorySample?: EmitDiagnosticMemorySample;
   sampleLiveness?: SampleDiagnosticLiveness;
   recoverStuckSession?: RecoverStuckSession;
   startupGraceMs?: number;
 };
 
-function resolveDiagnosticSessionStorePaths(config?: OpenClawConfig): string[] | undefined {
+function resolveDiagnosticSessionStorePaths(config?: RecallConfig): string[] | undefined {
   if (!config) {
     return undefined;
   }
@@ -140,7 +140,7 @@ function resolveDiagnosticSessionStorePaths(config?: OpenClawConfig): string[] |
   }
 }
 
-function shouldWriteCriticalMemoryPressureBundle(config?: OpenClawConfig): boolean {
+function shouldWriteCriticalMemoryPressureBundle(config?: RecallConfig): boolean {
   return config?.diagnostics?.memoryPressureSnapshot === true;
 }
 
@@ -442,7 +442,7 @@ function formatDiagnosticWorkLabels(work: DiagnosticWorkSnapshot): string {
   return parts.join(" ");
 }
 
-export function resolveStuckSessionWarnMs(config?: OpenClawConfig): number {
+export function resolveStuckSessionWarnMs(config?: RecallConfig): number {
   const raw = config?.diagnostics?.stuckSessionWarnMs;
   if (typeof raw !== "number" || !Number.isFinite(raw)) {
     return DEFAULT_STUCK_SESSION_WARN_MS;
@@ -455,7 +455,7 @@ export function resolveStuckSessionWarnMs(config?: OpenClawConfig): number {
 }
 
 export function resolveStuckSessionAbortMs(
-  config: OpenClawConfig | undefined,
+  config: RecallConfig | undefined,
   stuckSessionWarnMs: number,
 ): number {
   const raw = config?.diagnostics?.stuckSessionAbortMs;
@@ -1139,7 +1139,7 @@ export function logActiveRuns() {
 let heartbeatInterval: NodeJS.Timeout | null = null;
 
 export function startDiagnosticHeartbeat(
-  config?: OpenClawConfig,
+  config?: RecallConfig,
   opts?: StartDiagnosticHeartbeatOptions,
 ) {
   if (!areDiagnosticsEnabledForProcess() || !isDiagnosticsEnabled(config)) {

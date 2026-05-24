@@ -3,7 +3,7 @@ import { HttpsProxyAgent } from "https-proxy-agent";
 import {
   resolveActiveManagedProxyTlsOptions,
   resolveEnvHttpProxyUrl,
-} from "openclaw/plugin-sdk/fetch-runtime";
+} from "recall/plugin-sdk/fetch-runtime";
 
 export const SLACK_DEFAULT_RETRY_OPTIONS: RetryOptions = {
   retries: 2,

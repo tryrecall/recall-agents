@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { detectBinary as defaultDetectBinary } from "../../plugins/setup-binary.js";
 import type {
   ChannelSetupWizard,
@@ -19,10 +19,10 @@ export function createDetectedBinaryStatus(params: {
   configuredScore: number;
   unconfiguredScore: number;
   resolveConfigured: (params: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     accountId?: string;
   }) => boolean | Promise<boolean>;
-  resolveBinaryPath: (params: { cfg: OpenClawConfig; accountId?: string }) => string;
+  resolveBinaryPath: (params: { cfg: RecallConfig; accountId?: string }) => string;
   detectBinary?: (path: string) => Promise<boolean>;
 }): ChannelSetupWizardStatus {
   const detectBinary = params.detectBinary ?? defaultDetectBinary;
@@ -47,7 +47,7 @@ export function createDetectedBinaryStatus(params: {
       cfg,
       accountId,
     }: {
-      cfg: OpenClawConfig;
+      cfg: RecallConfig;
       accountId?: string;
       configured: boolean;
     }): Promise<string | undefined> {
@@ -59,7 +59,7 @@ export function createDetectedBinaryStatus(params: {
       cfg,
       accountId,
     }: {
-      cfg: OpenClawConfig;
+      cfg: RecallConfig;
       accountId?: string;
       configured: boolean;
     }): Promise<number | undefined> {

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { resolveDefaultAgentId } from "../../agents/agent-scope.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import {
   normalizeAgentId,
   parseAgentSessionKey,
@@ -67,7 +67,7 @@ function asNonEmptyString(value: unknown): string | undefined {
 
 function resolveRequesterSessionAgentId(
   sessionKey: string | undefined,
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): string | undefined {
   const key = asNonEmptyString(sessionKey);
   if (!key) {
@@ -90,7 +90,7 @@ function resolveRequesterSessionAgentId(
 function resolveScopedArtifactSessionKey(
   sessionKey: string | undefined,
   agentId: string | undefined,
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): string | undefined {
   const key = asNonEmptyString(sessionKey);
   if (!key) {
@@ -362,7 +362,7 @@ function collectArtifactsFromMessage(params: {
 
 function resolveQuerySession(
   query: ArtifactQuery,
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): ResolvedArtifactSession | undefined {
   if (query.sessionKey) {
     const sessionKey = resolveScopedArtifactSessionKey(query.sessionKey, query.agentId, cfg);
@@ -404,7 +404,7 @@ function resolveQuerySession(
 
 async function loadArtifacts(
   query: ArtifactQuery,
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): Promise<{ artifacts: ArtifactRecord[]; sessionKey?: string }> {
   const resolved = resolveQuerySession(query, cfg);
   if (!resolved) {
@@ -463,7 +463,7 @@ function requireQueryable(params: ArtifactQuery, respond: RespondFn): boolean {
 
 async function findArtifact(
   params: ArtifactsGetParams,
-  cfg?: OpenClawConfig,
+  cfg?: RecallConfig,
 ): Promise<{
   artifact?: ArtifactRecord;
   sessionKey?: string;

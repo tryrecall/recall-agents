@@ -1,12 +1,12 @@
 ---
-summary: "Host OpenClaw on a DigitalOcean Droplet"
+summary: "Host Recall on a DigitalOcean Droplet"
 read_when:
-  - Setting up OpenClaw on DigitalOcean
-  - Looking for a simple paid VPS for OpenClaw
+  - Setting up Recall on DigitalOcean
+  - Looking for a simple paid VPS for Recall
 title: "DigitalOcean"
 ---
 
-Run a persistent OpenClaw Gateway on a DigitalOcean Droplet (~$6/month for the 1 GB Basic plan).
+Run a persistent Recall Gateway on a DigitalOcean Droplet (~$6/month for the 1 GB Basic plan).
 
 DigitalOcean is the simplest paid VPS path. If you prefer cheaper or free options:
 
@@ -48,25 +48,25 @@ DigitalOcean is the simplest paid VPS path. If you prefer cheaper or free option
     curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
     apt install -y nodejs
 
-    # Install OpenClaw
-    curl -fsSL https://openclaw.ai/install.sh | bash
+    # Install Recall
+    curl -fsSL https://recall.ai/install.sh | bash
 
-    # Create the non-root user that will own OpenClaw state and services.
-    adduser openclaw
-    usermod -aG sudo openclaw
-    loginctl enable-linger openclaw
+    # Create the non-root user that will own Recall state and services.
+    adduser recall
+    usermod -aG sudo recall
+    loginctl enable-linger recall
 
-    su - openclaw
-    openclaw --version
+    su - recall
+    recall --version
     ```
 
-    Use the root shell only for system bootstrap. Run OpenClaw commands as the non-root `openclaw` user so state lives under `/home/openclaw/.openclaw/` and the Gateway installs as that user's systemd service.
+    Use the root shell only for system bootstrap. Run Recall commands as the non-root `recall` user so state lives under `/home/recall/.recall/` and the Gateway installs as that user's systemd service.
 
   </Step>
 
   <Step title="Run onboarding">
     ```bash
-    openclaw onboard --install-daemon
+    recall onboard --install-daemon
     ```
 
     The wizard walks you through model auth, channel setup, gateway token generation, and daemon installation (systemd).
@@ -85,9 +85,9 @@ DigitalOcean is the simplest paid VPS path. If you prefer cheaper or free option
 
   <Step title="Verify the gateway">
     ```bash
-    openclaw status
-    systemctl --user status openclaw-gateway.service
-    journalctl --user -u openclaw-gateway.service -f
+    recall status
+    systemctl --user status recall-gateway.service
+    journalctl --user -u recall-gateway.service -f
     ```
   </Step>
 
@@ -108,8 +108,8 @@ DigitalOcean is the simplest paid VPS path. If you prefer cheaper or free option
     ```bash
     curl -fsSL https://tailscale.com/install.sh | sudo sh
     sudo tailscale up
-    openclaw config set gateway.tailscale.mode serve
-    openclaw gateway restart
+    recall config set gateway.tailscale.mode serve
+    recall gateway restart
     ```
 
     Then open `https://<magicdns>/` from any device on your tailnet.
@@ -119,8 +119,8 @@ DigitalOcean is the simplest paid VPS path. If you prefer cheaper or free option
     **Option C: Tailnet bind (no Serve)**
 
     ```bash
-    openclaw config set gateway.bind tailnet
-    openclaw gateway restart
+    recall config set gateway.bind tailnet
+    recall gateway restart
     ```
 
     Then open `http://<tailscale-ip>:18789` (token required).
@@ -130,18 +130,18 @@ DigitalOcean is the simplest paid VPS path. If you prefer cheaper or free option
 
 ## Persistence and backups
 
-OpenClaw state lives under:
+Recall state lives under:
 
-- `~/.openclaw/` — `openclaw.json`, per-agent `auth-profiles.json`, channel/provider state, and session data.
-- `~/.openclaw/workspace/` — the agent workspace (SOUL.md, memory, artifacts).
+- `~/.recall/` — `recall.json`, per-agent `auth-profiles.json`, channel/provider state, and session data.
+- `~/.recall/workspace/` — the agent workspace (SOUL.md, memory, artifacts).
 
 These survive Droplet reboots. To take a portable snapshot:
 
 ```bash
-openclaw backup create
+recall backup create
 ```
 
-DigitalOcean snapshots back the whole Droplet up; `openclaw backup create` is portable across hosts.
+DigitalOcean snapshots back the whole Droplet up; `recall backup create` is portable across hosts.
 
 ## 1 GB RAM tips
 
@@ -154,7 +154,7 @@ The $6 Droplet only has 1 GB RAM. To keep things smooth:
 
 ## Troubleshooting
 
-**Gateway will not start** -- Run `openclaw doctor --non-interactive` and check logs with `journalctl --user -u openclaw-gateway.service -n 50`.
+**Gateway will not start** -- Run `recall doctor --non-interactive` and check logs with `journalctl --user -u recall-gateway.service -n 50`.
 
 **Port already in use** -- Run `lsof -i :18789` to find the process, then stop it.
 
@@ -164,7 +164,7 @@ The $6 Droplet only has 1 GB RAM. To keep things smooth:
 
 - [Channels](/channels) -- connect Telegram, WhatsApp, Discord, and more
 - [Gateway configuration](/gateway/configuration) -- all config options
-- [Updating](/install/updating) -- keep OpenClaw up to date
+- [Updating](/install/updating) -- keep Recall up to date
 
 ## Related
 

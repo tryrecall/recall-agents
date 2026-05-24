@@ -5,7 +5,7 @@ import {
 import { normalizeLowercaseStringOrEmpty } from "../../shared/string-coerce.js";
 import { deliveryContextFromSession } from "../../utils/delivery-context.shared.js";
 import { getRuntimeConfig } from "../io.js";
-import type { OpenClawConfig } from "../types.openclaw.js";
+import type { RecallConfig } from "../types.recall.js";
 import { resolveStorePath } from "./paths.js";
 import { normalizeStoreSessionKey } from "./store-entry.js";
 import { readSessionStoreSnapshot } from "./store.js";
@@ -30,7 +30,7 @@ function hasRoutableDeliveryContext(context?: {
 
 export function extractDeliveryInfo(
   sessionKey: string | undefined,
-  options?: { cfg?: OpenClawConfig },
+  options?: { cfg?: RecallConfig },
 ): {
   deliveryContext:
     | { channel?: string; to?: string; accountId?: string; threadId?: string | number }
@@ -68,7 +68,7 @@ export function extractDeliveryInfo(
   return { deliveryContext, threadId };
 }
 
-function resolveDeliveryStorePaths(cfg: OpenClawConfig, agentId: string): string[] {
+function resolveDeliveryStorePaths(cfg: RecallConfig, agentId: string): string[] {
   const paths = new Set<string>();
   paths.add(resolveStorePath(cfg.session?.store, { agentId }));
   for (const target of resolveAllAgentSessionStoreTargetsSync(cfg)) {
@@ -187,7 +187,7 @@ function buildFreshestSessionEntryIndex(
 }
 
 function loadDeliverySessionEntry(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionKey: string;
   baseSessionKey: string;
 }) {

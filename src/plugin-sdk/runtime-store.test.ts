@@ -1,4 +1,4 @@
-import { importFreshModule } from "openclaw/plugin-sdk/test-fixtures";
+import { importFreshModule } from "recall/plugin-sdk/test-fixtures";
 import { describe, expect, test } from "vitest";
 import { createPluginRuntimeStore } from "./runtime-store.js";
 

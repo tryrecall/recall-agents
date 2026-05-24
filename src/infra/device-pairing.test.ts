@@ -157,7 +157,7 @@ async function clearPairedOperatorApprovalBaseline(baseDir: string) {
   });
 }
 
-const suiteRootTracker = createSuiteTempRootTracker({ prefix: "openclaw-device-pairing-" });
+const suiteRootTracker = createSuiteTempRootTracker({ prefix: "recall-device-pairing-" });
 
 async function makeDevicePairingDir(): Promise<string> {
   return await suiteRootTracker.make("case");

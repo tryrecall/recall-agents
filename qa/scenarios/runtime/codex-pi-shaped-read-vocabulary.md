@@ -11,11 +11,11 @@ coverage:
   secondary:
     - runtime.prompt-compatibility
     - tools.fs.read
-objective: Verify Codex-mode agents can satisfy legacy Pi-shaped "Read tool" wording through the native Codex workspace-read capability instead of stopping because duplicate OpenClaw dynamic read is intentionally filtered.
+objective: Verify Codex-mode agents can satisfy legacy Pi-shaped "Read tool" wording through the native Codex workspace-read capability instead of stopping because duplicate Recall dynamic read is intentionally filtered.
 successCriteria:
   - Agent reads the seeded workspace file and replies with the exact marker line.
   - Agent does not claim that the Read tool is unavailable.
-  - Any failure is classified as a native prompt-compatibility/product behavior gap, not as missing OpenClaw dynamic read exposure.
+  - Any failure is classified as a native prompt-compatibility/product behavior gap, not as missing Recall dynamic read exposure.
 docsRefs:
   - docs/plugins/codex-harness.md
   - docs/tools/tool-search.md

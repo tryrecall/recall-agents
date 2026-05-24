@@ -6,12 +6,12 @@ import {
   validateExternalCodePluginPackageJson,
 } from "./index.js";
 
-describe("@openclaw/plugin-package-contract", () => {
-  it("normalizes the OpenClaw compatibility block for external plugins", () => {
+describe("@recall/plugin-package-contract", () => {
+  it("normalizes the Recall compatibility block for external plugins", () => {
     expect(
       normalizeExternalPluginCompatibility({
         version: "1.2.3",
-        openclaw: {
+        recall: {
           compat: {
             pluginApi: ">=2026.3.24-beta.2",
             minGatewayVersion: "2026.3.24-beta.2",
@@ -24,7 +24,7 @@ describe("@openclaw/plugin-package-contract", () => {
       }),
     ).toEqual({
       pluginApiRange: ">=2026.3.24-beta.2",
-      builtWithOpenClawVersion: "2026.3.24-beta.2",
+      builtWithRecallVersion: "2026.3.24-beta.2",
       pluginSdkVersion: "0.9.0",
       minGatewayVersion: "2026.3.24-beta.2",
     });
@@ -34,7 +34,7 @@ describe("@openclaw/plugin-package-contract", () => {
     expect(
       normalizeExternalPluginCompatibility({
         version: "1.2.3",
-        openclaw: {
+        recall: {
           compat: {
             pluginApi: ">=1.0.0",
           },
@@ -45,38 +45,38 @@ describe("@openclaw/plugin-package-contract", () => {
       }),
     ).toEqual({
       pluginApiRange: ">=1.0.0",
-      builtWithOpenClawVersion: "1.2.3",
+      builtWithRecallVersion: "1.2.3",
       minGatewayVersion: "2026.3.24-beta.2",
     });
   });
 
   it("lists the required external code-plugin fields", () => {
     expect(EXTERNAL_CODE_PLUGIN_REQUIRED_FIELD_PATHS).toEqual([
-      "openclaw.compat.pluginApi",
-      "openclaw.build.openclawVersion",
+      "recall.compat.pluginApi",
+      "recall.build.openclawVersion",
     ]);
   });
 
   it("reports missing required fields with stable field paths", () => {
     const packageJson = {
-      openclaw: {
+      recall: {
         compat: {},
         build: {},
       },
     };
 
     expect(listMissingExternalCodePluginFieldPaths(packageJson)).toEqual([
-      "openclaw.compat.pluginApi",
-      "openclaw.build.openclawVersion",
+      "recall.compat.pluginApi",
+      "recall.build.openclawVersion",
     ]);
     expect(validateExternalCodePluginPackageJson(packageJson).issues).toEqual([
       {
-        fieldPath: "openclaw.compat.pluginApi",
-        message: "openclaw.compat.pluginApi is required for external code plugin packages.",
+        fieldPath: "recall.compat.pluginApi",
+        message: "recall.compat.pluginApi is required for external code plugin packages.",
       },
       {
-        fieldPath: "openclaw.build.openclawVersion",
-        message: "openclaw.build.openclawVersion is required for external code plugin packages.",
+        fieldPath: "recall.build.openclawVersion",
+        message: "recall.build.openclawVersion is required for external code plugin packages.",
       },
     ]);
   });

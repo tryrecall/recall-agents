@@ -94,7 +94,7 @@ function createCatalogEntry(id: string, label: string): ChannelPluginCatalogEntr
   return {
     id,
     label,
-    pluginId: `@openclaw/${id}`,
+    pluginId: `@recall/${id}`,
     origin: "official",
     meta: {
       id,
@@ -103,7 +103,7 @@ function createCatalogEntry(id: string, label: string): ChannelPluginCatalogEntr
       docsPath: `/channels/${id}`,
       blurb: label,
     },
-    install: { npmSpec: `@openclaw/${id}` },
+    install: { npmSpec: `@recall/${id}` },
   } as unknown as ChannelPluginCatalogEntry;
 }
 
@@ -374,11 +374,11 @@ describe("channels list", () => {
       pluginId: "discord",
       channelId: "discord",
       label: "Discord",
-      installSpec: "@openclaw/discord",
-      installCommand: "openclaw plugins install @openclaw/discord",
-      doctorFixCommand: "openclaw doctor --fix",
+      installSpec: "@recall/discord",
+      installCommand: "recall plugins install @recall/discord",
+      doctorFixCommand: "recall doctor --fix",
       repairHint:
-        "Install the official external plugin with: openclaw plugins install @openclaw/discord, or run: openclaw doctor --fix.",
+        "Install the official external plugin with: recall plugins install @recall/discord, or run: recall doctor --fix.",
     });
     mocks.readConfigFileSnapshot.mockResolvedValue({
       ...baseConfigSnapshot,
@@ -406,7 +406,7 @@ describe("channels list", () => {
     expect(output).toContain("configured");
     expect(output).toContain("disabled");
     expect(output).toContain(
-      "run openclaw plugins install @openclaw/discord or openclaw doctor --fix",
+      "run recall plugins install @recall/discord or recall doctor --fix",
     );
     expect(output).not.toContain("no configured chat channels");
   });
@@ -422,11 +422,11 @@ describe("channels list", () => {
       pluginId: "discord",
       channelId: "discord",
       label: "Discord",
-      installSpec: "@openclaw/discord",
-      installCommand: "openclaw plugins install @openclaw/discord",
-      doctorFixCommand: "openclaw doctor --fix",
+      installSpec: "@recall/discord",
+      installCommand: "recall plugins install @recall/discord",
+      doctorFixCommand: "recall doctor --fix",
       repairHint:
-        "Install the official external plugin with: openclaw plugins install @openclaw/discord, or run: openclaw doctor --fix.",
+        "Install the official external plugin with: recall plugins install @recall/discord, or run: recall doctor --fix.",
     });
     mocks.readConfigFileSnapshot.mockResolvedValue({
       ...baseConfigSnapshot,

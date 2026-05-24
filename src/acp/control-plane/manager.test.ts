@@ -1,7 +1,7 @@
 import { setTimeout as scheduleNativeTimeout } from "node:timers";
 import { setTimeout as sleep } from "node:timers/promises";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { RecallConfig } from "../../config/config.js";
 import type { AcpSessionRuntimeOptions, SessionAcpMeta } from "../../config/sessions/types.js";
 import { resetHeartbeatWakeStateForTests } from "../../infra/heartbeat-wake.js";
 import { withTempDir } from "../../test-helpers/temp-dir.js";
@@ -52,11 +52,11 @@ const baseCfg = {
     dispatch: { enabled: true },
   },
 } as const;
-const ORIGINAL_STATE_DIR = process.env.OPENCLAW_STATE_DIR;
+const ORIGINAL_STATE_DIR = process.env.RECALL_STATE_DIR;
 
 async function withAcpManagerTaskStateDir(run: (root: string) => Promise<void>): Promise<void> {
-  await withTempDir({ prefix: "openclaw-acp-manager-task-" }, async (root) => {
-    process.env.OPENCLAW_STATE_DIR = root;
+  await withTempDir({ prefix: "recall-acp-manager-task-" }, async (root) => {
+    process.env.RECALL_STATE_DIR = root;
     resetTaskRegistryForTests({ persist: false });
     resetTaskFlowRegistryForTests({ persist: false });
     installInMemoryTaskRegistryRuntime();
@@ -290,9 +290,9 @@ describe("AcpSessionManager", () => {
 
   afterEach(() => {
     if (ORIGINAL_STATE_DIR === undefined) {
-      delete process.env.OPENCLAW_STATE_DIR;
+      delete process.env.RECALL_STATE_DIR;
     } else {
-      process.env.OPENCLAW_STATE_DIR = ORIGINAL_STATE_DIR;
+      process.env.RECALL_STATE_DIR = ORIGINAL_STATE_DIR;
     }
     resetHeartbeatWakeStateForTests();
     resetTaskRegistryForTests({ persist: false });
@@ -343,7 +343,7 @@ describe("AcpSessionManager", () => {
       ...baseCfg,
       session: { mainKey: "main" },
       agents: { list: [{ id: "main", default: true }] },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     await manager.runTurn({
       cfg,
@@ -535,7 +535,7 @@ describe("AcpSessionManager", () => {
         label: "Korean path",
         task: "Print the current directory in Korean",
         status: "succeeded",
-        progressSummary: "현재 작업 디렉토리는 /home/bykim0119/.openclaw/workspace 입니다",
+        progressSummary: "현재 작업 디렉토리는 /home/bykim0119/.recall/workspace 입니다",
       });
     });
   }, 300_000);
@@ -711,7 +711,7 @@ describe("AcpSessionManager", () => {
             timeoutSeconds: 1,
           },
         },
-      } as OpenClawConfig;
+      } as RecallConfig;
 
       const first = manager.runTurn({
         cfg,
@@ -809,7 +809,7 @@ describe("AcpSessionManager", () => {
             timeoutSeconds: 1,
           },
         },
-      } as OpenClawConfig;
+      } as RecallConfig;
 
       const first = manager.runTurn({
         cfg,
@@ -965,7 +965,7 @@ describe("AcpSessionManager", () => {
           safeBins: ["git"],
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies RecallConfig;
     const denyCfg = {
       ...baseCfg,
       tools: {
@@ -974,7 +974,7 @@ describe("AcpSessionManager", () => {
           safeBins: ["node"],
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies RecallConfig;
 
     const manager = new AcpSessionManager();
     await manager.runTurn({
@@ -1505,7 +1505,7 @@ describe("AcpSessionManager", () => {
         ...baseCfg.acp,
         maxConcurrentSessions: 1,
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const manager = new AcpSessionManager();
     await manager.runTurn({
@@ -1548,7 +1548,7 @@ describe("AcpSessionManager", () => {
         ...baseCfg.acp,
         maxConcurrentSessions: 1,
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const manager = new AcpSessionManager();
     await manager.initializeSession({
@@ -1603,7 +1603,7 @@ describe("AcpSessionManager", () => {
         enabled: true,
         dispatch: { enabled: true },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const manager = new AcpSessionManager();
     await expect(
@@ -1691,7 +1691,7 @@ describe("AcpSessionManager", () => {
         backend: "primary-backend",
         fallbacks: ["fallback-backend"],
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     return {
       cfg,
       fallbackRuntime,
@@ -1982,7 +1982,7 @@ describe("AcpSessionManager", () => {
           ...baseCfg.acp,
           maxConcurrentSessions: 1,
         },
-      } as OpenClawConfig;
+      } as RecallConfig;
 
       const manager = new AcpSessionManager();
       await manager.runTurn({
@@ -2062,17 +2062,17 @@ describe("AcpSessionManager", () => {
       runtime: runtimeState.runtime,
     });
     hoisted.readAcpSessionEntryMock.mockReturnValue({
-      sessionKey: "agent:openclaw:acp:session-1",
-      storeSessionKey: "agent:openclaw:acp:session-1",
+      sessionKey: "agent:recall:acp:session-1",
+      storeSessionKey: "agent:recall:acp:session-1",
       acp: readySessionMeta({
-        agent: "openclaw",
+        agent: "recall",
       }),
     });
 
     const manager = new AcpSessionManager();
     const closeResult = await manager.closeSession({
       cfg: baseCfg,
-      sessionKey: "agent:openclaw:acp:session-1",
+      sessionKey: "agent:recall:acp:session-1",
       reason: "terminal-task-cleanup",
       allowBackendUnavailable: true,
       discardPersistentState: true,
@@ -2083,7 +2083,7 @@ describe("AcpSessionManager", () => {
     expect(closeResult.runtimeNotice).toContain("does not support session/close");
     expect(closeResult.metaCleared).toBe(true);
     expect(runtimeState.prepareFreshSession).toHaveBeenCalledWith({
-      sessionKey: "agent:openclaw:acp:session-1",
+      sessionKey: "agent:recall:acp:session-1",
     });
   });
 
@@ -2315,7 +2315,7 @@ describe("AcpSessionManager", () => {
             ttlMinutes: 0.01,
           },
         },
-      } as OpenClawConfig;
+      } as RecallConfig;
 
       const manager = new AcpSessionManager();
       await manager.runTurn({
@@ -2661,7 +2661,7 @@ describe("AcpSessionManager", () => {
           yield {
             type: "text_delta" as const,
             stream: "output" as const,
-            text: "Current directory is /tmp/openclaw.",
+            text: "Current directory is /tmp/recall.",
           };
         })(),
         result: Promise.resolve({
@@ -2726,7 +2726,7 @@ describe("AcpSessionManager", () => {
         label: "Directory check",
         task: "Print the current directory",
         status: "succeeded",
-        progressSummary: "Current directory is /tmp/openclaw.",
+        progressSummary: "Current directory is /tmp/recall.",
       });
     });
   });

@@ -1,13 +1,13 @@
 {
-  "name": "@openclaw/azure-speech",
+  "name": "@recall/azure-speech",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw Azure Speech plugin",
+  "description": "Recall Azure Speech plugin",
   "type": "module",
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

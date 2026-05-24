@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChannelPlugin } from "../../channels/plugins/types.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import {
   createChannelTestPluginBase,
@@ -107,7 +107,7 @@ beforeAll(async () => {
   ]);
   await buildModelsProviderData({
     agents: { defaults: { model: { primary: "anthropic/claude-opus-4-5" } } },
-  } as OpenClawConfig);
+  } as RecallConfig);
 });
 
 beforeEach(() => {
@@ -142,7 +142,7 @@ beforeEach(() => {
 
 function buildParams(
   commandBodyNormalized: string,
-  cfgOverrides: Partial<OpenClawConfig> = {},
+  cfgOverrides: Partial<RecallConfig> = {},
 ): HandleCommandsParams {
   return {
     cfg: {
@@ -155,7 +155,7 @@ function buildParams(
         text: true,
       },
       ...cfgOverrides,
-    } as OpenClawConfig,
+    } as RecallConfig,
     ctx: {
       Surface: "discord",
     },
@@ -344,7 +344,7 @@ describe("handleModelsCommand", () => {
           },
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     expect([...(data.byProvider.get("claude-cli") ?? [])].toSorted()).toEqual([
       "claude-haiku-4-5",
@@ -380,7 +380,7 @@ describe("handleModelsCommand", () => {
           },
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
     expect([...(minimaxData.byProvider.get("minimax") ?? [])]).toEqual(["abab-7"]);
   });
 
@@ -434,7 +434,7 @@ describe("handleModelsCommand", () => {
           model: { primary: "openai/gpt-5.5" },
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     expect(data.runtimeChoicesByProvider?.get("openai")?.[0]).toEqual({
       id: "codex",
@@ -443,8 +443,8 @@ describe("handleModelsCommand", () => {
     });
     expect(data.runtimeChoicesByProvider?.get("openai")?.[1]).toEqual({
       id: "pi",
-      label: "OpenClaw Pi Default",
-      description: "Use the built-in OpenClaw Pi runtime.",
+      label: "Recall Pi Default",
+      description: "Use the built-in Recall Pi runtime.",
     });
   });
 
@@ -463,12 +463,12 @@ describe("handleModelsCommand", () => {
           model: { primary: "openai/gpt-5.5" },
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     expect(data.runtimeChoicesByProvider?.get("openai")?.[0]).toEqual({
       id: "pi",
-      label: "OpenClaw Pi Default",
-      description: "Use the built-in OpenClaw Pi runtime.",
+      label: "Recall Pi Default",
+      description: "Use the built-in Recall Pi runtime.",
     });
   });
 
@@ -491,7 +491,7 @@ describe("handleModelsCommand", () => {
           },
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     expect(data.runtimeChoicesByProvider?.get("openai")?.[0]).toEqual({
       id: "codex",
@@ -500,8 +500,8 @@ describe("handleModelsCommand", () => {
     });
     expect(data.runtimeChoicesByProvider?.get("openai")?.[1]).toEqual({
       id: "pi",
-      label: "OpenClaw Pi Default",
-      description: "Use the built-in OpenClaw Pi runtime.",
+      label: "Recall Pi Default",
+      description: "Use the built-in Recall Pi runtime.",
     });
   });
 
@@ -521,12 +521,12 @@ describe("handleModelsCommand", () => {
           },
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     expect(data.runtimeChoicesByProvider?.get("anthropic")?.[0]).toEqual({
       id: "pi",
-      label: "OpenClaw Pi Default",
-      description: "Use the built-in OpenClaw Pi runtime.",
+      label: "Recall Pi Default",
+      description: "Use the built-in Recall Pi runtime.",
     });
   });
 
@@ -546,7 +546,7 @@ describe("handleModelsCommand", () => {
           },
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     expect(data.runtimeChoicesByProvider?.get("anthropic")?.[0]).toEqual({
       id: "claude-cli",
@@ -555,8 +555,8 @@ describe("handleModelsCommand", () => {
     });
     expect(data.runtimeChoicesByProvider?.get("anthropic")?.[1]).toEqual({
       id: "pi",
-      label: "OpenClaw Pi Default",
-      description: "Use the built-in OpenClaw Pi runtime.",
+      label: "Recall Pi Default",
+      description: "Use the built-in Recall Pi runtime.",
     });
   });
 
@@ -653,9 +653,9 @@ describe("handleModelsCommand", () => {
           },
         },
       },
-    } satisfies Partial<OpenClawConfig>;
+    } satisfies Partial<RecallConfig>;
 
-    const data = await buildModelsProviderData(cfg as OpenClawConfig);
+    const data = await buildModelsProviderData(cfg as RecallConfig);
 
     expect([...(data.byProvider.get("openai-codex") ?? [])]).toEqual(["gpt-5.4"]);
     expect([...(data.byProvider.get("deepseek") ?? [])].toSorted()).toEqual([

@@ -26,7 +26,7 @@ on:
       package_spec:
         description: Published package spec when source=npm
         required: false
-        default: openclaw@beta
+        default: recall@beta
         type: string
       package_url:
         description: HTTPS .tgz URL when source=url
@@ -65,9 +65,9 @@ on:
         default: ""
         type: string
       published_upgrade_survivor_baseline:
-        description: Published OpenClaw package baseline for the published-upgrade-survivor Docker lane
+        description: Published Recall package baseline for the published-upgrade-survivor Docker lane
         required: false
-        default: openclaw@latest
+        default: recall@latest
         type: string
       published_upgrade_survivor_baselines:
         description: Optional baseline list for published-upgrade-survivor/update-migration; use last-stable-4, all-since-2026.4.23, release-history, or exact versions
@@ -122,7 +122,7 @@ on:
       package_spec:
         description: Published package spec when source=npm
         required: false
-        default: openclaw@beta
+        default: recall@beta
         type: string
       package_url:
         description: HTTPS .tgz URL when source=url
@@ -155,9 +155,9 @@ on:
         default: ""
         type: string
       published_upgrade_survivor_baseline:
-        description: Published OpenClaw package baseline for the published-upgrade-survivor Docker lane
+        description: Published Recall package baseline for the published-upgrade-survivor Docker lane
         required: false
-        default: openclaw@latest
+        default: recall@latest
         type: string
       published_upgrade_survivor_baselines:
         description: Optional baseline list for published-upgrade-survivor/update-migration; use last-stable-4, all-since-2026.4.23, release-history, or exact versions
@@ -214,15 +214,15 @@ on:
         required: false
       OPENCODE_ZEN_API_KEY:
         required: false
-      OPENCLAW_LIVE_BROWSER_CDP_URL:
+      RECALL_LIVE_BROWSER_CDP_URL:
         required: false
-      OPENCLAW_LIVE_SETUP_TOKEN:
+      RECALL_LIVE_SETUP_TOKEN:
         required: false
-      OPENCLAW_LIVE_SETUP_TOKEN_MODEL:
+      RECALL_LIVE_SETUP_TOKEN_MODEL:
         required: false
-      OPENCLAW_LIVE_SETUP_TOKEN_PROFILE:
+      RECALL_LIVE_SETUP_TOKEN_PROFILE:
         required: false
-      OPENCLAW_LIVE_SETUP_TOKEN_VALUE:
+      RECALL_LIVE_SETUP_TOKEN_VALUE:
         required: false
       GEMINI_API_KEY:
         required: false
@@ -254,25 +254,25 @@ on:
         required: false
       CLAUDE_CODE_OAUTH_TOKEN:
         required: false
-      OPENCLAW_CODEX_AUTH_JSON:
+      RECALL_CODEX_AUTH_JSON:
         required: false
-      OPENCLAW_CODEX_CONFIG_TOML:
+      RECALL_CODEX_CONFIG_TOML:
         required: false
-      OPENCLAW_CLAUDE_JSON:
+      RECALL_CLAUDE_JSON:
         required: false
-      OPENCLAW_CLAUDE_CREDENTIALS_JSON:
+      RECALL_CLAUDE_CREDENTIALS_JSON:
         required: false
-      OPENCLAW_CLAUDE_SETTINGS_JSON:
+      RECALL_CLAUDE_SETTINGS_JSON:
         required: false
-      OPENCLAW_CLAUDE_SETTINGS_LOCAL_JSON:
+      RECALL_CLAUDE_SETTINGS_LOCAL_JSON:
         required: false
-      OPENCLAW_GEMINI_SETTINGS_JSON:
+      RECALL_GEMINI_SETTINGS_JSON:
         required: false
       FIREWORKS_API_KEY:
         required: false
-      OPENCLAW_QA_CONVEX_SITE_URL:
+      RECALL_QA_CONVEX_SITE_URL:
         required: false
-      OPENCLAW_QA_CONVEX_SECRET_CI:
+      RECALL_QA_CONVEX_SECRET_CI:
         required: false
 
 permissions:
@@ -361,7 +361,7 @@ jobs:
             artifact_dir=".artifacts/package-candidate-input"
           fi
 
-          node scripts/resolve-openclaw-package-candidate.mjs \
+          node scripts/resolve-recall-package-candidate.mjs \
             --source "$SOURCE" \
             --package-ref "$PACKAGE_REF" \
             --package-spec "$PACKAGE_SPEC" \
@@ -369,7 +369,7 @@ jobs:
             --package-sha256 "$PACKAGE_SHA256" \
             --artifact-dir "${artifact_dir:-.}" \
             --output-dir .artifacts/docker-e2e-package \
-            --output-name openclaw-current.tgz \
+            --output-name recall-current.tgz \
             --metadata .artifacts/docker-e2e-package/package-candidate.json \
             --github-output "$GITHUB_OUTPUT"
 
@@ -451,11 +451,11 @@ jobs:
           releases_json=""
           npm_versions_json=""
           if [[ "$REQUESTED_BASELINES" == *"release-history"* || "$REQUESTED_BASELINES" == *"all-since-"* || "$REQUESTED_BASELINES" == *"last-stable-"* ]]; then
-            releases_json=".artifacts/package-candidate-input/openclaw-releases.json"
-            npm_versions_json=".artifacts/package-candidate-input/openclaw-npm-versions.json"
+            releases_json=".artifacts/package-candidate-input/recall-releases.json"
+            npm_versions_json=".artifacts/package-candidate-input/recall-npm-versions.json"
             mkdir -p "$(dirname "$releases_json")"
             gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,publishedAt,isPrerelease > "$releases_json"
-            npm view openclaw versions --json > "$npm_versions_json"
+            npm view recall versions --json > "$npm_versions_json"
           fi
           args=(
             --requested "$REQUESTED_BASELINES"
@@ -478,7 +478,7 @@ jobs:
         with:
           name: ${{ env.PACKAGE_ARTIFACT_NAME }}
           path: |
-            .artifacts/docker-e2e-package/openclaw-current.tgz
+            .artifacts/docker-e2e-package/recall-current.tgz
             .artifacts/docker-e2e-package/package-candidate.json
           retention-days: 14
           if-no-files-found: error
@@ -532,11 +532,11 @@ jobs:
 
       - name: Enforce public package integrity
         env:
-          OPENCLAW_PACKAGE_TARBALL_CHECK_TIMINGS: "0"
+          RECALL_PACKAGE_TARBALL_CHECK_TIMINGS: "0"
         shell: bash
         run: |
           set -euo pipefail
-          node scripts/check-openclaw-package-tarball.mjs .artifacts/docker-e2e-package/openclaw-current.tgz
+          node scripts/check-recall-package-tarball.mjs .artifacts/docker-e2e-package/recall-current.tgz
 
   docker_acceptance:
     name: Docker product acceptance
@@ -546,7 +546,7 @@ jobs:
       contents: read
       packages: write
       pull-requests: read
-    uses: ./.github/workflows/openclaw-live-and-e2e-checks-reusable.yml
+    uses: ./.github/workflows/recall-live-and-e2e-checks-reusable.yml
     with:
       advisory: ${{ inputs.advisory }}
       ref: ${{ needs.resolve_package.outputs.package_source_sha || inputs.workflow_ref }}
@@ -578,11 +578,11 @@ jobs:
       MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
       OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
       OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
-      OPENCLAW_LIVE_BROWSER_CDP_URL: ${{ secrets.OPENCLAW_LIVE_BROWSER_CDP_URL }}
-      OPENCLAW_LIVE_SETUP_TOKEN: ${{ secrets.OPENCLAW_LIVE_SETUP_TOKEN }}
-      OPENCLAW_LIVE_SETUP_TOKEN_MODEL: ${{ secrets.OPENCLAW_LIVE_SETUP_TOKEN_MODEL }}
-      OPENCLAW_LIVE_SETUP_TOKEN_PROFILE: ${{ secrets.OPENCLAW_LIVE_SETUP_TOKEN_PROFILE }}
-      OPENCLAW_LIVE_SETUP_TOKEN_VALUE: ${{ secrets.OPENCLAW_LIVE_SETUP_TOKEN_VALUE }}
+      RECALL_LIVE_BROWSER_CDP_URL: ${{ secrets.RECALL_LIVE_BROWSER_CDP_URL }}
+      RECALL_LIVE_SETUP_TOKEN: ${{ secrets.RECALL_LIVE_SETUP_TOKEN }}
+      RECALL_LIVE_SETUP_TOKEN_MODEL: ${{ secrets.RECALL_LIVE_SETUP_TOKEN_MODEL }}
+      RECALL_LIVE_SETUP_TOKEN_PROFILE: ${{ secrets.RECALL_LIVE_SETUP_TOKEN_PROFILE }}
+      RECALL_LIVE_SETUP_TOKEN_VALUE: ${{ secrets.RECALL_LIVE_SETUP_TOKEN_VALUE }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -598,13 +598,13 @@ jobs:
       BYTEPLUS_ACCESS_KEY_ID: ${{ secrets.BYTEPLUS_ACCESS_KEY_ID }}
       BYTEPLUS_SECRET_ACCESS_KEY: ${{ secrets.BYTEPLUS_SECRET_ACCESS_KEY }}
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-      OPENCLAW_CODEX_AUTH_JSON: ${{ secrets.OPENCLAW_CODEX_AUTH_JSON }}
-      OPENCLAW_CODEX_CONFIG_TOML: ${{ secrets.OPENCLAW_CODEX_CONFIG_TOML }}
-      OPENCLAW_CLAUDE_JSON: ${{ secrets.OPENCLAW_CLAUDE_JSON }}
-      OPENCLAW_CLAUDE_CREDENTIALS_JSON: ${{ secrets.OPENCLAW_CLAUDE_CREDENTIALS_JSON }}
-      OPENCLAW_CLAUDE_SETTINGS_JSON: ${{ secrets.OPENCLAW_CLAUDE_SETTINGS_JSON }}
-      OPENCLAW_CLAUDE_SETTINGS_LOCAL_JSON: ${{ secrets.OPENCLAW_CLAUDE_SETTINGS_LOCAL_JSON }}
-      OPENCLAW_GEMINI_SETTINGS_JSON: ${{ secrets.OPENCLAW_GEMINI_SETTINGS_JSON }}
+      RECALL_CODEX_AUTH_JSON: ${{ secrets.RECALL_CODEX_AUTH_JSON }}
+      RECALL_CODEX_CONFIG_TOML: ${{ secrets.RECALL_CODEX_CONFIG_TOML }}
+      RECALL_CLAUDE_JSON: ${{ secrets.RECALL_CLAUDE_JSON }}
+      RECALL_CLAUDE_CREDENTIALS_JSON: ${{ secrets.RECALL_CLAUDE_CREDENTIALS_JSON }}
+      RECALL_CLAUDE_SETTINGS_JSON: ${{ secrets.RECALL_CLAUDE_SETTINGS_JSON }}
+      RECALL_CLAUDE_SETTINGS_LOCAL_JSON: ${{ secrets.RECALL_CLAUDE_SETTINGS_LOCAL_JSON }}
+      RECALL_GEMINI_SETTINGS_JSON: ${{ secrets.RECALL_GEMINI_SETTINGS_JSON }}
       FIREWORKS_API_KEY: ${{ secrets.FIREWORKS_API_KEY }}
 
   package_telegram:
@@ -616,14 +616,14 @@ jobs:
       advisory: ${{ inputs.advisory }}
       package_spec: ${{ inputs.package_spec }}
       package_artifact_name: ${{ needs.resolve_package.outputs.package_artifact_name }}
-      package_label: openclaw@${{ needs.resolve_package.outputs.package_version }}
+      package_label: recall@${{ needs.resolve_package.outputs.package_version }}
       harness_ref: ${{ needs.resolve_package.outputs.package_source_sha || inputs.workflow_ref }}
       provider_mode: ${{ needs.resolve_package.outputs.telegram_mode }}
       scenario: ${{ inputs.telegram_scenarios }}
     secrets:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      OPENCLAW_QA_CONVEX_SITE_URL: ${{ secrets.OPENCLAW_QA_CONVEX_SITE_URL }}
-      OPENCLAW_QA_CONVEX_SECRET_CI: ${{ secrets.OPENCLAW_QA_CONVEX_SECRET_CI }}
+      RECALL_QA_CONVEX_SITE_URL: ${{ secrets.RECALL_QA_CONVEX_SITE_URL }}
+      RECALL_QA_CONVEX_SECRET_CI: ${{ secrets.RECALL_QA_CONVEX_SECRET_CI }}
 
   summary:
     name: Verify package acceptance

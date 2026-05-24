@@ -2,18 +2,18 @@ import type { QaRuntimeParityTier, QaSeedScenarioWithSource } from "./scenario-c
 
 export type QaRuntimeToolBucket =
   | "codex-native-workspace"
-  | "openclaw-dynamic-integration"
+  | "recall-dynamic-integration"
   | "optional-profile-or-plugin";
 
 export type QaRuntimeToolExpectedLayer =
   | "codex-native-workspace"
-  | "openclaw-dynamic"
+  | "recall-dynamic"
   | "profile-or-plugin";
 
 export type QaRuntimeCapabilityLayer =
   | "codex-native-workspace"
-  | "openclaw-dynamic-direct"
-  | "openclaw-dynamic-searchable"
+  | "recall-dynamic-direct"
+  | "recall-dynamic-searchable"
   | "optional-profile-or-plugin"
   | "structural-text";
 
@@ -35,20 +35,20 @@ export type QaRuntimeToolCoverageMetadata = {
 
 export const QA_RUNTIME_TOOL_BUCKETS: readonly QaRuntimeToolBucket[] = [
   "codex-native-workspace",
-  "openclaw-dynamic-integration",
+  "recall-dynamic-integration",
   "optional-profile-or-plugin",
 ] as const;
 
 export const QA_RUNTIME_TOOL_EXPECTED_LAYERS: readonly QaRuntimeToolExpectedLayer[] = [
   "codex-native-workspace",
-  "openclaw-dynamic",
+  "recall-dynamic",
   "profile-or-plugin",
 ] as const;
 
 export const QA_RUNTIME_CAPABILITY_LAYERS: readonly QaRuntimeCapabilityLayer[] = [
   "codex-native-workspace",
-  "openclaw-dynamic-direct",
-  "openclaw-dynamic-searchable",
+  "recall-dynamic-direct",
+  "recall-dynamic-searchable",
   "optional-profile-or-plugin",
   "structural-text",
 ] as const;
@@ -60,13 +60,13 @@ export const QA_CODEX_TOOL_LOADING_MODES: readonly QaCodexToolLoading[] = [
 
 const DEFAULT_LAYER_BY_BUCKET: Record<QaRuntimeToolBucket, QaRuntimeToolExpectedLayer> = {
   "codex-native-workspace": "codex-native-workspace",
-  "openclaw-dynamic-integration": "openclaw-dynamic",
+  "recall-dynamic-integration": "recall-dynamic",
   "optional-profile-or-plugin": "profile-or-plugin",
 };
 
 const DEFAULT_CAPABILITY_LAYER_BY_BUCKET: Record<QaRuntimeToolBucket, QaRuntimeCapabilityLayer> = {
   "codex-native-workspace": "codex-native-workspace",
-  "openclaw-dynamic-integration": "openclaw-dynamic-searchable",
+  "recall-dynamic-integration": "recall-dynamic-searchable",
   "optional-profile-or-plugin": "optional-profile-or-plugin",
 };
 
@@ -119,7 +119,7 @@ function inferRuntimeToolBucket(params: {
   if (params.runtimeParityTier === "optional" || params.config?.expectedAvailable === false) {
     return "optional-profile-or-plugin";
   }
-  return "openclaw-dynamic-integration";
+  return "recall-dynamic-integration";
 }
 
 export function readRuntimeToolCoverageMetadata(params: {
@@ -150,7 +150,7 @@ export function readRuntimeToolCoverageMetadata(params: {
   const capabilityLayer = capabilityLayerInput
     ? (capabilityLayerInput as QaRuntimeCapabilityLayer)
     : DEFAULT_CAPABILITY_LAYER_BY_BUCKET[bucket];
-  const explicitSearchableDynamic = capabilityLayerInput === "openclaw-dynamic-searchable";
+  const explicitSearchableDynamic = capabilityLayerInput === "recall-dynamic-searchable";
   const required =
     readBoolean(toolCoverage?.required) ??
     (bucket !== "optional-profile-or-plugin" && !explicitSearchableDynamic);

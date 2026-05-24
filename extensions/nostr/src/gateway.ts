@@ -1,10 +1,10 @@
 import {
   resolveStableChannelMessageIngress,
   type StableChannelIngressIdentityParams,
-} from "openclaw/plugin-sdk/channel-ingress-runtime";
-import { createChannelPairingController } from "openclaw/plugin-sdk/channel-pairing";
-import { attachChannelToResult } from "openclaw/plugin-sdk/channel-send-result";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+} from "recall/plugin-sdk/channel-ingress-runtime";
+import { createChannelPairingController } from "recall/plugin-sdk/channel-pairing";
+import { attachChannelToResult } from "recall/plugin-sdk/channel-send-result";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
 import { type ChannelOutboundAdapter, type ChannelPlugin } from "./channel-api.js";
 import type { MetricEvent, MetricsSnapshot } from "./metrics.js";
 import { startNostrBus, type NostrBusHandle } from "./nostr-bus.js";
@@ -273,7 +273,7 @@ export const nostrPairingTextAdapter = {
     message,
     accountId,
   }: {
-    cfg: OpenClawConfig;
+    cfg: RecallConfig;
     id: string;
     message: string;
     accountId?: string;

@@ -15,7 +15,7 @@ import { resolveAuthStorePath } from "../agents/auth-profiles/paths.js";
 import { clearRuntimeAuthProfileStoreSnapshots } from "../agents/auth-profiles/store.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { resolveOAuthDir, resolveStateDir } from "../config/paths.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { loadJsonFile, saveJsonFile } from "../infra/json-file.js";
 import { note } from "../terminal/note.js";
 import { shortenHomePath } from "../utils.js";
@@ -86,12 +86,12 @@ function listExistingAgentDirsFromState(env: NodeJS.ProcessEnv): string[] {
 }
 
 function listAuthProfileRepairCandidates(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   env: NodeJS.ProcessEnv,
 ): AuthProfileRepairCandidate[] {
   const candidates = new Map<string, AuthProfileRepairCandidate>();
   addCandidate(candidates, resolveDefaultAgentDir(cfg, env));
-  const envAgentDir = readNonEmptyString(env.OPENCLAW_AGENT_DIR);
+  const envAgentDir = readNonEmptyString(env.RECALL_AGENT_DIR);
   if (envAgentDir) {
     addCandidate(candidates, envAgentDir);
   }
@@ -190,7 +190,7 @@ function backupLegacyOAuthSidecarStore(authPath: string, now: () => number): str
 }
 
 export async function maybeRepairLegacyOAuthSidecarProfiles(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   prompter: Pick<DoctorPrompter, "confirmAutoFix">;
   now?: () => number;
   emitNotes?: boolean;
@@ -230,7 +230,7 @@ export async function maybeRepairLegacyOAuthSidecarProfiles(params: {
               `- Unreferenced sidecar files are left in place because external agent directories outside this scan may still reference them.`,
             ]
           : []),
-        `- ${formatCliCommand("openclaw doctor --fix")} migrates active profiles back to inline OAuth credentials and removes only sidecar files it successfully migrated.`,
+        `- ${formatCliCommand("recall doctor --fix")} migrates active profiles back to inline OAuth credentials and removes only sidecar files it successfully migrated.`,
       ].join("\n"),
       "Auth profiles",
     );

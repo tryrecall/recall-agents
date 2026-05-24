@@ -1,13 +1,13 @@
 {
-  "name": "@openclaw/together-provider",
+  "name": "@recall/together-provider",
   "version": "2026.5.22",
   "private": true,
-  "description": "OpenClaw Together provider plugin",
+  "description": "Recall Together provider plugin",
   "type": "module",
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ]

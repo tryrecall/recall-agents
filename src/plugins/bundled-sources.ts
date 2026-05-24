@@ -1,5 +1,5 @@
 import { normalizeOptionalString } from "../shared/string-coerce.js";
-import { discoverOpenClawPlugins, type PluginDiscoveryResult } from "./discovery.js";
+import { discoverRecallPlugins, type PluginDiscoveryResult } from "./discovery.js";
 import { loadPluginManifest } from "./manifest.js";
 
 export type BundledPluginSource = {
@@ -42,7 +42,7 @@ export function resolveBundledPluginSources(params: {
 }): Map<string, BundledPluginSource> {
   const discovery =
     params.discovery ??
-    discoverOpenClawPlugins({ workspaceDir: params.workspaceDir, env: params.env });
+    discoverRecallPlugins({ workspaceDir: params.workspaceDir, env: params.env });
   const bundled = new Map<string, BundledPluginSource>();
 
   for (const candidate of discovery.candidates) {
@@ -125,5 +125,5 @@ export function resolveBundledPluginInstallCommandHint(params: {
   if (!bundledSource?.localPath) {
     return null;
   }
-  return `openclaw plugins install ${bundledSource.localPath}`;
+  return `recall plugins install ${bundledSource.localPath}`;
 }

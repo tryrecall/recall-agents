@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import path from "node:path";
 import { writeExternalFileWithinRoot } from "../infra/fs-safe.js";
 import { tempWorkspaceSync, withTempWorkspace } from "../infra/private-temp-workspace.js";
-import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
+import { resolvePreferredRecallTmpDir } from "../infra/tmp-recall-dir.js";
 import { runFfmpeg } from "./ffmpeg-exec.js";
 import { basenameFromAnyPath } from "./file-name.js";
 
@@ -55,7 +55,7 @@ export async function transcodeAudioBufferToOpus(params: {
 }): Promise<Buffer> {
   return await withTempWorkspace(
     {
-      rootDir: resolvePreferredOpenClawTmpDir(),
+      rootDir: resolvePreferredRecallTmpDir(),
       prefix: normalizeTempPrefix(params.tempPrefix),
     },
     async (workspace) => {
@@ -136,7 +136,7 @@ export async function transcodeAudioBuffer(params: {
   }
 
   const tmp = tempWorkspaceSync({
-    rootDir: resolvePreferredOpenClawTmpDir(),
+    rootDir: resolvePreferredRecallTmpDir(),
     prefix: "tts-transcode-",
   });
   const inPath = tmp.write(`in.${source}`, params.audioBuffer);

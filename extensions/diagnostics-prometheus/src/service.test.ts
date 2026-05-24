@@ -453,7 +453,7 @@ describe("diagnostics-prometheus service", () => {
 
     exporter.service.start({
       config: {} as never,
-      stateDir: "/tmp/openclaw-prometheus-test",
+      stateDir: "/tmp/recall-prometheus-test",
       logger: {
         info: vi.fn(),
         warn: vi.fn(),

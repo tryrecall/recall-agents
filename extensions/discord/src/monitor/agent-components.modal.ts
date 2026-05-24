@@ -1,4 +1,4 @@
-import { logError } from "openclaw/plugin-sdk/logging-core";
+import { logError } from "recall/plugin-sdk/logging-core";
 import { parseDiscordModalCustomIdForInteraction } from "../component-custom-id.js";
 import { resolveDiscordModalEntryWithPersistence } from "../components-registry.js";
 import { Modal, type ComponentData, type ModalInteraction } from "../internal/discord.js";
@@ -15,7 +15,7 @@ import { dispatchDiscordComponentEvent } from "./agent-components.dispatch.js";
 import { dispatchPluginDiscordInteractiveEvent } from "./agent-components.plugin-interactive.js";
 
 export class DiscordComponentModal extends Modal {
-  override title = "OpenClaw form";
+  override title = "Recall form";
   override customId = "__openclaw_discord_component_modal_wildcard__";
   override components = [];
   override customIdParser = parseDiscordModalCustomIdForInteraction;

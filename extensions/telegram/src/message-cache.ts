@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import type { Message } from "grammy/types";
-import { formatLocationText } from "openclaw/plugin-sdk/channel-inbound";
-import type { MsgContext } from "openclaw/plugin-sdk/reply-runtime";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { appendRegularFileSync, replaceFileAtomicSync } from "openclaw/plugin-sdk/security-runtime";
+import { formatLocationText } from "recall/plugin-sdk/channel-inbound";
+import type { MsgContext } from "recall/plugin-sdk/reply-runtime";
+import { logVerbose } from "recall/plugin-sdk/runtime-env";
+import { appendRegularFileSync, replaceFileAtomicSync } from "recall/plugin-sdk/security-runtime";
 import { resolveTelegramPrimaryMedia } from "./bot/body-helpers.js";
 import {
   buildSenderName,

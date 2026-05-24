@@ -1,24 +1,24 @@
 import type { App } from "@slack/bolt";
-import { resolveDefaultAgentId } from "openclaw/plugin-sdk/agent-runtime";
-import { formatAllowlistMatchMeta } from "openclaw/plugin-sdk/allow-from";
+import { resolveDefaultAgentId } from "recall/plugin-sdk/agent-runtime";
+import { formatAllowlistMatchMeta } from "recall/plugin-sdk/allow-from";
 import type {
-  OpenClawConfig,
+  RecallConfig,
   SlackReactionNotificationMode,
-} from "openclaw/plugin-sdk/config-contracts";
-import type { SessionScope } from "openclaw/plugin-sdk/config-contracts";
-import type { DmPolicy, GroupPolicy } from "openclaw/plugin-sdk/config-contracts";
-import { resolveRuntimeConversationBindingRoute } from "openclaw/plugin-sdk/conversation-runtime";
-import { createDedupeCache } from "openclaw/plugin-sdk/dedupe-runtime";
-import type { HistoryEntry } from "openclaw/plugin-sdk/reply-history";
-import { resolveAgentRoute } from "openclaw/plugin-sdk/routing";
-import { resolveThreadSessionKeys } from "openclaw/plugin-sdk/routing";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { getChildLogger } from "openclaw/plugin-sdk/runtime-env";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/config-contracts";
+import type { SessionScope } from "recall/plugin-sdk/config-contracts";
+import type { DmPolicy, GroupPolicy } from "recall/plugin-sdk/config-contracts";
+import { resolveRuntimeConversationBindingRoute } from "recall/plugin-sdk/conversation-runtime";
+import { createDedupeCache } from "recall/plugin-sdk/dedupe-runtime";
+import type { HistoryEntry } from "recall/plugin-sdk/reply-history";
+import { resolveAgentRoute } from "recall/plugin-sdk/routing";
+import { resolveThreadSessionKeys } from "recall/plugin-sdk/routing";
+import { logVerbose } from "recall/plugin-sdk/runtime-env";
+import { getChildLogger } from "recall/plugin-sdk/runtime-env";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime-env";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "recall/plugin-sdk/string-coerce-runtime";
 import { formatSlackError } from "../errors.js";
 import type { SlackMessageEvent } from "../types.js";
 import { normalizeAllowList, normalizeAllowListLower, normalizeSlackSlug } from "./allow-list.js";
@@ -91,7 +91,7 @@ export function parseSlackAssistantThreadMetadata(value: unknown) {
 }
 
 export type SlackMonitorContext = {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId: string;
   botToken: string;
   app: App;
@@ -125,7 +125,7 @@ export type SlackMonitorContext = {
   threadHistoryScope: "thread" | "channel";
   threadInheritParent: boolean;
   threadRequireExplicitMention: boolean;
-  slashCommand: Required<import("openclaw/plugin-sdk/config-contracts").SlackSlashCommandConfig>;
+  slashCommand: Required<import("recall/plugin-sdk/config-contracts").SlackSlashCommandConfig>;
   textLimit: number;
   ackReactionScope: string;
   typingReaction: string;
@@ -178,7 +178,7 @@ const SLACK_ASSISTANT_CONTEXT_TTL_MS = 24 * 60 * 60 * 1000;
 const SLACK_ASSISTANT_CONTEXT_CLEANUP_INTERVAL_MS = 10 * 60 * 1000;
 
 export function createSlackMonitorContext(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId: string;
   botToken: string;
   app: App;

@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { clearAllBootstrapSnapshots } from "../agents/bootstrap-cache.js";
 import { runEmbeddedPiAgent } from "../agents/pi-embedded.js";
 import { clearSessionStoreCacheForTest } from "../config/sessions/store.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { resetAgentRunContextForTest } from "../infra/agent-events.js";
 import { createCliDeps, mockAgentPayloads } from "./isolated-agent.delivery.test-helpers.js";
 import { runCronIsolatedAgentTurn } from "./isolated-agent.js";
@@ -24,7 +24,7 @@ function makeTimeoutTestCfg(
   home: string,
   storePath: string,
   timeoutSeconds: number,
-): OpenClawConfig {
+): RecallConfig {
   return makeCfg(home, storePath, {
     agents: { defaults: { timeoutSeconds } },
     models: {
@@ -44,8 +44,8 @@ const envSnapshot = {
   USERPROFILE: process.env.USERPROFILE,
   HOMEDRIVE: process.env.HOMEDRIVE,
   HOMEPATH: process.env.HOMEPATH,
-  OPENCLAW_HOME: process.env.OPENCLAW_HOME,
-  OPENCLAW_STATE_DIR: process.env.OPENCLAW_STATE_DIR,
+  RECALL_HOME: process.env.RECALL_HOME,
+  RECALL_STATE_DIR: process.env.RECALL_STATE_DIR,
 } as const;
 
 function restoreSnapshotEnv() {

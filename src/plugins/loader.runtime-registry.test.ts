@@ -5,7 +5,7 @@ import {
   testing,
   clearPluginLoaderCache,
   clearPluginRegistryLoadCache,
-  loadOpenClawPlugins,
+  loadRecallPlugins,
   resolveRuntimePluginRegistry,
 } from "./loader.js";
 import { resetPluginLoaderTestStateForTest } from "./loader.test-fixtures.js";
@@ -644,10 +644,10 @@ describe("resolveRuntimePluginRegistry", () => {
         },
         workspaceDir: "/tmp/workspace-a",
       };
-      const fullRegistry = loadOpenClawPlugins(loadOptions);
+      const fullRegistry = loadRecallPlugins(loadOptions);
 
-      loadOpenClawPlugins({ ...loadOptions, onlyPluginIds: ["alpha"] });
-      loadOpenClawPlugins({ ...loadOptions, onlyPluginIds: ["bravo"] });
+      loadRecallPlugins({ ...loadOptions, onlyPluginIds: ["alpha"] });
+      loadRecallPlugins({ ...loadOptions, onlyPluginIds: ["bravo"] });
 
       expect(resolveRuntimePluginRegistry(loadOptions)).toBe(fullRegistry);
     } finally {
@@ -713,7 +713,7 @@ describe("clearPluginLoaderCache", () => {
   });
 });
 
-describe("loadOpenClawPlugins active runtime clearing", () => {
+describe("loadRecallPlugins active runtime clearing", () => {
   it("clears plugin-owned global providers before activating a new registry", () => {
     registerEmbeddingProvider({
       id: "stale-embedding",
@@ -729,7 +729,7 @@ describe("loadOpenClawPlugins active runtime clearing", () => {
       create: async () => ({ provider: null }),
     });
 
-    loadOpenClawPlugins({ onlyPluginIds: [] });
+    loadRecallPlugins({ onlyPluginIds: [] });
 
     expect(getEmbeddingProvider("stale-embedding")).toBeUndefined();
     expect(getCompactionProvider("stale-compaction")).toBeUndefined();
@@ -762,10 +762,10 @@ describe("clearPluginRegistryLoadCache", () => {
       },
       workspaceDir: "/tmp/workspace-a",
     };
-    const registry = loadOpenClawPlugins(loadOptions);
+    const registry = loadRecallPlugins(loadOptions);
 
     clearPluginRegistryLoadCache();
 
-    expect(loadOpenClawPlugins(loadOptions)).not.toBe(registry);
+    expect(loadRecallPlugins(loadOptions)).not.toBe(registry);
   });
 });

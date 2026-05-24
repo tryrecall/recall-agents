@@ -1,18 +1,18 @@
-import { describeAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
-import { hasConfiguredSecretInput } from "openclaw/plugin-sdk/secret-input";
-import { patchChannelConfigForAccount } from "openclaw/plugin-sdk/setup-runtime";
-import { formatDocsLink } from "openclaw/plugin-sdk/setup-tools";
+import { describeAccountSnapshot } from "recall/plugin-sdk/account-helpers";
+import { hasConfiguredSecretInput } from "recall/plugin-sdk/secret-input";
+import { patchChannelConfigForAccount } from "recall/plugin-sdk/setup-runtime";
+import { formatDocsLink } from "recall/plugin-sdk/setup-tools";
 import type { ResolvedSlackAccount } from "./accounts.js";
-import type { OpenClawConfig } from "./channel-api.js";
+import type { RecallConfig } from "./channel-api.js";
 
 export const SLACK_CHANNEL = "slack" as const;
 
-export function buildSlackManifest(botName = "OpenClaw") {
-  const safeName = botName.trim() || "OpenClaw";
+export function buildSlackManifest(botName = "Recall") {
+  const safeName = botName.trim() || "Recall";
   const manifest = {
     display_information: {
       name: safeName,
-      description: `${safeName} connector for OpenClaw`,
+      description: `${safeName} connector for Recall`,
     },
     features: {
       bot_user: {
@@ -25,7 +25,7 @@ export function buildSlackManifest(botName = "OpenClaw") {
         messages_tab_read_only_enabled: false,
       },
       assistant_view: {
-        assistant_description: `${safeName} connects Slack assistant threads to OpenClaw agents.`,
+        assistant_description: `${safeName} connects Slack assistant threads to Recall agents.`,
         suggested_prompts: [
           {
             title: "What can you do?",
@@ -43,8 +43,8 @@ export function buildSlackManifest(botName = "OpenClaw") {
       },
       slash_commands: [
         {
-          command: "/openclaw",
-          description: "Send a message to OpenClaw",
+          command: "/recall",
+          description: "Send a message to Recall",
           should_escape: false,
         },
       ],
@@ -118,10 +118,10 @@ export function buildSlackSetupLines(): string[] {
 }
 
 export function setSlackChannelAllowlist(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   accountId: string,
   channelKeys: string[],
-): OpenClawConfig {
+): RecallConfig {
   const channels = Object.fromEntries(channelKeys.map((key) => [key, { enabled: true }]));
   return patchChannelConfigForAccount({
     cfg,

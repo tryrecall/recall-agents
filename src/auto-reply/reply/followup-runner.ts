@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { hasOutboundReplyContent } from "openclaw/plugin-sdk/reply-payload";
+import { hasOutboundReplyContent } from "recall/plugin-sdk/reply-payload";
 import {
   clearAutoFallbackPrimaryProbeSelection,
   entryMatchesAutoFallbackPrimaryProbe,
@@ -344,7 +344,7 @@ export function createFollowupRunner(params: {
     ) {
       await opts.onBlockReply({
         text:
-          "Follow-up completed, but OpenClaw could not deliver it to the originating " +
+          "Follow-up completed, but Recall could not deliver it to the originating " +
           "channel. The reply content was not forwarded to this channel to avoid " +
           "cross-channel misdelivery.",
         isError: true,

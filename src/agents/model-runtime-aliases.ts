@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { normalizeStaticProviderModelId } from "./model-ref-shared.js";
 import { resolveModelRuntimePolicy } from "./model-runtime-policy.js";
 import { resolveProviderIdForAuth } from "./provider-auth-aliases.js";
@@ -169,7 +169,7 @@ export function areRuntimeModelRefsEquivalent(left: string, right: string): bool
 }
 
 function resolveConfiguredRuntime(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   provider: string;
   agentId?: string;
   modelId?: string;
@@ -183,7 +183,7 @@ function resolveConfiguredRuntime(params: {
 }
 
 function resolveProfileRuntimeAlias(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   provider: string;
   profileId: string;
 }): string | undefined {
@@ -205,7 +205,7 @@ function resolveProfileRuntimeAlias(params: {
 }
 
 function resolveCliRuntimeFromAuthProfile(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   provider: string;
   authProfileId?: string;
 }): string | undefined {
@@ -257,7 +257,7 @@ function resolveCliRuntimeFromAuthProfile(params: {
 
 export function resolveCliRuntimeExecutionProvider(params: {
   provider: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   agentId?: string;
   modelId?: string;
   authProfileId?: string;

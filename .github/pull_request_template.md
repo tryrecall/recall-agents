@@ -43,7 +43,7 @@ Explain why this change should exist now. Link it to the user pain, failure mode
 
 ## Real behavior proof (required for external PRs)
 
-External contributors must show after-fix evidence from a real OpenClaw setup. Unit tests, mocks, lint, typechecks, snapshots, and CI are supplemental only. Screenshots are encouraged even for CLI, console, text, or log changes; terminal screenshots and copied live output count. Be mindful of private information like IP addresses, API keys, phone numbers, non-public endpoints, or other private details when providing evidence.
+External contributors must show after-fix evidence from a real Recall setup. Unit tests, mocks, lint, typechecks, snapshots, and CI are supplemental only. Screenshots are encouraged even for CLI, console, text, or log changes; terminal screenshots and copied live output count. Be mindful of private information like IP addresses, API keys, phone numbers, non-public endpoints, or other private details when providing evidence.
 
 - Behavior or issue addressed:
 - Real environment tested:

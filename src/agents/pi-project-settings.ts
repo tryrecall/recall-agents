@@ -1,5 +1,5 @@
 import { SettingsManager } from "@earendil-works/pi-coding-agent";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { PluginMetadataSnapshot } from "../plugins/plugin-metadata-snapshot.js";
 import {
   buildEmbeddedPiSettingsSnapshot,
@@ -11,7 +11,7 @@ import { applyPiCompactionSettingsFromConfig } from "./pi-settings.js";
 function createEmbeddedPiSettingsManager(params: {
   cwd: string;
   agentDir: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   pluginMetadataSnapshot?: PluginMetadataSnapshot;
 }): SettingsManager {
   const fileSettingsManager = SettingsManager.create(params.cwd, params.agentDir);
@@ -48,7 +48,7 @@ function createRuntimeEmbeddedPiSettingsManager(settingsManager: SettingsManager
 export function createPreparedEmbeddedPiSettingsManager(params: {
   cwd: string;
   agentDir: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   pluginMetadataSnapshot?: PluginMetadataSnapshot;
   /** Resolved context window budget so reserve-token floor can be capped for small models. */
   contextTokenBudget?: number;
@@ -61,7 +61,7 @@ export function createPreparedEmbeddedPiSettingsManager(params: {
     cfg: params.cfg,
     contextTokenBudget: params.contextTokenBudget,
   });
-  // Disable the pi-coding-agent auto-retry. OpenClaw has its own comprehensive
+  // Disable the pi-coding-agent auto-retry. Recall has its own comprehensive
   // retry layer (failover rotation, auth profile rotation, empty-error retry,
   // thinking-level fallback) in run.ts. Having both layers active creates a
   // double-retry that can replay failed tool calls in an unbounded loop (#73781).

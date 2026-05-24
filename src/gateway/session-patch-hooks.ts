@@ -1,5 +1,5 @@
 import type { SessionEntry } from "../config/sessions.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   hasInternalHookListeners,
   triggerInternalHook,
@@ -9,7 +9,7 @@ import {
 import type { SessionsPatchParams } from "./protocol/index.js";
 
 export function triggerSessionPatchHook(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionEntry: SessionEntry;
   sessionKey: string;
   patch: SessionsPatchParams;

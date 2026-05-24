@@ -5,7 +5,7 @@ import { qaSuiteProgressTesting, runQaSuite } from "./suite.js";
 
 const fetchWithSsrFGuardMock = vi.hoisted(() => vi.fn());
 
-vi.mock("openclaw/plugin-sdk/ssrf-runtime", () => ({
+vi.mock("recall/plugin-sdk/ssrf-runtime", () => ({
   fetchWithSsrFGuard: fetchWithSsrFGuardMock,
 }));
 
@@ -100,46 +100,46 @@ describe("qa suite", () => {
     );
     expect(
       qaSuiteProgressTesting.resolveQaSuiteTransportReadyTimeoutMs(undefined, {
-        OPENCLAW_QA_TRANSPORT_READY_TIMEOUT_MS: "180000",
+        RECALL_QA_TRANSPORT_READY_TIMEOUT_MS: "180000",
       }),
     ).toBe(180_000);
     expect(
       qaSuiteProgressTesting.resolveQaSuiteTransportReadyTimeoutMs(undefined, {
-        OPENCLAW_QA_TRANSPORT_READY_TIMEOUT_MS: "bad",
+        RECALL_QA_TRANSPORT_READY_TIMEOUT_MS: "bad",
       }),
     ).toBe(120_000);
     expect(qaSuiteProgressTesting.resolveQaSuiteTransportReadyTimeoutMs(90_000, {})).toBe(90_000);
   });
 
-  it("applies OPENCLAW_QA_SUITE_PROGRESS override and falls back on invalid values", () => {
+  it("applies RECALL_QA_SUITE_PROGRESS override and falls back on invalid values", () => {
     expect(
       qaSuiteProgressTesting.shouldLogQaSuiteProgress({
         CI: "false",
-        OPENCLAW_QA_SUITE_PROGRESS: "true",
+        RECALL_QA_SUITE_PROGRESS: "true",
       }),
     ).toBe(true);
     expect(
       qaSuiteProgressTesting.shouldLogQaSuiteProgress({
         CI: "true",
-        OPENCLAW_QA_SUITE_PROGRESS: "false",
+        RECALL_QA_SUITE_PROGRESS: "false",
       }),
     ).toBe(false);
     expect(
       qaSuiteProgressTesting.shouldLogQaSuiteProgress({
         CI: "false",
-        OPENCLAW_QA_SUITE_PROGRESS: "on",
+        RECALL_QA_SUITE_PROGRESS: "on",
       }),
     ).toBe(true);
     expect(
       qaSuiteProgressTesting.shouldLogQaSuiteProgress({
         CI: "true",
-        OPENCLAW_QA_SUITE_PROGRESS: "off",
+        RECALL_QA_SUITE_PROGRESS: "off",
       }),
     ).toBe(false);
     expect(
       qaSuiteProgressTesting.shouldLogQaSuiteProgress({
         CI: "true",
-        OPENCLAW_QA_SUITE_PROGRESS: "definitely",
+        RECALL_QA_SUITE_PROGRESS: "definitely",
       }),
     ).toBe(true);
   });
@@ -217,12 +217,12 @@ describe("qa suite", () => {
   it("arms gateway heap checkpoint env only when requested", () => {
     expect(
       qaSuiteProgressTesting.buildQaGatewayHeapCheckpointRuntimeEnvPatch({
-        OPENCLAW_QA_GATEWAY_HEAP_CHECKPOINTS: "0",
+        RECALL_QA_GATEWAY_HEAP_CHECKPOINTS: "0",
       }),
     ).toBeUndefined();
     expect(
       qaSuiteProgressTesting.buildQaGatewayHeapCheckpointRuntimeEnvPatch({
-        OPENCLAW_QA_GATEWAY_HEAP_CHECKPOINTS: "1",
+        RECALL_QA_GATEWAY_HEAP_CHECKPOINTS: "1",
         NODE_OPTIONS: "--max-old-space-size=4096",
       }),
     ).toEqual({
@@ -247,9 +247,9 @@ describe("qa suite", () => {
         mockBaseUrl: "http://127.0.0.1:44080",
       }),
     ).toEqual({
-      OPENCLAW_BUILD_PRIVATE_QA: "1",
-      OPENCLAW_QA_FORCE_RUNTIME: "codex",
-      OPENCLAW_CODEX_APP_SERVER_ARGS:
+      RECALL_BUILD_PRIVATE_QA: "1",
+      RECALL_QA_FORCE_RUNTIME: "codex",
+      RECALL_CODEX_APP_SERVER_ARGS:
         "app-server -c openai_base_url=http://127.0.0.1:44080/v1 --listen stdio://",
       OPENAI_API_KEY: "qa-mock-openai-key",
       CODEX_API_KEY: "qa-mock-openai-key",
@@ -264,8 +264,8 @@ describe("qa suite", () => {
         mockBaseUrl: "http://127.0.0.1:44080",
       }),
     ).toEqual({
-      OPENCLAW_BUILD_PRIVATE_QA: "1",
-      OPENCLAW_QA_FORCE_RUNTIME: "pi",
+      RECALL_BUILD_PRIVATE_QA: "1",
+      RECALL_QA_FORCE_RUNTIME: "pi",
     });
   });
 

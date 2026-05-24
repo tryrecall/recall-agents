@@ -75,9 +75,9 @@ const prepareDeps = {
   createMcpLoopbackServerConfig,
   resolveMcpLoopbackBearerToken,
   resolveMcpLoopbackScopedTools,
-  resolveOpenClawReferencePaths: async (
-    params: Parameters<typeof import("../docs-path.js").resolveOpenClawReferencePaths>[0],
-  ) => (await import("../docs-path.js")).resolveOpenClawReferencePaths(params),
+  resolveRecallReferencePaths: async (
+    params: Parameters<typeof import("../docs-path.js").resolveRecallReferencePaths>[0],
+  ) => (await import("../docs-path.js")).resolveRecallReferencePaths(params),
   // Surfaced as a dep so tests can stub the on-disk Claude CLI transcript probe
   // without touching ~/.claude/projects.
   claudeCliSessionTranscriptHasContent,
@@ -229,15 +229,15 @@ export async function prepareCliRunContext(
       : undefined,
     env: mcpLoopbackRuntime
       ? {
-          OPENCLAW_MCP_TOKEN: prepareDeps.resolveMcpLoopbackBearerToken(
+          RECALL_MCP_TOKEN: prepareDeps.resolveMcpLoopbackBearerToken(
             mcpLoopbackRuntime,
             params.senderIsOwner === true,
           ),
-          OPENCLAW_MCP_AGENT_ID: sessionAgentId ?? "",
-          OPENCLAW_MCP_ACCOUNT_ID: params.agentAccountId ?? "",
-          OPENCLAW_MCP_SESSION_KEY: params.sessionKey ?? "",
-          OPENCLAW_MCP_MESSAGE_CHANNEL: params.messageChannel ?? params.messageProvider ?? "",
-          OPENCLAW_MCP_INBOUND_EVENT_KIND: params.currentInboundEventKind ?? "",
+          RECALL_MCP_AGENT_ID: sessionAgentId ?? "",
+          RECALL_MCP_ACCOUNT_ID: params.agentAccountId ?? "",
+          RECALL_MCP_SESSION_KEY: params.sessionKey ?? "",
+          RECALL_MCP_MESSAGE_CHANNEL: params.messageChannel ?? params.messageProvider ?? "",
+          RECALL_MCP_INBOUND_EVENT_KIND: params.currentInboundEventKind ?? "",
         }
       : undefined,
     warn: (message) => cliBackendLog.warn(message),
@@ -342,7 +342,7 @@ export async function prepareCliRunContext(
     );
   }
   let openClawHistoryMessages: unknown[] | undefined;
-  const loadOpenClawHistoryMessages = async () => {
+  const loadRecallHistoryMessages = async () => {
     openClawHistoryMessages ??= await loadCliSessionHistoryMessages({
       sessionId: params.sessionId,
       sessionFile: params.sessionFile,
@@ -357,7 +357,7 @@ export async function prepareCliRunContext(
     agentId: sessionAgentId,
     defaultAgentId,
   });
-  const openClawReferences = await prepareDeps.resolveOpenClawReferencePaths({
+  const openClawReferences = await prepareDeps.resolveRecallReferencePaths({
     workspaceDir,
     argv1: process.argv[1],
     cwd: process.cwd(),
@@ -408,7 +408,7 @@ export async function prepareCliRunContext(
     const hookResult = await resolvePromptBuildHookResult({
       config: params.config ?? getRuntimeConfig(),
       prompt: params.prompt,
-      messages: await loadOpenClawHistoryMessages(),
+      messages: await loadRecallHistoryMessages(),
       hookCtx: {
         runId: params.runId,
         agentId: sessionAgentId,
@@ -455,9 +455,9 @@ export async function prepareCliRunContext(
   const rawTranscriptReseedReason = reusableCliSession.sessionId
     ? "session-expired"
     : reusableCliSession.invalidatedReason;
-  const shouldPrepareOpenClawHistoryPrompt =
+  const shouldPrepareRecallHistoryPrompt =
     !reusableCliSession.sessionId || allowRawTranscriptReseed;
-  const openClawHistoryPrompt = shouldPrepareOpenClawHistoryPrompt
+  const openClawHistoryPrompt = shouldPrepareRecallHistoryPrompt
     ? buildCliSessionHistoryPrompt({
         messages: await loadCliSessionReseedMessages({
           sessionId: params.sessionId,

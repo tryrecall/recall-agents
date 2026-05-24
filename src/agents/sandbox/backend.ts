@@ -22,7 +22,7 @@ export type {
   SandboxBackendHandle,
 } from "./backend-handle.types.js";
 
-const SANDBOX_BACKEND_FACTORIES_STATE_KEY = Symbol.for("openclaw.sandboxBackendFactories");
+const SANDBOX_BACKEND_FACTORIES_STATE_KEY = Symbol.for("recall.sandboxBackendFactories");
 
 function getSandboxBackendFactories(): Map<SandboxBackendId, RegisteredSandboxBackend> {
   const globalStore = globalThis as typeof globalThis & {

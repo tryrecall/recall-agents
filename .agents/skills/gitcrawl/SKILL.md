@@ -2,14 +2,14 @@
 name: gitcrawl
 description: "GitHub archive: issue/PR search, sync freshness, duplicate clusters, gh-shim PR status, and Gitcrawl repo work."
 metadata:
-  openclaw:
-    homepage: https://github.com/openclaw/gitcrawl
+  recall:
+    homepage: https://github.com/recall/gitcrawl
     requires:
       bins:
         - gitcrawl
     install:
       - kind: go
-        module: github.com/openclaw/gitcrawl/cmd/gitcrawl@latest
+        module: github.com/recall/gitcrawl/cmd/gitcrawl@latest
         bins:
           - gitcrawl
 ---
@@ -25,19 +25,19 @@ gitcrawl doctor --json
 Find candidates:
 
 ```bash
-gitcrawl threads openclaw/openclaw --numbers <issue-or-pr-number> --include-closed --json
-gitcrawl neighbors openclaw/openclaw --number <issue-or-pr-number> --limit 12 --json
-gitcrawl search issues "query" -R openclaw/openclaw --state open --json number,title,url
-gitcrawl clusters openclaw/openclaw --sort size --min-size 5
-gitcrawl cluster-detail openclaw/openclaw --id <cluster-id>
+gitcrawl threads tryrecall/recall-agents --numbers <issue-or-pr-number> --include-closed --json
+gitcrawl neighbors tryrecall/recall-agents --number <issue-or-pr-number> --limit 12 --json
+gitcrawl search issues "query" -R tryrecall/recall-agents --state open --json number,title,url
+gitcrawl clusters tryrecall/recall-agents --sort size --min-size 5
+gitcrawl cluster-detail tryrecall/recall-agents --id <cluster-id>
 ```
 
 For PR triage, start cached and go live only before mutation/merge decisions:
 
 ```bash
-gitcrawl gh pr status <number-or-url> -R openclaw/openclaw --compact
-gitcrawl gh pr view <number-or-url> -R openclaw/openclaw --json number,title,state,url,isDraft,headRef,headSha
-gitcrawl gh --live pr status <number-or-url> -R openclaw/openclaw --compact
+gitcrawl gh pr status <number-or-url> -R tryrecall/recall-agents --compact
+gitcrawl gh pr view <number-or-url> -R tryrecall/recall-agents --json number,title,state,url,isDraft,headRef,headSha
+gitcrawl gh --live pr status <number-or-url> -R tryrecall/recall-agents --compact
 ```
 
 Use live `gh` plus checkout proof before commenting, labeling, closing, reopening, merging, or filing a PR review:

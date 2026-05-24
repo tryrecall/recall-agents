@@ -12,7 +12,7 @@ const { prepareSecretsRuntimeSnapshot } = setupSecretsRuntimeSnapshotTestHooks()
 
 describe("secrets runtime snapshot request secret refs", () => {
   it("can skip auth-profile SecretRef resolution when includeAuthStoreRefs is false", async () => {
-    const missingEnvVar = `OPENCLAW_MISSING_AUTH_PROFILE_SECRET_${Date.now()}`;
+    const missingEnvVar = `RECALL_MISSING_AUTH_PROFILE_SECRET_${Date.now()}`;
     delete process.env[missingEnvVar];
 
     const loadAuthStore = () =>
@@ -28,7 +28,7 @@ describe("secrets runtime snapshot request secret refs", () => {
       prepareSecretsRuntimeSnapshot({
         config: asConfig({}),
         env: {},
-        agentDirs: ["/tmp/openclaw-agent-main"],
+        agentDirs: ["/tmp/recall-agent-main"],
         loadAuthStore,
       }),
     ).rejects.toThrow(`Environment variable "${missingEnvVar}" is missing or empty.`);
@@ -37,7 +37,7 @@ describe("secrets runtime snapshot request secret refs", () => {
       config: asConfig({}),
       env: {},
       includeAuthStoreRefs: false,
-      agentDirs: ["/tmp/openclaw-agent-main"],
+      agentDirs: ["/tmp/recall-agent-main"],
       loadAuthStore,
     });
 
@@ -45,8 +45,8 @@ describe("secrets runtime snapshot request secret refs", () => {
   });
 
   it("can skip auth-profile SecretRef resolution during active runtime refresh", async () => {
-    const initialEnvVar = `OPENCLAW_INITIAL_AUTH_PROFILE_SECRET_${Date.now()}`;
-    const missingEnvVar = `OPENCLAW_MISSING_AUTH_PROFILE_SECRET_${Date.now()}`;
+    const initialEnvVar = `RECALL_INITIAL_AUTH_PROFILE_SECRET_${Date.now()}`;
+    const missingEnvVar = `RECALL_MISSING_AUTH_PROFILE_SECRET_${Date.now()}`;
     delete process.env[missingEnvVar];
 
     let useMissingProfileRef = false;
@@ -69,7 +69,7 @@ describe("secrets runtime snapshot request secret refs", () => {
     const snapshot = await prepareSecretsRuntimeSnapshot({
       config: asConfig({}),
       env: { [initialEnvVar]: "sk-initial" },
-      agentDirs: ["/tmp/openclaw-agent-main"],
+      agentDirs: ["/tmp/recall-agent-main"],
       loadAuthStore,
     });
     activateSecretsRuntimeSnapshot(snapshot);
@@ -82,7 +82,7 @@ describe("secrets runtime snapshot request secret refs", () => {
           token: "sk-live",
         },
       }),
-      "/tmp/openclaw-agent-main",
+      "/tmp/recall-agent-main",
     );
 
     useMissingProfileRef = true;
@@ -144,7 +144,7 @@ describe("secrets runtime snapshot request secret refs", () => {
         OPENAI_PROVIDER_CERT: "client-cert",
         OPENAI_PROVIDER_KEY: "client-key",
       },
-      agentDirs: ["/tmp/openclaw-agent-main"],
+      agentDirs: ["/tmp/recall-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -246,7 +246,7 @@ describe("secrets runtime snapshot request secret refs", () => {
         MEDIA_AUDIO_MODEL_KEY: "model-key", // pragma: allowlist secret
         MEDIA_AUDIO_PROXY_CA: "proxy-ca",
       },
-      agentDirs: ["/tmp/openclaw-agent-main"],
+      agentDirs: ["/tmp/recall-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 

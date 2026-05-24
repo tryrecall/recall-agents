@@ -6,13 +6,13 @@ import path from "node:path";
 import { resolveOAuthDir, resolveStateDir } from "../../config/paths.js";
 import { loadJsonFile } from "../../infra/json-file.js";
 
-const LEGACY_OAUTH_REF_SOURCE = "openclaw-credentials";
+const LEGACY_OAUTH_REF_SOURCE = "recall-credentials";
 const LEGACY_OAUTH_REF_PROVIDER = "openai-codex";
 const LEGACY_OAUTH_SECRET_DIRNAME = "auth-profiles";
 const LEGACY_OAUTH_SECRET_VERSION = 1;
 const LEGACY_OAUTH_SECRET_ALGORITHM = "aes-256-gcm";
-const LEGACY_OAUTH_SECRET_KEY_ENV = "OPENCLAW_AUTH_PROFILE_SECRET_KEY";
-const LEGACY_OAUTH_SECRET_KEYCHAIN_SERVICE = "OpenClaw Auth Profile Secrets";
+const LEGACY_OAUTH_SECRET_KEY_ENV = "RECALL_AUTH_PROFILE_SECRET_KEY";
+const LEGACY_OAUTH_SECRET_KEYCHAIN_SERVICE = "Recall Auth Profile Secrets";
 const LEGACY_OAUTH_SECRET_KEYCHAIN_ACCOUNT = "oauth-profile-master-key";
 const LEGACY_OAUTH_SECRET_KEY_FILE_NAME = "auth-profile-secret-key";
 
@@ -120,7 +120,7 @@ function buildLegacyOAuthSecretKey(seed: string): Buffer {
   // Legacy #79006 compatibility: existing sidecars were encrypted with this
   // SHA-256 key derivation, so changing it would strand affected users.
   // codeql[js/insufficient-password-hash]
-  return createHash("sha256").update(`openclaw:auth-profile-oauth:${seed}`).digest();
+  return createHash("sha256").update(`recall:auth-profile-oauth:${seed}`).digest();
 }
 
 function encryptLegacyOAuthMaterialForTest(params: {
@@ -171,9 +171,9 @@ function resolveLegacyOAuthSecretKeyFileCandidates(env: NodeJS.ProcessEnv): stri
     const home = env.USERPROFILE?.trim() || os.homedir();
     const root = env.APPDATA?.trim() || (home ? path.join(home, "AppData", "Roaming") : undefined);
     return uniquePaths([
-      root ? path.join(root, "OpenClaw", LEGACY_OAUTH_SECRET_KEY_FILE_NAME) : undefined,
+      root ? path.join(root, "Recall", LEGACY_OAUTH_SECRET_KEY_FILE_NAME) : undefined,
       home
-        ? path.join(home, ".openclaw-auth-profile-secrets", LEGACY_OAUTH_SECRET_KEY_FILE_NAME)
+        ? path.join(home, ".recall-auth-profile-secrets", LEGACY_OAUTH_SECRET_KEY_FILE_NAME)
         : undefined,
     ]);
   }
@@ -186,12 +186,12 @@ function resolveLegacyOAuthSecretKeyFileCandidates(env: NodeJS.ProcessEnv): stri
             home,
             "Library",
             "Application Support",
-            "OpenClaw",
+            "Recall",
             LEGACY_OAUTH_SECRET_KEY_FILE_NAME,
           )
         : undefined,
       home
-        ? path.join(home, ".openclaw-auth-profile-secrets", LEGACY_OAUTH_SECRET_KEY_FILE_NAME)
+        ? path.join(home, ".recall-auth-profile-secrets", LEGACY_OAUTH_SECRET_KEY_FILE_NAME)
         : undefined,
     ]);
   }
@@ -199,9 +199,9 @@ function resolveLegacyOAuthSecretKeyFileCandidates(env: NodeJS.ProcessEnv): stri
   const home = env.HOME?.trim() || os.homedir();
   const root = env.XDG_CONFIG_HOME?.trim() || (home ? path.join(home, ".config") : undefined);
   return uniquePaths([
-    root ? path.join(root, "openclaw", LEGACY_OAUTH_SECRET_KEY_FILE_NAME) : undefined,
+    root ? path.join(root, "recall", LEGACY_OAUTH_SECRET_KEY_FILE_NAME) : undefined,
     home
-      ? path.join(home, ".openclaw-auth-profile-secrets", LEGACY_OAUTH_SECRET_KEY_FILE_NAME)
+      ? path.join(home, ".recall-auth-profile-secrets", LEGACY_OAUTH_SECRET_KEY_FILE_NAME)
       : undefined,
   ]);
 }
@@ -272,7 +272,7 @@ function resolveLegacyOAuthSecretKeySeeds(env: NodeJS.ProcessEnv): string[] {
   };
   addSeed(env[LEGACY_OAUTH_SECRET_KEY_ENV]);
   if (env.NODE_ENV === "test" && env.VITEST === "true") {
-    addSeed("openclaw-test-oauth-profile-secret-key");
+    addSeed("recall-test-oauth-profile-secret-key");
   }
   addSeed(readLegacyOAuthSecretKeyFile(env));
   return seeds;

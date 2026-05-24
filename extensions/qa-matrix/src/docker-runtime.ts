@@ -1,6 +1,6 @@
 import { createServer } from "node:net";
-import { runExec } from "openclaw/plugin-sdk/process-runtime";
-import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
+import { runExec } from "recall/plugin-sdk/process-runtime";
+import { fetchWithSsrFGuard } from "recall/plugin-sdk/ssrf-runtime";
 
 const DEFAULT_DOCKER_COMMAND_TIMEOUT_MS = 120_000;
 

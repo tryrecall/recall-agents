@@ -2,13 +2,13 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { RecallConfig } from "../../../config/types.recall.js";
 import { collectCodexNativeAssetInfoNotes, scanCodexNativeAssets } from "./codex-native-assets.js";
 
 const tempRoots = new Set<string>();
 
 async function makeTempRoot(): Promise<string> {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-doctor-codex-assets-"));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "recall-doctor-codex-assets-"));
   tempRoots.add(root);
   return root;
 }
@@ -18,7 +18,7 @@ async function writeFile(filePath: string, content = ""): Promise<void> {
   await fs.writeFile(filePath, content, "utf8");
 }
 
-function codexConfig(): OpenClawConfig {
+function codexConfig(): RecallConfig {
   return {
     plugins: {
       entries: {
@@ -32,7 +32,7 @@ function codexConfig(): OpenClawConfig {
         },
       },
     },
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
 function hasAsset(hits: Array<{ kind: string; path: string }>, kind: string, assetPath: string) {
@@ -100,7 +100,7 @@ describe("scanCodexNativeAssets", () => {
 
     await expect(
       scanCodexNativeAssets({
-        cfg: {} as OpenClawConfig,
+        cfg: {} as RecallConfig,
         env: { CODEX_HOME: codexHome, HOME: root },
       }),
     ).resolves.toStrictEqual([]);
@@ -120,10 +120,10 @@ describe("collectCodexNativeAssetInfoNotes", () => {
 
     expect(notes).toStrictEqual([
       [
-        "- Personal Codex CLI assets were found, but native Codex-mode OpenClaw agents use isolated per-agent Codex homes.",
+        "- Personal Codex CLI assets were found, but native Codex-mode Recall agents use isolated per-agent Codex homes.",
         `- Sources: ${codexHome} and ${path.join(root, ".agents", "skills")} (1 skill, 0 plugins, 0 config files, 0 hook files).`,
         "- These assets will not be loaded by the Codex app-server child unless you intentionally promote them.",
-        "- Run `openclaw migrate plan codex` to inventory them. Applying that migration copies skills into the current OpenClaw agent workspace; Codex plugins, hooks, and config stay manual-review only.",
+        "- Run `recall migrate plan codex` to inventory them. Applying that migration copies skills into the current Recall agent workspace; Codex plugins, hooks, and config stay manual-review only.",
       ].join("\n"),
     ]);
   });

@@ -1,10 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { resolveMemoryDreamingWorkspaces } from "openclaw/plugin-sdk/memory-core-host-status";
-import type { MemoryPluginPublicArtifact } from "openclaw/plugin-sdk/memory-host-core";
-import { resolveMemoryHostEventLogPath } from "openclaw/plugin-sdk/memory-host-events";
-import { pathExists } from "openclaw/plugin-sdk/security-runtime";
-import type { OpenClawConfig } from "../api.js";
+import { resolveMemoryDreamingWorkspaces } from "recall/plugin-sdk/memory-core-host-status";
+import type { MemoryPluginPublicArtifact } from "recall/plugin-sdk/memory-host-core";
+import { resolveMemoryHostEventLogPath } from "recall/plugin-sdk/memory-host-events";
+import { pathExists } from "recall/plugin-sdk/security-runtime";
+import type { RecallConfig } from "../api.js";
 
 async function listMarkdownFilesRecursive(rootDir: string): Promise<string[]> {
   const entries = await fs.readdir(rootDir, { withFileTypes: true }).catch(() => []);
@@ -80,7 +80,7 @@ async function collectWorkspaceArtifacts(params: {
 }
 
 export async function listMemoryCorePublicArtifacts(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
 }): Promise<MemoryPluginPublicArtifact[]> {
   const workspaces = resolveMemoryDreamingWorkspaces(params.cfg);
   const artifacts: MemoryPluginPublicArtifact[] = [];

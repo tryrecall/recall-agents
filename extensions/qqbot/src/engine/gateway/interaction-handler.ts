@@ -11,7 +11,7 @@
  * branches fall through to a bare ACK (backward-compatible).
  */
 
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
 import { authorizeQQBotApprovalAction } from "../../exec-approvals.js";
 import { resolveQQBotEffectivePolicies } from "../access/resolve-policy.js";
 import { getPlatformAdapter } from "../adapter/index.js";
@@ -65,7 +65,7 @@ function buildClawCfgSnapshot(
   return {
     channel_type: "qqbot",
     channel_ver: getPluginVersion(),
-    claw_type: "openclaw",
+    claw_type: "recall",
     claw_ver: getFrameworkVersion(),
     require_mention: requireMentionMode,
     group_policy: policies.groupPolicy,
@@ -153,7 +153,7 @@ export function createInteractionHandler(
   account: GatewayAccount,
   runtime: GatewayPluginRuntime,
   log?: EngineLogger,
-  options?: { getActiveCfg?: () => OpenClawConfig },
+  options?: { getActiveCfg?: () => RecallConfig },
 ): (event: InteractionEvent) => void {
   return (event) => {
     const creds = accountToCreds(account);
@@ -202,7 +202,7 @@ async function handleApprovalButtonInteraction(params: {
   accountId: string;
   creds: { appId: string; clientSecret: string };
   event: InteractionEvent;
-  getActiveCfg?: () => OpenClawConfig | Record<string, unknown>;
+  getActiveCfg?: () => RecallConfig | Record<string, unknown>;
   log?: EngineLogger;
   parsed: { approvalId: string; decision: "allow-once" | "allow-always" | "deny" };
 }): Promise<void> {
@@ -214,9 +214,9 @@ async function handleApprovalButtonInteraction(params: {
     return;
   }
 
-  let cfg: OpenClawConfig;
+  let cfg: RecallConfig;
   try {
-    cfg = params.getActiveCfg() as OpenClawConfig;
+    cfg = params.getActiveCfg() as RecallConfig;
   } catch (err) {
     await acknowledgeApprovalInteraction(params.creds, params.event, params.log, {
       content: "Approval is unavailable.",
@@ -283,7 +283,7 @@ async function acknowledgeApprovalInteraction(
 }
 
 function authorizeApprovalButtonActor(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   accountId: string;
   event: InteractionEvent;
   approvalKind: "exec" | "plugin";

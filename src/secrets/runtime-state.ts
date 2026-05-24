@@ -11,7 +11,7 @@ import {
   setRuntimeConfigSnapshotRefreshHandler,
   type RuntimeConfigSnapshotRefreshHandler,
 } from "../config/runtime-snapshot.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { PluginOrigin } from "../plugins/plugin-origin.types.js";
 import type { SecretResolverWarning } from "./runtime-shared.js";
 import {
@@ -21,8 +21,8 @@ import {
 import type { RuntimeWebToolsMetadata } from "./runtime-web-tools.types.js";
 
 export type PreparedSecretsRuntimeSnapshot = {
-  sourceConfig: OpenClawConfig;
-  config: OpenClawConfig;
+  sourceConfig: RecallConfig;
+  config: RecallConfig;
   authStores: Array<{ agentDir: string; store: AuthProfileStore }>;
   warnings: SecretResolverWarning[];
   webTools: RuntimeWebToolsMetadata;

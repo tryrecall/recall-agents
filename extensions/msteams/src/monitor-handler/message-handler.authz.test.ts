@@ -1,6 +1,6 @@
-import { createInboundDebouncer } from "openclaw/plugin-sdk/channel-inbound-debounce";
+import { createInboundDebouncer } from "recall/plugin-sdk/channel-inbound-debounce";
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig, PluginRuntime } from "../../runtime-api.js";
+import type { RecallConfig, PluginRuntime } from "../../runtime-api.js";
 import type { GraphThreadMessage } from "../graph-thread.js";
 import { resetThreadParentContextCachesForTest } from "../thread-parent-context.js";
 import "./message-handler-mock-support.test-support.js";
@@ -82,7 +82,7 @@ vi.mock("../graph-thread.js", () => {
 
 describe("msteams monitor handler authz", () => {
   function createDeps(
-    cfg: OpenClawConfig,
+    cfg: RecallConfig,
     options: {
       hasControlCommand?: PluginRuntime["channel"]["text"]["hasControlCommand"];
       isControlCommandMessage?: PluginRuntime["channel"]["commands"]["isControlCommandMessage"];
@@ -151,7 +151,7 @@ describe("msteams monitor handler authz", () => {
   function createThreadAllowlistConfig(params: {
     groupAllowFrom: string[];
     dangerouslyAllowNameMatching?: boolean;
-  }): OpenClawConfig {
+  }): RecallConfig {
     return {
       channels: {
         msteams: {
@@ -169,7 +169,7 @@ describe("msteams monitor handler authz", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
   }
 
   function createMessageActivity(params: {
@@ -326,7 +326,7 @@ describe("msteams monitor handler authz", () => {
           groupAllowFrom: [],
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     const handler = createMSTeamsMessageHandler(deps);
     await handler(createAttackerGroupActivity({ text: "" }));
@@ -352,7 +352,7 @@ describe("msteams monitor handler authz", () => {
           },
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     const handler = createMSTeamsMessageHandler(deps);
     await handler(
@@ -375,7 +375,7 @@ describe("msteams monitor handler authz", () => {
           allowFrom: [],
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     const handler = createMSTeamsMessageHandler(deps);
     await handler({
@@ -462,7 +462,7 @@ describe("msteams monitor handler authz", () => {
           groupAllowFrom: ["sender-aad"],
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     const handler = createMSTeamsMessageHandler(deps);
     await handler({
@@ -517,7 +517,7 @@ describe("msteams monitor handler authz", () => {
           groupAllowFrom: ["sender-aad"],
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     const handler = createMSTeamsMessageHandler(deps);
     await handler({
@@ -562,7 +562,7 @@ describe("msteams monitor handler authz", () => {
           allowFrom: ["trusted-aad"],
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     const handler = createMSTeamsMessageHandler(deps);
     await handler(createAttackerPersonalActivity("msg-drop-dm"));
@@ -583,7 +583,7 @@ describe("msteams monitor handler authz", () => {
           groupAllowFrom: [],
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     const handler = createMSTeamsMessageHandler(deps);
     await handler(createAttackerGroupActivity());
@@ -605,7 +605,7 @@ describe("msteams monitor handler authz", () => {
             requireMention: false,
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       { hasControlCommand },
     );
 
@@ -630,7 +630,7 @@ describe("msteams monitor handler authz", () => {
             requireMention: false,
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       {
         isControlCommandMessage,
         shouldComputeCommandAuthorized,
@@ -665,7 +665,7 @@ describe("msteams monitor handler authz", () => {
             requireMention: true,
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       {
         hasControlCommand: vi.fn(() => false),
         isControlCommandMessage: isBareAbort,
@@ -700,7 +700,7 @@ describe("msteams monitor handler authz", () => {
           requireMention: true,
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     const handler = createMSTeamsMessageHandler(deps);
     await handler(
@@ -742,7 +742,7 @@ describe("msteams monitor handler authz", () => {
           requireMention: false,
         },
       },
-    } as OpenClawConfig);
+    } as RecallConfig);
 
     const handler = createMSTeamsMessageHandler(deps);
     await handler(
@@ -792,7 +792,7 @@ describe("msteams monitor handler authz", () => {
             requireMention: false,
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
       { hasControlCommand },
     );
 

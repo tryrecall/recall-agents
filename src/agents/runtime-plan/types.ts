@@ -329,13 +329,13 @@ export type AgentRuntimePromptPlan = {
 // Keep the leaf runtime-plan contract decoupled from plugin metadata internals.
 export type AgentRuntimePreparedMetadataSnapshot = object;
 
-export type PreparedOpenClawToolPlanning = {
+export type PreparedRecallToolPlanning = {
   metadataSnapshot?: AgentRuntimePreparedMetadataSnapshot;
   loadMetadataSnapshot?: () => AgentRuntimePreparedMetadataSnapshot;
 };
 
 export type AgentRuntimeToolPlan = {
-  preparedPlanning?: PreparedOpenClawToolPlanning;
+  preparedPlanning?: PreparedRecallToolPlanning;
   normalize<TSchemaType extends TSchema = TSchema, TResult = unknown>(
     tools: AgentTool<TSchemaType, TResult>[],
     params?: {

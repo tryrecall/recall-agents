@@ -1,5 +1,5 @@
 import type { ImageContent } from "@earendil-works/pi-ai";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { logVerbose } from "../../globals.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import type { PromptImageOrderEntry } from "../../media/prompt-image-order.js";
@@ -35,7 +35,7 @@ function countCurrentImageAttachmentCandidates(ctx: MsgContext): number {
 
 export async function resolveCurrentTurnImages(params: {
   ctx: MsgContext;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   images?: ImageContent[];
   imageOrder?: PromptImageOrderEntry[];
 }): Promise<{

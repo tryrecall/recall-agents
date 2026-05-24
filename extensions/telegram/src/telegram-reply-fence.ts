@@ -1,7 +1,7 @@
 import {
   isAbortRequestText,
   isBtwRequestText,
-} from "openclaw/plugin-sdk/command-primitives-runtime";
+} from "recall/plugin-sdk/command-primitives-runtime";
 import { isTelegramReadOnlyControlLaneText } from "./sequential-key.js";
 
 type TelegramReplyFenceState = {

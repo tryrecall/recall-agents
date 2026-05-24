@@ -1,4 +1,4 @@
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-payload";
+import type { ReplyPayload } from "recall/plugin-sdk/reply-payload";
 
 export type DiscordInboundEventDeliveryEnd = () => void;
 

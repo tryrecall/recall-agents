@@ -62,7 +62,7 @@ import {
   resolveAuthProfileOrder,
   shouldPreferExplicitConfigApiKeyAuth,
 } from "../model-auth.js";
-import { ensureOpenClawModelsJson } from "../models-config.js";
+import { ensureRecallModelsJson } from "../models-config.js";
 import {
   OPENAI_CODEX_PROVIDER_ID,
   listOpenAIAuthProfileProvidersForAgentRuntime,
@@ -353,7 +353,7 @@ function buildTraceToolSummary(params: {
  * The return value is normalized: whitespace-only inputs collapse to undefined, and
  * successful resolution returns a trimmed session key. This is a read-only lookup
  * with no side effects.
- * See: https://github.com/openclaw/openclaw/issues/60552
+ * See: https://github.com/tryrecall/recall-agents/issues/60552
  */
 function backfillSessionKey(params: {
   config: RunEmbeddedPiAgentParams["config"];
@@ -648,7 +648,7 @@ export async function runEmbeddedPiAgent(
         dynamicModelResolution.model || pluginHarnessOwnsTransport
           ? dynamicModelResolution
           : await (async () => {
-              await ensureOpenClawModelsJson(params.config, agentDir, {
+              await ensureRecallModelsJson(params.config, agentDir, {
                 workspaceDir: resolvedWorkspace,
               });
               return await resolveModelAsync(provider, modelId, agentDir, params.config, {
@@ -698,14 +698,14 @@ export async function runEmbeddedPiAgent(
       startupStages.mark("model-resolution");
       notifyExecutionPhase("model_resolution", { provider, model: modelId });
 
-      const pluginHarnessNeedsOpenClawAuthBootstrap =
+      const pluginHarnessNeedsRecallAuthBootstrap =
         pluginHarnessOwnsTransport &&
         provider === OPENAI_CODEX_PROVIDER_ID &&
         effectiveModel.api === "openai-codex-responses";
       const authStore =
-        pluginHarnessOwnsTransport && !pluginHarnessNeedsOpenClawAuthBootstrap
+        pluginHarnessOwnsTransport && !pluginHarnessNeedsRecallAuthBootstrap
           ? createEmptyAuthProfileStore()
-          : pluginHarnessNeedsOpenClawAuthBootstrap
+          : pluginHarnessNeedsRecallAuthBootstrap
             ? ensureAuthProfileStore(agentDir, {
                 externalCliProviderIds: [OPENAI_CODEX_PROVIDER_ID],
                 allowKeychainPrompt: false,
@@ -714,7 +714,7 @@ export async function runEmbeddedPiAgent(
                 allowKeychainPrompt: false,
               });
       const attemptAuthProfileStore =
-        pluginHarnessOwnsTransport && !pluginHarnessNeedsOpenClawAuthBootstrap
+        pluginHarnessOwnsTransport && !pluginHarnessNeedsRecallAuthBootstrap
           ? ensureAuthProfileStoreWithoutExternalProfiles(agentDir, {
               allowKeychainPrompt: false,
             })
@@ -968,14 +968,14 @@ export async function runEmbeddedPiAgent(
         return false;
       };
       const advanceAttemptAuthProfile =
-        pluginHarnessOwnsTransport && !pluginHarnessNeedsOpenClawAuthBootstrap
+        pluginHarnessOwnsTransport && !pluginHarnessNeedsRecallAuthBootstrap
           ? advancePluginHarnessAuthProfile
           : advanceAuthProfile;
 
       // Plugin harnesses own their model transport/auth. Running PI's generic
       // auth bootstrap here can turn synthetic provider markers into real
       // vendor-token refresh attempts before the plugin gets control.
-      if (!pluginHarnessOwnsTransport || pluginHarnessNeedsOpenClawAuthBootstrap) {
+      if (!pluginHarnessOwnsTransport || pluginHarnessNeedsRecallAuthBootstrap) {
         await initializeAuthProfile();
       } else if (lockedProfileId) {
         lastProfileId = lockedProfileId;
@@ -1466,7 +1466,7 @@ export async function runEmbeddedPiAgent(
             initialReplayState: accumulatedReplayState,
             authStorage,
             authProfileStore: runAttemptAuthProfileStore,
-            // Codex builds OpenClaw tools inside its harness. Keep transport
+            // Codex builds Recall tools inside its harness. Keep transport
             // auth scoped while letting tool construction see plugin creds.
             toolAuthProfileStore: agentHarness.id === "codex" ? attemptAuthProfileStore : undefined,
             modelRegistry,

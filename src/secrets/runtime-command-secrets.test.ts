@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { resolveCommandSecretsFromActiveRuntimeSnapshot } from "./runtime-command-secrets.js";
 import {
   activateSecretsRuntimeSnapshot,
@@ -8,26 +8,26 @@ import {
 } from "./runtime.js";
 
 describe("runtime command secrets", () => {
-  const previousBundledPluginsDir = process.env.OPENCLAW_BUNDLED_PLUGINS_DIR;
-  const previousTrustBundledPluginsDir = process.env.OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR;
+  const previousBundledPluginsDir = process.env.RECALL_BUNDLED_PLUGINS_DIR;
+  const previousTrustBundledPluginsDir = process.env.RECALL_TEST_TRUST_BUNDLED_PLUGINS_DIR;
 
   afterEach(() => {
     clearSecretsRuntimeSnapshot();
     if (previousBundledPluginsDir === undefined) {
-      delete process.env.OPENCLAW_BUNDLED_PLUGINS_DIR;
+      delete process.env.RECALL_BUNDLED_PLUGINS_DIR;
     } else {
-      process.env.OPENCLAW_BUNDLED_PLUGINS_DIR = previousBundledPluginsDir;
+      process.env.RECALL_BUNDLED_PLUGINS_DIR = previousBundledPluginsDir;
     }
     if (previousTrustBundledPluginsDir === undefined) {
-      delete process.env.OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR;
+      delete process.env.RECALL_TEST_TRUST_BUNDLED_PLUGINS_DIR;
     } else {
-      process.env.OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR = previousTrustBundledPluginsDir;
+      process.env.RECALL_TEST_TRUST_BUNDLED_PLUGINS_DIR = previousTrustBundledPluginsDir;
     }
   });
 
   it("returns forced fallback assignments from the active gateway snapshot", async () => {
-    process.env.OPENCLAW_BUNDLED_PLUGINS_DIR = "extensions";
-    process.env.OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR = "1";
+    process.env.RECALL_BUNDLED_PLUGINS_DIR = "extensions";
+    process.env.RECALL_TEST_TRUST_BUNDLED_PLUGINS_DIR = "1";
     const config = {
       tools: {
         web: {
@@ -51,14 +51,14 @@ describe("runtime command secrets", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const snapshot = await prepareSecretsRuntimeSnapshot({
       config,
       env: {
         FIRECRAWL_API_KEY: "gateway-only-firecrawl-key",
         HOME: process.env.HOME,
-        OPENCLAW_BUNDLED_PLUGINS_DIR: "extensions",
-        OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
+        RECALL_BUNDLED_PLUGINS_DIR: "extensions",
+        RECALL_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
       },
     });
     activateSecretsRuntimeSnapshot(snapshot);
@@ -80,8 +80,8 @@ describe("runtime command secrets", () => {
   });
 
   it("re-resolves forced command-selected web provider paths with gateway env", async () => {
-    process.env.OPENCLAW_BUNDLED_PLUGINS_DIR = "extensions";
-    process.env.OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR = "1";
+    process.env.RECALL_BUNDLED_PLUGINS_DIR = "extensions";
+    process.env.RECALL_TEST_TRUST_BUNDLED_PLUGINS_DIR = "1";
     const firecrawlPath = "plugins.entries.firecrawl.config.webSearch.apiKey";
     const config = {
       tools: {
@@ -105,14 +105,14 @@ describe("runtime command secrets", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const snapshot = await prepareSecretsRuntimeSnapshot({
       config,
       env: {
         FIRECRAWL_API_KEY: "gateway-selected-firecrawl-key",
         HOME: process.env.HOME,
-        OPENCLAW_BUNDLED_PLUGINS_DIR: "extensions",
-        OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
+        RECALL_BUNDLED_PLUGINS_DIR: "extensions",
+        RECALL_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
       },
     });
     activateSecretsRuntimeSnapshot(snapshot);

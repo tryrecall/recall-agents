@@ -53,7 +53,7 @@ describe("persisted auth profile boundary", () => {
           refresh: "refresh-token",
           expires: "later",
           oauthRef: {
-            source: "openclaw-credentials",
+            source: "recall-credentials",
             provider: "openai-codex",
             id: "not-a-secret-id",
           },
@@ -126,16 +126,16 @@ describe("persisted auth profile boundary", () => {
   });
 
   it("rehydrates legacy oauthRef sidecars read-only for upgraded Codex OAuth users", () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-auth-oauthref-runtime-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "recall-auth-oauthref-runtime-"));
     const agentDir = path.join(stateDir, "agents", "main", "agent");
-    const restoreStateDir = withEnvValue("OPENCLAW_STATE_DIR", stateDir);
-    const restoreOAuthDir = withEnvValue("OPENCLAW_OAUTH_DIR", undefined);
-    const restoreSecretKey = withEnvValue("OPENCLAW_AUTH_PROFILE_SECRET_KEY", "legacy-seed");
+    const restoreStateDir = withEnvValue("RECALL_STATE_DIR", stateDir);
+    const restoreOAuthDir = withEnvValue("RECALL_OAUTH_DIR", undefined);
+    const restoreSecretKey = withEnvValue("RECALL_AUTH_PROFILE_SECRET_KEY", "legacy-seed");
     try {
       fs.mkdirSync(agentDir, { recursive: true });
       const profileId = "openai-codex:default";
       const ref = {
-        source: "openclaw-credentials" as const,
+        source: "recall-credentials" as const,
         provider: "openai-codex" as const,
         id: "0123456789abcdef0123456789abcdef",
       };

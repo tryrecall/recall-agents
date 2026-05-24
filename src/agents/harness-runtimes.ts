@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { normalizeOptionalLowercaseString } from "../shared/string-coerce.js";
 import { isRecord } from "../utils.js";
 import { resolveAgentHarnessPolicy } from "./harness/policy.js";
@@ -61,7 +61,7 @@ function parseConfiguredModelRef(
 }
 
 function resolveConfiguredModelHarnessRuntime(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   includeImplicitRuntimePreferences: boolean;
   modelRef: string;
   agentId?: string;
@@ -83,7 +83,7 @@ function resolveConfiguredModelHarnessRuntime(params: {
   return runtime && runtime !== "auto" && runtime !== "pi" ? runtime : undefined;
 }
 
-function pushConfiguredModelRuntimeIds(config: OpenClawConfig, runtimes: Set<string>): void {
+function pushConfiguredModelRuntimeIds(config: RecallConfig, runtimes: Set<string>): void {
   for (const providerConfig of Object.values(config.models?.providers ?? {})) {
     const providerRuntime = normalizeRuntimeId(providerConfig?.agentRuntime?.id);
     if (providerRuntime && providerRuntime !== "auto" && providerRuntime !== "pi") {
@@ -120,7 +120,7 @@ function pushConfiguredModelRuntimeIds(config: OpenClawConfig, runtimes: Set<str
 }
 
 function pushConfiguredAgentModelRuntimeIds(
-  config: OpenClawConfig,
+  config: RecallConfig,
   runtimes: Set<string>,
   includeImplicitRuntimePreferences: boolean,
 ): void {
@@ -165,7 +165,7 @@ function pushConfiguredAgentModelRuntimeIds(
   }
 }
 
-function pushLegacyAgentRuntimeIds(config: OpenClawConfig, runtimes: Set<string>): void {
+function pushLegacyAgentRuntimeIds(config: RecallConfig, runtimes: Set<string>): void {
   const pushRuntimeId = (value: unknown) => {
     const runtime = normalizeRuntimeId(value);
     if (runtime && runtime !== "auto" && runtime !== "pi") {
@@ -187,7 +187,7 @@ export type ConfiguredAgentHarnessRuntimeOptions = {
 };
 
 export function collectConfiguredAgentHarnessRuntimes(
-  config: OpenClawConfig,
+  config: RecallConfig,
   env: NodeJS.ProcessEnv,
   options: ConfiguredAgentHarnessRuntimeOptions = {},
 ): string[] {
@@ -197,7 +197,7 @@ export function collectConfiguredAgentHarnessRuntimes(
   const includeLegacyAgentRuntimes = options.includeLegacyAgentRuntimes ?? true;
 
   if (includeEnvRuntime) {
-    const envRuntime = normalizeRuntimeId(env.OPENCLAW_AGENT_RUNTIME);
+    const envRuntime = normalizeRuntimeId(env.RECALL_AGENT_RUNTIME);
     if (envRuntime && envRuntime !== "auto" && envRuntime !== "pi") {
       runtimes.add(envRuntime);
     }

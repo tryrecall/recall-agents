@@ -1,5 +1,5 @@
-import { hasOutboundReplyContent } from "openclaw/plugin-sdk/reply-payload";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import { hasOutboundReplyContent } from "recall/plugin-sdk/reply-payload";
+import type { RecallConfig } from "../../config/types.recall.js";
 import type { TtsAutoMode } from "../../config/types.tts.js";
 import { logVerbose } from "../../globals.js";
 import { formatErrorMessage } from "../../infra/errors.js";
@@ -90,7 +90,7 @@ async function shouldTreatDeliveredTextAsVisible(params: {
 
 async function maybeApplyAcpTts(params: {
   payload: ReplyPayload;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId?: string;
   channel?: string;
   accountId?: string;
@@ -179,7 +179,7 @@ export type AcpDispatchDeliveryCoordinator = {
 };
 
 export function createAcpDispatchDeliveryCoordinator(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   agentId?: string;
   ctx: FinalizedMsgContext;
   dispatcher: ReplyDispatcher;

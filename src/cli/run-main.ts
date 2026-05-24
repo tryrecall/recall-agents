@@ -3,11 +3,11 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { resolveStateDir } from "../config/paths.js";
-import type { ConfigFileSnapshot, OpenClawConfig } from "../config/types.openclaw.js";
+import type { ConfigFileSnapshot, RecallConfig } from "../config/types.recall.js";
 import { isTruthyEnvValue, normalizeEnv } from "../infra/env.js";
 import { isMainModule } from "../infra/is-main.js";
 import type { ProxyHandle } from "../infra/net/proxy/proxy-lifecycle.js";
-import { ensureOpenClawCliOnPath } from "../infra/path-env.js";
+import { ensureRecallCliOnPath } from "../infra/path-env.js";
 import { assertSupportedRuntime } from "../infra/runtime-guard.js";
 import type { PluginManifestCommandAliasRegistry } from "../plugins/manifest-command-aliases.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
@@ -69,7 +69,7 @@ const CLI_PROXY_ENV_KEYS = [
 
 function createGatewayCliMainStartupTrace(argv: string[]) {
   const enabled =
-    isTruthyEnvValue(process.env.OPENCLAW_GATEWAY_STARTUP_TRACE) &&
+    isTruthyEnvValue(process.env.RECALL_GATEWAY_STARTUP_TRACE) &&
     argv.slice(2).includes("gateway");
   const started = performance.now();
   let last = started;
@@ -176,7 +176,7 @@ async function tryRunGatewayRunFastPath(
     emitCliBanner(VERSION, { argv });
   }
   const program = new Command();
-  program.name("openclaw");
+  program.name("recall");
   program.enablePositionalOptions();
   program.option("--no-color", "Disable ANSI colors", false);
   program.exitOverride((err) => {
@@ -268,7 +268,7 @@ function pauseNonTtyStdinForCliExit(): void {
 
 export function resolveMissingPluginCommandMessage(
   pluginId: string,
-  config?: OpenClawConfig,
+  config?: RecallConfig,
   options?: { registry?: PluginManifestCommandAliasRegistry },
 ): string | null {
   return resolveMissingPluginCommandMessageFromPolicy(
@@ -314,8 +314,8 @@ async function ensureCliEnvProxyDispatcher(): Promise<void> {
 
 function shouldBootstrapCliProxyBeforeFastPath(env: NodeJS.ProcessEnv = process.env): boolean {
   if (
-    isTruthyEnvValue(env.OPENCLAW_DEBUG_PROXY_ENABLED) ||
-    isTruthyEnvValue(env.OPENCLAW_DEBUG_PROXY_REQUIRE)
+    isTruthyEnvValue(env.RECALL_DEBUG_PROXY_ENABLED) ||
+    isTruthyEnvValue(env.RECALL_DEBUG_PROXY_REQUIRE)
   ) {
     return true;
   }
@@ -334,7 +334,7 @@ function isKnownBuiltInCommandRoot(primary: string): boolean {
 
 async function isPluginCliRoot(params: {
   primary: string;
-  config: OpenClawConfig;
+  config: RecallConfig;
 }): Promise<boolean | null> {
   try {
     const { resolvePluginCliRootOwnerIds } = await import("../plugins/cli-registry-loader.js");
@@ -349,7 +349,7 @@ async function isPluginCliRoot(params: {
   }
 }
 
-function createAllowlistAgnosticCliLookupConfig(config: OpenClawConfig): OpenClawConfig {
+function createAllowlistAgnosticCliLookupConfig(config: RecallConfig): RecallConfig {
   if (!Array.isArray(config.plugins?.allow) || config.plugins.allow.length === 0) {
     return config;
   }
@@ -364,7 +364,7 @@ function createAllowlistAgnosticCliLookupConfig(config: OpenClawConfig): OpenCla
 
 async function resolveCliCommandSurfaceOwner(params: {
   primary: string;
-  config: OpenClawConfig;
+  config: RecallConfig;
 }): Promise<string | undefined> {
   const { resolveManifestCliCommandSurfaceOwner } =
     await import("../plugins/manifest-command-aliases.runtime.js");
@@ -392,7 +392,7 @@ async function resolveCliCommandSurfaceOwner(params: {
 
 async function resolveUnownedCliPrimary(params: {
   argv: string[];
-  config: OpenClawConfig;
+  config: RecallConfig;
 }): Promise<string | null> {
   const invocation = resolveCliArgvInvocation(rewriteUpdateFlagArgv(params.argv));
   const { primary } = invocation;
@@ -414,7 +414,7 @@ async function resolveUnownedCliPrimary(params: {
 
 async function resolveUnownedCliPrimaryMessage(params: {
   primary: string;
-  config: OpenClawConfig;
+  config: RecallConfig;
 }): Promise<string> {
   const { resolveManifestCommandAliasOwner, resolveManifestToolOwner } =
     await import("../plugins/manifest-command-aliases.runtime.js");
@@ -425,7 +425,7 @@ async function resolveUnownedCliPrimaryMessage(params: {
       resolveToolOwner: resolveManifestToolOwner,
       resolveCliCommandSurfaceOwner: () => cliCommandSurfaceOwner,
     }) ??
-    `Unknown command: openclaw ${params.primary}. No built-in command or plugin CLI metadata owns "${params.primary}".`
+    `Unknown command: recall ${params.primary}. No built-in command or plugin CLI metadata owns "${params.primary}".`
   );
 }
 
@@ -464,7 +464,7 @@ export async function runCli(argv: string[] = process.argv) {
     applyCliProfileEnv({ profile: parsedProfile.profile });
   }
   const containerTargetName =
-    parsedContainer.container ?? normalizeOptionalString(process.env.OPENCLAW_CONTAINER) ?? null;
+    parsedContainer.container ?? normalizeOptionalString(process.env.RECALL_CONTAINER) ?? null;
   if (containerTargetName && parsedProfile.profile) {
     throw new Error("--container cannot be combined with --profile/--dev");
   }
@@ -489,7 +489,7 @@ export async function runCli(argv: string[] = process.argv) {
   }
   normalizeEnv();
   if (shouldEnsureCliPath(normalizedArgv)) {
-    ensureOpenClawCliOnPath();
+    ensureRecallCliOnPath();
   }
 
   // Enforce the minimum supported runtime before doing any work.
@@ -499,8 +499,8 @@ export async function runCli(argv: string[] = process.argv) {
   // Local Gateway/control-plane commands keep direct loopback access while
   // runtime, provider, plugin, update, and manifest/metadata-owned plugin commands route egress.
   let proxyHandle: ProxyHandle | null = null;
-  let bestEffortConfigPromise: Promise<OpenClawConfig> | null = null;
-  const readBestEffortCliConfig = async (): Promise<OpenClawConfig> => {
+  let bestEffortConfigPromise: Promise<RecallConfig> | null = null;
+  const readBestEffortCliConfig = async (): Promise<RecallConfig> => {
     if (!bestEffortConfigPromise) {
       bestEffortConfigPromise = import("../config/io.js").then(({ readBestEffortConfig }) =>
         readBestEffortConfig(),
@@ -626,7 +626,7 @@ export async function runCli(argv: string[] = process.argv) {
       if (await shouldStartOnboardingForFreshInstall(normalizedArgv)) {
         if (!process.stdin.isTTY || !process.stdout.isTTY) {
           console.error(
-            "Onboarding needs an interactive TTY. Use `openclaw onboard --non-interactive --accept-risk ...` for automation.",
+            "Onboarding needs an interactive TTY. Use `recall onboard --non-interactive --accept-risk ...` for automation.",
           );
           process.exitCode = 1;
           return;
@@ -637,7 +637,7 @@ export async function runCli(argv: string[] = process.argv) {
       }
       if (!process.stdin.isTTY || !process.stdout.isTTY) {
         console.error(
-          'Crestodian needs an interactive TTY. Use `openclaw crestodian --message "status"` for one command.',
+          'Crestodian needs an interactive TTY. Use `recall crestodian --message "status"` for one command.',
         );
         process.exitCode = 1;
         return;
@@ -709,7 +709,7 @@ export async function runCli(argv: string[] = process.argv) {
 
     const { createCliProgress } = await import("./progress.js");
     const startupProgress = createCliProgress({
-      label: "Loading OpenClaw CLI…",
+      label: "Loading Recall CLI…",
       indeterminate: true,
       delayMs: 0,
     });
@@ -760,20 +760,20 @@ export async function runCli(argv: string[] = process.argv) {
         }
         if (isBenignUncaughtExceptionError(error)) {
           console.warn(
-            "[openclaw] Non-fatal uncaught exception (continuing):",
+            "[recall] Non-fatal uncaught exception (continuing):",
             formatUncaughtError(error),
           );
           return;
         }
         for (const line of formatCliFailureLines({
-          title: "OpenClaw hit an unexpected runtime error.",
+          title: "Recall hit an unexpected runtime error.",
           error,
           argv: normalizedArgv,
         })) {
           console.error(line);
         }
         for (const message of runFatalErrorHooks({ reason: "uncaught_exception", error })) {
-          console.error("[openclaw]", message);
+          console.error("[recall]", message);
         }
         restoreTerminalState("uncaught exception", { resumeStdinIfPaused: false });
         process.exit(1);

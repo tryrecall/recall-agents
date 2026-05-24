@@ -1,6 +1,6 @@
-import type { ChannelMessageActionContext } from "openclaw/plugin-sdk/channel-contract";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { withEnv } from "openclaw/plugin-sdk/test-env";
+import type { ChannelMessageActionContext } from "recall/plugin-sdk/channel-contract";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { withEnv } from "recall/plugin-sdk/test-env";
 import { describe, expect, it, vi } from "vitest";
 
 const handleDiscordMessageActionMock = vi.hoisted(() =>
@@ -23,7 +23,7 @@ describe("discordMessageActions", () => {
               enabled: true,
             },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
       });
 
       expect(discovery).toEqual({
@@ -49,7 +49,7 @@ describe("discordMessageActions", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
     });
 
     expect(discovery?.capabilities).toEqual(["presentation"]);
@@ -97,7 +97,7 @@ describe("discordMessageActions", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as RecallConfig,
     });
 
     expect(discovery?.capabilities).toEqual(["presentation"]);
@@ -159,7 +159,7 @@ describe("discordMessageActions", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as RecallConfig,
       accountId: "ops",
     });
 
@@ -220,7 +220,7 @@ describe("discordMessageActions", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
 
     const defaultDiscovery = discordMessageActions.describeMessageTool?.({
       cfg,
@@ -312,7 +312,7 @@ describe("discordMessageActions", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
     });
 
     expect(discovery?.actions).toContain("send");
@@ -330,7 +330,7 @@ describe("discordMessageActions", () => {
             token: "Bot token-main",
           },
         },
-      } as OpenClawConfig,
+      } as RecallConfig,
     });
     expect(discovery?.schema).toBeUndefined();
   });
@@ -375,7 +375,7 @@ describe("discordMessageActions", () => {
       ctx: {
         channel: "discord",
         action: "send",
-        cfg: {} as OpenClawConfig,
+        cfg: {} as RecallConfig,
         params: {
           components: {
             text: "Choose",
@@ -419,7 +419,7 @@ describe("discordMessageActions", () => {
       ctx: {
         channel: "discord",
         action: "send",
-        cfg: {} as OpenClawConfig,
+        cfg: {} as RecallConfig,
         params: {},
         sessionKey: "agent:main:discord:channel:c1",
         inboundEventKind: "room_event",
@@ -446,7 +446,7 @@ describe("discordMessageActions", () => {
       ctx: {
         channel: "discord",
         action: "send",
-        cfg: {} as OpenClawConfig,
+        cfg: {} as RecallConfig,
         params: {
           components: () => [],
         },
@@ -465,7 +465,7 @@ describe("discordMessageActions", () => {
           token: "Bot token-main",
         },
       },
-    } as OpenClawConfig;
+    } as RecallConfig;
     const toolContext: ChannelMessageActionContext["toolContext"] = {
       currentChannelProvider: "discord",
     };

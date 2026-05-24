@@ -1,4 +1,4 @@
-import { createMessageReceiptFromOutboundResults } from "openclaw/plugin-sdk/channel-message";
+import { createMessageReceiptFromOutboundResults } from "recall/plugin-sdk/channel-message";
 import { stripNextcloudTalkTargetPrefix } from "./normalize.js";
 import {
   convertMarkdownTables,

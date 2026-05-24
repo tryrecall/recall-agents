@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/plugin-entry";
+import type { RecallConfig } from "recall/plugin-sdk/plugin-entry";
 import {
   resolveClaudeCliAnthropicModelRefs,
   resolveKnownAnthropicModelRef,
@@ -25,7 +25,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function resolveAnthropicDefaultAuthMode(
-  config: OpenClawConfig,
+  config: RecallConfig,
   env: NodeJS.ProcessEnv,
 ): "api_key" | "oauth" | null {
   const profiles = config.auth?.profiles ?? {};
@@ -130,7 +130,7 @@ function isAnthropicCacheRetentionTarget(
   );
 }
 
-function usesClaudeCliModelSelection(config: OpenClawConfig): boolean {
+function usesClaudeCliModelSelection(config: RecallConfig): boolean {
   if (config.agents?.defaults?.agentRuntime?.id === CLAUDE_CLI_BACKEND_ID) {
     return true;
   }
@@ -157,7 +157,7 @@ function usesClaudeCliModelSelection(config: OpenClawConfig): boolean {
   });
 }
 
-function usesSelectedClaudeCliAuthProfile(config: OpenClawConfig): boolean {
+function usesSelectedClaudeCliAuthProfile(config: RecallConfig): boolean {
   const profiles = config.auth?.profiles ?? {};
   const orderedProfileIds = [
     ...(config.auth?.order?.anthropic ?? []),
@@ -243,7 +243,7 @@ function collectClaudeCliRuntimeRefsFromModelMap(
   return [...refs];
 }
 
-function collectClaudeCliRuntimeRefsFromConfig(config: OpenClawConfig): string[] {
+function collectClaudeCliRuntimeRefsFromConfig(config: RecallConfig): string[] {
   const refs = new Set<string>(
     collectClaudeCliRuntimeRefs(
       config.agents?.defaults?.model as
@@ -292,9 +292,9 @@ export function normalizeAnthropicProviderConfigForProvider<
 }
 
 export function applyAnthropicConfigDefaults(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   env: NodeJS.ProcessEnv;
-}): OpenClawConfig {
+}): RecallConfig {
   const defaults = params.config.agents?.defaults;
   if (!defaults) {
     return params.config;

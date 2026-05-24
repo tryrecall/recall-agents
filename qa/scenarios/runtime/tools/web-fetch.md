@@ -27,14 +27,14 @@ execution:
     toolCoverage:
       family: web_fetch
       actualTool: web_fetch
-      bucket: openclaw-dynamic-integration
-      expectedLayer: openclaw-dynamic
-      capabilityLayer: openclaw-dynamic-direct
+      bucket: recall-dynamic-integration
+      expectedLayer: recall-dynamic
+      capabilityLayer: recall-dynamic-direct
       required: true
       codexDefaultImpact: P4
       qaImpact: P1
       action: hard gate in the standard direct-loading tier
-      reason: web_fetch is an OpenClaw integration tool and must stay visible and callable under Pi and Codex direct runtime parity.
+      reason: web_fetch is an Recall integration tool and must stay visible and callable under Pi and Codex direct runtime parity.
     promptSnippet: "target=web_fetch"
     failurePromptSnippet: "failure target=web_fetch"
 ```

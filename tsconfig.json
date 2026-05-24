@@ -22,14 +22,14 @@
     "types": ["node"],
     "useDefineForClassFields": false,
     "paths": {
-      "openclaw/extension-api": ["./src/extensionAPI.ts"],
-      "openclaw/plugin-sdk": ["./src/plugin-sdk/index.ts"],
-      "openclaw/plugin-sdk/*": ["./src/plugin-sdk/*.ts"],
-      "@openclaw/sdk": ["./packages/sdk/src/index.ts"],
-      "@openclaw/plugin-sdk": ["./src/plugin-sdk/index.ts"],
-      "@openclaw/plugin-sdk/*": ["./src/plugin-sdk/*.ts"],
-      "openclaw/plugin-sdk/account-id": ["./src/plugin-sdk/account-id.ts"],
-      "@openclaw/*": ["./extensions/*"]
+      "recall/extension-api": ["./src/extensionAPI.ts"],
+      "recall/plugin-sdk": ["./src/plugin-sdk/index.ts"],
+      "recall/plugin-sdk/*": ["./src/plugin-sdk/*.ts"],
+      "@recall/sdk": ["./packages/sdk/src/index.ts"],
+      "@recall/plugin-sdk": ["./src/plugin-sdk/index.ts"],
+      "@recall/plugin-sdk/*": ["./src/plugin-sdk/*.ts"],
+      "recall/plugin-sdk/account-id": ["./src/plugin-sdk/account-id.ts"],
+      "@recall/*": ["./extensions/*"]
     }
   },
   "include": ["src/**/*", "ui/**/*", "extensions/**/*", "packages/**/*"],

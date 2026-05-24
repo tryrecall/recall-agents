@@ -6,11 +6,11 @@ import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import type { ModelProviderConfig } from "openclaw/plugin-sdk/provider-model-shared";
-import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
-import { resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/temp-path";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
+import type { ModelProviderConfig } from "recall/plugin-sdk/provider-model-shared";
+import { fetchWithSsrFGuard } from "recall/plugin-sdk/ssrf-runtime";
+import { resolvePreferredRecallTmpDir } from "recall/plugin-sdk/temp-path";
 import {
   createQaBundledPluginsDir,
   resolveQaBundledPluginSourceDir,
@@ -49,8 +49,8 @@ const QA_GATEWAY_CHILD_RPC_STARTUP_TIMEOUT_MS = 30_000;
 const QA_GATEWAY_CHILD_RPC_RETRY_HEALTH_TIMEOUT_MS = 60_000;
 const QA_GATEWAY_CHILD_RESTART_BOUNDARY_TIMEOUT_MS = 90_000;
 const QA_GATEWAY_CHILD_BLOCKED_SECRET_ENV_VARS = Object.freeze([
-  "OPENCLAW_QA_CONVEX_SECRET_CI",
-  "OPENCLAW_QA_CONVEX_SECRET_MAINTAINER",
+  "RECALL_QA_CONVEX_SECRET_CI",
+  "RECALL_QA_CONVEX_SECRET_MAINTAINER",
 ]);
 
 export type QaGatewayChildStateMutationContext = {
@@ -211,32 +211,32 @@ export function buildQaRuntimeEnv(params: {
           claudeCliAuthMode: params.claudeCliAuthMode,
         })
       : {}),
-    OPENCLAW_HOME: params.homeDir,
-    OPENCLAW_CONFIG_PATH: params.configPath,
-    OPENCLAW_STATE_DIR: params.stateDir,
-    OPENCLAW_OAUTH_DIR: path.join(params.stateDir, "credentials"),
-    OPENCLAW_GATEWAY_TOKEN: params.gatewayToken,
-    OPENCLAW_SKIP_BROWSER_CONTROL_SERVER: "1",
-    OPENCLAW_SKIP_GMAIL_WATCHER: "1",
-    OPENCLAW_SKIP_CANVAS_HOST: "1",
-    OPENCLAW_SKIP_STARTUP_MODEL_PREWARM: "1",
-    OPENCLAW_NO_RESPAWN: "1",
-    OPENCLAW_TEST_FAST: "1",
-    OPENCLAW_QA_PARENT_PID: String(process.pid),
-    OPENCLAW_QA_TEMP_ROOT: params.tempRoot,
+    RECALL_HOME: params.homeDir,
+    RECALL_CONFIG_PATH: params.configPath,
+    RECALL_STATE_DIR: params.stateDir,
+    RECALL_OAUTH_DIR: path.join(params.stateDir, "credentials"),
+    RECALL_GATEWAY_TOKEN: params.gatewayToken,
+    RECALL_SKIP_BROWSER_CONTROL_SERVER: "1",
+    RECALL_SKIP_GMAIL_WATCHER: "1",
+    RECALL_SKIP_CANVAS_HOST: "1",
+    RECALL_SKIP_STARTUP_MODEL_PREWARM: "1",
+    RECALL_NO_RESPAWN: "1",
+    RECALL_TEST_FAST: "1",
+    RECALL_QA_PARENT_PID: String(process.pid),
+    RECALL_QA_TEMP_ROOT: params.tempRoot,
     ...(params.stagedBundledPluginsRoot
-      ? { OPENCLAW_QA_STAGED_RUNTIME_ROOT: params.stagedBundledPluginsRoot }
+      ? { RECALL_QA_STAGED_RUNTIME_ROOT: params.stagedBundledPluginsRoot }
       : {}),
-    OPENCLAW_QA_ALLOW_LOCAL_IMAGE_PROVIDER: "1",
+    RECALL_QA_ALLOW_LOCAL_IMAGE_PROVIDER: "1",
     // QA uses the fast runtime envelope for speed, but it still exercises
     // normal config-driven heartbeats and runtime config writes.
-    OPENCLAW_ALLOW_SLOW_REPLY_TESTS: "1",
+    RECALL_ALLOW_SLOW_REPLY_TESTS: "1",
     XDG_CONFIG_HOME: params.xdgConfigHome,
     XDG_DATA_HOME: params.xdgDataHome,
     XDG_CACHE_HOME: params.xdgCacheHome,
-    ...(params.bundledPluginsDir ? { OPENCLAW_BUNDLED_PLUGINS_DIR: params.bundledPluginsDir } : {}),
+    ...(params.bundledPluginsDir ? { RECALL_BUNDLED_PLUGINS_DIR: params.bundledPluginsDir } : {}),
     ...(params.compatibilityHostVersion
-      ? { OPENCLAW_COMPATIBILITY_HOST_VERSION: params.compatibilityHostVersion }
+      ? { RECALL_COMPATIBILITY_HOST_VERSION: params.compatibilityHostVersion }
       : {}),
   };
   const normalizedEnv = normalizeQaProviderModeEnv(env, params.providerMode);
@@ -556,11 +556,11 @@ export async function startQaGatewayChild(params: {
   controlUiEnabled?: boolean;
   enabledPluginIds?: string[];
   forwardHostHome?: boolean;
-  mutateConfig?: (cfg: OpenClawConfig) => OpenClawConfig;
+  mutateConfig?: (cfg: RecallConfig) => RecallConfig;
   runtimeEnvPatch?: NodeJS.ProcessEnv;
 }) {
   const tempRoot = await fs.mkdtemp(
-    path.join(resolvePreferredOpenClawTmpDir(), "openclaw-qa-suite-"),
+    path.join(resolvePreferredRecallTmpDir(), "recall-qa-suite-"),
   );
   const runtimeCwd = tempRoot;
   const distEntryPath = path.join(params.repoRoot, "dist", "index.js");
@@ -575,7 +575,7 @@ export async function startQaGatewayChild(params: {
   const xdgConfigHome = path.join(tempRoot, "xdg-config");
   const xdgDataHome = path.join(tempRoot, "xdg-data");
   const xdgCacheHome = path.join(tempRoot, "xdg-cache");
-  const configPath = path.join(tempRoot, "openclaw.json");
+  const configPath = path.join(tempRoot, "recall.json");
   const gatewayToken = `qa-suite-${randomUUID()}`;
   await seedQaAgentWorkspace({
     workspaceDir,
@@ -666,12 +666,12 @@ export async function startQaGatewayChild(params: {
   const stderrLog = createWriteStream(stderrLogPath, { flags: "a" });
 
   const logs = () => output.text();
-  const keepTemp = process.env.OPENCLAW_QA_KEEP_TEMP === "1";
+  const keepTemp = process.env.RECALL_QA_KEEP_TEMP === "1";
   let gatewayPort = 0;
   let baseUrl = "";
   let wsUrl = "";
   let child: ReturnType<typeof spawn> | null = null;
-  let cfg!: OpenClawConfig;
+  let cfg!: RecallConfig;
   let rpcClient: Awaited<ReturnType<typeof startQaGatewayRpcClient>> | null = null;
   let stagedBundledPluginsRoot: string | null = null;
   let env: NodeJS.ProcessEnv | null = null;

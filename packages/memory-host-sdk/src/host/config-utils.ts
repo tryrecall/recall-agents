@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { normalizeLowercaseStringOrEmpty, normalizeOptionalString } from "./string-utils.js";
-export { splitShellArgs } from "./openclaw-runtime-io.js";
+export { splitShellArgs } from "./recall-runtime-io.js";
 
 export type ChatType = "direct" | "group" | "channel";
 export type MemoryBackend = "builtin" | "qmd";
@@ -112,7 +112,7 @@ type AgentConfig = {
   contextLimits?: AgentContextLimitsConfig;
 };
 
-export type OpenClawConfig = {
+export type RecallConfig = {
   agents?: {
     defaults?: {
       workspace?: string;
@@ -142,7 +142,7 @@ const INVALID_CHARS_RE = /[^a-z0-9_-]+/g;
 const LEADING_DASH_RE = /^-+/;
 const TRAILING_DASH_RE = /-+$/;
 const LEGACY_STATE_DIRNAMES = [".clawdbot"] as const;
-const NEW_STATE_DIRNAME = ".openclaw";
+const NEW_STATE_DIRNAME = ".recall";
 const DURATION_MULTIPLIERS: Record<string, number> = {
   ms: 1,
   s: 1000,
@@ -189,7 +189,7 @@ function resolveRequiredHomeDir(
   env: NodeJS.ProcessEnv = process.env,
   homedir: () => string = os.homedir,
 ): string {
-  const explicitHome = normalizeHomeValue(env.OPENCLAW_HOME);
+  const explicitHome = normalizeHomeValue(env.RECALL_HOME);
   const rawHome = explicitHome
     ? explicitHome.replace(/^~(?=$|[\\/])/, resolveRawOsHomeDir(env, homedir) ?? "")
     : resolveRawOsHomeDir(env, homedir);
@@ -219,13 +219,13 @@ export function resolveStateDir(
   env: NodeJS.ProcessEnv = process.env,
   homedir: () => string = os.homedir,
 ): string {
-  const override = env.OPENCLAW_STATE_DIR?.trim();
+  const override = env.RECALL_STATE_DIR?.trim();
   if (override) {
     return resolveUserPath(override, env, homedir);
   }
   const effectiveHome = () => resolveRequiredHomeDir(env, homedir);
   const nextDir = path.join(effectiveHome(), NEW_STATE_DIRNAME);
-  if (env.OPENCLAW_TEST_FAST === "1" || fs.existsSync(nextDir)) {
+  if (env.RECALL_TEST_FAST === "1" || fs.existsSync(nextDir)) {
     return nextDir;
   }
   const existingLegacy = legacyStateDirs(effectiveHome).find((dir) => {
@@ -240,20 +240,20 @@ export function resolveStateDir(
 
 function resolveDefaultAgentWorkspaceDir(env: NodeJS.ProcessEnv = process.env): string {
   const home = resolveRequiredHomeDir(env, os.homedir);
-  const profile = env.OPENCLAW_PROFILE?.trim();
+  const profile = env.RECALL_PROFILE?.trim();
   if (profile && normalizeLowercaseStringOrEmpty(profile) !== "default") {
-    return path.join(home, ".openclaw", `workspace-${profile}`);
+    return path.join(home, ".recall", `workspace-${profile}`);
   }
-  return path.join(home, ".openclaw", "workspace");
+  return path.join(home, ".recall", "workspace");
 }
 
-function listAgentEntries(cfg: OpenClawConfig): AgentConfig[] {
+function listAgentEntries(cfg: RecallConfig): AgentConfig[] {
   return Array.isArray(cfg.agents?.list)
     ? cfg.agents.list.filter((entry): entry is AgentConfig => Boolean(entry))
     : [];
 }
 
-function resolveDefaultAgentId(cfg: OpenClawConfig): string {
+function resolveDefaultAgentId(cfg: RecallConfig): string {
   const agents = listAgentEntries(cfg);
   if (agents.length === 0) {
     return DEFAULT_AGENT_ID;
@@ -262,7 +262,7 @@ function resolveDefaultAgentId(cfg: OpenClawConfig): string {
   return normalizeAgentId(chosen || DEFAULT_AGENT_ID);
 }
 
-function resolveAgentConfig(cfg: OpenClawConfig, agentId: string): AgentConfig | undefined {
+function resolveAgentConfig(cfg: RecallConfig, agentId: string): AgentConfig | undefined {
   const id = normalizeAgentId(agentId);
   return listAgentEntries(cfg).find((entry) => normalizeAgentId(entry.id) === id);
 }
@@ -272,7 +272,7 @@ function stripNullBytes(value: string): string {
 }
 
 export function resolveAgentWorkspaceDir(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   agentId: string,
   env: NodeJS.ProcessEnv = process.env,
 ): string {
@@ -294,7 +294,7 @@ export function resolveAgentWorkspaceDir(
 }
 
 export function resolveAgentContextLimits(
-  cfg: OpenClawConfig | undefined,
+  cfg: RecallConfig | undefined,
   agentId?: string | null,
 ): AgentContextLimitsConfig | undefined {
   const defaults = cfg?.agents?.defaults?.contextLimits;
@@ -305,7 +305,7 @@ export function resolveAgentContextLimits(
 }
 
 export function resolveMemorySearchConfig(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   agentId: string,
 ): { enabled: boolean; extraPaths: string[] } | null {
   const defaults = cfg.agents?.defaults?.memorySearch;

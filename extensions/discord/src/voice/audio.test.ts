@@ -6,8 +6,8 @@ describe("discord voice opus decoder selection", () => {
   it("defaults to the pure-JS opusscript decoder", async () => {
     const verbose: string[] = [];
     const warnings: string[] = [];
-    const previousPreference = process.env.OPENCLAW_DISCORD_OPUS_DECODER;
-    delete process.env.OPENCLAW_DISCORD_OPUS_DECODER;
+    const previousPreference = process.env.RECALL_DISCORD_OPUS_DECODER;
+    delete process.env.RECALL_DISCORD_OPUS_DECODER;
 
     try {
       const decoded = await decodeOpusStream(Readable.from([]), {
@@ -20,16 +20,16 @@ describe("discord voice opus decoder selection", () => {
       expect(warnings).toEqual([]);
     } finally {
       if (previousPreference === undefined) {
-        delete process.env.OPENCLAW_DISCORD_OPUS_DECODER;
+        delete process.env.RECALL_DISCORD_OPUS_DECODER;
       } else {
-        process.env.OPENCLAW_DISCORD_OPUS_DECODER = previousPreference;
+        process.env.RECALL_DISCORD_OPUS_DECODER = previousPreference;
       }
     }
   });
 
   it("requires an explicit preference for native opus", () => {
-    const previousPreference = process.env.OPENCLAW_DISCORD_OPUS_DECODER;
-    delete process.env.OPENCLAW_DISCORD_OPUS_DECODER;
+    const previousPreference = process.env.RECALL_DISCORD_OPUS_DECODER;
+    delete process.env.RECALL_DISCORD_OPUS_DECODER;
 
     try {
       expect(resolveOpusDecoderPreference()).toBe("opusscript");
@@ -38,9 +38,9 @@ describe("discord voice opus decoder selection", () => {
       expect(resolveOpusDecoderPreference("@discordjs/opus")).toBe("native");
     } finally {
       if (previousPreference === undefined) {
-        delete process.env.OPENCLAW_DISCORD_OPUS_DECODER;
+        delete process.env.RECALL_DISCORD_OPUS_DECODER;
       } else {
-        process.env.OPENCLAW_DISCORD_OPUS_DECODER = previousPreference;
+        process.env.RECALL_DISCORD_OPUS_DECODER = previousPreference;
       }
     }
   });

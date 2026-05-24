@@ -1,4 +1,4 @@
-# OpenClaw QA Scenarios
+# Recall QA Scenarios
 
 Canonical scenario source now lives in:
 

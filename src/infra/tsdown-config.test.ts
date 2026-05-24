@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { bundledPluginRoot } from "openclaw/plugin-sdk/test-fixtures";
+import { bundledPluginRoot } from "recall/plugin-sdk/test-fixtures";
 import { describe, expect, it } from "vitest";
 import tsdownConfig from "../../tsdown.config.ts";
 
@@ -236,8 +236,8 @@ describe("tsdown config", () => {
       throw new Error("expected unified graph alwaysBundle predicate");
     }
 
-    expect(alwaysBundle("@openclaw/fs-safe")).toBe(true);
-    expect(alwaysBundle("@openclaw/fs-safe/path")).toBe(true);
+    expect(alwaysBundle("@recall/fs-safe")).toBe(true);
+    expect(alwaysBundle("@recall/fs-safe/path")).toBe(true);
     expect(alwaysBundle("zod")).toBe(true);
     expect(alwaysBundle("zod/v4/core")).toBe(true);
     expect(alwaysBundle("not-a-runtime-dependency")).toBe(false);

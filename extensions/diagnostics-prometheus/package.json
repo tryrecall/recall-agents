@@ -1,22 +1,22 @@
 {
-  "name": "@openclaw/diagnostics-prometheus",
+  "name": "@recall/diagnostics-prometheus",
   "version": "2026.5.22",
-  "description": "OpenClaw diagnostics Prometheus exporter",
+  "description": "Recall diagnostics Prometheus exporter",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/tryrecall/recall-agents"
   },
   "type": "module",
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@recall/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "recall": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "clawhubSpec": "clawhub:@openclaw/diagnostics-prometheus",
-      "npmSpec": "@openclaw/diagnostics-prometheus",
+      "clawhubSpec": "clawhub:@recall/diagnostics-prometheus",
+      "npmSpec": "@recall/diagnostics-prometheus",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.25"
     },

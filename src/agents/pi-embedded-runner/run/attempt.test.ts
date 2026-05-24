@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("../context-engine-capabilities.js", () => ({
   resolveContextEngineCapabilities: async () => ({ llm: undefined }),
 }));
-import type { OpenClawConfig } from "../../../config/config.js";
+import type { RecallConfig } from "../../../config/config.js";
 import { addSession, resetProcessRegistryForTests } from "../../bash-process-registry.js";
 import { createProcessSessionFixture } from "../../bash-process-registry.test-helpers.js";
 import { SYSTEM_PROMPT_CACHE_BOUNDARY } from "../../system-prompt-cache-boundary.js";
@@ -433,7 +433,7 @@ describe("normalizeMessagesForLlmBoundary", () => {
     const input = [
       {
         role: "custom",
-        customType: "openclaw.runtime-context",
+        customType: "recall.runtime-context",
         content: "old secret runtime context",
         display: false,
         timestamp: 0,
@@ -445,7 +445,7 @@ describe("normalizeMessagesForLlmBoundary", () => {
       },
       {
         role: "custom",
-        customType: "openclaw.runtime-context",
+        customType: "recall.runtime-context",
         content: "secret runtime context",
         display: false,
         timestamp: 2,
@@ -691,7 +691,7 @@ describe("composeSystemPromptWithHookContext", () => {
 
   it("keeps bootstrap truncation notices in the system prompt instead of the user prompt", () => {
     const baseSystemPrompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/openclaw",
+      workspaceDir: "/tmp/recall",
       contextFiles: [{ path: "AGENTS.md", content: "Follow AGENTS guidance." }],
       toolNames: ["read"],
       bootstrapTruncationNotice:
@@ -1121,7 +1121,7 @@ describe("resolveEmbeddedAgentStreamFn", () => {
 
 describe("resolveAttemptFsWorkspaceOnly", () => {
   it("uses global tools.fs.workspaceOnly when agent has no override", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       tools: {
         fs: { workspaceOnly: true },
       },
@@ -1136,7 +1136,7 @@ describe("resolveAttemptFsWorkspaceOnly", () => {
   });
 
   it("prefers agent-specific tools.fs.workspaceOnly override", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: RecallConfig = {
       tools: {
         fs: { workspaceOnly: true },
       },
@@ -2478,7 +2478,7 @@ describe("wrapStreamFnSanitizeMalformedToolCalls", () => {
     expect(repairedToolResult.content).toEqual([
       {
         type: "text",
-        text: "[openclaw] missing tool result in session history; inserted synthetic error result for transcript repair.",
+        text: "[recall] missing tool result in session history; inserted synthetic error result for transcript repair.",
       },
     ]);
     expect(repairedToolResult.isError).toBe(true);
@@ -3637,7 +3637,7 @@ describe("buildAfterTurnRuntimeContext", () => {
       const legacy = buildAfterTurnRuntimeContext({
         attempt: {
           sessionId: "session-123",
-          config: {} as OpenClawConfig,
+          config: {} as RecallConfig,
           skillsSnapshot: undefined,
           provider: "openai-codex",
           modelId: "gpt-5.4",
@@ -3675,7 +3675,7 @@ describe("buildAfterTurnRuntimeContext", () => {
         messageProvider: "slack",
         agentAccountId: "acct-1",
         authProfileId: "openai:p1",
-        config: {} as OpenClawConfig,
+        config: {} as RecallConfig,
         skillsSnapshot: undefined,
         provider: "openai-codex",
         modelId: "gpt-5.4",
@@ -3708,7 +3708,7 @@ describe("buildAfterTurnRuntimeContext", () => {
               },
             },
           },
-        } as OpenClawConfig,
+        } as RecallConfig,
         skillsSnapshot: undefined,
         provider: "openai-codex",
         modelId: "gpt-5.4",
@@ -3746,7 +3746,7 @@ describe("buildAfterTurnRuntimeContext", () => {
         messageProvider: "slack",
         agentAccountId: "acct-1",
         authProfileId: "openai:p1",
-        config: { plugins: { slots: { contextEngine: "lossless-claw" } } } as OpenClawConfig,
+        config: { plugins: { slots: { contextEngine: "lossless-claw" } } } as RecallConfig,
         skillsSnapshot: undefined,
         provider: "openai-codex",
         modelId: "gpt-5.4",
@@ -3788,7 +3788,7 @@ describe("buildAfterTurnRuntimeContext", () => {
         messageProvider: "slack",
         agentAccountId: "acct-1",
         authProfileId: "openai:p1",
-        config: { plugins: { slots: { contextEngine: "lossless-claw" } } } as OpenClawConfig,
+        config: { plugins: { slots: { contextEngine: "lossless-claw" } } } as RecallConfig,
         skillsSnapshot: undefined,
         provider: "openai-codex",
         modelId: "gpt-5.4",
@@ -3819,7 +3819,7 @@ describe("buildAfterTurnRuntimeContext", () => {
         currentThreadTs: "thread-9",
         currentMessageId: "msg-42",
         authProfileId: "openai:p1",
-        config: {} as OpenClawConfig,
+        config: {} as RecallConfig,
         skillsSnapshot: undefined,
         senderId: "user-123",
         provider: "openai-codex",

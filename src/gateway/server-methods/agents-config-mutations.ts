@@ -8,7 +8,7 @@ import {
 import { mutateConfigFileWithRetry } from "../../config/config.js";
 import { resolveSessionTranscriptsDirForAgent } from "../../config/sessions.js";
 import type { IdentityConfig } from "../../config/types.base.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 
 export type AgentDeleteMutationResult = {
   workspaceDir: string;
@@ -31,7 +31,7 @@ export class AgentConfigPreconditionError extends Error {
   }
 }
 
-export function isConfiguredAgent(cfg: OpenClawConfig, agentId: string): boolean {
+export function isConfiguredAgent(cfg: RecallConfig, agentId: string): boolean {
   return findAgentEntryIndex(listAgentEntries(cfg), agentId) >= 0;
 }
 
@@ -88,7 +88,7 @@ export async function updateAgentConfigEntry(params: {
 }
 
 export async function deleteAgentConfigEntry(params: { agentId: string }): Promise<{
-  nextConfig: OpenClawConfig;
+  nextConfig: RecallConfig;
   result: AgentDeleteMutationResult | undefined;
 }> {
   const committed = await mutateConfigFileWithRetry<AgentDeleteMutationResult>({

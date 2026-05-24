@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import {
   providerSupportsNativePdfDocument,
   resolveAutoMediaKeyProviders,
@@ -16,7 +16,7 @@ import { hasProviderAuthForTool, resolveDefaultModelRef } from "./model-config.h
 import { coercePdfModelConfig } from "./pdf-tool.helpers.js";
 
 function resolveImageCandidateRefs(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   agentDir: string;
   workspaceDir?: string;
   authStore?: AuthProfileStore;
@@ -56,7 +56,7 @@ function resolveImageCandidateRefs(params: {
 }
 
 export function resolvePdfModelConfigForTool(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   agentDir: string;
   workspaceDir?: string;
   authStore?: AuthProfileStore;

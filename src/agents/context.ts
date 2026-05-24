@@ -2,7 +2,7 @@
 // the agent reports a model id. This includes custom models.json entries.
 
 import { getRuntimeConfig } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { computeBackoff, type BackoffPolicy } from "../infra/backoff.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 import { resolveDefaultAgentDir } from "./agent-scope.js";
@@ -105,7 +105,7 @@ function loadModelsConfigRuntime() {
   return CONTEXT_WINDOW_RUNTIME_STATE.modelsConfigRuntimeLoader.load();
 }
 
-function primeConfiguredContextWindows(): OpenClawConfig | undefined {
+function primeConfiguredContextWindows(): RecallConfig | undefined {
   if (CONTEXT_WINDOW_RUNTIME_STATE.configuredConfig) {
     applyConfiguredContextWindows({
       cache: MODEL_CONTEXT_TOKEN_CACHE,
@@ -152,7 +152,7 @@ export function ensureContextWindowCacheLoaded(): Promise<void> {
 
   CONTEXT_WINDOW_RUNTIME_STATE.loadPromise = (async () => {
     try {
-      await (await loadModelsConfigRuntime()).ensureOpenClawModelsJson(cfg);
+      await (await loadModelsConfigRuntime()).ensureRecallModelsJson(cfg);
     } catch {
       // Continue with best-effort discovery/overrides.
     }
@@ -242,7 +242,7 @@ function resolveProviderModelRef(params: {
 // keys overlap with raw slash-containing model IDs (e.g. OpenRouter's
 // "google/gemini-2.5-pro" stored as a raw catalog entry).
 function resolveConfiguredProviderContextTokens(
-  cfg: OpenClawConfig | undefined,
+  cfg: RecallConfig | undefined,
   provider: string,
   model: string,
 ): number | undefined {
@@ -354,7 +354,7 @@ function isClaudeOpus47Model(model: string): boolean {
 }
 
 export function resolveContextTokensForModel(params: {
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   provider?: string;
   model?: string;
   contextTokensOverride?: number;

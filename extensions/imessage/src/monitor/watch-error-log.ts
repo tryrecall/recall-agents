@@ -1,6 +1,6 @@
-import { isRecord } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { sanitizeTerminalText } from "openclaw/plugin-sdk/text-chunking";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+import { isRecord } from "recall/plugin-sdk/string-coerce-runtime";
+import { sanitizeTerminalText } from "recall/plugin-sdk/text-chunking";
+import { truncateUtf16Safe } from "recall/plugin-sdk/text-utility-runtime";
 
 const MAX_WATCH_ERROR_MESSAGE_CHARS = 200;
 

@@ -223,15 +223,15 @@ describe("qa tool coverage report", () => {
     );
   });
 
-  it("keeps searchable OpenClaw dynamic tool rows report-only by default", () => {
+  it("keeps searchable Recall dynamic tool rows report-only by default", () => {
     const report = buildQaToolCoverageReport({
       scenarios: [
         makeScenario("tool-searchable-web-search", "web-search", {
           toolName: "web_search",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
-            capabilityLayer: "openclaw-dynamic-searchable",
+            bucket: "recall-dynamic-integration",
+            expectedLayer: "recall-dynamic",
+            capabilityLayer: "recall-dynamic-searchable",
           },
         }),
       ],
@@ -278,22 +278,22 @@ describe("qa tool coverage report", () => {
     expect(report.searchableDynamicTools).toBe(1);
     expect(report.rows[0]).toEqual(
       expect.objectContaining({
-        capabilityLayer: "openclaw-dynamic-searchable",
+        capabilityLayer: "recall-dynamic-searchable",
         required: false,
         drift: "tool-call-shape",
       }),
     );
   });
 
-  it("passes required OpenClaw dynamic tool coverage when both runtimes exercise the tool", () => {
+  it("passes required Recall dynamic tool coverage when both runtimes exercise the tool", () => {
     const report = buildQaToolCoverageReport({
       scenarios: [
         makeScenario("tool-web-search", "web-search", {
           toolName: "web_search",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
-            capabilityLayer: "openclaw-dynamic-direct",
+            bucket: "recall-dynamic-integration",
+            expectedLayer: "recall-dynamic",
+            capabilityLayer: "recall-dynamic-direct",
             required: true,
           },
         }),
@@ -339,15 +339,15 @@ describe("qa tool coverage report", () => {
     expect(report.passingTools).toBe(1);
   });
 
-  it("fails required OpenClaw dynamic tool coverage when a runtime skips the tool", () => {
+  it("fails required Recall dynamic tool coverage when a runtime skips the tool", () => {
     const report = buildQaToolCoverageReport({
       scenarios: [
         makeScenario("tool-web-search", "web-search", {
           toolName: "web_search",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
-            capabilityLayer: "openclaw-dynamic-direct",
+            bucket: "recall-dynamic-integration",
+            expectedLayer: "recall-dynamic",
+            capabilityLayer: "recall-dynamic-direct",
             required: true,
           },
         }),
@@ -394,15 +394,15 @@ describe("qa tool coverage report", () => {
     ]);
   });
 
-  it("fails required OpenClaw dynamic tool coverage when the fixture failure mode is preserved", () => {
+  it("fails required Recall dynamic tool coverage when the fixture failure mode is preserved", () => {
     const report = buildQaToolCoverageReport({
       scenarios: [
         makeScenario("tool-web-search", "web-search", {
           toolName: "web_search",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
-            capabilityLayer: "openclaw-dynamic-direct",
+            bucket: "recall-dynamic-integration",
+            expectedLayer: "recall-dynamic",
+            capabilityLayer: "recall-dynamic-direct",
             required: true,
           },
         }),
@@ -454,9 +454,9 @@ describe("qa tool coverage report", () => {
       scenarios: [
         makeScenario("tool-web-search", "web-search", {
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
-            capabilityLayer: "openclaw-dynamic-direct",
+            bucket: "recall-dynamic-integration",
+            expectedLayer: "recall-dynamic",
+            capabilityLayer: "recall-dynamic-direct",
             required: true,
           },
         }),
@@ -491,7 +491,7 @@ describe("qa tool coverage report", () => {
         scenarios: [
           makeScenario("tool-bad-layer", "bad", {
             toolCoverage: {
-              bucket: "openclaw-dynamic-integration",
+              bucket: "recall-dynamic-integration",
               capabilityLayer: "everything-everywhere",
             },
           }),
@@ -551,8 +551,8 @@ describe("qa tool coverage report", () => {
     );
     expect(report.rows.find((row) => row.tool === "web-search")).toEqual(
       expect.objectContaining({
-        bucket: "openclaw-dynamic-integration",
-        capabilityLayer: "openclaw-dynamic-direct",
+        bucket: "recall-dynamic-integration",
+        capabilityLayer: "recall-dynamic-direct",
         required: true,
       }),
     );

@@ -1,5 +1,5 @@
-import { resolveChannelConfigWrites } from "openclaw/plugin-sdk/channel-config-writes";
-import type { ResolvedAgentRoute } from "openclaw/plugin-sdk/routing";
+import { resolveChannelConfigWrites } from "recall/plugin-sdk/channel-config-writes";
+import type { ResolvedAgentRoute } from "recall/plugin-sdk/routing";
 import { resolveFeishuRuntimeAccount } from "./accounts.js";
 import { createFeishuClient } from "./client.js";
 import { createFeishuCommentReplyDispatcher } from "./comment-dispatcher.js";

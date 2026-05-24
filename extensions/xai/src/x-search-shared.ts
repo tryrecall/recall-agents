@@ -1,5 +1,5 @@
-import { readProviderJsonObjectResponse } from "openclaw/plugin-sdk/provider-http";
-import { postTrustedWebToolsJson, wrapWebContent } from "openclaw/plugin-sdk/provider-web-search";
+import { readProviderJsonObjectResponse } from "recall/plugin-sdk/provider-http";
+import { postTrustedWebToolsJson, wrapWebContent } from "recall/plugin-sdk/provider-web-search";
 import {
   buildXaiResponsesToolBody,
   requireXaiResponseTextCitationsAndInline,

@@ -63,7 +63,7 @@ type DiscordUser = {
 
 const execFileAsync = promisify(execFile);
 
-type DriverMode = "token" | "webhook" | "openclaw";
+type DriverMode = "token" | "webhook" | "recall";
 
 type Args = {
   channelId: string;
@@ -138,7 +138,7 @@ function parseNumber(value: string | undefined, fallback: number, label: string)
 }
 
 function resolveStateDir(): string {
-  const override = process.env.OPENCLAW_STATE_DIR?.trim();
+  const override = process.env.RECALL_STATE_DIR?.trim();
   if (override) {
     if (override === "~") {
       return path.resolve(process.env.HOME || "");
@@ -148,8 +148,8 @@ function resolveStateDir(): string {
     }
     return path.resolve(override);
   }
-  const home = process.env.OPENCLAW_HOME?.trim() || process.env.HOME || "";
-  return path.join(home, ".openclaw");
+  const home = process.env.RECALL_HOME?.trim() || process.env.HOME || "";
+  return path.join(home, ".recall");
 }
 
 function resolveArg(flag: string): string | undefined {
@@ -171,11 +171,11 @@ function hasFlag(flag: string): boolean {
 
 function parseDriverMode(raw: string): DriverMode {
   const normalized = raw.trim().toLowerCase();
-  if (normalized === "token" || normalized === "webhook" || normalized === "openclaw") {
+  if (normalized === "token" || normalized === "webhook" || normalized === "recall") {
     return normalized;
   }
   throw new Error(
-    `Invalid --driver value ${JSON.stringify(raw)}; expected token, webhook, or openclaw.`,
+    `Invalid --driver value ${JSON.stringify(raw)}; expected token, webhook, or recall.`,
   );
 }
 
@@ -193,13 +193,13 @@ function safeErrorMessage(error: unknown): string {
 function usage(): string {
   return (
     "Usage: bun scripts/dev/discord-acp-plain-language-smoke.ts " +
-    "--channel <discord-channel-id> [--token <driver-token> | --driver webhook --bot-token <bot-token> | --driver openclaw] [options]\n\n" +
+    "--channel <discord-channel-id> [--token <driver-token> | --driver webhook --bot-token <bot-token> | --driver recall] [options]\n\n" +
     "Manual live smoke only (not CI). Sends a plain-language instruction in Discord and verifies:\n" +
-    "1) OpenClaw spawned an ACP thread binding\n" +
+    "1) Recall spawned an ACP thread binding\n" +
     "2) agent replied in that bound thread with the expected ACK token\n\n" +
     "Options:\n" +
     "  --channel <id>               Parent Discord channel id (required)\n" +
-    "  --driver <token|webhook|openclaw> Driver transport mode (default: token)\n" +
+    "  --driver <token|webhook|recall> Driver transport mode (default: token)\n" +
     "  --token <token>              Driver Discord token (required for driver=token)\n" +
     "  --token-prefix <prefix>      Auth prefix for --token (default: Bot)\n" +
     "  --bot-token <token>          Bot token for webhook driver mode\n" +
@@ -210,65 +210,65 @@ function usage(): string {
     "  --timeout-ms <n>             Total timeout in ms (default: 240000)\n" +
     "  --poll-ms <n>                Poll interval in ms (default: 1500)\n" +
     "  --thread-bindings-path <p>   Override thread-bindings json path\n" +
-    "  --openclaw-bin <path>        OpenClaw CLI binary for driver=openclaw (default: openclaw)\n" +
+    "  --recall-bin <path>        Recall CLI binary for driver=recall (default: recall)\n" +
     "  --json                       Emit JSON output\n" +
     "\n" +
     "Environment fallbacks:\n" +
-    "  OPENCLAW_DISCORD_SMOKE_CHANNEL_ID\n" +
-    "  OPENCLAW_DISCORD_SMOKE_DRIVER\n" +
-    "  OPENCLAW_DISCORD_SMOKE_DRIVER_TOKEN\n" +
-    "  OPENCLAW_DISCORD_SMOKE_DRIVER_TOKEN_PREFIX\n" +
-    "  OPENCLAW_DISCORD_SMOKE_BOT_TOKEN\n" +
-    "  OPENCLAW_DISCORD_SMOKE_BOT_TOKEN_PREFIX\n" +
-    "  OPENCLAW_DISCORD_SMOKE_AGENT\n" +
-    "  OPENCLAW_DISCORD_SMOKE_MENTION_USER_ID\n" +
-    "  OPENCLAW_DISCORD_SMOKE_TIMEOUT_MS\n" +
-    "  OPENCLAW_DISCORD_SMOKE_POLL_MS\n" +
-    "  OPENCLAW_DISCORD_SMOKE_THREAD_BINDINGS_PATH\n" +
-    "  OPENCLAW_DISCORD_SMOKE_OPENCLAW_BIN"
+    "  RECALL_DISCORD_SMOKE_CHANNEL_ID\n" +
+    "  RECALL_DISCORD_SMOKE_DRIVER\n" +
+    "  RECALL_DISCORD_SMOKE_DRIVER_TOKEN\n" +
+    "  RECALL_DISCORD_SMOKE_DRIVER_TOKEN_PREFIX\n" +
+    "  RECALL_DISCORD_SMOKE_BOT_TOKEN\n" +
+    "  RECALL_DISCORD_SMOKE_BOT_TOKEN_PREFIX\n" +
+    "  RECALL_DISCORD_SMOKE_AGENT\n" +
+    "  RECALL_DISCORD_SMOKE_MENTION_USER_ID\n" +
+    "  RECALL_DISCORD_SMOKE_TIMEOUT_MS\n" +
+    "  RECALL_DISCORD_SMOKE_POLL_MS\n" +
+    "  RECALL_DISCORD_SMOKE_THREAD_BINDINGS_PATH\n" +
+    "  RECALL_DISCORD_SMOKE_RECALL_BIN"
   );
 }
 
 function parseArgs(): Args {
-  const channelId = resolveArg("--channel") || process.env.OPENCLAW_DISCORD_SMOKE_CHANNEL_ID || "";
+  const channelId = resolveArg("--channel") || process.env.RECALL_DISCORD_SMOKE_CHANNEL_ID || "";
   const driverModeRaw =
-    resolveArg("--driver") || process.env.OPENCLAW_DISCORD_SMOKE_DRIVER || "token";
+    resolveArg("--driver") || process.env.RECALL_DISCORD_SMOKE_DRIVER || "token";
   const driverMode = parseDriverMode(driverModeRaw);
   const driverToken =
-    resolveArg("--token") || process.env.OPENCLAW_DISCORD_SMOKE_DRIVER_TOKEN || "";
+    resolveArg("--token") || process.env.RECALL_DISCORD_SMOKE_DRIVER_TOKEN || "";
   const driverTokenPrefix =
-    resolveArg("--token-prefix") || process.env.OPENCLAW_DISCORD_SMOKE_DRIVER_TOKEN_PREFIX || "Bot";
+    resolveArg("--token-prefix") || process.env.RECALL_DISCORD_SMOKE_DRIVER_TOKEN_PREFIX || "Bot";
   const botToken =
     resolveArg("--bot-token") ||
-    process.env.OPENCLAW_DISCORD_SMOKE_BOT_TOKEN ||
+    process.env.RECALL_DISCORD_SMOKE_BOT_TOKEN ||
     process.env.DISCORD_BOT_TOKEN ||
     "";
   const botTokenPrefix =
     resolveArg("--bot-token-prefix") ||
-    process.env.OPENCLAW_DISCORD_SMOKE_BOT_TOKEN_PREFIX ||
+    process.env.RECALL_DISCORD_SMOKE_BOT_TOKEN_PREFIX ||
     "Bot";
-  const targetAgent = resolveArg("--agent") || process.env.OPENCLAW_DISCORD_SMOKE_AGENT || "codex";
+  const targetAgent = resolveArg("--agent") || process.env.RECALL_DISCORD_SMOKE_AGENT || "codex";
   const mentionUserId =
-    resolveArg("--mention") || process.env.OPENCLAW_DISCORD_SMOKE_MENTION_USER_ID || undefined;
+    resolveArg("--mention") || process.env.RECALL_DISCORD_SMOKE_MENTION_USER_ID || undefined;
   const instruction =
-    resolveArg("--instruction") || process.env.OPENCLAW_DISCORD_SMOKE_INSTRUCTION || undefined;
+    resolveArg("--instruction") || process.env.RECALL_DISCORD_SMOKE_INSTRUCTION || undefined;
   const timeoutMs = parseNumber(
-    resolveArg("--timeout-ms") || process.env.OPENCLAW_DISCORD_SMOKE_TIMEOUT_MS,
+    resolveArg("--timeout-ms") || process.env.RECALL_DISCORD_SMOKE_TIMEOUT_MS,
     240_000,
     "--timeout-ms",
   );
   const pollMs = parseNumber(
-    resolveArg("--poll-ms") || process.env.OPENCLAW_DISCORD_SMOKE_POLL_MS,
+    resolveArg("--poll-ms") || process.env.RECALL_DISCORD_SMOKE_POLL_MS,
     1_500,
     "--poll-ms",
   );
   const defaultBindingsPath = path.join(resolveStateDir(), "discord", "thread-bindings.json");
   const threadBindingsPath =
     resolveArg("--thread-bindings-path") ||
-    process.env.OPENCLAW_DISCORD_SMOKE_THREAD_BINDINGS_PATH ||
+    process.env.RECALL_DISCORD_SMOKE_THREAD_BINDINGS_PATH ||
     defaultBindingsPath;
   const openclawBin =
-    resolveArg("--openclaw-bin") || process.env.OPENCLAW_DISCORD_SMOKE_OPENCLAW_BIN || "openclaw";
+    resolveArg("--recall-bin") || process.env.RECALL_DISCORD_SMOKE_RECALL_BIN || "recall";
   const json = hasFlag("--json");
 
   if (!channelId) {
@@ -306,7 +306,7 @@ async function openclawCliJson<T>(params: { openclawBin: string; args: string[] 
   });
   const stdout = (result.stdout || "").trim();
   if (!stdout) {
-    throw new Error(`openclaw ${params.args.join(" ")} returned empty stdout`);
+    throw new Error(`recall ${params.args.join(" ")} returned empty stdout`);
   }
   return JSON.parse(stdout) as T;
 }
@@ -502,7 +502,7 @@ async function loadParentRecentMessages(params: {
   args: Args;
   readAuthHeader: string;
 }): Promise<DiscordMessage[]> {
-  if (params.args.driverMode === "openclaw") {
+  if (params.args.driverMode === "recall") {
     return await readMessagesWithOpenclaw({
       openclawBin: params.args.openclawBin,
       target: params.args.channelId,
@@ -636,7 +636,7 @@ async function run(): Promise<SuccessResult | FailureResult> {
         path: `/channels/${encodeURIComponent(args.channelId)}/webhooks`,
         authHeader: botAuthHeader,
         body: {
-          name: `openclaw-acp-smoke-${smokeId.slice(-8)}`,
+          name: `recall-acp-smoke-${smokeId.slice(-8)}`,
         },
       });
       if (!webhook.id || !webhook.token) {
@@ -688,7 +688,7 @@ async function run(): Promise<SuccessResult | FailureResult> {
       });
       sentMessageId = sent.payload?.result?.messageId || "";
       if (!sentMessageId) {
-        throw new Error("openclaw message send did not return payload.result.messageId");
+        throw new Error("recall message send did not return payload.result.messageId");
       }
     }
   } catch (err) {
@@ -754,7 +754,7 @@ async function run(): Promise<SuccessResult | FailureResult> {
     while (Date.now() < deadline && !ackMessage) {
       try {
         const threadMessages =
-          args.driverMode === "openclaw"
+          args.driverMode === "recall"
             ? await readMessagesWithOpenclaw({
                 openclawBin: args.openclawBin,
                 target: threadId,
@@ -793,7 +793,7 @@ async function run(): Promise<SuccessResult | FailureResult> {
         ok: false,
         stage: "wait-ack",
         smokeId,
-        error: `Thread bound (${threadId}) but timed out waiting for ACK token "${ackToken}" from OpenClaw.`,
+        error: `Thread bound (${threadId}) but timed out waiting for ACK token "${ackToken}" from Recall.`,
         diagnostics: {
           bindingCandidates: [
             {

@@ -3,17 +3,17 @@ import type { Bot } from "grammy";
 import {
   appendSessionTranscriptMessage,
   emitSessionTranscriptUpdate,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "recall/plugin-sdk/agent-harness-runtime";
 import {
   DEFAULT_TIMING,
   logAckFailure,
   logTypingFailure,
   removeAckReactionAfterReply,
-} from "openclaw/plugin-sdk/channel-feedback";
+} from "recall/plugin-sdk/channel-feedback";
 import {
   createChannelMessageReplyPipeline,
   deriveDurableFinalDeliveryRequirements,
-} from "openclaw/plugin-sdk/channel-message";
+} from "recall/plugin-sdk/channel-message";
 import {
   buildChannelProgressDraftLineForEntry,
   createChannelProgressDraftGate,
@@ -29,30 +29,30 @@ import {
   resolveChannelStreamingPreviewNativeToolProgressAllowFrom,
   resolveChannelStreamingPreviewToolProgress,
   resolveTranscriptBackedChannelFinalText,
-} from "openclaw/plugin-sdk/channel-streaming";
+} from "recall/plugin-sdk/channel-streaming";
 import type {
-  OpenClawConfig,
+  RecallConfig,
   ReplyToMode,
   TelegramAccountConfig,
-} from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { runInboundReplyTurn } from "openclaw/plugin-sdk/inbound-reply-dispatch";
-import { normalizeMessagePresentation } from "openclaw/plugin-sdk/interactive-runtime";
+} from "recall/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "recall/plugin-sdk/error-runtime";
+import { runInboundReplyTurn } from "recall/plugin-sdk/inbound-reply-dispatch";
+import { normalizeMessagePresentation } from "recall/plugin-sdk/interactive-runtime";
 import {
   createOutboundPayloadPlan,
   projectOutboundPayloadPlanForDelivery,
-} from "openclaw/plugin-sdk/outbound-runtime";
-import { chunkMarkdownTextWithMode } from "openclaw/plugin-sdk/reply-chunking";
-import { createChannelHistoryWindow } from "openclaw/plugin-sdk/reply-history";
-import { resolveSendableOutboundReplyParts } from "openclaw/plugin-sdk/reply-payload";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-payload";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/outbound-runtime";
+import { chunkMarkdownTextWithMode } from "recall/plugin-sdk/reply-chunking";
+import { createChannelHistoryWindow } from "recall/plugin-sdk/reply-history";
+import { resolveSendableOutboundReplyParts } from "recall/plugin-sdk/reply-payload";
+import type { ReplyPayload } from "recall/plugin-sdk/reply-payload";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime-env";
 import {
   createSubsystemLogger,
   danger,
   logVerbose,
   sleepWithAbort,
-} from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/runtime-env";
 import { resolveTelegramConfigReasoningDefault } from "./agent-config.js";
 import { normalizeAllowFrom } from "./bot-access.js";
 import type { TelegramBotDeps } from "./bot-deps.js";
@@ -204,7 +204,7 @@ function canUseNativeToolProgressDraftForChat(params: {
   return normalized.hasWildcard || normalized.entries.includes(String(params.chatId));
 }
 
-async function resolveStickerVisionSupport(cfg: OpenClawConfig, agentId: string) {
+async function resolveStickerVisionSupport(cfg: RecallConfig, agentId: string) {
   try {
     const catalog = await loadModelCatalog({ config: cfg });
     const defaultModel = resolveDefaultModelForAgent({ cfg, agentId });
@@ -221,7 +221,7 @@ async function resolveStickerVisionSupport(cfg: OpenClawConfig, agentId: string)
 type DispatchTelegramMessageParams = {
   context: TelegramMessageContext;
   bot: Bot;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   runtime: RuntimeEnv;
   replyToMode: ReplyToMode;
   streamMode: TelegramStreamMode;
@@ -236,7 +236,7 @@ type TelegramReasoningLevel = "off" | "on" | "stream";
 type TelegramTranscriptMirrorPayload = { text?: string; mediaUrls?: string[] };
 
 function resolveTelegramReasoningLevel(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionKey?: string;
   agentId: string;
   telegramDeps: TelegramBotDeps;
@@ -281,7 +281,7 @@ function resolveTelegramMirroredTranscriptText(
 }
 
 async function mirrorTelegramAssistantReplyToTranscript(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   route: TelegramMessageContext["route"];
   sessionKey: string;
   telegramDeps: TelegramBotDeps;
@@ -317,7 +317,7 @@ async function mirrorTelegramAssistantReplyToTranscript(params: {
     role: "assistant" as const,
     content: [{ type: "text" as const, text }],
     api: "openai-responses",
-    provider: "openclaw",
+    provider: "recall",
     model: "delivery-mirror",
     usage: {
       input: 0,

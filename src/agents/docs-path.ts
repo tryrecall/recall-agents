@@ -1,11 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
-import { resolveOpenClawPackageRoot } from "../infra/openclaw-root.js";
+import { resolveRecallPackageRoot } from "../infra/recall-root.js";
 
-export const OPENCLAW_DOCS_URL = "https://docs.openclaw.ai";
-export const OPENCLAW_SOURCE_URL = "https://github.com/openclaw/openclaw";
+export const RECALL_DOCS_URL = "https://docs.recall.ai";
+export const RECALL_SOURCE_URL = "https://github.com/tryrecall/recall-agents";
 
-type ResolveOpenClawReferencePathParams = {
+type ResolveRecallReferencePathParams = {
   workspaceDir?: string;
   argv1?: string;
   cwd?: string;
@@ -20,7 +20,7 @@ function isGitCheckout(rootDir: string): boolean {
   return fs.existsSync(path.join(rootDir, ".git"));
 }
 
-export async function resolveOpenClawDocsPath(params: {
+export async function resolveRecallDocsPath(params: {
   workspaceDir?: string;
   argv1?: string;
   cwd?: string;
@@ -34,7 +34,7 @@ export async function resolveOpenClawDocsPath(params: {
     }
   }
 
-  const packageRoot = await resolveOpenClawPackageRoot({
+  const packageRoot = await resolveRecallPackageRoot({
     cwd: params.cwd,
     argv1: params.argv1,
     moduleUrl: params.moduleUrl,
@@ -47,10 +47,10 @@ export async function resolveOpenClawDocsPath(params: {
   return isUsableDocsDir(packageDocs) ? packageDocs : null;
 }
 
-export async function resolveOpenClawSourcePath(
-  params: ResolveOpenClawReferencePathParams,
+export async function resolveRecallSourcePath(
+  params: ResolveRecallReferencePathParams,
 ): Promise<string | null> {
-  const packageRoot = await resolveOpenClawPackageRoot({
+  const packageRoot = await resolveRecallPackageRoot({
     cwd: params.cwd,
     argv1: params.argv1,
     moduleUrl: params.moduleUrl,
@@ -61,15 +61,15 @@ export async function resolveOpenClawSourcePath(
   return packageRoot;
 }
 
-export async function resolveOpenClawReferencePaths(
-  params: ResolveOpenClawReferencePathParams,
+export async function resolveRecallReferencePaths(
+  params: ResolveRecallReferencePathParams,
 ): Promise<{
   docsPath: string | null;
   sourcePath: string | null;
 }> {
   const [docsPath, sourcePath] = await Promise.all([
-    resolveOpenClawDocsPath(params),
-    resolveOpenClawSourcePath(params),
+    resolveRecallDocsPath(params),
+    resolveRecallSourcePath(params),
   ]);
   return { docsPath, sourcePath };
 }

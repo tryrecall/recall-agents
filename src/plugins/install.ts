@@ -15,8 +15,8 @@ import {
   type ManagedNpmRootPeerDependencySnapshot,
   readManagedNpmRootInstalledDependency,
   readManagedNpmRootPeerDependencySnapshot,
-  readOpenClawManagedNpmRootOverrides,
-  repairManagedNpmRootOpenClawPeer,
+  readRecallManagedNpmRootOverrides,
+  repairManagedNpmRootRecallPeer,
   removeManagedNpmRootDependency,
   resolveManagedNpmRootDependencySpec,
   restoreManagedNpmRootPeerDependencySnapshot,
@@ -25,7 +25,7 @@ import {
   type ManagedNpmRootInstalledDependency,
 } from "../infra/npm-managed-root.js";
 import {
-  compareOpenClawReleaseVersions,
+  compareRecallReleaseVersions,
   formatPrereleaseResolutionError,
   isExactSemverVersion,
   isPrereleaseSemverVersion,
@@ -34,7 +34,7 @@ import {
   validateRegistryNpmSpec,
   type ParsedRegistryNpmSpec,
 } from "../infra/npm-registry-spec.js";
-import { installedPackageNeedsOpenClawPeerLinkRepair } from "../infra/package-update-utils.js";
+import { installedPackageNeedsRecallPeerLinkRepair } from "../infra/package-update-utils.js";
 import {
   createSafeNpmInstallArgs,
   createSafeNpmInstallEnv,
@@ -60,8 +60,8 @@ import {
 } from "./manifest.js";
 import { validatePackageExtensionEntriesForInstall } from "./package-entry-resolution.js";
 import {
-  linkOpenClawPeerDependencies,
-  relinkOpenClawPeerDependenciesInManagedNpmRoot,
+  linkRecallPeerDependencies,
+  relinkRecallPeerDependenciesInManagedNpmRoot,
 } from "./plugin-peer-link.js";
 
 export { resolvePluginInstallDir } from "./install-paths.js";
@@ -83,8 +83,8 @@ type PackageManifest = PluginPackageManifest & {
   peerDependencies?: Record<string, string>;
 };
 
-function formatUnresolvedOpenClawPeerLinkError(packageName: string): string {
-  return `Installed plugin ${packageName} declares openclaw as a peer dependency, but OpenClaw could not create a plugin-local node_modules/openclaw link. Run from a packaged OpenClaw install or reinstall OpenClaw, then retry.`;
+function formatUnresolvedRecallPeerLinkError(packageName: string): string {
+  return `Installed plugin ${packageName} declares recall as a peer dependency, but Recall could not create a plugin-local node_modules/recall link. Run from a packaged Recall install or reinstall Recall, then retry.`;
 }
 
 function isNpmAliasOverrideComparatorError(result: { stdout: string; stderr: string }): boolean {
@@ -92,10 +92,10 @@ function isNpmAliasOverrideComparatorError(result: { stdout: string; stderr: str
 }
 
 const MISSING_EXTENSIONS_ERROR =
-  'package.json missing openclaw.extensions; update the plugin package to include openclaw.extensions (for example ["./dist/index.js"]). See https://docs.openclaw.ai/help/troubleshooting#plugin-install-fails-with-missing-openclaw-extensions';
+  'package.json missing recall.extensions; update the plugin package to include recall.extensions (for example ["./dist/index.js"]). See https://docs.recall.ai/help/troubleshooting#plugin-install-fails-with-missing-recall-extensions';
 const PLUGIN_ARCHIVE_ROOT_MARKERS = [
   "package.json",
-  "openclaw.plugin.json",
+  "recall.plugin.json",
   ".codex-plugin/plugin.json",
   ".claude-plugin/plugin.json",
   ".cursor-plugin/plugin.json",
@@ -107,10 +107,10 @@ export const PLUGIN_INSTALL_ERROR_CODE = {
   INVALID_MIN_HOST_VERSION: "invalid_min_host_version",
   UNKNOWN_HOST_VERSION: "unknown_host_version",
   INCOMPATIBLE_HOST_VERSION: "incompatible_host_version",
-  MISSING_OPENCLAW_EXTENSIONS: "missing_openclaw_extensions",
+  MISSING_RECALL_EXTENSIONS: "missing_openclaw_extensions",
   MISSING_PLUGIN_MANIFEST: "missing_plugin_manifest",
-  EMPTY_OPENCLAW_EXTENSIONS: "empty_openclaw_extensions",
-  INVALID_OPENCLAW_EXTENSIONS: "invalid_openclaw_extensions",
+  EMPTY_RECALL_EXTENSIONS: "empty_openclaw_extensions",
+  INVALID_RECALL_EXTENSIONS: "invalid_openclaw_extensions",
   NPM_PACKAGE_NOT_FOUND: "npm_package_not_found",
   PLUGIN_ID_MISMATCH: "plugin_id_mismatch",
   SECURITY_SCAN_BLOCKED: "security_scan_blocked",
@@ -147,7 +147,7 @@ type PluginInstallPolicyRequest = {
 
 const defaultLogger: PluginInstallLogger = {};
 
-function ensureOpenClawExtensions(params: { manifest: PackageManifest }):
+function ensureRecallExtensions(params: { manifest: PackageManifest }):
   | {
       ok: true;
       entries: string[];
@@ -162,21 +162,21 @@ function ensureOpenClawExtensions(params: { manifest: PackageManifest }):
     return {
       ok: false,
       error: MISSING_EXTENSIONS_ERROR,
-      code: PLUGIN_INSTALL_ERROR_CODE.MISSING_OPENCLAW_EXTENSIONS,
+      code: PLUGIN_INSTALL_ERROR_CODE.MISSING_RECALL_EXTENSIONS,
     };
   }
   if (resolved.status === "empty") {
     return {
       ok: false,
-      error: "package.json openclaw.extensions is empty",
-      code: PLUGIN_INSTALL_ERROR_CODE.EMPTY_OPENCLAW_EXTENSIONS,
+      error: "package.json recall.extensions is empty",
+      code: PLUGIN_INSTALL_ERROR_CODE.EMPTY_RECALL_EXTENSIONS,
     };
   }
   if (resolved.status === "invalid") {
     return {
       ok: false,
       error: resolved.error,
-      code: PLUGIN_INSTALL_ERROR_CODE.INVALID_OPENCLAW_EXTENSIONS,
+      code: PLUGIN_INSTALL_ERROR_CODE.INVALID_RECALL_EXTENSIONS,
     };
   }
   return {
@@ -194,7 +194,7 @@ function isNpmPackageNotFoundMessage(error: string): boolean {
 }
 
 function compareNpmSemver(a: string, b: string): number {
-  const releaseCmp = compareOpenClawReleaseVersions(a, b);
+  const releaseCmp = compareRecallReleaseVersions(a, b);
   if (releaseCmp !== null) {
     return releaseCmp;
   }
@@ -212,7 +212,7 @@ async function resolveTrustedOfficialPrereleaseResolution(params: {
   timeoutMs: number;
   logger: PluginInstallLogger;
 }): Promise<TrustedOfficialPrereleaseResolution | null> {
-  if (!params.spec.name.startsWith("@openclaw/")) {
+  if (!params.spec.name.startsWith("@recall/")) {
     return null;
   }
   const versions = await runCommandWithTimeout(
@@ -255,12 +255,12 @@ async function resolveTrustedOfficialPrereleaseResolution(params: {
           return null;
         }
         params.logger.warn?.(
-          `Resolved ${params.spec.raw} to prerelease version ${params.resolvedPrereleaseVersion}; using newest prerelease ${prereleaseSpec} because this trusted official OpenClaw package has no stable npm versions yet.`,
+          `Resolved ${params.spec.raw} to prerelease version ${params.resolvedPrereleaseVersion}; using newest prerelease ${prereleaseSpec} because this trusted official Recall package has no stable npm versions yet.`,
         );
         return { kind: "prerelease-only", resolution: metadataResult.metadata };
       }
       params.logger.warn?.(
-        `Resolved ${params.spec.raw} to prerelease version ${params.resolvedPrereleaseVersion}; allowing it because this trusted official OpenClaw package has no stable npm versions yet.`,
+        `Resolved ${params.spec.raw} to prerelease version ${params.resolvedPrereleaseVersion}; allowing it because this trusted official Recall package has no stable npm versions yet.`,
       );
       return { kind: "allow-prerelease-only" };
     }
@@ -276,7 +276,7 @@ async function resolveTrustedOfficialPrereleaseResolution(params: {
     return null;
   }
   params.logger.warn?.(
-    `Resolved ${params.spec.raw} to prerelease version ${params.resolvedPrereleaseVersion}; falling back to stable ${stableSpec} for this trusted official OpenClaw install.`,
+    `Resolved ${params.spec.raw} to prerelease version ${params.resolvedPrereleaseVersion}; falling back to stable ${stableSpec} for this trusted official Recall install.`,
   );
   return { kind: "stable", resolution: metadataResult.metadata };
 }
@@ -447,21 +447,21 @@ async function rollbackManagedNpmPluginInstall(params: {
       );
     }
   }
-  if (params.packageName !== "openclaw") {
+  if (params.packageName !== "recall") {
     try {
-      await repairManagedNpmRootOpenClawPeer({
+      await repairManagedNpmRootRecallPeer({
         npmRoot: params.npmRoot,
         timeoutMs: params.timeoutMs,
         logger: params.logger,
       });
     } catch (error) {
       params.logger.warn?.(
-        `Failed to repair managed npm openclaw peer after rollback: ${String(error)}`,
+        `Failed to repair managed npm recall peer after rollback: ${String(error)}`,
       );
     }
   }
   try {
-    await relinkOpenClawPeerDependenciesInManagedNpmRoot({
+    await relinkRecallPeerDependenciesInManagedNpmRoot({
       npmRoot: params.npmRoot,
       logger: params.logger,
     });
@@ -503,7 +503,7 @@ async function listManagedNpmRootPackageNames(npmRoot: string): Promise<Set<stri
 
   const packageNames = new Set<string>();
   for (const entry of entries.toSorted((left, right) => left.name.localeCompare(right.name))) {
-    if (entry.name === ".bin" || entry.name === "openclaw") {
+    if (entry.name === ".bin" || entry.name === "recall") {
       continue;
     }
     if (entry.name.startsWith("@")) {
@@ -627,18 +627,18 @@ async function installPluginFromManagedNpmRoot(
   }
 
   logger.info?.(`Installing ${params.displaySpec} into ${npmRoot}…`);
-  if (params.packageName !== "openclaw") {
-    const repairedOpenClawPeer = await repairManagedNpmRootOpenClawPeer({
+  if (params.packageName !== "recall") {
+    const repairedRecallPeer = await repairManagedNpmRootRecallPeer({
       npmRoot,
       timeoutMs,
       logger,
     });
-    if (repairedOpenClawPeer) {
-      logger.info?.(`Repaired stale openclaw peer dependency in ${npmRoot}`);
+    if (repairedRecallPeer) {
+      logger.info?.(`Repaired stale recall peer dependency in ${npmRoot}`);
     }
   }
   const preInstallRootPackageNames = await listManagedNpmRootPackageNames(npmRoot);
-  const managedOverrides = await readOpenClawManagedNpmRootOverrides();
+  const managedOverrides = await readRecallManagedNpmRootOverrides();
   const rollbackPeerDependencySnapshot = await readManagedNpmRootPeerDependencySnapshot({
     npmRoot,
   });
@@ -793,18 +793,18 @@ async function installPluginFromManagedNpmRoot(
         "npm install could not settle managed peer dependencies after 10 sync passes; refusing to leave a partially reconciled plugin dependency tree.",
     };
   }
-  if (params.packageName !== "openclaw") {
-    const repairedOpenClawPeer = await repairManagedNpmRootOpenClawPeer({
+  if (params.packageName !== "recall") {
+    const repairedRecallPeer = await repairManagedNpmRootRecallPeer({
       npmRoot,
       timeoutMs,
       logger,
     });
-    if (repairedOpenClawPeer) {
-      logger.info?.(`Repaired stale openclaw peer dependency in ${npmRoot} after npm install`);
+    if (repairedRecallPeer) {
+      logger.info?.(`Repaired stale recall peer dependency in ${npmRoot} after npm install`);
     }
   }
   try {
-    await relinkOpenClawPeerDependenciesInManagedNpmRoot({
+    await relinkRecallPeerDependenciesInManagedNpmRoot({
       npmRoot,
       logger,
     });
@@ -819,10 +819,10 @@ async function installPluginFromManagedNpmRoot(
     });
     return {
       ok: false,
-      error: `Failed to repair openclaw peer links after npm install: ${String(error)}`,
+      error: `Failed to repair recall peer links after npm install: ${String(error)}`,
     };
   }
-  if (installedPackageNeedsOpenClawPeerLinkRepair(installRoot)) {
+  if (installedPackageNeedsRecallPeerLinkRepair(installRoot)) {
     await rollbackManagedNpmPluginInstall({
       npmRoot,
       packageName: params.packageName,
@@ -833,7 +833,7 @@ async function installPluginFromManagedNpmRoot(
     });
     return {
       ok: false,
-      error: formatUnresolvedOpenClawPeerLinkError(params.packageName),
+      error: formatUnresolvedRecallPeerLinkError(params.packageName),
     };
   }
 
@@ -1047,7 +1047,7 @@ async function runInstallSourceScan(params: {
   } catch (err) {
     return {
       ok: false,
-      error: `${params.subject} installation blocked: code safety scan failed (${String(err)}). Run "openclaw security audit --deep" for details.`,
+      error: `${params.subject} installation blocked: code safety scan failed (${String(err)}). Run "recall security audit --deep" for details.`,
       code: PLUGIN_INSTALL_ERROR_CODE.SECURITY_SCAN_FAILED,
     };
   }
@@ -1292,7 +1292,7 @@ async function detectNativePackageInstallSource(packageDir: string): Promise<boo
 
   try {
     const manifest = await runtime.readJsonFile<PackageManifest>(manifestPath);
-    return ensureOpenClawExtensions({ manifest }).ok;
+    return ensureRecallExtensions({ manifest }).ok;
   } catch {
     return false;
   }
@@ -1338,7 +1338,7 @@ async function validatePackagePluginInstallSource(params: {
     return { ok: false, error: `invalid package.json: ${String(err)}` };
   }
 
-  const extensionsResult = ensureOpenClawExtensions({
+  const extensionsResult = ensureRecallExtensions({
     manifest,
   });
   if (!extensionsResult.ok) {
@@ -1356,7 +1356,7 @@ async function validatePackagePluginInstallSource(params: {
   if (!ocManifestResult.ok && params.requirePluginManifest) {
     return {
       ok: false,
-      error: `package missing valid openclaw.plugin.json: ${ocManifestResult.error}`,
+      error: `package missing valid recall.plugin.json: ${ocManifestResult.error}`,
       code: PLUGIN_INSTALL_ERROR_CODE.MISSING_PLUGIN_MANIFEST,
     };
   }
@@ -1400,20 +1400,20 @@ async function validatePackagePluginInstallSource(params: {
     if (minHostVersionCheck.kind === "invalid") {
       return {
         ok: false,
-        error: `invalid package.json openclaw.install.minHostVersion: ${minHostVersionCheck.error}`,
+        error: `invalid package.json recall.install.minHostVersion: ${minHostVersionCheck.error}`,
         code: PLUGIN_INSTALL_ERROR_CODE.INVALID_MIN_HOST_VERSION,
       };
     }
     if (minHostVersionCheck.kind === "unknown_host_version") {
       return {
         ok: false,
-        error: `plugin "${pluginId}" requires OpenClaw >=${minHostVersionCheck.requirement.minimumLabel}, but this host version could not be determined. Re-run from a released build or set OPENCLAW_VERSION and retry.`,
+        error: `plugin "${pluginId}" requires Recall >=${minHostVersionCheck.requirement.minimumLabel}, but this host version could not be determined. Re-run from a released build or set RECALL_VERSION and retry.`,
         code: PLUGIN_INSTALL_ERROR_CODE.UNKNOWN_HOST_VERSION,
       };
     }
     return {
       ok: false,
-      error: `plugin "${pluginId}" requires OpenClaw >=${minHostVersionCheck.requirement.minimumLabel}, but this host is ${minHostVersionCheck.currentVersion}. Upgrade OpenClaw and retry.`,
+      error: `plugin "${pluginId}" requires Recall >=${minHostVersionCheck.requirement.minimumLabel}, but this host is ${minHostVersionCheck.currentVersion}. Upgrade Recall and retry.`,
       code: PLUGIN_INSTALL_ERROR_CODE.INCOMPATIBLE_HOST_VERSION,
     };
   }
@@ -1427,7 +1427,7 @@ async function validatePackagePluginInstallSource(params: {
     return {
       ok: false,
       error: extensionValidation.error,
-      code: PLUGIN_INSTALL_ERROR_CODE.INVALID_OPENCLAW_EXTENSIONS,
+      code: PLUGIN_INSTALL_ERROR_CODE.INVALID_RECALL_EXTENSIONS,
     };
   }
 
@@ -1503,7 +1503,7 @@ async function scanAndLinkInstalledPackage(params: {
   if (scanResult) {
     return scanResult;
   }
-  const peerLinkRepair = await linkOpenClawPeerDependencies({
+  const peerLinkRepair = await linkRecallPeerDependencies({
     installedDir: params.installedDir,
     peerDependencies: params.peerDependencies,
     logger: params.logger,
@@ -1511,7 +1511,7 @@ async function scanAndLinkInstalledPackage(params: {
   if (peerLinkRepair.skipped > 0) {
     return {
       ok: false,
-      error: formatUnresolvedOpenClawPeerLinkError(params.pluginId),
+      error: formatUnresolvedRecallPeerLinkError(params.pluginId),
     };
   }
   return null;
@@ -1668,7 +1668,7 @@ export async function installPluginFromArchive(
 
   return await runtime.withExtractedArchiveRoot({
     archivePath,
-    tempDirPrefix: "openclaw-plugin-",
+    tempDirPrefix: "recall-plugin-",
     timeoutMs,
     logger,
     rootMarkers: PLUGIN_ARCHIVE_ROOT_MARKERS,

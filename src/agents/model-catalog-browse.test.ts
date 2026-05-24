@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { loadModelCatalogForBrowse } from "./model-catalog-browse.js";
 import type { ModelCatalogEntry } from "./model-catalog.types.js";
 
@@ -8,7 +8,7 @@ const readOnlyCatalog: ModelCatalogEntry[] = [
 ];
 const fullCatalog: ModelCatalogEntry[] = [{ id: "gpt-full", name: "GPT Full", provider: "openai" }];
 
-function config(params: { providerWildcard?: boolean } = {}): OpenClawConfig {
+function config(params: { providerWildcard?: boolean } = {}): RecallConfig {
   return {
     agents: params.providerWildcard
       ? {
@@ -19,7 +19,7 @@ function config(params: { providerWildcard?: boolean } = {}): OpenClawConfig {
           },
         }
       : undefined,
-  } as OpenClawConfig;
+  } as RecallConfig;
 }
 
 describe("loadModelCatalogForBrowse", () => {

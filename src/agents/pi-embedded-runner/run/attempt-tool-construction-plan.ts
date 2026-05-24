@@ -1,5 +1,5 @@
 import { TOOL_NAME_SEPARATOR } from "../../pi-bundle-mcp-names.js";
-import type { OpenClawCodingToolConstructionPlan } from "../../pi-tools.js";
+import type { RecallCodingToolConstructionPlan } from "../../pi-tools.js";
 import { isToolAllowedByPolicyName } from "../../tool-policy-match.js";
 import {
   buildPluginToolGroups,
@@ -12,10 +12,10 @@ const BASE_CODING_TOOL_FACTORY_NAMES = new Set(["edit", "read", "write"]);
 
 const SHELL_CODING_TOOL_FACTORY_NAMES = new Set(["apply_patch", "exec", "process"]);
 
-// Names here must be emitted directly by createOpenClawTools(). Catalog entries
+// Names here must be emitted directly by createRecallTools(). Catalog entries
 // backed by plugin registration, such as browser/x_search/code_execution, stay
 // out of this set so narrow allowlists still materialize plugin tools.
-const OPENCLAW_TOOL_FACTORY_NAMES = new Set([
+const RECALL_TOOL_FACTORY_NAMES = new Set([
   "agents_list",
   "canvas",
   "cron",
@@ -42,25 +42,25 @@ const OPENCLAW_TOOL_FACTORY_NAMES = new Set([
   "web_search",
 ]);
 
-const ALL_CODING_TOOL_CONSTRUCTION_PLAN: OpenClawCodingToolConstructionPlan = {
+const ALL_CODING_TOOL_CONSTRUCTION_PLAN: RecallCodingToolConstructionPlan = {
   includeBaseCodingTools: true,
   includeShellTools: true,
   includeChannelTools: true,
-  includeOpenClawTools: true,
+  includeRecallTools: true,
   includePluginTools: true,
 };
 
-const NO_CODING_TOOL_CONSTRUCTION_PLAN: OpenClawCodingToolConstructionPlan = {
+const NO_CODING_TOOL_CONSTRUCTION_PLAN: RecallCodingToolConstructionPlan = {
   includeBaseCodingTools: false,
   includeShellTools: false,
   includeChannelTools: false,
-  includeOpenClawTools: false,
+  includeRecallTools: false,
   includePluginTools: false,
 };
 
 function cloneCodingToolConstructionPlan(
-  plan: OpenClawCodingToolConstructionPlan,
-): OpenClawCodingToolConstructionPlan {
+  plan: RecallCodingToolConstructionPlan,
+): RecallCodingToolConstructionPlan {
   return { ...plan };
 }
 
@@ -80,7 +80,7 @@ function isKnownLocalCodingToolName(normalized: string): boolean {
   return (
     BASE_CODING_TOOL_FACTORY_NAMES.has(normalized) ||
     SHELL_CODING_TOOL_FACTORY_NAMES.has(normalized) ||
-    OPENCLAW_TOOL_FACTORY_NAMES.has(normalized)
+    RECALL_TOOL_FACTORY_NAMES.has(normalized)
   );
 }
 
@@ -129,7 +129,7 @@ export function mergeForcedEmbeddedAttemptToolsAllow(
 
 function resolveCodingToolConstructionPlanForAllowlist(
   toolsAllow?: string[],
-): OpenClawCodingToolConstructionPlan {
+): RecallCodingToolConstructionPlan {
   if (!toolsAllow) {
     return cloneCodingToolConstructionPlan(ALL_CODING_TOOL_CONSTRUCTION_PLAN);
   }
@@ -145,7 +145,7 @@ function resolveCodingToolConstructionPlanForAllowlist(
     BASE_CODING_TOOL_FACTORY_NAMES.has(name),
   );
   const includeShellTools = normalized.some((name) => SHELL_CODING_TOOL_FACTORY_NAMES.has(name));
-  const includeOpenClawTools = normalized.some((name) => OPENCLAW_TOOL_FACTORY_NAMES.has(name));
+  const includeRecallTools = normalized.some((name) => RECALL_TOOL_FACTORY_NAMES.has(name));
   const includePluginTools = normalized.some(
     (name) =>
       name === "group:plugins" ||
@@ -157,7 +157,7 @@ function resolveCodingToolConstructionPlanForAllowlist(
     includeBaseCodingTools,
     includeShellTools,
     includeChannelTools,
-    includeOpenClawTools,
+    includeRecallTools,
     includePluginTools,
   };
 }
@@ -171,7 +171,7 @@ export function resolveEmbeddedAttemptToolConstructionPlan(params: {
   constructTools: boolean;
   includeCoreTools: boolean;
   runtimeToolAllowlist?: string[];
-  codingToolConstructionPlan: OpenClawCodingToolConstructionPlan;
+  codingToolConstructionPlan: RecallCodingToolConstructionPlan;
 } {
   if (params.disableTools === true || params.isRawModelRun === true) {
     return {
@@ -187,7 +187,7 @@ export function resolveEmbeddedAttemptToolConstructionPlan(params: {
   const includeCoreTools =
     codingToolConstructionPlan.includeBaseCodingTools ||
     codingToolConstructionPlan.includeShellTools ||
-    codingToolConstructionPlan.includeOpenClawTools;
+    codingToolConstructionPlan.includeRecallTools;
   const constructTools =
     includeCoreTools ||
     codingToolConstructionPlan.includeChannelTools ||

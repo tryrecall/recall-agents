@@ -95,8 +95,8 @@ describe("scripts/ui windows spawn behavior", () => {
   });
 
   it("detects direct execution through a junctioned script path", () => {
-    const realScriptPath = path.resolve("repo/openclaw/scripts/ui.js");
-    const junctionScriptPath = path.resolve("linked/openclaw/scripts/ui.js");
+    const realScriptPath = path.resolve("repo/recall/scripts/ui.js");
+    const junctionScriptPath = path.resolve("linked/recall/scripts/ui.js");
     const realpath = (entry: string) => (entry === junctionScriptPath ? realScriptPath : entry);
 
     expect(isDirectScriptExecution(junctionScriptPath, realScriptPath, realpath)).toBe(true);

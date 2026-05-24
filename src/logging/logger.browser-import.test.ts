@@ -1,4 +1,4 @@
-import { importFreshModule } from "openclaw/plugin-sdk/test-fixtures";
+import { importFreshModule } from "recall/plugin-sdk/test-fixtures";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 type LoggerModule = typeof import("./logger.js");
@@ -8,24 +8,24 @@ const originalGetBuiltinModule = (
 ).getBuiltinModule;
 
 async function importBrowserSafeLogger(params?: {
-  resolvePreferredOpenClawTmpDir?: ReturnType<typeof vi.fn>;
+  resolvePreferredRecallTmpDir?: ReturnType<typeof vi.fn>;
 }): Promise<{
   module: LoggerModule;
-  resolvePreferredOpenClawTmpDir: ReturnType<typeof vi.fn>;
+  resolvePreferredRecallTmpDir: ReturnType<typeof vi.fn>;
 }> {
-  const resolvePreferredOpenClawTmpDir =
-    params?.resolvePreferredOpenClawTmpDir ??
+  const resolvePreferredRecallTmpDir =
+    params?.resolvePreferredRecallTmpDir ??
     vi.fn(() => {
-      throw new Error("resolvePreferredOpenClawTmpDir should not run during browser-safe import");
+      throw new Error("resolvePreferredRecallTmpDir should not run during browser-safe import");
     });
 
-  vi.doMock("../infra/tmp-openclaw-dir.js", async () => {
-    const actual = await vi.importActual<typeof import("../infra/tmp-openclaw-dir.js")>(
-      "../infra/tmp-openclaw-dir.js",
+  vi.doMock("../infra/tmp-recall-dir.js", async () => {
+    const actual = await vi.importActual<typeof import("../infra/tmp-recall-dir.js")>(
+      "../infra/tmp-recall-dir.js",
     );
     return {
       ...actual,
-      resolvePreferredOpenClawTmpDir,
+      resolvePreferredRecallTmpDir,
     };
   });
 
@@ -38,12 +38,12 @@ async function importBrowserSafeLogger(params?: {
     import.meta.url,
     "./logger.js?scope=browser-safe",
   );
-  return { module, resolvePreferredOpenClawTmpDir };
+  return { module, resolvePreferredRecallTmpDir };
 }
 
 describe("logging/logger browser-safe import", () => {
   afterEach(() => {
-    vi.doUnmock("../infra/tmp-openclaw-dir.js");
+    vi.doUnmock("../infra/tmp-recall-dir.js");
     Object.defineProperty(process, "getBuiltinModule", {
       configurable: true,
       value: originalGetBuiltinModule,
@@ -51,23 +51,23 @@ describe("logging/logger browser-safe import", () => {
   });
 
   it("does not resolve the preferred temp dir at import time when node fs is unavailable", async () => {
-    const { module, resolvePreferredOpenClawTmpDir } = await importBrowserSafeLogger();
+    const { module, resolvePreferredRecallTmpDir } = await importBrowserSafeLogger();
 
-    expect(resolvePreferredOpenClawTmpDir).not.toHaveBeenCalled();
-    expect(module.DEFAULT_LOG_DIR).toBe("/tmp/openclaw");
-    expect(module.DEFAULT_LOG_FILE).toBe("/tmp/openclaw/openclaw.log");
+    expect(resolvePreferredRecallTmpDir).not.toHaveBeenCalled();
+    expect(module.DEFAULT_LOG_DIR).toBe("/tmp/recall");
+    expect(module.DEFAULT_LOG_FILE).toBe("/tmp/tryrecall/recall-agents.log");
   });
 
   it("disables file logging when imported in a browser-like environment", async () => {
-    const { module, resolvePreferredOpenClawTmpDir } = await importBrowserSafeLogger();
+    const { module, resolvePreferredRecallTmpDir } = await importBrowserSafeLogger();
 
     expect(module.getResolvedLoggerSettings()).toStrictEqual({
       level: "silent",
-      file: "/tmp/openclaw/openclaw.log",
+      file: "/tmp/tryrecall/recall-agents.log",
       maxFileBytes: 100 * 1024 * 1024,
     });
     expect(module.isFileLogLevelEnabled("info")).toBe(false);
     expect(module.getLogger().info("browser-safe")).toBeUndefined();
-    expect(resolvePreferredOpenClawTmpDir).not.toHaveBeenCalled();
+    expect(resolvePreferredRecallTmpDir).not.toHaveBeenCalled();
   });
 });

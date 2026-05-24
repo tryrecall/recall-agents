@@ -44,7 +44,7 @@ const INDIRECT_RUNTIME_DEPENDENCIES = new Map<string, Set<string>>([
   ],
   [
     "extensions/memory-core",
-    // Packaged memory tools run through generated OpenClaw runtime chunks that parse JSON5 config.
+    // Packaged memory tools run through generated Recall runtime chunks that parse JSON5 config.
     new Set(["json5"]),
   ],
   [
@@ -158,7 +158,7 @@ function listRuntimeFiles(root: string): string[] {
 }
 
 function readManifestText(root: string): string {
-  const manifestPath = path.join(root, "openclaw.plugin.json");
+  const manifestPath = path.join(root, "recall.plugin.json");
   const resolvedManifestPath = path.resolve(REPO_ROOT, manifestPath);
   return fs.existsSync(resolvedManifestPath) ? fs.readFileSync(resolvedManifestPath, "utf8") : "";
 }
@@ -298,8 +298,8 @@ describe("extension runtime dependency manifests", () => {
       for (const filePath of listRuntimeFiles(extensionDir)) {
         for (const packageName of collectRuntimeImports(filePath)) {
           if (
-            packageName === "openclaw" ||
-            packageName.startsWith("@openclaw/") ||
+            packageName === "recall" ||
+            packageName.startsWith("@recall/") ||
             BUILTIN_MODULES.has(packageName) ||
             declared.has(packageName) ||
             allowedOptional.has(packageName)

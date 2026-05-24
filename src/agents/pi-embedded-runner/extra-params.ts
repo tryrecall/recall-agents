@@ -3,7 +3,7 @@ import type { SimpleStreamOptions } from "@earendil-works/pi-ai";
 import { streamSimple } from "@earendil-works/pi-ai";
 import type { SettingsManager } from "@earendil-works/pi-coding-agent";
 import type { ThinkLevel } from "../../auto-reply/thinking.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import {
   createDeepSeekV4OpenAICompatibleThinkingWrapper,
   createThinkingOnlyFinalTextWrapper,
@@ -47,7 +47,7 @@ const providerRuntimeDeps = {
   ...defaultProviderRuntimeDeps,
 };
 
-let preparedExtraParamsCache = new WeakMap<OpenClawConfig, Map<string, Record<string, unknown>>>();
+let preparedExtraParamsCache = new WeakMap<RecallConfig, Map<string, Record<string, unknown>>>();
 const REQUEST_SCOPED_EXTRA_PARAM_KEYS = new Set(["response_format", "responseFormat"]);
 
 export const testing = {
@@ -79,7 +79,7 @@ export const testing = {
  * @internal Exported for testing only
  */
 export function resolveExtraParams(params: {
-  cfg: OpenClawConfig | undefined;
+  cfg: RecallConfig | undefined;
   provider: string;
   modelId: string;
   agentId?: string;
@@ -221,7 +221,7 @@ function resolvePreparedExtraParamsCacheKey(params: {
 }
 
 export function resolvePreparedExtraParams(params: {
-  cfg: OpenClawConfig | undefined;
+  cfg: RecallConfig | undefined;
   provider: string;
   modelId: string;
   agentDir?: string;
@@ -710,7 +710,7 @@ function createOpenAICompletionsExtraBodyWrapper(
 
 type ApplyExtraParamsContext = {
   agent: { streamFn?: StreamFn };
-  cfg: OpenClawConfig | undefined;
+  cfg: RecallConfig | undefined;
   provider: string;
   modelId: string;
   agentDir?: string;
@@ -902,7 +902,7 @@ function isMiMoReasoningAsVisibleTextOpenAICompatibleModel(
  */
 export function applyExtraParamsToAgent(
   agent: { streamFn?: StreamFn },
-  cfg: OpenClawConfig | undefined,
+  cfg: RecallConfig | undefined,
   provider: string,
   modelId: string,
   extraParamsOverride?: Record<string, unknown>,

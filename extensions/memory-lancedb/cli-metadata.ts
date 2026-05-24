@@ -1,4 +1,4 @@
-import { definePluginEntry } from "openclaw/plugin-sdk/core";
+import { definePluginEntry } from "recall/plugin-sdk/core";
 
 export default definePluginEntry({
   id: "memory-lancedb",

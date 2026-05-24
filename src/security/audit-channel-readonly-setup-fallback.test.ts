@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { ChannelPlugin } from "../channels/plugins/types.plugin.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 
 const {
   collectChannelSecurityFindingsMock,
@@ -16,14 +16,14 @@ const {
     },
   ]),
   collectEnabledInsecureOrDangerousFlagsMock: vi.fn(
-    (configForTest: OpenClawConfig): string[] => [],
+    (configForTest: RecallConfig): string[] => [],
   ),
   listReadOnlyChannelPluginsForConfigMock: vi.fn(),
   hasConfiguredChannelsForReadOnlyScopeMock: vi.fn(),
 }));
 
 vi.mock("./dangerous-config-flags.js", () => ({
-  collectEnabledInsecureOrDangerousFlags: (config: OpenClawConfig) =>
+  collectEnabledInsecureOrDangerousFlags: (config: RecallConfig) =>
     collectEnabledInsecureOrDangerousFlagsMock(config),
 }));
 
@@ -97,7 +97,7 @@ describe("security audit channel read-only setup fallback", () => {
     const cfg = {
       session: { dmScope: "main" },
       channels: { telegram: { enabled: true } },
-    } satisfies OpenClawConfig;
+    } satisfies RecallConfig;
 
     hasConfiguredChannelsForReadOnlyScopeMock.mockReturnValue(true);
     listReadOnlyChannelPluginsForConfigMock.mockReturnValue([plugin]);
@@ -113,7 +113,7 @@ describe("security audit channel read-only setup fallback", () => {
     const readOnlyPluginCalls = listReadOnlyChannelPluginsForConfigMock.mock
       .calls as unknown as Array<
       [
-        OpenClawConfig,
+        RecallConfig,
         {
           includePersistedAuthState?: boolean;
           includeSetupFallbackPlugins?: boolean;
@@ -128,8 +128,8 @@ describe("security audit channel read-only setup fallback", () => {
     const collectCalls = collectChannelSecurityFindingsMock.mock.calls as unknown as Array<
       [
         {
-          cfg?: OpenClawConfig;
-          sourceConfig?: OpenClawConfig;
+          cfg?: RecallConfig;
+          sourceConfig?: RecallConfig;
           plugins?: ChannelPlugin[];
         },
       ]

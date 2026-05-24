@@ -27,14 +27,14 @@ execution:
     toolCoverage:
       family: web_search
       actualTool: web_search
-      bucket: openclaw-dynamic-integration
-      expectedLayer: openclaw-dynamic
-      capabilityLayer: openclaw-dynamic-direct
+      bucket: recall-dynamic-integration
+      expectedLayer: recall-dynamic
+      capabilityLayer: recall-dynamic-direct
       required: true
       codexDefaultImpact: P4
       qaImpact: P1
       action: hard gate in the standard direct-loading tier
-      reason: web_search is an OpenClaw integration tool and must stay visible and callable under Pi and Codex direct runtime parity.
+      reason: web_search is an Recall integration tool and must stay visible and callable under Pi and Codex direct runtime parity.
     promptSnippet: "target=web_search"
     failurePromptSnippet: "failure target=web_search"
 ```

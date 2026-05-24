@@ -1,11 +1,11 @@
 import { getBootstrapChannelSecrets } from "../channels/plugins/bootstrap-registry.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { PluginOrigin } from "../plugins/plugin-origin.types.js";
 import { loadChannelSecretContractApi } from "./channel-contract-api.js";
 import { type ResolverContext, type SecretDefaults } from "./runtime-shared.js";
 
 export function collectChannelConfigAssignments(params: {
-  config: OpenClawConfig;
+  config: RecallConfig;
   defaults: SecretDefaults | undefined;
   context: ResolverContext;
   loadablePluginOrigins?: ReadonlyMap<string, PluginOrigin>;

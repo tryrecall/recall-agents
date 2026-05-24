@@ -1,9 +1,9 @@
 import { rmSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { stripAnsi } from "openclaw/plugin-sdk/channel-test-helpers";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
-import { sanitizeTerminalText } from "openclaw/plugin-sdk/test-fixtures";
+import { stripAnsi } from "recall/plugin-sdk/channel-test-helpers";
+import type { RuntimeEnv } from "recall/plugin-sdk/runtime-env";
+import { sanitizeTerminalText } from "recall/plugin-sdk/test-fixtures";
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { loginWeb } from "./login.js";
 import { renderQrTerminal } from "./qr-terminal.js";
@@ -11,17 +11,17 @@ import { createWaSocket, formatError, waitForWaConnection } from "./session.js";
 
 const rmMock = vi.spyOn(fs, "rm");
 const testState = vi.hoisted(() => ({
-  authDir: `${(process.env.TMPDIR ?? "/tmp").replace(/\/+$/, "")}/openclaw-wa-creds-${process.pid}-${Math.random().toString(16).slice(2)}`,
+  authDir: `${(process.env.TMPDIR ?? "/tmp").replace(/\/+$/, "")}/recall-wa-creds-${process.pid}-${Math.random().toString(16).slice(2)}`,
 }));
 
 function resolveTestAuthDir() {
   return testState.authDir;
 }
 
-vi.mock("openclaw/plugin-sdk/runtime-config-snapshot", async () => {
+vi.mock("recall/plugin-sdk/runtime-config-snapshot", async () => {
   const actual = await vi.importActual<
-    typeof import("openclaw/plugin-sdk/runtime-config-snapshot")
-  >("openclaw/plugin-sdk/runtime-config-snapshot");
+    typeof import("recall/plugin-sdk/runtime-config-snapshot")
+  >("recall/plugin-sdk/runtime-config-snapshot");
   return {
     ...actual,
     getRuntimeConfig: () =>
@@ -173,7 +173,7 @@ describe("loginWeb coverage", () => {
       /cache cleared/i,
     );
     expect(runtimeMessageCalls(runtime.error)).toEqual([
-      "WhatsApp reported the session is logged out. Cleared cached web session; please rerun openclaw channels login and scan the QR again.",
+      "WhatsApp reported the session is logged out. Cleared cached web session; please rerun recall channels login and scan the QR again.",
     ]);
     expect(rmMock).toHaveBeenCalledWith(path.resolve(testState.authDir), {
       recursive: true,

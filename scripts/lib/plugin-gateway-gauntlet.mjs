@@ -6,7 +6,7 @@ import {
   collectBundledPluginBuildEntries,
 } from "./bundled-plugin-build-entries.mjs";
 
-const MANIFEST_NAMES = ["openclaw.plugin.json", "openclaw.plugin.json5"];
+const MANIFEST_NAMES = ["recall.plugin.json", "recall.plugin.json5"];
 const ANSI_PATTERN = new RegExp(String.raw`\u001B\[[0-9;]*m`, "gu");
 
 function isPlainObject(value) {
@@ -352,8 +352,8 @@ function buildGauntletPrebuildEnv(env, options = {}) {
   }
   return {
     ...env,
-    OPENCLAW_BUILD_PRIVATE_QA: "1",
-    OPENCLAW_ENABLE_PRIVATE_QA_CLI: "1",
+    RECALL_BUILD_PRIVATE_QA: "1",
+    RECALL_ENABLE_PRIVATE_QA_CLI: "1",
   };
 }
 

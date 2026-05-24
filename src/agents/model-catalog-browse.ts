@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import type { ModelCatalogEntry } from "./model-catalog.types.js";
 import { parseConfiguredModelVisibilityEntries } from "./model-selection-shared.js";
 
@@ -7,7 +7,7 @@ export const DEFAULT_MODEL_CATALOG_BROWSE_TIMEOUT_MS = 750;
 export type ModelCatalogBrowseView = "default" | "configured" | "all";
 
 export async function loadModelCatalogForBrowse(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   view?: ModelCatalogBrowseView;
   loadCatalog: (params: { readOnly: boolean }) => Promise<ModelCatalogEntry[]>;
   timeoutMs?: number;

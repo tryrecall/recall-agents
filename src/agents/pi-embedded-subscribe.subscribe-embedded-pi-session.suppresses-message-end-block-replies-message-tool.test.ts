@@ -167,7 +167,7 @@ describe("subscribeEmbeddedPiSession", () => {
     const { emit, onBlockReply } = createBlockReplyHarness("message_end");
 
     emitAssistantMessageEnd(emit, "Mirrored transcript text", {
-      provider: "openclaw",
+      provider: "recall",
       model: "delivery-mirror",
     });
     await Promise.resolve();
@@ -179,7 +179,7 @@ describe("subscribeEmbeddedPiSession", () => {
     const { emit, onBlockReply } = createBlockReplyHarness("message_end");
 
     emitAssistantMessageEnd(emit, "Injected transcript text", {
-      provider: "openclaw",
+      provider: "recall",
       model: "gateway-injected",
     });
     await Promise.resolve();

@@ -4,50 +4,50 @@ import {
   formatReasoningMessage,
   resolveAckReaction,
   resolveHumanDelayConfig,
-} from "openclaw/plugin-sdk/agent-runtime";
+} from "recall/plugin-sdk/agent-runtime";
 import {
   createStatusReactionController,
   DEFAULT_TIMING,
   logAckFailure,
   logTypingFailure,
   shouldAckReaction as shouldAckReactionGate,
-} from "openclaw/plugin-sdk/channel-feedback";
+} from "recall/plugin-sdk/channel-feedback";
 import {
   createChannelMessageReplyPipeline,
   defineFinalizableLivePreviewAdapter,
   deliverWithFinalizableLivePreviewAdapter,
   resolveChannelMessageSourceReplyDeliveryMode,
-} from "openclaw/plugin-sdk/channel-message";
+} from "recall/plugin-sdk/channel-message";
 import {
   buildChannelProgressDraftLine,
   buildChannelProgressDraftLineForEntry,
   resolveChannelStreamingBlockEnabled,
   resolveTranscriptBackedChannelFinalText,
-} from "openclaw/plugin-sdk/channel-streaming";
-import { recordInboundSession } from "openclaw/plugin-sdk/conversation-runtime";
+} from "recall/plugin-sdk/channel-streaming";
+import { recordInboundSession } from "recall/plugin-sdk/conversation-runtime";
 import {
   hasFinalInboundReplyDispatch,
   recordChannelBotPairLoopAndCheckSuppression,
   runPreparedInboundReplyTurn,
-} from "openclaw/plugin-sdk/inbound-reply-dispatch";
-import { resolveMarkdownTableMode } from "openclaw/plugin-sdk/markdown-table-runtime";
-import { getAgentScopedMediaLocalRoots } from "openclaw/plugin-sdk/media-runtime";
-import { resolveChunkMode } from "openclaw/plugin-sdk/reply-chunking";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-dispatch-runtime";
-import { createChannelHistoryWindow } from "openclaw/plugin-sdk/reply-history";
+} from "recall/plugin-sdk/inbound-reply-dispatch";
+import { resolveMarkdownTableMode } from "recall/plugin-sdk/markdown-table-runtime";
+import { getAgentScopedMediaLocalRoots } from "recall/plugin-sdk/media-runtime";
+import { resolveChunkMode } from "recall/plugin-sdk/reply-chunking";
+import type { ReplyPayload } from "recall/plugin-sdk/reply-dispatch-runtime";
+import { createChannelHistoryWindow } from "recall/plugin-sdk/reply-history";
 import {
   buildTtsSupplementMediaPayload,
   getReplyPayloadTtsSupplement,
   resolveSendableOutboundReplyParts,
-} from "openclaw/plugin-sdk/reply-payload";
-import { danger, logVerbose, shouldLogVerbose } from "openclaw/plugin-sdk/runtime-env";
+} from "recall/plugin-sdk/reply-payload";
+import { danger, logVerbose, shouldLogVerbose } from "recall/plugin-sdk/runtime-env";
 import {
   loadSessionStore,
   readLatestAssistantTextFromSessionTranscript,
   resolveAndPersistSessionFile,
   resolveSessionStoreEntry,
   resolveStorePath,
-} from "openclaw/plugin-sdk/session-store-runtime";
+} from "recall/plugin-sdk/session-store-runtime";
 import { resolveDiscordMaxLinesPerMessage } from "../accounts.js";
 import { createDiscordRestClient } from "../client.js";
 import { beginDiscordInboundEventDeliveryCorrelation } from "../inbound-event-delivery.js";
@@ -78,10 +78,10 @@ function sleep(ms: number): Promise<void> {
 }
 
 const DISCORD_TYPING_MAX_DURATION_MS = 20 * 60_000;
-let replyRuntimePromise: Promise<typeof import("openclaw/plugin-sdk/reply-runtime")> | undefined;
+let replyRuntimePromise: Promise<typeof import("recall/plugin-sdk/reply-runtime")> | undefined;
 
 async function loadReplyRuntime() {
-  replyRuntimePromise ??= import("openclaw/plugin-sdk/reply-runtime");
+  replyRuntimePromise ??= import("recall/plugin-sdk/reply-runtime");
   return await replyRuntimePromise;
 }
 

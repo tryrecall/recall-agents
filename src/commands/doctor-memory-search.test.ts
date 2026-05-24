@@ -1,6 +1,6 @@
 import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { RecallConfig } from "../config/config.js";
 import type { checkQmdBinaryAvailability as checkQmdBinaryAvailabilityFn } from "../memory-host-sdk/engine-qmd.js";
 import type { DoctorPrompter } from "./doctor-prompter.js";
 
@@ -147,7 +147,7 @@ function firstNoteMessage(): string {
 }
 
 describe("noteMemorySearchHealth", () => {
-  const cfg = {} as OpenClawConfig;
+  const cfg = {} as RecallConfig;
 
   async function expectNoWarningWithConfiguredRemoteApiKey(provider: string) {
     resolveMemorySearchConfig.mockReturnValue({
@@ -174,7 +174,7 @@ describe("noteMemorySearchHealth", () => {
     hasAnyAuthProfileStoreSource.mockReturnValue(true);
     getActiveMemorySearchManager.mockReset();
     resolveActiveMemoryBackendConfig.mockReset();
-    resolveActiveMemoryBackendConfig.mockImplementation(({ cfg }: { cfg: OpenClawConfig }) =>
+    resolveActiveMemoryBackendConfig.mockImplementation(({ cfg }: { cfg: RecallConfig }) =>
       cfg.memory?.backend === "qmd"
         ? { backend: "qmd", qmd: cfg.memory.qmd ?? {} }
         : { backend: "builtin" },
@@ -289,9 +289,9 @@ describe("noteMemorySearchHealth", () => {
     const cfgWithLancedb = {
       plugins: {
         slots: { memory: "memory-lancedb" },
-        entries: { "memory-lancedb": { enabled: true, config: { dbPath: ".openclaw/memory" } } },
+        entries: { "memory-lancedb": { enabled: true, config: { dbPath: ".recall/memory" } } },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     await noteMemorySearchHealth(cfgWithLancedb, {});
 
@@ -309,7 +309,7 @@ describe("noteMemorySearchHealth", () => {
     });
     const cfgWithSlotOnly = {
       plugins: { slots: { memory: "memory-lancedb" } },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     await noteMemorySearchHealth(cfgWithSlotOnly, {});
 
@@ -329,7 +329,7 @@ describe("noteMemorySearchHealth", () => {
         slots: { memory: "memory-lancedb" },
         entries: { "memory-lancedb": { enabled: false } },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     await noteMemorySearchHealth(cfgWithDisabledLancedb, {});
 
@@ -349,7 +349,7 @@ describe("noteMemorySearchHealth", () => {
         slots: { memory: "memory-lancedb" },
         entries: { "memory-lancedb": {} },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as RecallConfig;
 
     await noteMemorySearchHealth(cfgWithPlaceholderEntry, {});
 
@@ -411,7 +411,7 @@ describe("noteMemorySearchHealth", () => {
   });
 
   it("does not warn when QMD backend is active", async () => {
-    const qmdCfg = { memory: { backend: "qmd", qmd: { command: "qmd" } } } as OpenClawConfig;
+    const qmdCfg = { memory: { backend: "qmd", qmd: { command: "qmd" } } } as RecallConfig;
     resolveMemorySearchConfig.mockReturnValue({
       provider: "auto",
       local: {},
@@ -429,7 +429,7 @@ describe("noteMemorySearchHealth", () => {
   });
 
   it("warns when QMD backend is active but the qmd binary is unavailable", async () => {
-    const qmdCfg = { memory: { backend: "qmd", qmd: { command: "qmd" } } } as OpenClawConfig;
+    const qmdCfg = { memory: { backend: "qmd", qmd: { command: "qmd" } } } as RecallConfig;
     checkQmdBinaryAvailability.mockResolvedValueOnce({
       available: false,
       reason: "binary",
@@ -452,7 +452,7 @@ describe("noteMemorySearchHealth", () => {
   });
 
   it("treats legacy QMD unavailable results without a reason as binary failures", async () => {
-    const qmdCfg = { memory: { backend: "qmd", qmd: { command: "qmd" } } } as OpenClawConfig;
+    const qmdCfg = { memory: { backend: "qmd", qmd: { command: "qmd" } } } as RecallConfig;
     checkQmdBinaryAvailability.mockResolvedValueOnce({
       available: false,
       error: "spawn qmd ENOENT",
@@ -474,7 +474,7 @@ describe("noteMemorySearchHealth", () => {
   });
 
   it("warns with a workspace-specific fix when the QMD probe cwd is missing", async () => {
-    const qmdCfg = { memory: { backend: "qmd", qmd: { command: "qmd" } } } as OpenClawConfig;
+    const qmdCfg = { memory: { backend: "qmd", qmd: { command: "qmd" } } } as RecallConfig;
     checkQmdBinaryAvailability.mockResolvedValueOnce({
       available: false,
       reason: "workspace-cwd",
@@ -640,11 +640,11 @@ describe("noteMemorySearchHealth", () => {
   });
 
   it("does not warn when key-optional provider (lmstudio) probe was skipped (skipped: true)", async () => {
-    // When `openclaw doctor` runs without --deep, the probe is skipped and returns
+    // When `recall doctor` runs without --deep, the probe is skipped and returns
     // { checked: false, ready: false, skipped: true }. This must NOT produce a
     // false-positive warning — it means readiness was never checked, not that
     // embeddings are unavailable.
-    // Regression test for: https://github.com/openclaw/openclaw/issues/74608
+    // Regression test for: https://github.com/tryrecall/recall-agents/issues/74608
     resolveMemorySearchConfig.mockReturnValue({
       provider: "lmstudio",
       local: {},
@@ -676,7 +676,7 @@ describe("noteMemorySearchHealth", () => {
   it("warns for key-optional provider (lmstudio) when gateway probe timed out", async () => {
     // A gateway timeout sets checked: false but skipped: false/absent. This is a
     // real diagnostic signal — embeddings may be unavailable — so we should warn.
-    // Regression guard: https://github.com/openclaw/openclaw/issues/74608
+    // Regression guard: https://github.com/tryrecall/recall-agents/issues/74608
     resolveMemorySearchConfig.mockReturnValue({
       provider: "lmstudio",
       local: {},
@@ -728,8 +728,8 @@ describe("noteMemorySearchHealth", () => {
 
     const message = firstNoteMessage();
     expect(message).toContain("Gateway memory probe for default agent is not ready");
-    expect(message).toContain("openclaw configure --section model");
-    expect(message).not.toContain("openclaw auth add --provider");
+    expect(message).toContain("recall configure --section model");
+    expect(message).not.toContain("recall auth add --provider");
   });
 
   it("warns in auto mode when no local modelPath and no API keys are configured", async () => {
@@ -747,7 +747,7 @@ describe("noteMemorySearchHealth", () => {
     expect(note).toHaveBeenCalledTimes(1);
     const message = firstNoteMessage();
     expect(message).toContain("needs at least one embedding provider");
-    expect(message).toContain("openclaw configure --section model");
+    expect(message).toContain("recall configure --section model");
   });
 
   it("does not probe unrelated embedding providers in auto mode", async () => {
@@ -834,7 +834,7 @@ describe("noteMemorySearchHealth", () => {
 });
 
 describe("memory recall doctor integration", () => {
-  const cfg = {} as OpenClawConfig;
+  const cfg = {} as RecallConfig;
 
   beforeEach(() => {
     note.mockClear();
@@ -961,7 +961,7 @@ describe("memory recall doctor integration", () => {
     });
     repairDreamingArtifacts.mockResolvedValueOnce({
       changed: true,
-      archiveDir: "/tmp/agent-default/workspace/.openclaw-repair/dreaming/2026-04-11T21-35-00-000Z",
+      archiveDir: "/tmp/agent-default/workspace/.recall-repair/dreaming/2026-04-11T21-35-00-000Z",
       archivedDreamsDiary: false,
       archivedSessionCorpus: true,
       archivedSessionIngestion: true,
@@ -986,7 +986,7 @@ describe("memory recall doctor integration", () => {
 
 describe("detectLegacyWorkspaceDirs", () => {
   it("returns active workspace and no legacy dirs", () => {
-    const workspaceDir = "/home/user/openclaw";
+    const workspaceDir = "/home/user/recall";
     const detection = detectLegacyWorkspaceDirs({ workspaceDir });
     expect(detection.activeWorkspace).toBe(path.resolve(workspaceDir));
     expect(detection.legacyDirs).toStrictEqual([]);

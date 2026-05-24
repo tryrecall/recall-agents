@@ -1,9 +1,9 @@
 ---
-name: openclaw-docker-e2e-authoring
-description: "Author OpenClaw Docker E2E and live provider Docker lanes."
+name: recall-docker-e2e-authoring
+description: "Author Recall Docker E2E and live provider Docker lanes."
 ---
 
-# OpenClaw Docker E2E Authoring
+# Recall Docker E2E Authoring
 
 Use this when adding or changing Docker E2E lanes, release-path Docker tests,
 or live-provider Docker proof.
@@ -57,7 +57,7 @@ pnpm exec oxfmt --write <changed files>
 node --check <new .mjs files>
 bash -n <new .sh files>
 node scripts/run-vitest.mjs test/scripts/docker-e2e-plan.test.ts
-OPENCLAW_SKIP_DOCKER_BUILD=1 pnpm test:docker:<lane>
+RECALL_SKIP_DOCKER_BUILD=1 pnpm test:docker:<lane>
 ```
 
 For real-provider lanes, run the matching live Docker script after deterministic

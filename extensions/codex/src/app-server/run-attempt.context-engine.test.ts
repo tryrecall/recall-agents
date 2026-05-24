@@ -3,12 +3,12 @@ import os from "node:os";
 import path from "node:path";
 import type { AgentMessage } from "@earendil-works/pi-agent-core";
 import { SessionManager } from "@earendil-works/pi-coding-agent";
-import type { EmbeddedRunAttemptParams } from "openclaw/plugin-sdk/agent-harness";
+import type { EmbeddedRunAttemptParams } from "recall/plugin-sdk/agent-harness";
 import {
   embeddedAgentLog,
   type HarnessContextEngine as ContextEngine,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
-import { registerSandboxBackend } from "openclaw/plugin-sdk/sandbox";
+} from "recall/plugin-sdk/agent-harness-runtime";
+import { registerSandboxBackend } from "recall/plugin-sdk/sandbox";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CodexAppServerClientFactory } from "./client-factory.js";
 import type { CodexServerNotification } from "./protocol.js";
@@ -120,7 +120,7 @@ function threadStartResult(threadId = "thread-1") {
       updatedAt: 1,
       status: { type: "idle" },
       path: null,
-      cwd: tempDir || "/tmp/openclaw-codex-test",
+      cwd: tempDir || "/tmp/recall-codex-test",
       cliVersion: "0.125.0",
       source: "unknown",
       agentNickname: null,
@@ -132,7 +132,7 @@ function threadStartResult(threadId = "thread-1") {
     model: "gpt-5.4-codex",
     modelProvider: "openai",
     serviceTier: null,
-    cwd: tempDir || "/tmp/openclaw-codex-test",
+    cwd: tempDir || "/tmp/recall-codex-test",
     instructionSources: [],
     approvalPolicy: "never",
     approvalsReviewer: "user",
@@ -305,7 +305,7 @@ function getRequestInputTextAt(
 
 describe("runCodexAppServerAttempt context-engine lifecycle", () => {
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-codex-context-engine-"));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "recall-codex-context-engine-"));
   });
 
   afterEach(async () => {
@@ -359,7 +359,7 @@ describe("runCodexAppServerAttempt context-engine lifecycle", () => {
     expect(optionalString(threadStartParams.developerInstructions)).toContain(
       "context-engine system",
     );
-    expectRequestInputTextContains(harness, "OpenClaw assembled context for this turn:");
+    expectRequestInputTextContains(harness, "Recall assembled context for this turn:");
 
     await harness.completeTurn();
     await run;
@@ -479,7 +479,7 @@ describe("runCodexAppServerAttempt context-engine lifecycle", () => {
 
     const firstRun = runCodexAppServerAttempt(firstParams);
     await firstHarness.waitForMethod("turn/start");
-    expectRequestInputTextContains(firstHarness, "OpenClaw assembled context for this turn:");
+    expectRequestInputTextContains(firstHarness, "Recall assembled context for this turn:");
     expectRequestInputTextContains(firstHarness, "bootstrap-only context");
     await firstHarness.completeTurn();
     await firstRun;
@@ -506,7 +506,7 @@ describe("runCodexAppServerAttempt context-engine lifecycle", () => {
       "turn/start",
     ]);
     const secondInputText = getRequestInputText(secondHarness);
-    expect(secondInputText).not.toContain("OpenClaw assembled context for this turn:");
+    expect(secondInputText).not.toContain("Recall assembled context for this turn:");
     expect(secondInputText).not.toContain("bootstrap-only context");
     expect(secondInputText).toBe("hello");
     const projectionLogs = info.mock.calls.filter(
@@ -589,7 +589,7 @@ describe("runCodexAppServerAttempt context-engine lifecycle", () => {
       "thread/start",
       "turn/start",
     ]);
-    expectRequestInputTextContains(harness, "OpenClaw assembled context for this turn:");
+    expectRequestInputTextContains(harness, "Recall assembled context for this turn:");
     expectRequestInputTextContains(harness, "new epoch context");
 
     await harness.notify({
@@ -677,7 +677,7 @@ describe("runCodexAppServerAttempt context-engine lifecycle", () => {
       "thread/start",
       "turn/start",
     ]);
-    expectRequestInputTextContains(harness, "OpenClaw assembled context for this turn:");
+    expectRequestInputTextContains(harness, "Recall assembled context for this turn:");
     expectRequestInputTextContains(harness, "policy changed context");
 
     await harness.notify({
@@ -789,7 +789,7 @@ describe("runCodexAppServerAttempt context-engine lifecycle", () => {
         "thread/start",
         "turn/start",
       ]);
-      expectRequestInputTextContains(harness, "OpenClaw assembled context for this turn:");
+      expectRequestInputTextContains(harness, "Recall assembled context for this turn:");
       expectRequestInputTextContains(harness, "native-disabled context");
 
       await harness.notify({
@@ -855,7 +855,7 @@ describe("runCodexAppServerAttempt context-engine lifecycle", () => {
       "thread/start",
       "turn/start",
     ]);
-    expectRequestInputTextContains(harness, "OpenClaw assembled context for this turn:");
+    expectRequestInputTextContains(harness, "Recall assembled context for this turn:");
     expectRequestInputTextContains(harness, "per-turn context");
 
     await harness.notify({
@@ -1169,8 +1169,8 @@ describe("runCodexAppServerAttempt context-engine lifecycle", () => {
     params.currentInboundContext = {
       text: [
         "Conversation context (untrusted, chronological, selected for current message):",
-        "#6474 Sun 2026-05-10 22:22 GMT+5:30 [reply target] OpenClaw: anchor REPLYCTX this is the old message",
-        "#6498 Sun 2026-05-10 22:22 GMT+5:30 OpenClaw: filler REPLYCTX 23",
+        "#6474 Sun 2026-05-10 22:22 GMT+5:30 [reply target] Recall: anchor REPLYCTX this is the old message",
+        "#6498 Sun 2026-05-10 22:22 GMT+5:30 Recall: filler REPLYCTX 23",
       ].join("\n"),
     };
 
@@ -1178,9 +1178,9 @@ describe("runCodexAppServerAttempt context-engine lifecycle", () => {
     await harness.waitForMethod("turn/start");
 
     const inputText = getRequestInputText(harness);
-    expect(inputText).toContain("OpenClaw assembled context for this turn:");
+    expect(inputText).toContain("Recall assembled context for this turn:");
     expect(inputText).toContain("Current user request:\nhello");
-    expect(inputText).toContain("[reply target] OpenClaw: anchor REPLYCTX");
+    expect(inputText).toContain("[reply target] Recall: anchor REPLYCTX");
     expect(inputText.trim().startsWith("Conversation context (untrusted")).toBe(true);
 
     await harness.completeTurn();

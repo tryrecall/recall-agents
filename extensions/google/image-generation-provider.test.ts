@@ -1,6 +1,6 @@
-import * as providerAuthRuntime from "openclaw/plugin-sdk/provider-auth-runtime";
-import * as providerHttp from "openclaw/plugin-sdk/provider-http";
-import { mockPinnedHostnameResolution } from "openclaw/plugin-sdk/test-env";
+import * as providerAuthRuntime from "recall/plugin-sdk/provider-auth-runtime";
+import * as providerHttp from "recall/plugin-sdk/provider-http";
+import { mockPinnedHostnameResolution } from "recall/plugin-sdk/test-env";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { buildGoogleImageGenerationProvider } from "./image-generation-provider.js";
 import { testing as geminiWebSearchTesting } from "./src/gemini-web-search-provider.js";

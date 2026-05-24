@@ -42,8 +42,8 @@ function requireLastPostTranscriptionCall(): {
   };
 }
 
-vi.mock("openclaw/plugin-sdk/provider-http", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/provider-http")>();
+vi.mock("recall/plugin-sdk/provider-http", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recall/plugin-sdk/provider-http")>();
   return {
     ...actual,
     postTranscriptionRequest: postTranscriptionRequestMock,

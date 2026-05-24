@@ -1,4 +1,4 @@
-import { lowercasePreservingWhitespace } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { lowercasePreservingWhitespace } from "recall/plugin-sdk/string-coerce-runtime";
 
 export const A2UI_PATH = "/__openclaw__/a2ui";
 
@@ -45,9 +45,9 @@ export function injectCanvasLiveReload(html: string): string {
     const action = { ...userAction, id };
     return postToNode({ userAction: action });
   }
-  globalThis.OpenClaw = globalThis.OpenClaw ?? {};
-  globalThis.OpenClaw.postMessage = postToNode;
-  globalThis.OpenClaw.sendUserAction = sendUserAction;
+  globalThis.Recall = globalThis.Recall ?? {};
+  globalThis.Recall.postMessage = postToNode;
+  globalThis.Recall.sendUserAction = sendUserAction;
   globalThis.openclawPostMessage = postToNode;
   globalThis.openclawSendUserAction = sendUserAction;
 

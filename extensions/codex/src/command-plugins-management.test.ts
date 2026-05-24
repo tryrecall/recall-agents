@@ -1,4 +1,4 @@
-import type { PluginCommandContext } from "openclaw/plugin-sdk/plugin-entry";
+import type { PluginCommandContext } from "recall/plugin-sdk/plugin-entry";
 import { describe, expect, it } from "vitest";
 import {
   handleCodexPluginsSubcommand,
@@ -52,7 +52,7 @@ describe("Codex /codex plugins subcommand", () => {
 
     const result = await handleCodexPluginsSubcommand(fakeCtx, ["list"], io);
     expect(result.text).toContain("ON   google-calendar");
-    expect(result.text).toContain("openclaw.json");
+    expect(result.text).toContain("recall.json");
   });
 
   it("lists effective disabled status when the global plugin switch is off", async () => {

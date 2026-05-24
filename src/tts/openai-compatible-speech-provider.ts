@@ -3,8 +3,8 @@ import {
   postJsonRequest,
   readProviderBinaryResponse,
   resolveProviderHttpRequestConfig,
-} from "openclaw/plugin-sdk/provider-http";
-import { normalizeResolvedSecretInputString } from "openclaw/plugin-sdk/secret-input";
+} from "recall/plugin-sdk/provider-http";
+import { normalizeResolvedSecretInputString } from "recall/plugin-sdk/secret-input";
 import { asFiniteNumber, asObject, trimToUndefined } from "../agents/provider-http-errors.js";
 import type { SpeechProviderPlugin } from "../plugins/types.js";
 import { normalizeOptionalLowercaseString } from "../shared/string-coerce.js";

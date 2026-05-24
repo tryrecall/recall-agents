@@ -1,7 +1,7 @@
 import { installSkill } from "../agents/skills-install.js";
 import { buildWorkspaceSkillStatus } from "../agents/skills-status.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import { resolveBrewExecutable } from "../infra/brew.js";
 import { isContainerEnvironment } from "../infra/container-environment.js";
 import type { RuntimeEnv } from "../runtime.js";
@@ -45,10 +45,10 @@ function isBrewOnlyInstallableSkill(skill: {
 }
 
 function upsertSkillEntry(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   skillKey: string,
   patch: { apiKey?: string },
-): OpenClawConfig {
+): RecallConfig {
   const entries = { ...cfg.skills?.entries };
   const existing = (entries[skillKey] as { apiKey?: string } | undefined) ?? {};
   entries[skillKey] = { ...existing, ...patch };
@@ -62,11 +62,11 @@ function upsertSkillEntry(
 }
 
 export async function setupSkills(
-  cfg: OpenClawConfig,
+  cfg: RecallConfig,
   workspaceDir: string,
   runtime: RuntimeEnv,
   prompter: WizardPrompter,
-): Promise<OpenClawConfig> {
+): Promise<RecallConfig> {
   const report = buildWorkspaceSkillStatus(workspaceDir, { config: cfg });
   const eligible = report.skills.filter((s) => s.eligible);
   const unsupportedOs = report.skills.filter(
@@ -115,7 +115,7 @@ export async function setupSkills(
       );
     }
   }
-  let next: OpenClawConfig = cfg;
+  let next: RecallConfig = cfg;
   if (installable.length > 0) {
     const toInstall = await prompter.multiselect({
       message: t("wizard.skills.installDeps"),
@@ -229,7 +229,7 @@ export async function setupSkills(
         runtime.log(result.stdout.trim());
       }
       runtime.log(
-        `Tip: run \`${formatCliCommand("openclaw doctor")}\` to review skills + requirements.`,
+        `Tip: run \`${formatCliCommand("recall doctor")}\` to review skills + requirements.`,
       );
       runtime.log(t("wizard.skills.docsLine"));
     }

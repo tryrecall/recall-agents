@@ -168,7 +168,7 @@ describe("runReplyAgent media path normalization", () => {
     refreshQueuedFollowupSessionMock.mockReset();
     resolveOutboundAttachmentFromUrlMock.mockReset();
     createReplyMediaContextRuntimeMock.mockReset();
-    vi.stubEnv("OPENCLAW_TEST_FAST", "1");
+    vi.stubEnv("RECALL_TEST_FAST", "1");
     resolveOutboundAttachmentFromUrlMock.mockImplementation(async (mediaUrl: string) => ({
       path: path.join("/tmp/outbound-media", path.basename(mediaUrl)),
     }));
@@ -347,7 +347,7 @@ describe("runReplyAgent media path normalization", () => {
   });
 
   it("does not create a second media context inside runAgentTurnWithFallback when onBlockReply is provided", async () => {
-    // Regression test for openclaw/openclaw#68056.
+    // Regression test for tryrecall/recall-agents#68056.
     // Before the fix, runAgentTurnWithFallback created its own media context, separate from
     // the one agent-runner.ts created and passed to buildReplyPayloads. Two separate caches
     // meant the same source could be persisted twice (two UUID outbound files, two sends).
@@ -380,7 +380,7 @@ describe("runReplyAgent media path normalization", () => {
   });
 
   it("passes current inbound media paths as native PI images", async () => {
-    const tmpDir = await mkdtemp(path.join(os.tmpdir(), "openclaw-native-pi-media-"));
+    const tmpDir = await mkdtemp(path.join(os.tmpdir(), "recall-native-pi-media-"));
     cleanupPaths.push(tmpDir);
     const imagePath = path.join(tmpDir, "photo.png");
     await writeFile(
@@ -438,7 +438,7 @@ describe("runReplyAgent media path normalization", () => {
   });
 
   it("does not pass recent history images as unlabeled native PI images", async () => {
-    const tmpDir = await mkdtemp(path.join(os.tmpdir(), "openclaw-native-pi-history-"));
+    const tmpDir = await mkdtemp(path.join(os.tmpdir(), "recall-native-pi-history-"));
     cleanupPaths.push(tmpDir);
     const imagePath = path.join(tmpDir, "recent.png");
     await writeFile(
@@ -495,7 +495,7 @@ describe("runReplyAgent media path normalization", () => {
   });
 
   it("falls back to prompt refs instead of forwarding partial current media", async () => {
-    const tmpDir = await mkdtemp(path.join(os.tmpdir(), "openclaw-native-pi-partial-"));
+    const tmpDir = await mkdtemp(path.join(os.tmpdir(), "recall-native-pi-partial-"));
     cleanupPaths.push(tmpDir);
     const imagePath = path.join(tmpDir, "present.png");
     await writeFile(

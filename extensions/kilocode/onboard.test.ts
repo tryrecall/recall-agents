@@ -1,6 +1,6 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { resolveEnvApiKey } from "openclaw/plugin-sdk/provider-auth-runtime";
-import { resolveAgentModelPrimaryValue } from "openclaw/plugin-sdk/provider-onboard";
+import type { RecallConfig } from "recall/plugin-sdk/config-contracts";
+import { resolveEnvApiKey } from "recall/plugin-sdk/provider-auth-runtime";
+import { resolveAgentModelPrimaryValue } from "recall/plugin-sdk/provider-onboard";
 import { describe, expect, it, vi } from "vitest";
 import {
   buildKilocodeModelDefinition,
@@ -16,10 +16,10 @@ import {
   KILOCODE_DEFAULT_MODEL_REF,
 } from "./onboard.js";
 
-const emptyCfg: OpenClawConfig = {};
+const emptyCfg: RecallConfig = {};
 const KILOCODE_MODEL_IDS = ["kilo/auto"];
 
-function requireKilocodeProvider(cfg: OpenClawConfig) {
+function requireKilocodeProvider(cfg: RecallConfig) {
   const provider = cfg.models?.providers?.kilocode;
   if (!provider) {
     throw new Error("expected Kilocode provider config");
@@ -106,7 +106,7 @@ describe("Kilo Gateway provider config", () => {
     });
 
     it("preserves existing alias if already set", () => {
-      const cfg: OpenClawConfig = {
+      const cfg: RecallConfig = {
         agents: {
           defaults: {
             models: {
@@ -121,7 +121,7 @@ describe("Kilo Gateway provider config", () => {
     });
 
     it("does not change the default model selection", () => {
-      const cfg: OpenClawConfig = {
+      const cfg: RecallConfig = {
         agents: {
           defaults: {
             model: { primary: "openai/gpt-5" },

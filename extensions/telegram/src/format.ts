@@ -1,5 +1,5 @@
-import type { MarkdownTableMode } from "openclaw/plugin-sdk/config-contracts";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+import type { MarkdownTableMode } from "recall/plugin-sdk/config-contracts";
+import { normalizeLowercaseStringOrEmpty } from "recall/plugin-sdk/string-coerce-runtime";
 import {
   FILE_REF_EXTENSIONS_WITH_TLD,
   isAutoLinkedFileRef,
@@ -7,8 +7,8 @@ import {
   type MarkdownLinkSpan,
   type MarkdownIR,
   renderMarkdownIRChunksWithinLimit,
-} from "openclaw/plugin-sdk/text-chunking";
-import { renderMarkdownWithMarkers } from "openclaw/plugin-sdk/text-chunking";
+} from "recall/plugin-sdk/text-chunking";
+import { renderMarkdownWithMarkers } from "recall/plugin-sdk/text-chunking";
 
 export type TelegramFormattedChunk = {
   html: string;

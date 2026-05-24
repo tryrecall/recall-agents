@@ -1,13 +1,13 @@
 ---
-summary: "Export OpenClaw diagnostics to any OpenTelemetry collector via the diagnostics-otel plugin (OTLP/HTTP)"
+summary: "Export Recall diagnostics to any OpenTelemetry collector via the diagnostics-otel plugin (OTLP/HTTP)"
 title: "OpenTelemetry export"
 read_when:
-  - You want to send OpenClaw model usage, message flow, or session metrics to an OpenTelemetry collector
+  - You want to send Recall model usage, message flow, or session metrics to an OpenTelemetry collector
   - You are wiring traces, metrics, or logs into Grafana, Datadog, Honeycomb, New Relic, Tempo, or another OTLP backend
   - You need the exact metric names, span names, or attribute shapes to build dashboards or alerts
 ---
 
-OpenClaw exports diagnostics through the official `diagnostics-otel` plugin
+Recall exports diagnostics through the official `diagnostics-otel` plugin
 using **OTLP/HTTP (protobuf)**. Any collector or backend that accepts OTLP/HTTP
 works without code changes. For local file logs and how to read them, see
 [Logging](/logging).
@@ -19,7 +19,7 @@ works without code changes. For local file logs and how to read them, see
   and exec.
 - **`diagnostics-otel` plugin** subscribes to those events and exports them as
   OpenTelemetry **metrics**, **traces**, and **logs** over OTLP/HTTP.
-- **Provider calls** receive a W3C `traceparent` header from OpenClaw's
+- **Provider calls** receive a W3C `traceparent` header from Recall's
   trusted model-call span context when the provider transport accepts custom
   headers. Plugin-emitted trace context is not propagated.
 - Exporters only attach when both the diagnostics surface and the plugin are
@@ -30,7 +30,7 @@ works without code changes. For local file logs and how to read them, see
 For packaged installs, install the plugin first:
 
 ```bash
-openclaw plugins install clawhub:@openclaw/diagnostics-otel
+recall plugins install clawhub:@recall/diagnostics-otel
 ```
 
 ```json5
@@ -47,7 +47,7 @@ openclaw plugins install clawhub:@openclaw/diagnostics-otel
       enabled: true,
       endpoint: "http://otel-collector:4318",
       protocol: "http/protobuf",
-      serviceName: "openclaw-gateway",
+      serviceName: "recall-gateway",
       traces: true,
       metrics: true,
       logs: true,
@@ -61,7 +61,7 @@ openclaw plugins install clawhub:@openclaw/diagnostics-otel
 You can also enable the plugin from the CLI:
 
 ```bash
-openclaw plugins enable diagnostics-otel
+recall plugins enable diagnostics-otel
 ```
 
 <Note>
@@ -92,7 +92,7 @@ when `diagnostics.otel.enabled` is true.
       metricsEndpoint: "http://otel-collector:4318/v1/metrics",
       logsEndpoint: "http://otel-collector:4318/v1/logs",
       protocol: "http/protobuf", // grpc is ignored
-      serviceName: "openclaw-gateway",
+      serviceName: "recall-gateway",
       headers: { "x-collector-token": "..." },
       traces: true,
       metrics: true,
@@ -121,7 +121,7 @@ when `diagnostics.otel.enabled` is true.
 | `OTEL_SERVICE_NAME`                                                                                               | Override `diagnostics.otel.serviceName`.                                                                                                                                                                                                   |
 | `OTEL_EXPORTER_OTLP_PROTOCOL`                                                                                     | Override the wire protocol (only `http/protobuf` is honored today).                                                                                                                                                                        |
 | `OTEL_SEMCONV_STABILITY_OPT_IN`                                                                                   | Set to `gen_ai_latest_experimental` to emit the latest experimental GenAI span attribute (`gen_ai.provider.name`) instead of the legacy `gen_ai.system`. GenAI metrics always use bounded, low-cardinality semantic attributes regardless. |
-| `OPENCLAW_OTEL_PRELOADED`                                                                                         | Set to `1` when another preload or host process already registered the global OpenTelemetry SDK. The plugin then skips its own NodeSDK lifecycle but still wires diagnostic listeners and honors `traces`/`metrics`/`logs`.                |
+| `RECALL_OTEL_PRELOADED`                                                                                         | Set to `1` when another preload or host process already registered the global OpenTelemetry SDK. The plugin then skips its own NodeSDK lifecycle but still wires diagnostic listeners and honors `traces`/`metrics`/`logs`.                |
 
 ## Privacy and content capture
 
@@ -139,7 +139,7 @@ provider, and event type. They do not include transcripts, audio payloads,
 session ids, turn ids, call ids, room ids, or handoff tokens.
 
 Outbound model requests may include a W3C `traceparent` header. That header is
-generated only from OpenClaw-owned diagnostic trace context for the active model
+generated only from Recall-owned diagnostic trace context for the active model
 call. Existing caller-supplied `traceparent` headers are replaced, so plugins or
 custom provider options cannot spoof cross-service trace ancestry.
 
@@ -154,7 +154,7 @@ text. Each subkey is opt-in independently:
 - `systemPrompt` - assembled system/developer prompt.
 
 When any subkey is enabled, model and tool spans get bounded, redacted
-`openclaw.content.*` attributes for that class only. Use boolean
+`recall.content.*` attributes for that class only. Use boolean
 `captureContent: true` only for broad diagnostics captures where OTLP log
 message bodies are also approved for export.
 
@@ -179,62 +179,62 @@ message bodies are also approved for export.
 
 ### Model usage
 
-- `openclaw.tokens` (counter, attrs: `openclaw.token`, `openclaw.channel`, `openclaw.provider`, `openclaw.model`, `openclaw.agent`)
-- `openclaw.cost.usd` (counter, attrs: `openclaw.channel`, `openclaw.provider`, `openclaw.model`)
-- `openclaw.run.duration_ms` (histogram, attrs: `openclaw.channel`, `openclaw.provider`, `openclaw.model`)
-- `openclaw.context.tokens` (histogram, attrs: `openclaw.context`, `openclaw.channel`, `openclaw.provider`, `openclaw.model`)
+- `recall.tokens` (counter, attrs: `recall.token`, `recall.channel`, `recall.provider`, `recall.model`, `recall.agent`)
+- `recall.cost.usd` (counter, attrs: `recall.channel`, `recall.provider`, `recall.model`)
+- `recall.run.duration_ms` (histogram, attrs: `recall.channel`, `recall.provider`, `recall.model`)
+- `recall.context.tokens` (histogram, attrs: `recall.context`, `recall.channel`, `recall.provider`, `recall.model`)
 - `gen_ai.client.token.usage` (histogram, GenAI semantic-conventions metric, attrs: `gen_ai.token.type` = `input`/`output`, `gen_ai.provider.name`, `gen_ai.operation.name`, `gen_ai.request.model`)
 - `gen_ai.client.operation.duration` (histogram, seconds, GenAI semantic-conventions metric, attrs: `gen_ai.provider.name`, `gen_ai.operation.name`, `gen_ai.request.model`, optional `error.type`)
-- `openclaw.model_call.duration_ms` (histogram, attrs: `openclaw.provider`, `openclaw.model`, `openclaw.api`, `openclaw.transport`, plus `openclaw.errorCategory` and `openclaw.failureKind` on classified errors)
-- `openclaw.model_call.request_bytes` (histogram, UTF-8 byte size of the final model request payload; no raw payload content)
-- `openclaw.model_call.response_bytes` (histogram, UTF-8 byte size of streamed model response events; no raw response content)
-- `openclaw.model_call.time_to_first_byte_ms` (histogram, elapsed time before the first streamed response event)
+- `recall.model_call.duration_ms` (histogram, attrs: `recall.provider`, `recall.model`, `recall.api`, `recall.transport`, plus `recall.errorCategory` and `recall.failureKind` on classified errors)
+- `recall.model_call.request_bytes` (histogram, UTF-8 byte size of the final model request payload; no raw payload content)
+- `recall.model_call.response_bytes` (histogram, UTF-8 byte size of streamed model response events; no raw response content)
+- `recall.model_call.time_to_first_byte_ms` (histogram, elapsed time before the first streamed response event)
 
 ### Message flow
 
-- `openclaw.webhook.received` (counter, attrs: `openclaw.channel`, `openclaw.webhook`)
-- `openclaw.webhook.error` (counter, attrs: `openclaw.channel`, `openclaw.webhook`)
-- `openclaw.webhook.duration_ms` (histogram, attrs: `openclaw.channel`, `openclaw.webhook`)
-- `openclaw.message.queued` (counter, attrs: `openclaw.channel`, `openclaw.source`)
-- `openclaw.message.received` (counter, attrs: `openclaw.channel`, `openclaw.source`)
-- `openclaw.message.dispatch.started` (counter, attrs: `openclaw.channel`, `openclaw.source`)
-- `openclaw.message.dispatch.completed` (counter, attrs: `openclaw.channel`, `openclaw.outcome`, `openclaw.reason`, `openclaw.source`)
-- `openclaw.message.dispatch.duration_ms` (histogram, attrs: `openclaw.channel`, `openclaw.outcome`, `openclaw.reason`, `openclaw.source`)
-- `openclaw.message.processed` (counter, attrs: `openclaw.channel`, `openclaw.outcome`)
-- `openclaw.message.duration_ms` (histogram, attrs: `openclaw.channel`, `openclaw.outcome`)
-- `openclaw.message.delivery.started` (counter, attrs: `openclaw.channel`, `openclaw.delivery.kind`)
-- `openclaw.message.delivery.duration_ms` (histogram, attrs: `openclaw.channel`, `openclaw.delivery.kind`, `openclaw.outcome`, `openclaw.errorCategory`)
+- `recall.webhook.received` (counter, attrs: `recall.channel`, `recall.webhook`)
+- `recall.webhook.error` (counter, attrs: `recall.channel`, `recall.webhook`)
+- `recall.webhook.duration_ms` (histogram, attrs: `recall.channel`, `recall.webhook`)
+- `recall.message.queued` (counter, attrs: `recall.channel`, `recall.source`)
+- `recall.message.received` (counter, attrs: `recall.channel`, `recall.source`)
+- `recall.message.dispatch.started` (counter, attrs: `recall.channel`, `recall.source`)
+- `recall.message.dispatch.completed` (counter, attrs: `recall.channel`, `recall.outcome`, `recall.reason`, `recall.source`)
+- `recall.message.dispatch.duration_ms` (histogram, attrs: `recall.channel`, `recall.outcome`, `recall.reason`, `recall.source`)
+- `recall.message.processed` (counter, attrs: `recall.channel`, `recall.outcome`)
+- `recall.message.duration_ms` (histogram, attrs: `recall.channel`, `recall.outcome`)
+- `recall.message.delivery.started` (counter, attrs: `recall.channel`, `recall.delivery.kind`)
+- `recall.message.delivery.duration_ms` (histogram, attrs: `recall.channel`, `recall.delivery.kind`, `recall.outcome`, `recall.errorCategory`)
 
 ### Talk
 
-- `openclaw.talk.event` (counter, attrs: `openclaw.talk.event_type`, `openclaw.talk.mode`, `openclaw.talk.transport`, `openclaw.talk.brain`, `openclaw.talk.provider`)
-- `openclaw.talk.event.duration_ms` (histogram, attrs: same as `openclaw.talk.event`; emitted when a Talk event reports duration)
-- `openclaw.talk.audio.bytes` (histogram, attrs: same as `openclaw.talk.event`; emitted for Talk audio frame events that report byte length)
+- `recall.talk.event` (counter, attrs: `recall.talk.event_type`, `recall.talk.mode`, `recall.talk.transport`, `recall.talk.brain`, `recall.talk.provider`)
+- `recall.talk.event.duration_ms` (histogram, attrs: same as `recall.talk.event`; emitted when a Talk event reports duration)
+- `recall.talk.audio.bytes` (histogram, attrs: same as `recall.talk.event`; emitted for Talk audio frame events that report byte length)
 
 ### Queues and sessions
 
-- `openclaw.queue.lane.enqueue` (counter, attrs: `openclaw.lane`)
-- `openclaw.queue.lane.dequeue` (counter, attrs: `openclaw.lane`)
-- `openclaw.queue.depth` (histogram, attrs: `openclaw.lane` or `openclaw.channel=heartbeat`)
-- `openclaw.queue.wait_ms` (histogram, attrs: `openclaw.lane`)
-- `openclaw.session.state` (counter, attrs: `openclaw.state`, `openclaw.reason`)
-- `openclaw.session.stuck` (counter, attrs: `openclaw.state`; emitted only for stale session bookkeeping with no active work)
-- `openclaw.session.stuck_age_ms` (histogram, attrs: `openclaw.state`; emitted only for stale session bookkeeping with no active work)
-- `openclaw.session.turn.created` (counter, attrs: `openclaw.agent`, `openclaw.channel`, `openclaw.trigger`)
-- `openclaw.session.recovery.requested` (counter, attrs: `openclaw.state`, `openclaw.action`, `openclaw.active_work_kind`, `openclaw.reason`)
-- `openclaw.session.recovery.completed` (counter, attrs: `openclaw.state`, `openclaw.action`, `openclaw.status`, `openclaw.active_work_kind`, `openclaw.reason`)
-- `openclaw.session.recovery.age_ms` (histogram, attrs: same as the matching recovery counter)
-- `openclaw.run.attempt` (counter, attrs: `openclaw.attempt`)
+- `recall.queue.lane.enqueue` (counter, attrs: `recall.lane`)
+- `recall.queue.lane.dequeue` (counter, attrs: `recall.lane`)
+- `recall.queue.depth` (histogram, attrs: `recall.lane` or `recall.channel=heartbeat`)
+- `recall.queue.wait_ms` (histogram, attrs: `recall.lane`)
+- `recall.session.state` (counter, attrs: `recall.state`, `recall.reason`)
+- `recall.session.stuck` (counter, attrs: `recall.state`; emitted only for stale session bookkeeping with no active work)
+- `recall.session.stuck_age_ms` (histogram, attrs: `recall.state`; emitted only for stale session bookkeeping with no active work)
+- `recall.session.turn.created` (counter, attrs: `recall.agent`, `recall.channel`, `recall.trigger`)
+- `recall.session.recovery.requested` (counter, attrs: `recall.state`, `recall.action`, `recall.active_work_kind`, `recall.reason`)
+- `recall.session.recovery.completed` (counter, attrs: `recall.state`, `recall.action`, `recall.status`, `recall.active_work_kind`, `recall.reason`)
+- `recall.session.recovery.age_ms` (histogram, attrs: same as the matching recovery counter)
+- `recall.run.attempt` (counter, attrs: `recall.attempt`)
 
 ### Session liveness telemetry
 
 `diagnostics.stuckSessionWarnMs` is the no-progress age threshold for session
 liveness diagnostics. A `processing` session does not age toward this threshold
-while OpenClaw observes reply, tool, status, block, or ACP runtime progress.
+while Recall observes reply, tool, status, block, or ACP runtime progress.
 Typing keepalives are not counted as progress, so a silent model or harness can
 still be detected.
 
-OpenClaw classifies sessions by the work it can still observe:
+Recall classifies sessions by the work it can still observe:
 
 - `session.long_running`: active embedded work, model calls, or tool calls are
   still making progress.
@@ -252,8 +252,8 @@ Recovery emits structured `session.recovery.requested` and
 only after a mutating recovery outcome (`aborted` or `released`) and only if the
 same processing generation is still current.
 
-Only `session.stuck` emits the `openclaw.session.stuck` counter, the
-`openclaw.session.stuck_age_ms` histogram, and the `openclaw.session.stuck`
+Only `session.stuck` emits the `recall.session.stuck` counter, the
+`recall.session.stuck_age_ms` histogram, and the `recall.session.stuck`
 span. Repeated `session.stuck` diagnostics back off while the session remains
 unchanged, so dashboards should alert on sustained increases rather than every
 heartbeat tick. For the config knob and defaults, see
@@ -261,62 +261,62 @@ heartbeat tick. For the config knob and defaults, see
 
 ### Harness lifecycle
 
-- `openclaw.harness.duration_ms` (histogram, attrs: `openclaw.harness.id`, `openclaw.harness.plugin`, `openclaw.outcome`, `openclaw.harness.phase` on errors)
+- `recall.harness.duration_ms` (histogram, attrs: `recall.harness.id`, `recall.harness.plugin`, `recall.outcome`, `recall.harness.phase` on errors)
 
 ### Exec
 
-- `openclaw.exec.duration_ms` (histogram, attrs: `openclaw.exec.target`, `openclaw.exec.mode`, `openclaw.outcome`, `openclaw.failureKind`)
+- `recall.exec.duration_ms` (histogram, attrs: `recall.exec.target`, `recall.exec.mode`, `recall.outcome`, `recall.failureKind`)
 
 ### Diagnostics internals (memory and tool loop)
 
-- `openclaw.memory.heap_used_bytes` (histogram, attrs: `openclaw.memory.kind`)
-- `openclaw.memory.rss_bytes` (histogram)
-- `openclaw.memory.pressure` (counter, attrs: `openclaw.memory.level`)
-- `openclaw.tool.loop.iterations` (counter, attrs: `openclaw.toolName`, `openclaw.outcome`)
-- `openclaw.tool.loop.duration_ms` (histogram, attrs: `openclaw.toolName`, `openclaw.outcome`)
+- `recall.memory.heap_used_bytes` (histogram, attrs: `recall.memory.kind`)
+- `recall.memory.rss_bytes` (histogram)
+- `recall.memory.pressure` (counter, attrs: `recall.memory.level`)
+- `recall.tool.loop.iterations` (counter, attrs: `recall.toolName`, `recall.outcome`)
+- `recall.tool.loop.duration_ms` (histogram, attrs: `recall.toolName`, `recall.outcome`)
 
 ## Exported spans
 
-- `openclaw.model.usage`
-  - `openclaw.channel`, `openclaw.provider`, `openclaw.model`
-  - `openclaw.tokens.*` (input/output/cache_read/cache_write/total)
+- `recall.model.usage`
+  - `recall.channel`, `recall.provider`, `recall.model`
+  - `recall.tokens.*` (input/output/cache_read/cache_write/total)
   - `gen_ai.system` by default, or `gen_ai.provider.name` when the latest GenAI semantic conventions are opted in
   - `gen_ai.request.model`, `gen_ai.operation.name`, `gen_ai.usage.*`
-- `openclaw.run`
-  - `openclaw.outcome`, `openclaw.channel`, `openclaw.provider`, `openclaw.model`, `openclaw.errorCategory`
-- `openclaw.model.call`
+- `recall.run`
+  - `recall.outcome`, `recall.channel`, `recall.provider`, `recall.model`, `recall.errorCategory`
+- `recall.model.call`
   - `gen_ai.system` by default, or `gen_ai.provider.name` when the latest GenAI semantic conventions are opted in
-  - `gen_ai.request.model`, `gen_ai.operation.name`, `openclaw.provider`, `openclaw.model`, `openclaw.api`, `openclaw.transport`
-  - `openclaw.errorCategory` and optional `openclaw.failureKind` on errors
-  - `openclaw.model_call.request_bytes`, `openclaw.model_call.response_bytes`, `openclaw.model_call.time_to_first_byte_ms`
-  - `openclaw.provider.request_id_hash` (bounded SHA-based hash of the upstream provider request id; raw ids are not exported)
-- `openclaw.harness.run`
-  - `openclaw.harness.id`, `openclaw.harness.plugin`, `openclaw.outcome`, `openclaw.provider`, `openclaw.model`, `openclaw.channel`
-  - On completion: `openclaw.harness.result_classification`, `openclaw.harness.yield_detected`, `openclaw.harness.items.started`, `openclaw.harness.items.completed`, `openclaw.harness.items.active`
-  - On error: `openclaw.harness.phase`, `openclaw.errorCategory`, optional `openclaw.harness.cleanup_failed`
-- `openclaw.tool.execution`
-  - `gen_ai.tool.name`, `openclaw.toolName`, `openclaw.errorCategory`, `openclaw.tool.params.*`
-- `openclaw.exec`
-  - `openclaw.exec.target`, `openclaw.exec.mode`, `openclaw.outcome`, `openclaw.failureKind`, `openclaw.exec.command_length`, `openclaw.exec.exit_code`, `openclaw.exec.timed_out`
-- `openclaw.webhook.processed`
-  - `openclaw.channel`, `openclaw.webhook`
-- `openclaw.webhook.error`
-  - `openclaw.channel`, `openclaw.webhook`, `openclaw.error`
-- `openclaw.message.processed`
-  - `openclaw.channel`, `openclaw.outcome`, `openclaw.reason`
-- `openclaw.message.delivery`
-  - `openclaw.channel`, `openclaw.delivery.kind`, `openclaw.outcome`, `openclaw.errorCategory`, `openclaw.delivery.result_count`
-- `openclaw.session.stuck`
-  - `openclaw.state`, `openclaw.ageMs`, `openclaw.queueDepth`
-- `openclaw.context.assembled`
-  - `openclaw.prompt.size`, `openclaw.history.size`, `openclaw.context.tokens`, `openclaw.errorCategory` (no prompt, history, response, or session-key content)
-- `openclaw.tool.loop`
-  - `openclaw.toolName`, `openclaw.outcome`, `openclaw.iterations`, `openclaw.errorCategory` (no loop messages, params, or tool output)
-- `openclaw.memory.pressure`
-  - `openclaw.memory.level`, `openclaw.memory.heap_used_bytes`, `openclaw.memory.rss_bytes`
+  - `gen_ai.request.model`, `gen_ai.operation.name`, `recall.provider`, `recall.model`, `recall.api`, `recall.transport`
+  - `recall.errorCategory` and optional `recall.failureKind` on errors
+  - `recall.model_call.request_bytes`, `recall.model_call.response_bytes`, `recall.model_call.time_to_first_byte_ms`
+  - `recall.provider.request_id_hash` (bounded SHA-based hash of the upstream provider request id; raw ids are not exported)
+- `recall.harness.run`
+  - `recall.harness.id`, `recall.harness.plugin`, `recall.outcome`, `recall.provider`, `recall.model`, `recall.channel`
+  - On completion: `recall.harness.result_classification`, `recall.harness.yield_detected`, `recall.harness.items.started`, `recall.harness.items.completed`, `recall.harness.items.active`
+  - On error: `recall.harness.phase`, `recall.errorCategory`, optional `recall.harness.cleanup_failed`
+- `recall.tool.execution`
+  - `gen_ai.tool.name`, `recall.toolName`, `recall.errorCategory`, `recall.tool.params.*`
+- `recall.exec`
+  - `recall.exec.target`, `recall.exec.mode`, `recall.outcome`, `recall.failureKind`, `recall.exec.command_length`, `recall.exec.exit_code`, `recall.exec.timed_out`
+- `recall.webhook.processed`
+  - `recall.channel`, `recall.webhook`
+- `recall.webhook.error`
+  - `recall.channel`, `recall.webhook`, `recall.error`
+- `recall.message.processed`
+  - `recall.channel`, `recall.outcome`, `recall.reason`
+- `recall.message.delivery`
+  - `recall.channel`, `recall.delivery.kind`, `recall.outcome`, `recall.errorCategory`, `recall.delivery.result_count`
+- `recall.session.stuck`
+  - `recall.state`, `recall.ageMs`, `recall.queueDepth`
+- `recall.context.assembled`
+  - `recall.prompt.size`, `recall.history.size`, `recall.context.tokens`, `recall.errorCategory` (no prompt, history, response, or session-key content)
+- `recall.tool.loop`
+  - `recall.toolName`, `recall.outcome`, `recall.iterations`, `recall.errorCategory` (no loop messages, params, or tool output)
+- `recall.memory.pressure`
+  - `recall.memory.level`, `recall.memory.heap_used_bytes`, `recall.memory.rss_bytes`
 
 When content capture is explicitly enabled, model and tool spans can also
-include bounded, redacted `openclaw.content.*` attributes for the specific
+include bounded, redacted `recall.content.*` attributes for the specific
 content classes you opted into.
 
 ## Diagnostic event catalog
@@ -384,7 +384,7 @@ flags. Flags are case-insensitive and support wildcards (e.g. `telegram.*` or
 Or as a one-off env override:
 
 ```bash
-OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload openclaw gateway
+RECALL_DIAGNOSTICS=telegram.http,telegram.payload recall gateway
 ```
 
 Flag output goes to the standard log file (`logging.file`) and is still
@@ -400,7 +400,7 @@ redacted by `logging.redactSensitive`. Full guide:
 ```
 
 You can also leave `diagnostics-otel` out of `plugins.allow`, or run
-`openclaw plugins disable diagnostics-otel`.
+`recall plugins disable diagnostics-otel`.
 
 ## Related
 

@@ -10,7 +10,7 @@ import {
   normalizeCommandDescriptorName,
   sanitizeCommandDescriptorDescription,
 } from "../cli/program/command-descriptor-utils.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { RecallConfig } from "../config/types.recall.js";
 import {
   clearContextEnginesForOwner,
   registerContextEngineForOwner,
@@ -154,26 +154,26 @@ import type {
   CliBackendPlugin,
   ImageGenerationProviderPlugin,
   MusicGenerationProviderPlugin,
-  OpenClawPluginApi,
-  OpenClawPluginChannelRegistration,
-  OpenClawPluginCliCommandDescriptor,
-  OpenClawPluginCliRegistrar,
-  OpenClawPluginCommandDefinition,
+  RecallPluginApi,
+  RecallPluginChannelRegistration,
+  RecallPluginCliCommandDescriptor,
+  RecallPluginCliRegistrar,
+  RecallPluginCommandDefinition,
   PluginConversationBindingResolvedEvent,
-  OpenClawPluginGatewayRuntimeScopeSurface,
-  OpenClawGatewayDiscoveryService,
-  OpenClawPluginHostedMediaResolver,
-  OpenClawPluginHttpRouteParams,
-  OpenClawPluginHookOptions,
-  OpenClawPluginNodeHostCommand,
-  OpenClawPluginNodeInvokePolicy,
-  OpenClawPluginReloadRegistration,
-  OpenClawPluginSecurityAuditCollector,
+  RecallPluginGatewayRuntimeScopeSurface,
+  RecallGatewayDiscoveryService,
+  RecallPluginHostedMediaResolver,
+  RecallPluginHttpRouteParams,
+  RecallPluginHookOptions,
+  RecallPluginNodeHostCommand,
+  RecallPluginNodeInvokePolicy,
+  RecallPluginReloadRegistration,
+  RecallPluginSecurityAuditCollector,
   MediaUnderstandingProviderPlugin,
   MigrationProviderPlugin,
-  OpenClawPluginService,
-  OpenClawPluginToolContext,
-  OpenClawPluginToolFactory,
+  RecallPluginService,
+  RecallPluginToolContext,
+  RecallPluginToolFactory,
   PluginHookHandlerMap,
   PluginHookName,
   PluginHookRegistration as TypedPluginHookRegistration,
@@ -189,7 +189,7 @@ import type {
 } from "./types.js";
 
 export type PluginHttpRouteRegistration = RegistryTypesPluginHttpRouteRegistration & {
-  gatewayRuntimeScopeSurface?: OpenClawPluginGatewayRuntimeScopeSurface;
+  gatewayRuntimeScopeSurface?: RecallPluginGatewayRuntimeScopeSurface;
 };
 
 const GATEWAY_METHOD_DISPATCH_CONTRACT = "authenticated-request";
@@ -303,14 +303,14 @@ function isOfficialCodexPluginRecord(
   if (record.origin !== "global") {
     return false;
   }
-  if (record.packageName === "@openclaw/codex") {
+  if (record.packageName === "@recall/codex") {
     return true;
   }
   const sourcePath = path
     .normalize(record.rootDir ?? record.source)
     .split(path.sep)
     .join("/");
-  return sourcePath.includes("/node_modules/@openclaw/codex");
+  return sourcePath.includes("/node_modules/@recall/codex");
 }
 
 function canClaimReservedCommandOwnership(
@@ -319,7 +319,7 @@ function canClaimReservedCommandOwnership(
   return record.origin === "bundled" || isOfficialCodexPluginRecord(record);
 }
 
-const ACTIVE_PLUGIN_HOOK_REGISTRATIONS_KEY = Symbol.for("openclaw.activePluginHookRegistrations");
+const ACTIVE_PLUGIN_HOOK_REGISTRATIONS_KEY = Symbol.for("recall.activePluginHookRegistrations");
 const activePluginHookRegistrations = resolveGlobalSingleton<
   Map<string, Array<{ event: string; handler: Parameters<typeof registerInternalHook>[1] }>>
 >(ACTIVE_PLUGIN_HOOK_REGISTRATIONS_KEY, () => new Map());
@@ -411,7 +411,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerCodexAppServerExtensionFactory = (
     record: PluginRecord,
-    factory: Parameters<OpenClawPluginApi["registerCodexAppServerExtensionFactory"]>[0],
+    factory: Parameters<RecallPluginApi["registerCodexAppServerExtensionFactory"]>[0],
   ) => {
     if (record.origin !== "bundled") {
       pushDiagnostic({
@@ -474,8 +474,8 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerAgentToolResultMiddleware = (
     record: PluginRecord,
-    handler: Parameters<OpenClawPluginApi["registerAgentToolResultMiddleware"]>[0],
-    options: Parameters<OpenClawPluginApi["registerAgentToolResultMiddleware"]>[1],
+    handler: Parameters<RecallPluginApi["registerAgentToolResultMiddleware"]>[0],
+    options: Parameters<RecallPluginApi["registerAgentToolResultMiddleware"]>[1],
   ) => {
     if (record.origin !== "bundled") {
       pushDiagnostic({
@@ -548,7 +548,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerTool = (
     record: PluginRecord,
-    tool: AnyAgentTool | OpenClawPluginToolFactory,
+    tool: AnyAgentTool | RecallPluginToolFactory,
     opts?: { name?: string; names?: string[]; optional?: boolean },
   ) => {
     if (pluginsWithChannelRegistrationConflict.has(record.id)) {
@@ -566,8 +566,8 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
     }
     const names = [...(opts?.names ?? []), ...(opts?.name ? [opts.name] : [])];
     const optional = opts?.optional === true;
-    const factory: OpenClawPluginToolFactory =
-      typeof tool === "function" ? tool : (_ctx: OpenClawPluginToolContext) => tool;
+    const factory: RecallPluginToolFactory =
+      typeof tool === "function" ? tool : (_ctx: RecallPluginToolContext) => tool;
 
     if (typeof tool !== "function") {
       names.push(tool.name);
@@ -606,8 +606,8 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
     record: PluginRecord,
     events: string | string[],
     handler: Parameters<typeof registerInternalHook>[1],
-    opts: OpenClawPluginHookOptions | undefined,
-    config: OpenClawPluginApi["config"],
+    opts: RecallPluginHookOptions | undefined,
+    config: RecallPluginApi["config"],
     pluginConfig: unknown,
   ) => {
     const eventList = Array.isArray(events) ? events : [events];
@@ -636,7 +636,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
             ...entry.hook,
             name: hookName,
             description,
-            source: "openclaw-plugin",
+            source: "recall-plugin",
             pluginId: record.id,
           },
           metadata: {
@@ -648,7 +648,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
           hook: {
             name: hookName,
             description,
-            source: "openclaw-plugin",
+            source: "recall-plugin",
             pluginId: record.id,
             filePath: record.source,
             baseDir: path.dirname(record.source),
@@ -751,7 +751,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
   const canDispatchGatewayMethodsFromHttpRoute = (record: PluginRecord): boolean =>
     (record.contracts?.gatewayMethodDispatch ?? []).includes(GATEWAY_METHOD_DISPATCH_CONTRACT);
 
-  const registerHttpRoute = (record: PluginRecord, params: OpenClawPluginHttpRouteParams) => {
+  const registerHttpRoute = (record: PluginRecord, params: RecallPluginHttpRouteParams) => {
     const normalizedPath = normalizePluginHttpPath(params.path);
     if (!normalizedPath) {
       pushDiagnostic({
@@ -853,7 +853,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerHostedMediaResolver = (
     record: PluginRecord,
-    resolver: OpenClawPluginHostedMediaResolver,
+    resolver: RecallPluginHostedMediaResolver,
   ) => {
     if (typeof resolver !== "function") {
       pushDiagnostic({
@@ -875,13 +875,13 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerChannel = (
     record: PluginRecord,
-    registration: OpenClawPluginChannelRegistration | ChannelPlugin,
+    registration: RecallPluginChannelRegistration | ChannelPlugin,
     mode: PluginRegistrationMode = "full",
   ) => {
     const registrationCapabilities = resolvePluginRegistrationCapabilities(mode);
     const normalized =
-      typeof (registration as OpenClawPluginChannelRegistration).plugin === "object"
-        ? (registration as OpenClawPluginChannelRegistration)
+      typeof (registration as RecallPluginChannelRegistration).plugin === "object"
+        ? (registration as RecallPluginChannelRegistration)
         : { plugin: registration as ChannelPlugin };
     const plugin = normalizeRegisteredChannelPlugin({
       pluginId: record.id,
@@ -1359,11 +1359,11 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerCli = (
     record: PluginRecord,
-    registrar: OpenClawPluginCliRegistrar,
+    registrar: RecallPluginCliRegistrar,
     opts?: {
       parentPath?: string[];
       commands?: string[];
-      descriptors?: OpenClawPluginCliCommandDescriptor[];
+      descriptors?: RecallPluginCliCommandDescriptor[];
     },
   ) => {
     const normalizeCommandRoot = (raw: string, source: "command" | "descriptor") => {
@@ -1398,7 +1398,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
           : null;
       })
       .filter(
-        (descriptor): descriptor is OpenClawPluginCliCommandDescriptor => descriptor !== null,
+        (descriptor): descriptor is RecallPluginCliCommandDescriptor => descriptor !== null,
       );
     const commands = [
       ...(opts?.commands ?? []),
@@ -1455,10 +1455,10 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
     NODE_SYSTEM_NOTIFY_COMMAND,
   ]);
 
-  const registerReload = (record: PluginRecord, registration: OpenClawPluginReloadRegistration) => {
+  const registerReload = (record: PluginRecord, registration: RecallPluginReloadRegistration) => {
     const normalize = (values?: string[]) =>
       (values ?? []).map((value) => value.trim()).filter(Boolean);
-    const normalized: OpenClawPluginReloadRegistration = {
+    const normalized: RecallPluginReloadRegistration = {
       restartPrefixes: normalize(registration.restartPrefixes),
       hotPrefixes: normalize(registration.hotPrefixes),
       noopPrefixes: normalize(registration.noopPrefixes),
@@ -1488,7 +1488,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerNodeHostCommand = (
     record: PluginRecord,
-    nodeCommand: OpenClawPluginNodeHostCommand,
+    nodeCommand: RecallPluginNodeHostCommand,
   ) => {
     const command = nodeCommand.command.trim();
     if (!command) {
@@ -1535,7 +1535,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerNodeInvokePolicy = (
     record: PluginRecord,
-    policy: OpenClawPluginNodeInvokePolicy,
+    policy: RecallPluginNodeInvokePolicy,
     pluginConfig?: Record<string, unknown>,
   ) => {
     const commands = Array.isArray(policy.commands)
@@ -1586,7 +1586,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerSecurityAuditCollector = (
     record: PluginRecord,
-    collector: OpenClawPluginSecurityAuditCollector,
+    collector: RecallPluginSecurityAuditCollector,
   ) => {
     registry.securityAuditCollectors ??= [];
     registry.securityAuditCollectors.push({
@@ -1598,7 +1598,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
     });
   };
 
-  const registerService = (record: PluginRecord, service: OpenClawPluginService) => {
+  const registerService = (record: PluginRecord, service: RecallPluginService) => {
     const id = service.id.trim();
     if (!id) {
       return;
@@ -1632,7 +1632,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerGatewayDiscoveryService = (
     record: PluginRecord,
-    service: OpenClawGatewayDiscoveryService,
+    service: RecallGatewayDiscoveryService,
   ) => {
     const id = service.id.trim();
     if (!id) {
@@ -1661,7 +1661,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
     });
   };
 
-  const registerCommand = (record: PluginRecord, command: OpenClawPluginCommandDefinition) => {
+  const registerCommand = (record: PluginRecord, command: RecallPluginCommandDefinition) => {
     const name = command.name.trim();
     if (!name) {
       pushDiagnostic({
@@ -2536,12 +2536,12 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
   const createApi = (
     record: PluginRecord,
     params: {
-      config: OpenClawPluginApi["config"];
+      config: RecallPluginApi["config"];
       pluginConfig?: Record<string, unknown>;
       hookPolicy?: PluginTypedHookPolicy;
       registrationMode?: PluginRegistrationMode;
     },
-  ): OpenClawPluginApi => {
+  ): RecallPluginApi => {
     const registrationMode = params.registrationMode ?? "full";
     const registrationCapabilities = resolvePluginRegistrationCapabilities(registrationMode);
     pluginRuntimeRecordById.set(record.id, record);
@@ -2698,12 +2698,12 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
                 }
               },
               registerCompactionProvider: (
-                provider: Parameters<OpenClawPluginApi["registerCompactionProvider"]>[0],
+                provider: Parameters<RecallPluginApi["registerCompactionProvider"]>[0],
               ) => {
                 const id = normalizeOptionalString(
                   (
                     provider as Partial<
-                      Parameters<OpenClawPluginApi["registerCompactionProvider"]>[0]
+                      Parameters<RecallPluginApi["registerCompactionProvider"]>[0]
                     > | null
                   )?.id,
                 );
@@ -2762,7 +2762,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
                   });
                 }
                 return enqueuePluginNextTurnInjection({
-                  cfg: registryParams.runtime.config.current() as OpenClawConfig,
+                  cfg: registryParams.runtime.config.current() as RecallConfig,
                   pluginId: record.id,
                   pluginName: record.name,
                   injection,
@@ -2819,7 +2819,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
                     return { ok: false, error: "plugin is not loaded" };
                   }
                   const runtimeConfig =
-                    (registryParams.runtime.config?.current?.() as OpenClawConfig | undefined) ??
+                    (registryParams.runtime.config?.current?.() as RecallConfig | undefined) ??
                     params.config;
                   return await sendPluginSessionAttachment({
                     ...attachment,

@@ -43,7 +43,7 @@ describe("resolveOfficialPluginOnboardingInstallEntries", () => {
           installs: {
             "diagnostics-otel": {
               source: "npm",
-              spec: "@openclaw/diagnostics-otel",
+              spec: "@recall/diagnostics-otel",
               installPath: "/tmp/diagnostics-otel",
             },
           },
@@ -62,8 +62,8 @@ describe("formatInstallHint", () => {
   it("describes dual-source npm-default installs as npm first", () => {
     expect(
       testing.formatInstallHint({
-        clawhubSpec: "clawhub:@openclaw/diagnostics-otel",
-        npmSpec: "@openclaw/diagnostics-otel",
+        clawhubSpec: "clawhub:@recall/diagnostics-otel",
+        npmSpec: "@recall/diagnostics-otel",
         defaultChoice: "npm",
       }),
     ).toBe("npm, with ClawHub fallback");
@@ -72,8 +72,8 @@ describe("formatInstallHint", () => {
   it("keeps dual-source clawhub-default installs ClawHub first", () => {
     expect(
       testing.formatInstallHint({
-        clawhubSpec: "clawhub:@openclaw/diagnostics-otel",
-        npmSpec: "@openclaw/diagnostics-otel",
+        clawhubSpec: "clawhub:@recall/diagnostics-otel",
+        npmSpec: "@recall/diagnostics-otel",
         defaultChoice: "clawhub",
       }),
     ).toBe("ClawHub, with npm fallback");
@@ -115,27 +115,27 @@ describe("setupOfficialPluginInstalls", () => {
         {
           value: "acpx",
           label: "ACPX Runtime",
-          hint: "OpenClaw ACP runtime backend",
+          hint: "Recall ACP runtime backend",
         },
         {
           value: "diagnostics-otel",
           label: "Diagnostics OpenTelemetry",
-          hint: "OpenClaw diagnostics OpenTelemetry exporter",
+          hint: "Recall diagnostics OpenTelemetry exporter",
         },
         {
           value: "diagnostics-prometheus",
           label: "Diagnostics Prometheus",
-          hint: "OpenClaw diagnostics Prometheus exporter",
+          hint: "Recall diagnostics Prometheus exporter",
         },
         {
           value: "diffs",
           label: "Diffs",
-          hint: "OpenClaw diff viewer plugin",
+          hint: "Recall diff viewer plugin",
         },
         {
           value: "google-meet",
           label: "Google Meet",
-          hint: "OpenClaw Google Meet participant plugin",
+          hint: "Recall Google Meet participant plugin",
         },
         {
           value: "lobster",
@@ -145,17 +145,17 @@ describe("setupOfficialPluginInstalls", () => {
         {
           value: "memory-lancedb",
           label: "Memory LanceDB",
-          hint: "OpenClaw LanceDB-backed long-term memory plugin with auto-recall/capture",
+          hint: "Recall LanceDB-backed long-term memory plugin with auto-recall/capture",
         },
         {
           value: "openshell",
           label: "OpenShell Sandbox",
-          hint: "OpenClaw OpenShell sandbox backend",
+          hint: "Recall OpenShell sandbox backend",
         },
         {
           value: "voice-call",
           label: "Voice Call",
-          hint: "OpenClaw voice-call plugin",
+          hint: "Recall voice-call plugin",
         },
       ],
     });
@@ -164,10 +164,10 @@ describe("setupOfficialPluginInstalls", () => {
       entry: {
         pluginId: "diagnostics-otel",
         label: "Diagnostics OpenTelemetry",
-        description: "OpenClaw diagnostics OpenTelemetry exporter",
+        description: "Recall diagnostics OpenTelemetry exporter",
         install: {
-          clawhubSpec: "clawhub:@openclaw/diagnostics-otel",
-          npmSpec: "@openclaw/diagnostics-otel",
+          clawhubSpec: "clawhub:@recall/diagnostics-otel",
+          npmSpec: "@recall/diagnostics-otel",
           defaultChoice: "npm",
           minHostVersion: ">=2026.4.25",
         },

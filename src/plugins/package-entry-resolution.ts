@@ -28,8 +28,8 @@ function runtimeExtensionsLengthMismatchMessage(params: {
   extensionsLength: number;
 }): string {
   return (
-    `package.json openclaw.runtimeExtensions length (${params.runtimeExtensionsLength}) ` +
-    `must match openclaw.extensions length (${params.extensionsLength})`
+    `package.json recall.runtimeExtensions length (${params.runtimeExtensionsLength}) ` +
+    `must match recall.extensions length (${params.extensionsLength})`
   );
 }
 
@@ -60,7 +60,7 @@ function resolvePackageRuntimeExtensionEntries(params: {
 }): RuntimeExtensionsResolution {
   const packageManifest = getPackageManifestMetadata(params.manifest ?? undefined);
   const runtimeExtensionsResult = readPackageManifestStringList({
-    fieldName: "openclaw.runtimeExtensions",
+    fieldName: "recall.runtimeExtensions",
     value: packageManifest?.runtimeExtensions,
   });
   if (!runtimeExtensionsResult.ok) {
@@ -233,7 +233,7 @@ export async function validatePackageExtensionEntriesForInstall(params: {
   if (runtimeSetupEntry && !setupEntry) {
     return {
       ok: false,
-      error: "package.json openclaw.runtimeSetupEntry requires openclaw.setupEntry",
+      error: "package.json recall.runtimeSetupEntry requires recall.setupEntry",
     };
   }
   if (setupEntry) {

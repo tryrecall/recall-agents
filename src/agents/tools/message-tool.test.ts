@@ -4,14 +4,14 @@ import type { ChannelMessageCapability } from "../../channels/plugins/message-ca
 import type { ChannelMessageActionName, ChannelPlugin } from "../../channels/plugins/types.js";
 import type { MessageActionRunResult } from "../../infra/outbound/message-action-runner.js";
 type CreateMessageTool = typeof import("./message-tool.js").createMessageTool;
-type CreateOpenClawTools = typeof import("../openclaw-tools.js").createOpenClawTools;
+type CreateRecallTools = typeof import("../recall-tools.js").createRecallTools;
 type ResetPluginRuntimeStateForTest =
   typeof import("../../plugins/runtime.js").resetPluginRuntimeStateForTest;
 type SetActivePluginRegistry = typeof import("../../plugins/runtime.js").setActivePluginRegistry;
 type CreateTestRegistry = typeof import("../../test-utils/channel-plugins.js").createTestRegistry;
 
 let createMessageTool: CreateMessageTool;
-let createOpenClawTools: CreateOpenClawTools;
+let createRecallTools: CreateRecallTools;
 let resetPluginRuntimeStateForTest: ResetPluginRuntimeStateForTest;
 let setActivePluginRegistry: SetActivePluginRegistry;
 let createTestRegistry: CreateTestRegistry;
@@ -301,7 +301,7 @@ beforeAll(async () => {
     await import("../../plugins/runtime.js"));
   ({ createTestRegistry } = await import("../../test-utils/channel-plugins.js"));
   ({ createMessageTool } = await import("./message-tool.js"));
-  ({ createOpenClawTools } = await import("../openclaw-tools.js"));
+  ({ createRecallTools } = await import("../recall-tools.js"));
 });
 
 beforeEach(() => {
@@ -402,8 +402,8 @@ describe("message tool secret scoping", () => {
     );
   });
 
-  it("forwards source reply delivery mode through createOpenClawTools", () => {
-    const tool = createOpenClawTools({
+  it("forwards source reply delivery mode through createRecallTools", () => {
+    const tool = createRecallTools({
       config: {} as never,
       sourceReplyDeliveryMode: "message_tool_only",
     }).find((candidate) => candidate.name === "message");
@@ -856,10 +856,10 @@ describe("message tool agent routing", () => {
     expect(call?.toolContext?.replyToMode).toBe("off");
   });
 
-  it("forwards agentThreadId through createOpenClawTools to the message tool", async () => {
+  it("forwards agentThreadId through createRecallTools to the message tool", async () => {
     mockSendResult({ channel: "slack", to: "channel:C123" });
 
-    const tool = createOpenClawTools({
+    const tool = createRecallTools({
       agentSessionKey: "agent:main:slack:channel:c123:thread:111.222",
       config: {} as never,
       agentChannel: "slack",

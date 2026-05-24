@@ -2,7 +2,7 @@ import type { AgentMessage } from "@earendil-works/pi-agent-core";
 import { SessionManager } from "@earendil-works/pi-coding-agent";
 import type { SessionEntry } from "../../config/sessions/types.js";
 import type { AgentCompactionMode } from "../../config/types.agent-defaults.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { ensureContextEnginesInitialized as ensureContextEnginesInitializedImpl } from "../../context-engine/init.js";
 import { resolveContextEngine as resolveContextEngineImpl } from "../../context-engine/registry.js";
 import type { ContextEngine } from "../../context-engine/types.js";
@@ -42,11 +42,11 @@ type SettingsManagerLike = {
 type CliCompactionDeps = {
   openSessionManager: (sessionFile: string) => SessionManagerLike;
   ensureContextEnginesInitialized: () => void;
-  resolveContextEngine: (cfg: OpenClawConfig) => Promise<ContextEngine>;
+  resolveContextEngine: (cfg: RecallConfig) => Promise<ContextEngine>;
   createPreparedEmbeddedPiSettingsManager: (params: {
     cwd: string;
     agentDir: string;
-    cfg?: OpenClawConfig;
+    cfg?: RecallConfig;
     contextTokenBudget?: number;
   }) => SettingsManagerLike | Promise<SettingsManagerLike>;
   applyPiAutoCompactionGuard: (params: {
@@ -78,7 +78,7 @@ type CliCompactionRuntimeContextParams = {
   agentAccountId?: string;
   workspaceDir: string;
   agentDir: string;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   skillsSnapshot?: SkillSnapshot;
   senderIsOwner?: boolean;
   provider: string;
@@ -216,7 +216,7 @@ async function compactCliTranscript(params: {
   sessionKey: string;
   sessionFile: string;
   sessionManager: SessionManagerLike;
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   workspaceDir: string;
   agentDir: string;
   provider: string;
@@ -308,7 +308,7 @@ async function compactCliTranscript(params: {
 }
 
 async function compactNativeHarnessCliTranscript(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionId: string;
   sessionKey: string;
   sessionFile: string;
@@ -417,7 +417,7 @@ async function compactNativeHarnessCliTranscript(params: {
 }
 
 export async function runCliTurnCompactionLifecycle(params: {
-  cfg: OpenClawConfig;
+  cfg: RecallConfig;
   sessionId: string;
   sessionKey: string;
   sessionEntry: SessionEntry | undefined;

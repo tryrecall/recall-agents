@@ -18,7 +18,7 @@ import type {
   ChannelStreamingAdapter,
   ChannelThreadingAdapter,
 } from "../../channels/plugins/types.public.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { RecallConfig } from "../../config/types.recall.js";
 import { getActivePluginRegistry } from "../../plugins/runtime.js";
 import {
   isDeliverableMessageChannel,
@@ -100,7 +100,7 @@ export function normalizeDeliverableOutboundChannel(
 
 function maybeBootstrapChannelPlugin(params: {
   channel: DeliverableMessageChannel;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
 }): void {
   bootstrapOutboundChannelPlugin(params);
 }
@@ -173,7 +173,7 @@ function toOutboundChannelRuntime(plugin: ChannelPlugin): OutboundChannelRuntime
 
 export function resolveOutboundChannelPlugin(params: {
   channel: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   allowBootstrap?: boolean;
 }): ChannelPlugin | undefined {
   const normalized = normalizeDeliverableOutboundChannel(params.channel);
@@ -207,7 +207,7 @@ export function resolveOutboundChannelPlugin(params: {
 
 export function resolveOutboundChannelMessageAdapter(params: {
   channel: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
   allowBootstrap?: boolean;
 }): ChannelMessageAdapterShape | undefined {
   return resolveOutboundChannelPlugin(params)?.message;
@@ -215,7 +215,7 @@ export function resolveOutboundChannelMessageAdapter(params: {
 
 export function resolveOutboundChannelPluginForRead(params: {
   channel: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
 }): ChannelPlugin | undefined {
   const normalized = normalizeMessageChannel(params.channel) ?? params.channel.trim();
   if (!normalized) {
@@ -244,7 +244,7 @@ export function resolveOutboundChannelPluginForRead(params: {
 
 export function resolveOutboundChannelRuntime(params: {
   channel: string;
-  cfg?: OpenClawConfig;
+  cfg?: RecallConfig;
 }): OutboundChannelRuntime | undefined {
   const plugin = resolveOutboundChannelPluginForRead(params);
   return plugin ? toOutboundChannelRuntime(plugin) : undefined;

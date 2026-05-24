@@ -1,11 +1,11 @@
 ---
-name: openclaw-mac-release
-description: "Run or recover OpenClaw macOS release signing, notarization, appcast, and asset promotion."
+name: recall-mac-release
+description: "Run or recover Recall macOS release signing, notarization, appcast, and asset promotion."
 ---
 
-# OpenClaw Mac Release
+# Recall Mac Release
 
-Use with `$openclaw-release-maintainer`, `$openclaw-release-ci`, and `$one-password` when stable macOS assets, private mac preflight, notarization, appcast promotion, or mac release recovery is involved.
+Use with `$recall-release-maintainer`, `$recall-release-ci`, and `$one-password` when stable macOS assets, private mac preflight, notarization, appcast promotion, or mac release recovery is involved.
 
 ## Credentials
 
@@ -26,7 +26,7 @@ Use with `$openclaw-release-maintainer`, `$openclaw-release-ci`, and `$one-passw
 
 ## GitHub Secrets
 
-Target private repo environment: `openclaw/releases-private`, env `mac-release`.
+Target private repo environment: `recall/releases-private`, env `mac-release`.
 
 Set only after local notary auth validation:
 
@@ -48,7 +48,7 @@ Do not update these from mixed sources. All three ASC fields must come from the 
 
 ## Notarization
 
-- OpenClaw uses `scripts/notarize-mac-artifact.sh`.
+- Recall uses `scripts/notarize-mac-artifact.sh`.
 - `xcrun notarytool submit` should use `--no-s3-acceleration`; accelerated upload can surface misleading 401s even when `notarytool history` succeeds.
 - If signing succeeds but notarization fails immediately with 401, check ASC key freshness first.
 - If notarization stays in progress for several minutes after key-file write, that is normal Apple wait time; do not edit blindly.
@@ -58,7 +58,7 @@ Do not update these from mixed sources. All three ASC fields must come from the 
 Private preflight:
 
 ```bash
-gh workflow run openclaw-macos-publish.yml --repo openclaw/releases-private --ref main \
+gh workflow run recall-macos-publish.yml --repo recall/releases-private --ref main \
   -f tag=vYYYY.M.D \
   -f source_ref=release/YYYY.M.D \
   -f preflight_only=true \
@@ -70,7 +70,7 @@ gh workflow run openclaw-macos-publish.yml --repo openclaw/releases-private --re
 Private validation for a branch-variation preflight:
 
 ```bash
-gh workflow run openclaw-macos-validate.yml --repo openclaw/releases-private --ref main \
+gh workflow run recall-macos-validate.yml --repo recall/releases-private --ref main \
   -f tag=vYYYY.M.D \
   -f source_ref=release/YYYY.M.D
 ```
@@ -78,7 +78,7 @@ gh workflow run openclaw-macos-validate.yml --repo openclaw/releases-private --r
 Real publish:
 
 ```bash
-gh workflow run openclaw-macos-publish.yml --repo openclaw/releases-private --ref main \
+gh workflow run recall-macos-publish.yml --repo recall/releases-private --ref main \
   -f tag=vYYYY.M.D \
   -f preflight_only=false \
   -f smoke_test_only=false \
@@ -90,6 +90,6 @@ gh workflow run openclaw-macos-publish.yml --repo openclaw/releases-private --re
 
 ## Verify
 
-- `gh release view vYYYY.M.D --repo openclaw/openclaw` shows zip, dmg, dSYM zip, not draft, not prerelease.
-- Public `main` `appcast.xml` points at `OpenClaw-YYYY.M.D.zip`.
+- `gh release view vYYYY.M.D --repo tryrecall/recall-agents` shows zip, dmg, dSYM zip, not draft, not prerelease.
+- Public `main` `appcast.xml` points at `Recall-YYYY.M.D.zip`.
 - Appcast entry has `sparkle:version`, `sparkle:shortVersionString`, length, and `sparkle:edSignature`.
