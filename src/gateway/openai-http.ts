@@ -75,60 +75,12 @@ type OpenAiChatCompletionRequest = {
   tool_choice?: unknown;
   messages?: unknown;
   user?: unknown;
-  /**
-   * OpenAI-style hint for reasoning effort. Accepts "low" | "medium" |
-   * "high" (and "minimal" / "auto" are mapped via `normalizeThinkLevel`).
-   */
-  reasoning_effort?: unknown;
-  /**
-   * Anthropic-style extended-thinking opt-in. Either a string
-   * ("low"/"medium"/"high") or an object
-   * `{ type: "enabled", budget_tokens?: number }` per Anthropic's
-   * Messages API. Mapped to a coarse think-level for the agent runtime.
-   */
-  thinking?: unknown;
+  max_tokens?: unknown;
+  max_completion_tokens?: unknown;
+  temperature?: unknown;
+  top_p?: unknown;
+  response_format?: unknown;
 };
-
-/**
- * Translate the request body's reasoning hint into a coarse think-level
- * string the agent runtime accepts ("low"/"medium"/"high"/...).
- *
- * Precedence (when more than one is set):
- *   1. `reasoning_effort` (OpenAI canonical) wins
- *   2. `thinking` as a string ("medium")
- *   3. `thinking` as `{ type: "enabled", budget_tokens?: N }` — Anthropic shape;
- *      we bucket the budget into low/medium/high if provided, else default "medium".
- *
- * Returns undefined when nothing is set, signalling to the agent runtime that
- * thinking should remain off.
- */
-function resolveThinkingFromRequest(payload: OpenAiChatCompletionRequest): string | undefined {
-  if (typeof payload.reasoning_effort === "string" && payload.reasoning_effort.trim()) {
-    return payload.reasoning_effort.trim();
-  }
-  if (typeof payload.thinking === "string" && payload.thinking.trim()) {
-    return payload.thinking.trim();
-  }
-  const thinking = payload.thinking;
-  if (thinking && typeof thinking === "object") {
-    const obj = thinking as Record<string, unknown>;
-    if (obj.type !== "enabled") {
-      return undefined;
-    }
-    const budget = typeof obj.budget_tokens === "number" ? obj.budget_tokens : undefined;
-    if (budget === undefined) {
-      return "medium";
-    }
-    if (budget <= 1024) {
-      return "low";
-    }
-    if (budget <= 4096) {
-      return "medium";
-    }
-    return "high";
-  }
-  return undefined;
-}
 
 const DEFAULT_OPENAI_CHAT_COMPLETIONS_BODY_BYTES = 20 * 1024 * 1024;
 const IMAGE_ONLY_USER_MESSAGE = "User sent image(s) with no text.";
@@ -185,16 +137,13 @@ function buildAgentCommandInput(params: {
   sessionKey: string;
   runId: string;
   messageChannel: string;
-  /** Optional thinking level hint. "low"/"medium"/"high"/etc. */
-  thinking?: string;
-  /**
-   * Optional reasoning level. "on"/"stream". When set, agent-command resolves
-   * resolvedReasoningLevel which subscribeEmbeddedPiSession uses for
-   * reasoningMode. "stream" is what gates emission of stream:"thinking"
-   * AgentEvents — without it, the gateway never receives thinking events
-   * to forward as delta.thinking_content chunks.
-   */
-  reasoning?: string;
+  abortSignal?: AbortSignal;
+  streamParams?: {
+    maxTokens?: number;
+    temperature?: number;
+    topP?: number;
+    responseFormat?: Record<string, unknown>;
+  };
 }) {
   return {
     message: params.prompt.message,
@@ -207,18 +156,6 @@ function buildAgentCommandInput(params: {
     deliver: false as const,
     messageChannel: params.messageChannel,
     bestEffortDeliver: false as const,
-    // Forward thinking hint to the agent runtime so pi-embedded-subscribe can
-    // flip thinkingEnabled=true and the upstream Anthropic provider streams
-    // thinking_delta content blocks. See PR forwarding those events as
-    // delta.thinking_content chunks back to the client.
-    thinking: params.thinking,
-    // Forward reasoning level so the runner emits stream:"thinking" events
-    // for each Anthropic thinking_delta block. Without this, even with
-    // thinkingEnabled=true at the API level, no thinking_content chunks
-    // would be forwarded out as SSE.
-    reasoning: params.reasoning,
-    // HTTP API callers are authenticated operator clients for this gateway context.
-    senderIsOwner: true as const,
     allowModelOverride: true as const,
     abortSignal: params.abortSignal,
     streamParams: params.streamParams,
@@ -320,22 +257,9 @@ function writeAssistantContentChunk(
   });
 }
 
-/**
- * Emit a thinking-delta chunk for clients that subscribe to Anthropic's
- * extended-thinking content blocks. OpenAI's native chat-completion shape has
- * no thinking field, so we use a custom `delta.thinking_content` key. The
- * Recall dashboard's stream-transform (in tryrecall/signature-recall-chat)
- * already routes `delta.thinking_content` to a separate `thinking-delta` UI
- * message so it renders as a collapsible <Thinking> block above the answer.
- *
- * This is the gateway-side half of issue #110 in signature-recall-chat:
- * pi-embedded-subscribe emits AgentEvent {stream: "thinking", data.text} when
- * the upstream provider returns Anthropic thinking_delta events. Without this
- * forwarder, those events were dropped silently.
- */
-function writeAssistantThinkingChunk(
+function writeAssistantFinishChunk(
   res: ServerResponse,
-  params: { runId: string; model: string; thinkingContent: string },
+  params: { runId: string; model: string; finishReason: "stop" | "tool_calls" },
 ) {
   writeSse(res, {
     id: params.runId,
@@ -345,12 +269,97 @@ function writeAssistantThinkingChunk(
     choices: [
       {
         index: 0,
-        // Custom field. OpenAI never reads it; clients that want thinking
-        // content opt in by checking for this field.
-        delta: { thinking_content: params.thinkingContent },
-        finish_reason: null,
+        delta: {},
+        finish_reason: params.finishReason,
       },
     ],
+  });
+}
+
+function splitArgumentsForStreaming(argumentsValue: string): string[] {
+  if (!argumentsValue) {
+    return [""];
+  }
+  const chunkSize = 256;
+  const chunks: string[] = [];
+  for (let i = 0; i < argumentsValue.length; i += chunkSize) {
+    chunks.push(argumentsValue.slice(i, i + chunkSize));
+  }
+  return chunks.length > 0 ? chunks : [""];
+}
+
+function writeAssistantToolCallsIncrementalChunks(
+  res: ServerResponse,
+  params: {
+    runId: string;
+    model: string;
+    toolCalls: Array<{ id: string; name: string; arguments: string }>;
+  },
+) {
+  for (const [index, call] of params.toolCalls.entries()) {
+    writeSse(res, {
+      id: params.runId,
+      object: "chat.completion.chunk",
+      created: Math.floor(Date.now() / 1000),
+      model: params.model,
+      choices: [
+        {
+          index: 0,
+          delta: {
+            tool_calls: [
+              {
+                index,
+                id: call.id,
+                type: "function",
+                function: { name: call.name, arguments: "" },
+              },
+            ],
+          },
+          finish_reason: null,
+        },
+      ],
+    });
+
+    for (const argsDelta of splitArgumentsForStreaming(call.arguments)) {
+      writeSse(res, {
+        id: params.runId,
+        object: "chat.completion.chunk",
+        created: Math.floor(Date.now() / 1000),
+        model: params.model,
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [
+                {
+                  index,
+                  function: { arguments: argsDelta },
+                },
+              ],
+            },
+            finish_reason: null,
+          },
+        ],
+      });
+    }
+  }
+}
+
+function writeUsageChunk(
+  res: ServerResponse,
+  params: {
+    runId: string;
+    model: string;
+    usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
+  },
+) {
+  writeSse(res, {
+    id: params.runId,
+    object: "chat.completion.chunk",
+    created: Math.floor(Date.now() / 1000),
+    model: params.model,
+    choices: [],
+    usage: params.usage,
   });
 }
 
@@ -941,13 +950,10 @@ export async function handleOpenAiHttpRequest(
 
   const runId = `chatcmpl_${randomUUID()}`;
   const deps = createDefaultDeps();
-  const thinkingHint = resolveThinkingFromRequest(payload);
-  // When the request opts in to thinking (via either reasoning_effort or
-  // an explicit thinking:enabled object), set reasoning="stream" too so
-  // pi-embedded-subscribe emits AgentEvents on each Anthropic
-  // thinking_delta block. The gateway's openai-http handler then forwards
-  // those events as delta.thinking_content SSE chunks (PR #4).
-  const reasoningHint = thinkingHint ? "stream" : undefined;
+  const abortController = new AbortController();
+  const mergedExtraSystemPrompt = [prompt.extraSystemPrompt, toolChoicePrompt]
+    .filter((part): part is string => Boolean(part))
+    .join("\n\n");
   const commandInput = buildAgentCommandInput({
     prompt: {
       message: prompt.message,
@@ -959,8 +965,8 @@ export async function handleOpenAiHttpRequest(
     sessionKey,
     runId,
     messageChannel,
-    thinking: thinkingHint,
-    reasoning: reasoningHint,
+    abortSignal: abortController.signal,
+    streamParams,
   });
 
   if (!stream) {
@@ -1117,95 +1123,6 @@ export async function handleOpenAiHttpRequest(
         content,
         finishReason: null,
       });
-      return;
-    }
-
-    // Forward Anthropic extended-thinking deltas to the client. These arrive
-    // as AgentEvent {stream: "thinking", data: {text, delta}} from
-    // pi-embedded-subscribe whenever the upstream provider streams a
-    // thinking_delta content block. We emit them as a separate chunk with a
-    // custom `delta.thinking_content` field so consumers can render the
-    // reasoning trace distinctly from the answer text. See issue #110 in
-    // tryrecall/signature-recall-chat.
-    if (evt.stream === "thinking") {
-      const delta = typeof evt.data?.delta === "string" ? evt.data.delta : "";
-      if (!delta) {
-        return;
-      }
-      if (!wroteRole) {
-        wroteRole = true;
-        writeAssistantRoleChunk(res, { runId, model });
-      }
-      writeAssistantThinkingChunk(res, {
-        runId,
-        model,
-        thinkingContent: delta,
-      });
-      return;
-    }
-
-    if (evt.stream === "tool") {
-      const phase = evt.data?.phase;
-      const toolName = typeof evt.data?.name === "string" ? evt.data.name : "unknown";
-      const toolCallId =
-        typeof evt.data?.toolCallId === "string" ? evt.data.toolCallId : `call_${randomUUID()}`;
-
-      if (!wroteRole) {
-        wroteRole = true;
-        writeAssistantRoleChunk(res, { runId, model });
-      }
-
-      if (phase === "start") {
-        const args = evt.data?.args ? JSON.stringify(evt.data.args) : "{}";
-        writeSse(res, {
-          id: runId,
-          object: "chat.completion.chunk",
-          created: Math.floor(Date.now() / 1000),
-          model,
-          choices: [
-            {
-              index: 0,
-              delta: {
-                tool_calls: [
-                  {
-                    index: 0,
-                    id: toolCallId,
-                    type: "function",
-                    function: { name: toolName, arguments: args },
-                  },
-                ],
-              },
-              finish_reason: null,
-            },
-          ],
-        });
-      } else if (phase === "result") {
-        const result = evt.data?.result != null ? JSON.stringify(evt.data.result) : "{}";
-        const isError = Boolean(evt.data?.isError);
-        writeSse(res, {
-          id: runId,
-          object: "chat.completion.chunk",
-          created: Math.floor(Date.now() / 1000),
-          model,
-          choices: [
-            {
-              index: 0,
-              delta: {
-                tool_calls: [
-                  {
-                    index: 0,
-                    id: toolCallId,
-                    type: "function",
-                    function: { name: toolName, arguments: "" },
-                    _tool_result: { result, isError },
-                  },
-                ],
-              },
-              finish_reason: null,
-            },
-          ],
-        });
-      }
       return;
     }
 
