@@ -39,10 +39,6 @@ import {
 import type { PreauthConnectionBudget } from "./server/preauth-connection-budget.js";
 import type { ReadinessChecker } from "./server/readiness.js";
 import type { GatewayWsClient } from "./server/ws-types.js";
-import { handleSessionKillHttpRequest } from "./session-kill-http.js";
-import { handleSessionHistoryHttpRequest } from "./sessions-history-http.js";
-import { handleSessionSendHttpRequest } from "./sessions-send-http.js";
-import { handleToolsInvokeHttpRequest } from "./tools-invoke-http.js";
 
 type PluginHttpRequestHandler = (
   req: IncomingMessage,
@@ -595,50 +591,6 @@ export function createGatewayHttpServer(opts: {
           name: "hooks",
           run: () => handleHooksRequest(req, res),
         },
-        {
-          name: "tools-invoke",
-          run: () =>
-            handleToolsInvokeHttpRequest(req, res, {
-              auth: resolvedAuth,
-              trustedProxies,
-              allowRealIpFallback,
-              rateLimiter,
-            }),
-        },
-        {
-          name: "sessions-kill",
-          run: () =>
-            handleSessionKillHttpRequest(req, res, {
-              auth: resolvedAuth,
-              trustedProxies,
-              allowRealIpFallback,
-              rateLimiter,
-            }),
-        },
-        {
-          name: "sessions-history",
-          run: () =>
-            handleSessionHistoryHttpRequest(req, res, {
-              auth: resolvedAuth,
-              trustedProxies,
-              allowRealIpFallback,
-              rateLimiter,
-            }),
-        },
-        {
-          name: "sessions-send",
-          run: () =>
-            handleSessionSendHttpRequest(req, res, {
-              auth: resolvedAuth,
-              trustedProxies,
-              allowRealIpFallback,
-              rateLimiter,
-            }),
-        },
-        {
-          name: "slack",
-          run: () => handleSlackHttpRequest(req, res),
-        },
       ];
       if (openAiCompatEnabled && isOpenAiModelsPath(scopedRequestPath)) {
         requestStages.push({
@@ -993,17 +945,17 @@ export function attachGatewayUpgradeHandler(opts: {
         wss.handleUpgrade(req, socket, head, (ws) => {
           (
             ws as unknown as import("ws").WebSocket & {
-              __openclawPreauthBudgetClaimed?: boolean;
-              __openclawPreauthBudgetKey?: string;
+              __recallPreauthBudgetClaimed?: boolean;
+              __recallPreauthBudgetKey?: string;
             }
-          )["__openclawPreauthBudgetKey"] = preauthBudgetKey;
+          )["__recallPreauthBudgetKey"] = preauthBudgetKey;
           wss.emit("connection", ws, req);
           const budgetClaimed = Boolean(
             (
               ws as unknown as import("ws").WebSocket & {
-                __openclawPreauthBudgetClaimed?: boolean;
+                __recallPreauthBudgetClaimed?: boolean;
               }
-            )["__openclawPreauthBudgetClaimed"],
+            )["__recallPreauthBudgetClaimed"],
           );
           if (budgetClaimed) {
             budgetTransferred = true;
