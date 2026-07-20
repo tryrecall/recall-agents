@@ -1,7 +1,7 @@
 {
   "entries": [
     {
-      "name": "@steelengine/amazon-bedrock-provider",
+      "name": "@openclaw/amazon-bedrock-provider",
       "description": "SteelEngine Amazon Bedrock provider plugin",
       "source": "official",
       "kind": "provider",
@@ -19,14 +19,14 @@
           }
         ],
         "install": {
-          "npmSpec": "@steelengine/amazon-bedrock-provider",
+          "npmSpec": "@openclaw/amazon-bedrock-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.12-beta.1"
         }
       }
     },
     {
-      "name": "@steelengine/amazon-bedrock-mantle-provider",
+      "name": "@openclaw/amazon-bedrock-mantle-provider",
       "description": "SteelEngine Amazon Bedrock Mantle provider plugin",
       "source": "official",
       "kind": "provider",
@@ -44,14 +44,14 @@
           }
         ],
         "install": {
-          "npmSpec": "@steelengine/amazon-bedrock-mantle-provider",
+          "npmSpec": "@openclaw/amazon-bedrock-mantle-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.12-beta.1"
         }
       }
     },
     {
-      "name": "@steelengine/anthropic-vertex-provider",
+      "name": "@openclaw/anthropic-vertex-provider",
       "description": "SteelEngine Anthropic Vertex provider plugin",
       "source": "official",
       "kind": "provider",
@@ -69,14 +69,14 @@
           }
         ],
         "install": {
-          "npmSpec": "@steelengine/anthropic-vertex-provider",
+          "npmSpec": "@openclaw/anthropic-vertex-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.12-beta.1"
         }
       }
     },
     {
-      "name": "@steelengine/arcee-provider",
+      "name": "@openclaw/arcee-provider",
       "description": "SteelEngine Arcee provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -134,15 +134,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/arcee-provider",
-          "npmSpec": "@steelengine/arcee-provider",
+          "clawhubSpec": "clawhub:@openclaw/arcee-provider",
+          "npmSpec": "@openclaw/arcee-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/baseten-provider",
+      "name": "@openclaw/baseten-provider",
       "description": "SteelEngine Baseten provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -183,15 +183,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/baseten-provider",
-          "npmSpec": "@steelengine/baseten-provider",
+          "clawhubSpec": "clawhub:@openclaw/baseten-provider",
+          "npmSpec": "@openclaw/baseten-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.7.2"
         }
       }
     },
     {
-      "name": "@steelengine/cerebras-provider",
+      "name": "@openclaw/cerebras-provider",
       "description": "SteelEngine Cerebras provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -240,15 +240,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/cerebras-provider",
-          "npmSpec": "@steelengine/cerebras-provider",
+          "clawhubSpec": "clawhub:@openclaw/cerebras-provider",
+          "npmSpec": "@openclaw/cerebras-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/chutes-provider",
+      "name": "@openclaw/chutes-provider",
       "description": "SteelEngine Chutes.ai provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -311,15 +311,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/chutes-provider",
-          "npmSpec": "@steelengine/chutes-provider",
+          "clawhubSpec": "clawhub:@openclaw/chutes-provider",
+          "npmSpec": "@openclaw/chutes-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/cohere-provider",
+      "name": "@openclaw/cohere-provider",
       "description": "SteelEngine Cohere provider plugin",
       "source": "official",
       "kind": "provider",
@@ -357,15 +357,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/cohere-provider",
-          "npmSpec": "@steelengine/cohere-provider",
+          "clawhubSpec": "clawhub:@openclaw/cohere-provider",
+          "npmSpec": "@openclaw/cohere-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/cloudflare-ai-gateway-provider",
+      "name": "@openclaw/cloudflare-ai-gateway-provider",
       "description": "SteelEngine Cloudflare AI Gateway provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -407,15 +407,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/cloudflare-ai-gateway-provider",
-          "npmSpec": "@steelengine/cloudflare-ai-gateway-provider",
+          "clawhubSpec": "clawhub:@openclaw/cloudflare-ai-gateway-provider",
+          "npmSpec": "@openclaw/cloudflare-ai-gateway-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/deepinfra-provider",
+      "name": "@openclaw/deepinfra-provider",
       "description": "SteelEngine DeepInfra provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -482,15 +482,15 @@
           ]
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/deepinfra-provider",
-          "npmSpec": "@steelengine/deepinfra-provider",
+          "clawhubSpec": "clawhub:@openclaw/deepinfra-provider",
+          "npmSpec": "@openclaw/deepinfra-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/deepseek-provider",
+      "name": "@openclaw/deepseek-provider",
       "description": "SteelEngine DeepSeek provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -539,15 +539,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/deepseek-provider",
-          "npmSpec": "@steelengine/deepseek-provider",
+          "clawhubSpec": "clawhub:@openclaw/deepseek-provider",
+          "npmSpec": "@openclaw/deepseek-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/featherless-provider",
+      "name": "@openclaw/featherless-provider",
       "description": "SteelEngine Featherless AI provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -589,15 +589,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/featherless-provider",
-          "npmSpec": "@steelengine/featherless-provider",
+          "clawhubSpec": "clawhub:@openclaw/featherless-provider",
+          "npmSpec": "@openclaw/featherless-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.11"
         }
       }
     },
     {
-      "name": "@steelengine/gmi-provider",
+      "name": "@openclaw/gmi-provider",
       "description": "SteelEngine GMI Cloud provider plugin",
       "source": "official",
       "kind": "provider",
@@ -640,15 +640,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/gmi-provider",
-          "npmSpec": "@steelengine/gmi-provider",
+          "clawhubSpec": "clawhub:@openclaw/gmi-provider",
+          "npmSpec": "@openclaw/gmi-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/longcat-provider",
+      "name": "@openclaw/longcat-provider",
       "description": "SteelEngine LongCat provider plugin",
       "source": "official",
       "kind": "provider",
@@ -683,15 +683,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/longcat-provider",
-          "npmSpec": "@steelengine/longcat-provider",
+          "clawhubSpec": "clawhub:@openclaw/longcat-provider",
+          "npmSpec": "@openclaw/longcat-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/meta-provider",
+      "name": "@openclaw/meta-provider",
       "description": "SteelEngine Meta provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -732,15 +732,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/meta-provider",
-          "npmSpec": "@steelengine/meta-provider",
+          "clawhubSpec": "clawhub:@openclaw/meta-provider",
+          "npmSpec": "@openclaw/meta-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.11"
         }
       }
     },
     {
-      "name": "@steelengine/groq-provider",
+      "name": "@openclaw/groq-provider",
       "description": "SteelEngine Groq media-understanding provider.",
       "source": "official",
       "kind": "provider",
@@ -794,15 +794,15 @@
           ]
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/groq-provider",
-          "npmSpec": "@steelengine/groq-provider",
+          "clawhubSpec": "clawhub:@openclaw/groq-provider",
+          "npmSpec": "@openclaw/groq-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/kilocode-provider",
+      "name": "@openclaw/kilocode-provider",
       "description": "SteelEngine Kilo Gateway provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -844,15 +844,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/kilocode-provider",
-          "npmSpec": "@steelengine/kilocode-provider",
+          "clawhubSpec": "clawhub:@openclaw/kilocode-provider",
+          "npmSpec": "@openclaw/kilocode-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/kimi-provider",
+      "name": "@openclaw/kimi-provider",
       "description": "SteelEngine Kimi provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -897,15 +897,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/kimi-provider",
-          "npmSpec": "@steelengine/kimi-provider",
+          "clawhubSpec": "clawhub:@openclaw/kimi-provider",
+          "npmSpec": "@openclaw/kimi-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/pixverse-provider",
+      "name": "@openclaw/pixverse-provider",
       "description": "SteelEngine PixVerse video provider plugin",
       "source": "official",
       "kind": "provider",
@@ -939,14 +939,14 @@
           }
         ],
         "install": {
-          "npmSpec": "@steelengine/pixverse-provider",
+          "npmSpec": "@openclaw/pixverse-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.26"
         }
       }
     },
     {
-      "name": "@steelengine/qianfan-provider",
+      "name": "@openclaw/qianfan-provider",
       "description": "SteelEngine Qianfan provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -987,15 +987,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/qianfan-provider",
-          "npmSpec": "@steelengine/qianfan-provider",
+          "clawhubSpec": "clawhub:@openclaw/qianfan-provider",
+          "npmSpec": "@openclaw/qianfan-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/qwen-provider",
+      "name": "@openclaw/qwen-provider",
       "description": "SteelEngine Qwen Cloud provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -1180,15 +1180,15 @@
           ]
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/qwen-provider",
-          "npmSpec": "@steelengine/qwen-provider",
+          "clawhubSpec": "clawhub:@openclaw/qwen-provider",
+          "npmSpec": "@openclaw/qwen-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/fireworks-provider",
+      "name": "@openclaw/fireworks-provider",
       "description": "SteelEngine Fireworks provider plugin",
       "source": "official",
       "kind": "provider",
@@ -1233,15 +1233,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/fireworks-provider",
-          "npmSpec": "@steelengine/fireworks-provider",
+          "clawhubSpec": "clawhub:@openclaw/fireworks-provider",
+          "npmSpec": "@openclaw/fireworks-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9"
         }
       }
     },
     {
-      "name": "@steelengine/moonshot-provider",
+      "name": "@openclaw/moonshot-provider",
       "description": "SteelEngine Moonshot provider plugin",
       "source": "official",
       "kind": "provider",
@@ -1341,15 +1341,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/moonshot-provider",
-          "npmSpec": "@steelengine/moonshot-provider",
+          "clawhubSpec": "clawhub:@openclaw/moonshot-provider",
+          "npmSpec": "@openclaw/moonshot-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9"
         }
       }
     },
     {
-      "name": "@steelengine/tencent-provider",
+      "name": "@openclaw/tencent-provider",
       "description": "SteelEngine Tencent Cloud provider plugin (TokenHub + Token Plan)",
       "source": "official",
       "kind": "provider",
@@ -1421,15 +1421,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/tencent-provider",
-          "npmSpec": "@steelengine/tencent-provider",
+          "clawhubSpec": "clawhub:@openclaw/tencent-provider",
+          "npmSpec": "@openclaw/tencent-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9"
         }
       }
     },
     {
-      "name": "@steelengine/venice-provider",
+      "name": "@openclaw/venice-provider",
       "description": "SteelEngine Venice provider plugin",
       "source": "official",
       "kind": "provider",
@@ -1471,15 +1471,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/venice-provider",
-          "npmSpec": "@steelengine/venice-provider",
+          "clawhubSpec": "clawhub:@openclaw/venice-provider",
+          "npmSpec": "@openclaw/venice-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9"
         }
       }
     },
     {
-      "name": "@steelengine/vercel-ai-gateway-provider",
+      "name": "@openclaw/vercel-ai-gateway-provider",
       "description": "SteelEngine Vercel AI Gateway provider plugin",
       "source": "official",
       "kind": "provider",
@@ -1521,15 +1521,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/vercel-ai-gateway-provider",
-          "npmSpec": "@steelengine/vercel-ai-gateway-provider",
+          "clawhubSpec": "clawhub:@openclaw/vercel-ai-gateway-provider",
+          "npmSpec": "@openclaw/vercel-ai-gateway-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9"
         }
       }
     },
     {
-      "name": "@steelengine/zai-provider",
+      "name": "@openclaw/zai-provider",
       "description": "SteelEngine Z.AI provider plugin",
       "source": "official",
       "kind": "provider",
@@ -1652,15 +1652,15 @@
           ]
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/zai-provider",
-          "npmSpec": "@steelengine/zai-provider",
+          "clawhubSpec": "clawhub:@openclaw/zai-provider",
+          "npmSpec": "@openclaw/zai-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9"
         }
       }
     },
     {
-      "name": "@steelengine/stepfun-provider",
+      "name": "@openclaw/stepfun-provider",
       "description": "SteelEngine StepFun provider plugin.",
       "source": "official",
       "kind": "provider",
@@ -1764,8 +1764,8 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/stepfun-provider",
-          "npmSpec": "@steelengine/stepfun-provider",
+          "clawhubSpec": "clawhub:@openclaw/stepfun-provider",
+          "npmSpec": "@openclaw/stepfun-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9"
         }

@@ -845,10 +845,13 @@ export const stateMigrations: PluginDoctorStateMigration[] = [
       }
       const ownerCollection = await collectBindingOwners(sources, surfaces, params);
       if (ownerCollection.failures.length > 0) {
-        warnings.push(
+        // Invalid legacy indexes make ownership unprovable, but no state is
+        // mutated and every sidecar remains available to the legacy reader.
+        // Surface this preservation outcome without blocking Gateway startup.
+        notices.push(
           `Left ${sources.length} Codex binding sidecar(s) in place because session ownership is indeterminate: ${ownerCollection.failures.join("; ")}`,
         );
-        return { changes, warnings };
+        return { changes, warnings, notices };
       }
       const store = params.context.openPluginStateKeyedStore<MigratedBindingRow>({
         namespace: CODEX_APP_SERVER_BINDING_NAMESPACE,

@@ -219,17 +219,17 @@ describe("official external plugin catalog", () => {
     expect(entry.kind).toBe("plugin");
     expect(manifest?.providers).toBeUndefined();
     expect(resolveOfficialExternalPluginInstall(entry)).toMatchObject({
-      npmSpec: "@steelengine/codex",
+      npmSpec: "@openclaw/codex",
       defaultChoice: "npm",
     });
   });
 
   it("curates featured external plugins with ClawHub install alternatives", () => {
     const featured = [
-      ["diffs", "@steelengine/diffs", 40],
-      ["lobster", "@steelengine/lobster", 50],
-      ["tokenjuice", "@steelengine/tokenjuice", 60],
-      ["memory-lancedb", "@steelengine/memory-lancedb", 70],
+      ["diffs", "@openclaw/diffs", 40],
+      ["lobster", "@openclaw/lobster", 50],
+      ["tokenjuice", "@openclaw/tokenjuice", 60],
+      ["memory-lancedb", "@openclaw/memory-lancedb", 70],
     ] as const;
 
     for (const [id, npmSpec, order] of featured) {
@@ -484,10 +484,10 @@ describe("official external plugin catalog", () => {
     const stateDir = mkdtempSync(path.join(os.tmpdir(), "steelengine-signed-snapshot-race-"));
     const url = "https://packages.acme.example/steelengine/feed";
     const newer = signedHostedCatalogFeed({
-      feed: hostedCatalogFeed({ sequence: 10, pluginName: "@steelengine/signed-v10" }),
+      feed: hostedCatalogFeed({ sequence: 10, pluginName: "@openclaw/signed-v10" }),
     });
     const older = signedHostedCatalogFeed({
-      feed: hostedCatalogFeed({ sequence: 9, pluginName: "@steelengine/signed-v9" }),
+      feed: hostedCatalogFeed({ sequence: 9, pluginName: "@openclaw/signed-v9" }),
       privateKeyPem: newer.privateKeyPem,
     });
     const snapshotStore = createSqliteHostedOfficialExternalPluginCatalogSnapshotStore({
@@ -538,13 +538,13 @@ describe("official external plugin catalog", () => {
     const url = "https://packages.acme.example/steelengine/feed";
     const malformed = signedHostedCatalogFeed({
       feed: {
-        ...hostedCatalogFeed({ sequence: 10, pluginName: "@steelengine/malformed-current" }),
+        ...hostedCatalogFeed({ sequence: 10, pluginName: "@openclaw/malformed-current" }),
         generatedAt: "2026-02-30T00:00:00.000Z",
       },
     });
     const validFeed = hostedCatalogFeed({
       sequence: 10,
-      pluginName: "@steelengine/repaired-current",
+      pluginName: "@openclaw/repaired-current",
     });
     const valid = signedHostedCatalogFeed({
       feed: validFeed,
@@ -552,7 +552,7 @@ describe("official external plugin catalog", () => {
     });
     const lowerFeed = hostedCatalogFeed({
       sequence: 9,
-      pluginName: "@steelengine/lower-current",
+      pluginName: "@openclaw/lower-current",
     });
     const lower = signedHostedCatalogFeed({
       feed: lowerFeed,
@@ -604,7 +604,7 @@ describe("official external plugin catalog", () => {
       '{"schemaVersion":1,"id":"steelengine-official-external-plugins","generatedAt":"not-a-date","sequence":1e999,"entries":[]}';
     const validFeed = hostedCatalogFeed({
       sequence: 10,
-      pluginName: "@steelengine/repaired-sequence",
+      pluginName: "@openclaw/repaired-sequence",
     });
     const valid = signedHostedCatalogFeed({ feed: validFeed });
     const snapshotStore = createSqliteHostedOfficialExternalPluginCatalogSnapshotStore({
@@ -637,10 +637,10 @@ describe("official external plugin catalog", () => {
 
   it("verifies signed hosted feeds and rejects rollback before replacing snapshots", async () => {
     const newer = signedHostedCatalogFeed({
-      feed: hostedCatalogFeed({ sequence: 10, pluginName: "@steelengine/signed-v10" }),
+      feed: hostedCatalogFeed({ sequence: 10, pluginName: "@openclaw/signed-v10" }),
     });
     const older = signedHostedCatalogFeed({
-      feed: hostedCatalogFeed({ sequence: 9, pluginName: "@steelengine/signed-v9" }),
+      feed: hostedCatalogFeed({ sequence: 9, pluginName: "@openclaw/signed-v9" }),
       privateKeyPem: newer.privateKeyPem,
     });
     const snapshotStore = createInMemoryHostedCatalogSnapshotStore();
@@ -655,7 +655,7 @@ describe("official external plugin catalog", () => {
     });
 
     expect(accepted.source).toBe("hosted");
-    expect(accepted.entries.map((entry) => entry.name)).toEqual(["@steelengine/signed-v10"]);
+    expect(accepted.entries.map((entry) => entry.name)).toEqual(["@openclaw/signed-v10"]);
     if (accepted.source === "hosted") {
       expect(accepted.trust).toMatchObject({
         mode: "signed",
@@ -675,7 +675,7 @@ describe("official external plugin catalog", () => {
     });
 
     expect(rolledBack.source).toBe("hosted-snapshot");
-    expect(rolledBack.entries.map((entry) => entry.name)).toEqual(["@steelengine/signed-v10"]);
+    expect(rolledBack.entries.map((entry) => entry.name)).toEqual(["@openclaw/signed-v10"]);
     if (rolledBack.source === "hosted-snapshot") {
       expect(rolledBack.error).toContain("signed feed sequence is older");
     }
@@ -685,7 +685,7 @@ describe("official external plugin catalog", () => {
   it("rejects malformed feed timestamps before rollback handling", async () => {
     const malformed = signedHostedCatalogFeed({
       feed: {
-        ...hostedCatalogFeed({ sequence: 11, pluginName: "@steelengine/malformed-date" }),
+        ...hostedCatalogFeed({ sequence: 11, pluginName: "@openclaw/malformed-date" }),
         generatedAt: "not-a-date",
       },
     });
@@ -706,16 +706,16 @@ describe("official external plugin catalog", () => {
   it("replaces a signed snapshot with an invalid timestamp using a valid feed", async () => {
     const malformed = signedHostedCatalogFeed({
       feed: {
-        ...hostedCatalogFeed({ sequence: 10, pluginName: "@steelengine/malformed-current" }),
+        ...hostedCatalogFeed({ sequence: 10, pluginName: "@openclaw/malformed-current" }),
         generatedAt: "not-a-date",
       },
     });
     const valid = signedHostedCatalogFeed({
-      feed: hostedCatalogFeed({ sequence: 10, pluginName: "@steelengine/repaired-current" }),
+      feed: hostedCatalogFeed({ sequence: 10, pluginName: "@openclaw/repaired-current" }),
       privateKeyPem: malformed.privateKeyPem,
     });
     const lower = signedHostedCatalogFeed({
-      feed: hostedCatalogFeed({ sequence: 9, pluginName: "@steelengine/lower-current" }),
+      feed: hostedCatalogFeed({ sequence: 9, pluginName: "@openclaw/lower-current" }),
       privateKeyPem: malformed.privateKeyPem,
     });
     const url = "https://packages.acme.example/steelengine/feed";
@@ -741,16 +741,16 @@ describe("official external plugin catalog", () => {
     });
 
     expect(result.source).toBe("hosted");
-    expect(result.entries.map((entry) => entry.name)).toEqual(["@steelengine/repaired-current"]);
+    expect(result.entries.map((entry) => entry.name)).toEqual(["@openclaw/repaired-current"]);
     await expect(snapshotStore.read(url)).resolves.toMatchObject({ body: valid.body });
   });
 
   it("does not replace a signed snapshot that fails current trust verification", async () => {
     const current = signedHostedCatalogFeed({
-      feed: hostedCatalogFeed({ sequence: 10, pluginName: "@steelengine/current-key" }),
+      feed: hostedCatalogFeed({ sequence: 10, pluginName: "@openclaw/current-key" }),
     });
     const candidate = signedHostedCatalogFeed({
-      feed: hostedCatalogFeed({ sequence: 9, pluginName: "@steelengine/new-key" }),
+      feed: hostedCatalogFeed({ sequence: 9, pluginName: "@openclaw/new-key" }),
     });
     const url = "https://packages.acme.example/steelengine/feed";
     const snapshotStore = createInMemoryHostedCatalogSnapshotStore([
@@ -775,11 +775,11 @@ describe("official external plugin catalog", () => {
 
   it("fails closed for unsigned signed-profile responses and re-verifies offline snapshots", async () => {
     const signed = signedHostedCatalogFeed({
-      feed: hostedCatalogFeed({ sequence: 8, pluginName: "@steelengine/signed-offline" }),
+      feed: hostedCatalogFeed({ sequence: 8, pluginName: "@openclaw/signed-offline" }),
     });
     const catalogConfig = signedCatalogConfig(signed.publicKeyPem);
     const unsignedBody = JSON.stringify(
-      hostedCatalogFeed({ sequence: 8, pluginName: "@steelengine/unsigned" }),
+      hostedCatalogFeed({ sequence: 8, pluginName: "@openclaw/unsigned" }),
     );
 
     const unsigned = await loadHostedCatalog({
@@ -809,7 +809,7 @@ describe("official external plugin catalog", () => {
     });
 
     expect(offline.source).toBe("hosted-snapshot");
-    expect(offline.entries.map((entry) => entry.name)).toEqual(["@steelengine/signed-offline"]);
+    expect(offline.entries.map((entry) => entry.name)).toEqual(["@openclaw/signed-offline"]);
 
     const unsignedSnapshot = createInMemoryHostedCatalogSnapshotStore([
       {
@@ -869,10 +869,10 @@ describe("official external plugin catalog", () => {
 
   it("preserves signed profile verification for direct feed URL overrides", async () => {
     const signed = signedHostedCatalogFeed({
-      feed: hostedCatalogFeed({ sequence: 8, pluginName: "@steelengine/signed-override" }),
+      feed: hostedCatalogFeed({ sequence: 8, pluginName: "@openclaw/signed-override" }),
     });
     const unsignedBody = JSON.stringify(
-      hostedCatalogFeed({ sequence: 8, pluginName: "@steelengine/unsigned-override" }),
+      hostedCatalogFeed({ sequence: 8, pluginName: "@openclaw/unsigned-override" }),
     );
     const result = await loadHostedCatalog({
       feedProfile: "acme",
@@ -1025,7 +1025,7 @@ describe("official external plugin catalog", () => {
           candidates: [
             {
               sourceRef: "public-clawhub",
-              package: "@steelengine/candidate-package",
+              package: "@openclaw/candidate-package",
               version: "1.2.3",
               integrity: "sha256:b355dda04403becaab8bbab069fd1e7b0578262e7459e598cc5b19615b5bdab9",
             },
@@ -1042,7 +1042,7 @@ describe("official external plugin catalog", () => {
         },
       }),
     ).toEqual({
-      clawhubSpec: "clawhub:@steelengine/candidate-package@1.2.3",
+      clawhubSpec: "clawhub:@openclaw/candidate-package@1.2.3",
       defaultChoice: "clawhub",
       expectedIntegrity: "sha256-s1XdoEQDvsqri7qwaf0eewV4Ji50WeWYzFsZYVtb2rk=",
       minHostVersion: ">=2026.6.1",
@@ -1138,43 +1138,43 @@ describe("official external plugin catalog", () => {
 
   it("lists the externalized provider and capability plugins with install metadata", () => {
     const providers = [
-      ["arcee", "@steelengine/arcee-provider"],
-      ["cerebras", "@steelengine/cerebras-provider"],
-      ["chutes", "@steelengine/chutes-provider"],
-      ["cloudflare-ai-gateway", "@steelengine/cloudflare-ai-gateway-provider"],
-      ["deepinfra", "@steelengine/deepinfra-provider"],
-      ["deepseek", "@steelengine/deepseek-provider"],
-      ["groq", "@steelengine/groq-provider"],
-      ["longcat", "@steelengine/longcat-provider"],
-      ["kilocode", "@steelengine/kilocode-provider"],
-      ["kimi", "@steelengine/kimi-provider"],
-      ["qianfan", "@steelengine/qianfan-provider"],
-      ["qwen", "@steelengine/qwen-provider"],
+      ["arcee", "@openclaw/arcee-provider"],
+      ["cerebras", "@openclaw/cerebras-provider"],
+      ["chutes", "@openclaw/chutes-provider"],
+      ["cloudflare-ai-gateway", "@openclaw/cloudflare-ai-gateway-provider"],
+      ["deepinfra", "@openclaw/deepinfra-provider"],
+      ["deepseek", "@openclaw/deepseek-provider"],
+      ["groq", "@openclaw/groq-provider"],
+      ["longcat", "@openclaw/longcat-provider"],
+      ["kilocode", "@openclaw/kilocode-provider"],
+      ["kimi", "@openclaw/kimi-provider"],
+      ["qianfan", "@openclaw/qianfan-provider"],
+      ["qwen", "@openclaw/qwen-provider"],
     ] as const;
     const plugins = [
-      ["exa", "@steelengine/exa-plugin"],
-      ["firecrawl", "@steelengine/firecrawl-plugin"],
-      ["gradium", "@steelengine/gradium-speech"],
-      ["inworld", "@steelengine/inworld-speech"],
-      ["parallel", "@steelengine/parallel-plugin"],
-      ["perplexity", "@steelengine/perplexity-plugin"],
+      ["exa", "@openclaw/exa-plugin"],
+      ["firecrawl", "@openclaw/firecrawl-plugin"],
+      ["gradium", "@openclaw/gradium-speech"],
+      ["inworld", "@openclaw/inworld-speech"],
+      ["parallel", "@openclaw/parallel-plugin"],
+      ["perplexity", "@openclaw/perplexity-plugin"],
     ] as const;
     const newlyExternalized = [
-      ["clickclack", "@steelengine/clickclack"],
-      ["fireworks", "@steelengine/fireworks-provider"],
-      ["irc", "@steelengine/irc"],
-      ["mattermost", "@steelengine/mattermost"],
-      ["moonshot", "@steelengine/moonshot-provider"],
-      ["searxng", "@steelengine/searxng-plugin"],
-      ["signal", "@steelengine/signal"],
-      ["sms", "@steelengine/sms"],
-      ["tavily", "@steelengine/tavily-plugin"],
-      ["tencent", "@steelengine/tencent-provider"],
-      ["venice", "@steelengine/venice-provider"],
-      ["vercel-ai-gateway", "@steelengine/vercel-ai-gateway-provider"],
-      ["zai", "@steelengine/zai-provider"],
+      ["clickclack", "@openclaw/clickclack"],
+      ["fireworks", "@openclaw/fireworks-provider"],
+      ["irc", "@openclaw/irc"],
+      ["mattermost", "@openclaw/mattermost"],
+      ["moonshot", "@openclaw/moonshot-provider"],
+      ["searxng", "@openclaw/searxng-plugin"],
+      ["signal", "@openclaw/signal"],
+      ["sms", "@openclaw/sms"],
+      ["tavily", "@openclaw/tavily-plugin"],
+      ["tencent", "@openclaw/tencent-provider"],
+      ["venice", "@openclaw/venice-provider"],
+      ["vercel-ai-gateway", "@openclaw/vercel-ai-gateway-provider"],
+      ["zai", "@openclaw/zai-provider"],
     ] as const;
-    const currentExternalized = [["featherless", "@steelengine/featherless-provider"]] as const;
+    const currentExternalized = [["featherless", "@openclaw/featherless-provider"]] as const;
 
     for (const [id, npmSpec] of [...providers, ...plugins]) {
       expect(resolveOfficialExternalPluginInstall(expectCatalogEntry(id))).toEqual({
@@ -1204,8 +1204,8 @@ describe("official external plugin catalog", () => {
 
   it("advertises StepFun with its ClawHub package and plugin API floor", () => {
     expect(resolveOfficialExternalPluginInstall(expectCatalogEntry("stepfun"))).toEqual({
-      clawhubSpec: "clawhub:@steelengine/stepfun-provider",
-      npmSpec: "@steelengine/stepfun-provider",
+      clawhubSpec: "clawhub:@openclaw/stepfun-provider",
+      npmSpec: "@openclaw/stepfun-provider",
       defaultChoice: "npm",
       minHostVersion: ">=2026.6.9",
     });
@@ -1229,24 +1229,24 @@ describe("official external plugin catalog", () => {
 
   it("keeps official launch package specs on the production package names", () => {
     expect(resolveOfficialExternalPluginInstall(expectCatalogEntry("acpx"))?.npmSpec).toBe(
-      "@steelengine/acpx",
+      "@openclaw/acpx",
     );
     expect(resolveOfficialExternalPluginInstall(expectCatalogEntry("googlechat"))?.npmSpec).toBe(
-      "@steelengine/googlechat",
+      "@openclaw/googlechat",
     );
     expect(resolveOfficialExternalPluginInstall(expectCatalogEntry("line"))?.npmSpec).toBe(
-      "@steelengine/line",
+      "@openclaw/line",
     );
     expect(resolveOfficialExternalPluginInstall(expectCatalogEntry("diffs-language-pack"))).toEqual(
       {
-        npmSpec: "@steelengine/diffs-language-pack",
-        clawhubSpec: "clawhub:@steelengine/diffs-language-pack",
+        npmSpec: "@openclaw/diffs-language-pack",
+        clawhubSpec: "clawhub:@openclaw/diffs-language-pack",
         defaultChoice: "npm",
         minHostVersion: ">=2026.5.27",
       },
     );
     expect(resolveOfficialExternalPluginInstall(expectCatalogEntry("llama-cpp"))?.npmSpec).toBe(
-      "@steelengine/llama-cpp-provider",
+      "@openclaw/llama-cpp-provider",
     );
   });
 
@@ -1256,8 +1256,8 @@ describe("official external plugin catalog", () => {
     expect(resolveOfficialExternalPluginId(gmi)).toBe("gmi");
     expect(getOfficialExternalPluginCatalogEntry("gmi-cloud")).toBe(gmi);
     expect(resolveOfficialExternalPluginInstall(gmi)).toEqual({
-      clawhubSpec: "clawhub:@steelengine/gmi-provider",
-      npmSpec: "@steelengine/gmi-provider",
+      clawhubSpec: "clawhub:@openclaw/gmi-provider",
+      npmSpec: "@openclaw/gmi-provider",
       defaultChoice: "npm",
       minHostVersion: ">=2026.6.8",
     });
@@ -1268,8 +1268,8 @@ describe("official external plugin catalog", () => {
 
     expect(resolveOfficialExternalPluginId(cohere)).toBe("cohere");
     expect(resolveOfficialExternalPluginInstall(cohere)).toEqual({
-      clawhubSpec: "clawhub:@steelengine/cohere-provider",
-      npmSpec: "@steelengine/cohere-provider",
+      clawhubSpec: "clawhub:@openclaw/cohere-provider",
+      npmSpec: "@openclaw/cohere-provider",
       defaultChoice: "npm",
       minHostVersion: ">=2026.6.8",
     });
@@ -1281,8 +1281,8 @@ describe("official external plugin catalog", () => {
     expect(resolveOfficialExternalPluginId(longcat)).toBe("longcat");
     expect(getOfficialExternalPluginCatalogEntry("meituan-longcat")).toBe(longcat);
     expect(resolveOfficialExternalPluginInstall(longcat)).toEqual({
-      clawhubSpec: "clawhub:@steelengine/longcat-provider",
-      npmSpec: "@steelengine/longcat-provider",
+      clawhubSpec: "clawhub:@openclaw/longcat-provider",
+      npmSpec: "@openclaw/longcat-provider",
       defaultChoice: "npm",
       minHostVersion: ">=2026.6.8",
     });
@@ -1439,23 +1439,23 @@ describe("official external plugin catalog", () => {
 
   it("allows invalid-config recovery for externalized stock plugins", () => {
     expect(resolveOfficialExternalPluginInstall(expectCatalogEntry("brave"))).toMatchObject({
-      npmSpec: "@steelengine/brave-plugin",
+      npmSpec: "@openclaw/brave-plugin",
       allowInvalidConfigRecovery: true,
     });
     expect(resolveOfficialExternalPluginInstall(expectCatalogEntry("slack"))).toMatchObject({
-      npmSpec: "@steelengine/slack",
+      npmSpec: "@openclaw/slack",
       allowInvalidConfigRecovery: true,
     });
     expect(resolveOfficialExternalPluginInstall(expectCatalogEntry("discord"))).toMatchObject({
-      npmSpec: "@steelengine/discord",
+      npmSpec: "@openclaw/discord",
       allowInvalidConfigRecovery: true,
     });
     expect(resolveOfficialExternalPluginInstall(expectCatalogEntry("mattermost"))).toMatchObject({
-      npmSpec: "@steelengine/mattermost",
+      npmSpec: "@openclaw/mattermost",
       allowInvalidConfigRecovery: true,
     });
     expect(resolveOfficialExternalPluginInstall(expectCatalogEntry("tavily"))).toMatchObject({
-      npmSpec: "@steelengine/tavily-plugin",
+      npmSpec: "@openclaw/tavily-plugin",
       allowInvalidConfigRecovery: true,
     });
   });
@@ -1472,8 +1472,8 @@ describe("official external plugin catalog", () => {
     expect(ids.has("matrix")).toBe(true);
     expect(ids.has("mattermost")).toBe(true);
     expect(resolveOfficialExternalPluginInstall(expectCatalogEntry("matrix"))).toEqual({
-      clawhubSpec: "clawhub:@steelengine/matrix",
-      npmSpec: "@steelengine/matrix",
+      clawhubSpec: "clawhub:@openclaw/matrix",
+      npmSpec: "@openclaw/matrix",
       defaultChoice: "clawhub",
       minHostVersion: ">=2026.4.10",
       allowInvalidConfigRecovery: true,

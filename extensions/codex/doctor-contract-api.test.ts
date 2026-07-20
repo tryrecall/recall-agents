@@ -527,8 +527,9 @@ describe("codex doctor contract", () => {
     const result = await fixture.migration.migrateLegacyState(fixture.params);
 
     expect(result.changes).toEqual([]);
-    expect(result.warnings).toHaveLength(1);
-    expect(result.warnings[0]).toContain("invalid locator");
+    expect(result.warnings).toEqual([]);
+    expect(result.notices).toHaveLength(1);
+    expect(result.notices?.[0]).toContain("invalid locator");
     await expect(fs.access(fixture.sidecarPath)).resolves.toBeUndefined();
     await expect(fs.access(`${fixture.sidecarPath}.migrated`)).rejects.toThrow();
     expect(
@@ -1021,9 +1022,10 @@ describe("codex doctor contract", () => {
     const result = await fixture.migration.migrateLegacyState(params);
 
     expect(result.changes).toEqual([]);
-    expect(result.warnings).toHaveLength(1);
-    expect(result.warnings[0]).toContain("session index");
-    expect(result.warnings[0]).toContain(detail);
+    expect(result.warnings).toEqual([]);
+    expect(result.notices).toHaveLength(1);
+    expect(result.notices?.[0]).toContain("session index");
+    expect(result.notices?.[0]).toContain(detail);
     await expect(fs.access(fixture.sidecarPath)).resolves.toBeUndefined();
     await expect(fs.access(`${fixture.sidecarPath}.migrated`)).rejects.toThrow();
     await expect(openBindingStore(fixture.env).entries()).resolves.toEqual([]);
@@ -1036,7 +1038,9 @@ describe("codex doctor contract", () => {
 
   it("does not scan above stateDir or follow escaped external store locators", async () => {
     const outerDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-codex-doctor-outer-"));
-    const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-codex-doctor-outside-"));
+    const outsideDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "steelengine-codex-doctor-outside-"),
+    );
     const stateDir = path.join(outerDir, "state");
     await fs.mkdir(stateDir, { recursive: true });
     const strayDir = path.join(outerDir, "unrelated");

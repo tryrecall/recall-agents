@@ -19,6 +19,16 @@ CONTENT_EXCLUSIONS = {
     "scripts/check-steelengine-branding.py",
 }
 
+EXTERNAL_PLUGIN_CATALOGS = {
+    "scripts/lib/official-external-channel-catalog.json",
+    "scripts/lib/official-external-provider-catalog.json",
+    "scripts/lib/official-external-plugin-catalog.json",
+    "src/plugins/official-external-plugin-catalog.test.ts",
+    "src/plugins/official-external-plugin-repair-hints.test.ts",
+}
+
+MIGRATION_COMPATIBILITY_IDENTIFIERS = (".openclaw", "openclaw.json")
+
 REPLACEMENTS = (
     ("https://github.com/openclaw/openclaw", "https://github.com/steelengineai/recall-agents"),
     ("git+https://github.com/openclaw/openclaw.git", "git+https://github.com/steelengineai/recall-agents.git"),
@@ -48,11 +58,21 @@ def git_paths() -> list[str]:
     return [part.decode() for part in raw.split(b"\0") if part]
 
 
-def replace_text(value: str) -> str:
+def replace_text(value: str, *, preserve_external_namespace: bool = False) -> str:
+    protected = {
+        identifier: f"__STEELENGINE_MIGRATION_COMPAT_{index}__"
+        for index, identifier in enumerate(MIGRATION_COMPATIBILITY_IDENTIFIERS)
+    }
+    for identifier, placeholder in protected.items():
+        value = value.replace(identifier, placeholder)
     for old, new in REPLACEMENTS:
         value = value.replace(old, new)
     for renamed, upstream in UPSTREAM_TECHNICAL_IDENTIFIERS:
         value = value.replace(renamed, upstream)
+    if preserve_external_namespace:
+        value = value.replace("@steelengine/", "@openclaw/")
+    for identifier, placeholder in protected.items():
+        value = value.replace(placeholder, identifier)
     return value
 
 
@@ -85,7 +105,10 @@ def rewrite_files(paths: list[str]) -> int:
             before = path.read_text(encoding="utf-8")
         except (UnicodeDecodeError, OSError):
             continue
-        after = replace_text(before)
+        after = replace_text(
+            before,
+            preserve_external_namespace=mapped in EXTERNAL_PLUGIN_CATALOGS,
+        )
         if after == before:
             continue
         path.write_text(after, encoding="utf-8")

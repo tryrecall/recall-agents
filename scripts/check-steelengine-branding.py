@@ -15,6 +15,13 @@ ALLOWED = {
     "scripts/steelengine-rebrand.py",
     "scripts/check-steelengine-branding.py",
 }
+EXTERNAL_PLUGIN_CATALOGS = {
+    "scripts/lib/official-external-channel-catalog.json",
+    "scripts/lib/official-external-provider-catalog.json",
+    "scripts/lib/official-external-plugin-catalog.json",
+    "src/plugins/official-external-plugin-catalog.test.ts",
+    "src/plugins/official-external-plugin-repair-hints.test.ts",
+}
 FORBIDDEN = ("openclaw", "OpenClaw", "OPENCLAW")
 ALLOWED_TECHNICAL_IDENTIFIERS = (
     "@openclaw/fs-safe",
@@ -51,6 +58,8 @@ def main() -> None:
             product_line = line
             for identifier in ALLOWED_TECHNICAL_IDENTIFIERS:
                 product_line = product_line.replace(identifier, "")
+            if relative in EXTERNAL_PLUGIN_CATALOGS:
+                product_line = product_line.replace("@openclaw/", "")
             if any(token in product_line for token in FORBIDDEN):
                 violations.append(f"content: {relative}:{number}")
                 if len(violations) >= 200:

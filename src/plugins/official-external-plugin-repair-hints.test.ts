@@ -36,11 +36,11 @@ describe("resolveMissingOfficialExternalChannelPluginRepairHint", () => {
       pluginId: "feishu",
       channelId: "feishu",
       label: "Feishu",
-      installSpec: "@steelengine/feishu",
-      installCommand: "steelengine plugins install @steelengine/feishu",
+      installSpec: "@openclaw/feishu",
+      installCommand: "steelengine plugins install @openclaw/feishu",
       doctorFixCommand: "steelengine doctor --fix",
       repairHint:
-        "Install the official external plugin with: steelengine plugins install @steelengine/feishu, or run: steelengine doctor --fix.",
+        "Install the official external plugin with: steelengine plugins install @openclaw/feishu, or run: steelengine doctor --fix.",
     });
   });
 
@@ -64,8 +64,8 @@ describe("resolveMissingOfficialExternalChannelPluginRepairHint", () => {
       pluginId: "whatsapp",
       channelId: "whatsapp",
       label: "WhatsApp",
-      installSpec: "clawhub:@steelengine/whatsapp",
-      installCommand: "steelengine plugins install clawhub:@steelengine/whatsapp",
+      installSpec: "clawhub:@openclaw/whatsapp",
+      installCommand: "steelengine plugins install clawhub:@openclaw/whatsapp",
     });
   });
 

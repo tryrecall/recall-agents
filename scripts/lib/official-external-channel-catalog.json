@@ -161,7 +161,7 @@
       }
     },
     {
-      "name": "@steelengine/clickclack",
+      "name": "@openclaw/clickclack",
       "description": "SteelEngine ClickClack channel plugin",
       "source": "official",
       "kind": "channel",
@@ -187,8 +187,8 @@
           }
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/clickclack",
-          "npmSpec": "@steelengine/clickclack",
+          "clawhubSpec": "clawhub:@openclaw/clickclack",
+          "npmSpec": "@openclaw/clickclack",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9",
           "allowInvalidConfigRecovery": true
@@ -196,7 +196,7 @@
       }
     },
     {
-      "name": "@steelengine/discord",
+      "name": "@openclaw/discord",
       "description": "SteelEngine Discord channel plugin",
       "source": "official",
       "kind": "channel",
@@ -214,7 +214,7 @@
           "preferSessionLookupForAnnounceTarget": true
         },
         "install": {
-          "npmSpec": "@steelengine/discord",
+          "npmSpec": "@openclaw/discord",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10",
           "allowInvalidConfigRecovery": true
@@ -222,7 +222,7 @@
       }
     },
     {
-      "name": "@steelengine/feishu",
+      "name": "@openclaw/feishu",
       "description": "SteelEngine Feishu/Lark channel plugin",
       "source": "official",
       "kind": "channel",
@@ -239,14 +239,14 @@
           "quickstartAllowFrom": true
         },
         "install": {
-          "npmSpec": "@steelengine/feishu",
+          "npmSpec": "@openclaw/feishu",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.29"
         }
       }
     },
     {
-      "name": "@steelengine/googlechat",
+      "name": "@openclaw/googlechat",
       "description": "SteelEngine Google Chat channel plugin",
       "source": "official",
       "kind": "channel",
@@ -289,14 +289,14 @@
           ]
         },
         "install": {
-          "npmSpec": "@steelengine/googlechat",
+          "npmSpec": "@openclaw/googlechat",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10"
         }
       }
     },
     {
-      "name": "@steelengine/irc",
+      "name": "@openclaw/irc",
       "description": "SteelEngine IRC channel plugin",
       "source": "official",
       "kind": "channel",
@@ -327,8 +327,8 @@
           "systemImage": "network"
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/irc",
-          "npmSpec": "@steelengine/irc",
+          "clawhubSpec": "clawhub:@openclaw/irc",
+          "npmSpec": "@openclaw/irc",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9",
           "allowInvalidConfigRecovery": true
@@ -336,7 +336,7 @@
       }
     },
     {
-      "name": "@steelengine/line",
+      "name": "@openclaw/line",
       "description": "SteelEngine LINE channel plugin",
       "source": "official",
       "kind": "channel",
@@ -354,14 +354,14 @@
           "quickstartAllowFrom": true
         },
         "install": {
-          "npmSpec": "@steelengine/line",
+          "npmSpec": "@openclaw/line",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10"
         }
       }
     },
     {
-      "name": "@steelengine/mattermost",
+      "name": "@openclaw/mattermost",
       "description": "SteelEngine Mattermost channel plugin",
       "source": "official",
       "kind": "channel",
@@ -380,8 +380,8 @@
           "order": 65
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/mattermost",
-          "npmSpec": "@steelengine/mattermost",
+          "clawhubSpec": "clawhub:@openclaw/mattermost",
+          "npmSpec": "@openclaw/mattermost",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9",
           "allowInvalidConfigRecovery": true
@@ -389,7 +389,7 @@
       }
     },
     {
-      "name": "@steelengine/matrix",
+      "name": "@openclaw/matrix",
       "description": "SteelEngine Matrix channel plugin",
       "source": "official",
       "kind": "channel",
@@ -434,8 +434,8 @@
           ]
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/matrix",
-          "npmSpec": "@steelengine/matrix",
+          "clawhubSpec": "clawhub:@openclaw/matrix",
+          "npmSpec": "@openclaw/matrix",
           "defaultChoice": "clawhub",
           "minHostVersion": ">=2026.4.10",
           "allowInvalidConfigRecovery": true
@@ -443,7 +443,7 @@
       }
     },
     {
-      "name": "@steelengine/msteams",
+      "name": "@openclaw/msteams",
       "description": "SteelEngine Microsoft Teams channel plugin",
       "source": "official",
       "kind": "channel",
@@ -459,14 +459,14 @@
           "order": 60
         },
         "install": {
-          "npmSpec": "@steelengine/msteams",
+          "npmSpec": "@openclaw/msteams",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10"
         }
       }
     },
     {
-      "name": "@steelengine/nextcloud-talk",
+      "name": "@openclaw/nextcloud-talk",
       "description": "SteelEngine Nextcloud Talk channel plugin",
       "source": "official",
       "kind": "channel",
@@ -483,14 +483,14 @@
           "quickstartAllowFrom": true
         },
         "install": {
-          "npmSpec": "@steelengine/nextcloud-talk",
+          "npmSpec": "@openclaw/nextcloud-talk",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10"
         }
       }
     },
     {
-      "name": "@steelengine/nostr",
+      "name": "@openclaw/nostr",
       "description": "SteelEngine Nostr channel plugin for NIP-04 encrypted DMs",
       "source": "official",
       "kind": "channel",
@@ -506,14 +506,14 @@
           "quickstartAllowFrom": true
         },
         "install": {
-          "npmSpec": "@steelengine/nostr",
+          "npmSpec": "@openclaw/nostr",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10"
         }
       }
     },
     {
-      "name": "@steelengine/qqbot",
+      "name": "@openclaw/qqbot",
       "description": "SteelEngine QQ Bot channel plugin",
       "source": "official",
       "kind": "channel",
@@ -529,14 +529,14 @@
           "systemImage": "bubble.left.and.bubble.right"
         },
         "install": {
-          "npmSpec": "@steelengine/qqbot",
+          "npmSpec": "@openclaw/qqbot",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10"
         }
       }
     },
     {
-      "name": "@steelengine/signal",
+      "name": "@openclaw/signal",
       "description": "SteelEngine Signal channel plugin",
       "source": "official",
       "kind": "channel",
@@ -567,8 +567,8 @@
           ]
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/signal",
-          "npmSpec": "@steelengine/signal",
+          "clawhubSpec": "clawhub:@openclaw/signal",
+          "npmSpec": "@openclaw/signal",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9",
           "allowInvalidConfigRecovery": true
@@ -576,7 +576,7 @@
       }
     },
     {
-      "name": "@steelengine/slack",
+      "name": "@openclaw/slack",
       "description": "SteelEngine Slack channel plugin",
       "source": "official",
       "kind": "channel",
@@ -603,7 +603,7 @@
           }
         },
         "install": {
-          "npmSpec": "@steelengine/slack",
+          "npmSpec": "@openclaw/slack",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.12-beta.1",
           "allowInvalidConfigRecovery": true
@@ -611,7 +611,7 @@
       }
     },
     {
-      "name": "@steelengine/sms",
+      "name": "@openclaw/sms",
       "description": "SteelEngine SMS channel plugin for Twilio text messages.",
       "source": "official",
       "kind": "channel",
@@ -638,8 +638,8 @@
           "quickstartAllowFrom": true
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/sms",
-          "npmSpec": "@steelengine/sms",
+          "clawhubSpec": "clawhub:@openclaw/sms",
+          "npmSpec": "@openclaw/sms",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9",
           "allowInvalidConfigRecovery": true
@@ -647,7 +647,7 @@
       }
     },
     {
-      "name": "@steelengine/synology-chat",
+      "name": "@openclaw/synology-chat",
       "description": "Synology Chat channel plugin for SteelEngine",
       "source": "official",
       "kind": "channel",
@@ -662,14 +662,14 @@
           "order": 90
         },
         "install": {
-          "npmSpec": "@steelengine/synology-chat",
+          "npmSpec": "@openclaw/synology-chat",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10"
         }
       }
     },
     {
-      "name": "@steelengine/raft",
+      "name": "@openclaw/raft",
       "description": "SteelEngine Raft channel plugin",
       "source": "official",
       "kind": "channel",
@@ -712,14 +712,14 @@
           }
         },
         "install": {
-          "npmSpec": "@steelengine/raft",
+          "npmSpec": "@openclaw/raft",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/tlon",
+      "name": "@openclaw/tlon",
       "description": "SteelEngine Tlon/Urbit channel plugin",
       "source": "official",
       "kind": "channel",
@@ -735,14 +735,14 @@
           "quickstartAllowFrom": true
         },
         "install": {
-          "npmSpec": "@steelengine/tlon",
+          "npmSpec": "@openclaw/tlon",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10"
         }
       }
     },
     {
-      "name": "@steelengine/twitch",
+      "name": "@openclaw/twitch",
       "description": "SteelEngine Twitch channel plugin",
       "source": "official",
       "kind": "channel",
@@ -756,14 +756,14 @@
           "aliases": ["twitch-chat"]
         },
         "install": {
-          "npmSpec": "@steelengine/twitch",
+          "npmSpec": "@openclaw/twitch",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10"
         }
       }
     },
     {
-      "name": "@steelengine/whatsapp",
+      "name": "@openclaw/whatsapp",
       "description": "SteelEngine WhatsApp channel plugin",
       "source": "official",
       "kind": "channel",
@@ -779,15 +779,15 @@
           "systemImage": "message"
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/whatsapp",
-          "npmSpec": "@steelengine/whatsapp",
+          "clawhubSpec": "clawhub:@openclaw/whatsapp",
+          "npmSpec": "@openclaw/whatsapp",
           "defaultChoice": "clawhub",
           "minHostVersion": ">=2026.4.25"
         }
       }
     },
     {
-      "name": "@steelengine/zalo",
+      "name": "@openclaw/zalo",
       "description": "SteelEngine Zalo channel plugin",
       "source": "official",
       "kind": "channel",
@@ -804,14 +804,14 @@
           "quickstartAllowFrom": true
         },
         "install": {
-          "npmSpec": "@steelengine/zalo",
+          "npmSpec": "@openclaw/zalo",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10"
         }
       }
     },
     {
-      "name": "@steelengine/zalouser",
+      "name": "@openclaw/zalouser",
       "description": "SteelEngine Zalo Personal Account plugin via native zca-js integration",
       "source": "official",
       "kind": "channel",
@@ -828,7 +828,7 @@
           "quickstartAllowFrom": false
         },
         "install": {
-          "npmSpec": "@steelengine/zalouser",
+          "npmSpec": "@openclaw/zalouser",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10"
         }

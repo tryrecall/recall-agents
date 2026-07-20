@@ -6,7 +6,7 @@
   "description": "Bundled fallback feed for official external SteelEngine plugins.",
   "entries": [
     {
-      "name": "@steelengine/acpx",
+      "name": "@openclaw/acpx",
       "description": "SteelEngine ACP runtime backend",
       "source": "official",
       "kind": "plugin",
@@ -16,14 +16,14 @@
           "label": "ACPX Runtime"
         },
         "install": {
-          "npmSpec": "@steelengine/acpx",
+          "npmSpec": "@openclaw/acpx",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.25"
         }
       }
     },
     {
-      "name": "@steelengine/brave-plugin",
+      "name": "@openclaw/brave-plugin",
       "description": "SteelEngine Brave plugin",
       "source": "official",
       "kind": "plugin",
@@ -48,7 +48,7 @@
           }
         ],
         "install": {
-          "npmSpec": "@steelengine/brave-plugin",
+          "npmSpec": "@openclaw/brave-plugin",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10",
           "allowInvalidConfigRecovery": true
@@ -56,7 +56,7 @@
       }
     },
     {
-      "name": "@steelengine/codex",
+      "name": "@openclaw/codex",
       "description": "SteelEngine Codex app-server harness and native session catalog",
       "source": "official",
       "kind": "plugin",
@@ -69,14 +69,14 @@
           "migrationProviders": ["codex"]
         },
         "install": {
-          "npmSpec": "@steelengine/codex",
+          "npmSpec": "@openclaw/codex",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.1-beta.1"
         }
       }
     },
     {
-      "name": "@steelengine/copilot",
+      "name": "@openclaw/copilot",
       "description": "SteelEngine GitHub Copilot agent runtime plugin",
       "source": "official",
       "kind": "plugin",
@@ -86,15 +86,15 @@
           "label": "GitHub Copilot agent runtime"
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/copilot",
-          "npmSpec": "@steelengine/copilot",
+          "clawhubSpec": "clawhub:@openclaw/copilot",
+          "npmSpec": "@openclaw/copilot",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.28"
         }
       }
     },
     {
-      "name": "@steelengine/diagnostics-otel",
+      "name": "@openclaw/diagnostics-otel",
       "description": "SteelEngine diagnostics OpenTelemetry exporter",
       "source": "official",
       "kind": "plugin",
@@ -104,15 +104,15 @@
           "label": "Diagnostics OpenTelemetry"
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/diagnostics-otel",
-          "npmSpec": "@steelengine/diagnostics-otel",
+          "clawhubSpec": "clawhub:@openclaw/diagnostics-otel",
+          "npmSpec": "@openclaw/diagnostics-otel",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.25"
         }
       }
     },
     {
-      "name": "@steelengine/diagnostics-prometheus",
+      "name": "@openclaw/diagnostics-prometheus",
       "description": "SteelEngine diagnostics Prometheus exporter",
       "source": "official",
       "kind": "plugin",
@@ -122,15 +122,15 @@
           "label": "Diagnostics Prometheus"
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/diagnostics-prometheus",
-          "npmSpec": "@steelengine/diagnostics-prometheus",
+          "clawhubSpec": "clawhub:@openclaw/diagnostics-prometheus",
+          "npmSpec": "@openclaw/diagnostics-prometheus",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.25"
         }
       }
     },
     {
-      "name": "@steelengine/diffs",
+      "name": "@openclaw/diffs",
       "description": "SteelEngine diff viewer plugin",
       "source": "official",
       "kind": "plugin",
@@ -144,15 +144,15 @@
           "order": 40
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/diffs",
-          "npmSpec": "@steelengine/diffs",
+          "clawhubSpec": "clawhub:@openclaw/diffs",
+          "npmSpec": "@openclaw/diffs",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.30"
         }
       }
     },
     {
-      "name": "@steelengine/diffs-language-pack",
+      "name": "@openclaw/diffs-language-pack",
       "description": "SteelEngine diffs viewer syntax highlighting language pack",
       "source": "official",
       "kind": "plugin",
@@ -162,15 +162,15 @@
           "label": "Diff Viewer Language Pack"
         },
         "install": {
-          "npmSpec": "@steelengine/diffs-language-pack",
-          "clawhubSpec": "clawhub:@steelengine/diffs-language-pack",
+          "npmSpec": "@openclaw/diffs-language-pack",
+          "clawhubSpec": "clawhub:@openclaw/diffs-language-pack",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.27"
         }
       }
     },
     {
-      "name": "@steelengine/exa-plugin",
+      "name": "@openclaw/exa-plugin",
       "description": "SteelEngine Exa plugin.",
       "source": "official",
       "kind": "plugin",
@@ -204,15 +204,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/exa-plugin",
-          "npmSpec": "@steelengine/exa-plugin",
+          "clawhubSpec": "clawhub:@openclaw/exa-plugin",
+          "npmSpec": "@openclaw/exa-plugin",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/firecrawl-plugin",
+      "name": "@openclaw/firecrawl-plugin",
       "description": "SteelEngine Firecrawl plugin.",
       "source": "official",
       "kind": "plugin",
@@ -268,15 +268,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/firecrawl-plugin",
-          "npmSpec": "@steelengine/firecrawl-plugin",
+          "clawhubSpec": "clawhub:@openclaw/firecrawl-plugin",
+          "npmSpec": "@openclaw/firecrawl-plugin",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/google-meet",
+      "name": "@openclaw/google-meet",
       "description": "SteelEngine Google Meet participant plugin",
       "source": "official",
       "kind": "plugin",
@@ -286,14 +286,14 @@
           "label": "Google Meet"
         },
         "install": {
-          "npmSpec": "@steelengine/google-meet",
+          "npmSpec": "@openclaw/google-meet",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.20"
         }
       }
     },
     {
-      "name": "@steelengine/gradium-speech",
+      "name": "@openclaw/gradium-speech",
       "description": "SteelEngine Gradium speech plugin.",
       "source": "official",
       "kind": "plugin",
@@ -308,15 +308,15 @@
           ]
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/gradium-speech",
-          "npmSpec": "@steelengine/gradium-speech",
+          "clawhubSpec": "clawhub:@openclaw/gradium-speech",
+          "npmSpec": "@openclaw/gradium-speech",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/inworld-speech",
+      "name": "@openclaw/inworld-speech",
       "description": "SteelEngine Inworld speech plugin.",
       "source": "official",
       "kind": "plugin",
@@ -331,15 +331,15 @@
           ]
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/inworld-speech",
-          "npmSpec": "@steelengine/inworld-speech",
+          "clawhubSpec": "clawhub:@openclaw/inworld-speech",
+          "npmSpec": "@openclaw/inworld-speech",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/lobster",
+      "name": "@openclaw/lobster",
       "description": "Lobster workflow tool plugin (typed pipelines + resumable approvals)",
       "source": "official",
       "kind": "plugin",
@@ -353,15 +353,15 @@
           "order": 50
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/lobster",
-          "npmSpec": "@steelengine/lobster",
+          "clawhubSpec": "clawhub:@openclaw/lobster",
+          "npmSpec": "@openclaw/lobster",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.25"
         }
       }
     },
     {
-      "name": "@steelengine/memory-lancedb",
+      "name": "@openclaw/memory-lancedb",
       "description": "SteelEngine LanceDB-backed long-term memory plugin with auto-recall/capture",
       "source": "official",
       "kind": "plugin",
@@ -375,15 +375,15 @@
           "order": 70
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/memory-lancedb",
-          "npmSpec": "@steelengine/memory-lancedb",
+          "clawhubSpec": "clawhub:@openclaw/memory-lancedb",
+          "npmSpec": "@openclaw/memory-lancedb",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.31"
         }
       }
     },
     {
-      "name": "@steelengine/llama-cpp-provider",
+      "name": "@openclaw/llama-cpp-provider",
       "description": "SteelEngine llama.cpp embedding provider plugin",
       "source": "official",
       "kind": "plugin",
@@ -396,14 +396,14 @@
           "embeddingProviders": ["local"]
         },
         "install": {
-          "npmSpec": "@steelengine/llama-cpp-provider",
+          "npmSpec": "@openclaw/llama-cpp-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.2"
         }
       }
     },
     {
-      "name": "@steelengine/openshell-sandbox",
+      "name": "@openclaw/openshell-sandbox",
       "description": "SteelEngine OpenShell sandbox backend",
       "source": "official",
       "kind": "plugin",
@@ -413,14 +413,14 @@
           "label": "OpenShell Sandbox"
         },
         "install": {
-          "npmSpec": "@steelengine/openshell-sandbox",
+          "npmSpec": "@openclaw/openshell-sandbox",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.12-beta.1"
         }
       }
     },
     {
-      "name": "@steelengine/parallel-plugin",
+      "name": "@openclaw/parallel-plugin",
       "description": "SteelEngine Parallel web search plugin.",
       "source": "official",
       "kind": "plugin",
@@ -469,15 +469,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/parallel-plugin",
-          "npmSpec": "@steelengine/parallel-plugin",
+          "clawhubSpec": "clawhub:@openclaw/parallel-plugin",
+          "npmSpec": "@openclaw/parallel-plugin",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/perplexity-plugin",
+      "name": "@openclaw/perplexity-plugin",
       "description": "SteelEngine Perplexity plugin.",
       "source": "official",
       "kind": "plugin",
@@ -512,15 +512,15 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/perplexity-plugin",
-          "npmSpec": "@steelengine/perplexity-plugin",
+          "clawhubSpec": "clawhub:@openclaw/perplexity-plugin",
+          "npmSpec": "@openclaw/perplexity-plugin",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.8"
         }
       }
     },
     {
-      "name": "@steelengine/pixverse-provider",
+      "name": "@openclaw/pixverse-provider",
       "description": "SteelEngine PixVerse video generation provider plugin",
       "source": "official",
       "kind": "plugin",
@@ -530,15 +530,15 @@
           "label": "PixVerse"
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/pixverse-provider",
-          "npmSpec": "@steelengine/pixverse-provider",
+          "clawhubSpec": "clawhub:@openclaw/pixverse-provider",
+          "npmSpec": "@openclaw/pixverse-provider",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.26"
         }
       }
     },
     {
-      "name": "@steelengine/searxng-plugin",
+      "name": "@openclaw/searxng-plugin",
       "description": "SteelEngine SearXNG plugin",
       "source": "official",
       "kind": "plugin",
@@ -573,8 +573,8 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/searxng-plugin",
-          "npmSpec": "@steelengine/searxng-plugin",
+          "clawhubSpec": "clawhub:@openclaw/searxng-plugin",
+          "npmSpec": "@openclaw/searxng-plugin",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9",
           "allowInvalidConfigRecovery": true
@@ -582,7 +582,7 @@
       }
     },
     {
-      "name": "@steelengine/tavily-plugin",
+      "name": "@openclaw/tavily-plugin",
       "description": "SteelEngine Tavily plugin",
       "source": "official",
       "kind": "plugin",
@@ -620,8 +620,8 @@
           }
         ],
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/tavily-plugin",
-          "npmSpec": "@steelengine/tavily-plugin",
+          "clawhubSpec": "clawhub:@openclaw/tavily-plugin",
+          "npmSpec": "@openclaw/tavily-plugin",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.6.9",
           "allowInvalidConfigRecovery": true
@@ -629,7 +629,7 @@
       }
     },
     {
-      "name": "@steelengine/tokenjuice",
+      "name": "@openclaw/tokenjuice",
       "description": "SteelEngine tokenjuice exec output compaction plugin",
       "source": "official",
       "kind": "plugin",
@@ -643,15 +643,15 @@
           "order": 60
         },
         "install": {
-          "clawhubSpec": "clawhub:@steelengine/tokenjuice",
-          "npmSpec": "@steelengine/tokenjuice",
+          "clawhubSpec": "clawhub:@openclaw/tokenjuice",
+          "npmSpec": "@openclaw/tokenjuice",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.5.28"
         }
       }
     },
     {
-      "name": "@steelengine/voice-call",
+      "name": "@openclaw/voice-call",
       "description": "SteelEngine voice-call plugin",
       "source": "official",
       "kind": "plugin",
@@ -661,7 +661,7 @@
           "label": "Voice Call"
         },
         "install": {
-          "npmSpec": "@steelengine/voice-call",
+          "npmSpec": "@openclaw/voice-call",
           "defaultChoice": "npm",
           "minHostVersion": ">=2026.4.10"
         }
