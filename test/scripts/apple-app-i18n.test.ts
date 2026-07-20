@@ -280,7 +280,7 @@ describe("Apple app i18n catalogs", () => {
   });
 
   it("keeps custom component text on explicit localized or verbatim paths", async () => {
-    const design = await readFile("apps/ios/Sources/Design/OpenClawProComponents.swift", "utf8");
+    const design = await readFile("apps/ios/Sources/Design/SteelEngineProComponents.swift", "utf8");
     const agentOverview = await readFile(
       "apps/ios/Sources/Design/AgentProTab+Overview.swift",
       "utf8",
@@ -304,7 +304,7 @@ describe("Apple app i18n catalogs", () => {
     const watchDirect = await readFile("apps/ios/WatchApp/Sources/WatchDirectNode.swift", "utf8");
 
     expect(design).toContain(
-      "struct ProStatusRow: View {\n    let icon: String\n    let title: OpenClawTextValue\n    let detail: OpenClawTextValue",
+      "struct ProStatusRow: View {\n    let icon: String\n    let title: SteelEngineTextValue\n    let detail: SteelEngineTextValue",
     );
     expect(design).not.toContain(
       "struct ProStatusRow: View {\n    let icon: String\n    let title: String",
@@ -317,18 +317,18 @@ describe("Apple app i18n catalogs", () => {
     expect(watch).toContain("accessory: .verbatim(self.store.talkSummaryText)");
     expect(watch).toContain("title: .verbatim(record.approval.commandPreview");
     expect(settings).toContain(
-      "let title: OpenClawTextValue\n    let detail: OpenClawTextValue\n    let priority: OpenClawTextValue",
+      "let title: SteelEngineTextValue\n    let detail: SteelEngineTextValue\n    let priority: SteelEngineTextValue",
     );
     expect(settings).toContain(
-      "struct SettingsDetailRow: View {\n    let label: LocalizedStringKey\n    let value: OpenClawTextValue",
+      "struct SettingsDetailRow: View {\n    let label: LocalizedStringKey\n    let value: SteelEngineTextValue",
     );
     expect(settings).toContain("self.value.text");
     expect(settings).not.toContain("Text(self.item.title)");
     expect(agentOverview).toContain(
-      "func metricTile(\n        icon: String,\n        title: OpenClawTextValue,\n        value: String,\n        detail: OpenClawTextValue",
+      "func metricTile(\n        icon: String,\n        title: SteelEngineTextValue,\n        value: String,\n        detail: SteelEngineTextValue",
     );
     expect(settingsActions).toContain(
-      "func diagnosticCheckRow(\n        icon: String,\n        title: OpenClawTextValue,\n        detail: OpenClawTextValue,\n        value: OpenClawTextValue",
+      "func diagnosticCheckRow(\n        icon: String,\n        title: SteelEngineTextValue,\n        detail: SteelEngineTextValue,\n        value: SteelEngineTextValue",
     );
     expect(settingsSections).toContain("func settingsToggle(\n        _ title: LocalizedStringKey");
     expect(settingsSections).toContain(
@@ -387,8 +387,8 @@ describe("Apple app i18n catalogs", () => {
     expect(french).toContain('"NSMicrophoneUsageDescription" = ');
     expect(french).toContain('"NSHealthUpdateUsageDescription" = ');
     expect(watchChinese).toContain('"NSLocalNetworkUsageDescription" = ');
-    expect(shareGerman).toContain('"CFBundleDisplayName" = "OpenClaw Share";');
-    expect(activityJapanese).toContain('"CFBundleDisplayName" = "OpenClaw Activity";');
+    expect(shareGerman).toContain('"CFBundleDisplayName" = "SteelEngine Share";');
+    expect(activityJapanese).toContain('"CFBundleDisplayName" = "SteelEngine Activity";');
   });
 
   it("refreshes InfoPlist copy from translations for the current source", () => {
@@ -403,11 +403,11 @@ describe("Apple app i18n catalogs", () => {
       ),
     ).toBe("Utilisez l’appareil photo pour scanner les codes de configuration.");
     expect(
-      selectInfoPlistTranslation("OpenClaw Share", [], {
-        source: "OpenClaw Share",
-        value: "OpenClaw Partager",
+      selectInfoPlistTranslation("SteelEngine Share", [], {
+        source: "SteelEngine Share",
+        value: "SteelEngine Partager",
       }),
-    ).toBe("OpenClaw Partager");
+    ).toBe("SteelEngine Partager");
     expect(
       selectInfoPlistTranslation(
         "Use the camera to scan setup codes.",
@@ -451,7 +451,7 @@ describe("Apple app i18n catalogs", () => {
   });
 
   it("compiles macOS catalogs into app-bundle localization directories", async () => {
-    const outputDir = await mkdtemp(path.join(os.tmpdir(), "openclaw-apple-i18n-"));
+    const outputDir = await mkdtemp(path.join(os.tmpdir(), "steelengine-apple-i18n-"));
     try {
       await compileMacosLocalizations(outputDir);
       const swedish = await readFile(

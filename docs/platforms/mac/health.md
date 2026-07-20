@@ -38,9 +38,9 @@ does not flicker while offline.
 
 ## When in doubt
 
-Use the CLI flow in [Gateway health](/gateway/health) (`openclaw status`,
-`openclaw status --deep`, `openclaw health --json`) and tail
-`/tmp/openclaw/openclaw-*.log`, filtering for `web-heartbeat` / `web-reconnect`.
+Use the CLI flow in [Gateway health](/gateway/health) (`steelengine status`,
+`steelengine status --deep`, `steelengine health --json`) and tail
+`/tmp/steelengine/steelengine-*.log`, filtering for `web-heartbeat` / `web-reconnect`.
 
 ## Related
 

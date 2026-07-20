@@ -12,7 +12,7 @@ import {
   validateConnectParams,
   type ConnectParams,
 } from "../../packages/gateway-protocol/src/index.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   getBoundDeviceBootstrapProfile,
   redeemDeviceBootstrapTokenProfile,
@@ -119,7 +119,7 @@ type WatchNodeSession = {
 
 type WatchNodeHttpRuntimeOptions = {
   nodeRegistry: NodeRegistry;
-  getConfig: () => OpenClawConfig;
+  getConfig: () => SteelEngineConfig;
   broadcast: GatewayBroadcastFn;
   rateLimiter?: AuthRateLimiter;
   nodeReapprovalCoordinator?: NodeReapprovalCoordinator;
@@ -152,7 +152,7 @@ function readBearerToken(req: IncomingMessage): string | null {
 
 function resolveWatchClientAddress(
   req: IncomingMessage,
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
 ): { clientIp?: string; rateLimitKey: string } {
   const trustedProxies = config.gateway?.trustedProxies ?? [];
   const clientIp = resolveRequestClientIp(

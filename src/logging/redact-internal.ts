@@ -1,7 +1,7 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { fullContextToolPayloadRedactionState } from "./redact-internal-state.js";
 
-type LoggingConfig = OpenClawConfig["logging"];
+type LoggingConfig = SteelEngineConfig["logging"];
 
 export function isFullContextToolPayloadRedaction(loggingConfig: LoggingConfig): boolean {
   return fullContextToolPayloadRedactionState.isMarked(loggingConfig);

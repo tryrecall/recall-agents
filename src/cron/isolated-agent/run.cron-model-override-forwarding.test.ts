@@ -283,7 +283,7 @@ describe("runCronIsolatedAgentTurn — cron model override forwarding (#58065)",
       reseedReceipt: {
         version: 1 as const,
         promptHash: "a".repeat(64),
-        localSessionId: "openclaw-session",
+        localSessionId: "steelengine-session",
         userTurnDisposition: "persisted" as const,
       },
     };
@@ -464,14 +464,14 @@ describe("runCronIsolatedAgentTurn — cron model override forwarding (#58065)",
     resolveAllowedModelRefMock.mockReturnValue({
       ref: { provider: "openai", model: "gpt-5.6-luna" },
     });
-    resolveEffectiveAgentRuntimeMock.mockReturnValue("openclaw");
+    resolveEffectiveAgentRuntimeMock.mockReturnValue("steelengine");
     resolveCronSessionMock.mockReturnValue(
       makeCronSession({
         sessionEntry: makeCronSessionEntry({
           modelOverride: "gpt-5.6-luna",
           providerOverride: "openai",
           modelOverrideSource: "user",
-          agentRuntimeOverride: "openclaw",
+          agentRuntimeOverride: "steelengine",
           thinkingLevel: "ultra",
         }),
         isNewSession: true,
@@ -502,7 +502,7 @@ describe("runCronIsolatedAgentTurn — cron model override forwarding (#58065)",
         provider: "openai",
         model: "gpt-5.6-luna",
         level: "ultra",
-        agentRuntime: "openclaw",
+        agentRuntime: "steelengine",
       }),
     );
     expect(firstMockArg(runEmbeddedAgentMock).thinkLevel).toBe("ultra");
@@ -571,7 +571,7 @@ describe("runCronIsolatedAgentTurn — cron model override forwarding (#58065)",
     resolveAllowedModelRefMock.mockReturnValue({
       ref: { provider: "openai", model: "gpt-5.6-sol" },
     });
-    resolveEffectiveAgentRuntimeMock.mockReturnValue("openclaw");
+    resolveEffectiveAgentRuntimeMock.mockReturnValue("steelengine");
     isThinkingLevelSupportedMock.mockImplementation(
       ({ model }: { model?: string }) => model !== "gpt-5.5",
     );
@@ -586,7 +586,7 @@ describe("runCronIsolatedAgentTurn — cron model override forwarding (#58065)",
     const cronSession = makeCronSession({
       sessionEntry: makeCronSessionEntry({
         thinkingLevel: "ultra",
-        agentRuntimeOverride: "openclaw",
+        agentRuntimeOverride: "steelengine",
       }),
       isNewSession: true,
     });
@@ -608,8 +608,8 @@ describe("runCronIsolatedAgentTurn — cron model override forwarding (#58065)",
           agents: {
             defaults: {
               models: {
-                "openai/gpt-5.6-sol": { agentRuntime: { id: "openclaw" } },
-                "openai/gpt-5.5": { agentRuntime: { id: "openclaw" } },
+                "openai/gpt-5.6-sol": { agentRuntime: { id: "steelengine" } },
+                "openai/gpt-5.5": { agentRuntime: { id: "steelengine" } },
               },
             },
           },
@@ -634,7 +634,7 @@ describe("runCronIsolatedAgentTurn — cron model override forwarding (#58065)",
         provider: "openai",
         model: "gpt-5.5",
         level: "ultra",
-        agentRuntime: "openclaw",
+        agentRuntime: "steelengine",
       }),
     );
     expect(cronSession.sessionEntry.thinkingLevel).toBe("ultra");

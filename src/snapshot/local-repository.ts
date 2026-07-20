@@ -28,12 +28,12 @@ import {
 import { readSqliteUserVersion } from "../infra/sqlite-user-version.js";
 import { runExec } from "../process/exec.js";
 import { isValidAgentId, normalizeAgentId } from "../routing/session-key.js";
-import { assertOpenClawAgentDatabaseForMaintenance } from "../state/openclaw-agent-db.js";
-import { assertOpenClawStateDatabaseForMaintenance } from "../state/openclaw-state-db.js";
+import { assertSteelEngineAgentDatabaseForMaintenance } from "../state/steelengine-agent-db.js";
+import { assertSteelEngineStateDatabaseForMaintenance } from "../state/steelengine-state-db.js";
 import {
-  sanitizeOpenClawGlobalStateSnapshot,
-  sanitizeOpenClawStateLeaseRows,
-} from "../state/openclaw-state-snapshot-sanitizer.js";
+  sanitizeSteelEngineGlobalStateSnapshot,
+  sanitizeSteelEngineStateLeaseRows,
+} from "../state/steelengine-state-snapshot-sanitizer.js";
 import {
   containsAsciiControlCharacter,
   copySnapshotArtifact,
@@ -277,9 +277,9 @@ class LocalSqliteSnapshotProvider implements SqliteSnapshotProvider {
         targetPath: artifactPath,
         transform:
           identity.role === "global"
-            ? sanitizeOpenClawGlobalStateSnapshot
+            ? sanitizeSteelEngineGlobalStateSnapshot
             : identity.role === "agent"
-              ? sanitizeOpenClawStateLeaseRows
+              ? sanitizeSteelEngineStateLeaseRows
               : undefined,
         validate: buildDatabaseValidator(identity),
       });
@@ -718,11 +718,11 @@ function buildDatabaseValidator(
 ): SqliteSnapshotValidator {
   if (identity.role === "global") {
     return (database, pathname) =>
-      assertOpenClawStateDatabaseForMaintenance(database, { pathname });
+      assertSteelEngineStateDatabaseForMaintenance(database, { pathname });
   }
   if (identity.role === "agent") {
     return (database, pathname) =>
-      assertOpenClawAgentDatabaseForMaintenance(database, {
+      assertSteelEngineAgentDatabaseForMaintenance(database, {
         agentId: identity.agentId,
         pathname,
       });

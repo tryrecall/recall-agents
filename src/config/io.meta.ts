@@ -1,6 +1,6 @@
 // Maintains config metadata fields written alongside user config.
 import { VERSION } from "../version.js";
-import type { OpenClawConfig } from "./types.openclaw.js";
+import type { SteelEngineConfig } from "./types.steelengine.js";
 
 /** Metadata keys automatically stamped on config writes. */
 const AUTO_MANAGED_CONFIG_META_FIELDS = {
@@ -14,10 +14,10 @@ export const AUTO_MANAGED_CONFIG_META_PATHS = [
 ] as const;
 
 export function stampConfigWriteMetadata(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   now: string = new Date().toISOString(),
   version: string = VERSION,
-): OpenClawConfig {
+): SteelEngineConfig {
   return {
     ...cfg,
     meta: {

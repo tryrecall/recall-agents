@@ -6,13 +6,13 @@ import {
   clearRuntimeAuthProfileStoreSnapshots,
   saveAuthProfileStore,
 } from "../agents/auth-profiles/store.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
-import { closeOpenClawAgentDatabasesForTest } from "../state/openclaw-agent-db.js";
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
+import { closeSteelEngineAgentDatabasesForTest } from "../state/steelengine-agent-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import {
-  createOpenClawTestState,
-  type OpenClawTestState,
-} from "../test-utils/openclaw-test-state.js";
+  createSteelEngineTestState,
+  type SteelEngineTestState,
+} from "../test-utils/steelengine-test-state.js";
 import {
   collectOpenAICodexAuthProfileStoreIdMap,
   maybeMigrateAuthProfileJsonStoresToSqlite,
@@ -22,7 +22,7 @@ import {
 } from "./doctor-auth-flat-profiles.js";
 import type { DoctorPrompter } from "./doctor-prompter.js";
 
-const states: OpenClawTestState[] = [];
+const states: SteelEngineTestState[] = [];
 
 function makePrompter(shouldRepair: boolean): DoctorPrompter {
   return {
@@ -43,12 +43,12 @@ function makePrompter(shouldRepair: boolean): DoctorPrompter {
   };
 }
 
-async function makeTestState(): Promise<OpenClawTestState> {
-  const state = await createOpenClawTestState({
+async function makeTestState(): Promise<SteelEngineTestState> {
+  const state = await createSteelEngineTestState({
     layout: "state-only",
-    prefix: "openclaw-doctor-flat-auth-",
+    prefix: "steelengine-doctor-flat-auth-",
     env: {
-      OPENCLAW_AGENT_DIR: undefined,
+      STEELENGINE_AGENT_DIR: undefined,
     },
   });
   states.push(state);
@@ -56,7 +56,7 @@ async function makeTestState(): Promise<OpenClawTestState> {
 }
 
 async function writeLegacyAuthProfilesJson(
-  state: OpenClawTestState,
+  state: SteelEngineTestState,
   value: unknown,
   agentId = "main",
 ): Promise<string> {
@@ -68,8 +68,8 @@ async function writeLegacyAuthProfilesJson(
 
 afterEach(async () => {
   clearRuntimeAuthProfileStoreSnapshots();
-  closeOpenClawAgentDatabasesForTest();
-  closeOpenClawStateDatabaseForTest();
+  closeSteelEngineAgentDatabasesForTest();
+  closeSteelEngineStateDatabaseForTest();
   for (const state of states.splice(0)) {
     await state.cleanup();
   }
@@ -473,7 +473,7 @@ describe("maybeMigrateAuthProfileJsonStoresToSqlite", () => {
           anthropic: ["anthropic:default"],
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     const result = await maybeMigrateAuthProfileJsonStoresToSqlite({
       cfg,
@@ -548,7 +548,7 @@ describe("maybeMigrateAuthProfileJsonStoresToSqlite", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     const result = await maybeMigrateAuthProfileJsonStoresToSqlite({
       cfg,
@@ -582,12 +582,12 @@ describe("maybeMigrateAuthProfileJsonStoresToSqlite", () => {
   });
 
   it("infers config credential provider and mode before stripping config", async () => {
-    const cases: Array<{ profileId: string; cfg: OpenClawConfig; now: number }> = [
+    const cases: Array<{ profileId: string; cfg: SteelEngineConfig; now: number }> = [
       {
         profileId: "openai:default",
         cfg: {
           auth: { profiles: { "openai:default": { key: "sk-config" } } },
-        } as unknown as OpenClawConfig,
+        } as unknown as SteelEngineConfig,
         now: 468,
       },
       {
@@ -595,7 +595,7 @@ describe("maybeMigrateAuthProfileJsonStoresToSqlite", () => {
         cfg: {
           auth: { profiles: { work: { key: "sk-config" } } },
           agents: { defaults: { model: { primary: "openai/gpt-5.5@work" } } },
-        } as unknown as OpenClawConfig,
+        } as unknown as SteelEngineConfig,
         now: 470,
       },
       {
@@ -605,7 +605,7 @@ describe("maybeMigrateAuthProfileJsonStoresToSqlite", () => {
             profiles: { ordered: { key: "sk-config" } },
             order: { openai: ["ordered"] },
           },
-        } as unknown as OpenClawConfig,
+        } as unknown as SteelEngineConfig,
         now: 474,
       },
     ];
@@ -674,7 +674,7 @@ describe("maybeMigrateAuthProfileJsonStoresToSqlite", () => {
           openai: ["openai:default"],
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     const result = await maybeMigrateAuthProfileJsonStoresToSqlite({
       cfg,
@@ -761,7 +761,7 @@ describe("maybeMigrateAuthProfileJsonStoresToSqlite", () => {
             [entry.profileId]: entry.profile,
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
 
       const result = await maybeMigrateAuthProfileJsonStoresToSqlite({
         cfg,
@@ -828,7 +828,7 @@ describe("maybeMigrateAuthProfileJsonStoresToSqlite", () => {
             },
           },
         },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const result = await maybeMigrateAuthProfileJsonStoresToSqlite({
         cfg,
@@ -995,10 +995,10 @@ describe("maybeRepairOpenAICodexAuthConfig", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
 
     const result = maybeRepairOpenAICodexAuthConfig(cfg);
-    const migrated = result.config as OpenClawConfig & {
+    const migrated = result.config as SteelEngineConfig & {
       agents?: {
         defaults?: {
           models?: Record<string, { agentRuntime?: { authProfileId?: string } }>;
@@ -1046,10 +1046,10 @@ describe("maybeRepairOpenAICodexAuthConfig", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
 
     const result = maybeRepairOpenAICodexAuthConfig(cfg);
-    const migrated = result.config as OpenClawConfig & {
+    const migrated = result.config as SteelEngineConfig & {
       agents?: {
         defaults?: {
           models?: Record<string, { agentRuntime?: { authProfileId?: string } }>;
@@ -1086,12 +1086,12 @@ describe("maybeRepairOpenAICodexAuthConfig", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
 
     const result = maybeRepairOpenAICodexAuthConfig(cfg, {
       profileIdMap: new Map([["openai-codex:default", "openai:chatgpt-default"]]),
     });
-    const migrated = result.config as OpenClawConfig & {
+    const migrated = result.config as SteelEngineConfig & {
       agents?: {
         defaults?: {
           models?: Record<string, { agentRuntime?: { authProfileId?: string } }>;
@@ -1120,12 +1120,12 @@ describe("maybeRepairOpenAICodexAuthConfig", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
 
     const result = maybeRepairOpenAICodexAuthConfig(cfg, {
       profileIdMap: new Map([["openai-codex:default", "openai:chatgpt-default"]]),
     });
-    const migrated = result.config as OpenClawConfig & {
+    const migrated = result.config as SteelEngineConfig & {
       agents?: {
         defaults?: {
           models?: Record<string, { agentRuntime?: { authProfileId?: string } }>;
@@ -1161,12 +1161,12 @@ describe("maybeRepairOpenAICodexAuthConfig", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
 
     const result = maybeRepairOpenAICodexAuthConfig(cfg, {
       profileIdMap: new Map([["openai-codex:default", "openai:chatgpt-default"]]),
     });
-    const migrated = result.config as OpenClawConfig & {
+    const migrated = result.config as SteelEngineConfig & {
       agents?: {
         defaults?: {
           systemPrompt?: string;
@@ -1196,7 +1196,7 @@ describe("maybeRepairOpenAICodexAuthConfig", () => {
           "openai-codex": ["openai-codex:default"],
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
 
     const result = maybeRepairOpenAICodexAuthConfig(cfg, {
       profileIdMap: new Map([["openai-codex:default", "openai:chatgpt-default"]]),
@@ -1243,12 +1243,12 @@ describe("maybeRepairOpenAICodexAuthConfig", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
 
     const result = maybeRepairOpenAICodexAuthConfig(cfg, {
       profileIdMap: new Map([["openai-codex:default", "openai:default"]]),
     });
-    const migrated = result.config as OpenClawConfig & {
+    const migrated = result.config as SteelEngineConfig & {
       agents?: {
         defaults?: {
           models?: Record<string, { agentRuntime?: { authProfileId?: string } }>;

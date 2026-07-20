@@ -203,7 +203,7 @@ export function createScopedVitestConfig(
     environment?: string;
     exclude?: string[];
     argv?: string[];
-    includeOpenClawRuntimeSetup?: boolean;
+    includeSteelEngineRuntimeSetup?: boolean;
     isolate?: boolean;
     name?: string;
     fileParallelism?: boolean;
@@ -221,7 +221,7 @@ export function createScopedVitestConfig(
   const scopedDir = options?.dir;
   const resolvedScopedDir = scopedDir ? path.join(repoRoot, scopedDir) : undefined;
   const env = options?.env;
-  const externalIncludePatterns = loadPatternListFromEnv("OPENCLAW_VITEST_INCLUDE_FILE", env);
+  const externalIncludePatterns = loadPatternListFromEnv("STEELENGINE_VITEST_INCLUDE_FILE", env);
   const includeFromEnv = options?.intersectIncludeFile
     ? intersectIncludePatterns(include, externalIncludePatterns)
     : externalIncludePatterns;
@@ -247,7 +247,7 @@ export function createScopedVitestConfig(
     ...new Set([
       ...(baseTest.setupFiles ?? []),
       ...(options?.setupFiles ?? []),
-      ...(options?.includeOpenClawRuntimeSetup === false ? [] : ["test/setup-openclaw-runtime.ts"]),
+      ...(options?.includeSteelEngineRuntimeSetup === false ? [] : ["test/setup-steelengine-runtime.ts"]),
     ]),
   ].map(resolveRepoRootPath);
   const useNonIsolatedRunner = options?.useNonIsolatedRunner ?? !isolate;

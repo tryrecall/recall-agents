@@ -1,5 +1,5 @@
 import Foundation
-import OpenClawKit
+import SteelEngineKit
 
 enum TalkModeExecutionMode: Equatable {
     case native

@@ -137,7 +137,7 @@ function expectWriteContains(mock: unknown, fragment: string): void {
 
 function makeQaEvidence(entries: unknown[] = []) {
   return {
-    kind: "openclaw.qa.evidence-summary",
+    kind: "steelengine.qa.evidence-summary",
     schemaVersion: 2,
     generatedAt: "2026-06-14T00:00:00.000Z",
     evidenceMode: "full",
@@ -277,7 +277,7 @@ describe("qa cli runtime", () => {
       hostLogPath: "/tmp/multipass/multipass-host.log",
       bootstrapLogPath: "/tmp/multipass/multipass-guest-bootstrap.log",
       guestScriptPath: "/tmp/multipass/multipass-guest-run.sh",
-      vmName: "openclaw-qa-test",
+      vmName: "steelengine-qa-test",
       scenarioIds: ["channel-chat-baseline"],
     });
     listLiveTransportQaAdapterFactories.mockReturnValue([
@@ -302,13 +302,13 @@ describe("qa cli runtime", () => {
       stop: vi.fn(),
     });
     writeQaDockerHarnessFiles.mockResolvedValue({
-      outputDir: "/tmp/openclaw-repo/.artifacts/qa-docker",
+      outputDir: "/tmp/steelengine-repo/.artifacts/qa-docker",
     });
     buildQaDockerHarnessImage.mockResolvedValue({
-      imageName: "openclaw:qa-local-prebaked",
+      imageName: "steelengine:qa-local-prebaked",
     });
     runQaDockerUp.mockResolvedValue({
-      outputDir: "/tmp/openclaw-repo/.artifacts/qa-docker",
+      outputDir: "/tmp/steelengine-repo/.artifacts/qa-docker",
       qaLabUrl: "http://127.0.0.1:43124",
       gatewayUrl: "http://127.0.0.1:18789/",
       stopCommand: "docker compose down",
@@ -371,11 +371,11 @@ describe("qa cli runtime", () => {
   });
 
   it("dispatches a taxonomy-backed profile category through the suite runner", async () => {
-    const previousProfile = process.env.OPENCLAW_QA_PROFILE;
-    process.env.OPENCLAW_QA_PROFILE = "release";
+    const previousProfile = process.env.STEELENGINE_QA_PROFILE;
+    process.env.STEELENGINE_QA_PROFILE = "release";
     try {
       runQaSuite.mockImplementationOnce(async () => {
-        expect(process.env.OPENCLAW_QA_PROFILE).toBe("smoke-ci");
+        expect(process.env.STEELENGINE_QA_PROFILE).toBe("smoke-ci");
         await fs.writeFile(
           suiteEvidencePath,
           JSON.stringify(
@@ -435,7 +435,7 @@ describe("qa cli runtime", () => {
       });
 
       await runQaProfileCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         outputDir: ".artifacts/qa-e2e/smoke-ci",
         profile: "smoke-ci",
         surface: "channel-framework",
@@ -449,8 +449,8 @@ describe("qa cli runtime", () => {
 
       const suiteArgs = mockFirstObjectArg(runQaSuite);
       expectFields(suiteArgs, {
-        repoRoot: path.resolve("/tmp/openclaw-repo"),
-        outputDir: path.resolve("/tmp/openclaw-repo", ".artifacts/qa-e2e/smoke-ci"),
+        repoRoot: path.resolve("/tmp/steelengine-repo"),
+        outputDir: path.resolve("/tmp/steelengine-repo", ".artifacts/qa-e2e/smoke-ci"),
         transportId: "qa-channel",
         channelDriver: "crabline",
         providerMode: "mock-openai",
@@ -462,7 +462,7 @@ describe("qa cli runtime", () => {
         channelDriver: "crabline",
       });
       expect(suiteArgs.scenarioIds).toEqual(["dm-chat-baseline"]);
-      expect(process.env.OPENCLAW_QA_PROFILE).toBe("release");
+      expect(process.env.STEELENGINE_QA_PROFILE).toBe("release");
       const evidence = JSON.parse(await fs.readFile(suiteEvidencePath, "utf8")) as {
         evidenceMode?: unknown;
         entries?: unknown[];
@@ -500,16 +500,16 @@ describe("qa cli runtime", () => {
       expectWriteContains(stdoutWrite, `QA profile scorecard: ${suiteEvidencePath}`);
     } finally {
       if (previousProfile === undefined) {
-        delete process.env.OPENCLAW_QA_PROFILE;
+        delete process.env.STEELENGINE_QA_PROFILE;
       } else {
-        process.env.OPENCLAW_QA_PROFILE = previousProfile;
+        process.env.STEELENGINE_QA_PROFILE = previousProfile;
       }
     }
   });
 
   it("passes non-Crabline profile channel drivers as declarative suite metadata", async () => {
     await runQaProfileCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       profile: "release",
       surface: "agent-runtime-and-provider-execution",
       category: "agent-runtime-and-provider-execution.agent-turn-execution",
@@ -523,7 +523,7 @@ describe("qa cli runtime", () => {
 
   it("keeps portable channel scenarios in driver-selected profile runs", async () => {
     await runQaProfileCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       profile: "release",
       surface: "channel-framework",
       providerMode: "mock-openai",
@@ -540,7 +540,7 @@ describe("qa cli runtime", () => {
 
   it("runs the all profile through the live taxonomy profile path", async () => {
     await runQaProfileCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       profile: "all",
       surface: "agent-runtime-and-provider-execution",
       category: "agent-runtime-and-provider-execution.agent-turn-execution",
@@ -566,7 +566,7 @@ describe("qa cli runtime", () => {
     });
 
     await runQaProfileCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       profile: "smoke-ci",
       scenarioIds: ["dm-chat-baseline", "instruction-followthrough-repo-contract"],
     });
@@ -605,7 +605,7 @@ describe("qa cli runtime", () => {
 
   it("dispatches the Matrix restart scenario through the Crabline smoke profile", async () => {
     await runQaProfileCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       profile: "smoke-ci",
       scenarioIds: ["matrix-restart-resume"],
     });
@@ -621,7 +621,7 @@ describe("qa cli runtime", () => {
   it("rejects qa profile runs that do not match taxonomy categories", async () => {
     await expect(
       runQaProfileCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         profile: "smoke-ci",
         surface: "unknown-surface",
       }),
@@ -634,7 +634,7 @@ describe("qa cli runtime", () => {
   it("rejects qa profile scenario filters outside the selected taxonomy categories", async () => {
     await expect(
       runQaProfileCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         profile: "smoke-ci",
         category: "channel-framework.conversation-routing-and-delivery",
         scenarioIds: ["not-a-real-scenario"],
@@ -648,7 +648,7 @@ describe("qa cli runtime", () => {
   it("rejects qa profile runs whose profile is not declared in taxonomy.yaml", async () => {
     await expect(
       runQaProfileCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         profile: "nightly",
       }),
     ).rejects.toThrow('--qa-profile must be one of smoke-ci, release, all, got "nightly".');
@@ -657,7 +657,7 @@ describe("qa cli runtime", () => {
 
   it("resolves suite repo-root-relative paths before dispatching", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       outputDir: ".artifacts/qa/frontier",
       providerMode: "live-frontier",
       primaryModel: "openai/gpt-5.6-luna",
@@ -669,8 +669,8 @@ describe("qa cli runtime", () => {
     });
 
     expect(runQaSuite).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
-      outputDir: path.resolve("/tmp/openclaw-repo", ".artifacts/qa/frontier"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
+      outputDir: path.resolve("/tmp/steelengine-repo", ".artifacts/qa/frontier"),
       transportId: "qa-channel",
       channelDriver: undefined,
       channelDriverSelection: undefined,
@@ -686,7 +686,7 @@ describe("qa cli runtime", () => {
 
   it("runs canonical scenarios through a discovered live adapter factory", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       outputDir: ".artifacts/qa/telegram-live",
       channelDriver: "live",
       channel: "telegram",
@@ -702,7 +702,7 @@ describe("qa cli runtime", () => {
         concurrency: 1,
         adapterOptions: expect.objectContaining({
           explicitScenarioSelection: true,
-          repoRoot: path.resolve("/tmp/openclaw-repo"),
+          repoRoot: path.resolve("/tmp/steelengine-repo"),
         }),
         scenarioIds: ["channel-chat-baseline"],
       }),
@@ -778,7 +778,7 @@ describe("qa cli runtime", () => {
       runQaSuiteCommand({
         channelDriver: "live",
         channel: "telegram",
-        runtimePair: "openclaw,codex",
+        runtimePair: "steelengine,codex",
       }),
     ).rejects.toThrow("--runtime-pair is not supported with a live QA adapter.");
     expect(runQaSuite).not.toHaveBeenCalled();
@@ -802,7 +802,7 @@ describe("qa cli runtime", () => {
 
   it("uses the Crabline default channel when selected scenarios do not request one", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       outputDir: ".artifacts/qa/multipass-telegram",
       providerMode: "mock-openai",
       channelDriver: "crabline",
@@ -810,8 +810,8 @@ describe("qa cli runtime", () => {
     });
 
     expect(runQaSuite).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
-      outputDir: path.resolve("/tmp/openclaw-repo", ".artifacts/qa/multipass-telegram"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
+      outputDir: path.resolve("/tmp/steelengine-repo", ".artifacts/qa/multipass-telegram"),
       transportId: "qa-channel",
       channelDriver: "crabline",
       channelDriverSelection: {
@@ -832,7 +832,7 @@ describe("qa cli runtime", () => {
 
   it("defers mixed Crabline channels to the host suite launcher", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "mock-openai",
       channelDriver: "crabline",
       scenarioIds: ["telegram-help-command", "matrix-restart-resume"],
@@ -882,7 +882,7 @@ describe("qa cli runtime", () => {
 
   it("passes Crabline channel-driver selection through to the multipass runner", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "mock-openai",
       channelDriver: "crabline",
       channel: "telegram",
@@ -907,14 +907,14 @@ describe("qa cli runtime", () => {
 
   it("passes explicit suite plugin enablements into the host gateway run", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "mock-openai",
       scenarioIds: ["channel-chat-baseline"],
       enabledPluginIds: ["browser", "memory-core"],
     });
 
     expect(runQaSuite).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       outputDir: undefined,
       transportId: "qa-channel",
       channelDriver: undefined,
@@ -930,7 +930,7 @@ describe("qa cli runtime", () => {
 
   it("passes explicit suite plugin enablements through to the multipass runner", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       runner: "multipass",
       providerMode: "mock-openai",
       scenarioIds: ["channel-chat-baseline"],
@@ -948,14 +948,14 @@ describe("qa cli runtime", () => {
 
   it("passes runtime-pair suite selection through to the host runner", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "mock-openai",
       scenarioIds: ["approval-turn-tool-followthrough"],
-      runtimePair: "openclaw,codex",
+      runtimePair: "steelengine,codex",
     });
 
     expect(runQaSuite).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       outputDir: undefined,
       transportId: "qa-channel",
       channelDriver: undefined,
@@ -965,25 +965,25 @@ describe("qa cli runtime", () => {
       alternateModel: undefined,
       fastMode: undefined,
       scenarioIds: ["approval-turn-tool-followthrough"],
-      runtimePair: ["openclaw", "codex"],
+      runtimePair: ["steelengine", "codex"],
     });
   });
 
   it("rejects unknown runtime-pair ids at the CLI boundary", async () => {
     await expect(
       runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         providerMode: "mock-openai",
         scenarioIds: ["approval-turn-tool-followthrough"],
         runtimePair: "legacy-runtime,codex",
       }),
-    ).rejects.toThrow('--runtime-pair only supports "openclaw" and "codex".');
+    ).rejects.toThrow('--runtime-pair only supports "steelengine" and "codex".');
     expect(runQaSuite).not.toHaveBeenCalled();
   });
 
   it("accepts legacy pi as a runtime-pair suite alias", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "mock-openai",
       scenarioIds: ["approval-turn-tool-followthrough"],
       runtimePair: "pi,codex",
@@ -991,15 +991,15 @@ describe("qa cli runtime", () => {
 
     expect(runQaSuite).toHaveBeenCalledWith(
       expect.objectContaining({
-        repoRoot: path.resolve("/tmp/openclaw-repo"),
-        runtimePair: ["openclaw", "codex"],
+        repoRoot: path.resolve("/tmp/steelengine-repo"),
+        runtimePair: ["steelengine", "codex"],
       }),
     );
   });
 
   it("drops blank suite model refs so provider defaults apply", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "mock-openai",
       primaryModel: " ",
       alternateModel: "",
@@ -1007,7 +1007,7 @@ describe("qa cli runtime", () => {
     });
 
     expect(runQaSuite).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       outputDir: undefined,
       transportId: "qa-channel",
       channelDriver: undefined,
@@ -1022,7 +1022,7 @@ describe("qa cli runtime", () => {
 
   it("resolves telegram qa repo-root-relative paths before dispatching", async () => {
     await runQaTelegramCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       outputDir: ".artifacts/qa/telegram",
       providerMode: "live-frontier",
       primaryModel: "openai/gpt-5.6-luna",
@@ -1034,8 +1034,8 @@ describe("qa cli runtime", () => {
 
     expect(runQaFlowSuiteFromRuntime).toHaveBeenCalledWith(
       expect.objectContaining({
-        repoRoot: path.resolve("/tmp/openclaw-repo"),
-        outputDir: path.resolve("/tmp/openclaw-repo", ".artifacts/qa/telegram"),
+        repoRoot: path.resolve("/tmp/steelengine-repo"),
+        outputDir: path.resolve("/tmp/steelengine-repo", ".artifacts/qa/telegram"),
         providerMode: "live-frontier",
         primaryModel: "openai/gpt-5.6-luna",
         alternateModel: "openai/gpt-5.6-luna",
@@ -1049,23 +1049,23 @@ describe("qa cli runtime", () => {
   });
 
   it("rejects output dirs that escape the repo root", () => {
-    expect(() => resolveRepoRelativeOutputDir("/tmp/openclaw-repo", "../outside")).toThrow(
+    expect(() => resolveRepoRelativeOutputDir("/tmp/steelengine-repo", "../outside")).toThrow(
       "--output-dir must stay within the repo root.",
     );
-    expect(() => resolveRepoRelativeOutputDir("/tmp/openclaw-repo", "/tmp/outside")).toThrow(
+    expect(() => resolveRepoRelativeOutputDir("/tmp/steelengine-repo", "/tmp/outside")).toThrow(
       "--output-dir must be a relative path inside the repo root.",
     );
   });
 
   it("defaults telegram qa runs onto the live provider lane", async () => {
     await runQaTelegramCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       scenarioIds: ["telegram-help-command"],
     });
 
     expect(runQaFlowSuiteFromRuntime).toHaveBeenCalledWith(
       expect.objectContaining({
-        repoRoot: path.resolve("/tmp/openclaw-repo"),
+        repoRoot: path.resolve("/tmp/steelengine-repo"),
         providerMode: "live-frontier",
         scenarioIds: ["telegram-help-command"],
       }),
@@ -1074,7 +1074,7 @@ describe("qa cli runtime", () => {
 
   it("resolves the Telegram release profile when Commander supplies an empty scenario list", async () => {
     await runQaTelegramCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       scenarioIds: [],
     });
 
@@ -1092,10 +1092,10 @@ describe("qa cli runtime", () => {
   it("uses the trusted Telegram launcher for the shared suite gateway", async () => {
     const candidateRoot = path.join(telegramArtifactsDir, "candidate");
     const boundaryDir = path.join(telegramArtifactsDir, "boundary");
-    const launcherPath = path.join(telegramArtifactsDir, "openclaw-telegram-sut-launcher");
+    const launcherPath = path.join(telegramArtifactsDir, "steelengine-telegram-sut-launcher");
     const runtimeRoot = path.join(telegramArtifactsDir, "runtime");
     const runtimeTempParent = path.join(runtimeRoot, "tmp");
-    const preloadPath = path.join(runtimeRoot, "openclaw-telegram-preentry.mjs");
+    const preloadPath = path.join(runtimeRoot, "steelengine-telegram-preentry.mjs");
     const runtimeEntryPath = path.join(candidateRoot, "dist", "index.js");
     await fs.mkdir(path.dirname(runtimeEntryPath), { recursive: true });
     await fs.mkdir(boundaryDir);
@@ -1103,20 +1103,20 @@ describe("qa cli runtime", () => {
     await fs.writeFile(launcherPath, "#!/bin/sh\nexit 0\n", { mode: 0o700 });
     await fs.writeFile(preloadPath, "export {};\n", { mode: 0o600 });
     await fs.writeFile(runtimeEntryPath, "export {};\n", { mode: 0o600 });
-    vi.stubEnv("OPENCLAW_QA_TELEGRAM_SUT_FORWARDED_ENV_KEYS", "HOME,PATH");
-    vi.stubEnv("OPENCLAW_QA_TELEGRAM_SUT_CLEANUP_TIMEOUT_MS", "60000");
-    vi.stubEnv("OPENCLAW_QA_TELEGRAM_SUT_GID", "1002");
-    vi.stubEnv("OPENCLAW_QA_TELEGRAM_SUT_OPENCLAW_COMMAND", launcherPath);
-    vi.stubEnv("OPENCLAW_QA_TELEGRAM_SUT_PRELOAD_PATH", preloadPath);
-    vi.stubEnv("OPENCLAW_QA_TELEGRAM_SUT_PROCESS_BOUNDARY_DIR", boundaryDir);
-    vi.stubEnv("OPENCLAW_QA_TELEGRAM_SUT_RUNTIME_EXECUTABLE", process.execPath);
-    vi.stubEnv("OPENCLAW_QA_TELEGRAM_SUT_UID", "1001");
+    vi.stubEnv("STEELENGINE_QA_TELEGRAM_SUT_FORWARDED_ENV_KEYS", "HOME,PATH");
+    vi.stubEnv("STEELENGINE_QA_TELEGRAM_SUT_CLEANUP_TIMEOUT_MS", "60000");
+    vi.stubEnv("STEELENGINE_QA_TELEGRAM_SUT_GID", "1002");
+    vi.stubEnv("STEELENGINE_QA_TELEGRAM_SUT_STEELENGINE_COMMAND", launcherPath);
+    vi.stubEnv("STEELENGINE_QA_TELEGRAM_SUT_PRELOAD_PATH", preloadPath);
+    vi.stubEnv("STEELENGINE_QA_TELEGRAM_SUT_PROCESS_BOUNDARY_DIR", boundaryDir);
+    vi.stubEnv("STEELENGINE_QA_TELEGRAM_SUT_RUNTIME_EXECUTABLE", process.execPath);
+    vi.stubEnv("STEELENGINE_QA_TELEGRAM_SUT_UID", "1001");
     await runQaTelegramCommand({
       repoRoot: candidateRoot,
       scenarioIds: ["telegram-help-command", "telegram-stream-final-single-message"],
     });
 
-    const sutOpenClawCommand = {
+    const sutSteelEngineCommand = {
       executablePath: launcherPath,
       tempParentDir: runtimeTempParent,
       usePackagedPlugins: true,
@@ -1132,18 +1132,18 @@ describe("qa cli runtime", () => {
       },
     };
     expect(runQaFlowSuiteFromRuntime).toHaveBeenCalledWith(
-      expect.objectContaining({ sutOpenClawCommand }),
+      expect.objectContaining({ sutSteelEngineCommand }),
     );
   });
 
   it("rejects relative Telegram launcher paths before starting a gateway", async () => {
-    vi.stubEnv("OPENCLAW_QA_TELEGRAM_SUT_OPENCLAW_COMMAND", "relative-launcher");
+    vi.stubEnv("STEELENGINE_QA_TELEGRAM_SUT_STEELENGINE_COMMAND", "relative-launcher");
     await expect(
       runQaTelegramCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         scenarioIds: ["telegram-help-command"],
       }),
-    ).rejects.toThrow("OPENCLAW_QA_TELEGRAM_SUT_OPENCLAW_COMMAND must be an absolute file path.");
+    ).rejects.toThrow("STEELENGINE_QA_TELEGRAM_SUT_STEELENGINE_COMMAND must be an absolute file path.");
 
     expect(runQaFlowSuiteFromRuntime).not.toHaveBeenCalled();
   });
@@ -1151,24 +1151,24 @@ describe("qa cli runtime", () => {
   it("rejects non-executable Telegram launcher files before starting a gateway", async () => {
     const launcherPath = path.join(telegramArtifactsDir, "non-executable-launcher");
     await fs.writeFile(launcherPath, "#!/bin/sh\nexit 0\n", { mode: 0o600 });
-    vi.stubEnv("OPENCLAW_QA_TELEGRAM_SUT_OPENCLAW_COMMAND", launcherPath);
+    vi.stubEnv("STEELENGINE_QA_TELEGRAM_SUT_STEELENGINE_COMMAND", launcherPath);
     await expect(
       runQaTelegramCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         scenarioIds: ["telegram-help-command"],
       }),
     ).rejects.toThrow(
-      `OPENCLAW_QA_TELEGRAM_SUT_OPENCLAW_COMMAND must point to an executable regular file: ${launcherPath}`,
+      `STEELENGINE_QA_TELEGRAM_SUT_STEELENGINE_COMMAND must point to an executable regular file: ${launcherPath}`,
     );
 
     expect(runQaFlowSuiteFromRuntime).not.toHaveBeenCalled();
   });
 
   it("rejects unknown mixed Telegram selections before resolving the SUT launcher", async () => {
-    vi.stubEnv("OPENCLAW_QA_TELEGRAM_SUT_OPENCLAW_COMMAND", "relative-launcher");
+    vi.stubEnv("STEELENGINE_QA_TELEGRAM_SUT_STEELENGINE_COMMAND", "relative-launcher");
     await expect(
       runQaTelegramCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         scenarioIds: ["telegram-help-command", "missing-telegram-scenario"],
       }),
     ).rejects.toThrow("unknown Telegram QA scenario id(s): missing-telegram-scenario");
@@ -1177,9 +1177,9 @@ describe("qa cli runtime", () => {
   });
 
   it("prints telegram scenario catalog without resolving the SUT launcher", async () => {
-    vi.stubEnv("OPENCLAW_QA_TELEGRAM_SUT_OPENCLAW_COMMAND", "relative-launcher");
+    vi.stubEnv("STEELENGINE_QA_TELEGRAM_SUT_STEELENGINE_COMMAND", "relative-launcher");
     await runQaTelegramCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "mock-openai",
       listScenarios: true,
     });
@@ -1187,7 +1187,7 @@ describe("qa cli runtime", () => {
     expect(runQaFlowSuiteFromRuntime).not.toHaveBeenCalled();
     expectWriteContains(
       stdoutWrite,
-      "telegram-status-command\tdefault\tTelegram status command reply\tVerify Telegram status returns model, session, and activation details. refs=openclaw/openclaw#74698",
+      "telegram-status-command\tdefault\tTelegram status command reply\tVerify Telegram status returns model, session, and activation details. refs=steelengine/steelengine#74698",
     );
   });
 
@@ -1211,7 +1211,7 @@ describe("qa cli runtime", () => {
 
     try {
       await runQaTelegramCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
       });
       expect(process.exitCode).toBe(1);
     } finally {
@@ -1246,7 +1246,7 @@ describe("qa cli runtime", () => {
 
     try {
       await runQaTelegramCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         allowFailures: true,
       });
       expect(process.exitCode).toBeUndefined();
@@ -1257,13 +1257,13 @@ describe("qa cli runtime", () => {
 
   it("passes host suite concurrency through", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       scenarioIds: ["channel-chat-baseline", "thread-follow-up"],
       concurrency: 3,
     });
 
     expectFields(mockFirstObjectArg(runQaSuite), {
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       transportId: "qa-channel",
       scenarioIds: ["channel-chat-baseline", "thread-follow-up"],
       concurrency: 3,
@@ -1274,7 +1274,7 @@ describe("qa cli runtime", () => {
   it("rejects fractional suite concurrency from programmatic callers", async () => {
     await expect(
       runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         scenarioIds: ["channel-chat-baseline"],
         concurrency: 1.5,
       }),
@@ -1306,7 +1306,7 @@ describe("qa cli runtime", () => {
 
     try {
       await runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
       });
       expect(process.exitCode).toBe(1);
     } finally {
@@ -1339,7 +1339,7 @@ describe("qa cli runtime", () => {
 
     try {
       await runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
       });
       expect(process.exitCode).toBe(1);
     } finally {
@@ -1378,7 +1378,7 @@ describe("qa cli runtime", () => {
 
     try {
       await runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         allowFailures: true,
       });
       expect(process.exitCode).toBeUndefined();
@@ -1400,7 +1400,7 @@ describe("qa cli runtime", () => {
       );
 
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
     });
 
     expect(runQaSuite).toHaveBeenCalledTimes(2);
@@ -1423,7 +1423,7 @@ describe("qa cli runtime", () => {
       );
 
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
     });
 
     expect(runQaSuite).toHaveBeenCalledTimes(2);
@@ -1440,7 +1440,7 @@ describe("qa cli runtime", () => {
 
     await expect(
       runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
       }),
     ).rejects.toThrow("approval-turn timed out waiting for post-approval read");
 
@@ -1478,7 +1478,7 @@ describe("qa cli runtime", () => {
 
     try {
       await runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
       });
       expect(runQaSuite).toHaveBeenCalledTimes(1);
       expect(process.exitCode).toBe(1);
@@ -1488,9 +1488,9 @@ describe("qa cli runtime", () => {
   });
 
   it("runs a host-only parity preflight against the sentinel scenario", async () => {
-    const repoRoot = path.resolve("/tmp/openclaw-repo");
+    const repoRoot = path.resolve("/tmp/steelengine-repo");
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "mock-openai",
       primaryModel: "openai/gpt-5.6-luna",
       alternateModel: "anthropic/claude-opus-4-8",
@@ -1537,7 +1537,7 @@ describe("qa cli runtime", () => {
 
     await expect(
       runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         preflight: true,
       }),
     ).rejects.toThrow("QA parity preflight failed with 1 failing or skipped scenario.");
@@ -1569,7 +1569,7 @@ describe("qa cli runtime", () => {
 
     try {
       await runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         preflight: true,
         allowFailures: true,
       });
@@ -1582,7 +1582,7 @@ describe("qa cli runtime", () => {
   it("rejects preflight on the multipass runner", async () => {
     await expect(
       runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         runner: "multipass",
         preflight: true,
       }),
@@ -1591,7 +1591,7 @@ describe("qa cli runtime", () => {
 
   it("passes host suite CLI auth mode through", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "live-frontier",
       primaryModel: "claude-cli/claude-sonnet-4-6",
       alternateModel: "claude-cli/claude-sonnet-4-6",
@@ -1600,7 +1600,7 @@ describe("qa cli runtime", () => {
     });
 
     expectFields(mockFirstObjectArg(runQaSuite), {
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       providerMode: "live-frontier",
       primaryModel: "claude-cli/claude-sonnet-4-6",
       alternateModel: "claude-cli/claude-sonnet-4-6",
@@ -1611,13 +1611,13 @@ describe("qa cli runtime", () => {
 
   it("expands the agentic parity pack onto the suite scenario list", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       parityPack: "agentic",
       scenarioIds: ["channel-chat-baseline"],
     });
 
     expectFields(mockFirstObjectArg(runQaSuite), {
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       scenarioIds: [
         "channel-chat-baseline",
         "approval-turn-tool-followthrough",
@@ -1638,13 +1638,13 @@ describe("qa cli runtime", () => {
 
   it("expands the personal-agent pack onto the suite scenario list", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       pack: "personal-agent",
       scenarioIds: ["channel-chat-baseline"],
     });
 
     expectFields(mockFirstObjectArg(runQaSuite), {
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       scenarioIds: [
         "channel-chat-baseline",
         "personal-reminder-roundtrip",
@@ -1663,13 +1663,13 @@ describe("qa cli runtime", () => {
 
   it("expands runtime parity tier selections onto the suite scenario list", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       runtimeParityTier: ["standard"],
       scenarioIds: ["channel-chat-baseline", "runtime-tool-bash"],
     });
 
     expectFields(mockFirstObjectArg(runQaSuite), {
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       scenarioIds: [
         "channel-chat-baseline",
         "runtime-tool-bash",
@@ -1694,7 +1694,7 @@ describe("qa cli runtime", () => {
 
   it("accepts comma-separated runtime parity tier filters", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       runtimeParityTier: ["optional,soak"],
     });
 
@@ -1719,8 +1719,8 @@ describe("qa cli runtime", () => {
 
   it("keeps runtime-pair tier selection on flow scenarios and reports exclusions", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
-      runtimePair: "openclaw,codex",
+      repoRoot: "/tmp/steelengine-repo",
+      runtimePair: "steelengine,codex",
       runtimeParityTier: ["standard", "live-only"],
     });
 
@@ -1731,7 +1731,7 @@ describe("qa cli runtime", () => {
     expect(scenarioIds).not.toContain("hosted-image-generation-providers-live");
     expect(scenarioIds).not.toContain("hosted-video-generation-providers-live");
     expectFields(mockFirstObjectArg(runQaSuite), {
-      runtimePair: ["openclaw", "codex"],
+      runtimePair: ["steelengine", "codex"],
     });
     expectWriteContains(
       stderrWrite,
@@ -1746,8 +1746,8 @@ describe("qa cli runtime", () => {
   it("rejects explicit runtime-pair scenarios with no compatible flow execution", async () => {
     await expect(
       runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
-        runtimePair: "openclaw,codex",
+        repoRoot: "/tmp/steelengine-repo",
+        runtimePair: "steelengine,codex",
         scenarioIds: ["hosted-image-generation-providers-live"],
       }),
     ).rejects.toThrow(
@@ -1772,8 +1772,8 @@ describe("qa cli runtime", () => {
 
     await expect(
       runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
-        runtimePair: "openclaw,codex",
+        repoRoot: "/tmp/steelengine-repo",
+        runtimePair: "steelengine,codex",
         runtimeParityTier: ["live-only"],
       }),
     ).rejects.toThrow(
@@ -1786,7 +1786,7 @@ describe("qa cli runtime", () => {
   it("rejects unknown runtime parity tier filters", async () => {
     await expect(
       runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         runtimeParityTier: ["standardish"],
       }),
     ).rejects.toThrow(
@@ -1797,7 +1797,7 @@ describe("qa cli runtime", () => {
   it("rejects unknown suite packs", async () => {
     await expect(
       runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         pack: "personal-admin",
       }),
     ).rejects.toThrow('--pack must be one of personal-agent, observability, got "personal-admin"');
@@ -1806,7 +1806,7 @@ describe("qa cli runtime", () => {
   it("rejects unknown suite CLI auth modes", async () => {
     await expect(
       runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         cliAuthMode: "magic",
       }),
     ).rejects.toThrow("--cli-auth-mode must be one of auto, api-key, subscription");
@@ -1865,8 +1865,8 @@ describe("qa cli runtime", () => {
                 drift: "tool-call-shape",
                 driftDetails: "tool call 1 differs",
                 cells: {
-                  openclaw: {
-                    runtime: "openclaw",
+                  steelengine: {
+                    runtime: "steelengine",
                     transcriptBytes: '{"role":"assistant"}\n',
                     toolCalls: [{ tool: "read_file", argsHash: "a", resultHash: "r" }],
                     finalText: "done",
@@ -1892,7 +1892,7 @@ describe("qa cli runtime", () => {
           run: {
             providerMode: "mock-openai",
             primaryModel: "openai/gpt-5.6-luna",
-            runtimePair: ["openclaw", "codex"],
+            runtimePair: ["steelengine", "codex"],
           },
         }),
         "utf8",
@@ -1935,8 +1935,8 @@ describe("qa cli runtime", () => {
                 scenarioId: "runtime-tool-fs-read",
                 drift: "none",
                 cells: {
-                  openclaw: {
-                    runtime: "openclaw",
+                  steelengine: {
+                    runtime: "steelengine",
                     transcriptBytes: '{"role":"assistant"}\n',
                     toolCalls: [{ tool: "fs.read", argsHash: "a", resultHash: "r" }],
                     finalText: "done",
@@ -1965,7 +1965,7 @@ describe("qa cli runtime", () => {
           run: {
             providerMode: "live-frontier",
             primaryModel: "openai/gpt-5.6-luna",
-            runtimePair: ["openclaw", "codex"],
+            runtimePair: ["steelengine", "codex"],
           },
         }),
         "utf8",
@@ -2053,7 +2053,7 @@ describe("qa cli runtime", () => {
   it("prints a markdown tool coverage report from runtime tool fixtures", async () => {
     await runQaCoverageReportCommand({ repoRoot: process.cwd(), tools: true });
 
-    expectWriteContains(stdoutWrite, "# OpenClaw Runtime Tool Coverage");
+    expectWriteContains(stdoutWrite, "# SteelEngine Runtime Tool Coverage");
     expectWriteContains(stdoutWrite, "codex-native-workspace");
   });
 
@@ -2064,7 +2064,7 @@ describe("qa cli runtime", () => {
         repoRoot,
         transcripts: path.resolve("qa/scenarios/jsonl-replay"),
         outputDir: "jsonl-output",
-        runtimePair: "openclaw,codex",
+        runtimePair: "steelengine,codex",
       });
 
       const report = await fs.readFile(
@@ -2078,7 +2078,7 @@ describe("qa cli runtime", () => {
         ),
       ) as { transcripts?: Array<{ userTurnCount?: number }> };
 
-      expect(report).toContain("# OpenClaw JSONL Replay Report - openclaw vs codex");
+      expect(report).toContain("# SteelEngine JSONL Replay Report - steelengine vs codex");
       expect(report).toContain("| plan-mode-boundaries.jsonl | 3 |  | none, none, none |");
       expect(summary.transcripts).toHaveLength(7);
     } finally {
@@ -2111,8 +2111,8 @@ describe("qa cli runtime", () => {
                 drift: "tool-call-shape",
                 driftDetails: "Codex emitted no web_search call",
                 cells: {
-                  openclaw: {
-                    runtime: "openclaw",
+                  steelengine: {
+                    runtime: "steelengine",
                     transcriptBytes: "",
                     toolCalls: [{ tool: "web_search", argsHash: "a", resultHash: "r" }],
                     finalText: "",
@@ -2133,7 +2133,7 @@ describe("qa cli runtime", () => {
               },
             },
           ],
-          run: { runtimePair: ["openclaw", "codex"] },
+          run: { runtimePair: ["steelengine", "codex"] },
         }),
         "utf8",
       );
@@ -2155,7 +2155,7 @@ describe("qa cli runtime", () => {
 
   it("resolves character eval paths and passes model refs through", async () => {
     await runQaCharacterEvalCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       outputDir: ".artifacts/qa/character",
       model: [
         "openai/gpt-5.6-luna,thinking=xhigh,fast=false",
@@ -2178,8 +2178,8 @@ describe("qa cli runtime", () => {
     const characterEvalArgs = mockFirstObjectArg(runQaCharacterEval);
     expect(typeof characterEvalArgs.progress).toBe("function");
     expectFields(characterEvalArgs, {
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
-      outputDir: path.resolve("/tmp/openclaw-repo", ".artifacts/qa/character"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
+      outputDir: path.resolve("/tmp/steelengine-repo", ".artifacts/qa/character"),
       models: ["openai/gpt-5.6-luna", "codex-cli/test-model"],
       scenarioId: "character-vibes-gollum",
       candidateFastMode: true,
@@ -2203,14 +2203,14 @@ describe("qa cli runtime", () => {
 
   it("lets character eval auto-select candidate fast mode when --fast is omitted", async () => {
     await runQaCharacterEvalCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       model: ["openai/gpt-5.6-luna"],
     });
 
     const characterEvalArgs = mockFirstObjectArg(runQaCharacterEval);
     expect(typeof characterEvalArgs.progress).toBe("function");
     expectFields(characterEvalArgs, {
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       outputDir: undefined,
       models: ["openai/gpt-5.6-luna"],
       scenarioId: undefined,
@@ -2230,7 +2230,7 @@ describe("qa cli runtime", () => {
   it("rejects invalid character eval thinking levels", async () => {
     await expect(
       runQaCharacterEvalCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         model: ["openai/gpt-5.6-luna"],
         thinking: "enormous",
       }),
@@ -2238,21 +2238,21 @@ describe("qa cli runtime", () => {
 
     await expect(
       runQaCharacterEvalCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         model: ["openai/gpt-5.6-luna,thinking=galaxy"],
       }),
     ).rejects.toThrow("--model thinking must be one of");
 
     await expect(
       runQaCharacterEvalCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         model: ["openai/gpt-5.6-luna,warp"],
       }),
     ).rejects.toThrow("--model options must be thinking=<level>");
 
     await expect(
       runQaCharacterEvalCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         model: ["openai/gpt-5.6-luna"],
         modelThinking: ["openai/gpt-5.6-luna"],
       }),
@@ -2261,7 +2261,7 @@ describe("qa cli runtime", () => {
 
   it("passes the explicit repo root into manual runs", async () => {
     await runQaManualLaneCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "live-frontier",
       primaryModel: "openai/gpt-5.6-luna",
       alternateModel: "openai/gpt-5.6-luna",
@@ -2271,7 +2271,7 @@ describe("qa cli runtime", () => {
     });
 
     expect(runQaManualLane).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       transportId: "qa-channel",
       providerMode: "live-frontier",
       primaryModel: "openai/gpt-5.6-luna",
@@ -2284,7 +2284,7 @@ describe("qa cli runtime", () => {
 
   it("routes suite runs through multipass when the runner is selected", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       outputDir: ".artifacts/qa-multipass",
       runner: "multipass",
       providerMode: "mock-openai",
@@ -2298,8 +2298,8 @@ describe("qa cli runtime", () => {
     });
 
     expect(runQaMultipass).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
-      outputDir: path.resolve("/tmp/openclaw-repo", ".artifacts/qa-multipass"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
+      outputDir: path.resolve("/tmp/steelengine-repo", ".artifacts/qa-multipass"),
       transportId: "qa-channel",
       providerMode: "mock-openai",
       primaryModel: undefined,
@@ -2319,7 +2319,7 @@ describe("qa cli runtime", () => {
   it("rejects Vitest and Playwright scenarios on the multipass runner", async () => {
     await expect(
       runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         runner: "multipass",
         scenarioIds: ["control-ui-chat-flow-playwright"],
       }),
@@ -2332,25 +2332,25 @@ describe("qa cli runtime", () => {
 
   it("passes runtime-pair suite selection through to the multipass runner", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       runner: "multipass",
       providerMode: "mock-openai",
       scenarioIds: ["approval-turn-tool-followthrough"],
-      runtimePair: "codex,openclaw",
+      runtimePair: "codex,steelengine",
       allowFailures: true,
     });
 
     expect(runQaMultipass).toHaveBeenCalledWith(
       expect.objectContaining({
-        repoRoot: path.resolve("/tmp/openclaw-repo"),
-        runtimePair: ["openclaw", "codex"],
+        repoRoot: path.resolve("/tmp/steelengine-repo"),
+        runtimePair: ["steelengine", "codex"],
       }),
     );
   });
 
   it("passes live suite selection through to the multipass runner", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       runner: "multipass",
       providerMode: "live-frontier",
       primaryModel: "openai/gpt-5.6-luna",
@@ -2361,7 +2361,7 @@ describe("qa cli runtime", () => {
     });
 
     expectFields(mockFirstObjectArg(runQaMultipass), {
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       transportId: "qa-channel",
       providerMode: "live-frontier",
       primaryModel: "openai/gpt-5.6-luna",
@@ -2393,7 +2393,7 @@ describe("qa cli runtime", () => {
       hostLogPath: path.join(repoRoot, "multipass-host.log"),
       bootstrapLogPath: path.join(repoRoot, "multipass-guest-bootstrap.log"),
       guestScriptPath: path.join(repoRoot, "multipass-guest-run.sh"),
-      vmName: "openclaw-qa-test",
+      vmName: "steelengine-qa-test",
       scenarioIds: ["channel-chat-baseline"],
     });
     const priorExitCode = process.exitCode;
@@ -2401,7 +2401,7 @@ describe("qa cli runtime", () => {
 
     try {
       await runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         runner: "multipass",
       });
       expect(process.exitCode).toBe(1);
@@ -2433,7 +2433,7 @@ describe("qa cli runtime", () => {
       hostLogPath: path.join(repoRoot, "multipass-host.log"),
       bootstrapLogPath: path.join(repoRoot, "multipass-guest-bootstrap.log"),
       guestScriptPath: path.join(repoRoot, "multipass-guest-run.sh"),
-      vmName: "openclaw-qa-test",
+      vmName: "steelengine-qa-test",
       scenarioIds: ["channel-chat-baseline"],
     });
     const priorExitCode = process.exitCode;
@@ -2441,7 +2441,7 @@ describe("qa cli runtime", () => {
 
     try {
       await runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         runner: "multipass",
       });
       expect(process.exitCode).toBe(1);
@@ -2462,14 +2462,14 @@ describe("qa cli runtime", () => {
       hostLogPath: path.join(repoRoot, "multipass-host.log"),
       bootstrapLogPath: path.join(repoRoot, "multipass-guest-bootstrap.log"),
       guestScriptPath: path.join(repoRoot, "multipass-guest-run.sh"),
-      vmName: "openclaw-qa-test",
+      vmName: "steelengine-qa-test",
       scenarioIds: ["channel-chat-baseline"],
     });
 
     try {
       await expect(
         runQaSuiteCommand({
-          repoRoot: "/tmp/openclaw-repo",
+          repoRoot: "/tmp/steelengine-repo",
           runner: "multipass",
         }),
       ).rejects.toThrow("Could not parse QA summary JSON");
@@ -2488,14 +2488,14 @@ describe("qa cli runtime", () => {
       hostLogPath: path.join(repoRoot, "multipass-host.log"),
       bootstrapLogPath: path.join(repoRoot, "multipass-guest-bootstrap.log"),
       guestScriptPath: path.join(repoRoot, "multipass-guest-run.sh"),
-      vmName: "openclaw-qa-test",
+      vmName: "steelengine-qa-test",
       scenarioIds: ["channel-chat-baseline"],
     });
 
     try {
       await expect(
         runQaSuiteCommand({
-          repoRoot: "/tmp/openclaw-repo",
+          repoRoot: "/tmp/steelengine-repo",
           runner: "multipass",
         }),
       ).rejects.toThrow("Could not read QA summary JSON");
@@ -2515,14 +2515,14 @@ describe("qa cli runtime", () => {
       hostLogPath: path.join(repoRoot, "multipass-host.log"),
       bootstrapLogPath: path.join(repoRoot, "multipass-guest-bootstrap.log"),
       guestScriptPath: path.join(repoRoot, "multipass-guest-run.sh"),
-      vmName: "openclaw-qa-test",
+      vmName: "steelengine-qa-test",
       scenarioIds: ["channel-chat-baseline"],
     });
 
     try {
       await expect(
         runQaSuiteCommand({
-          repoRoot: "/tmp/openclaw-repo",
+          repoRoot: "/tmp/steelengine-repo",
           runner: "multipass",
         }),
       ).rejects.toThrow(
@@ -2554,7 +2554,7 @@ describe("qa cli runtime", () => {
       hostLogPath: path.join(repoRoot, "multipass-host.log"),
       bootstrapLogPath: path.join(repoRoot, "multipass-guest-bootstrap.log"),
       guestScriptPath: path.join(repoRoot, "multipass-guest-run.sh"),
-      vmName: "openclaw-qa-test",
+      vmName: "steelengine-qa-test",
       scenarioIds: ["channel-chat-baseline"],
     });
     const priorExitCode = process.exitCode;
@@ -2562,7 +2562,7 @@ describe("qa cli runtime", () => {
 
     try {
       await runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         runner: "multipass",
         allowFailures: true,
       });
@@ -2575,7 +2575,7 @@ describe("qa cli runtime", () => {
 
   it("passes provider-qualified mock parity suite selection through to the host runner", async () => {
     await runQaSuiteCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "mock-openai",
       parityPack: "agentic",
       primaryModel: "openai/gpt-5.6-luna",
@@ -2583,7 +2583,7 @@ describe("qa cli runtime", () => {
     });
 
     expect(runQaSuite).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       outputDir: undefined,
       transportId: "qa-channel",
       channelDriver: undefined,
@@ -2612,7 +2612,7 @@ describe("qa cli runtime", () => {
   it("rejects multipass-only suite flags on the host runner", async () => {
     await expect(
       runQaSuiteCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
         runner: "host",
         image: "lts",
       }),
@@ -2621,13 +2621,13 @@ describe("qa cli runtime", () => {
 
   it("defaults manual mock runs onto the mock-openai model lane", async () => {
     await runQaManualLaneCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "mock-openai",
       message: "read qa kickoff and reply short",
     });
 
     expect(runQaManualLane).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       transportId: "qa-channel",
       providerMode: "mock-openai",
       primaryModel: "mock-openai/gpt-5.6-luna",
@@ -2640,13 +2640,13 @@ describe("qa cli runtime", () => {
 
   it("defaults manual aimock runs onto the aimock model lane", async () => {
     await runQaManualLaneCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "aimock",
       message: "read qa kickoff and reply short",
     });
 
     expect(runQaManualLane).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       transportId: "qa-channel",
       providerMode: "aimock",
       primaryModel: "aimock/gpt-5.6-luna",
@@ -2659,12 +2659,12 @@ describe("qa cli runtime", () => {
 
   it("defaults manual frontier runs onto the frontier model lane", async () => {
     await runQaManualLaneCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       message: "read qa kickoff and reply short",
     });
 
     expect(runQaManualLane).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       transportId: "qa-channel",
       providerMode: "live-frontier",
       primaryModel: DEFAULT_LIVE_FRONTIER_MODEL,
@@ -2677,14 +2677,14 @@ describe("qa cli runtime", () => {
 
   it("keeps an explicit manual primary model as the alternate default", async () => {
     await runQaManualLaneCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       providerMode: "live-frontier",
       primaryModel: "anthropic/claude-sonnet-4-6",
       message: "read qa kickoff and reply short",
     });
 
     expect(runQaManualLane).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       transportId: "qa-channel",
       providerMode: "live-frontier",
       primaryModel: "anthropic/claude-sonnet-4-6",
@@ -2703,12 +2703,12 @@ describe("qa cli runtime", () => {
     );
 
     await runQaManualLaneCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       message: "read qa kickoff and reply short",
     });
 
     expect(runQaManualLane).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       transportId: "qa-channel",
       providerMode: "live-frontier",
       primaryModel: "openai/gpt-5.6-luna",
@@ -2721,13 +2721,13 @@ describe("qa cli runtime", () => {
 
   it("resolves self-check repo-root-relative paths before starting the lab server", async () => {
     await runQaLabSelfCheckCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       output: ".artifacts/qa/self-check.md",
     });
 
     expect(startQaLabServer).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
-      outputPath: path.resolve("/tmp/openclaw-repo", ".artifacts/qa/self-check.md"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
+      outputPath: path.resolve("/tmp/steelengine-repo", ".artifacts/qa/self-check.md"),
     });
   });
 
@@ -2750,7 +2750,7 @@ describe("qa cli runtime", () => {
 
     await expect(
       runQaLabSelfCheckCommand({
-        repoRoot: "/tmp/openclaw-repo",
+        repoRoot: "/tmp/steelengine-repo",
       }),
     ).rejects.toThrow("QA self-check failed. See /tmp/failed-report.md.");
 
@@ -2759,10 +2759,10 @@ describe("qa cli runtime", () => {
   });
 
   it("rejects oversized credential payload files before broker setup", async () => {
-    const previousMaxBytes = process.env.OPENCLAW_QA_CREDENTIAL_PAYLOAD_MAX_BYTES;
+    const previousMaxBytes = process.env.STEELENGINE_QA_CREDENTIAL_PAYLOAD_MAX_BYTES;
     const payloadPath = path.join(suiteArtifactsDir, "oversized-credential.json");
     await fs.writeFile(payloadPath, JSON.stringify({ blob: "x".repeat(64) }), "utf8");
-    process.env.OPENCLAW_QA_CREDENTIAL_PAYLOAD_MAX_BYTES = "32";
+    process.env.STEELENGINE_QA_CREDENTIAL_PAYLOAD_MAX_BYTES = "32";
 
     try {
       await expect(
@@ -2771,28 +2771,28 @@ describe("qa cli runtime", () => {
           payloadFile: payloadPath,
         }),
       ).rejects.toThrow(
-        "Payload file exceeds OPENCLAW_QA_CREDENTIAL_PAYLOAD_MAX_BYTES (32 bytes).",
+        "Payload file exceeds STEELENGINE_QA_CREDENTIAL_PAYLOAD_MAX_BYTES (32 bytes).",
       );
     } finally {
       if (previousMaxBytes === undefined) {
-        delete process.env.OPENCLAW_QA_CREDENTIAL_PAYLOAD_MAX_BYTES;
+        delete process.env.STEELENGINE_QA_CREDENTIAL_PAYLOAD_MAX_BYTES;
       } else {
-        process.env.OPENCLAW_QA_CREDENTIAL_PAYLOAD_MAX_BYTES = previousMaxBytes;
+        process.env.STEELENGINE_QA_CREDENTIAL_PAYLOAD_MAX_BYTES = previousMaxBytes;
       }
     }
   });
 
   it("resolves docker scaffold paths relative to the explicit repo root", async () => {
     await runQaDockerScaffoldCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       outputDir: ".artifacts/qa-docker",
       providerBaseUrl: "http://127.0.0.1:44080/v1",
       usePrebuiltImage: true,
     });
 
     expect(writeQaDockerHarnessFiles).toHaveBeenCalledWith({
-      outputDir: path.resolve("/tmp/openclaw-repo", ".artifacts/qa-docker"),
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
+      outputDir: path.resolve("/tmp/steelengine-repo", ".artifacts/qa-docker"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
       gatewayPort: undefined,
       qaLabPort: undefined,
       providerBaseUrl: "http://127.0.0.1:44080/v1",
@@ -2803,27 +2803,27 @@ describe("qa cli runtime", () => {
 
   it("passes the explicit repo root into docker image builds", async () => {
     await runQaDockerBuildImageCommand({
-      repoRoot: "/tmp/openclaw-repo",
-      image: "openclaw:qa-local-prebaked",
+      repoRoot: "/tmp/steelengine-repo",
+      image: "steelengine:qa-local-prebaked",
     });
 
     expect(buildQaDockerHarnessImage).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
-      imageName: "openclaw:qa-local-prebaked",
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
+      imageName: "steelengine:qa-local-prebaked",
     });
   });
 
   it("resolves docker up paths relative to the explicit repo root", async () => {
     await runQaDockerUpCommand({
-      repoRoot: "/tmp/openclaw-repo",
+      repoRoot: "/tmp/steelengine-repo",
       outputDir: ".artifacts/qa-up",
       usePrebuiltImage: true,
       skipUiBuild: true,
     });
 
     expect(runQaDockerUp).toHaveBeenCalledWith({
-      repoRoot: path.resolve("/tmp/openclaw-repo"),
-      outputDir: path.resolve("/tmp/openclaw-repo", ".artifacts/qa-up"),
+      repoRoot: path.resolve("/tmp/steelengine-repo"),
+      outputDir: path.resolve("/tmp/steelengine-repo", ".artifacts/qa-up"),
       gatewayPort: undefined,
       qaLabPort: undefined,
       providerBaseUrl: undefined,

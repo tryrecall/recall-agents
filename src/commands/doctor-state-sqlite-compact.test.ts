@@ -5,21 +5,21 @@ import { afterEach, describe, expect, it } from "vitest";
 import { useAutoCleanupTempDirTracker } from "../../test/helpers/temp-dir.js";
 import { requireNodeSqlite } from "../infra/node-sqlite.js";
 import {
-  readOpenClawDatabaseQuarantine,
-  recordOpenClawDatabaseQuarantine,
-} from "../state/openclaw-quarantine-store.js";
+  readSteelEngineDatabaseQuarantine,
+  recordSteelEngineDatabaseQuarantine,
+} from "../state/steelengine-quarantine-store.js";
 import {
-  closeOpenClawStateDatabase,
-  openOpenClawStateDatabase,
-  OPENCLAW_STATE_SCHEMA_VERSION,
-} from "../state/openclaw-state-db.js";
-import { resolveOpenClawStateSqlitePath } from "../state/openclaw-state-db.paths.js";
-import { OPENCLAW_STATE_SCHEMA_SQL } from "../state/openclaw-state-schema.generated.js";
+  closeSteelEngineStateDatabase,
+  openSteelEngineStateDatabase,
+  STEELENGINE_STATE_SCHEMA_VERSION,
+} from "../state/steelengine-state-db.js";
+import { resolveSteelEngineStateSqlitePath } from "../state/steelengine-state-db.paths.js";
+import { STEELENGINE_STATE_SCHEMA_SQL } from "../state/steelengine-state-schema.generated.js";
 import { runDoctorStateSqliteCompact } from "./doctor-state-sqlite-compact.js";
 
 const tempDirs = useAutoCleanupTempDirTracker((cleanup) => {
   afterEach(() => {
-    closeOpenClawStateDatabase();
+    closeSteelEngineStateDatabase();
     cleanup();
   });
 });
@@ -30,8 +30,8 @@ type CompletedStateSqliteCompactReport = Extract<
 >;
 
 function createStateEnv(): NodeJS.ProcessEnv {
-  const stateDir = tempDirs.make("openclaw-state-compact-");
-  return { ...process.env, OPENCLAW_STATE_DIR: stateDir };
+  const stateDir = tempDirs.make("steelengine-state-compact-");
+  return { ...process.env, STEELENGINE_STATE_DIR: stateDir };
 }
 
 function seedStateDatabase(params: {
@@ -40,16 +40,16 @@ function seedStateDatabase(params: {
   schemaVersion?: number;
   withBloat?: boolean;
 }): string {
-  const sqlitePath = resolveOpenClawStateSqlitePath(params.env);
+  const sqlitePath = resolveSteelEngineStateSqlitePath(params.env);
   fs.mkdirSync(path.dirname(sqlitePath), { recursive: true });
   const sqlite = requireNodeSqlite();
   const database = new sqlite.DatabaseSync(sqlitePath);
-  const schemaVersion = params.schemaVersion ?? OPENCLAW_STATE_SCHEMA_VERSION;
+  const schemaVersion = params.schemaVersion ?? STEELENGINE_STATE_SCHEMA_VERSION;
   try {
     database.exec(`
       PRAGMA auto_vacuum = NONE;
       PRAGMA journal_mode = WAL;
-      ${OPENCLAW_STATE_SCHEMA_SQL}
+      ${STEELENGINE_STATE_SCHEMA_SQL}
       CREATE TABLE compact_payload (
         id INTEGER PRIMARY KEY,
         payload TEXT NOT NULL
@@ -145,7 +145,7 @@ describe("runDoctorStateSqliteCompact", () => {
 
     await expect(runDoctorStateSqliteCompact({ env })).resolves.toEqual({
       mode: "compact",
-      path: resolveOpenClawStateSqlitePath(env),
+      path: resolveSteelEngineStateSqlitePath(env),
       reason: "missing",
       skipped: true,
     });
@@ -174,7 +174,7 @@ describe("runDoctorStateSqliteCompact", () => {
     const env = createStateEnv();
     const sqlitePath = seedStateDatabase({ env, withBloat: true });
     expect(
-      recordOpenClawDatabaseQuarantine({
+      recordSteelEngineDatabaseQuarantine({
         env,
         kind: "state",
         path: sqlitePath,
@@ -184,8 +184,8 @@ describe("runDoctorStateSqliteCompact", () => {
 
     await runDoctorStateSqliteCompact({ env });
 
-    expect(readOpenClawDatabaseQuarantine(sqlitePath, { env })).toBeUndefined();
-    expect(openOpenClawStateDatabase({ env }).db.isOpen).toBe(true);
+    expect(readSteelEngineDatabaseQuarantine(sqlitePath, { env })).toBeUndefined();
+    expect(openSteelEngineStateDatabase({ env }).db.isOpen).toBe(true);
   });
 
   it.skipIf(process.platform === "win32")("reapplies owner-only SQLite permissions", async () => {
@@ -214,8 +214,8 @@ describe("runDoctorStateSqliteCompact", () => {
   });
 
   it.each([
-    ["legacy", OPENCLAW_STATE_SCHEMA_VERSION - 1, /doctor --fix before compacting/],
-    ["future", OPENCLAW_STATE_SCHEMA_VERSION + 1, /uses newer schema version/],
+    ["legacy", STEELENGINE_STATE_SCHEMA_VERSION - 1, /doctor --fix before compacting/],
+    ["future", STEELENGINE_STATE_SCHEMA_VERSION + 1, /uses newer schema version/],
   ] as const)(
     "rejects a %s shared-state schema before mutation",
     async (_label, schemaVersion, message) => {
@@ -238,7 +238,7 @@ describe("runDoctorStateSqliteCompact", () => {
     "refuses a symlink at the canonical database path",
     async () => {
       const env = createStateEnv();
-      const canonicalPath = resolveOpenClawStateSqlitePath(env);
+      const canonicalPath = resolveSteelEngineStateSqlitePath(env);
       const externalEnv = createStateEnv();
       const externalPath = seedStateDatabase({ env: externalEnv });
       fs.mkdirSync(path.dirname(canonicalPath), { recursive: true });
@@ -250,7 +250,7 @@ describe("runDoctorStateSqliteCompact", () => {
 
   it("refuses compaction while this process owns an open shared-state handle", async () => {
     const env = createStateEnv();
-    openOpenClawStateDatabase({ env });
+    openSteelEngineStateDatabase({ env });
 
     await expect(runDoctorStateSqliteCompact({ env })).rejects.toThrow(
       /already open in this process/,
@@ -266,7 +266,7 @@ describe("runDoctorStateSqliteCompact", () => {
         { env },
         {
           withMaintenanceLock: async () => {
-            throw new Error("Gateway owns this OpenClaw state directory");
+            throw new Error("Gateway owns this SteelEngine state directory");
           },
         },
       ),

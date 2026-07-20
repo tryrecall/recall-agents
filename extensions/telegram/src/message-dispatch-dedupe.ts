@@ -6,11 +6,11 @@
 // logical (chat_id, message_id) — the only identity that catches that replay.
 import path from "node:path";
 import type { Message } from "grammy/types";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 import {
   createChannelReplayGuard,
   type ChannelReplayClaimHandle,
-} from "openclaw/plugin-sdk/persistent-dedupe";
+} from "steelengine/plugin-sdk/persistent-dedupe";
 
 export const TELEGRAM_MESSAGE_DISPATCH_DEDUPE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const TELEGRAM_MESSAGE_DISPATCH_DEDUPE_NAMESPACE = "global";

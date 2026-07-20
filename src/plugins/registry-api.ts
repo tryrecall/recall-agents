@@ -1,5 +1,5 @@
 import path from "node:path";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { resolveUserPath } from "../utils.js";
 import { emitPluginAgentEvent } from "./agent-event-emission.js";
@@ -25,7 +25,7 @@ import {
   type PluginSideEffectGuard,
 } from "./registry-state.js";
 import type { PluginRecord } from "./registry-types.js";
-import type { OpenClawPluginApi, PluginLogger, PluginRegistrationMode } from "./types.js";
+import type { SteelEnginePluginApi, PluginLogger, PluginRegistrationMode } from "./types.js";
 
 function normalizeLogger(logger: PluginLogger): PluginLogger {
   return {
@@ -135,12 +135,12 @@ export function createPluginApiFactory(
   const createApi = (
     record: PluginRecord,
     params: {
-      config: OpenClawPluginApi["config"];
+      config: SteelEnginePluginApi["config"];
       pluginConfig?: Record<string, unknown>;
       hookPolicy?: PluginTypedHookPolicy;
       registrationMode?: PluginRegistrationMode;
     },
-  ): OpenClawPluginApi => {
+  ): SteelEnginePluginApi => {
     const registrationMode = params.registrationMode ?? "full";
     const registrationCapabilities = resolvePluginRegistrationCapabilities(registrationMode);
     setPluginRuntimeRecord(record);
@@ -257,7 +257,7 @@ export function createPluginApiFactory(
                   });
                 }
                 return enqueuePluginNextTurnInjection({
-                  cfg: registryParams.runtime.config.current() as OpenClawConfig,
+                  cfg: registryParams.runtime.config.current() as SteelEngineConfig,
                   pluginId: record.id,
                   pluginName: record.name,
                   injection,
@@ -314,7 +314,7 @@ export function createPluginApiFactory(
                     return { ok: false, error: "plugin is not loaded" };
                   }
                   const runtimeConfig =
-                    (registryParams.runtime.config?.current?.() as OpenClawConfig | undefined) ??
+                    (registryParams.runtime.config?.current?.() as SteelEngineConfig | undefined) ??
                     params.config;
                   return await sendPluginSessionAttachment({
                     ...attachment,

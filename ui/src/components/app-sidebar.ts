@@ -131,7 +131,7 @@ class AppSidebar extends AppSidebarSessionListElement {
       (cardName || cardAgentId).slice(0, 1).toUpperCase();
     return html`
       <div class="sidebar-brand">
-        <openclaw-sidebar-agent-card
+        <steelengine-sidebar-agent-card
           .agentName=${cardName}
           .avatarUrl=${cardAgent ? resolveAgentAvatarUrl(cardAgent) : null}
           .avatarText=${cardAvatarText}
@@ -142,10 +142,10 @@ class AppSidebar extends AppSidebarSessionListElement {
           .menuUnread=${menuUnread}
           .switcherAvailable=${cardAgents.length > 1}
           .onToggleMenu=${(trigger: HTMLElement) => this.toggleAgentMenu(trigger)}
-        ></openclaw-sidebar-agent-card>
+        ></steelengine-sidebar-agent-card>
         <div class="sidebar-brand__actions">
           ${this.renderSearch()}
-          <openclaw-tooltip .content=${`${collapseLabel} (⌘B)`}>
+          <steelengine-tooltip .content=${`${collapseLabel} (⌘B)`}>
             <button
               class="sidebar-brand__icon sidebar-brand__collapse"
               type="button"
@@ -155,7 +155,7 @@ class AppSidebar extends AppSidebarSessionListElement {
             >
               ${icons.panelLeftClose}
             </button>
-          </openclaw-tooltip>
+          </steelengine-tooltip>
         </div>
       </div>
     `;
@@ -240,11 +240,11 @@ class AppSidebar extends AppSidebarSessionListElement {
           />
           ${this.renderLogoStandIn()}
         </span>
-        <openclaw-sidebar-build-chip
+        <steelengine-sidebar-build-chip
           .basePath=${this.basePath}
           .gatewayVersion=${this.gatewayVersion}
           .onNavigate=${(routeId: "about") => this.onNavigate?.(routeId)}
-        ></openclaw-sidebar-build-chip>
+        ></steelengine-sidebar-build-chip>
         ${this.debouncedDisconnected
           ? html`<span
               class="sidebar-footer-bar__status"
@@ -256,7 +256,7 @@ class AppSidebar extends AppSidebarSessionListElement {
               )}</span
             >`
           : nothing}
-        <openclaw-tooltip .content=${t("nav.settings")}>
+        <steelengine-tooltip .content=${t("nav.settings")}>
           <button
             type="button"
             class="sidebar-footer-bar__settings"
@@ -265,7 +265,7 @@ class AppSidebar extends AppSidebarSessionListElement {
           >
             ${icons.settings}
           </button>
-        </openclaw-tooltip>
+        </steelengine-tooltip>
       </div>
     `;
   }
@@ -273,7 +273,7 @@ class AppSidebar extends AppSidebarSessionListElement {
   private renderSearch() {
     const tooltip = `${t("chat.openCommandPalette")} (${PALETTE_SHORTCUT})`;
     return html`
-      <openclaw-tooltip .content=${tooltip}>
+      <steelengine-tooltip .content=${tooltip}>
         <button
           type="button"
           class="sidebar-brand__icon sidebar-search"
@@ -283,7 +283,7 @@ class AppSidebar extends AppSidebarSessionListElement {
         >
           ${icons.search}
         </button>
-      </openclaw-tooltip>
+      </steelengine-tooltip>
     `;
   }
 
@@ -307,23 +307,23 @@ class AppSidebar extends AppSidebarSessionListElement {
             ${this.renderSessions()}
           </div>
           <div class="sidebar-shell__footer">
-            <openclaw-sidebar-attention
+            <steelengine-sidebar-attention
               .onNavigate=${(routeId: NavigationRouteId) => this.onNavigate?.(routeId)}
               .onOpenApprovals=${() => this.onOpenApprovals?.()}
-            ></openclaw-sidebar-attention>
-            <openclaw-sidebar-update-card
+            ></steelengine-sidebar-attention>
+            <steelengine-sidebar-update-card
               .updateAvailable=${this.updateAvailable}
               .updateRunning=${this.updateRunning}
               .onUpdate=${this.onUpdate}
-            ></openclaw-sidebar-update-card>
-            <openclaw-lobster-pet
+            ></steelengine-sidebar-update-card>
+            <steelengine-lobster-pet
               .seed=${lobsterPetSeed(this.sessionKey)}
               .mode=${resolveLobsterPetMode(this.connected, this.sessionsResult?.sessions)}
               .runOutcome=${resolveLobsterRunOutcome(this.sessionsResult?.sessions)}
               .visitsEnabled=${this.lobsterPetVisits}
               .soundsEnabled=${this.lobsterPetSounds}
               .gatewayVersion=${this.gatewayVersion}
-            ></openclaw-lobster-pet>
+            ></steelengine-lobster-pet>
             ${this.devGitBranch
               ? html`<div class="sidebar-footer-branch" title=${this.devGitBranch}>
                   <span class="sidebar-footer-branch__icon" aria-hidden="true"
@@ -343,6 +343,6 @@ class AppSidebar extends AppSidebarSessionListElement {
   }
 }
 
-if (!customElements.get("openclaw-app-sidebar")) {
-  customElements.define("openclaw-app-sidebar", AppSidebar);
+if (!customElements.get("steelengine-app-sidebar")) {
+  customElements.define("steelengine-app-sidebar", AppSidebar);
 }

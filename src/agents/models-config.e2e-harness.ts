@@ -4,7 +4,7 @@
  */
 import { afterEach, beforeEach } from "vitest";
 import { clearConfigCache, clearRuntimeConfigSnapshot } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { withTempHome as withTempHomeBase } from "../plugin-sdk/test-helpers/temp-home.js";
 import { resetPluginLoaderTestStateForTest } from "../plugins/loader.test-fixtures.js";
 import { resetModelsJsonReadyCacheForTest } from "./models-config-state.test-support.js";
@@ -14,7 +14,7 @@ export function withModelsTempHome<T>(fn: (home: string) => Promise<T>): Promise
   // Models-config tests do not exercise session persistence; skip draining
   // unrelated session lock state during temp-home teardown.
   return withTempHomeBase(fn, {
-    prefix: "openclaw-models-",
+    prefix: "steelengine-models-",
     skipSessionCleanup: true,
   });
 }
@@ -25,14 +25,14 @@ export function installModelsConfigTestHooks(opts?: {
   resetPluginLoaderState?: boolean;
 }) {
   let previousHome: string | undefined;
-  let previousOpenClawAgentDir: string | undefined;
+  let previousSteelEngineAgentDir: string | undefined;
   const originalFetch = globalThis.fetch;
   const shouldResetPluginLoaderState = opts?.resetPluginLoaderState !== false;
 
   beforeEach(() => {
     previousHome = process.env.HOME;
-    previousOpenClawAgentDir = process.env.OPENCLAW_AGENT_DIR;
-    delete process.env.OPENCLAW_AGENT_DIR;
+    previousSteelEngineAgentDir = process.env.STEELENGINE_AGENT_DIR;
+    delete process.env.STEELENGINE_AGENT_DIR;
     clearRuntimeConfigSnapshot();
     clearConfigCache();
     if (shouldResetPluginLoaderState) {
@@ -43,10 +43,10 @@ export function installModelsConfigTestHooks(opts?: {
 
   afterEach(() => {
     process.env.HOME = previousHome;
-    if (previousOpenClawAgentDir === undefined) {
-      delete process.env.OPENCLAW_AGENT_DIR;
+    if (previousSteelEngineAgentDir === undefined) {
+      delete process.env.STEELENGINE_AGENT_DIR;
     } else {
-      process.env.OPENCLAW_AGENT_DIR = previousOpenClawAgentDir;
+      process.env.STEELENGINE_AGENT_DIR = previousSteelEngineAgentDir;
     }
     clearRuntimeConfigSnapshot();
     clearConfigCache();
@@ -90,7 +90,7 @@ export function unsetEnv(vars: string[]) {
 
 /** Ambient env vars cleared by implicit provider discovery tests. */
 export const MODELS_CONFIG_IMPLICIT_ENV_VARS = [
-  "OPENCLAW_TEST_ONLY_PROVIDER_PLUGIN_IDS",
+  "STEELENGINE_TEST_ONLY_PROVIDER_PLUGIN_IDS",
   "VITEST",
   "NODE_ENV",
   "AI_GATEWAY_API_KEY",
@@ -106,10 +106,10 @@ export const MODELS_CONFIG_IMPLICIT_ENV_VARS = [
   "MOONSHOT_API_KEY",
   "NVIDIA_API_KEY",
   "OLLAMA_API_KEY",
-  "OPENCLAW_AGENT_DIR",
+  "STEELENGINE_AGENT_DIR",
   "OPENAI_API_KEY",
   "OPENROUTER_API_KEY",
-  "OPENCLAW_AGENT_DIR",
+  "STEELENGINE_AGENT_DIR",
   "QIANFAN_API_KEY",
   "QWEN_API_KEY",
   "QWEN_TOKEN_PLAN_API_KEY",
@@ -125,7 +125,7 @@ export const MODELS_CONFIG_IMPLICIT_ENV_VARS = [
   "KIMI_API_KEY",
   "KIMICODE_API_KEY",
   "GEMINI_API_KEY",
-  "OPENCLAW_BUNDLED_PLUGINS_DIR",
+  "STEELENGINE_BUNDLED_PLUGINS_DIR",
   "GOOGLE_APPLICATION_CREDENTIALS",
   "GOOGLE_CLOUD_LOCATION",
   "GOOGLE_CLOUD_PROJECT",
@@ -149,7 +149,7 @@ export const MODELS_CONFIG_IMPLICIT_ENV_VARS = [
 ];
 
 /** Canonical custom proxy provider config used by models-config tests. */
-export const CUSTOM_PROXY_MODELS_CONFIG: OpenClawConfig = {
+export const CUSTOM_PROXY_MODELS_CONFIG: SteelEngineConfig = {
   models: {
     providers: {
       "custom-proxy": {

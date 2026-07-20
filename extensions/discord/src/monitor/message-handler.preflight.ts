@@ -1,6 +1,6 @@
 // Discord plugin module implements message handler.preflight behavior.
-import { formatAllowlistMatchMeta } from "openclaw/plugin-sdk/allow-from";
-import { recordChannelActivity } from "openclaw/plugin-sdk/channel-activity-runtime";
+import { formatAllowlistMatchMeta } from "steelengine/plugin-sdk/allow-from";
+import { recordChannelActivity } from "steelengine/plugin-sdk/channel-activity-runtime";
 import {
   buildMentionRegexes,
   classifyChannelInboundEvent,
@@ -10,16 +10,16 @@ import {
   resolveUnmentionedGroupInboundPolicy,
   recordDroppedChannelInboundHistory,
   toInboundMediaFacts,
-} from "openclaw/plugin-sdk/channel-inbound";
-import { hasControlCommand } from "openclaw/plugin-sdk/command-detection";
-import { isAbortRequestText } from "openclaw/plugin-sdk/command-primitives-runtime";
-import { shouldHandleTextCommands } from "openclaw/plugin-sdk/command-surface";
-import { isDangerousNameMatchingEnabled } from "openclaw/plugin-sdk/dangerous-name-runtime";
-import { logDebug } from "openclaw/plugin-sdk/logging-core";
-import { mimeTypeFromFilePath } from "openclaw/plugin-sdk/media-mime";
-import type { HistoryEntry } from "openclaw/plugin-sdk/reply-history";
-import { getChildLogger, logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { enqueueSystemEvent } from "openclaw/plugin-sdk/system-event-runtime";
+} from "steelengine/plugin-sdk/channel-inbound";
+import { hasControlCommand } from "steelengine/plugin-sdk/command-detection";
+import { isAbortRequestText } from "steelengine/plugin-sdk/command-primitives-runtime";
+import { shouldHandleTextCommands } from "steelengine/plugin-sdk/command-surface";
+import { isDangerousNameMatchingEnabled } from "steelengine/plugin-sdk/dangerous-name-runtime";
+import { logDebug } from "steelengine/plugin-sdk/logging-core";
+import { mimeTypeFromFilePath } from "steelengine/plugin-sdk/media-mime";
+import type { HistoryEntry } from "steelengine/plugin-sdk/reply-history";
+import { getChildLogger, logVerbose } from "steelengine/plugin-sdk/runtime-env";
+import { enqueueSystemEvent } from "steelengine/plugin-sdk/system-event-runtime";
 import { resolveDefaultDiscordAccountId } from "../accounts.js";
 import { ChannelType, MessageType, type User } from "../internal/discord.js";
 import {

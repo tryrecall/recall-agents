@@ -1,5 +1,5 @@
 // Question gateway methods create, inspect, wait for, and resolve transient prompts.
-import { truncateUtf16Safe } from "@openclaw/normalization-core/utf16-slice";
+import { truncateUtf16Safe } from "@steelengine/normalization-core/utf16-slice";
 import {
   ErrorCodes,
   errorShape,

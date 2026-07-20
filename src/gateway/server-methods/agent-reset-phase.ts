@@ -1,9 +1,9 @@
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import { ErrorCodes, errorShape } from "../../../packages/gateway-protocol/src/index.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { assertAgentRunLifecycleGenerationCurrent } from "../../infra/agent-events.js";
 import { ADMIN_SCOPE } from "../method-scopes.js";
 import { formatForLog } from "../ws-log.js";
@@ -38,7 +38,7 @@ type AgentResetPhaseResult = {
 
 export async function runAgentResetPhase(params: {
   request: AgentRunRequest;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   requestedSessionKey?: string;
   resolvedSessionId?: string;
   effectiveTranscriptInputText: string;

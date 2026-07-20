@@ -1,12 +1,12 @@
-# OpenClaw Perplexity Plugin
+# SteelEngine Perplexity Plugin
 
-Official OpenClaw plugin for Perplexity.
+Official SteelEngine plugin for Perplexity.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/perplexity-plugin
-openclaw gateway restart
+steelengine plugins install @steelengine/perplexity-plugin
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/tools/perplexity-search> for setup and configuration.
+See <https://docs.steelengine.ai/tools/perplexity-search> for setup and configuration.

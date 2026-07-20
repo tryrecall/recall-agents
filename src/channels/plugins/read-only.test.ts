@@ -55,7 +55,7 @@ vi.mock("../../plugins/bundled-dir.js", async (importOriginal) => {
   return {
     ...actual,
     resolveBundledPluginsDir: (env: NodeJS.ProcessEnv = process.env) =>
-      env.OPENCLAW_BUNDLED_PLUGINS_DIR ?? actual.resolveBundledPluginsDir(env),
+      env.STEELENGINE_BUNDLED_PLUGINS_DIR ?? actual.resolveBundledPluginsDir(env),
   };
 });
 
@@ -90,7 +90,7 @@ vi.mock("../../plugins/plugin-module-loader-cache.js", async (importOriginal) =>
       ? paths.filter((entry): entry is string => typeof entry === "string")
       : [];
     const workspaceExtensionsDir = params.workspaceDir
-      ? path.join(params.workspaceDir, ".openclaw", "extensions")
+      ? path.join(params.workspaceDir, ".steelengine", "extensions")
       : undefined;
     if (!workspaceExtensionsDir || !fs.existsSync(workspaceExtensionsDir)) {
       return explicitPaths;
@@ -103,7 +103,7 @@ vi.mock("../../plugins/plugin-module-loader-cache.js", async (importOriginal) =>
     );
   }
 
-  function loadOpenClawPlugins(params: LoaderParams) {
+  function loadSteelEnginePlugins(params: LoaderParams) {
     const onlyPluginIds = new Set(params.onlyPluginIds ?? []);
     const diagnostics: Array<{
       level: "error";
@@ -112,7 +112,7 @@ vi.mock("../../plugins/plugin-module-loader-cache.js", async (importOriginal) =>
       message: string;
     }> = [];
     const channelSetups = listCandidatePluginDirs(params).flatMap((pluginDir) => {
-      const manifestPath = path.join(pluginDir, "openclaw.plugin.json");
+      const manifestPath = path.join(pluginDir, "steelengine.plugin.json");
       const packagePath = path.join(pluginDir, "package.json");
       if (!fs.existsSync(manifestPath) || !fs.existsSync(packagePath)) {
         return [];
@@ -125,8 +125,8 @@ vi.mock("../../plugins/plugin-module-loader-cache.js", async (importOriginal) =>
         return [];
       }
       const packageJson = readJson(packagePath);
-      const openclaw = isRecord(packageJson) ? packageJson.openclaw : undefined;
-      const setupEntry = isRecord(openclaw) ? openclaw.setupEntry : undefined;
+      const steelengine = isRecord(packageJson) ? packageJson.steelengine : undefined;
+      const setupEntry = isRecord(steelengine) ? steelengine.setupEntry : undefined;
       if (typeof setupEntry !== "string") {
         return [];
       }
@@ -165,7 +165,7 @@ vi.mock("../../plugins/plugin-module-loader-cache.js", async (importOriginal) =>
           modulePathEndsWith(modulePath, "/plugins/loader.js") ||
           modulePathEndsWith(modulePath, "/plugins/loader.ts")
         ) {
-          return { loadOpenClawPlugins };
+          return { loadSteelEnginePlugins };
         }
         return actualLoader(modulePath);
       }) as ReturnType<typeof actual.getCachedPluginModuleLoader>;
@@ -201,9 +201,9 @@ function writeExternalSetupChannelPlugin(
     path.join(pluginDir, "package.json"),
     JSON.stringify(
       {
-        name: `@example/openclaw-${pluginId}`,
+        name: `@example/steelengine-${pluginId}`,
         version: "1.0.0",
-        openclaw: {
+        steelengine: {
           extensions: ["./index.cjs"],
           ...(setupEntry ? { setupEntry: "./setup-entry.cjs" } : {}),
         },
@@ -214,7 +214,7 @@ function writeExternalSetupChannelPlugin(
     "utf-8",
   );
   fs.writeFileSync(
-    path.join(pluginDir, "openclaw.plugin.json"),
+    path.join(pluginDir, "steelengine.plugin.json"),
     JSON.stringify(
       {
         id: pluginId,
@@ -289,7 +289,7 @@ module.exports = {
             {
               id: ${JSON.stringify(`channels.${channelId}.token`)},
               targetType: "channel",
-              configFile: "openclaw.json",
+              configFile: "steelengine.json",
               pathPattern: ${JSON.stringify(`channels.${channelId}.token`)},
               secretShape: "secret_input",
               expectedResolvedValue: "string",
@@ -333,7 +333,7 @@ module.exports = {
             {
               id: ${JSON.stringify(`channels.${setupChannelId}.token`)},
               targetType: "channel",
-              configFile: "openclaw.json",
+              configFile: "steelengine.json",
               pathPattern: ${JSON.stringify(`channels.${setupChannelId}.token`)},
           secretShape: "secret_input",
           expectedResolvedValue: "string",
@@ -360,7 +360,7 @@ function writeBundledSetupChannelPlugin(
   } = {},
 ) {
   const bundledRoot = makeTempDir();
-  process.env.OPENCLAW_BUNDLED_PLUGINS_DIR = bundledRoot;
+  process.env.STEELENGINE_BUNDLED_PLUGINS_DIR = bundledRoot;
   const pluginId = options.pluginId ?? "bundled-chat";
   const channelId = options.channelId ?? pluginId;
   const envVar = options.envVar ?? "BUNDLED_CHAT_TOKEN";
@@ -373,10 +373,10 @@ function writeBundledSetupChannelPlugin(
     path.join(pluginDir, "package.json"),
     JSON.stringify(
       {
-        name: `@openclaw/${pluginId}`,
+        name: `@steelengine/${pluginId}`,
         version: "1.0.0",
         type: "commonjs",
-        openclaw: {
+        steelengine: {
           extensions: ["./index.cjs"],
           setupEntry: "./setup-entry.cjs",
           channel: {
@@ -394,7 +394,7 @@ function writeBundledSetupChannelPlugin(
     "utf-8",
   );
   fs.writeFileSync(
-    path.join(pluginDir, "openclaw.plugin.json"),
+    path.join(pluginDir, "steelengine.plugin.json"),
     JSON.stringify(
       {
         id: pluginId,
@@ -492,7 +492,7 @@ afterAll(() => {
 
 describe("listReadOnlyChannelPluginsForConfig", () => {
   it("keeps built plugin loader candidates inside the installed package dist root", () => {
-    const packageRoot = path.join(makeTempDir(), "node_modules", "openclaw");
+    const packageRoot = path.join(makeTempDir(), "node_modules", "steelengine");
     const importerPath = path.join(packageRoot, "dist", "read-only-B4EkEtUx.js");
     const candidates = listPluginLoaderModuleCandidateUrls(pathToFileURL(importerPath).href).map(
       (candidate) => fileURLToPath(candidate),
@@ -729,7 +729,7 @@ describe("listReadOnlyChannelPluginsForConfig", () => {
     });
     expect(pluginIds(first)).toContain("external-chat");
     expect(fs.existsSync(setupMarker)).toBe(true);
-    const manifestPath = path.join(pluginDir, "openclaw.plugin.json");
+    const manifestPath = path.join(pluginDir, "steelengine.plugin.json");
     const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
     manifest.channels = ["other-chat"];
     fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), "utf-8");
@@ -887,7 +887,7 @@ describe("listReadOnlyChannelPluginsForConfig", () => {
     );
 
     const plugin = plugins.find((entry) => entry.id === "external-chat");
-    expect(plugin?.meta.label).toBe("@example/openclaw-external-chat");
+    expect(plugin?.meta.label).toBe("@example/steelengine-external-chat");
     expect(plugin?.meta.blurb).toBe("");
     expect(plugin?.configSchema).toBeUndefined();
     expect(
@@ -1363,7 +1363,7 @@ describe("listReadOnlyChannelPluginsForConfig", () => {
 
   it("discovers trusted external channel plugins from the default agent workspace", () => {
     const workspaceDir = makeTempDir();
-    const pluginDir = path.join(workspaceDir, ".openclaw", "extensions", "external-chat-plugin");
+    const pluginDir = path.join(workspaceDir, ".steelengine", "extensions", "external-chat-plugin");
     fs.mkdirSync(pluginDir, { recursive: true });
     const { fullMarker, setupMarker } = writeExternalSetupChannelPlugin({
       pluginDir,

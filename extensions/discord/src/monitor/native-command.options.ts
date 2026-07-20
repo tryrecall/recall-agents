@@ -1,14 +1,14 @@
 // Discord plugin module implements native command.options behavior.
 import { ApplicationCommandOptionType } from "discord-api-types/v10";
-import { loadModelCatalog } from "openclaw/plugin-sdk/agent-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import { loadModelCatalog } from "steelengine/plugin-sdk/agent-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   resolveCommandArgChoices,
   type ChatCommandDefinition,
-} from "openclaw/plugin-sdk/native-command-registry";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/runtime-env";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/native-command-registry";
+import { createSubsystemLogger } from "steelengine/plugin-sdk/runtime-env";
+import { normalizeLowercaseStringOrEmpty } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import type { AutocompleteInteraction, CommandOptions } from "../internal/discord.js";
 
 const log = createSubsystemLogger("discord/native-command");
@@ -59,8 +59,8 @@ function resolveDiscordCommandLogLabel(command: ChatCommandDefinition): string {
 
 export function buildDiscordCommandOptions(params: {
   command: ChatCommandDefinition;
-  cfg: OpenClawConfig;
-  resolveConfig?: () => OpenClawConfig;
+  cfg: SteelEngineConfig;
+  resolveConfig?: () => SteelEngineConfig;
   authorizeChoiceContext?: (interaction: AutocompleteInteraction) => Promise<boolean>;
   resolveChoiceContext?: (
     interaction: AutocompleteInteraction,

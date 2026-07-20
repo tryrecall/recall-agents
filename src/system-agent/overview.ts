@@ -1,20 +1,20 @@
-// OpenClaw overview gathers config, agent, tool, docs, source, and gateway status.
+// SteelEngine overview gathers config, agent, tool, docs, source, and gateway status.
 import {
   listAgentEntries,
   resolveAgentEffectiveModelPrimary,
   resolveDefaultAgentId,
 } from "../agents/agent-scope.js";
 import {
-  OPENCLAW_DOCS_URL,
-  OPENCLAW_SOURCE_URL,
-  resolveOpenClawReferencePaths,
+  STEELENGINE_DOCS_URL,
+  STEELENGINE_SOURCE_URL,
+  resolveSteelEngineReferencePaths,
 } from "../agents/docs-path.js";
 import {
   readConfigFileSnapshot,
   resolveConfigPath,
   resolveGatewayPort,
   type ConfigFileSnapshot,
-  type OpenClawConfig,
+  type SteelEngineConfig,
 } from "../config/config.js";
 import { resolveAgentModelPrimaryValue } from "../config/model-input.js";
 import { normalizeAgentId } from "../routing/session-key.js";
@@ -62,7 +62,7 @@ export type SystemAgentOverview = {
   };
 };
 
-type OpenClawReferencePaths = Awaited<ReturnType<typeof resolveOpenClawReferencePaths>>;
+type SteelEngineReferencePaths = Awaited<ReturnType<typeof resolveSteelEngineReferencePaths>>;
 
 type GatewayConnectionDetails = {
   url: string;
@@ -75,12 +75,12 @@ type SystemAgentOverviewDependencies = {
   resolveConfigPath?: typeof resolveConfigPath;
   resolveGatewayPort?: typeof resolveGatewayPort;
   buildGatewayConnectionDetails?: (input: {
-    config: OpenClawConfig;
+    config: SteelEngineConfig;
     configPath: string;
   }) => GatewayConnectionDetails;
   probeLocalCommand?: typeof probeLocalCommand;
   probeGatewayUrl?: typeof probeGatewayUrl;
-  resolveOpenClawReferencePaths?: typeof resolveOpenClawReferencePaths;
+  resolveSteelEngineReferencePaths?: typeof resolveSteelEngineReferencePaths;
 };
 
 function issueMessages(snapshot: ConfigFileSnapshot): string[] {
@@ -90,7 +90,7 @@ function issueMessages(snapshot: ConfigFileSnapshot): string[] {
   });
 }
 
-function buildAgentSummaries(cfg: OpenClawConfig): SystemAgentSummary[] {
+function buildAgentSummaries(cfg: SteelEngineConfig): SystemAgentSummary[] {
   const defaultAgentId = resolveDefaultAgentId(cfg);
   const entries = listAgentEntries(cfg);
   if (entries.length === 0) {
@@ -130,8 +130,8 @@ function buildAgentSummaries(cfg: OpenClawConfig): SystemAgentSummary[] {
   return summaries;
 }
 
-function resolveFastTestReferences(env: NodeJS.ProcessEnv): OpenClawReferencePaths | undefined {
-  if (env.OPENCLAW_TEST_FAST !== "1") {
+function resolveFastTestReferences(env: NodeJS.ProcessEnv): SteelEngineReferencePaths | undefined {
+  if (env.STEELENGINE_TEST_FAST !== "1") {
     return undefined;
   }
   const sourcePath = process.cwd();
@@ -168,7 +168,7 @@ export async function loadSystemAgentOverview(
   } catch (err) {
     gatewayError = err instanceof Error ? err.message : String(err);
   }
-  const resolveReferences = deps.resolveOpenClawReferencePaths ?? resolveOpenClawReferencePaths;
+  const resolveReferences = deps.resolveSteelEngineReferencePaths ?? resolveSteelEngineReferencePaths;
   const commandProbe = deps.probeLocalCommand ?? probeLocalCommand;
   const [codex, claude, gemini, gateway, references] = await Promise.all([
     // Probes run in parallel; each individual probe is timeout-bounded in probes.ts.
@@ -211,9 +211,9 @@ export async function loadSystemAgentOverview(
     },
     references: {
       docsPath: references.docsPath ?? undefined,
-      docsUrl: OPENCLAW_DOCS_URL,
+      docsUrl: STEELENGINE_DOCS_URL,
       sourcePath: references.sourcePath ?? undefined,
-      sourceUrl: OPENCLAW_SOURCE_URL,
+      sourceUrl: STEELENGINE_SOURCE_URL,
     },
   };
 }
@@ -249,7 +249,7 @@ export function formatSystemAgentOverview(overview: SystemAgentOverview): string
       ? ["Config issues:", ...overview.config.issues.map((issue) => `  - ${issue}`)]
       : [];
   return [
-    "OpenClaw online. Little claws, typed tools.",
+    "SteelEngine online. Little claws, typed tools.",
     "",
     `Config: ${configStatus}`,
     `Path: ${overview.config.path}`,
@@ -266,7 +266,7 @@ export function formatSystemAgentOverview(overview: SystemAgentOverview): string
     `AI: ${
       overview.defaultModel
         ? `conversation runs on ${overview.defaultModel}`
-        : "inference unavailable; run openclaw onboard before starting OpenClaw"
+        : "inference unavailable; run steelengine onboard before starting SteelEngine"
     }`,
     `Docs: ${overview.references.docsPath ?? overview.references.docsUrl}`,
     overview.references.sourcePath
@@ -283,13 +283,13 @@ export function formatSystemAgentOverview(overview: SystemAgentOverview): string
 
 function recommendSystemAgentNextStep(overview: SystemAgentOverview): string {
   if (!overview.config.exists) {
-    return 'run "openclaw onboard" to establish inference';
+    return 'run "steelengine onboard" to establish inference';
   }
   if (!overview.config.valid) {
     return 'run "validate config" or "doctor" to inspect the config';
   }
   if (!overview.defaultModel) {
-    return 'run "openclaw onboard" to establish inference';
+    return 'run "steelengine onboard" to establish inference';
   }
   if (!overview.gateway.reachable) {
     return 'run "gateway status" or "restart gateway"';
@@ -308,7 +308,7 @@ function formatStartupUse(overview: SystemAgentOverview): string {
   if (overview.defaultModel) {
     return `Using: ${overview.defaultModel} — just tell me what you want.`;
   }
-  return "Inference unavailable: run `openclaw onboard` and complete a live model check first.";
+  return "Inference unavailable: run `steelengine onboard` and complete a live model check first.";
 }
 
 function formatStartupGatewayStatus(overview: SystemAgentOverview): string {
@@ -323,10 +323,10 @@ function formatStartupAction(overview: SystemAgentOverview): string {
     return "I can start debugging with `validate config` or `doctor`.";
   }
   if (!overview.defaultModel) {
-    return "OpenClaw needs working inference before it can help with the rest of setup.";
+    return "SteelEngine needs working inference before it can help with the rest of setup.";
   }
   if (!overview.config.exists) {
-    return "Run `openclaw onboard` to establish inference before starting OpenClaw.";
+    return "Run `steelengine onboard` to establish inference before starting SteelEngine.";
   }
   if (!overview.gateway.reachable) {
     return "I can start debugging with `gateway status`, or queue `restart gateway` for approval.";
@@ -335,7 +335,7 @@ function formatStartupAction(overview: SystemAgentOverview): string {
 }
 
 /**
- * Welcome shown right after inference activation. OpenClaw owns the
+ * Welcome shown right after inference activation. SteelEngine owns the
  * remaining workspace, Gateway, channel, and agent setup.
  */
 export function formatSystemAgentOnboardingWelcome(overview: SystemAgentOverview): string {
@@ -357,7 +357,7 @@ export function formatSystemAgentStartupMessage(overview: SystemAgentOverview): 
     ? `${overview.defaultAgentId} (${agent.name})`
     : overview.defaultAgentId;
   return [
-    "## Hi, I'm OpenClaw.",
+    "## Hi, I'm SteelEngine.",
     "",
     "- Start me when setup, config, Gateway, model choice, or agent routing feels off.",
     `- ${formatStartupUse(overview)}`,

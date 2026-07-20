@@ -5,7 +5,7 @@ import {
   GATEWAY_CLIENT_CAPS,
   MIN_CLIENT_PROTOCOL_VERSION,
   PROTOCOL_VERSION,
-} from "@openclaw/gateway-client/browser";
+} from "@steelengine/gateway-client/browser";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   loadDeviceAuthToken as loadScopedDeviceAuthToken,
@@ -15,7 +15,7 @@ import { createStorageMock } from "../test-helpers/storage.ts";
 
 const wsInstances = vi.hoisted((): MockWebSocket[] => []);
 const DEFAULT_GATEWAY_URL = "ws://127.0.0.1:18789";
-const LEGACY_DEVICE_AUTH_STORAGE_KEY = "openclaw.device.auth.v1";
+const LEGACY_DEVICE_AUTH_STORAGE_KEY = "steelengine.device.auth.v1";
 const DEFAULT_DEVICE_AUTH_STORAGE_KEY = `${LEGACY_DEVICE_AUTH_STORAGE_KEY}:${DEFAULT_GATEWAY_URL}`;
 const STORED_CRED = "stored-device-token";
 const ROSITA_CRED = "rosita-device-token";
@@ -232,7 +232,7 @@ function expectSignedPayloadFields(
   expect(payload?.split("|")).toEqual([
     "v2",
     "device-1",
-    "openclaw-control-ui",
+    "steelengine-control-ui",
     "webchat",
     "operator",
     params.scopes.join(","),

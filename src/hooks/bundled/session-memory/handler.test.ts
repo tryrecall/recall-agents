@@ -2,9 +2,9 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../../config/config.js";
+import type { SteelEngineConfig } from "../../../config/config.js";
 import { replaceTranscriptEvents } from "../../../config/sessions/session-accessor.js";
 import { formatSqliteSessionFileMarker } from "../../../config/sessions/sqlite-marker.js";
 import { writeWorkspaceFile } from "../../../test-helpers/workspace.js";
@@ -13,7 +13,7 @@ import { createInternalHookEvent as createHookEvent } from "../../internal-hooks
 import { generateSlugViaLLM } from "../../llm-slug-generator.js";
 import { findPreviousSessionFile, getRecentSessionContentWithResetFallback } from "./transcript.js";
 
-// Avoid calling the embedded OpenClaw agent (global command lane); keep this unit test deterministic.
+// Avoid calling the embedded SteelEngine agent (global command lane); keep this unit test deterministic.
 vi.mock("../../llm-slug-generator.js", () => ({
   generateSlugViaLLM: vi.fn().mockResolvedValue("simple-math"),
 }));
@@ -43,7 +43,7 @@ async function createCaseWorkspace(prefix = "case"): Promise<string> {
 
 beforeAll(async () => {
   ({ default: handler, flushSessionMemoryWritesForTest } = await import("./handler.js"));
-  suiteWorkspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-session-memory-"));
+  suiteWorkspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-session-memory-"));
 });
 
 afterAll(async () => {
@@ -81,7 +81,7 @@ function createMockSessionContent(
 async function runNewWithPreviousSessionEntry(params: {
   tempDir: string;
   previousSessionEntry: { sessionId: string; sessionFile?: string };
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   action?: "new" | "reset";
   sessionKey?: string;
   workspaceDirOverride?: string;
@@ -96,7 +96,7 @@ async function runNewWithPreviousSessionEntry(params: {
         params.cfg ??
         ({
           agents: { defaults: { workspace: params.tempDir } },
-        } satisfies OpenClawConfig),
+        } satisfies SteelEngineConfig),
       previousSessionEntry: params.previousSessionEntry,
       ...(params.workspaceDirOverride ? { workspaceDir: params.workspaceDirOverride } : {}),
     },
@@ -122,7 +122,7 @@ async function runNewWithPreviousSessionEntry(params: {
 
 async function runNewWithPreviousSession(params: {
   sessionContent: string;
-  cfg?: (tempDir: string) => OpenClawConfig;
+  cfg?: (tempDir: string) => SteelEngineConfig;
   action?: "new" | "reset";
 }): Promise<{ tempDir: string; files: string[]; memoryContent: string }> {
   const tempDir = await createCaseWorkspace("workspace");
@@ -139,7 +139,7 @@ async function runNewWithPreviousSession(params: {
     params.cfg?.(tempDir) ??
     ({
       agents: { defaults: { workspace: tempDir } },
-    } satisfies OpenClawConfig);
+    } satisfies SteelEngineConfig);
 
   const { files, memoryContent } = await runNewWithPreviousSessionEntry({
     tempDir,
@@ -372,7 +372,7 @@ describe("session-memory hook", () => {
     await withEnvAsync(
       {
         NODE_ENV: "production",
-        OPENCLAW_TEST_FAST: undefined,
+        STEELENGINE_TEST_FAST: undefined,
         VITEST: undefined,
       },
       async () => {
@@ -397,7 +397,7 @@ describe("session-memory hook", () => {
     await withEnvAsync(
       {
         NODE_ENV: "production",
-        OPENCLAW_TEST_FAST: undefined,
+        STEELENGINE_TEST_FAST: undefined,
         VITEST: undefined,
       },
       async () => {
@@ -417,7 +417,7 @@ describe("session-memory hook", () => {
                   },
                 },
               },
-            }) satisfies OpenClawConfig,
+            }) satisfies SteelEngineConfig,
         });
         expectDatedMemoryFile(files, "simple-math");
       },
@@ -454,7 +454,7 @@ describe("session-memory hook", () => {
     await withEnvAsync(
       {
         NODE_ENV: "production",
-        OPENCLAW_TEST_FAST: undefined,
+        STEELENGINE_TEST_FAST: undefined,
         VITEST: undefined,
       },
       async () => {
@@ -471,7 +471,7 @@ describe("session-memory hook", () => {
                 },
               },
             },
-          } satisfies OpenClawConfig,
+          } satisfies SteelEngineConfig,
           previousSessionEntry: {
             sessionId: "test-123",
             sessionFile,
@@ -582,7 +582,7 @@ describe("session-memory hook", () => {
           defaults: { workspace: mainWorkspace },
           list: [{ id: "navi", workspace: naviWorkspace }],
         },
-      } satisfies OpenClawConfig,
+      } satisfies SteelEngineConfig,
       sessionKey: "agent:main:main",
       workspaceDirOverride: naviWorkspace,
       previousSessionEntry: {
@@ -911,7 +911,7 @@ describe("session-memory hook", () => {
           defaults: { workspace: defaultWorkspace },
           list: [{ id: "custom-agent", workspace: customAgentWorkspace }],
         },
-      } satisfies OpenClawConfig,
+      } satisfies SteelEngineConfig,
       sessionKey: "agent:main:main",
       workspaceDirOverride: customAgentWorkspace,
       previousSessionEntry: {
@@ -948,7 +948,7 @@ describe("session-memory hook", () => {
         type: "message",
         message: {
           role: "assistant",
-          provider: "openclaw",
+          provider: "steelengine",
           model: "delivery-mirror",
           content: [{ type: "text", text: "Lights turned on" }],
         },
@@ -969,7 +969,7 @@ describe("session-memory hook", () => {
         type: "message",
         message: {
           role: "assistant",
-          provider: "openclaw",
+          provider: "steelengine",
           model: "claude",
           content: [
             { type: "thinking", text: "..." },
@@ -981,7 +981,7 @@ describe("session-memory hook", () => {
         type: "message",
         message: {
           role: "assistant",
-          provider: "openclaw",
+          provider: "steelengine",
           model: "delivery-mirror",
           content: [{ type: "text", text: "2+2 = 4" }],
         },
@@ -990,7 +990,7 @@ describe("session-memory hook", () => {
         type: "message",
         message: {
           role: "assistant",
-          provider: "openclaw",
+          provider: "steelengine",
           model: "gateway-injected",
           content: [{ type: "text", text: "standalone gateway reply" }],
         },
@@ -1017,7 +1017,7 @@ describe("session-memory hook", () => {
         type: "message",
         message: {
           role: "assistant",
-          provider: "openclaw",
+          provider: "steelengine",
           model: "delivery-mirror",
           content: [{ type: "text", text: "Your number is 123-4567" }],
         },
@@ -1033,7 +1033,7 @@ describe("session-memory hook", () => {
         type: "message",
         message: {
           role: "assistant",
-          provider: "openclaw",
+          provider: "steelengine",
           model: "delivery-mirror",
           content: [{ type: "text", text: "Your number is 123-4567" }],
         },
@@ -1058,7 +1058,7 @@ describe("session-memory hook", () => {
         type: "message",
         message: {
           role: "assistant",
-          provider: "openclaw",
+          provider: "steelengine",
           model: "delivery-mirror",
           content: [{ type: "text", text: "Done" }],
         },
@@ -1071,7 +1071,7 @@ describe("session-memory hook", () => {
         type: "message",
         message: {
           role: "assistant",
-          provider: "openclaw",
+          provider: "steelengine",
           model: "delivery-mirror",
           content: [{ type: "text", text: "Done" }],
         },
@@ -1090,7 +1090,7 @@ describe("session-memory hook", () => {
     loggerMocks.info.mockClear();
 
     await withEnvAsync(
-      { HOME: fakeHome, USERPROFILE: fakeHome, OPENCLAW_HOME: undefined },
+      { HOME: fakeHome, USERPROFILE: fakeHome, STEELENGINE_HOME: undefined },
       async () => {
         const { files } = await runNewWithPreviousSessionEntry({
           tempDir: siblingWorkspace,

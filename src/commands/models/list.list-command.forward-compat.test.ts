@@ -85,7 +85,7 @@ const mocks = vi.hoisted(() => {
     sourceConfig,
     resolvedConfig,
     loadModelsConfigWithSource: vi.fn(),
-    ensureOpenClawModelsJson: vi.fn(),
+    ensureSteelEngineModelsJson: vi.fn(),
     ensureAuthProfileStore: vi.fn(),
     resolveDefaultAgentDir: vi.fn(),
     loadModelRegistry: vi.fn(),
@@ -111,9 +111,9 @@ function resetMocks() {
     resolvedConfig: mocks.resolvedConfig,
     diagnostics: [],
   });
-  mocks.ensureOpenClawModelsJson.mockResolvedValue({ wrote: false });
+  mocks.ensureSteelEngineModelsJson.mockResolvedValue({ wrote: false });
   mocks.ensureAuthProfileStore.mockReturnValue({ version: 1, profiles: {}, order: {} });
-  mocks.resolveDefaultAgentDir.mockReturnValue("/tmp/openclaw-agent");
+  mocks.resolveDefaultAgentDir.mockReturnValue("/tmp/steelengine-agent");
   mocks.loadModelRegistry.mockResolvedValue({
     models: [],
     availableKeys: new Set(),
@@ -295,7 +295,7 @@ function installModelsListCommandForwardCompatMocks() {
 
   vi.doMock("../../agents/agent-scope.js", () => ({
     listAgentEntries: vi.fn(() => []),
-    resolveAgentWorkspaceDir: vi.fn(() => "/tmp/openclaw-workspace"),
+    resolveAgentWorkspaceDir: vi.fn(() => "/tmp/steelengine-workspace"),
     resolveDefaultAgentDir: mocks.resolveDefaultAgentDir,
     resolveDefaultAgentId: vi.fn(() => "main"),
     resolveSessionAgentIds: vi.fn(() => ({ defaultAgentId: "main", sessionAgentId: "main" })),
@@ -350,7 +350,7 @@ async function buildAllOpenAiCodexRows(opts: { supplementCatalog?: boolean } = {
   const rows: unknown[] = [];
   const context = {
     cfg: mocks.resolvedConfig,
-    agentDir: "/tmp/openclaw-agent",
+    agentDir: "/tmp/steelengine-agent",
     authIndex: {
       evaluateModelAuth: (provider: string) => ({
         availability: provider === "openai",
@@ -892,12 +892,12 @@ describe("modelsListCommand forward-compat", () => {
 
       await modelsListCommand({ all: true, provider: "codex", json: true }, runtime as never);
 
-      expect(mocks.ensureOpenClawModelsJson).not.toHaveBeenCalled();
+      expect(mocks.ensureSteelEngineModelsJson).not.toHaveBeenCalled();
       expect(mocks.loadModelRegistry).not.toHaveBeenCalled();
       expect(mocks.loadProviderCatalogModelsForList).toHaveBeenCalledWith(
         expect.objectContaining({
           cfg: mocks.resolvedConfig,
-          agentDir: "/tmp/openclaw-agent",
+          agentDir: "/tmp/steelengine-agent",
           providerFilter: "codex",
           staticOnly: true,
         }),
@@ -1095,7 +1095,7 @@ describe("modelsListCommand forward-compat", () => {
         1,
         expect.objectContaining({
           cfg: mocks.resolvedConfig,
-          agentDir: "/tmp/openclaw-agent",
+          agentDir: "/tmp/steelengine-agent",
           providerFilter: "openai",
           staticOnly: true,
         }),
@@ -1104,7 +1104,7 @@ describe("modelsListCommand forward-compat", () => {
         2,
         expect.objectContaining({
           cfg: mocks.resolvedConfig,
-          agentDir: "/tmp/openclaw-agent",
+          agentDir: "/tmp/steelengine-agent",
           providerFilter: "openai",
           staticOnly: undefined,
         }),

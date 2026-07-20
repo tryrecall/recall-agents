@@ -5,35 +5,35 @@ import {
 } from "./install-channel-specs.js";
 
 describe("resolveNpmInstallSpecsForUpdateChannel", () => {
-  it.each(["@openclaw/discord", "@openclaw/discord@latest"])(
+  it.each(["@steelengine/discord", "@steelengine/discord@latest"])(
     "targets the exact core version for official extended-stable intent %s",
     (spec) => {
       expect(
         resolveNpmInstallSpecsForUpdateChannel({
           spec,
           updateChannel: "extended-stable",
-          officialPackageName: "@openclaw/discord",
+          officialPackageName: "@steelengine/discord",
           coreVersion: "2026.7.33",
         }),
       ).toEqual({
-        installSpec: "@openclaw/discord@2026.7.33",
+        installSpec: "@steelengine/discord@2026.7.33",
         recordSpec: spec,
       });
     },
   );
 
   it.each([
-    "@openclaw/discord@2026.6.33",
-    "@openclaw/discord@next",
-    "@openclaw/discord@beta",
-    "@openclaw/discord@^2026.6.0",
+    "@steelengine/discord@2026.6.33",
+    "@steelengine/discord@next",
+    "@steelengine/discord@beta",
+    "@steelengine/discord@^2026.6.0",
     "https://registry.example.test/discord.tgz",
   ])("preserves explicit extended-stable intent %s", (spec) => {
     expect(
       resolveNpmInstallSpecsForUpdateChannel({
         spec,
         updateChannel: "extended-stable",
-        officialPackageName: "@openclaw/discord",
+        officialPackageName: "@steelengine/discord",
         coreVersion: "2026.7.33",
       }),
     ).toEqual({ installSpec: spec, recordSpec: spec });
@@ -44,7 +44,7 @@ describe("resolveNpmInstallSpecsForUpdateChannel", () => {
       resolveNpmInstallSpecsForUpdateChannel({
         spec: "@acme/discord",
         updateChannel: "extended-stable",
-        officialPackageName: "@openclaw/discord",
+        officialPackageName: "@steelengine/discord",
         coreVersion: "2026.7.33",
       }),
     ).toEqual({ installSpec: "@acme/discord", recordSpec: "@acme/discord" });
@@ -53,9 +53,9 @@ describe("resolveNpmInstallSpecsForUpdateChannel", () => {
   it("fails closed without an authoritative extended-stable core version", () => {
     expect(() =>
       resolveNpmInstallSpecsForUpdateChannel({
-        spec: "@openclaw/discord",
+        spec: "@steelengine/discord",
         updateChannel: "extended-stable",
-        officialPackageName: "@openclaw/discord",
+        officialPackageName: "@steelengine/discord",
       }),
     ).toThrow("requires an exact core version");
   });
@@ -63,16 +63,16 @@ describe("resolveNpmInstallSpecsForUpdateChannel", () => {
   it("preserves beta behavior", () => {
     expect(
       resolveNpmInstallSpecsForUpdateChannel({
-        spec: "@openclaw/discord@latest",
+        spec: "@steelengine/discord@latest",
         updateChannel: "beta",
-        officialPackageName: "@openclaw/discord",
+        officialPackageName: "@steelengine/discord",
         coreVersion: "2026.7.33",
       }),
     ).toEqual({
-      installSpec: "@openclaw/discord@beta",
-      recordSpec: "@openclaw/discord@latest",
-      fallbackSpec: "@openclaw/discord@latest",
-      fallbackLabel: "@openclaw/discord@beta",
+      installSpec: "@steelengine/discord@beta",
+      recordSpec: "@steelengine/discord@latest",
+      fallbackSpec: "@steelengine/discord@latest",
+      fallbackLabel: "@steelengine/discord@beta",
     });
   });
 });
@@ -81,12 +81,12 @@ describe("resolveClawHubInstallSpecsForUpdateChannel", () => {
   it("does not rewrite ClawHub on extended-stable", () => {
     expect(
       resolveClawHubInstallSpecsForUpdateChannel({
-        spec: "clawhub:@openclaw/discord",
+        spec: "clawhub:@steelengine/discord",
         updateChannel: "extended-stable",
       }),
     ).toEqual({
-      installSpec: "clawhub:@openclaw/discord",
-      recordSpec: "clawhub:@openclaw/discord",
+      installSpec: "clawhub:@steelengine/discord",
+      recordSpec: "clawhub:@steelengine/discord",
     });
   });
 });

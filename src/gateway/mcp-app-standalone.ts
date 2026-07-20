@@ -5,7 +5,7 @@ import { buildMcpAppSandboxPath, resolveMcpAppSandboxPort } from "../agents/mcp-
 import { getMcpAppViewLease, type McpAppViewLease } from "../agents/mcp-ui-resource.js";
 import { safeEqualSecret } from "../security/secret-equal.js";
 
-const MCP_APP_STANDALONE_PATH = "/__openclaw__/mcp-app";
+const MCP_APP_STANDALONE_PATH = "/__steelengine__/mcp-app";
 const MCP_APP_STANDALONE_VIEW_PATH = `${MCP_APP_STANDALONE_PATH}/view`;
 const MCP_APP_STANDALONE_TICKET_SCOPE = "mcp-app-standalone-view";
 const MCP_APP_STANDALONE_TICKET_TTL_MS = 2 * 60_000;
@@ -194,7 +194,7 @@ function standaloneHostHtml(): string {
   return `<!doctype html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>OpenClaw MCP App</title>
+<title>SteelEngine MCP App</title>
 <style>html,body{height:100%;margin:0;background:#fff;color:#111;font:14px system-ui,sans-serif}main{height:100%}iframe{display:block;width:100%;height:600px;border:0}.error{padding:16px;color:#b91c1c}</style>
 <main id="host" aria-live="polite"></main>
 <script>
@@ -262,7 +262,7 @@ function standaloneHostHtml(): string {
     if (message.method === "ui/initialize" && message.id !== undefined) {
       respond(message.id, {
         protocolVersion: ${JSON.stringify(MCP_APP_STABLE_PROTOCOL_VERSION)},
-        hostInfo: { name: "OpenClaw read-only host", version: "1.0.0" },
+        hostInfo: { name: "SteelEngine read-only host", version: "1.0.0" },
         hostCapabilities: { sandbox: { csp: payload.csp ?? {} } },
         hostContext: {
           theme: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",

@@ -271,7 +271,7 @@ fn resolve_selected_agent(
         .iter()
         .find(|agent| agent.is_default)
         .cloned()
-        .ok_or_else(|| "OpenClaw did not report a default agent.".to_string())
+        .ok_or_else(|| "SteelEngine did not report a default agent.".to_string())
 }
 
 fn non_empty(value: Option<String>) -> Option<String> {
@@ -302,7 +302,7 @@ fn build_agents(catalog: &AgentsListResult) -> Result<Vec<QuickChatAgent>, Strin
     if agents.iter().any(|agent| agent.is_default) {
         Ok(agents)
     } else {
-        Err("OpenClaw did not report a default agent.".to_string())
+        Err("SteelEngine did not report a default agent.".to_string())
     }
 }
 
@@ -767,7 +767,7 @@ mod tests {
             .expect("clock before Unix epoch")
             .as_nanos();
         std::env::temp_dir().join(format!(
-            "openclaw-quickchat-{label}-{}-{unique}",
+            "steelengine-quickchat-{label}-{}-{unique}",
             std::process::id()
         ))
     }

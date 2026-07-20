@@ -24,7 +24,7 @@ function props(overrides: Partial<ComposerProps> = {}): ComposerProps {
     queue: [],
     draft: "",
     sessions: null,
-    assistantName: "OpenClaw",
+    assistantName: "SteelEngine",
     onDraftChange: vi.fn(),
     onSend: vi.fn(),
     onQueueRemove: vi.fn(),
@@ -263,7 +263,7 @@ describe("renderChatComposer status", () => {
     });
 
     render(renderChatComposer(composerProps), container);
-    let panel = container.querySelector("openclaw-chat-question-panel") as HTMLElement & {
+    let panel = container.querySelector("steelengine-chat-question-panel") as HTMLElement & {
       props: {
         model: { questions: Array<{ question: string }>; requestPosition?: unknown };
         onNextRequest?: () => void;
@@ -275,7 +275,7 @@ describe("renderChatComposer status", () => {
     panel.props.onNextRequest?.();
     expect(onRequestUpdate).toHaveBeenCalledOnce();
     render(renderChatComposer(composerProps), container);
-    panel = container.querySelector("openclaw-chat-question-panel") as typeof panel;
+    panel = container.querySelector("steelengine-chat-question-panel") as typeof panel;
     expect(panel.props.model.questions[0]?.question).toBe("Second prompt");
     expect(panel.props.model.requestPosition).toEqual({ current: 2, total: 2 });
   });
@@ -291,7 +291,7 @@ describe("renderChatComposer status", () => {
       gatewayQuestionPrompts: [unscopedPrompt, otherSessionPrompt],
     });
 
-    expect(view.container.querySelector("openclaw-chat-question-panel")).toBeNull();
+    expect(view.container.querySelector("steelengine-chat-question-panel")).toBeNull();
   });
   it("renders only a fresh interrupted run as visible status chrome", () => {
     const now = vi.spyOn(Date, "now").mockReturnValue(1_000);

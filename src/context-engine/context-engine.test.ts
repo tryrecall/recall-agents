@@ -1,8 +1,8 @@
 // Context engine tests cover context extraction and prompt context assembly.
-import type { AgentMessage } from "openclaw/plugin-sdk/agent-core";
+import type { AgentMessage } from "steelengine/plugin-sdk/agent-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MemoryCitationsMode } from "../config/types.memory.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   clearMemoryPluginState,
   registerMemoryPromptPreparation,
@@ -80,7 +80,7 @@ function requireCompactRuntimeParams(callIndex: number): Record<string, unknown>
 // ---------------------------------------------------------------------------
 
 /** Build a config object with a contextEngine slot for testing. */
-function configWithSlot(engineId: string): OpenClawConfig {
+function configWithSlot(engineId: string): SteelEngineConfig {
   return { plugins: { slots: { contextEngine: engineId } } };
 }
 
@@ -123,7 +123,7 @@ function requireFactoryContext(
 
 function requireRegistryState() {
   const registryState = (globalThis as Record<symbol, unknown>)[
-    Symbol.for("openclaw.contextEngineRegistryState")
+    Symbol.for("steelengine.contextEngineRegistryState")
   ] as { engines: Map<string, unknown> } | undefined;
   if (!registryState) {
     throw new Error("expected context engine registry state");
@@ -599,7 +599,7 @@ describe("Engine contract tests", () => {
       agentId: "main",
       sessionId: "s2",
       sessionKey: "agent:main:s2",
-      storePath: "/tmp/openclaw-agent.sqlite",
+      storePath: "/tmp/steelengine-agent.sqlite",
     };
     const result = await delegateCompactionToRuntime({
       sessionId: "s2",
@@ -647,7 +647,7 @@ describe("Engine contract tests", () => {
         tokensAfter: 40,
         details: undefined,
         sessionId: "s3-successor",
-        sessionFile: "sqlite:main:s3-successor:/tmp/openclaw-agent.sqlite",
+        sessionFile: "sqlite:main:s3-successor:/tmp/steelengine-agent.sqlite",
       },
     });
 
@@ -666,7 +666,7 @@ describe("Engine contract tests", () => {
         agentId: "main",
         sessionId: "s3-successor",
         sessionKey: "agent:main:s3",
-        storePath: "/tmp/openclaw-agent.sqlite",
+        storePath: "/tmp/steelengine-agent.sqlite",
       },
     });
     expect(result.result).not.toHaveProperty("sessionFile");
@@ -1646,7 +1646,7 @@ describe("Invalid engine fallback", () => {
   });
 
   it("accepts resolved engines whose info.id differs from the registered slot id (#66601)", async () => {
-    // Regression for openclaw/openclaw#66601: third-party plugins like
+    // Regression for steelengine/steelengine#66601: third-party plugins like
     // lossless-claw register under an external slot id ("lossless-claw") but
     // the ContextEngine they return uses the plugin's own internal id
     // (e.g. "lcm"). That id is metadata, not the lookup key.

@@ -1,9 +1,9 @@
 // Provider model helpers normalize model catalog entries shared by provider plugins.
-import { normalizeProviderId as normalizeProviderIdCore } from "@openclaw/model-catalog-core/provider-id";
+import { normalizeProviderId as normalizeProviderIdCore } from "@steelengine/model-catalog-core/provider-id";
 import {
   normalizeAntigravityPreviewModelId as normalizeAntigravityPreviewModelIdCore,
   normalizeGooglePreviewModelId as normalizeGooglePreviewModelIdCore,
-} from "@openclaw/model-catalog-core/provider-model-id-normalize";
+} from "@steelengine/model-catalog-core/provider-model-id-normalize";
 import {
   buildAnthropicReplayPolicyForModel,
   buildGoogleGeminiReplayPolicy,
@@ -38,12 +38,12 @@ export {
   supportsClaudeAdaptiveThinking,
   supportsClaudeNativeMaxEffort,
   supportsClaudeNativeXhighEffort,
-} from "@openclaw/llm-core";
+} from "@steelengine/llm-core";
 export type {
   UnifiedModelCatalogEntry,
   UnifiedModelCatalogKind,
   UnifiedModelCatalogSource,
-} from "@openclaw/model-catalog-core/model-catalog-types";
+} from "@steelengine/model-catalog-core/model-catalog-types";
 export type {
   BedrockDiscoveryConfig,
   ModelCompatConfig,
@@ -118,7 +118,7 @@ export function modelCostsEqual(
 
 const LOCAL_MODEL_FAMILY_PREFERENCES = [
   // Gemma 4 leads: live bench of the system-agent contract (planner JSON +
-  // openclaw tool calls) scored gemma4:e4b well above qwen3.5:4b on approval
+  // steelengine tool calls) scored gemma4:e4b well above qwen3.5:4b on approval
   // follow-through and structured-command accuracy at ~2.5x lower latency.
   /gemma[-_.]?4(?!\d)/,
   /qwen[-_.]?3[._]5(?!\d)/,

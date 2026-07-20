@@ -1,4 +1,4 @@
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import {
   isAgentHarnessSessionKey,
   isValidAgentHarnessSessionStoreEntry,
@@ -7,9 +7,9 @@ import {
 } from "../../sessions/agent-harness-session-key.js";
 import { emitSessionIdentityMutation } from "../../sessions/session-lifecycle-events.js";
 import {
-  openOpenClawAgentDatabase,
-  runOpenClawAgentWriteTransaction,
-} from "../../state/openclaw-agent-db.js";
+  openSteelEngineAgentDatabase,
+  runSteelEngineAgentWriteTransaction,
+} from "../../state/steelengine-agent-db.js";
 import { materializeSqliteSessionStateDeletePlans } from "./session-accessor.sqlite-archive.js";
 import type {
   SessionLifecycleArchivedTranscript,
@@ -64,7 +64,7 @@ export async function cleanupSqliteSessionLifecycleArtifacts(
     storePath: params.storePath,
   });
   return await runExclusiveSqliteSessionWrite(resolved, async () => {
-    const database = openOpenClawAgentDatabase(toDatabaseOptions(resolved));
+    const database = openSteelEngineAgentDatabase(toDatabaseOptions(resolved));
     const cleanupPlan = planSqliteSessionLifecycleArtifactCleanup(database, {
       archiveRemovedEntryTranscripts: params.archiveRemovedEntryTranscripts !== false,
       archiveDirectory: resolveSqliteTranscriptArchiveDirectory(resolved),
@@ -76,7 +76,7 @@ export async function cleanupSqliteSessionLifecycleArtifacts(
     const materializedPlans = materializeSqliteSessionStateDeletePlans(cleanupPlan.deletePlans);
     let removedEntries = 0;
     let archivedTranscripts: SessionLifecycleArchivedTranscript[] = [];
-    runOpenClawAgentWriteTransaction((transactionDb) => {
+    runSteelEngineAgentWriteTransaction((transactionDb) => {
       removedEntries = deletePlannedSqliteLifecycleArtifactEntries(
         transactionDb,
         cleanupPlan.entries,
@@ -100,7 +100,7 @@ export async function resetSqliteSessionEntryLifecycle(
 ): Promise<ResetSessionEntryLifecycleResult> {
   const resolved = resolveSqliteStoreScope(params.storePath, { agentId: params.agentId });
   return await runExclusiveSqliteSessionWrite(resolved, async () => {
-    const database = openOpenClawAgentDatabase(toDatabaseOptions(resolved));
+    const database = openSteelEngineAgentDatabase(toDatabaseOptions(resolved));
     const targetSnapshot = readSqliteLifecycleTargetSnapshot(database, params.target);
     const current = targetSnapshot.primary;
     const nextEntry = await params.buildNextEntry({
@@ -127,7 +127,7 @@ export async function resetSqliteSessionEntryLifecycle(
         })
       : [];
     const materializedPlans = materializeSqliteSessionStateDeletePlans(deletePlans);
-    runOpenClawAgentWriteTransaction((transactionDb) => {
+    runSteelEngineAgentWriteTransaction((transactionDb) => {
       assertSqliteLifecycleTargetUnchanged(transactionDb, params.target, current?.entry, "reset");
       deleteSqliteLifecycleTargetRows(transactionDb, params.target);
       writeSessionEntry(transactionDb, params.target.canonicalKey, nextEntry);
@@ -178,7 +178,7 @@ async function deleteSqliteSessionEntryLifecycleInternal(
       archivedTranscripts: [],
       deleted: false,
     };
-    const database = openOpenClawAgentDatabase(toDatabaseOptions(resolved));
+    const database = openSteelEngineAgentDatabase(toDatabaseOptions(resolved));
     const targetSnapshot = readSqliteLifecycleTargetSnapshot(database, params.target);
     const current = targetSnapshot.primary;
     if (!current) {
@@ -218,7 +218,7 @@ async function deleteSqliteSessionEntryLifecycleInternal(
         )
       : [];
     const materializedPlans = materializeSqliteSessionStateDeletePlans(deletePlans);
-    runOpenClawAgentWriteTransaction((transactionDb) => {
+    runSteelEngineAgentWriteTransaction((transactionDb) => {
       const transactionSnapshot = readSqliteLifecycleTargetSnapshot(transactionDb, params.target);
       assertSqliteLifecycleTargetSnapshotUnchanged(
         targetSnapshot,

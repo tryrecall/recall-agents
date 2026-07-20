@@ -5,8 +5,8 @@ import {
   defineTokenCredential,
   mergeAllowFromEntries,
   createSetupTranslator,
-} from "openclaw/plugin-sdk/setup";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/setup";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { resolveDefaultLineAccountId } from "./accounts.js";
 import {
   isLineConfigured,

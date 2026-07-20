@@ -1,12 +1,12 @@
-# OpenClaw Qwen Cloud Provider
+# SteelEngine Qwen Cloud Provider
 
-Official OpenClaw provider plugin for Qwen Cloud.
+Official SteelEngine provider plugin for Qwen Cloud.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/qwen-provider
-openclaw gateway restart
+steelengine plugins install @steelengine/qwen-provider
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/providers/qwen> for setup and configuration.
+See <https://docs.steelengine.ai/providers/qwen> for setup and configuration.

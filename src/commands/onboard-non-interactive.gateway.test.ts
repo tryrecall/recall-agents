@@ -2,7 +2,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { MigrationApplyResult, MigrationPlan } from "../plugins/types.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { makeTempWorkspace } from "../test-helpers/workspace.js";
@@ -11,7 +11,7 @@ import { createThrowingRuntime } from "./onboard-non-interactive.test-helpers.js
 import type { installGatewayDaemonNonInteractive } from "./onboard-non-interactive/local/daemon-install.js";
 
 const ensureWorkspaceAndSessionsMock = vi.fn(async (..._args: unknown[]) => {});
-const testConfigStore = new Map<string, OpenClawConfig>();
+const testConfigStore = new Map<string, SteelEngineConfig>();
 type InstallGatewayDaemonResult = Awaited<ReturnType<typeof installGatewayDaemonNonInteractive>>;
 const installGatewayDaemonNonInteractiveMock = vi.hoisted(() =>
   vi.fn(async (): Promise<InstallGatewayDaemonResult> => ({ installed: true })),
@@ -52,19 +52,19 @@ let waitForGatewayReachableMock:
   | undefined;
 
 function resolveTestConfigPath() {
-  const override = process.env.OPENCLAW_CONFIG_PATH?.trim();
+  const override = process.env.STEELENGINE_CONFIG_PATH?.trim();
   if (override) {
     return override;
   }
-  const stateDir = process.env.OPENCLAW_STATE_DIR?.trim();
+  const stateDir = process.env.STEELENGINE_STATE_DIR?.trim();
   if (!stateDir) {
-    throw new Error("OPENCLAW_STATE_DIR must be set before config IO in this test");
+    throw new Error("STEELENGINE_STATE_DIR must be set before config IO in this test");
   }
-  return path.join(stateDir, "openclaw.json");
+  return path.join(stateDir, "steelengine.json");
 }
 
 // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- Test helper lets assertions ascribe stored config shape.
-function readTestConfig<T = OpenClawConfig>(): T {
+function readTestConfig<T = SteelEngineConfig>(): T {
   return (testConfigStore.get(resolveTestConfigPath()) ?? {}) as T;
 }
 
@@ -99,7 +99,7 @@ vi.mock("../config/io.js", () => ({
 }));
 
 const capturedReplaceConfigFileCalls: Array<{
-  nextConfig: OpenClawConfig;
+  nextConfig: SteelEngineConfig;
   writeOptions?: { allowConfigSizeDrop?: boolean; unsetPaths?: string[][] };
 }> = [];
 
@@ -108,13 +108,13 @@ vi.mock("../config/config.js", () => ({
     nextConfig,
     writeOptions,
   }: {
-    nextConfig: OpenClawConfig;
+    nextConfig: SteelEngineConfig;
     writeOptions?: { allowConfigSizeDrop?: boolean; unsetPaths?: string[][] };
   }) => {
     capturedReplaceConfigFileCalls.push({ nextConfig, ...(writeOptions ? { writeOptions } : {}) });
     testConfigStore.set(resolveTestConfigPath(), nextConfig);
   },
-  resolveGatewayPort: (cfg: OpenClawConfig) => cfg.gateway?.port ?? 18789,
+  resolveGatewayPort: (cfg: SteelEngineConfig) => cfg.gateway?.port ?? 18789,
 }));
 
 vi.mock("./onboard-helpers.js", () => {
@@ -126,7 +126,7 @@ vi.mock("./onboard-helpers.js", () => {
     return trimmed === "undefined" || trimmed === "null" ? "" : trimmed;
   };
   return {
-    DEFAULT_WORKSPACE: "/tmp/openclaw-workspace",
+    DEFAULT_WORKSPACE: "/tmp/steelengine-workspace",
     applyWizardMetadata: (cfg: unknown) => cfg,
     ensureWorkspaceAndSessions: ensureWorkspaceAndSessionsMock,
     normalizeGatewayTokenInput,
@@ -249,7 +249,7 @@ type EnsureWorkspaceOptions = {
 };
 
 type MigrationPlanCall = {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   includeSecrets?: boolean;
   overwrite?: boolean;
   source?: string;
@@ -266,7 +266,7 @@ type GatewayHealthCall = {
 };
 
 type HealthCommandCall = GatewayHealthCall & {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
 };
 
 async function expectLocalJsonSetupFailure(stateDir: string, runtimeWithCapture: RuntimeEnv) {
@@ -275,7 +275,7 @@ async function expectLocalJsonSetupFailure(stateDir: string, runtimeWithCapture:
       {
         nonInteractive: true,
         mode: "local",
-        workspace: path.join(stateDir, "openclaw"),
+        workspace: path.join(stateDir, "steelengine"),
         authChoice: "skip",
         skipSkills: true,
         skipHealth: false,
@@ -292,7 +292,7 @@ function createLocalDaemonSetupOptions(stateDir: string) {
   return {
     nonInteractive: true,
     mode: "local" as const,
-    workspace: path.join(stateDir, "openclaw"),
+    workspace: path.join(stateDir, "steelengine"),
     authChoice: "skip" as const,
     skipSkills: true,
     skipHealth: false,
@@ -340,8 +340,8 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
       throw new Error("temp home not initialized");
     }
     const stateDir = await fs.mkdtemp(path.join(tempHome, prefix));
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
-    deleteTestEnvValue("OPENCLAW_CONFIG_PATH");
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
+    deleteTestEnvValue("STEELENGINE_CONFIG_PATH");
     return stateDir;
   };
   const withStateDir = async (
@@ -358,25 +358,25 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
   beforeAll(async () => {
     envSnapshot = captureEnv([
       "HOME",
-      "OPENCLAW_STATE_DIR",
-      "OPENCLAW_CONFIG_PATH",
-      "OPENCLAW_SKIP_CHANNELS",
-      "OPENCLAW_SKIP_GMAIL_WATCHER",
-      "OPENCLAW_SKIP_CRON",
-      "OPENCLAW_SKIP_CANVAS_HOST",
-      "OPENCLAW_SKIP_BROWSER_CONTROL_SERVER",
-      "OPENCLAW_GATEWAY_TOKEN",
-      "OPENCLAW_GATEWAY_PASSWORD",
+      "STEELENGINE_STATE_DIR",
+      "STEELENGINE_CONFIG_PATH",
+      "STEELENGINE_SKIP_CHANNELS",
+      "STEELENGINE_SKIP_GMAIL_WATCHER",
+      "STEELENGINE_SKIP_CRON",
+      "STEELENGINE_SKIP_CANVAS_HOST",
+      "STEELENGINE_SKIP_BROWSER_CONTROL_SERVER",
+      "STEELENGINE_GATEWAY_TOKEN",
+      "STEELENGINE_GATEWAY_PASSWORD",
     ]);
-    setTestEnvValue("OPENCLAW_SKIP_CHANNELS", "1");
-    setTestEnvValue("OPENCLAW_SKIP_GMAIL_WATCHER", "1");
-    setTestEnvValue("OPENCLAW_SKIP_CRON", "1");
-    setTestEnvValue("OPENCLAW_SKIP_CANVAS_HOST", "1");
-    setTestEnvValue("OPENCLAW_SKIP_BROWSER_CONTROL_SERVER", "1");
-    deleteTestEnvValue("OPENCLAW_GATEWAY_TOKEN");
-    deleteTestEnvValue("OPENCLAW_GATEWAY_PASSWORD");
+    setTestEnvValue("STEELENGINE_SKIP_CHANNELS", "1");
+    setTestEnvValue("STEELENGINE_SKIP_GMAIL_WATCHER", "1");
+    setTestEnvValue("STEELENGINE_SKIP_CRON", "1");
+    setTestEnvValue("STEELENGINE_SKIP_CANVAS_HOST", "1");
+    setTestEnvValue("STEELENGINE_SKIP_BROWSER_CONTROL_SERVER", "1");
+    deleteTestEnvValue("STEELENGINE_GATEWAY_TOKEN");
+    deleteTestEnvValue("STEELENGINE_GATEWAY_PASSWORD");
 
-    tempHome = await makeTempWorkspace("openclaw-onboard-");
+    tempHome = await makeTempWorkspace("steelengine-onboard-");
     setTestEnvValue("HOME", tempHome);
 
     await loadGatewayOnboardModules();
@@ -404,9 +404,9 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
     readLastGatewayErrorLineMock.mockClear();
   });
 
-  it("preserves existing agents.list and bindings on onboard rerun (openclaw#84692)", async () => {
+  it("preserves existing agents.list and bindings on onboard rerun (steelengine#84692)", async () => {
     await withStateDir("state-preserve-agents-", async (stateDir) => {
-      const workspace = path.join(stateDir, "openclaw");
+      const workspace = path.join(stateDir, "steelengine");
       const seededAgents = [
         { id: "alpha", model: "anthropic/claude-3-5-sonnet" },
         { id: "beta", model: "openai/gpt-4o" },
@@ -433,7 +433,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
         agents: { list: seededAgents, defaults: { workspace } },
         bindings: seededBindings,
         gateway: { mode: "local", port: 18789, auth: { mode: "token", token: "seed_tok" } },
-      } as OpenClawConfig);
+      } as SteelEngineConfig);
 
       await runNonInteractiveSetup(
         {
@@ -462,7 +462,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
 
   it("allows local onboard plugin install-record migration size drops", async () => {
     await withStateDir("state-local-plugin-installs-", async (stateDir) => {
-      const workspace = path.join(stateDir, "openclaw");
+      const workspace = path.join(stateDir, "steelengine");
       testConfigStore.set(resolveTestConfigPath(), {
         plugins: {
           installs: {
@@ -472,7 +472,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
             },
           },
         },
-      } as OpenClawConfig);
+      } as SteelEngineConfig);
 
       await runNonInteractiveSetup(
         {
@@ -505,7 +505,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
   it("writes gateway token auth into config", async () => {
     await withStateDir("state-noninteractive-", async (stateDir) => {
       const token = "tok_test_123";
-      const workspace = path.join(stateDir, "openclaw");
+      const workspace = path.join(stateDir, "steelengine");
 
       await runNonInteractiveSetup(
         {
@@ -541,7 +541,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
 
   it("does not auto-enable default hooks when skipHooks is set", async () => {
     await withStateDir("state-skip-hooks-", async (stateDir) => {
-      const workspace = path.join(stateDir, "openclaw");
+      const workspace = path.join(stateDir, "steelengine");
 
       await runNonInteractiveSetup(
         {
@@ -566,7 +566,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
   it("persists skipBootstrap and skips workspace bootstrap creation", async () => {
     ensureWorkspaceAndSessionsMock.mockClear();
     await withStateDir("state-skip-bootstrap-", async (stateDir) => {
-      const workspace = path.join(stateDir, "openclaw");
+      const workspace = path.join(stateDir, "steelengine");
 
       await runNonInteractiveSetup(
         {
@@ -601,7 +601,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
   it("applies non-interactive migration imports instead of ignoring import flags", async () => {
     await withStateDir("state-noninteractive-import-", async (stateDir) => {
       const source = path.join(stateDir, "hermes-home");
-      const workspace = path.join(stateDir, "openclaw");
+      const workspace = path.join(stateDir, "steelengine");
       const planned: MigrationPlan = {
         providerId: "hermes",
         source,
@@ -702,7 +702,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
     });
   }, 60_000);
 
-  it("preserves existing agents.list and bindings on remote onboard rerun (openclaw#84692)", async () => {
+  it("preserves existing agents.list and bindings on remote onboard rerun (steelengine#84692)", async () => {
     await withStateDir("state-remote-preserve-agents-", async (_stateDir) => {
       const port = getPseudoPort(30_000);
       const token = "tok_remote_seed";
@@ -727,7 +727,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
           mode: "remote",
           remote: { url: `ws://127.0.0.1:${port}`, token },
         },
-      } as OpenClawConfig);
+      } as SteelEngineConfig);
 
       await runNonInteractiveSetup(
         {
@@ -767,7 +767,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
           mode: "remote",
           remote: { url: `ws://127.0.0.1:${port}`, token },
         },
-      } as OpenClawConfig);
+      } as SteelEngineConfig);
 
       await runNonInteractiveSetup(
         {
@@ -805,7 +805,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
           {
             nonInteractive: true,
             mode: "local",
-            workspace: path.join(stateDir, "openclaw"),
+            workspace: path.join(stateDir, "steelengine"),
             authChoice: "skip",
             skipSkills: true,
             skipHealth: false,
@@ -815,7 +815,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
           runtime,
         ),
       ).rejects.toThrow(
-        /only waits for an already-running gateway unless you pass `--install-daemon` to `openclaw onboard`[\s\S]*openclaw onboard --install-daemon[\s\S]*openclaw onboard --skip-health/,
+        /only waits for an already-running gateway unless you pass `--install-daemon` to `steelengine onboard`[\s\S]*steelengine onboard --install-daemon[\s\S]*steelengine onboard --skip-health/,
       );
     });
   }, 60_000);
@@ -957,7 +957,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
       expect(parsed.installDaemon).toBe(true);
       expect(parsed.detail).toContain("1006 abnormal closure");
       expect(parsed.gateway?.wsUrl).toContain("ws://127.0.0.1:");
-      expect(parsed.hints).toContain("Run `openclaw gateway status --deep` for more detail.");
+      expect(parsed.hints).toContain("Run `steelengine gateway status --deep` for more detail.");
       expect(parsed.diagnostics?.service?.label).toBe("LaunchAgent");
       expect(parsed.diagnostics?.service?.loaded).toBe(true);
       expect(parsed.diagnostics?.service?.runtimeStatus).toBe("running");
@@ -991,7 +991,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
       expect(parsed.ok).toBe(false);
       expect(parsed.phase).toBe("gateway-health");
       expect(parsed.classification).toBe("service-stopped");
-      expect(parsed.hints).toContain("Fix: run `openclaw gateway restart`.");
+      expect(parsed.hints).toContain("Fix: run `steelengine gateway restart`.");
     });
   }, 60_000);
 
@@ -1001,11 +1001,11 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
       return;
     }
     await withStateDir("state-lan-", async (stateDir) => {
-      setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
-      setTestEnvValue("OPENCLAW_CONFIG_PATH", path.join(stateDir, "openclaw.json"));
+      setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
+      setTestEnvValue("STEELENGINE_CONFIG_PATH", path.join(stateDir, "steelengine.json"));
 
       const port = getPseudoPort(40_000);
-      const workspace = path.join(stateDir, "openclaw");
+      const workspace = path.join(stateDir, "steelengine");
 
       await runNonInteractiveSetup(
         {

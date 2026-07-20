@@ -9,7 +9,7 @@ read_when:
 ---
 
 Most skills configuration lives under `skills` in
-`~/.openclaw/openclaw.json`. Agent-specific visibility lives under
+`~/.steelengine/steelengine.json`. Agent-specific visibility lives under
 `agents.defaults.skills` and `agents.list[].skills`.
 
 ```json5
@@ -85,9 +85,9 @@ Most skills configuration lives under `skills` in
 
 <ParamField path="skills.install.nodeManager" type='"npm" | "pnpm" | "yarn" | "bun"' default='"npm"'>
   Node package manager preference for skill installs. This only affects skill
-  installs - the OpenClaw CLI and Gateway runtime require Node because the
-  canonical state store uses `node:sqlite`. `openclaw setup --node-manager` and
-  `openclaw onboard --node-manager` accept `npm`, `pnpm`, or `bun`; set
+  installs - the SteelEngine CLI and Gateway runtime require Node because the
+  canonical state store uses `node:sqlite`. `steelengine setup --node-manager` and
+  `steelengine onboard --node-manager` accept `npm`, `pnpm`, or `bun`; set
   `"yarn"` directly in config for Yarn-backed skill installs.
 </ParamField>
 
@@ -101,7 +101,7 @@ Most skills configuration lives under `skills` in
 
 Use `security.installPolicy` when operators need a trusted local command to
 approve or block skill and plugin installs with host-specific policy. The
-policy runs after OpenClaw has staged source material and before the install
+policy runs after SteelEngine has staged source material and before the install
 or update continues. It applies to ClawHub skills, uploaded skills, Git/local
 skills, skill dependency installers, and plugin install/update sources.
 
@@ -114,12 +114,12 @@ skills, skill dependency installers, and plugin install/update sources.
       targets: ["skill", "plugin"],
       exec: {
         source: "exec",
-        command: "/usr/local/bin/openclaw-install-policy",
+        command: "/usr/local/bin/steelengine-install-policy",
         args: ["--json"],
         timeoutMs: 10000,
         noOutputTimeoutMs: 10000,
         maxOutputBytes: 1048576,
-        passEnv: ["OPENCLAW_STATE_DIR", "PATH"],
+        passEnv: ["STEELENGINE_STATE_DIR", "PATH"],
         env: { POLICY_MODE: "strict" },
         trustedDirs: ["/usr/local/bin"],
       },
@@ -139,7 +139,7 @@ skills, skill dependency installers, and plugin install/update sources.
 </ParamField>
 
 <ParamField path="security.installPolicy.exec.command" type="string">
-  Absolute path to the trusted policy executable. OpenClaw runs it without a
+  Absolute path to the trusted policy executable. SteelEngine runs it without a
   shell and validates the path before use.
 </ParamField>
 
@@ -165,7 +165,7 @@ skills, skill dependency installers, and plugin install/update sources.
 </ParamField>
 
 <ParamField path="security.installPolicy.exec.passEnv" type="string[]">
-  Environment variable names copied from the OpenClaw process into the
+  Environment variable names copied from the SteelEngine process into the
   policy process. Only named variables are passed.
 </ParamField>
 
@@ -185,16 +185,16 @@ skills, skill dependency installers, and plugin install/update sources.
 </ParamField>
 
 The policy receives one JSON object on stdin with `protocolVersion: 1`,
-`openclawVersion`, `targetType`, `targetName`, `sourcePath`, `sourcePathKind`,
+`steelengineVersion`, `targetType`, `targetName`, `sourcePath`, `sourcePathKind`,
 optional structured `source`, structured `origin`, and `request`. It must
 write one JSON object on stdout: `{ "protocolVersion": 1, "decision": "allow" }`
 or `{ "protocolVersion": 1, "decision": "block", "reason": "..." }`. Non-zero
 exit, timeout, malformed JSON, missing fields, or unsupported protocol
 versions fail closed.
 
-OpenClaw does not execute install policy during normal Gateway startup.
+SteelEngine does not execute install policy during normal Gateway startup.
 Installs and updates fail closed when policy is enabled but unavailable.
-`openclaw doctor` performs static validation; `openclaw doctor --deep`
+`steelengine doctor` performs static validation; `steelengine doctor --deep`
 executes a synthetic install probe against the configured command.
 
 Bulk updates apply policy per target: a blocked skill or plugin update fails
@@ -206,20 +206,20 @@ Example stdin:
 ```json
 {
   "protocolVersion": 1,
-  "openclawVersion": "2026.6.1",
+  "steelengineVersion": "2026.6.1",
   "targetType": "skill",
   "targetName": "weather",
-  "sourcePath": "/var/folders/.../openclaw-skill-clawhub/root",
+  "sourcePath": "/var/folders/.../steelengine-skill-clawhub/root",
   "sourcePathKind": "directory",
   "source": {
     "kind": "clawhub",
-    "authority": "openclaw",
+    "authority": "steelengine",
     "mutable": false,
     "network": true
   },
   "origin": {
     "type": "clawhub",
-    "registry": "https://clawhub.openclaw.ai",
+    "registry": "https://clawhub.steelengine.ai",
     "slug": "weather",
     "version": "1.0.0"
   },
@@ -271,7 +271,7 @@ process.stdin.on("end", () => {
 ## Per-skill entries (`skills.entries`)
 
 Keys under `entries` match the skill `name` by default. If a skill defines
-`metadata.openclaw.skillKey`, use that key instead. Quote hyphenated names
+`metadata.steelengine.skillKey`, use that key instead. Quote hyphenated names
 (JSON5 allows quoted keys).
 
 <ParamField path="skills.entries.<key>.enabled" type="boolean">
@@ -282,7 +282,7 @@ Keys under `entries` match the skill `name` by default. If a skill defines
 </ParamField>
 
 <ParamField path="skills.entries.<key>.apiKey" type='string | { source, provider, id }'>
-  Convenience field for skills that declare `metadata.openclaw.primaryEnv`.
+  Convenience field for skills that declare `metadata.steelengine.primaryEnv`.
   Supports a plaintext string or a SecretRef: `{ source: "env", provider: "default", id: "VAR_NAME" }`.
 </ParamField>
 
@@ -328,12 +328,12 @@ different visible skill set per agent.
 </ParamField>
 
 <Warning>
-  Agent skill allowlists are a visibility and loading filter for OpenClaw
+  Agent skill allowlists are a visibility and loading filter for SteelEngine
   skill discovery, prompts, slash-command discovery, sandbox sync, and skill
   snapshots. They are not a shell-time authorization boundary. If an agent
   can run host `exec`, that shell can still run external clients or read
   host files that are visible to the execution user, including MCP client
-  registries such as `~/.openclaw/skills/config/mcporter.json`. For
+  registries such as `~/.steelengine/skills/config/mcporter.json`. For
   per-agent MCP isolation, combine skill allowlists with sandbox/OS-user
   isolation, deny or tightly allowlist host exec, and prefer per-agent
   credentials at the MCP server.
@@ -342,7 +342,7 @@ different visible skill set per agent.
 ## Workshop (`skills.workshop`)
 
 <ParamField path="skills.workshop.autonomous.enabled" type="boolean" default="false">
-  When `true`, OpenClaw can create pending proposals from durable corrections
+  When `true`, SteelEngine can create pending proposals from durable corrections
   and can review successful, substantial completed work after the system becomes
   idle. This can add a background model run after eligible turns. User-prompted
   skill creation and `/learn` continue to work when the setting is `false`.
@@ -418,7 +418,7 @@ in separately:
 }
 ```
 
-Managed `~/.openclaw/skills` and personal `~/.agents/skills` directories
+Managed `~/.steelengine/skills` and personal `~/.agents/skills` directories
 already accept skill-directory symlinks unconditionally (per-skill
 `SKILL.md` containment still applies) — `allowSymlinkTargets` is only needed
 for workspace, extra-dir, and project-agent (`<workspace>/.agents/skills`)
@@ -461,7 +461,7 @@ Pass secrets into a Docker sandbox with:
 workspace/skills      (highest)
 workspace/.agents/skills
 ~/.agents/skills
-~/.openclaw/skills
+~/.steelengine/skills
 bundled skills
 skills.load.extraDirs (lowest)
 ```

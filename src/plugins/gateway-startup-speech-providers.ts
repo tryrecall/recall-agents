@@ -1,7 +1,7 @@
 // Collects startup speech provider metadata from plugin manifests.
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
-import { normalizeOptionalLowercaseString } from "@openclaw/normalization-core/string-coerce";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
+import { normalizeOptionalLowercaseString } from "@steelengine/normalization-core/string-coerce";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { resolveEffectiveTtsConfig } from "../tts/tts-config.js";
 
 const TTS_PROVIDER_CONFIG_RESERVED_KEYS = new Set([
@@ -142,7 +142,7 @@ function addConfiguredTtsProviderIds(target: Set<string>, value: unknown): void 
 }
 
 /** Collects TTS provider ids referenced by root, agent, channel, account, and plugin config. */
-export function collectConfiguredSpeechProviderIds(config: OpenClawConfig): ReadonlySet<string> {
+export function collectConfiguredSpeechProviderIds(config: SteelEngineConfig): ReadonlySet<string> {
   const configured = new Set<string>();
   addConfiguredTtsProviderIds(configured, resolveEffectiveTtsConfig(config));
 

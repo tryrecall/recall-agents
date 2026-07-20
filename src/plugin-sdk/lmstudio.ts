@@ -1,7 +1,7 @@
 /**
  * Public SDK facade for LM Studio provider config, discovery, and auth helpers.
  */
-import type { OpenClawConfig } from "../config/types.js";
+import type { SteelEngineConfig } from "../config/types.js";
 import type {
   ProviderAuthMethodNonInteractiveContext,
   ProviderAuthResult,
@@ -12,7 +12,7 @@ import type {
 import type { WizardPrompter } from "../wizard/prompts.js";
 
 export type {
-  OpenClawPluginApi,
+  SteelEnginePluginApi,
   ProviderAuthContext,
   ProviderAuthMethodNonInteractiveContext,
   ProviderAuthResult,
@@ -51,7 +51,7 @@ export {
 import { loadBundledPluginPublicSurfaceModuleSync } from "./facade-runtime.js";
 
 type LmstudioInteractiveParams = {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   prompter?: WizardPrompter;
   secretInputMode?: unknown;
   allowSecretRefPrompt?: boolean;
@@ -70,7 +70,7 @@ type FacadeModule = {
   ) => Promise<ProviderAuthResult>;
   configureLmstudioNonInteractive: (
     ctx: ProviderAuthMethodNonInteractiveContext,
-  ) => Promise<OpenClawConfig | null>;
+  ) => Promise<SteelEngineConfig | null>;
   discoverLmstudioProvider: (
     ctx: ProviderCatalogContext,
   ) => Promise<{ provider: import("../config/types.js").ModelProviderConfig } | null>;

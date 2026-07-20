@@ -27,7 +27,7 @@ function createDedupe(root: string, overrides?: { ttlMs?: number }) {
     pluginId: "test-persistent-dedupe",
     namespacePrefix: "test-dedupe",
     stateMaxEntries: 1000,
-    env: { ...process.env, OPENCLAW_STATE_DIR: root },
+    env: { ...process.env, STEELENGINE_STATE_DIR: root },
   });
 }
 
@@ -152,7 +152,7 @@ describe("memory host event journal helpers", () => {
 
 describe("createPersistentDedupe", () => {
   it("deduplicates keys, persists across instances, warms up, and checks recent keys", async () => {
-    const root = await createTempDir("openclaw-dedupe-");
+    const root = await createTempDir("steelengine-dedupe-");
     const first = createDedupe(root);
     expect(await first.checkAndRecord("m1", { namespace: "a" })).toBe(true);
     expect(await first.checkAndRecord("m1", { namespace: "a" })).toBe(false);
@@ -173,14 +173,14 @@ describe("createPersistentDedupe", () => {
   });
 
   it("bounds non-finite persistent dedupe options", async () => {
-    const root = await createTempDir("openclaw-dedupe-");
+    const root = await createTempDir("steelengine-dedupe-");
     const dedupe = createPersistentDedupe({
       ttlMs: Number.NaN,
       memoryMaxSize: Number.NaN,
       pluginId: "test-persistent-dedupe",
       namespacePrefix: "test-bounds",
       stateMaxEntries: Number.NaN,
-      env: { ...process.env, OPENCLAW_STATE_DIR: root },
+      env: { ...process.env, STEELENGINE_STATE_DIR: root },
     });
 
     expect(await dedupe.checkAndRecord("m1", { namespace: "a", now: 100 })).toBe(true);
@@ -190,14 +190,14 @@ describe("createPersistentDedupe", () => {
   });
 
   it("uses legacy JSON paths only as SQLite namespace identifiers", async () => {
-    const root = await createTempDir("openclaw-legacy-dedupe-");
+    const root = await createTempDir("steelengine-legacy-dedupe-");
     const legacyPath = path.join(root, "legacy.json");
     const dedupe = createPersistentDedupe({
       ttlMs: 10_000,
       memoryMaxSize: 100,
       fileMaxEntries: 1000,
       resolveFilePath: () => legacyPath,
-      env: { ...process.env, OPENCLAW_STATE_DIR: root },
+      env: { ...process.env, STEELENGINE_STATE_DIR: root },
     });
 
     expect(await dedupe.checkAndRecord("sqlite-only", { namespace: "x" })).toBe(true);
@@ -206,7 +206,7 @@ describe("createPersistentDedupe", () => {
   });
 
   it("lists retired JSON cache files as persistent dedupe entries", async () => {
-    const root = await createTempDir("openclaw-legacy-dedupe-");
+    const root = await createTempDir("steelengine-legacy-dedupe-");
     const legacyPath = path.join(root, "legacy.json");
     await fs.writeFile(
       legacyPath,
@@ -233,7 +233,7 @@ describe("createPersistentDedupe", () => {
   });
 
   it("treats malformed legacy JSON cache files as empty", async () => {
-    const root = await createTempDir("openclaw-legacy-dedupe-malformed-");
+    const root = await createTempDir("steelengine-legacy-dedupe-malformed-");
     const legacyPath = path.join(root, "legacy.json");
     await fs.writeFile(legacyPath, "{not valid json");
 
@@ -247,7 +247,7 @@ describe("createPersistentDedupe", () => {
   });
 
   it("warms empty namespaces and ignores retired JSON cache files", async () => {
-    const root = await createTempDir("openclaw-dedupe-");
+    const root = await createTempDir("steelengine-dedupe-");
     const emptyReader = createDedupe(root, { ttlMs: 10_000 });
     expect(await emptyReader.warmup("nonexistent")).toBe(0);
 
@@ -323,14 +323,14 @@ describe("createClaimableDedupe", () => {
   });
 
   it("supports persistent-backed recent checks and warmup", async () => {
-    const root = await createTempDir("openclaw-claimable-dedupe-");
+    const root = await createTempDir("steelengine-claimable-dedupe-");
     const writer = createClaimableDedupe({
       ttlMs: 10_000,
       memoryMaxSize: 100,
       pluginId: "test-claimable-dedupe",
       namespacePrefix: "test-claimable-dedupe",
       stateMaxEntries: 1000,
-      env: { ...process.env, OPENCLAW_STATE_DIR: root },
+      env: { ...process.env, STEELENGINE_STATE_DIR: root },
     });
 
     await expect(writer.claim("m1", { namespace: "acct" })).resolves.toEqual({ kind: "claimed" });
@@ -342,7 +342,7 @@ describe("createClaimableDedupe", () => {
       pluginId: "test-claimable-dedupe",
       namespacePrefix: "test-claimable-dedupe",
       stateMaxEntries: 1000,
-      env: { ...process.env, OPENCLAW_STATE_DIR: root },
+      env: { ...process.env, STEELENGINE_STATE_DIR: root },
     });
 
     expect(await reader.hasRecent("m1", { namespace: "acct" })).toBe(true);
@@ -357,7 +357,7 @@ describe("createClaimableDedupe", () => {
       pluginId: "test-claimable-dedupe",
       namespacePrefix: "test-claimable-dedupe",
       stateMaxEntries: 1000,
-      env: { ...process.env, OPENCLAW_STATE_DIR: root },
+      env: { ...process.env, STEELENGINE_STATE_DIR: root },
     });
     await expect(afterForget.claim("m1", { namespace: "acct" })).resolves.toEqual({
       kind: "claimed",

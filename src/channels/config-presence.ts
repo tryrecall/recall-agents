@@ -5,14 +5,14 @@
  */
 import fs from "node:fs";
 import os from "node:os";
-import { normalizeOptionalLowercaseString } from "@openclaw/normalization-core/string-coerce";
-import { uniqueStrings } from "@openclaw/normalization-core/string-normalization";
+import { normalizeOptionalLowercaseString } from "@steelengine/normalization-core/string-coerce";
+import { uniqueStrings } from "@steelengine/normalization-core/string-normalization";
 import {
   hasBundledChannelPersistedAuthState,
   listBundledChannelIdsWithPersistedAuthState,
 } from "../channels/plugins/persisted-auth-state.js";
 import { resolveStateDir } from "../config/paths.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { hasNonEmptyString } from "../infra/outbound/channel-target.js";
 import type { PluginDiscoveryResult } from "../plugins/discovery.js";
 import { listOfficialExternalChannelEnvVars } from "../plugins/official-external-plugin-catalog.js";
@@ -29,7 +29,7 @@ type ChannelPresenceOptions = {
     listChannelIds: () => readonly string[];
     hasState: (params: {
       channelId: string;
-      cfg: OpenClawConfig;
+      cfg: SteelEngineConfig;
       env: NodeJS.ProcessEnv;
     }) => boolean;
   };
@@ -54,7 +54,7 @@ export function hasMeaningfulChannelConfig(value: unknown): boolean {
 }
 
 /** Lists channels explicitly disabled in config so activation logic can suppress auto-detection. */
-export function listExplicitlyDisabledChannelIdsForConfig(cfg: OpenClawConfig): string[] {
+export function listExplicitlyDisabledChannelIdsForConfig(cfg: SteelEngineConfig): string[] {
   const channels = isRecord(cfg.channels) ? cfg.channels : null;
   if (!channels) {
     return [];
@@ -99,7 +99,7 @@ function listPersistedAuthStateChannelIds(options: ChannelPresenceOptions): read
 
 function hasPersistedAuthState(params: {
   channelId: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   options: ChannelPresenceOptions;
 }): boolean {
@@ -117,7 +117,7 @@ function hasPersistedAuthState(params: {
 
 /** Lists channel ids detected from config, env vars, or persisted auth state. */
 export function listPotentialConfiguredChannelIds(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   env: NodeJS.ProcessEnv = process.env,
   options: ChannelPresenceOptions = {},
 ): string[] {
@@ -130,7 +130,7 @@ export function listPotentialConfiguredChannelIds(
 
 /** Lists deduplicated channel presence signals with their detection source. */
 export function listPotentialConfiguredChannelPresenceSignals(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   env: NodeJS.ProcessEnv = process.env,
   options: ChannelPresenceOptions = {},
 ): ChannelPresenceSignal[] {

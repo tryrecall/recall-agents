@@ -1,5 +1,5 @@
 ---
-summary: "OpenClaw diagnostics OpenTelemetry exporter for metrics, traces, and logs."
+summary: "SteelEngine diagnostics OpenTelemetry exporter for metrics, traces, and logs."
 read_when:
   - You are installing, configuring, or auditing the diagnostics-otel plugin
 title: "Diagnostics OpenTelemetry plugin"
@@ -7,12 +7,12 @@ title: "Diagnostics OpenTelemetry plugin"
 
 # Diagnostics OpenTelemetry plugin
 
-OpenClaw diagnostics OpenTelemetry exporter for metrics, traces, and logs.
+SteelEngine diagnostics OpenTelemetry exporter for metrics, traces, and logs.
 
 ## Distribution
 
-- Package: `@openclaw/diagnostics-otel`
-- Install route: npm; ClawHub: `clawhub:@openclaw/diagnostics-otel`
+- Package: `@steelengine/diagnostics-otel`
+- Install route: npm; ClawHub: `clawhub:@steelengine/diagnostics-otel`
 
 ## Surface
 

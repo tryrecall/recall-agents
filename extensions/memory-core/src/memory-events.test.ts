@@ -5,7 +5,7 @@ import {
   readMemoryHostEventRecords,
   readMemoryHostEvents,
   resolveMemoryHostEventLogPath,
-} from "openclaw/plugin-sdk/memory-host-events";
+} from "steelengine/plugin-sdk/memory-host-events";
 import { describe, expect, it } from "vitest";
 import { writeDailyDreamingPhaseBlock } from "./dreaming-markdown.js";
 import {

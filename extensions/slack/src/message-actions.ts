@@ -1,13 +1,13 @@
 // Slack plugin module implements message actions behavior.
-import { createActionGate } from "openclaw/plugin-sdk/channel-actions";
-import type { ChannelMessageActionName } from "openclaw/plugin-sdk/channel-contract";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { extractToolSend, type ChannelToolSend } from "openclaw/plugin-sdk/tool-send";
+import { createActionGate } from "steelengine/plugin-sdk/channel-actions";
+import type { ChannelMessageActionName } from "steelengine/plugin-sdk/channel-contract";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { extractToolSend, type ChannelToolSend } from "steelengine/plugin-sdk/tool-send";
 import { listEnabledSlackAccounts, resolveSlackAccount } from "./accounts.js";
 import { normalizeSlackThreadTsCandidate, resolveSlackThreadTsValue } from "./thread-ts.js";
 
 export function listSlackMessageActions(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   accountId?: string | null,
 ): ChannelMessageActionName[] {
   const accounts = (

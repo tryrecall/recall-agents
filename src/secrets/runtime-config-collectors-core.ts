@@ -1,6 +1,6 @@
 /** Collects core config secret refs during runtime preparation. */
-import { normalizeOptionalLowercaseString } from "@openclaw/normalization-core/string-coerce";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import { normalizeOptionalLowercaseString } from "@steelengine/normalization-core/string-coerce";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { MediaUnderstandingModelConfig } from "../config/types.tools.js";
 import {
   resolveConfiguredMediaEntryCapabilities,
@@ -134,7 +134,7 @@ function collectSkillAssignments(params: {
 }
 
 function collectTalkAssignments(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   defaults: SecretDefaults | undefined;
   context: ResolverContext;
 }): void {
@@ -194,7 +194,7 @@ function collectTalkProviderApiKeyAssignments(params: {
 }
 
 function collectGatewayAssignments(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   defaults: SecretDefaults | undefined;
   context: ResolverContext;
 }): void {
@@ -367,7 +367,7 @@ function collectProviderRequestAssignments(params: {
 }
 
 function collectMediaRequestAssignments(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   defaults: SecretDefaults | undefined;
   context: ResolverContext;
 }): void {
@@ -491,7 +491,7 @@ function collectMediaRequestAssignments(params: {
 }
 
 function collectMessagesTtsAssignments(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   defaults: SecretDefaults | undefined;
   context: ResolverContext;
 }): void {
@@ -508,7 +508,7 @@ function collectMessagesTtsAssignments(params: {
 }
 
 function collectAgentTtsAssignments(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   defaults: SecretDefaults | undefined;
   context: ResolverContext;
 }): void {
@@ -531,7 +531,7 @@ function collectAgentTtsAssignments(params: {
 }
 
 function collectCronAssignments(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   defaults: SecretDefaults | undefined;
   context: ResolverContext;
 }): void {
@@ -559,7 +559,7 @@ function collectCronAssignments(params: {
 
 /** Collects SecretRef assignments from core non-plugin config surfaces. */
 export function collectCoreConfigAssignments(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   defaults: SecretDefaults | undefined;
   context: ResolverContext;
 }): void {

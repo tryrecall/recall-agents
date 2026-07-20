@@ -3,9 +3,9 @@
  * dispatch and local Browser control route dispatch.
  */
 import crypto from "node:crypto";
-import { clampTimerTimeoutMs } from "openclaw/plugin-sdk/number-runtime";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/runtime-env";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { clampTimerTimeoutMs } from "steelengine/plugin-sdk/number-runtime";
+import { createSubsystemLogger } from "steelengine/plugin-sdk/runtime-env";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { isBrowserControlHostUnavailableError } from "../browser-node-fallback.js";
 import {
   BROWSER_PROXY_ERROR_ENVELOPE,
@@ -34,7 +34,7 @@ import {
   withTimeout,
   type GatewayRequestHandlers,
   type NodeSession,
-  type OpenClawConfig,
+  type SteelEngineConfig,
 } from "../core-api.js";
 
 const logger = createSubsystemLogger("browser");
@@ -63,7 +63,7 @@ function resolveBrowserNode(nodes: NodeSession[], query: string): NodeSession | 
 }
 
 function resolveBrowserNodeTarget(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   nodes: NodeSession[];
 }): NodeSession | null {
   const policy = params.cfg.gateway?.nodes?.browser;

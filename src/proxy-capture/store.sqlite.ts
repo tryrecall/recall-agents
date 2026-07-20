@@ -4,8 +4,8 @@ import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
 import { StringDecoder } from "node:string_decoder";
 import { gunzipSync, gzipSync } from "node:zlib";
-import { normalizeNullableString as normalizeObservedValue } from "@openclaw/normalization-core/string-coerce";
-import { normalizeUniqueStringEntries } from "@openclaw/normalization-core/string-normalization";
+import { normalizeNullableString as normalizeObservedValue } from "@steelengine/normalization-core/string-coerce";
+import { normalizeUniqueStringEntries } from "@steelengine/normalization-core/string-normalization";
 import { sha256Hex } from "../infra/crypto-digest.js";
 import { requireNodeSqlite } from "../infra/node-sqlite.js";
 import { applyPrivateModeSync } from "../infra/private-mode.js";
@@ -17,7 +17,7 @@ import {
   registerSqliteCacheExitClose,
   type SqliteWalMaintenance,
 } from "../infra/sqlite-wal.js";
-import { openOpenClawStateDatabase } from "../state/openclaw-state-db.js";
+import { openSteelEngineStateDatabase } from "../state/steelengine-state-db.js";
 import type {
   CaptureBlobRecord,
   CaptureEventRecord,
@@ -220,7 +220,7 @@ class DebugProxyCaptureStoreImpl {
       this.pathBased = opened.pathBased;
       return;
     }
-    const database = openOpenClawStateDatabase({ env: optionsOrDbPath.env });
+    const database = openSteelEngineStateDatabase({ env: optionsOrDbPath.env });
     this.db = database.db;
     this.dbPath = database.path;
     // Retain the shipped public property while shared-state blobs live in this DB.
@@ -842,7 +842,7 @@ function resolveDebugProxyCaptureStoreKey(
 ): string {
   return typeof optionsOrDbPath === "string"
     ? `legacy:${optionsOrDbPath}:${legacyBlobDir ?? ""}`
-    : `shared:${openOpenClawStateDatabase({ env: optionsOrDbPath.env }).path}`;
+    : `shared:${openSteelEngineStateDatabase({ env: optionsOrDbPath.env }).path}`;
 }
 
 function getDebugProxyCaptureStoreImpl(

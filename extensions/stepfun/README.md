@@ -1,12 +1,12 @@
-# OpenClaw StepFun Provider
+# SteelEngine StepFun Provider
 
-Official OpenClaw provider plugin for StepFun.
+Official SteelEngine provider plugin for StepFun.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/stepfun-provider
-openclaw gateway restart
+steelengine plugins install @steelengine/stepfun-provider
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/providers/stepfun> for setup and configuration.
+See <https://docs.steelengine.ai/providers/stepfun> for setup and configuration.

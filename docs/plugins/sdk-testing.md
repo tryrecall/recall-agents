@@ -1,5 +1,5 @@
 ---
-summary: "Testing utilities and patterns for OpenClaw plugins"
+summary: "Testing utilities and patterns for SteelEngine plugins"
 title: "Plugin testing"
 sidebarTitle: "Testing"
 read_when:
@@ -8,7 +8,7 @@ read_when:
   - You want to understand contract tests for bundled plugins
 ---
 
-Reference for test utilities, patterns, and lint enforcement for OpenClaw
+Reference for test utilities, patterns, and lint enforcement for SteelEngine
 plugins.
 
 <Tip>
@@ -19,7 +19,7 @@ plugins.
 
 ## Test utilities
 
-These subpaths are repo-local source entrypoints for OpenClaw's own bundled
+These subpaths are repo-local source entrypoints for SteelEngine's own bundled
 plugin tests. They are not published `package.json` exports for third-party
 plugins, and they may import Vitest or other repo-only test dependencies.
 
@@ -27,30 +27,30 @@ plugins, and they may import Vitest or other repo-only test dependencies.
 import {
   shouldAckReaction,
   removeAckReactionAfterReply,
-} from "openclaw/plugin-sdk/channel-feedback";
-import { installCommonResolveTargetErrorCases } from "openclaw/plugin-sdk/channel-target-testing";
-import { AUTH_PROFILE_RUNTIME_CONTRACT } from "openclaw/plugin-sdk/agent-runtime-test-contracts";
-import { createTestPluginApi } from "openclaw/plugin-sdk/plugin-test-api";
-import { expectChannelInboundContextContract } from "openclaw/plugin-sdk/channel-contract-testing";
-import { createStartAccountContext } from "openclaw/plugin-sdk/channel-test-helpers";
-import { describePluginRegistrationContract } from "openclaw/plugin-sdk/plugin-test-contracts";
-import { registerSingleProviderPlugin } from "openclaw/plugin-sdk/plugin-test-runtime";
-import { describeOpenAIProviderRuntimeContract } from "openclaw/plugin-sdk/provider-test-contracts";
-import { getProviderHttpMocks } from "openclaw/plugin-sdk/provider-http-test-mocks";
-import { withEnv, withFetchPreconnect, withServer } from "openclaw/plugin-sdk/test-env";
-import { isLiveTestEnabled } from "openclaw/plugin-sdk/test-live";
-import { createRequestCaptureJsonFetch } from "openclaw/plugin-sdk/test-media-understanding";
+} from "steelengine/plugin-sdk/channel-feedback";
+import { installCommonResolveTargetErrorCases } from "steelengine/plugin-sdk/channel-target-testing";
+import { AUTH_PROFILE_RUNTIME_CONTRACT } from "steelengine/plugin-sdk/agent-runtime-test-contracts";
+import { createTestPluginApi } from "steelengine/plugin-sdk/plugin-test-api";
+import { expectChannelInboundContextContract } from "steelengine/plugin-sdk/channel-contract-testing";
+import { createStartAccountContext } from "steelengine/plugin-sdk/channel-test-helpers";
+import { describePluginRegistrationContract } from "steelengine/plugin-sdk/plugin-test-contracts";
+import { registerSingleProviderPlugin } from "steelengine/plugin-sdk/plugin-test-runtime";
+import { describeOpenAIProviderRuntimeContract } from "steelengine/plugin-sdk/provider-test-contracts";
+import { getProviderHttpMocks } from "steelengine/plugin-sdk/provider-http-test-mocks";
+import { withEnv, withFetchPreconnect, withServer } from "steelengine/plugin-sdk/test-env";
+import { isLiveTestEnabled } from "steelengine/plugin-sdk/test-live";
+import { createRequestCaptureJsonFetch } from "steelengine/plugin-sdk/test-media-understanding";
 import {
   bundledPluginRoot,
   createCliRuntimeCapture,
   typedCases,
-} from "openclaw/plugin-sdk/test-fixtures";
-import { mockNodeBuiltinModule } from "openclaw/plugin-sdk/test-node-mocks";
+} from "steelengine/plugin-sdk/test-fixtures";
+import { mockNodeBuiltinModule } from "steelengine/plugin-sdk/test-node-mocks";
 ```
 
 Use these focused subpaths for bundled plugin tests. The former
-`openclaw/plugin-sdk/testing` barrel was repo-local, excluded from shipped
-packages, and has been removed. The legacy `openclaw/plugin-sdk/test-utils`
+`steelengine/plugin-sdk/testing` barrel was repo-local, excluded from shipped
+packages, and has been removed. The legacy `steelengine/plugin-sdk/test-utils`
 alias remains repo-local; `pnpm run lint:plugins:no-extension-test-core-imports`
 (`scripts/check-no-extension-test-core-imports.ts`) rejects new extension-test
 imports of that alias.
@@ -130,7 +130,7 @@ imports of that alias.
 
 Bundled-plugin contract suites also use these SDK testing subpaths for
 test-only registry, manifest, public-artifact, and runtime fixture helpers.
-Core-only suites that depend on bundled OpenClaw inventory stay under
+Core-only suites that depend on bundled SteelEngine inventory stay under
 `src/plugins/contracts` instead.
 
 ### Types
@@ -141,9 +141,9 @@ Focused testing subpaths also re-export types useful in test files:
 import type {
   ChannelAccountSnapshot,
   ChannelGatewayContext,
-} from "openclaw/plugin-sdk/channel-contract";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { MockFn, PluginRuntime, RuntimeEnv } from "openclaw/plugin-sdk/plugin-test-runtime";
+} from "steelengine/plugin-sdk/channel-contract";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { MockFn, PluginRuntime, RuntimeEnv } from "steelengine/plugin-sdk/plugin-test-runtime";
 ```
 
 ## Testing target resolution
@@ -153,7 +153,7 @@ channel target resolution:
 
 ```typescript
 import { describe } from "vitest";
-import { installCommonResolveTargetErrorCases } from "openclaw/plugin-sdk/channel-target-testing";
+import { installCommonResolveTargetErrorCases } from "steelengine/plugin-sdk/channel-target-testing";
 
 describe("my-channel target resolution", () => {
   installCommonResolveTargetErrorCases({
@@ -176,7 +176,7 @@ describe("my-channel target resolution", () => {
 ### Testing registration contracts
 
 Unit tests that pass a hand-written `api` mock to `register(api)` do not
-exercise OpenClaw's loader acceptance gates. Add at least one loader-backed
+exercise SteelEngine's loader acceptance gates. Add at least one loader-backed
 smoke test for each registration surface your plugin depends on, especially
 hooks and exclusive capabilities such as memory.
 
@@ -188,7 +188,7 @@ entry to declare `kind: "memory"`.
 
 ### Testing runtime config access
 
-Prefer the shared plugin runtime mock from `openclaw/plugin-sdk/plugin-test-runtime`.
+Prefer the shared plugin runtime mock from `steelengine/plugin-sdk/plugin-test-runtime`.
 Its `runtime.config.loadConfig()` and `runtime.config.writeConfigFile(...)`
 mocks throw by default so tests catch new usage of deprecated compatibility
 APIs. Override those mocks only when the test is explicitly covering legacy
@@ -263,8 +263,8 @@ describe("my-provider plugin", () => {
 For code that uses `createPluginRuntimeStore`, mock the runtime in tests:
 
 ```typescript
-import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
-import type { PluginRuntime } from "openclaw/plugin-sdk/runtime-store";
+import { createPluginRuntimeStore } from "steelengine/plugin-sdk/runtime-store";
+import type { PluginRuntime } from "steelengine/plugin-sdk/runtime-store";
 
 const store = createPluginRuntimeStore<PluginRuntime>({
   pluginId: "test-plugin",
@@ -342,7 +342,7 @@ import-boundary checks in CI; each can also be run standalone locally:
 
 | Command                                                        | Enforces                                                                                    |
 | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `pnpm run lint:plugins:no-monolithic-plugin-sdk-entry-imports` | Bundled plugins cannot import the monolithic `openclaw/plugin-sdk` root barrel.             |
+| `pnpm run lint:plugins:no-monolithic-plugin-sdk-entry-imports` | Bundled plugins cannot import the monolithic `steelengine/plugin-sdk` root barrel.             |
 | `pnpm run lint:plugins:no-extension-src-imports`               | Production extension files cannot import the repo `src/**` tree directly (`../../src/...`). |
 | `pnpm run lint:plugins:no-extension-test-core-imports`         | Extension test files cannot import `plugin-sdk/test-utils` or other core-only test helpers. |
 
@@ -351,7 +351,7 @@ patterns is recommended.
 
 ## Test configuration
 
-OpenClaw uses Vitest 4 with informational V8 coverage reporting. For plugin tests:
+SteelEngine uses Vitest 4 with informational V8 coverage reporting. For plugin tests:
 
 ```bash
 # Run all tests
@@ -370,7 +370,7 @@ pnpm test:coverage
 If local runs cause memory pressure:
 
 ```bash
-OPENCLAW_VITEST_MAX_WORKERS=1 pnpm test
+STEELENGINE_VITEST_MAX_WORKERS=1 pnpm test
 ```
 
 ## Related

@@ -11,5 +11,5 @@ export {
   WEBHOOK_IN_FLIGHT_DEFAULTS,
   WEBHOOK_RATE_LIMIT_DEFAULTS,
   type WebhookInFlightLimiter,
-} from "openclaw/plugin-sdk/webhook-ingress";
-export type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+} from "steelengine/plugin-sdk/webhook-ingress";
+export type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";

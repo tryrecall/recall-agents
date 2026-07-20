@@ -7,9 +7,9 @@ import {
   markMigrationItemError,
   MIGRATION_REASON_MISSING_SOURCE_OR_TARGET,
   MIGRATION_REASON_TARGET_EXISTS,
-} from "openclaw/plugin-sdk/migration";
-import type { MigrationItem } from "openclaw/plugin-sdk/plugin-entry";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/migration";
+import type { MigrationItem } from "steelengine/plugin-sdk/plugin-entry";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import { exists, readText, sanitizeName } from "./helpers.js";
 import type { ClaudeSource } from "./source.js";
 import type { PlannedTargets } from "./targets.js";

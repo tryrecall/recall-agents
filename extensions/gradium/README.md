@@ -1,12 +1,12 @@
-# OpenClaw Gradium Plugin
+# SteelEngine Gradium Plugin
 
-Official OpenClaw plugin for Gradium.
+Official SteelEngine plugin for Gradium.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/gradium-speech
-openclaw gateway restart
+steelengine plugins install @steelengine/gradium-speech
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/providers/gradium> for setup and configuration.
+See <https://docs.steelengine.ai/providers/gradium> for setup and configuration.

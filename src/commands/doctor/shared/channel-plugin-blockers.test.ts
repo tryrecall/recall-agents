@@ -1,8 +1,8 @@
 // Channel plugin blocker tests cover doctor diagnostics for blocked channel plugin setup.
 
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../../config/types.steelengine.js";
 import * as manifestRegistry from "../../../plugins/manifest-registry.js";
 import {
   channelPluginBlockerHitToHealthFinding,
@@ -177,7 +177,7 @@ describe("channel plugin blockers", () => {
           enabled: true,
         },
       },
-    } as OpenClawConfig);
+    } as SteelEngineConfig);
 
     expect(hits).toEqual([
       {
@@ -610,7 +610,7 @@ describe("channel plugin blockers", () => {
           origin: "bundled",
           channels: ["twitch"],
           channelEnvVars: {
-            twitch: ["OPENCLAW_TWITCH_ACCESS_TOKEN"],
+            twitch: ["STEELENGINE_TWITCH_ACCESS_TOKEN"],
           },
           enabledByDefault: false,
         },
@@ -619,7 +619,7 @@ describe("channel plugin blockers", () => {
     } as unknown as ReturnType<typeof manifestRegistry.loadPluginManifestRegistry>);
 
     const hits = scanConfiguredChannelPluginBlockers({}, {
-      OPENCLAW_TWITCH_ACCESS_TOKEN: "configured",
+      STEELENGINE_TWITCH_ACCESS_TOKEN: "configured",
     } as NodeJS.ProcessEnv);
 
     expect(hits).toEqual([
@@ -642,7 +642,7 @@ describe("channel plugin blockers", () => {
           origin: "bundled",
           channels: ["twitch"],
           channelEnvVars: {
-            twitch: ["OPENCLAW_TWITCH_ACCESS_TOKEN"],
+            twitch: ["STEELENGINE_TWITCH_ACCESS_TOKEN"],
           },
           enabledByDefault: false,
         },
@@ -657,7 +657,7 @@ describe("channel plugin blockers", () => {
         },
       },
       {
-        OPENCLAW_TWITCH_ACCESS_TOKEN: "configured",
+        STEELENGINE_TWITCH_ACCESS_TOKEN: "configured",
       } as NodeJS.ProcessEnv,
     );
 
@@ -826,7 +826,7 @@ describe("channel plugin blockers", () => {
       diagnostics: [],
     } as unknown as ReturnType<typeof manifestRegistry.loadPluginManifestRegistry>);
 
-    const sourceConfig: OpenClawConfig = {
+    const sourceConfig: SteelEngineConfig = {
       channels: {
         discord: {
           enabled: true,
@@ -867,7 +867,7 @@ describe("channel plugin blockers", () => {
       diagnostics: [],
     } as unknown as ReturnType<typeof manifestRegistry.loadPluginManifestRegistry>);
 
-    const sourceConfig: OpenClawConfig = {
+    const sourceConfig: SteelEngineConfig = {
       channels: {
         "workspace-chat": {
           enabled: true,
@@ -1168,7 +1168,7 @@ describe("channel plugin blockers", () => {
           enabledByDefault: true,
         },
         {
-          id: "openclaw-lark",
+          id: "steelengine-lark",
           origin: "config",
           channels: ["feishu"],
           enabledByDefault: false,
@@ -1190,7 +1190,7 @@ describe("channel plugin blockers", () => {
           feishu: {
             enabled: false,
           },
-          "openclaw-lark": {
+          "steelengine-lark": {
             enabled: true,
           },
         },
@@ -1217,7 +1217,7 @@ describe("channel plugin blockers", () => {
           enabledByDefault: true,
         },
         {
-          id: "openclaw-lark",
+          id: "steelengine-lark",
           origin: "config",
           channels: ["feishu"],
           enabledByDefault: false,
@@ -1258,7 +1258,7 @@ describe("channel plugin blockers", () => {
       },
       {
         channelId: "feishu",
-        pluginId: "openclaw-lark",
+        pluginId: "steelengine-lark",
         reason: "missing explicit enablement",
       },
     ]);

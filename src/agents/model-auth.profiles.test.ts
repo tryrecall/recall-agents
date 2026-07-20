@@ -2,11 +2,11 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import type { Model } from "openclaw/plugin-sdk/llm";
+import type { Model } from "steelengine/plugin-sdk/llm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { withEnvAsync } from "../test-utils/env.js";
-import { withOpenClawTestState } from "../test-utils/openclaw-test-state.js";
+import { withSteelEngineTestState } from "../test-utils/steelengine-test-state.js";
 import {
   clearRuntimeAuthProfileStoreSnapshots,
   ensureAuthProfileStore,
@@ -32,7 +32,7 @@ async function expectVertexAdcEnvApiKey(params: {
 }) {
   // Vertex ADC credentials are file evidence, not a raw API key. Tests create
   // a temporary credentials file and expect the non-secret marker to win.
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), params.tempPrefix ?? "openclaw-adc-"));
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), params.tempPrefix ?? "steelengine-adc-"));
   const credentialsPath = path.join(tempDir, "adc.json");
   await fs.writeFile(credentialsPath, params.credentialsJson, "utf8");
 
@@ -152,7 +152,7 @@ vi.mock("./model-auth-env-vars.js", () => {
     bedrock: "amazon-bedrock",
     "aws-bedrock": "amazon-bedrock",
   };
-  const resolveMockProviderAuthEvidence = (params?: { config?: OpenClawConfig }) => {
+  const resolveMockProviderAuthEvidence = (params?: { config?: SteelEngineConfig }) => {
     const evidence = {
       "google-vertex": [
         {
@@ -186,7 +186,7 @@ vi.mock("./model-auth-env-vars.js", () => {
   };
   return {
     listKnownProviderEnvApiKeyNames: () => [...new Set(Object.values(candidates).flat())],
-    resolveProviderEnvAuthLookupMaps: (params?: { config?: OpenClawConfig }) => ({
+    resolveProviderEnvAuthLookupMaps: (params?: { config?: SteelEngineConfig }) => ({
       aliasMap,
       envCandidateMap: candidates,
       authEvidenceMap: resolveMockProviderAuthEvidence(params),
@@ -370,7 +370,7 @@ function buildDemoLocalStore(keys: string[]) {
   };
 }
 
-function buildDemoLocalProviderCfg(apiKey: string): OpenClawConfig {
+function buildDemoLocalProviderCfg(apiKey: string): SteelEngineConfig {
   return {
     models: {
       providers: {
@@ -401,10 +401,10 @@ async function resolveDemoLocalApiKey(params: {
 
 describe("getApiKeyForModel", () => {
   it("reads oauth auth-profiles entries from auth-profiles.json via explicit profile", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-oauth-",
+        prefix: "steelengine-oauth-",
         agentEnv: "main",
       },
       async (state) => {
@@ -425,14 +425,14 @@ describe("getApiKeyForModel", () => {
           api: "openai-chatgpt-responses",
         } as Model;
 
-        const store = ensureAuthProfileStore(process.env.OPENCLAW_AGENT_DIR, {
+        const store = ensureAuthProfileStore(process.env.STEELENGINE_AGENT_DIR, {
           allowKeychainPrompt: false,
         });
         const apiKey = await getApiKeyForModel({
           model,
           profileId: "openai:default",
           store,
-          agentDir: process.env.OPENCLAW_AGENT_DIR,
+          agentDir: process.env.STEELENGINE_AGENT_DIR,
         });
         expect(apiKey.apiKey).toBe(oauthFixture.access);
       },
@@ -538,10 +538,10 @@ describe("getApiKeyForModel", () => {
   });
 
   it("uses the config default agent dir when resolving provider profiles", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-auth-agent-dir-",
+        prefix: "steelengine-auth-agent-dir-",
         agentEnv: "clear",
         env: {
           XAI_API_KEY: undefined,
@@ -575,7 +575,7 @@ describe("getApiKeyForModel", () => {
           "configured",
         );
 
-        const cfg: OpenClawConfig = {
+        const cfg: SteelEngineConfig = {
           agents: {
             list: [
               {
@@ -595,10 +595,10 @@ describe("getApiKeyForModel", () => {
   });
 
   it("reports the config default agent dir when provider auth is missing", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-auth-missing-agent-dir-",
+        prefix: "steelengine-auth-missing-agent-dir-",
         agentEnv: "clear",
         env: {
           XAI_API_KEY: undefined,
@@ -606,7 +606,7 @@ describe("getApiKeyForModel", () => {
       },
       async (state) => {
         const configuredAgentDir = state.agentDir("configured");
-        const cfg: OpenClawConfig = {
+        const cfg: SteelEngineConfig = {
           agents: {
             list: [
               {
@@ -626,10 +626,10 @@ describe("getApiKeyForModel", () => {
   });
 
   it("uses OpenAI OAuth when it is configured for the provider", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-auth-",
+        prefix: "steelengine-auth-",
         agentEnv: "main",
         env: {
           OPENAI_API_KEY: undefined,
@@ -667,10 +667,10 @@ describe("getApiKeyForModel", () => {
       expires: createUsableOAuthExpiry(),
     });
 
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-auth-scope-",
+        prefix: "steelengine-auth-scope-",
         agentEnv: "main",
         env: {
           OPENAI_API_KEY: undefined,
@@ -699,10 +699,10 @@ describe("getApiKeyForModel", () => {
       expires: createUsableOAuthExpiry(),
     });
 
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-auth-claude-cli-",
+        prefix: "steelengine-auth-claude-cli-",
         agentEnv: "main",
       },
       async () => {
@@ -774,7 +774,7 @@ describe("getApiKeyForModel", () => {
               "zai:default": {
                 type: "api_key",
                 provider: "zai",
-                key: "openclaw onboard --auth-choice zai-coding-global",
+                key: "steelengine onboard --auth-choice zai-coding-global",
               },
             },
           },
@@ -830,11 +830,11 @@ describe("getApiKeyForModel", () => {
   });
 
   it("uses trusted workspace manifest auth evidence in runtime auth checks", async () => {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-workspace-cloud-auth-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-workspace-cloud-auth-"));
     const credentialsPath = path.join(tempDir, "credentials.json");
     await fs.writeFile(credentialsPath, "{}", "utf8");
 
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       plugins: {
         allow: ["workspace-cloud"],
       },
@@ -869,7 +869,7 @@ describe("getApiKeyForModel", () => {
   });
 
   it("ignores untrusted workspace manifest auth evidence in runtime auth checks", async () => {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-workspace-cloud-auth-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-workspace-cloud-auth-"));
     const credentialsPath = path.join(tempDir, "credentials.json");
     await fs.writeFile(credentialsPath, "{}", "utf8");
 
@@ -891,7 +891,7 @@ describe("getApiKeyForModel", () => {
   });
 
   it("uses the same trusted workspace manifest auth evidence in provider auth checks", async () => {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-workspace-cloud-auth-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-workspace-cloud-auth-"));
     const credentialsPath = path.join(tempDir, "credentials.json");
     await fs.writeFile(credentialsPath, "{}", "utf8");
     const store = { version: 1 as const, profiles: {} };
@@ -935,12 +935,12 @@ describe("getApiKeyForModel", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     await expect(
       hasAuthForModelProvider({
         provider: "amazon-bedrock",
-        cfg: {} as OpenClawConfig,
+        cfg: {} as SteelEngineConfig,
         env: {},
         store,
       }),
@@ -1360,7 +1360,7 @@ describe("getApiKeyForModel", () => {
     await expectVertexAdcEnvApiKey({
       provider: "google-vertex",
       credentialsJson: "{}",
-      tempPrefix: "openclaw-google-adc-",
+      tempPrefix: "steelengine-google-adc-",
       env: {
         GOOGLE_CLOUD_LOCATION: "us-central1",
         GOOGLE_CLOUD_PROJECT: "vertex-project",
@@ -1369,7 +1369,7 @@ describe("getApiKeyForModel", () => {
   });
 
   it("resolveEnvApiKey('google-vertex') accepts Unicode explicit ADC credential paths", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-google-adc-unicode-"));
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-google-adc-unicode-"));
     const explicitDir = path.join(homeDir, "認証情報");
     const fallbackDir = path.join(homeDir, ".config", "gcloud");
     const explicitCredentialsPath = path.join(explicitDir, "adc.json");
@@ -1398,7 +1398,7 @@ describe("getApiKeyForModel", () => {
   });
 
   it("resolveEnvApiKey('google-vertex') accepts Unicode ADC fallback home paths", async () => {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-google-adc-home-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-google-adc-home-"));
     const homeDir = path.join(tempDir, "認証情報-home");
     const fallbackDir = path.join(homeDir, ".config", "gcloud");
     await fs.mkdir(fallbackDir, { recursive: true });
@@ -1423,7 +1423,7 @@ describe("getApiKeyForModel", () => {
   });
 
   it("resolveEnvApiKey('google-vertex') rejects GOOGLE_CLOUD_PROJECT_ID-only ADC auth evidence", async () => {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-google-adc-project-id-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-google-adc-project-id-"));
     const credentialsPath = path.join(tempDir, "adc.json");
     await fs.writeFile(credentialsPath, "{}", "utf8");
 
@@ -1441,7 +1441,7 @@ describe("getApiKeyForModel", () => {
   });
 
   it("resolveEnvApiKey('google-vertex') accepts Windows APPDATA ADC fallback evidence", async () => {
-    const appDataDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-google-adc-appdata-"));
+    const appDataDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-google-adc-appdata-"));
     const fallbackDir = path.join(appDataDir, "gcloud");
     await fs.mkdir(fallbackDir, { recursive: true });
     await fs.writeFile(
@@ -1465,9 +1465,9 @@ describe("getApiKeyForModel", () => {
   });
 
   it("resolveEnvApiKey('google-vertex') does not synthesize APPDATA from USERPROFILE", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-google-adc-home-"));
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-google-adc-home-"));
     const userProfileDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "openclaw-google-adc-userprofile-"),
+      path.join(os.tmpdir(), "steelengine-google-adc-userprofile-"),
     );
     const fallbackDir = path.join(userProfileDir, "AppData", "Roaming", "gcloud");
     await fs.mkdir(fallbackDir, { recursive: true });
@@ -1493,7 +1493,7 @@ describe("getApiKeyForModel", () => {
   });
 
   it("resolveEnvApiKey('google-vertex') keeps ADC fallback when manifest env candidates are empty", async () => {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-google-adc-candidates-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-google-adc-candidates-"));
     const credentialsPath = path.join(tempDir, "adc.json");
     await fs.writeFile(credentialsPath, "{}", "utf8");
 
@@ -1516,7 +1516,7 @@ describe("getApiKeyForModel", () => {
   });
 
   it("resolveEnvApiKey('google-vertex') rejects missing explicit ADC path before fallback paths", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-google-adc-home-"));
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-google-adc-home-"));
     const fallbackDir = path.join(homeDir, ".config", "gcloud");
     const missingCredentialsPath = path.join(homeDir, "missing-adc.json");
     await fs.mkdir(fallbackDir, { recursive: true });

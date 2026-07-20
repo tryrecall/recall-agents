@@ -19,12 +19,12 @@ describe("removed Workspaces state doctor check", () => {
   });
 
   it("previews and removes the stale plugin state directory", async () => {
-    root = await fs.mkdtemp(join(tmpdir(), "openclaw-workspaces-state-"));
+    root = await fs.mkdtemp(join(tmpdir(), "steelengine-workspaces-state-"));
     const staleDir = join(root, "workspaces");
     await fs.mkdir(join(staleDir, "assets"), { recursive: true });
     await fs.writeFile(join(staleDir, "workspaces.sqlite"), "stale", "utf8");
 
-    await withEnvAsync({ OPENCLAW_STATE_DIR: root }, async () => {
+    await withEnvAsync({ STEELENGINE_STATE_DIR: root }, async () => {
       const findings = await removedWorkspacesStateCheck.detect({
         mode: "lint",
         runtime,

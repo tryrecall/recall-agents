@@ -1,6 +1,6 @@
 // ClickClack tests cover token secret contract behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { createResolverContext } from "openclaw/plugin-sdk/secret-ref-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { createResolverContext } from "steelengine/plugin-sdk/secret-ref-runtime";
 import { describe, expect, it } from "vitest";
 import { collectRuntimeConfigAssignments, secretTargetRegistryEntries } from "./secret-contract.js";
 
@@ -27,7 +27,7 @@ describe("ClickClack secret contract", () => {
           },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const context = createResolverContext({ sourceConfig, env: {} });
 
     collectRuntimeConfigAssignments({

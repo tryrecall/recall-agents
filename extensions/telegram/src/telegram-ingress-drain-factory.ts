@@ -1,6 +1,6 @@
 // Telegram plugin module builds transport-shared durable ingress drains.
-import type { ChannelIngressDrain } from "openclaw/plugin-sdk/channel-outbound";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { ChannelIngressDrain } from "steelengine/plugin-sdk/channel-outbound";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import type { TelegramBotInfo } from "./bot-info.js";
 import type { TelegramMessageProcessingResult } from "./bot-processing-outcome.js";
 import {
@@ -17,7 +17,7 @@ type TelegramSpooledBot = {
 type CreateTelegramTransportIngressDrainParams = {
   spoolDir: string;
   bot: TelegramSpooledBot;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId: string;
   botInfo?: TelegramBotInfo;
   adoptionStallTimeoutMs?: number;

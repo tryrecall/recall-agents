@@ -38,7 +38,7 @@ changelog_required_for_changed_files() {
 }
 
 root_changelog_update_allowed_for_pr() {
-  case "${OPENCLAW_ALLOW_ROOT_CHANGELOG_PR:-}" in
+  case "${STEELENGINE_ALLOW_ROOT_CHANGELOG_PR:-}" in
     1|true|TRUE|yes|YES|on|ON)
       return 0
       ;;
@@ -151,7 +151,7 @@ pr_contributor_allows_human_trailers() {
   normalized=$(printf '%s' "$contrib" | tr '[:upper:]' '[:lower:]')
 
   case "$normalized" in
-    ""|"null"|"app/"*|"codex"|"openclaw"|"clawsweeper"|"openclaw-clawsweeper"|"clawsweeper[bot]"|"openclaw-clawsweeper[bot]"|"steipete")
+    ""|"null"|"app/"*|"codex"|"steelengine"|"clawsweeper"|"steelengine-clawsweeper"|"clawsweeper[bot]"|"steelengine-clawsweeper[bot]"|"steipete")
       return 1
       ;;
   esac

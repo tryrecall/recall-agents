@@ -2,7 +2,7 @@
 // reconciliation, commit hooks, and retry budget deferral.
 import fs from "node:fs/promises";
 import path from "node:path";
-import { MAX_DATE_TIMESTAMP_MS } from "@openclaw/normalization-core/number-coercion";
+import { MAX_DATE_TIMESTAMP_MS } from "@steelengine/normalization-core/number-coercion";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { controlNextRecoverySleep } from "../../../test/helpers/infra/delivery-recovery.js";
 import type { TrustedMessageAuditEvent } from "../../audit/message-audit-events.js";
@@ -15,8 +15,8 @@ import {
 } from "../../config/sessions/conversation-delivery-store.js";
 import { upsertSessionEntry } from "../../config/sessions/session-accessor.js";
 import { buildConversationRef } from "../../routing/conversation-ref.js";
-import { closeOpenClawAgentDatabasesForTest } from "../../state/openclaw-agent-db.js";
-import { openOpenClawStateDatabase } from "../../state/openclaw-state-db.js";
+import { closeSteelEngineAgentDatabasesForTest } from "../../state/steelengine-agent-db.js";
+import { openSteelEngineStateDatabase } from "../../state/steelengine-state-db.js";
 import {
   OutboundDeliveryError,
   PlatformMessageNotDispatchedError,
@@ -66,8 +66,8 @@ function expectMockMessageContaining(mock: { mock: { calls: unknown[][] } }, exp
 }
 
 function readOutboundQueueStatus(tmpDir: string, id: string): string | undefined {
-  const { db } = openOpenClawStateDatabase({
-    env: { ...process.env, OPENCLAW_STATE_DIR: tmpDir },
+  const { db } = openSteelEngineStateDatabase({
+    env: { ...process.env, STEELENGINE_STATE_DIR: tmpDir },
   });
   const row = db
     .prepare("SELECT status FROM delivery_queue_entries WHERE queue_name = 'outbound' AND id = ?")
@@ -217,7 +217,7 @@ describe("delivery-queue recovery", () => {
       });
       expect(await loadPendingDeliveries(tmpDir())).toHaveLength(0);
     } finally {
-      closeOpenClawAgentDatabasesForTest();
+      closeSteelEngineAgentDatabasesForTest();
     }
   });
 
@@ -280,7 +280,7 @@ describe("delivery-queue recovery", () => {
       );
       expect(await loadPendingDeliveries(tmpDir())).toHaveLength(0);
     } finally {
-      closeOpenClawAgentDatabasesForTest();
+      closeSteelEngineAgentDatabasesForTest();
     }
   });
 
@@ -344,7 +344,7 @@ describe("delivery-queue recovery", () => {
       });
       expect(await loadPendingDeliveries(tmpDir())).toHaveLength(0);
     } finally {
-      closeOpenClawAgentDatabasesForTest();
+      closeSteelEngineAgentDatabasesForTest();
     }
   });
 
@@ -585,7 +585,7 @@ describe("delivery-queue recovery", () => {
       expect(readOutboundQueueStatus(tmpDir(), id)).toBe("failed");
       expectMockMessageContaining(log.warn, "owner state could not be marked unknown");
     } finally {
-      closeOpenClawAgentDatabasesForTest();
+      closeSteelEngineAgentDatabasesForTest();
     }
   });
 

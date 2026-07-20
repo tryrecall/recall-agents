@@ -3,8 +3,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import type { Message } from "grammy/types";
-import type { ChannelReplayClaimHandle } from "openclaw/plugin-sdk/persistent-dedupe";
-import { resetPluginStateStoreForTests } from "openclaw/plugin-sdk/plugin-state-test-runtime";
+import type { ChannelReplayClaimHandle } from "steelengine/plugin-sdk/persistent-dedupe";
+import { resetPluginStateStoreForTests } from "steelengine/plugin-sdk/plugin-state-test-runtime";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   buildTelegramMessageDispatchAccountReplayKey,
@@ -23,7 +23,7 @@ const tempDirs: string[] = [];
 let previousStateDir: string | undefined;
 
 function createStateDir(): string {
-  const dir = mkdtempSync(path.join(tmpdir(), "openclaw-telegram-dispatch-dedupe-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "steelengine-telegram-dispatch-dedupe-"));
   tempDirs.push(dir);
   return dir;
 }
@@ -83,17 +83,17 @@ function createDeferred(): { promise: Promise<void>; resolve: () => void } {
 }
 
 beforeEach(() => {
-  previousStateDir = process.env.OPENCLAW_STATE_DIR;
-  process.env.OPENCLAW_STATE_DIR = createStateDir();
+  previousStateDir = process.env.STEELENGINE_STATE_DIR;
+  process.env.STEELENGINE_STATE_DIR = createStateDir();
   resetPluginStateStoreForTests({ closeDatabase: false });
 });
 
 afterEach(() => {
   resetPluginStateStoreForTests();
   if (previousStateDir === undefined) {
-    delete process.env.OPENCLAW_STATE_DIR;
+    delete process.env.STEELENGINE_STATE_DIR;
   } else {
-    process.env.OPENCLAW_STATE_DIR = previousStateDir;
+    process.env.STEELENGINE_STATE_DIR = previousStateDir;
   }
   for (const dir of tempDirs.splice(0)) {
     rmSync(dir, { recursive: true, force: true });

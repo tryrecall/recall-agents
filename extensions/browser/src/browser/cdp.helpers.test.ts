@@ -1,5 +1,5 @@
 // Browser tests cover cdp.helpers plugin behavior.
-import { MAX_TIMER_TIMEOUT_MS } from "openclaw/plugin-sdk/number-runtime";
+import { MAX_TIMER_TIMEOUT_MS } from "steelengine/plugin-sdk/number-runtime";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { resolveCdpReachabilityPolicy } from "./cdp-reachability-policy.js";
 import { resolveCdpReachabilityTimeouts } from "./cdp-timeouts.js";
@@ -12,8 +12,8 @@ const PROFILE_WS_REACHABILITY_MAX_TIMEOUT_MS = 2000;
 
 const fetchWithSsrFGuardMock = vi.hoisted(() => vi.fn());
 
-vi.mock("openclaw/plugin-sdk/ssrf-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/ssrf-runtime")>();
+vi.mock("steelengine/plugin-sdk/ssrf-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("steelengine/plugin-sdk/ssrf-runtime")>();
   return {
     ...actual,
     fetchWithSsrFGuard: (...args: unknown[]) => fetchWithSsrFGuardMock(...args),
@@ -210,7 +210,7 @@ describe("cdp helpers", () => {
     });
 
     await expect(
-      fetchOk("http://openclaw:relay-token@127.0.0.1:9222/json/version", 250),
+      fetchOk("http://steelengine:relay-token@127.0.0.1:9222/json/version", 250),
     ).resolves.toBeUndefined();
 
     const request = requireGuardedFetchRequest();
@@ -279,7 +279,7 @@ function createProfile(overrides: Partial<ResolvedBrowserProfile>): ResolvedBrow
     cdpHost: "172.29.128.1",
     cdpIsLoopback: false,
     color: "#123456",
-    driver: "openclaw",
+    driver: "steelengine",
     attachOnly: false,
     ...overrides,
     headless: overrides.headless ?? false,

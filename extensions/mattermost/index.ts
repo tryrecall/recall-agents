@@ -1,12 +1,12 @@
-// Mattermost plugin entrypoint registers its OpenClaw integration.
+// Mattermost plugin entrypoint registers its SteelEngine integration.
 import {
   defineBundledChannelEntry,
   loadBundledEntryExportSync,
-} from "openclaw/plugin-sdk/channel-entry-contract";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/channel-entry-contract";
+} from "steelengine/plugin-sdk/channel-entry-contract";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/channel-entry-contract";
 
-function registerSlashCommandRoute(api: OpenClawPluginApi): void {
-  const register = loadBundledEntryExportSync<(api: OpenClawPluginApi) => void>(import.meta.url, {
+function registerSlashCommandRoute(api: SteelEnginePluginApi): void {
+  const register = loadBundledEntryExportSync<(api: SteelEnginePluginApi) => void>(import.meta.url, {
     specifier: "./slash-route-api.js",
     exportName: "registerSlashCommandRoute",
   });

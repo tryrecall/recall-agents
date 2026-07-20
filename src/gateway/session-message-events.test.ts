@@ -16,7 +16,7 @@ import {
   persistSessionTranscriptTurn,
 } from "../config/sessions/session-accessor.js";
 import { appendAssistantMessageToSessionTranscript } from "../config/sessions/transcript.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   claimAgentRunContext,
   clearAgentRunContext,
@@ -78,7 +78,7 @@ afterEach(async () => {
 });
 
 async function createSessionStoreFile(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-session-message-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-session-message-"));
   cleanupDirs.push(dir);
   const storePath = path.join(dir, "sessions.json");
   testState.sessionStorePath = storePath;
@@ -637,14 +637,14 @@ describe("session.message websocket events", () => {
         message: {
           role: "user",
           content: [{ type: "text", text: "The agent cannot read this message." }],
-          __openclaw: {
+          __steelengine: {
             beforeAgentRunBlocked: { blockedBy: "policy-plugin", blockedAt: 1 },
           },
         },
       });
 
       const payload = messageEvent.payload as {
-        message?: { content?: unknown; __openclaw?: { beforeAgentRunBlocked?: unknown } };
+        message?: { content?: unknown; __steelengine?: { beforeAgentRunBlocked?: unknown } };
       };
       expect(payload.message?.content).toEqual([
         { type: "text", text: "The agent cannot read this message." },
@@ -675,7 +675,7 @@ describe("session.message websocket events", () => {
         message: {
           role: "user",
           content: [{ type: "text", text: "The agent cannot read this message." }],
-          __openclaw: {
+          __steelengine: {
             beforeAgentRunBlocked: {
               blockedBy: "policy-plugin",
               blockedAt: Date.now(),
@@ -689,7 +689,7 @@ describe("session.message websocket events", () => {
         message?: {
           role?: unknown;
           content?: unknown;
-          __openclaw?: { beforeAgentRunBlocked?: unknown };
+          __steelengine?: { beforeAgentRunBlocked?: unknown };
         };
       };
       expect(payload.message?.role).toBe("user");
@@ -737,7 +737,7 @@ describe("session.message websocket events", () => {
             messageSeq: 1,
             message: {
               role: "custom",
-              customType: "openclaw.runtime-context",
+              customType: "steelengine.runtime-context",
               content: "secret runtime context",
               display: false,
             },
@@ -939,7 +939,7 @@ describe("session.message websocket events", () => {
       });
       const payload = requireRecord(messageEvent.payload, "session.message payload");
       const message = requireRecord(payload.message, "session.message payload message");
-      expect((message["__openclaw"] as { seq?: unknown } | undefined)?.seq).toBe(7);
+      expect((message["__steelengine"] as { seq?: unknown } | undefined)?.seq).toBe(7);
     });
   });
 
@@ -1487,7 +1487,7 @@ describe("session.message websocket events", () => {
       },
       storePath,
     });
-    const config: OpenClawConfig = {
+    const config: SteelEngineConfig = {
       agents: { list: [{ id: "main", default: true }] },
       session: { mainKey: "main", store: storePath },
     };
@@ -1572,13 +1572,13 @@ describe("session.message websocket events", () => {
       expect(
         payloads.map((payload) => {
           const message = requireRecord(payload.message, "session.message payload message");
-          return requireRecord(message["__openclaw"], "session.message metadata").id;
+          return requireRecord(message["__steelengine"], "session.message metadata").id;
         }),
       ).toEqual(outcome.result.entryIds);
       expect(
         payloads.map((payload) => {
           const message = requireRecord(payload.message, "session.message payload message");
-          return requireRecord(message["__openclaw"], "session.message metadata").seq;
+          return requireRecord(message["__steelengine"], "session.message metadata").seq;
         }),
       ).toEqual([1, 2, 3]);
 

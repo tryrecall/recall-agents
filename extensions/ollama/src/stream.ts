@@ -1,7 +1,7 @@
 // Ollama plugin module implements stream behavior.
 import { randomUUID } from "node:crypto";
-import type { StreamFn } from "openclaw/plugin-sdk/agent-core";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import type { StreamFn } from "steelengine/plugin-sdk/agent-core";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 import type {
   AssistantMessage,
   StopReason,
@@ -10,33 +10,33 @@ import type {
   ToolCall,
   Tool,
   Usage,
-} from "openclaw/plugin-sdk/llm";
-import { createAssistantMessageEventStream, streamSimple } from "openclaw/plugin-sdk/llm";
+} from "steelengine/plugin-sdk/llm";
+import { createAssistantMessageEventStream, streamSimple } from "steelengine/plugin-sdk/llm";
 import type {
-  OpenClawConfig,
+  SteelEngineConfig,
   ProviderRuntimeModel,
   ProviderWrapStreamFnContext,
-} from "openclaw/plugin-sdk/plugin-entry";
-import { isNonSecretApiKeyMarker } from "openclaw/plugin-sdk/provider-auth";
-import { readResponseTextLimited } from "openclaw/plugin-sdk/provider-http";
+} from "steelengine/plugin-sdk/plugin-entry";
+import { isNonSecretApiKeyMarker } from "steelengine/plugin-sdk/provider-auth";
+import { readResponseTextLimited } from "steelengine/plugin-sdk/provider-http";
 import {
   DEFAULT_CONTEXT_TOKENS,
   normalizeProviderId,
-} from "openclaw/plugin-sdk/provider-model-shared";
+} from "steelengine/plugin-sdk/provider-model-shared";
 import {
   createMoonshotThinkingWrapper,
   createPlainTextToolCallCompatWrapper,
   resolveMoonshotThinkingType,
   streamWithPayloadPatch,
-} from "openclaw/plugin-sdk/provider-stream-shared";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/runtime-env";
-import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
+} from "steelengine/plugin-sdk/provider-stream-shared";
+import { createSubsystemLogger } from "steelengine/plugin-sdk/runtime-env";
+import { fetchWithSsrFGuard } from "steelengine/plugin-sdk/ssrf-runtime";
 import {
   isRecord,
   normalizeLowercaseStringOrEmpty,
   readStringValue,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import { OLLAMA_DEFAULT_BASE_URL } from "./defaults.js";
 import { shouldWrapOllamaCompatMoonshotThinking } from "./model-behavior.js";
 import { normalizeOllamaWireModelId } from "./model-id.js";
@@ -158,7 +158,7 @@ export function resolveOllamaBaseUrlForRun(params: {
 }
 
 export function resolveConfiguredOllamaProviderConfig(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   providerId?: string;
 }) {
   const providerId = params.providerId?.trim();
@@ -218,7 +218,7 @@ export function isOllamaCompatProvider(model: {
 }
 
 export function resolveOllamaCompatNumCtxEnabled(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   providerId?: string;
 }): boolean {
   return resolveConfiguredOllamaProviderConfig(params)?.injectNumCtxForOpenAICompat ?? true;
@@ -226,7 +226,7 @@ export function resolveOllamaCompatNumCtxEnabled(params: {
 
 export function shouldInjectOllamaCompatNumCtx(params: {
   model: { api?: string; provider?: string; baseUrl?: string };
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   providerId?: string;
 }): boolean {
   if (params.model.api !== "openai-completions") {

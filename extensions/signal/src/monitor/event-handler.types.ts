@@ -1,13 +1,13 @@
 // Signal type declarations define plugin contracts.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import type {
   DmPolicy,
   GroupPolicy,
   SignalReactionNotificationMode,
-} from "openclaw/plugin-sdk/config-contracts";
-import type { HistoryEntry } from "openclaw/plugin-sdk/reply-history";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/config-contracts";
+import type { HistoryEntry } from "steelengine/plugin-sdk/reply-history";
+import type { ReplyPayload } from "steelengine/plugin-sdk/reply-runtime";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
 import type { SignalSender } from "../identity.js";
 
 export type SignalEnvelope = {
@@ -93,7 +93,7 @@ export type SignalEventHandlerDeps = {
   runtime: RuntimeEnv;
   abortSignal?: AbortSignal;
   runTrackedTask?: (task: () => Promise<void>) => void;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   baseUrl: string;
   account?: string;
   accountUuid?: string;
@@ -121,7 +121,7 @@ export type SignalEventHandlerDeps = {
     maxBytes: number;
   }) => Promise<{ path: string; contentType?: string } | null>;
   deliverReplies: (params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     replies: ReplyPayload[];
     target: string;
     baseUrl: string;

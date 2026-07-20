@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/memory-core-host-engine-foundation";
-import type { ResolvedQmdConfig } from "openclaw/plugin-sdk/memory-core-host-engine-storage";
-import type { PluginStateLeaseContext } from "openclaw/plugin-sdk/plugin-state-runtime";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { createSubsystemLogger } from "steelengine/plugin-sdk/memory-core-host-engine-foundation";
+import type { ResolvedQmdConfig } from "steelengine/plugin-sdk/memory-core-host-engine-storage";
+import type { PluginStateLeaseContext } from "steelengine/plugin-sdk/plugin-state-runtime";
 import {
   canMigrateLegacyQmdCollection,
   deriveLegacyQmdCollectionName,

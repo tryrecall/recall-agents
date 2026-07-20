@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
 import { root, type Root } from "@openclaw/fs-safe";
-import { runOpenClawStateWriteTransaction } from "../state/openclaw-state-db.js";
+import { runSteelEngineStateWriteTransaction } from "../state/steelengine-state-db.js";
 import { formatErrorMessage } from "./errors.js";
 import { acquireGatewayLock, GatewayLockError } from "./gateway-lock.js";
 import {
@@ -285,7 +285,7 @@ function migrateIntoDatabase(params: {
 }): { importedSubscriptions: number; importedVapidKeys: boolean } {
   let importedSubscriptions = 0;
   let importedVapidKeys = false;
-  runOpenClawStateWriteTransaction(
+  runSteelEngineStateWriteTransaction(
     ({ db }) => {
       const webPushDb = getNodeSqliteKysely<WebPushDatabase>(db);
       const expectedSubscriptions = new Map<string, WebPushSubscription>();
@@ -380,7 +380,7 @@ function migrateIntoDatabase(params: {
         }
       }
     },
-    { env: { ...process.env, OPENCLAW_STATE_DIR: params.stateDir } },
+    { env: { ...process.env, STEELENGINE_STATE_DIR: params.stateDir } },
   );
   return { importedSubscriptions, importedVapidKeys };
 }
@@ -576,7 +576,7 @@ export async function migrateLegacyWebPush(params: {
     return { changes: [], warnings: [] };
   }
 
-  const env = { ...(params.env ?? process.env), OPENCLAW_STATE_DIR: params.stateDir };
+  const env = { ...(params.env ?? process.env), STEELENGINE_STATE_DIR: params.stateDir };
   let lock: Awaited<ReturnType<typeof acquireGatewayLock>>;
   try {
     lock = await acquireGatewayLock({
@@ -594,7 +594,7 @@ export async function migrateLegacyWebPush(params: {
     return {
       changes: [],
       warnings: [
-        `Failed migrating legacy Web Push state: ${detail}. Stop the Gateway and run \`openclaw doctor --fix\` again.`,
+        `Failed migrating legacy Web Push state: ${detail}. Stop the Gateway and run \`steelengine doctor --fix\` again.`,
       ],
     };
   }

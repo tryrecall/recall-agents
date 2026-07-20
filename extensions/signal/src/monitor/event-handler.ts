@@ -1,6 +1,6 @@
 // Signal plugin module implements event handler behavior.
 import { setTimeout as sleep } from "node:timers/promises";
-import { resolveHumanDelayConfig } from "openclaw/plugin-sdk/agent-runtime";
+import { resolveHumanDelayConfig } from "steelengine/plugin-sdk/agent-runtime";
 import {
   createStatusReactionController,
   DEFAULT_EMOJIS,
@@ -11,7 +11,7 @@ import {
   shouldAckReaction,
   type StatusReactionController,
   type StatusReactionEmojis,
-} from "openclaw/plugin-sdk/channel-feedback";
+} from "steelengine/plugin-sdk/channel-feedback";
 import {
   buildMentionRegexes,
   buildChannelInboundEventContext,
@@ -27,38 +27,38 @@ import {
   runChannelInboundEvent,
   shouldDebounceTextInbound,
   type ChannelInboundTurnPlan,
-} from "openclaw/plugin-sdk/channel-inbound";
+} from "steelengine/plugin-sdk/channel-inbound";
 import {
   bindIngressLifecycleToReplyOptions,
   createChannelMessageReplyPipeline,
-} from "openclaw/plugin-sdk/channel-outbound";
+} from "steelengine/plugin-sdk/channel-outbound";
 import {
   resolveChannelGroupPolicy,
   resolveChannelGroupRequireMention,
-} from "openclaw/plugin-sdk/channel-policy";
-import { isControlCommandMessage } from "openclaw/plugin-sdk/command-detection";
-import { collectErrorGraphCandidates, formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+} from "steelengine/plugin-sdk/channel-policy";
+import { isControlCommandMessage } from "steelengine/plugin-sdk/command-detection";
+import { collectErrorGraphCandidates, formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 import {
   createInternalHookEvent,
   fireAndForgetHook,
   toInternalMessageReceivedContext,
   triggerInternalHook,
-} from "openclaw/plugin-sdk/hook-runtime";
-import { kindFromMime } from "openclaw/plugin-sdk/media-runtime";
-import { createChannelHistoryWindow } from "openclaw/plugin-sdk/reply-history";
-import { resolveBatchedReplyThreadingPolicy } from "openclaw/plugin-sdk/reply-reference";
-import { resolveAgentRoute, resolveInboundLastRouteSessionKey } from "openclaw/plugin-sdk/routing";
+} from "steelengine/plugin-sdk/hook-runtime";
+import { kindFromMime } from "steelengine/plugin-sdk/media-runtime";
+import { createChannelHistoryWindow } from "steelengine/plugin-sdk/reply-history";
+import { resolveBatchedReplyThreadingPolicy } from "steelengine/plugin-sdk/reply-reference";
+import { resolveAgentRoute, resolveInboundLastRouteSessionKey } from "steelengine/plugin-sdk/routing";
 import {
   danger,
   logVerbose,
   shouldLogVerbose,
   sleep as delay,
-} from "openclaw/plugin-sdk/runtime-env";
-import { resolvePinnedMainDmOwnerFromAllowlist } from "openclaw/plugin-sdk/security-runtime";
-import { readSessionUpdatedAt, resolveStorePath } from "openclaw/plugin-sdk/session-store-runtime";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { enqueueSystemEvent } from "openclaw/plugin-sdk/system-event-runtime";
-import { normalizeE164, truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/runtime-env";
+import { resolvePinnedMainDmOwnerFromAllowlist } from "steelengine/plugin-sdk/security-runtime";
+import { readSessionUpdatedAt, resolveStorePath } from "steelengine/plugin-sdk/session-store-runtime";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { enqueueSystemEvent } from "steelengine/plugin-sdk/system-event-runtime";
+import { normalizeE164, truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import { resolveSignalReplyToMode } from "../accounts.js";
 import {
   maybeResolveSignalApprovalReaction,

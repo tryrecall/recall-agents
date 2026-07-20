@@ -32,7 +32,7 @@ export const SessionCatalogSessionSchema = closedObject({
   cliVersion: Type.Optional(Type.String()),
   gitBranch: Type.Optional(Type.String()),
   archived: Type.Boolean(),
-  openClawSessionKey: Type.Optional(NonEmptyString),
+  steelEngineSessionKey: Type.Optional(NonEmptyString),
   canContinue: Type.Boolean(),
   canArchive: Type.Boolean(),
   canOpenTerminal: Type.Optional(Type.Boolean()),

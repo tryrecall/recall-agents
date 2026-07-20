@@ -1,11 +1,11 @@
-# OpenClaw Discord
+# SteelEngine Discord
 
-Official OpenClaw channel plugin for Discord servers, channels, DMs, slash commands, and app events.
+Official SteelEngine channel plugin for Discord servers, channels, DMs, slash commands, and app events.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugin add @openclaw/discord
+steelengine plugin add @steelengine/discord
 ```
 
-Configure a Discord bot token and the channels or servers OpenClaw should handle. The plugin lets OpenClaw agents receive Discord messages and respond through the configured Discord app.
+Configure a Discord bot token and the channels or servers SteelEngine should handle. The plugin lets SteelEngine agents receive Discord messages and respond through the configured Discord app.

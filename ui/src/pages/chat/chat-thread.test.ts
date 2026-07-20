@@ -1,5 +1,5 @@
 // Control UI tests cover build chat items behavior.
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { describe, expect, it } from "vitest";
 import type { MessageGroup } from "../../lib/chat/chat-types.ts";
 import { extractToolCardsCached as extractToolCards } from "../../lib/chat/tool-cards.ts";
@@ -19,7 +19,7 @@ type WorkGroupItem = Extract<
 >;
 
 const SENDER_METADATA_BLOCK =
-  'Sender (untrusted metadata):\n```json\n{"label":"openclaw-control-ui","id":"openclaw-control-ui"}\n```';
+  'Sender (untrusted metadata):\n```json\n{"label":"steelengine-control-ui","id":"steelengine-control-ui"}\n```';
 
 function createProps(overrides: Partial<CachedChatItemsProps> = {}): CachedChatItemsProps {
   return {
@@ -188,7 +188,7 @@ describe("collapseCompletedTurnWork", () => {
           role: "system",
           content: "",
           timestamp: 3_000,
-          __openclaw: { kind: "compaction", id: "c1" },
+          __steelengine: { kind: "compaction", id: "c1" },
         },
         { role: "assistant", content: "Done.", timestamp: 4_000 },
       ],
@@ -264,23 +264,23 @@ describe("collapseCompletedTurnWork", () => {
       messages: [
         {
           ...toolResult("call-1", 1_000),
-          __openclaw: { id: "work-1", seq: 1, turnBoundary: true },
+          __steelengine: { id: "work-1", seq: 1, turnBoundary: true },
         },
         {
           role: "assistant",
           content: "First run done.",
           timestamp: 3_000,
-          __openclaw: { id: "reply-1", seq: 2 },
+          __steelengine: { id: "reply-1", seq: 2 },
         },
         {
           ...toolResult("call-2", 4_000),
-          __openclaw: { id: "work-2", seq: 3, turnBoundary: true },
+          __steelengine: { id: "work-2", seq: 3, turnBoundary: true },
         },
         {
           role: "assistant",
           content: "Second run done.",
           timestamp: 9_000,
-          __openclaw: { id: "reply-2", seq: 4 },
+          __steelengine: { id: "reply-2", seq: 4 },
         },
       ],
     });
@@ -293,7 +293,7 @@ describe("collapseCompletedTurnWork", () => {
   it("keeps a completed-work row keyed to its final reply as older work is prepended", () => {
     resetChatThreadState();
     const finalReply = {
-      __openclaw: { id: "final-reply", seq: 3 },
+      __steelengine: { id: "final-reply", seq: 3 },
       role: "assistant",
       content: "Done.",
       timestamp: 3_000,
@@ -306,7 +306,7 @@ describe("collapseCompletedTurnWork", () => {
     const prepended = collapsedItems({
       messages: [
         {
-          __openclaw: { id: "older-commentary", seq: 1 },
+          __steelengine: { id: "older-commentary", seq: 1 },
           role: "assistant",
           content: "Checking.",
           timestamp: 1_000,
@@ -329,7 +329,7 @@ describe("buildCachedChatItems row identity", () => {
       messageGroups({
         messages: [
           {
-            __openclaw: { id: "terminal-message" },
+            __steelengine: { id: "terminal-message" },
             role: "assistant",
             content: "Draft reply",
             timestamp: 1,
@@ -342,7 +342,7 @@ describe("buildCachedChatItems row identity", () => {
       messageGroups({
         messages: [
           {
-            __openclaw: { id: "terminal-message", seq: 42 },
+            __steelengine: { id: "terminal-message", seq: 42 },
             role: "assistant",
             content: "Final reply",
             timestamp: 2,
@@ -361,7 +361,7 @@ describe("buildCachedChatItems row identity", () => {
       messageGroups({
         messages: [
           {
-            __openclaw: { id: "tool-message" },
+            __steelengine: { id: "tool-message" },
             role: "assistant",
             toolCallId: "call-1",
             content: "Running",
@@ -375,7 +375,7 @@ describe("buildCachedChatItems row identity", () => {
       messageGroups({
         messages: [
           {
-            __openclaw: { id: "tool-message", seq: 43 },
+            __steelengine: { id: "tool-message", seq: 43 },
             role: "assistant",
             toolCallId: "call-1",
             content: "Finished",
@@ -392,13 +392,13 @@ describe("buildCachedChatItems row identity", () => {
   it("preserves a same-role group key as messages are prepended and appended", () => {
     resetChatThreadState();
     const first = {
-      __openclaw: { id: "assistant-1", seq: 2 },
+      __steelengine: { id: "assistant-1", seq: 2 },
       role: "assistant",
       content: "First",
       timestamp: 2,
     };
     const second = {
-      __openclaw: { id: "assistant-2", seq: 3 },
+      __steelengine: { id: "assistant-2", seq: 3 },
       role: "assistant",
       content: "Second",
       timestamp: 3,
@@ -408,7 +408,7 @@ describe("buildCachedChatItems row identity", () => {
       messageGroups({
         messages: [
           {
-            __openclaw: { id: "assistant-0", seq: 1 },
+            __steelengine: { id: "assistant-0", seq: 1 },
             role: "assistant",
             content: "Earlier",
             timestamp: 1,
@@ -424,7 +424,7 @@ describe("buildCachedChatItems row identity", () => {
         messages: [
           ...prepended.messages.map((entry) => entry.message),
           {
-            __openclaw: { id: "assistant-3", seq: 4 },
+            __steelengine: { id: "assistant-3", seq: 4 },
             role: "assistant",
             content: "Later",
             timestamp: 4,
@@ -442,13 +442,13 @@ describe("buildCachedChatItems row identity", () => {
     const groups = messageGroups({
       messages: [
         {
-          __openclaw: { id: "assistant-1", seq: 1 },
+          __steelengine: { id: "assistant-1", seq: 1 },
           role: "assistant",
           content: "First run",
           timestamp: 1,
         },
         {
-          __openclaw: { id: "assistant-2", seq: 2, turnBoundary: true },
+          __steelengine: { id: "assistant-2", seq: 2, turnBoundary: true },
           role: "assistant",
           content: "Second run",
           timestamp: 2,
@@ -464,14 +464,14 @@ describe("buildCachedChatItems row identity", () => {
   it("does not reclaim a group key naturally owned by another reordered group", () => {
     resetChatThreadState();
     const first = {
-      __openclaw: { id: "first", seq: 1 },
+      __steelengine: { id: "first", seq: 1 },
       role: "user",
       senderLabel: "same",
       content: "First",
       timestamp: 1,
     };
     const second = {
-      __openclaw: { id: "second", seq: 2 },
+      __steelengine: { id: "second", seq: 2 },
       role: "user",
       senderLabel: "same",
       content: "Second",
@@ -491,13 +491,13 @@ describe("buildCachedChatItems row identity", () => {
     resetChatThreadState();
     const siblings = [
       {
-        __openclaw: { seq: 2 },
+        __steelengine: { seq: 2 },
         role: "assistant",
         content: "First projection",
         timestamp: 2,
       },
       {
-        __openclaw: { seq: 2 },
+        __steelengine: { seq: 2 },
         role: "assistant",
         content: "Second projection",
         timestamp: 2,
@@ -508,19 +508,19 @@ describe("buildCachedChatItems row identity", () => {
       messageGroups({
         messages: [
           {
-            __openclaw: { id: "older-user", seq: 1 },
+            __steelengine: { id: "older-user", seq: 1 },
             role: "user",
             content: "Earlier",
             timestamp: 1,
           },
           {
-            __openclaw: { seq: 2 },
+            __steelengine: { seq: 2 },
             role: "assistant",
             content: "Earlier projection from the same record",
             timestamp: 2,
           },
           ...siblings.map((message) => ({
-            __openclaw: { seq: message["__openclaw"].seq },
+            __steelengine: { seq: message["__steelengine"].seq },
             role: message.role,
             content: message.content,
             timestamp: message.timestamp,
@@ -547,9 +547,9 @@ describe("buildCachedChatItems working spark", () => {
     toolCallId: "tool-1",
     content: [{ type: "toolcall", name: "exec", arguments: {} }],
     timestamp: 1_000,
-    __openclawToolStreamLive: true,
-    __openclawToolStreamResultReceived: resultReceived,
-    __openclawToolStreamReceivedAt: 1_000,
+    __steelengineToolStreamLive: true,
+    __steelengineToolStreamResultReceived: resultReceived,
+    __steelengineToolStreamReceivedAt: 1_000,
   });
 
   it("shows the spark while a run works with nothing streaming", () => {
@@ -831,7 +831,7 @@ describe("buildCachedChatItems", () => {
               type: "tool_use",
               id: "call-shell",
               name: "bash",
-              input: { command: "run openclaw doctor" },
+              input: { command: "run steelengine doctor" },
             },
           ],
           timestamp: 1000,
@@ -1262,18 +1262,18 @@ describe("buildCachedChatItems", () => {
     ]);
   });
 
-  it("deduplicates relay-labeled assistant copies by OpenClaw transcript metadata id", () => {
+  it("deduplicates relay-labeled assistant copies by SteelEngine transcript metadata id", () => {
     const groups = messageGroups({
       messages: [
         {
-          __openclaw: { id: "reply-3" },
+          __steelengine: { id: "reply-3" },
           role: "assistant",
           content: [{ type: "text", text: "Parzival On it." }],
           senderLabel: "Parzival",
           timestamp: 1,
         },
         {
-          __openclaw: { id: "reply-3" },
+          __steelengine: { id: "reply-3" },
           role: "assistant",
           content: [{ type: "text", text: "On it." }],
           timestamp: 2,
@@ -1289,12 +1289,12 @@ describe("buildCachedChatItems", () => {
     ]);
   });
 
-  it("deduplicates relay-labeled assistant copies by OpenClaw metadata before surface ids", () => {
+  it("deduplicates relay-labeled assistant copies by SteelEngine metadata before surface ids", () => {
     const groups = messageGroups({
       messages: [
         {
           id: "relay-surface-copy",
-          __openclaw: { id: "reply-4" },
+          __steelengine: { id: "reply-4" },
           role: "assistant",
           content: [{ type: "text", text: "Parzival Ship it." }],
           senderLabel: "Parzival",
@@ -1302,7 +1302,7 @@ describe("buildCachedChatItems", () => {
         },
         {
           id: "native-surface-copy",
-          __openclaw: { id: "reply-4" },
+          __steelengine: { id: "reply-4" },
           role: "assistant",
           content: [{ type: "text", text: "Ship it." }],
           timestamp: 2,
@@ -1322,13 +1322,13 @@ describe("buildCachedChatItems", () => {
     const groups = messageGroups({
       messages: [
         {
-          __openclaw: { id: "reply-5" },
+          __steelengine: { id: "reply-5" },
           role: "assistant",
           content: [{ type: "text", text: "Draft one" }],
           timestamp: 1,
         },
         {
-          __openclaw: { id: "reply-5" },
+          __steelengine: { id: "reply-5" },
           role: "assistant",
           content: [{ type: "text", text: "Draft two" }],
           timestamp: 2,
@@ -1350,14 +1350,14 @@ describe("buildCachedChatItems", () => {
     const groups = messageGroups({
       messages: [
         {
-          __openclaw: { id: "reply-formatted" },
+          __steelengine: { id: "reply-formatted" },
           role: "assistant",
           content: [{ type: "text", text: "Parzival first\n\nsecond" }],
           senderLabel: "Parzival",
           timestamp: 1,
         },
         {
-          __openclaw: { id: "reply-formatted" },
+          __steelengine: { id: "reply-formatted" },
           role: "assistant",
           content: [{ type: "text", text: "first second" }],
           timestamp: 2,
@@ -1378,14 +1378,14 @@ describe("buildCachedChatItems", () => {
     const groups = messageGroups({
       messages: [
         {
-          __openclaw: { id: "reply-case-change" },
+          __steelengine: { id: "reply-case-change" },
           role: "assistant",
           content: [{ type: "text", text: "PARZIVAL answer" }],
           senderLabel: "Parzival",
           timestamp: 1,
         },
         {
-          __openclaw: { id: "reply-case-change" },
+          __steelengine: { id: "reply-case-change" },
           role: "assistant",
           content: [{ type: "text", text: "answer" }],
           timestamp: 2,
@@ -1406,14 +1406,14 @@ describe("buildCachedChatItems", () => {
     const groups = messageGroups({
       messages: [
         {
-          __openclaw: { id: "reply-6" },
+          __steelengine: { id: "reply-6" },
           role: "assistant",
           content: [{ type: "text", text: "Parzival Draft one" }],
           senderLabel: "Parzival",
           timestamp: 1,
         },
         {
-          __openclaw: { id: "reply-6" },
+          __steelengine: { id: "reply-6" },
           role: "assistant",
           content: [{ type: "text", text: "Parzival Draft two" }],
           senderLabel: "Parzival",
@@ -1463,14 +1463,14 @@ describe("buildCachedChatItems", () => {
     const groups = messageGroups({
       messages: [
         {
-          __openclaw: { id: "user-1" },
+          __steelengine: { id: "user-1" },
           role: "user",
           content: [{ type: "text", text: "Alice hello" }],
           senderLabel: "Alice",
           timestamp: 1,
         },
         {
-          __openclaw: { id: "user-1" },
+          __steelengine: { id: "user-1" },
           role: "user",
           content: [{ type: "text", text: "hello" }],
           timestamp: 2,
@@ -1783,7 +1783,7 @@ describe("buildCachedChatItems", () => {
         {
           role: "user",
           content: SENDER_METADATA_BLOCK,
-          senderLabel: "openclaw-control-ui",
+          senderLabel: "steelengine-control-ui",
           timestamp: 1,
         },
       ],
@@ -2168,7 +2168,7 @@ describe("buildCachedChatItems", () => {
             view: {
               backend: "canvas",
               id: "cv_nearest_turn",
-              url: "/__openclaw__/canvas/documents/cv_nearest_turn/index.html",
+              url: "/__steelengine__/canvas/documents/cv_nearest_turn/index.html",
               title: "Nearest turn demo",
               preferred_height: 320,
             },
@@ -2238,7 +2238,7 @@ describe("buildCachedChatItems", () => {
             view: {
               backend: "canvas",
               id: "cv_empty_anchor",
-              url: "/__openclaw__/canvas/documents/cv_empty_anchor/index.html",
+              url: "/__steelengine__/canvas/documents/cv_empty_anchor/index.html",
               title: "Empty anchor demo",
               preferred_height: 320,
             },
@@ -2422,7 +2422,7 @@ describe("buildCachedChatItems", () => {
               view: {
                 backend: "canvas",
                 id: "cv_generic_inline",
-                url: "/__openclaw__/canvas/documents/cv_generic_inline/index.html",
+                url: "/__steelengine__/canvas/documents/cv_generic_inline/index.html",
                 title: "Inline generic preview",
                 preferred_height: 420,
               },
@@ -2466,7 +2466,7 @@ describe("buildCachedChatItems", () => {
                 view: {
                   backend: "canvas",
                   id: "cv_streamed_artifact",
-                  url: "/__openclaw__/canvas/documents/cv_streamed_artifact/index.html",
+                  url: "/__steelengine__/canvas/documents/cv_streamed_artifact/index.html",
                   title: "Streamed demo",
                   preferred_height: 320,
                 },
@@ -2498,7 +2498,7 @@ describe("buildCachedChatItems", () => {
           {
             role: "system",
             timestamp: 2_000,
-            __openclaw: {
+            __steelengine: {
               kind: "compaction",
               id: "checkpoint-1",
             },
@@ -2526,7 +2526,7 @@ describe("buildCachedChatItems", () => {
           {
             role: "system",
             timestamp: 2_000,
-            __openclaw: {
+            __steelengine: {
               kind: "compaction",
               id: "checkpoint-with-metrics",
               tokensBefore: 900_000,
@@ -2720,7 +2720,7 @@ function createAssistantCanvasBlock(params: { suffix: string }) {
       render: "url",
       viewId,
       title: "Inline demo",
-      url: `/__openclaw__/canvas/documents/${viewId}/index.html`,
+      url: `/__steelengine__/canvas/documents/${viewId}/index.html`,
       preferredHeight: 360,
     },
   };
@@ -2766,8 +2766,8 @@ function mcpAppLiveResult(viewId: string, toolCallId: string, timestamp: number 
       },
     ],
     ...(timestamp == null ? {} : { timestamp }),
-    __openclawToolStreamLive: true,
-    __openclawToolStreamResultReceived: true,
+    __steelengineToolStreamLive: true,
+    __steelengineToolStreamResultReceived: true,
   };
 }
 

@@ -2,11 +2,11 @@
 import { realpathSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import {
-  readOpenClawManagedNpmRootOverrides,
+  readSteelEngineManagedNpmRootOverrides,
   syncManagedNpmRootPeerDependencies,
 } from "../infra/npm-managed-root.js";
 import { createSafeNpmInstallEnv } from "../infra/safe-package-install.js";
@@ -17,7 +17,7 @@ import {
   resolvePluginInstallDir,
   resolvePluginNpmProjectsDir,
 } from "./install-paths.js";
-import { relinkOpenClawPeerDependenciesInManagedNpmRoot } from "./plugin-peer-link.js";
+import { relinkSteelEnginePeerDependenciesInManagedNpmRoot } from "./plugin-peer-link.js";
 import { defaultSlotIdForKey, resetPluginSlotsToDefaults } from "./slots.js";
 
 type UninstallActions = {
@@ -108,7 +108,7 @@ export type PluginUninstallDirectoryRemoval = {
 type PluginUninstallPlanResult =
   | {
       ok: true;
-      config: OpenClawConfig;
+      config: SteelEngineConfig;
       pluginId: string;
       actions: UninstallActions;
       directoryRemoval: PluginUninstallDirectoryRemoval | null;
@@ -370,10 +370,10 @@ function isPathInsideOrEqual(parent: string, child: string): boolean {
  * and owned channel config.
  */
 export function removePluginFromConfig(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   pluginId: string,
   opts?: { channelIds?: string[] },
-): { config: OpenClawConfig; actions: Omit<UninstallActions, "directory"> } {
+): { config: SteelEngineConfig; actions: Omit<UninstallActions, "directory"> } {
   const actions = createEmptyConfigUninstallActions();
 
   const pluginsConfig = cfg.plugins ?? {};
@@ -495,17 +495,17 @@ export function removePluginFromConfig(
     }
   }
 
-  const config: OpenClawConfig = {
+  const config: SteelEngineConfig = {
     ...cfg,
     plugins: Object.keys(cleanedPlugins).length > 0 ? cleanedPlugins : undefined,
-    channels: channels as OpenClawConfig["channels"],
+    channels: channels as SteelEngineConfig["channels"],
   };
 
   return { config, actions };
 }
 
 type UninstallPluginParams = {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   pluginId: string;
   channelIds?: string[];
   deleteFiles?: boolean;
@@ -657,7 +657,7 @@ export async function applyPluginUninstallDirectoryRemoval(
       );
     }
     try {
-      const managedOverrides = await readOpenClawManagedNpmRootOverrides();
+      const managedOverrides = await readSteelEngineManagedNpmRootOverrides();
       const syncedPeerDependencies = await syncManagedNpmRootPeerDependencies({
         npmRoot: removal.cleanup.npmRoot,
         managedOverrides,
@@ -702,7 +702,7 @@ export async function applyPluginUninstallDirectoryRemoval(
       );
     }
     try {
-      await relinkOpenClawPeerDependenciesInManagedNpmRoot({
+      await relinkSteelEnginePeerDependenciesInManagedNpmRoot({
         npmRoot: removal.cleanup.npmRoot,
         logger: {
           warn: (message) => warnings.push(message),

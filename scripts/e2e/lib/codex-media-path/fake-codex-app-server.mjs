@@ -6,8 +6,8 @@ import {
 } from "../codex-app-server-fixture.mjs";
 
 const requestLog =
-  process.env.OPENCLAW_CODEX_MEDIA_PATH_APP_SERVER_LOG ??
-  "/tmp/openclaw-codex-media-path-app-server.jsonl";
+  process.env.STEELENGINE_CODEX_MEDIA_PATH_APP_SERVER_LOG ??
+  "/tmp/steelengine-codex-media-path-app-server.jsonl";
 let turnCount = 0;
 
 runFakeCodexAppServer({
@@ -16,9 +16,9 @@ runFakeCodexAppServer({
     initialize: ({ sendResult }) =>
       sendResult(
         createFakeInitializeResponse({
-          name: "openclaw-codex-media-path-e2e",
+          name: "steelengine-codex-media-path-e2e",
           version: "0.125.0",
-          userAgent: "openclaw-codex-media-path-e2e/0.125.0 (Docker; test)",
+          userAgent: "steelengine-codex-media-path-e2e/0.125.0 (Docker; test)",
         }),
       ),
     "thread/start": ({ params, sendResult }) =>

@@ -1,9 +1,9 @@
 // Interactive grouped auth-choice prompt used by onboarding and agent setup.
-import { normalizeProviderId } from "@openclaw/model-catalog-core/provider-id";
-import { expectDefined } from "@openclaw/normalization-core";
+import { normalizeProviderId } from "@steelengine/model-catalog-core/provider-id";
+import { expectDefined } from "@steelengine/normalization-core";
 import type { AuthProfileStore } from "../agents/auth-profiles/types.js";
 import { resolveAgentModelPrimaryValue } from "../config/model-input.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { WizardPrompter, WizardSelectOption } from "../wizard/prompts.js";
 import {
   buildAuthChoiceGroups,
@@ -27,17 +27,17 @@ type PromptAuthChoiceGroupedParams = {
   assistantVisibleOnly?: boolean;
   allowedChoices?: ReadonlySet<string>;
   additionalGroups?: readonly AuthChoiceGroup[];
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   allowKeepCurrentProvider?: boolean;
 };
 
-function resolveConfiguredModelRef(config?: OpenClawConfig): string | undefined {
+function resolveConfiguredModelRef(config?: SteelEngineConfig): string | undefined {
   return resolveAgentModelPrimaryValue(config?.agents?.defaults?.model);
 }
 
-function resolveConfiguredProvider(config?: OpenClawConfig): string | undefined {
+function resolveConfiguredProvider(config?: SteelEngineConfig): string | undefined {
   const modelRef = resolveConfiguredModelRef(config);
   const slashIndex = modelRef?.indexOf("/") ?? -1;
   if (!modelRef || slashIndex <= 0) {

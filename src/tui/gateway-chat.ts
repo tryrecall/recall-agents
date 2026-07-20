@@ -19,7 +19,7 @@ import {
   type TaskSuggestionsListResult,
 } from "../../packages/gateway-protocol/src/index.js";
 import { getRuntimeConfig } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { assertExplicitGatewayAuthModeWhenBothConfigured } from "../gateway/auth-mode-policy.js";
 import { resolveGatewayInteractiveSurfaceAuth } from "../gateway/auth-surface-resolution.js";
 import {
@@ -75,7 +75,7 @@ function throwGatewayAuthResolutionError(reason: string): never {
   throw new Error(
     [
       reason,
-      "Fix: set OPENCLAW_GATEWAY_TOKEN/OPENCLAW_GATEWAY_PASSWORD, pass --token/--password,",
+      "Fix: set STEELENGINE_GATEWAY_TOKEN/STEELENGINE_GATEWAY_PASSWORD, pass --token/--password,",
       "or resolve the configured secret provider for this credential.",
     ].join("\n"),
   );
@@ -155,7 +155,7 @@ export class GatewayChatClient implements TuiBackend {
       tlsFingerprint: connection.tlsFingerprint,
       preauthHandshakeTimeoutMs: connection.preauthHandshakeTimeoutMs,
       clientName: GATEWAY_CLIENT_NAMES.TUI,
-      clientDisplayName: "openclaw-tui",
+      clientDisplayName: "steelengine-tui",
       clientVersion: VERSION,
       platform: process.platform,
       mode: GATEWAY_CLIENT_MODES.UI,
@@ -200,7 +200,7 @@ export class GatewayChatClient implements TuiBackend {
 
   /** Connect to a target already selected and authenticated by a preceding Gateway probe. */
   static connectBound(
-    opts: GatewayConnectionOptions & { config: OpenClawConfig; url: string },
+    opts: GatewayConnectionOptions & { config: SteelEngineConfig; url: string },
   ): GatewayChatClient {
     return new GatewayChatClient(resolveBoundGatewayConnection(opts));
   }
@@ -432,7 +432,7 @@ export class GatewayChatClient implements TuiBackend {
  * credentials, while still applying the normal remote URL safety policy.
  */
 function resolveBoundGatewayConnection(
-  opts: GatewayConnectionOptions & { config: OpenClawConfig; url: string },
+  opts: GatewayConnectionOptions & { config: SteelEngineConfig; url: string },
 ): ResolvedGatewayConnection {
   const url = buildGatewayConnectionDetails({
     config: opts.config,
@@ -470,8 +470,8 @@ async function resolveGatewayConnection(
   });
   const hasExplicitGatewayTarget = Boolean(
     urlOverride ||
-    env.OPENCLAW_GATEWAY_URL?.trim() ||
-    env.OPENCLAW_GATEWAY_PORT?.trim() ||
+    env.STEELENGINE_GATEWAY_URL?.trim() ||
+    env.STEELENGINE_GATEWAY_PORT?.trim() ||
     isRemoteMode,
   );
   const activeLocalGatewayPort = hasExplicitGatewayTarget

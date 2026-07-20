@@ -1,12 +1,12 @@
 ---
-summary: "Host OpenClaw on a DigitalOcean Droplet"
+summary: "Host SteelEngine on a DigitalOcean Droplet"
 read_when:
-  - Setting up OpenClaw on DigitalOcean
-  - Looking for a simple paid VPS for OpenClaw
+  - Setting up SteelEngine on DigitalOcean
+  - Looking for a simple paid VPS for SteelEngine
 title: "DigitalOcean"
 ---
 
-Run a persistent OpenClaw Gateway on a DigitalOcean Droplet (~$6/month for the 1 GB Basic plan).
+Run a persistent SteelEngine Gateway on a DigitalOcean Droplet (~$6/month for the 1 GB Basic plan).
 
 DigitalOcean is a straightforward paid VPS path. For cheaper or free options:
 
@@ -48,25 +48,25 @@ DigitalOcean is a straightforward paid VPS path. For cheaper or free options:
     curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
     apt install -y nodejs
 
-    # Install OpenClaw
-    curl -fsSL https://openclaw.ai/install.sh | bash
+    # Install SteelEngine
+    curl -fsSL https://steelengine.ai/install.sh | bash
 
-    # Create the non-root user that will own OpenClaw state and services.
-    adduser openclaw
-    usermod -aG sudo openclaw
-    loginctl enable-linger openclaw
+    # Create the non-root user that will own SteelEngine state and services.
+    adduser steelengine
+    usermod -aG sudo steelengine
+    loginctl enable-linger steelengine
 
-    su - openclaw
-    openclaw --version
+    su - steelengine
+    steelengine --version
     ```
 
-    Use the root shell only for system bootstrap. Run OpenClaw commands as the non-root `openclaw` user so state lives under `/home/openclaw/.openclaw/` and the Gateway installs as that user's systemd `--user` service.
+    Use the root shell only for system bootstrap. Run SteelEngine commands as the non-root `steelengine` user so state lives under `/home/steelengine/.steelengine/` and the Gateway installs as that user's systemd `--user` service.
 
   </Step>
 
   <Step title="Run onboarding">
     ```bash
-    openclaw onboard --install-daemon
+    steelengine onboard --install-daemon
     ```
 
     The wizard walks you through model auth, channel setup, gateway token generation, and daemon installation (systemd user service).
@@ -85,9 +85,9 @@ DigitalOcean is a straightforward paid VPS path. For cheaper or free options:
 
   <Step title="Verify the gateway">
     ```bash
-    openclaw status
-    systemctl --user status openclaw-gateway.service
-    journalctl --user -u openclaw-gateway.service -f
+    steelengine status
+    systemctl --user status steelengine-gateway.service
+    journalctl --user -u steelengine-gateway.service -f
     ```
   </Step>
 
@@ -108,8 +108,8 @@ DigitalOcean is a straightforward paid VPS path. For cheaper or free options:
     ```bash
     curl -fsSL https://tailscale.com/install.sh | sudo sh
     sudo tailscale up
-    openclaw config set gateway.tailscale.mode serve
-    openclaw gateway restart
+    steelengine config set gateway.tailscale.mode serve
+    steelengine gateway restart
     ```
 
     Then open `https://<magicdns>/` from any device on your tailnet.
@@ -119,8 +119,8 @@ DigitalOcean is a straightforward paid VPS path. For cheaper or free options:
     **Option C: Tailnet bind (no Serve)**
 
     ```bash
-    openclaw config set gateway.bind tailnet
-    openclaw gateway restart
+    steelengine config set gateway.bind tailnet
+    steelengine gateway restart
     ```
 
     Then open `http://<tailscale-ip>:18789` (token required).
@@ -130,18 +130,18 @@ DigitalOcean is a straightforward paid VPS path. For cheaper or free options:
 
 ## Persistence and backups
 
-OpenClaw state lives under:
+SteelEngine state lives under:
 
-- `~/.openclaw/` -- `openclaw.json`, channel/provider credentials, per-agent `auth-profiles.json`, and session data.
-- `~/.openclaw/workspace/` -- the agent workspace (SOUL.md, memory, artifacts).
+- `~/.steelengine/` -- `steelengine.json`, channel/provider credentials, per-agent `auth-profiles.json`, and session data.
+- `~/.steelengine/workspace/` -- the agent workspace (SOUL.md, memory, artifacts).
 
 These survive Droplet reboots. To take a portable snapshot:
 
 ```bash
-openclaw backup create
+steelengine backup create
 ```
 
-DigitalOcean snapshots back up the whole Droplet; `openclaw backup create` is portable across hosts.
+DigitalOcean snapshots back up the whole Droplet; `steelengine backup create` is portable across hosts.
 
 ## 1 GB RAM tips
 
@@ -154,7 +154,7 @@ The $6 Droplet only has 1 GB RAM. To keep things smooth:
 
 ## Troubleshooting
 
-**Gateway will not start** -- Run `openclaw doctor --non-interactive` and check logs with `journalctl --user -u openclaw-gateway.service -n 50`.
+**Gateway will not start** -- Run `steelengine doctor --non-interactive` and check logs with `journalctl --user -u steelengine-gateway.service -n 50`.
 
 **Port already in use** -- Run `lsof -i :18789` to find the process, then stop it.
 
@@ -164,7 +164,7 @@ The $6 Droplet only has 1 GB RAM. To keep things smooth:
 
 - [Channels](/channels) -- connect Telegram, WhatsApp, Discord, and more
 - [Gateway configuration](/gateway/configuration) -- all config options
-- [Updating](/install/updating) -- keep OpenClaw up to date
+- [Updating](/install/updating) -- keep SteelEngine up to date
 
 ## Related
 

@@ -1,19 +1,19 @@
 // Memory host dreaming helpers record and load memory dreaming artifacts.
 import path from "node:path";
-import { parseBoolean } from "@openclaw/normalization-core/boolean-coercion";
+import { parseBoolean } from "@steelengine/normalization-core/boolean-coercion";
 import {
   parseStrictNonNegativeInteger,
   parseStrictPositiveInteger,
-} from "@openclaw/normalization-core/number-coercion";
-import { asNullableRecord } from "@openclaw/normalization-core/record-coerce";
+} from "@steelengine/normalization-core/number-coercion";
+import { asNullableRecord } from "@steelengine/normalization-core/record-coerce";
 import {
   lowercasePreservingWhitespace,
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
   normalizeStringifiedOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 
 const DEFAULT_MEMORY_DREAMING_ENABLED = false;
 const DEFAULT_MEMORY_DREAMING_TIMEZONE = undefined;
@@ -25,13 +25,13 @@ export const DEFAULT_MEMORY_DREAMING_PLUGIN_ID = "memory-core";
 export const MANAGED_MEMORY_DREAMING_CRON_NAME = "Memory Dreaming Promotion";
 export const MANAGED_MEMORY_DREAMING_CRON_TAG = "[managed-by=memory-core.short-term-promotion]";
 export const MEMORY_DREAMING_SYSTEM_EVENT_TEXT =
-  "__openclaw_memory_core_short_term_promotion_dream__";
+  "__steelengine_memory_core_short_term_promotion_dream__";
 export const LEGACY_MEMORY_LIGHT_DREAMING_CRON_NAME = "Memory Light Dreaming";
 export const LEGACY_MEMORY_LIGHT_DREAMING_CRON_TAG = "[managed-by=memory-core.dreaming.light]";
-export const LEGACY_MEMORY_LIGHT_DREAMING_EVENT_TEXT = "__openclaw_memory_core_light_sleep__";
+export const LEGACY_MEMORY_LIGHT_DREAMING_EVENT_TEXT = "__steelengine_memory_core_light_sleep__";
 export const LEGACY_MEMORY_REM_DREAMING_CRON_NAME = "Memory REM Dreaming";
 export const LEGACY_MEMORY_REM_DREAMING_CRON_TAG = "[managed-by=memory-core.dreaming.rem]";
-export const LEGACY_MEMORY_REM_DREAMING_EVENT_TEXT = "__openclaw_memory_core_rem_sleep__";
+export const LEGACY_MEMORY_REM_DREAMING_EVENT_TEXT = "__steelengine_memory_core_rem_sleep__";
 const DEFAULT_MEMORY_LIGHT_DREAMING_LOOKBACK_DAYS = 2;
 const DEFAULT_MEMORY_LIGHT_DREAMING_LIMIT = 100;
 const DEFAULT_MEMORY_LIGHT_DREAMING_DEDUPE_SIMILARITY = 0.9;
@@ -302,7 +302,7 @@ function formatLocalIsoDay(epochMs: number): string {
 }
 
 export function resolveMemoryDreamingPluginId(
-  cfg: OpenClawConfig | Record<string, unknown> | undefined,
+  cfg: SteelEngineConfig | Record<string, unknown> | undefined,
 ): string {
   const root = asNullableRecord(cfg);
   const plugins = asNullableRecord(root?.plugins);
@@ -315,7 +315,7 @@ export function resolveMemoryDreamingPluginId(
 }
 
 export function resolveMemoryDreamingPluginConfig(
-  cfg: OpenClawConfig | Record<string, unknown> | undefined,
+  cfg: SteelEngineConfig | Record<string, unknown> | undefined,
 ): Record<string, unknown> | undefined {
   const root = asNullableRecord(cfg);
   const plugins = asNullableRecord(root?.plugins);
@@ -330,7 +330,7 @@ export const resolveMemoryCorePluginConfig = resolveMemoryDreamingPluginConfig;
 
 export function resolveMemoryDreamingConfig(params: {
   pluginConfig?: Record<string, unknown>;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
 }): MemoryDreamingConfig {
   const dreaming = asNullableRecord(params.pluginConfig?.dreaming);
   const frequency =
@@ -493,7 +493,7 @@ export function resolveMemoryDreamingConfig(params: {
 
 export function resolveMemoryDeepDreamingConfig(params: {
   pluginConfig?: Record<string, unknown>;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
 }): MemoryDeepDreamingConfig & {
   timezone?: string;
   verboseLogging: boolean;
@@ -511,7 +511,7 @@ export function resolveMemoryDeepDreamingConfig(params: {
 
 export function resolveMemoryLightDreamingConfig(params: {
   pluginConfig?: Record<string, unknown>;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
 }): MemoryLightDreamingConfig & {
   timezone?: string;
   verboseLogging: boolean;
@@ -529,7 +529,7 @@ export function resolveMemoryLightDreamingConfig(params: {
 
 export function resolveMemoryRemDreamingConfig(params: {
   pluginConfig?: Record<string, unknown>;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
 }): MemoryRemDreamingConfig & {
   timezone?: string;
   verboseLogging: boolean;
@@ -581,7 +581,7 @@ export function isSameMemoryDreamingDay(
 }
 
 export function resolveMemoryDreamingWorkspaces(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   options: MemoryDreamingWorkspaceOptions = {},
 ): MemoryDreamingWorkspace[] {
   const configured = Array.isArray(cfg.agents?.list) ? cfg.agents.list : [];

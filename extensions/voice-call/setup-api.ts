@@ -1,14 +1,14 @@
 // Voice Call API module exposes the plugin public contract.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/plugin-entry";
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
-import { isRecord } from "openclaw/plugin-sdk/string-coerce-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/plugin-entry";
+import { definePluginEntry } from "steelengine/plugin-sdk/plugin-entry";
+import { isRecord } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { migrateVoiceCallLegacyConfigInput } from "./src/config-migration.js";
 
 // Setup-time entrypoint for voice-call config migrations.
 
-/** Migrate voice-call plugin config inside the full OpenClaw config object. */
-function migrateVoiceCallPluginConfig(config: OpenClawConfig): {
-  config: OpenClawConfig;
+/** Migrate voice-call plugin config inside the full SteelEngine config object. */
+function migrateVoiceCallPluginConfig(config: SteelEngineConfig): {
+  config: SteelEngineConfig;
   changes: string[];
 } | null {
   const rawVoiceCallConfig = config.plugins?.entries?.["voice-call"]?.config;

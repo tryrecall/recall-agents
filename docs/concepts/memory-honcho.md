@@ -6,7 +6,7 @@ read_when:
   - You want AI-powered recall and user modeling
 ---
 
-[Honcho](https://honcho.dev) adds AI-native memory to OpenClaw through an
+[Honcho](https://honcho.dev) adds AI-native memory to SteelEngine through an
 external plugin. It persists conversations to a dedicated service and builds
 user and agent models over time, giving your agent cross-session context that
 goes beyond workspace Markdown files.
@@ -47,9 +47,9 @@ Honcho registers tools the agent can use during conversation:
 Install the plugin and run setup:
 
 ```bash
-openclaw plugins install @honcho-ai/openclaw-honcho
-openclaw honcho setup
-openclaw gateway --force
+steelengine plugins install @honcho-ai/steelengine-honcho
+steelengine honcho setup
+steelengine gateway --force
 ```
 
 The setup command prompts for your API credentials, writes the config, and
@@ -63,16 +63,16 @@ option.
 
 ## Configuration
 
-Settings live under `plugins.entries["openclaw-honcho"].config`:
+Settings live under `plugins.entries["steelengine-honcho"].config`:
 
 ```json5
 {
   plugins: {
     entries: {
-      "openclaw-honcho": {
+      "steelengine-honcho": {
         config: {
           apiKey: "your-api-key", // omit for self-hosted
-          workspaceId: "openclaw", // memory isolation
+          workspaceId: "steelengine", // memory isolation
           baseUrl: "https://api.honcho.dev",
         },
       },
@@ -87,7 +87,7 @@ For self-hosted instances, point `baseUrl` to your local server (for example
 ## Migrating existing memory
 
 If you have existing workspace memory files (`USER.md`, `MEMORY.md`,
-`IDENTITY.md`, `memory/`, `canvas/`), `openclaw honcho setup` detects and
+`IDENTITY.md`, `memory/`, `canvas/`), `steelengine honcho setup` detects and
 offers to migrate them.
 
 <Info>
@@ -101,7 +101,7 @@ After every AI turn, the conversation is persisted to Honcho. Both user and
 agent messages are observed, letting Honcho build and refine its models over
 time.
 
-During conversation, Honcho tools query the service during OpenClaw's
+During conversation, Honcho tools query the service during SteelEngine's
 `before_prompt_build` plugin hook, injecting relevant context before the model
 sees the prompt.
 
@@ -123,17 +123,17 @@ files alongside Honcho's cross-session memory.
 ## CLI commands
 
 ```bash
-openclaw honcho setup                        # Configure API key and migrate files
-openclaw honcho status                       # Check connection status
-openclaw honcho ask <question>               # Query Honcho about the user
-openclaw honcho search <query> [-k N] [-d D] # Semantic search over memory
+steelengine honcho setup                        # Configure API key and migrate files
+steelengine honcho status                       # Check connection status
+steelengine honcho ask <question>               # Query Honcho about the user
+steelengine honcho search <query> [-k N] [-d D] # Semantic search over memory
 ```
 
 ## Further reading
 
-- [Plugin source code](https://github.com/plastic-labs/openclaw-honcho)
+- [Plugin source code](https://github.com/plastic-labs/steelengine-honcho)
 - [Honcho documentation](https://docs.honcho.dev)
-- [Honcho OpenClaw integration guide](https://docs.honcho.dev/v3/guides/integrations/openclaw)
+- [Honcho SteelEngine integration guide](https://docs.honcho.dev/v3/guides/integrations/steelengine)
 
 ## Related
 

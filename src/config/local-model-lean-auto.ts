@@ -1,5 +1,5 @@
-import { normalizeProviderId } from "@openclaw/model-catalog-core/provider-id";
-import type { OpenClawConfig } from "./types.openclaw.js";
+import { normalizeProviderId } from "@steelengine/model-catalog-core/provider-id";
+import type { SteelEngineConfig } from "./types.steelengine.js";
 
 const AUTO_LOCAL_MODEL_LEAN_PROVIDER_IDS = new Set(["lmstudio", "ollama"]);
 
@@ -8,12 +8,12 @@ function shouldAutoEnableLocalModelLean(providerId: string): boolean {
   return AUTO_LOCAL_MODEL_LEAN_PROVIDER_IDS.has(normalizeProviderId(providerId));
 }
 
-function resolveDefaultModelRef(config: OpenClawConfig): string | undefined {
+function resolveDefaultModelRef(config: SteelEngineConfig): string | undefined {
   const model = config.agents?.defaults?.model;
   return typeof model === "string" ? model : model?.primary;
 }
 
-function clearAutoModel(config: OpenClawConfig): OpenClawConfig {
+function clearAutoModel(config: SteelEngineConfig): SteelEngineConfig {
   const wizard = { ...config.wizard };
   delete wizard.localModelLeanAutoModel;
   return { ...config, wizard };
@@ -21,11 +21,11 @@ function clearAutoModel(config: OpenClawConfig): OpenClawConfig {
 
 /** Maintains the onboarding-owned lean default while preserving explicit user configuration. */
 export function applyAutoLocalModelLean(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   providerId: string;
   modelRef: string;
 }): {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   changed: boolean;
   enabled: boolean;
 } {

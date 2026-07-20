@@ -1,6 +1,6 @@
-/** Resolves ACP request metadata into OpenClaw Gateway session keys and reset behavior. */
-import { readBool, readString } from "@openclaw/acp-core/meta";
-import type { AcpServerOptions } from "@openclaw/acp-core/types";
+/** Resolves ACP request metadata into SteelEngine Gateway session keys and reset behavior. */
+import { readBool, readString } from "@steelengine/acp-core/meta";
+import type { AcpServerOptions } from "@steelengine/acp-core/types";
 import type { GatewayClient } from "../gateway/client.js";
 
 type AcpSessionMeta = {
@@ -11,7 +11,7 @@ type AcpSessionMeta = {
   prefixCwd?: boolean;
 };
 
-/** Parses ACP request metadata into OpenClaw session routing hints. */
+/** Parses ACP request metadata into SteelEngine session routing hints. */
 export function parseSessionMeta(meta: unknown): AcpSessionMeta {
   if (!meta || typeof meta !== "object") {
     return {};

@@ -1,21 +1,21 @@
 /**
- * Reads OpenClaw session history for Codex transcript mirroring and sanitizes
+ * Reads SteelEngine session history for Codex transcript mirroring and sanitizes
  * image payloads before replaying messages into the app-server projector.
  */
 import fs from "node:fs/promises";
-import type { AgentMessage } from "openclaw/plugin-sdk/agent-harness-runtime";
-import type { SessionEntry } from "openclaw/plugin-sdk/agent-sessions";
+import type { AgentMessage } from "steelengine/plugin-sdk/agent-harness-runtime";
+import type { SessionEntry } from "steelengine/plugin-sdk/agent-sessions";
 import {
   buildSessionContext,
   migrateSessionEntries,
   parseSessionEntries,
-} from "openclaw/plugin-sdk/agent-sessions";
+} from "steelengine/plugin-sdk/agent-sessions";
 import {
   listSessionEntries,
   parseSqliteSessionFileMarker,
   type SqliteSessionFileMarker,
-} from "openclaw/plugin-sdk/session-store-runtime";
-import { readSessionTranscriptEvents } from "openclaw/plugin-sdk/session-transcript-runtime";
+} from "steelengine/plugin-sdk/session-store-runtime";
+import { readSessionTranscriptEvents } from "steelengine/plugin-sdk/session-transcript-runtime";
 import { sanitizeCodexHistoryImagePayloads } from "./image-payload-sanitizer.js";
 
 function isMissingFileError(error: unknown): boolean {

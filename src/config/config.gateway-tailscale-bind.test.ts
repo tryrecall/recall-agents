@@ -25,12 +25,12 @@ describe("gateway tailscale bind validation", () => {
     const validRes = validateConfigObject({
       gateway: {
         bind: "loopback",
-        tailscale: { mode: "serve", serviceName: "svc:openclaw-gateway" },
+        tailscale: { mode: "serve", serviceName: "svc:steelengine-gateway" },
       },
     });
     expect(validRes.ok).toBe(true);
 
-    for (const serviceName of ["openclaw", "svc:", "svc:-openclaw", "svc:OpenClaw"]) {
+    for (const serviceName of ["steelengine", "svc:", "svc:-steelengine", "svc:SteelEngine"]) {
       const res = validateConfigObject({
         gateway: {
           bind: "loopback",
@@ -42,7 +42,7 @@ describe("gateway tailscale bind validation", () => {
         expect(res.issues).toContainEqual({
           path: "gateway.tailscale.serviceName",
           message:
-            'Tailscale serviceName must use the "svc:<dns-label>" format, for example "svc:openclaw"',
+            'Tailscale serviceName must use the "svc:<dns-label>" format, for example "svc:steelengine"',
         });
       }
     }

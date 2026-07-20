@@ -1,12 +1,12 @@
-# OpenClaw Kilo Gateway Provider
+# SteelEngine Kilo Gateway Provider
 
-Official OpenClaw provider plugin for Kilo Gateway.
+Official SteelEngine provider plugin for Kilo Gateway.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/kilocode-provider
-openclaw gateway restart
+steelengine plugins install @steelengine/kilocode-provider
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/providers/kilocode> for setup and configuration.
+See <https://docs.steelengine.ai/providers/kilocode> for setup and configuration.

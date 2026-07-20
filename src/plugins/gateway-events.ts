@@ -1,11 +1,11 @@
 import type { PluginJsonValue } from "./host-hook-json.js";
 
-export type OpenClawPluginGatewayEventScope = "operator.read" | "operator.write" | "operator.admin";
+export type SteelEnginePluginGatewayEventScope = "operator.read" | "operator.write" | "operator.admin";
 
-export type OpenClawPluginGatewayEvents = {
+export type SteelEnginePluginGatewayEvents = {
   emit: (
     event: string,
     payload: PluginJsonValue,
-    opts: { scope: OpenClawPluginGatewayEventScope },
+    opts: { scope: SteelEnginePluginGatewayEventScope },
   ) => void;
 };

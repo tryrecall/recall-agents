@@ -11,8 +11,8 @@ Adds text-to-speech provider support.
 
 ## Distribution
 
-- Package: `@openclaw/gradium-speech`
-- Install route: npm; ClawHub: `clawhub:@openclaw/gradium-speech`
+- Package: `@steelengine/gradium-speech`
+- Install route: npm; ClawHub: `clawhub:@steelengine/gradium-speech`
 
 ## Surface
 

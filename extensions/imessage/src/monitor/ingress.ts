@@ -5,10 +5,10 @@ import {
   DEFAULT_INGRESS_RETRY_MAX_ATTEMPTS,
   type ChannelIngressDrain,
   type ChannelIngressQueue,
-} from "openclaw/plugin-sdk/channel-outbound";
-import { collectErrorGraphCandidates, formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { KeyedAsyncQueue } from "openclaw/plugin-sdk/keyed-async-queue";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/channel-outbound";
+import { collectErrorGraphCandidates, formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { KeyedAsyncQueue } from "steelengine/plugin-sdk/keyed-async-queue";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
 import { getIMessageRuntime } from "../runtime.js";
 import { parseIMessageNotification } from "./parse-notification.js";
 import type { IMessagePayload } from "./types.js";

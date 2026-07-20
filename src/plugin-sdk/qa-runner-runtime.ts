@@ -2,7 +2,7 @@
 import type { Command } from "commander";
 import type { PluginManifestRecord } from "../plugins/manifest-registry.js";
 import { loadPluginManifestRegistry } from "../plugins/manifest-registry.js";
-import type { OpenClawConfig } from "./config-contracts.js";
+import type { SteelEngineConfig } from "./config-contracts.js";
 import {
   loadBundledPluginPublicSurfaceModuleSync,
   tryLoadActivatedBundledPluginPublicSurfaceModuleSync,
@@ -94,7 +94,7 @@ type QaRunnerTransportAdapterDefinition = {
   }>;
   createGatewayConfig: (params: {
     baseUrl: string;
-  }) => Pick<OpenClawConfig, "channels" | "messages">;
+  }) => Pick<SteelEngineConfig, "channels" | "messages">;
   waitReady: (params: {
     gateway: {
       call: (
@@ -119,7 +119,7 @@ type QaRunnerTransportAdapterDefinition = {
   handleAction: (params: {
     action: "delete" | "edit" | "react" | "thread-create";
     args: Record<string, unknown>;
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     accountId?: string | null;
   }) => Promise<unknown>;
   createReportNotes: (params: {
@@ -322,7 +322,7 @@ export function listQaRunnerCliContributions(): readonly QaRunnerCliContribution
       }
       if (!registration) {
         throw new Error(
-          `QA runner plugin "${plugin.id}" declared "${runner.commandName}" in openclaw.plugin.json but did not export a matching CLI registration`,
+          `QA runner plugin "${plugin.id}" declared "${runner.commandName}" in steelengine.plugin.json but did not export a matching CLI registration`,
         );
       }
       const adapterFactory = registration.adapterFactory;
@@ -348,7 +348,7 @@ export function listQaRunnerCliContributions(): readonly QaRunnerCliContribution
     for (const commandName of runtimeRegistrationByCommandName?.keys() ?? []) {
       if (!declaredCommandNames.has(commandName)) {
         throw new Error(
-          `QA runner plugin "${plugin.id}" exported "${commandName}" from runtime-api.js but did not declare it in openclaw.plugin.json`,
+          `QA runner plugin "${plugin.id}" exported "${commandName}" from runtime-api.js but did not declare it in steelengine.plugin.json`,
         );
       }
     }

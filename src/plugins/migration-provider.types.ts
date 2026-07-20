@@ -1,10 +1,10 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { PluginLogger } from "./logger-types.js";
 import type { PluginRuntime } from "./runtime/types.js";
 
-export type PluginConfigMigration = (config: OpenClawConfig) =>
+export type PluginConfigMigration = (config: SteelEngineConfig) =>
   | {
-      config: OpenClawConfig;
+      config: SteelEngineConfig;
       changes: string[];
     }
   | null
@@ -86,7 +86,7 @@ type MigrationProviderPreparation = {
 };
 
 export type MigrationProviderContext = {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   runtime?: PluginRuntime;
   logger: PluginLogger;
   stateDir: string;
@@ -103,7 +103,7 @@ export type MigrationProviderContext = {
   signal?: AbortSignal;
 };
 
-/** Migration source implemented by a plugin and orchestrated by `openclaw migrate`. */
+/** Migration source implemented by a plugin and orchestrated by `steelengine migrate`. */
 export type MigrationProviderPlugin = {
   id: string;
   label: string;
@@ -122,7 +122,7 @@ export type MigrationProviderPlugin = {
 };
 
 type PluginSetupAutoEnableContext = {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
 };
 

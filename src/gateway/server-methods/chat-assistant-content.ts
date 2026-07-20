@@ -1,4 +1,4 @@
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import {
   readPairingQrReplyChannelData,
   type ReplyPayload,
@@ -51,10 +51,10 @@ async function buildPairingQrAssistantContentBlock(
     renderQrTerminal(qr.setupCode, { small: true }),
   ]);
   return {
-    type: "openclaw_pairing_qr",
+    type: "steelengine_pairing_qr",
     image_url: imageUrl,
     terminalText,
-    alt: "OpenClaw pairing QR code",
+    alt: "SteelEngine pairing QR code",
     expiresAtMs: qr.expiresAtMs,
     sensitive: true,
   };

@@ -14,36 +14,36 @@ describe("resolveGatewayLaunchAgentLabel", () => {
   it("returns default label when no profile is set", () => {
     const result = resolveGatewayLaunchAgentLabel();
     expect(result).toBe(GATEWAY_LAUNCH_AGENT_LABEL);
-    expect(result).toBe("ai.openclaw.gateway");
+    expect(result).toBe("ai.steelengine.gateway");
   });
 
   it("returns profile-specific label when profile is set", () => {
     const result = resolveGatewayLaunchAgentLabel("dev");
-    expect(result).toBe("ai.openclaw.dev");
+    expect(result).toBe("ai.steelengine.dev");
   });
 });
 
 describe("resolveGatewaySystemdServiceName", () => {
   it("returns default service name when no profile is set", () => {
     const result = resolveGatewaySystemdServiceName();
-    expect(result).toBe("openclaw-gateway");
+    expect(result).toBe("steelengine-gateway");
   });
 
   it("returns profile-specific service name when profile is set", () => {
     const result = resolveGatewaySystemdServiceName("dev");
-    expect(result).toBe("openclaw-gateway-dev");
+    expect(result).toBe("steelengine-gateway-dev");
   });
 });
 
 describe("resolveGatewayWindowsTaskName", () => {
   it("returns default task name when no profile is set", () => {
     const result = resolveGatewayWindowsTaskName();
-    expect(result).toBe("OpenClaw Gateway");
+    expect(result).toBe("SteelEngine Gateway");
   });
 
   it("returns profile-specific task name when profile is set", () => {
     const result = resolveGatewayWindowsTaskName("dev");
-    expect(result).toBe("OpenClaw Gateway (dev)");
+    expect(result).toBe("SteelEngine Gateway (dev)");
   });
 });
 
@@ -68,32 +68,32 @@ describe("resolveGatewayProfileSuffix", () => {
 
 describe("resolveGatewayServiceDescription", () => {
   it("returns default description when no profile/version", () => {
-    expect(resolveGatewayServiceDescription({ env: {} })).toBe("OpenClaw Gateway");
+    expect(resolveGatewayServiceDescription({ env: {} })).toBe("SteelEngine Gateway");
   });
 
   it("includes profile when set", () => {
-    expect(resolveGatewayServiceDescription({ env: { OPENCLAW_PROFILE: "work" } })).toBe(
-      "OpenClaw Gateway (profile: work)",
+    expect(resolveGatewayServiceDescription({ env: { STEELENGINE_PROFILE: "work" } })).toBe(
+      "SteelEngine Gateway (profile: work)",
     );
   });
 
   it("includes version when set", () => {
     expect(
-      resolveGatewayServiceDescription({ env: { OPENCLAW_SERVICE_VERSION: "2026.1.10" } }),
-    ).toBe("OpenClaw Gateway (v2026.1.10)");
+      resolveGatewayServiceDescription({ env: { STEELENGINE_SERVICE_VERSION: "2026.1.10" } }),
+    ).toBe("SteelEngine Gateway (v2026.1.10)");
   });
 
   it("includes profile and version when set", () => {
     expect(
       resolveGatewayServiceDescription({
-        env: { OPENCLAW_PROFILE: "dev", OPENCLAW_SERVICE_VERSION: "1.2.3" },
+        env: { STEELENGINE_PROFILE: "dev", STEELENGINE_SERVICE_VERSION: "1.2.3" },
       }),
-    ).toBe("OpenClaw Gateway (profile: dev, v1.2.3)");
+    ).toBe("SteelEngine Gateway (profile: dev, v1.2.3)");
   });
   it("prefers explicit description override", () => {
     expect(
       resolveGatewayServiceDescription({
-        env: { OPENCLAW_PROFILE: "work", OPENCLAW_SERVICE_VERSION: "1.0.0" },
+        env: { STEELENGINE_PROFILE: "work", STEELENGINE_SERVICE_VERSION: "1.0.0" },
         description: "Custom",
       }),
     ).toBe("Custom");
@@ -102,10 +102,10 @@ describe("resolveGatewayServiceDescription", () => {
   it("resolves version from explicit environment map", () => {
     expect(
       resolveGatewayServiceDescription({
-        env: { OPENCLAW_PROFILE: "work", OPENCLAW_SERVICE_VERSION: "local" },
-        environment: { OPENCLAW_SERVICE_VERSION: "remote" },
+        env: { STEELENGINE_PROFILE: "work", STEELENGINE_SERVICE_VERSION: "local" },
+        environment: { STEELENGINE_SERVICE_VERSION: "remote" },
       }),
-    ).toBe("OpenClaw Gateway (profile: work, vremote)");
+    ).toBe("SteelEngine Gateway (profile: work, vremote)");
   });
 });
 

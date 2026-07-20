@@ -1,8 +1,8 @@
 {
-  "name": "@openclaw/memory-wiki",
+  "name": "@steelengine/memory-wiki",
   "version": "2026.7.2-beta.3",
   "private": true,
-  "description": "OpenClaw persistent wiki plugin",
+  "description": "SteelEngine persistent wiki plugin",
   "type": "module",
   "dependencies": {
     "mdast-util-from-markdown": "2.0.3",
@@ -12,18 +12,18 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*",
+    "steelengine": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.7.2-beta.3"
+    "steelengine": ">=2026.7.2-beta.3"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "steelengine": {
       "optional": true
     }
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ]

@@ -1,12 +1,12 @@
-import { jsonResult, readStringParam } from "openclaw/plugin-sdk/channel-actions";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { AnyAgentTool, OpenClawPluginToolContext } from "openclaw/plugin-sdk/plugin-entry";
-import { escapeHtml } from "openclaw/plugin-sdk/text-utility-runtime";
+import { jsonResult, readStringParam } from "steelengine/plugin-sdk/channel-actions";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { AnyAgentTool, SteelEnginePluginToolContext } from "steelengine/plugin-sdk/plugin-entry";
+import { escapeHtml } from "steelengine/plugin-sdk/text-utility-runtime";
 import {
   assertWidgetHtmlSize,
   isCompleteHtmlDocument,
   WidgetHtmlInputError,
-} from "openclaw/plugin-sdk/widget-html";
+} from "steelengine/plugin-sdk/widget-html";
 import { Type } from "typebox";
 import { resolveDiscordAccount } from "../accounts.js";
 import { sendDiscordComponentMessage } from "../send.components.js";
@@ -28,7 +28,7 @@ const ShowWidgetParameters = Type.Object({
   button_label: Type.Optional(Type.String({ minLength: 1, maxLength: 80 })),
 });
 
-function currentConfig(context: OpenClawPluginToolContext, runtime: DiscordActivitiesRuntime) {
+function currentConfig(context: SteelEnginePluginToolContext, runtime: DiscordActivitiesRuntime) {
   return (
     context.getRuntimeConfig?.() ??
     context.runtimeConfig ??
@@ -37,7 +37,7 @@ function currentConfig(context: OpenClawPluginToolContext, runtime: DiscordActiv
   );
 }
 
-function resolveDiscordChannelId(context: OpenClawPluginToolContext): string | undefined {
+function resolveDiscordChannelId(context: SteelEnginePluginToolContext): string | undefined {
   const raw = context.nativeChannelId?.trim() || context.deliveryContext?.to?.trim();
   if (!raw) {
     return undefined;
@@ -91,7 +91,7 @@ const SHOW_WIDGET_VARIANT: DiscordWidgetToolVariant = {
 };
 
 function createDiscordWidgetToolVariant(
-  context: OpenClawPluginToolContext,
+  context: SteelEnginePluginToolContext,
   deps: DiscordWidgetToolDeps,
   variant: DiscordWidgetToolVariant,
 ): AnyAgentTool | null {
@@ -187,7 +187,7 @@ function createDiscordWidgetToolVariant(
           `channel:${channelId}`,
           { ...components, text: title },
           {
-            cfg: cfg as OpenClawConfig,
+            cfg: cfg as SteelEngineConfig,
             accountId: account.accountId,
             allowedMentions: { parse: [] },
             onDeliveryResult: recordDelivery,
@@ -212,14 +212,14 @@ function createDiscordWidgetToolVariant(
 }
 
 export function createDiscordWidgetTool(
-  context: OpenClawPluginToolContext,
+  context: SteelEnginePluginToolContext,
   deps: DiscordWidgetToolDeps,
 ): AnyAgentTool | null {
   return createDiscordWidgetToolVariant(context, deps, DISCORD_WIDGET_VARIANT);
 }
 
 export function createDiscordShowWidgetTool(
-  context: OpenClawPluginToolContext,
+  context: SteelEnginePluginToolContext,
   deps: DiscordWidgetToolDeps,
 ): AnyAgentTool | null {
   return createDiscordWidgetToolVariant(context, deps, SHOW_WIDGET_VARIANT);

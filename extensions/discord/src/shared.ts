@@ -1,11 +1,11 @@
 // Discord plugin module implements shared behavior.
-import { describeAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
-import { normalizeAccountId } from "openclaw/plugin-sdk/account-id";
-import { formatAllowFromLowercase } from "openclaw/plugin-sdk/allow-from";
-import { adaptScopedAccountAccessor } from "openclaw/plugin-sdk/channel-config-helpers";
-import { createScopedChannelConfigAdapter } from "openclaw/plugin-sdk/channel-config-helpers";
-import type { ChannelDoctorAdapter } from "openclaw/plugin-sdk/channel-contract";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
+import { describeAccountSnapshot } from "steelengine/plugin-sdk/account-helpers";
+import { normalizeAccountId } from "steelengine/plugin-sdk/account-id";
+import { formatAllowFromLowercase } from "steelengine/plugin-sdk/allow-from";
+import { adaptScopedAccountAccessor } from "steelengine/plugin-sdk/channel-config-helpers";
+import { createScopedChannelConfigAdapter } from "steelengine/plugin-sdk/channel-config-helpers";
+import type { ChannelDoctorAdapter } from "steelengine/plugin-sdk/channel-contract";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
 import { inspectDiscordAccount } from "./account-inspect.js";
 import {
   isDiscordAccountEnabledForRuntime,
@@ -25,7 +25,7 @@ import {
 import { DiscordChannelConfigSchema } from "./config-schema.js";
 import { normalizeCompatibilityConfig } from "./doctor-contract.js";
 import { DISCORD_LEGACY_CONFIG_RULES } from "./doctor-shared.js";
-import type { OpenClawConfig } from "./runtime-api.js";
+import type { SteelEngineConfig } from "./runtime-api.js";
 import {
   collectRuntimeConfigAssignments,
   secretTargetRegistryEntries,
@@ -64,7 +64,7 @@ const discordDoctor: ChannelDoctorAdapter = {
 };
 
 function resolveDiscordConfigAccessorAccount(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId?: string | null;
 }): DiscordConfigAccessorAccount {
   const accountId = normalizeAccountId(

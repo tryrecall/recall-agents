@@ -1,4 +1,4 @@
-import { readProviderTextResponse } from "openclaw/plugin-sdk/provider-http";
+import { readProviderTextResponse } from "steelengine/plugin-sdk/provider-http";
 import {
   admitGuardAdapter,
   assertPinnedModel,

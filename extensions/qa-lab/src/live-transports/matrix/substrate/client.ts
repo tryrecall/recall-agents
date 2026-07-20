@@ -1,10 +1,10 @@
 // Qa Lab Matrix module implements client behavior.
 import { randomUUID } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { expectDefined } from "openclaw/plugin-sdk/expect-runtime";
-import { readResponseWithLimit } from "openclaw/plugin-sdk/response-limit-runtime";
-import { uniqueValues } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { expectDefined } from "steelengine/plugin-sdk/expect-runtime";
+import { readResponseWithLimit } from "steelengine/plugin-sdk/response-limit-runtime";
+import { uniqueValues } from "steelengine/plugin-sdk/string-coerce-runtime";
 import {
   buildMatrixQaMediaMessageContent,
   buildMatrixQaMessageContent,
@@ -583,19 +583,19 @@ export async function provisionMatrixQaRoom(params: {
   });
   const [driver, sut, observer] = await Promise.all([
     anonClient.registerWithToken({
-      deviceName: "OpenClaw Matrix QA Driver",
+      deviceName: "SteelEngine Matrix QA Driver",
       localpart: params.driverLocalpart,
       password: `driver-${randomUUID()}`,
       registrationToken: params.registrationToken,
     }),
     anonClient.registerWithToken({
-      deviceName: "OpenClaw Matrix QA SUT",
+      deviceName: "SteelEngine Matrix QA SUT",
       localpart: params.sutLocalpart,
       password: `sut-${randomUUID()}`,
       registrationToken: params.registrationToken,
     }),
     anonClient.registerWithToken({
-      deviceName: "OpenClaw Matrix QA Observer",
+      deviceName: "SteelEngine Matrix QA Observer",
       localpart: params.observerLocalpart,
       password: `observer-${randomUUID()}`,
       registrationToken: params.registrationToken,

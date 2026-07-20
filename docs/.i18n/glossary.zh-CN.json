@@ -1,7 +1,7 @@
 [
   {
-    "source": "OpenClaw",
-    "target": "OpenClaw"
+    "source": "SteelEngine",
+    "target": "SteelEngine"
   },
   {
     "source": "macOS platform notes",
@@ -1216,12 +1216,12 @@
     "target": "Agent runtime architecture"
   },
   {
-    "source": "OpenClaw agent runtime workflow",
-    "target": "OpenClaw agent runtime workflow"
+    "source": "SteelEngine agent runtime workflow",
+    "target": "SteelEngine agent runtime workflow"
   },
   {
-    "source": "OpenClaw agent runtime architecture",
-    "target": "OpenClaw agent runtime architecture"
+    "source": "SteelEngine agent runtime architecture",
+    "target": "SteelEngine agent runtime architecture"
   },
   {
     "source": "Install and Configure Plugins",
@@ -1484,20 +1484,20 @@
     "target": "待处理的设备配对请求"
   },
   {
-    "source": "openclaw devices list",
-    "target": "openclaw devices list"
+    "source": "steelengine devices list",
+    "target": "steelengine devices list"
   },
   {
-    "source": "openclaw devices approve",
-    "target": "openclaw devices approve"
+    "source": "steelengine devices approve",
+    "target": "steelengine devices approve"
   },
   {
-    "source": "openclaw nodes pending",
-    "target": "openclaw nodes pending"
+    "source": "steelengine nodes pending",
+    "target": "steelengine nodes pending"
   },
   {
-    "source": "openclaw nodes approve",
-    "target": "openclaw nodes approve"
+    "source": "steelengine nodes approve",
+    "target": "steelengine nodes approve"
   },
   {
     "source": "Cloud workers plan",

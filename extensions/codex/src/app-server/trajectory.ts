@@ -5,9 +5,9 @@
 import type {
   EmbeddedRunAttemptParams,
   EmbeddedRunAttemptResult,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
-import { parseSqliteSessionFileMarker } from "openclaw/plugin-sdk/session-store-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/agent-harness-runtime";
+import { parseSqliteSessionFileMarker } from "steelengine/plugin-sdk/session-store-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import { resolveCodexLocalRuntimeAttribution } from "./local-runtime-attribution.js";
 import { flattenCodexDynamicToolFunctions, type CodexDynamicToolSpec } from "./protocol.js";
 
@@ -158,7 +158,7 @@ export function createCodexTrajectoryRecorder(
   return {
     recordEvent: (type, data) => {
       const event = boundedTrajectoryEvent({
-        traceSchema: "openclaw-trajectory",
+        traceSchema: "steelengine-trajectory",
         schemaVersion: 1,
         traceId: params.attempt.sessionId,
         source: "runtime",
@@ -228,7 +228,7 @@ export function recordCodexTrajectoryCompletion(
 }
 
 function parseTrajectoryEnabled(env: NodeJS.ProcessEnv): boolean {
-  const value = env.OPENCLAW_TRAJECTORY?.trim().toLowerCase();
+  const value = env.STEELENGINE_TRAJECTORY?.trim().toLowerCase();
   if (value === "1" || value === "true" || value === "yes" || value === "on") {
     return true;
   }

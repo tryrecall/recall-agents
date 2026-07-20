@@ -1,11 +1,11 @@
-# OpenClaw Microsoft Teams
+# SteelEngine Microsoft Teams
 
-Official OpenClaw channel plugin for Microsoft Teams bot conversations.
+Official SteelEngine channel plugin for Microsoft Teams bot conversations.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugin add @openclaw/msteams
+steelengine plugin add @steelengine/msteams
 ```
 
-Configure the Teams bot credentials and trusted service URLs in OpenClaw, then connect the bot to the teams or chats where agents should operate.
+Configure the Teams bot credentials and trusted service URLs in SteelEngine, then connect the bot to the teams or chats where agents should operate.

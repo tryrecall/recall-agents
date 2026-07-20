@@ -222,10 +222,10 @@ async function buildResponsesPayload(
     if (targetTool && hasDeclaredTool(body, "tool_search_code")) {
       return buildToolCallEventsWithArgs("tool_search_code", {
         code: [
-          `const hits = await openclaw.tools.search(${JSON.stringify(targetTool)}, { limit: 1 });`,
+          `const hits = await steelengine.tools.search(${JSON.stringify(targetTool)}, { limit: 1 });`,
           "const match = hits.find((tool) => tool.name === " + JSON.stringify(targetTool) + ");",
           "if (!match) throw new Error('target tool not found');",
-          `return await openclaw.tools.call(match.id, ${JSON.stringify(plannedArgs)});`,
+          `return await steelengine.tools.call(match.id, ${JSON.stringify(plannedArgs)});`,
         ].join("\n"),
       });
     }
@@ -711,7 +711,7 @@ async function buildResponsesPayload(
         path: "dreaming-shadow-trial-report.md",
         content: [
           "Candidate: The user prefers release reports that include exact verification commands and remaining risk.",
-          "Trial prompt: Prepare a release readiness reply for a local OpenClaw QA change.",
+          "Trial prompt: Prepare a release readiness reply for a local SteelEngine QA change.",
           "Baseline outcome: mentions tests passed but omits the exact command and remaining risk.",
           "Candidate outcome: includes the exact verification command and calls out the remaining review risk.",
           "Verdict: helpful",
@@ -1207,12 +1207,12 @@ async function buildResponsesPayload(
     if (
       !taskEvidenceText ||
       (!taskEvidenceText.includes("# Personal task ledger") &&
-        !taskEvidenceText.includes("Task: prepare a local OpenClaw PR readiness note."))
+        !taskEvidenceText.includes("Task: prepare a local SteelEngine PR readiness note."))
     ) {
       return buildToolCallEventsWithArgs("read", { path: "PERSONAL_TASK_LEDGER.md" });
     }
     if (
-      taskEvidenceText.includes("Task: prepare a local OpenClaw PR readiness note.") &&
+      taskEvidenceText.includes("Task: prepare a local SteelEngine PR readiness note.") &&
       taskEvidenceText.includes("Done: local evidence captured in personal-task-status.txt.")
     ) {
       return buildToolCallEventsWithArgs("write", {

@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { clearRuntimeConfigSnapshot, setRuntimeConfigSnapshot } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { createPluginActivationSource, normalizePluginsConfig } from "../plugins/config-state.js";
 import {
   clearCurrentPluginMetadataSnapshot,
@@ -25,9 +25,9 @@ import {
 import { createPluginSdkTestHarness } from "./test-helpers.js";
 
 const { createTempDirSync } = createPluginSdkTestHarness();
-const originalBundledPluginsDir = process.env.OPENCLAW_BUNDLED_PLUGINS_DIR;
-const originalDisableBundledPlugins = process.env.OPENCLAW_DISABLE_BUNDLED_PLUGINS;
-const originalStateDir = process.env.OPENCLAW_STATE_DIR;
+const originalBundledPluginsDir = process.env.STEELENGINE_BUNDLED_PLUGINS_DIR;
+const originalDisableBundledPlugins = process.env.STEELENGINE_DISABLE_BUNDLED_PLUGINS;
+const originalStateDir = process.env.STEELENGINE_STATE_DIR;
 const trustedBundledFixturesRoot = path.resolve("dist-runtime", "extensions");
 const trustedBundledFixtureDirs: string[] = [];
 type SnapshotPluginRecord = PluginMetadataSnapshot["manifestRegistry"]["plugins"][number];
@@ -50,7 +50,7 @@ function writePluginPackageJson(
   type: "commonjs" | "module" = "module",
 ): void {
   writeJsonFile(path.join(pluginDir, "package.json"), {
-    name: `@openclaw/plugin-${name}`,
+    name: `@steelengine/plugin-${name}`,
     version: "0.0.0",
     type,
   });
@@ -70,7 +70,7 @@ function createBundledPluginDir(prefix: string, marker: string): string {
 }
 
 function useBundledPluginDirOverrideForTest(dir: string): void {
-  process.env.OPENCLAW_BUNDLED_PLUGINS_DIR = dir;
+  process.env.STEELENGINE_BUNDLED_PLUGINS_DIR = dir;
 }
 
 function createThrowingPluginDir(prefix: string): string {
@@ -87,9 +87,9 @@ function createThrowingPluginDir(prefix: string): string {
 }
 
 beforeEach(() => {
-  delete process.env.OPENCLAW_BUNDLED_PLUGINS_DIR;
-  delete process.env.OPENCLAW_DISABLE_BUNDLED_PLUGINS;
-  delete process.env.OPENCLAW_STATE_DIR;
+  delete process.env.STEELENGINE_BUNDLED_PLUGINS_DIR;
+  delete process.env.STEELENGINE_DISABLE_BUNDLED_PLUGINS;
+  delete process.env.STEELENGINE_STATE_DIR;
 });
 
 afterEach(() => {
@@ -102,26 +102,26 @@ afterEach(() => {
   resetFacadeRuntimeStateForTest();
   vi.doUnmock("../plugins/manifest-registry.js");
   if (originalBundledPluginsDir === undefined) {
-    delete process.env.OPENCLAW_BUNDLED_PLUGINS_DIR;
+    delete process.env.STEELENGINE_BUNDLED_PLUGINS_DIR;
   } else {
-    process.env.OPENCLAW_BUNDLED_PLUGINS_DIR = originalBundledPluginsDir;
+    process.env.STEELENGINE_BUNDLED_PLUGINS_DIR = originalBundledPluginsDir;
   }
   if (originalDisableBundledPlugins === undefined) {
-    delete process.env.OPENCLAW_DISABLE_BUNDLED_PLUGINS;
+    delete process.env.STEELENGINE_DISABLE_BUNDLED_PLUGINS;
   } else {
-    process.env.OPENCLAW_DISABLE_BUNDLED_PLUGINS = originalDisableBundledPlugins;
+    process.env.STEELENGINE_DISABLE_BUNDLED_PLUGINS = originalDisableBundledPlugins;
   }
   if (originalStateDir === undefined) {
-    delete process.env.OPENCLAW_STATE_DIR;
+    delete process.env.STEELENGINE_STATE_DIR;
   } else {
-    process.env.OPENCLAW_STATE_DIR = originalStateDir;
+    process.env.STEELENGINE_STATE_DIR = originalStateDir;
   }
 });
 
 describe("plugin-sdk facade runtime", () => {
   it("honors trusted bundled plugin dir overrides", () => {
-    const overrideA = createBundledPluginDir("openclaw-facade-runtime-a-", "override-a");
-    const overrideB = createBundledPluginDir("openclaw-facade-runtime-b-", "override-b");
+    const overrideA = createBundledPluginDir("steelengine-facade-runtime-a-", "override-a");
+    const overrideB = createBundledPluginDir("steelengine-facade-runtime-b-", "override-b");
 
     useBundledPluginDirOverrideForTest(overrideA);
     const fromA = testing.resolveFacadeModuleLocation({
@@ -145,7 +145,7 @@ describe("plugin-sdk facade runtime", () => {
   });
 
   it("falls back to package source surfaces when an override dir is partial", () => {
-    const overrideDir = createTrustedBundledFixtureRoot("openclaw-facade-runtime-empty-");
+    const overrideDir = createTrustedBundledFixtureRoot("steelengine-facade-runtime-empty-");
     useBundledPluginDirOverrideForTest(overrideDir);
 
     const resolved = testing.resolveFacadeModuleLocation({
@@ -160,8 +160,8 @@ describe("plugin-sdk facade runtime", () => {
   });
 
   it("does not fall back to package source surfaces when bundled plugins are disabled", () => {
-    process.env.OPENCLAW_DISABLE_BUNDLED_PLUGINS = "1";
-    delete process.env.OPENCLAW_BUNDLED_PLUGINS_DIR;
+    process.env.STEELENGINE_DISABLE_BUNDLED_PLUGINS = "1";
+    delete process.env.STEELENGINE_BUNDLED_PLUGINS_DIR;
     testing.setFacadeActivationCheckRuntimeForTest({
       resolveRegistryPluginModuleLocation: () => null,
     } as never);
@@ -175,7 +175,7 @@ describe("plugin-sdk facade runtime", () => {
   });
 
   it("returns the same object identity on repeated calls (sentinel consistency)", () => {
-    const dir = createBundledPluginDir("openclaw-facade-identity-", "identity-check");
+    const dir = createBundledPluginDir("steelengine-facade-identity-", "identity-check");
     useBundledPluginDirOverrideForTest(dir);
     const location = {
       modulePath: path.join(dir, "demo", "api.js"),
@@ -200,7 +200,7 @@ describe("plugin-sdk facade runtime", () => {
   });
 
   it("breaks circular facade re-entry during module evaluation", () => {
-    const dir = createBundledPluginDir("openclaw-facade-circular-", "circular-ok");
+    const dir = createBundledPluginDir("steelengine-facade-circular-", "circular-ok");
     const location = {
       modulePath: path.join(dir, "demo", "api.js"),
       boundaryRoot: dir,
@@ -228,7 +228,7 @@ describe("plugin-sdk facade runtime", () => {
   });
 
   it("back-fills the sentinel before post-load facade tracking re-enters", () => {
-    const dir = createBundledPluginDir("openclaw-facade-post-load-", "post-load-ok");
+    const dir = createBundledPluginDir("steelengine-facade-post-load-", "post-load-ok");
     const location = {
       modulePath: path.join(dir, "demo", "api.js"),
       boundaryRoot: dir,
@@ -258,7 +258,7 @@ describe("plugin-sdk facade runtime", () => {
     expect(loader).toHaveBeenCalledTimes(1);
   });
   it("clears the cache on load failure so retries re-execute", () => {
-    const dir = createThrowingPluginDir("openclaw-facade-throw-");
+    const dir = createThrowingPluginDir("steelengine-facade-throw-");
     useBundledPluginDirOverrideForTest(dir);
 
     expect(() =>
@@ -314,7 +314,7 @@ describe("plugin-sdk facade runtime", () => {
   });
 
   it("allows runtime-api facade loads when the bundled plugin is explicitly enabled", () => {
-    const dir = createTempDirSync("openclaw-facade-runtime-enabled-");
+    const dir = createTempDirSync("steelengine-facade-runtime-enabled-");
     fs.mkdirSync(path.join(dir, "discord"), { recursive: true });
     fs.writeFileSync(
       path.join(dir, "discord", "runtime-api.js"),
@@ -364,7 +364,7 @@ describe("plugin-sdk facade runtime", () => {
   });
 
   it("rejects hardlinked artifacts under installed plugin roots", () => {
-    const installedDir = createTempDirSync("openclaw-facade-hardlink-");
+    const installedDir = createTempDirSync("steelengine-facade-hardlink-");
     const originalPath = path.join(installedDir, "original.js");
     fs.writeFileSync(originalPath, 'export const marker = "hardlinked";\n', "utf8");
     const artifactPath = path.join(installedDir, "runtime-api.js");
@@ -381,7 +381,7 @@ describe("plugin-sdk facade runtime", () => {
   });
 
   it("keeps hardlinked artifacts loadable under core-shipped roots", () => {
-    const rootDir = createTrustedBundledFixtureRoot("openclaw-facade-hardlink-bundled-");
+    const rootDir = createTrustedBundledFixtureRoot("steelengine-facade-hardlink-bundled-");
     const pluginDir = path.join(rootDir, "demo");
     fs.mkdirSync(pluginDir, { recursive: true });
     const originalPath = path.join(pluginDir, "original.js");
@@ -399,7 +399,7 @@ describe("plugin-sdk facade runtime", () => {
   });
 
   it("resolves a globally-installed plugin whose rootDir basename matches the dirName", () => {
-    const lineDir = createTempDirSync("openclaw-facade-global-line-");
+    const lineDir = createTempDirSync("steelengine-facade-global-line-");
     fs.mkdirSync(lineDir, { recursive: true });
     fs.writeFileSync(
       path.join(lineDir, "runtime-api.js"),
@@ -409,9 +409,9 @@ describe("plugin-sdk facade runtime", () => {
     fs.writeFileSync(
       path.join(lineDir, "package.json"),
       JSON.stringify({
-        name: "@openclaw/line",
+        name: "@steelengine/line",
         version: "0.0.0",
-        openclaw: {
+        steelengine: {
           extensions: ["./runtime-api.js"],
           channel: { id: "line" },
         },
@@ -419,7 +419,7 @@ describe("plugin-sdk facade runtime", () => {
       "utf8",
     );
     fs.writeFileSync(
-      path.join(lineDir, "openclaw.plugin.json"),
+      path.join(lineDir, "steelengine.plugin.json"),
       JSON.stringify({
         id: "line",
         channels: ["line"],
@@ -447,7 +447,7 @@ describe("plugin-sdk facade runtime", () => {
   });
 
   it("resolves a globally-installed plugin public surface from package dist", () => {
-    const lineDir = createTempDirSync("openclaw-facade-global-line-dist-");
+    const lineDir = createTempDirSync("steelengine-facade-global-line-dist-");
     fs.mkdirSync(path.join(lineDir, "dist"), { recursive: true });
     fs.writeFileSync(
       path.join(lineDir, "dist", "runtime-api.js"),
@@ -457,10 +457,10 @@ describe("plugin-sdk facade runtime", () => {
     fs.writeFileSync(
       path.join(lineDir, "package.json"),
       JSON.stringify({
-        name: "@openclaw/line",
+        name: "@steelengine/line",
         version: "0.0.0",
         type: "module",
-        openclaw: {
+        steelengine: {
           extensions: ["./index.ts"],
           runtimeExtensions: ["./dist/index.js"],
           channel: { id: "line" },
@@ -469,7 +469,7 @@ describe("plugin-sdk facade runtime", () => {
       "utf8",
     );
     fs.writeFileSync(
-      path.join(lineDir, "openclaw.plugin.json"),
+      path.join(lineDir, "steelengine.plugin.json"),
       JSON.stringify({
         id: "line",
         channels: ["line"],
@@ -497,7 +497,7 @@ describe("plugin-sdk facade runtime", () => {
   });
 
   it("resolves a globally-installed plugin with an encoded scoped rootDir basename", () => {
-    const encodedDir = createTempDirSync("openclaw-facade-encoded-line-");
+    const encodedDir = createTempDirSync("steelengine-facade-encoded-line-");
     fs.mkdirSync(encodedDir, { recursive: true });
     fs.writeFileSync(
       path.join(encodedDir, "runtime-api.js"),
@@ -507,9 +507,9 @@ describe("plugin-sdk facade runtime", () => {
     fs.writeFileSync(
       path.join(encodedDir, "package.json"),
       JSON.stringify({
-        name: "@openclaw/line",
+        name: "@steelengine/line",
         version: "0.0.0",
-        openclaw: {
+        steelengine: {
           extensions: ["./runtime-api.js"],
           channel: { id: "line" },
         },
@@ -517,7 +517,7 @@ describe("plugin-sdk facade runtime", () => {
       "utf8",
     );
     fs.writeFileSync(
-      path.join(encodedDir, "openclaw.plugin.json"),
+      path.join(encodedDir, "steelengine.plugin.json"),
       JSON.stringify({
         id: "line",
         channels: ["line"],
@@ -581,7 +581,7 @@ describe("plugin-sdk facade runtime", () => {
   });
 
   it("prefers the source runtime snapshot for facade activation checks", () => {
-    const dir = createTempDirSync("openclaw-facade-source-snapshot-");
+    const dir = createTempDirSync("steelengine-facade-source-snapshot-");
     fs.mkdirSync(path.join(dir, "demo"), { recursive: true });
     fs.writeFileSync(
       path.join(dir, "demo", "runtime-api.js"),
@@ -589,7 +589,7 @@ describe("plugin-sdk facade runtime", () => {
       "utf8",
     );
     fs.writeFileSync(
-      path.join(dir, "demo", "openclaw.plugin.json"),
+      path.join(dir, "demo", "steelengine.plugin.json"),
       JSON.stringify({
         id: "demo",
       }),
@@ -629,19 +629,19 @@ describe("plugin-sdk facade runtime", () => {
   });
 
   it("validates current snapshot against facade boundary config and ignores on mismatch", () => {
-    const dir = createTempDirSync("openclaw-facade-snapshot-validate-");
+    const dir = createTempDirSync("steelengine-facade-snapshot-validate-");
     fs.mkdirSync(path.join(dir, "demo"), { recursive: true });
     fs.writeFileSync(
       path.join(dir, "demo", "runtime-api.js"),
       'export const marker = "snapshot-validate";\n',
       "utf8",
     );
-    // Do NOT write openclaw.plugin.json on disk to force fallback to registry scan
+    // Do NOT write steelengine.plugin.json on disk to force fallback to registry scan
     useBundledPluginDirOverrideForTest(dir);
 
     function createTestSnapshot(
       params: {
-        config?: OpenClawConfig;
+        config?: SteelEngineConfig;
         plugins?: SnapshotPluginRecord[];
       } = {},
     ): PluginMetadataSnapshot {
@@ -694,7 +694,7 @@ describe("plugin-sdk facade runtime", () => {
           demo: { enabled: true },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const matchedSnapshot = createTestSnapshot({
       config: configWithPaths,
       plugins: [
@@ -702,7 +702,7 @@ describe("plugin-sdk facade runtime", () => {
           id: "demo-snapshot",
           rootDir: path.join(dir, "demo"),
           source: path.join(dir, "demo", "runtime-api.js"),
-          manifestPath: path.join(dir, "demo", "openclaw.plugin.json"),
+          manifestPath: path.join(dir, "demo", "steelengine.plugin.json"),
           channels: ["demo"],
           providers: [],
           cliBackends: [],

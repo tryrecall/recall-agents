@@ -11,8 +11,8 @@ Adds web search provider support.
 
 ## Distribution
 
-- Package: `@openclaw/duckduckgo-plugin`
-- Install route: included in OpenClaw
+- Package: `@steelengine/duckduckgo-plugin`
+- Install route: included in SteelEngine
 
 ## Surface
 

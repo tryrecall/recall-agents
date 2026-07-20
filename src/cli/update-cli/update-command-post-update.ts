@@ -1,7 +1,7 @@
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
 import { theme } from "../../../packages/terminal-core/src/theme.js";
 import { readConfigFileSnapshot } from "../../config/config.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { readGatewayServiceState, resolveGatewayService } from "../../daemon/service.js";
 import type { UpdateChannel } from "../../infra/update-channels.js";
 import { compareSemverStrings } from "../../infra/update-check.js";
@@ -135,18 +135,18 @@ export async function finishUpdate(params: {
         ),
       );
       defaultRuntime.log(
-        theme.muted("Commit, stash, or discard the local changes, then rerun `openclaw update`."),
+        theme.muted("Commit, stash, or discard the local changes, then rerun `steelengine update`."),
       );
     }
     if (params.result.reason === "not-git-install") {
       defaultRuntime.log(
         theme.warn(
-          `Skipped: this OpenClaw install isn't a git checkout, and the package manager couldn't be detected. Update via your package manager, then run \`${replaceCliName(formatCliCommand("openclaw doctor"), CLI_NAME)}\` and \`${replaceCliName(formatCliCommand("openclaw gateway restart"), CLI_NAME)}\`.`,
+          `Skipped: this SteelEngine install isn't a git checkout, and the package manager couldn't be detected. Update via your package manager, then run \`${replaceCliName(formatCliCommand("steelengine doctor"), CLI_NAME)}\` and \`${replaceCliName(formatCliCommand("steelengine gateway restart"), CLI_NAME)}\`.`,
         ),
       );
       defaultRuntime.log(
         theme.muted(
-          `Examples: \`${replaceCliName("npm i -g openclaw@latest", CLI_NAME)}\` or \`${replaceCliName("pnpm add -g openclaw@latest", CLI_NAME)}\``,
+          `Examples: \`${replaceCliName("npm i -g steelengine@latest", CLI_NAME)}\` or \`${replaceCliName("pnpm add -g steelengine@latest", CLI_NAME)}\``,
         ),
       );
     }
@@ -204,7 +204,7 @@ export async function finishUpdate(params: {
         ? {
             sourceConfig: params.configSnapshot.sourceConfig,
             authoredConfig: isRecord(params.configSnapshot.parsed)
-              ? (params.configSnapshot.parsed as OpenClawConfig)
+              ? (params.configSnapshot.parsed as SteelEngineConfig)
               : params.configSnapshot.sourceConfig,
           }
         : undefined,
@@ -233,7 +233,7 @@ export async function finishUpdate(params: {
         ? {
             sourceConfig: params.configSnapshot.sourceConfig,
             authoredConfig: isRecord(params.configSnapshot.parsed)
-              ? (params.configSnapshot.parsed as OpenClawConfig)
+              ? (params.configSnapshot.parsed as SteelEngineConfig)
               : params.configSnapshot.sourceConfig,
           }
         : undefined,
@@ -249,9 +249,9 @@ export async function finishUpdate(params: {
         : null;
     const compatibilityDowngradeTarget =
       versionComparison != null && versionComparison > 0 ? postUpdateInstalledVersion : null;
-    const previousCompatibilityHostVersion = process.env.OPENCLAW_COMPATIBILITY_HOST_VERSION;
+    const previousCompatibilityHostVersion = process.env.STEELENGINE_COMPATIBILITY_HOST_VERSION;
     if (compatibilityDowngradeTarget) {
-      process.env.OPENCLAW_COMPATIBILITY_HOST_VERSION = compatibilityDowngradeTarget;
+      process.env.STEELENGINE_COMPATIBILITY_HOST_VERSION = compatibilityDowngradeTarget;
     }
     try {
       postCorePluginUpdate = await updatePluginsAfterCoreUpdate({
@@ -267,9 +267,9 @@ export async function finishUpdate(params: {
     } finally {
       if (compatibilityDowngradeTarget) {
         if (previousCompatibilityHostVersion === undefined) {
-          delete process.env.OPENCLAW_COMPATIBILITY_HOST_VERSION;
+          delete process.env.STEELENGINE_COMPATIBILITY_HOST_VERSION;
         } else {
-          process.env.OPENCLAW_COMPATIBILITY_HOST_VERSION = previousCompatibilityHostVersion;
+          process.env.STEELENGINE_COMPATIBILITY_HOST_VERSION = previousCompatibilityHostVersion;
         }
       }
     }

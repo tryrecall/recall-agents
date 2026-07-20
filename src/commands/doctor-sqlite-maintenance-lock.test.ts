@@ -13,16 +13,16 @@ const tempDirs = useAutoCleanupTempDirTracker((cleanup) => {
 });
 
 async function createLockFixture() {
-  const root = tempDirs.make("openclaw-doctor-sqlite-lock-");
+  const root = tempDirs.make("steelengine-doctor-sqlite-lock-");
   const stateDir = path.join(root, "state");
-  const configPath = path.join(stateDir, "openclaw.json");
+  const configPath = path.join(stateDir, "steelengine.json");
   const lockDir = path.join(root, "locks");
   await fs.mkdir(stateDir, { recursive: true });
   await fs.writeFile(configPath, "{}\n", "utf8");
   const env = {
     ...process.env,
-    OPENCLAW_CONFIG_PATH: configPath,
-    OPENCLAW_STATE_DIR: stateDir,
+    STEELENGINE_CONFIG_PATH: configPath,
+    STEELENGINE_STATE_DIR: stateDir,
     VITEST: "1",
   };
   return {
@@ -32,7 +32,7 @@ async function createLockFixture() {
       lockDir,
       platform: "darwin" as const,
       pollIntervalMs: 2,
-      readProcessCmdline: () => ["openclaw-gateway"],
+      readProcessCmdline: () => ["steelengine-gateway"],
       timeoutMs: 15,
     },
   };
@@ -118,7 +118,7 @@ describe("doctor SQLite maintenance lock", () => {
         platform: "darwin",
         port: 18789,
         pollIntervalMs: 2,
-        readProcessCmdline: () => ["openclaw", "doctor", "--session-sqlite", "compact"],
+        readProcessCmdline: () => ["steelengine", "doctor", "--session-sqlite", "compact"],
         timeoutMs: 15,
       }),
     ).rejects.toBeInstanceOf(GatewayLockError);
@@ -175,7 +175,7 @@ describe("doctor SQLite maintenance lock", () => {
     const run = vi.fn();
     const gatewayLock = await acquireGatewayLock({
       allowInTests: true,
-      env: { ...fixture.env, OPENCLAW_ALLOW_MULTI_GATEWAY: "1" },
+      env: { ...fixture.env, STEELENGINE_ALLOW_MULTI_GATEWAY: "1" },
       lockDir: fixture.lockDir,
       platform: "darwin",
       port: 18789,
@@ -208,7 +208,7 @@ describe("doctor SQLite maintenance lock", () => {
     await expect(
       withDoctorSqliteMaintenanceLock(
         {
-          env: { ...fixture.env, OPENCLAW_ALLOW_MULTI_GATEWAY: "1" },
+          env: { ...fixture.env, STEELENGINE_ALLOW_MULTI_GATEWAY: "1" },
           operation: "state SQLite compaction",
           run: () => "done",
         },
@@ -220,7 +220,7 @@ describe("doctor SQLite maintenance lock", () => {
   it("refuses explicit destructive targets outside the locked state directory", async () => {
     const fixture = await createLockFixture();
     const externalPath = path.join(
-      tempDirs.make("openclaw-external-session-store-"),
+      tempDirs.make("steelengine-external-session-store-"),
       "sessions.json",
     );
     const run = vi.fn();
@@ -235,7 +235,7 @@ describe("doctor SQLite maintenance lock", () => {
         },
         { lockOptions: fixture.lockOptions },
       ),
-    ).rejects.toThrow(/outside the active OpenClaw state directory/);
+    ).rejects.toThrow(/outside the active SteelEngine state directory/);
     expect(run).not.toHaveBeenCalled();
 
     const gatewayLock = await acquireGatewayLock({
@@ -257,10 +257,10 @@ describe("doctor SQLite maintenance lock", () => {
       return;
     }
     const fixture = await createLockFixture();
-    const sessionsDir = path.join(fixture.env.OPENCLAW_STATE_DIR, "agents", "main", "sessions");
+    const sessionsDir = path.join(fixture.env.STEELENGINE_STATE_DIR, "agents", "main", "sessions");
     const storePath = path.join(sessionsDir, "sessions.json");
     const outsideTarget = path.join(
-      tempDirs.make("openclaw-dangling-session-target-"),
+      tempDirs.make("steelengine-dangling-session-target-"),
       "missing.json",
     );
     await fs.mkdir(sessionsDir, { recursive: true });
@@ -277,7 +277,7 @@ describe("doctor SQLite maintenance lock", () => {
         },
         { lockOptions: fixture.lockOptions },
       ),
-    ).rejects.toThrow(/outside the active OpenClaw state directory/);
+    ).rejects.toThrow(/outside the active SteelEngine state directory/);
     expect(run).not.toHaveBeenCalled();
   });
 
@@ -287,10 +287,10 @@ describe("doctor SQLite maintenance lock", () => {
     }
     const fixture = await createLockFixture();
     const externalAlias = path.join(
-      path.dirname(fixture.env.OPENCLAW_STATE_DIR),
+      path.dirname(fixture.env.STEELENGINE_STATE_DIR),
       "external-state-alias",
     );
-    await fs.symlink(fixture.env.OPENCLAW_STATE_DIR, externalAlias, "dir");
+    await fs.symlink(fixture.env.STEELENGINE_STATE_DIR, externalAlias, "dir");
     const storePath = path.join(externalAlias, "agents", "main", "sessions", "sessions.json");
     const run = vi.fn();
 
@@ -304,15 +304,15 @@ describe("doctor SQLite maintenance lock", () => {
         },
         { lockOptions: fixture.lockOptions },
       ),
-    ).rejects.toThrow(/outside the active OpenClaw state directory/);
+    ).rejects.toThrow(/outside the active SteelEngine state directory/);
     expect(run).not.toHaveBeenCalled();
   });
 
   it("refuses in-state hard links that can alias storage outside ownership", async () => {
     const fixture = await createLockFixture();
-    const sessionsDir = path.join(fixture.env.OPENCLAW_STATE_DIR, "agents", "main", "sessions");
+    const sessionsDir = path.join(fixture.env.STEELENGINE_STATE_DIR, "agents", "main", "sessions");
     const storePath = path.join(sessionsDir, "sessions.json");
-    const externalDir = path.join(path.dirname(fixture.env.OPENCLAW_STATE_DIR), "external-state");
+    const externalDir = path.join(path.dirname(fixture.env.STEELENGINE_STATE_DIR), "external-state");
     const externalPath = path.join(externalDir, "sessions.json");
     await fs.mkdir(sessionsDir, { recursive: true });
     await fs.mkdir(externalDir, { recursive: true });
@@ -338,7 +338,7 @@ describe("doctor SQLite maintenance lock", () => {
   it("allows explicit destructive targets owned by the locked state directory", async () => {
     const fixture = await createLockFixture();
     const storePath = path.join(
-      fixture.env.OPENCLAW_STATE_DIR,
+      fixture.env.STEELENGINE_STATE_DIR,
       "agents",
       "main",
       "sessions",

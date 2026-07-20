@@ -10,12 +10,12 @@ describe("hasAuthProfileStoreSourceForProvider", () => {
   });
 
   async function withAgentStore(profiles: Record<string, unknown>) {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-source-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-auth-source-"));
     const stateDir = path.join(root, "state");
     const agentDir = path.join(root, "agent");
     await fs.mkdir(agentDir, { recursive: true });
     await fs.mkdir(stateDir, { recursive: true });
-    vi.stubEnv("OPENCLAW_STATE_DIR", stateDir);
+    vi.stubEnv("STEELENGINE_STATE_DIR", stateDir);
     await fs.writeFile(
       path.join(agentDir, "auth-profiles.json"),
       JSON.stringify({ version: 1, profiles }),
@@ -24,12 +24,12 @@ describe("hasAuthProfileStoreSourceForProvider", () => {
   }
 
   async function withLegacyAuthStore(profiles: Record<string, unknown>) {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-source-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-auth-source-"));
     const stateDir = path.join(root, "state");
     const agentDir = path.join(root, "agent");
     await fs.mkdir(agentDir, { recursive: true });
     await fs.mkdir(stateDir, { recursive: true });
-    vi.stubEnv("OPENCLAW_STATE_DIR", stateDir);
+    vi.stubEnv("STEELENGINE_STATE_DIR", stateDir);
     await fs.writeFile(path.join(agentDir, "auth.json"), JSON.stringify(profiles));
     return { agentDir };
   }

@@ -2,15 +2,15 @@
 import {
   resolveApprovalOverGateway,
   type ApprovalResolveResult,
-} from "openclaw/plugin-sdk/approval-gateway-runtime";
-import type { ExecApprovalReplyDecision } from "openclaw/plugin-sdk/approval-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { isApprovalNotFoundError } from "openclaw/plugin-sdk/error-runtime";
+} from "steelengine/plugin-sdk/approval-gateway-runtime";
+import type { ExecApprovalReplyDecision } from "steelengine/plugin-sdk/approval-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { isApprovalNotFoundError } from "steelengine/plugin-sdk/error-runtime";
 
 export { isApprovalNotFoundError };
 
 export async function resolveMatrixApproval(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   approvalId: string;
   approvalKind: "exec" | "plugin";
   decision: ExecApprovalReplyDecision;

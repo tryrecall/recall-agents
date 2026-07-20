@@ -1,21 +1,21 @@
 ---
-summary: "Redirect: flow commands live under `openclaw tasks flow`"
+summary: "Redirect: flow commands live under `steelengine tasks flow`"
 read_when:
-  - You encounter `openclaw flows` in older docs or release notes
+  - You encounter `steelengine flows` in older docs or release notes
   - You want a quick TaskFlow inspection reference
 title: "Flows (redirect)"
 ---
 
-# `openclaw tasks flow`
+# `steelengine tasks flow`
 
-There is no top-level `openclaw flows` command. Durable TaskFlow inspection lives under `openclaw tasks flow`.
+There is no top-level `steelengine flows` command. Durable TaskFlow inspection lives under `steelengine tasks flow`.
 
 ## Subcommands
 
 ```bash
-openclaw tasks flow list   [--json] [--status <name>]
-openclaw tasks flow show   <lookup> [--json]
-openclaw tasks flow cancel <lookup>
+steelengine tasks flow list   [--json] [--status <name>]
+steelengine tasks flow show   <lookup> [--json]
+steelengine tasks flow cancel <lookup>
 ```
 
 | Subcommand | Description                | Arguments / options                                                                   |
@@ -33,12 +33,12 @@ openclaw tasks flow cancel <lookup>
 ## Examples
 
 ```bash
-openclaw tasks flow list
-openclaw tasks flow list --status running
-openclaw tasks flow list --json
-openclaw tasks flow show flow_abc123
-openclaw tasks flow show flow_abc123 --json
-openclaw tasks flow cancel flow_abc123
+steelengine tasks flow list
+steelengine tasks flow list --status running
+steelengine tasks flow list --json
+steelengine tasks flow show flow_abc123
+steelengine tasks flow show flow_abc123 --json
+steelengine tasks flow cancel flow_abc123
 ```
 
 For TaskFlow concepts and authoring, see [TaskFlow](/automation/taskflow). For the parent `tasks` command, see [tasks CLI reference](/cli/tasks).

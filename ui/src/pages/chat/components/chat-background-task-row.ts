@@ -70,16 +70,16 @@ export function renderTaskRow(task: TaskSummary, props: BackgroundTasksProps): T
           ${task.status === "running"
             ? html`<span class="chat-tasks-rail__task-pulse" aria-hidden="true"></span>`
             : nothing}
-          <openclaw-tooltip .content=${title}>
+          <steelengine-tooltip .content=${title}>
             <span class="chat-tasks-rail__task-title">${title}</span>
-          </openclaw-tooltip>
+          </steelengine-tooltip>
           <span class="chat-tasks-rail__task-chevron" aria-hidden="true">
             ${expanded ? icons.chevronDown : icons.chevronRight}
           </span>
         </button>
         ${active && props.canCancel
           ? html`
-              <openclaw-tooltip .content=${t("chat.backgroundTasks.stopTask", { title })}>
+              <steelengine-tooltip .content=${t("chat.backgroundTasks.stopTask", { title })}>
                 <button
                   class="chat-tasks-rail__task-stop"
                   type="button"
@@ -89,7 +89,7 @@ export function renderTaskRow(task: TaskSummary, props: BackgroundTasksProps): T
                 >
                   ${cancelling ? icons.loader : icons.stop}
                 </button>
-              </openclaw-tooltip>
+              </steelengine-tooltip>
             `
           : nothing}
       </div>
@@ -101,7 +101,7 @@ export function renderTaskRow(task: TaskSummary, props: BackgroundTasksProps): T
         <span>${taskRuntimeLabel(task)}</span>
         ${active && startedMs > 0
           ? html`<span class="chat-tasks-rail__task-sep" aria-hidden="true">·</span>
-              <span><openclaw-elapsed-time .startMs=${startedMs}></openclaw-elapsed-time></span>`
+              <span><steelengine-elapsed-time .startMs=${startedMs}></steelengine-elapsed-time></span>`
           : nothing}
         ${finishedDuration
           ? html`<span class="chat-tasks-rail__task-sep" aria-hidden="true">·</span>

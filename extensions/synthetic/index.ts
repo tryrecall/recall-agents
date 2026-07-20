@@ -1,5 +1,5 @@
-// Synthetic plugin entrypoint registers its OpenClaw integration.
-import { defineSingleProviderPluginEntry } from "openclaw/plugin-sdk/provider-entry";
+// Synthetic plugin entrypoint registers its SteelEngine integration.
+import { defineSingleProviderPluginEntry } from "steelengine/plugin-sdk/provider-entry";
 import { applySyntheticConfig, SYNTHETIC_DEFAULT_MODEL_REF } from "./onboard.js";
 import { buildSyntheticProvider } from "./provider-catalog.js";
 

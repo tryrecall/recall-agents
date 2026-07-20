@@ -10,7 +10,7 @@ import { resolveProviderToolPolicyEntry } from "../../agents/provider-tool-polic
 import { isToolAllowedByPolicyName } from "../../agents/tool-policy-match.js";
 import type { ToolPolicyFilterEvent } from "../../agents/tool-policy-pipeline.js";
 import type { AnyAgentTool } from "../../agents/tools/common.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type { AgentToolsConfig } from "../../config/types.tools.js";
 import { normalizeAgentId } from "../../routing/session-key.js";
 
@@ -29,7 +29,7 @@ type AgentToolsLocation = {
   tools: AgentToolsConfig;
 };
 
-function findAgentTools(config: OpenClawConfig, agentId: string): AgentToolsLocation | undefined {
+function findAgentTools(config: SteelEngineConfig, agentId: string): AgentToolsLocation | undefined {
   const index = config.agents?.list?.findIndex(
     (entry) => normalizeAgentId(entry.id) === normalizeAgentId(agentId),
   );
@@ -40,7 +40,7 @@ function findAgentTools(config: OpenClawConfig, agentId: string): AgentToolsLoca
 }
 
 function providerPolicyPath(params: {
-  tools: AgentToolsConfig | OpenClawConfig["tools"] | undefined;
+  tools: AgentToolsConfig | SteelEngineConfig["tools"] | undefined;
   basePath: string;
   capabilityProfile: ResolvedConversationCapabilityProfile;
 }): { path: string; profile?: string; ownsAlsoAllow: boolean } | undefined {
@@ -59,7 +59,7 @@ function providerPolicyPath(params: {
 }
 
 function profileAlsoAllowPath(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   agent: AgentToolsLocation | undefined;
   profileOwnerPath: string;
 }): string {
@@ -93,7 +93,7 @@ function policyDeniesWorkshop(event: ToolPolicyFilterEvent): boolean {
 }
 
 function describeExclusion(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   agentId: string;
   capabilityProfile: ResolvedConversationCapabilityProfile;
   event: ToolPolicyFilterEvent;
@@ -187,7 +187,7 @@ function makeSkillWorkshopPolicyProbe(): AnyAgentTool {
 
 /** Applies the real final tool-policy composition used by agent sessions and /learn. */
 export function resolveSkillWorkshopToolPolicyAvailability(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   conversationCapabilityProfile: ResolvedConversationCapabilityProfile;
 }): SkillWorkshopToolPolicyAvailability {
   let exclusion: ToolPolicyFilterEvent | undefined;
@@ -215,7 +215,7 @@ export function resolveSkillWorkshopToolPolicyAvailability(params: {
 
 /** Returns an actionable diagnostic when an active Workshop tool is policy-hidden. */
 export function detectSkillWorkshopToolPolicyDiagnostic(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   workshopEnabled: boolean;
   agentId?: string;
 }): SkillWorkshopToolPolicyDiagnostic | null {

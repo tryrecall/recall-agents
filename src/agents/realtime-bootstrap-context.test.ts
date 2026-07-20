@@ -3,25 +3,25 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { resolveRealtimeBootstrapContextInstructions } from "./realtime-bootstrap-context.js";
 
 const tempDirs: string[] = [];
 
 async function makeWorkspace(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-realtime-bootstrap-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-realtime-bootstrap-"));
   tempDirs.push(dir);
   return dir;
 }
 
-function makeConfig(workspaceDir: string): OpenClawConfig {
+function makeConfig(workspaceDir: string): SteelEngineConfig {
   // Bootstrap context resolves files through the configured default agent workspace.
   return {
     agents: {
       defaults: { workspace: workspaceDir },
       list: [{ id: "main", default: true }],
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 afterEach(async () => {
@@ -42,7 +42,7 @@ describe("resolveRealtimeBootstrapContextInstructions", () => {
       sessionKey: "agent:main:discord:channel:1001",
     });
 
-    expect(instructions).toContain("OpenClaw realtime voice profile context");
+    expect(instructions).toContain("SteelEngine realtime voice profile context");
     expect(instructions).toContain("### IDENTITY.md");
     expect(instructions).toContain("Name: Wilfred");
     expect(instructions).toContain("### USER.md");
@@ -51,7 +51,7 @@ describe("resolveRealtimeBootstrapContextInstructions", () => {
     expect(instructions).toContain("Warm and dry.");
     expect(instructions).not.toContain("AGENTS.md");
     expect(instructions).not.toContain("Do not load me here.");
-    expect(instructions).not.toContain("openclaw_agent_consult");
+    expect(instructions).not.toContain("steelengine_agent_consult");
     expect(instructions).not.toContain(workspaceDir);
   });
 

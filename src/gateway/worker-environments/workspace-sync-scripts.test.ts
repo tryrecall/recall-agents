@@ -18,7 +18,7 @@ afterEach(async () => {
 });
 
 async function fixture() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-quiescence-test-"));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-quiescence-test-"));
   roots.push(root);
   const home = path.join(root, "home");
   let workspace = path.join(root, "workspace");
@@ -30,7 +30,7 @@ async function fixture() {
   await fs.mkdir(bin);
   await fs.writeFile(
     path.join(bin, "ps"),
-    '#!/bin/sh\ncase "$*" in\n  *"stat=,lstart= -p"*) printf "T Tue Jul 15 08:00:00 2026\\n" ;;\n  *"lstart= -p"*) printf "Tue Jul 15 08:00:00 2026\\n" ;;\n  *) printf "%s %s %s S Tue Jul 15 08:00:00 2026\\n" "$$" "$PPID" "$(id -u)"; if [ -f "$OPENCLAW_TEST_PS_EXTRA" ]; then cat "$OPENCLAW_TEST_PS_EXTRA"; fi ;;\nesac\n',
+    '#!/bin/sh\ncase "$*" in\n  *"stat=,lstart= -p"*) printf "T Tue Jul 15 08:00:00 2026\\n" ;;\n  *"lstart= -p"*) printf "Tue Jul 15 08:00:00 2026\\n" ;;\n  *) printf "%s %s %s S Tue Jul 15 08:00:00 2026\\n" "$$" "$PPID" "$(id -u)"; if [ -f "$STEELENGINE_TEST_PS_EXTRA" ]; then cat "$STEELENGINE_TEST_PS_EXTRA"; fi ;;\nesac\n',
   );
   await fs.chmod(path.join(bin, "ps"), 0o755);
   return {
@@ -40,7 +40,7 @@ async function fixture() {
     env: {
       ...process.env,
       HOME: home,
-      OPENCLAW_TEST_PS_EXTRA: extraProcessPath,
+      STEELENGINE_TEST_PS_EXTRA: extraProcessPath,
       PATH: `${bin}:${process.env.PATH ?? ""}`,
     },
   };
@@ -59,7 +59,7 @@ async function quiesce(input: Awaited<ReturnType<typeof fixture>>) {
 
 function leasePath(home: string, workspace: string, nonce: string) {
   const key = createHash("sha256").update(workspace).digest("hex");
-  return path.join(home, ".openclaw-worker", "quiescence", `${key}.${nonce}.json`);
+  return path.join(home, ".steelengine-worker", "quiescence", `${key}.${nonce}.json`);
 }
 
 async function resume(input: Awaited<ReturnType<typeof fixture>>, nonce: string) {
@@ -186,7 +186,7 @@ describe("remote workspace quiescence scripts", () => {
 
 describe("remote workspace manifest script", () => {
   it("drops derived artifacts from the worker manifest", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-manifest-derived-test-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-manifest-derived-test-"));
     roots.push(root);
     const home = path.join(root, "home");
     const workspace = path.join(root, "workspace");
@@ -218,7 +218,7 @@ describe("remote workspace manifest script", () => {
     expect(result.code).toBe(0);
     const digest = result.stdout.trim().slice("sha256:".length);
     const manifest = JSON.parse(
-      await fs.readFile(path.join(home, ".openclaw-worker", "manifests", `${digest}.json`), "utf8"),
+      await fs.readFile(path.join(home, ".steelengine-worker", "manifests", `${digest}.json`), "utf8"),
     ) as { entries: Array<{ path: string }> };
     const manifestPaths = manifest.entries.map((entry) => entry.path);
     expect(manifestPaths).toContain("keep.ts");
@@ -228,7 +228,7 @@ describe("remote workspace manifest script", () => {
   });
 
   it("keeps base tombstones in the final ignored-path verification", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-manifest-tombstone-test-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-manifest-tombstone-test-"));
     roots.push(root);
     const home = path.join(root, "home");
     const workspace = path.join(root, "workspace");
@@ -240,9 +240,9 @@ describe("remote workspace manifest script", () => {
       ["add", ".gitignore"],
       [
         "-c",
-        "user.name=OpenClaw Test",
+        "user.name=SteelEngine Test",
         "-c",
-        "user.email=test@openclaw.invalid",
+        "user.email=test@steelengine.invalid",
         "commit",
         "--quiet",
         "-m",
@@ -307,7 +307,7 @@ describe("remote workspace manifest script", () => {
   });
 
   it("drops stale descendants when a tracked directory becomes a file", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-manifest-test-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-manifest-test-"));
     roots.push(root);
     const home = path.join(root, "home");
     const workspace = path.join(root, "workspace");
@@ -319,9 +319,9 @@ describe("remote workspace manifest script", () => {
       ["add", "."],
       [
         "-c",
-        "user.name=OpenClaw Test",
+        "user.name=SteelEngine Test",
         "-c",
-        "user.email=test@openclaw.invalid",
+        "user.email=test@steelengine.invalid",
         "commit",
         "--quiet",
         "-m",
@@ -371,7 +371,7 @@ describe("remote workspace manifest script", () => {
       await fs.readFile(
         path.join(
           home,
-          ".openclaw-worker",
+          ".steelengine-worker",
           "manifests",
           current.stdout.trim().slice("sha256:".length) + ".json",
         ),

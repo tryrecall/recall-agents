@@ -1,18 +1,18 @@
 // Qqbot plugin module implements channel behavior.
-import { getExecApprovalReplyMetadata } from "openclaw/plugin-sdk/approval-runtime";
-import { buildChannelOutboundSessionRoute } from "openclaw/plugin-sdk/channel-core";
+import { getExecApprovalReplyMetadata } from "steelengine/plugin-sdk/approval-runtime";
+import { buildChannelOutboundSessionRoute } from "steelengine/plugin-sdk/channel-core";
 import {
   createMessageReceiptFromOutboundResults,
   defineChannelMessageAdapter,
   type ChannelMessageSendResult,
   type MessageReceiptPartKind,
-} from "openclaw/plugin-sdk/channel-outbound";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { ChannelPlugin } from "openclaw/plugin-sdk/core";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
+} from "steelengine/plugin-sdk/channel-outbound";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { ChannelPlugin } from "steelengine/plugin-sdk/core";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
 // Register the PlatformAdapter before any core/ module is used.
 import "./bridge/bootstrap.js";
-import { sanitizeAssistantVisibleText } from "openclaw/plugin-sdk/text-chunking";
+import { sanitizeAssistantVisibleText } from "steelengine/plugin-sdk/text-chunking";
 import { getQQBotApprovalCapability } from "./bridge/approval/capability.js";
 import { qqbotConfigAdapter, qqbotMeta, qqbotSetupAdapterShared } from "./bridge/config-shared.js";
 import {
@@ -21,7 +21,7 @@ import {
   resolveQQBotAccount,
 } from "./bridge/config.js";
 import type { GatewayContext } from "./bridge/gateway.js";
-import { toGatewayAccount, writeOpenClawConfigThroughRuntime } from "./bridge/narrowing.js";
+import { toGatewayAccount, writeSteelEngineConfigThroughRuntime } from "./bridge/narrowing.js";
 import { getQQBotRuntime } from "./bridge/runtime.js";
 import { qqbotSetupWizard } from "./bridge/setup/surface.js";
 import { qqbotChannelConfigSchema } from "./config-schema.js";
@@ -65,7 +65,7 @@ function createQQBotSendReceipt(params: {
 }
 
 function resolveQQBotOutboundSessionRoute(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId: string;
   accountId?: string | null;
   target: string;
@@ -88,7 +88,7 @@ function resolveQQBotOutboundSessionRoute(params: {
 
 async function sendQQBotText(
   params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     to: string;
     text: string;
     accountId?: string | null;
@@ -124,7 +124,7 @@ async function sendQQBotText(
 
 async function sendQQBotMedia(
   params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     to: string;
     text?: string | null;
     mediaUrl?: string | null;
@@ -227,7 +227,7 @@ function persistAccountCredentialSnapshot(account: ResolvedQQBotAccount): void {
 }
 
 function shouldSuppressLocalQQBotApprovalPrompt(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId?: string | null;
   payload: { text?: string; channelData?: unknown };
   hint?: { kind: "approval-pending" | "approval-resolved"; approvalKind: "exec" | "plugin" };
@@ -268,7 +268,7 @@ export const qqbotPlugin: ChannelPlugin<ResolvedQQBotAccount> = {
      * Treat an account as configured when either the live config has
      * credentials OR a recoverable credential backup exists. This mirrors
      * the standalone plugin and lets the gateway survive a hot upgrade
-     * that wiped openclaw.json mid-flight.
+     * that wiped steelengine.json mid-flight.
      */
     isConfigured: (account: ResolvedQQBotAccount | undefined) => {
       if (qqbotConfigAdapter.isConfigured(account)) {
@@ -341,7 +341,7 @@ export const qqbotPlugin: ChannelPlugin<ResolvedQQBotAccount> = {
 
       // Recover credentials from the per-account backup if the live
       // config is missing appId/secret (e.g. a hot-upgrade wiped
-      // openclaw.json). We only restore when both fields are empty so a
+      // steelengine.json). We only restore when both fields are empty so a
       // user's intentional clear isn't silently undone.
       if (!account.appId || !account.clientSecret) {
         const backup = loadCredentialBackup(account.accountId);
@@ -351,7 +351,7 @@ export const qqbotPlugin: ChannelPlugin<ResolvedQQBotAccount> = {
               appId: backup.appId,
               clientSecret: backup.clientSecret,
             });
-            await writeOpenClawConfigThroughRuntime(getQQBotRuntime(), nextCfg);
+            await writeSteelEngineConfigThroughRuntime(getQQBotRuntime(), nextCfg);
             cfg = nextCfg;
             account = resolveQQBotAccount(nextCfg, account.accountId);
             log?.info(
@@ -390,7 +390,7 @@ export const qqbotPlugin: ChannelPlugin<ResolvedQQBotAccount> = {
             lastError: null,
           });
           // Snapshot credentials so we can recover from the next hot
-          // upgrade that might wipe openclaw.json mid-flight.
+          // upgrade that might wipe steelengine.json mid-flight.
           persistAccountCredentialSnapshot(account);
         },
         onResumed: () => {
@@ -433,10 +433,10 @@ export const qqbotPlugin: ChannelPlugin<ResolvedQQBotAccount> = {
       );
 
       if (changed) {
-        await writeOpenClawConfigThroughRuntime(getQQBotRuntime(), nextCfg as OpenClawConfig);
+        await writeSteelEngineConfigThroughRuntime(getQQBotRuntime(), nextCfg as SteelEngineConfig);
       }
 
-      const resolved = resolveQQBotAccount((changed ? nextCfg : cfg) as OpenClawConfig, accountId);
+      const resolved = resolveQQBotAccount((changed ? nextCfg : cfg) as SteelEngineConfig, accountId);
       const loggedOut = resolved.secretSource === "none";
       const envToken = Boolean(process.env.QQBOT_CLIENT_SECRET);
 

@@ -1,7 +1,7 @@
 // Normalizes model selection directives into provider and model ids.
-import { normalizeProviderId } from "@openclaw/model-catalog-core/provider-id";
-import { expectDefined } from "@openclaw/normalization-core";
-import { normalizeLowercaseStringOrEmpty } from "@openclaw/normalization-core/string-coerce";
+import { normalizeProviderId } from "@steelengine/model-catalog-core/provider-id";
+import { expectDefined } from "@steelengine/normalization-core";
+import { normalizeLowercaseStringOrEmpty } from "@steelengine/normalization-core/string-coerce";
 import { modelKey } from "../../agents/model-ref-shared.js";
 import {
   isModelKeyAllowedBySet,
@@ -20,7 +20,7 @@ export type ModelDirectiveSelection = {
 };
 
 function formatAddModelCommand(modelRef: string): string {
-  return `openclaw config set agents.defaults.models '${JSON.stringify({ [modelRef]: {} })}' --strict-json --merge`;
+  return `steelengine config set agents.defaults.models '${JSON.stringify({ [modelRef]: {} })}' --strict-json --merge`;
 }
 
 function formatNotAllowedError(params: {
@@ -37,7 +37,7 @@ function formatNotAllowedError(params: {
     `Then retry: ${retryCommand}`,
   ];
   if (rawRuntime && normalizeProviderId(rawRuntime) === "codex") {
-    lines.push("If the Codex runtime is missing, run: openclaw plugins enable codex");
+    lines.push("If the Codex runtime is missing, run: steelengine plugins enable codex");
   }
   return lines.join("\n");
 }

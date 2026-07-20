@@ -379,7 +379,7 @@ describe("runAgentTurnWithFallback: CLI session routing", () => {
       payloads: [{ text: "handled" }],
       meta: {
         agentMeta: {
-          sessionId: "openclaw-session",
+          sessionId: "steelengine-session",
           provider: "codex-cli",
           model: "gpt-5.4",
         },

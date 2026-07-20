@@ -1,6 +1,6 @@
 // Slack plugin module implements group policy behavior.
-import { normalizeAccountId } from "openclaw/plugin-sdk/account-resolution";
-import type { ChannelGroupContext } from "openclaw/plugin-sdk/channel-contract";
+import { normalizeAccountId } from "steelengine/plugin-sdk/account-resolution";
+import type { ChannelGroupContext } from "steelengine/plugin-sdk/channel-contract";
 import {
   resolveScopeRequireMention,
   resolveScopeToolsPolicy,
@@ -8,8 +8,8 @@ import {
   type GroupToolPolicyConfig,
   type ScopeNode,
   type ScopeTree,
-} from "openclaw/plugin-sdk/channel-policy";
-import { normalizeHyphenSlug } from "openclaw/plugin-sdk/string-normalization-runtime";
+} from "steelengine/plugin-sdk/channel-policy";
+import { normalizeHyphenSlug } from "steelengine/plugin-sdk/string-normalization-runtime";
 import { mergeSlackAccountConfig, resolveDefaultSlackAccountId } from "./accounts.js";
 
 type SlackChannelPolicyEntry = {

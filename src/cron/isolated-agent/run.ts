@@ -1,5 +1,5 @@
 import { isDeepStrictEqual } from "node:util";
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import { hasAcceptedSessionSpawn } from "../../agents/accepted-session-spawn.js";
 import { retireSessionMcpRuntime } from "../../agents/agent-bundle-mcp-tools.js";
 import { hasAnyAuthProfileStoreSource } from "../../agents/auth-profiles/source-check.js";
@@ -18,7 +18,7 @@ import type { SessionEntry } from "../../config/sessions.js";
 import { resolveSessionWorkStartError } from "../../config/sessions/lifecycle.js";
 import { formatSqliteSessionFileMarker } from "../../config/sessions/sqlite-marker.js";
 import type { AgentDefaultsConfig } from "../../config/types.agent-defaults.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import {
   assertAgentRunLifecycleGenerationCurrent,
   claimAgentRunContext,
@@ -212,7 +212,7 @@ async function loadWebSearchRuntime() {
   return await webSearchRuntimeLoader.load();
 }
 
-function hasConfiguredAuthProfiles(cfg: OpenClawConfig): boolean {
+function hasConfiguredAuthProfiles(cfg: SteelEngineConfig): boolean {
   return (
     Boolean(cfg.auth?.profiles && Object.keys(cfg.auth.profiles).length > 0) ||
     Boolean(cfg.auth?.order && Object.keys(cfg.auth.order).length > 0)
@@ -368,7 +368,7 @@ function canPromptForMessageTool(params: {
 }
 
 async function createCronToolsAllowPreflightDiagnostics(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   jobId: string;
   provider: string;
   model: string;
@@ -428,7 +428,7 @@ async function createCronToolsAllowPreflightDiagnostics(params: {
 
 /** Resolves the delivery plan and concrete target for one isolated cron run. */
 async function resolveCronDeliveryContext(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   job: CronJob;
   agentId: string;
 }) {
@@ -522,7 +522,7 @@ async function loadUsageFormatRuntime() {
 }
 
 type RunCronAgentTurnParams = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   deps: CliDeps;
   job: CronJob;
   message: string;
@@ -549,7 +549,7 @@ type WithRunSession = (
 
 type PreparedCronRunContext = {
   input: RunCronAgentTurnParams;
-  cfgWithAgentDefaults: OpenClawConfig;
+  cfgWithAgentDefaults: SteelEngineConfig;
   agentId: string;
   agentCfg: AgentDefaultsConfig;
   agentDir: string;
@@ -620,7 +620,7 @@ async function prepareCronRunContext(params: {
     defaults: runtimeCfg.agents?.defaults,
     agentConfigOverride,
   });
-  const cfgWithAgentDefaults: OpenClawConfig = {
+  const cfgWithAgentDefaults: SteelEngineConfig = {
     ...runtimeCfg,
     agents: Object.assign({}, runtimeCfg.agents, { defaults: agentCfg }),
   };
@@ -1655,7 +1655,7 @@ async function disposeCronRunContext(params: {
 
 /** Runs one isolated cron agent turn, including setup, execution, delivery, and persistence. */
 export async function runCronIsolatedAgentTurn(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   deps: CliDeps;
   job: CronJob;
   message: string;
@@ -1677,7 +1677,7 @@ export async function runCronIsolatedAgentTurn(params: {
   const isAborted = () => abortSignal?.aborted ?? false;
   const abortReason = () =>
     resolveCronAbortReasonText(abortSignal?.reason) ?? "cron: job execution timed out";
-  const isFastTestEnv = process.env.OPENCLAW_TEST_FAST === "1";
+  const isFastTestEnv = process.env.STEELENGINE_TEST_FAST === "1";
   const prepared = await prepareCronRunContext({
     input: { ...params, abortSignal },
     isFastTestEnv,

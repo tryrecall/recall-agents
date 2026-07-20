@@ -1,6 +1,6 @@
 // Imported by dispatch-from-config.test.ts to keep its mocked suite in one Vitest module graph.
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { SteelEngineConfig } from "../../config/config.js";
 import { createApprovalNativeRouteReporter } from "../../infra/approval-native-route-coordinator.js";
 import type { SessionBindingRecord } from "../../infra/outbound/session-binding-service.js";
 import type { MsgContext } from "../templating.js";
@@ -58,7 +58,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: OpenClawConfig,
+      _cfg?: SteelEngineConfig,
     ) => {
       await opts?.onPlanUpdate?.({
         phase: "update",
@@ -208,7 +208,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: OpenClawConfig,
+      _cfg?: SteelEngineConfig,
     ) => {
       await opts?.onToolResult?.({ mediaUrl: "https://example.com/tts-preview.opus" });
       return { text: "done" } satisfies ReplyPayload;
@@ -241,7 +241,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: OpenClawConfig,
+      _cfg?: SteelEngineConfig,
     ) => {
       await opts?.onToolResult?.({
         text: "Approval required.\n\n```txt\n/approve 117ba06d allow-once\n```",
@@ -491,7 +491,7 @@ describe("dispatchReplyFromConfig", () => {
         dispatch: { enabled: true },
         stream: { deliveryMode: "live", coalesceIdleMs: 0, maxChunkChars: 128 },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -558,7 +558,7 @@ describe("dispatchReplyFromConfig", () => {
           dispatch: { enabled: true },
           stream: { coalesceIdleMs: 0, maxChunkChars: 128 },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       dispatcher,
       replyOptions: {
         runId: "run-acp-lifecycle-end",
@@ -624,7 +624,7 @@ describe("dispatchReplyFromConfig", () => {
           dispatch: { enabled: true },
           stream: { coalesceIdleMs: 0, maxChunkChars: 128 },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       dispatcher,
       replyOptions: {
         runId: "run-acp-lifecycle-error",
@@ -712,7 +712,7 @@ describe("dispatchReplyFromConfig", () => {
           dispatch: { enabled: true },
           stream: { coalesceIdleMs: 0, maxChunkChars: 128 },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       dispatcher: createDispatcher(),
     });
 
@@ -778,7 +778,7 @@ describe("dispatchReplyFromConfig", () => {
         enabled: true,
         dispatch: { enabled: true },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -860,7 +860,7 @@ describe("dispatchReplyFromConfig", () => {
         enabled: true,
         dispatch: { enabled: true },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -918,7 +918,7 @@ describe("dispatchReplyFromConfig", () => {
           defaultAccount: "work",
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const dispatcher = createDispatcher();
     const replyResolver = vi.fn(async () => undefined);
     const ctx = buildTestCtx({
@@ -975,7 +975,7 @@ describe("dispatchReplyFromConfig", () => {
       { type: "done" },
     ]);
     acpMocks.readAcpSessionEntry.mockImplementation(
-      (params: { sessionKey: string; cfg?: OpenClawConfig }) =>
+      (params: { sessionKey: string; cfg?: SteelEngineConfig }) =>
         params.sessionKey === boundSessionKey
           ? {
               sessionKey: boundSessionKey,
@@ -1021,7 +1021,7 @@ describe("dispatchReplyFromConfig", () => {
         dispatch: { enabled: true },
         stream: { deliveryMode: "live", coalesceIdleMs: 0, maxChunkChars: 256 },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const dispatcher = createDispatcher();
     const replyResolver = vi.fn(async () => ({ text: "fallback reply" }) satisfies ReplyPayload);
     const ctx = buildTestCtx({
@@ -1110,7 +1110,7 @@ describe("dispatchReplyFromConfig", () => {
         dispatch: { enabled: true },
         stream: { deliveryMode: "live", coalesceIdleMs: 0, maxChunkChars: 256 },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -1166,7 +1166,7 @@ describe("dispatchReplyFromConfig", () => {
         dispatch: { enabled: true },
         stream: { deliveryMode: "live", coalesceIdleMs: 0, maxChunkChars: 256 },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -1189,8 +1189,8 @@ describe("dispatchReplyFromConfig", () => {
     replyMediaPathMocks.createReplyMediaPathNormalizer.mockReturnValue(
       async (payload: ReplyPayload) => ({
         ...payload,
-        mediaUrl: "/tmp/openclaw-media/normalized-tts.ogg",
-        mediaUrls: ["/tmp/openclaw-media/normalized-tts.ogg"],
+        mediaUrl: "/tmp/steelengine-media/normalized-tts.ogg",
+        mediaUrls: ["/tmp/steelengine-media/normalized-tts.ogg"],
       }),
     );
     const dispatcher = createDispatcher();
@@ -1213,8 +1213,8 @@ describe("dispatchReplyFromConfig", () => {
       .calls[0]?.[0] as { messageProvider?: unknown } | undefined;
     expect(normalizerOptions?.messageProvider).toBe("feishu");
     const finalPayload = firstFinalReplyPayload(dispatcher);
-    expect(finalPayload?.mediaUrl).toBe("/tmp/openclaw-media/normalized-tts.ogg");
-    expect(finalPayload?.mediaUrls).toStrictEqual(["/tmp/openclaw-media/normalized-tts.ogg"]);
+    expect(finalPayload?.mediaUrl).toBe("/tmp/steelengine-media/normalized-tts.ogg");
+    expect(finalPayload?.mediaUrls).toStrictEqual(["/tmp/steelengine-media/normalized-tts.ogg"]);
     expect(finalPayload?.audioAsVoice).toBe(true);
     expect(finalPayload?.spokenText).toBe("Hello from block streaming.");
     expect(finalPayload?.trustedLocalMedia).toBe(true);
@@ -1248,7 +1248,7 @@ describe("dispatchReplyFromConfig", () => {
         enabled: true,
         dispatch: { enabled: true },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -1292,7 +1292,7 @@ describe("dispatchReplyFromConfig", () => {
       messages: {
         groupChat: { visibleReplies: "message_tool" },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const ctx = buildTestCtx({
       Provider: "telegram",
       Surface: "telegram",
@@ -1321,7 +1321,7 @@ describe("dispatchReplyFromConfig", () => {
         groupChat: { visibleReplies: "message_tool" },
       },
       tools: { allow: ["read"] },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const ctx = buildTestCtx({
       Provider: "telegram",
       Surface: "telegram",
@@ -1355,7 +1355,7 @@ describe("dispatchReplyFromConfig", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -1394,7 +1394,7 @@ describe("dispatchReplyFromConfig", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const reporter = createApprovalNativeRouteReporter({
       handledKinds: new Set(["exec"]),
       channel: "discord",
@@ -1446,7 +1446,7 @@ describe("dispatchReplyFromConfig", () => {
           enabled: true,
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "signal",
@@ -1489,7 +1489,7 @@ describe("dispatchReplyFromConfig", () => {
           enabled: true,
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const reporter = createApprovalNativeRouteReporter({
       handledKinds: new Set(["exec"]),
       channel: "signal",
@@ -1544,7 +1544,7 @@ describe("dispatchReplyFromConfig", () => {
           enabled: false,
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const reporter = createApprovalNativeRouteReporter({
       handledKinds: new Set(["exec"]),
       channel: "signal",

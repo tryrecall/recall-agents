@@ -1,7 +1,7 @@
 // Persistence helpers for plugin installs plus related config mutation.
 import fs from "node:fs";
 import path from "node:path";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
 import { theme } from "../../packages/terminal-core/src/theme.js";
 import {
   hashConfigIncludeRaw,
@@ -9,7 +9,7 @@ import {
   resolveConfigIncludeWritePath,
 } from "../config/includes.js";
 import type { ConfigWriteOptions } from "../config/io.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 import { isPathInside } from "../infra/path-guards.js";
 import { defaultRuntime, type RuntimeEnv } from "../runtime.js";
@@ -33,7 +33,7 @@ import {
   type PluginUninstallDirectoryRemoval,
 } from "./uninstall.js";
 
-function addInstalledPluginToAllowlist(cfg: OpenClawConfig, pluginId: string): OpenClawConfig {
+function addInstalledPluginToAllowlist(cfg: SteelEngineConfig, pluginId: string): SteelEngineConfig {
   const allow = cfg.plugins?.allow;
   if (!Array.isArray(allow) || allow.length === 0 || allow.includes(pluginId)) {
     return cfg;
@@ -49,7 +49,7 @@ function addInstalledPluginToAllowlist(cfg: OpenClawConfig, pluginId: string): O
   };
 }
 
-function removeInstalledPluginFromDenylist(cfg: OpenClawConfig, pluginId: string): OpenClawConfig {
+function removeInstalledPluginFromDenylist(cfg: SteelEngineConfig, pluginId: string): SteelEngineConfig {
   const deny = cfg.plugins?.deny;
   if (!Array.isArray(deny) || !deny.includes(pluginId)) {
     return cfg;
@@ -69,7 +69,7 @@ function removeInstalledPluginFromDenylist(cfg: OpenClawConfig, pluginId: string
 }
 
 export type ConfigSnapshotForInstallPersist = {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   baseHash: string | undefined;
   writeOptions: Pick<
     ConfigWriteOptions,
@@ -312,7 +312,7 @@ function sourceMatchesInstalledPath(params: {
 }
 
 function logShadowedNpmInstallWarning(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   pluginId: string;
   install: Omit<PluginInstallUpdate, "pluginId">;
   runtime: RuntimeEnv;
@@ -345,7 +345,7 @@ function logShadowedNpmInstallWarning(params: {
         `Warning: installed plugin "${params.pluginId}" is not the active source because a config-selected plugin with the same id is currently selected:`,
         `  active config source: ${shortenHomePath(active.source)}`,
         `  installed npm source: ${shortenHomePath(installedSource)}`,
-        "Run `openclaw plugins doctor` for repair options.",
+        "Run `steelengine plugins doctor` for repair options.",
       ].join("\n"),
     ),
   );
@@ -407,7 +407,7 @@ function resolveReplacedManagedInstallRemoval(params: {
           [params.pluginId]: params.previousInstall,
         },
       },
-    } as OpenClawConfig,
+    } as SteelEngineConfig,
     pluginId: params.pluginId,
     deleteFiles: true,
   });
@@ -434,7 +434,7 @@ export async function persistPluginInstall(params: {
   successMessage?: string;
   warningMessage?: string;
   runtime?: RuntimeEnv;
-}): Promise<OpenClawConfig> {
+}): Promise<SteelEngineConfig> {
   const runtime = params.runtime ?? defaultRuntime;
   const installConfig =
     params.enable === false

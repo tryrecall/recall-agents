@@ -9,17 +9,17 @@ import { TokenManager } from "./token.js";
 const fetchWithSsrFGuardMock = vi.hoisted(() => vi.fn());
 const readResponseWithLimitMock = vi.hoisted(() => vi.fn());
 
-vi.mock("openclaw/plugin-sdk/response-limit-runtime", async (importOriginal) => {
+vi.mock("steelengine/plugin-sdk/response-limit-runtime", async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import("openclaw/plugin-sdk/response-limit-runtime")>();
+    await importOriginal<typeof import("steelengine/plugin-sdk/response-limit-runtime")>();
   return {
     ...actual,
     readResponseWithLimit: readResponseWithLimitMock,
   };
 });
 
-vi.mock("openclaw/plugin-sdk/ssrf-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/ssrf-runtime")>();
+vi.mock("steelengine/plugin-sdk/ssrf-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("steelengine/plugin-sdk/ssrf-runtime")>();
   return {
     ...actual,
     fetchWithSsrFGuard: fetchWithSsrFGuardMock,

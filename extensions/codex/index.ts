@@ -2,15 +2,15 @@
  * Bundled Codex plugin entry: app-server harness, media understanding,
  * migration provider, CLI-session commands, and binding hooks.
  */
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { mutateConfigFile } from "openclaw/plugin-sdk/config-mutation";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { mutateConfigFile } from "steelengine/plugin-sdk/config-mutation";
 import {
   normalizePluginsConfig,
   resolveEffectiveEnableState,
   resolveLivePluginConfigObject,
-} from "openclaw/plugin-sdk/plugin-config-runtime";
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
-import type { PluginStateSyncKeyedStore } from "openclaw/plugin-sdk/plugin-state-runtime";
+} from "steelengine/plugin-sdk/plugin-config-runtime";
+import { definePluginEntry } from "steelengine/plugin-sdk/plugin-entry";
+import type { PluginStateSyncKeyedStore } from "steelengine/plugin-sdk/plugin-state-runtime";
 import { registerCodexCliMetadata } from "./cli-metadata.js";
 import { createCodexAppServerAgentHarness } from "./harness.js";
 import { buildCodexMediaUnderstandingProvider } from "./media-understanding-provider.js";
@@ -59,8 +59,8 @@ export default definePluginEntry({
   description: "Codex app-server harness and native session supervision.",
   register(api) {
     const resolveCurrentConfig = () =>
-      api.runtime.config?.current ? (api.runtime.config.current() as OpenClawConfig) : undefined;
-    const resolvePluginConfig = (resolveConfig: () => OpenClawConfig | undefined) => {
+      api.runtime.config?.current ? (api.runtime.config.current() as SteelEngineConfig) : undefined;
+    const resolvePluginConfig = (resolveConfig: () => SteelEngineConfig | undefined) => {
       const liveConfig = resolveConfig();
       // Codex plugin config can change at runtime. A missing live entry is an
       // explicit removal, while an unavailable runtime snapshot uses startup config.
@@ -196,7 +196,7 @@ export default definePluginEntry({
             resolveCodexCliSessionForBindingOnNode({ runtime: api.runtime, ...params }),
           codexPluginsManagementIo: {
             readConfig: () => {
-              const current = (api.runtime.config?.current?.() ?? {}) as OpenClawConfig;
+              const current = (api.runtime.config?.current?.() ?? {}) as SteelEngineConfig;
               const plugins = (current as Record<string, unknown>).plugins;
               if (!plugins || typeof plugins !== "object") {
                 return Promise.resolve({});

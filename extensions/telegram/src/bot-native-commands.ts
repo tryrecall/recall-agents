@@ -6,9 +6,9 @@ import {
   resolveAgentConfig,
   resolveDefaultModelForAgent,
   resolveThinkingDefaultWithRuntimeCatalog,
-} from "openclaw/plugin-sdk/agent-runtime";
-import { resolveChannelStreamingBlockEnabled } from "openclaw/plugin-sdk/channel-outbound";
-import { resolveNativeCommandSessionTargets } from "openclaw/plugin-sdk/command-auth-native";
+} from "steelengine/plugin-sdk/agent-runtime";
+import { resolveChannelStreamingBlockEnabled } from "steelengine/plugin-sdk/channel-outbound";
+import { resolveNativeCommandSessionTargets } from "steelengine/plugin-sdk/command-auth-native";
 import {
   buildCommandTextFromArgs,
   findCommandByNativeName,
@@ -22,35 +22,35 @@ import {
   resolveFastModeState,
   resolveStoredModelOverride,
   type CommandArgs,
-} from "openclaw/plugin-sdk/command-auth-native";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { ChannelGroupPolicy } from "openclaw/plugin-sdk/config-contracts";
+} from "steelengine/plugin-sdk/command-auth-native";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { ChannelGroupPolicy } from "steelengine/plugin-sdk/config-contracts";
 import type {
   ReplyToMode,
   TelegramAccountConfig,
   TelegramDirectConfig,
   TelegramGroupConfig,
   TelegramTopicConfig,
-} from "openclaw/plugin-sdk/config-contracts";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
-import { resolveMarkdownTableMode } from "openclaw/plugin-sdk/markdown-table-runtime";
-import { codexChannelLoginRuntime } from "openclaw/plugin-sdk/provider-auth-login-flow-runtime";
-import { hasOutboundReplyContent } from "openclaw/plugin-sdk/reply-payload";
-import { resolveAgentRoute } from "openclaw/plugin-sdk/routing";
-import { danger, logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { getChildLogger } from "openclaw/plugin-sdk/runtime-env";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/config-contracts";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
+import { resolveMarkdownTableMode } from "steelengine/plugin-sdk/markdown-table-runtime";
+import { codexChannelLoginRuntime } from "steelengine/plugin-sdk/provider-auth-login-flow-runtime";
+import { hasOutboundReplyContent } from "steelengine/plugin-sdk/reply-payload";
+import { resolveAgentRoute } from "steelengine/plugin-sdk/routing";
+import { danger, logVerbose } from "steelengine/plugin-sdk/runtime-env";
+import { getChildLogger } from "steelengine/plugin-sdk/runtime-env";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
 import {
   formatSqliteSessionFileMarker,
   getSessionEntry,
   resolveStorePath,
   type SessionEntry,
   updateSessionStoreEntry,
-} from "openclaw/plugin-sdk/session-store-runtime";
+} from "steelengine/plugin-sdk/session-store-runtime";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 import { expandTelegramAllowFromWithAccessGroups } from "./access-groups.js";
 import { resolveTelegramAccount } from "./accounts.js";
 import { withTelegramApiErrorLogging } from "./api-logging.js";
@@ -120,9 +120,9 @@ const activeTelegramCodexLoginFlows = new Map<string, { expiresAt: number }>();
 
 type TelegramNativeCommandContext = Context & { match?: string };
 type TelegramChunkMode = ReturnType<
-  typeof import("openclaw/plugin-sdk/reply-dispatch-runtime").resolveChunkMode
+  typeof import("steelengine/plugin-sdk/reply-dispatch-runtime").resolveChunkMode
 >;
-type TelegramNativeReplyPayload = import("openclaw/plugin-sdk/plugin-entry").PluginCommandResult;
+type TelegramNativeReplyPayload = import("steelengine/plugin-sdk/plugin-entry").PluginCommandResult;
 type TelegramNativeReplyChannelData = {
   buttons?: TelegramInlineButtons;
   pin?: boolean;
@@ -246,7 +246,7 @@ function resolveTelegramProgressPlaceholder(command: {
 }
 
 async function resolveTelegramCommandTranscriptContext(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId: string;
   sessionKey: string;
   threadId?: string | number;
@@ -281,7 +281,7 @@ async function resolveTelegramCommandTranscriptContext(params: {
 }
 
 function resolveTelegramCommandMenuModelContext(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId: string;
   sessionKey: string;
 }): TelegramCommandMenuModelContext {
@@ -350,7 +350,7 @@ function resolveTelegramCommandMenuModelContext(params: {
 }
 
 function resolveTelegramFastCommandModelContext(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId: string;
   sessionKey: string;
 }): {
@@ -390,7 +390,7 @@ function resolveTelegramFastCommandModelContext(params: {
 }
 
 function resolveTelegramFastCommandState(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId: string;
   sessionKey: string;
 }): FastModeState {
@@ -430,7 +430,7 @@ function resolveTelegramFastCommandState(params: {
 }
 
 async function resolveTelegramThinkMenuCurrentLevel(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId: string;
   provider?: string;
   model?: string;
@@ -595,7 +595,7 @@ async function resolveTelegramNativeCommandThreadContext(params: {
 }
 
 export type RegisterTelegramHandlerParams = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId: string;
   bot: Bot;
   mediaMaxBytes: number;
@@ -604,19 +604,19 @@ export type RegisterTelegramHandlerParams = {
   runtime: RuntimeEnv;
   telegramCfg: TelegramAccountConfig;
   telegramDeps: TelegramBotDeps;
-  resolveGroupPolicy: (chatId: string | number, cfg: OpenClawConfig) => ChannelGroupPolicy;
+  resolveGroupPolicy: (chatId: string | number, cfg: SteelEngineConfig) => ChannelGroupPolicy;
   resolveGroupActivation: (params: {
     chatId: string | number;
     agentId?: string;
     messageThreadId?: number;
     sessionKey?: string;
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
   }) => boolean | undefined;
-  resolveGroupRequireMention: (chatId: string | number, cfg: OpenClawConfig) => boolean;
+  resolveGroupRequireMention: (chatId: string | number, cfg: SteelEngineConfig) => boolean;
   resolveTelegramGroupConfig: (
     chatId: string | number,
     messageThreadId: number | undefined,
-    cfg: OpenClawConfig,
+    cfg: SteelEngineConfig,
   ) => TelegramResolvedGroupConfig;
   shouldSkipUpdate: (ctx: TelegramUpdateKeyContext) => boolean;
   processMessage: (
@@ -641,7 +641,7 @@ function resolveTelegramNativeCommandDisableBlockStreaming(
 
 type RegisterTelegramNativeCommandsParams = {
   bot: Bot;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   runtime: RuntimeEnv;
   accountId: string;
   telegramCfg: TelegramAccountConfig;
@@ -649,11 +649,11 @@ type RegisterTelegramNativeCommandsParams = {
   nativeEnabled: boolean;
   nativeSkillsEnabled: boolean;
   nativeDisabledExplicit: boolean;
-  resolveGroupPolicy: (chatId: string | number, cfg: OpenClawConfig) => ChannelGroupPolicy;
+  resolveGroupPolicy: (chatId: string | number, cfg: SteelEngineConfig) => ChannelGroupPolicy;
   resolveTelegramGroupConfig: (
     chatId: string | number,
     messageThreadId: number | undefined,
-    cfg: OpenClawConfig,
+    cfg: SteelEngineConfig,
   ) => TelegramResolvedGroupConfig;
   shouldSkipUpdate: (ctx: TelegramUpdateKeyContext) => boolean;
   telegramDeps?: TelegramNativeCommandDeps;
@@ -663,17 +663,17 @@ type RegisterTelegramNativeCommandsParams = {
 async function resolveTelegramCommandAuth(params: {
   msg: NonNullable<TelegramNativeCommandContext["message"]>;
   bot: Bot;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId: string;
   telegramCfg: TelegramAccountConfig;
   readChannelAllowFromStore: TelegramBotDeps["readChannelAllowFromStore"];
   allowFrom?: Array<string | number>;
   groupAllowFrom?: Array<string | number>;
-  resolveGroupPolicy: (chatId: string | number, cfg: OpenClawConfig) => ChannelGroupPolicy;
+  resolveGroupPolicy: (chatId: string | number, cfg: SteelEngineConfig) => ChannelGroupPolicy;
   resolveTelegramGroupConfig: (
     chatId: string | number,
     messageThreadId: number | undefined,
-    cfg: OpenClawConfig,
+    cfg: SteelEngineConfig,
   ) => TelegramResolvedGroupConfig;
   requireAuth: boolean;
 }): Promise<TelegramCommandAuthResult | null> {
@@ -1007,8 +1007,8 @@ export const registerTelegramNativeCommands = ({
     );
   }
   const { nativeCommands, pluginCatalog } = fullCommandCatalog;
-  const loadFreshRuntimeConfig = (): OpenClawConfig => telegramDeps.getRuntimeConfig();
-  const resolveFreshTelegramConfig = (runtimeCfg: OpenClawConfig): TelegramAccountConfig =>
+  const loadFreshRuntimeConfig = (): SteelEngineConfig => telegramDeps.getRuntimeConfig();
+  const resolveFreshTelegramConfig = (runtimeCfg: SteelEngineConfig): TelegramAccountConfig =>
     resolveTelegramAccount({ cfg: runtimeCfg, accountId }).config;
   const {
     commandsToRegister,
@@ -1050,7 +1050,7 @@ export const registerTelegramNativeCommands = ({
 
   const resolveCommandRuntimeContext = async (params: {
     msg: NonNullable<TelegramNativeCommandContext["message"]>;
-    runtimeCfg: OpenClawConfig;
+    runtimeCfg: SteelEngineConfig;
     isGroup: boolean;
     isForum: boolean;
     resolvedThreadId?: number;
@@ -1123,7 +1123,7 @@ export const registerTelegramNativeCommands = ({
     return { chatId, threadSpec, route, mediaLocalRoots, tableMode, chunkMode };
   };
   const buildCommandDeliveryBaseOptions = (params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     chatId: string | number;
     accountId: string;
     sessionKeyForInternalHooks?: string;
@@ -1160,7 +1160,7 @@ export const registerTelegramNativeCommands = ({
     richMessages: params.richMessages,
   });
   const resolveCommandTargetSessionKey = (params: {
-    runtimeCfg: OpenClawConfig;
+    runtimeCfg: SteelEngineConfig;
     route: ReturnType<typeof resolveTelegramConversationRoute>["route"];
     chatId: number;
     isGroup: boolean;
@@ -1278,7 +1278,7 @@ export const registerTelegramNativeCommands = ({
             !codexChannelLoginRuntime.hasConfiguredCommandOwnerAllowlist(runtimeCfg)
           ) {
             await sendLoginMessage(
-              "Only a configured OpenClaw owner can start Codex login from Telegram.",
+              "Only a configured SteelEngine owner can start Codex login from Telegram.",
             );
             return;
           }

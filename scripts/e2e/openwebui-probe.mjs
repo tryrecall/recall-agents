@@ -19,7 +19,7 @@ const controlTimeoutMs = readPositiveTimerMs(
 const chatTimeoutMs = readPositiveTimerMs("OPENWEBUI_CHAT_TIMEOUT_MS", fetchTimeoutMs);
 const responseBodyMaxBytes = readPositiveInt("OPENWEBUI_RESPONSE_BODY_MAX_BYTES", 1024 * 1024);
 const smokeMode =
-  process.env.OPENWEBUI_SMOKE_MODE ?? process.env.OPENCLAW_OPENWEBUI_SMOKE_MODE ?? "chat";
+  process.env.OPENWEBUI_SMOKE_MODE ?? process.env.STEELENGINE_OPENWEBUI_SMOKE_MODE ?? "chat";
 
 setGlobalDispatcher(
   new Agent({
@@ -324,11 +324,11 @@ for (let attempt = 1; attempt <= modelAttempts; attempt += 1) {
   if (modelsResult?.ok) {
     modelIds = extractModelIds(modelsResult.json);
     targetModel =
-      modelIds.find((id) => id === "openclaw/default") ?? modelIds.find((id) => id === "openclaw");
+      modelIds.find((id) => id === "steelengine/default") ?? modelIds.find((id) => id === "steelengine");
     if (targetModel) {
       break;
     }
-    lastModelsError = `missing openclaw model: ${JSON.stringify(modelIds)}`;
+    lastModelsError = `missing steelengine model: ${JSON.stringify(modelIds)}`;
   } else if (modelsResult) {
     lastModelsError = `HTTP ${modelsResult.status} ${modelsResult.text}`;
   }
@@ -338,7 +338,7 @@ for (let attempt = 1; attempt <= modelAttempts; attempt += 1) {
 }
 if (!targetModel) {
   throw new Error(
-    `openclaw model missing from Open WebUI model list after retry: ${JSON.stringify(modelIds)} (${lastModelsError})`,
+    `steelengine model missing from Open WebUI model list after retry: ${JSON.stringify(modelIds)} (${lastModelsError})`,
   );
 }
 if (smokeMode === "models") {

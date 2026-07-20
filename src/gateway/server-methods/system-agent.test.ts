@@ -1,8 +1,8 @@
-// OpenClaw gateway tests cover activation serialization and chat sessions.
+// SteelEngine gateway tests cover activation serialization and chat sessions.
 
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type { SystemAgentApprovalRequestPayload } from "../../infra/system-agent-approvals.js";
 import { getCommandLaneSnapshot } from "../../process/command-queue.js";
 import { resetCommandQueueStateForTest } from "../../process/command-queue.test-support.js";
@@ -68,7 +68,7 @@ function makeContext(sessions: Map<string, SystemAgentChatSession>): GatewayRequ
   return { systemAgentSessions: sessions } as unknown as GatewayRequestContext;
 }
 
-const verifiedConfig: OpenClawConfig = {
+const verifiedConfig: SteelEngineConfig = {
   agents: { defaults: { model: "openai/gpt-5.5@openai:verified" } },
   auth: {
     profiles: {
@@ -96,7 +96,7 @@ function requireVerifiedInferenceDeps(): SystemAgentVerifiedInferenceDeps {
       ({
         exists: true,
         valid: true,
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         hash: "verified-config",
         config: verifiedConfig,
         runtimeConfig: verifiedConfig,
@@ -115,7 +115,7 @@ function makeVerifiedEngine(): SystemAgentChatEngine {
 
 function stubEngineOverview() {
   return vi.spyOn(SystemAgentChatEngine.prototype, "loadOverview").mockResolvedValue({
-    config: { path: "/tmp/openclaw.json", exists: true, valid: true, issues: [], hash: null },
+    config: { path: "/tmp/steelengine.json", exists: true, valid: true, issues: [], hash: null },
     agents: [],
     defaultAgentId: "main",
     defaultModel: "openai/gpt-5.5",
@@ -127,8 +127,8 @@ function stubEngineOverview() {
     },
     gateway: { url: "ws://127.0.0.1:18789", source: "test", reachable: true },
     references: {
-      docsUrl: "https://docs.openclaw.ai",
-      sourceUrl: "https://github.com/openclaw/openclaw",
+      docsUrl: "https://docs.steelengine.ai",
+      sourceUrl: "https://github.com/steelengineai/recall-agents",
     },
   } as never);
 }
@@ -155,7 +155,7 @@ beforeEach(async () => {
   setupSharedMocks.readSetupConfigFileSnapshot.mockResolvedValue({
     exists: true,
     valid: true,
-    path: "/tmp/openclaw.json",
+    path: "/tmp/steelengine.json",
     hash: "prepare-base-hash",
     sourceConfig: verifiedConfig,
     config: verifiedConfig,
@@ -183,8 +183,8 @@ async function callChat(
 ): Promise<RespondCall> {
   const { calls, respond } = makeRespond();
   await expectDefined(
-    systemAgentHandlers["openclaw.chat"],
-    'systemAgentHandlers["openclaw.chat"] test invariant',
+    systemAgentHandlers["steelengine.chat"],
+    'systemAgentHandlers["steelengine.chat"] test invariant',
   )({
     params,
     respond,
@@ -197,7 +197,7 @@ async function callChat(
   return call;
 }
 
-describe("openclaw.setup.activate", () => {
+describe("steelengine.setup.activate", () => {
   it("rejects a concurrent activation instead of queueing stale work", async () => {
     const firstStarted = createDeferred();
     const releaseFirst = createDeferred();
@@ -242,8 +242,8 @@ describe("openclaw.setup.activate", () => {
     try {
       const { calls, respond } = makeRespond();
       await expectDefined(
-        systemAgentHandlers["openclaw.setup.activate"],
-        'systemAgentHandlers["openclaw.setup.activate"] test invariant',
+        systemAgentHandlers["steelengine.setup.activate"],
+        'systemAgentHandlers["steelengine.setup.activate"] test invariant',
       )({
         params: { kind: "claude-cli" },
         respond,
@@ -255,7 +255,7 @@ describe("openclaw.setup.activate", () => {
           payload: undefined,
           error: {
             code: "UNAVAILABLE",
-            message: "OpenClaw setup is already in progress; try again when it finishes.",
+            message: "SteelEngine setup is already in progress; try again when it finishes.",
             retryable: true,
           },
         },
@@ -279,7 +279,7 @@ describe("openclaw.setup.activate", () => {
   });
 });
 
-describe("openclaw.setup.auth.start", () => {
+describe("steelengine.setup.auth.start", () => {
   it("starts provider auth as an interactive wizard session", async () => {
     const wizardSessions = new Map();
     const context = {
@@ -294,8 +294,8 @@ describe("openclaw.setup.auth.start", () => {
     const { calls, respond } = makeRespond();
 
     await expectDefined(
-      systemAgentHandlers["openclaw.setup.auth.start"],
-      'systemAgentHandlers["openclaw.setup.auth.start"] test invariant',
+      systemAgentHandlers["steelengine.setup.auth.start"],
+      'systemAgentHandlers["steelengine.setup.auth.start"] test invariant',
     )({
       params: { sessionId: "auth-session-1", authChoice: "github-copilot" },
       respond,
@@ -324,9 +324,9 @@ describe("openclaw.setup.auth.start", () => {
   });
 });
 
-describe("openclaw.setup.prepare.start", () => {
+describe("steelengine.setup.prepare.start", () => {
   it("runs the selected provider method in a shared wizard session and commits its config", async () => {
-    const preparedConfig: OpenClawConfig = {
+    const preparedConfig: SteelEngineConfig = {
       ...verifiedConfig,
       models: { providers: { ollama: { baseUrl: "http://127.0.0.1:11434", models: [] } } },
     };
@@ -346,8 +346,8 @@ describe("openclaw.setup.prepare.start", () => {
     const { calls, respond } = makeRespond();
 
     await expectDefined(
-      systemAgentHandlers["openclaw.setup.prepare.start"],
-      'systemAgentHandlers["openclaw.setup.prepare.start"] test invariant',
+      systemAgentHandlers["steelengine.setup.prepare.start"],
+      'systemAgentHandlers["steelengine.setup.prepare.start"] test invariant',
     )({
       params: {
         sessionId: "prepare-session-1",
@@ -390,7 +390,7 @@ describe("openclaw.setup.prepare.start", () => {
   });
 });
 
-describe("openclaw.chat", () => {
+describe("steelengine.chat", () => {
   it("refuses to create a session before inference is available", async () => {
     setupInferenceMocks.verifySetupInference.mockResolvedValueOnce({
       ok: false,
@@ -405,7 +405,7 @@ describe("openclaw.chat", () => {
       ok: false,
       error: {
         code: "UNAVAILABLE",
-        message: "OpenClaw requires working inference: no configured model",
+        message: "SteelEngine requires working inference: no configured model",
       },
     });
     expect(sessions.size).toBe(0);
@@ -462,8 +462,8 @@ describe("openclaw.chat", () => {
     const activeAtResponse: number[] = [];
 
     const pending = expectDefined(
-      systemAgentHandlers["openclaw.setup.detect"],
-      'systemAgentHandlers["openclaw.setup.detect"] test invariant',
+      systemAgentHandlers["steelengine.setup.detect"],
+      'systemAgentHandlers["steelengine.setup.detect"] test invariant',
     )({
       params: {},
       respond: () => {
@@ -498,8 +498,8 @@ describe("openclaw.chat", () => {
     const { calls, respond } = makeRespond();
 
     await expectDefined(
-      systemAgentHandlers["openclaw.setup.verify"],
-      'systemAgentHandlers["openclaw.setup.verify"] test invariant',
+      systemAgentHandlers["steelengine.setup.verify"],
+      'systemAgentHandlers["steelengine.setup.verify"] test invariant',
     )({ params: {}, respond } as never);
 
     expect(setupInferenceMocks.verifySetupInference).toHaveBeenCalledWith({
@@ -512,8 +512,8 @@ describe("openclaw.chat", () => {
     const { calls, respond } = makeRespond();
 
     await expectDefined(
-      systemAgentHandlers["openclaw.setup.verify"],
-      'systemAgentHandlers["openclaw.setup.verify"] test invariant',
+      systemAgentHandlers["steelengine.setup.verify"],
+      'systemAgentHandlers["steelengine.setup.verify"] test invariant',
     )({
       params: { modelRef: "openai/gpt-5.5" },
       respond,
@@ -541,8 +541,8 @@ describe("openclaw.chat", () => {
     const activeAtResponse: number[] = [];
 
     const pending = expectDefined(
-      systemAgentHandlers["openclaw.setup.activate"],
-      'systemAgentHandlers["openclaw.setup.activate"] test invariant',
+      systemAgentHandlers["steelengine.setup.activate"],
+      'systemAgentHandlers["steelengine.setup.activate"] test invariant',
     )({
       params: {
         kind: "api-key",
@@ -653,7 +653,7 @@ describe("openclaw.chat", () => {
     });
     expect(manager.getSnapshot(proposalId!)?.decision).toBeUndefined();
     expect(broadcast).toHaveBeenCalledWith(
-      "openclaw.approval.requested",
+      "steelengine.approval.requested",
       expect.objectContaining({ id: proposalId }),
       { dropIfSlow: true },
     );
@@ -754,8 +754,8 @@ describe("openclaw.chat", () => {
     const activeAtResponse: number[] = [];
 
     const first = expectDefined(
-      systemAgentHandlers["openclaw.chat"],
-      'systemAgentHandlers["openclaw.chat"] test invariant',
+      systemAgentHandlers["steelengine.chat"],
+      'systemAgentHandlers["steelengine.chat"] test invariant',
     )({
       params: { sessionId: "s1", message: "yes" },
       context: makeContext(sessions),
@@ -764,8 +764,8 @@ describe("openclaw.chat", () => {
       },
     } as never);
     const second = expectDefined(
-      systemAgentHandlers["openclaw.chat"],
-      'systemAgentHandlers["openclaw.chat"] test invariant',
+      systemAgentHandlers["steelengine.chat"],
+      'systemAgentHandlers["steelengine.chat"] test invariant',
     )({
       params: { sessionId: "s2", message: "yes" },
       context: makeContext(sessions),
@@ -887,8 +887,8 @@ describe("openclaw.chat", () => {
     const { calls, respond } = makeRespond();
     const context = makeContext(sessions);
     const pending = expectDefined(
-      systemAgentHandlers["openclaw.chat"],
-      'systemAgentHandlers["openclaw.chat"] test invariant',
+      systemAgentHandlers["steelengine.chat"],
+      'systemAgentHandlers["steelengine.chat"] test invariant',
     )({
       params: { sessionId: "s1", reset: true },
       respond,

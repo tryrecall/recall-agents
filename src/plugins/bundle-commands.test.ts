@@ -46,7 +46,7 @@ async function createTempDir(prefix: string): Promise<string> {
 }
 
 function resolveBundlePluginRoot(homeDir: string, pluginId: string) {
-  return path.join(homeDir, ".openclaw", "extensions", pluginId);
+  return path.join(homeDir, ".steelengine", "extensions", pluginId);
 }
 
 async function writeClaudeBundleCommandFixture(params: {
@@ -95,14 +95,14 @@ function expectEnabledClaudeBundleCommands(
 
 describe("loadEnabledClaudeBundleCommands", () => {
   it("loads enabled Claude bundle markdown commands and honors invocation policy", async () => {
-    const homeDir = await createTempDir("openclaw-bundle-commands-home-");
-    const workspaceDir = await createTempDir("openclaw-bundle-commands-workspace-");
+    const homeDir = await createTempDir("steelengine-bundle-commands-home-");
+    const workspaceDir = await createTempDir("steelengine-bundle-commands-workspace-");
     await withEnvAsync(
       {
         HOME: homeDir,
         USERPROFILE: homeDir,
-        OPENCLAW_HOME: undefined,
-        OPENCLAW_STATE_DIR: undefined,
+        STEELENGINE_HOME: undefined,
+        STEELENGINE_STATE_DIR: undefined,
       },
       async () => {
         await writeClaudeBundleCommandFixture({

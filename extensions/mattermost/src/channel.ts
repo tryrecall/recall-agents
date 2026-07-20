@@ -6,35 +6,35 @@ import type {
   ChannelThreadingContext,
   ChannelThreadingToolContext,
   ChannelToolSend,
-} from "openclaw/plugin-sdk/channel-contract";
-import { createChatChannelPlugin } from "openclaw/plugin-sdk/channel-core";
-import { createChannelMessageAdapterFromOutbound } from "openclaw/plugin-sdk/channel-outbound";
-import { createLoggedPairingApprovalNotifier } from "openclaw/plugin-sdk/channel-pairing";
-import { createRestrictSendersChannelSecurity } from "openclaw/plugin-sdk/channel-policy";
+} from "steelengine/plugin-sdk/channel-contract";
+import { createChatChannelPlugin } from "steelengine/plugin-sdk/channel-core";
+import { createChannelMessageAdapterFromOutbound } from "steelengine/plugin-sdk/channel-outbound";
+import { createLoggedPairingApprovalNotifier } from "steelengine/plugin-sdk/channel-pairing";
+import { createRestrictSendersChannelSecurity } from "steelengine/plugin-sdk/channel-policy";
 import {
   attachChannelToResult,
   createAttachedChannelResultAdapter,
   type ChannelOutboundAdapter,
-} from "openclaw/plugin-sdk/channel-send-result";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { createChannelDirectoryAdapter } from "openclaw/plugin-sdk/directory-runtime";
-import { buildPassiveProbedChannelStatusSummary } from "openclaw/plugin-sdk/extension-shared";
+} from "steelengine/plugin-sdk/channel-send-result";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { createChannelDirectoryAdapter } from "steelengine/plugin-sdk/directory-runtime";
+import { buildPassiveProbedChannelStatusSummary } from "steelengine/plugin-sdk/extension-shared";
 import {
   type MessagePresentation,
   normalizeMessagePresentation,
   renderMessagePresentationFallbackText,
   resolveMessagePresentationButtonAction,
   resolveMessagePresentationControlValue,
-} from "openclaw/plugin-sdk/interactive-runtime";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
-import { resolvePayloadMediaUrls, sendTextMediaPayload } from "openclaw/plugin-sdk/reply-payload";
-import { isPrivateNetworkOptInEnabled } from "openclaw/plugin-sdk/ssrf-runtime";
+} from "steelengine/plugin-sdk/interactive-runtime";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
+import { resolvePayloadMediaUrls, sendTextMediaPayload } from "steelengine/plugin-sdk/reply-payload";
+import { isPrivateNetworkOptInEnabled } from "steelengine/plugin-sdk/ssrf-runtime";
 import {
   createComputedAccountStatusAdapter,
   createDefaultChannelRuntimeState,
-} from "openclaw/plugin-sdk/status-helpers";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { sanitizeAssistantVisibleText } from "openclaw/plugin-sdk/text-chunking";
+} from "steelengine/plugin-sdk/status-helpers";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { sanitizeAssistantVisibleText } from "steelengine/plugin-sdk/text-chunking";
 import { mattermostApprovalAuth } from "./approval-auth.js";
 import {
   chunkTextForOutbound,
@@ -310,7 +310,7 @@ function normalizeMattermostThreadId(value: string | number | undefined): string
 }
 
 function buildMattermostThreadingToolContext(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId?: string | null;
   context: ChannelThreadingContext;
   hasRepliedRef?: { value: boolean };
@@ -932,7 +932,7 @@ export const mattermostPlugin: ChannelPlugin<ResolvedMattermostAccount> = create
   pairing: {
     text: {
       idLabel: "mattermostUserId",
-      message: "OpenClaw: your access has been approved.",
+      message: "SteelEngine: your access has been approved.",
       normalizeAllowEntry: (entry) => normalizeAllowEntry(entry),
       notify: createLoggedPairingApprovalNotifier(
         ({ id }) => `[mattermost] User ${id} approved for pairing`,

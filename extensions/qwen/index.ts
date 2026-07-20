@@ -1,6 +1,6 @@
-// Qwen plugin entrypoint registers its OpenClaw integration.
-import { createProviderApiKeyAuthMethod } from "openclaw/plugin-sdk/provider-auth-api-key";
-import { defineSingleProviderPluginEntry } from "openclaw/plugin-sdk/provider-entry";
+// Qwen plugin entrypoint registers its SteelEngine integration.
+import { createProviderApiKeyAuthMethod } from "steelengine/plugin-sdk/provider-auth-api-key";
+import { defineSingleProviderPluginEntry } from "steelengine/plugin-sdk/provider-entry";
 import { applyQwenNativeStreamingUsageCompat } from "./api.js";
 import { buildQwenMediaUnderstandingProvider } from "./media-understanding-provider.js";
 import {

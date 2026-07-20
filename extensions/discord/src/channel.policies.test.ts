@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { discordPlugin } from "./channel.js";
-import type { OpenClawConfig } from "./runtime-api.js";
+import type { SteelEngineConfig } from "./runtime-api.js";
 
 // Split from channel.test.ts to keep it under the max-lines lint budget; these
 // describes exercise pure config/binding/policy surfaces and need no transport mocks.
@@ -71,7 +71,7 @@ describe("discordPlugin security", () => {
           dm: { policy: "allowlist", allowFrom: ["  discord:<@!123456789>  "] },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     const result = resolveDmPolicy({
       cfg,
@@ -110,7 +110,7 @@ describe("discordPlugin groups", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     expect(
       discordPlugin.groups?.resolveRequireMention?.({

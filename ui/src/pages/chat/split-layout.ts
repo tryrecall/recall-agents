@@ -1,5 +1,5 @@
-import type { UiCommand } from "@openclaw/gateway-protocol";
-import { expectDefined, isRecord } from "@openclaw/normalization-core";
+import type { UiCommand } from "@steelengine/gateway-protocol";
+import { expectDefined, isRecord } from "@steelengine/normalization-core";
 
 export type ChatSplitPane = { id: string; sessionKey: string };
 type ChatSplitColumn = { id: string; panes: ChatSplitPane[]; paneWeights: number[] };

@@ -5,10 +5,10 @@ import * as querystring from "node:querystring";
 import {
   readResponseTextPrefix,
   readResponseWithLimit,
-} from "openclaw/plugin-sdk/response-limit-runtime";
-import { safeEqualSecret } from "openclaw/plugin-sdk/security-runtime";
-import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
-import { readRequestBodyWithLimit } from "openclaw/plugin-sdk/webhook-ingress";
+} from "steelengine/plugin-sdk/response-limit-runtime";
+import { safeEqualSecret } from "steelengine/plugin-sdk/security-runtime";
+import { fetchWithSsrFGuard } from "steelengine/plugin-sdk/ssrf-runtime";
+import { readRequestBodyWithLimit } from "steelengine/plugin-sdk/webhook-ingress";
 import { looksLikeSmsPhoneNumber, normalizeSmsPhoneNumber } from "./phone.js";
 import type { ResolvedSmsAccount, SmsInboundMessage, SmsSendResult } from "./types.js";
 

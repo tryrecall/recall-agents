@@ -1,9 +1,9 @@
-import { registerApiProvider, unregisterApiProviders } from "@openclaw/ai/internal/runtime";
+import { registerApiProvider, unregisterApiProviders } from "@steelengine/ai/internal/runtime";
 // Simple completion transport tests cover provider-specific stream alias
 // selection before the generic completion helper invokes the LLM layer.
-import type { Model } from "openclaw/plugin-sdk/llm";
+import type { Model } from "steelengine/plugin-sdk/llm";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import { createMoonshotThinkingWrapper } from "../llm/providers/stream-wrappers/moonshot-thinking.js";
 import { mintSecretSentinel } from "../secrets/sentinel.js";
 import type { StreamFn } from "./runtime/index.js";
@@ -13,7 +13,7 @@ const ensureCustomApiRegistered = vi.fn();
 const resolveProviderStreamFn = vi.fn();
 const wrapProviderSimpleCompletionStreamFn = vi.fn();
 const buildTransportAwareSimpleStreamFn = vi.fn();
-const createOpenClawTransportStreamFnForModel = vi.fn();
+const createSteelEngineTransportStreamFnForModel = vi.fn();
 const createTransportAwareStreamFnForModel = vi.fn();
 const prepareTransportAwareSimpleModel = vi.fn();
 const resolveTransportAwareSimpleApi = vi.fn();
@@ -34,7 +34,7 @@ vi.mock("./google-simple-completion-stream.js", () => ({
 
 vi.mock("./provider-transport-stream.js", () => ({
   buildTransportAwareSimpleStreamFn,
-  createOpenClawTransportStreamFnForModel,
+  createSteelEngineTransportStreamFnForModel,
   createTransportAwareStreamFnForModel,
   prepareTransportAwareSimpleModel,
   resolveTransportAwareSimpleApi,
@@ -68,7 +68,7 @@ describe("prepareModelForSimpleCompletion", () => {
     pluginStreamFn.mockClear();
     wrapProviderSimpleCompletionStreamFn.mockReset();
     buildTransportAwareSimpleStreamFn.mockReset();
-    createOpenClawTransportStreamFnForModel.mockReset();
+    createSteelEngineTransportStreamFnForModel.mockReset();
     createTransportAwareStreamFnForModel.mockReset();
     prepareTransportAwareSimpleModel.mockReset();
     resolveTransportAwareSimpleApi.mockReset();
@@ -77,7 +77,7 @@ describe("prepareModelForSimpleCompletion", () => {
     resolveProviderStreamFn.mockReturnValue(pluginStreamFn);
     wrapProviderSimpleCompletionStreamFn.mockReturnValue(undefined);
     buildTransportAwareSimpleStreamFn.mockReturnValue(undefined);
-    createOpenClawTransportStreamFnForModel.mockReturnValue(undefined);
+    createSteelEngineTransportStreamFnForModel.mockReturnValue(undefined);
     createTransportAwareStreamFnForModel.mockReturnValue(undefined);
     prepareTransportAwareSimpleModel.mockImplementation((model) => model);
     resolveTransportAwareSimpleApi.mockReturnValue(undefined);
@@ -124,7 +124,7 @@ describe("prepareModelForSimpleCompletion", () => {
     expect(wrapProviderSimpleCompletionStreamFn).toHaveBeenCalledTimes(1);
     expect(wrapProviderSimpleCompletionStreamFn.mock.results[0]?.value).toBeTypeOf("function");
     expect(result.api).toBe(
-      "openclaw-provider-simple:moonshot:kimi-k2.7-code:moonshot-simple-source:https%3A%2F%2Fapi.moonshot.ai%2Fv1",
+      "steelengine-provider-simple:moonshot:kimi-k2.7-code:moonshot-simple-source:https%3A%2F%2Fapi.moonshot.ai%2Fv1",
     );
     expect(wrapProviderSimpleCompletionStreamFn).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -161,7 +161,7 @@ describe("prepareModelForSimpleCompletion", () => {
       maxTokens: 4096,
       headers: { Authorization: `Bearer ${sentinel}` },
     };
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       models: {
         providers: {
           ollama: {
@@ -228,12 +228,12 @@ describe("prepareModelForSimpleCompletion", () => {
 
     expect(createAnthropicVertexStreamFnForModel).toHaveBeenCalledWith(model);
     expect(ensureCustomApiRegistered).toHaveBeenCalledWith(
-      "openclaw-anthropic-vertex-simple:https%3A%2F%2Fus-central1-aiplatform.googleapis.com",
+      "steelengine-anthropic-vertex-simple:https%3A%2F%2Fus-central1-aiplatform.googleapis.com",
       "vertex-stream",
     );
     expect(result).toEqual({
       ...model,
-      api: "openclaw-anthropic-vertex-simple:https%3A%2F%2Fus-central1-aiplatform.googleapis.com",
+      api: "steelengine-anthropic-vertex-simple:https%3A%2F%2Fus-central1-aiplatform.googleapis.com",
     });
   });
 
@@ -255,7 +255,7 @@ describe("prepareModelForSimpleCompletion", () => {
     buildTransportAwareSimpleStreamFn.mockReturnValueOnce("transport-stream");
     prepareTransportAwareSimpleModel.mockReturnValueOnce({
       ...model,
-      api: "openclaw-openai-responses-transport",
+      api: "steelengine-openai-responses-transport",
     });
 
     const result = prepareModelForSimpleCompletion({ model });
@@ -263,12 +263,12 @@ describe("prepareModelForSimpleCompletion", () => {
     expect(prepareTransportAwareSimpleModel).toHaveBeenCalledWith(model, { cfg: undefined });
     expect(buildTransportAwareSimpleStreamFn).toHaveBeenCalledWith(model, { cfg: undefined });
     expect(ensureCustomApiRegistered).toHaveBeenCalledWith(
-      "openclaw-openai-responses-transport",
+      "steelengine-openai-responses-transport",
       "transport-stream",
     );
     expect(result).toEqual({
       ...model,
-      api: "openclaw-openai-responses-transport",
+      api: "steelengine-openai-responses-transport",
     });
   });
 
@@ -288,7 +288,7 @@ describe("prepareModelForSimpleCompletion", () => {
     };
     prepareGoogleSimpleCompletionModel.mockImplementationOnce((m: unknown) => ({
       ...(m as Model<"google-generative-ai">),
-      api: "openclaw-google-generative-ai-simple",
+      api: "steelengine-google-generative-ai-simple",
     }));
     resolveProviderStreamFn.mockReturnValueOnce(undefined);
 
@@ -299,7 +299,7 @@ describe("prepareModelForSimpleCompletion", () => {
     expect(buildTransportAwareSimpleStreamFn).not.toHaveBeenCalled();
     expect(result).toEqual({
       ...model,
-      api: "openclaw-google-generative-ai-simple",
+      api: "steelengine-google-generative-ai-simple",
     });
   });
 
@@ -320,7 +320,7 @@ describe("prepareModelForSimpleCompletion", () => {
 
     const transportModel = {
       ...model,
-      api: "openclaw-google-generative-ai-transport",
+      api: "steelengine-google-generative-ai-transport",
     };
     resolveProviderStreamFn.mockReturnValueOnce(undefined);
     buildTransportAwareSimpleStreamFn.mockReturnValueOnce("google-transport-stream");
@@ -330,7 +330,7 @@ describe("prepareModelForSimpleCompletion", () => {
 
     expect(buildTransportAwareSimpleStreamFn).toHaveBeenCalledWith(model, { cfg: undefined });
     expect(ensureCustomApiRegistered).toHaveBeenCalledWith(
-      "openclaw-google-generative-ai-transport",
+      "steelengine-google-generative-ai-transport",
       "google-transport-stream",
     );
     expect(prepareGoogleSimpleCompletionModel).not.toHaveBeenCalled();
@@ -349,7 +349,7 @@ describe("prepareModelForSimpleCompletion", () => {
       "https://proxy.example.test/openai/codex",
     ],
   ])(
-    "uses OpenClaw transport for OpenAI Codex-response simple completions with baseUrl %s",
+    "uses SteelEngine transport for OpenAI Codex-response simple completions with baseUrl %s",
     (baseUrl, expectedBaseUrl) => {
       const model: Model<"openai-chatgpt-responses"> = {
         id: "gpt-5.5",
@@ -365,14 +365,14 @@ describe("prepareModelForSimpleCompletion", () => {
       };
 
       resolveProviderStreamFn.mockReturnValueOnce(undefined);
-      createOpenClawTransportStreamFnForModel.mockReturnValueOnce("codex-transport-stream");
-      resolveTransportAwareSimpleApi.mockReturnValueOnce("openclaw-openai-responses-transport");
+      createSteelEngineTransportStreamFnForModel.mockReturnValueOnce("codex-transport-stream");
+      resolveTransportAwareSimpleApi.mockReturnValueOnce("steelengine-openai-responses-transport");
 
       const result = prepareModelForSimpleCompletion({ model });
 
       // ChatGPT/Codex response endpoints share the transport stream, but the
       // simple-completion API must normalize caller-supplied base URLs first.
-      expect(createOpenClawTransportStreamFnForModel).toHaveBeenCalledWith(
+      expect(createSteelEngineTransportStreamFnForModel).toHaveBeenCalledWith(
         {
           ...model,
           baseUrl: expectedBaseUrl,
@@ -380,13 +380,13 @@ describe("prepareModelForSimpleCompletion", () => {
         { cfg: undefined },
       );
       expect(ensureCustomApiRegistered).toHaveBeenCalledWith(
-        "openclaw-openai-responses-transport",
+        "steelengine-openai-responses-transport",
         "codex-transport-stream",
       );
       expect(result).toEqual({
         ...model,
         baseUrl: expectedBaseUrl,
-        api: "openclaw-openai-responses-transport",
+        api: "steelengine-openai-responses-transport",
       });
       expect(prepareTransportAwareSimpleModel).not.toHaveBeenCalled();
     },

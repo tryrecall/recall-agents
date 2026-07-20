@@ -1,6 +1,6 @@
 /* @vitest-environment jsdom */
 
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { nothing, render } from "lit";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { i18n } from "../../i18n/index.ts";
@@ -308,7 +308,7 @@ describe("renderPlugins", () => {
       }),
     );
     const detail = container.querySelector<HTMLElement>(".plugins-detail")!;
-    expect(detail.closest("openclaw-modal-dialog")?.getAttribute("label")).toBe("Workboard");
+    expect(detail.closest("steelengine-modal-dialog")?.getAttribute("label")).toBe("Workboard");
     expect(normalizedText(detail.querySelector(".plugins-detail__title"))).toContain("Workboard");
     expect(normalizedText(detail.querySelector(".plugins-detail__meta"))).toContain("workboard");
     detail.querySelectorAll<HTMLButtonElement>(".plugins-detail__actions button")[0]?.click();
@@ -470,7 +470,7 @@ describe("renderPlugins", () => {
           {
             score: 0.9,
             package: {
-              name: "@openclaw/calendar-plus",
+              name: "@steelengine/calendar-plus",
               displayName: "Calendar Plus",
               family: "code-plugin",
               channel: "official",
@@ -504,7 +504,7 @@ describe("renderPlugins", () => {
     expect(link?.target).toBe("_blank");
 
     const result = container.querySelector<HTMLElement>(
-      '[data-package-name="@openclaw/calendar-plus"]',
+      '[data-package-name="@steelengine/calendar-plus"]',
     );
     expect(result?.dataset.pluginSource).toBe("clawhub");
     expect(normalizedText(result)).toContain("Official");
@@ -512,9 +512,9 @@ describe("renderPlugins", () => {
     expect(normalizedText(result)).toContain("149.3K");
     expect(normalizedText(result)).toContain("Code plugin");
     result?.querySelector<HTMLButtonElement>('[aria-label="Install Calendar Plus"]')?.click();
-    expect(onInstall).toHaveBeenCalledWith(clawHubKey("@openclaw/calendar-plus"), {
+    expect(onInstall).toHaveBeenCalledWith(clawHubKey("@steelengine/calendar-plus"), {
       source: "clawhub",
-      packageName: "@openclaw/calendar-plus",
+      packageName: "@steelengine/calendar-plus",
     });
   });
 
@@ -553,7 +553,7 @@ describe("renderPlugins", () => {
   });
 
   it("renders row-local risk acknowledgement and busy state", () => {
-    const packageName = "@openclaw/calendar-plus";
+    const packageName = "@steelengine/calendar-plus";
     const key = clawHubKey(packageName);
     const onInstall = vi.fn();
     const container = mount(

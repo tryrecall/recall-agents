@@ -13,10 +13,10 @@ export {
   type DiagnosticEventPayload,
   type DiagnosticEventPrivateData,
   type DiagnosticTraceContext,
-} from "openclaw/plugin-sdk/diagnostic-runtime";
-export { emptyPluginConfigSchema, type OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
+} from "steelengine/plugin-sdk/diagnostic-runtime";
+export { emptyPluginConfigSchema, type SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-entry";
 export type {
-  OpenClawPluginService,
-  OpenClawPluginServiceContext,
-} from "openclaw/plugin-sdk/plugin-entry";
-export { redactSensitiveText } from "openclaw/plugin-sdk/security-runtime";
+  SteelEnginePluginService,
+  SteelEnginePluginServiceContext,
+} from "steelengine/plugin-sdk/plugin-entry";
+export { redactSensitiveText } from "steelengine/plugin-sdk/security-runtime";

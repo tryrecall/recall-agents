@@ -19,7 +19,7 @@ import {
   formatMissingOperatorReadScopeMessage,
   isMissingOperatorReadScopeError,
 } from "../../lib/gateway-errors.ts";
-import { OpenClawLightDomElement } from "../../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../../lit/steelengine-element.ts";
 import { PollController } from "../../lit/poll-controller.ts";
 import { SubscriptionsController } from "../../lit/subscriptions-controller.ts";
 import {
@@ -39,7 +39,7 @@ type LogsRequestScope = {
   generation: number;
 };
 
-class LogsPage extends OpenClawLightDomElement {
+class LogsPage extends SteelEngineLightDomElement {
   @consume({ context: applicationContext, subscribe: true })
   private context!: ApplicationContext;
 
@@ -326,7 +326,7 @@ class LogsPage extends OpenClawLightDomElement {
     const anchor = document.createElement("a");
     const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
     anchor.href = url;
-    anchor.download = `openclaw-logs-${label}-${stamp}.log`;
+    anchor.download = `steelengine-logs-${label}-${stamp}.log`;
     anchor.click();
     URL.revokeObjectURL(url);
   }
@@ -366,6 +366,6 @@ class LogsPage extends OpenClawLightDomElement {
   }
 }
 
-if (!customElements.get("openclaw-logs-page")) {
-  customElements.define("openclaw-logs-page", LogsPage);
+if (!customElements.get("steelengine-logs-page")) {
+  customElements.define("steelengine-logs-page", LogsPage);
 }

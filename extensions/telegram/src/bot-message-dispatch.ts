@@ -2,9 +2,9 @@
 import {
   createOutboundPayloadPlan,
   projectOutboundPayloadPlanForDelivery,
-} from "openclaw/plugin-sdk/channel-outbound";
-import { createSubsystemLogger, danger, logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/channel-outbound";
+import { createSubsystemLogger, danger, logVerbose } from "steelengine/plugin-sdk/runtime-env";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import { resolveDispatchTelegramContext } from "./bot-message-dispatch-context.js";
 import { createTelegramDeliveryController } from "./bot-message-dispatch-delivery.js";
 import { createTelegramDraftController } from "./bot-message-dispatch-draft.js";

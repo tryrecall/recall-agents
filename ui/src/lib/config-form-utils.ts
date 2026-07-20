@@ -1,5 +1,5 @@
 // Control UI controller manages form utils gateway state.
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
 import JSON5 from "json5";
 
 export function cloneConfigObject<T>(value: T): T {
@@ -10,7 +10,7 @@ export function serializeConfigForm(form: Record<string, unknown>): string {
   return `${JSON.stringify(form, null, 2).trimEnd()}\n`;
 }
 
-const REDACTED_SENTINEL = "__OPENCLAW_REDACTED__";
+const REDACTED_SENTINEL = "__STEELENGINE_REDACTED__";
 type SanitizeResult = { omitted: true } | { omitted: false; value: unknown };
 
 const OMIT_VALUE: SanitizeResult = { omitted: true };

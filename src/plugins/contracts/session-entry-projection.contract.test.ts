@@ -4,12 +4,12 @@ import path from "node:path";
 import {
   createPluginRegistryFixture,
   registerTestPlugin,
-} from "openclaw/plugin-sdk/plugin-test-contracts";
+} from "steelengine/plugin-sdk/plugin-test-contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { SessionEntry } from "../../config/sessions.js";
 import { listSessionEntries, replaceSessionEntry } from "../../config/sessions/session-accessor.js";
 import { withTempConfig } from "../../gateway/test-temp-config.js";
-import { resolvePreferredOpenClawTmpDir } from "../../infra/tmp-openclaw-dir.js";
+import { resolvePreferredSteelEngineTmpDir } from "../../infra/tmp-steelengine-dir.js";
 import { withEnvAsync } from "../../test-utils/env.js";
 import { cleanupReplacedPluginHostRegistry, runPluginHostCleanup } from "../host-hook-cleanup.js";
 import { clearPluginHostRuntimeState } from "../host-hook-runtime.js";
@@ -72,12 +72,12 @@ async function withProjectionSessionStore(
     tempConfig: { session: { store: string } };
   }) => Promise<void>,
 ): Promise<void> {
-  const stateDir = await fs.mkdtemp(path.join(resolvePreferredOpenClawTmpDir(), prefix));
+  const stateDir = await fs.mkdtemp(path.join(resolvePreferredSteelEngineTmpDir(), prefix));
   const storePath = path.join(stateDir, "sessions.json");
   const tempConfig = { session: { store: storePath } };
   try {
     return await withEnvAsync(
-      { OPENCLAW_STATE_DIR: stateDir },
+      { STEELENGINE_STATE_DIR: stateDir },
       async () =>
         await withTempConfig({
           cfg: tempConfig,
@@ -125,7 +125,7 @@ describe("plugin session extension SessionEntry projection", () => {
     setActivePluginRegistry(registry.registry);
 
     await withProjectionSessionStore(
-      "openclaw-host-hooks-slot-",
+      "steelengine-host-hooks-slot-",
       async ({ storePath, tempConfig }) => {
         await updateSessionStore(storePath, (store) => {
           store["agent:main:main"] = {
@@ -191,7 +191,7 @@ describe("plugin session extension SessionEntry projection", () => {
     setActivePluginRegistry(registry.registry);
 
     await withProjectionSessionStore(
-      "openclaw-host-hooks-slot-projector-fail-",
+      "steelengine-host-hooks-slot-projector-fail-",
       async ({ storePath, tempConfig }) => {
         await updateSessionStore(storePath, (store) => {
           store["agent:main:main"] = {
@@ -436,7 +436,7 @@ describe("plugin session extension SessionEntry projection", () => {
     setActivePluginRegistry(registry.registry);
 
     await withProjectionSessionStore(
-      "openclaw-host-hooks-slot-cleanup-",
+      "steelengine-host-hooks-slot-cleanup-",
       async ({ storePath, tempConfig }) => {
         await updateSessionStore(storePath, (store) => {
           store["agent:main:main"] = {
@@ -490,7 +490,7 @@ describe("plugin session extension SessionEntry projection", () => {
     setActivePluginRegistry(registry.registry);
 
     await withProjectionSessionStore(
-      "openclaw-host-hooks-slot-active-cleanup-",
+      "steelengine-host-hooks-slot-active-cleanup-",
       async ({ storePath, tempConfig }) => {
         await updateSessionStore(storePath, (store) => {
           store["agent:main:main"] = {
@@ -555,7 +555,7 @@ describe("plugin session extension SessionEntry projection", () => {
     setActivePluginRegistry(previousFixture.registry.registry);
 
     await withProjectionSessionStore(
-      "openclaw-host-hooks-slot-restart-cleanup-",
+      "steelengine-host-hooks-slot-restart-cleanup-",
       async ({ storePath, tempConfig }) => {
         await updateSessionStore(storePath, (store) => {
           store["agent:main:main"] = {
@@ -635,7 +635,7 @@ describe("plugin session extension SessionEntry projection", () => {
     setActivePluginRegistry(previousFixture.registry.registry);
 
     await withProjectionSessionStore(
-      "openclaw-host-hooks-slot-restart-mixed-",
+      "steelengine-host-hooks-slot-restart-mixed-",
       async ({ storePath, tempConfig }) => {
         await updateSessionStore(storePath, (store) => {
           store["agent:main:main"] = {
@@ -722,7 +722,7 @@ describe("plugin session extension SessionEntry projection", () => {
     setActivePluginRegistry(previousFixture.registry.registry);
 
     await withProjectionSessionStore(
-      "openclaw-host-hooks-slot-restart-preserve-",
+      "steelengine-host-hooks-slot-restart-preserve-",
       async ({ storePath, tempConfig }) => {
         await updateSessionStore(storePath, (store) => {
           store["agent:main:main"] = {
@@ -770,7 +770,7 @@ describe("plugin session extension SessionEntry projection", () => {
   it("clears persisted promoted slots when registry metadata is unavailable", async () => {
     setActivePluginRegistry(createEmptyPluginRegistry());
     await withProjectionSessionStore(
-      "openclaw-host-hooks-slot-metadata-cleanup-",
+      "steelengine-host-hooks-slot-metadata-cleanup-",
       async ({ storePath, tempConfig }) => {
         await updateSessionStore(storePath, (store) => {
           store["agent:main:main"] = {
@@ -845,7 +845,7 @@ describe("plugin session extension SessionEntry projection", () => {
     setActivePluginRegistry(registry.registry);
 
     await withProjectionSessionStore(
-      "openclaw-host-hooks-policy-read-",
+      "steelengine-host-hooks-policy-read-",
       async ({ storePath, tempConfig }) => {
         await updateSessionStore(storePath, (store) => {
           store["agent:main:main"] = {
@@ -924,7 +924,7 @@ describe("plugin session extension SessionEntry projection", () => {
     setActivePluginRegistry(registry.registry);
 
     await withProjectionSessionStore(
-      "openclaw-host-hooks-slot-noop-",
+      "steelengine-host-hooks-slot-noop-",
       async ({ storePath, tempConfig }) => {
         await updateSessionStore(storePath, (store) => {
           store["agent:main:main"] = {

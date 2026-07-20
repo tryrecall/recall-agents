@@ -1,5 +1,5 @@
-import { isRecord } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+import { isRecord } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import type { CodexThread, CodexThreadTurnsListResponse } from "./app-server/protocol.js";
 import {
   CODEX_INTERACTIVE_CUSTOM_THREAD_SOURCES,
@@ -313,7 +313,7 @@ function parseOptionalCatalogString(
 
 function parseCatalogSession(
   value: unknown,
-  options: { allowOpenClawSessionKey?: boolean } = {},
+  options: { allowSteelEngineSessionKey?: boolean } = {},
 ): CodexSessionCatalogSession {
   if (
     !isRecord(value) ||
@@ -365,10 +365,10 @@ function parseCatalogSession(
     MAX_METADATA_LENGTH,
   );
   const gitBranch = parseOptionalCatalogString(value.gitBranch, "Git branch", MAX_METADATA_LENGTH);
-  const openClawSessionKey = options.allowOpenClawSessionKey
+  const steelEngineSessionKey = options.allowSteelEngineSessionKey
     ? parseOptionalCatalogString(
-        value.openClawSessionKey,
-        "OpenClaw session key",
+        value.steelEngineSessionKey,
+        "SteelEngine session key",
         MAX_SESSION_KEY_LENGTH,
       )
     : undefined;
@@ -390,13 +390,13 @@ function parseCatalogSession(
     ...(modelProvider !== undefined ? { modelProvider } : {}),
     ...(cliVersion !== undefined ? { cliVersion } : {}),
     ...(gitBranch !== undefined ? { gitBranch } : {}),
-    ...(openClawSessionKey !== undefined ? { openClawSessionKey } : {}),
+    ...(steelEngineSessionKey !== undefined ? { steelEngineSessionKey } : {}),
   };
 }
 
 export function parseCatalogPage(
   value: unknown,
-  options: { allowOpenClawSessionKey?: boolean } = {},
+  options: { allowSteelEngineSessionKey?: boolean } = {},
 ): CodexSessionCatalogPage {
   if (
     !isRecord(value) ||

@@ -3,29 +3,29 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import OpenAI from "openai";
-import type { ResolvedTtsConfig } from "openclaw/plugin-sdk/agent-runtime";
-import { AuthStorage, ModelRegistry } from "openclaw/plugin-sdk/agent-sessions";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { encodePngRgba, fillPixel } from "openclaw/plugin-sdk/media-runtime";
+import type { ResolvedTtsConfig } from "steelengine/plugin-sdk/agent-runtime";
+import { AuthStorage, ModelRegistry } from "steelengine/plugin-sdk/agent-sessions";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { encodePngRgba, fillPixel } from "steelengine/plugin-sdk/media-runtime";
 import {
   registerProviderPlugin,
   requireRegisteredProvider,
-} from "openclaw/plugin-sdk/plugin-test-runtime";
-import { runRealtimeSttLiveTest } from "openclaw/plugin-sdk/provider-test-contracts";
-import { getRuntimeConfig } from "openclaw/plugin-sdk/runtime-config-snapshot";
+} from "steelengine/plugin-sdk/plugin-test-runtime";
+import { runRealtimeSttLiveTest } from "steelengine/plugin-sdk/provider-test-contracts";
+import { getRuntimeConfig } from "steelengine/plugin-sdk/runtime-config-snapshot";
 import {
   isOverloadedErrorMessage,
   isServerErrorMessage,
   isTimeoutErrorMessage,
-} from "openclaw/plugin-sdk/test-live";
+} from "steelengine/plugin-sdk/test-live";
 import { describe, expect, it } from "vitest";
 import plugin from "./index.js";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY ?? "";
-const LIVE_MODEL_ID = process.env.OPENCLAW_LIVE_OPENAI_PLUGIN_MODEL?.trim() || "gpt-5.6-luna";
-const LIVE_IMAGE_MODEL = process.env.OPENCLAW_LIVE_OPENAI_IMAGE_MODEL?.trim() || "gpt-image-2";
-const LIVE_VISION_MODEL = process.env.OPENCLAW_LIVE_OPENAI_VISION_MODEL?.trim() || "gpt-5.4-mini";
-const liveEnabled = OPENAI_API_KEY.trim().length > 0 && process.env.OPENCLAW_LIVE_TEST === "1";
+const LIVE_MODEL_ID = process.env.STEELENGINE_LIVE_OPENAI_PLUGIN_MODEL?.trim() || "gpt-5.6-luna";
+const LIVE_IMAGE_MODEL = process.env.STEELENGINE_LIVE_OPENAI_IMAGE_MODEL?.trim() || "gpt-image-2";
+const LIVE_VISION_MODEL = process.env.STEELENGINE_LIVE_OPENAI_VISION_MODEL?.trim() || "gpt-5.4-mini";
+const liveEnabled = OPENAI_API_KEY.trim().length > 0 && process.env.STEELENGINE_LIVE_TEST === "1";
 const describeLive = liveEnabled ? describe : describe.skip;
 const EMPTY_AUTH_STORE = { version: 1, profiles: {} } as const;
 const LIVE_TTS_TIMEOUT_MS = 60_000;
@@ -97,7 +97,7 @@ function resolveLiveOpenAISkipReason(error: unknown): string | null {
   return null;
 }
 
-function createLiveConfig(): OpenClawConfig {
+function createLiveConfig(): SteelEngineConfig {
   const cfg = getRuntimeConfig();
   return {
     ...cfg,
@@ -112,7 +112,7 @@ function createLiveConfig(): OpenClawConfig {
         },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 function createLiveTtsConfig(): ResolvedTtsConfig {
@@ -247,7 +247,7 @@ describeLive("openai plugin live", () => {
     const ttsConfig = createLiveTtsConfig();
 
     const audioFile = await speechProvider.synthesize({
-      text: "OpenClaw integration test OK.",
+      text: "SteelEngine integration test OK.",
       cfg,
       providerConfig: ttsConfig.providerConfigs.openai ?? {},
       target: "audio-file",
@@ -331,7 +331,7 @@ describeLive("openai plugin live", () => {
     const speechProvider = requireRegisteredProvider(speechProviders, "openai");
     const cfg = createLiveConfig();
     const ttsConfig = createLiveTtsConfig();
-    const phrase = "Testing OpenClaw OpenAI realtime transcription integration test OK.";
+    const phrase = "Testing SteelEngine OpenAI realtime transcription integration test OK.";
 
     const telephony = await speechProvider.synthesizeTelephony?.({
       text: phrase,

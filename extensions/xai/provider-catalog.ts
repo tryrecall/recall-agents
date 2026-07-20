@@ -3,11 +3,11 @@ import {
   buildLiveModelProviderConfig,
   getCachedLiveProviderModelRows,
   type LiveModelCatalogFetchGuard,
-} from "openclaw/plugin-sdk/provider-catalog-live-runtime";
+} from "steelengine/plugin-sdk/provider-catalog-live-runtime";
 import type {
   ModelDefinitionConfig,
   ModelProviderConfig,
-} from "openclaw/plugin-sdk/provider-model-shared";
+} from "steelengine/plugin-sdk/provider-model-shared";
 import {
   buildXaiCatalogModels,
   resolveXaiCatalogEntry,

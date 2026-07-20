@@ -2,9 +2,9 @@
 import type {
   ChannelDoctorConfigMutation,
   ChannelDoctorLegacyConfigRule,
-} from "openclaw/plugin-sdk/channel-contract";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { asObjectRecord, defineChannelAliasMigration } from "openclaw/plugin-sdk/runtime-doctor";
+} from "steelengine/plugin-sdk/channel-contract";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { asObjectRecord, defineChannelAliasMigration } from "steelengine/plugin-sdk/runtime-doctor";
 import { normalizeCompatibilityConfig as normalizeAckReactionConfig } from "./doctor.js";
 
 // WhatsApp's nested streaming schema is delivery-only ({chunkMode, block});
@@ -58,10 +58,10 @@ function fillMissingStreamingFields(
 // the settings the account previously inherited, or `doctor --fix` silently
 // changes effective delivery behavior for that account.
 function seedMigratedAccountStreaming(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountsWithoutStreamingBefore: ReadonlySet<string>;
   changes: string[];
-}): OpenClawConfig {
+}): SteelEngineConfig {
   const channels = params.cfg.channels as Record<string, unknown> | undefined;
   const entry = asObjectRecord(channels?.whatsapp);
   const accounts = asObjectRecord(entry?.accounts);
@@ -119,13 +119,13 @@ function seedMigratedAccountStreaming(params: {
       ...channels,
       whatsapp: { ...entry, accounts: nextAccounts },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 export function normalizeCompatibilityConfig({
   cfg,
 }: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
 }): ChannelDoctorConfigMutation {
   const ackReaction = normalizeAckReactionConfig({ cfg });
   const accountsBefore = asObjectRecord(

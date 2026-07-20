@@ -4,7 +4,7 @@
  */
 import { createConfiguredProviderLocalServiceAcquirer } from "../agents/provider-local-service.js";
 import { getRuntimeConfig } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.js";
+import type { SteelEngineConfig } from "../config/types.js";
 import { withPluginStateLease } from "../plugin-state/plugin-state-lease.js";
 import { createPluginStateKeyedStore } from "../plugin-state/plugin-state-store.js";
 import { loadActivatedBundledPluginPublicSurfaceModuleSync } from "./facade-runtime.js";
@@ -109,7 +109,7 @@ export type RepairShortTermPromotionArtifactsResult = {
 
 type MemoryIndexManagerFacade = {
   get(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     agentId: string;
     purpose?: "default" | "status";
   }): Promise<MemorySearchManager | null>;
@@ -133,7 +133,7 @@ type FacadeModule = {
     providerId: string,
   ) => BuiltinMemoryEmbeddingProviderDoctorMetadata | null;
   getMemorySearchManager: (params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     agentId: string;
     purpose?: "default" | "status" | "cli";
   }) => Promise<{

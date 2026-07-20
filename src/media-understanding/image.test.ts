@@ -1,7 +1,7 @@
 // Image runtime tests cover model-backed image routing, auth/profile handling,
 // provider payload transforms, and MiniMax/Copilot special paths.
 import path from "node:path";
-import { MAX_TIMER_TIMEOUT_MS } from "@openclaw/normalization-core/number-coercion";
+import { MAX_TIMER_TIMEOUT_MS } from "@steelengine/normalization-core/number-coercion";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { attachModelProviderRequestTransport } from "../agents/provider-request-config.js";
 import {
@@ -12,7 +12,7 @@ import {
 
 const hoisted = vi.hoisted(() => ({
   completeMock: vi.fn(),
-  ensureOpenClawModelsJsonMock: vi.fn(async () => {}),
+  ensureSteelEngineModelsJsonMock: vi.fn(async () => {}),
   getApiKeyForModelMock: vi.fn(
     async (): Promise<{
       apiKey: string;
@@ -44,7 +44,7 @@ const hoisted = vi.hoisted(() => ({
 }));
 const {
   completeMock,
-  ensureOpenClawModelsJsonMock,
+  ensureSteelEngineModelsJsonMock,
   getApiKeyForModelMock,
   resolveApiKeyForProviderMock,
   requireApiKeyMock,
@@ -112,7 +112,7 @@ vi.mock("../agents/models-config.js", async () => ({
   ...(await vi.importActual<typeof import("../agents/models-config.js")>(
     "../agents/models-config.js",
   )),
-  ensureOpenClawModelsJson: ensureOpenClawModelsJsonMock,
+  ensureSteelEngineModelsJson: ensureSteelEngineModelsJsonMock,
 }));
 
 vi.mock("../agents/model-auth.js", () => ({
@@ -188,7 +188,7 @@ describe("describeImageWithModel", () => {
   beforeEach(() => {
     // Provider endpoint policy comes from manifests. Pin source manifests so a
     // prior local build cannot make this source-checkout test read partial dist output.
-    vi.stubEnv("OPENCLAW_BUNDLED_PLUGINS_DIR", path.join(process.cwd(), "extensions"));
+    vi.stubEnv("STEELENGINE_BUNDLED_PLUGINS_DIR", path.join(process.cwd(), "extensions"));
     vi.stubGlobal("fetch", fetchMock);
     vi.clearAllMocks();
     fetchMock.mockImplementation(async () =>
@@ -260,7 +260,7 @@ describe("describeImageWithModel", () => {
     const authStore = { version: 1, profiles: {} };
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "minimax-portal",
       model: "MiniMax-VL-01",
       buffer: Buffer.from("png-bytes"),
@@ -275,7 +275,7 @@ describe("describeImageWithModel", () => {
       text: "portal ok",
       model: "MiniMax-VL-01",
     });
-    expect(ensureOpenClawModelsJsonMock).not.toHaveBeenCalled();
+    expect(ensureSteelEngineModelsJsonMock).not.toHaveBeenCalled();
     const authRequest = getApiKeyForModelCall();
     expect(authRequest?.store).toBe(authStore);
     expect(requireApiKeyMock).toHaveBeenCalled();
@@ -295,7 +295,7 @@ describe("describeImageWithModel", () => {
     expect(Object.fromEntries(new Headers(fetchOptions.headers as HeadersInit))).toEqual({
       authorization: "Bearer oauth-test",
       "content-type": "application/json",
-      "mm-api-source": "OpenClaw",
+      "mm-api-source": "SteelEngine",
     });
     expect(fetchOptions.signal).toBeInstanceOf(AbortSignal);
     expect(timeoutSpy).toHaveBeenCalledWith(1000);
@@ -321,7 +321,7 @@ describe("describeImageWithModel", () => {
 
     await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "minimax-portal",
       model: "MiniMax-VL-01",
       buffer: Buffer.from("png-bytes"),
@@ -350,7 +350,7 @@ describe("describeImageWithModel", () => {
 
     await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "minimax-portal",
       model: "MiniMax-VL-01",
       buffer: Buffer.from("png-bytes"),
@@ -391,7 +391,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "minimax-portal",
       model: "custom-vision",
       buffer: Buffer.from("png-bytes"),
@@ -417,7 +417,7 @@ describe("describeImageWithModel", () => {
         baseUrl: "https://api.minimax.io/anthropic",
       },
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
     });
     expect(completeMock).toHaveBeenCalledOnce();
     expect(fetchMock).not.toHaveBeenCalled();
@@ -461,7 +461,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "amazon-bedrock",
       model: "us.anthropic.claude-sonnet-4-6-v1",
       buffer: Buffer.from("png-bytes"),
@@ -497,8 +497,8 @@ describe("describeImageWithModel", () => {
     await expect(
       describeImageWithModel({
         cfg: {},
-        agentDir: "/tmp/openclaw-agent",
-        workspaceDir: "/tmp/openclaw-workspace",
+        agentDir: "/tmp/steelengine-agent",
+        workspaceDir: "/tmp/steelengine-workspace",
         provider: "minimax-portal",
         model: "MiniMax-VL-01",
         buffer: Buffer.from("png-bytes"),
@@ -515,8 +515,8 @@ describe("describeImageWithModel", () => {
     expect(resolveApiKeyForProviderMock).toHaveBeenCalledWith(
       expect.objectContaining({
         provider: "minimax-portal",
-        agentDir: "/tmp/openclaw-agent",
-        workspaceDir: "/tmp/openclaw-workspace",
+        agentDir: "/tmp/steelengine-agent",
+        workspaceDir: "/tmp/steelengine-workspace",
       }),
     );
     expect(fetchMock).toHaveBeenCalledOnce();
@@ -545,7 +545,7 @@ describe("describeImageWithModel", () => {
             },
           },
         },
-        agentDir: "/tmp/openclaw-agent",
+        agentDir: "/tmp/steelengine-agent",
         provider: "minimax-cn",
         model: "MiniMax-VL-01",
         buffer: Buffer.from("png-bytes"),
@@ -591,7 +591,7 @@ describe("describeImageWithModel", () => {
             },
           },
         },
-        agentDir: "/tmp/openclaw-agent",
+        agentDir: "/tmp/steelengine-agent",
         provider: "minimax-cn",
         model: "MiniMax-VL-01",
         buffer: Buffer.from("png-bytes"),
@@ -633,7 +633,7 @@ describe("describeImageWithModel", () => {
             },
           },
         },
-        agentDir: "/tmp/openclaw-agent",
+        agentDir: "/tmp/steelengine-agent",
         provider: "minimax-cn",
         model: "MiniMax-VL-01",
         buffer: Buffer.from("png-bytes"),
@@ -672,8 +672,8 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
-      workspaceDir: "/tmp/openclaw-workspace",
+      agentDir: "/tmp/steelengine-agent",
+      workspaceDir: "/tmp/steelengine-workspace",
       provider: "google",
       model: "gemini-2.5-flash",
       buffer: Buffer.from("png-bytes"),
@@ -684,17 +684,17 @@ describe("describeImageWithModel", () => {
     });
 
     expect(result.text).toBe("workspace ok");
-    expect(ensureOpenClawModelsJsonMock).not.toHaveBeenCalled();
+    expect(ensureSteelEngineModelsJsonMock).not.toHaveBeenCalled();
     expect(resolveModelAsyncMock).toHaveBeenCalledWith(
       "google",
       "gemini-2.5-flash",
-      "/tmp/openclaw-agent",
+      "/tmp/steelengine-agent",
       {},
       {
         allowBundledStaticCatalogFallback: true,
         skipAgentDiscovery: true,
         skipProviderRuntimeHooks: true,
-        workspaceDir: "/tmp/openclaw-workspace",
+        workspaceDir: "/tmp/steelengine-workspace",
       },
     );
     expect(registerProviderStreamForModelMock).toHaveBeenCalledWith({
@@ -705,8 +705,8 @@ describe("describeImageWithModel", () => {
         input: ["text", "image"],
       },
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
-      workspaceDir: "/tmp/openclaw-workspace",
+      agentDir: "/tmp/steelengine-agent",
+      workspaceDir: "/tmp/steelengine-workspace",
     });
   });
 
@@ -745,7 +745,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "openai",
       model: "gpt-5.4",
       buffer: Buffer.from("png-bytes"),
@@ -759,12 +759,12 @@ describe("describeImageWithModel", () => {
       text: "normalized ok",
       model: "gpt-5.4",
     });
-    expect(ensureOpenClawModelsJsonMock).not.toHaveBeenCalled();
+    expect(ensureSteelEngineModelsJsonMock).not.toHaveBeenCalled();
     expect(resolveModelAsyncMock).toHaveBeenNthCalledWith(
       1,
       "openai",
       "gpt-5.4",
-      "/tmp/openclaw-agent",
+      "/tmp/steelengine-agent",
       {},
       {
         allowBundledStaticCatalogFallback: true,
@@ -776,7 +776,7 @@ describe("describeImageWithModel", () => {
       2,
       "openai",
       "gpt-5.4",
-      "/tmp/openclaw-agent",
+      "/tmp/steelengine-agent",
       {},
       {
         allowBundledStaticCatalogFallback: true,
@@ -812,7 +812,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "ollama",
       model: "llava:latest",
       buffer: Buffer.from("png-bytes"),
@@ -834,7 +834,7 @@ describe("describeImageWithModel", () => {
         input: ["text", "image"],
       },
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
     });
     expect(streamFn).toHaveBeenCalledOnce();
     expect(completeMock).not.toHaveBeenCalled();
@@ -884,7 +884,7 @@ describe("describeImageWithModel", () => {
           },
         },
       },
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "lmstudio",
       model: "google/gemma-4-e2b",
       buffer: Buffer.from("png-bytes"),
@@ -906,7 +906,7 @@ describe("describeImageWithModel", () => {
     const resolveRequest = requireRecord(resolveRequestValue, "model registry request");
     expect(resolveRequest.provider).toBe("lmstudio");
     expect(resolveRequest.modelId).toBe("google/gemma-4-e2b");
-    expect(resolveRequest.agentDir).toBe("/tmp/openclaw-agent");
+    expect(resolveRequest.agentDir).toBe("/tmp/steelengine-agent");
     expect(
       requireRecord(
         requireRecord(
@@ -935,7 +935,7 @@ describe("describeImageWithModel", () => {
     await expect(
       describeImageWithModel({
         cfg: {},
-        agentDir: "/tmp/openclaw-agent",
+        agentDir: "/tmp/steelengine-agent",
         provider: "lmstudio",
         model: "text-only",
         buffer: Buffer.from("png-bytes"),
@@ -971,7 +971,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "openai",
       model: "gpt-5.4",
       buffer: Buffer.from("png-bytes"),
@@ -1037,7 +1037,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "openai",
       model: "gpt-5.4",
       buffer: Buffer.from("png-bytes"),
@@ -1078,7 +1078,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "openrouter",
       model: "google/gemini-2.5-flash",
       buffer: Buffer.from("png-bytes"),
@@ -1131,7 +1131,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "qwen",
       model: "qwen3.6-plus",
       buffer: Buffer.from("png-bytes"),
@@ -1250,7 +1250,7 @@ describe("describeImageWithModel", () => {
 
       const result = await describeImageWithModel({
         cfg: {},
-        agentDir: "/tmp/openclaw-agent",
+        agentDir: "/tmp/steelengine-agent",
         provider,
         model: model.id,
         buffer: Buffer.from("png-bytes"),
@@ -1297,7 +1297,7 @@ describe("describeImageWithModel", () => {
 
     const result = describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "openai",
       model: "gpt-5.4-mini",
       buffer: Buffer.from("png-bytes"),
@@ -1356,7 +1356,7 @@ describe("describeImageWithModel", () => {
 
     const result = describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "openai",
       model: "gpt-5.4-mini",
       buffer: Buffer.from("png-bytes"),
@@ -1390,7 +1390,7 @@ describe("describeImageWithModel", () => {
 
     const result = describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "openai",
       model: "gpt-5.4-mini",
       buffer: Buffer.from("png-bytes"),
@@ -1432,7 +1432,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "google",
       model: "gemini-3.1-flash-preview",
       profile: "google:default",
@@ -1487,7 +1487,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "google",
       model: "gemini-3.1-flash-lite",
       profile: "google:default",
@@ -1547,7 +1547,7 @@ describe("describeImageWithModel", () => {
 
     await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "github-copilot",
       model: "gpt-5.6-sol",
       profile: "github-copilot:preferred",
@@ -1601,7 +1601,7 @@ describe("describeImageWithModel", () => {
 
     await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "github-copilot",
       model: "gemini-3.1-pro-preview",
       buffer: Buffer.from("png-bytes"),
@@ -1679,7 +1679,7 @@ describe("describeImageWithModel", () => {
 
     await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "github-copilot",
       model: "gpt-4.1",
       buffer: Buffer.from("png-bytes"),
@@ -1718,7 +1718,7 @@ describe("describeImageWithModel", () => {
     await expect(
       describeImageWithModel({
         cfg: {},
-        agentDir: "/tmp/openclaw-agent",
+        agentDir: "/tmp/steelengine-agent",
         provider: "github-copilot",
         model: "gemini-3.1-pro-preview",
         buffer: Buffer.from("png-bytes"),
@@ -1755,7 +1755,7 @@ describe("describeImageWithModel", () => {
 
     await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "openai",
       model: "gpt-4o",
       buffer: Buffer.from("png-bytes"),
@@ -1801,7 +1801,7 @@ describe("describeImageWithModel", () => {
 
     await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "agent-plan",
       model: "doubao-seed-2.0-pro",
       buffer: Buffer.from("png-bytes"),
@@ -1838,7 +1838,7 @@ describe("describeImageWithModel", () => {
 
     await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       provider: "fake",
       model: "small-vlm",
       buffer: Buffer.from("png-bytes"),

@@ -5,8 +5,8 @@ function hasTranscriptMeta(message: unknown): boolean {
   return Boolean(
     message &&
     typeof message === "object" &&
-    (message as { __openclaw?: unknown })["__openclaw"] &&
-    typeof (message as { __openclaw?: unknown })["__openclaw"] === "object",
+    (message as { __steelengine?: unknown })["__steelengine"] &&
+    typeof (message as { __steelengine?: unknown })["__steelengine"] === "object",
   );
 }
 
@@ -14,7 +14,7 @@ export function readTranscriptSequence(message: unknown): number | null {
   if (!message || typeof message !== "object" || Array.isArray(message)) {
     return null;
   }
-  const metadata = (message as Record<string, unknown>)["__openclaw"];
+  const metadata = (message as Record<string, unknown>)["__steelengine"];
   if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
     return null;
   }

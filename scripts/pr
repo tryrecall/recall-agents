@@ -83,19 +83,19 @@ is_main_only_pr_command() {
 }
 
 is_supervised_pr_process() {
-  [ "${OPENCLAW_PR_DEDICATED_PROCESS_GROUP:-}" = "1" ] &&
-    [ "${OPENCLAW_PR_LOCK_NOTIFY_FD:-}" = "3" ] &&
-    [ "${OPENCLAW_PR_LOCK_SUPERVISOR_PID:-}" = "$PPID" ]
+  [ "${STEELENGINE_PR_DEDICATED_PROCESS_GROUP:-}" = "1" ] &&
+    [ "${STEELENGINE_PR_LOCK_NOTIFY_FD:-}" = "3" ] &&
+    [ "${STEELENGINE_PR_LOCK_SUPERVISOR_PID:-}" = "$PPID" ]
 }
 
 if [ "${1-}" = "gc" ] || is_locked_pr_command "${1-}"; then
   if is_supervised_pr_process; then
     # Do not leak the one-shot marker to tools or nested wrapper calls.
-    unset OPENCLAW_PR_DEDICATED_PROCESS_GROUP
+    unset STEELENGINE_PR_DEDICATED_PROCESS_GROUP
   else
-    unset OPENCLAW_PR_DEDICATED_PROCESS_GROUP
-    unset OPENCLAW_PR_LOCK_NOTIFY_FD
-    unset OPENCLAW_PR_LOCK_SUPERVISOR_PID
+    unset STEELENGINE_PR_DEDICATED_PROCESS_GROUP
+    unset STEELENGINE_PR_LOCK_NOTIFY_FD
+    unset STEELENGINE_PR_LOCK_SUPERVISOR_PID
     command -v node >/dev/null 2>&1 || { echo "Missing required command: node" >&2; exit 1; }
     exec node "$script_parent_dir/pr-lib/process-group-runner.mjs" "$script_parent_dir/.." "$script_self" "$@"
   fi
@@ -126,7 +126,7 @@ Usage:
   scripts/pr prepare-run <PR>
   scripts/pr merge-verify <PR>
   scripts/pr merge-run <PR>
-    OPENCLAW_PR_MERGE_METHOD=merge|rebase preserves the PR commit series.
+    STEELENGINE_PR_MERGE_METHOD=merge|rebase preserves the PR commit series.
 USAGE
 }
 
@@ -138,10 +138,10 @@ require_cmds() {
       missing+=("$cmd")
     fi
   done
-  if ! OPENCLAW_GH_BIN="$(resolve_plain_gh_bin)"; then
+  if ! STEELENGINE_GH_BIN="$(resolve_plain_gh_bin)"; then
     missing+=("gh")
   else
-    export OPENCLAW_GH_BIN
+    export STEELENGINE_GH_BIN
   fi
 
   if [ "${#missing[@]}" -gt 0 ]; then

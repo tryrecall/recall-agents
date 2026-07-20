@@ -1,5 +1,5 @@
 /** Read-only Gateway config tool for regular agents. */
-import { readStringValue } from "@openclaw/normalization-core/string-coerce";
+import { readStringValue } from "@steelengine/normalization-core/string-coerce";
 import { Type } from "typebox";
 import { GatewayClientRequestError } from "../../gateway/client.js";
 import { parseConfigPathArrayIndex } from "../../shared/path-array-index.js";
@@ -109,7 +109,7 @@ export function createGatewayTool(): AnyAgentTool {
   return {
     label: "Gateway",
     name: "gateway",
-    description: "Read gateway config + schema. Writes/restart: use openclaw tool.",
+    description: "Read gateway config + schema. Writes/restart: use steelengine tool.",
     parameters: GatewayToolSchema,
     execute: async (_toolCallId, args) => {
       const params = args as Record<string, unknown>;

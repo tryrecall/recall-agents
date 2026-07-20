@@ -3,10 +3,10 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
-  closeOpenClawStateDatabaseForTest,
-  openOpenClawStateDatabase,
-  type OpenClawStateDatabase,
-} from "../../state/openclaw-state-db.js";
+  closeSteelEngineStateDatabaseForTest,
+  openSteelEngineStateDatabase,
+  type SteelEngineStateDatabase,
+} from "../../state/steelengine-state-db.js";
 import {
   createDispatchEnvironmentFixtures,
   REQUEST,
@@ -17,15 +17,15 @@ import { createWorkerSessionPlacementStore } from "./placement-store.js";
 
 describe("forced worker environment abandonment", () => {
   let root: string;
-  let database: OpenClawStateDatabase;
+  let database: SteelEngineStateDatabase;
 
   beforeEach(async () => {
-    root = await fs.mkdtemp(path.join(await fs.realpath(os.tmpdir()), "openclaw-force-worker-"));
-    database = openOpenClawStateDatabase({ env: { OPENCLAW_STATE_DIR: root } });
+    root = await fs.mkdtemp(path.join(await fs.realpath(os.tmpdir()), "steelengine-force-worker-"));
+    database = openSteelEngineStateDatabase({ env: { STEELENGINE_STATE_DIR: root } });
   });
 
   afterEach(async () => {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     await fs.rm(root, { recursive: true, force: true });
   });
 

@@ -23,7 +23,7 @@ import {
   setRuntimeConfigSnapshotRefreshHandler,
   type RuntimeConfigSnapshotRefreshHandler,
 } from "../config/runtime-snapshot.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { coerceSecretRef, isSecretRef, type SecretRef } from "../config/types.secrets.js";
 import type { PluginManifestRegistry } from "../plugins/manifest-registry.js";
 import type { PluginOrigin } from "../plugins/plugin-origin.types.js";
@@ -41,8 +41,8 @@ import type { RuntimeWebToolsMetadata } from "./runtime-web-tools.types.js";
 
 /** Prepared secrets runtime snapshot activated for fast secret resolution. */
 export type PreparedSecretsRuntimeSnapshot = {
-  sourceConfig: OpenClawConfig;
-  config: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
+  config: SteelEngineConfig;
   authStores: Array<{ agentDir: string; store: RuntimeAuthProfileStore }>;
   authStoreCredentialsRevision: number;
   warnings: SecretResolverWarning[];
@@ -281,7 +281,7 @@ function mergeRollbackValue(previous: unknown, candidate: unknown, current: unkn
   return merged;
 }
 
-function hasSameSecretProviderDefinition(ref: SecretRef, configs: OpenClawConfig[]): boolean {
+function hasSameSecretProviderDefinition(ref: SecretRef, configs: SteelEngineConfig[]): boolean {
   const definition = configs[0]?.secrets?.providers?.[ref.provider];
   if (
     !configs.every((config) =>
@@ -295,7 +295,7 @@ function hasSameSecretProviderDefinition(ref: SecretRef, configs: OpenClawConfig
   }
   // Plugin integration ownership is not fully normalized to one entry. Preserve a resolved value
   // only across an unchanged plugin/channel snapshot, or rollback can pair it with rejected owner state.
-  const dependency = (config: OpenClawConfig) => ({
+  const dependency = (config: SteelEngineConfig) => ({
     plugins: config.plugins,
     channels: config.channels,
   });
@@ -308,8 +308,8 @@ function preserveResolvedSecretRefValues(
   currentSource: unknown,
   current: unknown,
   restored: unknown,
-  sourceConfig: OpenClawConfig,
-  currentSourceConfig: OpenClawConfig,
+  sourceConfig: SteelEngineConfig,
+  currentSourceConfig: SteelEngineConfig,
 ): unknown {
   const sourceRef = coerceSecretRef(source, sourceConfig.secrets?.defaults);
   if (sourceRef) {
@@ -356,9 +356,9 @@ function preserveResolvedAuthStoreSecretValues(
   candidate: Record<string, AuthProfileStore>,
   restored: Record<string, AuthProfileStore>,
   current: Record<string, AuthProfileStore>,
-  previousConfig: OpenClawConfig,
-  candidateConfig: OpenClawConfig,
-  currentConfig: OpenClawConfig,
+  previousConfig: SteelEngineConfig,
+  candidateConfig: SteelEngineConfig,
+  currentConfig: SteelEngineConfig,
 ): Record<string, AuthProfileStore> {
   const next = structuredClone(restored);
   for (const [agentDir, store] of Object.entries(next)) {
@@ -540,7 +540,7 @@ function mergeRollbackAuthStoreCredentials(
   candidate: Record<string, AuthProfileStore>,
   current: Record<string, AuthProfileStore>,
   restored: Record<string, AuthProfileStore>,
-  configs: [OpenClawConfig, OpenClawConfig, OpenClawConfig],
+  configs: [SteelEngineConfig, SteelEngineConfig, SteelEngineConfig],
   mutationLineage: typeof activeSnapshotLineageAuthMutations,
 ): Record<string, AuthProfileStore> {
   const next = structuredClone(restored);
@@ -906,7 +906,7 @@ export function restoreSecretsRuntimeSnapshotStateIfCurrent(
     params.snapshot.sourceConfig,
     params.ownedSnapshot.sourceConfig,
     activeSnapshot.sourceConfig,
-  ) as OpenClawConfig;
+  ) as SteelEngineConfig;
   const restoredConfig = preserveResolvedSecretRefValues(
     restoredSourceConfig,
     activeSnapshot.sourceConfig,
@@ -914,7 +914,7 @@ export function restoreSecretsRuntimeSnapshotStateIfCurrent(
     mergeRollbackValue(params.snapshot.config, params.ownedSnapshot.config, activeSnapshot.config),
     restoredSourceConfig,
     activeSnapshot.sourceConfig,
-  ) as OpenClawConfig;
+  ) as SteelEngineConfig;
   return activateSecretsRuntimeSnapshotStateIfCurrent({
     ...params,
     snapshot: {
@@ -960,8 +960,8 @@ export function getActiveSecretsRuntimeSnapshotRevision(): number {
 export function setSecretsRuntimeSourceSnapshotIfCurrent(params: {
   expectedSecretsRevision: number;
   expectedRuntimeConfigRevision: number;
-  runtimeSourceConfig: OpenClawConfig;
-  secretsSourceConfig: OpenClawConfig;
+  runtimeSourceConfig: SteelEngineConfig;
+  secretsSourceConfig: SteelEngineConfig;
 }): boolean {
   if (activeSnapshotRevision !== params.expectedSecretsRevision) {
     return false;

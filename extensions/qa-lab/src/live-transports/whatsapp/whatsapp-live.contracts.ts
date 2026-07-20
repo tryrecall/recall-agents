@@ -2,9 +2,9 @@
 import type {
   WhatsAppQaDriverObservedMessage,
   WhatsAppQaDriverSession,
-} from "@openclaw/whatsapp/api.js";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+} from "@steelengine/whatsapp/api.js";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 import type { startQaGatewayChild } from "../../gateway-child.js";
 
 export type WhatsAppQaRuntimeEnv = {
@@ -265,7 +265,7 @@ export type WhatsAppQaConfigOverrides = {
     | boolean
     | {
         removeAckAfterReply?: boolean;
-        timing?: NonNullable<NonNullable<OpenClawConfig["messages"]>["statusReactions"]>["timing"];
+        timing?: NonNullable<NonNullable<SteelEngineConfig["messages"]>["statusReactions"]>["timing"];
       };
 };
 

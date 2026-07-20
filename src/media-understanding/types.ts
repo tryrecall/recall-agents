@@ -2,7 +2,7 @@
 // auth, decisions, and structured extraction inputs.
 import type { AuthProfileStore } from "../agents/auth-profiles/types.js";
 import type { ModelProviderConfig } from "../config/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 
 type MediaUnderstandingKind = "audio.transcription" | "video.description" | "image.description";
 
@@ -150,7 +150,7 @@ export type ImageDescriptionRequest = {
   authStore?: AuthProfileStore;
   agentDir: string;
   workspaceDir?: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   model: string;
   provider: string;
 };
@@ -173,7 +173,7 @@ export type ImagesDescriptionRequest = {
   authStore?: AuthProfileStore;
   agentDir: string;
   workspaceDir?: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
 };
 
 export type ImageDescriptionResult = {
@@ -214,7 +214,7 @@ export type StructuredExtractionRequest = {
   preferredProfile?: string;
   authStore?: AuthProfileStore;
   agentDir: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   model: string;
   provider: string;
 };
@@ -233,7 +233,7 @@ type MediaUnderstandingDocumentModelDefaults = {
 };
 
 export type MediaUnderstandingProviderAuthContext = {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   provider: string;
   providerConfig?: ModelProviderConfig;
 };

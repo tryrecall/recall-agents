@@ -6,7 +6,7 @@ import {
   fingerprintPluginAutoEnableEnv,
 } from "../../config/plugin-auto-enable.apply.js";
 import { applyPluginAutoEnable } from "../../config/plugin-auto-enable.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type { PluginInstallRecord } from "../../config/types.plugins.js";
 import { createSubsystemLogger } from "../../logging.js";
 import { resolvePluginActivationSourceConfig } from "../activation-source-config.js";
@@ -28,7 +28,7 @@ import type { PluginLogger } from "../types.js";
 const log = createSubsystemLogger("plugins");
 
 type CurrentAutoEnableCacheEntry = {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   autoEnableConfigFingerprint: string;
   autoEnableEnvFingerprint: string;
@@ -59,7 +59,7 @@ function samePluginIds(
 }
 
 function applyCurrentPluginAutoEnable(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   workspaceDir?: string;
   manifestRegistry: PluginManifestRegistry | undefined;
@@ -113,9 +113,9 @@ function applyCurrentPluginAutoEnable(params: {
 
 /** Resolved plugin runtime load context shared by runtime loader callers. */
 export type PluginRuntimeLoadContext = {
-  rawConfig: OpenClawConfig;
-  config: OpenClawConfig;
-  activationSourceConfig: OpenClawConfig;
+  rawConfig: SteelEngineConfig;
+  config: SteelEngineConfig;
+  activationSourceConfig: SteelEngineConfig;
   autoEnabledReasons: Readonly<Record<string, string[]>>;
   workspaceDir: string | undefined;
   env: NodeJS.ProcessEnv;
@@ -139,8 +139,8 @@ type PluginRuntimeResolvedLoadValues = Pick<
 
 /** Options accepted while resolving plugin runtime load context. */
 type PluginRuntimeLoadContextOptions = {
-  config?: OpenClawConfig;
-  activationSourceConfig?: OpenClawConfig;
+  config?: SteelEngineConfig;
+  activationSourceConfig?: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   workspaceDir?: string;
   logger?: PluginLogger;

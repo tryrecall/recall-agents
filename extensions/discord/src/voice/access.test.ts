@@ -1,10 +1,10 @@
 // Discord tests cover access plugin behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { DiscordAccountConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { DiscordAccountConfig } from "steelengine/plugin-sdk/config-contracts";
 import { describe, expect, it } from "vitest";
 import { authorizeDiscordVoiceIngress } from "./access.js";
 
-const baseCfg = { commands: { useAccessGroups: true } } as OpenClawConfig;
+const baseCfg = { commands: { useAccessGroups: true } } as SteelEngineConfig;
 
 describe("authorizeDiscordVoiceIngress", () => {
   it("blocks speakers outside the configured channel user allowlist", async () => {

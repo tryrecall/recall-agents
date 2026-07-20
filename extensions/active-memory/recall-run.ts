@@ -2,17 +2,17 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
-import { resolveAgentDir, resolveAgentWorkspaceDir } from "openclaw/plugin-sdk/agent-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
-import { parseAgentSessionKey } from "openclaw/plugin-sdk/routing";
+import { resolveAgentDir, resolveAgentWorkspaceDir } from "steelengine/plugin-sdk/agent-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-entry";
+import { parseAgentSessionKey } from "steelengine/plugin-sdk/routing";
 import {
   cleanupSessionLifecycleArtifacts,
   formatSqliteSessionFileMarker,
   patchSessionEntry,
-} from "openclaw/plugin-sdk/session-store-runtime";
-import { readSessionTranscriptEvents } from "openclaw/plugin-sdk/session-transcript-runtime";
-import { tempWorkspace, resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/temp-path";
+} from "steelengine/plugin-sdk/session-store-runtime";
+import { readSessionTranscriptEvents } from "steelengine/plugin-sdk/session-transcript-runtime";
+import { tempWorkspace, resolvePreferredSteelEngineTmpDir } from "steelengine/plugin-sdk/temp-path";
 import {
   applyActiveMemoryRuntimeConfigSnapshot,
   isMissingRegisteredMemoryToolsError,
@@ -141,8 +141,8 @@ async function cleanupActiveMemoryRecallSession(params: {
 }
 
 async function runRecallSubagent(params: {
-  api: OpenClawPluginApi;
-  runtimeConfig: OpenClawConfig;
+  api: SteelEnginePluginApi;
+  runtimeConfig: SteelEngineConfig;
   config: ResolvedActiveRecallPluginConfig;
   agentId: string;
   parentSessionKey?: string;
@@ -185,8 +185,8 @@ async function runRecallSubagent(params: {
   const transientWorkspace = params.config.persistTranscripts
     ? undefined
     : await tempWorkspace({
-        rootDir: resolvePreferredOpenClawTmpDir(),
-        prefix: "openclaw-active-memory-",
+        rootDir: resolvePreferredSteelEngineTmpDir(),
+        prefix: "steelengine-active-memory-",
       });
   const tempDir = transientWorkspace?.dir;
   const persistedDir = params.config.persistTranscripts

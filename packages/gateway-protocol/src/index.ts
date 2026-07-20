@@ -1837,7 +1837,7 @@ export type SessionsPatchResult = {
 
 type GatewayAgentRuntime = {
   id: string;
-  fallback?: "openclaw" | "none";
+  fallback?: "steelengine" | "none";
   source:
     | "env"
     | "agent"

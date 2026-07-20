@@ -1,7 +1,7 @@
 import Foundation
-import OpenClawChatUI
+import SteelEngineChatUI
 import Testing
-@testable import OpenClaw
+@testable import SteelEngine
 
 struct CommandSessionGroupingTests {
     @Test func `groups pinned categories and ungrouped in display order`() {
@@ -118,9 +118,9 @@ struct CommandSessionGroupingTests {
         _ key: String,
         category: String? = nil,
         pinned: Bool = false,
-        activity: Double) -> OpenClawChatSessionEntry
+        activity: Double) -> SteelEngineChatSessionEntry
     {
-        OpenClawChatSessionEntry(
+        SteelEngineChatSessionEntry(
             key: key,
             kind: nil,
             displayName: nil,

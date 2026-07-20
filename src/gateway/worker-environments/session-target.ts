@@ -1,5 +1,5 @@
 import type { SessionTranscriptWriteScope } from "../../config/sessions/session-accessor.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { resolveSessionIdMatchSelection } from "../../sessions/session-id-resolution.js";
 import {
   loadCombinedSessionStoreForGateway,
@@ -22,7 +22,7 @@ export type ResolvedWorkerSessionTarget = Omit<
 };
 
 export function resolveWorkerSessionTarget(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   sessionId: string,
 ): ResolvedWorkerSessionTarget | undefined {
   const { store } = loadCombinedSessionStoreForGateway(cfg);

@@ -1,8 +1,8 @@
 // Model probe RPC tests cover validation, normalization, bounded execution, and redacted mapping.
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AuthProbeSummary } from "../../commands/models/list.probe.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type { GatewayRequestHandlerOptions } from "./types.js";
 
 const mocks = vi.hoisted(() => ({
@@ -34,7 +34,7 @@ function summary(results: AuthProbeSummary["results"]): AuthProbeSummary {
   };
 }
 
-function createOptions(params: Record<string, unknown>, cfg: OpenClawConfig = {}) {
+function createOptions(params: Record<string, unknown>, cfg: SteelEngineConfig = {}) {
   const respond = vi.fn();
   return {
     options: {
@@ -67,7 +67,7 @@ describe("models.probe", () => {
   });
 
   it("normalizes providers, trims profiles, and clamps the timeout", async () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           model: { primary: "openai/gpt-5.6", fallbacks: ["openai/gpt-5.5"] },
@@ -95,7 +95,7 @@ describe("models.probe", () => {
   });
 
   it("probes the requested provider so overrides and model selection resolve", async () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       models: {
         providers: {
           "byteplus-plan": {

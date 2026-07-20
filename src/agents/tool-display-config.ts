@@ -320,9 +320,9 @@ export const TOOL_DISPLAY_CONFIG: ToolDisplayConfig = {
       title: "Skill Workshop",
       detailKeys: ["action", "name", "proposal_id"],
     },
-    openclaw: {
+    steelengine: {
       emoji: "🦀",
-      title: "OpenClaw",
+      title: "SteelEngine",
       detailKeys: ["action", "path", "model"],
     },
     gateway: {

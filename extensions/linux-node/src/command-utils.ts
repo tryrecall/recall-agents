@@ -1,6 +1,6 @@
-import type { OpenClawPluginNodeHostCommandAvailabilityContext } from "openclaw/plugin-sdk/plugin-entry";
-import type { CommandOptions, SpawnResult } from "openclaw/plugin-sdk/process-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+import type { SteelEnginePluginNodeHostCommandAvailabilityContext } from "steelengine/plugin-sdk/plugin-entry";
+import type { CommandOptions, SpawnResult } from "steelengine/plugin-sdk/process-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import {
   resolveLinuxNodePluginConfigFromHost,
   type ResolvedLinuxNodePluginConfig,
@@ -47,7 +47,7 @@ export function assertToolResult(result: SpawnResult, code: string): void {
 }
 
 export function isCapabilityEnabledForHost(
-  context: OpenClawPluginNodeHostCommandAvailabilityContext,
+  context: SteelEnginePluginNodeHostCommandAvailabilityContext,
   capability: keyof ResolvedLinuxNodePluginConfig,
 ): boolean {
   return resolveLinuxNodePluginConfigFromHost(context.config)?.[capability].enabled === true;

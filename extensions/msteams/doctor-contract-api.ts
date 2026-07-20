@@ -6,15 +6,15 @@ import path from "node:path";
 import type {
   ChannelDoctorConfigMutation,
   ChannelDoctorLegacyConfigRule,
-} from "openclaw/plugin-sdk/channel-contract";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+} from "steelengine/plugin-sdk/channel-contract";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   archiveLegacyStateSource,
   defineChannelAliasMigration,
   type PluginDoctorStateMigration,
-} from "openclaw/plugin-sdk/runtime-doctor";
-import { resolveStorePath } from "openclaw/plugin-sdk/session-store-runtime";
-import { isRecord } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/runtime-doctor";
+import { resolveStorePath } from "steelengine/plugin-sdk/session-store-runtime";
+import { isRecord } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { normalizeStoredConversationId } from "./src/conversation-store-helpers.js";
 import {
   buildMSTeamsConversationStateKey,
@@ -74,7 +74,7 @@ export const legacyConfigRules: ChannelDoctorLegacyConfigRule[] =
 export function normalizeCompatibilityConfig({
   cfg,
 }: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
 }): ChannelDoctorConfigMutation {
   return streamingAliasMigration.normalizeChannelConfig({ cfg });
 }

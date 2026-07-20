@@ -38,7 +38,7 @@ function createContext(request: ReturnType<typeof vi.fn>): ContextHarness {
       type: "hello-ok" as const,
       protocol: 1,
       auth: { role: "operator", scopes: ["operator.admin"] },
-      features: { methods: ["openclaw.chat"] },
+      features: { methods: ["steelengine.chat"] },
     },
     assistantAgentId: "main",
     sessionKey: "main",
@@ -103,7 +103,7 @@ async function mountPage(
   provider: ApplicationContextProvider;
 }> {
   const provider = createApplicationContextProvider(context);
-  const page = document.createElement("openclaw-custodian-page") as TestCustodianPage;
+  const page = document.createElement("steelengine-custodian-page") as TestCustodianPage;
   page.onboarding = options.onboarding ?? true;
   provider.append(page);
   document.body.append(provider);
@@ -155,7 +155,7 @@ describe("custodian page", () => {
 
     await waitForFast(() => expect(request).toHaveBeenCalledOnce());
     await page.updateComplete;
-    const card = page.querySelector("openclaw-option-card")!;
+    const card = page.querySelector("steelengine-option-card")!;
     await card.updateComplete;
     expect(page.querySelector(".option-card__choice--recommended")?.textContent).toContain(
       "Talk to my agent",
@@ -164,7 +164,7 @@ describe("custodian page", () => {
 
     await waitForFast(() => expect(request).toHaveBeenCalledTimes(2));
     await page.updateComplete;
-    expect(request.mock.calls[0]?.[0]).toBe("openclaw.chat");
+    expect(request.mock.calls[0]?.[0]).toBe("steelengine.chat");
     expect(request.mock.calls[0]?.[1]).toMatchObject({ welcomeVariant: "onboarding" });
     // The engine receives the parseable reply text; the transcript shows the label.
     expect(request.mock.calls[1]?.[1]).toMatchObject({
@@ -210,7 +210,7 @@ describe("custodian page", () => {
   it("preserves the onboarding session across a same-gateway reconnect", async () => {
     const request = vi.fn().mockResolvedValue({
       sessionId: "control-ui-onboarding-00000000-0000-4000-8000-000000000001",
-      reply: "Hello from OpenClaw.",
+      reply: "Hello from SteelEngine.",
       action: "none",
     });
     const { context, setGatewaySnapshot } = createContext(request);
@@ -228,7 +228,7 @@ describe("custodian page", () => {
     await page.updateComplete;
 
     expect(request).toHaveBeenCalledOnce();
-    expect(page.textContent).toContain("Hello from OpenClaw.");
+    expect(page.textContent).toContain("Hello from SteelEngine.");
   });
 
   it("keeps the device-token session scope while hello is gone during a drop", async () => {
@@ -253,7 +253,7 @@ describe("custodian page", () => {
         type: "hello-ok" as const,
         protocol: 1,
         auth: { role: "operator", scopes: ["operator.admin"], deviceToken: "stored-device-token" },
-        features: { methods: ["openclaw.chat"] },
+        features: { methods: ["steelengine.chat"] },
       } as ApplicationGatewaySnapshot["hello"],
     });
     await page.updateComplete;
@@ -499,7 +499,7 @@ describe("custodian page", () => {
     const question = {
       id: "access",
       header: "Access",
-      question: "How should OpenClaw work?",
+      question: "How should SteelEngine work?",
       options: [{ label: "Full access", recommended: true }, { label: "Ask first" }],
       isOther: false,
     };
@@ -526,14 +526,14 @@ describe("custodian page", () => {
     await waitForFast(() => expect(request).toHaveBeenCalledTimes(2));
     await page.updateComplete;
     expect(request.mock.calls[1]?.[1]).toMatchObject({ message: "Skip for now" });
-    expect(page.querySelector("openclaw-option-card")).toBeNull();
+    expect(page.querySelector("steelengine-option-card")).toBeNull();
   });
 
   it("retires a structured question after a freeform reply", async () => {
     const question = {
       id: "access",
       header: "Access",
-      question: "How should OpenClaw work?",
+      question: "How should SteelEngine work?",
       options: [{ label: "Full access", recommended: true }, { label: "Ask first" }],
       isOther: false,
     };
@@ -572,7 +572,7 @@ describe("custodian page", () => {
   it("requests the normal caretaker greeting outside onboarding", async () => {
     const request = vi.fn().mockResolvedValue({
       sessionId: "control-ui-onboarding-00000000-0000-4000-8000-000000000001",
-      reply: "OpenClaw here. Everything is healthy.",
+      reply: "SteelEngine here. Everything is healthy.",
       action: "none",
     });
     const { context } = createContext(request);

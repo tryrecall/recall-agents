@@ -6,17 +6,17 @@ import {
   deriveDurableFinalDeliveryRequirements,
   projectOutboundPayloadPlanForDelivery,
   resolveTranscriptBackedChannelFinalText,
-} from "openclaw/plugin-sdk/channel-outbound";
+} from "steelengine/plugin-sdk/channel-outbound";
 import type {
-  OpenClawConfig,
+  SteelEngineConfig,
   ReplyToMode,
   TelegramAccountConfig,
-} from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-payload";
-import { isSingleUseReplyToMode } from "openclaw/plugin-sdk/reply-reference";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import type { ReplyPayload } from "steelengine/plugin-sdk/reply-payload";
+import { isSingleUseReplyToMode } from "steelengine/plugin-sdk/reply-reference";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
+import { logVerbose } from "steelengine/plugin-sdk/runtime-env";
 import type { TelegramBotDeps } from "./bot-deps.js";
 import type { TelegramMessageContext } from "./bot-message-context.js";
 import type { TelegramDraftController } from "./bot-message-dispatch-draft.js";
@@ -55,7 +55,7 @@ import { editMessageTelegram } from "./send.js";
 
 export function createTelegramDeliveryController(params: {
   bot: Bot;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   chunkMode: ReturnType<typeof import("./bot-message-dispatch.runtime.js").resolveChunkMode>;
   context: TelegramMessageContext;
   dispatchStartedAt: number;

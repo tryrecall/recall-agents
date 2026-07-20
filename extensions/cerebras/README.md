@@ -1,12 +1,12 @@
-# OpenClaw Cerebras Provider
+# SteelEngine Cerebras Provider
 
-Official OpenClaw provider plugin for Cerebras.
+Official SteelEngine provider plugin for Cerebras.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/cerebras-provider
-openclaw gateway restart
+steelengine plugins install @steelengine/cerebras-provider
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/providers/cerebras> for setup and configuration.
+See <https://docs.steelengine.ai/providers/cerebras> for setup and configuration.

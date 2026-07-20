@@ -1,12 +1,12 @@
-# OpenClaw Parallel Plugin
+# SteelEngine Parallel Plugin
 
-Official OpenClaw plugin for Parallel.
+Official SteelEngine plugin for Parallel.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/parallel-plugin
-openclaw gateway restart
+steelengine plugins install @steelengine/parallel-plugin
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/tools/parallel-search> for setup and configuration.
+See <https://docs.steelengine.ai/tools/parallel-search> for setup and configuration.

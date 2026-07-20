@@ -3,7 +3,7 @@ import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
 import {
   coerceCommitmentRecord,
   commitmentImmutableIdentity,
@@ -16,9 +16,9 @@ import {
 } from "../commitments/store-record.js";
 import type { CommitmentRecord } from "../commitments/types.js";
 import {
-  openOpenClawStateDatabase,
-  runOpenClawStateWriteTransaction,
-} from "../state/openclaw-state-db.js";
+  openSteelEngineStateDatabase,
+  runSteelEngineStateWriteTransaction,
+} from "../state/steelengine-state-db.js";
 import {
   executeSqliteQuerySync,
   executeSqliteQueryTakeFirstSync,
@@ -237,7 +237,7 @@ export function migrateLegacyCommitments(params: {
   let activeDuplicateCount = 0;
   try {
     assertLegacySourceUnchanged(params.detected.sourcePath, snapshot);
-    runOpenClawStateWriteTransaction(
+    runSteelEngineStateWriteTransaction(
       ({ db }) => {
         const commitmentsDb = getNodeSqliteKysely<CommitmentsDatabase>(db);
         for (const legacyRecord of legacyRecords) {
@@ -287,7 +287,7 @@ export function migrateLegacyCommitments(params: {
           importedCount += 1;
         }
       },
-      { env: { ...process.env, OPENCLAW_STATE_DIR: params.stateDir } },
+      { env: { ...process.env, STEELENGINE_STATE_DIR: params.stateDir } },
     );
   } catch (error) {
     warnings.push(`Failed migrating legacy commitments state: ${String(error)}`);
@@ -296,8 +296,8 @@ export function migrateLegacyCommitments(params: {
 
   try {
     params.beforeVerify?.();
-    const database = openOpenClawStateDatabase({
-      env: { ...process.env, OPENCLAW_STATE_DIR: params.stateDir },
+    const database = openSteelEngineStateDatabase({
+      env: { ...process.env, STEELENGINE_STATE_DIR: params.stateDir },
     });
     const commitmentsDb = getNodeSqliteKysely<CommitmentsDatabase>(database.db);
     for (const expected of expectedRows.values()) {

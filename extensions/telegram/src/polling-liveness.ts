@@ -1,6 +1,6 @@
 // Telegram plugin module implements polling liveness behavior.
-import { formatDurationPrecise } from "openclaw/plugin-sdk/runtime-env";
-import { formatErrorMessage } from "openclaw/plugin-sdk/ssrf-runtime";
+import { formatDurationPrecise } from "steelengine/plugin-sdk/runtime-env";
+import { formatErrorMessage } from "steelengine/plugin-sdk/ssrf-runtime";
 
 type TelegramPollingLivenessTrackerOptions = {
   now?: () => number;

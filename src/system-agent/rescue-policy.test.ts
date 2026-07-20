@@ -1,9 +1,9 @@
-// OpenClaw rescue policy tests cover eligibility and safety decisions.
+// SteelEngine rescue policy tests cover eligibility and safety decisions.
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { resolveSystemAgentRescuePolicy } from "./rescue-policy.js";
 
-function decide(cfg: OpenClawConfig, overrides = {}) {
+function decide(cfg: SteelEngineConfig, overrides = {}) {
   return resolveSystemAgentRescuePolicy({
     cfg,
     senderIsOwner: true,

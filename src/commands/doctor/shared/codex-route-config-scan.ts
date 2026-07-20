@@ -1,7 +1,7 @@
-import { AGENT_MODEL_CONFIG_KEYS } from "@openclaw/model-catalog-core/configured-model-refs";
-import { asOptionalRecord as asMutableRecord } from "@openclaw/normalization-core/record-coerce";
-import { normalizeOptionalLowercaseString as normalizeString } from "@openclaw/normalization-core/string-coerce";
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import { AGENT_MODEL_CONFIG_KEYS } from "@steelengine/model-catalog-core/configured-model-refs";
+import { asOptionalRecord as asMutableRecord } from "@steelengine/normalization-core/record-coerce";
+import { normalizeOptionalLowercaseString as normalizeString } from "@steelengine/normalization-core/string-coerce";
+import type { SteelEngineConfig } from "../../../config/types.steelengine.js";
 import { normalizeAgentId } from "../../../routing/session-key.js";
 import {
   asAgentRuntimePolicyConfig,
@@ -116,7 +116,7 @@ function collectAgentModelRefs(params: {
 }
 
 export function collectConfigModelRefs(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   blockedModelIdentities?: ReadonlySet<LegacyCodexModelIdentity>,
 ): CodexRouteHit[] {
   const hits: CodexRouteHit[] = [];
@@ -195,7 +195,7 @@ export function collectConfigModelRefs(
 }
 
 export function collectDisabledCodexPluginRouteHits(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   env?: NodeJS.ProcessEnv,
 ): DisabledCodexPluginRouteHit[] {
   if (!isCodexPluginUnavailableByConfig(cfg)) {
@@ -299,7 +299,7 @@ export function collectDisabledCodexPluginRouteHits(
 
 /** Find Codex-routed model refs that require the Codex plugin while it is disabled. */
 export function collectDisabledCodexPluginRouteIssues(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   env?: NodeJS.ProcessEnv,
 ): DisabledCodexPluginRouteIssue[] {
   const repairBlocked = codexPluginRepairIsBlocked(cfg);
@@ -312,9 +312,9 @@ export function collectDisabledCodexPluginRouteIssues(
 }
 
 export function enableCodexPluginForRequiredRoutes(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   routeHits: DisabledCodexPluginRouteHit[];
-}): { cfg: OpenClawConfig; changes: string[] } {
+}): { cfg: SteelEngineConfig; changes: string[] } {
   // Explicit user opt-out wins over managed-harness repair; doctor warns instead.
   if (params.routeHits.length === 0 || codexPluginRepairIsBlocked(params.cfg)) {
     return { cfg: params.cfg, changes: [] };
@@ -349,18 +349,18 @@ export function enableCodexPluginForRequiredRoutes(params: {
   return { cfg, changes };
 }
 
-function codexPluginIsBlockedOutsideEntry(cfg: OpenClawConfig): boolean {
+function codexPluginIsBlockedOutsideEntry(cfg: SteelEngineConfig): boolean {
   return cfg.plugins?.enabled === false || pluginIdListIncludes(cfg.plugins?.deny, "codex");
 }
 
-export function codexPluginRepairIsBlocked(cfg: OpenClawConfig): boolean {
+export function codexPluginRepairIsBlocked(cfg: SteelEngineConfig): boolean {
   return (
     codexPluginIsBlockedOutsideEntry(cfg) ||
     asMutableRecord(asMutableRecord(cfg.plugins?.entries)?.codex)?.enabled === false
   );
 }
 
-function isCodexPluginUnavailableByConfig(cfg: OpenClawConfig): boolean {
+function isCodexPluginUnavailableByConfig(cfg: SteelEngineConfig): boolean {
   if (codexPluginRepairIsBlocked(cfg)) {
     return true;
   }
@@ -413,7 +413,7 @@ function hasAgentPrimaryModelConfig(agent: unknown): boolean {
 }
 
 function collectChannelAgentRuntimeModelRefs(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
 ): Array<{ path: string; modelRef: string }> {
   const refs: Array<{ path: string; modelRef: string }> = [];
   const channelsModelByChannel = asMutableRecord(cfg.channels?.modelByChannel);

@@ -2,7 +2,7 @@
 import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { normalizeLowercaseStringOrEmpty } from "steelengine/plugin-sdk/string-coerce-runtime";
 import pMap from "p-map";
 import type { BridgeMemoryWikiResult } from "./bridge.js";
 import type { ResolvedMemoryWikiConfig } from "./config.js";
@@ -188,8 +188,8 @@ async function writeUnsafeLocalSourcePage(params: {
           renderMarkdownFence(raw, detectFenceLanguage(params.artifact.absolutePath)),
           "",
           "## Notes",
-          "<!-- openclaw:human:start -->",
-          "<!-- openclaw:human:end -->",
+          "<!-- steelengine:human:start -->",
+          "<!-- steelengine:human:end -->",
           "",
         ].join("\n"),
       }),

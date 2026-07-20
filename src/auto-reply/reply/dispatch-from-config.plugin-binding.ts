@@ -1,5 +1,5 @@
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { matchPluginCommand } from "../../plugins/commands.js";
 import { isNativeCommandTurn, resolveCommandTurnContext } from "../command-turn-context.js";
 import {
@@ -12,7 +12,7 @@ import { isExplicitSourceReplyCommand } from "./source-reply-delivery-mode.js";
 
 export function shouldBypassPluginOwnedBindingForCommand(
   ctx: FinalizedMsgContext,
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
 ): boolean {
   const commandTurn = resolveCommandTurnContext(ctx);
   if (

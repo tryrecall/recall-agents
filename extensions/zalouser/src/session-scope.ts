@@ -1,6 +1,6 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 
-export function resolveZalouserDmSessionScope(config: OpenClawConfig) {
+export function resolveZalouserDmSessionScope(config: SteelEngineConfig) {
   const configured = config.session?.dmScope;
   return configured === "main" || !configured ? "per-channel-peer" : configured;
 }

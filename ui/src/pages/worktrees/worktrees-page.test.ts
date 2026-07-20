@@ -157,7 +157,7 @@ describe("WorktreesPage lifecycle", () => {
     const removedRecord = {
       ...record,
       removedAt: 2,
-      snapshotRef: "refs/openclaw/worktree-snapshots/test",
+      snapshotRef: "refs/steelengine/worktree-snapshots/test",
     };
     const pendingList = deferred<{ worktrees: WorktreeRecord[] }>();
     let listRequests = 0;
@@ -173,7 +173,7 @@ describe("WorktreesPage lifecycle", () => {
       }
       return Promise.resolve({ removed: true });
     });
-    const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+    const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
     page.context = contextWithGateway(
       gatewayWithClient({ request } as unknown as GatewayBrowserClient),
     );
@@ -203,7 +203,7 @@ describe("WorktreesPage lifecycle", () => {
   });
 
   it("clears stale records when a null-client gateway source is replaced", async () => {
-    const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+    const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
     page.records = [
       {
         id: "stale",
@@ -239,7 +239,7 @@ describe("WorktreesPage lifecycle", () => {
         }),
     );
     const secondRequest = vi.fn(async () => ({ worktrees: [] }));
-    const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+    const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
     page.context = contextWithGateway(
       gatewayWithClient({ request: firstRequest } as unknown as GatewayBrowserClient),
     );
@@ -271,7 +271,7 @@ describe("WorktreesPage lifecycle", () => {
       return Promise.resolve({ worktrees: [] });
     });
     const secondRequest = vi.fn(async () => ({ worktrees: [] }));
-    const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+    const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
     page.context = contextWithGateway(
       gatewayWithClient({ request: firstRequest } as unknown as GatewayBrowserClient),
     );
@@ -310,7 +310,7 @@ describe("WorktreesPage lifecycle", () => {
       }
       return Promise.resolve({ worktrees: [] });
     });
-    const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+    const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
     page.context = contextWithGateway(
       gatewayWithClient({ request } as unknown as GatewayBrowserClient),
     );
@@ -336,7 +336,7 @@ describe("WorktreesPage lifecycle", () => {
     });
     const client = { request } as unknown as GatewayBrowserClient;
     const source = mutableGateway(client);
-    const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+    const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
     page.context = contextWithGateway(source.gateway);
     document.body.append(page);
     await waitForFast(() => expect(request).toHaveBeenCalledWith("worktrees.list", {}));
@@ -367,7 +367,7 @@ describe("WorktreesPage lifecycle", () => {
       }
       return Promise.resolve({});
     });
-    const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+    const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
     page.context = contextWithGateway(
       gatewayWithClient({ request } as unknown as GatewayBrowserClient),
     );
@@ -397,7 +397,7 @@ describe("WorktreesPage lifecycle", () => {
       }
       return Promise.resolve({});
     });
-    const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+    const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
     page.context = contextWithGateway(
       gatewayWithClient({ request } as unknown as GatewayBrowserClient),
     );
@@ -422,7 +422,7 @@ describe("WorktreesPage lifecycle", () => {
     });
     const client = { request } as unknown as GatewayBrowserClient;
     const source = mutableGateway(client);
-    const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+    const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
     page.context = contextWithGateway(source.gateway);
     page.createRepoRoot = "/tmp/repo";
     document.body.append(page);
@@ -452,7 +452,7 @@ describe("WorktreesPage lifecycle", () => {
       }
       return Promise.resolve({ worktrees: [] });
     });
-    const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+    const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
     page.context = contextWithGateway(
       gatewayWithClient({ request } as unknown as GatewayBrowserClient),
     );
@@ -513,7 +513,7 @@ describe("WorktreesPage lifecycle", () => {
   it("renders cleanup limits from config and disables controls until config loads", async () => {
     const request = vi.fn(async () => ({ worktrees: [] }));
     const withConfig = document.createElement(
-      "openclaw-worktrees-page",
+      "steelengine-worktrees-page",
     ) as WorktreesPageTestElement;
     withConfig.context = contextWithConfig(
       gatewayWithClient({ request } as unknown as GatewayBrowserClient),
@@ -533,7 +533,7 @@ describe("WorktreesPage lifecycle", () => {
 
     // Without a runtimeConfig capability the section stays visible but inert.
     const withoutConfig = document.createElement(
-      "openclaw-worktrees-page",
+      "steelengine-worktrees-page",
     ) as WorktreesPageTestElement;
     withoutConfig.context = contextWithGateway(
       gatewayWithClient({ request } as unknown as GatewayBrowserClient),
@@ -552,7 +552,7 @@ describe("WorktreesPage lifecycle", () => {
     try {
       const request = vi.fn(async () => ({ worktrees: [] }));
       const runtimeConfig = runtimeConfigStub({ maxCount: 25, maxTotalSizeGb: 50 });
-      const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+      const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
       page.context = contextWithConfig(
         gatewayWithClient({ request } as unknown as GatewayBrowserClient),
         runtimeConfig,
@@ -594,7 +594,7 @@ describe("WorktreesPage lifecycle", () => {
         calls.push("config.patch");
         return true;
       });
-      const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+      const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
       page.context = contextWithConfig(
         gatewayWithClient({ request } as unknown as GatewayBrowserClient),
         runtimeConfig,
@@ -621,7 +621,7 @@ describe("WorktreesPage lifecycle", () => {
       const runtimeConfig = runtimeConfigStub({ maxCount: 25 });
       runtimeConfig.patch = vi.fn(async () => false);
       runtimeConfig.state.lastError = "save rejected";
-      const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+      const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
       page.context = contextWithConfig(
         gatewayWithClient({ request } as unknown as GatewayBrowserClient),
         runtimeConfig,
@@ -651,7 +651,7 @@ describe("WorktreesPage lifecycle", () => {
     try {
       const request = vi.fn(async () => ({ worktrees: [] }));
       const originalConfig = runtimeConfigStub({ maxCount: 25 });
-      const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+      const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
       page.context = contextWithConfig(
         gatewayWithClient({ request } as unknown as GatewayBrowserClient),
         originalConfig,
@@ -682,7 +682,7 @@ describe("WorktreesPage lifecycle", () => {
       const runtimeConfig = runtimeConfigStub({ maxCount: 1 });
       runtimeConfig.patch = vi.fn(async () => false);
       runtimeConfig.state.lastError = "config hash mismatch";
-      const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+      const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
       page.context = contextWithConfig(
         gatewayWithClient({ request } as unknown as GatewayBrowserClient),
         runtimeConfig,
@@ -715,7 +715,7 @@ describe("WorktreesPage lifecycle", () => {
       }
       return Promise.resolve({ worktrees: [] });
     });
-    const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+    const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
     page.context = contextWithGateway(
       gatewayWithClient({ request } as unknown as GatewayBrowserClient),
     );
@@ -741,7 +741,7 @@ describe("WorktreesPage lifecycle", () => {
       }
       return Promise.resolve({ worktrees: [] });
     });
-    const page = document.createElement("openclaw-worktrees-page") as WorktreesPageTestElement;
+    const page = document.createElement("steelengine-worktrees-page") as WorktreesPageTestElement;
     page.context = contextWithGateway(
       gatewayWithClient({ request } as unknown as GatewayBrowserClient),
     );

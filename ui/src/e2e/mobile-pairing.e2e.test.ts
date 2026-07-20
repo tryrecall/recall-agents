@@ -14,7 +14,7 @@ import {
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
 const artifactDir = path.resolve(process.cwd(), ".artifacts/control-ui-e2e/mobile-pairing");
 
@@ -25,7 +25,7 @@ describeControlUiE2e("Control UI mobile pairing mocked Gateway E2E", () => {
   beforeAll(async () => {
     if (!chromiumAvailable) {
       throw new Error(
-        `Playwright Chromium is not installed or cannot start at ${chromiumExecutablePath}. Run \`pnpm --dir ui exec playwright install --with-deps chromium\`, or set OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM=1 only when intentionally skipping this lane.`,
+        `Playwright Chromium is not installed or cannot start at ${chromiumExecutablePath}. Run \`pnpm --dir ui exec playwright install --with-deps chromium\`, or set STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM=1 only when intentionally skipping this lane.`,
       );
     }
     server = await startControlUiE2eServer();
@@ -78,7 +78,7 @@ describeControlUiE2e("Control UI mobile pairing mocked Gateway E2E", () => {
       expect(response?.status()).toBe(200);
 
       // Pairing folded into the identity-card agent menu.
-      const sidebar = page.locator("openclaw-app-sidebar");
+      const sidebar = page.locator("steelengine-app-sidebar");
       await sidebar.getByRole("button", { name: /Agent menu/ }).click();
       const sidebarPairingButton = sidebar
         .locator("wa-dropdown.sidebar-agent-menu")
@@ -88,8 +88,8 @@ describeControlUiE2e("Control UI mobile pairing mocked Gateway E2E", () => {
       await gateway.deferNext("device.pair.list");
       await sidebarPairingButton.click();
 
-      const dialog = page.getByRole("dialog", { name: "OpenClaw mobile" });
-      const qr = page.getByAltText("OpenClaw mobile pairing QR code");
+      const dialog = page.getByRole("dialog", { name: "SteelEngine mobile" });
+      const qr = page.getByAltText("SteelEngine mobile pairing QR code");
       await dialog.waitFor();
       expect(await dialog.isVisible()).toBe(true);
       expect(await qr.count()).toBe(0);

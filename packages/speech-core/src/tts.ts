@@ -1,23 +1,23 @@
 // Speech Core module implements tts behavior.
-import { resolveChannelTtsVoiceDelivery } from "openclaw/plugin-sdk/channel-targets";
+import { resolveChannelTtsVoiceDelivery } from "steelengine/plugin-sdk/channel-targets";
 import type {
-  OpenClawConfig,
+  SteelEngineConfig,
   ResolvedTtsPersona,
   TtsConfig,
   TtsProvider,
-} from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { redactSensitiveText } from "openclaw/plugin-sdk/logging-core";
-import { transcodeAudioBuffer } from "openclaw/plugin-sdk/media-runtime";
-import { clampTimerTimeoutMs } from "openclaw/plugin-sdk/number-runtime";
-import { mergeDeep } from "openclaw/plugin-sdk/plugin-config-runtime";
+} from "steelengine/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { redactSensitiveText } from "steelengine/plugin-sdk/logging-core";
+import { transcodeAudioBuffer } from "steelengine/plugin-sdk/media-runtime";
+import { clampTimerTimeoutMs } from "steelengine/plugin-sdk/number-runtime";
+import { mergeDeep } from "steelengine/plugin-sdk/plugin-config-runtime";
 import {
   markReplyPayloadAsTtsSupplement,
   resolveSendableOutboundReplyParts,
   type ReplyPayload,
-} from "openclaw/plugin-sdk/reply-payload";
-import { isVerbose, logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { tempWorkspaceSync, resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/sandbox";
+} from "steelengine/plugin-sdk/reply-payload";
+import { isVerbose, logVerbose } from "steelengine/plugin-sdk/runtime-env";
+import { tempWorkspaceSync, resolvePreferredSteelEngineTmpDir } from "steelengine/plugin-sdk/sandbox";
 import {
   canonicalizeSpeechProviderId,
   getSpeechProvider,
@@ -32,13 +32,13 @@ import {
   type SpeechVoiceOption,
   type TtsDirectiveOverrides,
   type TtsDirectiveParseResult,
-} from "openclaw/plugin-sdk/speech-core";
+} from "steelengine/plugin-sdk/speech-core";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
-import { stripMarkdown } from "openclaw/plugin-sdk/text-chunking";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
+import { stripMarkdown } from "steelengine/plugin-sdk/text-chunking";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import { withSpeakerSelectionCompat } from "../speaker.js";
 import {
   resolvePrimaryVoiceProviderCandidate,
@@ -198,7 +198,7 @@ type TtsStatusEntry = {
 
 let lastTtsAttempt: TtsStatusEntry | undefined;
 
-function resolveConfiguredSpeechVoiceModelRefs(cfg: OpenClawConfig | undefined): VoiceModelRef[] {
+function resolveConfiguredSpeechVoiceModelRefs(cfg: SteelEngineConfig | undefined): VoiceModelRef[] {
   const effectiveCfg = cfg ? resolveTtsRuntimeConfig(cfg) : undefined;
   return resolveSupportedVoiceModelRefs({
     config: effectiveCfg?.agents?.defaults?.voiceModel,
@@ -207,7 +207,7 @@ function resolveConfiguredSpeechVoiceModelRefs(cfg: OpenClawConfig | undefined):
 }
 
 function resolveConfiguredSpeechVoiceModelForProvider(params: {
-  cfg: OpenClawConfig | undefined;
+  cfg: SteelEngineConfig | undefined;
   providerId: string;
   provider?: VoiceModelProvider;
   voiceModel?: VoiceModelRef;
@@ -226,7 +226,7 @@ function resolveConfiguredSpeechVoiceModelForProvider(params: {
 }
 
 function applyVoiceModelToSpeechProviderConfig(params: {
-  cfg: OpenClawConfig | undefined;
+  cfg: SteelEngineConfig | undefined;
   providerId: string;
   providerConfig: SpeechProviderConfig;
   provider?: VoiceModelProvider;
@@ -254,7 +254,7 @@ function applyVoiceModelToSpeechProviderConfig(params: {
   };
 }
 
-function sortSpeechProvidersForAutoSelection(cfg?: OpenClawConfig) {
+function sortSpeechProvidersForAutoSelection(cfg?: SteelEngineConfig) {
   return listSpeechProviders(cfg).toSorted((left, right) => {
     const leftOrder = left.autoSelectOrder ?? Number.MAX_SAFE_INTEGER;
     const rightOrder = right.autoSelectOrder ?? Number.MAX_SAFE_INTEGER;
@@ -323,7 +323,7 @@ function resolveRawProviderConfig(
 function resolveLazyProviderConfig(
   config: ResolvedTtsConfig,
   providerId: string,
-  cfg?: OpenClawConfig,
+  cfg?: SteelEngineConfig,
   voiceModel?: VoiceModelRef,
 ): SpeechProviderConfig {
   const canonical =
@@ -402,7 +402,7 @@ function resolveLazyProviderConfig(
 export function getResolvedSpeechProviderConfig(
   config: ResolvedTtsConfig,
   providerId: string,
-  cfg?: OpenClawConfig,
+  cfg?: SteelEngineConfig,
 ): SpeechProviderConfig {
   const effectiveCfg = cfg ? resolveTtsRuntimeConfig(cfg) : config.sourceConfig;
   const canonical =
@@ -415,7 +415,7 @@ export function getResolvedSpeechProviderConfig(
 function getResolvedSpeechProviderConfigForVoiceModel(params: {
   config: ResolvedTtsConfig;
   providerId: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   voiceModel?: VoiceModelRef;
 }): SpeechProviderConfig {
   if (!params.voiceModel) {
@@ -463,13 +463,13 @@ export function getTtsProvider(config: ResolvedTtsConfig, prefsPath: string): Tt
 }
 
 export type PreparedTtsRequest = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   directives: TtsDirectiveParseResult;
 };
 
 /** Merge a surface TTS override and resolve its inline synthesis directives. */
 export function prepareTtsRequest(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   override?: TtsConfig;
   text: string;
 }): PreparedTtsRequest {
@@ -492,7 +492,7 @@ export function prepareTtsRequest(params: {
 }
 
 export function resolveExplicitTtsOverrides(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   prefsPath?: string;
   provider?: string;
   modelId?: string;
@@ -624,7 +624,7 @@ function shouldDeliverTtsAsVoice(params: {
   return params.voiceCompatible === true || delivery.transcodesAudio === true;
 }
 
-export function resolveTtsProviderOrder(primary: TtsProvider, cfg?: OpenClawConfig): TtsProvider[] {
+export function resolveTtsProviderOrder(primary: TtsProvider, cfg?: SteelEngineConfig): TtsProvider[] {
   const effectiveCfg = cfg ? resolveTtsRuntimeConfig(cfg) : undefined;
   const normalizedPrimary = canonicalizeSpeechProviderId(primary, effectiveCfg) ?? primary;
   const ordered = new Set<TtsProvider>([normalizedPrimary]);
@@ -645,7 +645,7 @@ export function resolveTtsProviderOrder(primary: TtsProvider, cfg?: OpenClawConf
 
 function resolveTtsProviderCandidates(
   primary: TtsProvider,
-  cfg?: OpenClawConfig,
+  cfg?: SteelEngineConfig,
 ): VoiceProviderCandidate[] {
   const effectiveCfg = cfg ? resolveTtsRuntimeConfig(cfg) : undefined;
   const normalizedPrimary = canonicalizeSpeechProviderId(primary, effectiveCfg) ?? primary;
@@ -658,7 +658,7 @@ function resolveTtsProviderCandidates(
 
 function resolvePrimaryTtsProviderCandidate(
   primary: TtsProvider,
-  cfg?: OpenClawConfig,
+  cfg?: SteelEngineConfig,
 ): VoiceProviderCandidate {
   const effectiveCfg = cfg ? resolveTtsRuntimeConfig(cfg) : undefined;
   return resolvePrimaryVoiceProviderCandidate({
@@ -671,7 +671,7 @@ function resolvePrimaryTtsProviderCandidate(
 export function isTtsProviderConfigured(
   config: ResolvedTtsConfig,
   provider: TtsProvider,
-  cfg?: OpenClawConfig,
+  cfg?: SteelEngineConfig,
 ): boolean {
   try {
     const effectiveCfg = cfg ? resolveTtsRuntimeConfig(cfg) : config.sourceConfig;
@@ -745,7 +745,7 @@ type TtsProviderReadyResolution =
 
 function resolveReadySpeechProvider(params: {
   provider: TtsProvider;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   config: ResolvedTtsConfig;
   persona?: ResolvedTtsPersona;
   voiceModel?: VoiceModelRef;
@@ -817,7 +817,7 @@ function resolveReadySpeechProvider(params: {
 async function prepareSpeechSynthesis(params: {
   provider: NonNullable<ReturnType<typeof getSpeechProvider>>;
   text: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   providerConfig: SpeechProviderConfig;
   providerOverrides?: SpeechProviderOverrides;
   persona?: ResolvedTtsPersona;
@@ -859,7 +859,7 @@ async function prepareSpeechSynthesis(params: {
 
 function resolveTtsRequestSetup(params: {
   text: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   prefsPath?: string;
   providerOverride?: TtsProvider;
   disableFallback?: boolean;
@@ -868,7 +868,7 @@ function resolveTtsRequestSetup(params: {
   accountId?: string;
 }):
   | {
-      cfg: OpenClawConfig;
+      cfg: SteelEngineConfig;
       config: ResolvedTtsConfig;
       persona?: ResolvedTtsPersona;
       providers: VoiceProviderCandidate[];
@@ -937,7 +937,7 @@ function resolveTtsResultVoice(
 
 export async function textToSpeech(params: {
   text: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   prefsPath?: string;
   channel?: string;
   overrides?: TtsDirectiveOverrides;
@@ -974,7 +974,7 @@ export async function textToSpeech(params: {
   }
 
   const temp = tempWorkspaceSync({
-    rootDir: resolvePreferredOpenClawTmpDir(),
+    rootDir: resolvePreferredSteelEngineTmpDir(),
     prefix: "tts-",
   });
   const audioPath = temp.write(`voice-${Date.now()}${fileExtension}`, audioBuffer);
@@ -1049,7 +1049,7 @@ async function maybePreTranscodeForVoiceDelivery(params: {
 
 export async function synthesizeSpeech(params: {
   text: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   prefsPath?: string;
   channel?: string;
   overrides?: TtsDirectiveOverrides;
@@ -1200,7 +1200,7 @@ export async function synthesizeSpeech(params: {
 
 export async function streamSpeech(params: {
   text: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   prefsPath?: string;
   channel?: string;
   overrides?: TtsDirectiveOverrides;
@@ -1365,7 +1365,7 @@ export async function streamSpeech(params: {
 
 export async function textToSpeechStream(params: {
   text: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   prefsPath?: string;
   channel?: string;
   overrides?: TtsDirectiveOverrides;
@@ -1389,7 +1389,7 @@ export async function textToSpeechStream(params: {
 
 export async function textToSpeechTelephony(params: {
   text: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   prefsPath?: string;
   overrides?: TtsDirectiveOverrides;
   timeoutMs?: number;
@@ -1532,7 +1532,7 @@ export async function textToSpeechTelephony(params: {
 
 export async function listSpeechVoices(params: {
   provider: string;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   config?: ResolvedTtsConfig;
   apiKey?: string;
   baseUrl?: string;
@@ -1573,7 +1573,7 @@ function hasLegacyFinalMediaDirective(text: string): boolean {
 
 export async function maybeApplyTtsToPayload(params: {
   payload: ReplyPayload;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   channel?: string;
   kind?: "tool" | "block" | "final";
   inboundAudio?: boolean;

@@ -3,13 +3,13 @@ import {
   getRuntimeConfigSnapshot,
   getRuntimeConfigSourceSnapshot,
 } from "../config/runtime-snapshot.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 
 /** Resolves the source config used for plugin activation policy decisions. */
 export function resolvePluginActivationSourceConfig(params: {
-  config?: OpenClawConfig;
-  activationSourceConfig?: OpenClawConfig;
-}): OpenClawConfig {
+  config?: SteelEngineConfig;
+  activationSourceConfig?: SteelEngineConfig;
+}): SteelEngineConfig {
   if (params.activationSourceConfig !== undefined) {
     return params.activationSourceConfig;
   }

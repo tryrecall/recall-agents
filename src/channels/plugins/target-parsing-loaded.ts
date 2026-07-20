@@ -2,7 +2,7 @@ import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
   normalizeOptionalThreadValue,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import type { ChannelRouteParsedTarget } from "../../plugin-sdk/channel-route.js";
 import { getChannelPlugin, normalizeChannelId } from "./index.js";
 import { getLoadedChannelPluginForRead } from "./registry-loaded.js";

@@ -6,14 +6,14 @@ import {
   type MessageReceipt,
   type MessageReceiptPartKind,
   type MessageReceiptSourceResult,
-} from "openclaw/plugin-sdk/channel-outbound";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { resolveMarkdownTableMode } from "openclaw/plugin-sdk/markdown-table-runtime";
-import { kindFromMime, resolveOutboundAttachmentFromUrl } from "openclaw/plugin-sdk/media-runtime";
-import { requireRuntimeConfig } from "openclaw/plugin-sdk/plugin-config-runtime";
-import { sleep as delay } from "openclaw/plugin-sdk/runtime-env";
-import { convertMarkdownTables } from "openclaw/plugin-sdk/text-chunking";
-import { stripInlineDirectiveTagsForDelivery } from "openclaw/plugin-sdk/text-chunking";
+} from "steelengine/plugin-sdk/channel-outbound";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { resolveMarkdownTableMode } from "steelengine/plugin-sdk/markdown-table-runtime";
+import { kindFromMime, resolveOutboundAttachmentFromUrl } from "steelengine/plugin-sdk/media-runtime";
+import { requireRuntimeConfig } from "steelengine/plugin-sdk/plugin-config-runtime";
+import { sleep as delay } from "steelengine/plugin-sdk/runtime-env";
+import { convertMarkdownTables } from "steelengine/plugin-sdk/text-chunking";
+import { stripInlineDirectiveTagsForDelivery } from "steelengine/plugin-sdk/text-chunking";
 import {
   hasExclusiveIMessageLocalDatabase,
   resolveIMessageAccount,
@@ -66,7 +66,7 @@ type IMessageSendOpts = {
   timeoutMs?: number;
   chatId?: number;
   client?: IMessageRpcClient;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   account?: ResolvedIMessageAccount;
   approvalKind?: "exec" | "plugin";
   resolveAttachmentImpl?: (

@@ -3,8 +3,8 @@ import {
   logAckFailure,
   removeAckReactionHandleAfterReply,
   type AckReactionHandle,
-} from "openclaw/plugin-sdk/channel-feedback";
-import { runChannelInboundEvent } from "openclaw/plugin-sdk/channel-inbound";
+} from "steelengine/plugin-sdk/channel-feedback";
+import { runChannelInboundEvent } from "steelengine/plugin-sdk/channel-inbound";
 import {
   createInternalHookEvent,
   deriveInboundMessageHookContext,
@@ -13,9 +13,9 @@ import {
   toPluginMessageContext,
   toPluginMessageReceivedEvent,
   triggerInternalHook,
-} from "openclaw/plugin-sdk/hook-runtime";
-import { getGlobalHookRunner } from "openclaw/plugin-sdk/plugin-runtime";
-import { resolveBatchedReplyThreadingPolicy } from "openclaw/plugin-sdk/reply-reference";
+} from "steelengine/plugin-sdk/hook-runtime";
+import { getGlobalHookRunner } from "steelengine/plugin-sdk/plugin-runtime";
+import { resolveBatchedReplyThreadingPolicy } from "steelengine/plugin-sdk/reply-reference";
 import { getPrimaryIdentityId, getSelfIdentity, getSenderIdentity } from "../../identity.js";
 import {
   resolveWhatsAppCommandAuthorized,

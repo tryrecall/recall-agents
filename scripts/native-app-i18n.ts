@@ -61,7 +61,7 @@ const SOURCE_ROOTS: Record<NativeI18nSurface, string[]> = {
   apple: [
     path.join(ROOT, "apps", "ios"),
     path.join(ROOT, "apps", "macos", "Sources"),
-    path.join(ROOT, "apps", "shared", "OpenClawKit", "Sources"),
+    path.join(ROOT, "apps", "shared", "SteelEngineKit", "Sources"),
   ],
 };
 
@@ -171,10 +171,10 @@ const GENERATED_FILE_RE = /(?:^|[\\/])NativeStringResources\.kt$/u;
 const BUILD_SETTING_RE = /\$\([A-Za-z0-9_.-]+\)/gu;
 const NATIVE_I18N_LOCALE_SET = new Set<string>(NATIVE_I18N_LOCALES);
 const ANDROID_LANGUAGE_PICKER_PATH =
-  "apps/android/app/src/main/java/ai/openclaw/app/AppLanguage.kt";
+  "apps/android/app/src/main/java/ai/steelengine/app/AppLanguage.kt";
 const ANDROID_LANGUAGE_PICKER_SOURCES = new Set([
   "Follow Android · $systemLanguageTag",
-  "OpenClaw translations · $languageTag",
+  "SteelEngine translations · $languageTag",
 ]);
 
 function isAsciiLowercaseLetter(character: string): boolean {

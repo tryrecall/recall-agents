@@ -19,7 +19,7 @@ import { t } from "../../i18n/index.ts";
 import { resolveEditableSnapshotConfig } from "../../lib/config/index.ts";
 import { formatRelativeTimestamp } from "../../lib/format.ts";
 import { searchForSession } from "../../lib/sessions/index.ts";
-import { OpenClawLightDomElement } from "../../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../../lit/steelengine-element.ts";
 import { SubscriptionsController } from "../../lit/subscriptions-controller.ts";
 
 type WorktreesListResult = { worktrees: WorktreeRecord[] };
@@ -70,7 +70,7 @@ function cleanupLimitFromConfig(
   return typeof value === "number" ? normalizeCleanupLimit(key, value) : 0;
 }
 
-class WorktreesPage extends OpenClawLightDomElement {
+class WorktreesPage extends SteelEngineLightDomElement {
   @consume({ context: applicationContext, subscribe: true })
   private context!: ApplicationContext;
 
@@ -720,6 +720,6 @@ class WorktreesPage extends OpenClawLightDomElement {
   }
 }
 
-if (!customElements.get("openclaw-worktrees-page")) {
-  customElements.define("openclaw-worktrees-page", WorktreesPage);
+if (!customElements.get("steelengine-worktrees-page")) {
+  customElements.define("steelengine-worktrees-page", WorktreesPage);
 }

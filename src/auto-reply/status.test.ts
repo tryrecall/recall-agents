@@ -1,7 +1,7 @@
 /** Tests auto-reply status message formatting. */
 import fs from "node:fs";
 import path from "node:path";
-import { withTempHome } from "openclaw/plugin-sdk/test-env";
+import { withTempHome } from "steelengine/plugin-sdk/test-env";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { normalizeTestText } from "../../test/helpers/normalize-text.js";
 import { testing as cliBackendsTesting } from "../agents/cli-backends.test-support.js";
@@ -9,7 +9,7 @@ import {
   MODEL_CONTEXT_TOKEN_CACHE,
   providerContextTokenCacheKey,
 } from "../agents/context-cache.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import { applyModelOverrideToSessionEntry } from "../sessions/model-overrides.js";
 import {
   buildStatusMessage as buildStatusMessageRaw,
@@ -99,7 +99,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "anthropic/test:opus",
         contextTokens: 32_000,
@@ -121,7 +121,7 @@ describe("buildStatusMessage", () => {
       sessionScope: "per-sender",
       resolvedThink: "medium",
       resolvedVerbose: "off",
-      resolvedHarness: "openclaw",
+      resolvedHarness: "steelengine",
       queue: { mode: "collect", depth: 0 },
       pluginHealthLine: "🔌 Plugins: OK",
       modelAuth: "api-key",
@@ -130,7 +130,7 @@ describe("buildStatusMessage", () => {
     });
     const normalized = normalizeTestText(text);
 
-    expect(normalized).toContain("OpenClaw");
+    expect(normalized).toContain("SteelEngine");
     expect(normalized).toContain("Model: anthropic/test:opus");
     expect(normalized).toContain("api-key");
     expect(normalized).toContain("Plugins: OK");
@@ -142,7 +142,7 @@ describe("buildStatusMessage", () => {
     expect(normalized).toContain("duration 2h 14m");
     expect(normalized).toContain("updated 4h ago");
     expect(normalized).toContain("Execution: direct");
-    expect(normalized).toContain("Runtime: OpenClaw Default");
+    expect(normalized).toContain("Runtime: SteelEngine Default");
     expect(normalized).not.toContain("Runner:");
     expect(normalized).toContain("Think: medium");
     expect(normalized).not.toContain("verbose");
@@ -172,7 +172,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "amazon-bedrock/us.anthropic.claude-sonnet-4-6",
         contextTokens: 200_000,
@@ -404,7 +404,7 @@ describe("buildStatusMessage", () => {
               },
             },
           },
-        } as unknown as OpenClawConfig,
+        } as unknown as SteelEngineConfig,
         agent: {},
         now: 0,
       });
@@ -429,7 +429,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "claude-cli/opus",
       },
@@ -456,7 +456,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "claude-cli/opus",
       },
@@ -720,25 +720,25 @@ describe("buildStatusMessage", () => {
     expect(normalized).not.toContain("· codex");
   });
 
-  it("shows the default OpenClaw harness as the model runtime", () => {
+  it("shows the default SteelEngine harness as the model runtime", () => {
     const text = buildStatusMessage({
       agent: {
         model: "openai/gpt-5.4",
       },
       sessionEntry: {
-        sessionId: "openclaw-harness",
+        sessionId: "steelengine-harness",
         updatedAt: 0,
         fastMode: true,
       },
       sessionKey: "agent:main:main",
       queue: { mode: "collect", depth: 0 },
-      resolvedHarness: "openclaw",
+      resolvedHarness: "steelengine",
     });
 
     const normalized = normalizeTestText(text);
     expect(normalized).toContain("Fast");
-    expect(normalized).toContain("Runtime: OpenClaw Default");
-    expect(normalized).not.toContain("· openclaw");
+    expect(normalized).toContain("Runtime: SteelEngine Default");
+    expect(normalized).not.toContain("· steelengine");
   });
 
   it("shows fast mode when disabled", () => {
@@ -773,7 +773,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "openai/gpt-5.4",
       },
@@ -811,7 +811,7 @@ describe("buildStatusMessage", () => {
             },
           ],
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agentId: "main",
       agent: {
         model: "openai/gpt-5.4",
@@ -837,7 +837,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "openai/gpt-4.1",
       },
@@ -877,7 +877,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "minimax-portal/MiniMax-M2.7",
         contextTokens: 1_048_576,
@@ -916,7 +916,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "anthropic/claude-opus-4-6",
       },
@@ -1030,7 +1030,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "ollama-cloud/deepseek-v4-pro",
         contextTokens: 1_000_000,
@@ -1070,7 +1070,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "xiaomi/mimo-v2-flash",
       },
@@ -1157,7 +1157,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "anthropic/claude-opus-4-7",
       },
@@ -1202,7 +1202,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "xiaomi/mimo-v2-flash",
       },
@@ -1248,7 +1248,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "xiaomi/mimo-v2-flash",
       },
@@ -1293,7 +1293,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "xiaomi/mimo-v2-flash",
         contextTokens: 120_000,
@@ -1339,7 +1339,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "xiaomi/mimo-v2-flash",
         contextTokens: 128_000,
@@ -1384,7 +1384,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "xiaomi/mimo-v2-flash",
         contextTokens: 1_048_576,
@@ -1426,7 +1426,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "xiaomi/mimo-v2-flash",
         contextTokens: 1_048_576,
@@ -1468,7 +1468,7 @@ describe("buildStatusMessage", () => {
             { id: "discord", sandbox: { mode: "all" } },
           ],
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {},
       sessionKey: "agent:discord:discord:channel:1456350065223270435",
       sessionScope: "per-sender",
@@ -1822,7 +1822,7 @@ describe("buildStatusMessage", () => {
     expect(normalized).not.toContain("Reason: session override");
     expect(normalized).not.toContain("This session is pinned");
     expect(normalized).not.toContain(
-      "Docs: https://docs.openclaw.ai/concepts/models#selection-source-and-fallback-behavior",
+      "Docs: https://docs.steelengine.ai/concepts/models#selection-source-and-fallback-behavior",
     );
   });
 
@@ -1966,7 +1966,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: { model: "anthropic/claude-opus-4-6" },
       sessionEntry: { sessionId: "c1", updatedAt: 0, inputTokens: 10 },
       sessionKey: "agent:main:main",
@@ -1993,7 +1993,7 @@ describe("buildStatusMessage", () => {
   }) {
     const logPath = path.join(
       params.dir,
-      ".openclaw",
+      ".steelengine",
       "agents",
       params.agentId,
       "sessions",
@@ -2072,7 +2072,7 @@ describe("buildStatusMessage", () => {
 
         expect(normalizeTestText(text)).toContain("Context: 1.0k/32k");
       },
-      { prefix: "openclaw-status-" },
+      { prefix: "steelengine-status-" },
     );
   });
 
@@ -2119,7 +2119,7 @@ describe("buildStatusMessage", () => {
         expect(normalized).not.toContain("Context: 3.8m/1.0m");
         expect(normalized).not.toContain("Context: 3.82m/1.0m");
       },
-      { prefix: "openclaw-status-" },
+      { prefix: "steelengine-status-" },
     );
   });
 
@@ -2167,7 +2167,7 @@ describe("buildStatusMessage", () => {
         expect(normalized).toContain("Context: 36k/1.0m (4%)");
         expect(normalized).not.toContain("Context: 2.3m/1.0m");
       },
-      { prefix: "openclaw-status-" },
+      { prefix: "steelengine-status-" },
     );
   });
 
@@ -2188,7 +2188,7 @@ describe("buildStatusMessage", () => {
 
         expect(normalizeTestText(text)).toContain("Context: 1.0k/32k");
       },
-      { prefix: "openclaw-status-" },
+      { prefix: "steelengine-status-" },
     );
   });
 
@@ -2230,7 +2230,7 @@ describe("buildStatusMessage", () => {
 
         expect(normalizeTestText(text)).toContain("Context: 1.2k/32k");
       },
-      { prefix: "openclaw-status-" },
+      { prefix: "steelengine-status-" },
     );
   });
 
@@ -2251,7 +2251,7 @@ describe("buildStatusMessage", () => {
 
         expect(normalizeTestText(text)).toContain("Cache: 100% hit · 1.0k cached, 0 new");
       },
-      { prefix: "openclaw-status-" },
+      { prefix: "steelengine-status-" },
     );
   });
 
@@ -2261,7 +2261,7 @@ describe("buildStatusMessage", () => {
         const sessionId = "sess-cache-delivery-mirror";
         const logPath = path.join(
           dir,
-          ".openclaw",
+          ".steelengine",
           "agents",
           "main",
           "sessions",
@@ -2291,7 +2291,7 @@ describe("buildStatusMessage", () => {
               type: "message",
               message: {
                 role: "assistant",
-                provider: "openclaw",
+                provider: "steelengine",
                 model: "delivery-mirror",
                 usage: {
                   input: 0,
@@ -2314,7 +2314,7 @@ describe("buildStatusMessage", () => {
         expect(normalizeTestText(text)).toContain("Cache: 100% hit · 1.0k cached, 0 new");
         expect(normalizeTestText(text)).toContain("Context: 1.0k/32k");
       },
-      { prefix: "openclaw-status-" },
+      { prefix: "steelengine-status-" },
     );
   });
 
@@ -2350,7 +2350,7 @@ describe("buildStatusMessage", () => {
 
         expect(normalizeTestText(text)).toContain("Cache: 26% hit · 12 cached, 34 new");
       },
-      { prefix: "openclaw-status-" },
+      { prefix: "steelengine-status-" },
     );
   });
 
@@ -2383,7 +2383,7 @@ describe("buildStatusMessage", () => {
                 },
               },
             },
-          } as unknown as OpenClawConfig,
+          } as unknown as SteelEngineConfig,
           agent: {
             model: "openrouter/google/gemini-2.5-pro",
           },
@@ -2403,7 +2403,7 @@ describe("buildStatusMessage", () => {
         expect(normalized).toContain("Context: 1.2k/999k");
         expect(normalized).not.toContain("Context: 1.2k/2.0m");
       },
-      { prefix: "openclaw-status-" },
+      { prefix: "steelengine-status-" },
     );
   });
 
@@ -2419,7 +2419,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "openrouter/google/gemini-2.5-pro",
       },
@@ -2456,7 +2456,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "xiaomi/mimo-v2-flash",
       },
@@ -2497,7 +2497,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "openai/gpt-4o",
       },
@@ -2564,7 +2564,7 @@ describe("buildStatusMessage", () => {
         expect(normalized).toContain("Context: 1.2k/1.0m");
         expect(normalized).not.toContain("Context: 1.2k/128k");
       },
-      { prefix: "openclaw-status-" },
+      { prefix: "steelengine-status-" },
     );
   });
 
@@ -2656,7 +2656,7 @@ describe("buildStatusMessage", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       agent: {
         model: "xiaomi/mimo-v2-flash",
       },
@@ -2692,7 +2692,7 @@ describe("buildCommandsMessage", () => {
   it("lists commands with aliases and hints", () => {
     const text = buildCommandsMessage({
       commands: { config: false, debug: false },
-    } as unknown as OpenClawConfig);
+    } as unknown as SteelEngineConfig);
     expect(text).toContain("ℹ️ Slash commands");
     expect(text).toContain("Status");
     expect(text).toContain("/commands - List all slash commands.");
@@ -2708,7 +2708,7 @@ describe("buildCommandsMessage", () => {
     const text = buildCommandsMessage(
       {
         commands: { config: false, debug: false },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       [
         {
           name: "demo_skill",
@@ -2725,7 +2725,7 @@ describe("buildHelpMessage", () => {
   it("hides config/debug when disabled", () => {
     const text = buildHelpMessage({
       commands: { config: false, debug: false },
-    } as unknown as OpenClawConfig);
+    } as unknown as SteelEngineConfig);
     expect(text).toContain("Skills");
     expect(text).toContain("/skill <name> [input]");
     expect(text).not.toContain("/config");
@@ -2746,7 +2746,7 @@ describe("buildCommandsMessagePaginated", () => {
     const result = buildCommandsMessagePaginated(
       {
         commands: { config: false, debug: false },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       undefined,
       { surface: "telegram", page: 1, forcePaginatedList: true },
     );
@@ -2764,7 +2764,7 @@ describe("buildCommandsMessagePaginated", () => {
     const firstPage = buildCommandsMessagePaginated(
       {
         commands: { config: false, debug: false },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       undefined,
       { surface: "telegram", page: 1, forcePaginatedList: true },
     );
@@ -2772,7 +2772,7 @@ describe("buildCommandsMessagePaginated", () => {
       buildCommandsMessagePaginated(
         {
           commands: { config: false, debug: false },
-        } as unknown as OpenClawConfig,
+        } as unknown as SteelEngineConfig,
         undefined,
         { surface: "telegram", page: index + 1, forcePaginatedList: true },
       ),

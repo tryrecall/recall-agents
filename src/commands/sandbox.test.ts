@@ -30,13 +30,13 @@ import { sandboxListCommand, sandboxRecreateCommand } from "./sandbox.js";
 const NOW = Date.now();
 
 function createContainer(overrides: Partial<SandboxContainerInfo> = {}): SandboxContainerInfo {
-  const containerName = overrides.containerName ?? "openclaw-sandbox-test";
+  const containerName = overrides.containerName ?? "steelengine-sandbox-test";
   return {
     containerName,
     backendId: "docker",
     runtimeLabel: containerName,
     sessionKey: "test-session",
-    image: "openclaw/sandbox:latest",
+    image: "steelengine/sandbox:latest",
     configLabelKind: "Image",
     imageMatch: true,
     running: true,
@@ -48,9 +48,9 @@ function createContainer(overrides: Partial<SandboxContainerInfo> = {}): Sandbox
 
 function createBrowser(overrides: Partial<SandboxBrowserInfo> = {}): SandboxBrowserInfo {
   return {
-    containerName: "openclaw-browser-test",
+    containerName: "steelengine-browser-test",
     sessionKey: "test-session",
-    image: "openclaw/browser:latest",
+    image: "steelengine/browser:latest",
     imageMatch: true,
     running: true,
     createdAtMs: NOW - 3600000,

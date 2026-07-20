@@ -1,11 +1,11 @@
-# OpenClaw LINE
+# SteelEngine LINE
 
-Official OpenClaw channel plugin for LINE Bot API chats.
+Official SteelEngine channel plugin for LINE Bot API chats.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugin add @openclaw/line
+steelengine plugin add @steelengine/line
 ```
 
-Configure LINE channel credentials in OpenClaw, then connect the bot to the chats where agents should receive and send messages.
+Configure LINE channel credentials in SteelEngine, then connect the bot to the chats where agents should receive and send messages.

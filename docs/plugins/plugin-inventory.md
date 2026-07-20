@@ -1,5 +1,5 @@
 ---
-summary: "Generated inventory of OpenClaw plugins shipped in core, published externally, or kept source-only"
+summary: "Generated inventory of SteelEngine plugins shipped in core, published externally, or kept source-only"
 read_when:
   - You are deciding whether a plugin ships in the core npm package or installs separately
   - You are updating bundled plugin package metadata or release automation
@@ -9,7 +9,7 @@ title: "Plugin inventory"
 
 # Plugin inventory
 
-This page is generated from `extensions/*/package.json`, `openclaw.plugin.json`,
+This page is generated from `extensions/*/package.json`, `steelengine.plugin.json`,
 and the root npm package `files` exclusions. Regenerate it with:
 
 ```bash
@@ -18,8 +18,8 @@ pnpm plugins:inventory:gen
 
 ## Definitions
 
-- **Core npm package:** built into the `openclaw` npm package and available without a separate plugin install.
-- **Official external package:** OpenClaw-maintained plugin omitted from the core npm package, kept in this official inventory, and installed on demand through ClawHub and/or npm.
+- **Core npm package:** built into the `steelengine` npm package and available without a separate plugin install.
+- **Official external package:** SteelEngine-maintained plugin omitted from the core npm package, kept in this official inventory, and installed on demand through ClawHub and/or npm.
 - **Source checkout only:** repo-local plugin omitted from published npm artifacts and not advertised as an installable package.
 
 Source checkouts are different from npm installs: after `pnpm install`, bundled
@@ -29,19 +29,19 @@ dependencies are available.
 ## Install a plugin
 
 Use the install route in each entry to decide whether install is needed. Plugins
-that say `included in OpenClaw` are already present in the core package.
+that say `included in SteelEngine` are already present in the core package.
 Official external packages need one install, then a Gateway restart.
 
 For example, Discord is an official external package:
 
 ```bash
-openclaw plugins install @openclaw/discord
-openclaw gateway restart
-openclaw plugins inspect discord --runtime --json
+steelengine plugins install @steelengine/discord
+steelengine gateway restart
+steelengine plugins inspect discord --runtime --json
 ```
 
 During the launch cutover, ordinary bare package specs still install from npm.
-Use `clawhub:@openclaw/discord` or `npm:@openclaw/discord` when you need an
+Use `clawhub:@steelengine/discord` or `npm:@steelengine/discord` when you need an
 explicit source. After install, follow the plugin's setup doc, such as
 [Discord](/channels/discord), to add credentials and channel config. See
 [Manage plugins](/plugins/manage-plugins) for update, uninstall, and publishing
@@ -53,294 +53,294 @@ Each entry lists the package, distribution route, and description.
 
 68 plugins
 
-- **[admin-http-rpc](/plugins/reference/admin-http-rpc)** (`@openclaw/admin-http-rpc`) - included in OpenClaw. OpenClaw admin HTTP RPC endpoint.
+- **[admin-http-rpc](/plugins/reference/admin-http-rpc)** (`@steelengine/admin-http-rpc`) - included in SteelEngine. SteelEngine admin HTTP RPC endpoint.
 
-- **[alibaba](/plugins/reference/alibaba)** (`@openclaw/alibaba-provider`) - included in OpenClaw. Adds video generation provider support.
+- **[alibaba](/plugins/reference/alibaba)** (`@steelengine/alibaba-provider`) - included in SteelEngine. Adds video generation provider support.
 
-- **[anthropic](/plugins/reference/anthropic)** (`@openclaw/anthropic-provider`) - included in OpenClaw. Anthropic models, Claude CLI, and native Claude session catalog.
+- **[anthropic](/plugins/reference/anthropic)** (`@steelengine/anthropic-provider`) - included in SteelEngine. Anthropic models, Claude CLI, and native Claude session catalog.
 
-- **[azure-speech](/plugins/reference/azure-speech)** (`@openclaw/azure-speech`) - included in OpenClaw. Azure AI Speech text-to-speech (MP3, native Ogg/Opus voice notes, PCM telephony).
+- **[azure-speech](/plugins/reference/azure-speech)** (`@steelengine/azure-speech`) - included in SteelEngine. Azure AI Speech text-to-speech (MP3, native Ogg/Opus voice notes, PCM telephony).
 
-- **[bonjour](/plugins/reference/bonjour)** (`@openclaw/bonjour`) - included in OpenClaw. Advertise the local OpenClaw gateway over Bonjour/mDNS.
+- **[bonjour](/plugins/reference/bonjour)** (`@steelengine/bonjour`) - included in SteelEngine. Advertise the local SteelEngine gateway over Bonjour/mDNS.
 
-- **[browser](/plugins/reference/browser)** (`@openclaw/browser-plugin`) - included in OpenClaw. Adds agent-callable tools.
+- **[browser](/plugins/reference/browser)** (`@steelengine/browser-plugin`) - included in SteelEngine. Adds agent-callable tools.
 
-- **[byteplus](/plugins/reference/byteplus)** (`@openclaw/byteplus-provider`) - included in OpenClaw. Adds BytePlus, BytePlus Plan model provider support to OpenClaw.
+- **[byteplus](/plugins/reference/byteplus)** (`@steelengine/byteplus-provider`) - included in SteelEngine. Adds BytePlus, BytePlus Plan model provider support to SteelEngine.
 
-- **[canvas](/plugins/reference/canvas)** (`@openclaw/canvas-plugin`) - included in OpenClaw. Experimental Canvas control and A2UI rendering surfaces for paired nodes.
+- **[canvas](/plugins/reference/canvas)** (`@steelengine/canvas-plugin`) - included in SteelEngine. Experimental Canvas control and A2UI rendering surfaces for paired nodes.
 
-- **[clawrouter](/plugins/reference/clawrouter)** (`@openclaw/clawrouter`) - included in OpenClaw. Adds ClawRouter model provider support to OpenClaw.
+- **[clawrouter](/plugins/reference/clawrouter)** (`@steelengine/clawrouter`) - included in SteelEngine. Adds ClawRouter model provider support to SteelEngine.
 
-- **[cohere](/plugins/reference/cohere)** (`@openclaw/cohere-provider`) - included in OpenClaw; npm; ClawHub: `clawhub:@openclaw/cohere-provider`. OpenClaw Cohere provider plugin.
+- **[cohere](/plugins/reference/cohere)** (`@steelengine/cohere-provider`) - included in SteelEngine; npm; ClawHub: `clawhub:@steelengine/cohere-provider`. SteelEngine Cohere provider plugin.
 
-- **[comfy](/plugins/reference/comfy)** (`@openclaw/comfy-provider`) - included in OpenClaw. Adds ComfyUI model provider support to OpenClaw.
+- **[comfy](/plugins/reference/comfy)** (`@steelengine/comfy-provider`) - included in SteelEngine. Adds ComfyUI model provider support to SteelEngine.
 
-- **[copilot-proxy](/plugins/reference/copilot-proxy)** (`@openclaw/copilot-proxy`) - included in OpenClaw. Adds Copilot Proxy model provider support to OpenClaw.
+- **[copilot-proxy](/plugins/reference/copilot-proxy)** (`@steelengine/copilot-proxy`) - included in SteelEngine. Adds Copilot Proxy model provider support to SteelEngine.
 
-- **[crabbox](/plugins/reference/crabbox)** (`@openclaw/crabbox-provider`) - included in OpenClaw. Cloud worker provider backed by the Crabbox CLI.
+- **[crabbox](/plugins/reference/crabbox)** (`@steelengine/crabbox-provider`) - included in SteelEngine. Cloud worker provider backed by the Crabbox CLI.
 
-- **[deepgram](/plugins/reference/deepgram)** (`@openclaw/deepgram-provider`) - included in OpenClaw. Adds media understanding provider support. Adds realtime transcription provider support.
+- **[deepgram](/plugins/reference/deepgram)** (`@steelengine/deepgram-provider`) - included in SteelEngine. Adds media understanding provider support. Adds realtime transcription provider support.
 
-- **[document-extract](/plugins/reference/document-extract)** (`@openclaw/document-extract-plugin`) - included in OpenClaw. Extract text and fallback page images from local document attachments.
+- **[document-extract](/plugins/reference/document-extract)** (`@steelengine/document-extract-plugin`) - included in SteelEngine. Extract text and fallback page images from local document attachments.
 
-- **[duckduckgo](/plugins/reference/duckduckgo)** (`@openclaw/duckduckgo-plugin`) - included in OpenClaw. Adds web search provider support.
+- **[duckduckgo](/plugins/reference/duckduckgo)** (`@steelengine/duckduckgo-plugin`) - included in SteelEngine. Adds web search provider support.
 
-- **[elevenlabs](/plugins/reference/elevenlabs)** (`@openclaw/elevenlabs-speech`) - included in OpenClaw. Adds media understanding provider support. Adds realtime transcription provider support. Adds text-to-speech provider support.
+- **[elevenlabs](/plugins/reference/elevenlabs)** (`@steelengine/elevenlabs-speech`) - included in SteelEngine. Adds media understanding provider support. Adds realtime transcription provider support. Adds text-to-speech provider support.
 
-- **[fal](/plugins/reference/fal)** (`@openclaw/fal-provider`) - included in OpenClaw. Adds fal model provider support to OpenClaw.
+- **[fal](/plugins/reference/fal)** (`@steelengine/fal-provider`) - included in SteelEngine. Adds fal model provider support to SteelEngine.
 
-- **[file-transfer](/plugins/reference/file-transfer)** (`@openclaw/file-transfer`) - included in OpenClaw. Fetch, list, and write files on paired nodes via dedicated node commands. Bypasses bash stdout truncation by using base64 over node.invoke for binaries up to 16 MB.
+- **[file-transfer](/plugins/reference/file-transfer)** (`@steelengine/file-transfer`) - included in SteelEngine. Fetch, list, and write files on paired nodes via dedicated node commands. Bypasses bash stdout truncation by using base64 over node.invoke for binaries up to 16 MB.
 
-- **[github-copilot](/plugins/reference/github-copilot)** (`@openclaw/github-copilot-provider`) - included in OpenClaw. Adds GitHub Copilot model provider support to OpenClaw.
+- **[github-copilot](/plugins/reference/github-copilot)** (`@steelengine/github-copilot-provider`) - included in SteelEngine. Adds GitHub Copilot model provider support to SteelEngine.
 
-- **[google](/plugins/reference/google)** (`@openclaw/google-plugin`) - included in OpenClaw. Adds Google, Google Gemini CLI, Google Vertex model provider support to OpenClaw.
+- **[google](/plugins/reference/google)** (`@steelengine/google-plugin`) - included in SteelEngine. Adds Google, Google Gemini CLI, Google Vertex model provider support to SteelEngine.
 
-- **[huggingface](/plugins/reference/huggingface)** (`@openclaw/huggingface-provider`) - included in OpenClaw. Adds Hugging Face model provider support to OpenClaw.
+- **[huggingface](/plugins/reference/huggingface)** (`@steelengine/huggingface-provider`) - included in SteelEngine. Adds Hugging Face model provider support to SteelEngine.
 
-- **[imessage](/plugins/reference/imessage)** (`@openclaw/imessage`) - included in OpenClaw. Adds the iMessage channel surface for sending and receiving OpenClaw messages.
+- **[imessage](/plugins/reference/imessage)** (`@steelengine/imessage`) - included in SteelEngine. Adds the iMessage channel surface for sending and receiving SteelEngine messages.
 
-- **[linux-canvas](/plugins/reference/linux-canvas)** (`@openclaw/linux-canvas`) - included in OpenClaw. Canvas rendering bridge for the OpenClaw Linux desktop app.
+- **[linux-canvas](/plugins/reference/linux-canvas)** (`@steelengine/linux-canvas`) - included in SteelEngine. Canvas rendering bridge for the SteelEngine Linux desktop app.
 
-- **[linux-node](/plugins/reference/linux-node)** (`@openclaw/linux-node`) - included in OpenClaw. Desktop notifications, camera capture, and location for Linux node hosts.
+- **[linux-node](/plugins/reference/linux-node)** (`@steelengine/linux-node`) - included in SteelEngine. Desktop notifications, camera capture, and location for Linux node hosts.
 
-- **[litellm](/plugins/reference/litellm)** (`@openclaw/litellm-provider`) - included in OpenClaw. Adds LiteLLM model provider support to OpenClaw.
+- **[litellm](/plugins/reference/litellm)** (`@steelengine/litellm-provider`) - included in SteelEngine. Adds LiteLLM model provider support to SteelEngine.
 
-- **[llm-task](/plugins/reference/llm-task)** (`@openclaw/llm-task`) - included in OpenClaw. Generic JSON-only LLM tool for structured tasks callable from workflows.
+- **[llm-task](/plugins/reference/llm-task)** (`@steelengine/llm-task`) - included in SteelEngine. Generic JSON-only LLM tool for structured tasks callable from workflows.
 
-- **[lmstudio](/plugins/reference/lmstudio)** (`@openclaw/lmstudio-provider`) - included in OpenClaw. Adds LM Studio model provider support to OpenClaw.
+- **[lmstudio](/plugins/reference/lmstudio)** (`@steelengine/lmstudio-provider`) - included in SteelEngine. Adds LM Studio model provider support to SteelEngine.
 
-- **[logbook](/plugins/reference/logbook)** (`@openclaw/logbook`) - included in OpenClaw. Automatic work journal: captures periodic screen snapshots from a paired node and turns them into a reviewable timeline of your day.
+- **[logbook](/plugins/reference/logbook)** (`@steelengine/logbook`) - included in SteelEngine. Automatic work journal: captures periodic screen snapshots from a paired node and turns them into a reviewable timeline of your day.
 
-- **[memory-core](/plugins/reference/memory-core)** (`@openclaw/memory-core`) - included in OpenClaw. Adds agent-callable tools.
+- **[memory-core](/plugins/reference/memory-core)** (`@steelengine/memory-core`) - included in SteelEngine. Adds agent-callable tools.
 
-- **[memory-wiki](/plugins/reference/memory-wiki)** (`@openclaw/memory-wiki`) - included in OpenClaw. Persistent wiki compiler and Obsidian-friendly knowledge vault for OpenClaw.
+- **[memory-wiki](/plugins/reference/memory-wiki)** (`@steelengine/memory-wiki`) - included in SteelEngine. Persistent wiki compiler and Obsidian-friendly knowledge vault for SteelEngine.
 
-- **[meta](/plugins/reference/meta)** (`@openclaw/meta-provider`) - included in OpenClaw; npm; ClawHub: `clawhub:@openclaw/meta-provider`. Adds Meta model provider support to OpenClaw.
+- **[meta](/plugins/reference/meta)** (`@steelengine/meta-provider`) - included in SteelEngine; npm; ClawHub: `clawhub:@steelengine/meta-provider`. Adds Meta model provider support to SteelEngine.
 
-- **[microsoft](/plugins/reference/microsoft)** (`@openclaw/microsoft-speech`) - included in OpenClaw. Adds text-to-speech provider support.
+- **[microsoft](/plugins/reference/microsoft)** (`@steelengine/microsoft-speech`) - included in SteelEngine. Adds text-to-speech provider support.
 
-- **[microsoft-foundry](/plugins/reference/microsoft-foundry)** (`@openclaw/microsoft-foundry`) - included in OpenClaw. Adds Microsoft Foundry model provider support to OpenClaw.
+- **[microsoft-foundry](/plugins/reference/microsoft-foundry)** (`@steelengine/microsoft-foundry`) - included in SteelEngine. Adds Microsoft Foundry model provider support to SteelEngine.
 
-- **[migrate-claude](/plugins/reference/migrate-claude)** (`@openclaw/migrate-claude`) - included in OpenClaw. Imports Claude Code and Claude Desktop instructions, MCP servers, skills, and safe configuration into OpenClaw.
+- **[migrate-claude](/plugins/reference/migrate-claude)** (`@steelengine/migrate-claude`) - included in SteelEngine. Imports Claude Code and Claude Desktop instructions, MCP servers, skills, and safe configuration into SteelEngine.
 
-- **[migrate-hermes](/plugins/reference/migrate-hermes)** (`@openclaw/migrate-hermes`) - included in OpenClaw. Imports Hermes configuration, memories, skills, and supported credentials into OpenClaw.
+- **[migrate-hermes](/plugins/reference/migrate-hermes)** (`@steelengine/migrate-hermes`) - included in SteelEngine. Imports Hermes configuration, memories, skills, and supported credentials into SteelEngine.
 
-- **[minimax](/plugins/reference/minimax)** (`@openclaw/minimax-provider`) - included in OpenClaw. Adds MiniMax, MiniMax Portal model provider support to OpenClaw.
+- **[minimax](/plugins/reference/minimax)** (`@steelengine/minimax-provider`) - included in SteelEngine. Adds MiniMax, MiniMax Portal model provider support to SteelEngine.
 
-- **[mistral](/plugins/reference/mistral)** (`@openclaw/mistral-provider`) - included in OpenClaw. Adds Mistral model provider support to OpenClaw.
+- **[mistral](/plugins/reference/mistral)** (`@steelengine/mistral-provider`) - included in SteelEngine. Adds Mistral model provider support to SteelEngine.
 
-- **[novita](/plugins/reference/novita)** (`@openclaw/novita-provider`) - included in OpenClaw. Adds Novita, Novita AI, Novitaai model provider support to OpenClaw.
+- **[novita](/plugins/reference/novita)** (`@steelengine/novita-provider`) - included in SteelEngine. Adds Novita, Novita AI, Novitaai model provider support to SteelEngine.
 
-- **[nvidia](/plugins/reference/nvidia)** (`@openclaw/nvidia-provider`) - included in OpenClaw. Adds NVIDIA model provider support to OpenClaw.
+- **[nvidia](/plugins/reference/nvidia)** (`@steelengine/nvidia-provider`) - included in SteelEngine. Adds NVIDIA model provider support to SteelEngine.
 
-- **[oc-path](/plugins/reference/oc-path)** (`@openclaw/oc-path`) - included in OpenClaw. Adds the openclaw path CLI for oc:// workspace file addressing.
+- **[oc-path](/plugins/reference/oc-path)** (`@steelengine/oc-path`) - included in SteelEngine. Adds the steelengine path CLI for oc:// workspace file addressing.
 
-- **[ollama](/plugins/reference/ollama)** (`@openclaw/ollama-provider`) - included in OpenClaw. Adds Ollama, Ollama Cloud model provider support to OpenClaw.
+- **[ollama](/plugins/reference/ollama)** (`@steelengine/ollama-provider`) - included in SteelEngine. Adds Ollama, Ollama Cloud model provider support to SteelEngine.
 
-- **[onepassword](/plugins/reference/onepassword)** (`@openclaw/onepassword`) - included in OpenClaw. Curated 1Password secrets broker with approval policy and SQLite audit history.
+- **[onepassword](/plugins/reference/onepassword)** (`@steelengine/onepassword`) - included in SteelEngine. Curated 1Password secrets broker with approval policy and SQLite audit history.
 
-- **[open-prose](/plugins/reference/open-prose)** (`@openclaw/open-prose`) - included in OpenClaw. OpenProse VM skill pack with a /prose slash command.
+- **[open-prose](/plugins/reference/open-prose)** (`@steelengine/open-prose`) - included in SteelEngine. OpenProse VM skill pack with a /prose slash command.
 
-- **[openai](/plugins/reference/openai)** (`@openclaw/openai-provider`) - included in OpenClaw. Adds OpenAI model provider support to OpenClaw.
+- **[openai](/plugins/reference/openai)** (`@steelengine/openai-provider`) - included in SteelEngine. Adds OpenAI model provider support to SteelEngine.
 
-- **[opencode](/plugins/reference/opencode)** (`@openclaw/opencode-provider`) - included in OpenClaw. Adds OpenCode model provider support to OpenClaw.
+- **[opencode](/plugins/reference/opencode)** (`@steelengine/opencode-provider`) - included in SteelEngine. Adds OpenCode model provider support to SteelEngine.
 
-- **[opencode-go](/plugins/reference/opencode-go)** (`@openclaw/opencode-go-provider`) - included in OpenClaw. Adds OpenCode Go model provider support to OpenClaw.
+- **[opencode-go](/plugins/reference/opencode-go)** (`@steelengine/opencode-go-provider`) - included in SteelEngine. Adds OpenCode Go model provider support to SteelEngine.
 
-- **[openrouter](/plugins/reference/openrouter)** (`@openclaw/openrouter-provider`) - included in OpenClaw. Adds OpenRouter model provider support to OpenClaw.
+- **[openrouter](/plugins/reference/openrouter)** (`@steelengine/openrouter-provider`) - included in SteelEngine. Adds OpenRouter model provider support to SteelEngine.
 
-- **[policy](/plugins/reference/policy)** (`@openclaw/policy`) - included in OpenClaw. Adds policy-backed doctor checks for workspace conformance.
+- **[policy](/plugins/reference/policy)** (`@steelengine/policy`) - included in SteelEngine. Adds policy-backed doctor checks for workspace conformance.
 
-- **[reef](/plugins/reference/reef)** (`@openclaw/reef`) - included in OpenClaw. Guarded end-to-end encrypted claw channel.
+- **[reef](/plugins/reference/reef)** (`@steelengine/reef`) - included in SteelEngine. Guarded end-to-end encrypted claw channel.
 
-- **[runway](/plugins/reference/runway)** (`@openclaw/runway-provider`) - included in OpenClaw. Adds video generation provider support.
+- **[runway](/plugins/reference/runway)** (`@steelengine/runway-provider`) - included in SteelEngine. Adds video generation provider support.
 
-- **[senseaudio](/plugins/reference/senseaudio)** (`@openclaw/senseaudio-provider`) - included in OpenClaw. Adds media understanding provider support.
+- **[senseaudio](/plugins/reference/senseaudio)** (`@steelengine/senseaudio-provider`) - included in SteelEngine. Adds media understanding provider support.
 
-- **[sglang](/plugins/reference/sglang)** (`@openclaw/sglang-provider`) - included in OpenClaw. Adds SGLang model provider support to OpenClaw.
+- **[sglang](/plugins/reference/sglang)** (`@steelengine/sglang-provider`) - included in SteelEngine. Adds SGLang model provider support to SteelEngine.
 
-- **[synthetic](/plugins/reference/synthetic)** (`@openclaw/synthetic-provider`) - included in OpenClaw. Adds Synthetic model provider support to OpenClaw.
+- **[synthetic](/plugins/reference/synthetic)** (`@steelengine/synthetic-provider`) - included in SteelEngine. Adds Synthetic model provider support to SteelEngine.
 
-- **[teams-meetings](/plugins/reference/teams-meetings)** (`@openclaw/teams-meetings`) - included in OpenClaw. Join Microsoft Teams meetings as a Chrome browser guest.
+- **[teams-meetings](/plugins/reference/teams-meetings)** (`@steelengine/teams-meetings`) - included in SteelEngine. Join Microsoft Teams meetings as a Chrome browser guest.
 
-- **[telegram](/plugins/reference/telegram)** (`@openclaw/telegram`) - included in OpenClaw. Adds the Telegram channel surface for sending and receiving OpenClaw messages.
+- **[telegram](/plugins/reference/telegram)** (`@steelengine/telegram`) - included in SteelEngine. Adds the Telegram channel surface for sending and receiving SteelEngine messages.
 
-- **[together](/plugins/reference/together)** (`@openclaw/together-provider`) - included in OpenClaw. Adds Together model provider support to OpenClaw.
+- **[together](/plugins/reference/together)** (`@steelengine/together-provider`) - included in SteelEngine. Adds Together model provider support to SteelEngine.
 
-- **[tts-local-cli](/plugins/reference/tts-local-cli)** (`@openclaw/tts-local-cli`) - included in OpenClaw. Adds text-to-speech provider support.
+- **[tts-local-cli](/plugins/reference/tts-local-cli)** (`@steelengine/tts-local-cli`) - included in SteelEngine. Adds text-to-speech provider support.
 
-- **[vault](/plugins/reference/vault)** (`@openclaw/vault`) - included in OpenClaw. HashiCorp Vault SecretRef provider integration.
+- **[vault](/plugins/reference/vault)** (`@steelengine/vault`) - included in SteelEngine. HashiCorp Vault SecretRef provider integration.
 
-- **[vllm](/plugins/reference/vllm)** (`@openclaw/vllm-provider`) - included in OpenClaw. Adds vLLM model provider support to OpenClaw.
+- **[vllm](/plugins/reference/vllm)** (`@steelengine/vllm-provider`) - included in SteelEngine. Adds vLLM model provider support to SteelEngine.
 
-- **[volcengine](/plugins/reference/volcengine)** (`@openclaw/volcengine-provider`) - included in OpenClaw. Adds Volcengine, Volcengine Plan model provider support to OpenClaw.
+- **[volcengine](/plugins/reference/volcengine)** (`@steelengine/volcengine-provider`) - included in SteelEngine. Adds Volcengine, Volcengine Plan model provider support to SteelEngine.
 
-- **[voyage](/plugins/reference/voyage)** (`@openclaw/voyage-provider`) - included in OpenClaw. Adds memory embedding provider support.
+- **[voyage](/plugins/reference/voyage)** (`@steelengine/voyage-provider`) - included in SteelEngine. Adds memory embedding provider support.
 
-- **[vydra](/plugins/reference/vydra)** (`@openclaw/vydra-provider`) - included in OpenClaw. Adds Vydra model provider support to OpenClaw.
+- **[vydra](/plugins/reference/vydra)** (`@steelengine/vydra-provider`) - included in SteelEngine. Adds Vydra model provider support to SteelEngine.
 
-- **[web-readability](/plugins/reference/web-readability)** (`@openclaw/web-readability-plugin`) - included in OpenClaw. Extract readable article content from local HTML web fetch responses.
+- **[web-readability](/plugins/reference/web-readability)** (`@steelengine/web-readability-plugin`) - included in SteelEngine. Extract readable article content from local HTML web fetch responses.
 
-- **[webhooks](/plugins/reference/webhooks)** (`@openclaw/webhooks`) - included in OpenClaw. Authenticated inbound webhooks that bind external automation to OpenClaw TaskFlows.
+- **[webhooks](/plugins/reference/webhooks)** (`@steelengine/webhooks`) - included in SteelEngine. Authenticated inbound webhooks that bind external automation to SteelEngine TaskFlows.
 
-- **[workboard](/plugins/reference/workboard)** (`@openclaw/workboard`) - included in OpenClaw. Dashboard workboard for agent-owned issues and sessions.
+- **[workboard](/plugins/reference/workboard)** (`@steelengine/workboard`) - included in SteelEngine. Dashboard workboard for agent-owned issues and sessions.
 
-- **[xai](/plugins/reference/xai)** (`@openclaw/xai-plugin`) - included in OpenClaw. Adds xAI model provider support to OpenClaw.
+- **[xai](/plugins/reference/xai)** (`@steelengine/xai-plugin`) - included in SteelEngine. Adds xAI model provider support to SteelEngine.
 
-- **[xiaomi](/plugins/reference/xiaomi)** (`@openclaw/xiaomi-provider`) - included in OpenClaw. Adds Xiaomi, Xiaomi Token Plan model provider support to OpenClaw.
+- **[xiaomi](/plugins/reference/xiaomi)** (`@steelengine/xiaomi-provider`) - included in SteelEngine. Adds Xiaomi, Xiaomi Token Plan model provider support to SteelEngine.
 
 ## Official external packages
 
 72 plugins
 
-- **[acpx](/plugins/reference/acpx)** (`@openclaw/acpx`) - npm; ClawHub. OpenClaw ACP runtime backend with plugin-owned session and transport management.
+- **[acpx](/plugins/reference/acpx)** (`@steelengine/acpx`) - npm; ClawHub. SteelEngine ACP runtime backend with plugin-owned session and transport management.
 
-- **[amazon-bedrock](/plugins/reference/amazon-bedrock)** (`@openclaw/amazon-bedrock-provider`) - npm; ClawHub. OpenClaw Amazon Bedrock provider plugin with model discovery, embeddings, and guardrail support.
+- **[amazon-bedrock](/plugins/reference/amazon-bedrock)** (`@steelengine/amazon-bedrock-provider`) - npm; ClawHub. SteelEngine Amazon Bedrock provider plugin with model discovery, embeddings, and guardrail support.
 
-- **[amazon-bedrock-mantle](/plugins/reference/amazon-bedrock-mantle)** (`@openclaw/amazon-bedrock-mantle-provider`) - npm; ClawHub. OpenClaw Amazon Bedrock Mantle provider plugin for OpenAI-compatible model routing.
+- **[amazon-bedrock-mantle](/plugins/reference/amazon-bedrock-mantle)** (`@steelengine/amazon-bedrock-mantle-provider`) - npm; ClawHub. SteelEngine Amazon Bedrock Mantle provider plugin for OpenAI-compatible model routing.
 
-- **[anthropic-vertex](/plugins/reference/anthropic-vertex)** (`@openclaw/anthropic-vertex-provider`) - npm; ClawHub. OpenClaw Anthropic Vertex provider plugin for Claude models on Google Vertex AI.
+- **[anthropic-vertex](/plugins/reference/anthropic-vertex)** (`@steelengine/anthropic-vertex-provider`) - npm; ClawHub. SteelEngine Anthropic Vertex provider plugin for Claude models on Google Vertex AI.
 
-- **[arcee](/plugins/reference/arcee)** (`@openclaw/arcee-provider`) - npm; ClawHub: `clawhub:@openclaw/arcee-provider`. Adds Arcee model provider support to OpenClaw.
+- **[arcee](/plugins/reference/arcee)** (`@steelengine/arcee-provider`) - npm; ClawHub: `clawhub:@steelengine/arcee-provider`. Adds Arcee model provider support to SteelEngine.
 
-- **[baseten](/plugins/reference/baseten)** (`@openclaw/baseten-provider`) - npm; ClawHub: `clawhub:@openclaw/baseten-provider`. OpenClaw Baseten provider plugin.
+- **[baseten](/plugins/reference/baseten)** (`@steelengine/baseten-provider`) - npm; ClawHub: `clawhub:@steelengine/baseten-provider`. SteelEngine Baseten provider plugin.
 
-- **[brave](/plugins/reference/brave)** (`@openclaw/brave-plugin`) - npm; ClawHub. OpenClaw Brave Search provider plugin for web search.
+- **[brave](/plugins/reference/brave)** (`@steelengine/brave-plugin`) - npm; ClawHub. SteelEngine Brave Search provider plugin for web search.
 
-- **[cerebras](/plugins/reference/cerebras)** (`@openclaw/cerebras-provider`) - npm; ClawHub: `clawhub:@openclaw/cerebras-provider`. Adds Cerebras model provider support to OpenClaw.
+- **[cerebras](/plugins/reference/cerebras)** (`@steelengine/cerebras-provider`) - npm; ClawHub: `clawhub:@steelengine/cerebras-provider`. Adds Cerebras model provider support to SteelEngine.
 
-- **[chutes](/plugins/reference/chutes)** (`@openclaw/chutes-provider`) - npm; ClawHub: `clawhub:@openclaw/chutes-provider`. Adds Chutes model provider support to OpenClaw.
+- **[chutes](/plugins/reference/chutes)** (`@steelengine/chutes-provider`) - npm; ClawHub: `clawhub:@steelengine/chutes-provider`. Adds Chutes model provider support to SteelEngine.
 
-- **[clickclack](/plugins/reference/clickclack)** (`@openclaw/clickclack`) - npm; ClawHub: `clawhub:@openclaw/clickclack`. Adds the Clickclack channel surface for sending and receiving OpenClaw messages.
+- **[clickclack](/plugins/reference/clickclack)** (`@steelengine/clickclack`) - npm; ClawHub: `clawhub:@steelengine/clickclack`. Adds the Clickclack channel surface for sending and receiving SteelEngine messages.
 
-- **[cloudflare-ai-gateway](/plugins/reference/cloudflare-ai-gateway)** (`@openclaw/cloudflare-ai-gateway-provider`) - npm; ClawHub: `clawhub:@openclaw/cloudflare-ai-gateway-provider`. Adds Cloudflare AI Gateway model provider support to OpenClaw.
+- **[cloudflare-ai-gateway](/plugins/reference/cloudflare-ai-gateway)** (`@steelengine/cloudflare-ai-gateway-provider`) - npm; ClawHub: `clawhub:@steelengine/cloudflare-ai-gateway-provider`. Adds Cloudflare AI Gateway model provider support to SteelEngine.
 
-- **[codex](/plugins/reference/codex)** (`@openclaw/codex`) - npm; ClawHub. Codex app-server harness and native session catalog.
+- **[codex](/plugins/reference/codex)** (`@steelengine/codex`) - npm; ClawHub. Codex app-server harness and native session catalog.
 
-- **[copilot](/plugins/reference/copilot)** (`@openclaw/copilot`) - npm; ClawHub: `clawhub:@openclaw/copilot`. Registers the GitHub Copilot agent runtime.
+- **[copilot](/plugins/reference/copilot)** (`@steelengine/copilot`) - npm; ClawHub: `clawhub:@steelengine/copilot`. Registers the GitHub Copilot agent runtime.
 
-- **[deepinfra](/plugins/reference/deepinfra)** (`@openclaw/deepinfra-provider`) - npm; ClawHub: `clawhub:@openclaw/deepinfra-provider`. Adds DeepInfra model provider support to OpenClaw.
+- **[deepinfra](/plugins/reference/deepinfra)** (`@steelengine/deepinfra-provider`) - npm; ClawHub: `clawhub:@steelengine/deepinfra-provider`. Adds DeepInfra model provider support to SteelEngine.
 
-- **[deepseek](/plugins/reference/deepseek)** (`@openclaw/deepseek-provider`) - npm; ClawHub: `clawhub:@openclaw/deepseek-provider`. Adds DeepSeek model provider support to OpenClaw.
+- **[deepseek](/plugins/reference/deepseek)** (`@steelengine/deepseek-provider`) - npm; ClawHub: `clawhub:@steelengine/deepseek-provider`. Adds DeepSeek model provider support to SteelEngine.
 
-- **[diagnostics-otel](/plugins/reference/diagnostics-otel)** (`@openclaw/diagnostics-otel`) - npm; ClawHub: `clawhub:@openclaw/diagnostics-otel`. OpenClaw diagnostics OpenTelemetry exporter for metrics, traces, and logs.
+- **[diagnostics-otel](/plugins/reference/diagnostics-otel)** (`@steelengine/diagnostics-otel`) - npm; ClawHub: `clawhub:@steelengine/diagnostics-otel`. SteelEngine diagnostics OpenTelemetry exporter for metrics, traces, and logs.
 
-- **[diagnostics-prometheus](/plugins/reference/diagnostics-prometheus)** (`@openclaw/diagnostics-prometheus`) - npm; ClawHub: `clawhub:@openclaw/diagnostics-prometheus`. OpenClaw diagnostics Prometheus exporter for runtime metrics.
+- **[diagnostics-prometheus](/plugins/reference/diagnostics-prometheus)** (`@steelengine/diagnostics-prometheus`) - npm; ClawHub: `clawhub:@steelengine/diagnostics-prometheus`. SteelEngine diagnostics Prometheus exporter for runtime metrics.
 
-- **[diffs](/plugins/reference/diffs)** (`@openclaw/diffs`) - npm; ClawHub. OpenClaw read-only diff viewer plugin and file renderer for agents.
+- **[diffs](/plugins/reference/diffs)** (`@steelengine/diffs`) - npm; ClawHub. SteelEngine read-only diff viewer plugin and file renderer for agents.
 
-- **[diffs-language-pack](/plugins/reference/diffs-language-pack)** (`@openclaw/diffs-language-pack`) - npm; ClawHub: `clawhub:@openclaw/diffs-language-pack`. Adds syntax highlighting for languages outside the default diffs viewer set.
+- **[diffs-language-pack](/plugins/reference/diffs-language-pack)** (`@steelengine/diffs-language-pack`) - npm; ClawHub: `clawhub:@steelengine/diffs-language-pack`. Adds syntax highlighting for languages outside the default diffs viewer set.
 
-- **[discord](/plugins/reference/discord)** (`@openclaw/discord`) - npm; ClawHub. OpenClaw Discord channel plugin for channels, DMs, commands, and app events.
+- **[discord](/plugins/reference/discord)** (`@steelengine/discord`) - npm; ClawHub. SteelEngine Discord channel plugin for channels, DMs, commands, and app events.
 
-- **[exa](/plugins/reference/exa)** (`@openclaw/exa-plugin`) - npm; ClawHub: `clawhub:@openclaw/exa-plugin`. Adds web search provider support.
+- **[exa](/plugins/reference/exa)** (`@steelengine/exa-plugin`) - npm; ClawHub: `clawhub:@steelengine/exa-plugin`. Adds web search provider support.
 
-- **[featherless](/plugins/reference/featherless)** (`@openclaw/featherless-provider`) - npm; ClawHub: `clawhub:@openclaw/featherless-provider`. OpenClaw Featherless AI provider plugin.
+- **[featherless](/plugins/reference/featherless)** (`@steelengine/featherless-provider`) - npm; ClawHub: `clawhub:@steelengine/featherless-provider`. SteelEngine Featherless AI provider plugin.
 
-- **[feishu](/plugins/reference/feishu)** (`@openclaw/feishu`) - npm; ClawHub. OpenClaw Feishu/Lark channel plugin for chats and workplace tools (community maintained by @m1heng).
+- **[feishu](/plugins/reference/feishu)** (`@steelengine/feishu`) - npm; ClawHub. SteelEngine Feishu/Lark channel plugin for chats and workplace tools (community maintained by @m1heng).
 
-- **[firecrawl](/plugins/reference/firecrawl)** (`@openclaw/firecrawl-plugin`) - npm; ClawHub: `clawhub:@openclaw/firecrawl-plugin`. Adds agent-callable tools. Adds web fetch provider support. Adds web search provider support.
+- **[firecrawl](/plugins/reference/firecrawl)** (`@steelengine/firecrawl-plugin`) - npm; ClawHub: `clawhub:@steelengine/firecrawl-plugin`. Adds agent-callable tools. Adds web fetch provider support. Adds web search provider support.
 
-- **[fireworks](/plugins/reference/fireworks)** (`@openclaw/fireworks-provider`) - npm; ClawHub: `clawhub:@openclaw/fireworks-provider`. Adds Fireworks model provider support to OpenClaw.
+- **[fireworks](/plugins/reference/fireworks)** (`@steelengine/fireworks-provider`) - npm; ClawHub: `clawhub:@steelengine/fireworks-provider`. Adds Fireworks model provider support to SteelEngine.
 
-- **[gmi](/plugins/reference/gmi)** (`@openclaw/gmi-provider`) - npm; ClawHub: `clawhub:@openclaw/gmi-provider`. OpenClaw GMI Cloud provider plugin.
+- **[gmi](/plugins/reference/gmi)** (`@steelengine/gmi-provider`) - npm; ClawHub: `clawhub:@steelengine/gmi-provider`. SteelEngine GMI Cloud provider plugin.
 
-- **[google-meet](/plugins/reference/google-meet)** (`@openclaw/google-meet`) - npm; ClawHub. OpenClaw Google Meet participant plugin for joining calls through Chrome or Twilio transports.
+- **[google-meet](/plugins/reference/google-meet)** (`@steelengine/google-meet`) - npm; ClawHub. SteelEngine Google Meet participant plugin for joining calls through Chrome or Twilio transports.
 
-- **[googlechat](/plugins/reference/googlechat)** (`@openclaw/googlechat`) - npm; ClawHub. OpenClaw Google Chat channel plugin for spaces and direct messages.
+- **[googlechat](/plugins/reference/googlechat)** (`@steelengine/googlechat`) - npm; ClawHub. SteelEngine Google Chat channel plugin for spaces and direct messages.
 
-- **[gradium](/plugins/reference/gradium)** (`@openclaw/gradium-speech`) - npm; ClawHub: `clawhub:@openclaw/gradium-speech`. Adds text-to-speech provider support.
+- **[gradium](/plugins/reference/gradium)** (`@steelengine/gradium-speech`) - npm; ClawHub: `clawhub:@steelengine/gradium-speech`. Adds text-to-speech provider support.
 
-- **[groq](/plugins/reference/groq)** (`@openclaw/groq-provider`) - npm; ClawHub: `clawhub:@openclaw/groq-provider`. Adds Groq model provider support to OpenClaw.
+- **[groq](/plugins/reference/groq)** (`@steelengine/groq-provider`) - npm; ClawHub: `clawhub:@steelengine/groq-provider`. Adds Groq model provider support to SteelEngine.
 
-- **[inworld](/plugins/reference/inworld)** (`@openclaw/inworld-speech`) - npm; ClawHub: `clawhub:@openclaw/inworld-speech`. Inworld streaming text-to-speech (MP3, OGG_OPUS, PCM telephony).
+- **[inworld](/plugins/reference/inworld)** (`@steelengine/inworld-speech`) - npm; ClawHub: `clawhub:@steelengine/inworld-speech`. Inworld streaming text-to-speech (MP3, OGG_OPUS, PCM telephony).
 
-- **[irc](/plugins/reference/irc)** (`@openclaw/irc`) - npm; ClawHub: `clawhub:@openclaw/irc`. Adds the IRC channel surface for sending and receiving OpenClaw messages.
+- **[irc](/plugins/reference/irc)** (`@steelengine/irc`) - npm; ClawHub: `clawhub:@steelengine/irc`. Adds the IRC channel surface for sending and receiving SteelEngine messages.
 
-- **[kilocode](/plugins/reference/kilocode)** (`@openclaw/kilocode-provider`) - npm; ClawHub: `clawhub:@openclaw/kilocode-provider`. Adds Kilocode model provider support to OpenClaw.
+- **[kilocode](/plugins/reference/kilocode)** (`@steelengine/kilocode-provider`) - npm; ClawHub: `clawhub:@steelengine/kilocode-provider`. Adds Kilocode model provider support to SteelEngine.
 
-- **[kimi](/plugins/reference/kimi)** (`@openclaw/kimi-provider`) - npm; ClawHub: `clawhub:@openclaw/kimi-provider`. Adds Kimi, Kimi Coding model provider support to OpenClaw.
+- **[kimi](/plugins/reference/kimi)** (`@steelengine/kimi-provider`) - npm; ClawHub: `clawhub:@steelengine/kimi-provider`. Adds Kimi, Kimi Coding model provider support to SteelEngine.
 
-- **[line](/plugins/reference/line)** (`@openclaw/line`) - npm; ClawHub. OpenClaw LINE channel plugin for LINE Bot API chats.
+- **[line](/plugins/reference/line)** (`@steelengine/line`) - npm; ClawHub. SteelEngine LINE channel plugin for LINE Bot API chats.
 
-- **[llama-cpp](/plugins/reference/llama-cpp)** (`@openclaw/llama-cpp-provider`) - npm; ClawHub. Local GGUF text inference and embeddings through node-llama-cpp.
+- **[llama-cpp](/plugins/reference/llama-cpp)** (`@steelengine/llama-cpp-provider`) - npm; ClawHub. Local GGUF text inference and embeddings through node-llama-cpp.
 
-- **[lobster](/plugins/reference/lobster)** (`@openclaw/lobster`) - npm; ClawHub. Lobster workflow tool plugin for typed pipelines and resumable approvals.
+- **[lobster](/plugins/reference/lobster)** (`@steelengine/lobster`) - npm; ClawHub. Lobster workflow tool plugin for typed pipelines and resumable approvals.
 
-- **[longcat](/plugins/reference/longcat)** (`@openclaw/longcat-provider`) - npm; ClawHub: `clawhub:@openclaw/longcat-provider`. OpenClaw LongCat provider plugin.
+- **[longcat](/plugins/reference/longcat)** (`@steelengine/longcat-provider`) - npm; ClawHub: `clawhub:@steelengine/longcat-provider`. SteelEngine LongCat provider plugin.
 
-- **[matrix](/plugins/reference/matrix)** (`@openclaw/matrix`) - ClawHub: `clawhub:@openclaw/matrix`; npm. OpenClaw Matrix channel plugin for rooms and direct messages.
+- **[matrix](/plugins/reference/matrix)** (`@steelengine/matrix`) - ClawHub: `clawhub:@steelengine/matrix`; npm. SteelEngine Matrix channel plugin for rooms and direct messages.
 
-- **[mattermost](/plugins/reference/mattermost)** (`@openclaw/mattermost`) - npm; ClawHub: `clawhub:@openclaw/mattermost`. Adds the Mattermost channel surface for sending and receiving OpenClaw messages.
+- **[mattermost](/plugins/reference/mattermost)** (`@steelengine/mattermost`) - npm; ClawHub: `clawhub:@steelengine/mattermost`. Adds the Mattermost channel surface for sending and receiving SteelEngine messages.
 
-- **[memory-lancedb](/plugins/reference/memory-lancedb)** (`@openclaw/memory-lancedb`) - npm; ClawHub. OpenClaw LanceDB-backed long-term memory plugin with auto-recall, auto-capture, and vector search.
+- **[memory-lancedb](/plugins/reference/memory-lancedb)** (`@steelengine/memory-lancedb`) - npm; ClawHub. SteelEngine LanceDB-backed long-term memory plugin with auto-recall, auto-capture, and vector search.
 
-- **[moonshot](/plugins/reference/moonshot)** (`@openclaw/moonshot-provider`) - npm; ClawHub: `clawhub:@openclaw/moonshot-provider`. Adds Moonshot model provider support to OpenClaw.
+- **[moonshot](/plugins/reference/moonshot)** (`@steelengine/moonshot-provider`) - npm; ClawHub: `clawhub:@steelengine/moonshot-provider`. Adds Moonshot model provider support to SteelEngine.
 
-- **[msteams](/plugins/reference/msteams)** (`@openclaw/msteams`) - npm; ClawHub. OpenClaw Microsoft Teams channel plugin for bot conversations.
+- **[msteams](/plugins/reference/msteams)** (`@steelengine/msteams`) - npm; ClawHub. SteelEngine Microsoft Teams channel plugin for bot conversations.
 
-- **[mxc](/plugins/reference/mxc)** (`@openclaw/mxc-sandbox`) - npm; ClawHub. OS-level sandboxed tool execution via MXC for MXC-capable Windows hosts: runs commands in ProcessContainer (Windows) with configured MXC policy files.
+- **[mxc](/plugins/reference/mxc)** (`@steelengine/mxc-sandbox`) - npm; ClawHub. OS-level sandboxed tool execution via MXC for MXC-capable Windows hosts: runs commands in ProcessContainer (Windows) with configured MXC policy files.
 
-- **[nextcloud-talk](/plugins/reference/nextcloud-talk)** (`@openclaw/nextcloud-talk`) - npm; ClawHub. OpenClaw Nextcloud Talk channel plugin for conversations.
+- **[nextcloud-talk](/plugins/reference/nextcloud-talk)** (`@steelengine/nextcloud-talk`) - npm; ClawHub. SteelEngine Nextcloud Talk channel plugin for conversations.
 
-- **[nostr](/plugins/reference/nostr)** (`@openclaw/nostr`) - npm; ClawHub. OpenClaw Nostr channel plugin for NIP-04 encrypted direct messages.
+- **[nostr](/plugins/reference/nostr)** (`@steelengine/nostr`) - npm; ClawHub. SteelEngine Nostr channel plugin for NIP-04 encrypted direct messages.
 
-- **[openshell](/plugins/reference/openshell)** (`@openclaw/openshell-sandbox`) - npm; ClawHub. OpenClaw sandbox backend for the NVIDIA OpenShell CLI with mirrored local workspaces and SSH command execution.
+- **[openshell](/plugins/reference/openshell)** (`@steelengine/openshell-sandbox`) - npm; ClawHub. SteelEngine sandbox backend for the NVIDIA OpenShell CLI with mirrored local workspaces and SSH command execution.
 
-- **[parallel](/tools/parallel-search)** (`@openclaw/parallel-plugin`) - npm; ClawHub: `clawhub:@openclaw/parallel-plugin`. Adds web search provider support.
+- **[parallel](/tools/parallel-search)** (`@steelengine/parallel-plugin`) - npm; ClawHub: `clawhub:@steelengine/parallel-plugin`. Adds web search provider support.
 
-- **[perplexity](/plugins/reference/perplexity)** (`@openclaw/perplexity-plugin`) - npm; ClawHub: `clawhub:@openclaw/perplexity-plugin`. Adds web search provider support.
+- **[perplexity](/plugins/reference/perplexity)** (`@steelengine/perplexity-plugin`) - npm; ClawHub: `clawhub:@steelengine/perplexity-plugin`. Adds web search provider support.
 
-- **[pixverse](/plugins/reference/pixverse)** (`@openclaw/pixverse-provider`) - npm; ClawHub: `clawhub:@openclaw/pixverse-provider`. OpenClaw PixVerse video generation provider plugin.
+- **[pixverse](/plugins/reference/pixverse)** (`@steelengine/pixverse-provider`) - npm; ClawHub: `clawhub:@steelengine/pixverse-provider`. SteelEngine PixVerse video generation provider plugin.
 
-- **[qianfan](/plugins/reference/qianfan)** (`@openclaw/qianfan-provider`) - npm; ClawHub: `clawhub:@openclaw/qianfan-provider`. Adds Qianfan model provider support to OpenClaw.
+- **[qianfan](/plugins/reference/qianfan)** (`@steelengine/qianfan-provider`) - npm; ClawHub: `clawhub:@steelengine/qianfan-provider`. Adds Qianfan model provider support to SteelEngine.
 
-- **[qqbot](/plugins/reference/qqbot)** (`@openclaw/qqbot`) - npm; ClawHub. OpenClaw QQ Bot channel plugin for group and direct-message workflows.
+- **[qqbot](/plugins/reference/qqbot)** (`@steelengine/qqbot`) - npm; ClawHub. SteelEngine QQ Bot channel plugin for group and direct-message workflows.
 
-- **[qwen](/plugins/reference/qwen)** (`@openclaw/qwen-provider`) - npm; ClawHub: `clawhub:@openclaw/qwen-provider`. Adds Qwen, Qwen Cloud, Model Studio, DashScope, Qwen Token Plan, Bailian Token Plan model provider support to OpenClaw.
+- **[qwen](/plugins/reference/qwen)** (`@steelengine/qwen-provider`) - npm; ClawHub: `clawhub:@steelengine/qwen-provider`. Adds Qwen, Qwen Cloud, Model Studio, DashScope, Qwen Token Plan, Bailian Token Plan model provider support to SteelEngine.
 
-- **[raft](/plugins/reference/raft)** (`@openclaw/raft`) - npm; ClawHub. OpenClaw Raft channel plugin for secure CLI wake bridges.
+- **[raft](/plugins/reference/raft)** (`@steelengine/raft`) - npm; ClawHub. SteelEngine Raft channel plugin for secure CLI wake bridges.
 
-- **[searxng](/plugins/reference/searxng)** (`@openclaw/searxng-plugin`) - npm; ClawHub: `clawhub:@openclaw/searxng-plugin`. Adds web search provider support.
+- **[searxng](/plugins/reference/searxng)** (`@steelengine/searxng-plugin`) - npm; ClawHub: `clawhub:@steelengine/searxng-plugin`. Adds web search provider support.
 
-- **[signal](/plugins/reference/signal)** (`@openclaw/signal`) - npm; ClawHub: `clawhub:@openclaw/signal`. Adds the Signal channel surface for sending and receiving OpenClaw messages.
+- **[signal](/plugins/reference/signal)** (`@steelengine/signal`) - npm; ClawHub: `clawhub:@steelengine/signal`. Adds the Signal channel surface for sending and receiving SteelEngine messages.
 
-- **[slack](/plugins/reference/slack)** (`@openclaw/slack`) - npm; ClawHub. OpenClaw Slack channel plugin for channels, DMs, commands, and app events.
+- **[slack](/plugins/reference/slack)** (`@steelengine/slack`) - npm; ClawHub. SteelEngine Slack channel plugin for channels, DMs, commands, and app events.
 
-- **[sms](/plugins/reference/sms)** (`@openclaw/sms`) - npm; ClawHub: `clawhub:@openclaw/sms`. Twilio SMS channel plugin for OpenClaw text messages.
+- **[sms](/plugins/reference/sms)** (`@steelengine/sms`) - npm; ClawHub: `clawhub:@steelengine/sms`. Twilio SMS channel plugin for SteelEngine text messages.
 
-- **[stepfun](/plugins/reference/stepfun)** (`@openclaw/stepfun-provider`) - npm; ClawHub: `clawhub:@openclaw/stepfun-provider`. Adds StepFun, StepFun Plan model provider support to OpenClaw.
+- **[stepfun](/plugins/reference/stepfun)** (`@steelengine/stepfun-provider`) - npm; ClawHub: `clawhub:@steelengine/stepfun-provider`. Adds StepFun, StepFun Plan model provider support to SteelEngine.
 
-- **[synology-chat](/plugins/reference/synology-chat)** (`@openclaw/synology-chat`) - npm; ClawHub. Synology Chat channel plugin for OpenClaw channels and direct messages.
+- **[synology-chat](/plugins/reference/synology-chat)** (`@steelengine/synology-chat`) - npm; ClawHub. Synology Chat channel plugin for SteelEngine channels and direct messages.
 
-- **[tavily](/plugins/reference/tavily)** (`@openclaw/tavily-plugin`) - npm; ClawHub: `clawhub:@openclaw/tavily-plugin`. Adds agent-callable tools. Adds web search provider support.
+- **[tavily](/plugins/reference/tavily)** (`@steelengine/tavily-plugin`) - npm; ClawHub: `clawhub:@steelengine/tavily-plugin`. Adds agent-callable tools. Adds web search provider support.
 
-- **[tencent](/plugins/reference/tencent)** (`@openclaw/tencent-provider`) - npm; ClawHub: `clawhub:@openclaw/tencent-provider`. Adds Tencent TokenHub, Tencent Tokenplan model provider support to OpenClaw.
+- **[tencent](/plugins/reference/tencent)** (`@steelengine/tencent-provider`) - npm; ClawHub: `clawhub:@steelengine/tencent-provider`. Adds Tencent TokenHub, Tencent Tokenplan model provider support to SteelEngine.
 
-- **[tlon](/plugins/reference/tlon)** (`@openclaw/tlon`) - npm; ClawHub. OpenClaw Tlon/Urbit channel plugin for chat workflows.
+- **[tlon](/plugins/reference/tlon)** (`@steelengine/tlon`) - npm; ClawHub. SteelEngine Tlon/Urbit channel plugin for chat workflows.
 
-- **[tokenjuice](/plugins/reference/tokenjuice)** (`@openclaw/tokenjuice`) - npm; ClawHub: `clawhub:@openclaw/tokenjuice`. Compacts exec and bash tool results with tokenjuice reducers.
+- **[tokenjuice](/plugins/reference/tokenjuice)** (`@steelengine/tokenjuice`) - npm; ClawHub: `clawhub:@steelengine/tokenjuice`. Compacts exec and bash tool results with tokenjuice reducers.
 
-- **[twitch](/plugins/reference/twitch)** (`@openclaw/twitch`) - npm; ClawHub. OpenClaw Twitch channel plugin for chat and moderation workflows.
+- **[twitch](/plugins/reference/twitch)** (`@steelengine/twitch`) - npm; ClawHub. SteelEngine Twitch channel plugin for chat and moderation workflows.
 
-- **[venice](/plugins/reference/venice)** (`@openclaw/venice-provider`) - npm; ClawHub: `clawhub:@openclaw/venice-provider`. Adds Venice model provider support to OpenClaw.
+- **[venice](/plugins/reference/venice)** (`@steelengine/venice-provider`) - npm; ClawHub: `clawhub:@steelengine/venice-provider`. Adds Venice model provider support to SteelEngine.
 
-- **[vercel-ai-gateway](/plugins/reference/vercel-ai-gateway)** (`@openclaw/vercel-ai-gateway-provider`) - npm; ClawHub: `clawhub:@openclaw/vercel-ai-gateway-provider`. Adds Vercel AI Gateway model provider support to OpenClaw.
+- **[vercel-ai-gateway](/plugins/reference/vercel-ai-gateway)** (`@steelengine/vercel-ai-gateway-provider`) - npm; ClawHub: `clawhub:@steelengine/vercel-ai-gateway-provider`. Adds Vercel AI Gateway model provider support to SteelEngine.
 
-- **[voice-call](/plugins/reference/voice-call)** (`@openclaw/voice-call`) - npm; ClawHub. OpenClaw voice-call plugin for Twilio, Telnyx, and Plivo phone calls.
+- **[voice-call](/plugins/reference/voice-call)** (`@steelengine/voice-call`) - npm; ClawHub. SteelEngine voice-call plugin for Twilio, Telnyx, and Plivo phone calls.
 
-- **[whatsapp](/plugins/reference/whatsapp)** (`@openclaw/whatsapp`) - ClawHub: `clawhub:@openclaw/whatsapp`; npm. OpenClaw WhatsApp channel plugin for WhatsApp Web chats.
+- **[whatsapp](/plugins/reference/whatsapp)** (`@steelengine/whatsapp`) - ClawHub: `clawhub:@steelengine/whatsapp`; npm. SteelEngine WhatsApp channel plugin for WhatsApp Web chats.
 
-- **[zai](/plugins/reference/zai)** (`@openclaw/zai-provider`) - npm; ClawHub: `clawhub:@openclaw/zai-provider`. Adds Z.AI model provider support to OpenClaw.
+- **[zai](/plugins/reference/zai)** (`@steelengine/zai-provider`) - npm; ClawHub: `clawhub:@steelengine/zai-provider`. Adds Z.AI model provider support to SteelEngine.
 
-- **[zalo](/plugins/reference/zalo)** (`@openclaw/zalo`) - npm; ClawHub. OpenClaw Zalo channel plugin for bot and webhook chats.
+- **[zalo](/plugins/reference/zalo)** (`@steelengine/zalo`) - npm; ClawHub. SteelEngine Zalo channel plugin for bot and webhook chats.
 
-- **[zalouser](/plugins/reference/zalouser)** (`@openclaw/zalouser`) - npm; ClawHub. OpenClaw Zalo Personal Account plugin via native zca-js integration.
+- **[zalouser](/plugins/reference/zalouser)** (`@steelengine/zalouser`) - npm; ClawHub. SteelEngine Zalo Personal Account plugin via native zca-js integration.
 
 ## Source checkout only
 
 2 plugins
 
-- **[qa-channel](/plugins/reference/qa-channel)** (`@openclaw/qa-channel`) - source checkout only. Adds the QA Channel surface for sending and receiving OpenClaw messages.
+- **[qa-channel](/plugins/reference/qa-channel)** (`@steelengine/qa-channel`) - source checkout only. Adds the QA Channel surface for sending and receiving SteelEngine messages.
 
-- **[qa-lab](/plugins/reference/qa-lab)** (`@openclaw/qa-lab`) - source checkout only. OpenClaw QA lab plugin with private debugger UI and scenario runner.
+- **[qa-lab](/plugins/reference/qa-lab)** (`@steelengine/qa-lab`) - source checkout only. SteelEngine QA lab plugin with private debugger UI and scenario runner.

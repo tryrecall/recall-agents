@@ -6,7 +6,7 @@ import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
 import { gunzipSync, gzipSync } from "node:zlib";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import type { SessionEntry } from "../config/sessions/types.js";
 import { requireNodeSqlite } from "../infra/node-sqlite.js";
 import { readChannelPairingStateSnapshot } from "../pairing/pairing-store-sqlite.test-helpers.js";
@@ -24,10 +24,10 @@ import {
 } from "../plugins/installed-plugin-index-store.js";
 import type { InstalledPluginInstallRecordInfo } from "../plugins/installed-plugin-index.js";
 import {
-  closeOpenClawStateDatabaseForTest,
-  openOpenClawStateDatabase,
-  OPENCLAW_STATE_SCHEMA_VERSION,
-} from "../state/openclaw-state-db.js";
+  closeSteelEngineStateDatabaseForTest,
+  openSteelEngineStateDatabase,
+  STEELENGINE_STATE_SCHEMA_VERSION,
+} from "../state/steelengine-state-db.js";
 import { loadTaskFlowRegistryStateFromSqlite } from "../tasks/task-flow-registry.store.sqlite.js";
 import { loadTaskRegistryStateFromSqlite } from "../tasks/task-registry.store.sqlite.js";
 import {
@@ -139,14 +139,14 @@ vi.mock("../plugins/doctor-contract-registry.js", () => ({
 }));
 
 async function makeTempRoot() {
-  const root = await fs.promises.mkdtemp(path.join(os.tmpdir(), "openclaw-doctor-"));
+  const root = await fs.promises.mkdtemp(path.join(os.tmpdir(), "steelengine-doctor-"));
   tempRoots.push(root);
   return root;
 }
 
 async function makeRootWithEmptyCfg() {
   const root = await makeTempRoot();
-  const cfg: OpenClawConfig = {};
+  const cfg: SteelEngineConfig = {};
   return { root, cfg };
 }
 
@@ -165,10 +165,10 @@ function writeLegacyTelegramAllowFromStore(oauthDir: string) {
   );
 }
 
-async function runTelegramAllowFromMigration(params: { root: string; cfg: OpenClawConfig }) {
+async function runTelegramAllowFromMigration(params: { root: string; cfg: SteelEngineConfig }) {
   const oauthDir = ensureCredentialsDir(params.root);
   writeLegacyTelegramAllowFromStore(oauthDir);
-  const env = { OPENCLAW_STATE_DIR: params.root } as NodeJS.ProcessEnv;
+  const env = { STEELENGINE_STATE_DIR: params.root } as NodeJS.ProcessEnv;
   const detected = await detectLegacyStateMigrations({
     cfg: params.cfg,
     env,
@@ -186,7 +186,7 @@ afterEach(async () => {
   resetAutoMigrateLegacyStateForTest();
   resetAutoMigrateLegacyStateDirForTest();
   resetAutoMigrateLegacyTaskStateSidecarsForTest();
-  closeOpenClawStateDatabaseForTest();
+  closeSteelEngineStateDatabaseForTest();
   setMaxPluginStateEntriesPerPluginForTests();
   resetPluginStateStoreForTests();
   mockedChannelMigrationPlans.plans = [];
@@ -213,7 +213,7 @@ function readPrimaryKeyColumns(db: DatabaseSync, tableName: string): string[] {
 }
 
 function createLegacyAgentDatabaseRegistry(stateDir: string): string {
-  const stateDatabasePath = path.join(stateDir, "state", "openclaw.sqlite");
+  const stateDatabasePath = path.join(stateDir, "state", "steelengine.sqlite");
   fs.mkdirSync(path.dirname(stateDatabasePath), { recursive: true });
   const { DatabaseSync } = requireNodeSqlite();
   const db = new DatabaseSync(stateDatabasePath);
@@ -234,7 +234,7 @@ function createLegacyAgentDatabaseRegistry(stateDir: string): string {
         size_bytes
       ) VALUES (
         'worker-1',
-        '/legacy/worker-1/openclaw-agent.sqlite',
+        '/legacy/worker-1/steelengine-agent.sqlite',
         1,
         10,
         20
@@ -352,8 +352,8 @@ function writeLegacyDebugProxyCaptureSidecar(
       100,
       200,
       "proxy-run",
-      "openclaw",
-      "openclaw",
+      "steelengine",
+      "steelengine",
       "http://127.0.0.1:8080",
       sourcePath,
       blobDir,
@@ -367,8 +367,8 @@ function writeLegacyDebugProxyCaptureSidecar(
     ).run(
       "legacy-session",
       150,
-      "openclaw",
-      "openclaw",
+      "steelengine",
+      "steelengine",
       "https",
       "outbound",
       "request",
@@ -425,7 +425,7 @@ function writeLegacyPluginInstallIndex(
 async function runLegacyStateMigrationsForRoot(root: string) {
   const detected = await detectLegacyStateMigrations({
     cfg: {},
-    env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+    env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
   });
   return await runLegacyStateMigrations({ detected });
 }
@@ -647,26 +647,26 @@ function appendLegacyTaskWithObsoleteDeliveryStatus(taskRunsPath: string): void 
 
 async function detectAndRunMigrations(params: {
   root: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   now?: () => number;
 }) {
   const detected = await detectLegacyStateMigrations({
     cfg: params.cfg,
-    env: { OPENCLAW_STATE_DIR: params.root } as NodeJS.ProcessEnv,
+    env: { STEELENGINE_STATE_DIR: params.root } as NodeJS.ProcessEnv,
   });
   await runLegacyStateMigrations({ detected, now: params.now });
 }
 
 async function withStateDir<T>(root: string, run: () => Promise<T>): Promise<T> {
-  const previous = process.env.OPENCLAW_STATE_DIR;
-  process.env.OPENCLAW_STATE_DIR = root;
+  const previous = process.env.STEELENGINE_STATE_DIR;
+  process.env.STEELENGINE_STATE_DIR = root;
   try {
     return await run();
   } finally {
     if (previous === undefined) {
-      delete process.env.OPENCLAW_STATE_DIR;
+      delete process.env.STEELENGINE_STATE_DIR;
     } else {
-      process.env.OPENCLAW_STATE_DIR = previous;
+      process.env.STEELENGINE_STATE_DIR = previous;
     }
   }
 }
@@ -680,7 +680,7 @@ function readSessionsStore(targetDir: string) {
 
 async function runAndReadSessionsStore(params: {
   root: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   targetDir: string;
   now?: () => number;
 }) {
@@ -698,7 +698,7 @@ const DIR_LINK_TYPE = process.platform === "win32" ? "junction" : "dir";
 
 function getStateDirMigrationPaths(root: string) {
   return {
-    targetDir: path.join(root, ".openclaw"),
+    targetDir: path.join(root, ".steelengine"),
     legacyDir: path.join(root, ".clawdbot"),
   };
 }
@@ -724,13 +724,13 @@ async function runFreshStateDirMigration(root: string, env = {} as NodeJS.Proces
 
 async function runAutoMigrateLegacyStateWithLog(params: {
   root: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   now?: () => number;
 }) {
   const log = { info: vi.fn(), warn: vi.fn() };
   const result = await autoMigrateLegacyState({
     cfg: params.cfg,
-    env: { OPENCLAW_STATE_DIR: params.root } as NodeJS.ProcessEnv,
+    env: { STEELENGINE_STATE_DIR: params.root } as NodeJS.ProcessEnv,
     log,
     now: params.now,
   });
@@ -774,7 +774,7 @@ describe("doctor legacy state migrations", () => {
 
   beforeAll(async () => {
     const root = await makeTempRoot();
-    const cfg: OpenClawConfig = {};
+    const cfg: SteelEngineConfig = {};
     const legacySessionsDir = writeLegacySessionsFixture({
       root,
       sessions: {
@@ -796,7 +796,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({
       detected,
@@ -849,7 +849,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     expect(detected.preview).toContain(
       `- Sessions: repair migrated transcript paths in ${path.join(targetDir, "sessions.json")}`,
@@ -889,7 +889,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     expect(detected.sessions.hasLegacy).toBe(false);
     expect(detected.preview).not.toContain(
@@ -906,7 +906,7 @@ describe("doctor legacy state migrations", () => {
     await expect(
       detectLegacyStateMigrations({
         cfg: {},
-        env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+        env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
       }),
     ).resolves.toBeDefined();
   });
@@ -927,14 +927,14 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     expect(detected.sessions.hasLegacy).toBe(true);
   });
 
   it("migrates the legacy shared state agent registry primary key", async () => {
     const root = await makeTempRoot();
-    const stateDir = path.join(root, ".openclaw");
+    const stateDir = path.join(root, ".steelengine");
     const stateDatabasePath = createLegacyAgentDatabaseRegistry(stateDir);
     const detected = await detectLegacyStateMigrations({
       cfg: {},
@@ -966,7 +966,7 @@ describe("doctor legacy state migrations", () => {
             size_bytes
           ) VALUES (
             'worker-1',
-            '/relocated/worker-1/openclaw-agent.sqlite',
+            '/relocated/worker-1/steelengine-agent.sqlite',
             1,
             20,
             30
@@ -983,11 +983,11 @@ describe("doctor legacy state migrations", () => {
 
   it("does not repair newer shared state schemas", async () => {
     const root = await makeTempRoot();
-    const stateDir = path.join(root, ".openclaw");
+    const stateDir = path.join(root, ".steelengine");
     const stateDatabasePath = createLegacyAgentDatabaseRegistry(stateDir);
     const { DatabaseSync } = requireNodeSqlite();
     const seededDb = new DatabaseSync(stateDatabasePath);
-    seededDb.exec(`PRAGMA user_version = ${OPENCLAW_STATE_SCHEMA_VERSION + 1};`);
+    seededDb.exec(`PRAGMA user_version = ${STEELENGINE_STATE_SCHEMA_VERSION + 1};`);
     seededDb.close();
 
     const detected = await detectLegacyStateMigrations({
@@ -999,7 +999,7 @@ describe("doctor legacy state migrations", () => {
     expect(result.changes).toStrictEqual([]);
     expect(result.warnings).toHaveLength(1);
     expect(result.warnings[0]).toContain(
-      `uses newer schema version ${OPENCLAW_STATE_SCHEMA_VERSION + 1}`,
+      `uses newer schema version ${STEELENGINE_STATE_SCHEMA_VERSION + 1}`,
     );
 
     const db = new DatabaseSync(stateDatabasePath);
@@ -1012,7 +1012,7 @@ describe("doctor legacy state migrations", () => {
 
   it("migrates legacy ACP metadata from sessions.json into shared SQLite", async () => {
     const root = await makeTempRoot();
-    const cfg: OpenClawConfig = {};
+    const cfg: SteelEngineConfig = {};
     const legacySessionKey = "acp:binding:discord:default:feedface";
     const sessionKey = "agent:main:acp:binding:discord:default:feedface";
     writeLegacySessionsFixture({
@@ -1035,7 +1035,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({
       detected,
@@ -1050,7 +1050,7 @@ describe("doctor legacy state migrations", () => {
     expect(store[legacySessionKey]?.acp).toBeUndefined();
 
     const sqlite = requireNodeSqlite();
-    const db = new sqlite.DatabaseSync(path.join(root, "state", "openclaw.sqlite"));
+    const db = new sqlite.DatabaseSync(path.join(root, "state", "steelengine.sqlite"));
     try {
       const row = db
         .prepare(
@@ -1089,7 +1089,7 @@ describe("doctor legacy state migrations", () => {
     const legacySessionKey = "acp:binding:discord:default:feedface";
     const sessionKey = "agent:ops:acp:binding:discord:default:feedface";
     const storePath = path.join(customRoot, "agents", "ops", "sessions", "sessions.json");
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       session: {
         store: path.join(customRoot, "agents", "{agentId}", "sessions", "sessions.json"),
       },
@@ -1111,7 +1111,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({
       detected,
@@ -1125,7 +1125,7 @@ describe("doctor legacy state migrations", () => {
     expect(store[legacySessionKey]?.acp).toBeUndefined();
 
     const sqlite = requireNodeSqlite();
-    const db = new sqlite.DatabaseSync(path.join(root, "state", "openclaw.sqlite"));
+    const db = new sqlite.DatabaseSync(path.join(root, "state", "steelengine.sqlite"));
     try {
       const row = db
         .prepare(
@@ -1179,7 +1179,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -1197,7 +1197,7 @@ describe("doctor legacy state migrations", () => {
     const customRoot = await makeTempRoot();
     const outsideRoot = await makeTempRoot();
     const sessionKey = "agent:main:acp:binding:discord:default:feedface";
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       session: {
         store: path.join(customRoot, "agents", "{agentId}", "sessions", "sessions.json"),
       },
@@ -1223,7 +1223,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected, config: cfg });
 
@@ -1238,7 +1238,7 @@ describe("doctor legacy state migrations", () => {
 
   it("keeps shipped WhatsApp legacy group keys channel-qualified during migration", async () => {
     const root = await makeTempRoot();
-    const cfg: OpenClawConfig = {};
+    const cfg: SteelEngineConfig = {};
     const targetDir = path.join(root, "agents", "main", "sessions");
 
     writeLegacySessionsFixture({
@@ -1335,7 +1335,7 @@ describe("doctor legacy state migrations", () => {
 
   it("uses the channel-resolved default account for unscoped pairing allowFrom", async () => {
     const root = await makeTempRoot();
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       channels: {
         whatsapp: {
           accounts: {
@@ -1348,7 +1348,7 @@ describe("doctor legacy state migrations", () => {
     const oauthDir = ensureCredentialsDir(root);
     const sourcePath = path.join(oauthDir, "whatsapp-allowFrom.json");
     fs.writeFileSync(sourcePath, '["123456"]\n', "utf8");
-    const env = { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv;
+    const env = { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv;
 
     const detected = await detectLegacyStateMigrations({ cfg, env });
     const result = await runLegacyStateMigrations({ detected, config: cfg, env, now: () => 123 });
@@ -1373,7 +1373,7 @@ describe("doctor legacy state migrations", () => {
 
   it("does not fan out legacy Telegram pairing allowFrom store to configured named accounts", async () => {
     const root = await makeTempRoot();
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       channels: {
         telegram: {
           defaultAccount: "bot2",
@@ -1395,7 +1395,7 @@ describe("doctor legacy state migrations", () => {
 
   it("migrates legacy Telegram pairing allowFrom store to the default agent bound account", async () => {
     const root = await makeTempRoot();
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         list: [{ id: "ops", default: true }],
       },
@@ -1421,10 +1421,10 @@ describe("doctor legacy state migrations", () => {
 
   it("no-ops when nothing detected", async () => {
     const root = await makeTempRoot();
-    const cfg: OpenClawConfig = {};
+    const cfg: SteelEngineConfig = {};
     const detected = await detectLegacyStateMigrations({
       cfg,
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
     expect(result.changes).toStrictEqual([]);
@@ -1479,7 +1479,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -1561,7 +1561,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -1598,7 +1598,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -1642,7 +1642,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -1689,7 +1689,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -1728,7 +1728,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -1773,7 +1773,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -1830,7 +1830,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
     expect(result.changes).toStrictEqual(["Migrated 1 Test recency cache entry → plugin state"]);
@@ -1885,7 +1885,7 @@ describe("doctor legacy state migrations", () => {
 
     const firstDetected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const firstResult = await runLegacyStateMigrations({ detected: firstDetected });
     expect(firstResult.changes).toContain("Migrated 1 Test deferred cache entry → plugin state");
@@ -1902,7 +1902,7 @@ describe("doctor legacy state migrations", () => {
 
     const secondDetected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const secondResult = await runLegacyStateMigrations({ detected: secondDetected });
 
@@ -1954,7 +1954,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -2005,7 +2005,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -2055,7 +2055,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -2121,7 +2121,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -2155,7 +2155,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     expect(detected.pluginStateSidecar).toEqual({ sourcePath, hasLegacy: true });
     expect(detected.preview).toContain(
@@ -2190,7 +2190,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     expect(detected.debugProxyCaptureSidecar).toEqual({
       sourcePath,
@@ -2213,8 +2213,8 @@ describe("doctor legacy state migrations", () => {
     expect(fs.existsSync(`${blobDir}.migrated`)).toBe(true);
     expect(fs.readFileSync(path.join(certDir, "ca.pem"), "utf8")).toBe("keep");
 
-    const state = openOpenClawStateDatabase({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+    const state = openSteelEngineStateDatabase({
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     expect(
       state.db.prepare("SELECT id, mode FROM capture_sessions WHERE id = ?").get("legacy-session"),
@@ -2245,9 +2245,9 @@ describe("doctor legacy state migrations", () => {
       legacyDb.close();
     }
     const env = {
-      OPENCLAW_STATE_DIR: root,
-      OPENCLAW_DEBUG_PROXY_DB_PATH: sourcePath,
-      OPENCLAW_DEBUG_PROXY_BLOB_DIR: blobDir,
+      STEELENGINE_STATE_DIR: root,
+      STEELENGINE_DEBUG_PROXY_DB_PATH: sourcePath,
+      STEELENGINE_DEBUG_PROXY_BLOB_DIR: blobDir,
     } as NodeJS.ProcessEnv;
 
     const detected = await detectLegacyStateMigrations({ cfg: {}, env });
@@ -2275,8 +2275,8 @@ describe("doctor legacy state migrations", () => {
     ]);
     expect(fs.existsSync(`${sourcePath}.migrated`)).toBe(true);
     expect(fs.existsSync(blobDir)).toBe(true);
-    const state = openOpenClawStateDatabase({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+    const state = openSteelEngineStateDatabase({
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     expect(
       state.db.prepare("SELECT blob_id FROM capture_blobs WHERE blob_id = ?").get(blobId),
@@ -2288,9 +2288,9 @@ describe("doctor legacy state migrations", () => {
 
   it("ignores a legacy debug proxy override that points at shared state", async () => {
     const root = await makeTempRoot();
-    const sharedStatePath = path.join(root, "state", "openclaw.sqlite");
-    const state = openOpenClawStateDatabase({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+    const sharedStatePath = path.join(root, "state", "steelengine.sqlite");
+    const state = openSteelEngineStateDatabase({
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     state.db
       .prepare(
@@ -2298,12 +2298,12 @@ describe("doctor legacy state migrations", () => {
           id, started_at, mode, source_scope, source_process
         ) VALUES (?, ?, ?, ?, ?)`,
       )
-      .run("shared-session", 100, "proxy-run", "openclaw", "openclaw");
+      .run("shared-session", 100, "proxy-run", "steelengine", "steelengine");
     const detected = await detectLegacyStateMigrations({
       cfg: {},
       env: {
-        OPENCLAW_STATE_DIR: root,
-        OPENCLAW_DEBUG_PROXY_DB_PATH: sharedStatePath,
+        STEELENGINE_STATE_DIR: root,
+        STEELENGINE_DEBUG_PROXY_DB_PATH: sharedStatePath,
       } as NodeJS.ProcessEnv,
     });
 
@@ -2360,8 +2360,8 @@ describe("doctor legacy state migrations", () => {
     const retryResult = await runLegacyStateMigrationsForRoot(root);
 
     expect(retryResult.warnings).toStrictEqual([]);
-    const state = openOpenClawStateDatabase({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+    const state = openSteelEngineStateDatabase({
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     expect(state.db.prepare("SELECT COUNT(*) AS count FROM capture_events").get()).toEqual({
       count: 2,
@@ -2371,8 +2371,8 @@ describe("doctor legacy state migrations", () => {
   it("leaves debug proxy sources in place when a session id conflicts", async () => {
     const root = await makeTempRoot();
     const { sourcePath, blobDir } = writeLegacyDebugProxyCaptureSidecar(root);
-    const state = openOpenClawStateDatabase({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+    const state = openSteelEngineStateDatabase({
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     state.db
       .prepare(
@@ -2380,7 +2380,7 @@ describe("doctor legacy state migrations", () => {
           id, started_at, mode, source_scope, source_process
         ) VALUES (?, ?, ?, ?, ?)`,
       )
-      .run("legacy-session", 999, "different", "openclaw", "openclaw");
+      .run("legacy-session", 999, "different", "steelengine", "steelengine");
 
     const result = await runLegacyStateMigrationsForRoot(root);
 
@@ -2414,7 +2414,7 @@ describe("doctor legacy state migrations", () => {
 
     const retryDetected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     expect(retryDetected.debugProxyCaptureSidecar.hasLegacy).toBe(true);
     const retryResult = await runLegacyStateMigrations({ detected: retryDetected });
@@ -2423,8 +2423,8 @@ describe("doctor legacy state migrations", () => {
     expect(retryResult.changes).toStrictEqual([
       `Archived debug proxy capture blobs → ${blobDir}.migrated`,
     ]);
-    const state = openOpenClawStateDatabase({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+    const state = openSteelEngineStateDatabase({
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     expect(state.db.prepare("SELECT COUNT(*) AS count FROM capture_events").get()).toEqual({
       count: 1,
@@ -2480,7 +2480,7 @@ describe("doctor legacy state migrations", () => {
 
     const retryDetected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     expect(retryDetected.pluginStateSidecar).toEqual({ sourcePath, hasLegacy: true });
     expect(retryDetected.preview).toContain(
@@ -2526,7 +2526,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     expect(detected.pluginInstallIndex).toEqual({ sourcePath, hasLegacy: true });
     expect(detected.preview).toContain(
@@ -2569,7 +2569,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -2602,7 +2602,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -2689,8 +2689,8 @@ describe("doctor legacy state migrations", () => {
     await writeExistingPluginInstallIndex(root, {
       discord: {
         source: "npm",
-        spec: "@openclaw/discord@latest",
-        resolvedName: "@openclaw/discord",
+        spec: "@steelengine/discord@latest",
+        resolvedName: "@steelengine/discord",
         resolvedVersion: "2026.6.16",
         integrity: "sha512-current",
         installedAt: "2026-06-16T12:00:00.000Z",
@@ -2699,7 +2699,7 @@ describe("doctor legacy state migrations", () => {
     const sourcePath = writeLegacyPluginInstallIndex(root, {
       discord: {
         source: "npm",
-        spec: "@openclaw/discord@2026.6.16",
+        spec: "@steelengine/discord@2026.6.16",
         version: "2026.6.16",
         installedAt: "2026-06-01T12:00:00.000Z",
       },
@@ -2714,8 +2714,8 @@ describe("doctor legacy state migrations", () => {
       installRecords: {
         discord: {
           source: "npm",
-          spec: "@openclaw/discord@latest",
-          resolvedName: "@openclaw/discord",
+          spec: "@steelengine/discord@latest",
+          resolvedName: "@steelengine/discord",
           resolvedVersion: "2026.6.16",
           integrity: "sha512-current",
         },
@@ -2761,8 +2761,8 @@ describe("doctor legacy state migrations", () => {
 
   it("converges the reported plugin, update-check, and config-health conflicts", async () => {
     const root = await makeTempRoot();
-    const env = { ...process.env, OPENCLAW_STATE_DIR: root };
-    const configPath = path.join(root, "openclaw.json");
+    const env = { ...process.env, STEELENGINE_STATE_DIR: root };
+    const configPath = path.join(root, "steelengine.json");
     const pluginSourcePath = writeLegacyPluginInstallIndex(root, {
       demo: {
         source: "npm",
@@ -2801,7 +2801,7 @@ describe("doctor legacy state migrations", () => {
       }),
       "utf8",
     );
-    const { db } = openOpenClawStateDatabase({ env });
+    const { db } = openSteelEngineStateDatabase({ env });
     db.prepare(
       `INSERT INTO update_check_state (
         state_key, last_checked_at, last_available_version, updated_at_ms
@@ -2902,11 +2902,11 @@ describe("doctor legacy state migrations", () => {
       label: "name different packages",
       current: {
         source: "npm",
-        spec: "@openclaw/demo@1.0.0",
+        spec: "@steelengine/demo@1.0.0",
         version: "1.0.0",
-        resolvedName: "@openclaw/demo",
+        resolvedName: "@steelengine/demo",
         resolvedVersion: "1.0.0",
-        resolvedSpec: "@openclaw/demo@1.0.0",
+        resolvedSpec: "@steelengine/demo@1.0.0",
       },
       legacy: {
         source: "npm",
@@ -3022,7 +3022,7 @@ describe("doctor legacy state migrations", () => {
 
     const result = await autoMigrateLegacyState({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
       log: { info: vi.fn(), warn: vi.fn() },
     });
 
@@ -3047,8 +3047,8 @@ describe("doctor legacy state migrations", () => {
     const result = await autoMigrateLegacyState({
       cfg: {},
       env: {
-        OPENCLAW_STATE_DIR: root,
-        OPENCLAW_AGENT_DIR: path.join(root, "custom-agent"),
+        STEELENGINE_STATE_DIR: root,
+        STEELENGINE_AGENT_DIR: path.join(root, "custom-agent"),
       } as NodeJS.ProcessEnv,
       log: { info: vi.fn(), warn: vi.fn() },
     });
@@ -3072,7 +3072,7 @@ describe("doctor legacy state migrations", () => {
     // Even direct doctor repair must not copy or archive default approvals.
     const root = await makeTempRoot();
     const stateDir = path.join(root, "custom-state");
-    const sourcePath = path.join(root, ".openclaw", "exec-approvals.json");
+    const sourcePath = path.join(root, ".steelengine", "exec-approvals.json");
     const targetPath = path.join(stateDir, "exec-approvals.json");
     writeJson5(sourcePath, {
       version: 1,
@@ -3088,7 +3088,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: stateDir } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: stateDir } as NodeJS.ProcessEnv,
       homedir: () => root,
     });
     expect(detected.preview.some((entry) => entry.includes("Exec approvals"))).toBe(false);
@@ -3105,7 +3105,7 @@ describe("doctor legacy state migrations", () => {
   it("keeps default exec approvals in place during automatic state migration", async () => {
     const root = await makeTempRoot();
     const stateDir = path.join(root, "custom-state");
-    const sourcePath = path.join(root, ".openclaw", "exec-approvals.json");
+    const sourcePath = path.join(root, ".steelengine", "exec-approvals.json");
     const targetPath = path.join(stateDir, "exec-approvals.json");
     writeJson5(sourcePath, {
       version: 1,
@@ -3120,7 +3120,7 @@ describe("doctor legacy state migrations", () => {
 
     const result = await autoMigrateLegacyState({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: stateDir } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: stateDir } as NodeJS.ProcessEnv,
       homedir: () => root,
       log: { info: vi.fn(), warn: vi.fn() },
     });
@@ -3146,7 +3146,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -3214,7 +3214,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -3291,7 +3291,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -3343,7 +3343,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -3397,7 +3397,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -3427,7 +3427,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -3454,7 +3454,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -3477,7 +3477,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
 
     expect(detected.taskStateSidecars).toEqual({
@@ -3539,7 +3539,7 @@ describe("doctor legacy state migrations", () => {
     fs.writeFileSync(flowJournalPath, "");
 
     const result = await autoMigrateLegacyTaskStateSidecars({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
 
     expect(result.warnings).toStrictEqual([]);
@@ -3563,7 +3563,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
 
     expect(detected.taskStateSidecars.hasLegacy).toBe(true);
@@ -3590,7 +3590,7 @@ describe("doctor legacy state migrations", () => {
     const firstResult = await (async () => {
       try {
         return await autoMigrateLegacyTaskStateSidecars({
-          env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+          env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
         });
       } finally {
         rename.mockRestore();
@@ -3610,7 +3610,7 @@ describe("doctor legacy state migrations", () => {
 
     resetAutoMigrateLegacyTaskStateSidecarsForTest();
     const retryResult = await autoMigrateLegacyTaskStateSidecars({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
 
     expect(retryResult.warnings).toStrictEqual([]);
@@ -3645,7 +3645,7 @@ describe("doctor legacy state migrations", () => {
     }
 
     const result = await autoMigrateLegacyTaskStateSidecars({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
 
     expect(result.changes).toContain("Migrated 1 task registry sidecar row → shared SQLite state");
@@ -3668,7 +3668,7 @@ describe("doctor legacy state migrations", () => {
     const { taskRunsPath, flowRunsPath } = writeLegacyTaskStateSidecars(root);
 
     const result = await autoMigrateLegacyTaskStateSidecars({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
 
     expect(result.warnings).toStrictEqual([]);
@@ -3689,7 +3689,7 @@ describe("doctor legacy state migrations", () => {
     appendLegacyTaskWithObsoleteDeliveryStatus(taskRunsPath);
 
     const result = await autoMigrateLegacyTaskStateSidecars({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
 
     expect(result.warnings).toStrictEqual([]);
@@ -3697,8 +3697,8 @@ describe("doctor legacy state migrations", () => {
     expect(fs.existsSync(taskRunsPath)).toBe(false);
     expect(fs.existsSync(`${taskRunsPath}.migrated`)).toBe(true);
 
-    const shared = openOpenClawStateDatabase({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+    const shared = openSteelEngineStateDatabase({
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     expect(
       shared.db
@@ -3719,7 +3719,7 @@ describe("doctor legacy state migrations", () => {
     appendLegacyCrossAgentTask(taskRunsPath);
 
     const result = await autoMigrateLegacyTaskStateSidecars({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
 
     expect(result.warnings).toStrictEqual([]);
@@ -3743,9 +3743,9 @@ describe("doctor legacy state migrations", () => {
 
     await withStateDir(root, async () => {
       loadTaskRegistryStateFromSqlite();
-      closeOpenClawStateDatabaseForTest();
+      closeSteelEngineStateDatabaseForTest();
       const sqlite = requireNodeSqlite();
-      const db = new sqlite.DatabaseSync(path.join(root, "state", "openclaw.sqlite"));
+      const db = new sqlite.DatabaseSync(path.join(root, "state", "steelengine.sqlite"));
       try {
         db.prepare(
           `INSERT INTO task_runs (
@@ -3788,7 +3788,7 @@ describe("doctor legacy state migrations", () => {
     });
 
     const result = await autoMigrateLegacyTaskStateSidecars({
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
 
     expect(result.warnings).toContain(
@@ -3803,7 +3803,7 @@ describe("doctor legacy state migrations", () => {
 
     await withStateDir(root, async () => {
       const sqlite = requireNodeSqlite();
-      const sharedPath = path.join(root, "state", "openclaw.sqlite");
+      const sharedPath = path.join(root, "state", "steelengine.sqlite");
       fs.mkdirSync(path.dirname(sharedPath), { recursive: true });
       const db = new sqlite.DatabaseSync(sharedPath);
       try {
@@ -3861,7 +3861,7 @@ describe("doctor legacy state migrations", () => {
 
     const detected = await detectLegacyStateMigrations({
       cfg: {},
-      env: { OPENCLAW_STATE_DIR: root } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_STATE_DIR: root } as NodeJS.ProcessEnv,
     });
     const result = await runLegacyStateMigrations({ detected });
 
@@ -3876,7 +3876,7 @@ describe("doctor legacy state migrations", () => {
 
   it("routes legacy state to the default agent entry", async () => {
     const root = await makeTempRoot();
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: { list: [{ id: "alpha", default: true }] },
     };
     writeLegacySessionsFixture({
@@ -3898,7 +3898,7 @@ describe("doctor legacy state migrations", () => {
 
   it("honors session.mainKey when seeding the direct-chat bucket", async () => {
     const root = await makeTempRoot();
-    const cfg: OpenClawConfig = { session: { mainKey: "work" } };
+    const cfg: SteelEngineConfig = { session: { mainKey: "work" } };
     writeLegacySessionsFixture({
       root,
       sessions: {
@@ -3938,7 +3938,7 @@ describe("doctor legacy state migrations", () => {
 
   it("prefers the newest entry when collapsing main aliases", async () => {
     const root = await makeTempRoot();
-    const cfg: OpenClawConfig = { session: { mainKey: "work" } };
+    const cfg: SteelEngineConfig = { session: { mainKey: "work" } };
     const targetDir = path.join(root, "agents", "main", "sessions");
     writeJson5(path.join(targetDir, "sessions.json"), {
       "agent:main:main": { sessionId: "legacy", updatedAt: 50 },
@@ -3957,7 +3957,7 @@ describe("doctor legacy state migrations", () => {
 
   it("lowercases agent session keys during canonicalization", async () => {
     const root = await makeTempRoot();
-    const cfg: OpenClawConfig = {};
+    const cfg: SteelEngineConfig = {};
     const targetDir = path.join(root, "agents", "main", "sessions");
     writeJson5(path.join(targetDir, "sessions.json"), {
       "agent:main:slack:channel:C123": { sessionId: "legacy", updatedAt: 10 },
@@ -3975,7 +3975,7 @@ describe("doctor legacy state migrations", () => {
 
   it("preserves Matrix room and thread casing during canonicalization", async () => {
     const root = await makeTempRoot();
-    const cfg: OpenClawConfig = {};
+    const cfg: SteelEngineConfig = {};
     const targetDir = path.join(root, "agents", "main", "sessions");
     writeJson5(path.join(targetDir, "sessions.json"), {
       "agent:main:Matrix:Channel:!Mixed:Example.Org:Thread:$EventABC": {
@@ -3998,7 +3998,7 @@ describe("doctor legacy state migrations", () => {
 
   it("preserves unscoped legacy Matrix room casing when scoping to an agent", async () => {
     const root = await makeTempRoot();
-    const cfg: OpenClawConfig = {};
+    const cfg: SteelEngineConfig = {};
     const targetDir = path.join(root, "agents", "main", "sessions");
     writeJson5(path.join(targetDir, "sessions.json"), {
       "Matrix:Channel:!Mixed:Example.Org": { sessionId: "matrix", updatedAt: 10 },
@@ -4047,7 +4047,7 @@ describe("doctor legacy state migrations", () => {
     fs.mkdirSync(legacyDir, { recursive: true });
 
     const result = await runStateDirMigration(root, {
-      OPENCLAW_STATE_DIR: "/custom/state",
+      STEELENGINE_STATE_DIR: "/custom/state",
     } as NodeJS.ProcessEnv);
 
     expect(result.skipped).toBe(true);

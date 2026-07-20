@@ -1,15 +1,15 @@
 import {
   dispatchInboundDirectDm,
   recordChannelBotPairLoopAndCheckSuppression,
-} from "openclaw/plugin-sdk/channel-inbound";
-import { createChannelPairingController } from "openclaw/plugin-sdk/channel-pairing";
-import { PAIRING_APPROVED_MESSAGE } from "openclaw/plugin-sdk/channel-status";
+} from "steelengine/plugin-sdk/channel-inbound";
+import { createChannelPairingController } from "steelengine/plugin-sdk/channel-pairing";
+import { PAIRING_APPROVED_MESSAGE } from "steelengine/plugin-sdk/channel-status";
 import {
   buildChannelConfigSchema,
   buildChannelOutboundSessionRoute,
   type ChannelPlugin,
-} from "openclaw/plugin-sdk/core";
-import { createChannelDirectoryAdapter } from "openclaw/plugin-sdk/directory-runtime";
+} from "steelengine/plugin-sdk/core";
+import { createChannelDirectoryAdapter } from "steelengine/plugin-sdk/directory-runtime";
 import {
   ReefChannelConfigSchema,
   autonomyBudget,
@@ -195,7 +195,7 @@ export const reefPlugin: ChannelPlugin<ReefAccount> = {
       allowFrom: listTrustedPeers(account.config),
       policyPath: "Reef local peer trust",
       allowFromPath: "Reef local peer trust",
-      approveHint: "openclaw pairing approve reef <code>",
+      approveHint: "steelengine pairing approve reef <code>",
       normalizeEntry: (entry) => normalizeReefTarget(entry) ?? entry,
     }),
   },

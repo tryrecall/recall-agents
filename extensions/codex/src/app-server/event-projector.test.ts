@@ -2,25 +2,25 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import type { EmbeddedRunAttemptParams } from "openclaw/plugin-sdk/agent-harness";
+import type { EmbeddedRunAttemptParams } from "steelengine/plugin-sdk/agent-harness";
 import {
   embeddedAgentLog,
   formatToolAggregate,
   inferToolMetaFromArgs,
   resetAgentEventsForTest,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
-import { SessionManager } from "openclaw/plugin-sdk/agent-sessions";
+} from "steelengine/plugin-sdk/agent-harness-runtime";
+import { SessionManager } from "steelengine/plugin-sdk/agent-sessions";
 import {
   onInternalDiagnosticEvent,
   resetDiagnosticEventsForTest,
   type DiagnosticEventPayload,
-} from "openclaw/plugin-sdk/diagnostic-runtime";
+} from "steelengine/plugin-sdk/diagnostic-runtime";
 import {
   initializeGlobalHookRunner,
   resetGlobalHookRunner,
-} from "openclaw/plugin-sdk/hook-runtime";
-import { createMockPluginRegistry } from "openclaw/plugin-sdk/plugin-test-runtime";
-import { withTempDir } from "openclaw/plugin-sdk/test-env";
+} from "steelengine/plugin-sdk/hook-runtime";
+import { createMockPluginRegistry } from "steelengine/plugin-sdk/plugin-test-runtime";
+import { withTempDir } from "steelengine/plugin-sdk/test-env";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CodexAppServerEventProjector } from "./event-projector.js";
 import { createCodexTestModel, createCodexTestToolTerminalObserver } from "./test-support.js";
@@ -64,7 +64,7 @@ function assistantMessage(text: string, timestamp: number) {
 }
 
 async function createParams(): Promise<EmbeddedRunAttemptParams> {
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-codex-projector-"));
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-codex-projector-"));
   tempDirs.add(tempDir);
   const sessionFile = path.join(tempDir, "session.jsonl");
   SessionManager.open(sessionFile).appendMessage(assistantMessage("history", Date.now()));
@@ -678,7 +678,7 @@ describe("CodexAppServerEventProjector", () => {
 
     const result = projector.buildResult(buildEmptyToolTelemetry());
     const userMessage = requireRecord(result.messagesSnapshot[0], "user message");
-    expect(userMessage["__openclaw"]).toMatchObject({
+    expect(userMessage["__steelengine"]).toMatchObject({
       upstreamUserText: "decorated upstream prompt",
     });
   });
@@ -1108,9 +1108,9 @@ describe("CodexAppServerEventProjector", () => {
   });
 
   it("saves raw Codex image-generation results as reply media", async () => {
-    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-codex-media-state-"));
+    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-codex-media-state-"));
     tempDirs.add(stateDir);
-    vi.stubEnv("OPENCLAW_STATE_DIR", stateDir);
+    vi.stubEnv("STEELENGINE_STATE_DIR", stateDir);
     const projector = await createProjector();
 
     await projector.handleNotification(
@@ -1250,9 +1250,9 @@ describe("CodexAppServerEventProjector", () => {
   });
 
   it("dedupes raw and typed Codex image-generation media for the same item", async () => {
-    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-codex-media-state-"));
+    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-codex-media-state-"));
     tempDirs.add(stateDir);
-    vi.stubEnv("OPENCLAW_STATE_DIR", stateDir);
+    vi.stubEnv("STEELENGINE_STATE_DIR", stateDir);
     const projector = await createProjector();
     const savedPath = "/tmp/codex-home/generated_images/session-1/ig_123.png";
 
@@ -1286,8 +1286,8 @@ describe("CodexAppServerEventProjector", () => {
   });
 
   it("prefers gateway-managed image media when the typed event arrives first", async () => {
-    await withTempDir("openclaw-codex-media-state-", async (stateDir) => {
-      vi.stubEnv("OPENCLAW_STATE_DIR", stateDir);
+    await withTempDir("steelengine-codex-media-state-", async (stateDir) => {
+      vi.stubEnv("STEELENGINE_STATE_DIR", stateDir);
       const projector = await createProjector();
       const savedPath = "/home/dev-user/.codex/generated_images/session-1/ig_123.png";
 
@@ -1327,9 +1327,9 @@ describe("CodexAppServerEventProjector", () => {
   });
 
   it("preserves distinct raw image-generation items with identical image bytes", async () => {
-    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-codex-media-state-"));
+    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-codex-media-state-"));
     tempDirs.add(stateDir);
-    vi.stubEnv("OPENCLAW_STATE_DIR", stateDir);
+    vi.stubEnv("STEELENGINE_STATE_DIR", stateDir);
     const projector = await createProjector();
 
     for (const id of ["ig_raw_1", "ig_raw_2"]) {
@@ -1477,7 +1477,7 @@ describe("CodexAppServerEventProjector", () => {
       }
     ).text;
     expect(emittedProgressText).toHaveLength(10_000);
-    expect(emittedProgressText).toContain("OpenClaw truncated Codex native tool output");
+    expect(emittedProgressText).toContain("SteelEngine truncated Codex native tool output");
 
     await projector.handleNotification(
       forCurrentTurn("rawResponseItem/completed", {
@@ -3972,7 +3972,7 @@ describe("CodexAppServerEventProjector", () => {
         | undefined
     )?.output;
     expect(output).toHaveLength(10_000);
-    expect(output).toContain("OpenClaw truncated Codex native tool output");
+    expect(output).toContain("SteelEngine truncated Codex native tool output");
     expect(output).toContain("original 12345 chars");
     expect(output).toContain("showing 10000");
 
@@ -3986,7 +3986,7 @@ describe("CodexAppServerEventProjector", () => {
     );
     const toolResultContentItem = requireRecord(toolResultContent[0], "tool result content item");
     expect(toolResultContentItem.content).toHaveLength(10_000);
-    expect(toolResultContentItem.content).toContain("OpenClaw truncated Codex native tool output");
+    expect(toolResultContentItem.content).toContain("SteelEngine truncated Codex native tool output");
   });
 
   it("delivers completed assistant text when a native tool call finishes without a matching result", async () => {
@@ -4216,7 +4216,7 @@ describe("CodexAppServerEventProjector", () => {
     const content = requireArray(message.content, "tool result content");
     const item = requireRecord(content[0], "tool result content item");
     expect(item.content).toBe(
-      `${prefix}\n...(OpenClaw truncated Codex native tool output: original 10288 chars, showing 10000; rerun with narrower args.)`,
+      `${prefix}\n...(SteelEngine truncated Codex native tool output: original 10288 chars, showing 10000; rerun with narrower args.)`,
     );
     // A split surrogate would leave a lone code unit behind.
     expect(item.content).not.toMatch(/[\uD800-\uDFFF]/);
@@ -4265,7 +4265,7 @@ describe("CodexAppServerEventProjector", () => {
     // A split surrogate would leave a lone code unit behind; the streamed output
     // must stay well-formed while still carrying the truncation notice.
     expect(item.content).not.toMatch(/[\uD800-\uDFFF]/);
-    expect(item.content).toContain("OpenClaw truncated Codex native tool output");
+    expect(item.content).toContain("SteelEngine truncated Codex native tool output");
     expect(item.content).toContain("showing 10000");
   });
 
@@ -4387,7 +4387,7 @@ describe("CodexAppServerEventProjector", () => {
       trajectoryRecorder,
     });
     const userOutputWithNotice =
-      "...(OpenClaw truncated Codex native tool output is a literal line from the process)\n";
+      "...(SteelEngine truncated Codex native tool output is a literal line from the process)\n";
 
     await projector.handleNotification(
       forCurrentTurn("item/commandExecution/outputDelta", {
@@ -4443,7 +4443,7 @@ describe("CodexAppServerEventProjector", () => {
       trajectoryRecorder,
     });
     const userOutputWithNotice =
-      "before user marker\n...(OpenClaw truncated Codex native tool output: original literal process text)\nsecond line must survive\n";
+      "before user marker\n...(SteelEngine truncated Codex native tool output: original literal process text)\nsecond line must survive\n";
 
     await projector.handleNotification(
       forCurrentTurn("item/commandExecution/outputDelta", {
@@ -4481,7 +4481,7 @@ describe("CodexAppServerEventProjector", () => {
         | undefined
     )?.output;
     expect(output).toHaveLength(10_000);
-    expect(output).toContain("OpenClaw truncated Codex native tool output");
+    expect(output).toContain("SteelEngine truncated Codex native tool output");
     expect(output).toContain("original 12124 chars");
     expect(output).toContain("before user marker");
     expect(output).toContain("second line must survive");
@@ -4533,10 +4533,10 @@ describe("CodexAppServerEventProjector", () => {
         | undefined
     )?.output;
     expect(output).toHaveLength(10_000);
-    expect(output).toContain("OpenClaw truncated Codex native tool output");
+    expect(output).toContain("SteelEngine truncated Codex native tool output");
     expect(output).toContain("original 13023 chars");
     expect(output).toContain("showing 10000");
-    expect(output?.match(/OpenClaw truncated Codex native tool output/g)).toHaveLength(1);
+    expect(output?.match(/SteelEngine truncated Codex native tool output/g)).toHaveLength(1);
 
     const result = projector.buildResult(buildEmptyToolTelemetry());
     const toolResultMessage = result.messagesSnapshot.find(
@@ -4548,7 +4548,7 @@ describe("CodexAppServerEventProjector", () => {
     );
     const toolResultContentItem = requireRecord(toolResultContent[0], "tool result content item");
     expect(toolResultContentItem.content).toHaveLength(10_000);
-    expect(toolResultContentItem.content).toContain("OpenClaw truncated Codex native tool output");
+    expect(toolResultContentItem.content).toContain("SteelEngine truncated Codex native tool output");
   });
 
   it("uses streamed command output for failed native tool errors", async () => {
@@ -5400,7 +5400,7 @@ describe("CodexAppServerEventProjector", () => {
     });
   });
 
-  it("records dynamic OpenClaw tool calls in mirrored transcript snapshots", async () => {
+  it("records dynamic SteelEngine tool calls in mirrored transcript snapshots", async () => {
     const projector = await createProjector();
 
     projector.recordDynamicToolCall({
@@ -5624,11 +5624,11 @@ describe("CodexAppServerEventProjector", () => {
         arguments: { action: "send", text: "hello" },
         executionStarted: false,
         outcome: "failure",
-        failure: { error: "Unknown OpenClaw tool: message" },
+        failure: { error: "Unknown SteelEngine tool: message" },
       }),
       success: false,
       terminalType: "error",
-      contentItems: [{ type: "inputText", text: "Unknown OpenClaw tool: message" }],
+      contentItems: [{ type: "inputText", text: "Unknown SteelEngine tool: message" }],
     });
 
     const result = projector.buildResult(buildEmptyToolTelemetry());
@@ -6081,7 +6081,7 @@ describe("CodexAppServerEventProjector", () => {
       tool: "bash",
       arguments: {
         command:
-          '/bin/bash -lc \'/home/openclaw/.openclaw/workspace/bin/log_activity.sh "web_search" "Grilled salmon research"\'',
+          '/bin/bash -lc \'/home/steelengine/.steelengine/workspace/bin/log_activity.sh "web_search" "Grilled salmon research"\'',
         cwd: "/workspace",
       },
     });

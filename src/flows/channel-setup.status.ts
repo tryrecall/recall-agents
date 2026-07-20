@@ -19,7 +19,7 @@ import { shouldShowChannelInSetup } from "../commands/channel-setup/discovery.js
 import { resolveChannelSetupWizardAdapterForPlugin } from "../commands/channel-setup/registry.js";
 import type { ChannelChoice } from "../commands/onboard-types.js";
 import { isChannelConfigured } from "../config/channel-configured.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   findBundledPluginSourceInMap,
   resolveBundledPluginSources,
@@ -337,7 +337,7 @@ export function findBundledSourceForCatalogChannel(params: {
 }
 
 export async function collectChannelStatus(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   options?: SetupChannelsOptions;
   accountOverrides: Partial<Record<ChannelChoice, string>>;
   installedPlugins?: ChannelSetupPlugin[];
@@ -445,7 +445,7 @@ export async function collectChannelStatus(params: {
 }
 
 export async function noteChannelStatus(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   prompter: WizardPrompter;
   options?: SetupChannelsOptions;
   accountOverrides?: Partial<Record<ChannelChoice, string>>;
@@ -483,11 +483,11 @@ export async function noteChannelPrimer(
     [
       t("wizard.channelsPrimer.inboundSafety"),
       t("wizard.channelsPrimer.approveWith", {
-        command: formatCliCommand("openclaw pairing approve <channel> <code>"),
+        command: formatCliCommand("steelengine pairing approve <channel> <code>"),
       }),
       t("wizard.channelsPrimer.openDm"),
       t("wizard.channelsPrimer.multiUserDm", {
-        command: formatCliCommand('openclaw config set session.dmScope "per-channel-peer"'),
+        command: formatCliCommand('steelengine config set session.dmScope "per-channel-peer"'),
       }),
       t("wizard.channelsPrimer.docs", {
         link: formatDocsLink("/channels/pairing", "channels/pairing"),
@@ -515,7 +515,7 @@ export function resolveQuickstartDefault(
 }
 
 export function resolveChannelSelectionNoteLines(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   installedPlugins: ChannelSetupPlugin[];
   selection: ChannelChoice[];
 }): string[] {

@@ -84,7 +84,7 @@ function createTestRuntime(params: {
         state: "active",
         createdAt,
         updatedAt: createdAt,
-        participantIdentity: "OpenClaw",
+        participantIdentity: "SteelEngine",
         realtime: { enabled: false, toolPolicy: "none" },
         notes: [],
       };

@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import {
   ErrorCodes,
   type ErrorShape,
@@ -36,7 +36,7 @@ import {
   resolveSupportedThinkingLevel,
 } from "../auto-reply/thinking.js";
 import type { SessionEntry } from "../config/sessions.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { normalizeExecTarget } from "../infra/exec-approvals.js";
 import {
   isAcpSessionKey,
@@ -114,7 +114,7 @@ type SessionPatchProjectionEntry = {
 
 /** Project a validated gateway session patch for one session entry. */
 export async function projectSessionsPatchEntry(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   entries: readonly SessionPatchProjectionEntry[];
   existingEntry?: SessionEntry;
   storeKey: string;
@@ -735,7 +735,7 @@ export async function projectSessionsPatchEntry(params: {
 
 /** Apply a validated gateway session patch to an in-memory session store entry. */
 export async function applySessionsPatchToStore(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   store: Record<string, SessionEntry>;
   storeKey: string;
   agentId?: string;

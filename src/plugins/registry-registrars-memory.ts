@@ -14,7 +14,7 @@ import {
 import type { PluginRegistryState } from "./registry-state.js";
 import type { PluginRecord } from "./registry-types.js";
 import { hasKind } from "./slots.js";
-import type { OpenClawPluginApi } from "./types.js";
+import type { SteelEnginePluginApi } from "./types.js";
 
 export function createMemoryRegistrars(state: PluginRegistryState) {
   const { registry, pushDiagnostic } = state;
@@ -37,7 +37,7 @@ export function createMemoryRegistrars(state: PluginRegistryState) {
 
   const registerMemoryCapability = (
     record: PluginRecord,
-    capability: Parameters<OpenClawPluginApi["registerMemoryCapability"]>[0],
+    capability: Parameters<SteelEnginePluginApi["registerMemoryCapability"]>[0],
   ) => {
     if (requireMemorySlot(record, "capability")) {
       registerGlobalMemoryCapability(record.id, capability);
@@ -46,7 +46,7 @@ export function createMemoryRegistrars(state: PluginRegistryState) {
 
   const registerMemoryPromptSection = (
     record: PluginRecord,
-    builder: Parameters<OpenClawPluginApi["registerMemoryPromptSection"]>[0],
+    builder: Parameters<SteelEnginePluginApi["registerMemoryPromptSection"]>[0],
   ) => {
     if (requireMemorySlot(record, "prompt section")) {
       registerMemoryPromptSectionForPlugin(record.id, builder);
@@ -55,7 +55,7 @@ export function createMemoryRegistrars(state: PluginRegistryState) {
 
   const registerMemoryPromptSupplement = (
     record: PluginRecord,
-    builder: Parameters<OpenClawPluginApi["registerMemoryPromptSupplement"]>[0],
+    builder: Parameters<SteelEnginePluginApi["registerMemoryPromptSupplement"]>[0],
   ) => {
     if (typeof builder !== "function") {
       pushDiagnostic({
@@ -71,7 +71,7 @@ export function createMemoryRegistrars(state: PluginRegistryState) {
 
   const registerMemoryPromptPreparation = (
     record: PluginRecord,
-    prepare: Parameters<OpenClawPluginApi["registerMemoryPromptPreparation"]>[0],
+    prepare: Parameters<SteelEnginePluginApi["registerMemoryPromptPreparation"]>[0],
   ) => {
     if (typeof prepare !== "function") {
       pushDiagnostic({
@@ -87,14 +87,14 @@ export function createMemoryRegistrars(state: PluginRegistryState) {
 
   const registerMemoryCorpusSupplement = (
     record: PluginRecord,
-    supplement: Parameters<OpenClawPluginApi["registerMemoryCorpusSupplement"]>[0],
+    supplement: Parameters<SteelEnginePluginApi["registerMemoryCorpusSupplement"]>[0],
   ) => {
     registerGlobalMemoryCorpusSupplement(record.id, supplement);
   };
 
   const registerMemoryFlushPlan = (
     record: PluginRecord,
-    resolver: Parameters<OpenClawPluginApi["registerMemoryFlushPlan"]>[0],
+    resolver: Parameters<SteelEnginePluginApi["registerMemoryFlushPlan"]>[0],
   ) => {
     if (requireMemorySlot(record, "flush plan")) {
       registerMemoryFlushPlanResolverForPlugin(record.id, resolver);
@@ -103,7 +103,7 @@ export function createMemoryRegistrars(state: PluginRegistryState) {
 
   const registerMemoryRuntime = (
     record: PluginRecord,
-    runtime: Parameters<OpenClawPluginApi["registerMemoryRuntime"]>[0],
+    runtime: Parameters<SteelEnginePluginApi["registerMemoryRuntime"]>[0],
   ) => {
     if (requireMemorySlot(record, "runtime")) {
       registerMemoryRuntimeForPlugin(record.id, runtime);
@@ -112,7 +112,7 @@ export function createMemoryRegistrars(state: PluginRegistryState) {
 
   const registerMemoryEmbeddingProvider = (
     record: PluginRecord,
-    adapter: Parameters<OpenClawPluginApi["registerMemoryEmbeddingProvider"]>[0],
+    adapter: Parameters<SteelEnginePluginApi["registerMemoryEmbeddingProvider"]>[0],
   ) => {
     if (hasKind(record.kind, "memory")) {
       if (!requireMemorySlot(record, "embedding provider")) {

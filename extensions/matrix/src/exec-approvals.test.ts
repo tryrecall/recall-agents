@@ -2,10 +2,10 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { ExecApprovalRequest } from "openclaw/plugin-sdk/approval-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { upsertSessionEntry } from "openclaw/plugin-sdk/session-store-runtime";
-import { closeOpenClawAgentDatabasesForTest } from "openclaw/plugin-sdk/sqlite-runtime-testing";
+import type { ExecApprovalRequest } from "steelengine/plugin-sdk/approval-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { upsertSessionEntry } from "steelengine/plugin-sdk/session-store-runtime";
+import { closeSteelEngineAgentDatabasesForTest } from "steelengine/plugin-sdk/sqlite-runtime-testing";
 import { afterEach, describe, expect, it } from "vitest";
 import { normalizeMatrixApproverId } from "./approval-ids.js";
 import {
@@ -23,7 +23,7 @@ type MatrixExecApprovalConfig = NonNullable<MatrixAccountConfig["execApprovals"]
 type MatrixExecApprovalRequest = ExecApprovalRequest;
 
 function shouldHandleMatrixExecApprovalRequest(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId?: string | null;
   request: ExecApprovalRequest;
 }): boolean {
@@ -34,22 +34,22 @@ function shouldHandleMatrixExecApprovalRequest(params: {
 }
 
 afterEach(() => {
-  closeOpenClawAgentDatabasesForTest();
+  closeSteelEngineAgentDatabasesForTest();
   for (const dir of tempDirs.splice(0)) {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
 
 function createTempDir(): string {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-matrix-exec-approvals-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-matrix-exec-approvals-"));
   tempDirs.push(dir);
   return dir;
 }
 
 function buildConfig(
-  execApprovals?: NonNullable<NonNullable<OpenClawConfig["channels"]>["matrix"]>["execApprovals"],
-  channelOverrides?: Partial<NonNullable<NonNullable<OpenClawConfig["channels"]>["matrix"]>>,
-): OpenClawConfig {
+  execApprovals?: NonNullable<NonNullable<SteelEngineConfig["channels"]>["matrix"]>["execApprovals"],
+  channelOverrides?: Partial<NonNullable<NonNullable<SteelEngineConfig["channels"]>["matrix"]>>,
+): SteelEngineConfig {
   return {
     channels: {
       matrix: {
@@ -60,7 +60,7 @@ function buildConfig(
         execApprovals,
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 function matrixAccount(
@@ -83,7 +83,7 @@ function buildMultiAccountMatrixConfig(params: {
   opsExecApprovals?: MatrixExecApprovalConfig;
   defaultOverrides?: Partial<MatrixAccountConfig>;
   opsOverrides?: Partial<MatrixAccountConfig>;
-}): OpenClawConfig {
+}): SteelEngineConfig {
   return {
     ...(params.sessionStorePath ? { session: { store: params.sessionStorePath } } : {}),
     channels: {
@@ -108,7 +108,7 @@ function buildMultiAccountMatrixConfig(params: {
         },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 function makeForeignChannelApprovalRequest(params: {
@@ -200,7 +200,7 @@ describe("matrix exec approvals", () => {
           ],
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     expect(isMatrixExecApprovalAuthorizedSender({ cfg, senderId: "@target:example.org" })).toBe(
       true,

@@ -1,9 +1,9 @@
 // Ollama provider module implements model/runtime integration.
 import { createHash } from "node:crypto";
-import { readProviderJsonResponse } from "openclaw/plugin-sdk/provider-http";
-import type { ModelProviderConfig } from "openclaw/plugin-sdk/provider-model-shared";
-import type { ModelDefinitionConfig } from "openclaw/plugin-sdk/provider-onboard";
-import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
+import { readProviderJsonResponse } from "steelengine/plugin-sdk/provider-http";
+import type { ModelProviderConfig } from "steelengine/plugin-sdk/provider-model-shared";
+import type { ModelDefinitionConfig } from "steelengine/plugin-sdk/provider-onboard";
+import { fetchWithSsrFGuard } from "steelengine/plugin-sdk/ssrf-runtime";
 import {
   OLLAMA_DEFAULT_BASE_URL,
   OLLAMA_DEFAULT_CONTEXT_WINDOW,

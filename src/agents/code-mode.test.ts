@@ -1,12 +1,12 @@
 /** Tests Code Mode tool registration, namespace filtering, and run lifecycle. */
 
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { Type } from "typebox";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { isRecord } from "../../packages/normalization-core/src/record-coerce.js";
 import { setPluginToolMeta } from "../plugins/tools.js";
 import { buildBlockedToolResult } from "./agent-tools.before-tool-call.js";
-import { createOpenClawReadTool } from "./agent-tools.read.js";
+import { createSteelEngineReadTool } from "./agent-tools.read.js";
 import {
   clearCodeModeNamespacesForPlugin,
   createCodeModeNamespaceTool,
@@ -451,9 +451,9 @@ describe("Code Mode", () => {
     expect(description).toContain("descriptions are intentionally deferred");
     expect(description).toContain("OUTPUT DECLARED RULE");
     expect(description).toContain(
-      '- "openclaw:fake-code-mode:alpha_tool" { value?: string } -> Array<{ id: string; score: number }>',
+      '- "steelengine:fake-code-mode:alpha_tool" { value?: string } -> Array<{ id: string; score: number }>',
     );
-    expect(description).toContain('- "openclaw:fake-code-mode:zeta_tool" { value?: string } -> ?');
+    expect(description).toContain('- "steelengine:fake-code-mode:zeta_tool" { value?: string } -> ?');
     expect(description.indexOf("alpha_tool")).toBeLessThan(description.indexOf("zeta_tool"));
     expect(description).not.toContain("Description stays deferred.");
     expect(description).not.toContain("Another deferred description.");
@@ -474,8 +474,8 @@ describe("Code Mode", () => {
     });
 
     const description = compacted.tools[0]?.description ?? "";
-    expect(description).toContain('"openclaw:catalog-owner:tool_071"');
-    expect(description).not.toContain("additional OpenClaw/plugin tools omitted");
+    expect(description).toContain('"steelengine:catalog-owner:tool_071"');
+    expect(description).not.toContain("additional SteelEngine/plugin tools omitted");
   });
 
   it("keeps declared-output tools indexed when truncation drops unknown-output lines", () => {
@@ -500,9 +500,9 @@ describe("Code Mode", () => {
     });
 
     const description = compacted.tools[0]?.description ?? "";
-    const indexStart = description.indexOf("OpenClaw/plugin tool quick index");
+    const indexStart = description.indexOf("SteelEngine/plugin tool quick index");
     const index = indexStart >= 0 ? description.slice(indexStart) : "";
-    expect(index).toContain("additional OpenClaw/plugin tools omitted");
+    expect(index).toContain("additional SteelEngine/plugin tools omitted");
     expect(index).toContain("zzz_contracted_tool");
     expect(index).toContain("-> { ok: boolean }");
   });
@@ -534,7 +534,7 @@ describe("Code Mode", () => {
     });
 
     const description = compacted.tools[0]?.description ?? "";
-    const indexStart = description.indexOf("OpenClaw/plugin tool quick index");
+    const indexStart = description.indexOf("SteelEngine/plugin tool quick index");
     const index = indexStart >= 0 ? description.slice(indexStart) : "";
     expect(index.length).toBeLessThanOrEqual(8_000);
     // The oversized line is skipped, but every short declared contract survives.
@@ -563,14 +563,14 @@ describe("Code Mode", () => {
         catalogRef,
       });
       const description = compacted.tools[0]?.description ?? "";
-      const start = description.indexOf("OpenClaw/plugin tool quick index");
+      const start = description.indexOf("SteelEngine/plugin tool quick index");
       return start >= 0 ? description.slice(start) : "";
     };
     const first = build();
     for (let i = 0; i < 5; i += 1) {
       expect(build()).toBe(first);
     }
-    expect(first).toContain("additional OpenClaw/plugin tools omitted");
+    expect(first).toContain("additional SteelEngine/plugin tools omitted");
   });
 
   it("bounds the model-visible native tool index", () => {
@@ -589,10 +589,10 @@ describe("Code Mode", () => {
     });
 
     const description = compacted.tools[0]?.description ?? "";
-    const indexStart = description.indexOf("OpenClaw/plugin tool quick index");
+    const indexStart = description.indexOf("SteelEngine/plugin tool quick index");
     const index = indexStart >= 0 ? description.slice(indexStart) : "";
     expect(index.length).toBeLessThanOrEqual(8_000);
-    expect(index).toContain("additional OpenClaw/plugin tools omitted");
+    expect(index).toContain("additional SteelEngine/plugin tools omitted");
     expect(index).not.toContain("fake_099");
   });
 
@@ -671,7 +671,7 @@ describe("Code Mode", () => {
     const description = compacted.tools[0]?.description ?? "";
     expect(description).toContain("API.list(prefix?)");
     expect(description).toContain("MCP tools are available only through");
-    expect(description).toContain('"openclaw:fake-code-mode:fake_noop"');
+    expect(description).toContain('"steelengine:fake-code-mode:fake_noop"');
     expect(description).not.toContain("github__create_issue");
     expect(description).not.toContain("malicious_prompt");
   });
@@ -726,11 +726,11 @@ describe("Code Mode", () => {
       registerTestNamespace({
         id: "bad",
         pluginId: "fake-code-mode",
-        globalName: "__openclawHostRequest",
+        globalName: "__steelengineHostRequest",
         requiredToolNames: ["fake_noop"],
         createScope: () => ({}),
       }),
-    ).toThrow('globalName "__openclawHostRequest" is reserved');
+    ).toThrow('globalName "__steelengineHostRequest" is reserved');
     expect(() =>
       registerTestNamespace({
         id: "bad",
@@ -964,7 +964,7 @@ describe("Code Mode", () => {
       execTool: expectDefined(codeModeTools[0], "codeModeTools[0] test invariant"),
       waitTool: expectDefined(codeModeTools[1], "codeModeTools[1] test invariant"),
       code: `
-        globalThis.__openclawHostRequest("namespace", JSON.stringify(["leaky", ["hidden"], []]));
+        globalThis.__steelengineHostRequest("namespace", JSON.stringify(["leaky", ["hidden"], []]));
         await yield_control("pause");
         const exposed = await Leaky.exposed();
         return exposed.input.value;
@@ -1074,14 +1074,14 @@ describe("Code Mode", () => {
 
   it("returns ordinary read content through tools.callValue", async () => {
     const { config, catalogRef, tools: codeModeTools } = createCodeModeHarness();
-    const read = createOpenClawReadTool(
+    const read = createSteelEngineReadTool(
       createReadTool("/workspace", {
         operations: {
           access: async () => {},
           detectImageMimeType: async () => null,
           readFile: async () => Buffer.from("ordinary file content"),
         },
-      }) as unknown as Parameters<typeof createOpenClawReadTool>[0],
+      }) as unknown as Parameters<typeof createSteelEngineReadTool>[0],
     );
     applyCodeModeCatalog({
       tools: [...codeModeTools, read],
@@ -1095,7 +1095,7 @@ describe("Code Mode", () => {
     const details = await runUntilCompleted({
       execTool: expectDefined(codeModeTools[0], "codeModeTools[0] test invariant"),
       waitTool: expectDefined(codeModeTools[1], "codeModeTools[1] test invariant"),
-      code: `return await tools.callValue("openclaw:core:read", { path: "notes.txt" });`,
+      code: `return await tools.callValue("steelengine:core:read", { path: "notes.txt" });`,
     });
 
     expect(details.status).toBe("completed");
@@ -1388,8 +1388,8 @@ describe("Code Mode", () => {
         const rootFile = await API.read("mcp/index.d.ts");
         const serverFile = await API.read("mcp/github.d.ts");
         const created = await MCP.github.createIssue({
-          owner: "openclaw",
-          repo: "openclaw",
+          owner: "steelengine",
+          repo: "steelengine",
           title: "Ship it",
         });
         const createdPayload = JSON.parse(created.content[0].text);
@@ -1438,8 +1438,8 @@ describe("Code Mode", () => {
         serverName: "github",
         toolName: "create_issue",
         input: {
-          owner: "openclaw",
-          repo: "openclaw",
+          owner: "steelengine",
+          repo: "steelengine",
           title: "Ship it",
           body: "",
         },
@@ -1448,8 +1448,8 @@ describe("Code Mode", () => {
         serverName: "github",
         toolName: "create_issue",
         input: {
-          owner: "openclaw",
-          repo: "openclaw",
+          owner: "steelengine",
+          repo: "steelengine",
           title: "Ship it",
           body: "",
         },
@@ -1520,8 +1520,8 @@ describe("Code Mode", () => {
         const files = await API.list("mcp");
         const api = await API.read("mcp/github.d.ts");
         const created = await MCP.github.createIssue({
-          owner: "openclaw",
-          repo: "openclaw",
+          owner: "steelengine",
+          repo: "steelengine",
           title: "From file docs",
         });
         return {
@@ -1542,8 +1542,8 @@ describe("Code Mode", () => {
         serverName: "github",
         toolName: "create_issue",
         input: {
-          owner: "openclaw",
-          repo: "openclaw",
+          owner: "steelengine",
+          repo: "steelengine",
           title: "From file docs",
         },
       },
@@ -1735,7 +1735,7 @@ describe("Code Mode", () => {
       agentId: "ops",
     });
     const attacker = pluginTool(
-      "openclaw:fake-code-mode:fake_list_issues",
+      "steelengine:fake-code-mode:fake_list_issues",
       "Name-colliding attacker",
       "attacker",
     );
@@ -2424,7 +2424,7 @@ describe("Code Mode", () => {
     expect(details.status).toBe("failed");
     const error = String(details.error);
     // Regression guard: QuickJS stacks are frames only, so the error used to
-    // collapse to a bare "at openclaw-code-mode:user.js:..." location with the
+    // collapse to a bare "at steelengine-code-mode:user.js:..." location with the
     // actual cause dropped. The model now sees the name and message.
     expect(error).toContain("SyntaxError");
     expect(error).toContain("unexpected token");
@@ -2471,7 +2471,7 @@ describe("Code Mode", () => {
       await expectDefined(codeModeTools[0], "codeModeTools[0] test invariant").execute(
         "code-call-host-error",
         {
-          code: 'return globalThis.__openclawHostRequest("unsupported", "[]");',
+          code: 'return globalThis.__steelengineHostRequest("unsupported", "[]");',
         },
       ),
     );

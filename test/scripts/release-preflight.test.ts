@@ -38,7 +38,7 @@ afterEach(() => {
 });
 
 function makeFakePnpm(): { binDir: string; eventsPath: string; logPath: string } {
-  const root = makeTempDir(tempDirs, "openclaw-release-preflight-");
+  const root = makeTempDir(tempDirs, "steelengine-release-preflight-");
   const binDir = join(root, "bin");
   const eventsPath = join(root, "pnpm-events.log");
   const logPath = join(root, "pnpm.log");
@@ -51,14 +51,14 @@ function makeFakePnpm(): { binDir: string; eventsPath: string; logPath: string }
 import { appendFileSync } from "node:fs";
 
 const command = ${JSON.stringify(bin)} + " " + process.argv.slice(2).join(" ");
-appendFileSync(process.env.OPENCLAW_RELEASE_PREFLIGHT_PNPM_LOG, command + "\\n");
-appendFileSync(process.env.OPENCLAW_RELEASE_PREFLIGHT_PNPM_EVENTS, "start " + command + "\\n");
-const delayMs = Number(process.env.OPENCLAW_RELEASE_PREFLIGHT_DELAY_MS ?? "0");
+appendFileSync(process.env.STEELENGINE_RELEASE_PREFLIGHT_PNPM_LOG, command + "\\n");
+appendFileSync(process.env.STEELENGINE_RELEASE_PREFLIGHT_PNPM_EVENTS, "start " + command + "\\n");
+const delayMs = Number(process.env.STEELENGINE_RELEASE_PREFLIGHT_DELAY_MS ?? "0");
 if (delayMs > 0) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, delayMs);
 }
-appendFileSync(process.env.OPENCLAW_RELEASE_PREFLIGHT_PNPM_EVENTS, "end " + command + "\\n");
-const failures = new Set((process.env.OPENCLAW_RELEASE_PREFLIGHT_FAIL_COMMANDS ?? "").split(";").filter(Boolean));
+appendFileSync(process.env.STEELENGINE_RELEASE_PREFLIGHT_PNPM_EVENTS, "end " + command + "\\n");
+const failures = new Set((process.env.STEELENGINE_RELEASE_PREFLIGHT_FAIL_COMMANDS ?? "").split(";").filter(Boolean));
 process.exit(failures.has(command) ? 7 : 0);
 `,
       { mode: 0o755 },
@@ -82,8 +82,8 @@ function runPreflight(
       ...extraEnv,
       ...(fakePnpm
         ? {
-            OPENCLAW_RELEASE_PREFLIGHT_PNPM_LOG: fakePnpm.logPath,
-            OPENCLAW_RELEASE_PREFLIGHT_PNPM_EVENTS: fakePnpm.eventsPath,
+            STEELENGINE_RELEASE_PREFLIGHT_PNPM_LOG: fakePnpm.logPath,
+            STEELENGINE_RELEASE_PREFLIGHT_PNPM_EVENTS: fakePnpm.eventsPath,
             PATH: `${fakePnpm.binDir}${delimiter}${process.env.PATH ?? ""}`,
           }
         : {}),
@@ -98,8 +98,8 @@ function makeReleaseFixture(
     shortVersion?: string;
   } = {},
 ): string {
-  const root = makeTempDir(tempDirs, "openclaw-release-preflight-fixture-");
-  const plistDir = join(root, "apps", "macos", "Sources", "OpenClaw", "Resources");
+  const root = makeTempDir(tempDirs, "steelengine-release-preflight-fixture-");
+  const plistDir = join(root, "apps", "macos", "Sources", "SteelEngine", "Resources");
   mkdirSync(plistDir, { recursive: true });
   writeFileSync(
     join(root, "package.json"),
@@ -140,7 +140,7 @@ describe("scripts/release-preflight.mjs", () => {
   it("runs every check command and reports all failed release artifact checks", () => {
     const fakePnpm = makeFakePnpm();
     const result = runPreflight(["--check"], fakePnpm, {
-      OPENCLAW_RELEASE_PREFLIGHT_FAIL_COMMANDS:
+      STEELENGINE_RELEASE_PREFLIGHT_FAIL_COMMANDS:
         "node --import tsx scripts/sync-plugin-versions.ts --check;pnpm config:docs:check",
     });
 
@@ -159,10 +159,10 @@ describe("scripts/release-preflight.mjs", () => {
       encoding: "utf8",
       env: {
         ...process.env,
-        OPENCLAW_RELEASE_PREFLIGHT_FAIL_COMMANDS:
+        STEELENGINE_RELEASE_PREFLIGHT_FAIL_COMMANDS:
           "node scripts/generate-npm-shrinkwrap.mjs --changed",
-        OPENCLAW_RELEASE_PREFLIGHT_PNPM_EVENTS: fakePnpm.eventsPath,
-        OPENCLAW_RELEASE_PREFLIGHT_PNPM_LOG: fakePnpm.logPath,
+        STEELENGINE_RELEASE_PREFLIGHT_PNPM_EVENTS: fakePnpm.eventsPath,
+        STEELENGINE_RELEASE_PREFLIGHT_PNPM_LOG: fakePnpm.logPath,
         PATH: `${fakePnpm.binDir}${delimiter}${process.env.PATH ?? ""}`,
       },
     });
@@ -181,7 +181,7 @@ describe("scripts/release-preflight.mjs", () => {
       ["--fix", "--jobs", "8"],
       fakePnpm,
       {
-        OPENCLAW_RELEASE_PREFLIGHT_DELAY_MS: "40",
+        STEELENGINE_RELEASE_PREFLIGHT_DELAY_MS: "40",
       },
       root,
     );
@@ -241,7 +241,7 @@ describe("scripts/release-preflight.mjs", () => {
 
   it("checks non-version scopes without requiring macOS source metadata", () => {
     const fakePnpm = makeFakePnpm();
-    const root = makeTempDir(tempDirs, "openclaw-release-preflight-config-");
+    const root = makeTempDir(tempDirs, "steelengine-release-preflight-config-");
     const result = runPreflight(["--scope", "config"], fakePnpm, {}, root);
 
     expect(result.status).toBe(0);
@@ -267,7 +267,7 @@ describe("scripts/release-preflight.mjs", () => {
   it("uses bounded parallelism for independent checks", () => {
     const fakePnpm = makeFakePnpm();
     const root = makeReleaseFixture();
-    const env = { OPENCLAW_RELEASE_PREFLIGHT_DELAY_MS: "120" };
+    const env = { STEELENGINE_RELEASE_PREFLIGHT_DELAY_MS: "120" };
 
     const serialStartedAt = performance.now();
     const serial = runPreflight(["--scope", "config", "--jobs", "1"], fakePnpm, env, root);
@@ -314,7 +314,7 @@ describe("scripts/release-preflight.mjs", () => {
   it("fails closed when required macOS plist values are missing", () => {
     const fakePnpm = makeFakePnpm();
     const root = makeReleaseFixture();
-    const plistPath = join(root, "apps", "macos", "Sources", "OpenClaw", "Resources", "Info.plist");
+    const plistPath = join(root, "apps", "macos", "Sources", "SteelEngine", "Resources", "Info.plist");
     writeFileSync(
       plistPath,
       readFileSync(plistPath, "utf8").replace(
@@ -336,7 +336,7 @@ describe("scripts/release-preflight.mjs", () => {
       buildVersion: "2026061000",
       shortVersion: "2026.6.10",
     });
-    const plistPath = join(root, "apps", "macos", "Sources", "OpenClaw", "Resources", "Info.plist");
+    const plistPath = join(root, "apps", "macos", "Sources", "SteelEngine", "Resources", "Info.plist");
     const before = readFileSync(plistPath, "utf8");
     const result = runPreflight(["--fix"], fakePnpm, {}, root);
 

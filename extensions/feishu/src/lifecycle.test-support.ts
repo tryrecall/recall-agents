@@ -139,10 +139,10 @@ const {
 
 vi.mock("./client.js", () => {
   return {
-    FEISHU_HTTP_TIMEOUT_ENV_VAR: "OPENCLAW_FEISHU_HTTP_TIMEOUT_MS",
+    FEISHU_HTTP_TIMEOUT_ENV_VAR: "STEELENGINE_FEISHU_HTTP_TIMEOUT_MS",
     FEISHU_HTTP_TIMEOUT_MAX_MS: 300_000,
     FEISHU_HTTP_TIMEOUT_MS: 30_000,
-    FEISHU_USER_AGENT: "openclaw-feishu-test",
+    FEISHU_USER_AGENT: "steelengine-feishu-test",
     clearClientCache: vi.fn(),
     createFeishuClient: vi.fn(() => {
       throw new Error("unexpected Feishu client call in lifecycle test");
@@ -152,7 +152,7 @@ vi.mock("./client.js", () => {
       start: vi.fn(),
     })),
     createEventDispatcher: createEventDispatcherMock,
-    getFeishuUserAgent: vi.fn(() => "openclaw-feishu-test"),
+    getFeishuUserAgent: vi.fn(() => "steelengine-feishu-test"),
     pluginVersion: "test",
     setFeishuClientRuntimeForTest: vi.fn(),
   };
@@ -178,9 +178,9 @@ vi.mock("./send.js", () => ({
   sendMessageFeishu: sendMessageFeishuMock,
 }));
 
-vi.mock("openclaw/plugin-sdk/conversation-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/conversation-runtime")>(
-    "openclaw/plugin-sdk/conversation-runtime",
+vi.mock("steelengine/plugin-sdk/conversation-runtime", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/conversation-runtime")>(
+    "steelengine/plugin-sdk/conversation-runtime",
   );
   return {
     ...actual,

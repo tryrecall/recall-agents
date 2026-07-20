@@ -4,11 +4,11 @@ import {
   resolveScopeRequireMention,
   resolveScopeToolsPolicy,
   type GroupToolPolicyConfig,
-} from "openclaw/plugin-sdk/channel-policy";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+} from "steelengine/plugin-sdk/channel-policy";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 
 type WhatsAppGroupContext = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId?: string | null;
   groupId?: string | null;
   senderId?: string | null;

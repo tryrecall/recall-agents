@@ -1,9 +1,9 @@
-import { err, ok, type Result } from "@openclaw/normalization-core/result";
+import { err, ok, type Result } from "@steelengine/normalization-core/result";
 import { isBlockedObjectKey } from "../infra/prototype-keys.js";
 // Applies runtime-only config overrides without mutating persisted config.
 import { isPlainObject } from "../utils.js";
 import { parseConfigPath, setConfigValueAtPath, unsetConfigValueAtPath } from "./config-paths.js";
-import type { OpenClawConfig } from "./types.js";
+import type { SteelEngineConfig } from "./types.js";
 
 type OverrideTree = Record<string, unknown>;
 
@@ -77,18 +77,18 @@ export function unsetConfigOverride(pathRaw: string): Result<boolean, string> {
 }
 
 /** Merge the current runtime overrides over a loaded config without mutating the input config. */
-export function applyConfigOverrides(cfg: OpenClawConfig): OpenClawConfig {
+export function applyConfigOverrides(cfg: SteelEngineConfig): SteelEngineConfig {
   if (!overrides || Object.keys(overrides).length === 0) {
     return cfg;
   }
-  return mergeOverrides(cfg, overrides) as OpenClawConfig;
+  return mergeOverrides(cfg, overrides) as SteelEngineConfig;
 }
 
 /** Capture an immutable applier for the process-local overrides active at this instant. */
-export function captureConfigOverrideApplier(): (cfg: OpenClawConfig) => OpenClawConfig {
+export function captureConfigOverrideApplier(): (cfg: SteelEngineConfig) => SteelEngineConfig {
   const capturedOverrides = structuredClone(overrides);
   if (Object.keys(capturedOverrides).length === 0) {
     return (cfg) => cfg;
   }
-  return (cfg) => mergeOverrides(cfg, capturedOverrides) as OpenClawConfig;
+  return (cfg) => mergeOverrides(cfg, capturedOverrides) as SteelEngineConfig;
 }

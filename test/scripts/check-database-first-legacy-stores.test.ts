@@ -10,7 +10,7 @@ import {
 
 describe("check-database-first-legacy-stores", () => {
   it("collects JavaScript runtime source files", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-db-first-guard-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-db-first-guard-"));
     try {
       await fs.mkdir(path.join(root, "src"), { recursive: true });
       await fs.writeFile(path.join(root, "src", "runtime.js"), "export {};\n");
@@ -33,7 +33,7 @@ describe("check-database-first-legacy-stores", () => {
   });
 
   it("skips generated extension asset and dist bundles", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-db-first-guard-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-db-first-guard-"));
     try {
       await fs.mkdir(path.join(root, "extensions", "diffs", "assets"), { recursive: true });
       await fs.mkdir(path.join(root, "extensions", "diffs", "dist", "assets"), {
@@ -228,7 +228,7 @@ describe("check-database-first-legacy-stores", () => {
   it("flags retired QMD file-lock sidecars", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { withFileLock } from "openclaw/plugin-sdk/file-lock";
+        import { withFileLock } from "steelengine/plugin-sdk/file-lock";
         import path from "node:path";
         await withFileLock(path.join(stateDir, "qmd", "embed.lock"), options, task);
         await withFileLock(path.join(agentDir, "qmd-write.lock"), options, task);
@@ -376,8 +376,8 @@ describe("check-database-first-legacy-stores", () => {
       `
         import { promises as fs } from "node:fs";
         import path from "node:path";
-        await fs.writeFile(path.join(workspaceDir, "openclaw-workspace-state.json"), "{}\\n");
-        await fs.writeFile(path.join(workspaceDir, ".openclaw", "workspace-state.json"), "{}\\n");
+        await fs.writeFile(path.join(workspaceDir, "steelengine-workspace-state.json"), "{}\\n");
+        await fs.writeFile(path.join(workspaceDir, ".steelengine", "workspace-state.json"), "{}\\n");
         await fs.writeFile(path.join(stateDir, "workspace-attestations", \`\${workspaceKey}.attested\`), "ok\\n");
         await fs.writeFile(\`\${workspaceDir}.attested\`, "ok\\n");
       `,
@@ -397,7 +397,7 @@ describe("check-database-first-legacy-stores", () => {
       `
         import { promises as fs } from "node:fs";
         import path from "node:path";
-        await fs.writeFile(path.join("/tmp", "openclaw-native-hook-relays-501", "relay.json"), "{}\n");
+        await fs.writeFile(path.join("/tmp", "steelengine-native-hook-relays-501", "relay.json"), "{}\n");
       `,
       "src/agents/harness/native-hook-relay-file-store.ts",
     );
@@ -436,7 +436,7 @@ describe("check-database-first-legacy-stores", () => {
       `
         import { promises as fs } from "node:fs";
         import path from "node:path";
-        await fs.writeFile(path.join(stateDir, "openclaw", "rescue-pending", \`\${key}.json\`), "{}\\n");
+        await fs.writeFile(path.join(stateDir, "steelengine", "rescue-pending", \`\${key}.json\`), "{}\\n");
         await fs.writeFile(path.join(stateDir, "crestodian", "rescue-pending", "old.json"), "{}\\n");
       `,
       "src/system-agent/rescue-writer.ts",
@@ -670,7 +670,7 @@ describe("check-database-first-legacy-stores", () => {
   it("flags private file store writes to legacy paths", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         await privateFileStore(stateDir).writeJson("thread-bindings.json", {});
       `,
       "src/runtime/private-file-store-write.ts",
@@ -682,8 +682,8 @@ describe("check-database-first-legacy-stores", () => {
   it("flags fs-safe factory aliases writing legacy paths", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
-        import * as fsSafe from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
+        import * as fsSafe from "steelengine/plugin-sdk/security-runtime";
         const makePrivateStore = privateFileStore;
         const makeRoot = fsSafe.root;
         const { privateFileStore: makeFromNamespace } = fsSafe;
@@ -704,7 +704,7 @@ describe("check-database-first-legacy-stores", () => {
   it("flags fs-safe root writes to legacy paths", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { root } from "openclaw/plugin-sdk/security-runtime";
+        import { root } from "steelengine/plugin-sdk/security-runtime";
         const state = await root(stateDir);
         await state.writeJson("plugin-binding-approvals.json", {});
         await (await root(stateDir)).writeJson("thread-bindings.json", {});
@@ -734,7 +734,7 @@ describe("check-database-first-legacy-stores", () => {
   it("flags file access runtime root writes to legacy paths", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { root } from "openclaw/plugin-sdk/file-access-runtime";
+        import { root } from "steelengine/plugin-sdk/file-access-runtime";
         const state = await root(stateDir);
         await state.writeJson("thread-bindings.json", {});
       `,
@@ -747,7 +747,7 @@ describe("check-database-first-legacy-stores", () => {
   it("flags fs-safe store root writes to legacy paths", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         const state = await privateFileStore(stateDir).root();
         await state.writeJson("thread-bindings.json", {});
         await (await privateFileStore(stateDir).root()).writeJson("plugin-binding-approvals.json", {});
@@ -764,7 +764,7 @@ describe("check-database-first-legacy-stores", () => {
   it("allows fs-safe store reads from legacy paths", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         const store = privateFileStore(stateDir);
         await store.readJson("thread-bindings.json");
       `,
@@ -777,7 +777,7 @@ describe("check-database-first-legacy-stores", () => {
   it("flags fs-safe JSON store writes to legacy paths", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         await privateFileStore(stateDir).json("thread-bindings.json").write({});
         const bindings = privateFileStore(stateDir).json("plugin-binding-approvals.json");
         await bindings.update((current) => current ?? {});
@@ -815,7 +815,7 @@ describe("check-database-first-legacy-stores", () => {
   it("flags fs-safe store object aliases writing legacy paths", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         const jsonBindings = privateFileStore(stateDir).json("plugin-binding-approvals.json");
         const stores = {
           state: privateFileStore(stateDir),
@@ -841,7 +841,7 @@ describe("check-database-first-legacy-stores", () => {
   it("flags fs-safe store object aliases copied through spreads and nested objects", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         const base = { state: privateFileStore(stateDir) };
         const stores = { ...base };
         const nested = { inner: { bindings: privateFileStore(stateDir).json("plugin-binding-approvals.json") } };
@@ -860,7 +860,7 @@ describe("check-database-first-legacy-stores", () => {
   it("flags fs-safe store object aliases assigned through nested object properties", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         const stores = {};
         stores.inner = { bindings: privateFileStore(stateDir).json("thread-bindings.json") };
         await stores.inner.bindings.write({});
@@ -874,7 +874,7 @@ describe("check-database-first-legacy-stores", () => {
   it("flags fs-safe store object aliases copied through destructuring", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         const stores = { state: privateFileStore(stateDir) };
         const nested = { inner: { bindings: privateFileStore(stateDir).json("plugin-binding-approvals.json") } };
         const { state } = stores;
@@ -894,7 +894,7 @@ describe("check-database-first-legacy-stores", () => {
   it("clears fs-safe store object aliases after exhaustive property reassignment", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         const stores = { state: privateFileStore(stateDir) };
         if (flag) {
           stores.state = customA;
@@ -912,7 +912,7 @@ describe("check-database-first-legacy-stores", () => {
   it("clears nested fs-safe store object aliases after exhaustive property reassignment", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         const stores = { inner: { bindings: privateFileStore(stateDir).json("thread-bindings.json") } };
         if (flag) {
           stores.inner = { bindings: customA };
@@ -930,7 +930,7 @@ describe("check-database-first-legacy-stores", () => {
   it("keeps fs-safe store object aliases when one exhaustive property branch remains a store", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         const stores = { state: customStore };
         if (flag) {
           stores.state = customA;
@@ -966,7 +966,7 @@ describe("check-database-first-legacy-stores", () => {
   it("allows fs-safe JSON store reads from legacy paths", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         const bindings = privateFileStore(stateDir).json("thread-bindings.json");
         await bindings.read();
         await privateFileStore(stateDir).json("plugin-binding-approvals.json").readOr({});
@@ -980,7 +980,7 @@ describe("check-database-first-legacy-stores", () => {
   it("clears fs-safe store aliases after exhaustive non-store reassignment", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         let store = privateFileStore(stateDir);
         if (flag) {
           store = customA;
@@ -998,7 +998,7 @@ describe("check-database-first-legacy-stores", () => {
   it("keeps fs-safe store aliases when one exhaustive branch remains a store", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { privateFileStore } from "openclaw/plugin-sdk/security-runtime";
+        import { privateFileStore } from "steelengine/plugin-sdk/security-runtime";
         let store = customStore;
         if (flag) {
           store = customA;
@@ -1016,7 +1016,7 @@ describe("check-database-first-legacy-stores", () => {
   it("clears fs-safe namespace factory aliases after shadowing", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import * as fsSafe from "openclaw/plugin-sdk/security-runtime";
+        import * as fsSafe from "steelengine/plugin-sdk/security-runtime";
         async function save(fsSafe: { root(dir: string): Promise<{ writeJson(path: string): void }> }) {
           await (await fsSafe.root(stateDir)).writeJson("thread-bindings.json");
         }
@@ -1106,10 +1106,10 @@ describe("check-database-first-legacy-stores", () => {
       `
         import fs from "node:fs/promises";
         import syncFs from "node:fs";
-        await fs.copyFile("sessions.json", "state/openclaw.sqlite.import");
-        await fs.cp("cron/jobs.json", "state/openclaw.sqlite.import");
-        syncFs.copyFileSync("auth-profiles.json", "state/openclaw.sqlite.import");
-        syncFs.cpSync("cache/models.json", "state/openclaw.sqlite.import");
+        await fs.copyFile("sessions.json", "state/steelengine.sqlite.import");
+        await fs.cp("cron/jobs.json", "state/steelengine.sqlite.import");
+        syncFs.copyFileSync("auth-profiles.json", "state/steelengine.sqlite.import");
+        syncFs.cpSync("cache/models.json", "state/steelengine.sqlite.import");
       `,
       "src/runtime/fs-copy-legacy-store-source.ts",
     );
@@ -1138,8 +1138,8 @@ describe("check-database-first-legacy-stores", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
         import path from "node:path";
-        import { root as fsRoot } from "openclaw/plugin-sdk/security-runtime";
-        const CLAIMS_DIGEST_PATH = ".openclaw-wiki/cache/claims.jsonl";
+        import { root as fsRoot } from "steelengine/plugin-sdk/security-runtime";
+        const CLAIMS_DIGEST_PATH = ".steelengine-wiki/cache/claims.jsonl";
         const claimsDigestPath = path.join(rootDir, CLAIMS_DIGEST_PATH);
         for (const [filePath, content] of [[claimsDigestPath, claimsDigest]]) {
           const relativePath = path.relative(rootDir, filePath);
@@ -1871,7 +1871,7 @@ describe("check-database-first-legacy-stores", () => {
   it("flags legacy paths written through regular-file helpers", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
-        import { appendRegularFile as appendSafe } from "openclaw/plugin-sdk/security-runtime";
+        import { appendRegularFile as appendSafe } from "steelengine/plugin-sdk/security-runtime";
         const filePath = "session.trajectory.jsonl";
         await appendSafe({ filePath, content: "{}\\n" });
       `,
@@ -1886,7 +1886,7 @@ describe("check-database-first-legacy-stores", () => {
       `
         import { writeJson, writeTextAtomic } from "../infra/json-files.js";
         import { replaceFileAtomicSync } from "../infra/replace-file.js";
-        import { saveJsonFile, writeJsonFileAtomically } from "openclaw/plugin-sdk/json-store";
+        import { saveJsonFile, writeJsonFileAtomically } from "steelengine/plugin-sdk/json-store";
         await writeJson("restart-sentinel.json", {});
         await writeTextAtomic("gateway-restart-intent.json", "{}\\n");
         replaceFileAtomicSync({ filePath: "plugin-state/state.sqlite", content: "" });
@@ -3092,7 +3092,7 @@ describe("check-database-first-legacy-stores", () => {
           return fs.writeFile(path, "{}\\n");
         }
         await writePath({
-          currentPath: "state/openclaw.sqlite",
+          currentPath: "state/steelengine.sqlite",
           legacyPath: "sessions.json",
         });
       `,
@@ -3113,7 +3113,7 @@ describe("check-database-first-legacy-stores", () => {
           return fs.writeFile(path, "{}\\n");
         }
         await writePath({
-          currentPath: "state/openclaw.sqlite",
+          currentPath: "state/steelengine.sqlite",
           legacyPath: "sessions.json",
         });
       `,
@@ -6318,7 +6318,7 @@ describe("check-database-first-legacy-stores", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
         import { writeTextAtomic } from "../infra/json-files.js";
-        const filePath = "not-openclaw-state.txt";
+        const filePath = "not-steelengine-state.txt";
         function helper() {
           return writeTextAtomic(filePath, "{}\\n");
         }
@@ -7528,7 +7528,7 @@ describe("check-database-first-legacy-stores", () => {
         function persist({ paths: { filePath = "sessions.json" } }: { paths: { filePath?: string } }) {
           return fs.writeFile(filePath, "{}\\n");
         }
-        const options = { paths: { filePath: "state/openclaw.sqlite" } };
+        const options = { paths: { filePath: "state/steelengine.sqlite" } };
         if (Math.random() > 0.5) {
           options.paths = {};
         }
@@ -8118,7 +8118,7 @@ describe("check-database-first-legacy-stores", () => {
         }
         const options = {
           paths: {
-            filePath: "state/openclaw.sqlite",
+            filePath: "state/steelengine.sqlite",
             legacyPath: "sessions.json",
           },
         };
@@ -8694,7 +8694,7 @@ describe("check-database-first-legacy-stores", () => {
     const violations = collectDatabaseFirstLegacyStoreViolations(
       `
         import { promises as fs } from "node:fs";
-        await fs.rename("openclaw-workspace-state.json", "openclaw-workspace-state.json.doctor-importing");
+        await fs.rename("steelengine-workspace-state.json", "steelengine-workspace-state.json.doctor-importing");
         await fs.rename("workspace.attested", "workspace.attested.doctor-importing");
       `,
       "src/infra/state-migrations.workspace-setup.ts",

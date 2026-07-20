@@ -1,8 +1,8 @@
 // Phone Control API module exposes the plugin public contract.
-export { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+export { definePluginEntry } from "steelengine/plugin-sdk/plugin-entry";
 export type {
-  OpenClawPluginApi,
-  OpenClawPluginCommandDefinition,
+  SteelEnginePluginApi,
+  SteelEnginePluginCommandDefinition,
   PluginCommandContext,
-  OpenClawPluginService,
-} from "openclaw/plugin-sdk/plugin-entry";
+  SteelEnginePluginService,
+} from "steelengine/plugin-sdk/plugin-entry";

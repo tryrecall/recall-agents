@@ -1,9 +1,9 @@
-import { truncateUtf16Safe } from "@openclaw/normalization-core/utf16-slice";
+import { truncateUtf16Safe } from "@steelengine/normalization-core/utf16-slice";
 // Dashboard session titles use the shared utility-model completion path.
 import { generateConversationLabel } from "../auto-reply/reply/conversation-label-generator.js";
 import { updateSessionEntry } from "../config/sessions/session-accessor.js";
 import type { SessionEntry } from "../config/sessions/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { parseAgentSessionKey } from "../sessions/session-key-utils.js";
 
 const DASHBOARD_SESSION_TITLE_MAX_CHARS = 60;
@@ -53,7 +53,7 @@ function normalizeDashboardSessionTitle(raw: string): string | null {
 }
 
 export async function maybeGenerateDashboardSessionTitle(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId: string;
   entry: SessionEntry | undefined;
   sessionId: string;

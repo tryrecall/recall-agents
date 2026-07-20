@@ -1,8 +1,8 @@
 // Doctor warnings for configured channels blocked by disabled channel plugins.
-import { normalizeOptionalLowercaseString } from "@openclaw/normalization-core/string-coerce";
+import { normalizeOptionalLowercaseString } from "@steelengine/normalization-core/string-coerce";
 import { sanitizeForLog } from "../../../../packages/terminal-core/src/ansi.js";
 import { listExplicitlyDisabledChannelIdsForConfig } from "../../../channels/config-presence.js";
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../../config/types.steelengine.js";
 import type { HealthFinding } from "../../../flows/health-checks.js";
 import {
   hasExplicitChannelConfig,
@@ -47,9 +47,9 @@ type ScanConfiguredChannelPluginBlockerOptions = {
 
 /** Find configured channel ids whose backing plugins cannot activate. */
 export function scanConfiguredChannelPluginBlockers(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   env: NodeJS.ProcessEnv = process.env,
-  activationSourceConfig: OpenClawConfig = cfg,
+  activationSourceConfig: SteelEngineConfig = cfg,
   options: ScanConfiguredChannelPluginBlockerOptions = {},
 ): ChannelPluginBlockerHit[] {
   const explicitChannelIds = listExplicitConfiguredChannelIdsForConfig(cfg)
@@ -231,9 +231,9 @@ type ChannelOwnerState = {
 function resolveConfiguredChannelOwnerState(params: {
   plugin: PluginManifestRecord;
   channelId: string;
-  sourceConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
   sourcePluginsConfig: ReturnType<typeof normalizePluginsConfig>;
-  effectiveConfig: OpenClawConfig;
+  effectiveConfig: SteelEngineConfig;
   effectivePluginsConfig: ReturnType<typeof normalizePluginsConfig>;
 }): ChannelOwnerState {
   const bundledChannelConfigured =

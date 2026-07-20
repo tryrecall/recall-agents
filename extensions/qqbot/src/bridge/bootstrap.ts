@@ -23,14 +23,14 @@
  * vitest (which resolves bare specifiers via `resolve.alias`, not Node CJS).
  */
 
-import type { ApprovalResolveResult } from "openclaw/plugin-sdk/approval-gateway-runtime";
-import { createLazyRuntimeNamedExport } from "openclaw/plugin-sdk/lazy-runtime";
+import type { ApprovalResolveResult } from "steelengine/plugin-sdk/approval-gateway-runtime";
+import { createLazyRuntimeNamedExport } from "steelengine/plugin-sdk/lazy-runtime";
 import {
   hasConfiguredSecretInput,
   normalizeResolvedSecretInputString,
   normalizeSecretInputString,
-} from "openclaw/plugin-sdk/secret-input";
-import { resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/temp-path";
+} from "steelengine/plugin-sdk/secret-input";
+import { resolvePreferredSteelEngineTmpDir } from "steelengine/plugin-sdk/temp-path";
 import {
   registerPlatformAdapter,
   registerPlatformAdapterFactory,
@@ -41,7 +41,7 @@ import type { FetchMediaOptions, FetchMediaResult } from "../engine/adapter/type
 import { getBridgeLogger } from "./logger.js";
 
 const loadReadRemoteMediaBuffer = createLazyRuntimeNamedExport(
-  () => import("openclaw/plugin-sdk/media-runtime"),
+  () => import("steelengine/plugin-sdk/media-runtime"),
   "readRemoteMediaBuffer",
 );
 
@@ -87,7 +87,7 @@ function createBuiltinAdapter(): PlatformAdapter {
     },
 
     getTempDir(): string {
-      return resolvePreferredOpenClawTmpDir();
+      return resolvePreferredSteelEngineTmpDir();
     },
 
     hasConfiguredSecret(value: unknown): boolean {
@@ -104,9 +104,9 @@ function createBuiltinAdapter(): PlatformAdapter {
 
     async resolveApproval(params): Promise<ApprovalResolveResult> {
       try {
-        const { getRuntimeConfig } = await import("openclaw/plugin-sdk/runtime-config-snapshot");
+        const { getRuntimeConfig } = await import("steelengine/plugin-sdk/runtime-config-snapshot");
         const { resolveApprovalOverGateway } =
-          await import("openclaw/plugin-sdk/approval-gateway-runtime");
+          await import("steelengine/plugin-sdk/approval-gateway-runtime");
         const cfg = getRuntimeConfig();
         return await resolveApprovalOverGateway({
           cfg,

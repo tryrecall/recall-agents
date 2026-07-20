@@ -20,7 +20,7 @@ describe("Android app i18n resources", () => {
 
   it("preserves the existing Swedish app name", async () => {
     const strings = await readFile("apps/android/app/src/main/res/values-sv/strings.xml", "utf8");
-    expect(strings).toContain('<string name="app_name">OpenClaw-nod</string>');
+    expect(strings).toContain('<string name="app_name">SteelEngine-nod</string>');
   });
 
   it("counts Kotlin and XML resource references", () => {
@@ -169,7 +169,7 @@ describe("Android app i18n resources", () => {
     expect(
       findUnlocalizedAndroidUiLiterals(
         source,
-        "apps/android/app/src/main/java/ai/openclaw/app/ui/Example.kt",
+        "apps/android/app/src/main/java/ai/steelengine/app/ui/Example.kt",
       ),
     ).toEqual([
       expect.objectContaining({ source: "Settings" }),
@@ -187,7 +187,7 @@ describe("Android app i18n resources", () => {
     expect(
       findUnlocalizedAndroidUiLiterals(
         source,
-        "apps/android/app/src/main/java/ai/openclaw/app/ui/Example.kt",
+        "apps/android/app/src/main/java/ai/steelengine/app/ui/Example.kt",
       ).map((finding) => finding.source),
     ).not.toEqual(expect.arrayContaining(["Connected", "Waiting"]));
   });
@@ -208,7 +208,7 @@ describe("Android app i18n resources", () => {
     `;
     const findings = findUnlocalizedAndroidUiLiterals(
       source,
-      "apps/android/app/src/main/java/ai/openclaw/app/ui/Example.kt",
+      "apps/android/app/src/main/java/ai/steelengine/app/ui/Example.kt",
     ).map((finding) => finding.source);
 
     expect(findings).toContain("Generic ready");
@@ -222,7 +222,7 @@ describe("Android app i18n resources", () => {
     `;
     const findings = findUnlocalizedAndroidUiLiterals(
       source,
-      "apps/android/app/src/main/java/ai/openclaw/app/ui/Example.kt",
+      "apps/android/app/src/main/java/ai/steelengine/app/ui/Example.kt",
     ).map((finding) => finding.source);
 
     expect(findings).toContain("No status");
@@ -240,7 +240,7 @@ describe("Android app i18n resources", () => {
     `;
     const findings = findUnlocalizedAndroidUiLiterals(
       source,
-      "apps/android/app/src/main/java/ai/openclaw/app/ui/Example.kt",
+      "apps/android/app/src/main/java/ai/steelengine/app/ui/Example.kt",
     ).map((finding) => finding.source);
 
     expect(findings).toEqual(
@@ -270,7 +270,7 @@ describe("Android app i18n resources", () => {
       CommandItem(
         key = "voice",
         title = nativeString("Start Voice"),
-        subtitle = nativeString("Talk with OpenClaw"),
+        subtitle = nativeString("Talk with SteelEngine"),
       )
       HomeAttentionRow(
         title = "Gateway",
@@ -285,7 +285,7 @@ describe("Android app i18n resources", () => {
     `;
     const findings = findUnlocalizedAndroidUiLiterals(
       source,
-      "apps/android/app/src/main/java/ai/openclaw/app/ui/Example.kt",
+      "apps/android/app/src/main/java/ai/steelengine/app/ui/Example.kt",
     ).map((finding) => finding.source);
 
     expect(findings).toEqual(
@@ -303,7 +303,7 @@ describe("Android app i18n resources", () => {
         "chat",
         "voice",
         "Start Voice",
-        "Talk with OpenClaw",
+        "Talk with SteelEngine",
         "Offline",
         "gateway",
       ]),
@@ -330,7 +330,7 @@ describe("Android app i18n resources", () => {
     `;
     const findings = findUnlocalizedAndroidUiLiterals(
       source,
-      "apps/android/app/src/main/java/ai/openclaw/app/ui/Example.kt",
+      "apps/android/app/src/main/java/ai/steelengine/app/ui/Example.kt",
     ).map((finding) => finding.source);
 
     expect(findings).toEqual(expect.arrayContaining(["Failure", "Fallback"]));
@@ -341,7 +341,7 @@ describe("Android app i18n resources", () => {
     expect(
       findUnlocalizedAndroidUiLiterals(
         'Text("Preview copy")',
-        "apps/android/app/src/main/java/ai/openclaw/app/ui/design/ClawComponents.kt",
+        "apps/android/app/src/main/java/ai/steelengine/app/ui/design/ClawComponents.kt",
       ),
     ).toEqual([]);
   });

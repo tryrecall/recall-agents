@@ -1,6 +1,6 @@
 /** Gateway startup coverage for active and inactive web-provider SecretRefs. */
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import { setActiveDegradedSecretOwners } from "../secrets/runtime-degraded-state.js";
 import { getActiveSecretsRuntimeSnapshot } from "../secrets/runtime.js";
 import { withEnvAsync } from "../test-utils/env.js";
@@ -25,7 +25,7 @@ const { webSearchProviders } = vi.hoisted(() => {
         setCredentialValue: (config: { apiKey?: unknown }, value: unknown) => {
           config.apiKey = value;
         },
-        getConfiguredCredentialValue: (config: OpenClawConfig | undefined) => {
+        getConfiguredCredentialValue: (config: SteelEngineConfig | undefined) => {
           const pluginConfig = config?.plugins?.entries?.google?.config;
           return pluginConfig && typeof pluginConfig === "object"
             ? (pluginConfig as { webSearch?: { apiKey?: unknown } }).webSearch?.apiKey
@@ -74,13 +74,13 @@ vi.mock("../secrets/runtime-web-tools-fallback.runtime.js", () => ({
   },
 }));
 
-const INACTIVE_SECRET_ENV = "OPENCLAW_TEST_INACTIVE_WEB_SEARCH_SECRET";
-const ACTIVE_SECRET_ENV = "OPENCLAW_TEST_ACTIVE_WEB_SEARCH_SECRET";
+const INACTIVE_SECRET_ENV = "STEELENGINE_TEST_INACTIVE_WEB_SEARCH_SECRET";
+const ACTIVE_SECRET_ENV = "STEELENGINE_TEST_ACTIVE_WEB_SEARCH_SECRET";
 const SECRET_PATH = "plugins.entries.google.config.webSearch.apiKey";
 
 installGatewayTestHooks({ scope: "suite" });
 
-function buildConfig(params: { enabled: boolean; envVar: string }): OpenClawConfig {
+function buildConfig(params: { enabled: boolean; envVar: string }): SteelEngineConfig {
   return {
     gateway: {
       mode: "local",
@@ -117,10 +117,10 @@ function buildConfig(params: { enabled: boolean; envVar: string }): OpenClawConf
         },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
-async function writeConfig(config: OpenClawConfig): Promise<void> {
+async function writeConfig(config: SteelEngineConfig): Promise<void> {
   const { writeConfigFile } = await import("../config/config.js");
   await writeConfigFile(config);
 }

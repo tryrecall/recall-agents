@@ -6,11 +6,11 @@ import {
   getNodeSqliteKysely,
 } from "../../infra/kysely-sync.js";
 import { runSqliteDeferredTransactionSync } from "../../infra/sqlite-transaction.js";
-import type { DB as OpenClawAgentKyselyDatabase } from "../../state/openclaw-agent-db.generated.js";
+import type { DB as SteelEngineAgentKyselyDatabase } from "../../state/steelengine-agent-db.generated.js";
 import {
-  openOpenClawAgentDatabase,
-  type OpenClawAgentDatabase,
-} from "../../state/openclaw-agent-db.js";
+  openSteelEngineAgentDatabase,
+  type SteelEngineAgentDatabase,
+} from "../../state/steelengine-agent-db.js";
 import type {
   SessionTranscriptReadScope,
   TranscriptEvent,
@@ -23,7 +23,7 @@ import type { SessionTranscriptProjectionState } from "./session-transcript-inde
 import { startSessionTranscriptIndexReconcile } from "./session-transcript-reconcile.js";
 
 type ActiveTranscriptDatabase = Pick<
-  OpenClawAgentKyselyDatabase,
+  SteelEngineAgentKyselyDatabase,
   | "session_transcript_active_events"
   | "session_transcript_index_state"
   | "transcript_event_identities"
@@ -60,7 +60,7 @@ export function isSessionTranscriptProjectionUnavailableError(
 }
 
 type CurrentProjection = {
-  database: OpenClawAgentDatabase;
+  database: SteelEngineAgentDatabase;
   resolved: ReturnType<typeof resolveSqliteTranscriptReadScope>;
   state: SessionTranscriptProjectionState;
 };
@@ -73,12 +73,12 @@ const EMPTY_PROJECTION_STATE: SessionTranscriptProjectionState = {
   needsRebuild: false,
 };
 
-function getActiveTranscriptKysely(database: OpenClawAgentDatabase) {
+function getActiveTranscriptKysely(database: SteelEngineAgentDatabase) {
   return getNodeSqliteKysely<ActiveTranscriptDatabase>(database.db);
 }
 
 function readProjectionSnapshot(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionId: string,
 ): { latestSeq: number; state?: SessionTranscriptProjectionState } | undefined {
   const row = executeSqliteQueryTakeFirstSync(
@@ -123,7 +123,7 @@ function withCurrentProjectionSnapshot<T>(
 ): T {
   const resolved = resolveSqliteTranscriptReadScope(scope);
   const databaseOptions = toDatabaseOptions(resolved);
-  const database = openOpenClawAgentDatabase(databaseOptions);
+  const database = openSteelEngineAgentDatabase(databaseOptions);
   const result = runSqliteDeferredTransactionSync(
     database.db,
     () => {

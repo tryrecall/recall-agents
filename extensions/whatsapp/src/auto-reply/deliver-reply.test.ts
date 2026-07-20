@@ -3,8 +3,8 @@ import fsSync from "node:fs";
 import {
   createMessageReceiptFromOutboundResults,
   listMessageReceiptPlatformIds,
-} from "openclaw/plugin-sdk/channel-outbound";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/channel-outbound";
+import { logVerbose } from "steelengine/plugin-sdk/runtime-env";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { createAcceptedWhatsAppSendResult } from "../inbound/send-result.test-helper.js";
 import { createTestWebInboundMessage } from "../inbound/test-message.test-helper.js";
@@ -17,9 +17,9 @@ const hoisted = vi.hoisted(() => ({
   runFfmpeg: vi.fn(),
 }));
 
-vi.mock("openclaw/plugin-sdk/media-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/media-runtime")>(
-    "openclaw/plugin-sdk/media-runtime",
+vi.mock("steelengine/plugin-sdk/media-runtime", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/media-runtime")>(
+    "steelengine/plugin-sdk/media-runtime",
   );
   return {
     ...actual,
@@ -27,9 +27,9 @@ vi.mock("openclaw/plugin-sdk/media-runtime", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/runtime-env", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/runtime-env")>(
-    "openclaw/plugin-sdk/runtime-env",
+vi.mock("steelengine/plugin-sdk/runtime-env", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/runtime-env")>(
+    "steelengine/plugin-sdk/runtime-env",
   );
   return {
     ...actual,

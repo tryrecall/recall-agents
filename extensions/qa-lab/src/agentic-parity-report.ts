@@ -69,11 +69,11 @@ type QaRuntimeParityScenarioReport = {
   runtimeParityUsage: RuntimeParityUsagePolicy;
   drift: RuntimeParityDrift | "missing";
   driftDetails?: string;
-  openclawStatus: "pass" | "fail" | "missing";
+  steelengineStatus: "pass" | "fail" | "missing";
   codexStatus: "pass" | "fail" | "missing";
-  openclawTokens: number;
+  steelengineTokens: number;
   codexTokens: number;
-  openclawToolCalls: number;
+  steelengineToolCalls: number;
   codexToolCalls: number;
 };
 
@@ -189,7 +189,7 @@ function scenarioHasRuntimeToolCallEvidence(scenario: QaParityReportScenario): b
   return (
     scenario.status === "pass" &&
     isRuntimeParityResultPass(parity) &&
-    parity.cells.openclaw.toolCalls.length > 0 &&
+    parity.cells.steelengine.toolCalls.length > 0 &&
     parity.cells.codex.toolCalls.length > 0
   );
 }
@@ -278,9 +278,9 @@ function isLiveProviderMode(providerMode: string | undefined) {
 
 function describeLiveUsageFailure(scenarioName: string, scenario: QaRuntimeParityScenarioReport) {
   const missing = [
-    scenario.openclawTokens > 0
+    scenario.steelengineTokens > 0
       ? undefined
-      : `${scenario.openclawStatus === "pass" ? "openclaw" : "openclaw failed"}=0`,
+      : `${scenario.steelengineStatus === "pass" ? "steelengine" : "steelengine failed"}=0`,
     scenario.codexTokens > 0
       ? undefined
       : `${scenario.codexStatus === "pass" ? "codex" : "codex failed"}=0`,
@@ -297,7 +297,7 @@ function normalizeRuntimePair(
   if (pair?.[0] && pair?.[1]) {
     return pair;
   }
-  return ["openclaw", "codex"];
+  return ["steelengine", "codex"];
 }
 
 function requiredCoverageStatus(
@@ -594,7 +594,7 @@ export function renderQaAgenticParityMarkdownReport(comparison: QaAgenticParityC
   // openai/gpt-5.6-luna vs anthropic/claude-opus-4-8, but the helper works for
   // any parity comparison a caller configures.
   const lines = [
-    `# OpenClaw Agentic Parity Report — ${comparison.candidateLabel} vs ${comparison.baselineLabel}`,
+    `# SteelEngine Agentic Parity Report — ${comparison.candidateLabel} vs ${comparison.baselineLabel}`,
     "",
     `- Compared at: ${comparison.comparedAt}`,
     `- Candidate: ${comparison.candidateLabel}`,
@@ -662,18 +662,18 @@ export function buildQaRuntimeParityReport(params: {
         runtimeParityUsage: resolveRuntimeParityUsagePolicy(undefined),
         drift: "missing",
         driftDetails: scenario.details,
-        openclawStatus: "missing",
+        steelengineStatus: "missing",
         codexStatus: "missing",
-        openclawTokens: 0,
+        steelengineTokens: 0,
         codexTokens: 0,
-        openclawToolCalls: 0,
+        steelengineToolCalls: 0,
         codexToolCalls: 0,
       } satisfies QaRuntimeParityScenarioReport;
     }
     driftCounts[parity.drift] += 1;
-    const openclawCell = parity.cells.openclaw;
+    const steelengineCell = parity.cells.steelengine;
     const codexCell = parity.cells.codex;
-    const openclawStatus = runtimeParityCellStatus(openclawCell);
+    const steelengineStatus = runtimeParityCellStatus(steelengineCell);
     const codexStatus = runtimeParityCellStatus(codexCell);
     const parityStatus = isRuntimeParityResultPass(parity) ? "pass" : "fail";
     const runtimeParityUsage = resolveRuntimeParityUsagePolicy(parity.runtimeParityUsage);
@@ -683,11 +683,11 @@ export function buildQaRuntimeParityReport(params: {
       runtimeParityUsage,
       drift: parity.drift,
       driftDetails: parity.driftDetails,
-      openclawStatus,
+      steelengineStatus,
       codexStatus,
-      openclawTokens: openclawCell.usage.totalTokens,
+      steelengineTokens: steelengineCell.usage.totalTokens,
       codexTokens: codexCell.usage.totalTokens,
-      openclawToolCalls: openclawCell.toolCalls.length,
+      steelengineToolCalls: steelengineCell.toolCalls.length,
       codexToolCalls: codexCell.toolCalls.length,
     } satisfies QaRuntimeParityScenarioReport;
     if (parityStatus === "fail") {
@@ -734,7 +734,7 @@ export function buildQaRuntimeParityReport(params: {
 
 export function renderQaRuntimeParityMarkdownReport(report: QaRuntimeParityReport): string {
   const lines = [
-    `# OpenClaw Runtime Parity Report — ${report.runtimePair[0]} vs ${report.runtimePair[1]}`,
+    `# SteelEngine Runtime Parity Report — ${report.runtimePair[0]} vs ${report.runtimePair[1]}`,
     "",
     `- Compared at: ${report.comparedAt}`,
     `- Provider mode: ${report.providerMode ?? "unknown"}`,
@@ -768,13 +768,13 @@ export function renderQaRuntimeParityMarkdownReport(report: QaRuntimeParityRepor
   lines.push("## Scenario Comparison", "");
   for (const scenario of report.scenarios) {
     const usageNotApplicable = scenario.runtimeParityUsage.expectation === "not-applicable";
-    const openclawTokens = usageNotApplicable ? "N/A" : String(scenario.openclawTokens);
+    const steelengineTokens = usageNotApplicable ? "N/A" : String(scenario.steelengineTokens);
     const codexTokens = usageNotApplicable ? "N/A" : String(scenario.codexTokens);
     lines.push(`### ${scenario.name}`, "");
     lines.push(`- status: ${scenario.status}`);
     lines.push(`- drift: ${scenario.drift}`);
     lines.push(
-      `- openclaw: ${scenario.openclawStatus} (${scenario.openclawToolCalls} tool calls, ${openclawTokens} tokens)`,
+      `- steelengine: ${scenario.steelengineStatus} (${scenario.steelengineToolCalls} tool calls, ${steelengineTokens} tokens)`,
     );
     lines.push(
       `- codex: ${scenario.codexStatus} (${scenario.codexToolCalls} tool calls, ${codexTokens} tokens)`,

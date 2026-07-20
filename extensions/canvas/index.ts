@@ -4,10 +4,10 @@
  */
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Duplex } from "node:stream";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
-import { definePluginEntry, type AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
+import { definePluginEntry, type AnyAgentTool } from "steelengine/plugin-sdk/plugin-entry";
 import { validateSupportedA2UIJsonl } from "./src/a2ui-jsonl.js";
 import { canvasConfigSchema, isCanvasHostEnabled } from "./src/config.js";
 import { A2UI_PATH, CANVAS_HOST_PATH, CANVAS_WS_PATH } from "./src/host/a2ui-shared.js";
@@ -29,7 +29,7 @@ const CANVAS_NODE_COMMANDS = [
 ];
 
 function createLazyCanvasTool(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   workspaceDir?: string;
   agentSessionKey?: string;
 }): AnyAgentTool {
@@ -54,7 +54,7 @@ function createLazyCanvasTool(params: {
 }
 
 function createLazyShowWidgetTool(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   sessionId?: string;
   agentId?: string;
 }): AnyAgentTool {

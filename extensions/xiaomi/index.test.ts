@@ -1,13 +1,13 @@
 // Xiaomi tests cover index plugin behavior.
-import type { Context, Model } from "openclaw/plugin-sdk/llm";
-import { createAssistantMessageEventStream } from "openclaw/plugin-sdk/llm";
+import type { Context, Model } from "steelengine/plugin-sdk/llm";
+import { createAssistantMessageEventStream } from "steelengine/plugin-sdk/llm";
 import {
   registerProviderPlugin,
   requireRegisteredProvider,
   resolveProviderPluginChoice,
   type RegisteredProviderCollections,
-} from "openclaw/plugin-sdk/plugin-test-runtime";
-import { buildOpenAICompletionsParams } from "openclaw/plugin-sdk/provider-transport-runtime";
+} from "steelengine/plugin-sdk/plugin-test-runtime";
+import { buildOpenAICompletionsParams } from "steelengine/plugin-sdk/provider-transport-runtime";
 import { describe, expect, it, vi } from "vitest";
 import { runSingleProviderCatalog } from "../test-support/provider-model-test-helpers.js";
 import xiaomiPlugin from "./index.js";

@@ -1,7 +1,7 @@
 // Qqbot plugin module implements remind logic behavior.
-import { resolveExpiresAtMsFromDurationMs } from "openclaw/plugin-sdk/number-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
-import { jsonResult as json } from "openclaw/plugin-sdk/tool-results";
+import { resolveExpiresAtMsFromDurationMs } from "steelengine/plugin-sdk/number-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
+import { jsonResult as json } from "steelengine/plugin-sdk/tool-results";
 
 /**
  * QQBot reminder tool core logic.

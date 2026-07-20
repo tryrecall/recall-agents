@@ -3,13 +3,13 @@
  * Keep this module synchronous; request paths call it while rendering usage summaries.
  */
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { expectDefined } from "@steelengine/normalization-core";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import { resolveDefaultAgentDir } from "../agents/agent-scope-config.js";
 import { modelKey, normalizeModelRef, normalizeProviderId } from "../agents/model-selection.js";
 import type { NormalizedUsage } from "../agents/usage.js";
 import type { ModelProviderConfig } from "../config/types.models.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { getGatewayModelPricingCacheFingerprint } from "../gateway/model-pricing-cache-state.js";
 import { getCachedGatewayModelPricing } from "../gateway/model-pricing-cache.js";
 import { tryReadJsonSync } from "../infra/json-files.js";
@@ -382,7 +382,7 @@ function loadModelsJsonCostIndex(options?: {
 function findConfiguredProviderCost(params: {
   provider?: string;
   model?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   allowPluginNormalization?: boolean;
 }): ModelCostConfig | undefined {
   const key = toResolvedModelKey(params);
@@ -576,7 +576,7 @@ function serializeCostIndex(
  * Fingerprints all model-pricing sources that can affect usage cost estimates.
  * Consumers cache this value to know when resolved cost entries need recomputation.
  */
-export function resolveModelCostConfigFingerprint(config?: OpenClawConfig): string {
+export function resolveModelCostConfigFingerprint(config?: SteelEngineConfig): string {
   return stableCostFingerprintValue({
     configuredRaw: serializeCostIndex(
       getProviderCostIndex(config?.models?.providers, { allowPluginNormalization: false }),
@@ -595,7 +595,7 @@ export function resolveModelCostConfigFingerprint(config?: OpenClawConfig): stri
 export function resolveModelCostConfig(params: {
   provider?: string;
   model?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   allowPluginNormalization?: boolean;
 }): ModelCostConfig | undefined {
   const rawKey = toDirectModelKey(params);

@@ -1,6 +1,6 @@
 /* @vitest-environment jsdom */
 
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { GatewayRequestError } from "../../api/gateway.ts";
 import type { GatewaySessionRow, SessionsListResult } from "../../api/types.ts";
@@ -874,7 +874,7 @@ describe("refreshChatAvatar", () => {
     );
     const fetchMock = vi.fn((input: string | URL | Request) => {
       const url = requestUrl(input);
-      if (url === "/openclaw/avatar/main?meta=1") {
+      if (url === "/steelengine/avatar/main?meta=1") {
         return Promise.resolve({
           ok: true,
           json: async () => ({ avatarUrl: "/avatar/main" }),
@@ -891,7 +891,7 @@ describe("refreshChatAvatar", () => {
     vi.stubGlobal("fetch", fetchMock as unknown as typeof fetch);
 
     const host = makeHost({
-      basePath: "/openclaw/",
+      basePath: "/steelengine/",
       sessionKey: "agent:main",
       settings: { token: "session-token" },
       password: "shared-password",
@@ -900,7 +900,7 @@ describe("refreshChatAvatar", () => {
     await refreshChatAvatar(host);
 
     expect(fetchUrl(fetchMock as unknown as MockCallSource, 0)).toBe(
-      "/openclaw/avatar/main?meta=1",
+      "/steelengine/avatar/main?meta=1",
     );
     expect(fetchInit(fetchMock as unknown as MockCallSource, 0).method).toBe("GET");
     expect(fetchInit(fetchMock as unknown as MockCallSource, 0).headers).toEqual({
@@ -928,7 +928,7 @@ describe("refreshChatAvatar", () => {
     );
     const fetchMock = vi.fn((input: string | URL | Request) => {
       const url = requestUrl(input);
-      if (url === "/openclaw/avatar/main?meta=1") {
+      if (url === "/steelengine/avatar/main?meta=1") {
         return Promise.resolve({
           ok: true,
           json: async () => ({ avatarUrl: "/avatar/main" }),
@@ -945,14 +945,14 @@ describe("refreshChatAvatar", () => {
     vi.stubGlobal("fetch", fetchMock as unknown as typeof fetch);
 
     const host = makeHost({
-      basePath: "/openclaw/",
+      basePath: "/steelengine/",
       sessionKey: "agent:main",
       settings: { token: "session-token" },
     });
     await refreshChatAvatar(host);
 
     expect(fetchUrl(fetchMock as unknown as MockCallSource, 0)).toBe(
-      "/openclaw/avatar/main?meta=1",
+      "/steelengine/avatar/main?meta=1",
     );
     expect(fetchInit(fetchMock as unknown as MockCallSource, 0).method).toBe("GET");
     expect(fetchInit(fetchMock as unknown as MockCallSource, 0).headers).toEqual({
@@ -975,10 +975,10 @@ describe("refreshChatAvatar", () => {
     });
     vi.stubGlobal("fetch", fetchMock as unknown as typeof fetch);
 
-    const host = makeHost({ basePath: "/openclaw/", sessionKey: "agent:ops:main" });
+    const host = makeHost({ basePath: "/steelengine/", sessionKey: "agent:ops:main" });
     await refreshChatAvatar(host);
 
-    expect(fetchUrl(fetchMock as unknown as MockCallSource, 0)).toBe("/openclaw/avatar/ops?meta=1");
+    expect(fetchUrl(fetchMock as unknown as MockCallSource, 0)).toBe("/steelengine/avatar/ops?meta=1");
     expect(fetchInit(fetchMock as unknown as MockCallSource, 0).method).toBe("GET");
     expect(host.chatAvatarUrl).toBeNull();
   });
@@ -4103,7 +4103,7 @@ describe("handleSendChat", () => {
     ).toEqual(["user", "assistant"]);
     expect(
       inactiveCached.filter((message) => {
-        const marker = requireRecord(message, "cached terminal transcript")["__openclaw"];
+        const marker = requireRecord(message, "cached terminal transcript")["__steelengine"];
         return (
           marker &&
           typeof marker === "object" &&
@@ -6001,7 +6001,7 @@ describe("handleSendChat", () => {
           messages: [
             {
               role: "user",
-              __openclaw: { idempotencyKey: "ambiguous-run:user" },
+              __steelengine: { idempotencyKey: "ambiguous-run:user" },
             },
           ],
           sessionInfo: row("agent:main", { hasActiveRun: false, status: "done" }),
@@ -6044,7 +6044,7 @@ describe("handleSendChat", () => {
               : [
                   {
                     role: "user",
-                    __openclaw: { idempotencyKey: "late-history-proof:user" },
+                    __steelengine: { idempotencyKey: "late-history-proof:user" },
                   },
                 ],
           sessionInfo: row("agent:main", { hasActiveRun: false, status: "done" }),
@@ -6146,7 +6146,7 @@ describe("handleSendChat", () => {
           messages: [
             {
               role: "user",
-              __openclaw: { idempotencyKey: "delivered-removal-failure:user" },
+              __steelengine: { idempotencyKey: "delivered-removal-failure:user" },
             },
           ],
           sessionInfo: row("agent:main", { hasActiveRun: false, status: "done" }),

@@ -1,15 +1,15 @@
 /** Main reply dispatch pipeline from finalized config/context to delivery payloads. */
-import { isParentOwnedBackgroundAcpSession } from "@openclaw/acp-core/session-interaction-mode";
+import { isParentOwnedBackgroundAcpSession } from "@steelengine/acp-core/session-interaction-mode";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
-import { truncateUtf16Safe } from "@openclaw/normalization-core/utf16-slice";
+} from "@steelengine/normalization-core/string-coerce";
+import { truncateUtf16Safe } from "@steelengine/normalization-core/utf16-slice";
 import {
   hasOutboundReplyContent,
   isFastModeAutoProgressPayload,
   resolveSendableOutboundReplyParts,
-} from "openclaw/plugin-sdk/reply-payload";
+} from "steelengine/plugin-sdk/reply-payload";
 import { readAcpSessionMeta } from "../../acp/runtime/session-meta.js";
 import {
   resolveAgentConfig,
@@ -45,7 +45,7 @@ import {
 import { applyMergePatch } from "../../config/merge-patch.js";
 import { normalizeExplicitSessionKey } from "../../config/sessions/explicit-session-key-normalization.js";
 import { resolveGroupSessionKey } from "../../config/sessions/group.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { logVerbose } from "../../globals.js";
 import { fireAndForgetHook } from "../../hooks/fire-and-forget.js";
 import {
@@ -212,7 +212,7 @@ function createReplyDispatchEvent(
 }
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
-  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("openclaw.dispatchFromConfigTestApi")] = {
+  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("steelengine.dispatchFromConfigTestApi")] = {
     createReplyDispatchEvent,
   };
 }
@@ -2169,7 +2169,7 @@ async function dispatchReplyFromConfigInner(
       (await traceReplyPhase("reply.load_reply_resolver", () => loadGetReplyFromConfigRuntime()))
         .getReplyFromConfig;
     const replyConfig = withFullRuntimeReplyConfig(
-      params.configOverride ? (applyMergePatch(cfg, params.configOverride) as OpenClawConfig) : cfg,
+      params.configOverride ? (applyMergePatch(cfg, params.configOverride) as SteelEngineConfig) : cfg,
     );
     recordAgentDispatchStarted();
     const replyResult = await runWithDispatchLifecycleAdmission(

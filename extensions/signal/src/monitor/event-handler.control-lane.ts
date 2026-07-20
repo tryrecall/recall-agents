@@ -3,8 +3,8 @@ import {
   listChatCommands,
   maybeResolveTextAlias,
   normalizeCommandBody,
-} from "openclaw/plugin-sdk/command-auth-native";
-import { isAbortRequestText } from "openclaw/plugin-sdk/command-primitives-runtime";
+} from "steelengine/plugin-sdk/command-auth-native";
+import { isAbortRequestText } from "steelengine/plugin-sdk/command-primitives-runtime";
 import type { SignalIngressLifecycle } from "../signal-ingress.js";
 
 export type SignalInboundEntry = {

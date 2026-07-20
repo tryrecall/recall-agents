@@ -1,6 +1,6 @@
 /** Prepares secrets runtime snapshots from config, auth stores, plugins, and env. */
 import { isDeepStrictEqual } from "node:util";
-import { uniqueStrings } from "@openclaw/normalization-core/string-normalization";
+import { uniqueStrings } from "@steelengine/normalization-core/string-normalization";
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope-config.js";
 import {
   clearRuntimeAuthProfileStoreSnapshots,
@@ -13,7 +13,7 @@ import {
   getRuntimeConfigSnapshot,
   type RuntimeConfigSnapshotRefreshParams,
 } from "../config/runtime-snapshot.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { coerceSecretRef } from "../config/types.secrets.js";
 import type { PluginManifestRegistry } from "../plugins/manifest-registry.js";
 import type { PluginMetadataSnapshot } from "../plugins/plugin-metadata-snapshot.js";
@@ -64,7 +64,7 @@ const loadRuntimeOwnerAssignmentHelpers = createLazyRuntimeModule(
 );
 
 async function resolveLoadablePluginOrigins(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   pluginMetadataSnapshot?: Pick<PluginMetadataSnapshot, "plugins">;
 }): Promise<ReadonlyMap<string, PluginOrigin>> {
@@ -84,7 +84,7 @@ async function resolveLoadablePluginOrigins(params: {
   return listPluginOriginsFromMetadataSnapshot(snapshot);
 }
 
-function hasConfiguredPluginEntries(config: OpenClawConfig): boolean {
+function hasConfiguredPluginEntries(config: SteelEngineConfig): boolean {
   const entries = config.plugins?.entries;
   return (
     Boolean(entries) &&
@@ -94,7 +94,7 @@ function hasConfiguredPluginEntries(config: OpenClawConfig): boolean {
   );
 }
 
-function hasConfiguredChannelEntries(config: OpenClawConfig): boolean {
+function hasConfiguredChannelEntries(config: SteelEngineConfig): boolean {
   const channels = config.channels;
   return (
     Boolean(channels) &&
@@ -104,7 +104,7 @@ function hasConfiguredChannelEntries(config: OpenClawConfig): boolean {
   );
 }
 
-function hasConfiguredPluginIntegrationSecretProviders(config: OpenClawConfig): boolean {
+function hasConfiguredPluginIntegrationSecretProviders(config: SteelEngineConfig): boolean {
   const providers = config.secrets?.providers;
   if (!providers || typeof providers !== "object" || Array.isArray(providers)) {
     return false;
@@ -117,7 +117,7 @@ function hasConfiguredPluginIntegrationSecretProviders(config: OpenClawConfig): 
   );
 }
 
-function shouldLoadPluginMetadataForSecrets(config: OpenClawConfig): boolean {
+function shouldLoadPluginMetadataForSecrets(config: SteelEngineConfig): boolean {
   return (
     hasConfiguredPluginEntries(config) ||
     hasConfiguredChannelEntries(config) ||
@@ -127,9 +127,9 @@ function shouldLoadPluginMetadataForSecrets(config: OpenClawConfig): boolean {
 
 /** Prepares a secrets runtime snapshot and records refresh context for later activation. */
 export async function prepareSecretsRuntimeSnapshot(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   /** Optional assignment projection; resolver/plugin policy still uses the full config. */
-  assignmentConfig?: OpenClawConfig;
+  assignmentConfig?: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   agentDirs?: string[];
   /** Skip config and web-tool refs when only auth-profile stores need materialization. */
@@ -328,7 +328,7 @@ type PreparedSecretsRuntimeRefresh = {
 
 function coercePreflightRefresh(
   value: unknown,
-  sourceConfig: OpenClawConfig,
+  sourceConfig: SteelEngineConfig,
 ): PreparedSecretsRuntimeRefresh | null {
   if (!value || typeof value !== "object") {
     return null;
@@ -342,9 +342,9 @@ function coercePreflightRefresh(
 }
 
 async function prepareActiveSecretsRuntimeRefresh(
-  sourceConfig: OpenClawConfig,
+  sourceConfig: SteelEngineConfig,
   includeAuthStoreRefs?: boolean,
-  snapshotConfig: OpenClawConfig = sourceConfig,
+  snapshotConfig: SteelEngineConfig = sourceConfig,
 ): Promise<PreparedSecretsRuntimeRefresh | null> {
   const expectedRevision = getActiveSecretsRuntimeSnapshotRevisionState();
   const activeRefreshContext = getActiveSecretsRuntimeRefreshContext();
@@ -419,7 +419,7 @@ function patchResolvedSecretRefLeaves(params: {
   current: unknown;
   source: unknown;
   resolved: unknown;
-  defaults: NonNullable<OpenClawConfig["secrets"]>["defaults"];
+  defaults: NonNullable<SteelEngineConfig["secrets"]>["defaults"];
 }): ResolvedSecretRefPatch {
   if (coerceSecretRef(params.source, params.defaults)) {
     return isDeepStrictEqual(params.source, params.resolved)
@@ -467,7 +467,7 @@ function patchResolvedSecretRefLeaves(params: {
   return { changed: false, value: params.current };
 }
 
-function selectProviderAuthConfig(config: OpenClawConfig): OpenClawConfig {
+function selectProviderAuthConfig(config: SteelEngineConfig): SteelEngineConfig {
   return {
     ...(config.secrets === undefined ? {} : { secrets: config.secrets }),
     ...(config.models === undefined ? {} : { models: config.models }),
@@ -524,7 +524,7 @@ export async function refreshActiveProviderAuthRuntimeSnapshot(): Promise<boolea
       defaults: activeSnapshot.sourceConfig.secrets?.defaults,
     });
     if (modelsPatch.changed) {
-      config.models = modelsPatch.value as OpenClawConfig["models"];
+      config.models = modelsPatch.value as SteelEngineConfig["models"];
     }
     const refreshedSnapshot: PreparedSecretsRuntimeSnapshot = {
       ...activeSnapshot,

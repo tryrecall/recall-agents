@@ -3,11 +3,11 @@
  *
  * Reads bounded, redacted session transcript history after session visibility filtering.
  */
-import { estimateBase64DecodedBytes } from "@openclaw/media-core/base64";
-import { readStringValue } from "@openclaw/normalization-core/string-coerce";
+import { estimateBase64DecodedBytes } from "@steelengine/media-core/base64";
+import { readStringValue } from "@steelengine/normalization-core/string-coerce";
 import { Type } from "typebox";
 import { getRuntimeConfig } from "../../config/config.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { callGateway } from "../../gateway/call.js";
 import { capArrayByJsonBytes } from "../../gateway/session-transcript-readers.js";
 import { jsonUtf8Bytes } from "../../infra/json-utf8-bytes.js";
@@ -137,8 +137,8 @@ function sanitizeHistoryContentBlock(block: unknown): {
       delete entry.thinkingSignature;
       truncated = true;
     }
-    if ("openclawReasoningReplay" in entry) {
-      delete entry.openclawReasoningReplay;
+    if ("steelengineReasoningReplay" in entry) {
+      delete entry.steelengineReasoningReplay;
       truncated = true;
     }
   }
@@ -233,7 +233,7 @@ function readHistoryMessageSeq(message: unknown): number | undefined {
   if (!message || typeof message !== "object" || Array.isArray(message)) {
     return undefined;
   }
-  const meta = (message as Record<string, unknown>)["__openclaw"];
+  const meta = (message as Record<string, unknown>)["__steelengine"];
   if (!meta || typeof meta !== "object" || Array.isArray(meta)) {
     return undefined;
   }
@@ -245,7 +245,7 @@ function readHistoryMessageId(message: unknown): string | undefined {
   if (!message || typeof message !== "object" || Array.isArray(message)) {
     return undefined;
   }
-  const meta = (message as Record<string, unknown>)["__openclaw"];
+  const meta = (message as Record<string, unknown>)["__steelengine"];
   if (!meta || typeof meta !== "object" || Array.isArray(meta)) {
     return undefined;
   }
@@ -307,7 +307,7 @@ function buildSessionsHistoryOmittedPlaceholder(source: unknown): Record<string,
     content: "[sessions_history omitted: message too large]",
     ...(seq !== undefined || id !== undefined
       ? {
-          __openclaw: {
+          __steelengine: {
             ...(seq !== undefined ? { seq } : {}),
             ...(id !== undefined ? { id } : {}),
           },
@@ -374,7 +374,7 @@ function resolveSessionsHistoryPaginationMetadata(params: {
 export function createSessionsHistoryTool(opts?: {
   agentSessionKey?: string;
   sandboxed?: boolean;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   callGateway?: GatewayCaller;
 }): AnyAgentTool {
   return {

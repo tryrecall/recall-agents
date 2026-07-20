@@ -1,9 +1,9 @@
 // Slack tests cover slash plugin behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   clearRuntimeConfigSnapshot,
   setRuntimeConfigSnapshot,
-} from "openclaw/plugin-sdk/runtime-config-snapshot";
+} from "steelengine/plugin-sdk/runtime-config-snapshot";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { getSlackSlashMocks, resetSlackSlashMocks } from "./slash.test-harness.js";
 
@@ -11,9 +11,9 @@ const slashCommandMenuMocks = vi.hoisted(() => ({
   resolveCommandArgMenu: vi.fn(),
 }));
 
-vi.mock("openclaw/plugin-sdk/agent-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/agent-runtime")>(
-    "openclaw/plugin-sdk/agent-runtime",
+vi.mock("steelengine/plugin-sdk/agent-runtime", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/agent-runtime")>(
+    "steelengine/plugin-sdk/agent-runtime",
   );
   return {
     ...actual,
@@ -362,7 +362,7 @@ function createDeferred<T>() {
 }
 
 function createArgMenusHarness(
-  cfg: OpenClawConfig = { commands: { native: true, nativeSkills: false } },
+  cfg: SteelEngineConfig = { commands: { native: true, nativeSkills: false } },
 ) {
   const commands = new Map<string | RegExp, (args: unknown) => Promise<void>>();
   const actions = new Map<string | RegExp, (args: unknown) => Promise<void>>();
@@ -401,7 +401,7 @@ function createArgMenusHarness(
     channelsConfig: undefined,
     slashCommand: {
       enabled: false,
-      name: "openclaw",
+      name: "steelengine",
       ephemeral: true,
       sessionPrefix: "slack:slash",
     },
@@ -653,8 +653,8 @@ describe("Slack native command argument menus", () => {
     unsafeConfirmHandler = requireHandler(harness.commands, "/unsafeconfirm", "/unsafeconfirm");
     longConfirmHandler = requireHandler(harness.commands, "/longconfirm", "/longconfirm");
     agentStatusHandler = requireHandler(harness.commands, "/agentstatus", "/agentstatus");
-    argMenuHandler = requireHandler(harness.actions, /^openclaw_cmdarg/, "arg-menu action");
-    argMenuOptionsHandler = requireHandler(harness.options, "openclaw_cmdarg", "arg-menu options");
+    argMenuHandler = requireHandler(harness.actions, /^steelengine_cmdarg/, "arg-menu action");
+    argMenuOptionsHandler = requireHandler(harness.options, "steelengine_cmdarg", "arg-menu options");
   });
 
   beforeEach(() => {
@@ -672,7 +672,7 @@ describe("Slack native command argument menus", () => {
 
     expect(
       [...configuredHarness.commands.keys()].some(
-        (command) => command instanceof RegExp && command.test("/openclaw"),
+        (command) => command instanceof RegExp && command.test("/steelengine"),
       ),
     ).toBe(true);
     expect(configuredHarness.commands.has("/usage")).toBe(false);
@@ -684,14 +684,14 @@ describe("Slack native command argument menus", () => {
     expect(testHarness.commands.size).toBeGreaterThan(0);
     expect(
       Array.from(testHarness.actions.keys()).some(
-        (key) => key instanceof RegExp && String(key) === String(/^openclaw_cmdarg/),
+        (key) => key instanceof RegExp && String(key) === String(/^steelengine_cmdarg/),
       ),
     ).toBe(true);
-    expect(testHarness.options.has("openclaw_cmdarg")).toBe(true);
+    expect(testHarness.options.has("steelengine_cmdarg")).toBe(true);
     expect(testHarness.optionsReceiverContexts[0]).toBe(testHarness.app);
   });
 
-  it.each(["codex", "openclaw"] as const)(
+  it.each(["codex", "steelengine"] as const)(
     "passes the configured %s runtime to dynamic /think choices",
     async (agentRuntime) => {
       const testHarness = createArgMenusHarness({
@@ -736,7 +736,7 @@ describe("Slack native command argument menus", () => {
     );
     expect(
       Array.from(testHarness.actions.keys()).some(
-        (key) => key instanceof RegExp && String(key) === String(/^openclaw_cmdarg/),
+        (key) => key instanceof RegExp && String(key) === String(/^steelengine_cmdarg/),
       ),
     ).toBe(true);
 
@@ -764,8 +764,8 @@ describe("Slack native command argument menus", () => {
     const actions = expectArgMenuLayout(respond);
     const elementType = actions?.elements?.[0]?.type;
     expect(elementType).toBe("button");
-    expect(actions?.elements?.[0]?.action_id).toBe("openclaw_cmdarg_0_0");
-    expect(actions?.elements?.[1]?.action_id).toBe("openclaw_cmdarg_0_1");
+    expect(actions?.elements?.[0]?.action_id).toBe("steelengine_cmdarg_0_0");
+    expect(actions?.elements?.[1]?.action_id).toBe("steelengine_cmdarg_0_1");
     expect(actions?.elements?.[0]).toHaveProperty("confirm");
   });
 
@@ -774,7 +774,7 @@ describe("Slack native command argument menus", () => {
     const actions = expectArgMenuLayout(respond);
     const element = actions?.elements?.[0];
     expect(element?.type).toBe("static_select");
-    expect(element?.action_id).toBe("openclaw_cmdarg");
+    expect(element?.action_id).toBe("steelengine_cmdarg");
     expect(element).toHaveProperty("confirm");
   });
 
@@ -836,7 +836,7 @@ describe("Slack native command argument menus", () => {
   it("shows an overflow menu when choices fit compact range", async () => {
     const element = await getFirstActionElementFromCommand(reportCompactHandler);
     expect(element?.type).toBe("overflow");
-    expect(element?.action_id).toBe("openclaw_cmdarg");
+    expect(element?.action_id).toBe("steelengine_cmdarg");
     expect(element).toHaveProperty("confirm");
   });
 
@@ -993,15 +993,15 @@ describe("Slack native command argument menus", () => {
     const actions = findFirstActionsBlock(payload);
     const element = actions?.elements?.[0];
     expect(element?.type).toBe("external_select");
-    expect(element?.action_id).toBe("openclaw_cmdarg");
-    expect(blockId).toContain("openclaw_cmdarg_ext:");
-    const token = (blockId ?? "").slice("openclaw_cmdarg_ext:".length);
+    expect(element?.action_id).toBe("steelengine_cmdarg");
+    expect(blockId).toContain("steelengine_cmdarg_ext:");
+    const token = (blockId ?? "").slice("steelengine_cmdarg_ext:".length);
     expect(token).toMatch(/^[A-Za-z0-9_-]{24}$/);
   });
 
   it("serves filtered options for external_select menus", async () => {
     const { blockId } = await runCommandAndResolveActionsBlock(reportExternalHandler);
-    expect(blockId).toContain("openclaw_cmdarg_ext:");
+    expect(blockId).toContain("steelengine_cmdarg_ext:");
 
     const ackOptions = vi.fn().mockResolvedValue(undefined);
     await argMenuOptionsHandler({
@@ -1023,7 +1023,7 @@ describe("Slack native command argument menus", () => {
 
   it("truncates served option labels on a surrogate boundary", async () => {
     const { blockId } = await runCommandAndResolveActionsBlock(reportExternalHandler);
-    expect(blockId).toContain("openclaw_cmdarg_ext:");
+    expect(blockId).toContain("steelengine_cmdarg_ext:");
 
     const ackOptions = vi.fn().mockResolvedValue(undefined);
     await argMenuOptionsHandler({
@@ -1063,7 +1063,7 @@ describe("Slack native command argument menus", () => {
     );
     const argMenuOptionsTrackingHandler = requireHandler(
       trackingHarness.options,
-      "openclaw_cmdarg",
+      "steelengine_cmdarg",
       "arg-menu options",
     );
     const { blockId } = await runCommandAndResolveActionsBlock(reportExternalTrackingHandler);
@@ -1084,7 +1084,7 @@ describe("Slack native command argument menus", () => {
 
   it("rejects external_select option requests without user identity", async () => {
     const { blockId } = await runCommandAndResolveActionsBlock(reportExternalHandler);
-    expect(blockId).toContain("openclaw_cmdarg_ext:");
+    expect(blockId).toContain("steelengine_cmdarg_ext:");
 
     const ackOptions = vi.fn().mockResolvedValue(undefined);
     await argMenuOptionsHandler({
@@ -1121,7 +1121,7 @@ describe("Slack native command argument menus", () => {
     await registerCommands(trackingHarness.ctx, trackingHarness.account, trackEvent);
     const argMenuTrackingHandler = requireHandler(
       trackingHarness.actions,
-      /^openclaw_cmdarg/,
+      /^steelengine_cmdarg/,
       "arg-menu action",
     );
 
@@ -1202,7 +1202,7 @@ function createPolicyHarness(overrides?: {
     channelsConfig: overrides?.channelsConfig,
     slashCommand: {
       enabled: overrides?.slashCommandEnabled ?? true,
-      name: overrides?.slashCommandName ?? "openclaw",
+      name: overrides?.slashCommandName ?? "steelengine",
       ephemeral: overrides?.slashEphemeral ?? true,
       sessionPrefix: "slack:slash",
     },
@@ -1521,12 +1521,12 @@ describe("slack slash command session metadata", () => {
       channelName: "directmessage",
       resolveChannelName: async () => ({ name: "directmessage", type: "im" }),
     });
-    const sourceCfg = (harness.ctx as { cfg: OpenClawConfig }).cfg;
+    const sourceCfg = (harness.ctx as { cfg: SteelEngineConfig }).cfg;
     const runtimeCfg = {
       ...sourceCfg,
       session: { dmScope: "per-channel-peer" },
-    } as OpenClawConfig;
-    resolveAgentRouteMock.mockImplementation((params: { cfg: OpenClawConfig }) => ({
+    } as SteelEngineConfig;
+    resolveAgentRouteMock.mockImplementation((params: { cfg: SteelEngineConfig }) => ({
       agentId: "main",
       accountId: "acct",
       sessionKey:

@@ -623,6 +623,6 @@ class ChatQuestionPanel extends LitElement {
   }
 }
 
-if (!customElements.get("openclaw-chat-question-panel")) {
-  customElements.define("openclaw-chat-question-panel", ChatQuestionPanel);
+if (!customElements.get("steelengine-chat-question-panel")) {
+  customElements.define("steelengine-chat-question-panel", ChatQuestionPanel);
 }

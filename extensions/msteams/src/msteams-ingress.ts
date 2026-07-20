@@ -4,8 +4,8 @@ import {
   DEFAULT_INGRESS_RETRY_DEAD_LETTER_MIN_AGE_MS,
   DEFAULT_INGRESS_RETRY_MAX_ATTEMPTS,
   type ChannelIngressQueue,
-} from "openclaw/plugin-sdk/channel-outbound";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/channel-outbound";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
 import { classifyMSTeamsSendError } from "./errors.js";
 import { getMSTeamsRuntime } from "./runtime.js";
 import type { MSTeamsTurnContext } from "./sdk-types.js";

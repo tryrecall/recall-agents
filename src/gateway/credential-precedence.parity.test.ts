@@ -2,7 +2,7 @@
 // aligned on local/remote gateway token and password resolution.
 import { describe, expect, it } from "vitest";
 import { resolveGatewayProbeAuthResolution } from "../commands/status.gateway-probe.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import { withEnv } from "../test-utils/env.js";
 import { resolveGatewayAuth } from "./auth.js";
 import { resolveGatewayCredentialsFromConfig } from "./credentials.js";
@@ -17,17 +17,17 @@ type ExpectedCredentialSet = {
 
 type TestCase = {
   name: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   expected: ExpectedCredentialSet;
 };
 
 const gatewayEnv = {
-  OPENCLAW_GATEWAY_TOKEN: "env-token", // pragma: allowlist secret
-  OPENCLAW_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
+  STEELENGINE_GATEWAY_TOKEN: "env-token", // pragma: allowlist secret
+  STEELENGINE_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
 } as NodeJS.ProcessEnv;
 
-function makeRemoteGatewayConfig(remote: { token?: string; password?: string }): OpenClawConfig {
+function makeRemoteGatewayConfig(remote: { token?: string; password?: string }): SteelEngineConfig {
   return {
     gateway: {
       mode: "remote",
@@ -37,15 +37,15 @@ function makeRemoteGatewayConfig(remote: { token?: string; password?: string }):
         password: "local-password", // pragma: allowlist secret
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 function withGatewayAuthEnv<T>(env: NodeJS.ProcessEnv, fn: () => T): T {
   return withEnv(
     {
-      OPENCLAW_GATEWAY_TOKEN: env.OPENCLAW_GATEWAY_TOKEN,
-      OPENCLAW_GATEWAY_PASSWORD: env.OPENCLAW_GATEWAY_PASSWORD,
-      OPENCLAW_SERVICE_KIND: env.OPENCLAW_SERVICE_KIND,
+      STEELENGINE_GATEWAY_TOKEN: env.STEELENGINE_GATEWAY_TOKEN,
+      STEELENGINE_GATEWAY_PASSWORD: env.STEELENGINE_GATEWAY_PASSWORD,
+      STEELENGINE_SERVICE_KIND: env.STEELENGINE_SERVICE_KIND,
     },
     fn,
   );
@@ -63,10 +63,10 @@ describe("gateway credential precedence coverage", () => {
             password: "config-password", // pragma: allowlist secret
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       env: {
-        OPENCLAW_GATEWAY_TOKEN: "env-token", // pragma: allowlist secret
-        OPENCLAW_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
+        STEELENGINE_GATEWAY_TOKEN: "env-token", // pragma: allowlist secret
+        STEELENGINE_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
       } as NodeJS.ProcessEnv,
       expected: {
         call: { token: "env-token", password: "env-password" }, // pragma: allowlist secret
@@ -112,11 +112,11 @@ describe("gateway credential precedence coverage", () => {
             password: "config-password", // pragma: allowlist secret
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       env: {
-        OPENCLAW_GATEWAY_TOKEN: "env-token",
-        OPENCLAW_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
-        OPENCLAW_SERVICE_KIND: "gateway",
+        STEELENGINE_GATEWAY_TOKEN: "env-token",
+        STEELENGINE_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
+        STEELENGINE_SERVICE_KIND: "gateway",
       } as NodeJS.ProcessEnv,
       expected: {
         call: { token: "config-token", password: "env-password" }, // pragma: allowlist secret

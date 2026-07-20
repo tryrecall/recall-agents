@@ -41,8 +41,8 @@ describe("fetchNpmRegistryPackumentWithRetry", () => {
     const packument = { versions: { "2026.7.1-beta.3": {} } };
 
     const result = await fetchNpmRegistryPackumentWithRetry({
-      packageName: "@openclaw/meta-provider",
-      packageUrl: "https://registry.npmjs.org/%40openclaw%2Fmeta-provider",
+      packageName: "@steelengine/meta-provider",
+      packageUrl: "https://registry.npmjs.org/%40steelengine%2Fmeta-provider",
       fetchImpl: async () => {
         fetchCalls += 1;
         return registryResponse(
@@ -75,8 +75,8 @@ describe("fetchNpmRegistryPackumentWithRetry", () => {
 
     await expect(
       fetchNpmRegistryPackumentWithRetry({
-        packageName: "@openclaw/meta-provider",
-        packageUrl: "https://registry.npmjs.org/%40openclaw%2Fmeta-provider",
+        packageName: "@steelengine/meta-provider",
+        packageUrl: "https://registry.npmjs.org/%40steelengine%2Fmeta-provider",
         fetchImpl: async () => {
           fetchCalls += 1;
           return registryResponse({
@@ -105,8 +105,8 @@ describe("fetchNpmRegistryPackumentWithRetry", () => {
     const packument = { versions: { "2026.7.1-beta.3": {} } };
 
     const result = await fetchNpmRegistryPackumentWithRetry({
-      packageName: "@openclaw/meta-provider",
-      packageUrl: "https://registry.npmjs.org/%40openclaw%2Fmeta-provider",
+      packageName: "@steelengine/meta-provider",
+      packageUrl: "https://registry.npmjs.org/%40steelengine%2Fmeta-provider",
       fetchImpl: async () => {
         fetchCalls += 1;
         return registryResponse(
@@ -139,8 +139,8 @@ describe("fetchNpmRegistryPackumentWithRetry", () => {
 
     await expect(
       fetchNpmRegistryPackumentWithRetry({
-        packageName: "@openclaw/meta-provider",
-        packageUrl: "https://registry.npmjs.org/%40openclaw%2Fmeta-provider",
+        packageName: "@steelengine/meta-provider",
+        packageUrl: "https://registry.npmjs.org/%40steelengine%2Fmeta-provider",
         fetchImpl: async () => {
           fetchCalls += 1;
           return registryResponse({
@@ -167,8 +167,8 @@ describe("fetchNpmRegistryPackumentWithRetry", () => {
     let cancelCalls = 0;
 
     const result = await fetchNpmRegistryPackumentWithRetry({
-      packageName: "@openclaw/meta-provider",
-      packageUrl: "https://registry.npmjs.org/%40openclaw%2Fmeta-provider",
+      packageName: "@steelengine/meta-provider",
+      packageUrl: "https://registry.npmjs.org/%40steelengine%2Fmeta-provider",
       fetchImpl: async () => {
         fetchCalls += 1;
         return registryResponse({

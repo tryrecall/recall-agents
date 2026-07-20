@@ -1,7 +1,7 @@
 // Microsoft Foundry tests cover index plugin behavior.
-import type { StreamFn } from "openclaw/plugin-sdk/agent-core";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { createTestPluginApi } from "openclaw/plugin-sdk/plugin-test-api";
+import type { StreamFn } from "steelengine/plugin-sdk/agent-core";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { createTestPluginApi } from "steelengine/plugin-sdk/plugin-test-api";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getAccessTokenResultAsync } from "./cli.js";
 import plugin from "./index.js";
@@ -51,17 +51,17 @@ vi.mock("node:child_process", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/process-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/process-runtime")>();
+vi.mock("steelengine/plugin-sdk/process-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("steelengine/plugin-sdk/process-runtime")>();
   return {
     ...actual,
     runExec: execFileMock,
   };
 });
 
-vi.mock("openclaw/plugin-sdk/provider-auth", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/provider-auth")>(
-    "openclaw/plugin-sdk/provider-auth",
+vi.mock("steelengine/plugin-sdk/provider-auth", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/provider-auth")>(
+    "steelengine/plugin-sdk/provider-auth",
   );
   return {
     ...actual,
@@ -199,7 +199,7 @@ function buildFoundryConfig(params?: {
         },
       },
     },
-  } satisfies OpenClawConfig;
+  } satisfies SteelEngineConfig;
 }
 
 function buildEntraProfileStore(
@@ -354,7 +354,7 @@ describe("microsoft-foundry plugin", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
 
     await provider.onModelSelected?.({
       config,
@@ -700,7 +700,7 @@ describe("microsoft-foundry plugin", () => {
 
   it("keeps other configured Foundry models when switching the selected model", async () => {
     const provider = registerProvider();
-    const config: OpenClawConfig = {
+    const config: SteelEngineConfig = {
       auth: {
         profiles: {
           "microsoft-foundry:default": {
@@ -829,7 +829,7 @@ describe("microsoft-foundry plugin", () => {
 
   it("infers OpenAI routing when adding a GPT deployment from a Claude-configured provider", async () => {
     const provider = registerProvider();
-    const config: OpenClawConfig = {
+    const config: SteelEngineConfig = {
       models: {
         providers: {
           "microsoft-foundry": {
@@ -1596,7 +1596,7 @@ describe("microsoft-foundry plugin", () => {
     expect(provider?.models[0]?.compat?.maxTokensField).toBe("max_completion_tokens");
   });
 
-  it("emits only persisted-schema thinkingLevelMap level keys for Entra ID reasoning onboarding (openclaw#91011)", () => {
+  it("emits only persisted-schema thinkingLevelMap level keys for Entra ID reasoning onboarding (steelengine#91011)", () => {
     // The persisted ModelDefinitionSchema only accepts these ModelThinkingLevel keys; if the writer
     // emits one outside the set, updateConfig rolls the Entra ID onboarding write back.
     const allowedThinkingLevels = new Set([
@@ -1710,7 +1710,7 @@ describe("microsoft-foundry plugin", () => {
 
   it("keeps persisted response-mode routing for custom deployment aliases", async () => {
     const provider = registerProvider();
-    const config: OpenClawConfig = {
+    const config: SteelEngineConfig = {
       auth: {
         profiles: {
           "microsoft-foundry:entra": {
@@ -1885,7 +1885,7 @@ describe("microsoft-foundry plugin", () => {
 
   it("keeps Foundry profile selection compatible with unrelated AWS SDK profile modes", async () => {
     const provider = registerProvider();
-    const config: OpenClawConfig = {
+    const config: SteelEngineConfig = {
       ...buildFoundryConfig({
         profileIds: ["microsoft-foundry:entra"],
         orderedProfileIds: ["microsoft-foundry:entra"],

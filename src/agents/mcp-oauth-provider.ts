@@ -1,11 +1,11 @@
-/** MCP SDK OAuth provider backed by canonical OpenClaw state. */
+/** MCP SDK OAuth provider backed by canonical SteelEngine state. */
 import { randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 import type { OAuthClientProvider } from "@modelcontextprotocol/sdk/client/auth.js";
 import type { OAuthClientMetadata, OAuthTokens } from "@modelcontextprotocol/sdk/shared/auth.js";
 import type { FetchLike } from "@modelcontextprotocol/sdk/shared/transport.js";
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
-import type { OpenClawStateLeaseContext } from "../state/openclaw-state-lease.js";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
+import type { SteelEngineStateLeaseContext } from "../state/steelengine-state-lease.js";
 import {
   readMcpOAuthStore,
   resolveMcpOAuthStoreKey,
@@ -42,7 +42,7 @@ function buildOAuthClientMetadata(
 ): OAuthClientMetadata {
   const redirectUrl = resolveOAuthRedirectUrl(config, store);
   return {
-    client_name: "OpenClaw MCP",
+    client_name: "SteelEngine MCP",
     redirect_uris: [redirectUrl],
     grant_types: ["authorization_code", "refresh_token"],
     response_types: ["code"],
@@ -54,7 +54,7 @@ function buildOAuthClientMetadata(
 }
 
 export function bindMcpOAuthLeaseAssertion(
-  lease: OpenClawStateLeaseContext | undefined,
+  lease: SteelEngineStateLeaseContext | undefined,
 ): ((database: DatabaseSync) => void) | undefined {
   return lease ? (database) => lease.assertOwnedInTransaction(database) : undefined;
 }
@@ -88,7 +88,7 @@ export function createMcpOAuthClientProvider(params: {
   onAuthorizationUrl?: (url: URL) => void | Promise<void>;
   allowAuthorizationRedirect?: boolean;
   suppressStoredTokens?: boolean;
-  lease?: OpenClawStateLeaseContext;
+  lease?: SteelEngineStateLeaseContext;
 }): OAuthClientProvider {
   const config = params.config ?? {};
   const storeKey = resolveMcpOAuthStoreKey(params.serverName, params.serverUrl);
@@ -100,7 +100,7 @@ export function createMcpOAuthClientProvider(params: {
   const assertAuthorizationRedirectAllowed = () => {
     if (!allowAuthorizationRedirect) {
       throw new Error(
-        `MCP server "${params.serverName}" requires OAuth authorization. Run openclaw mcp login ${params.serverName}.`,
+        `MCP server "${params.serverName}" requires OAuth authorization. Run steelengine mcp login ${params.serverName}.`,
       );
     }
   };

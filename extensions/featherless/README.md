@@ -1,12 +1,12 @@
-# OpenClaw Featherless AI Provider
+# SteelEngine Featherless AI Provider
 
-Official OpenClaw provider plugin for Featherless AI's OpenAI-compatible API.
+Official SteelEngine provider plugin for Featherless AI's OpenAI-compatible API.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/featherless-provider
-openclaw gateway restart
+steelengine plugins install @steelengine/featherless-provider
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/providers/featherless> for setup and configuration.
+See <https://docs.steelengine.ai/providers/featherless> for setup and configuration.

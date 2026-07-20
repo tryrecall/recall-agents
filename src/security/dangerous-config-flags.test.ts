@@ -1,10 +1,10 @@
 // Covers dangerous config flag detection and reporting.
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import { collectEnabledInsecureOrDangerousFlagsFromContracts } from "./dangerous-config-flags-core.js";
 
-function asConfig(value: unknown): OpenClawConfig {
-  return value as OpenClawConfig;
+function asConfig(value: unknown): SteelEngineConfig {
+  return value as SteelEngineConfig;
 }
 
 describe("collectEnabledInsecureOrDangerousFlags", () => {

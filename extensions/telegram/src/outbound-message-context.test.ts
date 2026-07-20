@@ -1,10 +1,10 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   createPluginStateKeyedStoreForTests,
   createPluginStateSyncKeyedStoreForTests,
   resetPluginStateStoreForTests,
-} from "openclaw/plugin-sdk/plugin-state-test-runtime";
-import { resolveStorePath } from "openclaw/plugin-sdk/session-store-runtime";
+} from "steelengine/plugin-sdk/plugin-state-test-runtime";
+import { resolveStorePath } from "steelengine/plugin-sdk/session-store-runtime";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createTelegramMessageCache, resolveTelegramMessageCacheScope } from "./message-cache.js";
 import { recordOutboundMessageForPromptContext } from "./outbound-message-context.js";
@@ -16,8 +16,8 @@ import {
 import type { TelegramRuntime } from "./runtime.types.js";
 
 const cfg = {
-  session: { store: "/tmp/openclaw-telegram-outbound-context-test.json" },
-} satisfies OpenClawConfig;
+  session: { store: "/tmp/steelengine-telegram-outbound-context-test.json" },
+} satisfies SteelEngineConfig;
 
 function installTelegramStateRuntimeForTest(): void {
   setTelegramRuntime({
@@ -80,7 +80,7 @@ describe("recordOutboundMessageForPromptContext", () => {
           is_bot: true,
           first_name: "Provisioning",
           last_name: "Placeholder",
-          username: "openclaw_bot",
+          username: "steelengine_bot",
         },
         message_id: 700,
         text: "Bot just replied",
@@ -92,13 +92,13 @@ describe("recordOutboundMessageForPromptContext", () => {
     expect(cached).toMatchObject({
       sender: "Configured Agent (you)",
       senderId: "999",
-      senderUsername: "openclaw_bot",
+      senderUsername: "steelengine_bot",
       sourceMessage: {
         from: {
           id: 999,
           is_bot: true,
           first_name: "Configured Agent (you)",
-          username: "openclaw_bot",
+          username: "steelengine_bot",
         },
       },
     });
@@ -149,7 +149,7 @@ describe("recordOutboundMessageForPromptContext", () => {
           id: 999,
           is_bot: true,
           first_name: "Telegram Bot Name",
-          username: "openclaw_bot",
+          username: "steelengine_bot",
         },
         message_id: 702,
         text: "Business reply",
@@ -163,7 +163,7 @@ describe("recordOutboundMessageForPromptContext", () => {
       senderId: "777",
       senderUsername: "business_account",
       sourceMessage: {
-        sender_business_bot: { id: 999, is_bot: true, username: "openclaw_bot" },
+        sender_business_bot: { id: 999, is_bot: true, username: "steelengine_bot" },
       },
     });
   });
@@ -202,7 +202,7 @@ describe("recordOutboundMessageForPromptContext", () => {
       messageId: 1498,
       text: "Channel announcement",
     });
-    expect(initial).toMatchObject({ sender: "OpenClaw (you)", senderId: "0" });
+    expect(initial).toMatchObject({ sender: "SteelEngine (you)", senderId: "0" });
 
     const cache = createPromptContextCache();
     await cache.record({
@@ -224,10 +224,10 @@ describe("recordOutboundMessageForPromptContext", () => {
       messageId: "1498",
     });
     expect(merged).toMatchObject({
-      sender: "OpenClaw (you)",
+      sender: "SteelEngine (you)",
       senderId: "0",
       sourceMessage: {
-        from: { id: 0, is_bot: true, first_name: "OpenClaw (you)" },
+        from: { id: 0, is_bot: true, first_name: "SteelEngine (you)" },
         sender_chat: { id: -1001, type: "channel", title: "Announcements" },
       },
     });

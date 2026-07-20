@@ -3,8 +3,8 @@ import {
   DEFAULT_LOCAL_MODEL,
   listMemoryEmbeddingProviders,
   type MemoryEmbeddingProviderAdapter,
-} from "openclaw/plugin-sdk/memory-core-host-embedding-registry";
-import { getProviderEnvVars } from "openclaw/plugin-sdk/provider-env-vars";
+} from "steelengine/plugin-sdk/memory-core-host-embedding-registry";
+import { getProviderEnvVars } from "steelengine/plugin-sdk/provider-env-vars";
 
 export type BuiltinMemoryEmbeddingProviderDoctorMetadata = {
   providerId: string;

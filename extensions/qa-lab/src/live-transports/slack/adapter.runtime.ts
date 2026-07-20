@@ -1,7 +1,7 @@
 // Qa Lab plugin module implements Slack live transport adapter behavior.
-import { createSlackWebClient, createSlackWriteClient } from "@openclaw/slack/api.js";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { QaRunnerCliRegistration } from "openclaw/plugin-sdk/qa-runner-runtime";
+import { createSlackWebClient, createSlackWriteClient } from "@steelengine/slack/api.js";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { QaRunnerCliRegistration } from "steelengine/plugin-sdk/qa-runner-runtime";
 import {
   acquireQaCredentialLease,
   startQaCredentialLeaseHeartbeat,
@@ -176,7 +176,7 @@ export async function createSlackQaTransportAdapter(
     async sendInbound(input) {
       heartbeat.throwIfFailed();
       logicalConversationId = input.conversation.id;
-      const text = input.text.replaceAll("@openclaw", `<@${sutIdentity.userId}>`);
+      const text = input.text.replaceAll("@steelengine", `<@${sutIdentity.userId}>`);
       const nativeThreadTs = input.threadId ? nativeMessageIds.get(input.threadId) : undefined;
       const sent = await sendSlackChannelMessage({
         channelId: runtimeEnv.channelId,
@@ -201,7 +201,7 @@ export async function createSlackQaTransportAdapter(
       activeThreadRoots.clear();
     },
     createGatewayConfig: () =>
-      buildSlackQaConfig({} as OpenClawConfig, {
+      buildSlackQaConfig({} as SteelEngineConfig, {
         channelId: runtimeEnv.channelId,
         driverBotUserId: driverIdentity.userId,
         sutAccountId: accountId,

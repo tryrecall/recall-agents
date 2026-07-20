@@ -24,6 +24,6 @@ export const page = definePage({
     import("./model-providers-page.ts").then(() => ({
       header: true,
       render: (data: ModelProvidersRouteData | undefined) =>
-        html`<openclaw-model-providers-page .routeData=${data}></openclaw-model-providers-page>`,
+        html`<steelengine-model-providers-page .routeData=${data}></steelengine-model-providers-page>`,
     })),
 });

@@ -1,11 +1,11 @@
-import type { Model } from "openclaw/plugin-sdk/llm";
+import type { Model } from "steelengine/plugin-sdk/llm";
 /**
  * Shared parameter and metric types for embedded-agent compaction.
  */
 import type { SourceReplyDeliveryMode } from "../../auto-reply/get-reply-options.types.js";
 import type { ReasoningLevel, ThinkLevel } from "../../auto-reply/thinking.js";
 import type { ChatType } from "../../channels/chat-type.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type { ContextEngine, ContextEngineRuntimeContext } from "../../context-engine/types.js";
 import type { CommandQueueEnqueueFn } from "../../process/command-queue.types.js";
 import type { SkillSnapshot } from "../../skills/types.js";
@@ -56,7 +56,7 @@ export type CompactEmbeddedAgentSessionParams = {
   /** Optional task working directory; workspaceDir remains the agent bootstrap workspace. */
   cwd?: string;
   agentDir?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   skillsSnapshot?: SkillSnapshot;
   senderIsOwner?: boolean;
   provider?: string;
@@ -75,7 +75,7 @@ export type CompactEmbeddedAgentSessionParams = {
   agentHarnessId?: string;
   /** Prevent compaction from changing the persisted session runtime or model. */
   modelSelectionLocked?: boolean;
-  /** OpenClaw-owned runtime policy prepared for this compaction path. */
+  /** SteelEngine-owned runtime policy prepared for this compaction path. */
   runtimePlan?: AgentRuntimePlan;
   /** Host-prepared route and credential selection for native harness compaction. */
   runtimeAuthPlan?: AgentRuntimeAuthPlan;

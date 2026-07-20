@@ -1,13 +1,13 @@
 {
-  "name": "@openclaw/deepgram-provider",
+  "name": "@steelengine/deepgram-provider",
   "version": "2026.7.2-beta.3",
   "private": true,
-  "description": "OpenClaw Deepgram media-understanding provider",
+  "description": "SteelEngine Deepgram media-understanding provider",
   "type": "module",
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ]

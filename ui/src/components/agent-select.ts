@@ -11,7 +11,7 @@ import {
   resolveAgentTextAvatar,
 } from "../lib/agents/display.ts";
 import { resolveAgentAvatarUrl } from "../lib/avatar.ts";
-import { OpenClawLightDomElement } from "../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../lit/steelengine-element.ts";
 import { icons } from "./icons.ts";
 
 type WebAwesomeSelectEvent = Event & { detail: { item: Element } };
@@ -20,7 +20,7 @@ type AvatarFetch = { authToken: string; controller: AbortController };
 /** Bound local avatar fetches so a stalled Control UI media route cannot pin pending state forever. */
 const AGENT_SELECT_AVATAR_FETCH_TIMEOUT_MS = 30_000;
 
-export class AgentSelect extends OpenClawLightDomElement {
+export class AgentSelect extends SteelEngineLightDomElement {
   @property({ attribute: false }) agents: GatewayAgentRow[] = [];
   @property({ attribute: false }) selectedId: string | null = null;
   @property({ attribute: false }) defaultId: string | null = null;

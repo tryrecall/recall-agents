@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { normalizeMessage } from "./message-normalizer.ts";
 
 const SENDER_METADATA_BLOCK =
-  'Sender (untrusted metadata):\n```json\n{"label":"openclaw-control-ui","id":"openclaw-control-ui"}\n```';
+  'Sender (untrusted metadata):\n```json\n{"label":"steelengine-control-ui","id":"steelengine-control-ui"}\n```';
 
 describe("message-normalizer", () => {
   describe("normalizeMessage", () => {
@@ -165,7 +165,7 @@ describe("message-normalizer", () => {
             source: {
               type: "url",
               media_type: "audio/mpeg",
-              url: "/tmp/openclaw/clip.mp3",
+              url: "/tmp/steelengine/clip.mp3",
             },
           },
         ],
@@ -175,7 +175,7 @@ describe("message-normalizer", () => {
         {
           type: "attachment",
           attachment: {
-            url: "/tmp/openclaw/clip.mp3",
+            url: "/tmp/steelengine/clip.mp3",
             kind: "audio",
             label: "clip.mp3",
             mimeType: "audio/mpeg",
@@ -244,7 +244,7 @@ describe("message-normalizer", () => {
             surface: "assistant_message",
             render: "url",
             viewId: "cv_status",
-            url: "/__openclaw__/canvas/documents/cv_status/index.html",
+            url: "/__steelengine__/canvas/documents/cv_status/index.html",
             title: "Status",
             preferredHeight: 320,
           },
@@ -263,7 +263,7 @@ describe("message-normalizer", () => {
               kind: "canvas",
               surface: "assistant_message",
               render: "url",
-              url: "/__openclaw__/canvas/documents/cv_widget/index.html",
+              url: "/__steelengine__/canvas/documents/cv_widget/index.html",
               sandbox: "scripts",
             },
           },
@@ -411,7 +411,7 @@ describe("message-normalizer", () => {
     it("keeps valid local MEDIA paths as assistant attachments", () => {
       const result = normalizeMessage({
         role: "assistant",
-        content: "Hello\nMEDIA:/tmp/openclaw/test-image.png\nWorld",
+        content: "Hello\nMEDIA:/tmp/steelengine/test-image.png\nWorld",
       });
 
       expect(result.content).toEqual([
@@ -419,7 +419,7 @@ describe("message-normalizer", () => {
         {
           type: "attachment",
           attachment: {
-            url: "/tmp/openclaw/test-image.png",
+            url: "/tmp/steelengine/test-image.png",
             kind: "image",
             label: "test-image.png",
             mimeType: "image/png",
@@ -432,14 +432,14 @@ describe("message-normalizer", () => {
     it("keeps spaced local filenames together instead of leaking suffix text", () => {
       const result = normalizeMessage({
         role: "assistant",
-        content: "MEDIA:/tmp/openclaw/shinkansen kato - Google Shopping.pdf",
+        content: "MEDIA:/tmp/steelengine/shinkansen kato - Google Shopping.pdf",
       });
 
       expect(result.content).toEqual([
         {
           type: "attachment",
           attachment: {
-            url: "/tmp/openclaw/shinkansen kato - Google Shopping.pdf",
+            url: "/tmp/steelengine/shinkansen kato - Google Shopping.pdf",
             kind: "document",
             label: "shinkansen kato - Google Shopping.pdf",
             mimeType: "application/pdf",

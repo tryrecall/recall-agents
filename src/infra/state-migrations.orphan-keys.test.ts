@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import { withTempDir } from "../test-helpers/temp-dir.js";
 import { migrateOrphanedSessionKeys } from "./state-migrations.js";
 
@@ -40,7 +40,7 @@ async function withStateFixture(
   run: (params: { tmpDir: string; stateDir: string }) => Promise<void>,
 ): Promise<void> {
   await withTempDir({ prefix: "orphan-keys-test-" }, async (tmpDir) => {
-    const stateDir = path.join(tmpDir, ".openclaw");
+    const stateDir = path.join(tmpDir, ".steelengine");
     fs.mkdirSync(stateDir, { recursive: true });
     await run({ tmpDir, stateDir });
   });
@@ -49,27 +49,27 @@ async function withStateFixture(
 const OPS_WORK_CONFIG = {
   session: { mainKey: "work" },
   agents: { list: [{ id: "ops", default: true }] },
-} as OpenClawConfig;
+} as SteelEngineConfig;
 
 function opsSessionStorePath(stateDir: string): string {
   return path.join(stateDir, "agents", "ops", "sessions", "sessions.json");
 }
 
-function sharedMainOpsConfig(sharedStorePath: string): OpenClawConfig {
+function sharedMainOpsConfig(sharedStorePath: string): SteelEngineConfig {
   return {
     session: { mainKey: "work", store: sharedStorePath },
     agents: { list: [{ id: "main" }, { id: "ops", default: true }] },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 async function migrateFixtureState(
   stateDir: string,
-  cfg: OpenClawConfig = OPS_WORK_CONFIG,
+  cfg: SteelEngineConfig = OPS_WORK_CONFIG,
   additionalAgentIds?: readonly string[],
 ) {
   return migrateOrphanedSessionKeys({
     cfg,
-    env: { OPENCLAW_STATE_DIR: stateDir },
+    env: { STEELENGINE_STATE_DIR: stateDir },
     additionalAgentIds,
   });
 }
@@ -104,7 +104,7 @@ describe("migrateOrphanedSessionKeys", () => {
         "agent:main:voice:15550001111": { sessionId: "stale-canonical", updatedAt: 1_000 },
       });
 
-      await migrateFixtureState(stateDir, {} as OpenClawConfig);
+      await migrateFixtureState(stateDir, {} as SteelEngineConfig);
 
       const store = readStore(storePath);
       expect(requireStoreEntry(store, "agent:main:voice:15550001111").sessionId).toBe(
@@ -124,7 +124,7 @@ describe("migrateOrphanedSessionKeys", () => {
       const result = await migrateFixtureState(stateDir, {
         session: { store: "" },
         agents: { list: [{ id: "main", default: true }] },
-      } as OpenClawConfig);
+      } as SteelEngineConfig);
 
       const store = readStore(storePath);
       expect(requireStoreEntry(store, "agent:main:voice:15550001111").sessionId).toBe(
@@ -151,11 +151,11 @@ describe("migrateOrphanedSessionKeys", () => {
             "voice-call": { config: { agentId: "voice" } },
           },
         },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const result = await migrateOrphanedSessionKeys({
         cfg,
-        env: { OPENCLAW_STATE_DIR: stateDir },
+        env: { STEELENGINE_STATE_DIR: stateDir },
         additionalAgentIds: ["voice"],
       });
 
@@ -189,13 +189,13 @@ describe("migrateOrphanedSessionKeys", () => {
             "voice-call": { config: { agentId: "voice" } },
           },
         },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const result = await migrateFixtureState(stateDir, cfg);
 
       expect(listPluginDoctorSessionStoreAgentIdsMock).toHaveBeenCalledWith({
         config: cfg,
-        env: { OPENCLAW_STATE_DIR: stateDir },
+        env: { STEELENGINE_STATE_DIR: stateDir },
         pluginIds: ["voice-call"],
       });
       const store = readStore(voiceStorePath);
@@ -230,7 +230,7 @@ describe("migrateOrphanedSessionKeys", () => {
               "voice-call": { config: { agentId: "voice" } },
             },
           },
-        } as OpenClawConfig;
+        } as SteelEngineConfig;
 
         const result = await migrateFixtureState(stateDir, cfg, ["voice"]);
 
@@ -262,7 +262,7 @@ describe("migrateOrphanedSessionKeys", () => {
             "voice-call": { config: { agentId: "voice" } },
           },
         },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const result = await migrateFixtureState(stateDir, cfg, ["voice"]);
 
@@ -288,7 +288,7 @@ describe("migrateOrphanedSessionKeys", () => {
             "voice-call": { config: { agentId: "voice" } },
           },
         },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const result = await migrateFixtureState(stateDir, cfg, ["voice"]);
 
@@ -322,14 +322,14 @@ describe("migrateOrphanedSessionKeys", () => {
             "voice-call": { config: { agentId: "voice" } },
           },
         },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const result = await migrateFixtureState(stateDir, cfg, ["voice"]);
       const rerun = await migrateFixtureState(stateDir, cfg, ["voice"]);
 
       expect(result.changes).toHaveLength(0);
       expect(result.warnings).toEqual([
-        `Deferred migration of 2 ambiguous session key(s) in aliased store ${configuredStorePath}; remove filesystem aliases or configure one canonical session.store path, then rerun openclaw doctor --fix`,
+        `Deferred migration of 2 ambiguous session key(s) in aliased store ${configuredStorePath}; remove filesystem aliases or configure one canonical session.store path, then rerun steelengine doctor --fix`,
       ]);
       expect(rerun).toEqual(result);
       expect(
@@ -359,7 +359,7 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { store: configuredStorePath },
         agents: { list: [{ id: "ops", default: true }] },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
       const realStatSync = fs.statSync.bind(fs);
       const statSpy = vi.spyOn(fs, "statSync").mockImplementation((candidate) => {
         if (path.resolve(candidate.toString()) === configuredStorePath) {
@@ -372,7 +372,7 @@ describe("migrateOrphanedSessionKeys", () => {
       try {
         result = await migrateOrphanedSessionKeys({
           cfg,
-          env: { OPENCLAW_STATE_DIR: stateDir },
+          env: { STEELENGINE_STATE_DIR: stateDir },
           additionalAgentIds: ["voice"],
         });
       } finally {
@@ -381,7 +381,7 @@ describe("migrateOrphanedSessionKeys", () => {
 
       expect(result.changes).toHaveLength(0);
       expect(result.warnings).toEqual([
-        `Deferred session key migration for ${standardStorePath}; filesystem identity could not be established for every configured store path. Restore path access or configure one canonical session.store path, then rerun openclaw doctor --fix`,
+        `Deferred session key migration for ${standardStorePath}; filesystem identity could not be established for every configured store path. Restore path access or configure one canonical session.store path, then rerun steelengine doctor --fix`,
       ]);
       expect(requireStoreEntry(readStore(standardStorePath), "voice:15550001111").sessionId).toBe(
         "legacy-voice",
@@ -409,13 +409,13 @@ describe("migrateOrphanedSessionKeys", () => {
             "voice-call": { config: { agentId: "voice" } },
           },
         },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const result = await migrateFixtureState(stateDir, cfg, ["voice"]);
 
       expect(result.changes).toHaveLength(0);
       expect(result.warnings).toEqual([
-        `Deferred migration of 2 ambiguous session key(s) in aliased store ${configuredStorePath}; remove filesystem aliases or configure one canonical session.store path, then rerun openclaw doctor --fix`,
+        `Deferred migration of 2 ambiguous session key(s) in aliased store ${configuredStorePath}; remove filesystem aliases or configure one canonical session.store path, then rerun steelengine doctor --fix`,
       ]);
       expect(fs.lstatSync(configuredStorePath).isSymbolicLink()).toBe(true);
       expect(
@@ -437,11 +437,11 @@ describe("migrateOrphanedSessionKeys", () => {
       fs.mkdirSync(path.dirname(storePath), { recursive: true });
       fs.symlinkSync(outsideStorePath, storePath);
 
-      const result = await migrateFixtureState(stateDir, {} as OpenClawConfig);
+      const result = await migrateFixtureState(stateDir, {} as SteelEngineConfig);
 
       expect(result.changes).toHaveLength(0);
       expect(result.warnings).toEqual([
-        `Deferred session key migration in final-component symlink store ${storePath}; configure one canonical session.store path, then rerun openclaw doctor --fix`,
+        `Deferred session key migration in final-component symlink store ${storePath}; configure one canonical session.store path, then rerun steelengine doctor --fix`,
       ]);
       expect(fs.lstatSync(storePath).isSymbolicLink()).toBe(true);
       expect(requireStoreEntry(readStore(outsideStorePath), "voice:15550001111").sessionId).toBe(
@@ -459,13 +459,13 @@ describe("migrateOrphanedSessionKeys", () => {
       const storePath = path.join(stateDir, "agents", "main", "sessions", "sessions.json");
       fs.mkdirSync(path.dirname(storePath), { recursive: true });
       fs.symlinkSync(outsideStorePath, storePath);
-      const cfg = { session: { scope: "global" } } as OpenClawConfig;
+      const cfg = { session: { scope: "global" } } as SteelEngineConfig;
 
       const result = await migrateFixtureState(stateDir, cfg);
 
       expect(result.changes).toHaveLength(0);
       expect(result.warnings).toEqual([
-        `Deferred session key migration in final-component symlink store ${storePath}; configure one canonical session.store path, then rerun openclaw doctor --fix`,
+        `Deferred session key migration in final-component symlink store ${storePath}; configure one canonical session.store path, then rerun steelengine doctor --fix`,
       ]);
       expect(fs.lstatSync(storePath).isSymbolicLink()).toBe(true);
       expect(requireStoreEntry(readStore(outsideStorePath), "agent:main:main").sessionId).toBe(
@@ -485,7 +485,7 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { scope: "global", store: configuredStorePath },
         agents: { list: [{ id: "main", default: true }] },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const result = await migrateFixtureState(stateDir, cfg);
 
@@ -497,7 +497,7 @@ describe("migrateOrphanedSessionKeys", () => {
       }
       expect(result.changes).toHaveLength(0);
       expect(result.warnings).toEqual([
-        `Deferred session key migration in aliased store ${configuredStorePath}; atomic replacement cannot update distinct filesystem aliases as one operation. Remove filesystem aliases or configure one canonical session.store path, then rerun openclaw doctor --fix`,
+        `Deferred session key migration in aliased store ${configuredStorePath}; atomic replacement cannot update distinct filesystem aliases as one operation. Remove filesystem aliases or configure one canonical session.store path, then rerun steelengine doctor --fix`,
       ]);
     });
   });
@@ -511,7 +511,7 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { mainKey: "work", store: storePath },
         agents: { list: [{ id: "main", default: true }] },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const result = await migrateFixtureState(stateDir, cfg);
 
@@ -620,7 +620,7 @@ describe("migrateOrphanedSessionKeys", () => {
         "agent:main:main": { sessionId: "abc-123", updatedAt: 1000 },
       });
 
-      const env = { OPENCLAW_STATE_DIR: stateDir };
+      const env = { STEELENGINE_STATE_DIR: stateDir };
       await migrateOrphanedSessionKeys({ cfg: OPS_WORK_CONFIG, env });
       const result2 = await migrateOrphanedSessionKeys({ cfg: OPS_WORK_CONFIG, env });
 
@@ -662,7 +662,7 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { scope: "global", mainKey: "work", store: sharedStorePath },
         agents: { list: [{ id: "main" }, { id: "ops", default: true }] },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const result = await migrateFixtureState(stateDir, cfg);
 
@@ -685,7 +685,7 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { mainKey: "work", store: sharedStorePath },
         agents: { list: [{ id: "ops", default: true }, { id: "research" }] },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const result = await migrateFixtureState(stateDir, cfg);
 
@@ -708,7 +708,7 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { mainKey: "work", store: sharedStorePath },
         agents: { list: [{ id: "ops", default: true }, { id: "research" }] },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const result = await migrateFixtureState(stateDir, cfg);
 
@@ -731,7 +731,7 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { mainKey: "work", store: sharedStorePath },
         agents: { list: [{ id: "main", default: true }] },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const result = await migrateFixtureState(stateDir, cfg);
 
@@ -832,7 +832,7 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { store: sharedStorePath },
         agents: { list: [{ id: "main", default: true }, { id: "ops" }] },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const first = await migrateFixtureState(stateDir, cfg);
       const second = await migrateFixtureState(stateDir, cfg);
@@ -859,7 +859,7 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { store: fixedStorePath },
         agents: { list: [{ id: "main", default: true }] },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
 
       const first = await migrateFixtureState(stateDir, cfg);
       const second = await migrateFixtureState(stateDir, cfg);
@@ -905,11 +905,11 @@ describe("migrateOrphanedSessionKeys", () => {
         "agent:main:main": { sessionId: "abc-123", updatedAt: 1000 },
       });
 
-      const cfg = {} as OpenClawConfig;
+      const cfg = {} as SteelEngineConfig;
 
       const result = await migrateOrphanedSessionKeys({
         cfg,
-        env: { OPENCLAW_STATE_DIR: stateDir },
+        env: { STEELENGINE_STATE_DIR: stateDir },
       });
 
       expect(result.changes).toHaveLength(0);

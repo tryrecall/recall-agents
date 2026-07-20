@@ -48,7 +48,7 @@ export async function resumePostCoreUpdate(params: {
     return;
   }
 
-  process.env.OPENCLAW_COMPATIBILITY_HOST_VERSION =
+  process.env.STEELENGINE_COMPATIBILITY_HOST_VERSION =
     (await readPackageVersion(params.root)) ?? VERSION;
 
   let configSnapshot = await readConfigFileSnapshot({

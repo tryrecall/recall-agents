@@ -9,13 +9,13 @@ import {
   resolvePositiveTimerTimeoutMs,
   resolveTimerTimeoutMs,
   resolveTimestampMsToIsoString,
-} from "@openclaw/normalization-core/number-coercion";
+} from "@steelengine/normalization-core/number-coercion";
 import { z } from "zod";
 import { resolveConfigPath, resolveGatewayLockDir, resolveStateDir } from "../config/paths.js";
 import { getFileLockProcessStartTime, isPidAlive } from "../shared/pid-alive.js";
 import { safeParseJsonWithSchema } from "../utils/zod-parse.js";
 import { sha256HexPrefix } from "./crypto-digest.js";
-import { isGatewayArgv, isOpenClawCommandArgv, parseProcCmdline } from "./gateway-process-argv.js";
+import { isGatewayArgv, isSteelEngineCommandArgv, parseProcCmdline } from "./gateway-process-argv.js";
 import { requireNodeSqlite } from "./node-sqlite.js";
 import { isSqliteLockError } from "./sqlite-transaction.js";
 import {
@@ -242,7 +242,7 @@ async function resolveGatewayOwnerStatus(
     if (!args) {
       return "unknown";
     }
-    return isOpenClawCommandArgv(args, "doctor") ? "alive" : "dead";
+    return isSteelEngineCommandArgv(args, "doctor") ? "alive" : "dead";
   }
 
   const args = readFn(pid);
@@ -374,7 +374,7 @@ export async function acquireGatewayLock(
     ownerId,
   });
   const shouldAcquireConfigLock =
-    role === "sqlite-maintenance" || env.OPENCLAW_ALLOW_MULTI_GATEWAY !== "1";
+    role === "sqlite-maintenance" || env.STEELENGINE_ALLOW_MULTI_GATEWAY !== "1";
   if (!shouldAcquireConfigLock) {
     return {
       ...stateLock,

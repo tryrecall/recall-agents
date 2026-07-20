@@ -1,12 +1,12 @@
 // Plugin install command implementation for bundled, npm, path, git, ClawHub, and hook packs.
 import fs from "node:fs";
-import { uniqueStrings } from "@openclaw/normalization-core/string-normalization";
+import { uniqueStrings } from "@steelengine/normalization-core/string-normalization";
 import { theme } from "../../packages/terminal-core/src/theme.js";
 import {
   assertConfigWriteAllowedInCurrentMode,
   readConfigFileSnapshotForWrite,
 } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   installHooksFromNpmSpec,
   installHooksFromPath,
@@ -29,7 +29,7 @@ import {
   type ConfigMutationPreflight,
   type ConfigSnapshotForInstallPersist,
 } from "../plugins/install-persistence.js";
-import { resolveOpenClawTrustedNpmPackageInstall } from "../plugins/install-provenance.js";
+import { resolveSteelEngineTrustedNpmPackageInstall } from "../plugins/install-provenance.js";
 import type { InstallSafetyOverrides } from "../plugins/install-security-scan.js";
 import {
   PLUGIN_INSTALL_ERROR_CODE,
@@ -550,7 +550,7 @@ function extractMissingPluginLoadPath(issue: { path?: string; message?: string }
 }
 
 function collectRequestedPluginInstallPaths(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   installRecords: Awaited<ReturnType<typeof loadInstalledPluginIndexInstallRecords>>,
   request: PluginInstallRequestContext,
   env: NodeJS.ProcessEnv = process.env,
@@ -595,11 +595,11 @@ async function collectRequestedPluginLocationBridgePaths(
 }
 
 function removeOwnedMissingPluginLoadPaths(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   issues: readonly { path?: string; message?: string }[],
   ownedLoadPaths: ReadonlySet<string>,
   env: NodeJS.ProcessEnv = process.env,
-): OpenClawConfig {
+): SteelEngineConfig {
   const missingPaths = new Set<string>();
   for (const issue of issues) {
     const missingPath = extractMissingPluginLoadPath(issue);
@@ -634,7 +634,7 @@ function removeOwnedMissingPluginLoadPaths(
 }
 
 async function resolveRequestedPluginInstallPaths(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   issues: readonly { path?: string; message?: string }[],
   request: PluginInstallRequestContext,
   env: NodeJS.ProcessEnv = process.env,
@@ -667,13 +667,13 @@ async function loadConfigFromSnapshotForInstall(
   const mutationWriteOptions = selectInstallMutationWriteOptions(writeOptions);
   if (resolvePluginInstallInvalidConfigPolicy(request) !== "allow-plugin-recovery") {
     throw buildInvalidPluginInstallConfigError(
-      "Config invalid; run `openclaw doctor --fix` before installing plugins.",
+      "Config invalid; run `steelengine doctor --fix` before installing plugins.",
     );
   }
   const parsed = (snapshot.parsed ?? {}) as Record<string, unknown>;
   if (!snapshot.exists || Object.keys(parsed).length === 0) {
     throw buildInvalidPluginInstallConfigError(
-      "Config file could not be parsed; run `openclaw doctor` to repair it.",
+      "Config file could not be parsed; run `steelengine doctor` to repair it.",
     );
   }
   const ownedLoadPaths = await resolveRequestedPluginInstallPaths(
@@ -689,12 +689,12 @@ async function loadConfigFromSnapshotForInstall(
   ) {
     const pluginLabel = request.bundledPluginId ?? "the requested plugin";
     throw buildInvalidPluginInstallConfigError(
-      `Config invalid outside the plugin recovery path for ${pluginLabel}; run \`openclaw doctor --fix\` before reinstalling it.`,
+      `Config invalid outside the plugin recovery path for ${pluginLabel}; run \`steelengine doctor --fix\` before reinstalling it.`,
     );
   }
   if (!supportsPluginRecoveryIncludeShape(parsed)) {
     throw buildInvalidPluginInstallConfigError(
-      "Config plugin recovery uses an unsupported $include shape; use a single-file top-level plugins include or run `openclaw doctor --fix` before reinstalling it.",
+      "Config plugin recovery uses an unsupported $include shape; use a single-file top-level plugins include or run `steelengine doctor --fix` before reinstalling it.",
     );
   }
   const { hookMutation, pluginMutation } = resolveInstallConfigMutationPreflights({
@@ -751,7 +751,7 @@ async function loadConfigForInstall(
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
   (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.pluginsInstallCommandTestApi")
+    Symbol.for("steelengine.pluginsInstallCommandTestApi")
   ] = { loadConfigForInstall };
 }
 
@@ -795,13 +795,13 @@ export async function runPluginInstallCommand(params: {
   if (opts.marketplace) {
     if (opts.link) {
       runtime.error(
-        `--link is not supported with --marketplace. Remove --link, or install a local path with ${formatCliCommand(`openclaw plugins install --link <path> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
+        `--link is not supported with --marketplace. Remove --link, or install a local path with ${formatCliCommand(`steelengine plugins install --link <path> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
       );
       return runtime.exit(1);
     }
     if (opts.pin) {
       runtime.error(
-        `--pin is not supported with --marketplace. Use ${formatCliCommand(`openclaw plugins install <plugin> --marketplace <name> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)} without --pin.`,
+        `--pin is not supported with --marketplace. Use ${formatCliCommand(`steelengine plugins install <plugin> --marketplace <name> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)} without --pin.`,
       );
       return runtime.exit(1);
     }
@@ -810,19 +810,19 @@ export async function runPluginInstallCommand(params: {
   const gitSpec = parseGitPluginSpec(raw);
   if (gitPrefix && !gitSpec) {
     runtime.error(
-      `Unsupported git plugin spec: ${raw}. Use ${formatCliCommand(`openclaw plugins install git:<repo>@<ref> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
+      `Unsupported git plugin spec: ${raw}. Use ${formatCliCommand(`steelengine plugins install git:<repo>@<ref> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
     );
     return runtime.exit(1);
   }
   if (gitSpec && opts.link) {
     runtime.error(
-      `--link is not supported with git: installs. Use ${formatCliCommand(`openclaw plugins install git:<repo>@<ref> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)} for Git installs or ${formatCliCommand(`openclaw plugins install --link <path> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)} for local paths.`,
+      `--link is not supported with git: installs. Use ${formatCliCommand(`steelengine plugins install git:<repo>@<ref> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)} for Git installs or ${formatCliCommand(`steelengine plugins install --link <path> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)} for local paths.`,
     );
     return runtime.exit(1);
   }
   if (gitSpec && opts.pin) {
     runtime.error(
-      `--pin is not supported with git: installs. Pin the ref in the spec instead, for example ${formatCliCommand(`openclaw plugins install git:<repo>@<ref> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
+      `--pin is not supported with git: installs. Pin the ref in the spec instead, for example ${formatCliCommand(`steelengine plugins install git:<repo>@<ref> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
     );
     return runtime.exit(1);
   }
@@ -1067,7 +1067,7 @@ export async function runPluginInstallCommand(params: {
 
   if (opts.link) {
     runtime.error(
-      `--link requires a local path. Run ${formatCliCommand(`openclaw plugins install --link <path> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
+      `--link requires a local path. Run ${formatCliCommand(`steelengine plugins install --link <path> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
     );
     return runtime.exit(1);
   }
@@ -1076,11 +1076,11 @@ export async function runPluginInstallCommand(params: {
   if (npmPrefixSpec !== null) {
     if (!npmPrefixSpec) {
       runtime.error(
-        `Unsupported npm plugin spec: missing package. Use ${formatCliCommand(`openclaw plugins install npm:<package> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
+        `Unsupported npm plugin spec: missing package. Use ${formatCliCommand(`steelengine plugins install npm:<package> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
       );
       return runtime.exit(1);
     }
-    const trustedNpmInstall = resolveOpenClawTrustedNpmPackageInstall(npmPrefixSpec);
+    const trustedNpmInstall = resolveSteelEngineTrustedNpmPackageInstall(npmPrefixSpec);
     if (!trustedNpmInstall && !(await acknowledgeNonClawHubSource("npm", npmPrefixSpec))) {
       return runtime.exit(1);
     }
@@ -1113,7 +1113,7 @@ export async function runPluginInstallCommand(params: {
   if (npmPackPath !== null) {
     if (!npmPackPath) {
       runtime.error(
-        `Unsupported npm-pack plugin spec: missing archive path. Use ${formatCliCommand(`openclaw plugins install npm-pack:<path-to.tgz> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
+        `Unsupported npm-pack plugin spec: missing archive path. Use ${formatCliCommand(`steelengine plugins install npm-pack:<path-to.tgz> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
       );
       return runtime.exit(1);
     }
@@ -1167,7 +1167,7 @@ export async function runPluginInstallCommand(params: {
     ])
   ) {
     runtime.error(
-      `Plugin path not found: ${resolved}. Check the path, or install from npm with ${formatCliCommand(`openclaw plugins install npm:<package> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
+      `Plugin path not found: ${resolved}. Check the path, or install from npm with ${formatCliCommand(`steelengine plugins install npm:<package> ${NON_CLAWHUB_INSTALL_FORCE_FLAG}`)}.`,
     );
     return runtime.exit(1);
   }
@@ -1247,7 +1247,7 @@ export async function runPluginInstallCommand(params: {
     return;
   }
 
-  const trustedNpmInstall = resolveOpenClawTrustedNpmPackageInstall(raw);
+  const trustedNpmInstall = resolveSteelEngineTrustedNpmPackageInstall(raw);
   if (!trustedNpmInstall && !(await acknowledgeNonClawHubSource("npm", raw))) {
     return runtime.exit(1);
   }

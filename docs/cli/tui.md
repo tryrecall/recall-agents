@@ -1,14 +1,14 @@
 ---
-summary: "CLI reference for `openclaw tui` (Gateway-backed or local embedded terminal UI)"
+summary: "CLI reference for `steelengine tui` (Gateway-backed or local embedded terminal UI)"
 read_when:
   - You want a terminal UI for the Gateway (remote-friendly)
   - You want to pass url/token/session from scripts
   - You want to run the TUI in local embedded mode without a Gateway
-  - You want to use openclaw chat or openclaw tui --local
+  - You want to use steelengine chat or steelengine tui --local
 title: "TUI"
 ---
 
-# `openclaw tui`
+# `steelengine tui`
 
 Open the terminal UI connected to the Gateway, or run it in local embedded
 mode.
@@ -31,7 +31,7 @@ Related guide: [TUI](/web/tui)
 | `--timeout-ms <ms>`          | `agents.defaults.timeoutSeconds`          | Agent timeout. Invalid values log a warning and are ignored.                       |
 | `--history-limit <n>`        | `200`                                     | History entries to load on attach.                                                 |
 
-Aliases: `openclaw chat` and `openclaw terminal` invoke this command with
+Aliases: `steelengine chat` and `steelengine terminal` invoke this command with
 `--local` implied.
 
 ## Notes
@@ -40,13 +40,13 @@ Aliases: `openclaw chat` and `openclaw terminal` invoke this command with
 - `tui` resolves configured Gateway auth SecretRefs for token/password auth
   when possible (`env`/`file`/`exec` providers).
 - With no explicit URL or port, `tui` follows the active local Gateway port
-  recorded by the running Gateway. Explicit `--url`, `OPENCLAW_GATEWAY_URL`,
-  `OPENCLAW_GATEWAY_PORT`, and remote Gateway config keep precedence.
+  recorded by the running Gateway. Explicit `--url`, `STEELENGINE_GATEWAY_URL`,
+  `STEELENGINE_GATEWAY_PORT`, and remote Gateway config keep precedence.
 - Launched from inside a configured agent workspace directory, TUI auto-selects
   that agent for the session key default (unless `--session` is explicitly
   `agent:<id>:...`).
 - To show the Gateway hostname in the footer for non-local URL-backed
-  connections, run `openclaw config set tui.footer.showRemoteHost true`. Off by
+  connections, run `steelengine config set tui.footer.showRemoteHost true`. Off by
   default; never shown for loopback or embedded local connections.
 - Local mode uses the embedded agent runtime directly. Most local tools work,
   but Gateway-only features are unavailable.
@@ -59,14 +59,14 @@ Aliases: `openclaw chat` and `openclaw terminal` invoke this command with
 ## Examples
 
 ```bash
-openclaw chat
-openclaw tui --local
-openclaw tui
-openclaw tui --url ws://127.0.0.1:18789 --token <token>
-openclaw tui --session main --deliver
-openclaw chat --message "Compare my config to the docs and tell me what to fix"
+steelengine chat
+steelengine tui --local
+steelengine tui
+steelengine tui --url ws://127.0.0.1:18789 --token <token>
+steelengine tui --session main --deliver
+steelengine chat --message "Compare my config to the docs and tell me what to fix"
 # when run inside an agent workspace, infers that agent automatically
-openclaw tui --session bugfix
+steelengine tui --session bugfix
 ```
 
 ## Config repair loop
@@ -74,25 +74,25 @@ openclaw tui --session bugfix
 Use local mode to have the embedded agent inspect the current config, compare
 it against the docs, and help repair it from the same terminal.
 
-If `openclaw config validate` is already failing, run `openclaw configure` or
-`openclaw doctor --fix` first; `openclaw chat` does not bypass the
+If `steelengine config validate` is already failing, run `steelengine configure` or
+`steelengine doctor --fix` first; `steelengine chat` does not bypass the
 invalid-config guard.
 
 ```bash
-openclaw chat
+steelengine chat
 ```
 
 Then inside the TUI:
 
 ```text
-!openclaw config file
-!openclaw docs gateway auth token secretref
-!openclaw config validate
-!openclaw doctor
+!steelengine config file
+!steelengine docs gateway auth token secretref
+!steelengine config validate
+!steelengine doctor
 ```
 
-Apply targeted fixes with `openclaw config set` or `openclaw configure`, then
-rerun `openclaw config validate`. See [TUI](/web/tui) and
+Apply targeted fixes with `steelengine config set` or `steelengine configure`, then
+rerun `steelengine config validate`. See [TUI](/web/tui) and
 [Config](/cli/config).
 
 ## Related

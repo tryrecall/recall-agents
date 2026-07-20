@@ -31,10 +31,10 @@ export type {
 } from "../plugin-state/plugin-state-store.js";
 export { createPluginStateSyncKeyedStore } from "../plugin-state/plugin-state-store.js";
 export {
-  detectOpenClawStateDatabaseSchemaMigrations,
-  repairOpenClawStateDatabaseSchema,
-} from "../state/openclaw-state-db.js";
-export type { OpenClawStateDatabaseSchemaMigration } from "../state/openclaw-state-db.js";
+  detectSteelEngineStateDatabaseSchemaMigrations,
+  repairSteelEngineStateDatabaseSchema,
+} from "../state/steelengine-state-db.js";
+export type { SteelEngineStateDatabaseSchemaMigration } from "../state/steelengine-state-db.js";
 export { removePluginFromConfig } from "../plugins/uninstall.js";
 export type {
   PluginDoctorStateMigration,

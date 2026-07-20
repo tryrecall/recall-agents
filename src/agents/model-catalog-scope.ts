@@ -1,9 +1,9 @@
 /**
  * Resolves model catalog scope from config and discovery options.
  */
-import { findNormalizedProviderValue } from "@openclaw/model-catalog-core/provider-id";
-import { normalizeUniqueSingleOrTrimmedStringList } from "@openclaw/normalization-core/string-normalization";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import { findNormalizedProviderValue } from "@steelengine/model-catalog-core/provider-id";
+import { normalizeUniqueSingleOrTrimmedStringList } from "@steelengine/normalization-core/string-normalization";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 
 function providerConfigDeclaresModel(
   providerConfig: { models?: readonly { id?: string }[] } | undefined,
@@ -18,7 +18,7 @@ function providerConfigDeclaresModel(
 
 /** Resolves provider/model refs used to scope model catalog discovery. */
 export function resolveModelCatalogScope(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   provider: string;
   model: string;
 }): { providerRefs: string[]; modelRefs: string[] } {

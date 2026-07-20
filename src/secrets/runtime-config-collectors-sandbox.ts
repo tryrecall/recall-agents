@@ -1,7 +1,7 @@
 /** Collects agent-scoped sandbox SSH SecretRefs during runtime preparation. */
-import { normalizeOptionalLowercaseString } from "@openclaw/normalization-core/string-coerce";
+import { normalizeOptionalLowercaseString } from "@steelengine/normalization-core/string-coerce";
 import { resolveSandboxScope } from "../agents/sandbox/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { DEFAULT_AGENT_ID, normalizeAgentId } from "../routing/session-key.js";
 import { runtimeSandboxSecretOwnerId } from "./runtime-sandbox-secret-owner.js";
 import {
@@ -52,7 +52,7 @@ function collectAssignment(params: {
 
 /** Collects SSH material once for every agent whose current backend can manage it. */
 export function collectAgentSandboxAssignments(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   defaults: SecretDefaults | undefined;
   context: ResolverContext;
 }): void {

@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { AuthProfileStore } from "openclaw/plugin-sdk/agent-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { resolveTimerTimeoutMs } from "openclaw/plugin-sdk/number-runtime";
-import { resolvePreferredOpenClawTmpDir, withTempWorkspace } from "openclaw/plugin-sdk/temp-path";
+import type { AuthProfileStore } from "steelengine/plugin-sdk/agent-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { resolveTimerTimeoutMs } from "steelengine/plugin-sdk/number-runtime";
+import { resolvePreferredSteelEngineTmpDir, withTempWorkspace } from "steelengine/plugin-sdk/temp-path";
 import { readCodexNotificationItem } from "./attempt-notifications.js";
 import type { CodexAppServerClient } from "./client.js";
 import { resolveCodexAppServerRuntimeOptions } from "./config.js";
@@ -33,7 +33,7 @@ import {
 import { buildCodexRuntimeThreadConfig } from "./thread-lifecycle.js";
 
 const CODEX_PRIVATE_STDIO_ARGS = ["app-server", "--listen", "stdio://"];
-const OPENCLAW_CODEX_APP_SERVER_ARGS_ENV_VAR = "OPENCLAW_CODEX_APP_SERVER_ARGS";
+const STEELENGINE_CODEX_APP_SERVER_ARGS_ENV_VAR = "STEELENGINE_CODEX_APP_SERVER_ARGS";
 const CODEX_BOUNDED_THREAD_CONFIG: JsonObject = {
   "features.multi_agent": false,
   "features.apps": false,
@@ -61,7 +61,7 @@ type CodexBoundedTurnResult = {
 type CodexBoundedTurnModelSelection = { mode: "required"; id: string } | { mode: "live-default" };
 
 type CodexBoundedTurnParams = {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   model: CodexBoundedTurnModelSelection;
   profile?: string;
   timeoutMs: number;
@@ -94,7 +94,7 @@ export async function runBoundedCodexAppServerTurn(
   }
   return await withTempWorkspace(
     {
-      rootDir: resolvePreferredOpenClawTmpDir(),
+      rootDir: resolvePreferredSteelEngineTmpDir(),
       prefix: "codex-bounded-turn-",
     },
     async (workspace) => {
@@ -180,7 +180,7 @@ async function runBoundedCodexAppServerTurnInWorkspace(
           cwd: workspace.cwd,
           approvalPolicy: "on-request",
           sandbox: "read-only",
-          serviceName: "OpenClaw",
+          serviceName: "SteelEngine",
           developerInstructions: params.developerInstructions,
           config: buildCodexRuntimeThreadConfig(resolveBoundedThreadConfig(params, workspace), {
             nativeCodeModeEnabled: false,
@@ -267,12 +267,12 @@ function buildPrivateCodexAppServerStartOptions(
 ): ReturnType<typeof resolveCodexAppServerRuntimeOptions>["start"] {
   const privateEnv = Object.fromEntries(
     Object.entries(start.env ?? {}).filter(
-      ([name]) => name.trim().toUpperCase() !== OPENCLAW_CODEX_APP_SERVER_ARGS_ENV_VAR,
+      ([name]) => name.trim().toUpperCase() !== STEELENGINE_CODEX_APP_SERVER_ARGS_ENV_VAR,
     ),
   );
   const clearEnv = (start.clearEnv ?? []).filter((name) => {
     const normalized = name.trim().toUpperCase();
-    return normalized !== "CODEX_HOME" && normalized !== OPENCLAW_CODEX_APP_SERVER_ARGS_ENV_VAR;
+    return normalized !== "CODEX_HOME" && normalized !== STEELENGINE_CODEX_APP_SERVER_ARGS_ENV_VAR;
   });
   return {
     ...start,
@@ -281,7 +281,7 @@ function buildPrivateCodexAppServerStartOptions(
       ...privateEnv,
       CODEX_HOME: codexHome,
     },
-    clearEnv: [...clearEnv, OPENCLAW_CODEX_APP_SERVER_ARGS_ENV_VAR],
+    clearEnv: [...clearEnv, STEELENGINE_CODEX_APP_SERVER_ARGS_ENV_VAR],
   };
 }
 
@@ -293,7 +293,7 @@ function createCodexBoundedApprovalHandler(taskLabel: string) {
     ) {
       return {
         decision: "decline",
-        reason: `OpenClaw Codex ${taskLabel} does not grant tool or file approvals.`,
+        reason: `SteelEngine Codex ${taskLabel} does not grant tool or file approvals.`,
       };
     }
     if (request.method === "item/permissions/requestApproval") {
@@ -302,7 +302,7 @@ function createCodexBoundedApprovalHandler(taskLabel: string) {
     if (request.method.includes("requestApproval")) {
       return {
         decision: "decline",
-        reason: `OpenClaw Codex ${taskLabel} does not grant native approvals.`,
+        reason: `SteelEngine Codex ${taskLabel} does not grant native approvals.`,
       };
     }
     if (request.method === "mcpServer/elicitation/request") {

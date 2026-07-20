@@ -1,8 +1,8 @@
 // Matrix helper module supports config update behavior.
-import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "openclaw/plugin-sdk/account-id";
-import { resolveOptionalIntegerOption } from "openclaw/plugin-sdk/number-runtime";
-import { coerceSecretRef } from "openclaw/plugin-sdk/secret-ref-runtime";
-import { normalizeSecretInputString } from "openclaw/plugin-sdk/setup";
+import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "steelengine/plugin-sdk/account-id";
+import { resolveOptionalIntegerOption } from "steelengine/plugin-sdk/number-runtime";
+import { coerceSecretRef } from "steelengine/plugin-sdk/secret-ref-runtime";
+import { normalizeSecretInputString } from "steelengine/plugin-sdk/setup";
 import type { CoreConfig, MatrixConfig } from "../types.js";
 import { findMatrixAccountConfig } from "./account-config.js";
 import {

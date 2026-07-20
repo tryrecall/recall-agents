@@ -214,15 +214,15 @@ describe("gateway pre-auth hardening", () => {
   });
 
   it("closes idle unauthenticated sockets after the handshake timeout", async () => {
-    setEnvForTest("OPENCLAW_TEST_HANDSHAKE_TIMEOUT_MS", "200");
+    setEnvForTest("STEELENGINE_TEST_HANDSHAKE_TIMEOUT_MS", "200");
 
     await expectIdlePreauthSocketClose();
   });
 
   it("uses gateway.handshakeTimeoutMs for idle unauthenticated sockets", async () => {
-    const configPath = process.env.OPENCLAW_CONFIG_PATH;
+    const configPath = process.env.STEELENGINE_CONFIG_PATH;
     if (!configPath) {
-      throw new Error("OPENCLAW_CONFIG_PATH missing in gateway preauth test");
+      throw new Error("STEELENGINE_CONFIG_PATH missing in gateway preauth test");
     }
     await writeFile(
       configPath,
@@ -291,7 +291,7 @@ describe("gateway pre-auth hardening", () => {
   });
 
   it("rejects excess simultaneous unauthenticated sockets from the same client ip", async () => {
-    setEnvForTest("OPENCLAW_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP", "1");
+    setEnvForTest("STEELENGINE_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP", "1");
     setGatewayAuthNoneForTest();
 
     const harness = await createGatewaySuiteHarness();
@@ -309,7 +309,7 @@ describe("gateway pre-auth hardening", () => {
   });
 
   it("rejects excess simultaneous unauthenticated sockets when trusted proxy headers are missing", async () => {
-    setEnvForTest("OPENCLAW_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP", "1");
+    setEnvForTest("STEELENGINE_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP", "1");
     setGatewayAuthNoneForTest();
 
     await withTempConfig({
@@ -318,7 +318,7 @@ describe("gateway pre-auth hardening", () => {
           trustedProxies: ["127.0.0.1"],
         },
       },
-      prefix: "openclaw-preauth-proxy-",
+      prefix: "steelengine-preauth-proxy-",
       run: async () => {
         const harness = await createGatewaySuiteHarness();
         try {

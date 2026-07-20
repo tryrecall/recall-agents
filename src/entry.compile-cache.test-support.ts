@@ -17,7 +17,7 @@ type CompileCacheRespawnPlan = {
 };
 
 type CompileCacheTestApi = {
-  buildOpenClawCompileCacheRespawnPlan(params: {
+  buildSteelEngineCompileCacheRespawnPlan(params: {
     currentFile: string;
     env?: NodeJS.ProcessEnv;
     execArgv?: string[];
@@ -30,27 +30,27 @@ type CompileCacheTestApi = {
   }): CompileCacheRespawnPlan | undefined;
   isNodeVersionAffectedByCompileCacheDeadlock(nodeVersion: string | undefined): boolean;
   isSourceCheckoutInstallRoot(installRoot: string): boolean;
-  resolveOpenClawCompileCacheDirectory(params: {
+  resolveSteelEngineCompileCacheDirectory(params: {
     env?: NodeJS.ProcessEnv;
     installRoot: string;
   }): string;
-  runOpenClawCompileCacheRespawnPlan(
+  runSteelEngineCompileCacheRespawnPlan(
     plan: CompileCacheRespawnPlan,
     runtime?: RespawnChildRuntime & { writeError(message: string): void },
   ): ChildProcess;
-  shouldEnableOpenClawCompileCache(params: CompileCacheParams): boolean;
+  shouldEnableSteelEngineCompileCache(params: CompileCacheParams): boolean;
 };
 
 function getTestApi(): CompileCacheTestApi {
   return (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.entryCompileCacheTestApi")
+    Symbol.for("steelengine.entryCompileCacheTestApi")
   ] as CompileCacheTestApi;
 }
 
-export function buildOpenClawCompileCacheRespawnPlan(
-  params: Parameters<CompileCacheTestApi["buildOpenClawCompileCacheRespawnPlan"]>[0],
+export function buildSteelEngineCompileCacheRespawnPlan(
+  params: Parameters<CompileCacheTestApi["buildSteelEngineCompileCacheRespawnPlan"]>[0],
 ): CompileCacheRespawnPlan | undefined {
-  return getTestApi().buildOpenClawCompileCacheRespawnPlan(params);
+  return getTestApi().buildSteelEngineCompileCacheRespawnPlan(params);
 }
 
 export function isNodeVersionAffectedByCompileCacheDeadlock(
@@ -63,18 +63,18 @@ export function isSourceCheckoutInstallRoot(installRoot: string): boolean {
   return getTestApi().isSourceCheckoutInstallRoot(installRoot);
 }
 
-export function resolveOpenClawCompileCacheDirectory(
-  params: Parameters<CompileCacheTestApi["resolveOpenClawCompileCacheDirectory"]>[0],
+export function resolveSteelEngineCompileCacheDirectory(
+  params: Parameters<CompileCacheTestApi["resolveSteelEngineCompileCacheDirectory"]>[0],
 ): string {
-  return getTestApi().resolveOpenClawCompileCacheDirectory(params);
+  return getTestApi().resolveSteelEngineCompileCacheDirectory(params);
 }
 
-export function runOpenClawCompileCacheRespawnPlan(
-  ...args: Parameters<CompileCacheTestApi["runOpenClawCompileCacheRespawnPlan"]>
+export function runSteelEngineCompileCacheRespawnPlan(
+  ...args: Parameters<CompileCacheTestApi["runSteelEngineCompileCacheRespawnPlan"]>
 ): ChildProcess {
-  return getTestApi().runOpenClawCompileCacheRespawnPlan(...args);
+  return getTestApi().runSteelEngineCompileCacheRespawnPlan(...args);
 }
 
-export function shouldEnableOpenClawCompileCache(params: CompileCacheParams): boolean {
-  return getTestApi().shouldEnableOpenClawCompileCache(params);
+export function shouldEnableSteelEngineCompileCache(params: CompileCacheParams): boolean {
+  return getTestApi().shouldEnableSteelEngineCompileCache(params);
 }

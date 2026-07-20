@@ -332,7 +332,7 @@ export async function settleEmbeddedAttemptStream(input: {
 
     if (promptError && promptErrorSource === "prompt" && !compactionOccurredThisAttempt) {
       try {
-        sessionManager.appendCustomEntry("openclaw:prompt-error", {
+        sessionManager.appendCustomEntry("steelengine:prompt-error", {
           timestamp: Date.now(),
           runId: attempt.runId,
           sessionId: attempt.sessionId,

@@ -396,7 +396,7 @@ export abstract class AppSidebarMenusElement extends AppSidebarSessionGroupsElem
     return keyed(
       menu,
       html`
-        <openclaw-session-menu
+        <steelengine-session-menu
           .session=${{
             label: session.label,
             pinned: session.pinned,
@@ -475,7 +475,7 @@ export abstract class AppSidebarMenusElement extends AppSidebarSessionGroupsElem
                 break;
             }
           }}
-        ></openclaw-session-menu>
+        ></steelengine-session-menu>
       `,
     );
   }

@@ -1,20 +1,20 @@
 // Discord plugin module implements rest fetch behavior.
 import { randomUUID } from "node:crypto";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 import {
   createHttp1EnvHttpProxyAgent,
   createHttp1ProxyAgent,
   resolveEnvHttpProxyAgentOptions,
   wrapFetchWithAbortSignal,
-} from "openclaw/plugin-sdk/fetch-runtime";
+} from "steelengine/plugin-sdk/fetch-runtime";
 import {
   captureHttpExchange,
   resolveEffectiveDebugProxyUrl,
-} from "openclaw/plugin-sdk/proxy-capture";
-import { resolveRequestUrl } from "openclaw/plugin-sdk/request-url";
-import { danger } from "openclaw/plugin-sdk/runtime-env";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
-import { fetchWithRuntimeDispatcher } from "openclaw/plugin-sdk/runtime-fetch";
+} from "steelengine/plugin-sdk/proxy-capture";
+import { resolveRequestUrl } from "steelengine/plugin-sdk/request-url";
+import { danger } from "steelengine/plugin-sdk/runtime-env";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
+import { fetchWithRuntimeDispatcher } from "steelengine/plugin-sdk/runtime-fetch";
 import { Agent } from "undici";
 import { createDiscordDnsLookup } from "../network-config.js";
 import { withValidatedDiscordProxy } from "../proxy-fetch.js";

@@ -3,9 +3,9 @@ import {
   createStatusReactionController,
   shouldAckReactionForWhatsApp,
   type StatusReactionController,
-} from "openclaw/plugin-sdk/channel-feedback";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/channel-feedback";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { logVerbose } from "steelengine/plugin-sdk/runtime-env";
 import { getSenderIdentity } from "../../identity.js";
 import { requireWhatsAppInboundAdmission } from "../../inbound/admission.js";
 import type { AdmittedWebInboundMessage } from "../../inbound/types.js";
@@ -17,7 +17,7 @@ import { resolveGroupActivationFor } from "./group-activation.js";
 export type { StatusReactionController };
 
 type WhatsAppStatusReactionParams = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   msg: AdmittedWebInboundMessage;
   agentId: string;
   sessionKey: string;

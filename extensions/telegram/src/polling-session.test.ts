@@ -2,22 +2,22 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
-import type { ChannelAccountSnapshot } from "openclaw/plugin-sdk/channel-contract";
-import { DEFAULT_INGRESS_RETRY_MAX_ATTEMPTS as TELEGRAM_SPOOLED_RETRY_MAX_ATTEMPTS } from "openclaw/plugin-sdk/channel-outbound";
+import { expectDefined } from "@steelengine/normalization-core";
+import type { ChannelAccountSnapshot } from "steelengine/plugin-sdk/channel-contract";
+import { DEFAULT_INGRESS_RETRY_MAX_ATTEMPTS as TELEGRAM_SPOOLED_RETRY_MAX_ATTEMPTS } from "steelengine/plugin-sdk/channel-outbound";
 import {
   isIngressClaimOwnedByOtherLiveProcess as isTelegramSpooledUpdateClaimOwnedByOtherLiveProcess,
   resolveIngressRetryDelayMs,
   shouldDeadLetterRetryableIngressEvent,
-} from "openclaw/plugin-sdk/plugin-state-test-runtime";
+} from "steelengine/plugin-sdk/plugin-state-test-runtime";
 import {
-  closeOpenClawStateDatabaseForTest,
+  closeSteelEngineStateDatabaseForTest,
   createChannelIngressQueueForTests as createChannelIngressQueue,
   executeSqliteQuerySync,
   getNodeSqliteKysely,
-  openOpenClawStateDatabase,
-  type OpenClawStateKyselyDatabaseForTests,
-} from "openclaw/plugin-sdk/plugin-state-test-runtime";
+  openSteelEngineStateDatabase,
+  type SteelEngineStateKyselyDatabaseForTests,
+} from "steelengine/plugin-sdk/plugin-state-test-runtime";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { commitTelegramMessageDispatchReplay } from "./message-dispatch-dedupe.js";
 import {
@@ -69,7 +69,7 @@ vi.mock("./network-errors.js", () => ({
   isRecoverableTelegramNetworkError: isRecoverableTelegramNetworkErrorMock,
 }));
 
-vi.mock("openclaw/plugin-sdk/delivery-queue-runtime", () => ({
+vi.mock("steelengine/plugin-sdk/delivery-queue-runtime", () => ({
   drainPendingDeliveries: drainPendingDeliveriesMock,
 }));
 
@@ -77,7 +77,7 @@ vi.mock("./api-logging.js", () => ({
   withTelegramApiErrorLogging: async ({ fn }: { fn: () => Promise<unknown> }) => await fn(),
 }));
 
-vi.mock("openclaw/plugin-sdk/runtime-env", () => ({
+vi.mock("steelengine/plugin-sdk/runtime-env", () => ({
   computeBackoff: computeBackoffMock,
   createSubsystemLogger: vi.fn(() => {
     const logger = {
@@ -132,7 +132,7 @@ async function claimSpooledUpdate(update: TelegramSpooledUpdate) {
 
 async function createTelegramMessageDispatchReplayForgetError(): Promise<unknown> {
   type ReplayGuard = Parameters<typeof commitTelegramMessageDispatchReplay>[0]["guard"];
-  type ReplayClaim = import("openclaw/plugin-sdk/persistent-dedupe").ChannelReplayClaimHandle;
+  type ReplayClaim = import("steelengine/plugin-sdk/persistent-dedupe").ChannelReplayClaimHandle;
   const diskError = new Error("dedupe disk write failed");
   const guard: ReplayGuard = {
     claim: async () => ({ kind: "invalid" }),
@@ -194,7 +194,7 @@ type WorkerMessageListener = (message: TelegramIngressWorkerMessage) => void;
 type AsyncVoidFn = () => Promise<void>;
 type MockCallSource = { mock: { calls: Array<Array<unknown>> } };
 type TelegramPollingTestDatabase = Pick<
-  OpenClawStateKyselyDatabaseForTests,
+  SteelEngineStateKyselyDatabaseForTests,
   "channel_ingress_events"
 >;
 
@@ -601,8 +601,8 @@ function telegramTestQueueName(spoolDir: string): string {
 }
 
 function openTelegramSpoolTestKysely(spoolDir: string) {
-  const database = openOpenClawStateDatabase({
-    env: { ...process.env, OPENCLAW_STATE_DIR: spoolDir },
+  const database = openSteelEngineStateDatabase({
+    env: { ...process.env, STEELENGINE_STATE_DIR: spoolDir },
   });
   return {
     database,
@@ -663,11 +663,11 @@ async function adoptClaimOwner(params: {
 }
 
 async function withTempSpool<T>(fn: (spoolDir: string) => Promise<T>): Promise<T> {
-  const spoolDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+  const spoolDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
   try {
     return await fn(spoolDir);
   } finally {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     await fs.rm(spoolDir, { recursive: true, force: true });
   }
 }
@@ -760,14 +760,14 @@ describe("TelegramPollingSession", () => {
     drainPendingDeliveriesMock.mockReset().mockResolvedValue(undefined);
     resetTelegramReplyFenceForTests();
     installTelegramIngressQueueRuntime(() =>
-      path.join(os.tmpdir(), "openclaw-telegram-test-state"),
+      path.join(os.tmpdir(), "steelengine-telegram-test-state"),
     );
   });
 
   afterEach(() => {
     pollingSessionTesting.resetActiveSpooledUpdateHandlersForTests();
     clearTelegramRuntime();
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
   });
 
   it("uses backoff helpers for recoverable polling retries", async () => {
@@ -943,13 +943,13 @@ describe("TelegramPollingSession", () => {
     await session.runUntilAbort();
 
     // Offset confirmation was removed because it could self-conflict with the runner.
-    // OpenClaw middleware still skips duplicates using the persisted update offset.
+    // SteelEngine middleware still skips duplicates using the persisted update offset.
     expect(bot.api.getUpdates).not.toHaveBeenCalled();
   });
 
   it("initializes the main-thread bot before draining isolated ingress spool", async () => {
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const handleUpdate = vi.fn(async () => undefined);
     const init = vi.fn(async () => undefined);
     const bot = {
@@ -1022,7 +1022,7 @@ describe("TelegramPollingSession", () => {
 
   it("writes isolated worker updates through the main runtime queue", async () => {
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const handleUpdate = vi.fn(async () => undefined);
     const bot = {
       api: {
@@ -1093,7 +1093,7 @@ describe("TelegramPollingSession", () => {
 
   it("drains worker-spooled updates without waiting for the next drain interval", async () => {
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const handleUpdate = vi.fn(async () => {
       abort.abort();
     });
@@ -1169,7 +1169,7 @@ describe("TelegramPollingSession", () => {
 
   it("drains worker-spooled updates that arrive during an active drain", async () => {
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     let releaseFirstClaim: (() => void) | undefined;
     let firstClaimStarted: (() => void) | undefined;
     const firstClaimGate = new Promise<void>((resolve) => {
@@ -1295,7 +1295,7 @@ describe("TelegramPollingSession", () => {
 
   it("drains existing isolated ingress spool entries below the persisted offset", async () => {
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const handleUpdate = vi.fn(async () => undefined);
     createTelegramBotMock.mockReturnValueOnce({
       api: {
@@ -2958,7 +2958,7 @@ describe("TelegramPollingSession", () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const firstAbort = new AbortController();
     const secondAbort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     let releaseTurn: (() => void) | undefined;
     const turnDone = new Promise<void>((resolve) => {
       releaseTurn = resolve;
@@ -3045,7 +3045,7 @@ describe("TelegramPollingSession", () => {
 
   it("lets isolated ingress drain interleave different Telegram topic lanes", async () => {
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const events: string[] = [];
     let releaseTopicTenTurn: (() => void) | undefined;
     const topicTenTurnDone = new Promise<void>((resolve) => {
@@ -3146,7 +3146,7 @@ describe("TelegramPollingSession", () => {
 
   it("lets isolated ingress drain interleave different Telegram chats", async () => {
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const events: string[] = [];
     let releaseFirstChatTurn: (() => void) | undefined;
     const firstChatTurnDone = new Promise<void>((resolve) => {
@@ -3245,7 +3245,7 @@ describe("TelegramPollingSession", () => {
 
   it("lets isolated ingress control updates bypass an active spooled turn", async () => {
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const events: string[] = [];
     let releaseRegularTurn: (() => void) | undefined;
     const regularTurnDone = new Promise<void>((resolve) => {
@@ -3364,7 +3364,7 @@ describe("TelegramPollingSession", () => {
 
   it("preserves spool order when a control update is already queued after a regular turn", async () => {
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const events: string[] = [];
     let releaseRegularTurn: (() => void) | undefined;
     const regularTurnDone = new Promise<void>((resolve) => {
@@ -3451,7 +3451,7 @@ describe("TelegramPollingSession", () => {
 
   it("waits for active spooled handlers before stopping the bot", async () => {
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const events: string[] = [];
     let releaseRegularTurn: (() => void) | undefined;
     const regularTurnDone = new Promise<void>((resolve) => {
@@ -3523,7 +3523,7 @@ describe("TelegramPollingSession", () => {
     // Core drain dispose leaves the claim for recover; the next cycle re-dispatches.
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     let releaseRegularTurn: (() => void) | undefined;
     const regularTurnDone = new Promise<void>((resolve) => {
       releaseRegularTurn = resolve;
@@ -3608,7 +3608,7 @@ describe("TelegramPollingSession", () => {
   it("restarts isolated ingress when the worker task rejects before shutdown", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const log = vi.fn();
     const setStatus = vi.fn();
     createTelegramBotMock.mockImplementation(() => ({
@@ -3707,7 +3707,7 @@ describe("TelegramPollingSession", () => {
   it("waits for a fresh bot before draining updates after an isolated worker crash", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     let releaseBackoff: (() => void) | undefined;
     const backoff = new Promise<void>((resolve) => {
       releaseBackoff = resolve;
@@ -3822,7 +3822,7 @@ describe("TelegramPollingSession", () => {
   it("keeps adopted-turn Bot API delivery alive when an isolated worker crashes", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     let releaseBackoff: (() => void) | undefined;
     const backoff = new Promise<void>((resolve) => {
       releaseBackoff = resolve;
@@ -3932,7 +3932,7 @@ describe("TelegramPollingSession", () => {
   it("treats isolated ingress worker rejection after abort as clean shutdown", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const log = vi.fn();
     createTelegramBotMock.mockImplementation(() => ({
       api: {
@@ -3987,7 +3987,7 @@ describe("TelegramPollingSession", () => {
   it("propagates fatal isolated ingress polling errors", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const log = vi.fn();
     const setStatus = vi.fn();
     isRecoverableTelegramNetworkErrorMock.mockReturnValue(false);
@@ -4049,7 +4049,7 @@ describe("TelegramPollingSession", () => {
 
   it("restarts isolated ingress on a getUpdates conflict instead of crashing the account", async () => {
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const log = vi.fn();
     const setStatus = vi.fn();
     // 409 conflicts are not "recoverable network errors"; the conflict branch
@@ -4116,12 +4116,12 @@ describe("TelegramPollingSession", () => {
       expect(deleteWebhook).toHaveBeenCalledTimes(2);
       // The conflict marks the transport dirty so the next cycle gets a fresh socket.
       expect(createTelegramTransport).toHaveBeenCalledTimes(1);
-      expectLogIncludes(log, "Another OpenClaw gateway, script, or Telegram poller");
+      expectLogIncludes(log, "Another SteelEngine gateway, script, or Telegram poller");
       expect(
         statusPatches(setStatus).some(
           (patch) =>
             patch.connected === false &&
-            String(patch.lastError).includes("Another OpenClaw gateway"),
+            String(patch.lastError).includes("Another SteelEngine gateway"),
         ),
       ).toBe(true);
     } finally {
@@ -4135,7 +4135,7 @@ describe("TelegramPollingSession", () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const firstAbort = new AbortController();
     const secondAbort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     let releaseRegularTurn: (() => void) | undefined;
     const regularTurnDone = new Promise<void>((resolve) => {
       releaseRegularTurn = resolve;
@@ -4232,7 +4232,7 @@ describe("TelegramPollingSession", () => {
     // behavior; the user-visible outcome is 42 failed and 43 processed.
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const abort = new AbortController();
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-spool-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-spool-"));
     const log = vi.fn();
     const events: string[] = [];
     const bot = {
@@ -5004,12 +5004,12 @@ describe("TelegramPollingSession", () => {
 
     await session.runUntilAbort();
 
-    expectLogIncludes(log, "Another OpenClaw gateway, script, or Telegram poller");
+    expectLogIncludes(log, "Another SteelEngine gateway, script, or Telegram poller");
     // The hint must reach channel status, not just the gateway log.
     expect(
       statusPatches(setStatus).some(
         (patch) =>
-          patch.connected === false && String(patch.lastError).includes("Another OpenClaw gateway"),
+          patch.connected === false && String(patch.lastError).includes("Another SteelEngine gateway"),
       ),
     ).toBe(true);
   });

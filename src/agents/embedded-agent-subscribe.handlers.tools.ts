@@ -6,12 +6,12 @@
 import {
   asOptionalObjectRecord,
   asOptionalRecord as readRecordField,
-} from "@openclaw/normalization-core/record-coerce";
+} from "@steelengine/normalization-core/record-coerce";
 import {
   normalizeOptionalLowercaseString,
   readStringValue,
-} from "@openclaw/normalization-core/string-coerce";
-import { truncateUtf16Safe } from "@openclaw/normalization-core/utf16-slice";
+} from "@steelengine/normalization-core/string-coerce";
+import { truncateUtf16Safe } from "@steelengine/normalization-core/utf16-slice";
 import {
   HEARTBEAT_RESPONSE_TOOL_NAME,
   normalizeHeartbeatToolResponse,
@@ -491,17 +491,17 @@ function extractLiveExecOutput(result: unknown): string | undefined {
   return typeof output === "string" ? truncateLiveExecOutput(output) : undefined;
 }
 
-function isOpenClawExecutable(token: string | undefined): boolean {
+function isSteelEngineExecutable(token: string | undefined): boolean {
   const executable = normalizeOptionalLowercaseString(token);
-  return executable?.split(/[\\/]/).at(-1) === "openclaw";
+  return executable?.split(/[\\/]/).at(-1) === "steelengine";
 }
 
-function isOpenClawPackageSpec(token: string | undefined): boolean {
+function isSteelEnginePackageSpec(token: string | undefined): boolean {
   const packageSpec = normalizeOptionalLowercaseString(token);
-  return packageSpec?.startsWith("openclaw@") === true && packageSpec.length > "openclaw@".length;
+  return packageSpec?.startsWith("steelengine@") === true && packageSpec.length > "steelengine@".length;
 }
 
-function skipOpenClawPackageRunner(
+function skipSteelEnginePackageRunner(
   tokens: string[],
   startIndex: number,
 ): { commandIndex: number; acceptsPackageSpec: boolean } {
@@ -554,7 +554,7 @@ function skipOpenClawPackageRunner(
   return { commandIndex, acceptsPackageSpec };
 }
 
-function isOpenClawCronAddShellCommand(args: unknown): boolean {
+function isSteelEngineCronAddShellCommand(args: unknown): boolean {
   const record = asOptionalObjectRecord(args);
   const command = readStringValue(record?.command) ?? readStringValue(record?.cmd);
   if (!command || hasTopLevelShellControlOperator(command)) {
@@ -573,7 +573,7 @@ function isOpenClawCronAddShellCommand(args: unknown): boolean {
   while (/^[A-Za-z_][A-Za-z0-9_]*=/u.test(tokens[commandIndex] ?? "")) {
     commandIndex += 1;
   }
-  const packageRunner = skipOpenClawPackageRunner(tokens, commandIndex);
+  const packageRunner = skipSteelEnginePackageRunner(tokens, commandIndex);
   commandIndex = packageRunner.commandIndex;
 
   let cliArgIndex = commandIndex + 1;
@@ -587,8 +587,8 @@ function isOpenClawCronAddShellCommand(args: unknown): boolean {
   const action = normalizeOptionalLowercaseString(tokens[cliArgIndex + 1]);
   const actionArgs = tokens.slice(cliArgIndex + 2);
   return (
-    (isOpenClawExecutable(tokens[commandIndex]) ||
-      (packageRunner.acceptsPackageSpec && isOpenClawPackageSpec(tokens[commandIndex]))) &&
+    (isSteelEngineExecutable(tokens[commandIndex]) ||
+      (packageRunner.acceptsPackageSpec && isSteelEnginePackageSpec(tokens[commandIndex]))) &&
     normalizeOptionalLowercaseString(tokens[cliArgIndex]) === "cron" &&
     (action === "add" || action === "create") &&
     !actionArgs.some((token) => token === "-h" || token === "--help")
@@ -596,7 +596,7 @@ function isOpenClawCronAddShellCommand(args: unknown): boolean {
 }
 
 function didShellCronAddSucceed(args: unknown, result: unknown): boolean {
-  if (!isOpenClawCronAddShellCommand(args)) {
+  if (!isSteelEngineCronAddShellCommand(args)) {
     return false;
   }
   const details = readExecToolDetails(result);
@@ -1587,7 +1587,7 @@ export async function handleToolExecutionEnd(
       data: {
         phase: "update",
         title: "Plan updated",
-        source: "openclaw",
+        source: "steelengine",
         ...planUpdate,
       },
     };

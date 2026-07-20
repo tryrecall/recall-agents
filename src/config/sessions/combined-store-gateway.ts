@@ -1,14 +1,14 @@
 // Builds the gateway-visible combined session store across agent-specific stores.
 // Gateway callers need canonical per-agent keys even when stores are split by `{agentId}`.
 
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { resolveDefaultAgentId } from "../../agents/agent-scope.js";
 import {
   canonicalizeSpawnedByForAgent,
   resolveStoredSessionKeyForAgentStore,
 } from "../../gateway/session-store-key.js";
 import { normalizeAgentId } from "../../routing/session-key.js";
-import type { OpenClawConfig } from "../types.openclaw.js";
+import type { SteelEngineConfig } from "../types.steelengine.js";
 import { resolveStorePath } from "./paths.js";
 import { listSessionEntries } from "./session-accessor.js";
 import {
@@ -37,7 +37,7 @@ function loadGatewayStoreEntries(params: {
 }
 
 function mergeSessionEntryIntoCombined(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   combined: Record<string, SessionEntry>;
   entry: SessionEntry;
   agentId: string;
@@ -79,7 +79,7 @@ function mergeSessionEntryIntoCombined(params: {
 
 /** Loads and canonicalizes session entries for gateway views across one or more agent stores. */
 export function loadCombinedSessionStoreForGateway(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   opts: { agentId?: string; configuredAgentsOnly?: boolean } = {},
 ): {
   storePath: string;

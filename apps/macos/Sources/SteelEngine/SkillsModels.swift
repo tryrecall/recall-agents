@@ -1,0 +1,10 @@
+import SteelEngineKit
+
+typealias SkillsStatusReport = SteelEngineKit.SkillsStatusReport
+typealias SkillStatus = SteelEngineKit.SkillStatus
+typealias SkillRequirements = SteelEngineKit.SkillRequirements
+typealias SkillMissing = SteelEngineKit.SkillMissing
+typealias SkillStatusConfigCheck = SteelEngineKit.SkillStatusConfigCheck
+typealias SkillInstallOption = SteelEngineKit.SkillInstallOption
+typealias SkillInstallResult = SteelEngineKit.SkillInstallResult
+typealias SkillUpdateResult = SteelEngineKit.SkillUpdateResult

@@ -1,6 +1,6 @@
 // Video live test helper tests cover live provider test configuration helpers.
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/types.js";
+import type { SteelEngineConfig } from "../config/types.js";
 import {
   canRunBufferBackedImageToVideoLiveLane,
   canRunBufferBackedVideoToVideoLiveLane,
@@ -39,7 +39,7 @@ describe("video-generation live-test helpers", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     expect(resolveConfiguredLiveVideoModels(cfg)).toEqual(
       new Map([

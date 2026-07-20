@@ -132,7 +132,7 @@ beforeEach(async () => {
   runtimePluginMocks.findRestartRecoveryUnsafeReplyHook.mockReturnValue(undefined);
   resetAgentEventsForTest();
   resetGatewayWorkAdmission();
-  tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-main-restart-recovery-"));
+  tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-main-restart-recovery-"));
 });
 
 afterEach(async () => {
@@ -2961,7 +2961,7 @@ describe("main-session-restart-recovery", () => {
         role: "assistant",
         content: [{ type: "text", text: "delivered answer" }],
         stopReason: "stop",
-        openclawDeliveryMirror: {
+        steelengineDeliveryMirror: {
           kind: "message-tool-source-reply",
           final: true,
           sourceTurnId: "discord-message-1",
@@ -4345,7 +4345,7 @@ describe("main-session-restart-recovery", () => {
         role: "assistant",
         content: [{ type: "text", text: "not this turn's terminal answer" }],
         stopReason: "stop",
-        openclawDeliveryMirror: {
+        steelengineDeliveryMirror: {
           kind: "message-tool-source-reply",
           final,
           sourceTurnId,
@@ -4953,7 +4953,7 @@ describe("main-session-restart-recovery", () => {
       {
         role: "user",
         content:
-          "[System] Your previous turn was interrupted by a gateway restart while OpenClaw was waiting on tool/model work. Continue from the existing transcript and finish the interrupted response.",
+          "[System] Your previous turn was interrupted by a gateway restart while SteelEngine was waiting on tool/model work. Continue from the existing transcript and finish the interrupted response.",
       },
       {
         role: "assistant",
@@ -5071,7 +5071,7 @@ describe("main-session-restart-recovery", () => {
       {
         role: "user",
         content:
-          "[System] Your previous turn was interrupted by a gateway restart while OpenClaw was waiting on tool/model work. Continue from the existing transcript and finish the interrupted response.",
+          "[System] Your previous turn was interrupted by a gateway restart while SteelEngine was waiting on tool/model work. Continue from the existing transcript and finish the interrupted response.",
       },
       { role: "assistant", content: [{ type: "text", text: "Finished that recovery." }] },
       { role: "user", content: "a later request" },

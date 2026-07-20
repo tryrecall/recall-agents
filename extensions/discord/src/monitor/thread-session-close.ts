@@ -1,11 +1,11 @@
 // Discord plugin module implements thread session close behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   listSessionEntries,
   patchSessionEntry,
   resolveStorePath,
-} from "openclaw/plugin-sdk/session-store-runtime";
-import { normalizeOptionalLowercaseString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/session-store-runtime";
+import { normalizeOptionalLowercaseString } from "steelengine/plugin-sdk/string-coerce-runtime";
 
 /**
  * Marks every session entry in the store whose key contains {@link threadId}
@@ -17,7 +17,7 @@ import { normalizeOptionalLowercaseString } from "openclaw/plugin-sdk/string-coe
  * any on-disk transcript history.
  */
 export async function closeDiscordThreadSessions(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId: string;
   threadId: string;
 }): Promise<number> {

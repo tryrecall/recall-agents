@@ -1,7 +1,7 @@
 /**
  * Auth-profile forwarding shared by normal and narrow CLI-backed agent runs.
  */
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { resolveAuthProfileOrder } from "./auth-profiles/order.js";
 import { loadAuthProfileStoreForRuntime } from "./auth-profiles/store.js";
 import { resolveCliBackendConfig } from "./cli-backends.js";
@@ -16,7 +16,7 @@ type CliExecutionAuthProfileSelection = {
 
 export function cliBackendAcceptsAuthProfileForwarding(params: {
   provider: string;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   agentId?: string;
 }): boolean {
   const backend = resolveCliBackendConfig(params.provider, params.config, {
@@ -34,7 +34,7 @@ export function cliBackendAcceptsAuthProfileForwarding(params: {
 export function resolveCliExecutionAuthProfileId(params: {
   cliExecutionProvider: string;
   authProfileProvider: string;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   agentDir: string;
   selected?: CliExecutionAuthProfileSelection;
 }): string | undefined {

@@ -3,11 +3,11 @@ import {
   resolveAllowedModelRef,
   resolveDefaultAgentId,
   resolveDefaultModelForAgent,
-} from "openclaw/plugin-sdk/agent-runtime";
-import { resolveEffectiveAgentRuntime } from "openclaw/plugin-sdk/command-auth-native";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
-import { isRecord } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/agent-runtime";
+import { resolveEffectiveAgentRuntime } from "steelengine/plugin-sdk/command-auth-native";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-entry";
+import { isRecord } from "steelengine/plugin-sdk/string-coerce-runtime";
 import {
   CLAUDE_CLI_BACKEND_ID,
   CLAUDE_CLI_CANONICAL_DEFAULT_MODEL_ID,
@@ -15,8 +15,8 @@ import {
 } from "./cli-constants.js";
 import { adoptedSourceKey, CLAUDE_LOCAL_SESSION_HOST_ID } from "./session-catalog-adoption.js";
 
-export function currentClaudeSessionCatalogConfig(api: OpenClawPluginApi): OpenClawConfig {
-  return (api.runtime.config?.current?.() ?? api.config ?? {}) as OpenClawConfig;
+export function currentClaudeSessionCatalogConfig(api: SteelEnginePluginApi): SteelEngineConfig {
+  return (api.runtime.config?.current?.() ?? api.config ?? {}) as SteelEngineConfig;
 }
 
 function boundClaudeSource(
@@ -51,7 +51,7 @@ function boundClaudeSource(
     : undefined;
 }
 
-export function listBoundClaudeSessions(api: OpenClawPluginApi): Map<string, string> {
+export function listBoundClaudeSessions(api: SteelEnginePluginApi): Map<string, string> {
   const config = currentClaudeSessionCatalogConfig(api);
   const defaultAgentId = resolveDefaultAgentId(config);
   const agentIds = [
@@ -71,7 +71,7 @@ export function listBoundClaudeSessions(api: OpenClawPluginApi): Map<string, str
 }
 
 export function resolveClaudeCatalogCreateSession(
-  api: OpenClawPluginApi,
+  api: SteelEnginePluginApi,
   requestedAgentId?: string,
 ): { model: string; agentRuntime: string } | undefined {
   const config = currentClaudeSessionCatalogConfig(api);

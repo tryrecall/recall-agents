@@ -184,7 +184,7 @@ describe("MCP App standalone host", () => {
   });
 
   it("serves a static shell without embedding tickets or per-view data", () => {
-    const result = request({ url: "/__openclaw__/mcp-app" });
+    const result = request({ url: "/__steelengine__/mcp-app" });
 
     expect(result.handled).toBe(true);
     expect(result.res.statusCode).toBe(200);
@@ -208,7 +208,7 @@ describe("MCP App standalone host", () => {
       nowMs,
       secret,
     });
-    const route = "/__openclaw__/mcp-app/view";
+    const route = "/__steelengine__/mcp-app/view";
 
     expect(request({ url: route }).res.statusCode).toBe(401);
     expect(request({ url: `${route}?ticket=${issued.ticket}` }).res.statusCode).toBe(401);
@@ -241,7 +241,7 @@ describe("MCP App standalone host", () => {
   });
 
   it("keeps the standalone surface read-only and path-scoped", () => {
-    expect(request({ url: "/__openclaw__/mcp-app", method: "POST" }).res.statusCode).toBe(404);
-    expect(request({ url: "/__openclaw__/mcp-app/other" }).handled).toBe(false);
+    expect(request({ url: "/__steelengine__/mcp-app", method: "POST" }).res.statusCode).toBe(404);
+    expect(request({ url: "/__steelengine__/mcp-app/other" }).handled).toBe(false);
   });
 });

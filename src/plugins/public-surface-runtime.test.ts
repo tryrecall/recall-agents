@@ -13,8 +13,8 @@ import {
 const tempDirs: string[] = [];
 const noBundledPluginOverrideEnv = {
   ...process.env,
-  OPENCLAW_BUNDLED_PLUGINS_DIR: undefined,
-  OPENCLAW_DISABLE_BUNDLED_PLUGINS: undefined,
+  STEELENGINE_BUNDLED_PLUGINS_DIR: undefined,
+  STEELENGINE_DISABLE_BUNDLED_PLUGINS: undefined,
 } satisfies NodeJS.ProcessEnv;
 
 afterEach(() => {
@@ -24,7 +24,7 @@ afterEach(() => {
 });
 
 function createTempDir(): string {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-public-surface-runtime-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-public-surface-runtime-"));
   tempDirs.push(tempDir);
   return tempDir;
 }

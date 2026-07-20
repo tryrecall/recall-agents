@@ -1,9 +1,9 @@
-import type { ErrorShape, EventFrame, HelloOk, ResponseFrame } from "@openclaw/gateway-protocol";
+import type { ErrorShape, EventFrame, HelloOk, ResponseFrame } from "@steelengine/gateway-protocol";
 import {
   isGatewayEventFrame,
   isGatewayResponseFrame,
-} from "@openclaw/gateway-protocol/frame-guards";
-import { RetrySupervisor, sleepWithAbort } from "@openclaw/retry";
+} from "@steelengine/gateway-protocol/frame-guards";
+import { RetrySupervisor, sleepWithAbort } from "@steelengine/retry";
 
 export type GatewayProtocolSocket = {
   isOpen: () => boolean;

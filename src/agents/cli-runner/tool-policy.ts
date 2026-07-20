@@ -1,12 +1,12 @@
 import { normalizeToolName } from "../tool-policy.js";
 
-/** Transport prefix CLI harnesses use for loopback OpenClaw MCP tool names. */
-export const OPENCLAW_MCP_TOOL_PREFIX = "mcp__openclaw__";
+/** Transport prefix CLI harnesses use for loopback SteelEngine MCP tool names. */
+export const STEELENGINE_MCP_TOOL_PREFIX = "mcp__steelengine__";
 
 /** Strips the loopback MCP transport prefix so observers see gateway tool names. */
-export function stripOpenClawMcpToolPrefix(toolName: string): string {
-  return toolName.startsWith(OPENCLAW_MCP_TOOL_PREFIX)
-    ? toolName.slice(OPENCLAW_MCP_TOOL_PREFIX.length)
+export function stripSteelEngineMcpToolPrefix(toolName: string): string {
+  return toolName.startsWith(STEELENGINE_MCP_TOOL_PREFIX)
+    ? toolName.slice(STEELENGINE_MCP_TOOL_PREFIX.length)
     : toolName;
 }
 
@@ -28,13 +28,13 @@ export function resolveLoopbackToolsAllowFromMcpPermissions(
     if (!trimmed) {
       continue;
     }
-    if (trimmed === "*" || trimmed === `${OPENCLAW_MCP_TOOL_PREFIX}*`) {
+    if (trimmed === "*" || trimmed === `${STEELENGINE_MCP_TOOL_PREFIX}*`) {
       return undefined;
     }
-    if (trimmed.startsWith("mcp__") && !trimmed.startsWith(OPENCLAW_MCP_TOOL_PREFIX)) {
+    if (trimmed.startsWith("mcp__") && !trimmed.startsWith(STEELENGINE_MCP_TOOL_PREFIX)) {
       continue;
     }
-    const name = normalizeToolName(stripOpenClawMcpToolPrefix(trimmed));
+    const name = normalizeToolName(stripSteelEngineMcpToolPrefix(trimmed));
     if (name) {
       names.add(name);
     }

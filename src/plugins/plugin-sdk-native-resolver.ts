@@ -1,4 +1,4 @@
-/** Installs native Node resolution aliases so plugins can import the OpenClaw SDK in dev and tests. */
+/** Installs native Node resolution aliases so plugins can import the SteelEngine SDK in dev and tests. */
 import fs from "node:fs";
 import Module from "node:module";
 import path from "node:path";
@@ -38,7 +38,7 @@ type NativeAliasEntry = {
 };
 
 /** Resolver install options for CJS `_resolveFilename` and modern ESM loader hooks. */
-type InstallOpenClawPluginSdkNativeResolverOptions = {
+type InstallSteelEnginePluginSdkNativeResolverOptions = {
   modulePath?: string;
   pluginModulePath?: string;
   allowedParentRoots?: readonly string[];
@@ -50,10 +50,10 @@ type InstallOpenClawPluginSdkNativeResolverOptions = {
 
 const moduleWithResolver = Module as ModuleWithResolver;
 const nodeResolveFilenameProperty = "_resolveFilename" as const;
-const PLUGIN_SDK_PACKAGE_PREFIXES = ["openclaw/plugin-sdk", "@openclaw/plugin-sdk"] as const;
+const PLUGIN_SDK_PACKAGE_PREFIXES = ["steelengine/plugin-sdk", "@steelengine/plugin-sdk"] as const;
 const INTERNAL_CORE_PACKAGE_ALIASES = [
   {
-    packageName: "@openclaw/markdown-core",
+    packageName: "@steelengine/markdown-core",
     packageDir: "markdown-core",
     subpaths: [
       ["", "index.ts"],
@@ -71,7 +71,7 @@ const INTERNAL_CORE_PACKAGE_ALIASES = [
     // Mirrors packages/ai/package.json exports; dist file names do not follow
     // the src layout (dist/diagnostics.mjs <- src/utils/diagnostics.ts), so the
     // generic export-map derivation cannot be used here.
-    packageName: "@openclaw/ai",
+    packageName: "@steelengine/ai",
     packageDir: "ai",
     subpaths: [
       ["", "index.ts"],
@@ -88,7 +88,7 @@ const INTERNAL_CORE_PACKAGE_ALIASES = [
     ],
   },
   {
-    packageName: "@openclaw/media-core",
+    packageName: "@steelengine/media-core",
     packageDir: "media-core",
     subpaths: [
       ["", "index.ts"],
@@ -104,7 +104,7 @@ const INTERNAL_CORE_PACKAGE_ALIASES = [
     ],
   },
   {
-    packageName: "@openclaw/llm-core",
+    packageName: "@steelengine/llm-core",
     packageDir: "llm-core",
     subpaths: [
       ["", "index.ts"],
@@ -119,7 +119,7 @@ const pluginSdkNativeAliases = new Map<string, NativeAliasEntry[]>();
 let installed = false;
 let previousResolveFilename: ResolveFilename | undefined;
 
-function resolveLoaderModulePath(options: InstallOpenClawPluginSdkNativeResolverOptions): string {
+function resolveLoaderModulePath(options: InstallSteelEnginePluginSdkNativeResolverOptions): string {
   return options.modulePath ?? fileURLToPath(options.moduleUrl ?? import.meta.url);
 }
 
@@ -191,10 +191,10 @@ function resolveLoaderPackageRootFromModulePath(modulePath: string): string {
           name?: unknown;
         };
         if (
-          packageJson.name === "openclaw" ||
+          packageJson.name === "steelengine" ||
           (typeof packageJson.bin === "object" &&
             packageJson.bin !== null &&
-            typeof (packageJson.bin as { openclaw?: unknown }).openclaw === "string")
+            typeof (packageJson.bin as { steelengine?: unknown }).steelengine === "string")
         ) {
           return cursor;
         }
@@ -216,7 +216,7 @@ function resolveAllowedParentRoot(modulePath: string): string {
 }
 
 function resolveAllowedParentRoots(
-  options: InstallOpenClawPluginSdkNativeResolverOptions,
+  options: InstallSteelEnginePluginSdkNativeResolverOptions,
 ): string[] {
   const roots = new Set<string>();
   if (options.pluginModulePath) {
@@ -266,7 +266,7 @@ function resolveAliasTargetForParentPath(
 }
 
 function listPluginSdkNativeAliases(
-  options: InstallOpenClawPluginSdkNativeResolverOptions,
+  options: InstallSteelEnginePluginSdkNativeResolverOptions,
 ): Array<readonly [string, string]> {
   const modulePath = options.pluginModulePath ?? resolveLoaderModulePath(options);
   return Object.entries(
@@ -294,7 +294,7 @@ function listPluginSdkNativeAliases(
 }
 
 function listInternalCorePackageNativeAliases(
-  options: InstallOpenClawPluginSdkNativeResolverOptions,
+  options: InstallSteelEnginePluginSdkNativeResolverOptions,
 ): Array<{
   request: string;
   target: string;
@@ -317,11 +317,11 @@ function listInternalCorePackageNativeAliases(
   const internalCorePackageAliases = [
     ...INTERNAL_CORE_PACKAGE_ALIASES,
     ...["normalization-core", "acp-core"].map((packageDir) => ({
-      packageName: `@openclaw/${packageDir}`,
+      packageName: `@steelengine/${packageDir}`,
       packageDir,
       subpaths: listWorkspacePackageExportAliasEntries({
         packageRoot,
-        packageName: `@openclaw/${packageDir}`,
+        packageName: `@steelengine/${packageDir}`,
         packageDir,
       }).map((entry) => [entry.subpath, entry.srcFile] as const),
     })),
@@ -399,8 +399,8 @@ function clearNativeAliasesForParentRoots(parentRoots: readonly string[]): void 
   }
 }
 
-export function installOpenClawPluginSdkNativeResolver(
-  options: InstallOpenClawPluginSdkNativeResolverOptions = {},
+export function installSteelEnginePluginSdkNativeResolver(
+  options: InstallSteelEnginePluginSdkNativeResolverOptions = {},
 ): string[] {
   const parentRoots = resolveAllowedParentRoots(options);
   clearNativeAliasesForParentRoots(parentRoots);
@@ -414,8 +414,8 @@ export function installOpenClawPluginSdkNativeResolver(
   return [...pluginSdkNativeAliases.keys()].toSorted();
 }
 
-export function installOpenClawInternalCorePackageNativeResolver(
-  options: Pick<InstallOpenClawPluginSdkNativeResolverOptions, "moduleUrl"> = {},
+export function installSteelEngineInternalCorePackageNativeResolver(
+  options: Pick<InstallSteelEnginePluginSdkNativeResolverOptions, "moduleUrl"> = {},
 ): string[] {
   for (const alias of listInternalCorePackageNativeAliases(options)) {
     registerNativeAlias(alias);

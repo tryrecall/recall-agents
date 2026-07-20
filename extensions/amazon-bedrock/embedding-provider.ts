@@ -7,11 +7,11 @@ import {
   sanitizeAndNormalizeEmbedding,
   type MemoryEmbeddingProvider,
   type MemoryEmbeddingProviderCreateOptions,
-} from "openclaw/plugin-sdk/memory-core-host-engine-embeddings";
+} from "steelengine/plugin-sdk/memory-core-host-engine-embeddings";
 import {
   asOptionalRecord as asRecord,
   normalizeLowercaseStringOrEmpty,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 import { refreshAwsSharedConfigCacheForBedrock } from "./aws-credential-refresh.js";
 
 // ---------------------------------------------------------------------------
@@ -295,7 +295,7 @@ const testing = {
 };
 
 if (process.env.VITEST === "true") {
-  Reflect.set(globalThis, Symbol.for("openclaw.amazonBedrockEmbeddingTestApi"), testing);
+  Reflect.set(globalThis, Symbol.for("steelengine.amazonBedrockEmbeddingTestApi"), testing);
 }
 
 // ---------------------------------------------------------------------------

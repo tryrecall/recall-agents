@@ -3,7 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import type { SessionEntry } from "../config/sessions.js";
 import { withEnv } from "../test-utils/env.js";
 import {
@@ -32,15 +32,15 @@ import {
 
 describe("resolveAgentConfig", () => {
   it("should return undefined when no agents config exists", () => {
-    const cfg: OpenClawConfig = {};
+    const cfg: SteelEngineConfig = {};
     const result = resolveAgentConfig(cfg, "main");
     expect(result).toBeUndefined();
   });
 
   it("should return undefined when agent id does not exist", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
-        list: [{ id: "main", workspace: "~/openclaw" }],
+        list: [{ id: "main", workspace: "~/steelengine" }],
       },
     };
     const result = resolveAgentConfig(cfg, "nonexistent");
@@ -48,14 +48,14 @@ describe("resolveAgentConfig", () => {
   });
 
   it("should return basic agent config", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         list: [
           {
             id: "main",
             name: "Main Agent",
-            workspace: "~/openclaw",
-            agentDir: "~/.openclaw/agents/main",
+            workspace: "~/steelengine",
+            agentDir: "~/.steelengine/agents/main",
             model: "anthropic/claude-sonnet-4-6",
             utilityModel: "openai/gpt-5.4-mini",
           },
@@ -65,8 +65,8 @@ describe("resolveAgentConfig", () => {
     const result = resolveAgentConfig(cfg, "main");
     expect(result).toEqual({
       name: "Main Agent",
-      workspace: "~/openclaw",
-      agentDir: "~/.openclaw/agents/main",
+      workspace: "~/steelengine",
+      agentDir: "~/.steelengine/agents/main",
       model: "anthropic/claude-sonnet-4-6",
       utilityModel: "openai/gpt-5.4-mini",
       identity: undefined,
@@ -79,7 +79,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("prefers per-agent verbose defaults over global defaults", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           verboseDefault: "full",
@@ -96,7 +96,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("merges contextLimits from defaults with per-agent overrides", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           contextLimits: {
@@ -127,7 +127,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("merges experimental flags from defaults with per-agent overrides", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           experimental: {
@@ -151,7 +151,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("merges runRetries from defaults with per-agent overrides", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           runRetries: {
@@ -188,13 +188,13 @@ describe("resolveAgentConfig", () => {
         },
         list: [{ id: "main" }],
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     expect(resolveAgentExplicitModelPrimary(cfgWithStringDefault, "main")).toBeUndefined();
     expect(resolveAgentEffectiveModelPrimary(cfgWithStringDefault, "main")).toBe(
       "anthropic/claude-sonnet-4-6",
     );
 
-    const cfgWithObjectDefault: OpenClawConfig = {
+    const cfgWithObjectDefault: SteelEngineConfig = {
       agents: {
         defaults: {
           model: {
@@ -208,7 +208,7 @@ describe("resolveAgentConfig", () => {
     expect(resolveAgentExplicitModelPrimary(cfgWithObjectDefault, "main")).toBeUndefined();
     expect(resolveAgentEffectiveModelPrimary(cfgWithObjectDefault, "main")).toBe("openai/gpt-5.4");
 
-    const cfgNoDefaults: OpenClawConfig = {
+    const cfgNoDefaults: SteelEngineConfig = {
       agents: {
         list: [{ id: "main" }],
       },
@@ -218,7 +218,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("supports per-agent model primary+fallbacks", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           model: {
@@ -243,7 +243,7 @@ describe("resolveAgentConfig", () => {
     expect(resolveAgentModelFallbacksOverride(cfg, "linus")).toEqual(["openai/gpt-5.4"]);
 
     // If an agent owns a primary, missing fallbacks means no model fallback.
-    const cfgNoOverride: OpenClawConfig = {
+    const cfgNoOverride: SteelEngineConfig = {
       agents: {
         list: [
           {
@@ -264,7 +264,7 @@ describe("resolveAgentConfig", () => {
       }),
     ).toStrictEqual([]);
 
-    const cfgStringModel: OpenClawConfig = {
+    const cfgStringModel: SteelEngineConfig = {
       agents: {
         list: [
           {
@@ -276,7 +276,7 @@ describe("resolveAgentConfig", () => {
     };
     expect(resolveAgentModelFallbacksOverride(cfgStringModel, "linus")).toStrictEqual([]);
 
-    const cfgStrictAgentWithDefaultFallbacks: OpenClawConfig = {
+    const cfgStrictAgentWithDefaultFallbacks: SteelEngineConfig = {
       agents: {
         defaults: {
           model: {
@@ -306,7 +306,7 @@ describe("resolveAgentConfig", () => {
     ).toStrictEqual([]);
 
     // Explicit empty list disables global fallbacks for that agent.
-    const cfgDisable: OpenClawConfig = {
+    const cfgDisable: SteelEngineConfig = {
       agents: {
         list: [
           {
@@ -376,7 +376,7 @@ describe("resolveAgentConfig", () => {
       }),
     ).toStrictEqual([]);
 
-    const cfgInheritDefaultsWithoutAgentModel: OpenClawConfig = {
+    const cfgInheritDefaultsWithoutAgentModel: SteelEngineConfig = {
       agents: {
         defaults: {
           model: {
@@ -405,7 +405,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("updates the effective model primary at the winning config layer", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           model: {
@@ -436,7 +436,7 @@ describe("resolveAgentConfig", () => {
       fallbacks: ["anthropic/claude-sonnet-4-6"],
     });
 
-    const inheritedCfg: OpenClawConfig = {
+    const inheritedCfg: SteelEngineConfig = {
       agents: {
         defaults: {
           model: {
@@ -475,7 +475,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("resolves run fallback overrides via shared helper", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           model: {
@@ -810,7 +810,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("computes whether any model fallbacks are configured via shared helper", () => {
-    const cfgDefaultsOnly: OpenClawConfig = {
+    const cfgDefaultsOnly: SteelEngineConfig = {
       agents: {
         defaults: {
           model: {
@@ -827,7 +827,7 @@ describe("resolveAgentConfig", () => {
       }),
     ).toBe(true);
 
-    const cfgAgentOverrideOnly: OpenClawConfig = {
+    const cfgAgentOverrideOnly: SteelEngineConfig = {
       agents: {
         defaults: {
           model: {
@@ -861,7 +861,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("resolves subagent model fallbacks from the selected subagent model source", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           model: {
@@ -941,7 +941,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("uses subagent model fallbacks for auto-selected spawned subagent models", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           model: {
@@ -1006,7 +1006,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("resolves the subagent model config selected for isolated runs", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           subagents: { model: "openai/gpt-5.4" },
@@ -1062,7 +1062,7 @@ describe("resolveAgentConfig", () => {
         list: [
           {
             id: "work",
-            workspace: "~/openclaw-work",
+            workspace: "~/steelengine-work",
             sandbox: {
               mode: "all",
               scope: "agent",
@@ -1073,7 +1073,7 @@ describe("resolveAgentConfig", () => {
           },
         ],
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     const result = resolveAgentConfig(cfg, "work");
     expect(result?.sandbox).toEqual({
       mode: "all",
@@ -1085,12 +1085,12 @@ describe("resolveAgentConfig", () => {
   });
 
   it("should return agent-specific tools config", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         list: [
           {
             id: "restricted",
-            workspace: "~/openclaw-restricted",
+            workspace: "~/steelengine-restricted",
             tools: {
               allow: ["read"],
               deny: ["exec", "write", "edit"],
@@ -1115,12 +1115,12 @@ describe("resolveAgentConfig", () => {
   });
 
   it("should return both sandbox and tools config", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         list: [
           {
             id: "family",
-            workspace: "~/openclaw-family",
+            workspace: "~/steelengine-family",
             sandbox: {
               mode: "all",
               scope: "agent",
@@ -1139,61 +1139,61 @@ describe("resolveAgentConfig", () => {
   });
 
   it("should normalize agent id", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
-        list: [{ id: "main", workspace: "~/openclaw" }],
+        list: [{ id: "main", workspace: "~/steelengine" }],
       },
     };
     // Should normalize to "main" (default)
     const result = resolveAgentConfig(cfg, "");
-    expect(result?.workspace).toBe("~/openclaw");
+    expect(result?.workspace).toBe("~/steelengine");
   });
 
-  it("uses OPENCLAW_HOME for default agent workspace", () => {
-    const home = path.join(path.sep, "srv", "openclaw-home");
-    withEnv({ OPENCLAW_HOME: home }, () => {
-      const workspace = resolveAgentWorkspaceDir({} as OpenClawConfig, "main");
-      expect(workspace).toBe(path.join(path.resolve(home), ".openclaw", "workspace"));
+  it("uses STEELENGINE_HOME for default agent workspace", () => {
+    const home = path.join(path.sep, "srv", "steelengine-home");
+    withEnv({ STEELENGINE_HOME: home }, () => {
+      const workspace = resolveAgentWorkspaceDir({} as SteelEngineConfig, "main");
+      expect(workspace).toBe(path.join(path.resolve(home), ".steelengine", "workspace"));
     });
   });
 
-  it("uses OPENCLAW_WORKSPACE_DIR for default agent workspace", () => {
-    const workspaceDir = path.join(path.sep, "srv", "openclaw-workspace");
+  it("uses STEELENGINE_WORKSPACE_DIR for default agent workspace", () => {
+    const workspaceDir = path.join(path.sep, "srv", "steelengine-workspace");
     withEnv(
       {
-        OPENCLAW_WORKSPACE_DIR: workspaceDir,
-        OPENCLAW_HOME: path.join(path.sep, "srv", "openclaw-home"),
+        STEELENGINE_WORKSPACE_DIR: workspaceDir,
+        STEELENGINE_HOME: path.join(path.sep, "srv", "steelengine-home"),
       },
       () => {
-        const workspace = resolveAgentWorkspaceDir({} as OpenClawConfig, "main");
+        const workspace = resolveAgentWorkspaceDir({} as SteelEngineConfig, "main");
         expect(workspace).toBe(path.resolve(workspaceDir));
       },
     );
   });
 
-  it("uses OPENCLAW_HOME for default agentDir", () => {
-    const home = path.join(path.sep, "srv", "openclaw-home");
-    withEnv({ OPENCLAW_HOME: home, OPENCLAW_STATE_DIR: "" }, () => {
-      const agentDir = resolveAgentDir({} as OpenClawConfig, "main");
-      expect(agentDir).toBe(path.join(path.resolve(home), ".openclaw", "agents", "main", "agent"));
+  it("uses STEELENGINE_HOME for default agentDir", () => {
+    const home = path.join(path.sep, "srv", "steelengine-home");
+    withEnv({ STEELENGINE_HOME: home, STEELENGINE_STATE_DIR: "" }, () => {
+      const agentDir = resolveAgentDir({} as SteelEngineConfig, "main");
+      expect(agentDir).toBe(path.join(path.resolve(home), ".steelengine", "agents", "main", "agent"));
     });
   });
 
   it("resolves default agentDir from the configured default agent", () => {
     const stateDir = path.join(path.sep, "tmp", "test-state");
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         list: [{ id: "main" }, { id: "ops", default: true }],
       },
     };
 
-    const agentDir = withEnv({ OPENCLAW_STATE_DIR: stateDir }, () => resolveDefaultAgentDir(cfg));
+    const agentDir = withEnv({ STEELENGINE_STATE_DIR: stateDir }, () => resolveDefaultAgentDir(cfg));
 
     expect(agentDir).toBe(path.resolve(stateDir, "agents", "ops", "agent"));
   });
 
   it("non-default agent uses agents.defaults.workspace as base (#59789)", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: { workspace: "/shared-ws" },
         list: [{ id: "main" }, { id: "work", default: true, workspace: "/work-ws" }],
@@ -1204,7 +1204,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("default agent without per-agent workspace uses agents.defaults.workspace directly", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: { workspace: "/shared-ws" },
         list: [{ id: "main" }, { id: "work", default: true }],
@@ -1216,12 +1216,12 @@ describe("resolveAgentConfig", () => {
 
   it("non-default agent without defaults.workspace falls back to stateDir", () => {
     const stateDir = path.join(path.sep, "tmp", "test-state");
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         list: [{ id: "main" }, { id: "work", default: true, workspace: "/work-ws" }],
       },
     };
-    const workspace = withEnv({ OPENCLAW_STATE_DIR: stateDir }, () =>
+    const workspace = withEnv({ STEELENGINE_STATE_DIR: stateDir }, () =>
       resolveAgentWorkspaceDir(cfg, "main"),
     );
     expect(workspace).toBe(path.resolve(stateDir, "workspace-main"));
@@ -1230,9 +1230,9 @@ describe("resolveAgentConfig", () => {
 
 describe("resolveAgentIdByWorkspacePath", () => {
   it("returns the most specific workspace match for a directory", () => {
-    const workspaceRoot = `/tmp/openclaw-agent-scope-${Date.now()}-root`;
+    const workspaceRoot = `/tmp/steelengine-agent-scope-${Date.now()}-root`;
     const opsWorkspace = `${workspaceRoot}/projects/ops`;
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         list: [
           { id: "main", workspace: workspaceRoot },
@@ -1245,8 +1245,8 @@ describe("resolveAgentIdByWorkspacePath", () => {
   });
 
   it("returns undefined when directory has no matching workspace", () => {
-    const workspaceRoot = `/tmp/openclaw-agent-scope-${Date.now()}-root`;
-    const cfg: OpenClawConfig = {
+    const workspaceRoot = `/tmp/steelengine-agent-scope-${Date.now()}-root`;
+    const cfg: SteelEngineConfig = {
       agents: {
         list: [
           { id: "main", workspace: workspaceRoot },
@@ -1256,12 +1256,12 @@ describe("resolveAgentIdByWorkspacePath", () => {
     };
 
     expect(
-      resolveAgentIdByWorkspacePath(cfg, `/tmp/openclaw-agent-scope-${Date.now()}-unrelated`),
+      resolveAgentIdByWorkspacePath(cfg, `/tmp/steelengine-agent-scope-${Date.now()}-unrelated`),
     ).toBeUndefined();
   });
 
   it("matches workspace paths through symlink aliases", () => {
-    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-agent-scope-"));
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-agent-scope-"));
     const realWorkspaceRoot = path.join(tempRoot, "real-root");
     const realOpsWorkspace = path.join(realWorkspaceRoot, "projects", "ops");
     const aliasWorkspaceRoot = path.join(tempRoot, "alias-root");
@@ -1273,7 +1273,7 @@ describe("resolveAgentIdByWorkspacePath", () => {
         process.platform === "win32" ? "junction" : "dir",
       );
 
-      const cfg: OpenClawConfig = {
+      const cfg: SteelEngineConfig = {
         agents: {
           list: [
             { id: "main", workspace: realWorkspaceRoot },
@@ -1296,10 +1296,10 @@ describe("resolveAgentIdByWorkspacePath", () => {
 
 describe("resolveAgentIdsByWorkspacePath", () => {
   it("returns matching workspaces ordered by specificity", () => {
-    const workspaceRoot = `/tmp/openclaw-agent-scope-${Date.now()}-root`;
+    const workspaceRoot = `/tmp/steelengine-agent-scope-${Date.now()}-root`;
     const opsWorkspace = `${workspaceRoot}/projects/ops`;
     const opsDevWorkspace = `${opsWorkspace}/dev`;
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         list: [
           { id: "main", workspace: workspaceRoot },
@@ -1319,7 +1319,7 @@ describe("resolveAgentIdsByWorkspacePath", () => {
 
 describe("resolveAgentSkillsFilter", () => {
   it("inherits agents.defaults.skills when the agent omits skills", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           skills: ["github", "weather"],
@@ -1332,7 +1332,7 @@ describe("resolveAgentSkillsFilter", () => {
   });
 
   it("uses agents.list[].skills as a full replacement", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           skills: ["github", "weather"],
@@ -1345,7 +1345,7 @@ describe("resolveAgentSkillsFilter", () => {
   });
 
   it("keeps explicit empty agent skills as no skills", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         defaults: {
           skills: ["github", "weather"],

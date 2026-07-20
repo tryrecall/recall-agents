@@ -3,13 +3,13 @@ import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useAutoCleanupTempDirTracker } from "../../test/helpers/temp-dir.js";
 
-const resolvePreferredOpenClawTmpDirMock = vi.hoisted(() => vi.fn());
+const resolvePreferredSteelEngineTmpDirMock = vi.hoisted(() => vi.fn());
 
-vi.mock("./tmp-openclaw-dir.js", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("./tmp-openclaw-dir.js")>();
+vi.mock("./tmp-steelengine-dir.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./tmp-steelengine-dir.js")>();
   return {
     ...actual,
-    resolvePreferredOpenClawTmpDir: resolvePreferredOpenClawTmpDirMock,
+    resolvePreferredSteelEngineTmpDir: resolvePreferredSteelEngineTmpDirMock,
   };
 });
 
@@ -19,21 +19,21 @@ describe("withTempDir private root", () => {
   const tempDirs = useAutoCleanupTempDirTracker(afterEach);
 
   it.runIf(process.platform !== "win32")(
-    "preserves parent temp root permissions when using private OpenClaw temp root",
+    "preserves parent temp root permissions when using private SteelEngine temp root",
     async () => {
-      const mockParentRoot = tempDirs.make("openclaw-chmod-test-");
-      const mockOpenClawDir = path.join(mockParentRoot, "openclaw");
+      const mockParentRoot = tempDirs.make("steelengine-chmod-test-");
+      const mockSteelEngineDir = path.join(mockParentRoot, "steelengine");
 
-      await fs.mkdir(mockOpenClawDir, { recursive: true });
+      await fs.mkdir(mockSteelEngineDir, { recursive: true });
       await fs.chmod(mockParentRoot, 0o1777);
-      const canonicalOpenClawDir = await fs.realpath(mockOpenClawDir);
+      const canonicalSteelEngineDir = await fs.realpath(mockSteelEngineDir);
 
-      resolvePreferredOpenClawTmpDirMock.mockReturnValue(mockOpenClawDir);
+      resolvePreferredSteelEngineTmpDirMock.mockReturnValue(mockSteelEngineDir);
 
       let observedDir = "";
-      const value = await withTempDir("openclaw-test-", async (tmpDir) => {
+      const value = await withTempDir("steelengine-test-", async (tmpDir) => {
         observedDir = tmpDir;
-        expect(path.dirname(tmpDir)).toBe(canonicalOpenClawDir);
+        expect(path.dirname(tmpDir)).toBe(canonicalSteelEngineDir);
         await fs.writeFile(path.join(tmpDir, "marker.txt"), "ok");
         return "done";
       });
@@ -47,7 +47,7 @@ describe("withTempDir private root", () => {
         ),
       ).resolves.toBe(false);
 
-      const privateRootStat = await fs.stat(mockOpenClawDir);
+      const privateRootStat = await fs.stat(mockSteelEngineDir);
       expect(privateRootStat.mode & 0o7777).toBe(0o700);
 
       const parentStat = await fs.stat(mockParentRoot);

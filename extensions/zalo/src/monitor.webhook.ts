@@ -1,8 +1,8 @@
 // Zalo plugin module implements monitor.webhook behavior.
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { createChannelReplayGuard } from "openclaw/plugin-sdk/persistent-dedupe";
-import { safeEqualSecret } from "openclaw/plugin-sdk/security-runtime";
-import { runDetachedWebhookWork } from "openclaw/plugin-sdk/webhook-request-guards";
+import { createChannelReplayGuard } from "steelengine/plugin-sdk/persistent-dedupe";
+import { safeEqualSecret } from "steelengine/plugin-sdk/security-runtime";
+import { runDetachedWebhookWork } from "steelengine/plugin-sdk/webhook-request-guards";
 import type { ResolvedZaloAccount } from "./accounts.js";
 import type { ZaloFetch, ZaloUpdate } from "./api.js";
 import type { ZaloRuntimeEnv } from "./monitor.types.js";
@@ -20,7 +20,7 @@ import {
   WEBHOOK_ANOMALY_COUNTER_DEFAULTS,
   WEBHOOK_RATE_LIMIT_DEFAULTS,
   resolveClientIp,
-  type OpenClawConfig,
+  type SteelEngineConfig,
 } from "./runtime-api.js";
 
 const ZALO_WEBHOOK_REPLAY_WINDOW_MS = 5 * 60_000;
@@ -28,7 +28,7 @@ const ZALO_WEBHOOK_REPLAY_WINDOW_MS = 5 * 60_000;
 type ZaloWebhookTarget = {
   token: string;
   account: ResolvedZaloAccount;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   runtime: ZaloRuntimeEnv;
   core: unknown;
   secret: string;

@@ -5,9 +5,9 @@ import path from "node:path";
 import {
   initializeGlobalHookRunner,
   resetGlobalHookRunner,
-} from "openclaw/plugin-sdk/hook-runtime";
-import { createMockPluginRegistry } from "openclaw/plugin-sdk/plugin-test-runtime";
-import { castAgentMessage } from "openclaw/plugin-sdk/test-fixtures";
+} from "steelengine/plugin-sdk/hook-runtime";
+import { createMockPluginRegistry } from "steelengine/plugin-sdk/plugin-test-runtime";
+import { castAgentMessage } from "steelengine/plugin-sdk/test-fixtures";
 import { afterEach, describe, expect, it } from "vitest";
 import { runAgentHarnessBeforeMessageWriteHook } from "../agents/harness/hook-helpers.js";
 import { loadTranscriptEvents } from "../config/sessions/session-accessor.js";
@@ -28,7 +28,7 @@ describe("user turn transcript persistence", () => {
     sessionEntry: undefined,
     sessionId: "unused-session",
     sessionKey: "agent:main:unused",
-    storePath: "/tmp/openclaw-unused-sessions.json",
+    storePath: "/tmp/steelengine-unused-sessions.json",
   };
 
   afterEach(() => {
@@ -138,7 +138,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("resolves staged relative media paths against the media workspace", () => {
-      const workspaceDir = createTempDir("openclaw-user-turn-media-");
+      const workspaceDir = createTempDir("steelengine-user-turn-media-");
 
       expect(
         buildPersistedUserTurnMediaInputsFromFields({
@@ -155,7 +155,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("does not rewrite absolute or URL-like media paths", () => {
-      const workspaceDir = createTempDir("openclaw-user-turn-media-");
+      const workspaceDir = createTempDir("steelengine-user-turn-media-");
       const absolutePath = path.join(workspaceDir, "media/inbound/a.png");
 
       expect(
@@ -256,12 +256,12 @@ describe("user turn transcript persistence", () => {
           runtimeMessage: castAgentMessage({
             role: "user",
             content: "runtime prompt",
-            __openclaw: { mirrorIdentity: "run-1:prompt" },
+            __steelengine: { mirrorIdentity: "run-1:prompt" },
           }),
           preparedMessage: recorder.message,
         }),
       ).toMatchObject({
-        __openclaw: {
+        __steelengine: {
           mirrorIdentity: "run-1:prompt",
           senderId: "user-42",
           senderName: "Ada",
@@ -277,7 +277,7 @@ describe("user turn transcript persistence", () => {
       const blocked = castAgentMessage({
         role: "user",
         content: "[blocked]",
-        __openclaw: { beforeAgentRunBlocked: true },
+        __steelengine: { beforeAgentRunBlocked: true },
       });
 
       expect(
@@ -348,7 +348,7 @@ describe("user turn transcript persistence", () => {
 
   describe("persistUserTurnTranscript", () => {
     it("appends a structured user turn through the shared transcript writer", async () => {
-      const dir = createTempDir("openclaw-user-turn-append-");
+      const dir = createTempDir("steelengine-user-turn-append-");
       const target = createSqliteTranscriptTarget({ dir });
       const provenance = {
         kind: "inter_session" as const,
@@ -378,15 +378,15 @@ describe("user turn transcript persistence", () => {
           role: "user",
           content: "What is in this image?",
           MediaPath: "/tmp/image.png",
-          __openclaw: { senderIsOwner: true },
+          __steelengine: { senderIsOwner: true },
           provenance,
           MediaType: "image/png",
         }),
       ]);
     });
 
-    it("persists sender metadata as __openclaw envelope", async () => {
-      const dir = createTempDir("openclaw-user-turn-append-sender-");
+    it("persists sender metadata as __steelengine envelope", async () => {
+      const dir = createTempDir("steelengine-user-turn-append-sender-");
       const target = createSqliteTranscriptTarget({ dir });
 
       const appended = await persistUserTurnTranscript({
@@ -405,7 +405,7 @@ describe("user turn transcript persistence", () => {
       expect(appended?.message).toMatchObject({
         role: "user",
         content: "hello from group",
-        __openclaw: {
+        __steelengine: {
           senderId: "8489979671",
           senderName: "Ram Shenoy",
           senderUsername: "ram_s",
@@ -415,7 +415,7 @@ describe("user turn transcript persistence", () => {
         expect.objectContaining({
           role: "user",
           content: "hello from group",
-          __openclaw: {
+          __steelengine: {
             senderId: "8489979671",
             senderName: "Ram Shenoy",
             senderUsername: "ram_s",
@@ -424,8 +424,8 @@ describe("user turn transcript persistence", () => {
       ]);
     });
 
-    it("omits __openclaw when no sender metadata is provided", async () => {
-      const dir = createTempDir("openclaw-user-turn-append-nosender-");
+    it("omits __steelengine when no sender metadata is provided", async () => {
+      const dir = createTempDir("steelengine-user-turn-append-nosender-");
       const target = createSqliteTranscriptTarget({ dir });
 
       const appended = await persistUserTurnTranscript({
@@ -437,11 +437,11 @@ describe("user turn transcript persistence", () => {
         updateMode: "none",
       });
 
-      expect(appended?.message).not.toHaveProperty("__openclaw");
+      expect(appended?.message).not.toHaveProperty("__steelengine");
     });
 
     it("uses inline update mode by default", async () => {
-      const dir = createTempDir("openclaw-user-turn-append-inline-");
+      const dir = createTempDir("steelengine-user-turn-append-inline-");
       const target = createSqliteTranscriptTarget({ dir });
 
       const appended = await persistUserTurnTranscript({
@@ -466,7 +466,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("returns the existing user turn when the idempotency key was already persisted", async () => {
-      const dir = createTempDir("openclaw-user-turn-append-idempotent-");
+      const dir = createTempDir("steelengine-user-turn-append-idempotent-");
       const target = createSqliteTranscriptTarget({ dir });
 
       const first = await persistUserTurnTranscript({
@@ -519,7 +519,7 @@ describe("user turn transcript persistence", () => {
             handler: (event) => {
               hookCalls += 1;
               const message = (event as { message: Record<string, unknown> }).message;
-              const meta = message["__openclaw"] as {
+              const meta = message["__steelengine"] as {
                 transport?: { conversationRef?: string; messageId?: string };
               };
               if (meta.transport) {
@@ -530,14 +530,14 @@ describe("user turn transcript persistence", () => {
                 message: castAgentMessage({
                   role: "user",
                   content: "[redacted by hook]",
-                  __openclaw: { hookOwned: true },
+                  __steelengine: { hookOwned: true },
                 }),
               };
             },
           },
         ]),
       );
-      const dir = createTempDir("openclaw-user-turn-redacted-idempotent-");
+      const dir = createTempDir("steelengine-user-turn-redacted-idempotent-");
       const target = createSqliteTranscriptTarget({ dir });
 
       await persistUserTurnTranscript({
@@ -581,7 +581,7 @@ describe("user turn transcript persistence", () => {
           content: "[redacted by hook]",
           idempotencyKey: "chat-run-1:user",
           provenance,
-          __openclaw: {
+          __steelengine: {
             hookOwned: true,
             senderIsOwner: true,
             transport: {
@@ -599,7 +599,7 @@ describe("user turn transcript persistence", () => {
 
   describe("persistUserTurnTranscript", () => {
     it("resolves the session file and persists the user turn", async () => {
-      const dir = createTempDir("openclaw-user-turn-persist-");
+      const dir = createTempDir("steelengine-user-turn-persist-");
       const target = createSqliteTranscriptTarget({ dir });
       const sessionStore = {
         [target.sessionKey]: {
@@ -636,7 +636,7 @@ describe("user turn transcript persistence", () => {
 
   describe("createUserTurnTranscriptRecorder", () => {
     it("persists fallback user turns only once", async () => {
-      const dir = createTempDir("openclaw-user-turn-recorder-fallback-");
+      const dir = createTempDir("steelengine-user-turn-recorder-fallback-");
       const target = createSqliteTranscriptTarget({ dir });
       const recorder = createUserTurnTranscriptRecorder({
         input: {
@@ -669,7 +669,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("notifies once after fallback user-turn persistence", async () => {
-      const dir = createTempDir("openclaw-user-turn-recorder-notify-");
+      const dir = createTempDir("steelengine-user-turn-recorder-notify-");
       const target = createSqliteTranscriptTarget({ dir });
       const persistedMessages: unknown[] = [];
       const recorder = createUserTurnTranscriptRecorder({
@@ -705,7 +705,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("resolves media lazily at persistence time", async () => {
-      const dir = createTempDir("openclaw-user-turn-recorder-lazy-media-");
+      const dir = createTempDir("steelengine-user-turn-recorder-lazy-media-");
       const target = createSqliteTranscriptTarget({ dir });
       let resolverCalled = false;
       const recorder = createUserTurnTranscriptRecorder({
@@ -759,7 +759,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("appends #99495 media that resolves after the admitted turn reached the provider", async () => {
-      const dir = createTempDir("openclaw-user-turn-recorder-late-media-");
+      const dir = createTempDir("steelengine-user-turn-recorder-late-media-");
       const target = createSqliteTranscriptTarget({ dir });
       const admittedInput = {
         text: "describe this",
@@ -813,7 +813,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("keeps #99495 media inline when it resolves before first serialization", async () => {
-      const dir = createTempDir("openclaw-user-turn-recorder-early-media-");
+      const dir = createTempDir("steelengine-user-turn-recorder-early-media-");
       const target = createSqliteTranscriptTarget({ dir });
       const recorder = createUserTurnTranscriptRecorder({
         input: {
@@ -845,7 +845,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("falls back to the admitted text message when lazy media resolution fails", async () => {
-      const dir = createTempDir("openclaw-user-turn-recorder-lazy-failed-");
+      const dir = createTempDir("steelengine-user-turn-recorder-lazy-failed-");
       const target = createSqliteTranscriptTarget({ dir });
       const errors: unknown[] = [];
       const recorder = createUserTurnTranscriptRecorder({
@@ -883,7 +883,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("does not fallback-persist after runtime persistence is marked", async () => {
-      const dir = createTempDir("openclaw-user-turn-recorder-runtime-");
+      const dir = createTempDir("steelengine-user-turn-recorder-runtime-");
       const target = createSqliteTranscriptTarget({ dir });
       const recorder = createUserTurnTranscriptRecorder({
         input: {
@@ -907,7 +907,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("approved persistence skips file targets after runtime persistence is marked", async () => {
-      const dir = createTempDir("openclaw-user-turn-recorder-runtime-approved-");
+      const dir = createTempDir("steelengine-user-turn-recorder-runtime-approved-");
       const target = createSqliteTranscriptTarget({ dir });
       const recorder = createUserTurnTranscriptRecorder({
         input: {
@@ -931,7 +931,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("approved persistence does not duplicate runtime-owned SQLite turns", async () => {
-      const dir = createTempDir("openclaw-user-turn-recorder-runtime-canonical-");
+      const dir = createTempDir("steelengine-user-turn-recorder-runtime-canonical-");
       const storePath = path.join(dir, "sessions.json");
       const sessionStore = {};
       const recorder = createUserTurnTranscriptRecorder({
@@ -967,7 +967,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("does not fallback-persist after before_agent_run blocks the turn", async () => {
-      const dir = createTempDir("openclaw-user-turn-recorder-blocked-");
+      const dir = createTempDir("steelengine-user-turn-recorder-blocked-");
       const target = createSqliteTranscriptTarget({ dir });
       const recorder = createUserTurnTranscriptRecorder({
         input: {
@@ -987,7 +987,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("uses the runtime target supplied at approved persistence time", async () => {
-      const dir = createTempDir("openclaw-user-turn-recorder-target-");
+      const dir = createTempDir("steelengine-user-turn-recorder-target-");
       const staleTarget = createSqliteTranscriptTarget({ dir, sessionId: "stale-session" });
       const admittedTarget = createSqliteTranscriptTarget({ dir, sessionId: "admitted-session" });
       const recorder = createUserTurnTranscriptRecorder({
@@ -1018,7 +1018,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("waits for runtime persistence before deciding fallback ownership", async () => {
-      const dir = createTempDir("openclaw-user-turn-recorder-pending-");
+      const dir = createTempDir("steelengine-user-turn-recorder-pending-");
       const target = createSqliteTranscriptTarget({ dir });
       let releaseRuntimePersistence!: () => void;
       const runtimePersistenceStarted = new Promise<void>((resolve) => {
@@ -1060,7 +1060,7 @@ describe("user turn transcript persistence", () => {
     });
 
     it("fallback-persists when pending runtime persistence fails", async () => {
-      const dir = createTempDir("openclaw-user-turn-recorder-pending-failed-");
+      const dir = createTempDir("steelengine-user-turn-recorder-pending-failed-");
       const target = createSqliteTranscriptTarget({ dir });
       const errors: unknown[] = [];
       let rejectRuntimePersistence!: (error: unknown) => void;

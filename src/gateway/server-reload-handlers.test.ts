@@ -12,7 +12,7 @@ import {
   clearRuntimeConfigSnapshot,
   setRuntimeConfigSnapshot,
 } from "../config/runtime-snapshot.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   consumeGatewaySigusr1RestartIntent,
   isGatewaySigusr1RestartExternallyAllowed,
@@ -119,7 +119,7 @@ function startManagedGatewayConfigReloader(
 }
 
 type GmailWatcherRestartParams = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   log: {
     info: (msg: string) => void;
     warn: (msg: string) => void;
@@ -149,13 +149,13 @@ const hoisted = vi.hoisted(() => ({
   activeEmbeddedRunSessionIds: [] as string[],
   activeEmbeddedRunSessionKeys: [] as string[],
   markRestartAbortedMainSessions: vi.fn(async (_params: unknown) => ({ marked: 1, skipped: 0 })),
-  runtimeConfig: { value: { session: { store: "/tmp/active-sessions.json" } } as OpenClawConfig },
+  runtimeConfig: { value: { session: { store: "/tmp/active-sessions.json" } } as SteelEngineConfig },
   reloadEvents: [] as string[],
-  loadModelCatalog: vi.fn(async (_params: { config: OpenClawConfig }) => []),
+  loadModelCatalog: vi.fn(async (_params: { config: SteelEngineConfig }) => []),
   resetModelCatalogCache: vi.fn(() => {}),
-  refreshContextWindowCache: vi.fn(async (_cfg: OpenClawConfig) => {}),
+  refreshContextWindowCache: vi.fn(async (_cfg: SteelEngineConfig) => {}),
   clearCurrentProviderAuthState: vi.fn(() => {}),
-  warmCurrentProviderAuthStateOffMainThread: vi.fn(async (_cfg: OpenClawConfig) => {}),
+  warmCurrentProviderAuthStateOffMainThread: vi.fn(async (_cfg: SteelEngineConfig) => {}),
   disposeAllSessionMcpRuntimes: vi.fn(async () => {}),
   buildGatewayCronService: vi.fn((_params?: { env?: NodeJS.ProcessEnv }) => ({
     cron: { start: vi.fn(async () => {}), stop: vi.fn() },
@@ -224,7 +224,7 @@ vi.mock("../config/config.js", async () => {
 });
 
 vi.mock("../agents/model-catalog.js", () => ({
-  loadModelCatalog: (params: { config: OpenClawConfig }) => {
+  loadModelCatalog: (params: { config: SteelEngineConfig }) => {
     hoisted.reloadEvents.push("load-model-catalog");
     return hoisted.loadModelCatalog(params);
   },
@@ -235,7 +235,7 @@ vi.mock("../agents/model-catalog.js", () => ({
 }));
 
 vi.mock("../agents/context.js", () => ({
-  refreshContextWindowCache: async (cfg: OpenClawConfig) => {
+  refreshContextWindowCache: async (cfg: SteelEngineConfig) => {
     hoisted.reloadEvents.push("refresh-context-window");
     await hoisted.refreshContextWindowCache(cfg);
   },
@@ -247,7 +247,7 @@ vi.mock("../agents/model-provider-auth.js", () => ({
     hoisted.clearCurrentProviderAuthState();
   },
   warmCurrentProviderAuthStateOffMainThread: async (
-    cfg: OpenClawConfig,
+    cfg: SteelEngineConfig,
     options?: { isCancelled?: () => boolean },
   ) => {
     hoisted.reloadEvents.push("warm-provider-auth");
@@ -418,7 +418,7 @@ function createManagedRestartSequenceHarness(
       reload: { debounceMs: 0 },
       terminal: { enabled: true },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
   setRuntimeConfigSnapshot(initialConfig, initialConfig);
   const deferredConfig = {
     gateway: {
@@ -434,7 +434,7 @@ function createManagedRestartSequenceHarness(
         },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
   const invalidConfig = {
     gateway: {
       ...deferredConfig.gateway,
@@ -448,7 +448,7 @@ function createManagedRestartSequenceHarness(
       },
       terminal: { enabled: false },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
   const missingHotSecret = {
     source: "env" as const,
     provider: "default",
@@ -465,7 +465,7 @@ function createManagedRestartSequenceHarness(
         },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
   const invalidNoopConfig = {
     ...deferredConfig,
     tools: {
@@ -473,13 +473,13 @@ function createManagedRestartSequenceHarness(
         search: { apiKey: missingHotSecret },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
   const replacementConfig = {
     gateway: {
       ...deferredConfig.gateway,
       bind: "lan",
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
   const terminalPolicy = createTerminalLaunchPolicy(initialConfig);
   const writeListenerRef: { current: ((event: ConfigWriteNotification) => void) | null } = {
     current: null,
@@ -510,7 +510,7 @@ function createManagedRestartSequenceHarness(
       recordReloadError = undefined;
     }),
   };
-  const activateRuntimeSecrets = vi.fn(async (config: OpenClawConfig) => {
+  const activateRuntimeSecrets = vi.fn(async (config: SteelEngineConfig) => {
     const secretInputs = [
       config.gateway?.auth?.token,
       config.models?.providers?.test?.apiKey,
@@ -545,9 +545,9 @@ function createManagedRestartSequenceHarness(
     initialConfig,
     initialCompareConfig: initialConfig,
     initialInternalWriteHash: null,
-    watchPath: "/tmp/openclaw.json",
+    watchPath: "/tmp/steelengine.json",
     readSnapshot: vi.fn(async () => ({
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       exists: true,
       raw: "{}",
       parsed: snapshotConfig,
@@ -620,10 +620,10 @@ function createManagedRestartSequenceHarness(
     requestRecoveryRestart,
   });
   const writeConfig = (
-    config: OpenClawConfig,
+    config: SteelEngineConfig,
     hash: string,
     revision: number,
-    runtimeConfig: OpenClawConfig = config,
+    runtimeConfig: SteelEngineConfig = config,
   ) => {
     const listener = writeListenerRef.current;
     if (!listener) {
@@ -632,7 +632,7 @@ function createManagedRestartSequenceHarness(
     snapshotConfig = config;
     snapshotHash = hash;
     listener({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: config,
       runtimeConfig,
       persistedHash: hash,
@@ -682,7 +682,7 @@ async function withGatewayRestartSignal(
 }
 
 // Other gateway test helpers (test-helpers.mocks.ts, test-helpers.server.ts)
-// set OPENCLAW_SKIP_CHANNELS / OPENCLAW_SKIP_PROVIDERS at module load. When a
+// set STEELENGINE_SKIP_CHANNELS / STEELENGINE_SKIP_PROVIDERS at module load. When a
 // shared vitest worker imports those helpers before this file runs, the leaked
 // env routes reloads into the skip branch and channel restarts never fire.
 const testGatewayRestartListener = () => {};
@@ -691,8 +691,8 @@ beforeEach(() => {
   process.on("SIGUSR1", testGatewayRestartListener);
   resetGatewayWorkAdmission();
   resetProcessRegistryForTests();
-  delete process.env.OPENCLAW_SKIP_CHANNELS;
-  delete process.env.OPENCLAW_SKIP_PROVIDERS;
+  delete process.env.STEELENGINE_SKIP_CHANNELS;
+  delete process.env.STEELENGINE_SKIP_PROVIDERS;
 });
 
 afterEach(() => {
@@ -730,7 +730,7 @@ async function runManagedOwnershipScenario(params: {
   const initialConfig = {
     gateway: { reload: { mode: "off" as const, debounceMs: 0 } },
     hooks: { enabled: true, token: "test-token", path: "/old" },
-  } satisfies OpenClawConfig;
+  } satisfies SteelEngineConfig;
   const configA = {
     gateway: {
       reload: {
@@ -743,9 +743,9 @@ async function runManagedOwnershipScenario(params: {
       token: "test-token",
       path: params.kind === "noop" ? "/old" : "/a",
     },
-  } satisfies OpenClawConfig;
+  } satisfies SteelEngineConfig;
   const configB = structuredClone(initialConfig);
-  const snapshot = (config: OpenClawConfig): PreparedSecretsRuntimeSnapshot => ({
+  const snapshot = (config: SteelEngineConfig): PreparedSecretsRuntimeSnapshot => ({
     sourceConfig: config,
     config,
     authStores: [],
@@ -766,11 +766,11 @@ async function runManagedOwnershipScenario(params: {
   const reconcileTerminalSessions = vi.fn();
   const requestRecoveryRestart = vi.fn(() => ({ status: "emitted" as const }));
   let queuedB = false;
-  const activateRuntimeSecrets = vi.fn(async (config: OpenClawConfig) => {
+  const activateRuntimeSecrets = vi.fn(async (config: SteelEngineConfig) => {
     if (params.queueRevert && !queuedB) {
       queuedB = true;
       writeListenerRef.current?.({
-        configPath: "/tmp/openclaw.json",
+        configPath: "/tmp/steelengine.json",
         sourceConfig: configB,
         runtimeConfig: configB,
         persistedHash: "hash-b",
@@ -788,9 +788,9 @@ async function runManagedOwnershipScenario(params: {
     initialConfig,
     initialCompareConfig: initialConfig,
     initialInternalWriteHash: null,
-    watchPath: "/tmp/openclaw.json",
+    watchPath: "/tmp/steelengine.json",
     readSnapshot: vi.fn(async () => ({
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       exists: true,
       raw: "{}",
       parsed: {},
@@ -847,7 +847,7 @@ async function runManagedOwnershipScenario(params: {
     requestRecoveryRestart,
   });
   writeListenerRef.current?.({
-    configPath: "/tmp/openclaw.json",
+    configPath: "/tmp/steelengine.json",
     sourceConfig: configA,
     runtimeConfig: configA,
     persistedHash: "hash-a",
@@ -940,7 +940,7 @@ describe("gateway hot reload model state", () => {
         order.push("hook");
       },
     }));
-    const nextConfig = { cron: { enabled: true } } as OpenClawConfig;
+    const nextConfig = { cron: { enabled: true } } as SteelEngineConfig;
 
     await withGatewayRestartSignal(async () => {
       await applyHotReload(createCronRestartPlan(), nextConfig);
@@ -982,7 +982,7 @@ describe("gateway hot reload model state", () => {
     };
     hoisted.buildGatewayCronService.mockReturnValueOnce(rebuiltCronState);
     const { applyHotReload, cronReconciliation } = createReloadHandlersForTest();
-    const nextConfig = { cron: { enabled: false } } as OpenClawConfig;
+    const nextConfig = { cron: { enabled: false } } as SteelEngineConfig;
 
     await withGatewayRestartSignal(async () => {
       await applyHotReload(createCronRestartPlan(), nextConfig);
@@ -1025,7 +1025,7 @@ describe("gateway hot reload model state", () => {
       vi.fn(),
       false,
     );
-    const nextConfig = { agents: { defaults: { heartbeat: { every: "1h" } } } } as OpenClawConfig;
+    const nextConfig = { agents: { defaults: { heartbeat: { every: "1h" } } } } as SteelEngineConfig;
 
     await expect(
       applyHotReload(createHotTailPlan({ restartHeartbeat: true }), nextConfig),
@@ -1057,7 +1057,7 @@ describe("gateway hot reload model state", () => {
       await expect(
         applyHotReload(
           createHotTailPlan({ restartHeartbeat: true }),
-          { agents: { defaults: { maxConcurrent: 1 } } } as OpenClawConfig,
+          { agents: { defaults: { maxConcurrent: 1 } } } as SteelEngineConfig,
           { publish, isCurrent: () => true },
         ),
       ).rejects.toThrow("heartbeat update failed");
@@ -1227,7 +1227,7 @@ describe("gateway hot reload model state", () => {
       createHealthMonitor: () => null,
     });
 
-    const nextConfig = { plugins: { enabled: true } } as OpenClawConfig;
+    const nextConfig = { plugins: { enabled: true } } as SteelEngineConfig;
     await applyHotReload(
       {
         changedPaths: ["plugins.enabled"],
@@ -1273,7 +1273,7 @@ describe("gateway hot reload model state", () => {
       undefined,
       vi.fn(),
     );
-    const nextConfig = { mcp: { servers: {} } } as OpenClawConfig;
+    const nextConfig = { mcp: { servers: {} } } as SteelEngineConfig;
 
     await applyHotReload(
       {
@@ -1311,7 +1311,7 @@ describe("gateway hot reload model state", () => {
     );
     const nextConfig = {
       agents: { defaults: { workspace: "/tmp/next-workspace" } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     await applyHotReload(
       {
@@ -1351,7 +1351,7 @@ describe("gateway hot reload model state", () => {
           changedPaths: ["agents.defaults.workspace"],
           hotReasons: ["agents.defaults.workspace"],
         }),
-        { agents: { defaults: { workspace: "/tmp/next-workspace" } } } as OpenClawConfig,
+        { agents: { defaults: { workspace: "/tmp/next-workspace" } } } as SteelEngineConfig,
       ),
     ).rejects.toThrow(
       "config reload requires a managed gateway restart owner for irreversible hot reload",
@@ -1376,8 +1376,8 @@ describe("gateway hot reload model state", () => {
     },
   ])("refreshes context metadata when a workspace change $label", async (testCase) => {
     const { applyHotReload } = createReloadHandlersForTest();
-    const previousConfig = testCase.previousConfig as OpenClawConfig;
-    const nextConfig = testCase.nextConfig as OpenClawConfig;
+    const previousConfig = testCase.previousConfig as SteelEngineConfig;
+    const nextConfig = testCase.nextConfig as SteelEngineConfig;
     const changedPaths = diffConfigPaths(previousConfig, nextConfig);
     expect(changedPaths).toEqual([testCase.expectedPath]);
 
@@ -1392,7 +1392,7 @@ describe("gateway hot reload superseded tail recovery", () => {
     vi.useFakeTimers();
     const requestRecoveryRestart = vi.fn(() => ({ status: "emitted" as const }));
     const prepareRuntimeConfig = vi.fn(
-      async (): Promise<OpenClawConfig> => ({ logging: { level: "debug" } }),
+      async (): Promise<SteelEngineConfig> => ({ logging: { level: "debug" } }),
     );
     const handlers = createReloadHandlersForTest(
       undefined,
@@ -1443,8 +1443,8 @@ describe("gateway hot reload superseded tail recovery", () => {
       undefined,
       requestRecoveryRestart,
     );
-    const configA = { logging: { level: "info" as const } } satisfies OpenClawConfig;
-    const configC = { logging: { level: "debug" as const } } satisfies OpenClawConfig;
+    const configA = { logging: { level: "info" as const } } satisfies SteelEngineConfig;
+    const configC = { logging: { level: "debug" as const } } satisfies SteelEngineConfig;
     const prepareA = vi.fn(async () => configA);
     const prepareC = vi.fn(async () => configC);
     handlers.recordAcceptedRestartTarget({
@@ -1522,8 +1522,8 @@ describe("gateway hot reload superseded tail recovery", () => {
             },
           },
         },
-      } satisfies OpenClawConfig;
-      let pendingConfig: OpenClawConfig | null = null;
+      } satisfies SteelEngineConfig;
+      let pendingConfig: SteelEngineConfig | null = null;
       const isCurrent = () => pendingConfig === null;
       const requestRecoveryRestart = vi.fn(() => ({ status: "emitted" as const }));
       const startChannel = vi.fn(async () => {});
@@ -1581,7 +1581,7 @@ describe("gateway hot reload superseded tail recovery", () => {
       );
       const configA = {
         agents: { defaults: { workspace: "/tmp/a" } },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
       const reloadA = handlers.applyHotReload(plan, configA, {
         isCurrent,
         publish: async (commit) => await commit(),
@@ -1598,7 +1598,7 @@ describe("gateway hot reload superseded tail recovery", () => {
       );
       expect(hoisted.warmCurrentProviderAuthStateOffMainThread).not.toHaveBeenCalled();
 
-      const configC = { logging: { level: "debug" as const } } satisfies OpenClawConfig;
+      const configC = { logging: { level: "debug" as const } } satisfies SteelEngineConfig;
       pendingConfig = configC;
       await handlers.applyHotReload(createHotTailPlan(), configC, {
         isCurrent: () => pendingConfig === configC,
@@ -1723,7 +1723,7 @@ describe("gateway hot reload commit policy", () => {
       }),
     });
 
-    await applyHotReload(createHotTailPlan({ restartHealthMonitor: true }), {} as OpenClawConfig);
+    await applyHotReload(createHotTailPlan({ restartHealthMonitor: true }), {} as SteelEngineConfig);
 
     expect(events).toEqual(["setState", "stop", "waitForIdle", "create", "setState"]);
     expect(state.channelHealthMonitor).toBe(nextMonitor);
@@ -1933,11 +1933,11 @@ describe("gateway restart deferral preflight", () => {
       );
     const configA = {
       hooks: { enabled: true, token: "test-token", path: "/a" },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const configB = {
       ...configA,
       logging: { level: "debug" },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const forcedRestartPlan = {
       changedPaths: ["hooks.path"],
       restartGateway: true,
@@ -2044,15 +2044,15 @@ describe("gateway restart deferral preflight", () => {
     const configA = {
       channels: { discord: { token: "discord-token-a" } },
       logging: { level: "info" },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const configC = {
       ...configA,
       logging: { level: "debug" },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const configB = {
       ...configA,
       gateway: { port: 19_001 },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const plan = {
       changedPaths: ["channels.discord.token", "logging.level"],
       restartGateway: false,
@@ -2150,11 +2150,11 @@ describe("gateway restart deferral preflight", () => {
     );
     const configA = {
       channels: { discord: { token: "discord-token-a" } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const configB = {
       ...configA,
       gateway: { port: 19_001 },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const recoveryPlan = {
       ...createHotTailPlan(),
       changedPaths: ["channels.discord.token"],
@@ -2577,10 +2577,10 @@ describe("gateway restart deferral preflight", () => {
   });
 
   it("defers channel hot reload until active embedded work drains", async () => {
-    const previousSkipChannels = process.env.OPENCLAW_SKIP_CHANNELS;
-    const previousSkipProviders = process.env.OPENCLAW_SKIP_PROVIDERS;
-    delete process.env.OPENCLAW_SKIP_CHANNELS;
-    delete process.env.OPENCLAW_SKIP_PROVIDERS;
+    const previousSkipChannels = process.env.STEELENGINE_SKIP_CHANNELS;
+    const previousSkipProviders = process.env.STEELENGINE_SKIP_PROVIDERS;
+    delete process.env.STEELENGINE_SKIP_CHANNELS;
+    delete process.env.STEELENGINE_SKIP_PROVIDERS;
     const startChannel = vi.fn(async () => {});
     const stopChannel = vi.fn(async () => {});
     const setState = vi.fn();
@@ -2662,14 +2662,14 @@ describe("gateway restart deferral preflight", () => {
       vi.useRealTimers();
       await reloadPromise.catch(() => {});
       if (previousSkipChannels === undefined) {
-        delete process.env.OPENCLAW_SKIP_CHANNELS;
+        delete process.env.STEELENGINE_SKIP_CHANNELS;
       } else {
-        process.env.OPENCLAW_SKIP_CHANNELS = previousSkipChannels;
+        process.env.STEELENGINE_SKIP_CHANNELS = previousSkipChannels;
       }
       if (previousSkipProviders === undefined) {
-        delete process.env.OPENCLAW_SKIP_PROVIDERS;
+        delete process.env.STEELENGINE_SKIP_PROVIDERS;
       } else {
-        process.env.OPENCLAW_SKIP_PROVIDERS = previousSkipProviders;
+        process.env.STEELENGINE_SKIP_PROVIDERS = previousSkipProviders;
       }
     }
 
@@ -2680,10 +2680,10 @@ describe("gateway restart deferral preflight", () => {
   });
 
   it("forces channel hot reload after the configured deferral timeout", async () => {
-    const previousSkipChannels = process.env.OPENCLAW_SKIP_CHANNELS;
-    const previousSkipProviders = process.env.OPENCLAW_SKIP_PROVIDERS;
-    delete process.env.OPENCLAW_SKIP_CHANNELS;
-    delete process.env.OPENCLAW_SKIP_PROVIDERS;
+    const previousSkipChannels = process.env.STEELENGINE_SKIP_CHANNELS;
+    const previousSkipProviders = process.env.STEELENGINE_SKIP_PROVIDERS;
+    delete process.env.STEELENGINE_SKIP_CHANNELS;
+    delete process.env.STEELENGINE_SKIP_PROVIDERS;
     const startChannel = vi.fn(async () => {});
     const stopChannel = vi.fn(async () => {});
     const logReload = { info: vi.fn(), warn: vi.fn() };
@@ -2752,14 +2752,14 @@ describe("gateway restart deferral preflight", () => {
       vi.useRealTimers();
       await reloadPromise.catch(() => {});
       if (previousSkipChannels === undefined) {
-        delete process.env.OPENCLAW_SKIP_CHANNELS;
+        delete process.env.STEELENGINE_SKIP_CHANNELS;
       } else {
-        process.env.OPENCLAW_SKIP_CHANNELS = previousSkipChannels;
+        process.env.STEELENGINE_SKIP_CHANNELS = previousSkipChannels;
       }
       if (previousSkipProviders === undefined) {
-        delete process.env.OPENCLAW_SKIP_PROVIDERS;
+        delete process.env.STEELENGINE_SKIP_PROVIDERS;
       } else {
-        process.env.OPENCLAW_SKIP_PROVIDERS = previousSkipProviders;
+        process.env.STEELENGINE_SKIP_PROVIDERS = previousSkipProviders;
       }
     }
 
@@ -2771,10 +2771,10 @@ describe("gateway restart deferral preflight", () => {
   });
 
   it("uses the default channel reload deferral timeout when config omits deferralTimeoutMs", async () => {
-    const previousSkipChannels = process.env.OPENCLAW_SKIP_CHANNELS;
-    const previousSkipProviders = process.env.OPENCLAW_SKIP_PROVIDERS;
-    delete process.env.OPENCLAW_SKIP_CHANNELS;
-    delete process.env.OPENCLAW_SKIP_PROVIDERS;
+    const previousSkipChannels = process.env.STEELENGINE_SKIP_CHANNELS;
+    const previousSkipProviders = process.env.STEELENGINE_SKIP_PROVIDERS;
+    delete process.env.STEELENGINE_SKIP_CHANNELS;
+    delete process.env.STEELENGINE_SKIP_PROVIDERS;
     const startChannel = vi.fn(async () => {});
     const stopChannel = vi.fn(async () => {});
     const logReload = { info: vi.fn(), warn: vi.fn() };
@@ -2843,14 +2843,14 @@ describe("gateway restart deferral preflight", () => {
       vi.useRealTimers();
       await reloadPromise.catch(() => {});
       if (previousSkipChannels === undefined) {
-        delete process.env.OPENCLAW_SKIP_CHANNELS;
+        delete process.env.STEELENGINE_SKIP_CHANNELS;
       } else {
-        process.env.OPENCLAW_SKIP_CHANNELS = previousSkipChannels;
+        process.env.STEELENGINE_SKIP_CHANNELS = previousSkipChannels;
       }
       if (previousSkipProviders === undefined) {
-        delete process.env.OPENCLAW_SKIP_PROVIDERS;
+        delete process.env.STEELENGINE_SKIP_PROVIDERS;
       } else {
-        process.env.OPENCLAW_SKIP_PROVIDERS = previousSkipProviders;
+        process.env.STEELENGINE_SKIP_PROVIDERS = previousSkipProviders;
       }
     }
 
@@ -2862,10 +2862,10 @@ describe("gateway restart deferral preflight", () => {
   });
 
   it("waits indefinitely for channel hot reload when deferral timeout is 0", async () => {
-    const previousSkipChannels = process.env.OPENCLAW_SKIP_CHANNELS;
-    const previousSkipProviders = process.env.OPENCLAW_SKIP_PROVIDERS;
-    delete process.env.OPENCLAW_SKIP_CHANNELS;
-    delete process.env.OPENCLAW_SKIP_PROVIDERS;
+    const previousSkipChannels = process.env.STEELENGINE_SKIP_CHANNELS;
+    const previousSkipProviders = process.env.STEELENGINE_SKIP_PROVIDERS;
+    delete process.env.STEELENGINE_SKIP_CHANNELS;
+    delete process.env.STEELENGINE_SKIP_PROVIDERS;
     const startChannel = vi.fn(async () => {});
     const stopChannel = vi.fn(async () => {});
     const logReload = { info: vi.fn(), warn: vi.fn() };
@@ -2939,14 +2939,14 @@ describe("gateway restart deferral preflight", () => {
       vi.useRealTimers();
       await reloadPromise.catch(() => {});
       if (previousSkipChannels === undefined) {
-        delete process.env.OPENCLAW_SKIP_CHANNELS;
+        delete process.env.STEELENGINE_SKIP_CHANNELS;
       } else {
-        process.env.OPENCLAW_SKIP_CHANNELS = previousSkipChannels;
+        process.env.STEELENGINE_SKIP_CHANNELS = previousSkipChannels;
       }
       if (previousSkipProviders === undefined) {
-        delete process.env.OPENCLAW_SKIP_PROVIDERS;
+        delete process.env.STEELENGINE_SKIP_PROVIDERS;
       } else {
-        process.env.OPENCLAW_SKIP_PROVIDERS = previousSkipProviders;
+        process.env.STEELENGINE_SKIP_PROVIDERS = previousSkipProviders;
       }
     }
 
@@ -3100,22 +3100,22 @@ describe("gateway channel hot reload handlers", () => {
   }
 
   async function withChannelReloadsEnabled(run: () => Promise<void>) {
-    const previousSkipChannels = process.env.OPENCLAW_SKIP_CHANNELS;
-    const previousSkipProviders = process.env.OPENCLAW_SKIP_PROVIDERS;
-    delete process.env.OPENCLAW_SKIP_CHANNELS;
-    delete process.env.OPENCLAW_SKIP_PROVIDERS;
+    const previousSkipChannels = process.env.STEELENGINE_SKIP_CHANNELS;
+    const previousSkipProviders = process.env.STEELENGINE_SKIP_PROVIDERS;
+    delete process.env.STEELENGINE_SKIP_CHANNELS;
+    delete process.env.STEELENGINE_SKIP_PROVIDERS;
     try {
       await run();
     } finally {
       if (previousSkipChannels === undefined) {
-        delete process.env.OPENCLAW_SKIP_CHANNELS;
+        delete process.env.STEELENGINE_SKIP_CHANNELS;
       } else {
-        process.env.OPENCLAW_SKIP_CHANNELS = previousSkipChannels;
+        process.env.STEELENGINE_SKIP_CHANNELS = previousSkipChannels;
       }
       if (previousSkipProviders === undefined) {
-        delete process.env.OPENCLAW_SKIP_PROVIDERS;
+        delete process.env.STEELENGINE_SKIP_PROVIDERS;
       } else {
-        process.env.OPENCLAW_SKIP_PROVIDERS = previousSkipProviders;
+        process.env.STEELENGINE_SKIP_PROVIDERS = previousSkipProviders;
       }
     }
   }
@@ -3135,7 +3135,7 @@ describe("gateway channel hot reload handlers", () => {
   async function withDiscordAccountResolver(
     listAccountIds: () => string[],
     run: () => Promise<void>,
-    resolveAccount: (cfg: OpenClawConfig, accountId?: string | null) => unknown = () => ({}),
+    resolveAccount: (cfg: SteelEngineConfig, accountId?: string | null) => unknown = () => ({}),
   ) {
     const registry = createTestRegistry([
       {
@@ -3715,7 +3715,7 @@ describe("gateway Gmail hot reload handlers", () => {
     };
   }
 
-  function createGmailConfig(account: string): OpenClawConfig {
+  function createGmailConfig(account: string): SteelEngineConfig {
     return {
       gateway: { reload: { debounceMs: 0 } },
       hooks: { enabled: true, token: "test-token", gmail: { account } },
@@ -3872,15 +3872,15 @@ describe("gateway Gmail hot reload handlers", () => {
     const writeListenerRef: { current: ((event: ConfigWriteNotification) => void) | null } = {
       current: null,
     };
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       messages: { visibleReplies: "automatic" },
     };
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       messages: { visibleReplies: "message_tool" },
     };
-    const activateRuntimeSecrets = vi.fn(async (config: OpenClawConfig) => ({
+    const activateRuntimeSecrets = vi.fn(async (config: SteelEngineConfig) => ({
       sourceConfig: config,
       config,
       authStores: [],
@@ -3896,9 +3896,9 @@ describe("gateway Gmail hot reload handlers", () => {
       initialConfig,
       initialCompareConfig: initialConfig,
       initialInternalWriteHash: null,
-      watchPath: "/tmp/openclaw.json",
+      watchPath: "/tmp/steelengine.json",
       readSnapshot: vi.fn(async () => ({
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         exists: true,
         raw: "{}",
         parsed: {},
@@ -3962,7 +3962,7 @@ describe("gateway Gmail hot reload handlers", () => {
     }
 
     registeredWriteListener({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: nextConfig,
       runtimeConfig: nextConfig,
       persistedHash: "hash-next",
@@ -3989,7 +3989,7 @@ describe("gateway Gmail hot reload handlers", () => {
 
   it("rejects ownerless irreversible plans but applies safe hot plans", async () => {
     vi.useFakeTimers();
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: {
         port: 18789,
         reload: { debounceMs: 0 },
@@ -4003,7 +4003,7 @@ describe("gateway Gmail hot reload handlers", () => {
       logging: { level: "info" },
     };
     const terminalPolicy = createTerminalLaunchPolicy(initialConfig);
-    const prepareTerminalConfig = vi.fn((plan: GatewayReloadPlan, nextConfig: OpenClawConfig) => {
+    const prepareTerminalConfig = vi.fn((plan: GatewayReloadPlan, nextConfig: SteelEngineConfig) => {
       terminalPolicy.prepareConfig(nextConfig, { restartPending: plan.restartGateway });
     });
     const reconcileTerminalSessions = vi.fn();
@@ -4015,7 +4015,7 @@ describe("gateway Gmail hot reload handlers", () => {
     };
     let snapshotConfig = initialConfig;
     let snapshotHash = "initial";
-    const activateRuntimeSecrets = vi.fn(async (config: OpenClawConfig) => ({
+    const activateRuntimeSecrets = vi.fn(async (config: SteelEngineConfig) => ({
       sourceConfig: config,
       config,
       authStores: [],
@@ -4028,9 +4028,9 @@ describe("gateway Gmail hot reload handlers", () => {
       initialConfig,
       initialCompareConfig: initialConfig,
       initialInternalWriteHash: null,
-      watchPath: "/tmp/openclaw.json",
+      watchPath: "/tmp/steelengine.json",
       readSnapshot: vi.fn(async () => ({
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         exists: true,
         raw: "{}",
         parsed: snapshotConfig,
@@ -4087,7 +4087,7 @@ describe("gateway Gmail hot reload handlers", () => {
       restartRecoveryAvailable: false,
     });
     let revision = 0;
-    const writeConfig = (config: OpenClawConfig, hash: string) => {
+    const writeConfig = (config: SteelEngineConfig, hash: string) => {
       const listener = writeListenerRef.current;
       if (!listener) {
         throw new Error("Expected config write listener to be registered");
@@ -4096,7 +4096,7 @@ describe("gateway Gmail hot reload handlers", () => {
       snapshotHash = hash;
       revision += 1;
       listener({
-        configPath: "/tmp/openclaw.json",
+        configPath: "/tmp/steelengine.json",
         sourceConfig: config,
         runtimeConfig: config,
         persistedHash: hash,
@@ -4143,7 +4143,7 @@ describe("gateway Gmail hot reload handlers", () => {
           },
           surface: "irreversible hot reload",
         },
-      ] satisfies Array<{ label: string; config: OpenClawConfig; surface: string }>;
+      ] satisfies Array<{ label: string; config: SteelEngineConfig; surface: string }>;
 
       for (const testCase of rejectedConfigs) {
         writeConfig(testCase.config, `${testCase.label}-unsupported`);
@@ -4163,7 +4163,7 @@ describe("gateway Gmail hot reload handlers", () => {
         logReload.error.mockClear();
       }
 
-      const safeConfig: OpenClawConfig = {
+      const safeConfig: SteelEngineConfig = {
         ...initialConfig,
         logging: { level: "debug" },
       };
@@ -4192,14 +4192,14 @@ describe("gateway Gmail hot reload handlers", () => {
         reload: { debounceMs: 0 },
         terminal: { enabled: true },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const rejectedConfig = {
       gateway: {
         port: 18790,
         reload: { debounceMs: 0 },
         terminal: { enabled: false },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const terminalPolicy = createTerminalLaunchPolicy(initialConfig);
     const expectedReloadError = "config reload failed: Error: restart secrets preflight failed";
     let recordReloadFailure: (() => void) | undefined;
@@ -4225,7 +4225,7 @@ describe("gateway Gmail hot reload handlers", () => {
         recordRestartRetired?.();
       }
     };
-    const activateRuntimeSecrets = vi.fn(async (config: OpenClawConfig) => {
+    const activateRuntimeSecrets = vi.fn(async (config: SteelEngineConfig) => {
       if (config.gateway?.port === rejectedConfig.gateway?.port) {
         throw new Error("restart secrets preflight failed");
       }
@@ -4252,9 +4252,9 @@ describe("gateway Gmail hot reload handlers", () => {
       initialConfig,
       initialCompareConfig: initialConfig,
       initialInternalWriteHash: null,
-      watchPath: "/tmp/openclaw.json",
+      watchPath: "/tmp/steelengine.json",
       readSnapshot: vi.fn(async () => ({
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         exists: true,
         raw: "{}",
         parsed: initialConfig,
@@ -4323,7 +4323,7 @@ describe("gateway Gmail hot reload handlers", () => {
 
     try {
       registeredWriteListener({
-        configPath: "/tmp/openclaw.json",
+        configPath: "/tmp/steelengine.json",
         sourceConfig: rejectedConfig,
         runtimeConfig: rejectedConfig,
         persistedHash: "rejected-restart",
@@ -4340,7 +4340,7 @@ describe("gateway Gmail hot reload handlers", () => {
       expect(requestRecoveryRestart).not.toHaveBeenCalled();
 
       registeredWriteListener({
-        configPath: "/tmp/openclaw.json",
+        configPath: "/tmp/steelengine.json",
         sourceConfig: initialConfig,
         runtimeConfig: initialConfig,
         persistedHash: "accepted-revert",
@@ -4425,7 +4425,7 @@ describe("gateway Gmail hot reload handlers", () => {
       const acceptedWithLogging = {
         ...harness.deferredConfig,
         logging: { level: "debug" },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
       const revertPromotion = harness.nextPromotion();
       harness.writeConfig(acceptedWithLogging, "accepted-a-plus-logging", 3);
       await vi.advanceTimersByTimeAsync(0);
@@ -4465,7 +4465,7 @@ describe("gateway Gmail hot reload handlers", () => {
     const preflightBlocked = new Promise<void>((resolve) => {
       releasePreflight = resolve;
     });
-    harness.activateRuntimeSecrets.mockImplementationOnce(async (config: OpenClawConfig) => {
+    harness.activateRuntimeSecrets.mockImplementationOnce(async (config: SteelEngineConfig) => {
       markPreflightStarted?.();
       await preflightBlocked;
       return {
@@ -4539,7 +4539,7 @@ describe("gateway Gmail hot reload handlers", () => {
         const acceptedConfig = {
           ...harness.deferredConfig,
           logging: { level: "debug" },
-        } as OpenClawConfig;
+        } as SteelEngineConfig;
         const acceptedPromotion = harness.nextPromotion();
         harness.writeConfig(acceptedConfig, `accepted-after-${_kind}`, 3);
         await vi.advanceTimersByTimeAsync(0);
@@ -4564,7 +4564,7 @@ describe("gateway Gmail hot reload handlers", () => {
         ...harness.deferredConfig.gateway,
         auth: { mode: "token" as const, token: "resolved-restart-token" },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     harness.setSecretUnavailable("RESTART_A_TOKEN");
 
     try {
@@ -4796,11 +4796,11 @@ describe("gateway Gmail hot reload handlers", () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
       hooks: { enabled: true, token: "test-token", path: "/old" },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const nextConfig = {
       gateway: { reload: { debounceMs: 0 } },
       hooks: { enabled: true, token: "test-token", path: "/next" },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const initialSnapshot: PreparedSecretsRuntimeSnapshot = {
       sourceConfig: initialConfig,
       config: initialConfig,
@@ -4837,7 +4837,7 @@ describe("gateway Gmail hot reload handlers", () => {
     );
     let preparationCount = 0;
     const activateRuntimeSecrets = Object.assign(
-      vi.fn(async (config: OpenClawConfig) => {
+      vi.fn(async (config: SteelEngineConfig) => {
         preparationCount += 1;
         if (preparationCount === 1) {
           activateSecretsRuntimeSnapshot(refreshedSnapshot);
@@ -4874,9 +4874,9 @@ describe("gateway Gmail hot reload handlers", () => {
       initialConfig,
       initialCompareConfig: initialConfig,
       initialInternalWriteHash: null,
-      watchPath: "/tmp/openclaw.json",
+      watchPath: "/tmp/steelengine.json",
       readSnapshot: vi.fn(async () => ({
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         exists: true,
         raw: "{}",
         parsed: {},
@@ -4940,7 +4940,7 @@ describe("gateway Gmail hot reload handlers", () => {
     }
 
     registeredWriteListener({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: nextConfig,
       runtimeConfig: nextConfig,
       persistedHash: "hot-reload-next",
@@ -4994,7 +4994,7 @@ describe("gateway Gmail hot reload handlers", () => {
     const initialConfig = createGmailConfig("old@example.com");
     const nextConfig = createGmailConfig("next@example.com");
     const readSnapshot = vi.fn(async () => ({
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       exists: true,
       raw: "{}",
       parsed: {},
@@ -5013,7 +5013,7 @@ describe("gateway Gmail hot reload handlers", () => {
       initialConfig,
       initialCompareConfig: initialConfig,
       initialInternalWriteHash: null,
-      watchPath: "/tmp/openclaw.json",
+      watchPath: "/tmp/steelengine.json",
       readSnapshot: readSnapshot as never,
       promoteSnapshot: vi.fn(async () => true) as never,
       subscribeToWrites: ((listener: (event: ConfigWriteNotification) => void) => {
@@ -5051,7 +5051,7 @@ describe("gateway Gmail hot reload handlers", () => {
       logCron: { error: vi.fn() },
       logReload,
       channelManager: {} as never,
-      activateRuntimeSecrets: vi.fn(async (config: OpenClawConfig) => ({
+      activateRuntimeSecrets: vi.fn(async (config: SteelEngineConfig) => ({
         sourceConfig: config,
         config,
         authStores: [],
@@ -5072,7 +5072,7 @@ describe("gateway Gmail hot reload handlers", () => {
     }
 
     registeredWriteListener({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: nextConfig,
       runtimeConfig: nextConfig,
       persistedHash: "hash-next",
@@ -5095,7 +5095,7 @@ describe("gateway Gmail hot reload handlers", () => {
       current: null,
     };
     const initialConfig = createGmailConfig("old@example.com");
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       ...createGmailConfig("next@example.com"),
       models: { providers: {} },
     };
@@ -5114,9 +5114,9 @@ describe("gateway Gmail hot reload handlers", () => {
       initialConfig,
       initialCompareConfig: initialConfig,
       initialInternalWriteHash: null,
-      watchPath: "/tmp/openclaw.json",
+      watchPath: "/tmp/steelengine.json",
       readSnapshot: vi.fn(async () => ({
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         exists: true,
         raw: "{}",
         parsed: {},
@@ -5166,7 +5166,7 @@ describe("gateway Gmail hot reload handlers", () => {
       logCron: { error: vi.fn() },
       logReload,
       channelManager: {} as never,
-      activateRuntimeSecrets: vi.fn(async (config: OpenClawConfig) => ({
+      activateRuntimeSecrets: vi.fn(async (config: SteelEngineConfig) => ({
         sourceConfig: config,
         config,
         authStores: [],
@@ -5187,7 +5187,7 @@ describe("gateway Gmail hot reload handlers", () => {
     }
 
     registeredWriteListener({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: nextConfig,
       runtimeConfig: nextConfig,
       persistedHash: "hash-next",
@@ -5226,9 +5226,9 @@ describe("gateway Gmail hot reload handlers", () => {
       initialConfig,
       initialCompareConfig: initialConfig,
       initialInternalWriteHash: null,
-      watchPath: "/tmp/openclaw.json",
+      watchPath: "/tmp/steelengine.json",
       readSnapshot: vi.fn(async () => ({
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         exists: true,
         raw: "{}",
         parsed: {},
@@ -5278,7 +5278,7 @@ describe("gateway Gmail hot reload handlers", () => {
       logCron: { error: vi.fn() },
       logReload: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
       channelManager: {} as never,
-      activateRuntimeSecrets: vi.fn(async (config: OpenClawConfig) => {
+      activateRuntimeSecrets: vi.fn(async (config: SteelEngineConfig) => {
         secretsEntered?.();
         await releaseSecretsPromise;
         return {
@@ -5303,7 +5303,7 @@ describe("gateway Gmail hot reload handlers", () => {
     }
 
     registeredWriteListener({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: nextConfig,
       runtimeConfig: nextConfig,
       persistedHash: "hash-next",
@@ -5328,11 +5328,11 @@ describe("gateway Gmail hot reload handlers", () => {
 
 describe("gateway plugin hot reload handlers", () => {
   it("restarts channels when the candidate env removes an active skip flag", async () => {
-    const envKey = "OPENCLAW_SKIP_CHANNELS";
+    const envKey = "STEELENGINE_SKIP_CHANNELS";
     const previousValue = process.env[envKey];
     process.env[envKey] = "1";
     const targetEnv: NodeJS.ProcessEnv = { [envKey]: "1" };
-    const previousConfig = { env: { vars: { [envKey]: "1" } } } satisfies OpenClawConfig;
+    const previousConfig = { env: { vars: { [envKey]: "1" } } } satisfies SteelEngineConfig;
     const runtimeEnv = prepareConfigRuntimeEnv({
       previousConfig,
       nextConfig: {},
@@ -5394,11 +5394,11 @@ describe("gateway plugin hot reload handlers", () => {
   });
 
   it("skips channel work when the candidate env adds a skip flag", async () => {
-    const envKey = "OPENCLAW_SKIP_PROVIDERS";
+    const envKey = "STEELENGINE_SKIP_PROVIDERS";
     const previousValue = process.env[envKey];
     delete process.env[envKey];
     const targetEnv: NodeJS.ProcessEnv = {};
-    const nextConfig = { env: { vars: { [envKey]: "1" } } } satisfies OpenClawConfig;
+    const nextConfig = { env: { vars: { [envKey]: "1" } } } satisfies SteelEngineConfig;
     const runtimeEnv = prepareConfigRuntimeEnv({
       previousConfig: {},
       nextConfig,
@@ -5481,30 +5481,30 @@ describe("gateway plugin hot reload handlers", () => {
     expect(stopChannel).not.toHaveBeenCalled();
     expect(startChannel).not.toHaveBeenCalled();
     expect(logChannels.info).toHaveBeenCalledWith(
-      "skipping channel reload (OPENCLAW_SKIP_CHANNELS=1 or OPENCLAW_SKIP_PROVIDERS=1)",
+      "skipping channel reload (STEELENGINE_SKIP_CHANNELS=1 or STEELENGINE_SKIP_PROVIDERS=1)",
     );
   });
 
   it("publishes candidate env before cron, plugin, and channel replacements start", async () => {
     vi.useFakeTimers();
-    const envKey = "OPENCLAW_TEST_HOT_RELOAD_SERVICE_ENV";
+    const envKey = "STEELENGINE_TEST_HOT_RELOAD_SERVICE_ENV";
     const targetEnv: NodeJS.ProcessEnv = { [envKey]: "old" };
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
       cron: { enabled: false },
       plugins: { enabled: false },
       env: { vars: { [envKey]: "old" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const nextConfig = {
       ...initialConfig,
       cron: { enabled: true },
       plugins: { enabled: true },
       env: { vars: { [envKey]: "candidate" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const compareConfig = {
       ...nextConfig,
       env: initialConfig.env,
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const runtimeEnv = prepareConfigRuntimeEnv({
       previousConfig: initialConfig,
       nextConfig,
@@ -5550,7 +5550,7 @@ describe("gateway plugin hot reload handlers", () => {
       initialConfig,
       initialCompareConfig: initialConfig,
       initialInternalWriteHash: null,
-      watchPath: "/tmp/openclaw.json",
+      watchPath: "/tmp/steelengine.json",
       readSnapshot: vi.fn() as never,
       promoteSnapshot: vi.fn(async () => true) as never,
       subscribeToWrites: ((listener: (event: ConfigWriteNotification) => void) => {
@@ -5583,7 +5583,7 @@ describe("gateway plugin hot reload handlers", () => {
       logCron: { error: vi.fn() },
       logReload: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
       channelManager: {} as never,
-      activateRuntimeSecrets: vi.fn(async (config: OpenClawConfig) => ({
+      activateRuntimeSecrets: vi.fn(async (config: SteelEngineConfig) => ({
         sourceConfig: config,
         config,
         authStores: [],
@@ -5604,7 +5604,7 @@ describe("gateway plugin hot reload handlers", () => {
     }
 
     listener({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: nextConfig,
       runtimeConfig: nextConfig,
       preparedCandidate: { runtimeConfig: nextConfig, compareConfig, runtimeEnv },
@@ -5995,10 +5995,10 @@ describe("gateway plugin hot reload handlers", () => {
   });
 
   it("rolls back stopped channels when plugin pre-replace stop fails", async () => {
-    const previousSkipChannels = process.env.OPENCLAW_SKIP_CHANNELS;
-    const previousSkipProviders = process.env.OPENCLAW_SKIP_PROVIDERS;
-    delete process.env.OPENCLAW_SKIP_CHANNELS;
-    delete process.env.OPENCLAW_SKIP_PROVIDERS;
+    const previousSkipChannels = process.env.STEELENGINE_SKIP_CHANNELS;
+    const previousSkipProviders = process.env.STEELENGINE_SKIP_PROVIDERS;
+    delete process.env.STEELENGINE_SKIP_CHANNELS;
+    delete process.env.STEELENGINE_SKIP_PROVIDERS;
     const cron = { start: vi.fn(async () => {}), stop: vi.fn() };
     const heartbeatRunner = {
       stop: vi.fn(),
@@ -6084,14 +6084,14 @@ describe("gateway plugin hot reload handlers", () => {
     } finally {
       root?.release();
       if (previousSkipChannels === undefined) {
-        delete process.env.OPENCLAW_SKIP_CHANNELS;
+        delete process.env.STEELENGINE_SKIP_CHANNELS;
       } else {
-        process.env.OPENCLAW_SKIP_CHANNELS = previousSkipChannels;
+        process.env.STEELENGINE_SKIP_CHANNELS = previousSkipChannels;
       }
       if (previousSkipProviders === undefined) {
-        delete process.env.OPENCLAW_SKIP_PROVIDERS;
+        delete process.env.STEELENGINE_SKIP_PROVIDERS;
       } else {
-        process.env.OPENCLAW_SKIP_PROVIDERS = previousSkipProviders;
+        process.env.STEELENGINE_SKIP_PROVIDERS = previousSkipProviders;
       }
     }
 
@@ -6112,10 +6112,10 @@ describe("gateway plugin hot reload handlers", () => {
   });
 
   it("stops removed channel plugins from broad activation before swapping plugin runtime", async () => {
-    const previousSkipChannels = process.env.OPENCLAW_SKIP_CHANNELS;
-    const previousSkipProviders = process.env.OPENCLAW_SKIP_PROVIDERS;
-    delete process.env.OPENCLAW_SKIP_CHANNELS;
-    delete process.env.OPENCLAW_SKIP_PROVIDERS;
+    const previousSkipChannels = process.env.STEELENGINE_SKIP_CHANNELS;
+    const previousSkipProviders = process.env.STEELENGINE_SKIP_PROVIDERS;
+    delete process.env.STEELENGINE_SKIP_CHANNELS;
+    delete process.env.STEELENGINE_SKIP_PROVIDERS;
     const cron = { start: vi.fn(async () => {}), stop: vi.fn() };
     const heartbeatRunner = {
       stop: vi.fn(),
@@ -6186,14 +6186,14 @@ describe("gateway plugin hot reload handlers", () => {
       );
     } finally {
       if (previousSkipChannels === undefined) {
-        delete process.env.OPENCLAW_SKIP_CHANNELS;
+        delete process.env.STEELENGINE_SKIP_CHANNELS;
       } else {
-        process.env.OPENCLAW_SKIP_CHANNELS = previousSkipChannels;
+        process.env.STEELENGINE_SKIP_CHANNELS = previousSkipChannels;
       }
       if (previousSkipProviders === undefined) {
-        delete process.env.OPENCLAW_SKIP_PROVIDERS;
+        delete process.env.STEELENGINE_SKIP_PROVIDERS;
       } else {
-        process.env.OPENCLAW_SKIP_PROVIDERS = previousSkipProviders;
+        process.env.STEELENGINE_SKIP_PROVIDERS = previousSkipProviders;
       }
     }
 
@@ -6214,10 +6214,10 @@ describe("gateway plugin hot reload handlers", () => {
   });
 
   it("stops manually started channels before plugin replacement while autostart is suppressed", async () => {
-    const previousSkipChannels = process.env.OPENCLAW_SKIP_CHANNELS;
-    const previousSkipProviders = process.env.OPENCLAW_SKIP_PROVIDERS;
-    delete process.env.OPENCLAW_SKIP_CHANNELS;
-    delete process.env.OPENCLAW_SKIP_PROVIDERS;
+    const previousSkipChannels = process.env.STEELENGINE_SKIP_CHANNELS;
+    const previousSkipProviders = process.env.STEELENGINE_SKIP_PROVIDERS;
+    delete process.env.STEELENGINE_SKIP_CHANNELS;
+    delete process.env.STEELENGINE_SKIP_PROVIDERS;
     const cron = { start: vi.fn(async () => {}), stop: vi.fn() };
     const heartbeatRunner = {
       stop: vi.fn(),
@@ -6295,14 +6295,14 @@ describe("gateway plugin hot reload handlers", () => {
       );
     } finally {
       if (previousSkipChannels === undefined) {
-        delete process.env.OPENCLAW_SKIP_CHANNELS;
+        delete process.env.STEELENGINE_SKIP_CHANNELS;
       } else {
-        process.env.OPENCLAW_SKIP_CHANNELS = previousSkipChannels;
+        process.env.STEELENGINE_SKIP_CHANNELS = previousSkipChannels;
       }
       if (previousSkipProviders === undefined) {
-        delete process.env.OPENCLAW_SKIP_PROVIDERS;
+        delete process.env.STEELENGINE_SKIP_PROVIDERS;
       } else {
-        process.env.OPENCLAW_SKIP_PROVIDERS = previousSkipProviders;
+        process.env.STEELENGINE_SKIP_PROVIDERS = previousSkipProviders;
       }
     }
 
@@ -6336,8 +6336,8 @@ describe("deferred channel reload abort generation", () => {
   afterEach(() => {
     hoisted.activeTaskCount.value = 0;
     vi.useRealTimers();
-    delete process.env.OPENCLAW_SKIP_CHANNELS;
-    delete process.env.OPENCLAW_SKIP_PROVIDERS;
+    delete process.env.STEELENGINE_SKIP_CHANNELS;
+    delete process.env.STEELENGINE_SKIP_PROVIDERS;
   });
 
   const createTestHandlers = (
@@ -6566,11 +6566,11 @@ describe("deferred channel reload abort generation", () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
       channels: { whatsapp: { enabled: true, selfChatMode: false } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const nextConfig = {
       gateway: { reload: { debounceMs: 0 } },
       channels: { whatsapp: { enabled: true, selfChatMode: true } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const whatsappPlugin = {
       ...createChannelTestPluginBase({ id: "whatsapp" }),
       reload: {
@@ -6597,7 +6597,7 @@ describe("deferred channel reload abort generation", () => {
       initialConfig,
       initialCompareConfig: initialConfig,
       initialInternalWriteHash: null,
-      watchPath: "/tmp/openclaw.json",
+      watchPath: "/tmp/steelengine.json",
       readSnapshot: vi.fn() as never,
       promoteSnapshot: promoteSnapshot as never,
       subscribeToWrites: ((listener: (event: ConfigWriteNotification) => void) => {
@@ -6635,7 +6635,7 @@ describe("deferred channel reload abort generation", () => {
       logCron: { error: vi.fn() },
       logReload,
       channelManager: {} as never,
-      activateRuntimeSecrets: vi.fn(async (config: OpenClawConfig) => ({
+      activateRuntimeSecrets: vi.fn(async (config: SteelEngineConfig) => ({
         sourceConfig: config,
         config,
         authStores: [],
@@ -6664,7 +6664,7 @@ describe("deferred channel reload abort generation", () => {
 
     try {
       registeredWriteListener({
-        configPath: "/tmp/openclaw.json",
+        configPath: "/tmp/steelengine.json",
         sourceConfig: nextConfig,
         runtimeConfig: nextConfig,
         persistedHash: "managed-abort-next",
@@ -6747,7 +6747,7 @@ describe("deferred channel reload abort generation", () => {
     let reloadWasCancelled = false;
     const reloadPlugins = vi.fn(
       async (params: {
-        nextConfig: OpenClawConfig;
+        nextConfig: SteelEngineConfig;
         beforeReplace: (channels: ReadonlySet<ChannelKind>) => Promise<void>;
         isAborted?: () => boolean;
       }): Promise<GatewayPluginReloadResult> => {

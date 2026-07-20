@@ -1,5 +1,5 @@
 // Google plugin module implements transport stream behavior.
-import type { StreamFn } from "openclaw/plugin-sdk/agent-core";
+import type { StreamFn } from "steelengine/plugin-sdk/agent-core";
 import {
   calculateCost,
   getEnvApiKey,
@@ -7,17 +7,17 @@ import {
   type Model,
   type SimpleStreamOptions,
   type ThinkingLevel,
-} from "openclaw/plugin-sdk/llm";
-import { parseStrictNonNegativeInteger } from "openclaw/plugin-sdk/number-runtime";
+} from "steelengine/plugin-sdk/llm";
+import { parseStrictNonNegativeInteger } from "steelengine/plugin-sdk/number-runtime";
 import {
   collectProviderApiKeysForExecution,
   executeWithApiKeyRotation,
-} from "openclaw/plugin-sdk/provider-auth-runtime";
+} from "steelengine/plugin-sdk/provider-auth-runtime";
 import {
   createProviderHttpError,
   providerOperationRetryConfig,
   resolveProviderRequestHeaders,
-} from "openclaw/plugin-sdk/provider-http";
+} from "steelengine/plugin-sdk/provider-http";
 import {
   buildGuardedModelFetch,
   coerceTransportToolCallArguments,
@@ -32,11 +32,11 @@ import {
   stripSystemPromptCacheBoundary,
   transformTransportMessages,
   type WritableTransportStream,
-} from "openclaw/plugin-sdk/provider-transport-runtime";
+} from "steelengine/plugin-sdk/provider-transport-runtime";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 import { parseGeminiAuth } from "./gemini-auth.js";
 import { stripGoogleProviderPrefix } from "./model-id.js";
 import { normalizeGoogleApiBaseUrl } from "./provider-policy.js";
@@ -55,7 +55,7 @@ import {
 } from "./vertex-adc.js";
 
 type CanonicalGoogleTransportApi = "google-generative-ai" | "google-vertex";
-type GoogleTransportApi = CanonicalGoogleTransportApi | "openclaw-google-generative-ai-transport";
+type GoogleTransportApi = CanonicalGoogleTransportApi | "steelengine-google-generative-ai-transport";
 
 type GoogleTransportModel = Model<GoogleTransportApi> & {
   headers?: Record<string, string>;
@@ -92,7 +92,7 @@ type GoogleGenerateContentRequest = {
 };
 
 const GOOGLE_GEMINI3_FIRST_RESPONSE_RETRY_DEFAULT_MS = 45_000;
-const GOOGLE_GEMINI3_FIRST_RESPONSE_RETRY_ENV = "OPENCLAW_GOOGLE_GEMINI_FIRST_RESPONSE_RETRY_MS";
+const GOOGLE_GEMINI3_FIRST_RESPONSE_RETRY_ENV = "STEELENGINE_GOOGLE_GEMINI_FIRST_RESPONSE_RETRY_MS";
 
 type GoogleTransportContentBlock =
   | { type: "text"; text: string; textSignature?: string }
@@ -259,7 +259,7 @@ function normalizeGoogleTransportRouteApi(
 ): CanonicalGoogleTransportApi | undefined {
   switch (api) {
     case "google-generative-ai":
-    case "openclaw-google-generative-ai-transport":
+    case "steelengine-google-generative-ai-transport":
       return "google-generative-ai";
     case "google-vertex":
       return "google-vertex";

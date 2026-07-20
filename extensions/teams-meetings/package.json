@@ -1,25 +1,25 @@
 {
-  "name": "@openclaw/teams-meetings",
+  "name": "@steelengine/teams-meetings",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw Microsoft Teams browser meeting participant plugin.",
+  "description": "SteelEngine Microsoft Teams browser meeting participant plugin.",
   "private": true,
   "type": "module",
   "dependencies": {
     "typebox": "1.3.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*",
+    "steelengine": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.7.2-beta.3"
+    "steelengine": ">=2026.7.2-beta.3"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "steelengine": {
       "optional": true
     }
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
@@ -27,7 +27,7 @@
       "pluginApi": ">=2026.7.2-beta.3"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3"
+      "steelengineVersion": "2026.7.2-beta.3"
     }
   }
 }

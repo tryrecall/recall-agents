@@ -1,6 +1,6 @@
 // Ollama tests cover provider models plugin behavior.
-import { expectDefined } from "@openclaw/normalization-core";
-import { jsonResponse, requestBodyText, requestUrl } from "openclaw/plugin-sdk/test-env";
+import { expectDefined } from "@steelengine/normalization-core";
+import { jsonResponse, requestBodyText, requestUrl } from "steelengine/plugin-sdk/test-env";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildOllamaProvider,

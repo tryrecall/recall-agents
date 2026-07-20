@@ -1,5 +1,5 @@
 // Defines the detached task runtime contract and spawn options.
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type {
   JsonValue,
   TaskDeliveryState,
@@ -107,7 +107,7 @@ type DetachedTaskDeliveryStatusParams = {
 };
 
 type DetachedTaskCancelParams = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   taskId: string;
   reason?: string;
 };

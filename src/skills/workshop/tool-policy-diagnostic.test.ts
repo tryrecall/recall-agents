@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { detectSkillWorkshopToolPolicyDiagnostic } from "./tool-policy-diagnostic.js";
 
-function detect(config: OpenClawConfig, workshopEnabled = true) {
+function detect(config: SteelEngineConfig, workshopEnabled = true) {
   return detectSkillWorkshopToolPolicyDiagnostic({ config, workshopEnabled });
 }
 

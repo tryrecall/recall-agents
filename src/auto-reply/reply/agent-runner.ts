@@ -1,7 +1,7 @@
 // Orchestrates reply agent execution, payload building, and delivery callbacks.
 import crypto from "node:crypto";
-import { expectDefined } from "@openclaw/normalization-core";
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { expectDefined } from "@steelengine/normalization-core";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import {
   hasSessionAutoModelFallbackProvenance,
   hasConfiguredModelFallbacks,
@@ -30,7 +30,7 @@ import { isCliProvider } from "../../agents/model-selection.js";
 import { deriveContextPromptTokens, hasNonzeroUsage } from "../../agents/usage.js";
 import { isIngressAdoptionLostError } from "../../channels/message/ingress-drain.js";
 import { enqueueCommitmentExtraction } from "../../commitments/runtime.js";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { SteelEngineConfig } from "../../config/config.js";
 import {
   resolveSessionPluginStatusLines,
   resolveSessionPluginTraceLines,
@@ -243,7 +243,7 @@ function buildSilentFallbackFailurePayload(params: {
 }
 
 function resolveSourceReplyPolicy(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   sessionCtx: TemplateContext;
   sessionEntry?: SessionEntry;
   sessionKey: string;
@@ -270,7 +270,7 @@ function resolveSourceReplyPolicy(params: {
 }
 
 function resolveReplyRunDeliveryContext(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   sessionCtx: TemplateContext;
   sessionEntry?: SessionEntry;
   sessionKey: string;
@@ -1061,7 +1061,7 @@ function normalizeAssistantFinalDeliveryText(text: string): string {
 }
 
 function enqueueCommitmentExtractionForTurn(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   commandBody: string;
   isHeartbeat: boolean;
   followupRun: FollowupRun;

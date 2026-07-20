@@ -7,7 +7,7 @@ import {
   readConfigFileSnapshot,
 } from "../../config/config.js";
 import { formatConfigIssueLines } from "../../config/issue-format.js";
-import { disableCurrentOpenClawUpdateLaunchdJob } from "../../daemon/launchd.js";
+import { disableCurrentSteelEngineUpdateLaunchdJob } from "../../daemon/launchd.js";
 import {
   formatExternalSupervisorUpdateRequired,
   isGatewayExternallySupervised,
@@ -37,7 +37,7 @@ import {
 import { cleanupStaleManagedServiceUpdateHandoffs } from "../../infra/update-managed-service-handoff-cleanup.js";
 import { loadInstalledPluginIndexInstallRecords } from "../../plugins/installed-plugin-index-records.js";
 import { defaultRuntime } from "../../runtime.js";
-import type { OpenClawSchemaVersions } from "../../state/openclaw-schema-versions.js";
+import type { SteelEngineSchemaVersions } from "../../state/steelengine-schema-versions.js";
 import { resolveCliName } from "../cli-name.js";
 import { createUpdateProgress } from "./progress.js";
 import {
@@ -84,13 +84,13 @@ const CLI_NAME = resolveCliName();
 const DEFAULT_UPDATE_STEP_TIMEOUT_MS = 30 * 60_000;
 
 async function withUpdateInProgressEnv<T>(run: () => Promise<T>): Promise<T> {
-  const previousUpdateInProgress = process.env.OPENCLAW_UPDATE_IN_PROGRESS;
-  process.env.OPENCLAW_UPDATE_IN_PROGRESS = "1";
+  const previousUpdateInProgress = process.env.STEELENGINE_UPDATE_IN_PROGRESS;
+  process.env.STEELENGINE_UPDATE_IN_PROGRESS = "1";
   return run().finally(() => {
     if (previousUpdateInProgress === undefined) {
-      delete process.env.OPENCLAW_UPDATE_IN_PROGRESS;
+      delete process.env.STEELENGINE_UPDATE_IN_PROGRESS;
     } else {
-      process.env.OPENCLAW_UPDATE_IN_PROGRESS = previousUpdateInProgress;
+      process.env.STEELENGINE_UPDATE_IN_PROGRESS = previousUpdateInProgress;
     }
   });
 }
@@ -134,7 +134,7 @@ async function updateCommandInternal(
     try {
       assertConfigWriteAllowedInCurrentMode();
     } catch (err) {
-      await disableCurrentOpenClawUpdateLaunchdJob().catch(() => undefined);
+      await disableCurrentSteelEngineUpdateLaunchdJob().catch(() => undefined);
       throw err;
     }
   }
@@ -220,7 +220,7 @@ async function updateCommandInternal(
     updateInstallKind === "git" ? DEFAULT_GIT_CHANNEL : DEFAULT_PACKAGE_CHANNEL;
   const channel = requestedChannel ?? storedChannel ?? defaultChannel;
   const devTargetRef =
-    channel === "dev" ? process.env.OPENCLAW_UPDATE_DEV_TARGET_REF?.trim() || undefined : undefined;
+    channel === "dev" ? process.env.STEELENGINE_UPDATE_DEV_TARGET_REF?.trim() || undefined : undefined;
 
   const explicitTag = normalizeTag(opts.tag);
   if (channel === "extended-stable" && explicitTag) {
@@ -244,7 +244,7 @@ async function updateCommandInternal(
   let packageInstallTarget: ResolvedGlobalInstallTarget | undefined;
   let installedPackageName = DEFAULT_PACKAGE_NAME;
   let packageAlreadyCurrent = false;
-  let packageTargetSchemaVersions: OpenClawSchemaVersions | undefined;
+  let packageTargetSchemaVersions: SteelEngineSchemaVersions | undefined;
   let managedServiceRootRedirect: ManagedServiceRootRedirect | null = null;
   // Resolved independently of the root redirect so it covers the common case
   // where the package root is the same but the user's PATH-resolved node
@@ -265,7 +265,7 @@ async function updateCommandInternal(
         );
         defaultRuntime.log(
           theme.warn(
-            `Shell OpenClaw root differs from the managed gateway service root: ${managedServiceRootRedirect.previousRoot}`,
+            `Shell SteelEngine root differs from the managed gateway service root: ${managedServiceRootRedirect.previousRoot}`,
           ),
         );
         defaultRuntime.log(
@@ -400,7 +400,7 @@ async function updateCommandInternal(
       });
       if (targetMetadata.error || targetMetadata.version !== targetVersion) {
         defaultRuntime.error(
-          `Update refused: could not inspect exact package target openclaw@${targetVersion}: ${targetMetadata.error ?? `registry returned version ${targetMetadata.version ?? "unknown"}`}.`,
+          `Update refused: could not inspect exact package target steelengine@${targetVersion}: ${targetMetadata.error ?? `registry returned version ${targetMetadata.version ?? "unknown"}`}.`,
         );
         defaultRuntime.exit(1);
         return;
@@ -514,7 +514,7 @@ async function updateCommandInternal(
     if (runtimeSelection.replacedNodeRunner && !opts.json) {
       defaultRuntime.log(
         theme.warn(
-          `Managed gateway service Node (${runtimeSelection.replacedNodeRunner}) cannot run openclaw@${runtimeSelection.targetVersion ?? tag}.`,
+          `Managed gateway service Node (${runtimeSelection.replacedNodeRunner}) cannot run steelengine@${runtimeSelection.targetVersion ?? tag}.`,
         ),
       );
       defaultRuntime.log(
@@ -525,11 +525,11 @@ async function updateCommandInternal(
     }
   }
 
-  await disableCurrentOpenClawUpdateLaunchdJob().catch(() => undefined);
+  await disableCurrentSteelEngineUpdateLaunchdJob().catch(() => undefined);
 
   const showProgress = !opts.json && process.stdout.isTTY;
   if (!opts.json) {
-    defaultRuntime.log(theme.heading("Updating OpenClaw..."));
+    defaultRuntime.log(theme.heading("Updating SteelEngine..."));
     defaultRuntime.log("");
   }
 

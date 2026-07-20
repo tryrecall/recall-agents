@@ -1,5 +1,5 @@
 // Line tests cover auto reply delivery plugin behavior.
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { describe, expect, it, vi } from "vitest";
 import { deliverLineAutoReply } from "./auto-reply-delivery.js";
 import { buildLineMediaMessage } from "./outbound-media.js";

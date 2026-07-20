@@ -1,14 +1,14 @@
-// Talk Voice plugin entrypoint registers its OpenClaw integration.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { parseStrictPositiveInteger } from "openclaw/plugin-sdk/number-runtime";
-import type { SpeechVoiceOption } from "openclaw/plugin-sdk/speech";
+// Talk Voice plugin entrypoint registers its SteelEngine integration.
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { parseStrictPositiveInteger } from "steelengine/plugin-sdk/number-runtime";
+import type { SpeechVoiceOption } from "steelengine/plugin-sdk/speech";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
-import { resolveActiveTalkProviderConfig } from "openclaw/plugin-sdk/talk-config-runtime";
-import { definePluginEntry, type OpenClawPluginApi } from "./api.js";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
+import { resolveActiveTalkProviderConfig } from "steelengine/plugin-sdk/talk-config-runtime";
+import { definePluginEntry, type SteelEnginePluginApi } from "./api.js";
 
 function mask(s: string, keep = 6): string {
   const trimmed = s.trim();
@@ -128,7 +128,7 @@ export default definePluginEntry({
   id: "talk-voice",
   name: "Talk Voice",
   description: "Command helpers for managing Talk voice configuration",
-  register(api: OpenClawPluginApi) {
+  register(api: SteelEnginePluginApi) {
     api.registerCommand({
       name: "voice",
       nativeNames: {
@@ -143,7 +143,7 @@ export default definePluginEntry({
         const tokens = args.split(/\s+/).filter(Boolean);
         const action = normalizeLowercaseStringOrEmpty(tokens[0] ?? "status");
 
-        const cfg = api.runtime.config.current() as OpenClawConfig;
+        const cfg = api.runtime.config.current() as SteelEngineConfig;
         const active = resolveActiveTalkProviderConfig(cfg.talk);
         if (!active) {
           return {

@@ -1,13 +1,13 @@
-# Z.AI OpenClaw provider
+# Z.AI SteelEngine provider
 
-Official OpenClaw provider plugin for Z.AI.
+Official SteelEngine provider plugin for Z.AI.
 
 ## Install
 
 ```sh
-openclaw plugins install @openclaw/zai-provider
+steelengine plugins install @steelengine/zai-provider
 ```
 
 ## Docs
 
-See `docs/providers/zai.md` in the OpenClaw repository, or the published docs at `https://docs.openclaw.ai/providers/zai`.
+See `docs/providers/zai.md` in the SteelEngine repository, or the published docs at `https://docs.steelengine.ai/providers/zai`.

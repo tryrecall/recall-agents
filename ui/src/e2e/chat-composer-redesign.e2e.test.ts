@@ -11,7 +11,7 @@ import {
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
 
 let server: ControlUiE2eServer;
@@ -554,7 +554,7 @@ describeControlUiE2e("Control UI chat composer redesign", () => {
       methodResponses: {
         "chat.startup": {
           agentsList: {
-            agents: [{ id: "main", name: "OpenClaw" }],
+            agents: [{ id: "main", name: "SteelEngine" }],
             defaultId: "main",
             mainKey: "main",
             scope: "agent",
@@ -718,7 +718,7 @@ describeControlUiE2e("Control UI chat composer redesign", () => {
         .poll(() => composer.locator('[data-chat-model-option="openai/work-model"]').count())
         .toBe(1);
 
-      await page.locator("openclaw-chat-pane").evaluate((pane) => {
+      await page.locator("steelengine-chat-pane").evaluate((pane) => {
         (pane as HTMLElement & { sessionKey: string }).sessionKey = "agent:other:main";
       });
 
@@ -777,7 +777,7 @@ describeControlUiE2e("Control UI chat composer redesign", () => {
     try {
       await page.goto(`${server.baseUrl}chat?session=agent%3Amain%3Amain`);
       await gateway.waitForRequest("chat.startup");
-      await page.locator("openclaw-chat-pane").evaluate((pane) => {
+      await page.locator("steelengine-chat-pane").evaluate((pane) => {
         (pane as HTMLElement & { sessionKey: string }).sessionKey = "agent:work:main";
       });
       await expect
@@ -815,7 +815,7 @@ describeControlUiE2e("Control UI chat composer redesign", () => {
         .poll(async () => (await gateway.getRequests("agents.list")).length)
         .toBeGreaterThan(agentsRequestsBeforeStartup);
       await page.waitForFunction(() => {
-        const pane = document.querySelector("openclaw-chat-pane") as
+        const pane = document.querySelector("steelengine-chat-pane") as
           | (HTMLElement & {
               state?: { agentsList?: { defaultId?: string; agents?: Array<{ id?: string }> } };
             })

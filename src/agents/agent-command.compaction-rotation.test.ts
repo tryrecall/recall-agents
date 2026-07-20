@@ -13,7 +13,7 @@ import {
   formatSqliteSessionFileMarker,
   parseSqliteSessionFileMarker,
 } from "../config/sessions/sqlite-marker.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { rotateAgentEventLifecycleGeneration } from "../infra/agent-events.js";
 import type { runAgentAttempt } from "./command/attempt-execution.runtime.js";
 import type { EmbeddedAgentRunResult } from "./embedded-agent.js";
@@ -31,7 +31,7 @@ type CliCompactionParams = {
 };
 
 const state = vi.hoisted(() => ({
-  cfg: undefined as OpenClawConfig | undefined,
+  cfg: undefined as SteelEngineConfig | undefined,
   workspaceDir: undefined as string | undefined,
   agentDir: undefined as string | undefined,
   runAgentAttemptMock: vi.fn<RunAgentAttempt>(),
@@ -71,11 +71,11 @@ vi.mock("./agent-scope.js", async () => {
     markAutoFallbackPrimaryProbe: vi.fn(),
     resolveAutoFallbackPrimaryProbe: () => undefined,
     resolveAgentConfig: () => undefined,
-    resolveAgentDir: () => state.agentDir ?? "/tmp/openclaw-agent",
+    resolveAgentDir: () => state.agentDir ?? "/tmp/steelengine-agent",
     resolveDefaultAgentId: () => "main",
     resolveEffectiveModelFallbacks: () => undefined,
     resolveSessionAgentId: () => "main",
-    resolveAgentWorkspaceDir: () => state.workspaceDir ?? "/tmp/openclaw-workspace",
+    resolveAgentWorkspaceDir: () => state.workspaceDir ?? "/tmp/steelengine-workspace",
   };
 });
 
@@ -208,7 +208,7 @@ beforeEach(async () => {
       return { deliverySucceeded: true };
     },
   );
-  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-rotation-e2e-"));
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-rotation-e2e-"));
   state.workspaceDir = path.join(tmpDir, "workspace");
   state.agentDir = path.join(tmpDir, "agent");
   await fs.mkdir(state.workspaceDir, { recursive: true });
@@ -224,7 +224,7 @@ beforeEach(async () => {
         },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 });
 
 afterEach(async () => {
@@ -354,7 +354,7 @@ describe("agentCommand compaction transcript rotation", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     state.runAgentAttemptMock.mockResolvedValueOnce(
       makeResult({
         sessionId: "custom-provider-session",

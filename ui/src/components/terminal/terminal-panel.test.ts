@@ -71,13 +71,13 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
-import { OpenClawTerminalPanel } from "./terminal-panel.ts";
+import { SteelEngineTerminalPanel } from "./terminal-panel.ts";
 
-const TERMINAL_PANEL_ELEMENT_NAME = `test-openclaw-terminal-panel-${crypto.randomUUID()}`;
+const TERMINAL_PANEL_ELEMENT_NAME = `test-steelengine-terminal-panel-${crypto.randomUUID()}`;
 
 // The full non-isolated UI suite can import the production panel before this
 // test. Override its factory instead of relying on a module mock import order.
-class TestTerminalPanel extends OpenClawTerminalPanel {
+class TestTerminalPanel extends SteelEngineTerminalPanel {
   protected override createTerminal = createGhosttyTerminalMock as unknown as TerminalFactory;
 }
 
@@ -99,7 +99,7 @@ async function startPanelWithPendingOpen() {
     },
     addEventListener: () => () => {},
   };
-  const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+  const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
   panel.client = client;
   panel.available = true;
   document.body.append(panel);
@@ -110,7 +110,7 @@ async function startPanelWithPendingOpen() {
   return { createOptions: createOptions!, open, requests };
 }
 
-describe("OpenClawTerminalPanel", () => {
+describe("SteelEngineTerminalPanel", () => {
   beforeEach(async () => {
     vi.stubGlobal("localStorage", createStorageMock());
     vi.stubGlobal("sessionStorage", createStorageMock());
@@ -128,7 +128,7 @@ describe("OpenClawTerminalPanel", () => {
 
   it("restores persisted open state when a mounted tag upgrades lazily", async () => {
     localStorage.setItem(
-      "openclaw.terminal.panel.v1",
+      "steelengine.terminal.panel.v1",
       JSON.stringify({ open: true, dock: "bottom", height: 320, width: 520 }),
     );
     const tagName = `test-lazy-terminal-panel-${crypto.randomUUID()}`;
@@ -138,7 +138,7 @@ describe("OpenClawTerminalPanel", () => {
 
     class LazyUpgradeTerminalPanel extends TestTerminalPanel {}
     customElements.define(tagName, LazyUpgradeTerminalPanel);
-    const panel = element as unknown as OpenClawTerminalPanel;
+    const panel = element as unknown as SteelEngineTerminalPanel;
     await panel.updateComplete;
     await waitForFast(() => expect((panel as unknown as { open: boolean }).open).toBe(true));
   });
@@ -164,7 +164,7 @@ describe("OpenClawTerminalPanel", () => {
       },
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.agentId = "ops";
     panel.available = true;
@@ -180,9 +180,9 @@ describe("OpenClawTerminalPanel", () => {
     });
     expect(createOptions?.terminalOptions?.fontFamily).toContain("MesloLGLDZ Nerd Font Mono");
     expect(getComputedStyle(createOptions!.parent).caretColor).toBe("rgba(0, 0, 0, 0)");
-    const styleResults = Array.isArray(OpenClawTerminalPanel.styles)
-      ? OpenClawTerminalPanel.styles
-      : [OpenClawTerminalPanel.styles];
+    const styleResults = Array.isArray(SteelEngineTerminalPanel.styles)
+      ? SteelEngineTerminalPanel.styles
+      : [SteelEngineTerminalPanel.styles];
     const styles = styleResults.map((style) => style.cssText).join("\n");
     expect(styles).toMatch(/\.tabstrip-new\s*\{[^}]*align-self:\s*center/u);
     await waitForFast(() => {
@@ -219,7 +219,7 @@ describe("OpenClawTerminalPanel", () => {
         (method === "terminal.open" ? terminalOpenResult("session-1") : {}) as T,
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
@@ -263,7 +263,7 @@ describe("OpenClawTerminalPanel", () => {
         return () => {};
       },
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
@@ -341,7 +341,7 @@ describe("OpenClawTerminalPanel", () => {
     open.reject(new Error("terminal open refused"));
 
     await waitForFast(() => {
-      const panel = document.querySelector(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+      const panel = document.querySelector(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
       expect(panel.renderRoot.querySelector(".tp-error")?.textContent).toContain(
         "terminal open refused",
       );
@@ -350,7 +350,7 @@ describe("OpenClawTerminalPanel", () => {
   });
 
   it("reattaches persisted sessions before opening a catalog tab", async () => {
-    sessionStorage.setItem("openclaw.terminal.sessions.v1", JSON.stringify(["persisted-1"]));
+    sessionStorage.setItem("steelengine.terminal.sessions.v1", JSON.stringify(["persisted-1"]));
     createGhosttyTerminalMock
       .mockResolvedValueOnce(createTerminalController())
       .mockResolvedValueOnce(createTerminalController());
@@ -387,13 +387,13 @@ describe("OpenClawTerminalPanel", () => {
       },
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
     const catalog = { catalogId: "codex", hostId: "node:mac", threadId: "thread" };
 
-    panel.handleToggleRequest(new CustomEvent("openclaw:terminal-toggle", { detail: { catalog } }));
+    panel.handleToggleRequest(new CustomEvent("steelengine:terminal-toggle", { detail: { catalog } }));
 
     await waitForFast(() => {
       expect(requests.filter((entry) => entry.method === "terminal.attach")).toHaveLength(1);
@@ -402,13 +402,13 @@ describe("OpenClawTerminalPanel", () => {
     expect(requests.findIndex((entry) => entry.method === "terminal.attach")).toBeLessThan(
       requests.findIndex((entry) => entry.method === "terminal.open"),
     );
-    expect(sessionStorage.getItem("openclaw.terminal.sessions.v1")).toBe(
+    expect(sessionStorage.getItem("steelengine.terminal.sessions.v1")).toBe(
       JSON.stringify(["persisted-1"]),
     );
   });
 
   it("restores a vanished persisted session as exited without replaying stale output", async () => {
-    sessionStorage.setItem("openclaw.terminal.sessions.v1", JSON.stringify(["gone-1"]));
+    sessionStorage.setItem("steelengine.terminal.sessions.v1", JSON.stringify(["gone-1"]));
     const controller = createTerminalController();
     createGhosttyTerminalMock.mockResolvedValue(controller);
     const requests: Array<{ method: string; params: unknown }> = [];
@@ -426,7 +426,7 @@ describe("OpenClawTerminalPanel", () => {
       },
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
@@ -441,11 +441,11 @@ describe("OpenClawTerminalPanel", () => {
     expect(requests.some((entry) => entry.method === "terminal.open")).toBe(false);
     expect(controller.terminal.reset).not.toHaveBeenCalled();
     expect(controller.write).not.toHaveBeenCalled();
-    expect(sessionStorage.getItem("openclaw.terminal.sessions.v1")).toBe("[]");
+    expect(sessionStorage.getItem("steelengine.terminal.sessions.v1")).toBe("[]");
   });
 
   it("keeps a persisted session exited when it disappears during attach", async () => {
-    sessionStorage.setItem("openclaw.terminal.sessions.v1", JSON.stringify(["gone-1"]));
+    sessionStorage.setItem("steelengine.terminal.sessions.v1", JSON.stringify(["gone-1"]));
     const controller = createTerminalController();
     createGhosttyTerminalMock.mockResolvedValue(controller);
     const requests: Array<{ method: string; params: unknown }> = [];
@@ -473,7 +473,7 @@ describe("OpenClawTerminalPanel", () => {
       },
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
@@ -488,11 +488,11 @@ describe("OpenClawTerminalPanel", () => {
     expect(requests.some((entry) => entry.method === "terminal.open")).toBe(false);
     expect(controller.terminal.reset).not.toHaveBeenCalled();
     expect(controller.write).not.toHaveBeenCalled();
-    expect(sessionStorage.getItem("openclaw.terminal.sessions.v1")).toBe("[]");
+    expect(sessionStorage.getItem("steelengine.terminal.sessions.v1")).toBe("[]");
   });
 
   it("does not mark a live persisted session exited after a transient attach failure", async () => {
-    sessionStorage.setItem("openclaw.terminal.sessions.v1", JSON.stringify(["live-1"]));
+    sessionStorage.setItem("steelengine.terminal.sessions.v1", JSON.stringify(["live-1"]));
     const controllers = [createTerminalController(), createTerminalController()] as const;
     createGhosttyTerminalMock
       .mockResolvedValueOnce(controllers[0])
@@ -517,7 +517,7 @@ describe("OpenClawTerminalPanel", () => {
       },
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
@@ -531,7 +531,7 @@ describe("OpenClawTerminalPanel", () => {
     expect(requests.filter((entry) => entry.method === "terminal.attach")).toHaveLength(1);
     expect(panel.renderRoot.querySelector(".tabstrip-tab__status")?.textContent).not.toBe("exited");
     expect(controllers[0].write).not.toHaveBeenCalled();
-    expect(sessionStorage.getItem("openclaw.terminal.sessions.v1")).toBe(
+    expect(sessionStorage.getItem("steelengine.terminal.sessions.v1")).toBe(
       JSON.stringify(["replacement-1"]),
     );
   });
@@ -598,7 +598,7 @@ describe("OpenClawTerminalPanel", () => {
       },
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
@@ -640,7 +640,7 @@ describe("OpenClawTerminalPanel", () => {
     expect(new TextDecoder().decode(controllers[1].write.mock.calls[0]?.[0])).toBe(
       "detached history",
     );
-    expect(sessionStorage.getItem("openclaw.terminal.sessions.v1")).toBe(
+    expect(sessionStorage.getItem("steelengine.terminal.sessions.v1")).toBe(
       JSON.stringify(["current-1", "detached-1"]),
     );
   });
@@ -668,7 +668,7 @@ describe("OpenClawTerminalPanel", () => {
       },
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
@@ -732,13 +732,13 @@ describe("OpenClawTerminalPanel", () => {
       },
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
     panel.toggle();
     await waitForFast(() => {
-      expect(sessionStorage.getItem("openclaw.terminal.sessions.v1")).toBe(
+      expect(sessionStorage.getItem("steelengine.terminal.sessions.v1")).toBe(
         JSON.stringify(["current-1"]),
       );
     });
@@ -750,7 +750,7 @@ describe("OpenClawTerminalPanel", () => {
     await panel.updateComplete;
 
     expect(panel.renderRoot.textContent).toContain("Could not attach terminal session");
-    expect(sessionStorage.getItem("openclaw.terminal.sessions.v1")).toBe(
+    expect(sessionStorage.getItem("steelengine.terminal.sessions.v1")).toBe(
       JSON.stringify(["current-1"]),
     );
   });
@@ -774,7 +774,7 @@ describe("OpenClawTerminalPanel", () => {
       },
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
@@ -782,7 +782,7 @@ describe("OpenClawTerminalPanel", () => {
     await waitForFast(() => expect(createGhosttyTerminalMock).toHaveBeenCalledOnce());
     const catalog = { catalogId: "codex", hostId: "node:mac", threadId: "thread" };
 
-    panel.handleToggleRequest(new CustomEvent("openclaw:terminal-toggle", { detail: { catalog } }));
+    panel.handleToggleRequest(new CustomEvent("steelengine:terminal-toggle", { detail: { catalog } }));
     firstBoot.resolve(createTerminalController());
 
     await waitForFast(() => {
@@ -811,7 +811,7 @@ describe("OpenClawTerminalPanel", () => {
       },
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     panel.fullscreen = true;
@@ -871,7 +871,7 @@ describe("OpenClawTerminalPanel", () => {
         };
       },
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
@@ -897,7 +897,7 @@ describe("OpenClawTerminalPanel", () => {
       });
     });
     expect(controllers[0].dispose).toHaveBeenCalledOnce();
-    expect(sessionStorage.getItem("openclaw.terminal.sessions.v1")).toBe("[]");
+    expect(sessionStorage.getItem("steelengine.terminal.sessions.v1")).toBe("[]");
 
     panel.toggle();
     await waitForFast(() => {
@@ -936,14 +936,14 @@ describe("OpenClawTerminalPanel", () => {
       },
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = oldClient;
     panel.available = true;
     document.body.append(panel);
     panel.toggle();
 
     await waitForFast(() => {
-      expect(sessionStorage.getItem("openclaw.terminal.sessions.v1")).toContain("old-session");
+      expect(sessionStorage.getItem("steelengine.terminal.sessions.v1")).toContain("old-session");
     });
     panel.client = newClient;
     await panel.updateComplete;
@@ -975,7 +975,7 @@ describe("OpenClawTerminalPanel", () => {
       },
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
@@ -1015,7 +1015,7 @@ describe("OpenClawTerminalPanel", () => {
         (method === "terminal.open" ? terminalOpenResult("session-1") : {}) as T,
       addEventListener: () => () => {},
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
@@ -1037,7 +1037,7 @@ describe("OpenClawTerminalPanel", () => {
   });
 
   it("removes a tab host even when controller disposal throws", () => {
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     const host = document.createElement("div");
     document.body.append(host);
     const dispose = vi.fn(() => {
@@ -1068,13 +1068,13 @@ describe("OpenClawTerminalPanel", () => {
         };
       },
     };
-    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as OpenClawTerminalPanel;
+    const panel = document.createElement(TERMINAL_PANEL_ELEMENT_NAME) as SteelEngineTerminalPanel;
     panel.client = client;
     panel.available = true;
     document.body.append(panel);
     panel.toggle();
     await waitForFast(() => {
-      expect(sessionStorage.getItem("openclaw.terminal.sessions.v1")).toContain("session-1");
+      expect(sessionStorage.getItem("steelengine.terminal.sessions.v1")).toContain("session-1");
     });
 
     listener?.({

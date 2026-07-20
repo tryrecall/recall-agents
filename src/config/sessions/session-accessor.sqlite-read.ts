@@ -5,11 +5,11 @@ import {
   iterateSqliteQuerySync,
 } from "../../infra/kysely-sync.js";
 import { extractAssistantVisibleText } from "../../shared/chat-message-content.js";
-import { isTranscriptOnlyOpenClawAssistantModel } from "../../shared/transcript-only-openclaw-assistant.js";
+import { isTranscriptOnlySteelEngineAssistantModel } from "../../shared/transcript-only-steelengine-assistant.js";
 import {
-  openOpenClawAgentDatabase,
-  type OpenClawAgentDatabase,
-} from "../../state/openclaw-agent-db.js";
+  openSteelEngineAgentDatabase,
+  type SteelEngineAgentDatabase,
+} from "../../state/steelengine-agent-db.js";
 import type {
   LatestTranscriptAssistantMessage,
   LatestTranscriptAssistantText,
@@ -42,7 +42,7 @@ export function loadSqliteTranscriptEventsSync(
   scope: SessionTranscriptReadScope,
 ): TranscriptEvent[] {
   const resolved = resolveSqliteTranscriptReadScope(scope);
-  const database = openOpenClawAgentDatabase(toDatabaseOptions(resolved));
+  const database = openSteelEngineAgentDatabase(toDatabaseOptions(resolved));
   return loadSqliteTranscriptEventsFromDatabase(database, resolved.sessionId);
 }
 
@@ -53,7 +53,7 @@ export function loadSqliteTranscriptEventRowsAfterSeqSync(
   throughSeq?: number,
 ): SessionTranscriptEventRow[] {
   const resolved = resolveSqliteTranscriptReadScope(scope);
-  const database = openOpenClawAgentDatabase(toDatabaseOptions(resolved));
+  const database = openSteelEngineAgentDatabase(toDatabaseOptions(resolved));
   const db = getSessionKysely(database.db);
   let query = db
     .selectFrom("transcript_events")
@@ -75,7 +75,7 @@ export function readSqliteTranscriptEventAtSeqSync(
   seq: number,
 ): SessionTranscriptEventRow | undefined {
   const resolved = resolveSqliteTranscriptReadScope(scope);
-  const database = openOpenClawAgentDatabase(toDatabaseOptions(resolved));
+  const database = openSteelEngineAgentDatabase(toDatabaseOptions(resolved));
   const db = getSessionKysely(database.db);
   const row = executeSqliteQueryTakeFirstSync(
     database.db,
@@ -94,7 +94,7 @@ export function readSqliteTranscriptEventAtSeqSync(
 }
 
 export function loadSqliteTranscriptEventsFromDatabase(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionId: string,
 ): TranscriptEvent[] {
   const db = getSessionKysely(database.db);
@@ -110,7 +110,7 @@ export function loadSqliteTranscriptEventsFromDatabase(
 }
 
 export function readSqliteTranscriptSnapshot(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionId: string,
 ): { events: TranscriptEvent[]; rows: SqliteTranscriptSnapshotRow[] } {
   const db = getSessionKysely(database.db);
@@ -141,7 +141,7 @@ export function readSqliteTranscriptStatsSync(
   scope: SessionTranscriptReadScope,
 ): SessionTranscriptStats {
   const resolved = resolveSqliteTranscriptReadScope(scope);
-  const database = openOpenClawAgentDatabase(toDatabaseOptions(resolved));
+  const database = openSteelEngineAgentDatabase(toDatabaseOptions(resolved));
   const db = getSessionKysely(database.db);
   const row = executeSqliteQueryTakeFirstSync(
     database.db,
@@ -175,7 +175,7 @@ export function readSqliteTranscriptStatsSync(
 }
 
 export function readTranscriptEventJsonSetInTransaction(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionId: string,
 ): Set<string> {
   const db = getSessionKysely(database.db);
@@ -189,10 +189,10 @@ export function readTranscriptEventJsonSetInTransaction(
 /** Reads the latest visible assistant text from SQLite transcript rows in reverse order. */
 export function loadLatestSqliteAssistantText(
   scope: SessionTranscriptReadScope,
-  options: { includeTranscriptOnlyOpenClawAssistant?: boolean } = {},
+  options: { includeTranscriptOnlySteelEngineAssistant?: boolean } = {},
 ): LatestTranscriptAssistantText | undefined {
   const resolved = resolveSqliteTranscriptReadScope(scope);
-  const database = openOpenClawAgentDatabase(toDatabaseOptions(resolved));
+  const database = openSteelEngineAgentDatabase(toDatabaseOptions(resolved));
   const db = getSessionKysely(database.db);
   const rows = iterateSqliteQuerySync(
     database.db,
@@ -238,7 +238,7 @@ function parseLatestAssistantText(
 
 function parseLatestAssistantMessageEvent(
   raw: string,
-  options: { includeTranscriptOnlyOpenClawAssistant?: boolean } = {},
+  options: { includeTranscriptOnlySteelEngineAssistant?: boolean } = {},
 ): LatestTranscriptAssistantMessage | undefined {
   let parsed: {
     id?: unknown;
@@ -254,8 +254,8 @@ function parseLatestAssistantMessageEvent(
     return undefined;
   }
   if (
-    !options.includeTranscriptOnlyOpenClawAssistant &&
-    isTranscriptOnlyOpenClawAssistantModel(message.provider, message.model)
+    !options.includeTranscriptOnlySteelEngineAssistant &&
+    isTranscriptOnlySteelEngineAssistantModel(message.provider, message.model)
   ) {
     return undefined;
   }
@@ -271,12 +271,12 @@ export function findSqliteTranscriptEvent(
   match: (event: TranscriptEvent) => boolean,
 ): { event: TranscriptEvent } | undefined {
   const resolved = resolveSqliteTranscriptReadScope(scope);
-  const database = openOpenClawAgentDatabase(toDatabaseOptions(resolved));
+  const database = openSteelEngineAgentDatabase(toDatabaseOptions(resolved));
   return findSqliteTranscriptEventInDatabase(database, resolved.sessionId, match);
 }
 
 export function findSqliteTranscriptEventInDatabase(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionId: string,
   match: (event: TranscriptEvent) => boolean,
 ): { event: TranscriptEvent } | undefined {

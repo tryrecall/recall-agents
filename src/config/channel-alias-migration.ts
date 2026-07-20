@@ -10,7 +10,7 @@ import {
   type NormalizeLegacyChannelAccountParams,
 } from "./channel-compat-normalization.js";
 import type { LegacyConfigRule } from "./legacy.shared.js";
-import type { OpenClawConfig } from "./types.openclaw.js";
+import type { SteelEngineConfig } from "./types.steelengine.js";
 
 export type StreamingAliasMode = "off" | "partial" | "block" | "progress";
 
@@ -96,7 +96,7 @@ function buildAliasRuleMessage(params: {
   const prefixedCount = params.root && !streaming.deliveryOnly ? 2 : 1;
   const keys = flat.map((key, index) => (index < prefixedCount ? `${prefix}.${key}` : key));
   const keyList = `${keys.slice(0, -1).join(", ")}, and ${keys.at(-1)}`;
-  return `${keyList} are legacy; use ${prefix}.streaming.{${nested.join(",")}}. Run "openclaw doctor --fix".`;
+  return `${keyList} are legacy; use ${prefix}.streaming.{${nested.join(",")}}. Run "steelengine doctor --fix".`;
 }
 
 /**
@@ -109,8 +109,8 @@ export function defineChannelAliasMigration<TMode extends string = StreamingAlia
 ): {
   legacyConfigRules: LegacyConfigRule[];
   hasLegacyAliases: (value: unknown) => boolean;
-  normalizeChannelConfig: (params: { cfg: OpenClawConfig; changes?: string[] }) => {
-    config: OpenClawConfig;
+  normalizeChannelConfig: (params: { cfg: SteelEngineConfig; changes?: string[] }) => {
+    config: SteelEngineConfig;
     changes: string[];
   };
 } {
@@ -144,7 +144,7 @@ export function defineChannelAliasMigration<TMode extends string = StreamingAlia
     resolvedNativeTransport: streaming.resolveNativeTransport?.(entry),
   });
 
-  const normalizeChannelConfig = (params: { cfg: OpenClawConfig; changes?: string[] }) => {
+  const normalizeChannelConfig = (params: { cfg: SteelEngineConfig; changes?: string[] }) => {
     const changes = params.changes ?? [];
     const channels = params.cfg.channels as Record<string, unknown> | undefined;
     const entry = asObjectRecord(channels?.[spec.channelId]);
@@ -176,7 +176,7 @@ export function defineChannelAliasMigration<TMode extends string = StreamingAlia
       config: {
         ...params.cfg,
         channels: { ...channels, [spec.channelId]: result.entry },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       changes,
     };
   };

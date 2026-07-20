@@ -44,6 +44,6 @@ export const page = definePage({
     import("./plugins-page.ts").then(() => ({
       header: true,
       render: (data: PluginsRouteData | undefined) =>
-        html`<openclaw-plugins-page .routeData=${data}></openclaw-plugins-page>`,
+        html`<steelengine-plugins-page .routeData=${data}></steelengine-plugins-page>`,
     })),
 });

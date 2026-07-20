@@ -6,16 +6,16 @@ import {
   buildChannelOutboundSessionRoute,
   buildThreadAwareOutboundSessionRoute,
   createChatChannelPlugin,
-} from "openclaw/plugin-sdk/channel-core";
-import type { ChannelPlugin } from "openclaw/plugin-sdk/channel-core";
+} from "steelengine/plugin-sdk/channel-core";
+import type { ChannelPlugin } from "steelengine/plugin-sdk/channel-core";
 import {
   createMessageReceiptFromOutboundResults,
   defineChannelMessageAdapter,
-} from "openclaw/plugin-sdk/channel-outbound";
+} from "steelengine/plugin-sdk/channel-outbound";
 import {
   createComputedAccountStatusAdapter,
   createDefaultChannelRuntimeState,
-} from "openclaw/plugin-sdk/status-helpers";
+} from "steelengine/plugin-sdk/status-helpers";
 import {
   CLICKCLACK_CHANNEL_ID,
   clickClackConfigAdapter,

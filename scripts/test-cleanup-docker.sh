@@ -4,13 +4,13 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$ROOT_DIR/scripts/lib/docker-build.sh"
 source "$ROOT_DIR/scripts/lib/docker-e2e-container.sh"
-IMAGE_NAME="${OPENCLAW_CLEANUP_SMOKE_IMAGE:-openclaw-cleanup-smoke:local}"
-DOCKER_COMMAND_TIMEOUT="${DOCKER_COMMAND_TIMEOUT:-${OPENCLAW_CLEANUP_SMOKE_DOCKER_TIMEOUT:-600s}}"
+IMAGE_NAME="${STEELENGINE_CLEANUP_SMOKE_IMAGE:-steelengine-cleanup-smoke:local}"
+DOCKER_COMMAND_TIMEOUT="${DOCKER_COMMAND_TIMEOUT:-${STEELENGINE_CLEANUP_SMOKE_DOCKER_TIMEOUT:-600s}}"
 
 resolve_default_cleanup_platform() {
   local host_arch
-  if [[ -n "${OPENCLAW_CLEANUP_SMOKE_PLATFORM:-}" ]]; then
-    printf "%s" "$OPENCLAW_CLEANUP_SMOKE_PLATFORM"
+  if [[ -n "${STEELENGINE_CLEANUP_SMOKE_PLATFORM:-}" ]]; then
+    printf "%s" "$STEELENGINE_CLEANUP_SMOKE_PLATFORM"
     return
   fi
   host_arch="$(uname -m)"

@@ -5,7 +5,7 @@ import { getDeliveryQueueEntryStatus } from "../infra/delivery-queue-sqlite.js";
 import { PlatformMessageNotDispatchedError } from "../infra/outbound/deliver-types.js";
 import { loadPendingDelivery } from "../infra/outbound/delivery-queue-storage.js";
 import { markDeliveryPlatformSendAttemptStarted } from "../infra/outbound/delivery-queue.js";
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import { captureEnv, setTestEnvValue } from "../test-utils/env.js";
 
 const mocks = vi.hoisted(() => ({
@@ -39,7 +39,7 @@ describe("restart sentinel notice recovery", () => {
   let stateDir = "";
   const tempDirs = useAutoCleanupTempDirTracker((cleanup) => {
     afterEach(() => {
-      closeOpenClawStateDatabaseForTest();
+      closeSteelEngineStateDatabaseForTest();
       envSnapshot?.restore();
       envSnapshot = undefined;
       cleanup();
@@ -47,10 +47,10 @@ describe("restart sentinel notice recovery", () => {
   });
 
   beforeEach(() => {
-    closeOpenClawStateDatabaseForTest();
-    stateDir = tempDirs.make("openclaw-restart-notice-");
-    envSnapshot = captureEnv(["OPENCLAW_STATE_DIR"]);
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
+    closeSteelEngineStateDatabaseForTest();
+    stateDir = tempDirs.make("steelengine-restart-notice-");
+    envSnapshot = captureEnv(["STEELENGINE_STATE_DIR"]);
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
     mocks.sendDurableMessageBatch.mockReset();
     mocks.recoveryDeliver.mockReset();
     mocks.resolveOutboundChannelMessageAdapter.mockClear();

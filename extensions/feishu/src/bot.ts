@@ -5,30 +5,30 @@ import {
   recordChannelBotPairLoopAndCheckSuppression,
   resolveEnvelopeFormatOptions,
   toInboundMediaFacts,
-} from "openclaw/plugin-sdk/channel-inbound";
-import { resolveAgentOutboundIdentity } from "openclaw/plugin-sdk/channel-outbound";
-import { createChannelPairingController } from "openclaw/plugin-sdk/channel-pairing";
+} from "steelengine/plugin-sdk/channel-inbound";
+import { resolveAgentOutboundIdentity } from "steelengine/plugin-sdk/channel-outbound";
+import { createChannelPairingController } from "steelengine/plugin-sdk/channel-pairing";
 import {
   ensureConfiguredBindingRouteReady,
   resolveConfiguredBindingRoute,
   resolveRuntimeConversationBindingRoute,
-} from "openclaw/plugin-sdk/conversation-runtime";
-import { parseStrictNonNegativeInteger } from "openclaw/plugin-sdk/number-runtime";
+} from "steelengine/plugin-sdk/conversation-runtime";
+import { parseStrictNonNegativeInteger } from "steelengine/plugin-sdk/number-runtime";
 import {
   DEFAULT_GROUP_HISTORY_LIMIT,
   createChannelHistoryWindow,
   type HistoryEntry,
-} from "openclaw/plugin-sdk/reply-history";
-import { resolveInboundLastRouteSessionKey } from "openclaw/plugin-sdk/routing";
+} from "steelengine/plugin-sdk/reply-history";
+import { resolveInboundLastRouteSessionKey } from "steelengine/plugin-sdk/routing";
 import {
   resolveDefaultGroupPolicy,
   resolveOpenProviderRuntimeGroupPolicy,
   warnMissingProviderGroupPolicyFallbackOnce,
-} from "openclaw/plugin-sdk/runtime-group-policy";
-import { resolvePinnedMainDmOwnerFromAllowlist } from "openclaw/plugin-sdk/security-runtime";
-import { resolveStorePath } from "openclaw/plugin-sdk/session-store-runtime";
-import { normalizeOptionalString, uniqueStrings } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/runtime-group-policy";
+import { resolvePinnedMainDmOwnerFromAllowlist } from "steelengine/plugin-sdk/security-runtime";
+import { resolveStorePath } from "steelengine/plugin-sdk/session-store-runtime";
+import { normalizeOptionalString, uniqueStrings } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import { resolveFeishuRuntimeAccount } from "./accounts.js";
 import { buildFeishuAgentBody } from "./bot-agent-body.js";
 import { buildBroadcastSessionKey, resolveBroadcastAgents } from "./bot-broadcast.js";

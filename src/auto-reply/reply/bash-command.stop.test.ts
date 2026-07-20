@@ -1,6 +1,6 @@
 // Tests bash stop command handling and active-process cancellation.
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { SteelEngineConfig } from "../../config/config.js";
 import type { MsgContext } from "../templating.js";
 
 const { getSessionMock, getFinishedSessionMock, killProcessTreeMock } = vi.hoisted(() => ({
@@ -24,7 +24,7 @@ const { handleBashChatCommand } = await import("./bash-command.js");
 function buildParams(commandBody: string) {
   const cfg = {
     commands: { bash: true },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 
   const ctx = {
     CommandBody: commandBody,
@@ -173,10 +173,10 @@ describe("handleBashChatCommand stop", () => {
       sessionKey: "agent:target:telegram:direct:target-session",
     });
     expect(result.text).toContain(
-      "openclaw sandbox explain --session agent:target:telegram:direct:target-session",
+      "steelengine sandbox explain --session agent:target:telegram:direct:target-session",
     );
     expect(result.text).not.toContain(
-      "openclaw sandbox explain --session agent:main:telegram:slash-session",
+      "steelengine sandbox explain --session agent:main:telegram:slash-session",
     );
   });
 });

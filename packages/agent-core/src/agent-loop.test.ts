@@ -1,5 +1,5 @@
 // Agent Core tests cover agent loop behavior.
-import { EventStream } from "@openclaw/ai/event-stream";
+import { EventStream } from "@steelengine/ai/event-stream";
 import { Type } from "typebox";
 import { describe, expect, it, vi } from "vitest";
 import { agentLoop, agentLoopContinue, runAgentLoop, runAgentLoopContinue } from "./agent-loop.js";
@@ -133,7 +133,7 @@ describe("agentLoop EventStream failures", () => {
 
     expect(agent.state.messages.at(-1)).toMatchObject({
       role: "custom",
-      customType: "openclaw:turn-aborted",
+      customType: "steelengine:turn-aborted",
     });
 
     let replayedMessages: Message[] = [];
@@ -170,7 +170,7 @@ describe("agentLoop EventStream failures", () => {
       expect.arrayContaining([
         expect.objectContaining({
           role: "custom",
-          customType: "openclaw:turn-aborted",
+          customType: "steelengine:turn-aborted",
         }),
       ]),
     );
@@ -1454,7 +1454,7 @@ describe("agentLoop tool termination", () => {
     expect(messages.at(-2)).toMatchObject({ role: "assistant", stopReason: "aborted" });
     expect(messages.at(-1)).toMatchObject({
       role: "custom",
-      customType: "openclaw:turn-aborted",
+      customType: "steelengine:turn-aborted",
       display: false,
       content: expect.stringContaining("may have partially executed"),
     });
@@ -1661,7 +1661,7 @@ describe("agentLoop tool termination", () => {
     expect(messages.at(-2)).toMatchObject({ role: "assistant", stopReason: "aborted" });
     expect(messages.at(-1)).toMatchObject({
       role: "custom",
-      customType: "openclaw:turn-aborted",
+      customType: "steelengine:turn-aborted",
     });
     expect(events.map((event) => event.type)).toEqual([
       "agent_start",

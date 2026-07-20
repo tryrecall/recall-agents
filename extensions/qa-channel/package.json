@@ -1,8 +1,8 @@
 {
-  "name": "@openclaw/qa-channel",
+  "name": "@steelengine/qa-channel",
   "version": "2026.7.2-beta.3",
   "private": true,
-  "description": "OpenClaw QA synthetic channel plugin",
+  "description": "SteelEngine QA synthetic channel plugin",
   "type": "module",
   "exports": {
     ".": "./index.ts",
@@ -15,18 +15,18 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*",
+    "steelengine": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.7.2-beta.3"
+    "steelengine": ">=2026.7.2-beta.3"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "steelengine": {
       "optional": true
     }
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
@@ -38,7 +38,7 @@
       "detailLabel": "QA Channel",
       "docsPath": "/channels/qa-channel",
       "docsLabel": "qa-channel",
-      "blurb": "Synthetic Slack-class transport for automated OpenClaw QA scenarios.",
+      "blurb": "Synthetic Slack-class transport for automated SteelEngine QA scenarios.",
       "systemImage": "checklist",
       "order": 999,
       "exposure": {

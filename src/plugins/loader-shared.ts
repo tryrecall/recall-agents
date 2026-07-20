@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
-import { err as resultError, ok, type Result } from "@openclaw/normalization-core/result";
-import { normalizeLowercaseStringOrEmpty } from "@openclaw/normalization-core/string-coerce";
+import { err as resultError, ok, type Result } from "@steelengine/normalization-core/result";
+import { normalizeLowercaseStringOrEmpty } from "@steelengine/normalization-core/string-coerce";
 import { clearAgentHarnesses } from "../agents/harness/registry.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import {
   DEFAULT_MEMORY_DREAMING_PLUGIN_ID,
@@ -60,7 +60,7 @@ export type AuthorizedDreamingSidecar = {
 };
 
 function resolveDreamingSidecarEngineId(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   memorySlot: string | null | undefined;
 }): string | null {
   const normalizedMemorySlot = normalizeLowercaseStringOrEmpty(params.memorySlot);
@@ -79,7 +79,7 @@ function resolveDreamingSidecarEngineId(params: {
 }
 
 export function resolveAuthorizedDreamingSidecar(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   normalized: NormalizedPluginsConfig;
   activationSource: PluginActivationConfigSource;
   manifestRegistry: PluginManifestRegistry;

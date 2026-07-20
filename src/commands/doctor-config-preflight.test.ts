@@ -3,22 +3,22 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { promoteConfigSnapshotToLastKnownGood, readConfigFileSnapshot } from "../config/config.js";
-import { withTempHome, writeOpenClawConfig } from "../config/test-helpers.js";
+import { withTempHome, writeSteelEngineConfig } from "../config/test-helpers.js";
 import { executeSqliteQueryTakeFirstSync, getNodeSqliteKysely } from "../infra/kysely-sync.js";
-import type { DB as OpenClawStateKyselyDatabase } from "../state/openclaw-state-db.generated.js";
+import type { DB as SteelEngineStateKyselyDatabase } from "../state/steelengine-state-db.generated.js";
 import {
-  closeOpenClawStateDatabaseForTest,
-  openOpenClawStateDatabase,
-} from "../state/openclaw-state-db.js";
+  closeSteelEngineStateDatabaseForTest,
+  openSteelEngineStateDatabase,
+} from "../state/steelengine-state-db.js";
 import {
   runDoctorConfigPreflight,
   shouldSkipPluginValidationForDoctorConfigPreflight,
 } from "./doctor-config-preflight.js";
 
-type ConfigHealthDatabase = Pick<OpenClawStateKyselyDatabase, "config_health_entries">;
+type ConfigHealthDatabase = Pick<SteelEngineStateKyselyDatabase, "config_health_entries">;
 
 function readConfigHealthRow(env: NodeJS.ProcessEnv, configPath: string) {
-  const { db } = openOpenClawStateDatabase({ env });
+  const { db } = openSteelEngineStateDatabase({ env });
   const healthDb = getNodeSqliteKysely<ConfigHealthDatabase>(db);
   return executeSqliteQueryTakeFirstSync(
     db,
@@ -31,12 +31,12 @@ function readConfigHealthRow(env: NodeJS.ProcessEnv, configPath: string) {
 
 describe("runDoctorConfigPreflight", () => {
   afterEach(() => {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
   });
 
   it("supports non-observing config reads", async () => {
     await withTempHome(async (home) => {
-      const configPath = await writeOpenClawConfig(home, { gateway: { mode: "local" } });
+      const configPath = await writeSteelEngineConfig(home, { gateway: { mode: "local" } });
 
       await runDoctorConfigPreflight({
         migrateState: false,
@@ -52,24 +52,24 @@ describe("runDoctorConfigPreflight", () => {
   it("skips plugin schema validation while doctor is running inside update", () => {
     expect(
       shouldSkipPluginValidationForDoctorConfigPreflight({
-        OPENCLAW_UPDATE_IN_PROGRESS: "1",
+        STEELENGINE_UPDATE_IN_PROGRESS: "1",
       } as NodeJS.ProcessEnv),
     ).toBe(true);
     expect(
       shouldSkipPluginValidationForDoctorConfigPreflight({
-        OPENCLAW_UPDATE_IN_PROGRESS: "true",
+        STEELENGINE_UPDATE_IN_PROGRESS: "true",
       } as NodeJS.ProcessEnv),
     ).toBe(true);
     expect(
       shouldSkipPluginValidationForDoctorConfigPreflight({
-        OPENCLAW_UPDATE_IN_PROGRESS: "0",
+        STEELENGINE_UPDATE_IN_PROGRESS: "0",
       } as NodeJS.ProcessEnv),
     ).toBe(false);
   });
 
   it("collects legacy config issues outside the normal config read path", async () => {
     await withTempHome(async (home) => {
-      await writeOpenClawConfig(home, {
+      await writeSteelEngineConfig(home, {
         memorySearch: {
           provider: "local",
           fallback: "none",
@@ -96,7 +96,7 @@ describe("runDoctorConfigPreflight", () => {
 
   it("restores invalid config from last-known-good only during repair preflight", async () => {
     await withTempHome(async (home) => {
-      const configPath = await writeOpenClawConfig(home, {
+      const configPath = await writeSteelEngineConfig(home, {
         gateway: { mode: "local", port: 19091 },
       });
       await promoteConfigSnapshotToLastKnownGood(await readConfigFileSnapshot());
@@ -125,7 +125,7 @@ describe("runDoctorConfigPreflight", () => {
 
   it("preserves and rejects unparseable config without last-known-good during repair preflight", async () => {
     await withTempHome(async (home) => {
-      const configPath = path.join(home, ".openclaw", "openclaw.json");
+      const configPath = path.join(home, ".steelengine", "steelengine.json");
       const brokenRaw = '{ "gateway": { "mode": "local" }, "models": {';
       await fs.mkdir(path.dirname(configPath), { recursive: true });
       await fs.writeFile(configPath, brokenRaw, "utf-8");
@@ -145,7 +145,7 @@ describe("runDoctorConfigPreflight", () => {
 
       await expect(fs.readFile(configPath, "utf-8")).resolves.toBe(brokenRaw);
       const entries = await fs.readdir(path.dirname(configPath));
-      const clobbered = entries.filter((entry) => entry.startsWith("openclaw.json.clobbered."));
+      const clobbered = entries.filter((entry) => entry.startsWith("steelengine.json.clobbered."));
       expect(clobbered).toHaveLength(1);
       const clobberedPath = path.join(path.dirname(configPath), clobbered[0] ?? "missing");
       expect((failure as Error).message).toContain(`Original preserved at ${clobberedPath}.`);
@@ -155,7 +155,7 @@ describe("runDoctorConfigPreflight", () => {
 
   it("does not restore last-known-good for stale plugins.deny entries", async () => {
     await withTempHome(async (home) => {
-      const configPath = await writeOpenClawConfig(home, {
+      const configPath = await writeSteelEngineConfig(home, {
         gateway: { mode: "local", port: 19091 },
       });
       await promoteConfigSnapshotToLastKnownGood(await readConfigFileSnapshot());
@@ -181,7 +181,7 @@ describe("runDoctorConfigPreflight", () => {
 
   it("restores last-known-good for malformed plugin policy values", async () => {
     await withTempHome(async (home) => {
-      const configPath = await writeOpenClawConfig(home, {
+      const configPath = await writeSteelEngineConfig(home, {
         gateway: { mode: "local", port: 19091 },
       });
       await promoteConfigSnapshotToLastKnownGood(await readConfigFileSnapshot());

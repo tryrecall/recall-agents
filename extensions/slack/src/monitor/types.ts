@@ -1,7 +1,7 @@
 // Slack type declarations define plugin contracts.
-import type { ChannelRuntimeSurface } from "openclaw/plugin-sdk/channel-contract";
-import type { OpenClawConfig, SlackSlashCommandConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import type { ChannelRuntimeSurface } from "steelengine/plugin-sdk/channel-contract";
+import type { SteelEngineConfig, SlackSlashCommandConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
 import type { SlackMessageEvent } from "../types.js";
 
 export type MonitorSlackOpts = {
@@ -9,7 +9,7 @@ export type MonitorSlackOpts = {
   appToken?: string;
   accountId?: string;
   mode?: "socket" | "http" | "relay";
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   runtime?: RuntimeEnv;
   channelRuntime?: ChannelRuntimeSurface;
   abortSignal?: AbortSignal;

@@ -6,9 +6,9 @@ import type {
   WorkboardClaim,
   WorkboardNotification,
   WorkboardRunAttempt,
-} from "@openclaw/workboard-contract";
-import { isFutureDateTimestampMs } from "openclaw/plugin-sdk/number-runtime";
-import { safeEqualSecret } from "openclaw/plugin-sdk/security-runtime";
+} from "@steelengine/workboard-contract";
+import { isFutureDateTimestampMs } from "steelengine/plugin-sdk/number-runtime";
+import { safeEqualSecret } from "steelengine/plugin-sdk/security-runtime";
 import {
   appendEvent,
   assertCanMutateClaimedCard,

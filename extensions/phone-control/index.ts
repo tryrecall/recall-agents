@@ -1,21 +1,21 @@
-// Phone Control plugin entrypoint registers its OpenClaw integration.
+// Phone Control plugin entrypoint registers its SteelEngine integration.
 import { randomUUID } from "node:crypto";
 import milliseconds from "ms";
 import {
   asDateTimestampMs,
   resolveExpiresAtMsFromDurationMs,
-} from "openclaw/plugin-sdk/number-runtime";
+} from "steelengine/plugin-sdk/number-runtime";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
   normalizeStringEntries,
   sortUniqueStrings,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 import prettyMilliseconds from "pretty-ms";
 import {
   definePluginEntry,
-  type OpenClawPluginApi,
-  type OpenClawPluginService,
+  type SteelEnginePluginApi,
+  type SteelEnginePluginService,
 } from "./runtime-api.js";
 
 type ArmGroup = "camera" | "screen" | "computer" | "writes" | "all";
@@ -111,7 +111,7 @@ function formatDuration(ms: number): string {
   });
 }
 
-function openArmStateStore(api: OpenClawPluginApi) {
+function openArmStateStore(api: SteelEnginePluginApi) {
   return api.runtime.state.openKeyedStore<ArmStateFile>({
     namespace: ARM_STATE_NAMESPACE,
     maxEntries: 1,
@@ -119,7 +119,7 @@ function openArmStateStore(api: OpenClawPluginApi) {
   });
 }
 
-async function readStoredArmState(api: OpenClawPluginApi): Promise<StoredArmState | null> {
+async function readStoredArmState(api: SteelEnginePluginApi): Promise<StoredArmState | null> {
   const entries = await openArmStateStore(api).entries();
   if (entries.length === 0) {
     return null;
@@ -134,16 +134,16 @@ async function readStoredArmState(api: OpenClawPluginApi): Promise<StoredArmStat
   return { key: entry.key, state: entry.value };
 }
 
-async function readArmState(api: OpenClawPluginApi): Promise<ArmStateFile | null> {
+async function readArmState(api: SteelEnginePluginApi): Promise<ArmStateFile | null> {
   return (await readStoredArmState(api))?.state ?? null;
 }
 
-async function registerArmState(api: OpenClawPluginApi, state: ArmStateFileV3): Promise<void> {
+async function registerArmState(api: SteelEnginePluginApi, state: ArmStateFileV3): Promise<void> {
   await openArmStateStore(api).register(state.generation, state);
 }
 
 async function activateArmState(
-  api: OpenClawPluginApi,
+  api: SteelEnginePluginApi,
   preparing: ArmStateFileV3,
 ): Promise<boolean> {
   const store = openArmStateStore(api);
@@ -162,7 +162,7 @@ async function activateArmState(
   });
 }
 
-async function consumeArmState(api: OpenClawPluginApi, expected: StoredArmState): Promise<boolean> {
+async function consumeArmState(api: SteelEnginePluginApi, expected: StoredArmState): Promise<boolean> {
   const consumed = await openArmStateStore(api).consume(expected.key);
   if (!consumed) {
     return false;
@@ -251,9 +251,9 @@ function hasPhoneControlAllowOverride(cfg: PhoneControlConfigView): boolean {
 }
 
 function patchConfigNodeLists(
-  cfg: OpenClawPluginApi["config"],
+  cfg: SteelEnginePluginApi["config"],
   next: { allowCommands: string[]; denyCommands: string[] },
-): OpenClawPluginApi["config"] {
+): SteelEnginePluginApi["config"] {
   return {
     ...cfg,
     gateway: {
@@ -268,7 +268,7 @@ function patchConfigNodeLists(
 }
 
 async function disarmNow(params: {
-  api: OpenClawPluginApi;
+  api: SteelEnginePluginApi;
   reason: string;
   expectedKey?: string;
   fallbackState?: ArmStateFileV3;
@@ -463,7 +463,7 @@ export default definePluginEntry({
   id: "phone-control",
   name: "Phone Control",
   description: "Temporary allowlist control for phone automation commands",
-  register(api: OpenClawPluginApi) {
+  register(api: SteelEnginePluginApi) {
     let expiryInterval: ReturnType<typeof setInterval> | null = null;
     let initialExpiryTick: ReturnType<typeof setImmediate> | null = null;
     let acceptingLeaseMutations = true;
@@ -506,7 +506,7 @@ export default definePluginEntry({
       api.logger.warn(`phone-control: ${reason} reconciliation failed: ${String(err)}`);
     };
 
-    const timerService: OpenClawPluginService = {
+    const timerService: SteelEnginePluginService = {
       id: "phone-control-expiry",
       start: async (ctx) => {
         const tick = async () =>

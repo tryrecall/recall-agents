@@ -3,10 +3,10 @@ import { ChannelType } from "discord-api-types/v10";
 import type {
   DiscordGuildChannelConfig,
   DiscordGuildEntry,
-  OpenClawConfig,
-} from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { isRecord, normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+  SteelEngineConfig,
+} from "steelengine/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { isRecord, normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
 
 type DiscordChannelPermissionsAuditEntry = {
   channelId: string;
@@ -114,14 +114,14 @@ export function collectDiscordAuditChannelIdsForAccount(config: {
 }
 
 export async function auditDiscordChannelPermissionsWithFetcher(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   token: string;
   accountId?: string | null;
   channelIds: string[];
   timeoutMs: number;
   fetchChannelPermissions: (
     channelId: string,
-    params: { cfg: OpenClawConfig; token: string; accountId?: string },
+    params: { cfg: SteelEngineConfig; token: string; accountId?: string },
   ) => Promise<{
     permissions: string[];
     channelType?: number;

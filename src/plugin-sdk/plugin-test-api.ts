@@ -1,15 +1,15 @@
 // Plugin test API helpers construct SDK-shaped host APIs for plugin unit tests.
 import {
   attachPluginApiFacades,
-  type OpenClawPluginApiWithoutFacades,
+  type SteelEnginePluginApiWithoutFacades,
 } from "../plugins/api-facades.js";
-import type { OpenClawPluginApi } from "./plugin-runtime.js";
+import type { SteelEnginePluginApi } from "./plugin-runtime.js";
 
 /** Partial plugin API overrides accepted by the SDK test helper. */
-export type TestPluginApiInput = Partial<OpenClawPluginApi>;
+export type TestPluginApiInput = Partial<SteelEnginePluginApi>;
 
 /** Create a minimal plugin API object for plugin-sdk contract and unit tests. */
-export function createTestPluginApi(api: TestPluginApiInput = {}): OpenClawPluginApi {
+export function createTestPluginApi(api: TestPluginApiInput = {}): SteelEnginePluginApi {
   const { agent, lifecycle, runContext, session, ...flatApi } = api;
   const mergedApi = {
     id: "test-plugin",
@@ -17,7 +17,7 @@ export function createTestPluginApi(api: TestPluginApiInput = {}): OpenClawPlugi
     source: "test",
     registrationMode: "full",
     config: {},
-    runtime: {} as OpenClawPluginApi["runtime"],
+    runtime: {} as SteelEnginePluginApi["runtime"],
     logger: { info() {}, warn() {}, error() {}, debug() {} },
     registerTool() {},
     registerHook() {},
@@ -96,7 +96,7 @@ export function createTestPluginApi(api: TestPluginApiInput = {}): OpenClawPlugi
     },
     on() {},
     ...flatApi,
-  } satisfies OpenClawPluginApiWithoutFacades;
+  } satisfies SteelEnginePluginApiWithoutFacades;
   // Facades derive nested `agent`, `lifecycle`, `runContext`, and `session`
   // views from the flat API; explicit overrides below let tests replace only
   // the nested surface under test without rebuilding every no-op method.

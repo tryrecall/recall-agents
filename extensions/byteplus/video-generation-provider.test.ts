@@ -1,5 +1,5 @@
 // Byteplus tests cover video generation provider plugin behavior.
-import { expectExplicitVideoGenerationCapabilities } from "openclaw/plugin-sdk/provider-test-contracts";
+import { expectExplicitVideoGenerationCapabilities } from "steelengine/plugin-sdk/provider-test-contracts";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 // Submit/poll transport is mocked locally so each test can inject the BytePlus task JSON
@@ -13,12 +13,12 @@ const { postJsonRequestMock, fetchWithTimeoutMock, resolveApiKeyForProviderMock 
   }),
 );
 
-vi.mock("openclaw/plugin-sdk/provider-auth-runtime", () => ({
+vi.mock("steelengine/plugin-sdk/provider-auth-runtime", () => ({
   resolveApiKeyForProvider: resolveApiKeyForProviderMock,
 }));
 
-vi.mock("openclaw/plugin-sdk/provider-http", async (importActual) => {
-  const actual = await importActual<typeof import("openclaw/plugin-sdk/provider-http")>();
+vi.mock("steelengine/plugin-sdk/provider-http", async (importActual) => {
+  const actual = await importActual<typeof import("steelengine/plugin-sdk/provider-http")>();
   const resolveTimeoutMs = (timeoutMs: unknown): number =>
     typeof timeoutMs === "function" ? (timeoutMs() as number) : ((timeoutMs as number) ?? 60_000);
   return {

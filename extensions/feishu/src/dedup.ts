@@ -3,7 +3,7 @@
 // the same event once per bot, so handlers claim a dedupe key before
 // processing, commit once handling is dispatched, and release on retryable
 // failure so the event can be redelivered.
-import type { ChannelReplayClaimHandle } from "openclaw/plugin-sdk/persistent-dedupe";
+import type { ChannelReplayClaimHandle } from "steelengine/plugin-sdk/persistent-dedupe";
 import { feishuDedupeState } from "./dedup-state.js";
 
 type FeishuDedupeLog = (...args: unknown[]) => void;

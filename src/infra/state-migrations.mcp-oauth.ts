@@ -4,11 +4,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { root, type Root } from "@openclaw/fs-safe";
 import { parseMcpOAuthStoreJson } from "../agents/mcp-oauth-store.js";
-import type { DB as OpenClawStateKyselyDatabase } from "../state/openclaw-state-db.generated.js";
+import type { DB as SteelEngineStateKyselyDatabase } from "../state/steelengine-state-db.generated.js";
 import {
-  openOpenClawStateDatabase,
-  runOpenClawStateWriteTransaction,
-} from "../state/openclaw-state-db.js";
+  openSteelEngineStateDatabase,
+  runSteelEngineStateWriteTransaction,
+} from "../state/steelengine-state-db.js";
 import { formatErrorMessage } from "./errors.js";
 import { acquireGatewayLock, GatewayLockError } from "./gateway-lock.js";
 import {
@@ -31,7 +31,7 @@ const LEGACY_STORE_NAME_RE = /^[A-Za-z][A-Za-z0-9_-]{0,29}-[0-9a-f]{16}\.json$/u
 const utf8Decoder = new TextDecoder("utf-8", { fatal: true });
 
 type McpOAuthMigrationDatabase = Pick<
-  OpenClawStateKyselyDatabase,
+  SteelEngineStateKyselyDatabase,
   "mcp_oauth_stores" | "migration_runs" | "migration_sources"
 >;
 
@@ -179,7 +179,7 @@ function receiptSourceKey(sourcePath: string): string {
 
 function readMigrationReceipt(sourcePath: string, env: NodeJS.ProcessEnv): MigrationReceipt | null {
   const sourceKey = receiptSourceKey(sourcePath);
-  const { db } = openOpenClawStateDatabase({ env });
+  const { db } = openSteelEngineStateDatabase({ env });
   const row = executeSqliteQueryTakeFirstSync(
     db,
     getNodeSqliteKysely<McpOAuthMigrationDatabase>(db)
@@ -199,7 +199,7 @@ function importAndRecordReceipt(params: {
   const storeKey = storeKeyForSource(params.sourcePath);
   const runId = `${sourceKey}:${params.snapshot.sha256.slice(0, 16)}`;
   const now = Date.now();
-  return runOpenClawStateWriteTransaction(
+  return runSteelEngineStateWriteTransaction(
     ({ db }) => {
       const stateDb = getNodeSqliteKysely<McpOAuthMigrationDatabase>(db);
       const existingReceipt = executeSqliteQueryTakeFirstSync(
@@ -309,7 +309,7 @@ function importAndRecordReceipt(params: {
 }
 
 function markSourceRemoved(sourceKey: string, env: NodeJS.ProcessEnv): void {
-  runOpenClawStateWriteTransaction(
+  runSteelEngineStateWriteTransaction(
     ({ db }) => {
       executeSqliteQuerySync(
         db,
@@ -542,7 +542,7 @@ async function migrateWithExclusiveStateOwnership(params: {
     } catch (error) {
       const staleGuidance =
         (error as { code?: unknown }).code === "file_lock_stale"
-          ? " Verify no older OpenClaw process is running, remove the retired .lock sidecar, and rerun Doctor."
+          ? " Verify no older SteelEngine process is running, remove the retired .lock sidecar, and rerun Doctor."
           : "";
       warnings.push(
         `Failed locking legacy MCP OAuth store ${path.basename(sourcePath)}: ${String(error)}.${staleGuidance}`,
@@ -564,7 +564,7 @@ export async function migrateLegacyMcpOAuthStores(params: {
   if (!params.detected.hasLegacy) {
     return { changes: [], warnings: [] };
   }
-  const env = { ...(params.env ?? process.env), OPENCLAW_STATE_DIR: params.stateDir };
+  const env = { ...(params.env ?? process.env), STEELENGINE_STATE_DIR: params.stateDir };
   let lock: Awaited<ReturnType<typeof acquireGatewayLock>>;
   try {
     lock = await acquireGatewayLock({
@@ -582,7 +582,7 @@ export async function migrateLegacyMcpOAuthStores(params: {
     return {
       changes: [],
       warnings: [
-        `Failed migrating legacy MCP OAuth stores: ${detail}. Stop the Gateway and run \`openclaw doctor --fix\` again.`,
+        `Failed migrating legacy MCP OAuth stores: ${detail}. Stop the Gateway and run \`steelengine doctor --fix\` again.`,
       ],
     };
   }

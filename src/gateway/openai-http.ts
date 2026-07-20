@@ -1,13 +1,13 @@
 // Gateway OpenAI-compatible chat completions endpoint.
-// Translates OpenAI chat requests to OpenClaw agent runs and SSE/JSON responses.
+// Translates OpenAI chat requests to SteelEngine agent runs and SSE/JSON responses.
 import { randomUUID } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { estimateBase64DecodedBytes } from "@openclaw/media-core/base64";
-import { resolveIntegerOption } from "@openclaw/normalization-core/number-coercion";
+import { estimateBase64DecodedBytes } from "@steelengine/media-core/base64";
+import { resolveIntegerOption } from "@steelengine/normalization-core/number-coercion";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import { isClientToolNameConflictError } from "../agents/agent-tool-definition-adapter.js";
 import type { AgentStreamParams, ClientToolDefinition } from "../agents/command/shared-types.js";
 import type { ImageContent } from "../agents/command/types.js";
@@ -725,13 +725,13 @@ function coerceRequest(val: unknown): OpenAiChatCompletionRequest {
 function resolveAgentResponseText(result: unknown): string {
   const payloads = (result as { payloads?: Array<{ text?: string }> } | null)?.payloads;
   if (!Array.isArray(payloads) || payloads.length === 0) {
-    return "No response from OpenClaw.";
+    return "No response from SteelEngine.";
   }
   const content = payloads
     .map((p) => (typeof p.text === "string" ? p.text : ""))
     .filter(Boolean)
     .join("\n\n");
-  return content || "No response from OpenClaw.";
+  return content || "No response from SteelEngine.";
 }
 
 function resolveAgentResponseCommentary(result: unknown): string {
@@ -906,7 +906,7 @@ export async function handleOpenAiHttpRequest(
   const payload = coerceRequest(handled.body);
   const stream = Boolean(payload.stream);
   const streamIncludeUsage = stream && resolveIncludeUsageForStreaming(payload);
-  const model = typeof payload.model === "string" ? payload.model : "openclaw";
+  const model = typeof payload.model === "string" ? payload.model : "steelengine";
   const user = typeof payload.user === "string" ? payload.user : undefined;
   const maxTokens =
     typeof payload.max_completion_tokens === "number"
@@ -1273,6 +1273,71 @@ export async function handleOpenAiHttpRequest(
       return;
     }
 
+    if (evt.stream === "tool") {
+      const phase = evt.data?.phase;
+      const toolName = typeof evt.data?.name === "string" ? evt.data.name : "unknown";
+      const toolCallId =
+        typeof evt.data?.toolCallId === "string" ? evt.data.toolCallId : `call_${randomUUID()}`;
+
+      if (!wroteRole) {
+        wroteRole = true;
+        writeAssistantRoleChunk(res, { runId, model });
+      }
+
+      if (phase === "start") {
+        const args = evt.data?.args ? JSON.stringify(evt.data.args) : "{}";
+        writeSse(res, {
+          id: runId,
+          object: "chat.completion.chunk",
+          created: Math.floor(Date.now() / 1000),
+          model,
+          choices: [
+            {
+              index: 0,
+              delta: {
+                tool_calls: [
+                  {
+                    index: 0,
+                    id: toolCallId,
+                    type: "function",
+                    function: { name: toolName, arguments: args },
+                  },
+                ],
+              },
+              finish_reason: null,
+            },
+          ],
+        });
+      } else if (phase === "result") {
+        const result = evt.data?.result != null ? JSON.stringify(evt.data.result) : "{}";
+        const isError = Boolean(evt.data?.isError);
+        writeSse(res, {
+          id: runId,
+          object: "chat.completion.chunk",
+          created: Math.floor(Date.now() / 1000),
+          model,
+          choices: [
+            {
+              index: 0,
+              delta: {
+                tool_calls: [
+                  {
+                    index: 0,
+                    id: toolCallId,
+                    type: "function",
+                    function: { name: toolName, arguments: "" },
+                    _tool_result: { result, isError },
+                  },
+                ],
+              },
+              finish_reason: null,
+            },
+          ],
+        });
+      }
+      return;
+    }
+
     if (evt.stream === "lifecycle") {
       const phase = evt.data?.phase;
       if (phase === "end" || phase === "error") {
@@ -1365,7 +1430,7 @@ export async function handleOpenAiHttpRequest(
           resolveAgentResponseCommentary(result) ||
           bufferedReplaceableAssistantContent ||
           resolveAgentResponseText(result) ||
-          "No response from OpenClaw.";
+          "No response from SteelEngine.";
 
         sawAssistantDelta = true;
         writeAssistantContentChunk(res, {

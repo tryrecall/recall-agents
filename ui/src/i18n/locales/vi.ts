@@ -277,14 +277,14 @@ export const vi: TranslationMap = {
     genericSubtitle: "Đã xảy ra lỗi khi tải bảng điều khiển này.",
     staleTitle: "Đã có phiên bản mới",
     staleSubtitle:
-      "OpenClaw đã được cập nhật trong nền. Hãy tải lại để xem bảng điều khiển mới nhất.",
+      "SteelEngine đã được cập nhật trong nền. Hãy tải lại để xem bảng điều khiển mới nhất.",
     retry: "Thử lại",
   },
   nodes: {
     pairing: {
       button: "Ghép nối thiết bị di động",
       adminRequired: "Cần quyền truy cập quản trị viên để tạo mã thiết lập.",
-      title: "OpenClaw di động",
+      title: "SteelEngine di động",
       subtitle: "Quét mã QR này trong ứng dụng di động để kết nối điện thoại mới.",
       generating: "Đang tạo mã thiết lập bảo mật…",
       accessTitle: "Truy cập trên thiết bị di động",
@@ -299,14 +299,14 @@ export const vi: TranslationMap = {
       transportLimitedHint:
         "URL Gateway này sử dụng ws:// dạng văn bản thuần. Hãy sử dụng wss:// hoặc Tailscale Serve, sau đó tạo mã mới để có toàn quyền truy cập.",
       failed: "Không thể tạo mã thiết lập.",
-      qrAlt: "Mã QR ghép nối OpenClaw di động",
+      qrAlt: "Mã QR ghép nối SteelEngine di động",
       qrUnavailable: "Không có mã QR. Hãy sao chép mã thiết lập thay thế.",
       copySetupCode: "Sao chép mã thiết lập",
       newCode: "Mã mới",
       showSetupCode: "Hiển thị mã thiết lập",
       pending: "Yêu cầu thiết bị đang chờ xem xét: {count}",
       review: "Đánh giá",
-      waiting: "Các ứng dụng di động OpenClaw chính thức sẽ tự động kết nối sau khi quét.",
+      waiting: "Các ứng dụng di động SteelEngine chính thức sẽ tự động kết nối sau khi quét.",
       help: "Trợ giúp ghép nối",
       manageDevices: "Quản lý thiết bị",
     },
@@ -451,11 +451,11 @@ export const vi: TranslationMap = {
     ownerSession: "Phiên",
     ownerWorkboard: "Workboard",
     title: "Worktree được quản lý",
-    subtitle: "Các bản checkout kho lưu trữ được cô lập do OpenClaw sở hữu.",
+    subtitle: "Các bản checkout kho lưu trữ được cô lập do SteelEngine sở hữu.",
     cleanNow: "Dọn dẹp ngay",
     cleanupTitle: "Dọn dẹp",
     cleanupSubtitle:
-      "OpenClaw định kỳ xóa các worktree cũ để giải phóng dung lượng ổ đĩa. Điều chỉnh mức độ dọn dẹp.",
+      "SteelEngine định kỳ xóa các worktree cũ để giải phóng dung lượng ổ đĩa. Điều chỉnh mức độ dọn dẹp.",
     cleanupMaxCount: "Số worktree tối đa",
     cleanupMaxCountHelp:
       "Số lượng worktree được quản lý tối đa cần giữ lại trên tất cả kho lưu trữ. Các worktree cũ hơn sẽ được tạo bản chụp nhanh và xóa trước. Đặt thành 0 để tắt giới hạn số lượng.",
@@ -505,8 +505,8 @@ export const vi: TranslationMap = {
     cloudWorker: "Đám mây · {profile}",
     cloudWorkerProvider: "Nhà cung cấp worker đám mây: {provider}",
     cloudRequiresWorktree: "Worker đám mây yêu cầu một worktree được quản lý",
-    cloudRequiresOpenClawRuntime:
-      "Trình thực thi đám mây yêu cầu môi trường chạy OpenClaw; {runtime} đang được chọn.",
+    cloudRequiresSteelEngineRuntime:
+      "Trình thực thi đám mây yêu cầu môi trường chạy SteelEngine; {runtime} đang được chọn.",
     cloudSecureContextRequired:
       "Worker đám mây cần ngữ cảnh trình duyệt bảo mật để tính năng khôi phục có thể bảo vệ tác vụ của bạn.",
     cloudStartFailed: "Phiên đã được tạo cục bộ, nhưng không thể khởi động trên đám mây: {error}",
@@ -1306,7 +1306,7 @@ export const vi: TranslationMap = {
     autoSaveFailed: "Lưu thất bại",
     autoSaveConflict: "Cài đặt đã được thay đổi ở nơi khác",
     retry: "Thử lại",
-    applyBannerText: "Đã lưu vào openclaw.json — khởi động lại gateway để áp dụng.",
+    applyBannerText: "Đã lưu vào steelengine.json — khởi động lại gateway để áp dụng.",
     applyBannerAction: "Khởi động lại & áp dụng",
     rawDiscard: "Loại bỏ",
     rawDraftBlocksApply:
@@ -1362,7 +1362,7 @@ export const vi: TranslationMap = {
     },
   },
   approvalPage: {
-    brandName: "OpenClaw",
+    brandName: "SteelEngine",
     eyebrow: "Operator approval",
     loadingTitle: "Loading approval",
     loadingDescription: "Checking the current approval state with the Gateway.",
@@ -1371,7 +1371,7 @@ export const vi: TranslationMap = {
       "This approval could not be found or this device is not authorized to review it.",
     connectionErrorTitle: "Connection interrupted",
     connectionErrorDescription:
-      "OpenClaw cannot confirm or record a decision while disconnected. Reconnect to check the current status.",
+      "SteelEngine cannot confirm or record a decision while disconnected. Reconnect to check the current status.",
     retry: "Retry",
     execTitle: "Command approval",
     pending: "Waiting for your decision",
@@ -1548,7 +1548,7 @@ export const vi: TranslationMap = {
     chat: "Trò chuyện",
     settings: "Cài đặt",
     settingsGeneral: "Chung",
-    askOpenClaw: "Hỏi OpenClaw",
+    askSteelEngine: "Hỏi SteelEngine",
     settingsGroupConnections: "Kết nối",
     settingsGroupAgents: "Tác nhân & Công cụ",
     settingsGroupSecurity: "Quyền riêng tư & Bảo mật",
@@ -1670,7 +1670,7 @@ export const vi: TranslationMap = {
     skillWorkshop: "Xưởng kỹ năng",
     nodes: "Nút",
     chat: "Trò chuyện",
-    custodian: "OpenClaw",
+    custodian: "SteelEngine",
     config: "Cấu hình",
     profile: "Hồ sơ",
     communications: "Liên lạc",
@@ -1710,7 +1710,7 @@ export const vi: TranslationMap = {
     nodes: "Thiết bị đã ghép nối và lệnh.",
     chat: "Trò chuyện Gateway để can thiệp nhanh.",
     custodian: "Thiết lập và bảo trì hệ thống.",
-    config: "Chỉnh sửa openclaw.json.",
+    config: "Chỉnh sửa steelengine.json.",
     profile: "Thống kê, chuỗi hoạt động và cuộc sống trong rạn san hô của agent của bạn.",
     communications: "Kênh, tin nhắn và cài đặt âm thanh.",
     appearance: "Giao diện, UI và cài đặt trình hướng dẫn thiết lập.",
@@ -1732,7 +1732,7 @@ export const vi: TranslationMap = {
   modelSetup: {
     heading: "Kết nối AI của bạn",
     intro:
-      "OpenClaw sử dụng lại quyền truy cập AI mà bạn đã có — thông tin đăng nhập CLI, khóa API hoặc thông tin đăng nhập nhà cung cấp.",
+      "SteelEngine sử dụng lại quyền truy cập AI mà bạn đã có — thông tin đăng nhập CLI, khóa API hoặc thông tin đăng nhập nhà cung cấp.",
     loading: "Đang kiểm tra quyền truy cập AI khả dụng trên Gateway này…",
     retry: "Thử lại",
     checkAgain: "Kiểm tra lại",
@@ -1745,7 +1745,7 @@ export const vi: TranslationMap = {
     },
     access: {
       adminRequired: "Việc thiết lập mô hình yêu cầu quyền operator.admin.",
-      gatewayTooOld: "Gateway đang chạy một phiên bản OpenClaw cũ hơn",
+      gatewayTooOld: "Gateway đang chạy một phiên bản SteelEngine cũ hơn",
     },
     candidates: {
       title: "Tìm thấy trên Gateway này",
@@ -1846,12 +1846,12 @@ export const vi: TranslationMap = {
       "Sao chép {count} tệp bộ nhớ đã chọn vào không gian làm việc của tác nhân này.",
     confirmReplace:
       "Các tệp hiện có tại đích sẽ được sao lưu trong báo cáo di chuyển trước khi bị thay thế.",
-    confirmBackup: "OpenClaw tạo bản sao lưu đã xác minh trước khi nhập rồi mới sao chép bộ nhớ.",
+    confirmBackup: "SteelEngine tạo bản sao lưu đã xác minh trước khi nhập rồi mới sao chép bộ nhớ.",
     confirmImport: "Nhập bộ nhớ",
     disconnected: "Kết nối với Gateway để nhập bộ nhớ.",
     title: "Nhập bộ nhớ của trợ lý",
     subtitle:
-      "Xem lại bộ nhớ hợp nhất của Codex và bộ nhớ tự động của Claude Code trước khi sao chép vào OpenClaw.",
+      "Xem lại bộ nhớ hợp nhất của Codex và bộ nhớ tự động của Claude Code trước khi sao chép vào SteelEngine.",
     agent: "Tác nhân đích",
     replaceExisting: "Thay thế các mục đã nhập hiện có",
     replaceHint:
@@ -1860,7 +1860,7 @@ export const vi: TranslationMap = {
   onboarding: {
     memoryImport: {
       title: "Mang theo bộ nhớ của trợ lý",
-      body: "OpenClaw đã tìm thấy bộ nhớ từ các trợ lý lập trình khác. Nhập bộ nhớ đó vào không gian làm việc của tác nhân?",
+      body: "SteelEngine đã tìm thấy bộ nhớ từ các trợ lý lập trình khác. Nhập bộ nhớ đó vào không gian làm việc của tác nhân?",
       plannedCount: "{count} mục sẵn sàng để nhập",
       alreadyImported: "Đã nhập: {count}",
       sourceUnavailable: "Đường dẫn nguồn không khả dụng",
@@ -1876,22 +1876,22 @@ export const vi: TranslationMap = {
       unknownError: "Yêu cầu thất bại",
       doneTitle: "Đã hoàn tất nhập bộ nhớ",
       doneBody:
-        "Đã di chuyển {migrated}, bỏ qua {skipped}. Bạn có thể tiếp tục thiết lập OpenClaw.",
+        "Đã di chuyển {migrated}, bỏ qua {skipped}. Bạn có thể tiếp tục thiết lập SteelEngine.",
     },
   },
   custodian: {
-    title: "OpenClaw",
+    title: "SteelEngine",
     subtitle: "Hướng dẫn thiết lập hệ thống của bạn",
     exitSetup: "Thoát thiết lập",
     hatchDraft: "Thức dậy nào, bạn tôi!",
-    placeholder: "Nhắn tin cho OpenClaw…",
+    placeholder: "Nhắn tin cho SteelEngine…",
     sensitivePlaceholder: "Nhập giá trị nhạy cảm…",
     sensitiveReply: "Đã gửi phản hồi nhạy cảm",
     send: "Gửi",
-    thinking: "OpenClaw đang suy nghĩ",
-    requestFailed: "OpenClaw không thể phản hồi. Hãy thử lại.",
+    thinking: "SteelEngine đang suy nghĩ",
+    requestFailed: "SteelEngine không thể phản hồi. Hãy thử lại.",
     connectionChanged: "Kết nối Gateway đã thay đổi. Hãy thử lại để tiếp tục thiết lập.",
-    unsupportedGateway: "Cập nhật Gateway để tiếp tục thiết lập với OpenClaw.",
+    unsupportedGateway: "Cập nhật Gateway để tiếp tục thiết lập với SteelEngine.",
   },
   mcpPage: {
     manageServersLink: "Quản lý máy chủ trên trang Plugins.",
@@ -1982,7 +1982,7 @@ export const vi: TranslationMap = {
       notes: "Ghi chú vào Markdown, Obsidian, Notion hoặc Bear.",
     },
     noInstalledTitle: "Chưa cài đặt plugin tùy chọn nào",
-    noInstalledBody: "Khám phá một plugin nổi bật hoặc tìm kiếm trên ClawHub để mở rộng OpenClaw.",
+    noInstalledBody: "Khám phá một plugin nổi bật hoặc tìm kiếm trên ClawHub để mở rộng SteelEngine.",
     noInstalledMatchTitle: "Không có plugin đã cài đặt nào khớp",
     noMatchBody: "Thử tìm kiếm khác.",
     filterAll: "Tất cả",
@@ -2028,7 +2028,7 @@ export const vi: TranslationMap = {
     detailPluginId: "ID plugin",
     offlineTitle: "Gateway ngoại tuyến",
     offlineBody: "Kết nối để duyệt các plugin đã cài đặt và được đề xuất.",
-    optionalCapability: "Khả năng OpenClaw tùy chọn.",
+    optionalCapability: "Khả năng SteelEngine tùy chọn.",
     enabled: "Đã bật",
     disabled: "Đã tắt",
     available: "Có sẵn",
@@ -2060,7 +2060,7 @@ export const vi: TranslationMap = {
     disabledRestart: "Đã tắt {name}. Cần khởi động lại Gateway để áp dụng thay đổi.",
   },
   aboutPage: {
-    productName: "OpenClaw",
+    productName: "SteelEngine",
     tagline: "Trợ lý AI cá nhân của bạn, chạy trên chính thiết bị của bạn.",
     waveHello: "Vẫy tay chào Clawd",
     linksLabel: "Cộng đồng và tài nguyên",
@@ -2070,7 +2070,7 @@ export const vi: TranslationMap = {
     linkDiscord: "Discord",
     linkX: "X (Twitter)",
     linkChangelog: "Nhật ký thay đổi",
-    license: "© 2026 OpenClaw Foundation — Giấy phép MIT.",
+    license: "© 2026 SteelEngine Foundation — Giấy phép MIT.",
     artifactTitle: "Control UI",
     artifactSubtitle: "Danh tính được nhúng khi artifact trình duyệt này được xây dựng.",
     artifactDetails: "Chi tiết bản dựng Control UI",
@@ -2088,7 +2088,7 @@ export const vi: TranslationMap = {
       "Do kết nối Gateway đang hoạt động báo cáo; tách biệt với bản dựng Control UI này.",
   },
   appsPage: {
-    heroTitle: "Mang OpenClaw theo bạn đến mọi nơi",
+    heroTitle: "Mang SteelEngine theo bạn đến mọi nơi",
     heroTagline:
       "Các ứng dụng đồng hành dành cho điện thoại, đồng hồ, máy tính và trình duyệt của bạn — cùng các plugin giúp mở rộng khả năng của tác nhân.",
     sectionMobile: "Trên điện thoại",
@@ -2110,11 +2110,11 @@ export const vi: TranslationMap = {
     cards: {
       ios: {
         title: "iPhone",
-        desc: "Trò chuyện, đàm thoại, phê duyệt hành động và chia sẻ vào OpenClaw từ iOS.",
+        desc: "Trò chuyện, đàm thoại, phê duyệt hành động và chia sẻ vào SteelEngine từ iOS.",
       },
       android: {
         title: "Android",
-        desc: "Biến điện thoại Android của bạn thành một nút OpenClaw đầy đủ — với tính năng trò chuyện, camera và Canvas.",
+        desc: "Biến điện thoại Android của bạn thành một nút SteelEngine đầy đủ — với tính năng trò chuyện, camera và Canvas.",
       },
       appleWatch: {
         title: "Apple Watch",
@@ -2122,7 +2122,7 @@ export const vi: TranslationMap = {
       },
       wearOs: {
         title: "Wear OS",
-        desc: "Ứng dụng đồng hành trên Android mở rộng OpenClaw sang đồng hồ của bạn.",
+        desc: "Ứng dụng đồng hành trên Android mở rộng SteelEngine sang đồng hồ của bạn.",
       },
       macos: {
         title: "macOS",
@@ -2130,7 +2130,7 @@ export const vi: TranslationMap = {
       },
       windows: {
         title: "Windows",
-        desc: "Ứng dụng đồng hành trên Windows kết nối PC của bạn dưới dạng một nút OpenClaw.",
+        desc: "Ứng dụng đồng hành trên Windows kết nối PC của bạn dưới dạng một nút SteelEngine.",
       },
       linux: {
         title: "Linux",
@@ -2138,11 +2138,11 @@ export const vi: TranslationMap = {
       },
       chrome: {
         title: "Tiện ích mở rộng Chrome",
-        desc: "Cho phép OpenClaw điều khiển Chrome hiện có của bạn — các thẻ, trang và biểu mẫu.",
+        desc: "Cho phép SteelEngine điều khiển Chrome hiện có của bạn — các thẻ, trang và biểu mẫu.",
       },
       plugins: {
         title: "Plugin & ClawHub",
-        desc: "Mở rộng OpenClaw với các kênh, công cụ và kỹ năng từ cộng đồng.",
+        desc: "Mở rộng SteelEngine với các kênh, công cụ và kỹ năng từ cộng đồng.",
       },
     },
   },
@@ -2311,7 +2311,7 @@ export const vi: TranslationMap = {
     selfLearning: {
       pitchTitle: "Bật tính năng tự học",
       pitchBody:
-        "OpenClaw xem xét các chỉnh sửa và những lượt chạy quan trọng đã hoàn thành, sau đó soạn thảo các đề xuất kỹ năng cho bảng này. Tính năng này sử dụng thêm token nền và các bản nháp sẽ xuất hiện dưới dạng đề xuất đang chờ xử lý.",
+        "SteelEngine xem xét các chỉnh sửa và những lượt chạy quan trọng đã hoàn thành, sau đó soạn thảo các đề xuất kỹ năng cho bảng này. Tính năng này sử dụng thêm token nền và các bản nháp sẽ xuất hiện dưới dạng đề xuất đang chờ xử lý.",
       enable: "Bật tính năng tự học",
       enabling: "Đang bật…",
       updateError: "Không thể cập nhật cài đặt tự học.",
@@ -3391,16 +3391,16 @@ export const vi: TranslationMap = {
         title: "Cần xác thực",
         summary:
           "Gateway có thể truy cập được, nhưng cần token hoặc mật khẩu khớp trước khi trình duyệt này có thể kết nối.",
-        stepPaste: "Dán token từ openclaw dashboard --no-open hoặc nhập mật khẩu đã cấu hình.",
+        stepPaste: "Dán token từ steelengine dashboard --no-open hoặc nhập mật khẩu đã cấu hình.",
         stepGenerate:
-          "Nếu chưa cấu hình token, hãy chạy openclaw doctor --generate-gateway-token trên máy chủ Gateway.",
+          "Nếu chưa cấu hình token, hãy chạy steelengine doctor --generate-gateway-token trên máy chủ Gateway.",
         stepConnect: "Nhấp Connect lần nữa sau khi cập nhật thông tin xác thực.",
       },
       authFailed: {
         title: "Xác thực không khớp",
         summary:
           "Thông tin xác thực đã cung cấp bị từ chối. Nguyên nhân phổ biến nhất là token cũ hoặc token sao chép từ một Gateway URL khác.",
-        stepDashboard: "Chạy openclaw dashboard --no-open rồi mở URL mới hoặc dán token của nó.",
+        stepDashboard: "Chạy steelengine dashboard --no-open rồi mở URL mới hoặc dán token của nó.",
         stepReplace:
           "Thay các giá trị token/mật khẩu cũ; không dùng lại token từ Gateway URL khác.",
         stepMode:
@@ -3423,8 +3423,8 @@ export const vi: TranslationMap = {
           "Trình duyệt này cần phê duyệt một lần từ máy chủ Gateway trước khi dùng Control UI.",
         upgradeSummary:
           "Trình duyệt này đã được biết đến, nhưng quyền truy cập yêu cầu đã thay đổi và cần phê duyệt mới.",
-        stepList: "Chạy openclaw devices list trên máy chủ Gateway.",
-        stepApproveId: "Phê duyệt yêu cầu này: openclaw devices approve {requestId}.",
+        stepList: "Chạy steelengine devices list trên máy chủ Gateway.",
+        stepApproveId: "Phê duyệt yêu cầu này: steelengine devices approve {requestId}.",
         stepApprove: "Phê duyệt yêu cầu trình duyệt/thiết bị đang chờ trong danh sách đó.",
         stepReconnect: "Kết nối lại sau khi phê duyệt hoàn tất.",
       },
@@ -3450,20 +3450,20 @@ export const vi: TranslationMap = {
         summary:
           "Control UI được phục vụ và Gateway đang chạy không thống nhất về giao thức kết nối được hỗ trợ.",
         stepDashboard:
-          "Mở lại dashboard được phục vụ bằng openclaw dashboard để UI và Gateway đến từ cùng một bản cài đặt.",
+          "Mở lại dashboard được phục vụ bằng steelengine dashboard để UI và Gateway đến từ cùng một bản cài đặt.",
         stepDevUi:
           "Nếu dùng pnpm ui:dev, hãy build lại hoặc khởi động lại UI dev theo checkout hiện tại.",
         stepRestart:
-          "Khởi động lại Gateway sau khi cập nhật OpenClaw để nó phục vụ giao thức hiện tại.",
+          "Khởi động lại Gateway sau khi cập nhật SteelEngine để nó phục vụ giao thức hiện tại.",
       },
       network: {
         title: "Không thể kết nối",
         summary:
           "Trình duyệt không thể hoàn tất kết nối Gateway. Kiểm tra đích và transport trước khi thử lại thông tin xác thực.",
-        stepGateway: "Xác nhận Gateway đang chạy bằng openclaw status hoặc openclaw gateway run.",
+        stepGateway: "Xác nhận Gateway đang chạy bằng steelengine status hoặc steelengine gateway run.",
         stepUrl: "Kiểm tra WebSocket URL và dùng wss:// khi Gateway nằm sau HTTPS/Tailscale Serve.",
         stepDashboard:
-          "Mở lại dashboard bằng openclaw dashboard --no-open để sao chép lại URL và chi tiết auth hiện tại.",
+          "Mở lại dashboard bằng steelengine dashboard --no-open để sao chép lại URL và chi tiết auth hiện tại.",
       },
     },
   },
@@ -3488,7 +3488,7 @@ export const vi: TranslationMap = {
       remoteViewOnly: "Phiên này nằm trên một nút đã ghép nối và chỉ có thể xem.",
       unsupportedViewOnly: "Nguồn phiên bên ngoài này chỉ có thể xem.",
       sessionMenu: "External session actions",
-      openInOpenClaw: "Open in OpenClaw",
+      openInSteelEngine: "Open in SteelEngine",
       openInTerminal: "Open in terminal",
       terminalUnavailable: "Terminal opening is unavailable for this session.",
     },
@@ -3543,7 +3543,7 @@ export const vi: TranslationMap = {
     followUpModeOverriding: "Đang ghi đè mặc định của máy chủ ({mode})",
     followUpModeReset: "Đặt lại về mặc định máy chủ",
     catalogOpenTarget: "Open Codex/Claude sessions in",
-    catalogOpenTargetViewer: "OpenClaw viewer",
+    catalogOpenTargetViewer: "SteelEngine viewer",
     catalogOpenTargetTerminal: "Terminal",
     onboardingDisabled: "Đã tắt trong quá trình thiết lập",
     gatewayStatus: "Trạng thái Gateway: {status}",
@@ -4005,7 +4005,7 @@ export const vi: TranslationMap = {
       filters: "Bộ lọc",
       shownOf: "{shown} trên {total}",
       emptyTitle: "Chưa có tác vụ theo lịch nào",
-      emptyHint: "Mô tả những gì OpenClaw nên làm và khi nào — nó sẽ chạy theo lịch.",
+      emptyHint: "Mô tả những gì SteelEngine nên làm và khi nào — nó sẽ chạy theo lịch.",
       noMatching: "Không có tác vụ nào khớp với bộ lọc hiện tại.",
       loadMore: "Tải thêm",
       loading: "Đang tải...",
@@ -4072,7 +4072,7 @@ export const vi: TranslationMap = {
     detail: {
       tabsLabel: "Chi tiết tự động hóa",
       newTitle: "Tác vụ theo lịch mới",
-      newSubtitle: "Mô tả những gì OpenClaw nên làm, sau đó chọn thời điểm chạy.",
+      newSubtitle: "Mô tả những gì SteelEngine nên làm, sau đó chọn thời điểm chạy.",
       back: "Tất cả tác vụ tự động",
       settingsTab: "Cài đặt",
       historyTitle: "Lịch sử chạy",
@@ -4145,7 +4145,7 @@ export const vi: TranslationMap = {
       descriptionPlaceholder: "Ngữ cảnh tùy chọn cho tác vụ này",
       agentPlaceholder: "main hoặc ops",
       agentHelp: "Bắt đầu nhập để chọn agent đã biết, hoặc nhập agent tùy chỉnh.",
-      promptPlaceholder: "Mô tả những gì OpenClaw nên làm...",
+      promptPlaceholder: "Mô tả những gì SteelEngine nên làm...",
       repeat: "Lặp lại",
       repeatInterval: "Khoảng thời gian",
       repeatOnce: "Một lần",

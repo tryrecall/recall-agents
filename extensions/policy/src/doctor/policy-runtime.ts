@@ -1,9 +1,9 @@
 import os from "node:os";
 import { basename, isAbsolute, resolve } from "node:path";
 import JSON5 from "json5";
-import type { HealthCheckContext, HealthFinding } from "openclaw/plugin-sdk/health";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
-import { isRecord } from "openclaw/plugin-sdk/string-coerce-runtime";
+import type { HealthCheckContext, HealthFinding } from "steelengine/plugin-sdk/health";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
+import { isRecord } from "steelengine/plugin-sdk/string-coerce-runtime";
 import type { PolicyAuthProfileEvidence } from "../policy-state.js";
 import { POLICY_TOOL_GROUPS } from "../tool-policy-conformance.js";
 import { CHECK_IDS } from "./check-ids.js";
@@ -83,7 +83,7 @@ function resolvePolicyArtifactPath(ctx: HealthCheckContext, fileName: string): s
 }
 
 function resolvePolicyArtifactHomeDir(): string | undefined {
-  const explicitHome = normalizedEnvValue(process.env.OPENCLAW_HOME);
+  const explicitHome = normalizedEnvValue(process.env.STEELENGINE_HOME);
   if (explicitHome !== undefined) {
     if (explicitHome === "~" || explicitHome.startsWith("~/") || explicitHome.startsWith("~\\")) {
       return resolvePolicyHomeRelativePath(explicitHome);
@@ -258,7 +258,7 @@ export function channelIdsFromFindings(findings: readonly HealthFinding[]): read
     ...new Set(
       findings
         .filter((finding) => finding.checkId === CHECK_IDS.policyDeniedChannelProvider)
-        .map((finding) => finding.ocPath?.match(/^oc:\/\/openclaw\.config\/channels\/(.+)$/)?.[1])
+        .map((finding) => finding.ocPath?.match(/^oc:\/\/steelengine\.config\/channels\/(.+)$/)?.[1])
         .filter((id): id is string => id !== undefined && id !== ""),
     ),
   ];
@@ -382,14 +382,14 @@ export function normalizePolicyChannelId(value: string): string {
 }
 
 function canonicalExecApprovalsPath(): string {
-  return "~/.openclaw/exec-approvals.json";
+  return "~/.steelengine/exec-approvals.json";
 }
 
 function execApprovalsArtifactLocation(ctx: HealthCheckContext): {
   readonly path: string;
   readonly displayName: string;
 } {
-  const stateDir = normalizedEnvValue(process.env.OPENCLAW_STATE_DIR);
+  const stateDir = normalizedEnvValue(process.env.STEELENGINE_STATE_DIR);
   if (stateDir !== undefined) {
     const path = resolve(resolvePolicyStateDir(stateDir), "exec-approvals.json");
     return { path, displayName: path };
@@ -401,7 +401,7 @@ function execApprovalsArtifactLocation(ctx: HealthCheckContext): {
 }
 
 export function execApprovalsDisplayName(): string {
-  const stateDir = normalizedEnvValue(process.env.OPENCLAW_STATE_DIR);
+  const stateDir = normalizedEnvValue(process.env.STEELENGINE_STATE_DIR);
   if (stateDir === undefined) {
     return canonicalExecApprovalsPath();
   }

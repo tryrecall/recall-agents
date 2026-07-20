@@ -3,7 +3,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { Value } from "typebox/value";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { callGateway as gatewayCall } from "../../gateway/call.js";
@@ -14,7 +14,7 @@ type CallGatewayRequest = Parameters<typeof gatewayCall>[0];
 type HistoryMessage = {
   role: string;
   content: string;
-  __openclaw: { seq: number };
+  __steelengine: { seq: number };
 };
 
 let createSessionsHistoryTool: typeof import("./sessions-history-tool.js").createSessionsHistoryTool;
@@ -27,7 +27,7 @@ function useLoggingConfig(name: string, logging: Record<string, unknown>): void 
   }
   const configPath = path.join(tempDir, name);
   fs.writeFileSync(configPath, `${JSON.stringify({ logging })}\n`, "utf8");
-  setTestEnvValue("OPENCLAW_CONFIG_PATH", configPath);
+  setTestEnvValue("STEELENGINE_CONFIG_PATH", configPath);
 }
 
 function createHistoryToolWithMessage(content: unknown) {
@@ -57,7 +57,7 @@ function readMessageSeq(message: unknown): number | undefined {
   if (!message || typeof message !== "object" || Array.isArray(message)) {
     return undefined;
   }
-  const meta = (message as Record<string, unknown>)["__openclaw"];
+  const meta = (message as Record<string, unknown>)["__steelengine"];
   if (!meta || typeof meta !== "object" || Array.isArray(meta)) {
     return undefined;
   }
@@ -69,7 +69,7 @@ function readMessageId(message: unknown): string | undefined {
   if (!message || typeof message !== "object" || Array.isArray(message)) {
     return undefined;
   }
-  const meta = (message as Record<string, unknown>)["__openclaw"];
+  const meta = (message as Record<string, unknown>)["__steelengine"];
   if (!meta || typeof meta !== "object" || Array.isArray(meta)) {
     return undefined;
   }
@@ -79,17 +79,17 @@ function readMessageId(message: unknown): string | undefined {
 
 describe("sessions_history redaction", () => {
   beforeAll(async () => {
-    previousConfigPath = process.env.OPENCLAW_CONFIG_PATH;
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-sessions-history-redact-"));
+    previousConfigPath = process.env.STEELENGINE_CONFIG_PATH;
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-sessions-history-redact-"));
     useLoggingConfig("redaction-off.json", { redactSensitive: "off" });
     ({ createSessionsHistoryTool } = await import("./sessions-history-tool.js"));
   });
 
   afterAll(() => {
     if (previousConfigPath === undefined) {
-      deleteTestEnvValue("OPENCLAW_CONFIG_PATH");
+      deleteTestEnvValue("STEELENGINE_CONFIG_PATH");
     } else {
-      setTestEnvValue("OPENCLAW_CONFIG_PATH", previousConfigPath);
+      setTestEnvValue("STEELENGINE_CONFIG_PATH", previousConfigPath);
     }
     if (tempDir) {
       fs.rmSync(tempDir, { recursive: true, force: true });
@@ -314,7 +314,7 @@ describe("sessions_history redaction", () => {
     const messages = Array.from({ length: 30 }, (_, index) => ({
       role: index % 2 === 0 ? "user" : "assistant",
       content: `message-${index + 1} ${"x".repeat(4_000)}`,
-      __openclaw: { id: `message-${index + 1}`, seq: index + 1 },
+      __steelengine: { id: `message-${index + 1}`, seq: index + 1 },
     }));
     const tool = createSessionsHistoryTool({
       config: {},
@@ -341,7 +341,7 @@ describe("sessions_history redaction", () => {
     const messages: HistoryMessage[] = Array.from({ length: 30 }, (_, index) => ({
       role: "assistant",
       content: `message-${index + 1} ${"x".repeat(10_000)}`,
-      __openclaw: { seq: index + 1 },
+      __steelengine: { seq: index + 1 },
     }));
     const tool = createSessionsHistoryTool({
       config: {},
@@ -382,9 +382,9 @@ describe("sessions_history redaction", () => {
       callGateway: async <T = Record<string, unknown>>(): Promise<T> =>
         ({
           messages: [
-            { role: "tool", content: "hidden", __openclaw: { seq: 6 } },
-            { role: "assistant", content: "visible", __openclaw: { seq: 7 } },
-            { role: "assistant", content: "latest", __openclaw: { seq: 8 } },
+            { role: "tool", content: "hidden", __steelengine: { seq: 6 } },
+            { role: "assistant", content: "visible", __steelengine: { seq: 7 } },
+            { role: "assistant", content: "latest", __steelengine: { seq: 8 } },
           ],
           offset: 0,
           nextOffset: 5,
@@ -397,8 +397,8 @@ describe("sessions_history redaction", () => {
     const details = readHistoryDetails(result);
 
     expect(details.messages).toEqual([
-      { role: "assistant", content: "visible", __openclaw: { seq: 7 } },
-      { role: "assistant", content: "latest", __openclaw: { seq: 8 } },
+      { role: "assistant", content: "visible", __steelengine: { seq: 7 } },
+      { role: "assistant", content: "latest", __steelengine: { seq: 8 } },
     ]);
     expect(details).toMatchObject({
       offset: 0,

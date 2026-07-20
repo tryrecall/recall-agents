@@ -1,4 +1,4 @@
-import type { OpenClawPluginNodeHostCommand } from "openclaw/plugin-sdk/plugin-entry";
+import type { SteelEnginePluginNodeHostCommand } from "steelengine/plugin-sdk/plugin-entry";
 import { LinuxCanvasIpcClient, type LinuxCanvasIpcTransport } from "./ipc-client.js";
 import {
   linuxCanvasSocketExists,
@@ -98,7 +98,7 @@ function bindActionRelay(
 
 export function createLinuxCanvasCommands(
   options: LinuxCanvasCommandsOptions = {},
-): OpenClawPluginNodeHostCommand[] {
+): SteelEnginePluginNodeHostCommand[] {
   const platform = options.platform ?? process.platform;
   const env = options.env ?? process.env;
   const socketPath = resolveLinuxCanvasSocketPath(env);
@@ -124,7 +124,7 @@ export function createLinuxCanvasCommands(
   };
 
   return LINUX_CANVAS_COMMANDS.map((command, index) => {
-    const registration: OpenClawPluginNodeHostCommand = {
+    const registration: SteelEnginePluginNodeHostCommand = {
       command,
       cap: "canvas",
       dangerous: false,

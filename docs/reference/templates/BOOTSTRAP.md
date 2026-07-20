@@ -9,7 +9,7 @@ read_when:
 
 _You just woke up. Keep this first conversation short and make it yours._
 
-OpenClaw only seeds this file into a brand-new workspace, alongside `AGENTS.md`, `SOUL.md`, `TOOLS.md`, `IDENTITY.md`, `USER.md`, and `HEARTBEAT.md`. There is no memory yet; it's normal that `memory/` doesn't exist until you create it.
+SteelEngine only seeds this file into a brand-new workspace, alongside `AGENTS.md`, `SOUL.md`, `TOOLS.md`, `IDENTITY.md`, `USER.md`, and `HEARTBEAT.md`. There is no memory yet; it's normal that `memory/` doesn't exist until you create it.
 
 Complete these three beats. Do not turn them into a questionnaire or a long
 biography.
@@ -33,11 +33,11 @@ After the name and vibe are agreed, persist them twice — both places matter:
    identity:
 
 ```bash
-openclaw agents set-identity --workspace "<this workspace>" --name "<name>" --theme "<vibe>" --emoji "<emoji>"
+steelengine agents set-identity --workspace "<this workspace>" --name "<name>" --theme "<vibe>" --emoji "<emoji>"
 ```
 
 Use the real workspace path and safely quote the values. Do not hand-edit
-`openclaw.json`.
+`steelengine.json`.
 
 ## 3. Finish With Recommendations
 
@@ -46,7 +46,7 @@ read-only, never scans the machine again, and returns an empty list if the user
 already answered the offer:
 
 ```bash
-openclaw onboard recommendations --json
+steelengine onboard recommendations --json
 ```
 
 The output contains opaque install IDs plus a locally generated source and
@@ -56,24 +56,24 @@ If matches exist, explain them briefly and ask: **"minimal set or maximum
 convenience?"**
 
 - For official plugin matches, install only the user's chosen set with
-  `openclaw plugins install <id>`.
+  `steelengine plugins install <id>`.
 - ClawHub skills are third-party. List them separately and never install one
   unless the user explicitly opts into that specific skill. Then use
-  `openclaw skills install <id>`.
+  `steelengine skills install <id>`.
 - If there are no stored matches, skip this beat without commentary.
 
 After the user answers and any chosen installs finish, record completion so the
 offer never appears again:
 
 ```bash
-openclaw onboard recommendations acknowledge
+steelengine onboard recommendations acknowledge
 ```
 
 When the three beats are complete, delete this file. Then say one line:
 
-> Ask me anything; for system things I'll ask OpenClaw.
+> Ask me anything; for system things I'll ask SteelEngine.
 
-Once the file is removed, OpenClaw treats the birth sequence as complete and
+Once the file is removed, SteelEngine treats the birth sequence as complete and
 will not recreate `BOOTSTRAP.md`.
 
 ## Related

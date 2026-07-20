@@ -3,7 +3,7 @@ import { Command } from "commander";
 import type { Mock } from "vitest";
 import { vi } from "vitest";
 import { getRuntimeConfig } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 import type { CliMockOutputRuntime } from "./test-runtime-capture.js";
 
@@ -52,14 +52,14 @@ function invokeMock<TArgs extends unknown[], TResult>(mock: unknown, ...args: TA
   return (mock as (...args: TArgs) => TResult)(...args);
 }
 
-export const loadConfig: Mock<LoadConfigFn> = vi.fn<LoadConfigFn>(() => ({}) as OpenClawConfig);
+export const loadConfig: Mock<LoadConfigFn> = vi.fn<LoadConfigFn>(() => ({}) as SteelEngineConfig);
 export const readConfigFileSnapshot: AsyncUnknownMock = vi.fn();
 export const readConfigFileSnapshotForWrite: AsyncUnknownMock = vi.fn();
 export const writeConfigFile: AsyncUnknownMock = vi.fn(async () => undefined);
 export const replaceConfigFile: AsyncUnknownMock = vi.fn(
-  async (params: { nextConfig: OpenClawConfig }) => await writeConfigFile(params.nextConfig),
+  async (params: { nextConfig: SteelEngineConfig }) => await writeConfigFile(params.nextConfig),
 ) as AsyncUnknownMock;
-const resolveStateDir: Mock<() => string> = vi.fn(() => "/tmp/openclaw-state");
+const resolveStateDir: Mock<() => string> = vi.fn(() => "/tmp/steelengine-state");
 export const installPluginFromMarketplace: Mock<InstallPluginFromMarketplaceFn> = vi.fn();
 export const installPluginFromGitSpec: Mock<InstallPluginFromGitSpecFn> = vi.fn();
 const parseGitPluginSpec: Mock<ParseGitPluginSpecFn> = vi.fn();
@@ -192,13 +192,13 @@ vi.mock("./plugins-update-gateway-signal.js", () => ({
 
 vi.mock("../config/config.js", () => ({
   assertConfigWriteAllowedInCurrentMode: () => {
-    if (process.env.OPENCLAW_NIX_MODE === "1") {
+    if (process.env.STEELENGINE_NIX_MODE === "1") {
       throw new Error(
         [
-          "Config is managed by Nix (`OPENCLAW_NIX_MODE=1`), so OpenClaw treats openclaw.json as immutable.",
-          "Do not run setup, onboarding, openclaw update, plugin install/update/uninstall/enable, doctor repair/token-generation, or config set against this file.",
-          "Agent-first Nix setup: https://github.com/openclaw/nix-openclaw#quick-start",
-          "OpenClaw Nix overview: https://docs.openclaw.ai/install/nix",
+          "Config is managed by Nix (`STEELENGINE_NIX_MODE=1`), so SteelEngine treats steelengine.json as immutable.",
+          "Do not run setup, onboarding, steelengine update, plugin install/update/uninstall/enable, doctor repair/token-generation, or config set against this file.",
+          "Agent-first Nix setup: https://github.com/steelengine/nix-steelengine#quick-start",
+          "SteelEngine Nix overview: https://docs.steelengine.ai/install/nix",
         ].join("\n"),
       );
     }
@@ -225,9 +225,9 @@ vi.mock("../config/config.js", () => ({
       readConfigFileSnapshotForWrite,
       ...args,
     )) as (typeof import("../config/config.js"))["readConfigFileSnapshotForWrite"],
-  writeConfigFile: ((config: OpenClawConfig) =>
+  writeConfigFile: ((config: SteelEngineConfig) =>
     invokeMock<
-      [OpenClawConfig],
+      [SteelEngineConfig],
       ReturnType<(typeof import("../config/config.js"))["writeConfigFile"]>
     >(writeConfigFile, config)) as (typeof import("../config/config.js"))["writeConfigFile"],
   replaceConfigFile: ((
@@ -631,8 +631,8 @@ vi.mock("../plugins/git-install.js", () => ({
 
 vi.mock("../hooks/install.js", () => ({
   HOOK_INSTALL_ERROR_CODE: {
-    MISSING_OPENCLAW_HOOKS: "missing_openclaw_hooks",
-    EMPTY_OPENCLAW_HOOKS: "empty_openclaw_hooks",
+    MISSING_STEELENGINE_HOOKS: "missing_steelengine_hooks",
+    EMPTY_STEELENGINE_HOOKS: "empty_steelengine_hooks",
   },
   installHooksFromNpmSpec: ((
     ...args: Parameters<(typeof import("../hooks/install.js"))["installHooksFromNpmSpec"]>
@@ -755,11 +755,11 @@ export function resetPluginsCliTestState() {
   installHooksFromPath.mockReset();
   recordHookInstall.mockReset();
 
-  loadConfig.mockReturnValue({} as OpenClawConfig);
+  loadConfig.mockReturnValue({} as SteelEngineConfig);
   readConfigFileSnapshot.mockImplementation(async () => {
     const config = getRuntimeConfig();
     return {
-      path: "/tmp/openclaw-config.json5",
+      path: "/tmp/steelengine-config.json5",
       exists: true,
       raw: "{}",
       parsed: config,
@@ -787,22 +787,22 @@ export function resetPluginsCliTestState() {
   });
   writeConfigFile.mockResolvedValue(undefined);
   replaceConfigFile.mockImplementation(
-    (async (params: { nextConfig: OpenClawConfig }) =>
+    (async (params: { nextConfig: SteelEngineConfig }) =>
       await writeConfigFile(params.nextConfig)) as (...args: unknown[]) => Promise<unknown>,
   );
-  resolveStateDir.mockReturnValue("/tmp/openclaw-state");
+  resolveStateDir.mockReturnValue("/tmp/steelengine-state");
   resolveMarketplaceInstallShortcut.mockResolvedValue(null);
   installPluginFromMarketplace.mockResolvedValue({
     ok: false,
     error: "marketplace install failed",
   });
-  enablePluginInConfig.mockImplementation(((cfg: OpenClawConfig, pluginId: string) => ({
+  enablePluginInConfig.mockImplementation(((cfg: SteelEngineConfig, pluginId: string) => ({
     config: cfg,
     enabled: true,
     pluginId,
   })) as (...args: unknown[]) => unknown);
   recordPluginInstall.mockImplementation(
-    ((cfg: OpenClawConfig) => cfg) as (...args: unknown[]) => unknown,
+    ((cfg: SteelEngineConfig) => cfg) as (...args: unknown[]) => unknown,
   );
   loadInstalledPluginIndexInstallRecords.mockImplementation(async () =>
     clonePluginInstallRecords(mockInstalledPluginIndexInstallRecords),
@@ -846,7 +846,7 @@ export function resetPluginsCliTestState() {
   });
   refreshPluginRegistry.mockResolvedValue(defaultRegistryIndex);
   notifyGatewayPluginMetadataChanged.mockResolvedValue(true);
-  applyExclusiveSlotSelection.mockImplementation((({ config }: { config: OpenClawConfig }) => ({
+  applyExclusiveSlotSelection.mockImplementation((({ config }: { config: SteelEngineConfig }) => ({
     config,
     warnings: [],
   })) as (...args: unknown[]) => unknown);
@@ -854,7 +854,7 @@ export function resetPluginsCliTestState() {
     config,
     pluginId,
   }: {
-    config: OpenClawConfig;
+    config: SteelEngineConfig;
     pluginId: string;
   }) => ({
     ok: true,
@@ -870,12 +870,12 @@ export function resetPluginsCliTestState() {
   updateNpmInstalledPlugins.mockResolvedValue({
     outcomes: [],
     changed: false,
-    config: {} as OpenClawConfig,
+    config: {} as SteelEngineConfig,
   });
   updateNpmInstalledHookPacks.mockResolvedValue({
     outcomes: [],
     changed: false,
-    config: {} as OpenClawConfig,
+    config: {} as SteelEngineConfig,
   });
   promptYesNo.mockResolvedValue(true);
   promptText.mockResolvedValue("demo");
@@ -918,7 +918,7 @@ export function resetPluginsCliTestState() {
     error: "hook npm install disabled in test",
   });
   recordHookInstall.mockImplementation(
-    ((cfg: OpenClawConfig) => cfg) as (...args: unknown[]) => unknown,
+    ((cfg: SteelEngineConfig) => cfg) as (...args: unknown[]) => unknown,
   );
 }
 /* oxlint-disable max-lines -- TODO: split this grandfathered oversized file. */

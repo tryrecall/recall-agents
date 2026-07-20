@@ -3,7 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { runOpenClawStateWriteTransaction } from "../state/openclaw-state-db.js";
+import { runSteelEngineStateWriteTransaction } from "../state/steelengine-state-db.js";
 import {
   clearCurrentPluginMetadataSnapshot,
   setCurrentPluginMetadataSnapshot,
@@ -46,13 +46,13 @@ vi.mock("./manifest-registry-installed.js", async (importOriginal) => {
 const tempDirs: string[] = [];
 
 function tempStateDir(): string {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-metadata-memo-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-metadata-memo-"));
   tempDirs.push(dir);
   return dir;
 }
 
 function touchPersistedIndex(stateDir: string, value = 1): void {
-  runOpenClawStateWriteTransaction(
+  runSteelEngineStateWriteTransaction(
     ({ db }) => {
       db.prepare(
         `
@@ -71,7 +71,7 @@ function touchPersistedIndex(stateDir: string, value = 1): void {
         generated_at_ms: value,
       });
     },
-    { env: { ...process.env, OPENCLAW_STATE_DIR: stateDir } },
+    { env: { ...process.env, STEELENGINE_STATE_DIR: stateDir } },
   );
 }
 
@@ -89,7 +89,7 @@ function writePersistedIndex(params: {
   stateDir: string;
 }): void {
   const pluginDir = path.join(params.stateDir, "extensions", params.pluginId);
-  const manifestPath = params.manifestPath ?? path.join(pluginDir, "openclaw.plugin.json");
+  const manifestPath = params.manifestPath ?? path.join(pluginDir, "steelengine.plugin.json");
   const packageJsonPath = params.packageJsonPath ?? path.join(pluginDir, "package.json");
   writePersistedInstalledPluginIndexSync(
     {
@@ -146,11 +146,11 @@ function writeRecoverableNpmPlugin(params: {
   writeJson(path.join(packageDir, "package.json"), {
     name: params.packageName,
     version: params.version,
-    openclaw: {
+    steelengine: {
       extensions: ["."],
     },
   });
-  writeJson(path.join(packageDir, "openclaw.plugin.json"), { id: params.pluginId });
+  writeJson(path.join(packageDir, "steelengine.plugin.json"), { id: params.pluginId });
 }
 
 function writePersistedInstallRecords(
@@ -181,7 +181,7 @@ function makeIndex(
   } = {},
 ): InstalledPluginIndex {
   const rootDir = options.rootDir ?? `/plugins/${pluginId}`;
-  const manifestPath = options.manifestPath ?? path.join(rootDir, "openclaw.plugin.json");
+  const manifestPath = options.manifestPath ?? path.join(rootDir, "steelengine.plugin.json");
   return {
     version: 1,
     hostContractVersion: "test",
@@ -223,7 +223,7 @@ function makeManifestRegistry(pluginId = "demo"): PluginManifestRegistry {
     commandAliases: [{ name: `${pluginId}-command` }],
     rootDir: `/plugins/${pluginId}`,
     source: `/plugins/${pluginId}/index.js`,
-    manifestPath: `/plugins/${pluginId}/openclaw.plugin.json`,
+    manifestPath: `/plugins/${pluginId}/steelengine.plugin.json`,
     origin: "global",
   };
   return { plugins: [plugin], diagnostics: [] };
@@ -278,8 +278,8 @@ describe("loadPluginMetadataSnapshot process memo", () => {
     const stateDir = tempStateDir();
     const timelinePath = path.join(stateDir, "timeline", "metadata.jsonl");
     const env = {
-      OPENCLAW_DIAGNOSTICS: "timeline",
-      OPENCLAW_DIAGNOSTICS_TIMELINE_PATH: timelinePath,
+      STEELENGINE_DIAGNOSTICS: "timeline",
+      STEELENGINE_DIAGNOSTICS_TIMELINE_PATH: timelinePath,
     };
     touchPersistedIndex(stateDir);
     loadPluginRegistrySnapshotWithMetadata.mockReturnValue({
@@ -620,7 +620,7 @@ describe("loadPluginMetadataSnapshot process memo", () => {
     const stateDir = tempStateDir();
     touchPersistedIndex(stateDir);
     const pluginDir = path.join(stateDir, "current", "derived");
-    const manifestPath = path.join(pluginDir, "openclaw.plugin.json");
+    const manifestPath = path.join(pluginDir, "steelengine.plugin.json");
     writeJson(manifestPath, { id: "derived", version: "1.0.0" });
     loadPluginRegistrySnapshotWithMetadata.mockReturnValue({
       source: "derived",
@@ -686,7 +686,7 @@ describe("loadPluginMetadataSnapshot process memo", () => {
 
   it("reuses the expanded freshness fingerprint on hot cache hits", () => {
     const stateDir = tempStateDir();
-    const manifestPath = path.join(stateDir, "extensions", "demo", "openclaw.plugin.json");
+    const manifestPath = path.join(stateDir, "extensions", "demo", "steelengine.plugin.json");
     writePersistedIndex({ manifestPath, pluginId: "demo", stateDir });
     loadPluginRegistrySnapshotWithMetadata.mockReturnValue({
       source: "persisted",
@@ -708,7 +708,7 @@ describe("loadPluginMetadataSnapshot process memo", () => {
   });
 
   it.each([
-    ["manifest", "openclaw.plugin.json", "manifestPath"],
+    ["manifest", "steelengine.plugin.json", "manifestPath"],
     ["source", "index.js", "source"],
     ["setup source", "setup.js", "setupSource"],
     ["package manifest", "package.json", "packageJsonPath"],
@@ -910,7 +910,7 @@ describe("loadPluginMetadataSnapshot process memo", () => {
 
   it("does not fingerprint persisted plugin paths outside the plugin root", () => {
     const stateDir = tempStateDir();
-    const outsideManifestPath = path.join(stateDir, "outside", "openclaw.plugin.json");
+    const outsideManifestPath = path.join(stateDir, "outside", "steelengine.plugin.json");
     const outsideSourcePath = path.join(stateDir, "outside", "index.js");
     writePersistedIndex({
       manifestPath: outsideManifestPath,
@@ -942,8 +942,8 @@ describe("loadPluginMetadataSnapshot process memo", () => {
   it("does not hash symlinked persisted plugin files that escape the plugin root", () => {
     const stateDir = tempStateDir();
     const pluginDir = path.join(stateDir, "extensions", "demo");
-    const manifestPath = path.join(pluginDir, "openclaw.plugin.json");
-    const outsideManifestPath = path.join(stateDir, "outside", "openclaw.plugin.json");
+    const manifestPath = path.join(pluginDir, "steelengine.plugin.json");
+    const outsideManifestPath = path.join(stateDir, "outside", "steelengine.plugin.json");
     fs.mkdirSync(pluginDir, { recursive: true });
     writeJson(outsideManifestPath, { id: "outside" });
     fs.symlinkSync(outsideManifestPath, manifestPath);

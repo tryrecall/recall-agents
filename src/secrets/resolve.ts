@@ -1,9 +1,9 @@
 /** Resolves SecretRef values from env, file, and exec secret providers. */
 import fs from "node:fs/promises";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
-import { uniqueStrings } from "@openclaw/normalization-core/string-normalization";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import { expectDefined } from "@steelengine/normalization-core";
+import { uniqueStrings } from "@steelengine/normalization-core/string-normalization";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type {
   FileSecretProviderConfig,
   ManualExecSecretProviderConfig,
@@ -69,7 +69,7 @@ const WINDOWS_UNC_PATH_PATTERN = /^\\\\[^\\]+\\[^\\]+/;
 export type { SecretRefResolveCache } from "./resolve-types.js";
 
 type ResolveSecretRefOptions = {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   cache?: SecretRefResolveCache;
   manifestRegistry?: Pick<PluginManifestRegistry, "plugins">;
@@ -126,7 +126,7 @@ function isAbsolutePathname(value: string): boolean {
   );
 }
 
-function resolveResolutionLimits(config: OpenClawConfig): ResolutionLimits {
+function resolveResolutionLimits(config: SteelEngineConfig): ResolutionLimits {
   const resolution = config.secrets?.resolution;
   return {
     maxProviderConcurrency: normalizePositiveInt(
@@ -147,7 +147,7 @@ function toProviderKey(source: SecretRefSource, provider: string): string {
 
 function resolveConfiguredProvider(params: {
   ref: SecretRef;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   manifestRegistry?: Pick<PluginManifestRegistry, "plugins">;
 }): SecretProviderConfig {

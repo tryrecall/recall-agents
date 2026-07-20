@@ -39,19 +39,19 @@ type UpdatingHost = {
 };
 
 export const COMMAND_PALETTE_ELEMENT = {
-  tagName: "openclaw-command-palette",
+  tagName: "steelengine-command-palette",
   label: "command palette",
   loadModule: () => import("../components/command-palette.ts"),
 } satisfies OptionalCustomElement;
 
 export const TERMINAL_PANEL_ELEMENT = {
-  tagName: "openclaw-terminal-panel",
+  tagName: "steelengine-terminal-panel",
   label: "terminal panel",
   loadModule: () => import("../components/terminal/terminal-panel-registration.ts"),
 } satisfies OptionalCustomElement;
 
 export const BROWSER_PANEL_ELEMENT = {
-  tagName: "openclaw-browser-panel",
+  tagName: "steelengine-browser-panel",
   label: "browser panel",
   loadModule: () => import("../components/browser/browser-panel.ts"),
 } satisfies OptionalCustomElement;
@@ -59,7 +59,7 @@ export const BROWSER_PANEL_ELEMENT = {
 // Loaded only for approval document URLs: the approval page pulls the protocol
 // validators (typebox runtime) and must stay out of the normal startup graph.
 export const APPROVAL_PAGE_ELEMENT = {
-  tagName: "openclaw-approval-page",
+  tagName: "steelengine-approval-page",
   label: "approval page",
   loadModule: () => import("../pages/approval/approval-page-registration.ts"),
 } satisfies OptionalCustomElement;
@@ -92,7 +92,7 @@ export function ensureOptionalElementForHost(
       host.requestUpdate();
     })
     .catch((error: unknown) => {
-      console.error(`[openclaw] failed to load ${element.label}`, error);
+      console.error(`[steelengine] failed to load ${element.label}`, error);
       throw error;
     })
     .finally(() => {

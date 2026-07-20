@@ -5,19 +5,19 @@
 import {
   createAccountListHelpers,
   hasConfiguredAccountValue,
-} from "openclaw/plugin-sdk/account-helpers";
-import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "openclaw/plugin-sdk/account-id";
-import { resolveMergedAccountConfig } from "openclaw/plugin-sdk/account-resolution";
-import { resolveNormalizedAccountEntry } from "openclaw/plugin-sdk/account-resolution-runtime";
-import { resolveIntegerOption } from "openclaw/plugin-sdk/number-runtime";
-import { resolveDefaultSecretProviderAlias } from "openclaw/plugin-sdk/provider-auth";
-import { tryReadSecretFileSync } from "openclaw/plugin-sdk/secret-file-runtime";
+} from "steelengine/plugin-sdk/account-helpers";
+import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "steelengine/plugin-sdk/account-id";
+import { resolveMergedAccountConfig } from "steelengine/plugin-sdk/account-resolution";
+import { resolveNormalizedAccountEntry } from "steelengine/plugin-sdk/account-resolution-runtime";
+import { resolveIntegerOption } from "steelengine/plugin-sdk/number-runtime";
+import { resolveDefaultSecretProviderAlias } from "steelengine/plugin-sdk/provider-auth";
+import { tryReadSecretFileSync } from "steelengine/plugin-sdk/secret-file-runtime";
 import {
   normalizeSecretInputString,
   normalizeResolvedSecretInputString,
   resolveSecretInputString,
-} from "openclaw/plugin-sdk/secret-input";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/secret-input";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
 import type { ClickClackAccountConfig, CoreConfig, ResolvedClickClackAccount } from "./types.js";
 
 const DEFAULT_RECONNECT_MS = 1_500;

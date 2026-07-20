@@ -1,4 +1,4 @@
-import { createChannelReplayGuard } from "openclaw/plugin-sdk/persistent-dedupe";
+import { createChannelReplayGuard } from "steelengine/plugin-sdk/persistent-dedupe";
 
 const DEDUPE_NAMESPACE_PREFIX = "feishu.dedup";
 const DEDUP_TTL_MS = 24 * 60 * 60 * 1000;

@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { openOpenClawStateDatabase } from "../state/openclaw-state-db.js";
+import { openSteelEngineStateDatabase } from "../state/steelengine-state-db.js";
 import {
   completeDeliveryQueueEntry,
   countFailedDeliveryQueueEntries,
@@ -14,7 +14,7 @@ import {
   updateDeliveryQueueEntry,
   upsertDeliveryQueueEntry,
 } from "./delivery-queue-sqlite.js";
-import { resolvePreferredOpenClawTmpDir } from "./tmp-openclaw-dir.js";
+import { resolvePreferredSteelEngineTmpDir } from "./tmp-steelengine-dir.js";
 
 describe("delivery-queue-sqlite corrupt JSON resilience", () => {
   let stateDir: string;
@@ -22,7 +22,7 @@ describe("delivery-queue-sqlite corrupt JSON resilience", () => {
   const QUEUE = "test-q";
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(resolvePreferredOpenClawTmpDir(), "openclaw-dq-case-"));
+    tmpDir = fs.mkdtempSync(path.join(resolvePreferredSteelEngineTmpDir(), "steelengine-dq-case-"));
     stateDir = path.join(tmpDir, "state");
     fs.mkdirSync(stateDir, { recursive: true });
   });
@@ -32,8 +32,8 @@ describe("delivery-queue-sqlite corrupt JSON resilience", () => {
   });
 
   function insertCorruptRow(id: string, json: string) {
-    const { db } = openOpenClawStateDatabase({
-      env: { ...process.env, OPENCLAW_STATE_DIR: stateDir },
+    const { db } = openSteelEngineStateDatabase({
+      env: { ...process.env, STEELENGINE_STATE_DIR: stateDir },
     });
     db.prepare(
       `INSERT INTO delivery_queue_entries
@@ -195,8 +195,8 @@ describe("delivery-queue-sqlite corrupt JSON resilience", () => {
       expect(loadDeliveryQueueEntry(QUEUE, "rt-completed", stateDir)).toBeNull();
       expect(getDeliveryQueueEntryStatus(QUEUE, "rt-completed", stateDir)).toBe("completed");
       expect(getDeliveryQueueEntryStatus(QUEUE, "rt-expired-completed", stateDir)).toBeUndefined();
-      const { db } = openOpenClawStateDatabase({
-        env: { ...process.env, OPENCLAW_STATE_DIR: stateDir },
+      const { db } = openSteelEngineStateDatabase({
+        env: { ...process.env, STEELENGINE_STATE_DIR: stateDir },
       });
       const row = db
         .prepare(
@@ -233,8 +233,8 @@ describe("delivery-queue-sqlite corrupt JSON resilience", () => {
         stateDir,
       });
       completeDeliveryQueueEntry(QUEUE, "rt-permanent", stateDir);
-      const { db } = openOpenClawStateDatabase({
-        env: { ...process.env, OPENCLAW_STATE_DIR: stateDir },
+      const { db } = openSteelEngineStateDatabase({
+        env: { ...process.env, STEELENGINE_STATE_DIR: stateDir },
       });
       db.prepare(
         `UPDATE delivery_queue_entries
@@ -267,7 +267,7 @@ describe("countFailedDeliveryQueueEntries", () => {
   let stateDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(resolvePreferredOpenClawTmpDir(), "openclaw-dq-count-"));
+    tmpDir = fs.mkdtempSync(path.join(resolvePreferredSteelEngineTmpDir(), "steelengine-dq-count-"));
     stateDir = path.join(tmpDir, "state");
     fs.mkdirSync(stateDir, { recursive: true });
   });

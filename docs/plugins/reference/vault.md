@@ -11,8 +11,8 @@ HashiCorp Vault SecretRef provider integration.
 
 ## Distribution
 
-- Package: `@openclaw/vault`
-- Install route: included in OpenClaw
+- Package: `@steelengine/vault`
+- Install route: included in SteelEngine
 
 ## Surface
 

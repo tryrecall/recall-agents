@@ -5,7 +5,7 @@ import { enableCompileCache, getCompileCacheDir } from "node:module";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { isTerminalInteractiveRespawnArgv } from "./cli/respawn-policy.js";
 import { attachChildProcessBridge } from "./process/child-process-bridge.js";
 import {
@@ -16,7 +16,7 @@ import {
 // Node 24.0-24.14 can deadlock during ESM module loading when compile cache is
 // enabled on Windows npm-global installs. Keep the skip scoped to that platform.
 const MIN_COMPILE_CACHE_NODE_24_MINOR = 15;
-const COMPILE_CACHE_DISABLED_RESPAWNED_ENV = "OPENCLAW_COMPILE_CACHE_DISABLED_RESPAWNED";
+const COMPILE_CACHE_DISABLED_RESPAWNED_ENV = "STEELENGINE_COMPILE_CACHE_DISABLED_RESPAWNED";
 
 export function resolveEntryInstallRoot(entryFile: string): string {
   const entryDir = path.dirname(entryFile);
@@ -55,7 +55,7 @@ function isNodeVersionAffectedByCompileCacheDeadlock(nodeVersion: string | undef
   return minor < MIN_COMPILE_CACHE_NODE_24_MINOR;
 }
 
-function shouldEnableOpenClawCompileCache(params: {
+function shouldEnableSteelEngineCompileCache(params: {
   env?: NodeJS.ProcessEnv;
   installRoot: string;
   nodeVersion?: string;
@@ -96,7 +96,7 @@ function readPackageVersion(packageJsonPath: string): string {
   return "unknown";
 }
 
-function resolveOpenClawCompileCacheDirectory(params: {
+function resolveSteelEngineCompileCacheDirectory(params: {
   env?: NodeJS.ProcessEnv;
   installRoot: string;
 }): string {
@@ -116,24 +116,24 @@ function resolveOpenClawCompileCacheDirectory(params: {
       : path.join(os.tmpdir(), "node-compile-cache");
   return path.join(
     baseDirectory,
-    "openclaw",
+    "steelengine",
     version,
     sanitizeCompileCachePathSegment(installMarker),
   );
 }
 
-type OpenClawCompileCacheRespawnPlan = {
+type SteelEngineCompileCacheRespawnPlan = {
   command: string;
   args: string[];
   env: NodeJS.ProcessEnv;
   detachForProcessTree: boolean;
 };
 
-type OpenClawCompileCacheRespawnRuntime = RespawnChildRuntime & {
+type SteelEngineCompileCacheRespawnRuntime = RespawnChildRuntime & {
   writeError: (message: string) => void;
 };
 
-function buildOpenClawCompileCacheRespawnPlan(params: {
+function buildSteelEngineCompileCacheRespawnPlan(params: {
   currentFile: string;
   env?: NodeJS.ProcessEnv;
   execArgv?: string[];
@@ -143,7 +143,7 @@ function buildOpenClawCompileCacheRespawnPlan(params: {
   compileCacheDir?: string;
   nodeVersion?: string;
   platform?: NodeJS.Platform;
-}): OpenClawCompileCacheRespawnPlan | undefined {
+}): SteelEngineCompileCacheRespawnPlan | undefined {
   const env = params.env ?? process.env;
   const needsDisabledCompileCacheRespawn =
     isSourceCheckoutInstallRoot(params.installRoot) ||
@@ -178,11 +178,11 @@ function buildOpenClawCompileCacheRespawnPlan(params: {
   };
 }
 
-export function respawnWithoutOpenClawCompileCacheIfNeeded(params: {
+export function respawnWithoutSteelEngineCompileCacheIfNeeded(params: {
   currentFile: string;
   installRoot: string;
 }): boolean {
-  const plan = buildOpenClawCompileCacheRespawnPlan({
+  const plan = buildSteelEngineCompileCacheRespawnPlan({
     currentFile: params.currentFile,
     installRoot: params.installRoot,
     compileCacheDir: getCompileCacheDir?.(),
@@ -190,13 +190,13 @@ export function respawnWithoutOpenClawCompileCacheIfNeeded(params: {
   if (!plan) {
     return false;
   }
-  runOpenClawCompileCacheRespawnPlan(plan);
+  runSteelEngineCompileCacheRespawnPlan(plan);
   return true;
 }
 
-function runOpenClawCompileCacheRespawnPlan(
-  plan: OpenClawCompileCacheRespawnPlan,
-  runtime: OpenClawCompileCacheRespawnRuntime = {
+function runSteelEngineCompileCacheRespawnPlan(
+  plan: SteelEngineCompileCacheRespawnPlan,
+  runtime: SteelEngineCompileCacheRespawnRuntime = {
     spawn,
     attachChildProcessBridge,
     exit: process.exit.bind(process) as (code?: number) => never,
@@ -211,7 +211,7 @@ function runOpenClawCompileCacheRespawnPlan(
     runtime,
     onError: (error) => {
       runtime.writeError(
-        `[openclaw] Failed to respawn CLI without compile cache: ${
+        `[steelengine] Failed to respawn CLI without compile cache: ${
           error instanceof Error ? (error.stack ?? error.message) : String(error)
         }\n`,
       );
@@ -219,27 +219,27 @@ function runOpenClawCompileCacheRespawnPlan(
   });
 }
 
-export function enableOpenClawCompileCache(params: {
+export function enableSteelEngineCompileCache(params: {
   env?: NodeJS.ProcessEnv;
   installRoot: string;
 }): void {
-  if (!shouldEnableOpenClawCompileCache(params)) {
+  if (!shouldEnableSteelEngineCompileCache(params)) {
     return;
   }
   try {
-    enableCompileCache(resolveOpenClawCompileCacheDirectory(params));
+    enableCompileCache(resolveSteelEngineCompileCacheDirectory(params));
   } catch {
     // Best-effort only; never block startup.
   }
 }
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
-  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("openclaw.entryCompileCacheTestApi")] = {
-    buildOpenClawCompileCacheRespawnPlan,
+  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("steelengine.entryCompileCacheTestApi")] = {
+    buildSteelEngineCompileCacheRespawnPlan,
     isNodeVersionAffectedByCompileCacheDeadlock,
     isSourceCheckoutInstallRoot,
-    resolveOpenClawCompileCacheDirectory,
-    runOpenClawCompileCacheRespawnPlan,
-    shouldEnableOpenClawCompileCache,
+    resolveSteelEngineCompileCacheDirectory,
+    runSteelEngineCompileCacheRespawnPlan,
+    shouldEnableSteelEngineCompileCache,
   };
 }

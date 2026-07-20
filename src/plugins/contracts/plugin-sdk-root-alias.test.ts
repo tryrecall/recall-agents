@@ -4,7 +4,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { describe, expect, it } from "vitest";
 
 const require = createRequire(import.meta.url);
@@ -13,7 +13,7 @@ const rootSdk = require(rootAliasPath) as Record<string, unknown>;
 const rootAliasSource = fs.readFileSync(rootAliasPath, "utf-8");
 const compatPath = fileURLToPath(new URL("../../plugin-sdk/compat.ts", import.meta.url));
 const packageJsonPath = fileURLToPath(new URL("../../../package.json", import.meta.url));
-const diagnosticEventsStateKey = Symbol.for("openclaw.diagnosticEvents.state.v1");
+const diagnosticEventsStateKey = Symbol.for("steelengine.diagnosticEvents.state.v1");
 const legacyRootExportNames = [
   "registerContextEngine",
   "buildMemorySystemPromptAddition",
@@ -27,7 +27,7 @@ const legacyRootExportNames = [
   "createTypingCallbacks",
   "createChannelReplyPipeline",
   "resolveChannelSourceReplyDeliveryMode",
-  "resolvePreferredOpenClawTmpDir",
+  "resolvePreferredSteelEngineTmpDir",
 ] as const;
 
 type EmptySchema = {
@@ -147,7 +147,7 @@ function loadRootAliasWithStubs(options?: {
     if (id === "node:os") {
       return {
         tmpdir: () =>
-          context.process.env.TMPDIR ?? options?.defaultTmpDir ?? "/tmp/openclaw-root-alias-test",
+          context.process.env.TMPDIR ?? options?.defaultTmpDir ?? "/tmp/steelengine-root-alias-test",
       };
     }
     if (id === "jiti") {
@@ -211,7 +211,7 @@ function ensureDiagnosticEventsStateFixture(
   }
   const state = vm.runInNewContext(
     `({
-      marker: Symbol.for("openclaw.diagnosticEvents.state.v1"),
+      marker: Symbol.for("steelengine.diagnosticEvents.state.v1"),
       enabled: true,
       seq: 0,
       listeners: new Set(),
@@ -360,7 +360,7 @@ describe("plugin-sdk root alias", () => {
     expect(lazyModule.jitiLoadCalls).toBe(1);
     expect(lazyModule.createJitiOptions.at(-1)?.tryNative).toBe(false);
     expect(lazyModule.createJitiOptions.at(-1)?.fsCache).toBe(
-      path.join("/tmp/openclaw-root-alias-test", "jiti", "openclaw", "3.4.5", "12345-678"),
+      path.join("/tmp/steelengine-root-alias-test", "jiti", "steelengine", "3.4.5", "12345-678"),
     );
     expect((lazyRootSdk.slowHelper as () => string)()).toBe("loaded");
     expect(Object.keys(lazyRootSdk)).toContain("slowHelper");
@@ -369,15 +369,15 @@ describe("plugin-sdk root alias", () => {
 
   it("preserves jiti's tmpdir guard when root-alias TMPDIR resolves to cwd", () => {
     const lazyModule = loadRootAliasWithStubs({
-      cwd: "/tmp/openclaw-root-alias-cwd",
-      defaultTmpDir: "/tmp/openclaw-root-alias-fallback",
-      env: { TMPDIR: "/tmp/openclaw-root-alias-cwd" },
+      cwd: "/tmp/steelengine-root-alias-cwd",
+      defaultTmpDir: "/tmp/steelengine-root-alias-fallback",
+      env: { TMPDIR: "/tmp/steelengine-root-alias-cwd" },
       packageVersion: "3.4.5",
     });
 
     expect("slowHelper" in lazyModule.moduleExports).toBe(true);
     expect(lazyModule.createJitiOptions.at(-1)?.fsCache).toBe(
-      path.join("/tmp/openclaw-root-alias-fallback", "jiti", "openclaw", "3.4.5", "12345-678"),
+      path.join("/tmp/steelengine-root-alias-fallback", "jiti", "steelengine", "3.4.5", "12345-678"),
     );
   });
 
@@ -480,12 +480,12 @@ describe("plugin-sdk root alias", () => {
 
     expect((lazyModule.moduleExports.slowHelper as () => string)()).toBe("loaded");
     const aliasMap = (lazyModule.createJitiOptions.at(-1)?.alias ?? {}) as Record<string, string>;
-    expect(aliasMap["openclaw/plugin-sdk"]).toBe(rootAliasPath);
-    expect(aliasMap["@openclaw/plugin-sdk"]).toBe(rootAliasPath);
-    expect(aliasMap["openclaw/plugin-sdk/group-access"]).toContain(
+    expect(aliasMap["steelengine/plugin-sdk"]).toBe(rootAliasPath);
+    expect(aliasMap["@steelengine/plugin-sdk"]).toBe(rootAliasPath);
+    expect(aliasMap["steelengine/plugin-sdk/group-access"]).toContain(
       path.join("src", "plugin-sdk", "group-access.ts"),
     );
-    expect(aliasMap["@openclaw/plugin-sdk/group-access"]).toContain(
+    expect(aliasMap["@steelengine/plugin-sdk/group-access"]).toContain(
       path.join("src", "plugin-sdk", "group-access.ts"),
     );
   });
@@ -502,7 +502,7 @@ describe("plugin-sdk root alias", () => {
 
     expect((lazyModule.moduleExports.slowHelper as () => string)()).toBe("loaded");
     const aliasMap = (lazyModule.createJitiOptions.at(-1)?.alias ?? {}) as Record<string, string>;
-    expect(aliasMap["@openclaw/llm-core"]).toBe(sourceLlmCorePath);
+    expect(aliasMap["@steelengine/llm-core"]).toBe(sourceLlmCorePath);
   });
 
   it("keeps AI runtime transitive package imports on the source graph", () => {
@@ -529,15 +529,15 @@ describe("plugin-sdk root alias", () => {
 
     expect((lazyModule.moduleExports.slowHelper as () => string)()).toBe("loaded");
     const aliasMap = (lazyModule.createJitiOptions.at(-1)?.alias ?? {}) as Record<string, string>;
-    expect(aliasMap["@openclaw/ai/internal/retry-after"]).toBe(sourcePaths.aiRetryAfter);
-    expect(aliasMap["@openclaw/ai/internal/runtime"]).toBe(sourcePaths.aiRuntime);
-    expect(aliasMap["@openclaw/markdown-core/code-spans"]).toBe(sourcePaths.codeSpans);
-    expect(aliasMap["@openclaw/markdown-core/fences"]).toBe(sourcePaths.fences);
-    expect(aliasMap["@openclaw/normalization-core/number-coercion"]).toBe(
+    expect(aliasMap["@steelengine/ai/internal/retry-after"]).toBe(sourcePaths.aiRetryAfter);
+    expect(aliasMap["@steelengine/ai/internal/runtime"]).toBe(sourcePaths.aiRuntime);
+    expect(aliasMap["@steelengine/markdown-core/code-spans"]).toBe(sourcePaths.codeSpans);
+    expect(aliasMap["@steelengine/markdown-core/fences"]).toBe(sourcePaths.fences);
+    expect(aliasMap["@steelengine/normalization-core/number-coercion"]).toBe(
       sourcePaths.numberCoercion,
     );
-    expect(aliasMap["@openclaw/normalization-core/result"]).toBe(sourcePaths.result);
-    expect(aliasMap["@openclaw/retry"]).toBe(sourcePaths.retry);
+    expect(aliasMap["@steelengine/normalization-core/result"]).toBe(sourcePaths.result);
+    expect(aliasMap["@steelengine/retry"]).toBe(sourcePaths.retry);
   });
 
   it("keeps bootstrap plugin-sdk aliases deterministic and ignores unsafe subpaths", () => {
@@ -558,49 +558,49 @@ describe("plugin-sdk root alias", () => {
       (lazyModule.createJitiOptions.at(-1)?.alias ?? {}) as Record<string, string>,
     );
     expect(aliasKeys).toEqual([
-      "openclaw/plugin-sdk/alpha",
-      "@openclaw/plugin-sdk/alpha",
-      "openclaw/plugin-sdk/group-access",
-      "@openclaw/plugin-sdk/group-access",
-      "openclaw/plugin-sdk/zeta",
-      "@openclaw/plugin-sdk/zeta",
-      "@openclaw/llm-core",
-      "@openclaw/llm-core/diagnostics",
-      "@openclaw/llm-core/event-stream",
-      "@openclaw/llm-core/types",
-      "@openclaw/llm-core/validation",
-      "@openclaw/ai",
-      "@openclaw/ai/providers",
-      "@openclaw/ai/diagnostics",
-      "@openclaw/ai/event-stream",
-      "@openclaw/ai/types",
-      "@openclaw/ai/validation",
-      "@openclaw/ai/internal/anthropic",
-      "@openclaw/ai/internal/openai",
-      "@openclaw/ai/internal/retry-after",
-      "@openclaw/ai/internal/runtime",
-      "@openclaw/ai/internal/shared",
-      "@openclaw/markdown-core",
-      "@openclaw/markdown-core/code-spans",
-      "@openclaw/markdown-core/fences",
-      "@openclaw/markdown-core/frontmatter",
-      "@openclaw/markdown-core/ir",
-      "@openclaw/markdown-core/render",
-      "@openclaw/markdown-core/render-aware-chunking",
-      "@openclaw/markdown-core/tables",
-      "@openclaw/markdown-core/types",
-      "@openclaw/normalization-core",
-      "@openclaw/normalization-core/boolean-coercion",
-      "@openclaw/normalization-core/error-coercion",
-      "@openclaw/normalization-core/number-coercion",
-      "@openclaw/normalization-core/record-coerce",
-      "@openclaw/normalization-core/result",
-      "@openclaw/normalization-core/string-coerce",
-      "@openclaw/normalization-core/string-normalization",
-      "@openclaw/normalization-core/utf16-slice",
-      "@openclaw/retry",
-      "openclaw/plugin-sdk",
-      "@openclaw/plugin-sdk",
+      "steelengine/plugin-sdk/alpha",
+      "@steelengine/plugin-sdk/alpha",
+      "steelengine/plugin-sdk/group-access",
+      "@steelengine/plugin-sdk/group-access",
+      "steelengine/plugin-sdk/zeta",
+      "@steelengine/plugin-sdk/zeta",
+      "@steelengine/llm-core",
+      "@steelengine/llm-core/diagnostics",
+      "@steelengine/llm-core/event-stream",
+      "@steelengine/llm-core/types",
+      "@steelengine/llm-core/validation",
+      "@steelengine/ai",
+      "@steelengine/ai/providers",
+      "@steelengine/ai/diagnostics",
+      "@steelengine/ai/event-stream",
+      "@steelengine/ai/types",
+      "@steelengine/ai/validation",
+      "@steelengine/ai/internal/anthropic",
+      "@steelengine/ai/internal/openai",
+      "@steelengine/ai/internal/retry-after",
+      "@steelengine/ai/internal/runtime",
+      "@steelengine/ai/internal/shared",
+      "@steelengine/markdown-core",
+      "@steelengine/markdown-core/code-spans",
+      "@steelengine/markdown-core/fences",
+      "@steelengine/markdown-core/frontmatter",
+      "@steelengine/markdown-core/ir",
+      "@steelengine/markdown-core/render",
+      "@steelengine/markdown-core/render-aware-chunking",
+      "@steelengine/markdown-core/tables",
+      "@steelengine/markdown-core/types",
+      "@steelengine/normalization-core",
+      "@steelengine/normalization-core/boolean-coercion",
+      "@steelengine/normalization-core/error-coercion",
+      "@steelengine/normalization-core/number-coercion",
+      "@steelengine/normalization-core/record-coerce",
+      "@steelengine/normalization-core/result",
+      "@steelengine/normalization-core/string-coerce",
+      "@steelengine/normalization-core/string-normalization",
+      "@steelengine/normalization-core/utf16-slice",
+      "@steelengine/retry",
+      "steelengine/plugin-sdk",
+      "@steelengine/plugin-sdk",
     ]);
   });
 
@@ -614,7 +614,7 @@ describe("plugin-sdk root alias", () => {
       "ssrf-runtime-internal.ts",
     );
     const lazyModule = loadRootAliasWithStubs({
-      env: { OPENCLAW_ENABLE_PRIVATE_QA_CLI: "1" },
+      env: { STEELENGINE_ENABLE_PRIVATE_QA_CLI: "1" },
       privateLocalOnlySubpaths: ["qa-lab", "../escape", "nested/path", "ssrf-runtime-internal"],
       existingPaths: [qaLabPath, ssrfRuntimeInternalPath],
       monolithicExports: {
@@ -624,12 +624,12 @@ describe("plugin-sdk root alias", () => {
 
     expect((lazyModule.moduleExports.slowHelper as () => string)()).toBe("loaded");
     const aliasMap = (lazyModule.createJitiOptions.at(-1)?.alias ?? {}) as Record<string, string>;
-    expect(aliasMap["openclaw/plugin-sdk/qa-lab"]).toBe(qaLabPath);
-    expect(aliasMap["@openclaw/plugin-sdk/qa-lab"]).toBe(qaLabPath);
-    expect(aliasMap).not.toHaveProperty("openclaw/plugin-sdk/../escape");
-    expect(aliasMap).not.toHaveProperty("openclaw/plugin-sdk/nested/path");
-    expect(aliasMap).not.toHaveProperty("openclaw/plugin-sdk/ssrf-runtime-internal");
-    expect(aliasMap).not.toHaveProperty("@openclaw/plugin-sdk/ssrf-runtime-internal");
+    expect(aliasMap["steelengine/plugin-sdk/qa-lab"]).toBe(qaLabPath);
+    expect(aliasMap["@steelengine/plugin-sdk/qa-lab"]).toBe(qaLabPath);
+    expect(aliasMap).not.toHaveProperty("steelengine/plugin-sdk/../escape");
+    expect(aliasMap).not.toHaveProperty("steelengine/plugin-sdk/nested/path");
+    expect(aliasMap).not.toHaveProperty("steelengine/plugin-sdk/ssrf-runtime-internal");
+    expect(aliasMap).not.toHaveProperty("@steelengine/plugin-sdk/ssrf-runtime-internal");
   });
 
   it("keeps non-QA private local-only plugin-sdk subpaths out of the CJS root alias", () => {
@@ -651,9 +651,9 @@ describe("plugin-sdk root alias", () => {
 
     expect((lazyModule.moduleExports.slowHelper as () => string)()).toBe("loaded");
     const aliasMap = (lazyModule.createJitiOptions.at(-1)?.alias ?? {}) as Record<string, string>;
-    expect(aliasMap).not.toHaveProperty("openclaw/plugin-sdk/codex-mcp-projection");
-    expect(aliasMap).not.toHaveProperty("@openclaw/plugin-sdk/codex-mcp-projection");
-    expect(aliasMap).not.toHaveProperty("openclaw/plugin-sdk/qa-runtime");
+    expect(aliasMap).not.toHaveProperty("steelengine/plugin-sdk/codex-mcp-projection");
+    expect(aliasMap).not.toHaveProperty("@steelengine/plugin-sdk/codex-mcp-projection");
+    expect(aliasMap).not.toHaveProperty("steelengine/plugin-sdk/qa-runtime");
   });
 
   it("builds source plugin-sdk subpath aliases through the wider source extension family", () => {
@@ -670,10 +670,10 @@ describe("plugin-sdk root alias", () => {
 
     expect((lazyModule.moduleExports.slowHelper as () => string)()).toBe("loaded");
     const aliasMap = (lazyModule.createJitiOptions.at(-1)?.alias ?? {}) as Record<string, string>;
-    expect(aliasMap["openclaw/plugin-sdk/channel-runtime"]).toBe(
+    expect(aliasMap["steelengine/plugin-sdk/channel-runtime"]).toBe(
       path.join(packageRoot, "src", "plugin-sdk", "channel-runtime.mts"),
     );
-    expect(aliasMap["@openclaw/plugin-sdk/channel-runtime"]).toBe(
+    expect(aliasMap["@steelengine/plugin-sdk/channel-runtime"]).toBe(
       path.join(packageRoot, "src", "plugin-sdk", "channel-runtime.mts"),
     );
   });
@@ -850,7 +850,7 @@ describe("plugin-sdk root alias", () => {
     )((event) => {
       seen.push(event.type);
     });
-    const state = lazyModule.globalContext[Symbol.for("openclaw.diagnosticEvents.state.v1")] as {
+    const state = lazyModule.globalContext[Symbol.for("steelengine.diagnosticEvents.state.v1")] as {
       listeners: Set<(event: { type: string }, metadata: { trusted: boolean }) => void>;
     };
 

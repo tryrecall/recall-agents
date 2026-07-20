@@ -5,7 +5,7 @@ import type { IncomingMessage } from "node:http";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import { listAgentIds, resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { modelKey, parseModelRef, resolveDefaultModelForAgent } from "../agents/model-selection.js";
 import { createModelVisibilityPolicy } from "../agents/model-visibility-policy.js";
@@ -45,9 +45,12 @@ export {
   type AuthorizedGatewayHttpRequest,
 } from "./http-auth-utils.js";
 
-export const OPENCLAW_MODEL_ID = "openclaw";
-/** Default OpenAI-compatible model alias that targets the default OpenClaw agent. */
-export const OPENCLAW_DEFAULT_MODEL_ID = "openclaw/default";
+export const STEELENGINE_MODEL_ID = "steelengine";
+/** Default OpenAI-compatible model alias that targets the default SteelEngine agent. */
+export const STEELENGINE_DEFAULT_MODEL_ID = "steelengine/default";
+/** Legacy Recall aliases retained for Signature platform compatibility. */
+export const RECALL_MODEL_ID = "recall";
+export const RECALL_DEFAULT_MODEL_ID = "recall/default";
 
 class UnknownGatewayAgentError extends Error {
   constructor(readonly agentId: string) {
@@ -58,7 +61,7 @@ class UnknownGatewayAgentError extends Error {
 
 class GatewaySessionKeyOverrideError extends Error {
   constructor() {
-    super("`x-openclaw-session-key` cannot use reserved internal session namespaces.");
+    super("`x-steelengine-session-key` cannot use reserved internal session namespaces.");
     this.name = "GatewaySessionKeyOverrideError";
   }
 }
@@ -81,8 +84,10 @@ function assertKnownAgentId(agentId: string, cfg = getRuntimeConfig()): void {
 
 function resolveAgentIdFromHeader(req: IncomingMessage): string | undefined {
   const raw =
-    normalizeOptionalString(getHeader(req, "x-openclaw-agent-id")) ||
-    normalizeOptionalString(getHeader(req, "x-openclaw-agent")) ||
+    normalizeOptionalString(getHeader(req, "x-steelengine-agent-id")) ||
+    normalizeOptionalString(getHeader(req, "x-steelengine-agent")) ||
+    normalizeOptionalString(getHeader(req, "x-recall-agent-id")) ||
+    normalizeOptionalString(getHeader(req, "x-recall-agent")) ||
     "";
   if (!raw) {
     return undefined;
@@ -103,12 +108,18 @@ export function resolveAgentIdFromModel(
     return undefined;
   }
   const lowered = normalizeLowercaseStringOrEmpty(raw);
-  if (lowered === OPENCLAW_MODEL_ID || lowered === OPENCLAW_DEFAULT_MODEL_ID) {
+  if (
+    lowered === STEELENGINE_MODEL_ID ||
+    lowered === STEELENGINE_DEFAULT_MODEL_ID ||
+    lowered === RECALL_MODEL_ID ||
+    lowered === RECALL_DEFAULT_MODEL_ID
+  ) {
     return resolveDefaultAgentId(cfg);
   }
 
   const m =
-    raw.match(/^openclaw[:/](?<agentId>[a-z0-9][a-z0-9_-]{0,63})$/i) ??
+    raw.match(/^steelengine[:/](?<agentId>[a-z0-9][a-z0-9_-]{0,63})$/i) ??
+    raw.match(/^recall[:/](?<agentId>[a-z0-9][a-z0-9_-]{0,63})$/i) ??
     raw.match(/^agent:(?<agentId>[a-z0-9][a-z0-9_-]{0,63})$/i);
   const agentId = m?.groups?.agentId;
   if (!agentId) {
@@ -117,7 +128,7 @@ export function resolveAgentIdFromModel(
   return normalizeAgentId(agentId);
 }
 
-/** Validates and resolves the `x-openclaw-model` override for OpenAI-compatible requests. */
+/** Validates and resolves the `x-steelengine-model` override for OpenAI-compatible requests. */
 export async function resolveOpenAiCompatModelOverride(params: {
   req: IncomingMessage;
   agentId: string;
@@ -126,11 +137,13 @@ export async function resolveOpenAiCompatModelOverride(params: {
   const requestModel = params.model?.trim();
   if (requestModel && !resolveAgentIdFromModel(requestModel)) {
     return {
-      errorMessage: "Invalid `model`. Use `openclaw` or `openclaw/<agentId>`.",
+      errorMessage: "Invalid `model`. Use `steelengine` or `steelengine/<agentId>`.",
     };
   }
 
-  const raw = getHeader(params.req, "x-openclaw-model")?.trim();
+  const raw =
+    getHeader(params.req, "x-steelengine-model")?.trim() ||
+    getHeader(params.req, "x-recall-model")?.trim();
   if (!raw) {
     return {};
   }
@@ -151,7 +164,7 @@ export async function resolveOpenAiCompatModelOverride(params: {
     ...modelManifestContext,
   });
   if (!parsed) {
-    return { errorMessage: "Invalid `x-openclaw-model`." };
+    return { errorMessage: "Invalid `x-steelengine-model`." };
   }
 
   // Overrides must pass the same visibility policy as model picker surfaces;
@@ -203,7 +216,9 @@ function resolveSessionKey(params: {
   user?: string | undefined;
   prefix: string;
 }): string {
-  const explicit = getHeader(params.req, "x-openclaw-session-key")?.trim();
+  const explicit =
+    getHeader(params.req, "x-steelengine-session-key")?.trim() ||
+    getHeader(params.req, "x-recall-session-key")?.trim();
   if (explicit) {
     if (isReservedSessionKeyOverride(explicit, params.agentId)) {
       throw new GatewaySessionKeyOverrideError();
@@ -259,7 +274,7 @@ export function resolveGatewayRequestContext(params: {
   });
 
   const messageChannel = params.useMessageChannelHeader
-    ? (normalizeMessageChannel(getHeader(params.req, "x-openclaw-message-channel")) ??
+    ? (normalizeMessageChannel(getHeader(params.req, "x-steelengine-message-channel")) ??
       params.defaultMessageChannel)
     : params.defaultMessageChannel;
 

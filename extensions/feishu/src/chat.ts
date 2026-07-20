@@ -1,9 +1,9 @@
 // Feishu plugin module implements chat behavior.
 import type * as Lark from "@larksuiteoapi/node-sdk";
-import { readPositiveIntegerParam } from "openclaw/plugin-sdk/param-readers";
-import type { OpenClawPluginToolContext } from "openclaw/plugin-sdk/plugin-entry";
-import { jsonResult as json } from "openclaw/plugin-sdk/tool-results";
-import type { OpenClawPluginApi } from "../runtime-api.js";
+import { readPositiveIntegerParam } from "steelengine/plugin-sdk/param-readers";
+import type { SteelEnginePluginToolContext } from "steelengine/plugin-sdk/plugin-entry";
+import { jsonResult as json } from "steelengine/plugin-sdk/tool-results";
+import type { SteelEnginePluginApi } from "../runtime-api.js";
 import { listEnabledFeishuAccounts } from "./accounts.js";
 import { FeishuChatSchema, type FeishuChatParams } from "./chat-schema.js";
 import { resolveFeishuChatType } from "./chat-type.js";
@@ -67,11 +67,11 @@ export async function getChatInfo(client: Lark.Client, chatId: string) {
 }
 
 function authorizeFeishuChatInfo(params: {
-  cfg: NonNullable<OpenClawPluginApi["config"]>;
+  cfg: NonNullable<SteelEnginePluginApi["config"]>;
   account: ReturnType<typeof resolveFeishuToolAccount>;
   chatId: string;
   chat: Awaited<ReturnType<typeof getChatInfo>>;
-  ctx: OpenClawPluginToolContext;
+  ctx: SteelEnginePluginToolContext;
 }): void {
   assertFeishuChatReadAllowed({
     cfg: params.cfg,
@@ -84,10 +84,10 @@ function authorizeFeishuChatInfo(params: {
 
 async function getAuthorizedFeishuChatInfo(params: {
   client: Lark.Client;
-  cfg: NonNullable<OpenClawPluginApi["config"]>;
+  cfg: NonNullable<SteelEnginePluginApi["config"]>;
   account: ReturnType<typeof resolveFeishuToolAccount>;
   chatId: string;
-  ctx: OpenClawPluginToolContext;
+  ctx: SteelEnginePluginToolContext;
 }) {
   const preliminary = resolveFeishuChatReadPreliminaryAuthorization({
     cfg: params.cfg,
@@ -238,7 +238,7 @@ export async function getFeishuMemberInfo(
   };
 }
 
-export function registerFeishuChatTools(api: OpenClawPluginApi) {
+export function registerFeishuChatTools(api: SteelEnginePluginApi) {
   if (!api.config) {
     return;
   }
@@ -255,7 +255,7 @@ export function registerFeishuChatTools(api: OpenClawPluginApi) {
   }
 
   api.registerTool(
-    (toolContext: OpenClawPluginToolContext) => ({
+    (toolContext: SteelEnginePluginToolContext) => ({
       name: "feishu_chat",
       label: "Feishu Chat",
       description: "Feishu chat operations. Actions: members, info, member_info",

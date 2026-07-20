@@ -12,7 +12,7 @@ import {
 import { useAutoCleanupTempDirTracker } from "../../test/helpers/temp-dir.js";
 import { createPinnedLookup } from "../infra/net/ssrf.js";
 import { setMediaStoreNetworkDepsForTest } from "../media/store.test-support.js";
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import { withEnvAsync } from "../test-utils/env.js";
 import {
   insertManagedImageRecord,
@@ -207,7 +207,7 @@ async function requestManagedImage(params: {
               openUrl: params.pathName,
             },
           ],
-          __openclaw: { id: "msg-1" },
+          __steelengine: { id: "msg-1" },
         },
       ]
     );
@@ -285,7 +285,7 @@ describe("handleManagedOutgoingImageHttpRequest", () => {
   });
 
   afterEach(async () => {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     setMediaStoreNetworkDepsForTest();
     await fs.rm(stateDir, { recursive: true, force: true });
   });
@@ -326,9 +326,9 @@ describe("handleManagedOutgoingImageHttpRequest", () => {
     try {
       await withEnvAsync(
         {
-          OPENCLAW_CONFIG_PATH: path.join(externalConfigDir, "config.json"),
-          OPENCLAW_HOME: isolatedHome,
-          OPENCLAW_STATE_DIR: undefined,
+          STEELENGINE_CONFIG_PATH: path.join(externalConfigDir, "config.json"),
+          STEELENGINE_HOME: isolatedHome,
+          STEELENGINE_STATE_DIR: undefined,
         },
         async () => {
           const pathName = `/api/chat/media/outgoing/${encodeURIComponent(fixture.sessionKey)}/${fixture.attachmentId}/full`;
@@ -416,7 +416,7 @@ describe("handleManagedOutgoingImageHttpRequest", () => {
       stateDir,
       pathName: `/api/chat/media/outgoing/${encodeURIComponent(sessionKey)}/${attachmentId}/full`,
       authResponse: { authMethod: "trusted-proxy", trustDeclaredOperatorScopes: true },
-      headers: { "x-openclaw-requester-session-key": sessionKey },
+      headers: { "x-steelengine-requester-session-key": sessionKey },
     });
 
     expect(result.statusCode).toBe(403);
@@ -429,7 +429,7 @@ describe("handleManagedOutgoingImageHttpRequest", () => {
       stateDir,
       pathName: `/api/chat/media/outgoing/${encodeURIComponent(sessionKey)}/${attachmentId}/full`,
       authResponse: { authMethod: "device-token" },
-      headers: { "x-openclaw-requester-session-key": sessionKey },
+      headers: { "x-steelengine-requester-session-key": sessionKey },
     });
 
     expect(result.statusCode).toBe(403);
@@ -456,7 +456,7 @@ describe("handleManagedOutgoingImageHttpRequest", () => {
       stateDir,
       pathName: `/api/chat/media/outgoing/${encodeURIComponent(sessionKey)}/${attachmentId}/full`,
       method: "POST",
-      headers: { "x-openclaw-requester-session-key": sessionKey },
+      headers: { "x-steelengine-requester-session-key": sessionKey },
     });
 
     expect(result.statusCode).toBe(405);
@@ -482,7 +482,7 @@ describe("handleManagedOutgoingImageHttpRequest", () => {
 
     const transcriptMessages = [
       {
-        __openclaw: { id: "msg-1" },
+        __steelengine: { id: "msg-1" },
         content: [
           {
             type: "image",
@@ -539,7 +539,7 @@ describe("handleManagedOutgoingImageHttpRequest", () => {
 
     const transcriptMessages = [
       {
-        __openclaw: { id: "msg-1" },
+        __steelengine: { id: "msg-1" },
         content: [
           {
             type: "image",
@@ -581,7 +581,7 @@ describe("handleManagedOutgoingImageHttpRequest", () => {
 
     const transcriptMessages = [
       {
-        __openclaw: { id: "msg-1" },
+        __steelengine: { id: "msg-1" },
         content: [
           {
             type: "image",
@@ -630,7 +630,7 @@ describe("createManagedOutgoingImageBlocks", () => {
   });
 
   afterEach(async () => {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     setMediaStoreNetworkDepsForTest();
     await fs.rm(stateDir, { recursive: true, force: true });
   });
@@ -733,7 +733,7 @@ describe("createManagedOutgoingImageBlocks", () => {
     await fs.mkdir(path.dirname(sourcePath), { recursive: true });
     await fs.writeFile(sourcePath, Buffer.from(TINY_PNG_BASE64, "base64"));
 
-    await withEnvAsync({ OPENCLAW_STATE_DIR: stateDir }, async () => {
+    await withEnvAsync({ STEELENGINE_STATE_DIR: stateDir }, async () => {
       const blocks = await createManagedOutgoingImageBlocks({
         stateDir,
         sessionKey: "agent:main:main",
@@ -780,7 +780,7 @@ describe("createManagedOutgoingImageBlocks", () => {
     });
 
     try {
-      await withEnvAsync({ OPENCLAW_STATE_DIR: stateDir }, async () => {
+      await withEnvAsync({ STEELENGINE_STATE_DIR: stateDir }, async () => {
         const sourceUrl = `http://127.0.0.1:${address.port}/remote-cat.png?sig=secret`;
         const blocks = await createManagedOutgoingImageBlocks({
           stateDir,
@@ -815,9 +815,9 @@ describe("createManagedOutgoingImageBlocks", () => {
   });
 
   it("serves managed originals from a split config-path media root", async () => {
-    const openClawHome = tempDirs.make("managed-image-home-");
+    const steelEngineHome = tempDirs.make("managed-image-home-");
     const externalConfigDir = tempDirs.make("managed-image-config-");
-    const splitStateDir = path.join(openClawHome, ".openclaw");
+    const splitStateDir = path.join(steelEngineHome, ".steelengine");
     const sourcePath = path.join(splitStateDir, "workspace", "fixtures", "dot.png");
     await fs.mkdir(path.dirname(sourcePath), { recursive: true });
     await fs.writeFile(sourcePath, Buffer.from(TINY_PNG_BASE64, "base64"));
@@ -825,9 +825,9 @@ describe("createManagedOutgoingImageBlocks", () => {
     try {
       await withEnvAsync(
         {
-          OPENCLAW_HOME: openClawHome,
-          OPENCLAW_CONFIG_PATH: path.join(externalConfigDir, "config.json"),
-          OPENCLAW_STATE_DIR: undefined,
+          STEELENGINE_HOME: steelEngineHome,
+          STEELENGINE_CONFIG_PATH: path.join(externalConfigDir, "config.json"),
+          STEELENGINE_STATE_DIR: undefined,
         },
         async () => {
           const blocks = await createManagedOutgoingImageBlocks({
@@ -873,8 +873,8 @@ describe("createManagedOutgoingImageBlocks", () => {
         },
       );
     } finally {
-      closeOpenClawStateDatabaseForTest();
-      await fs.rm(openClawHome, { recursive: true, force: true });
+      closeSteelEngineStateDatabaseForTest();
+      await fs.rm(steelEngineHome, { recursive: true, force: true });
       await fs.rm(externalConfigDir, { recursive: true, force: true });
     }
   });
@@ -961,7 +961,7 @@ describe("createManagedOutgoingImageBlocks", () => {
     });
 
     try {
-      await withEnvAsync({ OPENCLAW_STATE_DIR: stateDir }, async () => {
+      await withEnvAsync({ STEELENGINE_STATE_DIR: stateDir }, async () => {
         const blocks = await createManagedOutgoingImageBlocks({
           sessionKey: "agent:main:main",
           mediaUrls: [`http://127.0.0.1:${address.port}/large-image.png`],
@@ -1020,7 +1020,7 @@ describe("createManagedOutgoingImageBlocks", () => {
     await fs.mkdir(path.dirname(inboundPath), { recursive: true });
     await fs.writeFile(inboundPath, Buffer.from(TINY_PNG_BASE64, "base64"));
 
-    await withEnvAsync({ OPENCLAW_STATE_DIR: stateDir }, async () => {
+    await withEnvAsync({ STEELENGINE_STATE_DIR: stateDir }, async () => {
       const blocks = await createManagedOutgoingImageBlocks({
         sessionKey: "agent:main:main",
         mediaUrls: [inboundPath],
@@ -1156,7 +1156,7 @@ describe("attachManagedOutgoingImagesToMessage", () => {
   });
 
   afterEach(async () => {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     await fs.rm(stateDir, { recursive: true, force: true });
   });
 
@@ -1191,7 +1191,7 @@ describe("cleanupManagedOutgoingImageRecords", () => {
   });
 
   afterEach(async () => {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     await fs.rm(stateDir, { recursive: true, force: true });
   });
 
@@ -1321,7 +1321,7 @@ describe("cleanupManagedOutgoingImageRecords", () => {
     });
     readSessionMessagesMock.mockReturnValue([
       {
-        __openclaw: { id: "msg-1" },
+        __steelengine: { id: "msg-1" },
         content: [
           {
             type: "image",
@@ -1368,7 +1368,7 @@ describe("cleanupManagedOutgoingImageRecords", () => {
     });
     readSessionMessagesMock.mockReturnValue([
       {
-        __openclaw: { id: "msg-1" },
+        __steelengine: { id: "msg-1" },
         content: [
           {
             type: "image",

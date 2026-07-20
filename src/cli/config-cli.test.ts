@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { Command } from "commander";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { ConfigFileSnapshot, OpenClawConfig } from "../config/types.js";
+import type { ConfigFileSnapshot, SteelEngineConfig } from "../config/types.js";
 import type { PluginManifestRecord, PluginManifestRegistry } from "../plugins/manifest-registry.js";
 import type { PluginMetadataSnapshot } from "../plugins/plugin-metadata-snapshot.js";
 import { applyCliProfileEnv } from "./profile.js";
@@ -12,14 +12,14 @@ import { createCliRuntimeCapture, mockRuntimeModule } from "./test-runtime-captu
 
 /**
  * Test for issue #6070:
- * `openclaw config set/unset` must update snapshot.resolved (user config after $include/${ENV},
+ * `steelengine config set/unset` must update snapshot.resolved (user config after $include/${ENV},
  * but before runtime defaults), so runtime defaults don't leak into the written config.
  */
 
 const mockReadConfigFileSnapshot = vi.fn<() => Promise<ConfigFileSnapshot>>();
 const mockWriteConfigFile = vi.fn<
   (
-    cfg: OpenClawConfig,
+    cfg: SteelEngineConfig,
     options?: { unsetPaths?: string[][]; explicitSetPaths?: string[][] },
   ) => Promise<void>
 >(async () => {});
@@ -32,11 +32,11 @@ const mockLoadPluginMetadataSnapshot = vi.fn((_configForTest: unknown) =>
 vi.mock("../config/config.js", () => ({
   readConfigFileSnapshot: () => mockReadConfigFileSnapshot(),
   writeConfigFile: (
-    cfg: OpenClawConfig,
+    cfg: SteelEngineConfig,
     options?: { unsetPaths?: string[][]; explicitSetPaths?: string[][] },
   ) => mockWriteConfigFile(cfg, options),
   replaceConfigFile: (params: {
-    nextConfig: OpenClawConfig;
+    nextConfig: SteelEngineConfig;
     writeOptions?: { unsetPaths?: string[][]; explicitSetPaths?: string[][] };
   }) => mockWriteConfigFile(params.nextConfig, params.writeOptions),
 }));
@@ -105,11 +105,11 @@ vi.mock("../runtime.js", async () => {
 });
 
 function buildSnapshot(params: {
-  resolved: OpenClawConfig;
-  config: OpenClawConfig;
+  resolved: SteelEngineConfig;
+  config: SteelEngineConfig;
 }): ConfigFileSnapshot {
   return {
-    path: "/tmp/openclaw.json",
+    path: "/tmp/steelengine.json",
     exists: true,
     raw: JSON.stringify(params.resolved),
     parsed: params.resolved,
@@ -124,7 +124,7 @@ function buildSnapshot(params: {
   };
 }
 
-function setSnapshot(resolved: OpenClawConfig, config: OpenClawConfig) {
+function setSnapshot(resolved: SteelEngineConfig, config: SteelEngineConfig) {
   mockReadConfigFileSnapshot.mockResolvedValueOnce(buildSnapshot({ resolved, config }));
 }
 
@@ -146,7 +146,7 @@ function writeSecurePluginEntrypoint(pathname: string, contents: string): void {
   fs.chmodSync(pathname, 0o644);
 }
 
-function withRuntimeDefaults(resolved: OpenClawConfig): OpenClawConfig {
+function withRuntimeDefaults(resolved: SteelEngineConfig): SteelEngineConfig {
   return {
     ...resolved,
     agents: {
@@ -165,7 +165,7 @@ function createPluginManifestRecord(
     channels: [],
     cliBackends: [],
     hooks: [],
-    manifestPath: `/tmp/${overrides.id}/openclaw.plugin.json`,
+    manifestPath: `/tmp/${overrides.id}/steelengine.plugin.json`,
     origin: "bundled",
     providers: [],
     rootDir: `/tmp/${overrides.id}`,
@@ -282,7 +282,7 @@ function setExternalFeishuSchema() {
       diagnostics: [],
       plugins: [
         createPluginManifestRecord({
-          id: "openclaw-lark",
+          id: "steelengine-lark",
           origin: "global",
           channels: ["feishu"],
           channelConfigs: {
@@ -313,16 +313,16 @@ function makeInvalidSnapshot(params: {
   path?: string;
   raw?: string;
   parsed?: unknown;
-  sourceConfig?: OpenClawConfig;
+  sourceConfig?: SteelEngineConfig;
 }): ConfigFileSnapshot {
   const parsed = params.parsed ?? {};
   return {
-    path: params.path ?? "/tmp/custom-openclaw.json",
+    path: params.path ?? "/tmp/custom-steelengine.json",
     exists: true,
     raw: params.raw ?? "{}",
     parsed,
-    sourceConfig: params.sourceConfig ?? (parsed as OpenClawConfig),
-    resolved: parsed as OpenClawConfig,
+    sourceConfig: params.sourceConfig ?? (parsed as SteelEngineConfig),
+    resolved: parsed as SteelEngineConfig,
     valid: false,
     runtimeConfig: {},
     config: {},
@@ -371,12 +371,12 @@ async function runValidateJsonAndGetPayload() {
   };
 }
 
-function firstWrittenConfig(): OpenClawConfig {
+function firstWrittenConfig(): SteelEngineConfig {
   const written = firstMockArg(mockWriteConfigFile);
   if (!written) {
     throw new Error("expected written config");
   }
-  return written as OpenClawConfig;
+  return written as SteelEngineConfig;
 }
 
 function firstWriteConfigOptions():
@@ -485,7 +485,7 @@ describe("config cli", () => {
 
   describe("config set - issue #6070", () => {
     it("preserves existing config keys when setting a new value", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           list: [{ id: "main" }, { id: "oracle", workspace: "~/oracle-workspace" }],
         },
@@ -493,7 +493,7 @@ describe("config cli", () => {
         tools: { allow: ["group:fs"] },
         logging: { level: "debug" },
       };
-      const runtimeMerged: OpenClawConfig = {
+      const runtimeMerged: SteelEngineConfig = {
         ...withRuntimeDefaults(resolved),
       };
       setSnapshot(resolved, runtimeMerged);
@@ -511,7 +511,7 @@ describe("config cli", () => {
     });
 
     it("marks set paths explicit so default-equal writes persist", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         channels: {
           telegram: {
             botToken: "tok-abc",
@@ -526,7 +526,7 @@ describe("config cli", () => {
             dmPolicy: "pairing",
           },
         },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
       setSnapshot(resolved, runtimeMerged);
 
       await runConfigCommand(["config", "set", "channels.telegram.dmPolicy", "pairing"]);
@@ -538,7 +538,7 @@ describe("config cli", () => {
     });
 
     it("marks object set paths explicit so nested default-equal writes persist", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         channels: {
           telegram: {
             botToken: "tok-abc",
@@ -553,7 +553,7 @@ describe("config cli", () => {
             dmPolicy: "pairing",
           },
         },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
       setSnapshot(resolved, runtimeMerged);
 
       await runConfigCommand([
@@ -569,7 +569,7 @@ describe("config cli", () => {
     });
 
     it("does not inject runtime defaults into the written config", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
       };
       const runtimeMerged = {
@@ -583,7 +583,7 @@ describe("config cli", () => {
         } as never,
         messages: { ackReaction: "✅" } as never,
         sessions: { persistence: { enabled: true } } as never,
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, runtimeMerged);
 
       await runConfigCommand(["config", "set", "gateway.auth.mode", "token"]);
@@ -600,7 +600,7 @@ describe("config cli", () => {
     });
 
     it("writes agents.defaults.videoGenerationModel.primary without disturbing sibling defaults", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           defaults: {
             model: "openai/gpt-5.4",
@@ -631,7 +631,7 @@ describe("config cli", () => {
     });
 
     it("normalizes retired Google Gemini model refs before writing config mutations", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           defaults: {
             model: {
@@ -664,7 +664,7 @@ describe("config cli", () => {
     });
 
     it("normalizes explicit model-map paths before writing config mutations", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           defaults: {
             models: {
@@ -693,7 +693,7 @@ describe("config cli", () => {
     });
 
     it("normalizes agent-list model refs before writing config mutations", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           list: [
             {
@@ -719,7 +719,7 @@ describe("config cli", () => {
     });
 
     it("normalizes provider catalog model refs before writing config mutations", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         models: {
           providers: {
             google: {
@@ -755,16 +755,16 @@ describe("config cli", () => {
         runConfigCommand([
           "config",
           "set",
-          'plugins.installs["openclaw-web-search"].spec',
-          '"@ollama/openclaw-web-search@0.2.2"',
+          'plugins.installs["steelengine-web-search"].spec',
+          '"@ollama/steelengine-web-search@0.2.2"',
           "--strict-json",
           "--dry-run",
         ]),
       ).rejects.toThrow(ExitError);
 
       expect(mockWriteConfigFile).not.toHaveBeenCalled();
-      expectErrorIncludes("openclaw plugins install <spec>");
-      expectErrorIncludes("openclaw plugins update <plugin-id>");
+      expectErrorIncludes("steelengine plugins install <spec>");
+      expectErrorIncludes("steelengine plugins update <plugin-id>");
     });
 
     it("rejects auto-managed meta.lastTouchedVersion config updates (#80849)", async () => {
@@ -878,7 +878,7 @@ describe("config cli", () => {
     });
 
     it("rejects protected model map replacement unless explicitly requested", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           defaults: {
             models: {
@@ -905,7 +905,7 @@ describe("config cli", () => {
     });
 
     it("merges protected model map values with --merge", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           defaults: {
             models: {
@@ -946,7 +946,7 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand([
@@ -968,7 +968,7 @@ describe("config cli", () => {
     });
 
     it("drops gateway.auth.password when switching mode to token", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: {
           auth: {
             mode: "password",
@@ -993,7 +993,7 @@ describe("config cli", () => {
     });
 
     it("drops gateway.auth.token when switching mode to password", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: {
           auth: {
             mode: "token",
@@ -1016,7 +1016,7 @@ describe("config cli", () => {
     });
 
     it("applies mode-based credential cleanup using the final batch result", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: {
           auth: {
             mode: "password",
@@ -1046,7 +1046,7 @@ describe("config cli", () => {
 
   describe("config get", () => {
     it("redacts sensitive values", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: {
           auth: {
             token: "super-secret-token",
@@ -1057,12 +1057,12 @@ describe("config cli", () => {
 
       await runConfigCommand(["config", "get", "gateway.auth.token"]);
 
-      expect(mockLog).toHaveBeenCalledWith("__OPENCLAW_REDACTED__");
+      expect(mockLog).toHaveBeenCalledWith("__STEELENGINE_REDACTED__");
     });
 
     it("prints materialized subagent archive default", async () => {
-      const resolved: OpenClawConfig = {};
-      const config: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {};
+      const config: SteelEngineConfig = {
         agents: {
           defaults: {
             maxConcurrent: 4,
@@ -1081,7 +1081,7 @@ describe("config cli", () => {
     });
 
     it("outputs JSON error to stdout when path is not found and --json is set", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1098,7 +1098,7 @@ describe("config cli", () => {
 
   describe("config validate", () => {
     it("prints success and exits 0 when config is valid", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1112,7 +1112,7 @@ describe("config cli", () => {
 
     it("prints warnings while still reporting a valid config", async () => {
       setSnapshotOnce({
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         exists: true,
         raw: "{}",
         parsed: {},
@@ -1185,7 +1185,7 @@ describe("config cli", () => {
       expectErrorIncludes("This is a plugin packaging issue, not a local config problem.");
       expectErrorIncludes("disable/uninstall the plugin");
       expect(mockError.mock.calls.map((call) => String(call[0])).join("\n")).not.toContain(
-        "openclaw doctor --fix",
+        "steelengine doctor --fix",
       );
       expect(mockLog).not.toHaveBeenCalled();
     });
@@ -1212,7 +1212,7 @@ describe("config cli", () => {
         makeInvalidSnapshot({
           raw,
           parsed,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           issues: [
             {
               path: "agents.list.3.tools.profile",
@@ -1227,7 +1227,7 @@ describe("config cli", () => {
       await expect(runConfigCommand(["config", "validate"])).rejects.toThrow(ExitError);
 
       expectErrorIncludes(
-        'openclaw.json:7 — agents.list[3].tools.profile: Invalid input (allowed: "minimal", "coding", "messaging", "full"), got: "none"',
+        'steelengine.json:7 — agents.list[3].tools.profile: Invalid input (allowed: "minimal", "coding", "messaging", "full"), got: "none"',
       );
     });
 
@@ -1240,7 +1240,7 @@ describe("config cli", () => {
 
       const payload = await runValidateJsonAndGetPayload();
       expect(payload.valid).toBe(false);
-      expect(payload.path).toBe("/tmp/custom-openclaw.json");
+      expect(payload.path).toBe("/tmp/custom-steelengine.json");
       expect(payload.issues).toEqual([{ path: "gateway.bind", message: "Invalid enum value" }]);
       expect(mockError).not.toHaveBeenCalled();
     });
@@ -1261,7 +1261,7 @@ describe("config cli", () => {
 
       const payload = await runValidateJsonAndGetPayload();
       expect(payload.valid).toBe(false);
-      expect(payload.path).toBe("/tmp/custom-openclaw.json");
+      expect(payload.path).toBe("/tmp/custom-steelengine.json");
       expect(payload.issues).toEqual([
         {
           path: "update.channel",
@@ -1274,7 +1274,7 @@ describe("config cli", () => {
 
     it("prints file-not-found and exits 1 when config file is missing", async () => {
       setSnapshotOnce({
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         exists: false,
         raw: null,
         parsed: {},
@@ -1371,7 +1371,7 @@ describe("config cli", () => {
 
   describe("config set parsing flags", () => {
     it("falls back to raw string when parsing fails and strict mode is off", async () => {
-      const resolved: OpenClawConfig = { gateway: { port: 18789 } };
+      const resolved: SteelEngineConfig = { gateway: { port: 18789 } };
       setSnapshot(resolved, resolved);
 
       await runConfigCommand(["config", "set", "gateway.auth.mode", "{bad"]);
@@ -1411,7 +1411,7 @@ describe("config cli", () => {
     });
 
     it("accepts --strict-json with batch mode and applies batch payload", async () => {
-      const resolved: OpenClawConfig = { gateway: { port: 18789 } };
+      const resolved: SteelEngineConfig = { gateway: { port: 18789 } };
       setSnapshot(resolved, resolved);
 
       await runConfigCommand([
@@ -1460,7 +1460,7 @@ describe("config cli", () => {
 
   describe("config set builders and dry-run", () => {
     it("supports SecretRef builder mode without requiring a value argument", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1488,13 +1488,13 @@ describe("config cli", () => {
 
     it("keeps numeric config set path segments as object keys for schema-backed Discord guild records", async () => {
       setConfigMutationShapeSchema();
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         channels: {
           discord: {
             enabled: true,
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand([
@@ -1519,13 +1519,13 @@ describe("config cli", () => {
 
     it("keeps numeric config set path segments as object keys for other schema-backed records", async () => {
       setConfigMutationShapeSchema();
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         channels: {
           telegram: {
             enabled: true,
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand([
@@ -1550,7 +1550,7 @@ describe("config cli", () => {
 
     it("still creates arrays for schema-backed numeric list indexes", async () => {
       setConfigMutationShapeSchema();
-      const resolved: OpenClawConfig = {};
+      const resolved: SteelEngineConfig = {};
       setSnapshot(resolved, resolved);
 
       await runConfigCommand(["config", "set", "agents.list.0.id", '"tech"', "--strict-json"]);
@@ -1564,7 +1564,7 @@ describe("config cli", () => {
     });
 
     it("fails early when unsupported mutable paths are assigned SecretRef objects (builder mode)", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1589,7 +1589,7 @@ describe("config cli", () => {
     });
 
     it("fails early when parent-object writes include unsupported SecretRef objects", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1610,7 +1610,7 @@ describe("config cli", () => {
     });
 
     it("supports provider builder mode under secrets.providers.<alias>", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1658,7 +1658,7 @@ describe("config cli", () => {
     });
 
     it("runs resolvability checks in builder dry-run mode without writing", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -1693,7 +1693,7 @@ describe("config cli", () => {
     });
 
     it("requires schema validation in JSON dry-run mode", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1715,7 +1715,7 @@ describe("config cli", () => {
 
     it("dry-runs config patch channel fields against plugin-owned schemas", async () => {
       setExternalFeishuSchema();
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         channels: {
           feishu: {
             appId: "app-id",
@@ -1724,13 +1724,13 @@ describe("config cli", () => {
         },
       };
       setSnapshot(resolved, resolved);
-      const pathname = writeTempJson5File("openclaw-config-plugin-channel-schema", {
+      const pathname = writeTempJson5File("steelengine-config-plugin-channel-schema", {
         channels: {
           feishu: {
             appId: "app-id",
             appSecret: "secret",
             replyMode: "thread",
-            footer: "OpenClaw",
+            footer: "SteelEngine",
           },
         },
       });
@@ -1743,7 +1743,7 @@ describe("config cli", () => {
     });
 
     it("fails dry-run when unsupported mutable paths receive SecretRef objects in value/json mode", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -1770,7 +1770,7 @@ describe("config cli", () => {
     });
 
     it("aggregates policy failures across batch entries", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1791,7 +1791,7 @@ describe("config cli", () => {
     });
 
     it("does not duplicate policy errors in --dry-run --json mode for parent-object writes", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1824,7 +1824,7 @@ describe("config cli", () => {
     });
 
     it("logs a dry-run note when value mode performs no validation checks", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
       };
       setSnapshot(resolved, resolved);
@@ -1838,7 +1838,7 @@ describe("config cli", () => {
     });
 
     it("supports batch mode for refs/providers in dry-run", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -1861,7 +1861,7 @@ describe("config cli", () => {
     });
 
     it("skips exec SecretRef resolvability checks in dry-run by default", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -1896,7 +1896,7 @@ describe("config cli", () => {
     });
 
     it("allows exec SecretRef resolvability checks in dry-run when --allow-exec is set", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -1938,7 +1938,7 @@ describe("config cli", () => {
     it("rejects --allow-exec without --dry-run", async () => {
       const nonexistentBatchPath = path.join(
         os.tmpdir(),
-        `openclaw-config-batch-nonexistent-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
+        `steelengine-config-batch-nonexistent-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
       );
       await expect(
         runConfigCommand(["config", "set", "--batch-file", nonexistentBatchPath, "--allow-exec"]),
@@ -1950,7 +1950,7 @@ describe("config cli", () => {
     });
 
     it("fails dry-run when skipped exec refs use an unconfigured provider", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {},
@@ -1978,7 +1978,7 @@ describe("config cli", () => {
     });
 
     it("fails dry-run when skipped exec refs use a provider with mismatched source", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2010,7 +2010,7 @@ describe("config cli", () => {
     });
 
     it("writes sibling SecretRef paths when target uses sibling-ref shape", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         channels: {
           googlechat: {
@@ -2084,12 +2084,12 @@ describe("config cli", () => {
     });
 
     it("supports batch-file mode", async () => {
-      const resolved: OpenClawConfig = { gateway: { port: 18789 } };
+      const resolved: SteelEngineConfig = { gateway: { port: 18789 } };
       setSnapshot(resolved, resolved);
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-batch-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
+        `steelengine-config-batch-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
       );
       fs.writeFileSync(pathname, '[{"path":"gateway.auth.mode","value":"token"}]', "utf8");
       try {
@@ -2104,7 +2104,7 @@ describe("config cli", () => {
     });
 
     it("batch-file nested leaf updates preserve agents defaults and list siblings", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           defaults: {
             models: {
@@ -2124,7 +2124,7 @@ describe("config cli", () => {
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-memory-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
+        `steelengine-config-memory-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
       );
       fs.writeFileSync(
         pathname,
@@ -2157,7 +2157,7 @@ describe("config cli", () => {
     it("rejects malformed batch-file payloads", async () => {
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-batch-invalid-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
+        `steelengine-config-batch-invalid-${Date.now()}-${Math.random().toString(16).slice(2)}.json`,
       );
       fs.writeFileSync(pathname, '{"path":"gateway.auth.mode","value":"token"}', "utf8");
       try {
@@ -2185,12 +2185,12 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-patch-${Date.now()}-${Math.random().toString(16).slice(2)}.json5`,
+        `steelengine-config-patch-${Date.now()}-${Math.random().toString(16).slice(2)}.json5`,
       );
       fs.writeFileSync(
         pathname,
@@ -2258,10 +2258,10 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
-      const pathname = writeTempJson5File("openclaw-config-patch-empty-object", {
+      const pathname = writeTempJson5File("steelengine-config-patch-empty-object", {
         agents: {
           defaults: {
             models: {
@@ -2293,10 +2293,10 @@ describe("config cli", () => {
             mode: "socket",
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
-      const pathname = writeTempJson5File("openclaw-config-patch-empty-merge", {
+      const pathname = writeTempJson5File("steelengine-config-patch-empty-merge", {
         channels: {
           slack: {},
         },
@@ -2321,10 +2321,10 @@ describe("config cli", () => {
             enabled: true,
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
-      const pathname = writeTempJson5File("openclaw-config-patch-numeric-object-key", {
+      const pathname = writeTempJson5File("steelengine-config-patch-numeric-object-key", {
         channels: {
           discord: {
             guilds: {
@@ -2358,12 +2358,12 @@ describe("config cli", () => {
             default: { source: "env" },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-patch-dry-${Date.now()}-${Math.random().toString(16).slice(2)}.json5`,
+        `steelengine-config-patch-dry-${Date.now()}-${Math.random().toString(16).slice(2)}.json5`,
       );
       fs.writeFileSync(
         pathname,
@@ -2390,15 +2390,15 @@ describe("config cli", () => {
     });
 
     it("emits the resolved config path in config patch JSON", async () => {
-      const home = path.join(os.tmpdir(), "openclaw-home-token-config-patch");
-      const configPath = path.join(home, ".openclaw", "openclaw.json");
-      const resolved: OpenClawConfig = { gateway: { port: 18789 } };
+      const home = path.join(os.tmpdir(), "steelengine-home-token-config-patch");
+      const configPath = path.join(home, ".steelengine", "steelengine.json");
+      const resolved: SteelEngineConfig = { gateway: { port: 18789 } };
       const snapshot = buildSnapshot({ resolved, config: resolved });
       snapshot.path = configPath;
       mockReadConfigFileSnapshot.mockResolvedValueOnce(snapshot);
-      vi.stubEnv("OPENCLAW_HOME", home);
+      vi.stubEnv("STEELENGINE_HOME", home);
 
-      const patch = writeTempJson5File("openclaw-config-patch-resolved-path", {
+      const patch = writeTempJson5File("steelengine-config-patch-resolved-path", {
         gateway: { port: 18790 },
       });
       try {
@@ -2411,7 +2411,7 @@ describe("config cli", () => {
       const payload = lastMockArg(defaultRuntime.writeJson) as { configPath: string };
       expect(payload.configPath).toBe(configPath);
       expect(path.isAbsolute(payload.configPath)).toBe(true);
-      expect(payload.configPath).not.toContain("$OPENCLAW_HOME");
+      expect(payload.configPath).not.toContain("$STEELENGINE_HOME");
       expect(payload.configPath).not.toContain("~");
     });
 
@@ -2426,7 +2426,7 @@ describe("config cli", () => {
 
     it("dry-runs pluginIntegration provider patches against manifest integration metadata", async () => {
       const pluginId = "secret-provider-proof";
-      const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-config-plugin-provider-"));
+      const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-config-plugin-provider-"));
       try {
         writeSecurePluginEntrypoint(path.join(rootDir, "index.js"), "export default {};\n");
         writeSecurePluginEntrypoint(path.join(rootDir, "resolve.mjs"), "process.stdin.resume();\n");
@@ -2434,7 +2434,7 @@ describe("config cli", () => {
           secrets: {
             providers: {},
           },
-        } as unknown as OpenClawConfig;
+        } as unknown as SteelEngineConfig;
         mockLoadPluginMetadataSnapshot.mockReturnValue(
           createPluginMetadataSnapshot({
             diagnostics: [],
@@ -2445,7 +2445,7 @@ describe("config cli", () => {
                 origin: "bundled",
                 rootDir,
                 source: path.join(rootDir, "index.js"),
-                manifestPath: path.join(rootDir, "openclaw.plugin.json"),
+                manifestPath: path.join(rootDir, "steelengine.plugin.json"),
                 secretProviderIntegrations: {
                   vault: {
                     source: "exec",
@@ -2459,7 +2459,7 @@ describe("config cli", () => {
         );
 
         setSnapshot(resolved, resolved);
-        const validPatch = writeTempJson5File("openclaw-config-plugin-provider-valid", {
+        const validPatch = writeTempJson5File("steelengine-config-plugin-provider-valid", {
           secrets: {
             providers: {
               team: {
@@ -2485,7 +2485,7 @@ describe("config cli", () => {
         expect(mockWriteConfigFile).not.toHaveBeenCalled();
 
         setSnapshot(resolved, resolved);
-        const invalidPatch = writeTempJson5File("openclaw-config-plugin-provider-invalid", {
+        const invalidPatch = writeTempJson5File("steelengine-config-plugin-provider-invalid", {
           secrets: {
             providers: {
               team: {
@@ -2544,10 +2544,10 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
-      const patch = writeTempJson5File("openclaw-config-plugin-disable", {
+      const patch = writeTempJson5File("steelengine-config-plugin-disable", {
         plugins: {
           entries: {
             [pluginId]: { enabled: false },
@@ -2577,10 +2577,10 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
-      const patch = writeTempJson5File("openclaw-config-plugin-provider-ref", {
+      const patch = writeTempJson5File("steelengine-config-plugin-provider-ref", {
         gateway: {
           auth: {
             token: { source: "exec", provider: "team", id: "gateway/token" },
@@ -2610,12 +2610,12 @@ describe("config cli", () => {
             default: { source: "env" },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-patch-ref-schema-${Date.now()}-${Math.random()
+        `steelengine-config-patch-ref-schema-${Date.now()}-${Math.random()
           .toString(16)
           .slice(2)}.json5`,
       );
@@ -2655,13 +2655,13 @@ describe("config cli", () => {
             enabled: false,
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
       mockResolveSecretRefValue.mockRejectedValue(new Error("missing env var"));
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-patch-nested-ref-${Date.now()}-${Math.random()
+        `steelengine-config-patch-nested-ref-${Date.now()}-${Math.random()
           .toString(16)
           .slice(2)}.json5`,
       );
@@ -2724,12 +2724,12 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-patch-replace-${Date.now()}-${Math.random().toString(16).slice(2)}.json5`,
+        `steelengine-config-patch-replace-${Date.now()}-${Math.random().toString(16).slice(2)}.json5`,
       );
       fs.writeFileSync(
         pathname,
@@ -2780,7 +2780,7 @@ describe("config cli", () => {
     it("rejects unused config patch replace paths", async () => {
       const pathname = path.join(
         os.tmpdir(),
-        `openclaw-config-patch-unused-replace-${Date.now()}-${Math.random()
+        `steelengine-config-patch-unused-replace-${Date.now()}-${Math.random()
           .toString(16)
           .slice(2)}.json5`,
       );
@@ -2830,7 +2830,7 @@ describe("config cli", () => {
     });
 
     it("fails dry-run when a builder-assigned SecretRef is unresolved", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2860,7 +2860,7 @@ describe("config cli", () => {
     });
 
     it("emits structured JSON for --dry-run --json success", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2903,7 +2903,7 @@ describe("config cli", () => {
     });
 
     it("emits skipped exec metadata for --dry-run --json success", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2945,7 +2945,7 @@ describe("config cli", () => {
     });
 
     it("emits structured JSON for --dry-run --json failure", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -2984,7 +2984,7 @@ describe("config cli", () => {
     });
 
     it("keeps distinct resolvability failures when messages are identical but refs differ", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -3022,7 +3022,7 @@ describe("config cli", () => {
     });
 
     it("aggregates schema and resolvability failures in --dry-run --json mode", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -3057,7 +3057,7 @@ describe("config cli", () => {
     });
 
     it("fails dry-run when provider updates make existing refs unresolvable", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -3098,7 +3098,7 @@ describe("config cli", () => {
     });
 
     it("fails dry-run for nested provider edits that make existing refs unresolvable", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -3173,7 +3173,7 @@ describe("config cli", () => {
     });
 
     it("rejects impractical array indexes for config set", async () => {
-      const resolved = { agents: { list: [] } } as unknown as OpenClawConfig;
+      const resolved = { agents: { list: [] } } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       await expect(
@@ -3184,7 +3184,7 @@ describe("config cli", () => {
     });
 
     it("rejects signed array indexes for config set", async () => {
-      const resolved = { agents: { list: [{ id: "main" }] } } as unknown as OpenClawConfig;
+      const resolved = { agents: { list: [{ id: "main" }] } } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       await expect(
@@ -3282,7 +3282,7 @@ describe("config cli", () => {
     });
 
     it("preserves valid bracket path forms", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: { list: [{ id: "main" }, { id: "other" }] },
       };
       setSnapshot(resolved, resolved);
@@ -3305,7 +3305,7 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand([
@@ -3330,7 +3330,7 @@ describe("config cli", () => {
 
   describe("config unset - issue #6070", () => {
     it("preserves existing config keys when unsetting a value", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: { list: [{ id: "main" }] },
         gateway: { port: 18789 },
         tools: {
@@ -3339,7 +3339,7 @@ describe("config cli", () => {
         },
         logging: { level: "debug" },
       };
-      const runtimeMerged: OpenClawConfig = {
+      const runtimeMerged: SteelEngineConfig = {
         ...withRuntimeDefaults(resolved),
       };
       setSnapshot(resolved, runtimeMerged);
@@ -3360,12 +3360,12 @@ describe("config cli", () => {
     });
 
     it("removes only the specified array element", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           list: [{ id: "agent-a" }, { id: "agent-b" }, { id: "agent-c" }],
         },
       };
-      const runtimeMerged: OpenClawConfig = {
+      const runtimeMerged: SteelEngineConfig = {
         ...withRuntimeDefaults(resolved),
       };
       setSnapshot(resolved, runtimeMerged);
@@ -3379,7 +3379,7 @@ describe("config cli", () => {
     });
 
     it("preserves write-level unset handling for numeric object keys", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         channels: {
           discord: {
             guilds: {
@@ -3388,7 +3388,7 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand(["config", "unset", "channels.discord.guilds.123"]);
@@ -3406,7 +3406,7 @@ describe("config cli", () => {
     });
 
     it("dry-runs an unset without writing the config file", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: { list: [{ id: "main" }] },
         gateway: { port: 18789 },
         tools: {
@@ -3420,12 +3420,12 @@ describe("config cli", () => {
       await runConfigCommand(["config", "unset", "tools.alsoAllow", "--dry-run"]);
 
       expect(mockWriteConfigFile).not.toHaveBeenCalled();
-      expectLogIncludes("Dry run successful: 1 update(s) validated against /tmp/openclaw.json.");
+      expectLogIncludes("Dry run successful: 1 update(s) validated against /tmp/steelengine.json.");
       expect(mockReadConfigFileSnapshot).toHaveBeenCalledTimes(2);
     });
 
     it("prints JSON for config unset dry-run", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: { list: [{ id: "main" }] },
         gateway: { port: 18789 },
         tools: {
@@ -3452,7 +3452,7 @@ describe("config cli", () => {
     });
 
     it("prints structured JSON when unset dry-run misses a path", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         tools: {
           profile: "coding",
@@ -3496,7 +3496,7 @@ describe("config cli", () => {
             },
           },
         },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
       const runtimeMerged = {
         agents: {
           defaults: {
@@ -3505,7 +3505,7 @@ describe("config cli", () => {
             },
           },
         },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
       const aliasPath = 'agents.defaults.models["openai/gpt-5.4"].alias';
       setSnapshot(resolved, runtimeMerged);
 
@@ -3519,9 +3519,9 @@ describe("config cli", () => {
 
       expectErrorIncludes(`Config path not found in authored config: ${aliasPath}.`);
       expectErrorIncludes("It only exists after runtime defaults are applied");
-      expectErrorIncludes("openclaw config set <path> <value>");
+      expectErrorIncludes("steelengine config set <path> <value>");
       expect(mockError.mock.calls.map((call) => String(call[0])).join("\n")).not.toContain(
-        "Run openclaw config get <path>",
+        "Run steelengine config get <path>",
       );
 
       setSnapshot(resolved, runtimeMerged);
@@ -3544,7 +3544,7 @@ describe("config cli", () => {
     });
 
     it("validates existing refs when unset dry-run removes all secret providers", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           providers: {
@@ -3582,7 +3582,7 @@ describe("config cli", () => {
     });
 
     it("validates existing refs when unset dry-run removes secret defaults", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         gateway: { port: 18789 },
         secrets: {
           defaults: {
@@ -3601,7 +3601,7 @@ describe("config cli", () => {
             },
           },
         } as never,
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
       setSnapshot(resolved, resolved);
       setSnapshot(resolved, resolved);
 
@@ -3615,7 +3615,7 @@ describe("config cli", () => {
         provider: "default",
         id: "WEB_SEARCH_API_KEY",
       });
-      expectLogIncludes("Dry run successful: 1 update(s) validated against /tmp/openclaw.json.");
+      expectLogIncludes("Dry run successful: 1 update(s) validated against /tmp/steelengine.json.");
     });
 
     it("rejects config unset --json without --dry-run", async () => {
@@ -3639,7 +3639,7 @@ describe("config cli", () => {
 
   describe("config apply hints - issue #80722", () => {
     it("prints a hot-reload hint for agents.list model changes", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           list: [
             { id: "main" },
@@ -3663,7 +3663,7 @@ describe("config cli", () => {
     });
 
     it("does not treat legacy per-agent agentRuntime as restart-required", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           list: [
             {
@@ -3673,7 +3673,7 @@ describe("config cli", () => {
             },
           ],
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, withRuntimeDefaults(resolved));
 
       await runConfigCommand([
@@ -3689,7 +3689,7 @@ describe("config cli", () => {
     });
 
     it("keeps the restart hint for hot-path edits when reload mode is off", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           list: [{ id: "main", model: { primary: "openai/gpt-5.4" } }],
         },
@@ -3713,7 +3713,7 @@ describe("config cli", () => {
     });
 
     it("keeps the restart hint for hot-path edits when reload mode is restart", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           list: [{ id: "main", model: { primary: "openai/gpt-5.4" } }],
         },
@@ -3737,7 +3737,7 @@ describe("config cli", () => {
     });
 
     it("prints a hot-reload hint when removing legacy per-agent agentRuntime", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: {
           list: [
             {
@@ -3746,7 +3746,7 @@ describe("config cli", () => {
             },
           ],
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, withRuntimeDefaults(resolved));
 
       await runConfigCommand(["config", "unset", "agents.list[0].agentRuntime"]);
@@ -3757,13 +3757,13 @@ describe("config cli", () => {
     });
 
     it("prints a hot-reload hint for provider runtime policy changes", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         models: {
           providers: {
             openai: {},
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand([
@@ -3780,7 +3780,7 @@ describe("config cli", () => {
     });
 
     it("keeps the restart hint for broad models writes that change pricing bootstrap", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         models: {
           pricing: {
             enabled: false,
@@ -3791,7 +3791,7 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand([
@@ -3808,23 +3808,23 @@ describe("config cli", () => {
     });
 
     it("keeps the restart hint for broad plugins writes that change load paths", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         plugins: {
           load: {
-            paths: ["/tmp/openclaw-plugins-a"],
+            paths: ["/tmp/steelengine-plugins-a"],
           },
           entries: {
             canvas: { enabled: true },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand([
         "config",
         "set",
         "plugins",
-        '{"load":{"paths":["/tmp/openclaw-plugins-b"]},"entries":{"canvas":{"enabled":true}}}',
+        '{"load":{"paths":["/tmp/steelengine-plugins-b"]},"entries":{"canvas":{"enabled":true}}}',
         "--strict-json",
         "--replace",
       ]);
@@ -3834,7 +3834,7 @@ describe("config cli", () => {
     });
 
     it("keeps the restart hint for broad models unsets that remove pricing bootstrap", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         models: {
           pricing: {
             enabled: false,
@@ -3845,7 +3845,7 @@ describe("config cli", () => {
             },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand(["config", "unset", "models"]);
@@ -3855,16 +3855,16 @@ describe("config cli", () => {
     });
 
     it("keeps the restart hint for broad plugins unsets that remove load paths", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         plugins: {
           load: {
-            paths: ["/tmp/openclaw-plugins-a"],
+            paths: ["/tmp/steelengine-plugins-a"],
           },
           entries: {
             canvas: { enabled: true },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand(["config", "unset", "plugins"]);
@@ -3874,7 +3874,7 @@ describe("config cli", () => {
     });
 
     it("keeps the restart hint for restart-required config paths", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: { list: [{ id: "main" }] },
         gateway: { port: 18789 },
       };
@@ -3887,13 +3887,13 @@ describe("config cli", () => {
     });
 
     it("keeps plugin entry config writes restart-backed when reload metadata is absent", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         plugins: {
           entries: {
             canvas: { enabled: true },
           },
         },
-      } as unknown as OpenClawConfig;
+      } as unknown as SteelEngineConfig;
       setSnapshot(resolved, resolved);
 
       await runConfigCommand(["config", "set", "plugins.entries.canvas.enabled", "false"]);
@@ -3904,7 +3904,7 @@ describe("config cli", () => {
     });
 
     it("keeps the restart hint for mixed hot and restart batch updates", async () => {
-      const resolved: OpenClawConfig = {
+      const resolved: SteelEngineConfig = {
         agents: { list: [{ id: "main", model: { primary: "openai/gpt-5.4" } }] },
         gateway: { port: 18789 },
       };
@@ -3924,19 +3924,19 @@ describe("config cli", () => {
 
   describe("config file", () => {
     it("resolves the active path without initializing state", async () => {
-      const home = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-config-file-"));
+      const home = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-config-file-"));
       const profile = "configfile-probe";
-      const stateDir = path.join(home, `.openclaw-${profile}`);
-      const configPath = path.join(stateDir, "openclaw.json");
-      vi.stubEnv("OPENCLAW_HOME", home);
-      vi.stubEnv("OPENCLAW_CONFIG_PATH", "");
-      vi.stubEnv("OPENCLAW_PROFILE", "");
-      vi.stubEnv("OPENCLAW_STATE_DIR", "");
-      vi.stubEnv("OPENCLAW_TEST_FAST", "1");
+      const stateDir = path.join(home, `.steelengine-${profile}`);
+      const configPath = path.join(stateDir, "steelengine.json");
+      vi.stubEnv("STEELENGINE_HOME", home);
+      vi.stubEnv("STEELENGINE_CONFIG_PATH", "");
+      vi.stubEnv("STEELENGINE_PROFILE", "");
+      vi.stubEnv("STEELENGINE_STATE_DIR", "");
+      vi.stubEnv("STEELENGINE_TEST_FAST", "1");
       applyCliProfileEnv({ profile });
       mockReadConfigFileSnapshot.mockImplementationOnce(async () => {
         fs.mkdirSync(path.join(stateDir, "state"), { recursive: true });
-        fs.writeFileSync(path.join(stateDir, "state", "openclaw.sqlite"), "initialized");
+        fs.writeFileSync(path.join(stateDir, "state", "steelengine.sqlite"), "initialized");
         const snapshot = buildSnapshot({ resolved: {}, config: {} });
         snapshot.path = configPath;
         return snapshot;
@@ -3947,11 +3947,11 @@ describe("config cli", () => {
         const output = String(lastMockArg(mockLog));
         expect(output).toBe(configPath);
         expect(path.isAbsolute(output)).toBe(true);
-        expect(output).not.toContain("$OPENCLAW_HOME");
+        expect(output).not.toContain("$STEELENGINE_HOME");
         expect(output).not.toContain("~");
         expect(mockReadConfigFileSnapshot).not.toHaveBeenCalled();
         expect(fs.existsSync(stateDir)).toBe(false);
-        expect(fs.existsSync(path.join(stateDir, "state", "openclaw.sqlite"))).toBe(false);
+        expect(fs.existsSync(path.join(stateDir, "state", "steelengine.sqlite"))).toBe(false);
       } finally {
         vi.unstubAllEnvs();
         fs.rmSync(home, { recursive: true, force: true });

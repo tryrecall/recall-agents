@@ -1,13 +1,13 @@
 // Structured heartbeat response tool payload helpers.
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
-import { normalizeOptionalString as readString } from "@openclaw/normalization-core/string-coerce";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
+import { normalizeOptionalString as readString } from "@steelengine/normalization-core/string-coerce";
 import { readTrimmedStringAlias } from "../utils/string-readers.js";
 import type { ReplyPayload } from "./reply-payload.js";
 import { HEARTBEAT_TOKEN } from "./tokens.js";
 
 /** Tool name used by heartbeat runs to report visible or silent progress. */
 export const HEARTBEAT_RESPONSE_TOOL_NAME = "heartbeat_respond";
-const HEARTBEAT_RESPONSE_CHANNEL_DATA_KEY = "openclawHeartbeatResponse";
+const HEARTBEAT_RESPONSE_CHANNEL_DATA_KEY = "steelengineHeartbeatResponse";
 
 /** Allowed heartbeat response outcomes. */
 export const HEARTBEAT_TOOL_OUTCOMES = [

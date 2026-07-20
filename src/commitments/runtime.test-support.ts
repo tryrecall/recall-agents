@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import "./runtime.js";
 import type { CommitmentExtractionBatchResult, CommitmentExtractionItem } from "./types.js";
 
@@ -6,10 +6,10 @@ type TimerHandle = ReturnType<typeof setTimeout>;
 
 type CommitmentExtractionRuntime = {
   extractBatch?: (params: {
-    cfg?: OpenClawConfig;
+    cfg?: SteelEngineConfig;
     items: CommitmentExtractionItem[];
   }) => Promise<CommitmentExtractionBatchResult>;
-  resolveDefaultModel?: (params: { cfg: OpenClawConfig; agentId?: string }) => {
+  resolveDefaultModel?: (params: { cfg: SteelEngineConfig; agentId?: string }) => {
     provider: string;
     model: string;
   };
@@ -26,7 +26,7 @@ type CommitmentRuntimeTestApi = {
 
 function getTestApi(): CommitmentRuntimeTestApi {
   const api = (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.commitmentRuntimeTestApi")
+    Symbol.for("steelengine.commitmentRuntimeTestApi")
   ];
   if (!api) {
     throw new Error("commitment runtime test API is unavailable");

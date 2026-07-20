@@ -2,7 +2,7 @@
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { resolveUserPath } from "../utils.js";
 import { createPluginRecord } from "./loader-records.js";
 import { createPluginRegistry } from "./registry.js";
@@ -25,7 +25,7 @@ function createTestRegistry(runtime: PluginRuntime) {
 
 describe("plugin registry runtime config scope", () => {
   it("resolves plugin API paths against the plugin root", () => {
-    const pluginRoot = path.join(os.tmpdir(), "openclaw-plugins", "demo");
+    const pluginRoot = path.join(os.tmpdir(), "steelengine-plugins", "demo");
     const pluginRegistry = createTestRegistry(createPluginRuntime());
     const record = createPluginRecord({
       id: "path-plugin",
@@ -36,19 +36,19 @@ describe("plugin registry runtime config scope", () => {
       enabled: true,
       configSchema: false,
     });
-    const api = pluginRegistry.createApi(record, { config: {} as OpenClawConfig });
+    const api = pluginRegistry.createApi(record, { config: {} as SteelEngineConfig });
     const absolute = path.resolve(pluginRoot, "..", "outside.txt");
 
     expect(api.resolvePath("data/cache.json")).toBe(path.join(pluginRoot, "data", "cache.json"));
     expect(api.resolvePath("./data/cache.json")).toBe(path.join(pluginRoot, "data", "cache.json"));
     expect(api.resolvePath(absolute)).toBe(absolute);
-    expect(api.resolvePath("~/openclaw/plugin.txt")).toBe(resolveUserPath("~/openclaw/plugin.txt"));
+    expect(api.resolvePath("~/steelengine/plugin.txt")).toBe(resolveUserPath("~/steelengine/plugin.txt"));
   });
 
   it("adds plugin context to lazy runtime resolution failures", () => {
     const runtime = new Proxy({} as PluginRuntime, {
       get() {
-        throw new Error("Unable to resolve plugin runtime module; loader=/tmp/openclaw-loader.js");
+        throw new Error("Unable to resolve plugin runtime module; loader=/tmp/steelengine-loader.js");
       },
     });
     const pluginRegistry = createTestRegistry(runtime);
@@ -60,7 +60,7 @@ describe("plugin registry runtime config scope", () => {
       enabled: true,
       configSchema: false,
     });
-    const api = pluginRegistry.createApi(record, { config: {} as OpenClawConfig });
+    const api = pluginRegistry.createApi(record, { config: {} as SteelEngineConfig });
 
     let thrown: unknown;
     try {
@@ -81,12 +81,12 @@ describe("plugin registry runtime config scope", () => {
     let currentScope = getPluginRuntimeGatewayRequestScope();
     let mutateScope = getPluginRuntimeGatewayRequestScope();
     let replaceScope = getPluginRuntimeGatewayRequestScope();
-    const config = {} as OpenClawConfig;
+    const config = {} as SteelEngineConfig;
     const replaceResult = {
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       previousHash: null,
       persistedHash: "persisted-hash",
-      snapshot: { path: "/tmp/openclaw.json" },
+      snapshot: { path: "/tmp/steelengine.json" },
       nextConfig: config,
       afterWrite: { mode: "auto" },
       followUp: { mode: "auto", requiresRestart: false },
@@ -168,7 +168,7 @@ describe("plugin registry runtime config scope", () => {
       enabled: true,
       configSchema: false,
     });
-    const api = pluginRegistry.createApi(record, { config: {} as OpenClawConfig });
+    const api = pluginRegistry.createApi(record, { config: {} as SteelEngineConfig });
 
     await api.runtime.llm.acquireLocalService({
       providerId: "gpu-host",
@@ -201,7 +201,7 @@ describe("plugin registry runtime config scope", () => {
       enabled: true,
       configSchema: false,
     });
-    const api = pluginRegistry.createApi(record, { config: {} as OpenClawConfig });
+    const api = pluginRegistry.createApi(record, { config: {} as SteelEngineConfig });
 
     await api.runtime.nodes.list({ connected: true });
     await api.runtime.nodes.invoke({
@@ -239,7 +239,7 @@ describe("plugin registry runtime config scope", () => {
       enabled: true,
       configSchema: false,
     });
-    const api = pluginRegistry.createApi(record, { config: {} as OpenClawConfig });
+    const api = pluginRegistry.createApi(record, { config: {} as SteelEngineConfig });
 
     await api.runtime.gateway.request("voicecall.start", { to: "+15550001234" });
 
@@ -285,8 +285,8 @@ describe("plugin registry runtime config scope", () => {
       enabled: true,
       configSchema: false,
     });
-    const ownerApi = pluginRegistry.createApi(ownerRecord, { config: {} as OpenClawConfig });
-    const otherApi = pluginRegistry.createApi(otherRecord, { config: {} as OpenClawConfig });
+    const ownerApi = pluginRegistry.createApi(ownerRecord, { config: {} as SteelEngineConfig });
+    const otherApi = pluginRegistry.createApi(otherRecord, { config: {} as SteelEngineConfig });
     ownerApi.registerAgentHarness({
       id: "codex",
       label: "Codex",
@@ -347,7 +347,7 @@ describe("plugin registry runtime config scope", () => {
       enabled: true,
       configSchema: false,
     });
-    const api = pluginRegistry.createApi(record, { config: {} as OpenClawConfig });
+    const api = pluginRegistry.createApi(record, { config: {} as SteelEngineConfig });
     api.registerCliBackend({ id: "claude-cli", config: { command: "claude" } });
     api.registerAgentHarness({
       id: "anthropic-harness",
@@ -494,9 +494,9 @@ describe("plugin registry runtime config scope", () => {
       enabled: true,
       configSchema: false,
     });
-    const ownerApi = pluginRegistry.createApi(ownerRecord, { config: {} as OpenClawConfig });
-    const otherApi = pluginRegistry.createApi(otherRecord, { config: {} as OpenClawConfig });
-    const voiceApi = pluginRegistry.createApi(voiceRecord, { config: {} as OpenClawConfig });
+    const ownerApi = pluginRegistry.createApi(ownerRecord, { config: {} as SteelEngineConfig });
+    const otherApi = pluginRegistry.createApi(otherRecord, { config: {} as SteelEngineConfig });
+    const voiceApi = pluginRegistry.createApi(voiceRecord, { config: {} as SteelEngineConfig });
     ownerApi.registerAgentHarness({
       id: "codex",
       label: "Codex",
@@ -561,7 +561,7 @@ describe("plugin registry runtime config scope", () => {
     await expect(
       voiceApi.runtime.agent.runEmbeddedAgent({
         ...delegatedRunParams,
-        agentHarnessRuntimeOverride: "openclaw",
+        agentHarnessRuntimeOverride: "steelengine",
       }),
     ).rejects.toThrow("only with its exact persisted identity and harness");
     await expect(

@@ -1,4 +1,4 @@
-// Write Plugin Sdk Entry Dts script supports OpenClaw repository automation.
+// Write Plugin Sdk Entry Dts script supports SteelEngine repository automation.
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -44,17 +44,17 @@ const RUNTIME_SHIMS: Partial<Record<string, string>> = {
   ].join("\n"),
 };
 
-const USE_CANONICAL_DECLARATIONS = process.env.OPENCLAW_PLUGIN_SDK_CANONICAL_DTS === "1";
+const USE_CANONICAL_DECLARATIONS = process.env.STEELENGINE_PLUGIN_SDK_CANONICAL_DTS === "1";
 
 function isBareImportSpecifier(id: string): boolean {
   if (
-    id === "@openclaw/llm-core" ||
-    id.startsWith("@openclaw/llm-core/") ||
-    id === "@openclaw/model-catalog-core/model-catalog-types" ||
-    id === "@openclaw/retry" ||
-    id.startsWith("@openclaw/normalization-core/") ||
-    id.startsWith("@openclaw/media-core/") ||
-    id.startsWith("@openclaw/acp-core/")
+    id === "@steelengine/llm-core" ||
+    id.startsWith("@steelengine/llm-core/") ||
+    id === "@steelengine/model-catalog-core/model-catalog-types" ||
+    id === "@steelengine/retry" ||
+    id.startsWith("@steelengine/normalization-core/") ||
+    id.startsWith("@steelengine/media-core/") ||
+    id.startsWith("@steelengine/acp-core/")
   ) {
     return false;
   }
@@ -84,7 +84,7 @@ function copyFlatDeclarations(fromDir: string, toDir: string): void {
 }
 
 const distPluginSdkDir = path.join(process.cwd(), "dist/plugin-sdk");
-const shouldBuildPrivateQaEntries = process.env.OPENCLAW_BUILD_PRIVATE_QA === "1";
+const shouldBuildPrivateQaEntries = process.env.STEELENGINE_BUILD_PRIVATE_QA === "1";
 const flatDeclarationEntrypoints = shouldBuildPrivateQaEntries
   ? pluginSdkEntrypoints
   : publicPluginSdkEntrypoints;
@@ -100,7 +100,7 @@ if (USE_CANONICAL_DECLARATIONS) {
     }
   }
 } else {
-  const flatDeclarationTempDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-plugin-sdk-dts-"));
+  const flatDeclarationTempDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-plugin-sdk-dts-"));
   try {
     await build({
       clean: true,

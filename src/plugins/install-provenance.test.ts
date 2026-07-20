@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 import type { BundledPluginSource } from "./bundled-sources.js";
-import { isOpenClawTrustedPluginInstallSpec } from "./install-provenance.js";
+import { isSteelEngineTrustedPluginInstallSpec } from "./install-provenance.js";
 
 const bundledSources = new Map<string, BundledPluginSource>([
   [
     "discord",
     {
       pluginId: "discord",
-      localPath: "/opt/openclaw/extensions/discord",
-      npmSpec: "@openclaw/discord",
+      localPath: "/opt/steelengine/extensions/discord",
+      npmSpec: "@steelengine/discord",
     },
   ],
 ]);
@@ -16,20 +16,20 @@ const bundledSources = new Map<string, BundledPluginSource>([
 describe("plugin install provenance", () => {
   it.each([
     "discord",
-    "@openclaw/discord",
-    "npm:@openclaw/discord",
-    "/opt/openclaw/extensions/discord",
+    "@steelengine/discord",
+    "npm:@steelengine/discord",
+    "/opt/steelengine/extensions/discord",
     "brave",
-    "npm:@openclaw/brave-plugin",
-    "clawhub:openclaw-demo",
-  ])("trusts OpenClaw-owned install source %s", (spec) => {
-    expect(isOpenClawTrustedPluginInstallSpec(spec, bundledSources)).toBe(true);
+    "npm:@steelengine/brave-plugin",
+    "clawhub:steelengine-demo",
+  ])("trusts SteelEngine-owned install source %s", (spec) => {
+    expect(isSteelEngineTrustedPluginInstallSpec(spec, bundledSources)).toBe(true);
   });
 
   it.each(["npm:discord", "npm:@example/plugin", "/tmp/example-plugin"])(
     "keeps arbitrary install source %s untrusted",
     (spec) => {
-      expect(isOpenClawTrustedPluginInstallSpec(spec, bundledSources)).toBe(false);
+      expect(isSteelEngineTrustedPluginInstallSpec(spec, bundledSources)).toBe(false);
     },
   );
 });

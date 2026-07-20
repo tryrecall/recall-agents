@@ -17,12 +17,12 @@ export type {
   AcpRuntimeTurnResult,
   AcpRuntimeTurnResultError,
   AcpSessionUpdateTag,
-} from "@openclaw/acp-core/runtime/types";
+} from "@steelengine/acp-core/runtime/types";
 export type {
-  OpenClawPluginApi,
-  OpenClawPluginConfigSchema,
-  OpenClawPluginService,
-  OpenClawPluginServiceContext,
+  SteelEnginePluginApi,
+  SteelEnginePluginConfigSchema,
+  SteelEnginePluginService,
+  SteelEnginePluginServiceContext,
   PluginLogger,
 } from "../plugins/types.js";
 export type {

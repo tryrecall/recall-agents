@@ -1,13 +1,13 @@
-# SMS OpenClaw channel
+# SMS SteelEngine channel
 
-Official OpenClaw channel plugin for SMS.
+Official SteelEngine channel plugin for SMS.
 
 ## Install
 
 ```sh
-openclaw plugins install @openclaw/sms
+steelengine plugins install @steelengine/sms
 ```
 
 ## Docs
 
-See `docs/channels/sms.md` in the OpenClaw repository, or the published docs at `https://docs.openclaw.ai/channels/sms`.
+See `docs/channels/sms.md` in the SteelEngine repository, or the published docs at `https://docs.steelengine.ai/channels/sms`.

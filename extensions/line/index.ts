@@ -1,14 +1,14 @@
-// Line plugin entrypoint registers its OpenClaw integration.
+// Line plugin entrypoint registers its SteelEngine integration.
 import {
   defineBundledChannelEntry,
-  type OpenClawPluginCommandDefinition,
-  type OpenClawPluginApi,
-} from "openclaw/plugin-sdk/channel-entry-contract";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
+  type SteelEnginePluginCommandDefinition,
+  type SteelEnginePluginApi,
+} from "steelengine/plugin-sdk/channel-entry-contract";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
 
-type RegisteredLineCardCommand = OpenClawPluginCommandDefinition;
+type RegisteredLineCardCommand = SteelEnginePluginCommandDefinition;
 
-function createLineCardCommandLoader(api: OpenClawPluginApi) {
+function createLineCardCommandLoader(api: SteelEnginePluginApi) {
   return createLazyRuntimeModule<RegisteredLineCardCommand>(async () => {
     let registered: RegisteredLineCardCommand | null = null;
     const { registerLineCardCommand } = await import("./src/card-command.js");

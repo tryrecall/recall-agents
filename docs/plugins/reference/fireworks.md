@@ -1,5 +1,5 @@
 ---
-summary: "Adds Fireworks model provider support to OpenClaw."
+summary: "Adds Fireworks model provider support to SteelEngine."
 read_when:
   - You are installing, configuring, or auditing the fireworks plugin
 title: "Fireworks plugin"
@@ -7,12 +7,12 @@ title: "Fireworks plugin"
 
 # Fireworks plugin
 
-Adds Fireworks model provider support to OpenClaw.
+Adds Fireworks model provider support to SteelEngine.
 
 ## Distribution
 
-- Package: `@openclaw/fireworks-provider`
-- Install route: npm; ClawHub: `clawhub:@openclaw/fireworks-provider`
+- Package: `@steelengine/fireworks-provider`
+- Install route: npm; ClawHub: `clawhub:@steelengine/fireworks-provider`
 
 ## Surface
 

@@ -26,7 +26,7 @@ import {
 const tempRoots = new Set<string>();
 
 function createTempExtensionRoot(extensionId = "demo") {
-  const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-boundary-canary-"));
+  const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-boundary-canary-"));
   tempRoots.add(rootDir);
   const extensionRoot = path.join(rootDir, "extensions", extensionId);
   fs.mkdirSync(extensionRoot, { recursive: true });
@@ -157,7 +157,7 @@ describe("check-extension-package-tsc-boundary", () => {
   });
 
   it("cleans stale artifacts for every extension id passed to the cleanup hook", () => {
-    const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-boundary-canary-"));
+    const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-boundary-canary-"));
     tempRoots.add(rootDir);
     fs.mkdirSync(path.join(rootDir, "extensions", "demo-a"), { recursive: true });
     fs.mkdirSync(path.join(rootDir, "extensions", "demo-b"), { recursive: true });
@@ -179,13 +179,13 @@ describe("check-extension-package-tsc-boundary", () => {
   });
 
   it("parses extension boundary compile concurrency strictly", () => {
-    expect(resolveCompileConcurrency({ OPENCLAW_EXTENSION_BOUNDARY_CONCURRENCY: "4" }, 32)).toBe(4);
+    expect(resolveCompileConcurrency({ STEELENGINE_EXTENSION_BOUNDARY_CONCURRENCY: "4" }, 32)).toBe(4);
     expect(resolveCompileConcurrency({}, 12)).toBe(6);
     expect(resolveCompileConcurrency({}, 3)).toBe(1);
     for (const value of ["4x", "0", "1e3"]) {
       expect(() =>
-        resolveCompileConcurrency({ OPENCLAW_EXTENSION_BOUNDARY_CONCURRENCY: value }, 32),
-      ).toThrow("OPENCLAW_EXTENSION_BOUNDARY_CONCURRENCY must be a positive integer");
+        resolveCompileConcurrency({ STEELENGINE_EXTENSION_BOUNDARY_CONCURRENCY: value }, 32),
+      ).toThrow("STEELENGINE_EXTENSION_BOUNDARY_CONCURRENCY must be a positive integer");
     }
   });
 
@@ -564,7 +564,7 @@ describe("check-extension-package-tsc-boundary", () => {
   it.skipIf(process.platform === "win32")(
     "waits for timed-out async node step process groups",
     async () => {
-      const root = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-extension-tsc-timeout-"));
+      const root = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-extension-tsc-timeout-"));
       tempRoots.add(root);
       const childPidPath = path.join(root, "child.pid");
       let childPid = 0;
@@ -700,7 +700,7 @@ describe("check-extension-package-tsc-boundary", () => {
   it.skipIf(process.platform === "win32")(
     "cleans active async node step descendants before forwarding parent SIGTERM",
     async () => {
-      const root = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-extension-tsc-signal-"));
+      const root = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-extension-tsc-signal-"));
       tempRoots.add(root);
       const childPidPath = path.join(root, "child.pid");
       const readyPath = path.join(root, "child.ready");

@@ -2,8 +2,8 @@
  * ACPX setup plugin entry. It auto-enables setup when ACP config already points
  * at the embedded ACPX runtime backend.
  */
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { definePluginEntry } from "steelengine/plugin-sdk/plugin-entry";
+import { normalizeLowercaseStringOrEmpty } from "steelengine/plugin-sdk/string-coerce-runtime";
 
 export default definePluginEntry({
   id: "acpx",

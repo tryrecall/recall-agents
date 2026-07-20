@@ -39,8 +39,8 @@ function mount(patch: Partial<ChatPaneHeaderProps> = {}) {
     catalog: false,
     editing: false,
     renameValue: "Session title",
-    workspaceRoot: "/repo/openclaw",
-    workspaceLabel: "openclaw",
+    workspaceRoot: "/repo/steelengine",
+    workspaceLabel: "steelengine",
     branch: "feature/header",
     platform: "darwin",
     canReveal: true,
@@ -100,7 +100,7 @@ describe("chat pane header", () => {
     const title = container.querySelector<HTMLButtonElement>(".chat-pane__session-title-button");
     const chip = container.querySelector<HTMLButtonElement>(".chat-pane__workspace-chip");
     expect(title?.textContent?.trim()).toBe("Session title");
-    expect(chip?.textContent?.trim()).toContain("openclaw");
+    expect(chip?.textContent?.trim()).toContain("steelengine");
     title?.click();
     expect(props.onBeginRename).toHaveBeenCalledOnce();
   });
@@ -171,39 +171,39 @@ describe("chat pane workspace resolution", () => {
       resolveChatPaneWorkspace({
         session: row({
           spawnedCwd: "/tmp/worktrees/title-bar",
-          worktree: { id: "wt-1", branch: "title-bar", repoRoot: "/src/openclaw" },
+          worktree: { id: "wt-1", branch: "title-bar", repoRoot: "/src/steelengine" },
         }),
       }),
-    ).toEqual({ root: "/tmp/worktrees/title-bar", label: "openclaw" });
+    ).toEqual({ root: "/tmp/worktrees/title-bar", label: "steelengine" });
   });
 
   it("does not substitute the agent workspace for a missing worktree checkout", () => {
     expect(
       resolveChatPaneWorkspace({
         session: row({
-          worktree: { id: "wt-missing", branch: "feature", repoRoot: "/src/openclaw" },
+          worktree: { id: "wt-missing", branch: "feature", repoRoot: "/src/steelengine" },
         }),
         agentWorkspace: "/src/default-agent-workspace",
         worktreePath: null,
       }),
-    ).toEqual({ root: null, label: "openclaw" });
+    ).toEqual({ root: null, label: "steelengine" });
   });
 
   it("matches the gateway root order: spawned workspace before spawned cwd", () => {
     expect(
       resolveChatPaneWorkspace({
         session: row({
-          spawnedWorkspaceDir: "/src/openclaw",
-          spawnedCwd: "/src/openclaw/packages/nested",
+          spawnedWorkspaceDir: "/src/steelengine",
+          spawnedCwd: "/src/steelengine/packages/nested",
         }),
       }),
-    ).toEqual({ root: "/src/openclaw", label: "openclaw" });
+    ).toEqual({ root: "/src/steelengine", label: "steelengine" });
     // execCwd is exec-node routing state; it never overrides local facts.
     expect(
       resolveChatPaneWorkspace({
-        session: row({ execCwd: "/remote/stale", spawnedCwd: "/src/openclaw" }),
+        session: row({ execCwd: "/remote/stale", spawnedCwd: "/src/steelengine" }),
       }),
-    ).toEqual({ root: "/src/openclaw", label: "openclaw" });
+    ).toEqual({ root: "/src/steelengine", label: "steelengine" });
   });
 
   it("prefers exec cwd and falls back to the agent workspace", () => {
@@ -222,9 +222,9 @@ describe("chat pane workspace resolution", () => {
         worktreePath: "/local/worktree",
       }),
     ).toEqual({ root: null, label: null });
-    expect(resolveChatPaneWorkspace({ session: row(), agentWorkspace: "/src/openclaw" })).toEqual({
-      root: "/src/openclaw",
-      label: "openclaw",
+    expect(resolveChatPaneWorkspace({ session: row(), agentWorkspace: "/src/steelengine" })).toEqual({
+      root: "/src/steelengine",
+      label: "steelengine",
     });
   });
 
@@ -248,7 +248,7 @@ describe("chat pane workspace resolution", () => {
     expect(
       canRevealSessionWorkspace({
         session: row(),
-        workspaceRoot: "/src/openclaw",
+        workspaceRoot: "/src/steelengine",
         methodAdvertised: false,
         hasAdminAccess: true,
       }),
@@ -256,7 +256,7 @@ describe("chat pane workspace resolution", () => {
     expect(
       canRevealSessionWorkspace({
         session: row(),
-        workspaceRoot: "/src/openclaw",
+        workspaceRoot: "/src/steelengine",
         methodAdvertised: true,
         hasAdminAccess: false,
       }),

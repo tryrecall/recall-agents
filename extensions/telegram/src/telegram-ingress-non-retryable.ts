@@ -3,7 +3,7 @@ import {
   collectErrorGraphCandidates,
   formatErrorMessage,
   readErrorName,
-} from "openclaw/plugin-sdk/error-runtime";
+} from "steelengine/plugin-sdk/error-runtime";
 import { isTelegramMessageDispatchReplayForgetError } from "./message-dispatch-dedupe.js";
 
 const MISSING_AGENT_HARNESS_ERROR_NAME = "MissingAgentHarnessError";

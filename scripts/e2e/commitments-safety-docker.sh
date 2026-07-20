@@ -6,9 +6,9 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 source "$ROOT_DIR/scripts/lib/docker-e2e-image.sh"
 
-IMAGE_NAME="$(docker_e2e_resolve_image "openclaw-commitments-safety-e2e" OPENCLAW_COMMITMENTS_SAFETY_E2E_IMAGE)"
-CONTAINER_NAME="openclaw-commitments-safety-e2e-$$"
-RUN_LOG="$(mktemp -t openclaw-commitments-safety-log.XXXXXX)"
+IMAGE_NAME="$(docker_e2e_resolve_image "steelengine-commitments-safety-e2e" STEELENGINE_COMMITMENTS_SAFETY_E2E_IMAGE)"
+CONTAINER_NAME="steelengine-commitments-safety-e2e-$$"
+RUN_LOG="$(mktemp -t steelengine-commitments-safety-log.XXXXXX)"
 
 cleanup() {
   docker_e2e_docker_cmd rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
@@ -23,7 +23,7 @@ set +e
 docker_e2e_run_with_harness \
   --name "$CONTAINER_NAME" \
   -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
-  -e OPENCLAW_COMMITMENTS_SAFETY_E2E=1 \
+  -e STEELENGINE_COMMITMENTS_SAFETY_E2E=1 \
   "$IMAGE_NAME" \
   bash -lc 'set -euo pipefail; tsx scripts/e2e/commitments-safety-docker-client.ts' \
   >"$RUN_LOG" 2>&1

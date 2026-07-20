@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/diffs",
+  "name": "@steelengine/diffs",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw read-only diff viewer plugin and file renderer for agents.",
+  "description": "SteelEngine read-only diff viewer plugin and file renderer for agents.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/steelengineai/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -15,14 +15,14 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "npmSpec": "@openclaw/diffs",
+      "npmSpec": "@steelengine/diffs",
       "localPath": "extensions/diffs",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.30"
@@ -34,7 +34,7 @@
       "build": "node ../../scripts/build-diffs-viewer-runtime.mjs curated"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3",
+      "steelengineVersion": "2026.7.2-beta.3",
       "staticAssets": [
         {
           "source": "./assets/viewer-runtime.js",

@@ -19,7 +19,7 @@ import {
   runExclusiveSessionLifecycleMutation,
 } from "../sessions/session-lifecycle-admission.js";
 import { runExclusiveSessionLifecycle } from "../sessions/session-lifecycle-admission.test-support.js";
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import { embeddedRunMock, testState, writeSessionStore } from "./test-helpers.js";
 import {
   setupGatewaySessionsTestHarness,
@@ -62,7 +62,7 @@ type ResetAcpState = {
 type ConfigFilePatch = Parameters<(typeof import("../config/config.js"))["writeConfigFile"]>[0];
 
 afterEach(() => {
-  closeOpenClawStateDatabaseForTest();
+  closeSteelEngineStateDatabaseForTest();
 });
 
 function expectResetAcpState(acp: ResetAcpState | undefined) {
@@ -802,9 +802,9 @@ test("sessions.reset closes child ACP runtime handles spawned from the parent", 
 });
 
 test("sessions.reset closes a spawned ACP child that lives in a different agent store", async () => {
-  const stateDir = process.env.OPENCLAW_STATE_DIR;
+  const stateDir = process.env.STEELENGINE_STATE_DIR;
   if (!stateDir) {
-    throw new Error("OPENCLAW_STATE_DIR is required for gateway session tests");
+    throw new Error("STEELENGINE_STATE_DIR is required for gateway session tests");
   }
   // Per-agent store layout: ACP children live under the target agent's own
   // store file, which is different from the parent's store.

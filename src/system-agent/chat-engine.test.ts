@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   fingerprintAuthProfileCredential,
@@ -10,7 +10,7 @@ import {
   fingerprintResolvedProviderAuth,
 } from "../agents/execution-auth-binding.js";
 import { hashSystemAgentOperation } from "../agents/tools/system-agent-tool.js";
-import type { ConfigFileSnapshot, OpenClawConfig } from "../config/types.openclaw.js";
+import type { ConfigFileSnapshot, SteelEngineConfig } from "../config/types.steelengine.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
 import { runSystemAgentTurnWithDeps } from "./agent-turn.test-support.js";
 import { classifySystemAgentApprovalText } from "./approval-intent.js";
@@ -34,7 +34,7 @@ const mocks = vi.hoisted(() => ({
   readConfigFileSnapshot: vi.fn(async () => ({
     exists: true,
     valid: true,
-    path: "/tmp/openclaw.json",
+    path: "/tmp/steelengine.json",
     hash: "h",
     config: {},
     sourceConfig: {},
@@ -77,7 +77,7 @@ const sharedVerifiedInferenceConfig = {
       {
         id: "main",
         default: true,
-        agentDir: "/tmp/openclaw-openclaw-chat-engine-agent",
+        agentDir: "/tmp/steelengine-steelengine-chat-engine-agent",
         model: "openai/gpt-5.5",
       },
     ],
@@ -92,23 +92,23 @@ const sharedVerifiedInferenceConfig = {
       },
     },
   },
-} satisfies OpenClawConfig;
+} satisfies SteelEngineConfig;
 
 let sharedVerifiedInference: SystemAgentVerifiedInferenceBinding | undefined;
 let sharedVerifiedInferenceDeps: SystemAgentVerifiedInferenceDeps | undefined;
 
 function useTempStateDir(): string {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-engine-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-engine-"));
   tempDirs.push(dir);
-  vi.stubEnv("OPENCLAW_STATE_DIR", dir);
+  vi.stubEnv("STEELENGINE_STATE_DIR", dir);
   return dir;
 }
 
-function configSnapshot(config: OpenClawConfig): ConfigFileSnapshot {
+function configSnapshot(config: SteelEngineConfig): ConfigFileSnapshot {
   return {
     exists: true,
     valid: true,
-    path: "/tmp/openclaw.json",
+    path: "/tmp/steelengine.json",
     hash: "h",
     raw: null,
     parsed: config,
@@ -127,8 +127,8 @@ function testHarnessBinding(route: SystemAgentConfiguredRoute) {
     return { auth: {}, deps: {} };
   }
   const agentHarnessId =
-    route.agentHarnessRuntimeOverride === "auto" ? "openclaw" : route.agentHarnessRuntimeOverride;
-  if (agentHarnessId === "openclaw") {
+    route.agentHarnessRuntimeOverride === "auto" ? "steelengine" : route.agentHarnessRuntimeOverride;
+  if (agentHarnessId === "steelengine") {
     return { auth: { agentHarnessId }, deps: {} };
   }
   return {
@@ -145,7 +145,7 @@ function testHarnessBinding(route: SystemAgentConfiguredRoute) {
   };
 }
 
-async function createAmbientVerifiedBinding(config: OpenClawConfig) {
+async function createAmbientVerifiedBinding(config: SteelEngineConfig) {
   const route = await resolveSystemAgentConfiguredRouteFromConfig(config);
   if (!route) {
     throw new Error("missing test route");
@@ -168,7 +168,7 @@ async function createAmbientVerifiedBinding(config: OpenClawConfig) {
 }
 
 async function createOAuthVerifiedBinding(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   credential: Parameters<typeof fingerprintAuthProfileCredential>[0]["credential"],
 ) {
   const route = await resolveSystemAgentConfiguredRouteFromConfig(config);
@@ -195,7 +195,7 @@ async function createOAuthVerifiedBinding(
   });
 }
 
-async function createCliVerifiedBinding(config: OpenClawConfig) {
+async function createCliVerifiedBinding(config: SteelEngineConfig) {
   const route = await resolveSystemAgentConfiguredRouteFromConfig(config);
   if (!route || route.runner !== "cli") {
     throw new Error("missing test CLI route");
@@ -365,7 +365,7 @@ describe("SystemAgentChatEngine", () => {
     expect(pending.text).toContain("Approval pending");
     expect(runAgentTurn).not.toHaveBeenCalled();
     expect(runConfigSet).toHaveBeenCalledOnce();
-    expect(applied?.text).toContain("[openclaw] done: config.set");
+    expect(applied?.text).toContain("[steelengine] done: config.set");
     expect(engine.hasPendingProposal()).toBe(false);
   });
 
@@ -381,7 +381,7 @@ describe("SystemAgentChatEngine", () => {
     const reply = await engine.handle("yes");
     expect(runConfigSet).toHaveBeenCalledOnce();
     expect(reply.action).toBe("none");
-    expect(reply.text).toContain("[openclaw] done: config.set");
+    expect(reply.text).toContain("[steelengine] done: config.set");
     expect(engine.hasPendingProposal()).toBe(false);
   });
 
@@ -393,7 +393,7 @@ describe("SystemAgentChatEngine", () => {
       latencyMs: 100,
     }));
     const applySetup = vi.fn(async () => ({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       configHashBefore: "before",
       configHashAfter: "after",
       bootstrapPending: true,
@@ -422,13 +422,13 @@ describe("SystemAgentChatEngine", () => {
       agentDraft: "hatch",
     });
     expect(reply.text).toContain("Your agent is hatching");
-    expect(reply.text).toContain("Settings → Ask OpenClaw");
+    expect(reply.text).toContain("Settings → Ask SteelEngine");
   });
 
   it("stays in setup when an established workspace has no bootstrap pending", async () => {
     useTempStateDir();
     const applySetup = vi.fn(async () => ({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       configHashBefore: "before",
       configHashAfter: "after",
       bootstrapPending: false,
@@ -469,7 +469,7 @@ describe("SystemAgentChatEngine", () => {
     const applySetup = vi.fn(async () => {
       applied = true;
       return {
-        configPath: "/tmp/openclaw.json",
+        configPath: "/tmp/steelengine.json",
         configHashBefore: "before",
         configHashAfter: "after",
         bootstrapPending: true,
@@ -537,12 +537,12 @@ describe("SystemAgentChatEngine", () => {
           },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const changedConfig = {
       agents: { defaults: { model: "anthropic/claude-opus-4-8" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const verifiedInference = await createAmbientVerifiedBinding(baseConfig);
-    let currentConfig = baseConfig as OpenClawConfig;
+    let currentConfig = baseConfig as SteelEngineConfig;
     const runConfigSet = vi.fn(async () => {});
     const engine = new SystemAgentChatEngine({
       verifiedInference,
@@ -564,7 +564,7 @@ describe("SystemAgentChatEngine", () => {
   it("rejects a setup write without a verified inference binding", async () => {
     useTempStateDir();
     const applySetup = vi.fn(async () => ({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       configHashBefore: null,
       configHashAfter: "after",
       bootstrapPending: false,
@@ -599,7 +599,7 @@ describe("SystemAgentChatEngine", () => {
     expect(reply.handoff).toBeUndefined();
     expect(reply.sensitive).toBeUndefined();
     expect(reply.text).toContain("replace the inference route powering this session");
-    expect(reply.text).toContain("Exit OpenClaw and run `openclaw onboard`");
+    expect(reply.text).toContain("Exit SteelEngine and run `steelengine onboard`");
   });
 
   it("keeps the current inference route when model provider setup is declined", async () => {
@@ -698,7 +698,7 @@ describe("SystemAgentChatEngine", () => {
 
   it("rejects a hosted channel commit after a concurrent inference-route change", async () => {
     useTempStateDir();
-    const baseConfig: OpenClawConfig = {
+    const baseConfig: SteelEngineConfig = {
       agents: { defaults: { model: { primary: "openai/gpt-5.5" } } },
       auth: {
         profiles: { "openai:main": { provider: "openai", mode: "api_key" } },
@@ -709,14 +709,14 @@ describe("SystemAgentChatEngine", () => {
     mocks.readSetupConfigFileSnapshot.mockImplementation(async () => ({
       exists: true,
       valid: true,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: currentHash,
       config: structuredClone(currentConfig),
       sourceConfig: structuredClone(currentConfig),
       issues: [],
     }));
     mocks.setupChannels.mockImplementation(
-      async (config: OpenClawConfig, _runtime: unknown, prompter: WizardPrompter) => {
+      async (config: SteelEngineConfig, _runtime: unknown, prompter: WizardPrompter) => {
         const token = await prompter.text({ message: "Bot token" });
         return {
           ...config,
@@ -728,7 +728,7 @@ describe("SystemAgentChatEngine", () => {
       },
     );
     mocks.writeWizardConfigFile.mockImplementation(
-      async (nextConfig: OpenClawConfig, opts: { baseHash?: string }) => {
+      async (nextConfig: SteelEngineConfig, opts: { baseHash?: string }) => {
         if (opts.baseHash !== currentHash) {
           throw new Error("configuration changed during channel setup");
         }
@@ -747,7 +747,7 @@ describe("SystemAgentChatEngine", () => {
     const tokenStep = await engine.handle("connect telegram");
     expect(tokenStep.text).toContain("Bot token");
 
-    const concurrentConfig: OpenClawConfig = {
+    const concurrentConfig: SteelEngineConfig = {
       agents: { defaults: { model: { primary: "anthropic/claude-opus-4-8" } } },
       auth: {
         profiles: { "anthropic:main": { provider: "anthropic", mode: "api_key" } },
@@ -774,7 +774,7 @@ describe("SystemAgentChatEngine", () => {
 
   it("rechecks inference authority immediately before a hosted channel write", async () => {
     useTempStateDir();
-    const baseConfig: OpenClawConfig = {
+    const baseConfig: SteelEngineConfig = {
       agents: { defaults: { model: { primary: "openai/gpt-5.5" } } },
       auth: { profiles: { "openai:main": { provider: "openai", mode: "api_key" } } },
       models: {
@@ -788,7 +788,7 @@ describe("SystemAgentChatEngine", () => {
         },
       },
     };
-    const changedConfig: OpenClawConfig = {
+    const changedConfig: SteelEngineConfig = {
       agents: { defaults: { model: { primary: "anthropic/claude-opus-4-8" } } },
     };
     const verifiedInference = await createAmbientVerifiedBinding(baseConfig);
@@ -796,14 +796,14 @@ describe("SystemAgentChatEngine", () => {
     mocks.readSetupConfigFileSnapshot.mockResolvedValue({
       exists: true,
       valid: true,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: "base-hash",
       config: structuredClone(baseConfig),
       sourceConfig: structuredClone(baseConfig),
       issues: [],
     });
     mocks.setupChannels.mockImplementation(
-      async (config: OpenClawConfig, _runtime: unknown, prompter: WizardPrompter) => {
+      async (config: SteelEngineConfig, _runtime: unknown, prompter: WizardPrompter) => {
         const token = await prompter.text({ message: "Bot token" });
         currentConfig = structuredClone(changedConfig);
         return {
@@ -812,7 +812,7 @@ describe("SystemAgentChatEngine", () => {
         };
       },
     );
-    mocks.writeWizardConfigFile.mockImplementation(async (config: OpenClawConfig) => config);
+    mocks.writeWizardConfigFile.mockImplementation(async (config: SteelEngineConfig) => config);
     const engine = new SystemAgentChatEngine({
       surface: "gateway",
       verifiedInference,
@@ -835,7 +835,7 @@ describe("SystemAgentChatEngine", () => {
 
   it("rechecks inference authority before hosted channel post-write hooks", async () => {
     useTempStateDir();
-    const baseConfig: OpenClawConfig = {
+    const baseConfig: SteelEngineConfig = {
       agents: { defaults: { model: { primary: "openai/gpt-5.5" } } },
       auth: { profiles: { "openai:main": { provider: "openai", mode: "api_key" } } },
       models: {
@@ -849,7 +849,7 @@ describe("SystemAgentChatEngine", () => {
         },
       },
     };
-    const changedConfig: OpenClawConfig = {
+    const changedConfig: SteelEngineConfig = {
       agents: { defaults: { model: { primary: "anthropic/claude-opus-4-8" } } },
     };
     const verifiedInference = await createAmbientVerifiedBinding(baseConfig);
@@ -858,7 +858,7 @@ describe("SystemAgentChatEngine", () => {
     mocks.readSetupConfigFileSnapshot.mockResolvedValue({
       exists: true,
       valid: true,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: "base-hash",
       config: structuredClone(baseConfig),
       sourceConfig: structuredClone(baseConfig),
@@ -866,7 +866,7 @@ describe("SystemAgentChatEngine", () => {
     });
     mocks.setupChannels.mockImplementation(
       async (
-        config: OpenClawConfig,
+        config: SteelEngineConfig,
         _runtime: unknown,
         prompter: WizardPrompter,
         options: { onPostWriteHook?: (hook: unknown) => void },
@@ -879,7 +879,7 @@ describe("SystemAgentChatEngine", () => {
         };
       },
     );
-    mocks.writeWizardConfigFile.mockImplementation(async (config: OpenClawConfig) => {
+    mocks.writeWizardConfigFile.mockImplementation(async (config: SteelEngineConfig) => {
       currentConfig = structuredClone(changedConfig);
       return config;
     });
@@ -944,7 +944,7 @@ describe("SystemAgentChatEngine", () => {
     const reply = await engine.handle("connect telegram");
 
     expect(reply.text).toContain("Sensitive input is not accepted");
-    expect(reply.text).toContain("openclaw channels add --channel telegram");
+    expect(reply.text).toContain("steelengine channels add --channel telegram");
     expect(reply.sensitive).toBeUndefined();
 
     const handoff = await engine.handle("open channel wizard");
@@ -979,7 +979,7 @@ describe("SystemAgentChatEngine", () => {
       const cliReply = await cli.handle(command);
       expect(cliReply.action).toBe("none");
       expect(cliReply.handoff).toBeUndefined();
-      expect(cliReply.text).toContain("run `openclaw onboard`");
+      expect(cliReply.text).toContain("run `steelengine onboard`");
     }
 
     const gateway = new SystemAgentChatEngine({ ...common, surface: "gateway" });
@@ -1228,7 +1228,7 @@ describe("SystemAgentChatEngine", () => {
     expect(reply.action).toBe("none");
     expect(reply.handoff).toBeUndefined();
     expect(reply.text).toContain("Opening the menu wizard");
-    expect(reply.text).toContain("run `openclaw onboard`");
+    expect(reply.text).toContain("run `steelengine onboard`");
   });
 
   it("starts the channel wizard from an agent-loop directive", async () => {
@@ -1261,10 +1261,10 @@ describe("SystemAgentChatEngine", () => {
           },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const changedConfig = {
       agents: { defaults: { model: "anthropic/claude-opus-4-8" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const verifiedInference = await createAmbientVerifiedBinding(baseConfig);
     const readConfigFileSnapshot = vi
       .fn()
@@ -1295,7 +1295,7 @@ describe("SystemAgentChatEngine", () => {
     const config = {
       agents: { defaults: { model: "anthropic/claude-opus-4-8@anthropic:oauth" } },
       auth: { profiles: { "anthropic:oauth": { provider: "anthropic", mode: "oauth" } } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     let credential = {
       type: "oauth" as const,
       provider: "anthropic",
@@ -1342,7 +1342,7 @@ describe("SystemAgentChatEngine", () => {
     const config = {
       agents: { defaults: { model: "anthropic/claude-opus-4-8@anthropic:oauth" } },
       auth: { profiles: { "anthropic:oauth": { provider: "anthropic", mode: "oauth" } } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     let credential = {
       type: "oauth" as const,
       provider: "anthropic",
@@ -1379,7 +1379,7 @@ describe("SystemAgentChatEngine", () => {
     const reply = await engine.handle("yes, apply that exact port change");
 
     expect(runConfigSet).toHaveBeenCalledOnce();
-    expect(reply.text).toContain("[openclaw] done: config.set");
+    expect(reply.text).toContain("[steelengine] done: config.set");
   });
 
   it("arms an agent turn when the classifier approves in the user's own words", async () => {
@@ -1459,7 +1459,7 @@ describe("SystemAgentChatEngine", () => {
       latencyMs: 100,
     }));
     const applySetup = vi.fn(async () => ({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       configHashBefore: "before",
       configHashAfter: "after",
       bootstrapPending: false,
@@ -1624,7 +1624,7 @@ describe("SystemAgentChatEngine", () => {
 
     const applied = await engine.handle("yes");
     expect(runConfigSet).toHaveBeenCalledOnce();
-    expect(applied.text).toContain("[openclaw] done: config.set");
+    expect(applied.text).toContain("[steelengine] done: config.set");
   });
 
   it("redacts sensitive config-set values from the AI-visible history", async () => {
@@ -1679,7 +1679,7 @@ describe("SystemAgentChatEngine", () => {
     expect(call.surface).toBe("gateway");
     // A question is not consent: mutations stay locked for this turn.
     expect(call.approvalArmed).toBe(false);
-    expect(call.session.sessionId).toMatch(/^openclaw-/);
+    expect(call.session.sessionId).toMatch(/^steelengine-/);
     // The same session flows into every turn for real multi-turn memory.
     await engine.handle("and the gateway?");
     expect(runAgentTurn.mock.calls[1]?.[0]).toMatchObject({
@@ -1722,12 +1722,12 @@ describe("SystemAgentChatEngine", () => {
           },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const changedConfig = {
       agents: { defaults: { model: "anthropic/claude-opus-4-8" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const verifiedInference = await createAmbientVerifiedBinding(baseConfig);
-    let currentConfig: OpenClawConfig = baseConfig;
+    let currentConfig: SteelEngineConfig = baseConfig;
     const planner = vi.fn(async () => {
       currentConfig = changedConfig;
       return { reply: "stale reply" };
@@ -1805,7 +1805,7 @@ describe("SystemAgentChatEngine", () => {
       mocks.readConfigFileSnapshot.mockResolvedValue({
         exists: true,
         valid: false,
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         hash: "h",
         config: {},
         sourceConfig: {},
@@ -1836,7 +1836,7 @@ describe("SystemAgentChatEngine", () => {
       mocks.readConfigFileSnapshot.mockResolvedValue({
         exists: true,
         valid: false,
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         hash: "h",
         config: {},
         sourceConfig: {},
@@ -1857,7 +1857,7 @@ describe("SystemAgentChatEngine", () => {
     expect(runInvalidConfigSet).toHaveBeenCalledOnce();
     expect(reply.text).toContain("failed validation");
     expect(reply.text).toContain("The write was applied");
-    expect(reply.text).toContain("openclaw doctor --fix");
+    expect(reply.text).toContain("steelengine doctor --fix");
   });
 
   it("warns when an applied write leaves no config to verify", async () => {
@@ -1866,7 +1866,7 @@ describe("SystemAgentChatEngine", () => {
       mocks.readConfigFileSnapshot.mockResolvedValue({
         exists: false,
         valid: true,
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         hash: null,
         config: {},
         sourceConfig: {},
@@ -1881,8 +1881,8 @@ describe("SystemAgentChatEngine", () => {
     expect(runConfigSet).toHaveBeenCalledOnce();
     expect(reply.text).toContain("The write was applied");
     expect(reply.text).toContain("post-write verification is unavailable");
-    expect(reply.text).toContain("openclaw.json was not found");
-    expect(reply.text).toContain("openclaw doctor --fix");
+    expect(reply.text).toContain("steelengine.json was not found");
+    expect(reply.text).toContain("steelengine doctor --fix");
   });
 
   it("warns when the applied write cannot be read back for verification", async () => {
@@ -1890,7 +1890,7 @@ describe("SystemAgentChatEngine", () => {
     const validSnapshot = {
       exists: true,
       valid: true,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: "h",
       config: {},
       sourceConfig: {},
@@ -1909,8 +1909,8 @@ describe("SystemAgentChatEngine", () => {
     expect(runConfigSet).toHaveBeenCalledOnce();
     expect(reply.text).toContain("The write was applied");
     expect(reply.text).toContain("post-write verification is unavailable");
-    expect(reply.text).toContain("openclaw.json could not be read");
-    expect(reply.text).toContain("openclaw doctor --fix");
+    expect(reply.text).toContain("steelengine.json could not be read");
+    expect(reply.text).toContain("steelengine doctor --fix");
   });
 
   it("stays quiet when the post-write validation passes", async () => {
@@ -1944,7 +1944,7 @@ describe("SystemAgentChatEngine", () => {
   });
 });
 
-describe("OpenClaw agent loop backends", () => {
+describe("SteelEngine agent loop backends", () => {
   it("runs a configured claude-cli model through the CLI loop with the ring-zero MCP tool", async () => {
     useTempStateDir();
     const config = {
@@ -1954,7 +1954,7 @@ describe("OpenClaw agent loop backends", () => {
           cliBackends: { "claude-cli": { command: "claude" } },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const snapshot = configSnapshot(config);
     const inference = await createCliVerifiedBinding(config);
     const inferenceDeps = {
@@ -2018,7 +2018,7 @@ describe("OpenClaw agent loop backends", () => {
           cliBackends: { "claude-cli": { command: "claude" } },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const snapshot = configSnapshot(config);
     const inference = await createCliVerifiedBinding(config);
     const inferenceDeps = {
@@ -2055,7 +2055,7 @@ function fakeOverviewLoader(
 ) {
   return async () =>
     ({
-      config: { path: "/tmp/openclaw.json", exists: false, valid: true, issues: [], hash: null },
+      config: { path: "/tmp/steelengine.json", exists: false, valid: true, issues: [], hash: null },
       agents: [],
       defaultAgentId: "main",
       defaultModel: overrides.defaultModel,
@@ -2067,8 +2067,8 @@ function fakeOverviewLoader(
       },
       gateway: { url: "ws://127.0.0.1:18789", source: "local", reachable: false },
       references: {
-        docsUrl: "https://docs.openclaw.ai",
-        sourceUrl: "https://github.com/openclaw/openclaw",
+        docsUrl: "https://docs.steelengine.ai",
+        sourceUrl: "https://github.com/steelengineai/recall-agents",
       },
     }) as never;
 }

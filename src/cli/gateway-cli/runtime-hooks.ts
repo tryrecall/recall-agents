@@ -1,8 +1,8 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 
 export type GatewayRunRuntimeHooks = {
   releaseManagedProxy?: () => Promise<void> | void;
-  refreshManagedProxy?: (config: OpenClawConfig["proxy"]) => Promise<void> | void;
+  refreshManagedProxy?: (config: SteelEngineConfig["proxy"]) => Promise<void> | void;
 };
 
 let activeGatewayRunRuntimeHooks: GatewayRunRuntimeHooks = {};

@@ -1,9 +1,9 @@
 // Public file-oriented media-understanding runtime for image, audio, video, and
 // structured extraction calls outside normal channel message handling.
 import path from "node:path";
-import { detectMime, kindFromMime, mimeTypeFromFilePath } from "@openclaw/media-core/mime";
-import { hasHttpUrlPrefix } from "@openclaw/net-policy/url-protocol";
-import type { OpenClawConfig } from "../config/types.js";
+import { detectMime, kindFromMime, mimeTypeFromFilePath } from "@steelengine/media-core/mime";
+import { hasHttpUrlPrefix } from "@steelengine/net-policy/url-protocol";
+import type { SteelEngineConfig } from "../config/types.js";
 import { readLocalFileSafely } from "../infra/fs-safe.js";
 import { DEFAULT_MAX_BYTES } from "./defaults.constants.js";
 import { normalizeImageDescriptionInput } from "./image-input-normalize.js";
@@ -303,7 +303,7 @@ async function readImageDescriptionInput(params: {
   filePath: string;
   mediaUrl?: string;
   mime?: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   timeoutMs: number;
 }): Promise<{ buffer: Buffer; fileName: string; mime?: string }> {
   const remoteRef =

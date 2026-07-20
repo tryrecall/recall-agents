@@ -1,9 +1,9 @@
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/core";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/core";
 // Line plugin module implements card command behavior.
-import { expectDefined } from "openclaw/plugin-sdk/expect-runtime";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+import { expectDefined } from "steelengine/plugin-sdk/expect-runtime";
+import type { ReplyPayload } from "steelengine/plugin-sdk/reply-runtime";
+import { normalizeLowercaseStringOrEmpty } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import { messageAction, postbackAction, uriAction } from "./actions.js";
 import {
   createActionCard,
@@ -158,7 +158,7 @@ function parseCardArgs(argsStrInput: string): {
   return result;
 }
 
-export function registerLineCardCommand(api: OpenClawPluginApi): void {
+export function registerLineCardCommand(api: SteelEnginePluginApi): void {
   api.registerCommand({
     name: "card",
     description: "Send a rich card message (LINE).",

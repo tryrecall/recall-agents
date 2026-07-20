@@ -1,12 +1,12 @@
-// Whatsapp plugin entrypoint registers its OpenClaw integration.
+// Whatsapp plugin entrypoint registers its SteelEngine integration.
 import {
   defineBundledChannelEntry,
   loadBundledEntryExportSync,
-} from "openclaw/plugin-sdk/channel-entry-contract";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/channel-entry-contract";
+} from "steelengine/plugin-sdk/channel-entry-contract";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/channel-entry-contract";
 
-function registerWhatsAppCallTool(api: OpenClawPluginApi): void {
-  const registerTool = loadBundledEntryExportSync<(api: OpenClawPluginApi) => void>(
+function registerWhatsAppCallTool(api: SteelEnginePluginApi): void {
+  const registerTool = loadBundledEntryExportSync<(api: SteelEnginePluginApi) => void>(
     import.meta.url,
     {
       specifier: "./call-tool-api.js",

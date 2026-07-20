@@ -2,7 +2,7 @@
 import {
   adaptMessagePresentationForChannel,
   renderMessagePresentationFallbackText,
-} from "openclaw/plugin-sdk/interactive-runtime";
+} from "steelengine/plugin-sdk/interactive-runtime";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createDiscordOutboundHoisted,
@@ -723,7 +723,7 @@ describe("discordOutbound", () => {
           text: "delivered",
           channelData: {
             discord: {
-              __openclawInboundEventDelivery: {
+              __steelengineInboundEventDelivery: {
                 sessionKey: "agent:main:discord:channel:c1",
                 inboundEventKind: "room_event",
               },

@@ -1,8 +1,8 @@
 // Validates and normalizes provider asset attachments for music generation.
-import { maxBytesForKind } from "@openclaw/media-core/constants";
-import { extensionForMime } from "@openclaw/media-core/mime";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { maxBytesForKind } from "@steelengine/media-core/constants";
+import { extensionForMime } from "@steelengine/media-core/mime";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import { readResponseWithLimit } from "../infra/http-body.js";
 import { fetchProviderDownloadResponse } from "../media-understanding/shared.js";
 import type { GeneratedMusicAsset } from "./types.js";

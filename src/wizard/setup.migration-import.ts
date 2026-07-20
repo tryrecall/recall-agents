@@ -3,7 +3,7 @@ import {
   ensureOnboardingPluginInstalled,
   type OnboardingPluginInstallEntry,
 } from "../commands/onboarding-plugin-install.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import {
   listAvailableManifestContractPlugins,
@@ -77,7 +77,7 @@ const loadMigrationContextModule = createLazyRuntimeModule(
 const loadConfigPathsModule = createLazyRuntimeModule(() => import("../config/paths.js"));
 
 export async function detectSetupMigrationSources(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   runtime: RuntimeEnv;
 }): Promise<SetupMigrationDetection[]> {
   const [
@@ -177,7 +177,7 @@ function resolveManifestMigrationProviderLabel(params: {
 }
 
 function resolveManifestSetupMigrationProviders(
-  baseConfig: OpenClawConfig,
+  baseConfig: SteelEngineConfig,
 ): ManifestSetupMigrationProvider[] {
   const snapshot = loadManifestContractSnapshot({ config: baseConfig });
   return listAvailableManifestContractPlugins({
@@ -199,7 +199,7 @@ function resolveManifestSetupMigrationProviders(
 }
 
 export async function listSetupMigrationOptions(params: {
-  baseConfig: OpenClawConfig;
+  baseConfig: SteelEngineConfig;
   detections: readonly SetupMigrationDetection[];
 }): Promise<SetupMigrationOption[]> {
   const { resolvePluginMigrationProviders } = await loadMigrationProviderRuntimeModule();
@@ -250,7 +250,7 @@ export async function listSetupMigrationOptions(params: {
 
 async function selectSetupMigrationProvider(params: {
   opts: OnboardOptions;
-  baseConfig: OpenClawConfig;
+  baseConfig: SteelEngineConfig;
   detections: readonly SetupMigrationDetection[];
   prompter: WizardPrompter;
 }): Promise<string> {
@@ -280,11 +280,11 @@ async function selectSetupMigrationProvider(params: {
 
 async function resolveSetupMigrationProvider(params: {
   providerId: string;
-  baseConfig: OpenClawConfig;
+  baseConfig: SteelEngineConfig;
   prompter: WizardPrompter;
   runtime: RuntimeEnv;
   workspaceDir: string;
-}): Promise<{ provider: MigrationProviderPlugin; baseConfig: OpenClawConfig }> {
+}): Promise<{ provider: MigrationProviderPlugin; baseConfig: SteelEngineConfig }> {
   const { ensureStandaloneMigrationProviderRegistryLoaded, resolvePluginMigrationProvider } =
     await loadMigrationProviderRuntimeModule();
   ensureStandaloneMigrationProviderRegistryLoaded({
@@ -361,12 +361,12 @@ async function createSetupMigrationPlan(params: {
 
 export async function runSetupMigrationImport(params: {
   opts: OnboardOptions;
-  baseConfig: OpenClawConfig;
+  baseConfig: SteelEngineConfig;
   detections: readonly SetupMigrationDetection[];
   prompter: WizardPrompter;
   runtime: RuntimeEnv;
-  readConfigFile: () => Promise<OpenClawConfig>;
-  commitConfigFile: (config: OpenClawConfig) => Promise<OpenClawConfig>;
+  readConfigFile: () => Promise<SteelEngineConfig>;
+  commitConfigFile: (config: SteelEngineConfig) => Promise<SteelEngineConfig>;
   continueOnboarding?: boolean;
 }): Promise<void> {
   const [

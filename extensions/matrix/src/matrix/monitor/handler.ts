@@ -1,4 +1,4 @@
-import { resolveHumanDelayConfig } from "openclaw/plugin-sdk/agent-runtime";
+import { resolveHumanDelayConfig } from "steelengine/plugin-sdk/agent-runtime";
 import {
   buildChannelInboundEventContext,
   createChannelInboundEnvelopeBuilder,
@@ -6,7 +6,7 @@ import {
   resolveInboundMentionDecision,
   toInboundMediaFacts,
   type ChannelBotLoopProtectionFacts,
-} from "openclaw/plugin-sdk/channel-inbound";
+} from "steelengine/plugin-sdk/channel-inbound";
 import {
   type AgentPlanStep,
   buildChannelProgressDraftLineForEntry,
@@ -22,30 +22,30 @@ import {
   normalizeChannelProgressDraftLineIdentity,
   resolveChannelProgressDraftMaxLines,
   type MessageReceipt,
-} from "openclaw/plugin-sdk/channel-outbound";
+} from "steelengine/plugin-sdk/channel-outbound";
 import {
   evaluateSupplementalContextVisibility,
   resolveChannelContextVisibilityMode,
-} from "openclaw/plugin-sdk/context-visibility-runtime";
-import { isDangerousNameMatchingEnabled } from "openclaw/plugin-sdk/dangerous-name-runtime";
-import { KeyedAsyncQueue } from "openclaw/plugin-sdk/keyed-async-queue";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
+} from "steelengine/plugin-sdk/context-visibility-runtime";
+import { isDangerousNameMatchingEnabled } from "steelengine/plugin-sdk/dangerous-name-runtime";
+import { KeyedAsyncQueue } from "steelengine/plugin-sdk/keyed-async-queue";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
 import {
   isFutureDateTimestampMs,
   resolveExpiresAtMsFromDurationMs,
-} from "openclaw/plugin-sdk/number-runtime";
-import { mergePairLoopGuardConfig } from "openclaw/plugin-sdk/pair-loop-guard-runtime";
-import { buildInboundHistoryFromEntries } from "openclaw/plugin-sdk/reply-history";
+} from "steelengine/plugin-sdk/number-runtime";
+import { mergePairLoopGuardConfig } from "steelengine/plugin-sdk/pair-loop-guard-runtime";
+import { buildInboundHistoryFromEntries } from "steelengine/plugin-sdk/reply-history";
 import {
   buildTtsSupplementMediaPayload,
   getReplyPayloadTtsSupplement,
-} from "openclaw/plugin-sdk/reply-payload";
-import type { GetReplyOptions } from "openclaw/plugin-sdk/reply-runtime";
-import { resolveInboundLastRouteSessionKey } from "openclaw/plugin-sdk/routing";
-import { resolvePinnedMainDmOwnerFromAllowlist } from "openclaw/plugin-sdk/security-runtime";
-import { getSessionEntry, resolveStorePath } from "openclaw/plugin-sdk/session-store-runtime";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/reply-payload";
+import type { GetReplyOptions } from "steelengine/plugin-sdk/reply-runtime";
+import { resolveInboundLastRouteSessionKey } from "steelengine/plugin-sdk/routing";
+import { resolvePinnedMainDmOwnerFromAllowlist } from "steelengine/plugin-sdk/security-runtime";
+import { getSessionEntry, resolveStorePath } from "steelengine/plugin-sdk/session-store-runtime";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import type {
   CoreConfig,
   MatrixConfig,
@@ -75,7 +75,7 @@ import {
   parsePollStartContent,
 } from "../poll-types.js";
 import type { LocationMessageEventContent, MatrixClient } from "../sdk.js";
-import { MATRIX_OPENCLAW_FINALIZED_PREVIEW_KEY } from "../send/types.js";
+import { MATRIX_STEELENGINE_FINALIZED_PREVIEW_KEY } from "../send/types.js";
 import { resolveMatrixStoredSessionMeta } from "../session-store-metadata.js";
 import {
   resolveMatrixMonitorAccessState,
@@ -132,11 +132,11 @@ const MATRIX_TOOL_PROGRESS_MAX_CHARS = 300;
 const loadMatrixSendModule = createLazyRuntimeModule(() => import("../send.js"));
 
 const loadAcpBindingRuntime = createLazyRuntimeModule(
-  () => import("openclaw/plugin-sdk/acp-binding-runtime"),
+  () => import("steelengine/plugin-sdk/acp-binding-runtime"),
 );
 
 const loadSessionBindingRuntime = createLazyRuntimeModule(
-  () => import("openclaw/plugin-sdk/session-binding-runtime"),
+  () => import("steelengine/plugin-sdk/session-binding-runtime"),
 );
 
 const loadMatrixReactionEvents = createLazyRuntimeModule(() => import("./reaction-events.js"));
@@ -175,7 +175,7 @@ async function redactMatrixDraftEvent(
 }
 
 function buildMatrixFinalizedPreviewContent(): Record<string, unknown> {
-  return { [MATRIX_OPENCLAW_FINALIZED_PREVIEW_KEY]: true };
+  return { [MATRIX_STEELENGINE_FINALIZED_PREVIEW_KEY]: true };
 }
 
 type MatrixMonitorHandlerParams = {
@@ -587,7 +587,7 @@ export function createMatrixRoomMessageHandler(params: MatrixMonitorHandlerParam
   return async (roomId: string, event: MatrixRawEvent) => {
     const eventId = typeof event.event_id === "string" ? event.event_id.trim() : "";
     let inboundReplayClaim:
-      | import("openclaw/plugin-sdk/persistent-dedupe").ChannelReplayClaimHandle
+      | import("steelengine/plugin-sdk/persistent-dedupe").ChannelReplayClaimHandle
       | undefined;
     let draftStreamRef: MatrixDraftStreamHandle | undefined;
     let draftConsumed = false;

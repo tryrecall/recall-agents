@@ -1,5 +1,5 @@
-// Senseaudio plugin entrypoint registers its OpenClaw integration.
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+// Senseaudio plugin entrypoint registers its SteelEngine integration.
+import { definePluginEntry } from "steelengine/plugin-sdk/plugin-entry";
 import { senseaudioMediaUnderstandingProvider } from "./media-understanding-provider.js";
 
 export default definePluginEntry({

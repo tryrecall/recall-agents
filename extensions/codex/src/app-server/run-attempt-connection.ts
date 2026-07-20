@@ -6,17 +6,17 @@ import {
   resolveSessionAgentIds,
   resolveUserPath,
   type FastModeAutoProgressState,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
-import { resolveAgentDir } from "openclaw/plugin-sdk/agent-runtime";
+} from "steelengine/plugin-sdk/agent-harness-runtime";
+import { resolveAgentDir } from "steelengine/plugin-sdk/agent-runtime";
 import {
   createDiagnosticTraceContextFromActiveScope,
   freezeDiagnosticTraceContext,
   resolveDiagnosticModelContentCapturePolicy,
-} from "openclaw/plugin-sdk/diagnostic-runtime";
-import { loadExecApprovals } from "openclaw/plugin-sdk/exec-approvals-runtime";
+} from "steelengine/plugin-sdk/diagnostic-runtime";
+import { loadExecApprovals } from "steelengine/plugin-sdk/exec-approvals-runtime";
 import {
   resolveCodexAppServerForModelProvider,
-  resolveCodexAppServerForOpenClawToolPolicy,
+  resolveCodexAppServerForSteelEngineToolPolicy,
 } from "./app-server-policy.js";
 import {
   resolveCodexAppServerAuthProfileId,
@@ -29,7 +29,7 @@ import {
   readCodexPluginConfig,
   resolveCodexComputerUseConfig,
   resolveCodexModelBackedReviewerPolicyContext,
-  resolveOpenClawExecPolicyForCodexAppServer,
+  resolveSteelEngineExecPolicyForCodexAppServer,
 } from "./config.js";
 import { createCodexDynamicToolBuildStageTracker } from "./dynamic-tool-build.js";
 import { resolveCodexNativeHookRelayEvents } from "./native-hook-relay.js";
@@ -91,7 +91,7 @@ export async function prepareCodexAttemptConnection({ params, options }: CodexRu
     workspaceDir: resolvedWorkspace,
   });
   preDynamicStartupStages.mark("sandbox");
-  const execPolicy = resolveOpenClawExecPolicyForCodexAppServer({
+  const execPolicy = resolveSteelEngineExecPolicyForCodexAppServer({
     execOverrides: params.execOverrides,
     approvals: loadExecApprovals(),
     config: params.config,
@@ -144,7 +144,7 @@ export async function prepareCodexAttemptConnection({ params, options }: CodexRu
       model: selection.model,
       config: params.config,
       agentDir,
-      openClawSandboxActive: sandbox?.enabled === true,
+      steelEngineSandboxActive: sandbox?.enabled === true,
     }).appServer;
   const initialStartupBindingHadInactiveThreadBootstrap =
     isInactiveThreadBootstrapBinding(startupBinding);
@@ -226,7 +226,7 @@ export async function prepareCodexAttemptConnection({ params, options }: CodexRu
   await ensureCodexWorkspaceDirOnce(effectiveWorkspace);
   preDynamicStartupStages.mark("effective-workspace");
   const resolvePolicyAppServer = () =>
-    resolveCodexAppServerForOpenClawToolPolicy({
+    resolveCodexAppServerForSteelEngineToolPolicy({
       appServer: configuredAppServer,
       pluginConfig,
       env: process.env,
@@ -248,7 +248,7 @@ export async function prepareCodexAttemptConnection({ params, options }: CodexRu
     agentDir,
   });
   if (configuredAppServer.approvalPolicy === "never" && appServer.approvalPolicy === "untrusted") {
-    embeddedAgentLog.info("codex app-server approval policy promoted for OpenClaw tool policy", {
+    embeddedAgentLog.info("codex app-server approval policy promoted for SteelEngine tool policy", {
       from: "never",
       to: "untrusted",
       beforeToolCallHook: beforeToolCallPolicy.hasBeforeToolCallHook,
@@ -336,7 +336,7 @@ export async function prepareCodexAttemptConnection({ params, options }: CodexRu
       model: selection.model,
       config: params.config,
       agentDir,
-      openClawSandboxActive: sandbox?.enabled === true,
+      steelEngineSandboxActive: sandbox?.enabled === true,
     }).appServer;
   return {
     params,

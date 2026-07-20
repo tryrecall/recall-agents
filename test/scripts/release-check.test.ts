@@ -32,12 +32,12 @@ describe("release-check", () => {
   });
 
   it("resolves exactly one prepacked local dependency tarball", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-release-check-tarball-test-"));
+    const root = mkdtempSync(join(tmpdir(), "steelengine-release-check-tarball-test-"));
     try {
-      writeFileSync(join(root, "openclaw-ai-2026.6.33.tgz"), "fixture");
+      writeFileSync(join(root, "steelengine-ai-2026.6.33.tgz"), "fixture");
       writeFileSync(join(root, "SHA256SUMS"), "fixture");
       expect(resolveReleaseCheckLocalPackageTarballs(root)).toEqual([
-        join(root, "openclaw-ai-2026.6.33.tgz"),
+        join(root, "steelengine-ai-2026.6.33.tgz"),
       ]);
       expect(resolveReleaseCheckLocalPackageTarballs(undefined)).toEqual([]);
     } finally {
@@ -46,17 +46,17 @@ describe("release-check", () => {
   });
 
   it("writes an explicit local project for unpublished core and AI tarballs", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-release-check-install-test-"));
+    const root = mkdtempSync(join(tmpdir(), "steelengine-release-check-install-test-"));
     try {
-      writePackedTarballInstallManifest(root, "/tmp/openclaw.tgz", ["/tmp/openclaw-ai.tgz"]);
+      writePackedTarballInstallManifest(root, "/tmp/steelengine.tgz", ["/tmp/steelengine-ai.tgz"]);
       const manifest = JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as {
         dependencies?: Record<string, string>;
         private?: boolean;
       };
       expect(manifest.private).toBe(true);
       expect(manifest.dependencies).toEqual({
-        "@openclaw/ai": "file:///tmp/openclaw-ai.tgz",
-        openclaw: "file:///tmp/openclaw.tgz",
+        "@steelengine/ai": "file:///tmp/steelengine-ai.tgz",
+        steelengine: "file:///tmp/steelengine.tgz",
       });
     } finally {
       rmSync(root, { recursive: true, force: true });
@@ -64,28 +64,28 @@ describe("release-check", () => {
   });
 
   it("packs the local AI workspace when no prepared tarball is supplied", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-release-check-ai-pack-test-"));
+    const root = mkdtempSync(join(tmpdir(), "steelengine-release-check-ai-pack-test-"));
     try {
       const tarballs = prepareReleaseCheckLocalPackageTarballs({
         tmpRoot: root,
         packLocalAi: (packDestination) => {
-          const filename = "openclaw-ai-2026.7.1-beta.3.tgz";
+          const filename = "steelengine-ai-2026.7.1-beta.3.tgz";
           writeFileSync(join(packDestination, filename), "fixture");
           return [{ filename }];
         },
       });
-      expect(tarballs).toEqual([join(root, "ai-pack", "openclaw-ai-2026.7.1-beta.3.tgz")]);
+      expect(tarballs).toEqual([join(root, "ai-pack", "steelengine-ai-2026.7.1-beta.3.tgz")]);
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
   });
 
   it("prefers the prepared AI tarball over packing the workspace", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-release-check-ai-pack-test-"));
+    const root = mkdtempSync(join(tmpdir(), "steelengine-release-check-ai-pack-test-"));
     try {
       const preparedDir = join(root, "prepared");
       mkdirSync(preparedDir);
-      const preparedTarball = join(preparedDir, "openclaw-ai-2026.7.1-beta.3.tgz");
+      const preparedTarball = join(preparedDir, "steelengine-ai-2026.7.1-beta.3.tgz");
       writeFileSync(preparedTarball, "fixture");
       const tarballs = prepareReleaseCheckLocalPackageTarballs({
         tmpRoot: root,
@@ -101,24 +101,24 @@ describe("release-check", () => {
   });
 
   it("rejects a packed install without the local AI tarball", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-release-check-install-test-"));
+    const root = mkdtempSync(join(tmpdir(), "steelengine-release-check-install-test-"));
     try {
-      expect(() => writePackedTarballInstallManifest(root, "/tmp/openclaw.tgz", [])).toThrow(
-        "requires exactly one @openclaw/ai tarball",
+      expect(() => writePackedTarballInstallManifest(root, "/tmp/steelengine.tgz", [])).toThrow(
+        "requires exactly one @steelengine/ai tarball",
       );
       expect(() =>
-        writePackedTarballInstallManifest(root, "/tmp/openclaw.tgz", [
-          "/tmp/openclaw-ai-one.tgz",
-          "/tmp/openclaw-ai-two.tgz",
+        writePackedTarballInstallManifest(root, "/tmp/steelengine.tgz", [
+          "/tmp/steelengine-ai-one.tgz",
+          "/tmp/steelengine-ai-two.tgz",
         ]),
-      ).toThrow("requires exactly one @openclaw/ai tarball");
+      ).toThrow("requires exactly one @steelengine/ai tarball");
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
   });
 
   it("rejects missing, empty, or ambiguous local dependency tarball directories", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-release-check-tarball-test-"));
+    const root = mkdtempSync(join(tmpdir(), "steelengine-release-check-tarball-test-"));
     try {
       expect(() => resolveReleaseCheckLocalPackageTarballs(join(root, "missing"))).toThrow(
         RELEASE_CHECK_LOCAL_PACKAGE_TARBALL_DIR_ENV,
@@ -135,11 +135,11 @@ describe("release-check", () => {
   });
 
   it("seeds packaged activation smoke with an included channel plugin", () => {
-    const homeDir = mkdtempSync(join(tmpdir(), "openclaw-release-check-test-"));
+    const homeDir = mkdtempSync(join(tmpdir(), "steelengine-release-check-test-"));
     try {
       writePackedBundledPluginActivationConfig(homeDir);
       const config = JSON.parse(
-        readFileSync(join(homeDir, ".openclaw", "openclaw.json"), "utf8"),
+        readFileSync(join(homeDir, ".steelengine", "steelengine.json"), "utf8"),
       ) as {
         channels?: Record<string, unknown>;
         plugins?: { entries?: Record<string, unknown> };

@@ -19,7 +19,7 @@ import {
   getRuntimeConfigSourceSnapshot,
   setRuntimeConfigAppliedHash,
 } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { isSecretRef } from "../config/types.secrets.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import { formatErrorMessage } from "../infra/errors.js";
@@ -158,9 +158,9 @@ type GatewayGmailRestartAbortController = {
 type GatewayHotReloadPublication = {
   publish: (commit: () => Promise<void>, isCommitted: () => boolean) => Promise<void>;
   isCurrent: () => boolean;
-  prepareRestartRuntimeConfig?: () => Promise<OpenClawConfig>;
+  prepareRestartRuntimeConfig?: () => Promise<SteelEngineConfig>;
   runtimeEnv?: NodeJS.ProcessEnv;
-  sourceConfig?: OpenClawConfig;
+  sourceConfig?: SteelEngineConfig;
 };
 
 type GatewayRestartTransactionState = "pending" | "committed" | "rejected";
@@ -172,14 +172,14 @@ type GatewayRestartTransactionResult = {
 
 type GatewayRestartRequestOptions = {
   retainDebtAcrossConfigChanges?: boolean;
-  prepareRuntimeConfig?: () => Promise<OpenClawConfig>;
-  debtConfig?: OpenClawConfig;
+  prepareRuntimeConfig?: () => Promise<SteelEngineConfig>;
+  debtConfig?: SteelEngineConfig;
 };
 
 type AcceptedRestartTarget = {
-  runtimeConfig: OpenClawConfig;
-  sourceConfig: OpenClawConfig;
-  prepareRuntimeConfig: () => Promise<OpenClawConfig>;
+  runtimeConfig: SteelEngineConfig;
+  sourceConfig: SteelEngineConfig;
+  prepareRuntimeConfig: () => Promise<SteelEngineConfig>;
 };
 
 type AcceptedRestartTargetOwnership = {
@@ -257,10 +257,10 @@ function projectCanonicalSecretRefsOntoRuntime(
 }
 
 function restoreCanonicalSecretRefs(
-  runtimeConfig: OpenClawConfig,
-  sourceConfig: OpenClawConfig,
-): OpenClawConfig {
-  return projectCanonicalSecretRefsOntoRuntime(sourceConfig, runtimeConfig) as OpenClawConfig;
+  runtimeConfig: SteelEngineConfig,
+  sourceConfig: SteelEngineConfig,
+): SteelEngineConfig {
+  return projectCanonicalSecretRefsOntoRuntime(sourceConfig, runtimeConfig) as SteelEngineConfig;
 }
 
 function resetPreparedModelRuntimeStateForHotReload(): void {
@@ -341,7 +341,7 @@ type GatewayReloadHandlerParams = {
   getChannelAutostartSuppression?: GatewayChannelManager["getAutostartSuppression"];
   stopPostReadySidecars?: () => Promise<void> | void;
   reloadPlugins: (params: {
-    nextConfig: OpenClawConfig;
+    nextConfig: SteelEngineConfig;
     changedPaths: readonly string[];
     beforeReplace: (channels: ReadonlySet<ChannelKind>) => Promise<void>;
     commitRuntime: () => Promise<void>;
@@ -357,7 +357,7 @@ type GatewayReloadHandlerParams = {
   logCron: { error: (msg: string) => void };
   logReload: GatewayReloadLog;
   cronReconciliation: GatewayCronReconciliation;
-  createHealthMonitor: (config: OpenClawConfig) => ChannelHealthMonitor | null;
+  createHealthMonitor: (config: SteelEngineConfig) => ChannelHealthMonitor | null;
   createGmailRestartAbortController?: () => GatewayGmailRestartAbortController;
   clearGmailRestartAbortController?: (controller: GatewayGmailRestartAbortController) => void;
   onCronRestart?: () => void;
@@ -370,8 +370,8 @@ type ManagedGatewayConfigReloaderParams = Omit<
   "createHealthMonitor" | "logReload"
 > & {
   minimalTestGateway: boolean;
-  initialConfig: OpenClawConfig;
-  initialCompareConfig?: OpenClawConfig;
+  initialConfig: SteelEngineConfig;
+  initialCompareConfig?: SteelEngineConfig;
   initialInternalWriteHash: string | null;
   watchPath: string;
   readSnapshot: typeof import("../config/io.js").readConfigFileSnapshotForRuntimeTransaction;
@@ -384,22 +384,22 @@ type ManagedGatewayConfigReloaderParams = Omit<
   activateRuntimeSecrets: ActivateRuntimeSecrets;
   /** Applies one immutable effective config/compare snapshot before reload planning. */
   prepareConfigCandidate?: (params: {
-    runtimeConfig: OpenClawConfig;
-    sourceConfig: OpenClawConfig;
+    runtimeConfig: SteelEngineConfig;
+    sourceConfig: SteelEngineConfig;
   }) => {
-    runtimeConfig: OpenClawConfig;
-    compareConfig: OpenClawConfig;
-    reapplyRuntimeOverlays?: (config: OpenClawConfig) => OpenClawConfig;
-    reapplyCompareOverlays?: (config: OpenClawConfig) => OpenClawConfig;
+    runtimeConfig: SteelEngineConfig;
+    compareConfig: SteelEngineConfig;
+    reapplyRuntimeOverlays?: (config: SteelEngineConfig) => SteelEngineConfig;
+    reapplyCompareOverlays?: (config: SteelEngineConfig) => SteelEngineConfig;
   };
   /** Reapplies fixed process-lifetime overlays before secrets preparation. */
-  applyRuntimeConfigOverrides?: (config: OpenClawConfig) => OpenClawConfig;
-  resolveSharedGatewaySessionGenerationForConfig: (config: OpenClawConfig) => string | undefined;
+  applyRuntimeConfigOverrides?: (config: SteelEngineConfig) => SteelEngineConfig;
+  resolveSharedGatewaySessionGenerationForConfig: (config: SteelEngineConfig) => string | undefined;
   sharedGatewaySessionGenerationState: SharedGatewaySessionGenerationState;
   clients: Iterable<SharedGatewayAuthClient>;
-  prepareTerminalConfig: (plan: GatewayReloadPlan, nextConfig: OpenClawConfig) => void;
-  reconcileTerminalSessions: (plan: GatewayReloadPlan, nextConfig: OpenClawConfig) => void;
-  commitTerminalConfig: (nextConfig: OpenClawConfig) => void;
+  prepareTerminalConfig: (plan: GatewayReloadPlan, nextConfig: SteelEngineConfig) => void;
+  reconcileTerminalSessions: (plan: GatewayReloadPlan, nextConfig: SteelEngineConfig) => void;
+  commitTerminalConfig: (nextConfig: SteelEngineConfig) => void;
   acceptTerminalConfig: (options: { retireRejectedRestart: boolean }) => void;
 };
 
@@ -464,7 +464,7 @@ export function createGatewayReloadHandlers(params: GatewayReloadHandlerParams) 
   };
   const waitForActiveWorkBeforeChannelReload = async (
     channels: Iterable<ChannelKind>,
-    nextConfig: OpenClawConfig,
+    nextConfig: SteelEngineConfig,
     isTransactionCurrent: () => boolean,
   ): Promise<boolean> => {
     // Returns true when the wait was cancelled (restart or config supersession),
@@ -531,7 +531,7 @@ export function createGatewayReloadHandlers(params: GatewayReloadHandlerParams) 
 
   const applyHotReload = async (
     plan: GatewayReloadPlan,
-    nextConfig: OpenClawConfig,
+    nextConfig: SteelEngineConfig,
     publication?: GatewayHotReloadPublication,
   ): Promise<void> => {
     assertIrreversibleReloadPlanHasRecoveryOwner(plan, restartRecoveryAvailable);
@@ -579,8 +579,8 @@ export function createGatewayReloadHandlers(params: GatewayReloadHandlerParams) 
     // Planning happens before candidate env publication, while channel starts
     // happen after it. Use one candidate snapshot across both phases.
     const shouldSkipChannelRestart =
-      isTruthyEnvValue(candidateEnv.OPENCLAW_SKIP_CHANNELS) ||
-      isTruthyEnvValue(candidateEnv.OPENCLAW_SKIP_PROVIDERS);
+      isTruthyEnvValue(candidateEnv.STEELENGINE_SKIP_CHANNELS) ||
+      isTruthyEnvValue(candidateEnv.STEELENGINE_SKIP_PROVIDERS);
     const channelReloadTargets = () =>
       new Set<ChannelKind>([...channelsToRestart, ...restartChannelAccounts.keys()]);
     const getChannelAutostartSuppression = () => params.getChannelAutostartSuppression?.() ?? null;
@@ -940,7 +940,7 @@ export function createGatewayReloadHandlers(params: GatewayReloadHandlerParams) 
               signal: restartAbortController.signal,
               onSkipped: () =>
                 params.logHooks.info(
-                  "skipping gmail watcher restart (OPENCLAW_SKIP_GMAIL_WATCHER=1)",
+                  "skipping gmail watcher restart (STEELENGINE_SKIP_GMAIL_WATCHER=1)",
                 ),
             });
           }
@@ -996,7 +996,7 @@ export function createGatewayReloadHandlers(params: GatewayReloadHandlerParams) 
     if (channelsToRestart.size > 0 || restartChannelAccounts.size > 0) {
       if (shouldSkipChannelRestart) {
         params.logChannels.info(
-          "skipping channel reload (OPENCLAW_SKIP_CHANNELS=1 or OPENCLAW_SKIP_PROVIDERS=1)",
+          "skipping channel reload (STEELENGINE_SKIP_CHANNELS=1 or STEELENGINE_SKIP_PROVIDERS=1)",
         );
       } else if (getChannelAutostartSuppression()) {
         const cancelledByRestart = pluginReloadAborted;
@@ -1135,7 +1135,7 @@ export function createGatewayReloadHandlers(params: GatewayReloadHandlerParams) 
   let restartEmissionSettled = false;
   type RestartRequestDetails = {
     plan: GatewayReloadPlan;
-    nextConfig: OpenClawConfig;
+    nextConfig: SteelEngineConfig;
     restartOwnedPaths: string[];
     retainDebtAcrossConfigChanges: boolean;
   };
@@ -1187,7 +1187,7 @@ export function createGatewayReloadHandlers(params: GatewayReloadHandlerParams) 
 
   const createRestartRequestDetails = (
     plan: GatewayReloadPlan,
-    nextConfig: OpenClawConfig,
+    nextConfig: SteelEngineConfig,
     options?: GatewayRestartRequestOptions,
   ): RestartRequestDetails => {
     const explicitRestartPaths = plan.restartReasons.filter((path) =>
@@ -1204,7 +1204,7 @@ export function createGatewayReloadHandlers(params: GatewayReloadHandlerParams) 
 
   const deferGatewayRestartDebt = (
     plan: GatewayReloadPlan,
-    nextConfig: OpenClawConfig,
+    nextConfig: SteelEngineConfig,
     options?: GatewayRestartRequestOptions,
   ) => {
     const details = createRestartRequestDetails(plan, nextConfig, options);
@@ -1321,7 +1321,7 @@ export function createGatewayReloadHandlers(params: GatewayReloadHandlerParams) 
     restartRetryTimer.unref?.();
   };
 
-  const acceptRestartConfig = (acceptedConfig?: OpenClawConfig) => {
+  const acceptRestartConfig = (acceptedConfig?: SteelEngineConfig) => {
     if (restartRequestTransaction?.state !== "rejected") {
       return { retireRejectedRestart: false };
     }
@@ -1392,7 +1392,7 @@ export function createGatewayReloadHandlers(params: GatewayReloadHandlerParams) 
 
   const requestGatewayRestartForGeneration = (
     plan: GatewayReloadPlan,
-    nextConfig: OpenClawConfig,
+    nextConfig: SteelEngineConfig,
     requestGeneration: number,
     options?: GatewayRestartRequestOptions,
   ): boolean => {
@@ -1569,7 +1569,7 @@ export function createGatewayReloadHandlers(params: GatewayReloadHandlerParams) 
 
   const requestGatewayRestart = (
     plan: GatewayReloadPlan,
-    nextConfig: OpenClawConfig,
+    nextConfig: SteelEngineConfig,
     options?: GatewayRestartRequestOptions,
   ): GatewayRestartTransactionResult => {
     if (restartRetryStopped) {
@@ -1621,15 +1621,15 @@ export function startManagedGatewayConfigReloader(
   }
 
   const prepareRuntimeCandidate = (
-    runtimeConfig: OpenClawConfig,
-    sourceConfig: OpenClawConfig,
+    runtimeConfig: SteelEngineConfig,
+    sourceConfig: SteelEngineConfig,
     ownership?: GatewayConfigReloadTransactionOwnership,
-  ): OpenClawConfig => {
+  ): SteelEngineConfig => {
     const canonicalConfig = restoreCanonicalSecretRefs(runtimeConfig, sourceConfig);
     const candidateConfig = ownership?.reapplyRuntimeOverlays(canonicalConfig) ?? canonicalConfig;
     return params.applyRuntimeConfigOverrides?.(candidateConfig) ?? candidateConfig;
   };
-  const applyRuntimeConfigOverrides = (config: OpenClawConfig): OpenClawConfig =>
+  const applyRuntimeConfigOverrides = (config: SteelEngineConfig): SteelEngineConfig =>
     params.applyRuntimeConfigOverrides?.(config) ?? config;
   const restartRecoveryAvailable =
     params.restartRecoveryAvailable !== false && params.requestRecoveryRestart !== undefined;
@@ -1696,9 +1696,9 @@ export function startManagedGatewayConfigReloader(
   });
   const runManagedRestart = async (
     plan: GatewayReloadPlan,
-    nextConfig: OpenClawConfig,
+    nextConfig: SteelEngineConfig,
     transactionOwnership: GatewayConfigReloadTransactionOwnership,
-    sourceConfig: OpenClawConfig,
+    sourceConfig: SteelEngineConfig,
     restartOptions?: GatewayRestartRequestOptions,
     beforeRestartRequest?: () => Promise<void>,
   ) => {
@@ -1716,7 +1716,7 @@ export function startManagedGatewayConfigReloader(
           previousRequired: string | undefined | null;
           previousCurrent: string | undefined;
           nextGeneration: string | undefined;
-          runtimeConfig: OpenClawConfig;
+          runtimeConfig: SteelEngineConfig;
         }
       | undefined;
     try {

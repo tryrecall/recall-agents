@@ -26,7 +26,7 @@ import {
   clearRuntimeConfigSnapshot,
   readConfigFileSnapshotWithPluginMetadata,
 } from "../../../src/config/config.js";
-import type { OpenClawConfig } from "../../../src/config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../../src/config/types.steelengine.js";
 import { startGatewayServer } from "../../../src/gateway/server.js";
 import { getFreeGatewayPort } from "../../../src/gateway/test-helpers.e2e.js";
 import { captureEnv, setTestEnvValue } from "../../../src/test-utils/env.js";
@@ -40,7 +40,7 @@ import {
 const require = createRequire(import.meta.url);
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeConformance = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
 const authValue = "test";
 const sessionKey = "agent:main:mcp-app-conformance";
@@ -95,7 +95,7 @@ function appHtml(appModuleUrl: string): string {
 import { App, McpUiResourceTeardownResultSchema } from ${JSON.stringify(appModuleUrl)};
 const write = (id, value) => { document.getElementById(id).textContent = value; };
 try { void window.top.document; write("isolation", "failed"); } catch { write("isolation", "isolated"); }
-const app = new App({ name: "OpenClaw conformance fixture", version: "1.0.0" });
+const app = new App({ name: "SteelEngine conformance fixture", version: "1.0.0" });
 app.ontoolinput = ({ arguments: args }) => write("input", JSON.stringify(args ?? {}));
 app.ontoolresult = (value) => write("result", JSON.stringify(value.structuredContent ?? value));
 app.onteardown = async () => ({});
@@ -304,17 +304,17 @@ describeConformance("MCP App Control UI and standalone host conformance", () => 
     }
     envSnapshot = captureEnv([
       "HOME",
-      "OPENCLAW_STATE_DIR",
-      "OPENCLAW_CONFIG_PATH",
-      "OPENCLAW_GATEWAY_TOKEN",
-      "OPENCLAW_SKIP_CHANNELS",
-      "OPENCLAW_SKIP_CRON",
-      "OPENCLAW_SKIP_PROVIDERS",
-      "OPENCLAW_BUNDLED_PLUGINS_DIR",
+      "STEELENGINE_STATE_DIR",
+      "STEELENGINE_CONFIG_PATH",
+      "STEELENGINE_GATEWAY_TOKEN",
+      "STEELENGINE_SKIP_CHANNELS",
+      "STEELENGINE_SKIP_CRON",
+      "STEELENGINE_SKIP_PROVIDERS",
+      "STEELENGINE_BUNDLED_PLUGINS_DIR",
     ]);
-    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-mcp-app-conformance-"));
+    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-mcp-app-conformance-"));
     const stateDir = path.join(tempRoot, "state");
-    const configPath = path.join(stateDir, "openclaw.json");
+    const configPath = path.join(stateDir, "steelengine.json");
     const fixturePath = path.join(tempRoot, "fixture-server.mjs");
     await fs.mkdir(path.join(tempRoot, "empty-plugins"), { recursive: true });
     controlUiServer = await startControlUiE2eServer();
@@ -346,7 +346,7 @@ describeConformance("MCP App Control UI and standalone host conformance", () => 
     do {
       sandboxPort = await getFreeGatewayPort();
     } while (sandboxPort === gatewayPort);
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       gateway: {
         auth: { mode: "token", token: authValue },
         controlUi: { allowedOrigins: [controlUiOrigin] },
@@ -359,13 +359,13 @@ describeConformance("MCP App Control UI and standalone host conformance", () => 
     await fs.mkdir(stateDir, { recursive: true });
     await fs.writeFile(configPath, `${JSON.stringify(cfg, null, 2)}\n`);
     setTestEnvValue("HOME", tempRoot);
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
-    setTestEnvValue("OPENCLAW_CONFIG_PATH", configPath);
-    setTestEnvValue("OPENCLAW_GATEWAY_TOKEN", authValue);
-    setTestEnvValue("OPENCLAW_SKIP_CHANNELS", "1");
-    setTestEnvValue("OPENCLAW_SKIP_CRON", "1");
-    setTestEnvValue("OPENCLAW_SKIP_PROVIDERS", "1");
-    setTestEnvValue("OPENCLAW_BUNDLED_PLUGINS_DIR", path.join(tempRoot, "empty-plugins"));
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
+    setTestEnvValue("STEELENGINE_CONFIG_PATH", configPath);
+    setTestEnvValue("STEELENGINE_GATEWAY_TOKEN", authValue);
+    setTestEnvValue("STEELENGINE_SKIP_CHANNELS", "1");
+    setTestEnvValue("STEELENGINE_SKIP_CRON", "1");
+    setTestEnvValue("STEELENGINE_SKIP_PROVIDERS", "1");
+    setTestEnvValue("STEELENGINE_BUNDLED_PLUGINS_DIR", path.join(tempRoot, "empty-plugins"));
     clearConfigCache();
     clearRuntimeConfigSnapshot();
     runtime = await getOrCreateSessionMcpRuntime({

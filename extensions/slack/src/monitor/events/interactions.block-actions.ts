@@ -1,20 +1,20 @@
 // Slack plugin module implements interactions.block actions behavior.
 import type { SlackActionMiddlewareArgs } from "@slack/bolt";
 import type { Block, KnownBlock } from "@slack/web-api";
-import { resolveApprovalOverGateway } from "openclaw/plugin-sdk/approval-gateway-runtime";
-import { parseExecApprovalCommandText } from "openclaw/plugin-sdk/approval-reply-runtime";
-import { resolveCommandAuthorization } from "openclaw/plugin-sdk/command-auth-native";
-import { isApprovalNotFoundError } from "openclaw/plugin-sdk/error-runtime";
-import { requestHeartbeat } from "openclaw/plugin-sdk/heartbeat-runtime";
+import { resolveApprovalOverGateway } from "steelengine/plugin-sdk/approval-gateway-runtime";
+import { parseExecApprovalCommandText } from "steelengine/plugin-sdk/approval-reply-runtime";
+import { resolveCommandAuthorization } from "steelengine/plugin-sdk/command-auth-native";
+import { isApprovalNotFoundError } from "steelengine/plugin-sdk/error-runtime";
+import { requestHeartbeat } from "steelengine/plugin-sdk/heartbeat-runtime";
 import {
   parseStrictFiniteNumber,
   timestampMsToIsoString,
-} from "openclaw/plugin-sdk/number-runtime";
+} from "steelengine/plugin-sdk/number-runtime";
 import {
   normalizeOptionalString,
   normalizeUniqueTrimmedStringList,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
-import { enqueueSystemEvent } from "openclaw/plugin-sdk/system-event-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
+import { enqueueSystemEvent } from "steelengine/plugin-sdk/system-event-runtime";
 import { decodeSlackApprovalAction, type SlackApprovalAction } from "../../approval-actions.js";
 import { isSlackApprovalAuthorizedSender } from "../../approval-auth.js";
 import { isSlackExecApprovalAuthorizedSender } from "../../exec-approvals.js";

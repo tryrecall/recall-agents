@@ -1,13 +1,13 @@
 /** Explicit doctor maintenance for the canonical shared state SQLite database. */
 import fs from "node:fs";
-import { clearOpenClawDatabaseQuarantine } from "../state/openclaw-quarantine-store.js";
+import { clearSteelEngineDatabaseQuarantine } from "../state/steelengine-quarantine-store.js";
 import {
-  assertOpenClawStateDatabaseForMaintenance,
-  clearOpenClawStateDatabaseOpenFailure,
-  ensureOpenClawStatePermissions,
-  isOpenClawStateDatabaseOpen,
-} from "../state/openclaw-state-db.js";
-import { resolveOpenClawStateSqlitePath } from "../state/openclaw-state-db.paths.js";
+  assertSteelEngineStateDatabaseForMaintenance,
+  clearSteelEngineStateDatabaseOpenFailure,
+  ensureSteelEngineStatePermissions,
+  isSteelEngineStateDatabaseOpen,
+} from "../state/steelengine-state-db.js";
+import { resolveSteelEngineStateSqlitePath } from "../state/steelengine-state-db.paths.js";
 import {
   compactDoctorSqliteFile,
   type DoctorSqliteCompactSnapshot,
@@ -46,7 +46,7 @@ export async function runDoctorStateSqliteCompact(
   deps: DoctorStateSqliteCompactDeps = {},
 ): Promise<DoctorStateSqliteCompactReport> {
   const env = options.env ?? process.env;
-  const sqlitePath = resolveOpenClawStateSqlitePath(env);
+  const sqlitePath = resolveSteelEngineStateSqlitePath(env);
   const stat = readCanonicalStateDatabaseStat(sqlitePath);
   if (!stat) {
     return {
@@ -57,33 +57,33 @@ export async function runDoctorStateSqliteCompact(
     };
   }
   if (!stat.isFile()) {
-    throw new Error(`Canonical OpenClaw state database is not a regular file: ${sqlitePath}`);
+    throw new Error(`Canonical SteelEngine state database is not a regular file: ${sqlitePath}`);
   }
   const withMaintenanceLock = deps.withMaintenanceLock ?? withDoctorSqliteMaintenanceLock;
   return await withMaintenanceLock({
     env,
     operation: "state SQLite compaction",
     run: () => {
-      if (isOpenClawStateDatabaseOpen()) {
+      if (isSteelEngineStateDatabaseOpen()) {
         throw new Error(
-          "The shared OpenClaw state database is already open in this process. Stop OpenClaw and retry.",
+          "The shared SteelEngine state database is already open in this process. Stop SteelEngine and retry.",
         );
       }
 
       const compact = compactDoctorSqliteFile({
         afterMutation: () => {
-          if (!clearOpenClawDatabaseQuarantine(sqlitePath, { env })) {
+          if (!clearSteelEngineDatabaseQuarantine(sqlitePath, { env })) {
             throw new Error(
-              `OpenClaw state database ${sqlitePath} was compacted, but its persisted quarantine record could not be cleared. Rerun openclaw doctor --fix so the database is not refused again.`,
+              `SteelEngine state database ${sqlitePath} was compacted, but its persisted quarantine record could not be cleared. Rerun steelengine doctor --fix so the database is not refused again.`,
             );
           }
-          clearOpenClawStateDatabaseOpenFailure(sqlitePath);
-          ensureOpenClawStatePermissions(sqlitePath, env);
+          clearSteelEngineStateDatabaseOpenFailure(sqlitePath);
+          ensureSteelEngineStatePermissions(sqlitePath, env);
         },
         ...(deps.busyTimeoutMs !== undefined ? { busyTimeoutMs: deps.busyTimeoutMs } : {}),
         sqlitePath,
         validateBeforeMutation: (database) =>
-          assertOpenClawStateDatabaseForMaintenance(database, { pathname: sqlitePath }),
+          assertSteelEngineStateDatabaseForMaintenance(database, { pathname: sqlitePath }),
       });
       return {
         ...compact,

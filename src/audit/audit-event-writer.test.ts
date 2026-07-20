@@ -1,9 +1,9 @@
 import { afterAll, afterEach, describe, expect, it } from "vitest";
 import { cleanupTempDirs, makeTempDir } from "../../test/helpers/temp-dir.js";
 import {
-  closeOpenClawStateDatabaseForTest,
-  openOpenClawStateDatabase,
-} from "../state/openclaw-state-db.js";
+  closeSteelEngineStateDatabaseForTest,
+  openSteelEngineStateDatabase,
+} from "../state/steelengine-state-db.js";
 import { listAuditEvents } from "./audit-event-store.js";
 import type { AuditEventInput } from "./audit-event-types.js";
 import { createAuditEventWriter } from "./audit-event-writer.js";
@@ -26,7 +26,7 @@ function input(): AuditEventInput {
 }
 
 afterEach(() => {
-  closeOpenClawStateDatabaseForTest();
+  closeSteelEngineStateDatabaseForTest();
 });
 
 afterAll(() => {
@@ -35,12 +35,12 @@ afterAll(() => {
 
 describe("audit event worker", () => {
   it("returns immediately under SQLite contention and flushes before stop", async () => {
-    const stateDir = makeTempDir(tempDirs, "openclaw-audit-writer-");
-    const database = { env: { OPENCLAW_STATE_DIR: stateDir } };
+    const stateDir = makeTempDir(tempDirs, "steelengine-audit-writer-");
+    const database = { env: { STEELENGINE_STATE_DIR: stateDir } };
     const errors: string[] = [];
     const writer = createAuditEventWriter({ stateDir, onError: (error) => errors.push(error) });
     await writer.ready;
-    const { db } = openOpenClawStateDatabase(database);
+    const { db } = openSteelEngineStateDatabase(database);
     db.exec("BEGIN IMMEDIATE");
     const startedAt = performance.now();
     expect(writer.record(input())).toBe(true);

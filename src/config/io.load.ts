@@ -27,13 +27,13 @@ import {
   warnOnConfigMiskeys,
 } from "./io.warnings.js";
 import { resolveShellEnvExpectedKeys } from "./shell-env-expected-keys.js";
-import type { OpenClawConfig } from "./types.js";
+import type { SteelEngineConfig } from "./types.js";
 import { validateConfigObjectWithPlugins } from "./validation.js";
 
 export function loadConfigFromContext(
   context: ConfigIoContext,
   options: { skipSuspiciousRecovery?: boolean } = {},
-): OpenClawConfig {
+): SteelEngineConfig {
   const { deps, configPath } = context;
   let envBeforeRead: Record<string, string | undefined> | undefined;
   try {
@@ -97,7 +97,7 @@ export function loadConfigFromContext(
       );
       return {};
     }
-    const duplicates = findDuplicateAgentDirs(validationConfigRaw as OpenClawConfig, {
+    const duplicates = findDuplicateAgentDirs(validationConfigRaw as SteelEngineConfig, {
       env: deps.env,
       homedir: deps.homedir,
     });

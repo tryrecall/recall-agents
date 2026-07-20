@@ -37,8 +37,8 @@ describe("tailscale helpers", () => {
   let envSnapshot: ReturnType<typeof captureEnv>;
 
   beforeEach(() => {
-    envSnapshot = captureEnv(["OPENCLAW_TEST_TAILSCALE_BINARY", "NODE_ENV", "VITEST"]);
-    process.env.OPENCLAW_TEST_TAILSCALE_BINARY = "tailscale";
+    envSnapshot = captureEnv(["STEELENGINE_TEST_TAILSCALE_BINARY", "NODE_ENV", "VITEST"]);
+    process.env.STEELENGINE_TEST_TAILSCALE_BINARY = "tailscale";
     process.env.VITEST ??= "true";
   });
 
@@ -172,14 +172,14 @@ describe("tailscale helpers", () => {
   it("enableTailscaleServe passes a configured service name", async () => {
     const exec = vi.fn().mockResolvedValue({ stdout: "" });
 
-    await enableTailscaleServe(3000, exec as never, "svc:openclaw");
+    await enableTailscaleServe(3000, exec as never, "svc:steelengine");
 
     expect(exec).toHaveBeenCalledTimes(1);
     expectExecCall(
       exec,
       1,
       tailscaleBin,
-      ["serve", "--service=svc:openclaw", "--bg", "--yes", "3000"],
+      ["serve", "--service=svc:steelengine", "--bg", "--yes", "3000"],
       {
         maxBuffer: 200_000,
         timeoutMs: 15_000,
@@ -205,10 +205,10 @@ describe("tailscale helpers", () => {
   it("disableTailscaleServe disables only the configured service name", async () => {
     const exec = vi.fn().mockResolvedValue({ stdout: "" });
 
-    await disableTailscaleServe(exec as never, "svc:openclaw");
+    await disableTailscaleServe(exec as never, "svc:steelengine");
 
     expect(exec).toHaveBeenCalledTimes(1);
-    expectExecCall(exec, 1, tailscaleBin, ["serve", "clear", "svc:openclaw"], {
+    expectExecCall(exec, 1, tailscaleBin, ["serve", "clear", "svc:steelengine"], {
       maxBuffer: 200_000,
       timeoutMs: 15_000,
     });

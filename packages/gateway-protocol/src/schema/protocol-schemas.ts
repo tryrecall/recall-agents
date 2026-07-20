@@ -334,7 +334,7 @@ import {
   SystemAgentSetupDetectResultSchema,
   SystemAgentSetupVerifyParamsSchema,
   SystemAgentSetupVerifyResultSchema,
-} from "./openclaw.js";
+} from "./steelengine.js";
 import {
   PluginApprovalRequestParamsSchema,
   PluginApprovalResolveParamsSchema,

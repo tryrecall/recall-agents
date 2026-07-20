@@ -6,13 +6,13 @@ import {
   resolveTypedApprovalReactionTarget,
   type ApprovalReactionDecisionBinding,
   type ApprovalReactionTargetRecord,
-} from "openclaw/plugin-sdk/approval-reaction-runtime";
-import type { ExecApprovalReplyDecision } from "openclaw/plugin-sdk/approval-reply-runtime";
-import type { OutboundDeliveryResult } from "openclaw/plugin-sdk/channel-send-result";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { MessagePresentation } from "openclaw/plugin-sdk/interactive-runtime";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
+} from "steelengine/plugin-sdk/approval-reaction-runtime";
+import type { ExecApprovalReplyDecision } from "steelengine/plugin-sdk/approval-reply-runtime";
+import type { OutboundDeliveryResult } from "steelengine/plugin-sdk/channel-send-result";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { MessagePresentation } from "steelengine/plugin-sdk/interactive-runtime";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
+import type { ReplyPayload } from "steelengine/plugin-sdk/reply-runtime";
 import { resolveWhatsAppAccount } from "./accounts.js";
 import { getWhatsAppApprovalApprovers, whatsappApprovalAuth } from "./approval-auth.js";
 import { getOptionalWhatsAppRuntime } from "./runtime.js";
@@ -399,7 +399,7 @@ function listWhatsAppDeliveredMessageIdentities(
 
 /** Bind generic forwarded approvals to the exact WhatsApp messages accepted by Baileys. */
 export function registerWhatsAppApprovalReactionTargetForDeliveredPayload(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   target: { channel: string; to: string; accountId?: string | null };
   payload: ReplyPayload;
   results: readonly OutboundDeliveryResult[];
@@ -548,7 +548,7 @@ function readWhatsAppApprovalReactionEvent(params: {
 }
 
 export async function maybeResolveWhatsAppApprovalReaction(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId: string;
   msg: WAMessage;
   gatewayUrl?: string;

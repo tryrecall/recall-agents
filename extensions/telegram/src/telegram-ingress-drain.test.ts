@@ -2,14 +2,14 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { createChannelIngressQueueForTests } from "openclaw/plugin-sdk/plugin-state-test-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { createChannelIngressQueueForTests } from "steelengine/plugin-sdk/plugin-state-test-runtime";
 import { describe, expect, it } from "vitest";
 import { createTelegramIngressDrain } from "./telegram-ingress-drain.js";
 import type { TelegramSpooledUpdatePayload } from "./telegram-ingress-spool.payload.js";
 
 async function withTempState<T>(fn: (stateDir: string) => Promise<T>): Promise<T> {
-  const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-telegram-ingress-drain-"));
+  const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-telegram-ingress-drain-"));
   try {
     return await fn(stateDir);
   } finally {
@@ -24,7 +24,7 @@ const cfg = {
       dmPolicy: "allowlist",
     },
   },
-} as OpenClawConfig;
+} as SteelEngineConfig;
 
 function updatePayload(updateId: number): TelegramSpooledUpdatePayload {
   return {

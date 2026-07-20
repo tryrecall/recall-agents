@@ -7,8 +7,8 @@ import {
   createSseByteGuard,
   parseStreamingJson,
   type SseByteGuard,
-} from "@openclaw/ai/internal/runtime";
-import { resolvePositiveTimerTimeoutMs } from "@openclaw/normalization-core/number-coercion";
+} from "@steelengine/ai/internal/runtime";
+import { resolvePositiveTimerTimeoutMs } from "@steelengine/normalization-core/number-coercion";
 import { readResponseWithLimit } from "../../infra/http-body.js";
 // Internal import for JSON parsing utility
 import type {

@@ -6,17 +6,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { captureEnv, deleteTestEnvValue, setTestEnvValue } from "../test-utils/env.js";
 import { clearCurrentPluginMetadataSnapshot } from "./current-plugin-metadata-snapshot.js";
 import { writePersistedInstalledPluginIndexSync } from "./installed-plugin-index-store.js";
-import { listOpenClawPluginManifestMetadata } from "./manifest-metadata-scan.js";
+import { listSteelEnginePluginManifestMetadata } from "./manifest-metadata-scan.js";
 import { normalizeProviderModelIdWithManifest } from "./manifest-model-id-normalization.js";
 import { clearPluginMetadataLifecycleCaches } from "./plugin-metadata-lifecycle.js";
 import { resetPluginRuntimeStateForTest } from "./runtime.js";
 
 const tempDirs: string[] = [];
 const testEnvSnapshot = captureEnv([
-  "OPENCLAW_STATE_DIR",
-  "OPENCLAW_HOME",
-  "OPENCLAW_DISABLE_BUNDLED_PLUGINS",
-  "OPENCLAW_BUNDLED_PLUGINS_DIR",
+  "STEELENGINE_STATE_DIR",
+  "STEELENGINE_HOME",
+  "STEELENGINE_DISABLE_BUNDLED_PLUGINS",
+  "STEELENGINE_BUNDLED_PLUGINS_DIR",
 ]);
 
 function restoreEnv(): void {
@@ -24,7 +24,7 @@ function restoreEnv(): void {
 }
 
 function makeTempDir(): string {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-model-id-normalization-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-model-id-normalization-"));
   tempDirs.push(dir);
   return dir;
 }
@@ -42,7 +42,7 @@ function writeInstallIndex(params: { stateDir: string; pluginDir: string }): voi
       plugins: [
         {
           pluginId: "normalizer",
-          manifestPath: path.join(params.pluginDir, "openclaw.plugin.json"),
+          manifestPath: path.join(params.pluginDir, "steelengine.plugin.json"),
           manifestHash: "normalizer-manifest",
           rootDir: params.pluginDir,
           origin: "global",
@@ -70,7 +70,7 @@ function writeNormalizerManifest(params: { pluginDir: string; prefix: string }):
     "utf-8",
   );
   fs.writeFileSync(
-    path.join(params.pluginDir, "openclaw.plugin.json"),
+    path.join(params.pluginDir, "steelengine.plugin.json"),
     JSON.stringify({
       id: "normalizer",
       configSchema: { type: "object" },
@@ -116,10 +116,10 @@ describe("manifest model id normalization", () => {
     writeInstallIndex({ stateDir: stateDirA, pluginDir: pluginDirA });
     writeNormalizerManifest({ pluginDir: pluginDirA, prefix: "alpha" });
 
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDirA);
-    deleteTestEnvValue("OPENCLAW_HOME");
-    setTestEnvValue("OPENCLAW_DISABLE_BUNDLED_PLUGINS", "1");
-    deleteTestEnvValue("OPENCLAW_BUNDLED_PLUGINS_DIR");
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDirA);
+    deleteTestEnvValue("STEELENGINE_HOME");
+    setTestEnvValue("STEELENGINE_DISABLE_BUNDLED_PLUGINS", "1");
+    deleteTestEnvValue("STEELENGINE_BUNDLED_PLUGINS_DIR");
 
     expect(normalizeDemoModel()).toBe("alpha/demo-model");
 
@@ -131,7 +131,7 @@ describe("manifest model id normalization", () => {
     writeInstallIndex({ stateDir: stateDirB, pluginDir: pluginDirB });
     writeNormalizerManifest({ pluginDir: pluginDirB, prefix: "charlie" });
 
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDirB);
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDirB);
     clearPluginMetadataLifecycleCaches();
     expect(normalizeDemoModel()).toBe("charlie/demo-model");
   });
@@ -139,21 +139,21 @@ describe("manifest model id normalization", () => {
   it("reuses manifest metadata while file fingerprints are unchanged", () => {
     const stateDir = makeTempDir();
     const pluginDir = path.join(stateDir, "extensions", "normalizer");
-    const manifestPath = path.join(pluginDir, "openclaw.plugin.json");
+    const manifestPath = path.join(pluginDir, "steelengine.plugin.json");
     writeInstallIndex({ stateDir, pluginDir });
     writeNormalizerManifest({ pluginDir, prefix: "alpha" });
 
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
-    deleteTestEnvValue("OPENCLAW_HOME");
-    setTestEnvValue("OPENCLAW_DISABLE_BUNDLED_PLUGINS", "1");
-    deleteTestEnvValue("OPENCLAW_BUNDLED_PLUGINS_DIR");
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
+    deleteTestEnvValue("STEELENGINE_HOME");
+    setTestEnvValue("STEELENGINE_DISABLE_BUNDLED_PLUGINS", "1");
+    deleteTestEnvValue("STEELENGINE_BUNDLED_PLUGINS_DIR");
 
     const readFileSyncSpy = vi.spyOn(fs, "readFileSync");
 
     // The scan also lists source-checkout extensions/ manifests when tests run
     // from a repo checkout, so only pin the record for the plugin under test.
     const listNormalizerRecords = () =>
-      listOpenClawPluginManifestMetadata(process.env).filter(
+      listSteelEnginePluginManifestMetadata(process.env).filter(
         (record) => record.pluginDir === pluginDir,
       );
     expect(listNormalizerRecords()).toHaveLength(1);

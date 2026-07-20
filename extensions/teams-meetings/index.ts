@@ -1,19 +1,19 @@
 import {
   readNonNegativeIntegerParam,
   readPositiveIntegerParam,
-} from "openclaw/plugin-sdk/channel-actions";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+} from "steelengine/plugin-sdk/channel-actions";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 import {
   callGatewayFromCli,
   ErrorCodes,
   errorShape,
   type GatewayRequestHandlerOptions,
-} from "openclaw/plugin-sdk/gateway-runtime";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
-import { definePluginEntry, type OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
-import { normalizeAgentId, parseAgentSessionKey } from "openclaw/plugin-sdk/routing";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { jsonResult as json } from "openclaw/plugin-sdk/tool-results";
+} from "steelengine/plugin-sdk/gateway-runtime";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
+import { definePluginEntry, type SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-entry";
+import { normalizeAgentId, parseAgentSessionKey } from "steelengine/plugin-sdk/routing";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { jsonResult as json } from "steelengine/plugin-sdk/tool-results";
 import { Type } from "typebox";
 import {
   resolveTeamsMeetingsConfig,
@@ -37,7 +37,7 @@ const teamsMeetingsConfigSchema = {
   uiHints: {
     defaultMode: {
       label: "Default Mode",
-      help: "Agent consults OpenClaw, bidi uses direct realtime voice, and transcribe observes only.",
+      help: "Agent consults SteelEngine, bidi uses direct realtime voice, and transcribe observes only.",
     },
     "chrome.browserProfile": { label: "Chrome Profile", advanced: true },
     "chrome.guestName": { label: "Guest Name" },
@@ -180,7 +180,7 @@ async function callGatewayFromTool(params: {
   action: ToolAction;
   config: TeamsMeetingsConfig;
   raw: Record<string, unknown>;
-  runtime?: OpenClawPluginApi["runtime"];
+  runtime?: SteelEnginePluginApi["runtime"];
 }) {
   try {
     if (params.runtime) {
@@ -212,7 +212,7 @@ export default definePluginEntry({
   name: "Microsoft Teams meetings",
   description: "Join Microsoft Teams meetings as a Chrome browser guest",
   configSchema: teamsMeetingsConfigSchema,
-  register(api: OpenClawPluginApi) {
+  register(api: SteelEnginePluginApi) {
     const config = teamsMeetingsConfigSchema.parse(api.pluginConfig);
     let runtime: TeamsMeetingsRuntime | undefined;
 
@@ -386,7 +386,7 @@ export default definePluginEntry({
         name: "teams_meetings",
         label: "Microsoft Teams meetings",
         description:
-          "Join and manage Microsoft Teams meeting browser guests. Guest admission, tenant sign-in, and media permissions may require manual action in the OpenClaw Chrome profile.",
+          "Join and manage Microsoft Teams meeting browser guests. Guest admission, tenant sign-in, and media permissions may require manual action in the SteelEngine Chrome profile.",
         parameters: TeamsMeetingsToolSchema,
         async execute(_toolCallId, params) {
           const raw = asRecord(params);

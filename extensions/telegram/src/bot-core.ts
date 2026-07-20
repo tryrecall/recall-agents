@@ -3,26 +3,26 @@ import {
   buildChannelGroupsScopeTree,
   resolveChannelGroupPolicy,
   resolveScopeRequireMention,
-} from "openclaw/plugin-sdk/channel-policy";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+} from "steelengine/plugin-sdk/channel-policy";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   resolveThreadBindingIdleTimeoutMsForChannel,
   resolveThreadBindingMaxAgeMsForChannel,
   resolveThreadBindingSpawnPolicy,
-} from "openclaw/plugin-sdk/conversation-runtime";
-import { formatErrorMessage, formatUncaughtError } from "openclaw/plugin-sdk/error-runtime";
-import { normalizeGroupActivation } from "openclaw/plugin-sdk/group-activation";
+} from "steelengine/plugin-sdk/conversation-runtime";
+import { formatErrorMessage, formatUncaughtError } from "steelengine/plugin-sdk/error-runtime";
+import { normalizeGroupActivation } from "steelengine/plugin-sdk/group-activation";
 import {
   isNativeCommandsExplicitlyDisabled,
   resolveNativeCommandsEnabled,
   resolveNativeSkillsEnabled,
-} from "openclaw/plugin-sdk/native-command-config-runtime";
-import type { HistoryEntry } from "openclaw/plugin-sdk/reply-history";
-import { danger, logVerbose, shouldLogVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { getChildLogger } from "openclaw/plugin-sdk/runtime-env";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/runtime-env";
-import { createNonExitingRuntime, type RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/native-command-config-runtime";
+import type { HistoryEntry } from "steelengine/plugin-sdk/reply-history";
+import { danger, logVerbose, shouldLogVerbose } from "steelengine/plugin-sdk/runtime-env";
+import { getChildLogger } from "steelengine/plugin-sdk/runtime-env";
+import { createSubsystemLogger } from "steelengine/plugin-sdk/runtime-env";
+import { createNonExitingRuntime, type RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { getOrCreateAccountThrottler } from "./account-throttler.js";
 import { resolveTelegramAccount } from "./accounts.js";
 import { normalizeTelegramApiRoot } from "./api-root.js";
@@ -288,7 +288,7 @@ export function createTelegramBotCore(
   });
   const mediaMaxBytes = (opts.mediaMaxMb ?? telegramCfg.mediaMaxMb ?? 100) * 1024 * 1024;
   const logger = getChildLogger({ module: "telegram-auto-reply" });
-  const resolveGroupPolicy = (chatId: string | number, turnCfg: OpenClawConfig) =>
+  const resolveGroupPolicy = (chatId: string | number, turnCfg: SteelEngineConfig) =>
     resolveChannelGroupPolicy({
       cfg: turnCfg,
       channel: "telegram",
@@ -300,7 +300,7 @@ export function createTelegramBotCore(
     agentId?: string;
     messageThreadId?: number;
     sessionKey?: string;
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
   }) => {
     const agentId = params.agentId ?? resolveDefaultAgentId(params.cfg);
     const sessionKey =
@@ -328,7 +328,7 @@ export function createTelegramBotCore(
     }
     return undefined;
   };
-  const resolveGroupRequireMention = (chatId: string | number, turnCfg: OpenClawConfig) =>
+  const resolveGroupRequireMention = (chatId: string | number, turnCfg: SteelEngineConfig) =>
     resolveScopeRequireMention({
       tree: buildChannelGroupsScopeTree(turnCfg, "telegram", account.accountId),
       path: [String(chatId)],
@@ -338,7 +338,7 @@ export function createTelegramBotCore(
   const resolveTelegramGroupConfig = (
     chatId: string | number,
     messageThreadId: number | undefined,
-    turnCfg: OpenClawConfig,
+    turnCfg: SteelEngineConfig,
   ) => {
     const turnTelegramCfg = resolveTelegramAccount({
       cfg: turnCfg,

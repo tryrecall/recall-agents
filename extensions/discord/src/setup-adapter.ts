@@ -2,7 +2,7 @@
 import {
   createEnvPatchedAccountSetupAdapter,
   type ChannelSetupAdapter,
-} from "openclaw/plugin-sdk/setup-runtime";
+} from "steelengine/plugin-sdk/setup-runtime";
 
 const channel = "discord" as const;
 

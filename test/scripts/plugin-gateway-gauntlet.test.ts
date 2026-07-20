@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { pathToFileURL } from "node:url";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   buildObservationGuardFailures,
@@ -144,7 +144,7 @@ describe("plugin gateway gauntlet helpers", () => {
       ]),
     ).toThrow("Duplicate --qa-scenario value: channel-chat-baseline");
 
-    vi.stubEnv("OPENCLAW_PLUGIN_GATEWAY_GAUNTLET_IDS", "telegram,discord");
+    vi.stubEnv("STEELENGINE_PLUGIN_GATEWAY_GAUNTLET_IDS", "telegram,discord");
     expect(() => parseArgs(["--plugin", "telegram"])).toThrow("Duplicate --plugin value: telegram");
   });
 
@@ -187,7 +187,7 @@ describe("plugin gateway gauntlet helpers", () => {
   it("discovers bundled plugin manifests into lifecycle matrix rows", async () => {
     await writeManifest(
       "alpha",
-      "openclaw.plugin.json",
+      "steelengine.plugin.json",
       JSON.stringify({
         id: "alpha",
         enabledByDefault: true,
@@ -207,7 +207,7 @@ describe("plugin gateway gauntlet helpers", () => {
     );
     await writeManifest(
       "beta",
-      "openclaw.plugin.json",
+      "steelengine.plugin.json",
       JSON.stringify({ id: "beta", commandAliases: ["dreaming"], onboardingScopes: ["memory"] }),
     );
 
@@ -226,7 +226,7 @@ describe("plugin gateway gauntlet helpers", () => {
       hasConfigSchema: true,
       hasRequiredConfigFields: true,
       id: "alpha",
-      manifestPath: path.join("extensions", "alpha", "openclaw.plugin.json"),
+      manifestPath: path.join("extensions", "alpha", "steelengine.plugin.json"),
       name: "alpha",
       onboardingScopes: ["models"],
       providers: ["openai"],
@@ -242,7 +242,7 @@ describe("plugin gateway gauntlet helpers", () => {
   });
 
   it("keeps manifest ids separate from bounded build entry ids", async () => {
-    await writeManifest("kimi-coding", "openclaw.plugin.json", JSON.stringify({ id: "kimi" }));
+    await writeManifest("kimi-coding", "steelengine.plugin.json", JSON.stringify({ id: "kimi" }));
 
     const matrix = discoverBundledPluginManifests(repoRoot);
 
@@ -254,15 +254,15 @@ describe("plugin gateway gauntlet helpers", () => {
     ]);
     const kimi = expectDefined(matrix[0], "Kimi bundled plugin manifest");
     expect(buildGauntletPrebuildEnv({}, { buildIds: [kimi.buildId] })).toEqual({
-      OPENCLAW_BUNDLED_PLUGIN_BUILD_IDS: "kimi-coding",
+      STEELENGINE_BUNDLED_PLUGIN_BUILD_IDS: "kimi-coding",
       PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false",
     });
   });
 
   it("skips source-only plugin dirs that are excluded from the built runtime", async () => {
-    await writeManifest("qa-lab", "openclaw.plugin.json", JSON.stringify({ id: "qa-lab" }));
-    await writeManifest("qqbot", "openclaw.plugin.json", JSON.stringify({ id: "qqbot" }));
-    await writeManifest("telegram", "openclaw.plugin.json", JSON.stringify({ id: "telegram" }));
+    await writeManifest("qa-lab", "steelengine.plugin.json", JSON.stringify({ id: "qa-lab" }));
+    await writeManifest("qqbot", "steelengine.plugin.json", JSON.stringify({ id: "qqbot" }));
+    await writeManifest("telegram", "steelengine.plugin.json", JSON.stringify({ id: "telegram" }));
 
     const matrix = discoverBundledPluginManifests(repoRoot);
 
@@ -488,9 +488,9 @@ describe("plugin gateway gauntlet helpers", () => {
   it("prebuilds private QA dist when QA chunks are enabled", () => {
     expect(buildGauntletPrebuildEnv({ EXISTING: "1" }, { includePrivateQa: true })).toEqual({
       EXISTING: "1",
-      OPENCLAW_BUILD_PRIVATE_QA: "1",
-      OPENCLAW_BUNDLED_PLUGIN_BUILD_IDS: "qa-channel,qa-lab",
-      OPENCLAW_ENABLE_PRIVATE_QA_CLI: "1",
+      STEELENGINE_BUILD_PRIVATE_QA: "1",
+      STEELENGINE_BUNDLED_PLUGIN_BUILD_IDS: "qa-channel,qa-lab",
+      STEELENGINE_ENABLE_PRIVATE_QA_CLI: "1",
       PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false",
     });
     const env = { EXISTING: "1" };
@@ -508,8 +508,8 @@ describe("plugin gateway gauntlet helpers", () => {
       ),
     ).toEqual({
       EXISTING: "1",
-      OPENCLAW_BUNDLED_PLUGIN_BUILD_IDS: "acpx",
-      OPENCLAW_RUN_NODE_SKIP_DTS_BUILD: "1",
+      STEELENGINE_BUNDLED_PLUGIN_BUILD_IDS: "acpx",
+      STEELENGINE_RUN_NODE_SKIP_DTS_BUILD: "1",
       PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false",
     });
   });
@@ -525,9 +525,9 @@ describe("plugin gateway gauntlet helpers", () => {
       ),
     ).toEqual({
       EXISTING: "1",
-      OPENCLAW_BUILD_PRIVATE_QA: "1",
-      OPENCLAW_BUNDLED_PLUGIN_BUILD_IDS: "acpx,active-memory,qa-channel,qa-lab",
-      OPENCLAW_ENABLE_PRIVATE_QA_CLI: "1",
+      STEELENGINE_BUILD_PRIVATE_QA: "1",
+      STEELENGINE_BUNDLED_PLUGIN_BUILD_IDS: "acpx,active-memory,qa-channel,qa-lab",
+      STEELENGINE_ENABLE_PRIVATE_QA_CLI: "1",
       PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false",
     });
   });
@@ -1149,12 +1149,12 @@ process.exit(7);
       "--command-timeout-ms",
       "--build-timeout-ms",
       "--qa-timeout-ms",
-      "OPENCLAW_PLUGIN_GATEWAY_GAUNTLET_IDS",
-      "OPENCLAW_PLUGIN_GATEWAY_GAUNTLET_TOTAL",
-      "OPENCLAW_PLUGIN_GATEWAY_GAUNTLET_INDEX",
-      "OPENCLAW_PLUGIN_GATEWAY_GAUNTLET_FAIL_ON_OBSERVATION",
-      "OPENCLAW_PLUGIN_GATEWAY_GAUNTLET_KEEP_RUN_ROOT",
-      "OPENCLAW_PLUGIN_GATEWAY_GAUNTLET_QA_SUMMARY_MAX_BYTES",
+      "STEELENGINE_PLUGIN_GATEWAY_GAUNTLET_IDS",
+      "STEELENGINE_PLUGIN_GATEWAY_GAUNTLET_TOTAL",
+      "STEELENGINE_PLUGIN_GATEWAY_GAUNTLET_INDEX",
+      "STEELENGINE_PLUGIN_GATEWAY_GAUNTLET_FAIL_ON_OBSERVATION",
+      "STEELENGINE_PLUGIN_GATEWAY_GAUNTLET_KEEP_RUN_ROOT",
+      "STEELENGINE_PLUGIN_GATEWAY_GAUNTLET_QA_SUMMARY_MAX_BYTES",
     ]) {
       expect(result.stdout).toContain(text);
     }
@@ -1162,7 +1162,7 @@ process.exit(7);
 
   it("fails once when skip-prebuild leaves plugin lifecycle probes without a built entry", async () => {
     const outputDir = path.join(repoRoot, "artifacts");
-    await writeManifest("acpx", "openclaw.plugin.json", JSON.stringify({ id: "acpx" }));
+    await writeManifest("acpx", "steelengine.plugin.json", JSON.stringify({ id: "acpx" }));
 
     const result = spawnSync(
       process.execPath,
@@ -1204,7 +1204,7 @@ process.exit(7);
 
   it("allows skip-prebuild slash-only dry runs when selected plugins have no slash probes", async () => {
     const outputDir = path.join(repoRoot, "artifacts");
-    await writeManifest("acpx", "openclaw.plugin.json", JSON.stringify({ id: "acpx" }));
+    await writeManifest("acpx", "steelengine.plugin.json", JSON.stringify({ id: "acpx" }));
 
     const result = spawnSync(
       process.execPath,
@@ -1243,7 +1243,7 @@ process.exit(7);
       failOnObservation: true,
     });
 
-    vi.stubEnv("OPENCLAW_PLUGIN_GATEWAY_GAUNTLET_FAIL_ON_OBSERVATION", "1");
+    vi.stubEnv("STEELENGINE_PLUGIN_GATEWAY_GAUNTLET_FAIL_ON_OBSERVATION", "1");
     expect(parseArgs(["--allow-empty"])).toMatchObject({
       allowEmpty: true,
       failOnObservation: true,
@@ -1344,7 +1344,7 @@ process.exit(7);
         encoding: "utf8",
         env: {
           ...process.env,
-          OPENCLAW_PLUGIN_GATEWAY_GAUNTLET_QA_SUMMARY_MAX_BYTES: "not-a-number",
+          STEELENGINE_PLUGIN_GATEWAY_GAUNTLET_QA_SUMMARY_MAX_BYTES: "not-a-number",
         },
       },
     );
@@ -1366,7 +1366,7 @@ process.exit(7);
     const outputDir = path.join(repoRoot, `artifacts-${mode}`);
     await writeManifest(
       "workboard",
-      "openclaw.plugin.json",
+      "steelengine.plugin.json",
       JSON.stringify({
         id: "workboard",
         commandAliases: [
@@ -1385,7 +1385,7 @@ process.exit(7);
       [
         'const fs = require("node:fs");',
         'const path = require("node:path");',
-        "const stateDir = process.env.OPENCLAW_STATE_DIR ?? process.cwd();",
+        "const stateDir = process.env.STEELENGINE_STATE_DIR ?? process.cwd();",
         'const marker = path.join(stateDir, "workboard-enabled");',
         "const args = process.argv.slice(2);",
         'if (args[0] === "plugins") {',
@@ -1396,7 +1396,7 @@ process.exit(7);
         "}",
         'if (args[0] === "workboard" && args[1] === "--help") {',
         "  if (fs.existsSync(marker)) {",
-        '    console.log("Usage: openclaw workboard");',
+        '    console.log("Usage: steelengine workboard");',
         "    process.exit(0);",
         "  }",
         '  console.error("workboard help was probed after uninstall");',
@@ -1450,7 +1450,7 @@ process.exit(7);
       const slashHelpLogPath = slashHelpRow?.logPath;
       expect(slashHelpLogPath).toEqual(expect.any(String));
       await expect(fs.readFile(slashHelpLogPath as string, "utf8")).resolves.toContain(
-        "Usage: openclaw workboard",
+        "Usage: steelengine workboard",
       );
       return;
     }
@@ -1486,10 +1486,10 @@ process.exit(7);
     );
     await writeManifest(
       "alpha",
-      "openclaw.plugin.json",
+      "steelengine.plugin.json",
       JSON.stringify({ id: "alpha", requiresPlugins: ["beta"] }),
     );
-    await writeManifest("beta", "openclaw.plugin.json", JSON.stringify({ id: "beta" }));
+    await writeManifest("beta", "steelengine.plugin.json", JSON.stringify({ id: "beta" }));
     await fs.writeFile(path.join(repoRoot, "extensions", "alpha", "index.ts"), "export {};\n");
     await fs.writeFile(path.join(repoRoot, "extensions", "beta", "index.ts"), "export {};\n");
     await fs.mkdir(path.join(repoRoot, "scripts"), { recursive: true });
@@ -1501,7 +1501,7 @@ process.exit(7);
         'const outputArgIndex = process.argv.indexOf("--output-dir");',
         "const outputDir = path.resolve(process.cwd(), process.argv[outputArgIndex + 1]);",
         "fs.mkdirSync(outputDir, { recursive: true });",
-        'fs.writeFileSync(path.join(outputDir, "env.txt"), process.env.OPENCLAW_BUNDLED_PLUGIN_BUILD_IDS ?? "", "utf8");',
+        'fs.writeFileSync(path.join(outputDir, "env.txt"), process.env.STEELENGINE_BUNDLED_PLUGIN_BUILD_IDS ?? "", "utf8");',
         'fs.writeFileSync(path.join(outputDir, "args.txt"), process.argv.slice(2).join("\\n"), "utf8");',
         `fs.writeFileSync(path.join(outputDir, "qa-suite-summary.json"), ${JSON.stringify(qaSummaryJson)}, "utf8");`,
       ].join("\n"),
@@ -1543,10 +1543,10 @@ process.exit(7);
     const outputDir = path.join(repoRoot, "artifacts");
     await writeManifest(
       "alpha",
-      "openclaw.plugin.json",
+      "steelengine.plugin.json",
       JSON.stringify({ id: "alpha", requiresPlugins: ["beta"] }),
     );
-    await writeManifest("beta", "openclaw.plugin.json", JSON.stringify({ id: "beta" }));
+    await writeManifest("beta", "steelengine.plugin.json", JSON.stringify({ id: "beta" }));
     await fs.writeFile(path.join(repoRoot, "extensions", "alpha", "index.ts"), "export {};\n");
     await fs.writeFile(path.join(repoRoot, "extensions", "beta", "index.ts"), "export {};\n");
     await fs.mkdir(path.join(repoRoot, "dist"), { recursive: true });
@@ -1613,7 +1613,7 @@ process.exit(7);
         { name: "gateway-restart-inflight-run", status: "fail", steps: [] },
       ],
     });
-    await writeManifest("alpha", "openclaw.plugin.json", JSON.stringify({ id: "alpha" }));
+    await writeManifest("alpha", "steelengine.plugin.json", JSON.stringify({ id: "alpha" }));
     await fs.writeFile(path.join(repoRoot, "extensions", "alpha", "index.ts"), "export {};\n");
     await fs.mkdir(path.join(repoRoot, "scripts"), { recursive: true });
     await fs.writeFile(
@@ -1695,7 +1695,7 @@ process.exit(7);
       },
       scenarios: [{ name: "channel-chat-baseline", status: "pass", steps: [] }],
     });
-    await writeManifest("alpha", "openclaw.plugin.json", JSON.stringify({ id: "alpha" }));
+    await writeManifest("alpha", "steelengine.plugin.json", JSON.stringify({ id: "alpha" }));
     await fs.writeFile(path.join(repoRoot, "extensions", "alpha", "index.ts"), "export {};\n");
     await fs.mkdir(path.join(repoRoot, "scripts"), { recursive: true });
     await fs.writeFile(
@@ -1773,7 +1773,7 @@ process.exit(7);
         { name: "gateway-restart-inflight-run", status: "fail", steps: [] },
       ],
     });
-    await writeManifest("alpha", "openclaw.plugin.json", JSON.stringify({ id: "alpha" }));
+    await writeManifest("alpha", "steelengine.plugin.json", JSON.stringify({ id: "alpha" }));
     await fs.writeFile(path.join(repoRoot, "extensions", "alpha", "index.ts"), "export {};\n");
     await fs.mkdir(path.join(repoRoot, "scripts"), { recursive: true });
     await fs.writeFile(
@@ -1834,7 +1834,7 @@ process.exit(7);
 
   it("fails successful QA chunks that do not write the requested summary", async () => {
     const outputDir = path.join(repoRoot, "artifacts");
-    await writeManifest("alpha", "openclaw.plugin.json", JSON.stringify({ id: "alpha" }));
+    await writeManifest("alpha", "steelengine.plugin.json", JSON.stringify({ id: "alpha" }));
     await fs.writeFile(path.join(repoRoot, "extensions", "alpha", "index.ts"), "export {};\n");
     await fs.mkdir(path.join(repoRoot, "scripts"), { recursive: true });
     await fs.writeFile(
@@ -1897,7 +1897,7 @@ process.exit(7);
 
   it("fails successful QA chunks that write unusable summary JSON", async () => {
     const outputDir = path.join(repoRoot, "artifacts");
-    await writeManifest("alpha", "openclaw.plugin.json", JSON.stringify({ id: "alpha" }));
+    await writeManifest("alpha", "steelengine.plugin.json", JSON.stringify({ id: "alpha" }));
     await fs.writeFile(path.join(repoRoot, "extensions", "alpha", "index.ts"), "export {};\n");
     await fs.mkdir(path.join(repoRoot, "scripts"), { recursive: true });
     await fs.writeFile(
@@ -1955,7 +1955,7 @@ process.exit(7);
 
   it("fails successful QA chunks that write oversized summary JSON", async () => {
     const outputDir = path.join(repoRoot, "artifacts");
-    await writeManifest("alpha", "openclaw.plugin.json", JSON.stringify({ id: "alpha" }));
+    await writeManifest("alpha", "steelengine.plugin.json", JSON.stringify({ id: "alpha" }));
     await fs.writeFile(path.join(repoRoot, "extensions", "alpha", "index.ts"), "export {};\n");
     await fs.mkdir(path.join(repoRoot, "scripts"), { recursive: true });
     await fs.writeFile(
@@ -1992,7 +1992,7 @@ process.exit(7);
         encoding: "utf8",
         env: {
           ...process.env,
-          OPENCLAW_PLUGIN_GATEWAY_GAUNTLET_QA_SUMMARY_MAX_BYTES: "64",
+          STEELENGINE_PLUGIN_GATEWAY_GAUNTLET_QA_SUMMARY_MAX_BYTES: "64",
         },
       },
     );

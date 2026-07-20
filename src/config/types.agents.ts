@@ -1,4 +1,4 @@
-import type { FastMode } from "@openclaw/normalization-core/string-coerce";
+import type { FastMode } from "@steelengine/normalization-core/string-coerce";
 // Defines agent routing, model, and runtime configuration types.
 import type { ChatType } from "../channels/chat-type.js";
 import type {
@@ -146,7 +146,7 @@ export type AgentConfig = {
   };
   /** Optional outer run loop retry boundaries. */
   runRetries?: AgentDefaultsConfig["runRetries"];
-  /** Optional per-agent embedded OpenClaw overrides. */
+  /** Optional per-agent embedded SteelEngine overrides. */
   embeddedAgent?: {
     /** Optional per-agent execution contract override. */
     executionContract?: EmbeddedAgentExecutionContract;

@@ -1,22 +1,22 @@
 {
-  "name": "@openclaw/chutes-provider",
+  "name": "@steelengine/chutes-provider",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw Chutes.ai provider plugin.",
+  "description": "SteelEngine Chutes.ai provider plugin.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/steelengineai/recall-agents"
   },
   "type": "module",
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "clawhubSpec": "clawhub:@openclaw/chutes-provider",
-      "npmSpec": "@openclaw/chutes-provider",
+      "clawhubSpec": "clawhub:@steelengine/chutes-provider",
+      "npmSpec": "@steelengine/chutes-provider",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.6.8"
     },
@@ -24,7 +24,7 @@
       "pluginApi": ">=2026.7.2-beta.3"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3",
+      "steelengineVersion": "2026.7.2-beta.3",
       "bundledDist": false
     },
     "release": {

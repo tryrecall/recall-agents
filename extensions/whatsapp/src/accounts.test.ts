@@ -47,7 +47,7 @@ describe("resolveWhatsAppAuthDir", () => {
     const cfg = {
       channels: {
         whatsapp: {
-          authDir: "~/.openclaw/whatsapp-default",
+          authDir: "~/.steelengine/whatsapp-default",
           accounts: {
             work: { enabled: false },
           },

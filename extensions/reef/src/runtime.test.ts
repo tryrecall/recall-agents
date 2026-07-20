@@ -1,6 +1,6 @@
-import type { PluginRuntime } from "openclaw/plugin-sdk/core";
-import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
-import { importFreshModule } from "openclaw/plugin-sdk/test-fixtures";
+import type { PluginRuntime } from "steelengine/plugin-sdk/core";
+import { createPluginRuntimeStore } from "steelengine/plugin-sdk/runtime-store";
+import { importFreshModule } from "steelengine/plugin-sdk/test-fixtures";
 import { afterEach, describe, expect, it } from "vitest";
 
 const reefRuntimeSlot = createPluginRuntimeStore<PluginRuntime>({

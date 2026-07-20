@@ -1,9 +1,9 @@
 // Session target tests cover persisted channel targets for sessions.
 import fs from "node:fs/promises";
 import path from "node:path";
-import { withTempHome } from "openclaw/plugin-sdk/test-env";
+import { withTempHome } from "steelengine/plugin-sdk/test-env";
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config.js";
+import type { SteelEngineConfig } from "../config.js";
 import { resolveStorePath } from "./paths.js";
 import { replaceSessionEntry } from "./session-accessor.js";
 import {
@@ -35,7 +35,7 @@ async function createAgentSessionStores(
   return storePaths;
 }
 
-function createCustomRootCfg(customRoot: string, defaultAgentId = "ops"): OpenClawConfig {
+function createCustomRootCfg(customRoot: string, defaultAgentId = "ops"): SteelEngineConfig {
   return {
     session: {
       store: path.join(customRoot, "agents", "{agentId}", "sessions", "sessions.json"),
@@ -78,9 +78,9 @@ function expectTargetsToContainStores(
 describe("resolveSessionStoreTargets", () => {
   it("resolves all configured agent stores", async () => {
     await withTempHome(async () => {
-      const cfg: OpenClawConfig = {
+      const cfg: SteelEngineConfig = {
         session: {
-          store: "~/.openclaw/agents/{agentId}/sessions/sessions.json",
+          store: "~/.steelengine/agents/{agentId}/sessions/sessions.json",
         },
         agents: {
           list: [{ id: "main", default: true }, { id: "work" }],
@@ -104,9 +104,9 @@ describe("resolveSessionStoreTargets", () => {
 
   it("includes configured ACP harness stores for all-agent session views", async () => {
     await withTempHome(async () => {
-      const cfg: OpenClawConfig = {
+      const cfg: SteelEngineConfig = {
         session: {
-          store: "~/.openclaw/agents/{agentId}/sessions/sessions.json",
+          store: "~/.steelengine/agents/{agentId}/sessions/sessions.json",
         },
         agents: {
           list: [
@@ -148,7 +148,7 @@ describe("resolveSessionStoreTargets", () => {
   });
 
   it("keeps shared store paths distinct by SQLite owner for --all-agents", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       session: {
         store: "/tmp/shared-sessions.json",
       },
@@ -165,9 +165,9 @@ describe("resolveSessionStoreTargets", () => {
 
   it("uses the path-owned agent id for explicit agent store paths", async () => {
     await withTempHome(async (home) => {
-      const stateDir = path.join(home, ".openclaw");
+      const stateDir = path.join(home, ".steelengine");
       const storePaths = await createAgentSessionStores(stateDir, ["codex-proof"]);
-      const env = { ...process.env, OPENCLAW_STATE_DIR: stateDir };
+      const env = { ...process.env, STEELENGINE_STATE_DIR: stateDir };
 
       expect(resolveSessionStoreTargets({}, { store: storePaths["codex-proof"] }, { env })).toEqual(
         [
@@ -194,7 +194,7 @@ describe("resolveSessionStoreTargets", () => {
   });
 
   it("rejects unknown agent ids", () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       agents: {
         list: [{ id: "main", default: true }, { id: "work" }],
       },
@@ -250,10 +250,10 @@ describe("resolveAgentSessionStoreTargetsSync", () => {
 describe("resolveAllAgentSessionStoreTargetsSync", () => {
   it("includes discovered on-disk agent stores alongside configured targets", async () => {
     await withTempHome(async (home) => {
-      const stateDir = path.join(home, ".openclaw");
+      const stateDir = path.join(home, ".steelengine");
       const storePaths = await createAgentSessionStores(stateDir, ["ops", "retired"]);
 
-      const cfg: OpenClawConfig = {
+      const cfg: SteelEngineConfig = {
         agents: {
           list: [{ id: "ops", default: true }],
         },
@@ -268,7 +268,7 @@ describe("resolveAllAgentSessionStoreTargetsSync", () => {
 
   it("includes legacy JSON stores before an agent SQLite database exists", async () => {
     await withTempHome(async (home) => {
-      const stateDir = path.join(home, ".openclaw");
+      const stateDir = path.join(home, ".steelengine");
       const sessionsDir = path.join(stateDir, "agents", "legacy", "sessions");
       const storePath = path.join(sessionsDir, "sessions.json");
       await fs.mkdir(sessionsDir, { recursive: true });
@@ -280,7 +280,7 @@ describe("resolveAllAgentSessionStoreTargetsSync", () => {
 
       const targets = resolveAllAgentSessionStoreTargetsSync(
         { agents: { list: [{ id: "legacy", default: true }] } },
-        { env: { ...process.env, OPENCLAW_STATE_DIR: stateDir } },
+        { env: { ...process.env, STEELENGINE_STATE_DIR: stateDir } },
       );
 
       expect(targets).toContainEqual({ agentId: "legacy", storePath });
@@ -330,9 +330,9 @@ describe("resolveAllAgentSessionStoreTargetsSync", () => {
 
       const env = {
         ...process.env,
-        OPENCLAW_STATE_DIR: envStateDir,
+        STEELENGINE_STATE_DIR: envStateDir,
       };
-      const cfg: OpenClawConfig = {};
+      const cfg: SteelEngineConfig = {};
       const mainStorePath = await resolveRealStorePath(mainSessionsDir);
       const retiredStorePath = await resolveRealStorePath(retiredSessionsDir);
 
@@ -360,7 +360,7 @@ describe("resolveAllAgentSessionStoreTargetsSync", () => {
       const cfg = createCustomRootCfg(customRoot, "main");
       const env = {
         ...process.env,
-        OPENCLAW_STATE_DIR: envStateDir,
+        STEELENGINE_STATE_DIR: envStateDir,
       };
 
       const targets = resolveAllAgentSessionStoreTargetsSync(cfg, { env });
@@ -384,7 +384,7 @@ describe("resolveAllAgentSessionStoreTargetsSync", () => {
       await fs.mkdir(opsSessionsDir, { recursive: true });
       await fs.mkdir(opsAgentDbDir, { recursive: true });
       await fs.writeFile(leakedFile, JSON.stringify({ leak: { secret: "x" } }), "utf8");
-      await fs.symlink(leakedFile, path.join(opsAgentDbDir, "openclaw-agent.sqlite"));
+      await fs.symlink(leakedFile, path.join(opsAgentDbDir, "steelengine-agent.sqlite"));
 
       const targets = resolveAllAgentSessionStoreTargetsSync(createCustomRootCfg(customRoot), {
         env: process.env,
@@ -400,7 +400,7 @@ describe("resolveAllAgentSessionStoreTargetsSync", () => {
 
   it("skips discovered directories that only normalize into the default main agent", async () => {
     await withTempHome(async (home) => {
-      const stateDir = path.join(home, ".openclaw");
+      const stateDir = path.join(home, ".steelengine");
       const mainSessionsDir = path.join(stateDir, "agents", "main", "sessions");
       const junkSessionsDir = path.join(stateDir, "agents", "###", "sessions");
       await fs.mkdir(mainSessionsDir, { recursive: true });
@@ -418,7 +418,7 @@ describe("resolveAllAgentSessionStoreTargetsSync", () => {
         { sessionId: "sid-junk", updatedAt: Date.now() },
       );
 
-      const cfg: OpenClawConfig = {};
+      const cfg: SteelEngineConfig = {};
       const mainStorePath = await resolveRealStorePath(mainSessionsDir);
       const targets = resolveAllAgentSessionStoreTargetsSync(cfg, { env: process.env });
 
@@ -438,8 +438,8 @@ describe("resolveAllAgentSessionStoreTargetsSync", () => {
 describe("resolveAllAgentSessionStoreCandidateTargetsSync", () => {
   it("includes configured targets before either state file exists", async () => {
     await withTempHome(async (home) => {
-      const stateDir = path.join(home, ".openclaw");
-      const env = { ...process.env, OPENCLAW_STATE_DIR: stateDir };
+      const stateDir = path.join(home, ".steelengine");
+      const env = { ...process.env, STEELENGINE_STATE_DIR: stateDir };
       const storePath = resolveStorePath(undefined, { agentId: "main", env });
 
       expect(
@@ -453,10 +453,10 @@ describe("resolveAllAgentSessionStoreCandidateTargetsSync", () => {
 
   it("includes retired agent directories after both state files are removed", async () => {
     await withTempHome(async (home) => {
-      const stateDir = path.join(home, ".openclaw");
+      const stateDir = path.join(home, ".steelengine");
       const retiredAgentDir = path.join(stateDir, "agents", "retired");
       await fs.mkdir(retiredAgentDir, { recursive: true });
-      const env = { ...process.env, OPENCLAW_STATE_DIR: stateDir };
+      const env = { ...process.env, STEELENGINE_STATE_DIR: stateDir };
 
       expect(resolveAllAgentSessionStoreCandidateTargetsSync({}, { env })).toContainEqual({
         agentId: "retired",
@@ -470,13 +470,13 @@ describe("resolveAllAgentSessionStoreCandidateTargetsSync", () => {
       if (process.platform === "win32") {
         return;
       }
-      const stateDir = path.join(home, ".openclaw");
+      const stateDir = path.join(home, ".steelengine");
       const agentDir = path.join(stateDir, "agents", "retired");
       const outsideSessionsDir = path.join(home, "outside-sessions");
       await fs.mkdir(agentDir, { recursive: true });
       await fs.mkdir(outsideSessionsDir, { recursive: true });
       await fs.symlink(outsideSessionsDir, path.join(agentDir, "sessions"));
-      const env = { ...process.env, OPENCLAW_STATE_DIR: stateDir };
+      const env = { ...process.env, STEELENGINE_STATE_DIR: stateDir };
 
       expect(resolveAllAgentSessionStoreCandidateTargetsSync({}, { env })).not.toContainEqual({
         agentId: "retired",

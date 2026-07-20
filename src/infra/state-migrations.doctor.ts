@@ -7,7 +7,7 @@ import { getChannelPlugin } from "../channels/plugins/registry.js";
 import type { ChannelLegacyStateMigrationPlan } from "../channels/plugins/types.core.js";
 import type { ChannelId } from "../channels/plugins/types.public.js";
 import { resolveOAuthDir, resolveStateDir } from "../config/paths.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import {
   createPluginStateKeyedStore,
@@ -23,10 +23,10 @@ import {
 import { resolveLegacyInstalledPluginIndexStorePath } from "../plugins/installed-plugin-index-store.js";
 import { DEFAULT_ACCOUNT_ID, DEFAULT_MAIN_KEY, normalizeAgentId } from "../routing/session-key.js";
 import {
-  detectOpenClawStateDatabaseSchemaMigrations,
-  repairOpenClawStateDatabaseSchema,
-  type OpenClawStateDatabaseSchemaMigration,
-} from "../state/openclaw-state-db.js";
+  detectSteelEngineStateDatabaseSchemaMigrations,
+  repairSteelEngineStateDatabaseSchema,
+  type SteelEngineStateDatabaseSchemaMigration,
+} from "../state/steelengine-state-db.js";
 import {
   detectLegacyAcpReplayLedger,
   migrateLegacyAcpReplayLedger,
@@ -146,14 +146,14 @@ import {
   migrateLegacyWorkspaceState,
 } from "./state-migrations.workspace-setup.js";
 
-function describeStateSchemaMigration(migration: OpenClawStateDatabaseSchemaMigration): string {
+function describeStateSchemaMigration(migration: SteelEngineStateDatabaseSchemaMigration): string {
   switch (migration.kind) {
     case "agent-databases-composite-primary-key":
       return "agent database registry primary key → agent_id,path";
     case "audit-events-v2":
       return "audit event ledger → versioned message lifecycle schema";
     case "operator-approvals-system-agent":
-      return "operator approvals → OpenClaw system changes";
+      return "operator approvals → SteelEngine system changes";
     case "session-watch-cursor-provenance-v4":
       return "session watch cursors → provenance column";
     case "strict-tables-v3":
@@ -171,7 +171,7 @@ export function resetAutoMigrateLegacyStateForTest(): void {
 }
 
 async function collectChannelLegacyStateMigrationPlans(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   stateDir: string;
   oauthDir: string;
@@ -201,8 +201,8 @@ async function collectChannelLegacyStateMigrationPlans(params: {
 }
 
 async function collectPluginDoctorStateMigrationPlans(params: {
-  cfg: OpenClawConfig;
-  pluginDoctorConfig?: OpenClawConfig;
+  cfg: SteelEngineConfig;
+  pluginDoctorConfig?: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   stateDir: string;
   oauthDir: string;
@@ -253,8 +253,8 @@ function createPluginDoctorStateMigrationContext(
 }
 
 export async function detectLegacyStateMigrations(params: {
-  cfg: OpenClawConfig;
-  pluginDoctorConfig?: OpenClawConfig;
+  cfg: SteelEngineConfig;
+  pluginDoctorConfig?: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   homedir?: () => string;
   pluginSessionStoreAgentIds?: readonly string[];
@@ -348,8 +348,8 @@ export async function detectLegacyStateMigrations(params: {
   const pluginInstallIndexPath = resolveLegacyInstalledPluginIndexStorePath({ stateDir });
   const hasPluginInstallIndex = fileExists(pluginInstallIndexPath);
   const debugProxyCaptureSidecar = detectLegacyDebugProxyCaptureSidecar(stateDir, env);
-  const stateSchemaMigrations = detectOpenClawStateDatabaseSchemaMigrations({
-    env: { ...env, OPENCLAW_STATE_DIR: stateDir },
+  const stateSchemaMigrations = detectSteelEngineStateDatabaseSchemaMigrations({
+    env: { ...env, STEELENGINE_STATE_DIR: stateDir },
   });
   const taskRunsSidecarPath = resolveLegacyTaskRunsSidecarPath(stateDir);
   const flowRunsSidecarPath = resolveLegacyFlowRunsSidecarPath(stateDir);
@@ -726,7 +726,7 @@ export async function detectLegacyStateMigrations(params: {
 
 async function runPluginDoctorStateMigrationPlans(params: {
   detected: LegacyStateDetection;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
 }): Promise<MigrationMessages> {
   const changes: string[] = [];
@@ -766,7 +766,7 @@ async function runPluginDoctorStateMigrationPlans(params: {
 }
 
 export async function autoMigrateLegacyPluginDoctorState(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   homedir?: () => string;
   log?: MigrationLogger;
@@ -785,8 +785,8 @@ export async function autoMigrateLegacyPluginDoctorState(params: {
   });
   const stateDir = resolveStateDir(env, params.homedir ?? os.homedir);
   const oauthDir = resolveOAuthDir(env, stateDir);
-  const stateSchema = repairOpenClawStateDatabaseSchema({
-    env: { ...env, OPENCLAW_STATE_DIR: stateDir },
+  const stateSchema = repairSteelEngineStateDatabaseSchema({
+    env: { ...env, STEELENGINE_STATE_DIR: stateDir },
   });
   const changes = [...stateDirResult.changes, ...stateSchema.changes];
   const warnings = [...stateDirResult.warnings, ...stateSchema.warnings];
@@ -839,14 +839,14 @@ function migrateLegacyStateSchema(
   changes: string[];
   warnings: string[];
 } {
-  return repairOpenClawStateDatabaseSchema({
-    env: { ...env, OPENCLAW_STATE_DIR: detected.stateDir },
+  return repairSteelEngineStateDatabaseSchema({
+    env: { ...env, STEELENGINE_STATE_DIR: detected.stateDir },
   });
 }
 
 export async function runLegacyStateMigrations(params: {
   detected: LegacyStateDetection;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   now?: () => number;
   recoverCorruptTargetStore?: boolean;
@@ -951,7 +951,7 @@ export async function runLegacyStateMigrations(params: {
   });
   const channelPairing = migrateLegacyChannelPairingState({
     detected: detected.channelPairing,
-    env: { ...env, OPENCLAW_STATE_DIR: detected.stateDir },
+    env: { ...env, STEELENGINE_STATE_DIR: detected.stateDir },
   });
   const preSessionChannelPlans = await runLegacyMigrationPlans(
     detected.channelPlans.plans.filter((plan) => plan.kind === "plugin-state-import"),
@@ -960,15 +960,15 @@ export async function runLegacyStateMigrations(params: {
     ? { changes: [], warnings: [] }
     : await runPluginDoctorStateMigrationPlans({
         detected,
-        config: params.config ?? ({} as OpenClawConfig),
+        config: params.config ?? ({} as SteelEngineConfig),
         env,
       });
   const sessions = await migrateLegacySessions(detected, now, {
     recoverCorruptTargetStore: params.recoverCorruptTargetStore,
   });
   const acpSessionMetadata = await migrateLegacyAcpSessionMetadata({
-    cfg: params.config ?? ({} as OpenClawConfig),
-    env: { ...env, OPENCLAW_STATE_DIR: detected.stateDir },
+    cfg: params.config ?? ({} as SteelEngineConfig),
+    env: { ...env, STEELENGINE_STATE_DIR: detected.stateDir },
     now,
   });
   const agentDir = await migrateLegacyAgentDir(detected, now);
@@ -1073,8 +1073,8 @@ export async function runLegacyStateMigrations(params: {
  * Safe to run multiple times (idempotent). See #29683.
  */
 export async function autoMigrateLegacyState(params: {
-  cfg: OpenClawConfig;
-  pluginDoctorConfig?: OpenClawConfig;
+  cfg: SteelEngineConfig;
+  pluginDoctorConfig?: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   homedir?: () => string;
   log?: MigrationLogger;
@@ -1099,8 +1099,8 @@ export async function autoMigrateLegacyState(params: {
     log: params.log,
   });
   const stateDir = resolveStateDir(env, params.homedir ?? os.homedir);
-  const stateSchema = repairOpenClawStateDatabaseSchema({
-    env: { ...env, OPENCLAW_STATE_DIR: stateDir },
+  const stateSchema = repairSteelEngineStateDatabaseSchema({
+    env: { ...env, STEELENGINE_STATE_DIR: stateDir },
   });
   if (stateSchema.warnings.length > 0) {
     return {
@@ -1168,7 +1168,7 @@ export async function autoMigrateLegacyState(params: {
     env,
     homedir: params.homedir,
   });
-  const hasCustomAgentDir = env.OPENCLAW_AGENT_DIR?.trim() || env.PI_CODING_AGENT_DIR?.trim();
+  const hasCustomAgentDir = env.STEELENGINE_AGENT_DIR?.trim() || env.PI_CODING_AGENT_DIR?.trim();
   if (hasCustomAgentDir) {
     const pluginStateSidecar = await migrateLegacyPluginStateSidecar({
       stateDir: detected.stateDir,
@@ -1213,7 +1213,7 @@ export async function autoMigrateLegacyState(params: {
     });
     const channelPairing = migrateLegacyChannelPairingState({
       detected: detected.channelPairing,
-      env: { ...env, OPENCLAW_STATE_DIR: detected.stateDir },
+      env: { ...env, STEELENGINE_STATE_DIR: detected.stateDir },
     });
     const preSessionChannelPlans = await runLegacyMigrationPlans(
       detected.channelPlans.plans.filter((plan) => plan.kind === "plugin-state-import"),
@@ -1392,7 +1392,7 @@ export async function autoMigrateLegacyState(params: {
   });
   const channelPairing = migrateLegacyChannelPairingState({
     detected: detected.channelPairing,
-    env: { ...env, OPENCLAW_STATE_DIR: detected.stateDir },
+    env: { ...env, STEELENGINE_STATE_DIR: detected.stateDir },
   });
   const preSessionChannelPlans = await runLegacyMigrationPlans(
     detected.channelPlans.plans.filter((plan) => plan.kind === "plugin-state-import"),

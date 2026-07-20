@@ -7,7 +7,7 @@ import "../infra/fs-safe-defaults.js";
 import type fsSync from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { MAX_TIMER_TIMEOUT_MS } from "@openclaw/normalization-core/number-coercion";
+import { MAX_TIMER_TIMEOUT_MS } from "@steelengine/normalization-core/number-coercion";
 import { parseSqliteSessionFileMarker } from "../config/sessions/sqlite-marker.js";
 import { createFileLockManager } from "../infra/file-lock-manager.js";
 import { readGatewayProcessArgsSync as readProcessArgsSync } from "../infra/gateway-processes.js";
@@ -45,8 +45,8 @@ export type SessionLockOwnerProcessArgsReader = (pid: number) => string[] | null
 
 const CLEANUP_SIGNALS = ["SIGINT", "SIGTERM", "SIGQUIT", "SIGABRT"] as const;
 type CleanupSignal = (typeof CLEANUP_SIGNALS)[number];
-const CLEANUP_STATE_KEY = Symbol.for("openclaw.sessionWriteLockCleanupState");
-const WATCHDOG_STATE_KEY = Symbol.for("openclaw.sessionWriteLockWatchdogState");
+const CLEANUP_STATE_KEY = Symbol.for("steelengine.sessionWriteLockCleanupState");
+const WATCHDOG_STATE_KEY = Symbol.for("steelengine.sessionWriteLockWatchdogState");
 
 const DEFAULT_SESSION_WRITE_LOCK_STALE_MS = 30 * 60 * 1000;
 const DEFAULT_SESSION_WRITE_LOCK_MAX_HOLD_MS = 5 * 60 * 1000;
@@ -89,7 +89,7 @@ type LockInspectionDetails = Pick<
   "pid" | "pidAlive" | "createdAt" | "ageMs" | "stale" | "staleReasons"
 >;
 
-const SESSION_LOCKS = createFileLockManager("openclaw.session-write-lock");
+const SESSION_LOCKS = createFileLockManager("steelengine.session-write-lock");
 let resolveProcessStartTimeForLock = getProcessStartTime;
 
 function isFileLockError(error: unknown, code: string): boolean {
@@ -109,9 +109,9 @@ export type SessionWriteLockAcquireTimeoutConfig = {
 type SessionWriteLockMsKey = "acquireTimeoutMs" | "staleMs" | "maxHoldMs";
 
 const SESSION_WRITE_LOCK_ENV: Record<SessionWriteLockMsKey, string> = {
-  acquireTimeoutMs: "OPENCLAW_SESSION_WRITE_LOCK_ACQUIRE_TIMEOUT_MS",
-  staleMs: "OPENCLAW_SESSION_WRITE_LOCK_STALE_MS",
-  maxHoldMs: "OPENCLAW_SESSION_WRITE_LOCK_MAX_HOLD_MS",
+  acquireTimeoutMs: "STEELENGINE_SESSION_WRITE_LOCK_ACQUIRE_TIMEOUT_MS",
+  staleMs: "STEELENGINE_SESSION_WRITE_LOCK_STALE_MS",
+  maxHoldMs: "STEELENGINE_SESSION_WRITE_LOCK_MAX_HOLD_MS",
 };
 
 function readPositiveMsEnv(
@@ -467,22 +467,22 @@ function normalizeOwnerProcessArg(arg: string): string {
   return arg.trim().replaceAll("\\", "/").toLowerCase();
 }
 
-function isOpenClawSessionOwnerArgv(args: string[]): boolean {
+function isSteelEngineSessionOwnerArgv(args: string[]): boolean {
   const normalized = args.map(normalizeOwnerProcessArg).filter(Boolean);
   if (normalized.length === 0) {
     return false;
   }
   const exe = (normalized[0] ?? "").replace(/\.(bat|cmd|exe)$/i, "");
-  if (exe === "openclaw" || exe.endsWith("/openclaw") || exe.endsWith("/openclaw-gateway")) {
+  if (exe === "steelengine" || exe.endsWith("/steelengine") || exe.endsWith("/steelengine-gateway")) {
     return true;
   }
   if (
     normalized.some(
       (arg) =>
-        arg === "openclaw" ||
-        arg.endsWith("/openclaw") ||
-        arg === "openclaw.mjs" ||
-        arg.endsWith("/openclaw.mjs"),
+        arg === "steelengine" ||
+        arg.endsWith("/steelengine") ||
+        arg === "steelengine.mjs" ||
+        arg.endsWith("/steelengine.mjs"),
     )
   ) {
     return true;
@@ -495,9 +495,9 @@ function isOpenClawSessionOwnerArgv(args: string[]): boolean {
     "src/entry.ts",
     "src/index.ts",
   ];
-  const hasOpenClawCommandToken = normalized.some((arg) => arg === "gateway" || arg === "agent");
+  const hasSteelEngineCommandToken = normalized.some((arg) => arg === "gateway" || arg === "agent");
   return normalized.some(
-    (arg) => entryCandidates.some((entry) => arg.endsWith(entry)) && hasOpenClawCommandToken,
+    (arg) => entryCandidates.some((entry) => arg.endsWith(entry)) && hasSteelEngineCommandToken,
   );
 }
 
@@ -571,7 +571,7 @@ function inspectLockPayload(
   };
 }
 
-function shouldTreatAsNonOpenClawOwner(params: {
+function shouldTreatAsNonSteelEngineOwner(params: {
   payload: LockFilePayload | null;
   inspected: LockInspectionDetails;
   heldByThisProcess: boolean;
@@ -594,7 +594,7 @@ function shouldTreatAsNonOpenClawOwner(params: {
   if (!args || args.every((arg) => !arg.trim())) {
     return false;
   }
-  return !isOpenClawSessionOwnerArgv(args);
+  return !isSteelEngineSessionOwnerArgv(args);
 }
 
 function lockInspectionNeedsMtimeStaleFallback(details: LockInspectionDetails): boolean {
@@ -790,7 +790,7 @@ function inspectLockPayloadForSession(params: {
   }
 
   if (
-    shouldTreatAsNonOpenClawOwner({
+    shouldTreatAsNonSteelEngineOwner({
       payload: params.payload,
       inspected,
       heldByThisProcess: params.heldByThisProcess,
@@ -800,7 +800,7 @@ function inspectLockPayloadForSession(params: {
     return {
       ...inspected,
       stale: true,
-      staleReasons: [...inspected.staleReasons, "non-openclaw-owner"],
+      staleReasons: [...inspected.staleReasons, "non-steelengine-owner"],
     };
   }
 
@@ -1103,7 +1103,7 @@ function resetSessionWriteLockStateForTest(): void {
 }
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
-  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("openclaw.sessionWriteLockTestApi")] = {
+  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("steelengine.sessionWriteLockTestApi")] = {
     resetSessionWriteLockStateForTest,
     testing,
   };

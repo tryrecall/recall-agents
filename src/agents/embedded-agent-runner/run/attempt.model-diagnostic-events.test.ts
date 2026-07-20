@@ -1,7 +1,7 @@
 // Coverage for model-call diagnostic events around attempt stream functions.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { StreamFn } from "openclaw/plugin-sdk/agent-core";
+import type { StreamFn } from "steelengine/plugin-sdk/agent-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAutoCleanupTempDirTracker } from "../../../../test/helpers/temp-dir.js";
 import {
@@ -120,12 +120,12 @@ function requireMockRecordArg(
 }
 
 async function collectProviderTimelineEvents(run: () => Promise<void>) {
-  const root = tempDirs.make("openclaw-provider-timeline-");
+  const root = tempDirs.make("steelengine-provider-timeline-");
   const timelinePath = join(root, "timeline.jsonl");
   await withEnvAsync(
     {
-      OPENCLAW_DIAGNOSTICS: "1",
-      OPENCLAW_DIAGNOSTICS_TIMELINE_PATH: timelinePath,
+      STEELENGINE_DIAGNOSTICS: "1",
+      STEELENGINE_DIAGNOSTICS_TIMELINE_PATH: timelinePath,
     },
     run,
   );

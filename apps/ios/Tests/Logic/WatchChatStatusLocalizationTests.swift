@@ -1,5 +1,5 @@
 import Foundation
-import OpenClawKit
+import SteelEngineKit
 import Testing
 
 struct WatchChatStatusLocalizationTests {
@@ -153,13 +153,13 @@ struct WatchChatStatusLocalizationTests {
     }
 
     @Test func `gateway presentation localizes key and keeps backend override verbatim`() {
-        let localized = OpenClawWatchAppStatus(
+        let localized = SteelEngineWatchAppStatus(
             code: .gatewayProblem,
             localizationKey: "Gateway update required")
-        let backendOverride = OpenClawWatchAppStatus(
+        let backendOverride = SteelEngineWatchAppStatus(
             code: .gatewayProblem,
             verbatim: "Gateway says update channel beta")
-        let localizedTalkFailure = OpenClawWatchAppStatus(
+        let localizedTalkFailure = SteelEngineWatchAppStatus(
             code: .talkFailure,
             localizationKey: "Paused")
 
@@ -176,9 +176,9 @@ struct WatchChatStatusLocalizationTests {
 
     private static func semanticPayload() -> [String: Any] {
         [
-            "type": OpenClawWatchPayloadType.appSnapshot.rawValue,
+            "type": SteelEngineWatchPayloadType.appSnapshot.rawValue,
             "gatewayStatus": [
-                "code": OpenClawWatchAppStatusCode.gatewayProblem.rawValue,
+                "code": SteelEngineWatchAppStatusCode.gatewayProblem.rawValue,
                 "localizationKey": "Gateway update required",
             ],
             "gatewayConnected": false,
@@ -186,14 +186,14 @@ struct WatchChatStatusLocalizationTests {
             "agentAvatarUrl": "https://example.com/avatar.png",
             "sessionKey": "main",
             "talkStatus": [
-                "code": OpenClawWatchAppStatusCode.talkOff.rawValue,
+                "code": SteelEngineWatchAppStatusCode.talkOff.rawValue,
             ],
             "talkEnabled": false,
             "talkListening": false,
             "talkSpeaking": false,
             "pendingApprovalCount": 0,
             "chatStatus": [
-                "code": OpenClawWatchAppStatusCode.chatConnectIPhone.rawValue,
+                "code": SteelEngineWatchAppStatusCode.chatConnectIPhone.rawValue,
             ],
         ]
     }

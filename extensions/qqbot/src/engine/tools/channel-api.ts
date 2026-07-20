@@ -8,14 +8,14 @@
  * validation, fetch, and structured response formatting.
  */
 
-import { resolveChannelGroupPolicy } from "openclaw/plugin-sdk/channel-policy";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import { resolveChannelGroupPolicy } from "steelengine/plugin-sdk/channel-policy";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   readProviderTextResponse,
   readResponseTextLimited,
-} from "openclaw/plugin-sdk/provider-http";
-import { fetchWithSsrFGuard, type SsrFPolicy } from "openclaw/plugin-sdk/ssrf-runtime";
-import { jsonResult as json } from "openclaw/plugin-sdk/tool-results";
+} from "steelengine/plugin-sdk/provider-http";
+import { fetchWithSsrFGuard, type SsrFPolicy } from "steelengine/plugin-sdk/ssrf-runtime";
+import { jsonResult as json } from "steelengine/plugin-sdk/tool-results";
 import { formatErrorMessage } from "../utils/format.js";
 import { debugLog, debugError } from "../utils/log.js";
 
@@ -248,7 +248,7 @@ function validateDeleteConfirmation(params: ChannelApiParams): string | null {
  */
 interface ChannelApiExecuteOptions {
   accessToken: string;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   accountId?: string | null;
 }
 

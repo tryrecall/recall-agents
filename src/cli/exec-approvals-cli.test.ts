@@ -526,7 +526,7 @@ describe("exec approvals CLI", () => {
 
     expect(writtenJson().defaultAction).toBe("deny");
     expect(effectivePolicy()).toEqual({
-      note: "This node enforces a host-native exec policy; OpenClaw approvals-file policy math does not apply.",
+      note: "This node enforces a host-native exec policy; SteelEngine approvals-file policy math does not apply.",
       scopes: [],
     });
     expect(callGatewayFromCli.mock.calls.map((call) => call[0])).toEqual([
@@ -536,7 +536,7 @@ describe("exec approvals CLI", () => {
   });
 
   it("writes host-native node approvals with the current hash", async () => {
-    const dir = tempDirs.make("openclaw-native-approvals-");
+    const dir = tempDirs.make("steelengine-native-approvals-");
     const policyPath = path.join(dir, "policy.json");
     fs.writeFileSync(
       policyPath,
@@ -583,7 +583,7 @@ describe("exec approvals CLI", () => {
   });
 
   it("rejects unknown host-native policy fields instead of dropping them", async () => {
-    const dir = tempDirs.make("openclaw-native-approvals-");
+    const dir = tempDirs.make("steelengine-native-approvals-");
     const policyPath = path.join(dir, "policy.json");
     fs.writeFileSync(
       policyPath,
@@ -786,7 +786,7 @@ describe("exec approvals CLI", () => {
       "tools.exec askFallback",
       {
         effective: "deny",
-        source: "OpenClaw default (deny)",
+        source: "SteelEngine default (deny)",
       },
     );
 
@@ -803,7 +803,7 @@ describe("exec approvals CLI", () => {
     });
     expectFields(requireRecord(agentScope.askFallback, "agent askFallback"), "agent askFallback", {
       effective: "deny",
-      source: "OpenClaw default (deny)",
+      source: "SteelEngine default (deny)",
     });
   });
 

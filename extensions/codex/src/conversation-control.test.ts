@@ -2,9 +2,9 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { clearRuntimeAuthProfileStoreSnapshots } from "openclaw/plugin-sdk/agent-runtime";
-import { MODEL_SELECTION_LOCKED_MESSAGE } from "openclaw/plugin-sdk/model-session-runtime";
-import { upsertAuthProfile } from "openclaw/plugin-sdk/provider-auth";
+import { clearRuntimeAuthProfileStoreSnapshots } from "steelengine/plugin-sdk/agent-runtime";
+import { MODEL_SELECTION_LOCKED_MESSAGE } from "steelengine/plugin-sdk/model-session-runtime";
+import { upsertAuthProfile } from "steelengine/plugin-sdk/provider-auth";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   buildCodexSupervisionTestConnectionFingerprint,
@@ -86,8 +86,8 @@ vi.mock("./app-server/shared-client.js", () => ({
 describe("codex conversation controls", () => {
   beforeEach(async () => {
     resetCodexTestBindingStore();
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-codex-control-"));
-    vi.stubEnv("OPENCLAW_STATE_DIR", tempDir);
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-codex-control-"));
+    vi.stubEnv("STEELENGINE_STATE_DIR", tempDir);
     sharedClientMocks.getSharedCodexAppServerClient.mockReset();
   });
 

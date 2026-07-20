@@ -1,5 +1,5 @@
 import { consume } from "@lit/context";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { html, nothing } from "lit";
 import { property, state } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
@@ -13,7 +13,7 @@ import { resolveSessionDisplayName } from "../../lib/session-display.ts";
 import { readSessionDragData, sessionDragActive } from "../../lib/sessions/drag.ts";
 import { resolveSessionKey, searchForSession } from "../../lib/sessions/index.ts";
 import { areUiSessionKeysEquivalent } from "../../lib/sessions/session-key.ts";
-import { OpenClawLightDomElement } from "../../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../../lit/steelengine-element.ts";
 import { SubscriptionsController } from "../../lit/subscriptions-controller.ts";
 import "../../styles/chat.css";
 import "./chat-pane.ts";
@@ -58,7 +58,7 @@ const NARROW_SPLIT_QUERY = "(max-width: 1099px)";
 type DropIndicator = { paneId: string; zone: SplitDropZone; rect: SplitDropRect };
 type ChatPaneElement = HTMLElement & { paneId?: string };
 
-export class ChatPage extends OpenClawLightDomElement {
+export class ChatPage extends SteelEngineLightDomElement {
   @consume({ context: applicationContext, subscribe: true })
   private context!: ApplicationContext;
   @property({ attribute: false }) data!: ChatRouteData;
@@ -229,7 +229,7 @@ export class ChatPage extends OpenClawLightDomElement {
       event.dataTransfer.dropEffect = "copy";
     }
     const target = event.target instanceof Element ? event.target : null;
-    const pane = target?.closest<ChatPaneElement>("openclaw-chat-pane");
+    const pane = target?.closest<ChatPaneElement>("steelengine-chat-pane");
     if (!pane || !this.contains(pane)) {
       // Dividers and pane gaps sit between drop targets; keep the last preview
       // instead of flickering it away while the pointer crosses them.
@@ -280,7 +280,7 @@ export class ChatPage extends OpenClawLightDomElement {
     event.preventDefault();
     const sessionKey = readSessionDragData(event.dataTransfer);
     const target = event.target instanceof Element ? event.target : null;
-    const pane = target?.closest<ChatPaneElement>("openclaw-chat-pane");
+    const pane = target?.closest<ChatPaneElement>("steelengine-chat-pane");
     // Fall back to the retained preview when the drop lands on a divider or
     // gap, so the drop always matches what the indicator promised.
     const indicator =
@@ -530,7 +530,7 @@ export class ChatPage extends OpenClawLightDomElement {
         @pointerdown=${() => this.handleFocusPane(pane.id)}
         @focusin=${() => this.handleFocusPane(pane.id)}
       >
-        <openclaw-chat-pane
+        <steelengine-chat-pane
           class=${splitMode ? "chat-split-view__pane" : ""}
           .paneId=${pane.id}
           .chatMessagesBySession=${this.chatMessagesBySession}
@@ -546,7 +546,7 @@ export class ChatPage extends OpenClawLightDomElement {
           .onClosePane=${splitMode ? this.handleClosePane : undefined}
           .onFocusPane=${this.handleFocusPane}
           .onPaneSessionChange=${this.handlePaneSessionChange}
-        ></openclaw-chat-pane>
+        ></steelengine-chat-pane>
       </div>
     `;
   }
@@ -683,6 +683,6 @@ export class ChatPage extends OpenClawLightDomElement {
   }
 }
 
-if (!customElements.get("openclaw-chat-page")) {
-  customElements.define("openclaw-chat-page", ChatPage);
+if (!customElements.get("steelengine-chat-page")) {
+  customElements.define("steelengine-chat-page", ChatPage);
 }

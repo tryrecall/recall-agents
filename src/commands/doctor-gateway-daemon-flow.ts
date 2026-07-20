@@ -2,7 +2,7 @@
 import { note } from "../../packages/terminal-core/src/note.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { resolveGatewayPort } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   resolveGatewayLaunchAgentLabel,
   resolveNodeLaunchAgentLabel,
@@ -136,10 +136,10 @@ async function maybeRepairLaunchAgentBootstrap(params: {
 
 function renderBlockingSystemGatewayServices(services: ExtraGatewayService[]): string {
   return [
-    "System-level OpenClaw gateway service detected while the user gateway service is not installed.",
+    "System-level SteelEngine gateway service detected while the user gateway service is not installed.",
     ...services.map((svc) => `- ${svc.label} (${svc.detail})`),
-    "OpenClaw will not install a second user-level gateway service automatically.",
-    "Run `openclaw gateway status --deep` or `openclaw doctor --deep` to inspect duplicate services.",
+    "SteelEngine will not install a second user-level gateway service automatically.",
+    "Run `steelengine gateway status --deep` or `steelengine doctor --deep` to inspect duplicate services.",
     `Set ${SERVICE_REPAIR_POLICY_ENV}=external if a system supervisor owns the gateway lifecycle.`,
   ].join("\n");
 }
@@ -156,12 +156,12 @@ function renderEstablishedGatewayConnections(connections: PortConnection[]): str
       return `- ${pid} ${direction}${command}${address}${commandLine}`;
     }),
     ...(connections.length > 8 ? [`- ... ${connections.length - 8} more connection(s)`] : []),
-    "If logs show protocol mismatch after rollback, stop stale OpenClaw client processes listed here and rerun doctor.",
+    "If logs show protocol mismatch after rollback, stop stale SteelEngine client processes listed here and rerun doctor.",
   ].join("\n");
 }
 
 async function maybeReportEstablishedGatewayClients(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   deep: boolean;
   port?: number;
 }): Promise<void> {
@@ -185,7 +185,7 @@ async function maybeReportEstablishedGatewayClients(params: {
  * services, report port conflicts, or restart unhealthy supervision when policy allows.
  */
 export async function maybeRepairGatewayDaemon(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   runtime: RuntimeEnv;
   prompter: DoctorPrompter;
   options: DoctorOptions;
@@ -250,7 +250,7 @@ export async function maybeRepairGatewayDaemon(params: {
     await maybeRepairLaunchAgentBootstrap({
       env: {
         ...process.env,
-        OPENCLAW_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
+        STEELENGINE_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
       },
       title: "Node",
       runtime: params.runtime,
@@ -339,7 +339,7 @@ export async function maybeRepairGatewayDaemon(params: {
       );
       if (!install) {
         note(
-          `Run ${formatCliCommand("openclaw gateway install")} when you want to install the gateway service.`,
+          `Run ${formatCliCommand("steelengine gateway install")} when you want to install the gateway service.`,
           "Gateway",
         );
       }
@@ -430,9 +430,9 @@ export async function maybeRepairGatewayDaemon(params: {
   }
 
   if (process.platform === "darwin") {
-    const label = resolveGatewayLaunchAgentLabel(process.env.OPENCLAW_PROFILE);
+    const label = resolveGatewayLaunchAgentLabel(process.env.STEELENGINE_PROFILE);
     note(
-      `LaunchAgent loaded; stopping requires "${formatCliCommand("openclaw gateway stop")}" or launchctl bootout gui/$UID/${label}.`,
+      `LaunchAgent loaded; stopping requires "${formatCliCommand("steelengine gateway stop")}" or launchctl bootout gui/$UID/${label}.`,
       "Gateway",
     );
   }

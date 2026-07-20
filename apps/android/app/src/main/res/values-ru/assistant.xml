@@ -1,7 +1,7 @@
 <resources>
-    <string-array name="ask_openclaw_query_patterns">
-        <item>"спросить OpenClaw %1$s"</item>
-        <item>"сказать OpenClaw %1$s"</item>
-        <item>"открыть OpenClaw и спросить %1$s"</item>
+    <string-array name="ask_steelengine_query_patterns">
+        <item>"спросить SteelEngine %1$s"</item>
+        <item>"сказать SteelEngine %1$s"</item>
+        <item>"открыть SteelEngine и спросить %1$s"</item>
     </string-array>
 </resources>

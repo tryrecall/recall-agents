@@ -1,7 +1,7 @@
 /** Tests BTW side-question execution, session context, auth, and harness routing. */
 
-import { expectDefined } from "@openclaw/normalization-core";
-import { MAX_TIMER_TIMEOUT_MS } from "@openclaw/normalization-core/number-coercion";
+import { expectDefined } from "@steelengine/normalization-core";
+import { MAX_TIMER_TIMEOUT_MS } from "@steelengine/normalization-core/number-coercion";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { SessionEntry } from "../config/sessions.js";
 import {
@@ -17,7 +17,7 @@ const readFileMock = vi.fn();
 const parseSessionEntriesMock = vi.fn();
 const migrateSessionEntriesMock = vi.fn();
 const buildSessionContextMock = vi.fn();
-const ensureOpenClawModelsJsonMock = vi.fn();
+const ensureSteelEngineModelsJsonMock = vi.fn();
 const discoverAuthStorageMock = vi.fn();
 const discoverModelsMock = vi.fn();
 const resolveModelWithRegistryMock = vi.fn();
@@ -74,7 +74,7 @@ vi.mock("./sessions/session-manager.js", () => ({
 }));
 
 vi.mock("./models-config.js", () => ({
-  ensureOpenClawModelsJson: (...args: unknown[]) => ensureOpenClawModelsJsonMock(...args),
+  ensureSteelEngineModelsJson: (...args: unknown[]) => ensureSteelEngineModelsJsonMock(...args),
 }));
 
 vi.mock("./agent-model-discovery.js", () => ({
@@ -529,7 +529,7 @@ describe("runBtwSideQuestion", () => {
     parseSessionEntriesMock.mockReset();
     migrateSessionEntriesMock.mockReset();
     buildSessionContextMock.mockReset();
-    ensureOpenClawModelsJsonMock.mockReset();
+    ensureSteelEngineModelsJsonMock.mockReset();
     discoverAuthStorageMock.mockReset();
     discoverModelsMock.mockReset();
     resolveModelAsyncMock.mockReset();
@@ -693,7 +693,7 @@ describe("runBtwSideQuestion", () => {
     const result = await runSideQuestion();
 
     expect(result).toEqual({ text: "Final answer." });
-    const ensureArgs = mockCall(ensureOpenClawModelsJsonMock);
+    const ensureArgs = mockCall(ensureSteelEngineModelsJsonMock);
     expect(ensureArgs?.[1]).toBe(DEFAULT_AGENT_DIR);
     expect(ensureArgs?.[2]).toEqual({ workspaceDir: "/tmp/workspace" });
     expect(discoverModelsMock).toHaveBeenCalledWith(undefined, DEFAULT_AGENT_DIR, {
@@ -809,7 +809,7 @@ describe("runBtwSideQuestion", () => {
     );
   });
 
-  it("keeps an unprofiled subscription token on the OpenClaw BTW path", async () => {
+  it("keeps an unprofiled subscription token on the SteelEngine BTW path", async () => {
     const supports = vi.fn(supportsPreparedOpenAIAuth);
     const codexSideQuestionMock = registerCodexSideQuestionHarness({ supports });
     const subscriptionModel = {
@@ -829,7 +829,7 @@ describe("runBtwSideQuestion", () => {
       source: "models.json",
     });
     requireApiKeyMock.mockReturnValue("subscription-token");
-    mockDoneAnswer("OpenClaw side answer.");
+    mockDoneAnswer("SteelEngine side answer.");
 
     await expect(
       runSideQuestion({
@@ -843,7 +843,7 @@ describe("runBtwSideQuestion", () => {
         provider: "openai",
         model: "gpt-5.5",
       }),
-    ).resolves.toEqual({ text: "OpenClaw side answer." });
+    ).resolves.toEqual({ text: "SteelEngine side answer." });
 
     expect(codexSideQuestionMock).not.toHaveBeenCalled();
     expect(streamSimpleMock).toHaveBeenCalled();
@@ -954,7 +954,7 @@ describe("runBtwSideQuestion", () => {
       harnessAuthProvider: "openai",
       deferredRouteSupport: {
         requestTransportOverrides: "none",
-        runtimePolicy: { compatibleIds: ["openclaw", "codex"] },
+        runtimePolicy: { compatibleIds: ["steelengine", "codex"] },
       },
     });
     expect(preparedRuntimeAuth?.plan?.modelRoute).toBeUndefined();
@@ -965,7 +965,7 @@ describe("runBtwSideQuestion", () => {
       expect.objectContaining({
         modelProvider: expect.objectContaining({
           requestTransportOverrides: "none",
-          runtimePolicy: { compatibleIds: ["openclaw", "codex"] },
+          runtimePolicy: { compatibleIds: ["steelengine", "codex"] },
           preparedAuth: { source: "harness" },
         }),
       }),
@@ -1098,7 +1098,7 @@ describe("runBtwSideQuestion", () => {
         agents: {
           defaults: {
             models: {
-              "anthropic/claude-sonnet-4-6": { agentRuntime: { id: "openclaw" } },
+              "anthropic/claude-sonnet-4-6": { agentRuntime: { id: "steelengine" } },
             },
           },
         },
@@ -1814,7 +1814,7 @@ describe("runBtwSideQuestion", () => {
           agents: {
             defaults: {
               models: {
-                "openai/gpt-5.5": { agentRuntime: { id: "openclaw" } },
+                "openai/gpt-5.5": { agentRuntime: { id: "steelengine" } },
               },
             },
           },
@@ -1895,7 +1895,7 @@ describe("runBtwSideQuestion", () => {
           agents: {
             defaults: {
               models: {
-                "openai/gpt-5.5": { agentRuntime: { id: "openclaw" } },
+                "openai/gpt-5.5": { agentRuntime: { id: "steelengine" } },
               },
             },
           },

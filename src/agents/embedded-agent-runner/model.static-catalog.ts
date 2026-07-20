@@ -1,13 +1,13 @@
 /**
  * Resolves bundled static catalog rows for embedded-agent model selection.
  */
-import type { NormalizedModelCatalogRow } from "@openclaw/model-catalog-core/model-catalog-types";
-import { normalizeProviderId } from "@openclaw/model-catalog-core/provider-id";
+import type { NormalizedModelCatalogRow } from "@steelengine/model-catalog-core/model-catalog-types";
+import { normalizeProviderId } from "@steelengine/model-catalog-core/provider-id";
 import type { ModelProviderConfig } from "../../config/types.models.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { planManifestModelCatalogRows } from "../../model-catalog/manifest-planner.js";
 import { normalizePluginsConfig } from "../../plugins/config-state.js";
-import { listOpenClawPluginManifestMetadata } from "../../plugins/manifest-metadata-scan.js";
+import { listSteelEnginePluginManifestMetadata } from "../../plugins/manifest-metadata-scan.js";
 import { passesManifestOwnerBasePolicy } from "../../plugins/manifest-owner-policy.js";
 import { loadPluginManifestRegistry } from "../../plugins/manifest-registry.js";
 import { loadPluginManifest } from "../../plugins/manifest.js";
@@ -134,11 +134,11 @@ type StaticCatalogPlugin = Parameters<
 >[0]["registry"]["plugins"][number];
 
 function listBundledStaticCatalogPlugins(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
 }): StaticCatalogPlugin[] {
   const normalizedConfig = normalizePluginsConfig(params.cfg?.plugins);
-  return listOpenClawPluginManifestMetadata(params.env).flatMap((record): StaticCatalogPlugin[] => {
+  return listSteelEnginePluginManifestMetadata(params.env).flatMap((record): StaticCatalogPlugin[] => {
     if (record.origin !== "bundled") {
       return [];
     }
@@ -167,7 +167,7 @@ function listBundledStaticCatalogPlugins(params: {
 /** Returns whether a bundled static catalog asks runtime discovery to augment its rows. */
 export function bundledStaticCatalogProviderUsesRuntimeAugment(params: {
   provider: string;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
 }): boolean {
   const provider = normalizeProviderId(params.provider);
@@ -209,7 +209,7 @@ type BundledStaticCatalogScopedLookup = {
 };
 
 type BundledProviderStaticCatalogResolverParams = {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 };
@@ -219,7 +219,7 @@ type BundledProviderStaticCatalogResolverParams = {
  * Manifest discovery runs once; provider-specific plans are cached on demand.
  */
 export function createBundledStaticCatalogModelResolver(params?: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   includeRuntimeDiscovery?: boolean;
 }): (lookup: BundledStaticCatalogLookup) => ProviderRuntimeModel | undefined {
@@ -266,7 +266,7 @@ export function createBundledStaticCatalogModelResolver(params?: {
 /** Resolves one bundled static-catalog model row for provider/model lookup. */
 export function resolveBundledStaticCatalogModel(
   params: BundledStaticCatalogLookup & {
-    cfg?: OpenClawConfig;
+    cfg?: SteelEngineConfig;
     workspaceDir?: string;
     env?: NodeJS.ProcessEnv;
     includeRuntimeDiscovery?: boolean;
@@ -283,7 +283,7 @@ export function resolveBundledStaticCatalogModel(
 
 function resolveBundledProviderStaticCatalogPluginIds(params: {
   provider: string;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
 }): string[] {
@@ -317,7 +317,7 @@ function resolveBundledProviderStaticCatalogPluginIds(params: {
 
 async function loadBundledProviderStaticCatalogModels(params: {
   pluginIds: string[];
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
 }): Promise<Map<string, ProviderRuntimeModel[]>> {
@@ -539,7 +539,7 @@ export function createBundledProviderStaticCatalogContextResolver(
 export async function resolveBundledProviderStaticCatalogModel(params: {
   provider: string;
   modelId: string;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): Promise<ProviderRuntimeModel | undefined> {

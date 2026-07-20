@@ -3,10 +3,10 @@ import {
   DEFAULT_ACCOUNT_ID,
   normalizeAccountId as normalizeSharedAccountId,
   normalizeOptionalAccountId,
-} from "openclaw/plugin-sdk/account-id";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/account-resolution";
-import { resolveAccountEntry } from "openclaw/plugin-sdk/account-resolution";
-import { tryReadSecretFileSync } from "openclaw/plugin-sdk/secret-file-runtime";
+} from "steelengine/plugin-sdk/account-id";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/account-resolution";
+import { resolveAccountEntry } from "steelengine/plugin-sdk/account-resolution";
+import { tryReadSecretFileSync } from "steelengine/plugin-sdk/secret-file-runtime";
 import type {
   LineAccountConfig,
   LineConfig,
@@ -141,7 +141,7 @@ function resolveSecret(params: {
 }
 
 export function resolveLineAccount(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId?: string;
 }): ResolvedLineAccount {
   const cfg = params.cfg;
@@ -203,7 +203,7 @@ export function resolveLineAccount(params: {
   };
 }
 
-export function listLineAccountIds(cfg: OpenClawConfig): string[] {
+export function listLineAccountIds(cfg: SteelEngineConfig): string[] {
   const lineConfig = cfg.channels?.line as LineConfig | undefined;
   const accounts = lineConfig?.accounts;
   const ids = new Set<string>();
@@ -225,7 +225,7 @@ export function listLineAccountIds(cfg: OpenClawConfig): string[] {
   return Array.from(ids);
 }
 
-export function resolveDefaultLineAccountId(cfg: OpenClawConfig): string {
+export function resolveDefaultLineAccountId(cfg: SteelEngineConfig): string {
   const preferred = normalizeOptionalAccountId(
     (cfg.channels?.line as LineConfig | undefined)?.defaultAccount,
   );

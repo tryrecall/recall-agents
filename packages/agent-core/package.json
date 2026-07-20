@@ -1,5 +1,5 @@
 {
-  "name": "@openclaw/agent-core",
+  "name": "@steelengine/agent-core",
   "version": "0.0.0-private",
   "private": true,
   "files": [
@@ -63,9 +63,9 @@
     }
   },
   "dependencies": {
-    "@openclaw/ai": "workspace:*",
-    "@openclaw/llm-core": "workspace:*",
-    "@openclaw/normalization-core": "workspace:*",
+    "@steelengine/ai": "workspace:*",
+    "@steelengine/llm-core": "workspace:*",
+    "@steelengine/normalization-core": "workspace:*",
     "typebox": "1.3.3"
   }
 }

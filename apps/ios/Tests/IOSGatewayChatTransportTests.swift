@@ -1,20 +1,20 @@
 import Foundation
-import OpenClawChatUI
-import OpenClawKit
-import OpenClawProtocol
+import SteelEngineChatUI
+import SteelEngineKit
+import SteelEngineProtocol
 import Testing
-@testable import OpenClaw
+@testable import SteelEngine
 
 struct IOSGatewayChatTransportTests {
     private actor RequestRecorder {
-        private var requests: [OpenClawChatGatewayRequest] = []
+        private var requests: [SteelEngineChatGatewayRequest] = []
 
-        func record(_ request: OpenClawChatGatewayRequest) -> Data {
+        func record(_ request: SteelEngineChatGatewayRequest) -> Data {
             self.requests.append(request)
             return Data(#"{"key":"forked","entry":{}}"#.utf8)
         }
 
-        func all() -> [OpenClawChatGatewayRequest] {
+        func all() -> [SteelEngineChatGatewayRequest] {
             self.requests
         }
     }
@@ -42,23 +42,23 @@ struct IOSGatewayChatTransportTests {
     }
 
     @Test func `live routing guard permits an identity still loading`() {
-        #expect(OpenClawChatSessionRoutingContract.expectedValue(
+        #expect(SteelEngineChatSessionRoutingContract.expectedValue(
             nil,
             serverSupportsGuard: true) == nil)
-        #expect(OpenClawChatSessionRoutingContract.expectedValue(
+        #expect(SteelEngineChatSessionRoutingContract.expectedValue(
             " per-sender|main|reviewer ",
             serverSupportsGuard: true) == "per-sender|main|reviewer")
-        #expect(OpenClawChatSessionRoutingContract.expectedValue(
+        #expect(SteelEngineChatSessionRoutingContract.expectedValue(
             "per-sender|main|reviewer",
             serverSupportsGuard: false) == nil)
     }
 
     @Test func `routing contract round trips a delimited legacy main key`() throws {
-        let contract = try #require(OpenClawChatSessionRoutingContract.make(
+        let contract = try #require(SteelEngineChatSessionRoutingContract.make(
             scope: "per-sender",
             mainKey: "team|primary",
             defaultAgentID: "main"))
-        let components = try #require(OpenClawChatSessionRoutingContract.parse(contract))
+        let components = try #require(SteelEngineChatSessionRoutingContract.parse(contract))
         #expect(components.scope == "per-sender")
         #expect(components.mainKey == "team|primary")
         #expect(components.defaultAgentID == "main")
@@ -159,11 +159,11 @@ struct IOSGatewayChatTransportTests {
         _ = try await transport.patchSessionSettings(
             sessionKey: "global",
             agentID: nil,
-            patch: OpenClawChatSessionSettingsPatch(verboseLevel: .some("full")))
+            patch: SteelEngineChatSessionSettingsPatch(verboseLevel: .some("full")))
         _ = try await transport.patchSessionSettings(
             sessionKey: "global",
             agentID: nil,
-            patch: OpenClawChatSessionSettingsPatch(verboseLevel: .some(nil)))
+            patch: SteelEngineChatSessionSettingsPatch(verboseLevel: .some(nil)))
 
         let requests = await recorder.all()
         #expect(requests.count == 2)
@@ -205,7 +205,7 @@ struct IOSGatewayChatTransportTests {
                 idempotencyKey: "guarded-idempotency",
                 attachments: [])
             Issue.record("Expected guarded sendMessage to fail before dispatch")
-        } catch is OpenClawChatTransportSendError {
+        } catch is SteelEngineChatTransportSendError {
             // Expected: a missing route never reached chat.send.
         } catch {
             Issue.record("Expected a typed pre-dispatch failure, got \(error)")
@@ -250,7 +250,7 @@ struct IOSGatewayChatTransportTests {
             payload: payload,
             seq: 1,
             stateversion: nil)
-        let mapped = OpenClawChatGatewayPayloadCodec.event(from: frame)
+        let mapped = SteelEngineChatGatewayPayloadCodec.event(from: frame)
 
         switch mapped {
         case let .sessionMessage(message):
@@ -278,7 +278,7 @@ struct IOSGatewayChatTransportTests {
             seq: 1,
             stateversion: nil)
 
-        let mapped = OpenClawChatGatewayPayloadCodec.event(from: frame)
+        let mapped = SteelEngineChatGatewayPayloadCodec.event(from: frame)
         guard case let .sessionsChanged(change) = mapped else {
             Issue.record("expected .sessionsChanged, got \(String(describing: mapped))")
             return
@@ -296,7 +296,7 @@ struct IOSGatewayChatTransportTests {
             "state": AnyCodable("final"),
         ])
         let frame = EventFrame(type: "event", event: "chat", payload: payload, seq: 1, stateversion: nil)
-        let mapped = OpenClawChatGatewayPayloadCodec.event(from: frame)
+        let mapped = SteelEngineChatGatewayPayloadCodec.event(from: frame)
 
         switch mapped {
         case let .chat(chat):
@@ -315,7 +315,7 @@ struct IOSGatewayChatTransportTests {
             payload: AnyCodable(["a": AnyCodable(1)]),
             seq: 1,
             stateversion: nil)
-        let mapped = OpenClawChatGatewayPayloadCodec.event(from: frame)
+        let mapped = SteelEngineChatGatewayPayloadCodec.event(from: frame)
         #expect(mapped == nil)
     }
 }
@@ -331,9 +331,9 @@ struct LocalFixtureChatTransportTests {
             idempotencyKey: "fixture-run",
             attachments: [])
         let history = try await transport.requestHistory(sessionKey: "main")
-        let decoded = try #require(history.messages).compactMap { payload -> OpenClawChatMessage? in
+        let decoded = try #require(history.messages).compactMap { payload -> SteelEngineChatMessage? in
             guard let data = try? JSONEncoder().encode(payload) else { return nil }
-            return try? JSONDecoder().decode(OpenClawChatMessage.self, from: data)
+            return try? JSONDecoder().decode(SteelEngineChatMessage.self, from: data)
         }
 
         #expect(decoded.last(where: { $0.role == "user" })?.idempotencyKey == "fixture-run:user")

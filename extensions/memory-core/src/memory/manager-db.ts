@@ -11,11 +11,11 @@ import {
   loadSqliteVecExtension,
   MEMORY_INDEX_PATHS_FTS_TABLE,
   requireNodeSqlite,
-} from "openclaw/plugin-sdk/memory-core-host-engine-storage";
+} from "steelengine/plugin-sdk/memory-core-host-engine-storage";
 import {
-  ensureOpenClawAgentDatabaseSchema,
+  ensureSteelEngineAgentDatabaseSchema,
   runSqliteImmediateTransactionSync,
-} from "openclaw/plugin-sdk/sqlite-runtime";
+} from "steelengine/plugin-sdk/sqlite-runtime";
 import {
   tryAcquireMemoryReindexLock,
   type MemoryReindexLockHandle,
@@ -330,7 +330,7 @@ export function openMemoryDatabaseAtPath(
       databasePath: dbPath,
     });
     if (agentId) {
-      ensureOpenClawAgentDatabaseSchema(db, { agentId, path: dbPath, register: true });
+      ensureSteelEngineAgentDatabaseSchema(db, { agentId, path: dbPath, register: true });
     }
     return db;
   } catch (err) {

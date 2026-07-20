@@ -1,5 +1,5 @@
 // Shared execution admission for scheduled, manual, and on-exit cron runs.
-import { resolveIntegerOption } from "@openclaw/normalization-core/number-coercion";
+import { resolveIntegerOption } from "@steelengine/normalization-core/number-coercion";
 import type { CronServiceState } from "./state.js";
 
 export function resolveRunConcurrency(state: CronServiceState): number {

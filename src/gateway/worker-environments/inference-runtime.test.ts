@@ -11,7 +11,7 @@ import type { registerProviderStreamForModel } from "../../agents/provider-strea
 import type { prepareSimpleCompletionModel } from "../../agents/simple-completion-runtime.js";
 import { resolveSimpleCompletionModelResolverWorkspace } from "../../agents/simple-completion-scope.js";
 import type { SessionEntry } from "../../config/sessions.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { onTrustedInternalDiagnosticEvent } from "../../infra/diagnostic-events.js";
 import type { AssistantMessage, Model, StreamFn, Usage } from "../../llm/types.js";
 import { createAssistantMessageEventStream } from "../../llm/utils/event-stream.js";
@@ -61,13 +61,13 @@ const config = {
       {
         id: "runtime-agent",
         models: {
-          [`${PROVIDER}/${MODEL}`]: { alias: ALIAS, agentRuntime: { id: "openclaw" } },
+          [`${PROVIDER}/${MODEL}`]: { alias: ALIAS, agentRuntime: { id: "steelengine" } },
         },
         params: { temperature: 0.1 },
       },
     ],
   },
-} satisfies OpenClawConfig;
+} satisfies SteelEngineConfig;
 const sessionEntry: SessionEntry = {
   sessionId: SESSION_ID,
   updatedAt: 1,
@@ -255,7 +255,7 @@ function setup(entry: SessionEntry = sessionEntry) {
 function params(
   inferenceRequest: WorkerInferenceStartParams,
   emit: Execution["emit"],
-  runtimeConfig: OpenClawConfig = config,
+  runtimeConfig: SteelEngineConfig = config,
 ): Execution {
   return {
     identity,
@@ -360,7 +360,7 @@ describe("worker inference provider runtime", () => {
     const prepared = runtime.prepareModel.mock.calls[0]?.[0];
     expect(runtime.scope).toEqual({
       agentDir: prepared?.agentDir,
-      agentRuntime: "openclaw",
+      agentRuntime: "steelengine",
       authProfile: PROFILE,
       catalogWorkspace: WORKSPACE,
       prepareWorkspace: WORKSPACE,

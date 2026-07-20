@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { ClawHubTrustErrorCode } from "../infra/clawhub-install-trust.js";
 import { CLAWHUB_INSTALL_ERROR_CODE } from "./clawhub-error-codes.js";
 import { installPluginFromClawHub, type ClawHubRiskAcknowledgementRequest } from "./clawhub.js";
@@ -277,7 +277,7 @@ export async function buildDryRunPluginUpdateOutcome(params: {
       newerExactPinnedDefaultLine && params.effectiveSpec
         ? `${params.pluginId} is pinned to ${params.effectiveSpec} (installed ${currentLabel}); ` +
           `registry default resolves to ${newerExactPinnedDefaultLine.version}. ` +
-          `Pass \`openclaw plugins update ${newerExactPinnedDefaultLine.packageName}@latest\` to follow the registry default line.` +
+          `Pass \`steelengine plugins update ${newerExactPinnedDefaultLine.packageName}@latest\` to follow the registry default line.` +
           params.channelFallbackSuffix
         : `${params.pluginId} is up to date (${currentLabel}).${params.channelFallbackSuffix}`;
     return {
@@ -303,7 +303,7 @@ export async function buildDryRunPluginUpdateOutcome(params: {
 export async function runPluginUpdateAttempt(params: {
   pluginId: string;
   record: UpdatablePluginInstallRecord;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   dryRun: boolean;
   effectiveSpec?: string;
   extensionsDir?: string;

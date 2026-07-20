@@ -7,26 +7,26 @@ plugins {
   alias(libs.plugins.kotlin.serialization)
 }
 
-val openClawAndroidVersionFile = rootProject.file("Config/Version.properties")
-val openClawAndroidVersionProperties =
+val steelEngineAndroidVersionFile = rootProject.file("Config/Version.properties")
+val steelEngineAndroidVersionProperties =
   Properties().apply {
-    if (!openClawAndroidVersionFile.isFile) {
+    if (!steelEngineAndroidVersionFile.isFile) {
       error("Missing Android version properties. Run `pnpm android:version:sync`.")
     }
-    openClawAndroidVersionFile.inputStream().use(::load)
+    steelEngineAndroidVersionFile.inputStream().use(::load)
   }
 
-fun requireOpenClawAndroidVersionProperty(name: String): String =
-  openClawAndroidVersionProperties.getProperty(name)?.trim()?.takeIf { it.isNotEmpty() }
+fun requireSteelEngineAndroidVersionProperty(name: String): String =
+  steelEngineAndroidVersionProperties.getProperty(name)?.trim()?.takeIf { it.isNotEmpty() }
     ?: error("Missing $name in Config/Version.properties. Run `pnpm android:version:sync`.")
 
-val openClawAndroidPhoneVersionCode = requireOpenClawAndroidVersionProperty("OPENCLAW_ANDROID_VERSION_CODE").toInt()
-val openClawAndroidBuildNumber = openClawAndroidPhoneVersionCode % 100
-check(openClawAndroidBuildNumber in 1..49) {
+val steelEngineAndroidPhoneVersionCode = requireSteelEngineAndroidVersionProperty("STEELENGINE_ANDROID_VERSION_CODE").toInt()
+val steelEngineAndroidBuildNumber = steelEngineAndroidPhoneVersionCode % 100
+check(steelEngineAndroidBuildNumber in 1..49) {
   "Android build number must be 01 through 49; Wear reserves 51 through 99."
 }
-val openClawAndroidWearVersionCode = openClawAndroidPhoneVersionCode + 50
-check(openClawAndroidWearVersionCode <= 2_100_000_000) { "Wear versionCode exceeds the Android platform maximum." }
+val steelEngineAndroidWearVersionCode = steelEngineAndroidPhoneVersionCode + 50
+check(steelEngineAndroidWearVersionCode <= 2_100_000_000) { "Wear versionCode exceeds the Android platform maximum." }
 
 // Data Layer delivery requires the phone and watch packages to share one certificate.
 evaluationDependsOn(":app")
@@ -38,16 +38,16 @@ val phoneReleaseSigning =
     .findByName("release")
 
 android {
-  namespace = "ai.openclaw.wear"
+  namespace = "ai.steelengine.wear"
   compileSdk = 37
 
   defaultConfig {
     // Data Layer traffic is scoped to matching package names and signatures.
-    applicationId = "ai.openclaw.app"
+    applicationId = "ai.steelengine.app"
     minSdk = 31
     targetSdk = 36
-    versionCode = openClawAndroidWearVersionCode
-    versionName = requireOpenClawAndroidVersionProperty("OPENCLAW_ANDROID_VERSION_NAME")
+    versionCode = steelEngineAndroidWearVersionCode
+    versionName = requireSteelEngineAndroidVersionProperty("STEELENGINE_ANDROID_VERSION_NAME")
   }
 
   buildTypes {

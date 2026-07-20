@@ -5,7 +5,7 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import { isSilentReplyPayloadText, SILENT_REPLY_TOKEN } from "../auto-reply/tokens.js";
 import { resolveStateDir } from "../config/paths.js";
 import {
@@ -26,7 +26,7 @@ import {
   type SessionTranscriptTurnLifecyclePatch,
 } from "../config/sessions/session-accessor.js";
 import { appendAssistantMessageToSessionTranscript } from "../config/sessions/transcript.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { GatewayRecoveryRuntime } from "../gateway/server-instance-runtime.types.js";
 import { readSessionMessagesAsync } from "../gateway/session-transcript-readers.js";
 import { resolveGatewaySessionStoreTarget } from "../gateway/session-utils.js";
@@ -172,8 +172,8 @@ function resolveEntryTranscriptLockPaths(params: {
 }
 
 export async function markRestartAbortedMainSessions(params: {
-  cfg?: OpenClawConfig;
-  additionalCfgs?: Iterable<OpenClawConfig | undefined>;
+  cfg?: SteelEngineConfig;
+  additionalCfgs?: Iterable<SteelEngineConfig | undefined>;
   stateDir?: string;
   sessionKeys?: Iterable<string>;
   sessionIds?: Iterable<string>;
@@ -215,10 +215,10 @@ export async function markRestartAbortedMainSessions(params: {
   const env =
     params.stateDir === undefined
       ? process.env
-      : { ...process.env, OPENCLAW_STATE_DIR: params.stateDir };
+      : { ...process.env, STEELENGINE_STATE_DIR: params.stateDir };
   const stateDir = resolveStateDir(env);
   const configs = [params.cfg, ...(params.additionalCfgs ?? [])].filter(
-    (cfg): cfg is OpenClawConfig => Boolean(cfg),
+    (cfg): cfg is SteelEngineConfig => Boolean(cfg),
   );
   for (const cfg of configs) {
     try {
@@ -350,7 +350,7 @@ export async function markRestartAbortedMainSessions(params: {
 }
 
 export async function markStartupOrphanedMainSessionsForRecovery(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   stateDir?: string;
   activeSessionIds?: Iterable<string>;
   activeSessionKeys?: Iterable<string>;
@@ -585,7 +585,7 @@ function isExactMessageToolDeliveryMirror(params: {
   if (!params.message || typeof params.message !== "object") {
     return false;
   }
-  const marker = (params.message as { openclawDeliveryMirror?: unknown }).openclawDeliveryMirror;
+  const marker = (params.message as { steelengineDeliveryMirror?: unknown }).steelengineDeliveryMirror;
   if (!marker || typeof marker !== "object") {
     return false;
   }
@@ -706,7 +706,7 @@ function readDeliveredTerminalSourceReplyToolCallId(
     if (!message || typeof message !== "object" || getMessageRole(message) !== "assistant") {
       continue;
     }
-    const marker = (message as { openclawDeliveryMirror?: unknown }).openclawDeliveryMirror;
+    const marker = (message as { steelengineDeliveryMirror?: unknown }).steelengineDeliveryMirror;
     if (!marker || typeof marker !== "object") {
       continue;
     }
@@ -1376,7 +1376,7 @@ async function writeUnresumableSessionNotice(params: {
 }
 
 async function failUnresumableMainSession(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   entry: SessionEntry;
   gatewayRuntime: GatewayRecoveryRuntime;
   observation: MainSessionRecoveryObservation;
@@ -1477,7 +1477,7 @@ export async function markRestartAbortedMainSessionsFromLocks(params: {
 }
 
 function resolveRecoveryDispatchSessionKey(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   sessionKey: string;
   storePath: string;
 }): string | undefined {
@@ -1500,7 +1500,7 @@ function resolveRecoveryDispatchSessionKey(params: {
 }
 
 async function recoverStore(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   observationOnly?: boolean;
   onExhaustedTarget?: (target: ExhaustedRestartRecoveryTarget) => void;
   storePath: string;
@@ -1878,7 +1878,7 @@ async function recoverStore(params: {
 }
 
 async function resolveRestartRecoveryStorePaths(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   stateDir?: string;
 }): Promise<string[]> {
   const storePaths = new Set<string>();
@@ -1887,7 +1887,7 @@ async function resolveRestartRecoveryStorePaths(params: {
     storePaths.add(path.join(sessionsDir, "sessions.json"));
   }
   if (params.cfg) {
-    const env = { ...process.env, OPENCLAW_STATE_DIR: stateDir };
+    const env = { ...process.env, STEELENGINE_STATE_DIR: stateDir };
     for (const target of resolveAllAgentSessionStoreTargetsSync(params.cfg, { env })) {
       storePaths.add(path.resolve(target.storePath));
     }
@@ -1896,7 +1896,7 @@ async function resolveRestartRecoveryStorePaths(params: {
 }
 
 async function recoverRestartAbortedMainSessionsWithOptions(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   onExhaustedTarget?: (target: ExhaustedRestartRecoveryTarget) => void;
   stateDir?: string;
   resumedSessionKeys?: Set<string>;
@@ -1931,7 +1931,7 @@ async function recoverRestartAbortedMainSessionsWithOptions(params: {
 }
 
 export async function recoverRestartAbortedMainSessions(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   stateDir?: string;
   resumedSessionKeys?: Set<string>;
   activeSessionIds?: Iterable<string>;
@@ -1944,7 +1944,7 @@ export async function recoverRestartAbortedMainSessions(params: {
 /** Retries one exact durable Control UI row from its owning per-agent SQLite store. */
 export async function retryRestartAbortedMainSessionRecovery(params: {
   canonicalSessionKey?: string;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   expectedRecoveryRunId: string;
   expectedRecoverySourceRunId: string;
   expectedSessionId: string;
@@ -1999,7 +1999,7 @@ export async function retryRestartAbortedMainSessionRecovery(params: {
 
 /** Reconciles one interrupted row after its final foreground owner releases. */
 export async function retryRestartAbortedMainSessionRecoveryAfterOwnerRelease(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   expectedSessionId: string;
   sessionKey: string;
   storePath: string;
@@ -2010,7 +2010,7 @@ export async function retryRestartAbortedMainSessionRecoveryAfterOwnerRelease(pa
 
 async function recoverExpectedRestartRecoveryTarget(params: {
   canonicalSessionKey?: string;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   expectedSessionId: string;
   observationOnly?: boolean;
   sessionKey: string;
@@ -2063,7 +2063,7 @@ async function recoverExpectedRestartRecoveryTarget(params: {
 export function scheduleRestartAbortedMainSessionRecoveryAfterOwnerRelease(params: {
   delayMs?: number;
   expectedSessionId: string;
-  getConfig: () => OpenClawConfig;
+  getConfig: () => SteelEngineConfig;
   getGatewayRuntime: () => GatewayRecoveryRuntime | undefined;
   maxRetries?: number;
   sessionKey: string;
@@ -2127,7 +2127,7 @@ export function scheduleRestartAbortedMainSessionRecoveryAfterOwnerRelease(param
 }
 
 async function recoverStartupOrphanedMainSessionsWithOptions(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   stateDir?: string;
   activeSessionIds?: Iterable<string>;
   activeSessionKeys?: Iterable<string>;
@@ -2162,7 +2162,7 @@ async function recoverStartupOrphanedMainSessionsWithOptions(params: {
 }
 
 export async function recoverStartupOrphanedMainSessions(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   stateDir?: string;
   activeSessionIds?: Iterable<string>;
   activeSessionKeys?: Iterable<string>;
@@ -2174,7 +2174,7 @@ export async function recoverStartupOrphanedMainSessions(params: {
 }
 
 export function scheduleRestartAbortedMainSessionRecovery(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   delayMs?: number;
   maxRetries?: number;
   stateDir?: string;

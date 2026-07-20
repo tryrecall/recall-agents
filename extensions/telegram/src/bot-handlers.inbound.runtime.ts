@@ -1,13 +1,13 @@
 // Telegram inbound buffering, media resolution, and message dispatch.
 import type { Message } from "grammy/types";
-import { isAbortRequestText } from "openclaw/plugin-sdk/command-primitives-runtime";
+import { isAbortRequestText } from "steelengine/plugin-sdk/command-primitives-runtime";
 import type {
   DmPolicy,
-  OpenClawConfig,
+  SteelEngineConfig,
   TelegramGroupConfig,
   TelegramTopicConfig,
-} from "openclaw/plugin-sdk/config-contracts";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/config-contracts";
+import { logVerbose } from "steelengine/plugin-sdk/runtime-env";
 import { withTelegramApiErrorLogging } from "./api-logging.js";
 import type { NormalizedAllowFrom } from "./bot-access.js";
 import {
@@ -87,7 +87,7 @@ export function createTelegramHandlerInboundRuntime(
     messageRuntime,
   );
   const processInboundMessage = async (params: {
-    authorizationCfg: OpenClawConfig;
+    authorizationCfg: SteelEngineConfig;
     ctx: TelegramContext;
     msg: Message;
     chatId: number;

@@ -16,7 +16,7 @@ import {
   scanSessionTranscriptTree,
   selectSessionTranscriptTreePathNodes,
 } from "../config/sessions/transcript-tree.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { HealthFinding, HealthRepairEffect } from "../flows/health-checks.js";
 import { shortenHomePath } from "../utils.js";
 import { withDoctorSqliteMaintenanceLock } from "./doctor-sqlite-maintenance-lock.js";
@@ -417,7 +417,7 @@ export function sessionTranscriptIssueToHealthFinding(
     message: `Session transcript has legacy branch or provider metadata that can be cleaned up.${metadata}`,
     path: issue.filePath,
     fixHint:
-      "To clean up the advisory artifact, run `openclaw doctor --fix` to rewrite affected transcripts to their active branch.",
+      "To clean up the advisory artifact, run `steelengine doctor --fix` to rewrite affected transcripts to their active branch.",
   };
 }
 
@@ -434,7 +434,7 @@ export function sessionTranscriptIssueToRepairEffect(
 
 /** Scans session transcript files and reports or repairs legacy/broken transcript state. */
 export async function noteSessionTranscriptHealth(params?: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   sessionSqlite?: boolean;
   shouldRepair?: boolean;
@@ -477,7 +477,7 @@ export async function noteSessionTranscriptHealth(params?: {
       lines.push(`- ...and ${broken.length - 20} more.`);
     }
     if (!shouldRepair) {
-      lines.push('- Run "openclaw doctor --fix" to rewrite affected files to their active branch.');
+      lines.push('- Run "steelengine doctor --fix" to rewrite affected files to their active branch.');
     } else if (repairedCount > 0) {
       lines.push(`- Repaired ${repairedCount} transcript file${repairedCount === 1 ? "" : "s"}.`);
     }
@@ -494,7 +494,7 @@ export async function noteSessionTranscriptHealth(params?: {
 }
 
 async function noteSessionSqliteMigrationHealth(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   shouldRepair: boolean;
 }): Promise<void> {
@@ -541,7 +541,7 @@ async function noteSessionSqliteMigrationHealth(params: {
   }
   if (!params.shouldRepair) {
     lines.push(
-      '- Run "openclaw doctor --fix" to migrate legacy session metadata/transcripts to SQLite.',
+      '- Run "steelengine doctor --fix" to migrate legacy session metadata/transcripts to SQLite.',
     );
   }
   note(lines.join("\n"), "Session SQLite");

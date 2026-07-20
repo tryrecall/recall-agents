@@ -13,7 +13,7 @@ import { loadSettings } from "../../app/settings.ts";
 import { renderSettingsWorkspace } from "../../components/settings-workspace.ts";
 import { resolveSessionKey } from "../../lib/sessions/index.ts";
 import { uiSessionEventMatches } from "../../lib/sessions/session-key.ts";
-import { OpenClawLightDomElement } from "../../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../../lit/steelengine-element.ts";
 import { SubscriptionsController } from "../../lit/subscriptions-controller.ts";
 import {
   parseActivityEvent,
@@ -25,7 +25,7 @@ import { renderActivity } from "./view.ts";
 
 let activityClearBoundary: EventLogEntry | undefined;
 
-class ActivityPage extends OpenClawLightDomElement {
+class ActivityPage extends SteelEngineLightDomElement {
   @consume({ context: applicationContext, subscribe: true })
   private context!: ApplicationContext;
 
@@ -247,6 +247,6 @@ class ActivityPage extends OpenClawLightDomElement {
   }
 }
 
-if (!customElements.get("openclaw-activity-page")) {
-  customElements.define("openclaw-activity-page", ActivityPage);
+if (!customElements.get("steelengine-activity-page")) {
+  customElements.define("steelengine-activity-page", ActivityPage);
 }

@@ -1,11 +1,11 @@
 /** Availability check for exposing ACP runtime spawning to tools and clients. */
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { isAcpEnabledByPolicy } from "../policy.js";
 import { getAcpRuntimeBackend } from "./registry.js";
 
 /** Returns whether ACP runtime spawning is allowed and the selected backend is healthy enough. */
 export function isAcpRuntimeSpawnAvailable(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   sandboxed?: boolean;
   backendId?: string;
 }): boolean {

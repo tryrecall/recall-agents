@@ -1,7 +1,7 @@
 import { FailoverError } from "../../failover-error.js";
 import { ensureSelectedAgentHarnessPlugin } from "../../harness/runtime-plugin.js";
 import { selectAgentHarness } from "../../harness/selection.js";
-import { ensureOpenClawModelsJson } from "../../models-config.js";
+import { ensureSteelEngineModelsJson } from "../../models-config.js";
 import { resolveSelectedOpenAIRuntimeProvider } from "../../openai-routing.js";
 import { createEmptyAgentDiscoveryStores, resolveModelAsync } from "../model.js";
 import type { RunEmbeddedAgentParams } from "./params.js";
@@ -71,7 +71,7 @@ export async function resolveEmbeddedRunModelSetup(params: {
     agentHarnessId: runParams.agentHarnessId,
     agentHarnessRuntimeOverride: runParams.agentHarnessRuntimeOverride,
   });
-  const pluginHarnessOwnsTransport = agentHarness.id !== "openclaw";
+  const pluginHarnessOwnsTransport = agentHarness.id !== "steelengine";
   const expectedHarnessArtifact = runParams.expectedAgentHarnessRuntimeArtifact;
   if (expectedHarnessArtifact && expectedHarnessArtifact.harnessId !== agentHarness.id) {
     throw new Error(
@@ -137,7 +137,7 @@ export async function resolveEmbeddedRunModelSetup(params: {
       modelResolution = firstModelResolution;
     }
     if (!modelResolution) {
-      await ensureOpenClawModelsJson(runParams.config, params.agentDir, {
+      await ensureSteelEngineModelsJson(runParams.config, params.agentDir, {
         workspaceDir: params.workspaceDir,
       });
       for (const candidateProvider of modelResolutionProviders) {

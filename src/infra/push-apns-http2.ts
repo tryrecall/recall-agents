@@ -2,7 +2,7 @@
 import { once } from "node:events";
 import http2 from "node:http2";
 import tls from "node:tls";
-import { resolveTimerTimeoutMs } from "@openclaw/normalization-core/number-coercion";
+import { resolveTimerTimeoutMs } from "@steelengine/normalization-core/number-coercion";
 import { openProxyConnectTunnel } from "@openclaw/proxyline";
 import { toErrorObject } from "./errors.js";
 import {
@@ -271,8 +271,8 @@ export async function probeApnsHttp2ReachabilityViaProxy(
         ":path": `/3/device/${"0".repeat(64)}`,
         // APNs should reject this token with InvalidProviderToken. That failure
         // is the success signal that the proxy actually tunneled to Apple.
-        authorization: "bearer intentionally.invalid.openclaw.proxy.validation",
-        "apns-topic": "ai.openclaw.ios",
+        authorization: "bearer intentionally.invalid.steelengine.proxy.validation",
+        "apns-topic": "ai.steelengine.ios",
         "apns-push-type": "alert",
         "apns-priority": "10",
       });
@@ -304,7 +304,7 @@ export async function probeApnsHttp2ReachabilityViaProxy(
         }
         resolve({ status, body: body.text, responseHeaders });
       });
-      request.end(JSON.stringify({ aps: { alert: "OpenClaw APNs proxy validation" } }));
+      request.end(JSON.stringify({ aps: { alert: "SteelEngine APNs proxy validation" } }));
     });
   } finally {
     if (!session.closed && !session.destroyed) {

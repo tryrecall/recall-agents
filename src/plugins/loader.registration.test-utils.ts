@@ -31,7 +31,7 @@ import {
   claimPluginInteractiveCallbackDedupe,
   commitPluginInteractiveCallbackDedupe,
 } from "./interactive-state.js";
-import { loadOpenClawPlugins } from "./loader.js";
+import { loadSteelEnginePlugins } from "./loader.js";
 import {
   makeTempDir,
   mkdirSafe,
@@ -77,7 +77,7 @@ import { ensurePluginRegistryLoaded } from "./runtime/runtime-registry-loader.js
 afterEach(globalAfterEach0);
 afterAll(globalAfterAll1);
 
-describe("loadOpenClawPlugins", () => {
+describe("loadSteelEnginePlugins", () => {
   it("runs consecutive plugin hook handlers with shared mutable context but isolated plugin config", async () => {
     useNoBundledPlugins();
     const first = writePlugin({
@@ -118,7 +118,7 @@ describe("loadOpenClawPlugins", () => {
     });
     for (const plugin of [first, second]) {
       fs.writeFileSync(
-        path.join(plugin.dir, "openclaw.plugin.json"),
+        path.join(plugin.dir, "steelengine.plugin.json"),
         JSON.stringify(
           {
             id: plugin.id,
@@ -133,7 +133,7 @@ describe("loadOpenClawPlugins", () => {
 
     clearInternalHooks();
 
-    loadOpenClawPlugins({
+    loadSteelEnginePlugins({
       cache: false,
       workspaceDir: first.dir,
       onlyPluginIds: ["hook-context-first", "hook-context-second"],
@@ -227,7 +227,7 @@ describe("loadOpenClawPlugins", () => {
     clearPluginCommands();
     clearPluginInteractiveHandlers();
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       workspaceDir: plugin.dir,
       config: {
@@ -276,7 +276,7 @@ describe("loadOpenClawPlugins", () => {
 
     clearInternalHooks();
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       workspaceDir: plugin.dir,
       config: {
@@ -319,7 +319,7 @@ describe("loadOpenClawPlugins", () => {
         };`,
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       workspaceDir: plugin.dir,
       config: {
@@ -351,8 +351,8 @@ describe("loadOpenClawPlugins", () => {
     fs.writeFileSync(
       path.join(scopedDir, "package.json"),
       JSON.stringify({
-        name: "@openclaw/scoped-provider",
-        openclaw: { extensions: ["./index.cjs"] },
+        name: "@steelengine/scoped-provider",
+        steelengine: { extensions: ["./index.cjs"] },
       }),
       "utf-8",
     );
@@ -378,8 +378,8 @@ describe("loadOpenClawPlugins", () => {
     fs.writeFileSync(
       path.join(unscopedDir, "package.json"),
       JSON.stringify({
-        name: "@openclaw/unscoped-provider",
-        openclaw: { extensions: ["./index.cjs"] },
+        name: "@steelengine/unscoped-provider",
+        steelengine: { extensions: ["./index.cjs"] },
       }),
       "utf-8",
     );
@@ -398,10 +398,10 @@ describe("loadOpenClawPlugins", () => {
       enabledByDefault: true,
       providers: ["unscoped-provider"],
     });
-    process.env.OPENCLAW_BUNDLED_PLUGINS_DIR = bundledDir;
-    delete process.env.OPENCLAW_DISABLE_BUNDLED_PLUGINS;
+    process.env.STEELENGINE_BUNDLED_PLUGINS_DIR = bundledDir;
+    delete process.env.STEELENGINE_DISABLE_BUNDLED_PLUGINS;
 
-    const scoped = loadOpenClawPlugins({
+    const scoped = loadSteelEnginePlugins({
       cache: false,
       activate: false,
       config: {
@@ -425,8 +425,8 @@ describe("loadOpenClawPlugins", () => {
     fs.writeFileSync(
       path.join(bundledPluginDir, "package.json"),
       JSON.stringify({
-        name: "@openclaw/notify-host",
-        openclaw: { extensions: ["./index.cjs"] },
+        name: "@steelengine/notify-host",
+        steelengine: { extensions: ["./index.cjs"] },
       }),
       "utf-8",
     );
@@ -445,10 +445,10 @@ describe("loadOpenClawPlugins", () => {
         };`,
     });
     updatePluginManifest(bundled, { enabledByDefault: true });
-    process.env.OPENCLAW_BUNDLED_PLUGINS_DIR = bundledDir;
-    delete process.env.OPENCLAW_DISABLE_BUNDLED_PLUGINS;
+    process.env.STEELENGINE_BUNDLED_PLUGINS_DIR = bundledDir;
+    delete process.env.STEELENGINE_DISABLE_BUNDLED_PLUGINS;
 
-    const bundledRegistry = loadOpenClawPlugins({
+    const bundledRegistry = loadSteelEnginePlugins({
       cache: false,
       config: { plugins: { allow: ["notify-host"] } },
       onlyPluginIds: ["notify-host"],
@@ -471,7 +471,7 @@ describe("loadOpenClawPlugins", () => {
           },
         };`,
     });
-    const externalRegistry = loadOpenClawPlugins({
+    const externalRegistry = loadSteelEnginePlugins({
       cache: false,
       workspaceDir: external.dir,
       config: {
@@ -554,7 +554,7 @@ describe("loadOpenClawPlugins", () => {
         };`,
     });
 
-    const scoped = loadOpenClawPlugins({
+    const scoped = loadSteelEnginePlugins({
       cache: false,
       activate: false,
       workspaceDir: plugin.dir,
@@ -603,7 +603,7 @@ describe("loadOpenClawPlugins", () => {
       contracts: { embeddingProviders: ["snapshot"] },
     });
 
-    const scoped = loadOpenClawPlugins({
+    const scoped = loadSteelEnginePlugins({
       cache: false,
       activate: false,
       workspaceDir: plugin.dir,
@@ -650,7 +650,7 @@ describe("loadOpenClawPlugins", () => {
       contracts: { embeddingProviders: ["shared"] },
     });
 
-    const scoped = loadOpenClawPlugins({
+    const scoped = loadSteelEnginePlugins({
       cache: false,
       activate: false,
       workspaceDir: plugin.dir,
@@ -694,7 +694,7 @@ describe("loadOpenClawPlugins", () => {
       contracts: { embeddingProviders: ["failed"] },
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       workspaceDir: plugin.dir,
       config: {
@@ -755,7 +755,7 @@ describe("loadOpenClawPlugins", () => {
         };`,
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       workspaceDir: plugin.dir,
       config: {
@@ -803,7 +803,7 @@ describe("loadOpenClawPlugins", () => {
         };`,
     });
 
-    const scoped = loadOpenClawPlugins({
+    const scoped = loadSteelEnginePlugins({
       cache: false,
       activate: false,
       workspaceDir: plugin.dir,
@@ -848,7 +848,7 @@ describe("loadOpenClawPlugins", () => {
         };`,
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       workspaceDir: plugin.dir,
       config: {
@@ -898,15 +898,15 @@ describe("loadOpenClawPlugins", () => {
         },
       },
       onlyPluginIds: ["cached-detached-runtime"],
-    } satisfies Parameters<typeof loadOpenClawPlugins>[0];
+    } satisfies Parameters<typeof loadSteelEnginePlugins>[0];
 
-    loadOpenClawPlugins(loadOptions);
+    loadSteelEnginePlugins(loadOptions);
     expect(getDetachedTaskLifecycleRuntimeRegistration()?.pluginId).toBe("cached-detached-runtime");
 
     clearDetachedTaskLifecycleRuntimeRegistration();
     expect(getDetachedTaskLifecycleRuntimeRegistration()).toBeUndefined();
 
-    loadOpenClawPlugins(loadOptions);
+    loadSteelEnginePlugins(loadOptions);
 
     expect(getDetachedTaskLifecycleRuntimeRegistration()?.pluginId).toBe("cached-detached-runtime");
   });
@@ -942,9 +942,9 @@ describe("loadOpenClawPlugins", () => {
         },
       },
       onlyPluginIds: ["cached-command-interactive"],
-    } satisfies Parameters<typeof loadOpenClawPlugins>[0];
+    } satisfies Parameters<typeof loadSteelEnginePlugins>[0];
 
-    const registry = loadOpenClawPlugins(loadOptions);
+    const registry = loadSteelEnginePlugins(loadOptions);
     expect(getPluginCommandSpecs()).toEqual([
       { name: "hue", description: "Control Hue lights", acceptsArgs: false },
     ]);
@@ -964,7 +964,7 @@ describe("loadOpenClawPlugins", () => {
     commitPluginInteractiveCallbackDedupe(dedupeKey, 1_000);
     expect(claimPluginInteractiveCallbackDedupe(dedupeKey, 1_001)).toBe(false);
 
-    loadOpenClawPlugins(loadOptions);
+    loadSteelEnginePlugins(loadOptions);
     expect(claimPluginInteractiveCallbackDedupe(dedupeKey, 1_002)).toBe(false);
 
     clearPluginCommands();
@@ -972,7 +972,7 @@ describe("loadOpenClawPlugins", () => {
     expect(getPluginCommandSpecs()).toStrictEqual([]);
     expect(resolvePluginInteractiveNamespaceMatch("telegram", "hue:on")).toBeNull();
 
-    loadOpenClawPlugins(loadOptions);
+    loadSteelEnginePlugins(loadOptions);
 
     expect(getPluginCommandSpecs()).toEqual([
       { name: "hue", description: "Control Hue lights", acceptsArgs: false },
@@ -988,7 +988,7 @@ describe("loadOpenClawPlugins", () => {
     useNoBundledPlugins();
     registerDetachedTaskLifecycleRuntime("stale-runtime", createDetachedTaskRuntimeStub("stale"));
 
-    loadOpenClawPlugins({
+    loadSteelEnginePlugins({
       cache: false,
       config: {
         plugins: {
@@ -1054,14 +1054,14 @@ describe("loadOpenClawPlugins", () => {
       },
     ];
 
-    const first = loadOpenClawPlugins(options);
+    const first = loadSteelEnginePlugins(options);
     await expect(listActiveMemoryPublicArtifacts({ cfg: {} as never })).resolves.toEqual(
       expectedArtifacts,
     );
 
     clearMemoryPluginState();
 
-    const second = loadOpenClawPlugins(options);
+    const second = loadSteelEnginePlugins(options);
     expect(second).toBe(first);
     await expect(listActiveMemoryPublicArtifacts({ cfg: {} as never })).resolves.toEqual(
       expectedArtifacts,
@@ -1113,7 +1113,7 @@ describe("loadOpenClawPlugins", () => {
         slots: { memory: "capability-survives-memory" },
       },
     };
-    loadOpenClawPlugins({
+    loadSteelEnginePlugins({
       cache: false,
       workspaceDir: memoryPlugin.dir,
       config: activateConfig,
@@ -1137,7 +1137,7 @@ describe("loadOpenClawPlugins", () => {
     // Simulate what resolvePluginWebSearchProviders and similar read-only paths do:
     // load plugins again with activate:false. Each per-plugin snapshot/rollback must
     // preserve the previously registered memory capability.
-    loadOpenClawPlugins({
+    loadSteelEnginePlugins({
       cache: false,
       activate: false,
       workspaceDir: memoryPlugin.dir,
@@ -1151,7 +1151,7 @@ describe("loadOpenClawPlugins", () => {
 
   it("uses discovery registration mode for non-activating loads", () => {
     useNoBundledPlugins();
-    const marker = "__openclawDiscoveryModeTest";
+    const marker = "__steelengineDiscoveryModeTest";
     const plugin = writePlugin({
       id: "discovery-mode-test",
       filename: "discovery-mode-test.cjs",
@@ -1178,7 +1178,7 @@ describe("loadOpenClawPlugins", () => {
       },
     };
 
-    const snapshot = loadOpenClawPlugins({
+    const snapshot = loadSteelEnginePlugins({
       activate: false,
       cache: false,
       workspaceDir: plugin.dir,
@@ -1188,7 +1188,7 @@ describe("loadOpenClawPlugins", () => {
     expect(snapshot.providers.map((entry) => entry.provider.id)).toEqual(["discovery-provider"]);
     expect(snapshot.tools.flatMap((entry) => entry.names)).toContain("discovery_tool");
 
-    loadOpenClawPlugins({
+    loadSteelEnginePlugins({
       cache: false,
       workspaceDir: plugin.dir,
       config,
@@ -1227,7 +1227,7 @@ describe("loadOpenClawPlugins", () => {
       contracts: { tools: ["attested_tool", "unknown_policy_tool"] },
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       activate: false,
       cache: false,
       workspaceDir: plugin.dir,
@@ -1270,7 +1270,7 @@ describe("loadOpenClawPlugins", () => {
         };`,
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       activate: false,
       cache: false,
       workspaceDir: plugin.dir,
@@ -1311,7 +1311,7 @@ describe("loadOpenClawPlugins", () => {
     });
     updatePluginManifest(plugin, { contracts: { tools: ["manifest_tool"] } });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       activate: false,
       cache: false,
       workspaceDir: plugin.dir,
@@ -1336,7 +1336,7 @@ describe("loadOpenClawPlugins", () => {
   it("caches non-activating snapshots without restoring global side effects", () => {
     useNoBundledPlugins();
     clearPluginCommands();
-    const marker = "__openclawSnapshotCacheRegisterCount";
+    const marker = "__steelengineSnapshotCacheRegisterCount";
     const plugin = writePlugin({
       id: "snapshot-cache",
       filename: "snapshot-cache.cjs",
@@ -1364,15 +1364,15 @@ describe("loadOpenClawPlugins", () => {
       onlyPluginIds: ["snapshot-cache"],
     };
 
-    const first = loadOpenClawPlugins(options);
-    const second = loadOpenClawPlugins(options);
+    const first = loadSteelEnginePlugins(options);
+    const second = loadSteelEnginePlugins(options);
 
     expect(second).toBe(first);
     expect((globalThis as Record<string, unknown>)[marker]).toBe(1);
     expect(first.commands.map((entry) => entry.command.name)).toEqual(["snapshot-command"]);
     expect(getPluginCommandSpecs()).toStrictEqual([]);
 
-    const active = loadOpenClawPlugins({
+    const active = loadSteelEnginePlugins({
       workspaceDir: plugin.dir,
       config: options.config,
       onlyPluginIds: ["snapshot-cache"],
@@ -1391,7 +1391,7 @@ describe("loadOpenClawPlugins", () => {
 
   it("does not re-register non-bundled plugins after gateway-bindable boot loads", () => {
     useNoBundledPlugins();
-    const marker = "__openclawGatewayBootRegisterCount";
+    const marker = "__steelengineGatewayBootRegisterCount";
     const plugin = writePlugin({
       id: "costclaw-boot-cache",
       filename: "costclaw-boot-cache.cjs",
@@ -1412,7 +1412,7 @@ describe("loadOpenClawPlugins", () => {
       },
     };
 
-    loadOpenClawPlugins({
+    loadSteelEnginePlugins({
       workspaceDir: plugin.dir,
       config,
       runtimeOptions: {
@@ -1431,7 +1431,7 @@ describe("loadOpenClawPlugins", () => {
 
   it("reuses a gateway-bindable cache entry for later default-mode loads", () => {
     useNoBundledPlugins();
-    const marker = "__openclawGatewayBindableCacheRegisterCount";
+    const marker = "__steelengineGatewayBindableCacheRegisterCount";
     const plugin = writePlugin({
       id: "gateway-bindable-cache",
       filename: "gateway-bindable-cache.cjs",
@@ -1455,13 +1455,13 @@ describe("loadOpenClawPlugins", () => {
       },
     };
 
-    const gatewayBindable = loadOpenClawPlugins({
+    const gatewayBindable = loadSteelEnginePlugins({
       ...options,
       runtimeOptions: {
         allowGatewaySubagentBinding: true,
       },
     });
-    const defaultMode = loadOpenClawPlugins(options);
+    const defaultMode = loadSteelEnginePlugins(options);
 
     expect(defaultMode).toBe(gatewayBindable);
     expect((globalThis as Record<string, unknown>)[marker]).toBe(1);
@@ -1486,13 +1486,13 @@ describe("loadOpenClawPlugins", () => {
       },
     };
 
-    const first = loadOpenClawPlugins(options);
+    const first = loadSteelEnginePlugins(options);
     expectGlobalHookRunner(getGlobalHookRunner());
 
     resetGlobalHookRunner();
     expect(getGlobalHookRunner()).toBeNull();
 
-    const second = loadOpenClawPlugins(options);
+    const second = loadSteelEnginePlugins(options);
     expect(second).toBe(first);
     expectGlobalHookRunner(getGlobalHookRunner());
 
@@ -1516,7 +1516,7 @@ describe("loadOpenClawPlugins", () => {
         } };`,
     });
 
-    const gatewayRegistry = loadOpenClawPlugins({
+    const gatewayRegistry = loadSteelEnginePlugins({
       workspaceDir: gatewayPlugin.dir,
       config: {
         plugins: {
@@ -1541,7 +1541,7 @@ describe("loadOpenClawPlugins", () => {
       expect(getGlobalPluginRegistry()).toBe(gatewayRegistry);
       expect(expectGlobalHookRunner(getGlobalHookRunner()).hasHooks("subagent_ended")).toBe(true);
 
-      const defaultRegistry = loadOpenClawPlugins({
+      const defaultRegistry = loadSteelEnginePlugins({
         workspaceDir: defaultPlugin.dir,
         config: {
           plugins: {
@@ -1586,7 +1586,7 @@ describe("loadOpenClawPlugins", () => {
         } };`,
     });
 
-    loadOpenClawPlugins({
+    loadSteelEnginePlugins({
       workspaceDir: firstPlugin.dir,
       config: {
         plugins: {
@@ -1600,7 +1600,7 @@ describe("loadOpenClawPlugins", () => {
 
     // A second activation retires the unpinned first registry entirely; its
     // hooks must drop instead of dispatching stale config closures.
-    loadOpenClawPlugins({
+    loadSteelEnginePlugins({
       workspaceDir: secondPlugin.dir,
       config: {
         plugins: {
@@ -1650,19 +1650,19 @@ describe("loadOpenClawPlugins", () => {
           expectedFirstSource: pluginA.file,
           expectedSecondSource: pluginB.file,
           loadFirst: () =>
-            loadOpenClawPlugins({
+            loadSteelEnginePlugins({
               ...options,
               env: {
                 ...process.env,
-                OPENCLAW_BUNDLED_PLUGINS_DIR: bundledA,
+                STEELENGINE_BUNDLED_PLUGINS_DIR: bundledA,
               },
             }),
           loadSecond: () =>
-            loadOpenClawPlugins({
+            loadSteelEnginePlugins({
               ...options,
               env: {
                 ...process.env,
-                OPENCLAW_BUNDLED_PLUGINS_DIR: bundledB,
+                STEELENGINE_BUNDLED_PLUGINS_DIR: bundledB,
               },
             }),
         };
@@ -1707,25 +1707,25 @@ describe("loadOpenClawPlugins", () => {
           expectedFirstSource: pluginA.file,
           expectedSecondSource: pluginB.file,
           loadFirst: () =>
-            loadOpenClawPlugins({
+            loadSteelEnginePlugins({
               ...options,
               env: {
                 ...process.env,
                 HOME: homeA,
-                OPENCLAW_HOME: undefined,
-                OPENCLAW_STATE_DIR: stateDir,
-                OPENCLAW_BUNDLED_PLUGINS_DIR: bundledDir,
+                STEELENGINE_HOME: undefined,
+                STEELENGINE_STATE_DIR: stateDir,
+                STEELENGINE_BUNDLED_PLUGINS_DIR: bundledDir,
               },
             }),
           loadSecond: () =>
-            loadOpenClawPlugins({
+            loadSteelEnginePlugins({
               ...options,
               env: {
                 ...process.env,
                 HOME: homeB,
-                OPENCLAW_HOME: undefined,
-                OPENCLAW_STATE_DIR: stateDir,
-                OPENCLAW_BUNDLED_PLUGINS_DIR: bundledDir,
+                STEELENGINE_HOME: undefined,
+                STEELENGINE_STATE_DIR: stateDir,
+                STEELENGINE_BUNDLED_PLUGINS_DIR: bundledDir,
               },
             }),
         };

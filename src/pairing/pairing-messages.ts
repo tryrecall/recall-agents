@@ -10,9 +10,9 @@ export function buildPairingReply(params: {
   code: string;
 }): string {
   const { channel, idLine, code } = params;
-  const approveCommand = formatCliCommand(`openclaw pairing approve ${channel} ${code}`);
+  const approveCommand = formatCliCommand(`steelengine pairing approve ${channel} ${code}`);
   return [
-    "OpenClaw: access not configured.",
+    "SteelEngine: access not configured.",
     "",
     idLine,
     "Pairing code:",

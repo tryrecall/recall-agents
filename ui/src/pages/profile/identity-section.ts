@@ -1,6 +1,6 @@
 // Profile identity section: local user avatar plus the assistant's configured
 // avatar. Moved from the General quick-settings page so identity has one home.
-import { sliceUtf16Safe } from "@openclaw/normalization-core/utf16-slice";
+import { sliceUtf16Safe } from "@steelengine/normalization-core/utf16-slice";
 import { html, nothing } from "lit";
 import {
   normalizeLocalUserIdentity,

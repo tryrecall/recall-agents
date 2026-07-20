@@ -136,12 +136,12 @@ class OptionCard extends LitElement {
   }
 }
 
-if (!customElements.get("openclaw-option-card")) {
-  customElements.define("openclaw-option-card", OptionCard);
+if (!customElements.get("steelengine-option-card")) {
+  customElements.define("steelengine-option-card", OptionCard);
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    "openclaw-option-card": OptionCard;
+    "steelengine-option-card": OptionCard;
   }
 }

@@ -122,7 +122,7 @@ impl ServerCertVerifier for GatewayTlsPinVerifier {
         _now: UnixTime,
     ) -> Result<ServerCertVerified, RustlsError> {
         // The local CLI authenticates this exact leaf-certificate hash before handing it to the
-        // app. A present pin replaces CA/hostname trust, matching OpenClawKit; the signature
+        // app. A present pin replaces CA/hostname trust, matching SteelEngineKit; the signature
         // methods below still prove the peer owns the certificate's private key.
         if pinned_fingerprint_matches(&self.expected, end_entity.as_ref()) {
             Ok(ServerCertVerified::assertion())
@@ -1232,7 +1232,7 @@ mod tests {
     #[test]
     fn connect_frame_matches_gateway_schema() {
         let directory = std::env::temp_dir().join(format!(
-            "openclaw-linux-connect-frame-test-{}",
+            "steelengine-linux-connect-frame-test-{}",
             Uuid::new_v4()
         ));
         let store = GatewayDeviceIdentityStore::load_or_create(directory.join("identity.json"))

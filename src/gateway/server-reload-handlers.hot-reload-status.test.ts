@@ -2,12 +2,12 @@
  * Proves `startManagedGatewayConfigReloader` forwards the underlying watcher's
  * live `hotReloadStatus()` accessor on its returned handle instead of only
  * `stop`. Before this test, the returned handle dropped the accessor, so
- * `openclaw health` had no live signal to surface even though the watcher
+ * `steelengine health` had no live signal to surface even though the watcher
  * itself already tracked "active"/"disabled" correctly.
  */
 import { describe, expect, it, vi } from "vitest";
 import { getRuntimeAuthProfileStoreCredentialsRevision } from "../agents/auth-profiles/runtime-snapshots.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { GatewayPluginReloadResult } from "./server-reload-handlers.js";
 import { startManagedGatewayConfigReloader } from "./server-reload-handlers.js";
 
@@ -29,13 +29,13 @@ vi.mock("./config-reload.js", async () => {
 
 describe("startManagedGatewayConfigReloader hotReloadStatus plumbing", () => {
   it("forwards the live watcher accessor instead of dropping it", async () => {
-    const initialConfig = { session: { store: "/tmp/sessions.json" } } as OpenClawConfig;
+    const initialConfig = { session: { store: "/tmp/sessions.json" } } as SteelEngineConfig;
     const reloader = startManagedGatewayConfigReloader({
       minimalTestGateway: false,
       initialConfig,
       initialCompareConfig: initialConfig,
       initialInternalWriteHash: null,
-      watchPath: "/tmp/openclaw.json",
+      watchPath: "/tmp/steelengine.json",
       readSnapshot: vi.fn() as never,
       promoteSnapshot: vi.fn(async () => true) as never,
       subscribeToWrites: vi.fn(() => () => {}) as never,
@@ -70,7 +70,7 @@ describe("startManagedGatewayConfigReloader hotReloadStatus plumbing", () => {
         invalidate: vi.fn(),
       },
       channelManager: {} as never,
-      activateRuntimeSecrets: vi.fn(async (config: OpenClawConfig) => ({
+      activateRuntimeSecrets: vi.fn(async (config: SteelEngineConfig) => ({
         sourceConfig: config,
         config,
         authStores: [],

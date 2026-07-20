@@ -140,7 +140,7 @@ describe("titleForRoute", () => {
       Object.fromEntries(ALL_ROUTES.map((routeId) => [routeId, titleForRoute(routeId)])),
     ).toEqual({
       chat: "Chat",
-      custodian: "OpenClaw",
+      custodian: "SteelEngine",
       activity: "Activity",
       apps: "Apps",
       approvals: "Approvals",
@@ -201,7 +201,7 @@ describe("subtitleForRoute", () => {
       plugins: "Install and manage optional capabilities.",
       "skill-workshop": "Review, refine, and apply proposals before they become live skills.",
       nodes: "Paired devices, pairing approvals, and exec bindings.",
-      config: "Edit openclaw.json.",
+      config: "Edit steelengine.json.",
       profile: "Your agent's stats, streaks, and life in the reef.",
       communications: "Channels, messages, and audio settings.",
       appearance: "Theme, UI, and setup wizard settings.",
@@ -236,7 +236,7 @@ describe("pathForRoute", () => {
 
   it("prepends base path", () => {
     expect(pathForRoute("chat", "/ui")).toBe("/ui/chat");
-    expect(pathForRoute("sessions", "/apps/openclaw")).toBe("/apps/openclaw/sessions");
+    expect(pathForRoute("sessions", "/apps/steelengine")).toBe("/apps/steelengine/sessions");
   });
 });
 
@@ -245,7 +245,7 @@ describe("route path normalization", () => {
     expect(normalizeBasePath("")).toBe("");
     expect(normalizeBasePath("/")).toBe("");
     expect(normalizeBasePath("ui")).toBe("/ui");
-    expect(normalizeBasePath("/apps/openclaw/")).toBe("/apps/openclaw");
+    expect(normalizeBasePath("/apps/steelengine/")).toBe("/apps/steelengine");
     expect(routeIdFromPath("/chat/")).toBe("chat");
     expect(routeIdFromPath("/ui/chat/", "/ui/")).toBe("chat");
   });
@@ -278,13 +278,13 @@ describe("routeIdFromPath", () => {
 
   it("handles base paths", () => {
     expect(routeIdFromPath("/ui/chat", "/ui")).toBe("chat");
-    expect(routeIdFromPath("/apps/openclaw/sessions", "/apps/openclaw")).toBe("sessions");
+    expect(routeIdFromPath("/apps/steelengine/sessions", "/apps/steelengine")).toBe("sessions");
     expect(routeIdFromPath("/ui/settings/plugins", "/ui")).toBe("plugins");
   });
 
   it("rejects route-shaped paths outside the configured base path", () => {
     expect(routeIdFromPath("/xx/chat", "/ui")).toBeNull();
-    expect(routeIdFromPath("/other/sessions", "/apps/openclaw")).toBeNull();
+    expect(routeIdFromPath("/other/sessions", "/apps/steelengine")).toBeNull();
   });
 
   it("returns null for unknown path", () => {
@@ -333,9 +333,9 @@ describe("inferBasePathFromPathname", () => {
     expect(inferBasePathFromPathname("/custodian")).toBe("");
     expect(inferBasePathFromPathname("/settings/connection")).toBe("");
     expect(inferBasePathFromPathname("/ui/chat")).toBe("/ui");
-    expect(inferBasePathFromPathname("/apps/openclaw/sessions")).toBe("/apps/openclaw");
-    expect(inferBasePathFromPathname("/__openclaw__/")).toBe("/__openclaw__");
-    expect(inferBasePathFromPathname("/apps/openclaw/")).toBe("/apps/openclaw");
+    expect(inferBasePathFromPathname("/apps/steelengine/sessions")).toBe("/apps/steelengine");
+    expect(inferBasePathFromPathname("/__steelengine__/")).toBe("/__steelengine__");
+    expect(inferBasePathFromPathname("/apps/steelengine/")).toBe("/apps/steelengine");
     expect(inferBasePathFromPathname("/typo")).toBe("");
     expect(inferBasePathFromPathname("/index.html")).toBe("");
     expect(inferBasePathFromPathname("/ui/index.html")).toBe("/ui");

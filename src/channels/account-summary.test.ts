@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { buildChannelAccountSnapshot } from "./account-summary.js";
 import type { ChannelPlugin } from "./plugins/types.plugin.js";
 
@@ -28,7 +28,7 @@ describe("buildChannelAccountSnapshot", () => {
     const snapshot = buildChannelAccountSnapshot({
       plugin,
       account,
-      cfg: {} as OpenClawConfig,
+      cfg: {} as SteelEngineConfig,
       accountId: "default",
       enabled: true,
       configured: true,

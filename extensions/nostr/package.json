@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/nostr",
+  "name": "@steelengine/nostr",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw Nostr channel plugin for NIP-04 encrypted direct messages.",
+  "description": "SteelEngine Nostr channel plugin for NIP-04 encrypted direct messages.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/steelengineai/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -12,18 +12,18 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*",
+    "steelengine": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.7.2-beta.3"
+    "steelengine": ">=2026.7.2-beta.3"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "steelengine": {
       "optional": true
     }
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
@@ -49,7 +49,7 @@
       ]
     },
     "install": {
-      "npmSpec": "@openclaw/nostr",
+      "npmSpec": "@steelengine/nostr",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.10"
     },
@@ -57,7 +57,7 @@
       "pluginApi": ">=2026.7.2-beta.3"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3"
+      "steelengineVersion": "2026.7.2-beta.3"
     },
     "release": {
       "publishToClawHub": true,

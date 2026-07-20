@@ -73,7 +73,7 @@ describe("custodian route", () => {
 
     render(renderCustodianRoute({ onboarding: false }), provider);
     const normalPage = provider.querySelector<HTMLElement & { updateComplete: Promise<boolean> }>(
-      "openclaw-custodian-page",
+      "steelengine-custodian-page",
     );
     await normalPage?.updateComplete;
     expect(normalPage?.querySelector(".custodian__header > .btn")).toBeNull();
@@ -81,7 +81,7 @@ describe("custodian route", () => {
     render(renderCustodianRoute({ onboarding: true }), provider);
     const onboardingPage = provider.querySelector<
       HTMLElement & { updateComplete: Promise<boolean> }
-    >("openclaw-custodian-page");
+    >("steelengine-custodian-page");
     await onboardingPage?.updateComplete;
     expect(onboardingPage?.querySelector(".custodian__header > .btn")).not.toBeNull();
   });

@@ -1,26 +1,26 @@
 /**
  * ACPX process ownership checks and cleanup. The reaper only terminates
- * OpenClaw-owned wrapper trees after validating paths, packages, and lease ids.
+ * SteelEngine-owned wrapper trees after validating paths, packages, and lease ids.
  */
 import { createRequire } from "node:module";
 import path from "node:path";
-import { runExec } from "openclaw/plugin-sdk/process-runtime";
+import { runExec } from "steelengine/plugin-sdk/process-runtime";
 import { CODEX_ACP_PACKAGE, LEGACY_CODEX_ACP_PACKAGE } from "./codex-adapter.js";
 import { splitCommandParts } from "./command-line.js";
 import { resolveAcpxPluginRoot } from "./config.js";
-import { OPENCLAW_ACPX_LEASE_ID_ARG, OPENCLAW_GATEWAY_INSTANCE_ID_ARG } from "./process-lease.js";
+import { STEELENGINE_ACPX_LEASE_ID_ARG, STEELENGINE_GATEWAY_INSTANCE_ID_ARG } from "./process-lease.js";
 
 const requireFromHere = createRequire(import.meta.url);
 const GENERATED_WRAPPER_BASENAMES = new Set([
   "codex-acp-wrapper.mjs",
   "claude-agent-acp-wrapper.mjs",
 ]);
-const OPENCLAW_PLUGIN_DEPS_MARKER = "/plugin-runtime-deps/";
+const STEELENGINE_PLUGIN_DEPS_MARKER = "/plugin-runtime-deps/";
 const ACPX_PROCESS_LIST_TIMEOUT_MS = 2_000;
 const OWNED_ACP_PACKAGE_NAMES = [
   CODEX_ACP_PACKAGE,
   // Shipped Zed adapter processes can survive a gateway upgrade. Keep cleanup
-  // recognition until their OpenClaw-owned wrapper/process tree is gone.
+  // recognition until their SteelEngine-owned wrapper/process tree is gone.
   LEGACY_CODEX_ACP_PACKAGE,
   "@zed-industries/codex-acp-darwin-arm64",
   "@zed-industries/codex-acp-darwin-x64",
@@ -66,7 +66,7 @@ export type AcpxProcessCleanupDeps = {
 type AcpxProcessCleanupResult = {
   inspectedPids: number[];
   terminatedPids: number[];
-  skippedReason?: "missing-root" | "not-openclaw-owned" | "unverified-root";
+  skippedReason?: "missing-root" | "not-steelengine-owned" | "unverified-root";
 };
 
 /** Result from startup orphan reaping. */
@@ -88,7 +88,7 @@ function resolvePackageRoot(packageName: string): string | undefined {
   }
 }
 
-function resolveOpenClawInstallRoot(pluginRoot: string): string {
+function resolveSteelEngineInstallRoot(pluginRoot: string): string {
   if (
     path.basename(pluginRoot) === "acpx" &&
     path.basename(path.dirname(pluginRoot)) === "extensions"
@@ -101,11 +101,11 @@ function resolveOpenClawInstallRoot(pluginRoot: string): string {
 
 function resolveOwnedAcpPackageRootCandidates(packageName: string): string[] {
   const pluginRoot = resolveAcpxPluginRoot(import.meta.url);
-  const openClawRoot = resolveOpenClawInstallRoot(pluginRoot);
+  const steelEngineRoot = resolveSteelEngineInstallRoot(pluginRoot);
   return [
     resolvePackageRoot(packageName),
     path.join(pluginRoot, "node_modules", packageName),
-    path.join(openClawRoot, "node_modules", packageName),
+    path.join(steelEngineRoot, "node_modules", packageName),
   ].flatMap((root) => (root ? [normalizePathLike(root)] : []));
 }
 
@@ -132,8 +132,8 @@ function commandWrapperBelongsToRoot(command: string, wrapperRoot: string | unde
   );
 }
 
-/** Check whether a command references an OpenClaw-generated ACPX wrapper path. */
-export function isOpenClawLeaseAwareAcpxProcessCommand(params: {
+/** Check whether a command references an SteelEngine-generated ACPX wrapper path. */
+export function isSteelEngineLeaseAwareAcpxProcessCommand(params: {
   command: string | undefined;
   wrapperRoot?: string;
 }): boolean {
@@ -177,13 +177,13 @@ function liveCommandMatchesLeaseIdentity(params: {
   }
   const parts = splitCommandParts(params.command ?? "");
   return (
-    commandOptionEquals(parts, OPENCLAW_ACPX_LEASE_ID_ARG, params.expectedLeaseId) &&
-    commandOptionEquals(parts, OPENCLAW_GATEWAY_INSTANCE_ID_ARG, params.expectedGatewayInstanceId)
+    commandOptionEquals(parts, STEELENGINE_ACPX_LEASE_ID_ARG, params.expectedLeaseId) &&
+    commandOptionEquals(parts, STEELENGINE_GATEWAY_INSTANCE_ID_ARG, params.expectedGatewayInstanceId)
   );
 }
 
-/** Check whether a command is owned by OpenClaw ACPX runtime packages or wrappers. */
-function isOpenClawOwnedAcpxProcessCommand(params: {
+/** Check whether a command is owned by SteelEngine ACPX runtime packages or wrappers. */
+function isSteelEngineOwnedAcpxProcessCommand(params: {
   command: string | undefined;
   wrapperRoot?: string;
 }): boolean {
@@ -193,7 +193,7 @@ function isOpenClawOwnedAcpxProcessCommand(params: {
   }
   const normalized = normalizePathLike(command);
   if (
-    isOpenClawLeaseAwareAcpxProcessCommand({
+    isSteelEngineLeaseAwareAcpxProcessCommand({
       command: normalized,
       wrapperRoot: params.wrapperRoot,
     })
@@ -203,7 +203,7 @@ function isOpenClawOwnedAcpxProcessCommand(params: {
   if (commandBelongsToResolvedAcpPackage(normalized)) {
     return true;
   }
-  if (!normalized.includes(OPENCLAW_PLUGIN_DEPS_MARKER)) {
+  if (!normalized.includes(STEELENGINE_PLUGIN_DEPS_MARKER)) {
     return false;
   }
   return ACP_PACKAGE_MARKERS.some((marker) => normalized.includes(marker));
@@ -325,8 +325,8 @@ async function terminatePids(
   return terminated;
 }
 
-/** Terminate one validated OpenClaw-owned ACPX wrapper process tree. */
-export async function cleanupOpenClawOwnedAcpxProcessTree(params: {
+/** Terminate one validated SteelEngine-owned ACPX wrapper process tree. */
+export async function cleanupSteelEngineOwnedAcpxProcessTree(params: {
   rootPid?: number;
   rootCommand?: string;
   expectedLeaseId?: string;
@@ -348,7 +348,7 @@ export async function cleanupOpenClawOwnedAcpxProcessTree(params: {
 
   const listedTree = collectProcessTree(processes, rootPid);
   // Session-store PIDs are stale data. If the live process table cannot prove
-  // that this PID still belongs to an OpenClaw-owned wrapper, fail closed to
+  // that this PID still belongs to an SteelEngine-owned wrapper, fail closed to
   // avoid killing an unrelated process after PID reuse.
   if (listedTree.length === 0) {
     return { inspectedPids: [], terminatedPids: [], skippedReason: "unverified-root" };
@@ -364,7 +364,7 @@ export async function cleanupOpenClawOwnedAcpxProcessTree(params: {
     return {
       inspectedPids: listedTree.map((processInfo) => processInfo.pid),
       terminatedPids: [],
-      skippedReason: "not-openclaw-owned",
+      skippedReason: "not-steelengine-owned",
     };
   }
   if (
@@ -374,11 +374,11 @@ export async function cleanupOpenClawOwnedAcpxProcessTree(params: {
     return {
       inspectedPids: listedTree.map((processInfo) => processInfo.pid),
       terminatedPids: [],
-      skippedReason: "not-openclaw-owned",
+      skippedReason: "not-steelengine-owned",
     };
   }
   if (
-    !isOpenClawOwnedAcpxProcessCommand({
+    !isSteelEngineOwnedAcpxProcessCommand({
       command: rootCommand,
       wrapperRoot: params.wrapperRoot,
     })
@@ -386,7 +386,7 @@ export async function cleanupOpenClawOwnedAcpxProcessTree(params: {
     return {
       inspectedPids: listedTree.map((processInfo) => processInfo.pid),
       terminatedPids: [],
-      skippedReason: "not-openclaw-owned",
+      skippedReason: "not-steelengine-owned",
     };
   }
   if (
@@ -399,7 +399,7 @@ export async function cleanupOpenClawOwnedAcpxProcessTree(params: {
     return {
       inspectedPids: listedTree.map((processInfo) => processInfo.pid),
       terminatedPids: [],
-      skippedReason: "not-openclaw-owned",
+      skippedReason: "not-steelengine-owned",
     };
   }
 
@@ -410,8 +410,8 @@ export async function cleanupOpenClawOwnedAcpxProcessTree(params: {
   };
 }
 
-/** Reap orphaned OpenClaw-owned ACPX wrapper trees during runtime startup. */
-export async function reapStaleOpenClawOwnedAcpxOrphans(params: {
+/** Reap orphaned SteelEngine-owned ACPX wrapper trees during runtime startup. */
+export async function reapStaleSteelEngineOwnedAcpxOrphans(params: {
   wrapperRoot: string;
   deps?: AcpxProcessCleanupDeps;
 }): Promise<AcpxStartupReapResult> {
@@ -429,7 +429,7 @@ export async function reapStaleOpenClawOwnedAcpxOrphans(params: {
   const orphans = processes.filter(
     (processInfo) =>
       processInfo.ppid === 1 &&
-      isOpenClawOwnedAcpxProcessCommand({
+      isSteelEngineOwnedAcpxProcessCommand({
         command: processInfo.command,
         wrapperRoot: params.wrapperRoot,
       }),

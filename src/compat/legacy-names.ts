@@ -1,8 +1,8 @@
-// Product/package naming constants that bridge current OpenClaw manifests with
+// Product/package naming constants that bridge current SteelEngine manifests with
 // legacy Clawdbot keys still seen in older configs and packages.
-const PROJECT_NAME = "openclaw" as const;
+const PROJECT_NAME = "steelengine" as const;
 
-const LEGACY_PROJECT_NAMES = ["clawdbot"] as const;
+const LEGACY_PROJECT_NAMES = ["recall", "clawdbot"] as const;
 
 export const MANIFEST_KEY = PROJECT_NAME;
 

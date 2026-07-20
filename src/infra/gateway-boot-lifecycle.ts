@@ -1,11 +1,11 @@
 // Persists gateway boot outcomes for supervisor crash-loop decisions.
 import { randomUUID } from "node:crypto";
 import { createSubsystemLogger } from "../logging/subsystem.js";
-import type { DB as OpenClawStateKyselyDatabase } from "../state/openclaw-state-db.generated.js";
+import type { DB as SteelEngineStateKyselyDatabase } from "../state/steelengine-state-db.generated.js";
 import {
-  openOpenClawStateDatabase,
-  runOpenClawStateWriteTransaction,
-} from "../state/openclaw-state-db.js";
+  openSteelEngineStateDatabase,
+  runSteelEngineStateWriteTransaction,
+} from "../state/steelengine-state-db.js";
 import {
   executeSqliteQuerySync,
   executeSqliteQueryTakeFirstSync,
@@ -25,7 +25,7 @@ export const GATEWAY_CRASH_LOOP_RECOVERED_REASON = "gateway.crash_loop_recovered
 
 const gatewayLifecycleLog = createSubsystemLogger("gateway/lifecycle");
 
-type GatewayBootLifecycleDatabase = Pick<OpenClawStateKyselyDatabase, "gateway_boot_lifecycle">;
+type GatewayBootLifecycleDatabase = Pick<SteelEngineStateKyselyDatabase, "gateway_boot_lifecycle">;
 
 type GatewayBootLifecycleOutcome =
   | "clean_stop"
@@ -74,7 +74,7 @@ export function inspectGatewayCrashLoopBreaker(
   nowMs = Date.now(),
 ): GatewayCrashLoopBreakerDecision {
   try {
-    const { db } = openOpenClawStateDatabase({ env });
+    const { db } = openSteelEngineStateDatabase({ env });
     const kysely = getNodeSqliteKysely<GatewayBootLifecycleDatabase>(db);
     const windowStartMs = nowMs - GATEWAY_BOOT_LOOP_WINDOW_MS;
     // Unclean means startup_failed by completion time, or an open boot row
@@ -131,7 +131,7 @@ export function recordGatewayBootStart(
 ): string | undefined {
   const bootId = randomUUID();
   try {
-    runOpenClawStateWriteTransaction(
+    runSteelEngineStateWriteTransaction(
       ({ db }) => {
         const kysely = getNodeSqliteKysely<GatewayBootLifecycleDatabase>(db);
         executeSqliteQuerySync(
@@ -172,7 +172,7 @@ export function completeGatewayBootLifecycle(
     return;
   }
   try {
-    runOpenClawStateWriteTransaction(
+    runSteelEngineStateWriteTransaction(
       ({ db }) => {
         const kysely = getNodeSqliteKysely<GatewayBootLifecycleDatabase>(db);
         executeSqliteQuerySync(

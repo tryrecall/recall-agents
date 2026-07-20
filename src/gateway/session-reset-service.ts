@@ -37,7 +37,7 @@ import { rebindCliSessionReseedReceiptsForReset } from "../config/sessions/cli-s
 import { resolveResetPreservedSelection } from "../config/sessions/reset-preserved-selection.js";
 import { formatSqliteSessionFileMarker } from "../config/sessions/sqlite-marker.js";
 import type { SessionAcpMeta } from "../config/sessions/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { logVerbose } from "../globals.js";
 import { createInternalHookEvent, triggerInternalHook } from "../hooks/internal-hooks.js";
 import { getSessionBindingService } from "../infra/outbound/session-binding-service.js";
@@ -107,7 +107,7 @@ export function archiveSessionTranscriptsForSessionDetailed(params: {
 }
 
 export function emitGatewaySessionEndPluginHook(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   sessionKey: string;
   sessionId?: string;
   storePath: string;
@@ -163,7 +163,7 @@ export function emitGatewaySessionEndPluginHook(params: {
 }
 
 export function emitGatewaySessionStartPluginHook(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   sessionKey: string;
   sessionId?: string;
   resumedFrom?: string;
@@ -329,7 +329,7 @@ export async function emitSessionUnboundLifecycleEvent(params: {
 }
 
 async function ensureSessionRuntimeCleanup(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   key: string;
   target: ReturnType<typeof resolveGatewaySessionStoreTarget>;
   sessionId?: string;
@@ -464,7 +464,7 @@ async function runAcpCleanupStep(params: {
 }
 
 async function closeAcpRuntimeForSession(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   sessionKey: string;
   fallbackSessionKeys?: Array<string | undefined>;
   reason: "session-reset" | "session-delete";
@@ -611,7 +611,7 @@ function buildPendingAcpMeta(base: SessionAcpMeta, now: number): SessionAcpMeta 
 }
 
 async function ensureFreshAcpResetState(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   sessionKey: string;
   reason: "session-reset" | "session-delete";
   acpMeta: SessionAcpMeta;
@@ -675,7 +675,7 @@ async function ensureFreshAcpResetState(params: {
 }
 
 async function closeChildAcpRuntimesForParent(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   parentKey: string;
   reason: "session-reset" | "session-delete";
   assertCurrent?: () => void;
@@ -739,7 +739,7 @@ async function closeChildAcpRuntimesForParent(params: {
 }
 
 export async function cleanupSessionBeforeMutation(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   key: string;
   target: ReturnType<typeof resolveGatewaySessionStoreTarget>;
   entry: SessionEntry | undefined;
@@ -812,7 +812,7 @@ export async function cleanupSessionBeforeMutation(params: {
 }
 
 export async function emitGatewayBeforeResetPluginHook(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   key: string;
   messages?: unknown[];
   target: ReturnType<typeof resolveGatewaySessionStoreTarget>;

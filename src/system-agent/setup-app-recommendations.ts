@@ -177,7 +177,7 @@ function officialCandidate(
   return {
     id,
     displayName: resolveOfficialExternalPluginLabel(entry),
-    summary: entry.description?.trim() || "Official OpenClaw plugin",
+    summary: entry.description?.trim() || "Official SteelEngine plugin",
     source,
   };
 }
@@ -293,7 +293,7 @@ function buildMatcherPrompt(groups: SetupAppCandidateGroup[]): string {
     candidates: group.candidates,
   }));
   return [
-    "Match installed applications to genuinely related OpenClaw plugins or skills.",
+    "Match installed applications to genuinely related SteelEngine plugins or skills.",
     "Reject coincidental substring, brand, or name overlaps.",
     "Use tier recommended for messaging-channel integrations; otherwise choose recommended or optional by usefulness.",
     "Give a reason of at most 12 words.",

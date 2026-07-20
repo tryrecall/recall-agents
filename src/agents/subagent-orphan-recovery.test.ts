@@ -798,7 +798,7 @@ describe("subagent-orphan-recovery", () => {
 
     readSessionMessages.mockResolvedValue([
       { role: "user", content: "Update the config" },
-      { role: "assistant", content: "I've modified openclaw.json to add the new setting." },
+      { role: "assistant", content: "I've modified steelengine.json to add the new setting." },
     ]);
 
     const activeRuns = createActiveRuns(createTestRunRecord());

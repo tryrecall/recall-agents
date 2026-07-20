@@ -1,10 +1,10 @@
 // Qa Lab plugin module implements suite runtime gateway behavior.
 import fs from "node:fs/promises";
 import { setTimeout as sleep } from "node:timers/promises";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { readProviderJsonResponse } from "openclaw/plugin-sdk/provider-http";
-import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
-import { isRecord as isPlainObject } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { readProviderJsonResponse } from "steelengine/plugin-sdk/provider-http";
+import { fetchWithSsrFGuard } from "steelengine/plugin-sdk/ssrf-runtime";
+import { isRecord as isPlainObject } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { QaSuiteInfraError, toQaErrorObject } from "./errors.js";
 import { applyQaMergePatch } from "./suite-merge-patch.js";
 import { liveTurnTimeoutMs } from "./suite-runtime-agent-common.js";

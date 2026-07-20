@@ -1,5 +1,5 @@
 import type { SessionTranscriptUpdate } from "../../sessions/transcript-events.js";
-import type { OpenClawConfig } from "../types.openclaw.js";
+import type { SteelEngineConfig } from "../types.steelengine.js";
 import type { ResolvedSessionMaintenanceConfig } from "./store-maintenance.js";
 import type {
   DeletedAgentSessionEntryPurgeParams,
@@ -87,7 +87,7 @@ export type SessionTranscriptEventRow = {
 };
 
 export type TranscriptMessageAppendOptions<TMessage> = {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   cwd?: string;
   idempotencyLookup?: "scan" | "scan-assistant" | "caller-checked";
   message: TMessage;

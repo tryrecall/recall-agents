@@ -1,9 +1,9 @@
-import { ensureSystemPromptCacheBoundary } from "@openclaw/ai/internal/shared";
+import { ensureSystemPromptCacheBoundary } from "@steelengine/ai/internal/shared";
 /**
  * Prepares CLI backend run context: backend config, prompts, bootstrap context,
  * MCP, auth epoch, and reusable session metadata.
  */
-import { uniqueStrings } from "@openclaw/normalization-core/string-normalization";
+import { uniqueStrings } from "@steelengine/normalization-core/string-normalization";
 import { getRuntimeConfig } from "../../config/config.js";
 import type { CliBackendConfig } from "../../config/types.agent-defaults.js";
 import {
@@ -24,7 +24,7 @@ import {
   getActiveMcpLoopbackRuntime,
 } from "../../gateway/mcp-http.loopback-runtime.js";
 import { resolveMcpLoopbackScopedTools } from "../../gateway/mcp-http.runtime.js";
-import { buildSystemAgentToolsMcpServerConfig } from "../../mcp/openclaw-tools-serve-config.js";
+import { buildSystemAgentToolsMcpServerConfig } from "../../mcp/steelengine-tools-serve-config.js";
 import type {
   CliBackendAuthEpochMode,
   CliBackendPreparedExecution,
@@ -129,7 +129,7 @@ function resolveClaudeCliContextModelId(modelId: string): string {
   return CLAUDE_CLI_CONTEXT_MODEL_ALIASES[lower] ?? trimmed;
 }
 type RunCliAgentPrepareParams = RunCliAgentParams & {
-  /** Ring-zero tool transport supplied only by the OpenClaw orchestrator. */
+  /** Ring-zero tool transport supplied only by the SteelEngine orchestrator. */
   systemAgentTool?: import("../tools/system-agent-tool.js").SystemAgentToolOptions;
 };
 
@@ -145,9 +145,9 @@ const prepareDeps = {
   mintMcpLoopbackClientGrant,
   revokeMcpLoopbackClientGrant,
   resolveMcpLoopbackScopedTools,
-  resolveOpenClawReferencePaths: async (
-    params: Parameters<typeof import("../docs-path.js").resolveOpenClawReferencePaths>[0],
-  ) => (await import("../docs-path.js")).resolveOpenClawReferencePaths(params),
+  resolveSteelEngineReferencePaths: async (
+    params: Parameters<typeof import("../docs-path.js").resolveSteelEngineReferencePaths>[0],
+  ) => (await import("../docs-path.js")).resolveSteelEngineReferencePaths(params),
   prepareClaudeCliSkillsPlugin,
   claudeCliSessionTranscriptHasContent,
   claudeCliSessionTranscriptHasOrphanedToolUse,
@@ -184,7 +184,7 @@ function buildCliSessionDriftUserContext(
   if (reusableCliSession.mode !== "reuse-with-drift") {
     return undefined;
   }
-  return `OpenClaw resumed this CLI session after prompt content changed. Follow the current turn's instructions; changed=${reusableCliSession.drift.reasons.join(",")}.`;
+  return `SteelEngine resumed this CLI session after prompt content changed. Follow the current turn's instructions; changed=${reusableCliSession.drift.reasons.join(",")}.`;
 }
 
 function prependCliSessionDriftUserContext(
@@ -295,7 +295,7 @@ function shouldSkipLocalCliCredentialEpoch(params: {
 }
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
-  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("openclaw.cliRunnerPrepareTestApi")] = {
+  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("steelengine.cliRunnerPrepareTestApi")] = {
     setCliRunnerPrepareTestDeps: (overrides: Record<string, unknown>) => {
       setCliRunnerPrepareTestDeps(overrides as Partial<typeof prepareDeps>);
     },
@@ -581,7 +581,7 @@ export async function prepareCliRunContext(
         }),
       });
   // Mirror the embedded runner's bootstrap routing for backends that transport
-  // OpenClaw's system prompt. Only a declared native-tool backend can complete
+  // SteelEngine's system prompt. Only a declared native-tool backend can complete
   // the file-based ritual; other backends receive limited guidance.
   const canonicalWorkspace = resolveUserPath(
     resolveAgentWorkspaceDir(params.config ?? {}, workspaceResolution.agentId),
@@ -640,9 +640,9 @@ export async function prepareCliRunContext(
     bootstrapMode === "none"
       ? toolBoundExtraSystemPromptHash
       : hashCliSessionText(JSON.stringify([toolBoundExtraSystemPromptHash ?? null, bootstrapMode]));
-  // Ring-zero OpenClaw runs replace the bundle MCP surface entirely: no
+  // Ring-zero SteelEngine runs replace the bundle MCP surface entirely: no
   // loopback server, no plugin/user servers. A selectable backend also removes
-  // its native tools, leaving only this openclaw stdio server.
+  // its native tools, leaving only this steelengine stdio server.
   const systemAgentMcpConfig = internalParams.systemAgentTool
     ? buildSystemAgentToolsMcpServerConfig(internalParams.systemAgentTool)
     : undefined;
@@ -658,7 +658,7 @@ export async function prepareCliRunContext(
       await prepareDeps.ensureMcpLoopbackServer();
     } catch (error) {
       throw new Error(
-        `Bundled MCP is enabled, but the OpenClaw MCP loopback server failed to start: ${String(error)}`,
+        `Bundled MCP is enabled, but the SteelEngine MCP loopback server failed to start: ${String(error)}`,
         { cause: error },
       );
     }
@@ -666,7 +666,7 @@ export async function prepareCliRunContext(
   }
   if (bundleMcpEnabled && !mcpLoopbackRuntime) {
     throw new Error(
-      "Bundled MCP is enabled, but the OpenClaw MCP loopback server did not publish a runtime after startup.",
+      "Bundled MCP is enabled, but the SteelEngine MCP loopback server did not publish a runtime after startup.",
     );
   }
   const mcpDeliveryCaptureEnabled = bundleMcpEnabled && Boolean(mcpLoopbackRuntime);
@@ -750,8 +750,8 @@ export async function prepareCliRunContext(
       env:
         mcpLoopbackRuntime && mcpClientGrant
           ? {
-              OPENCLAW_MCP_TOKEN: mcpClientGrant.token,
-              OPENCLAW_MCP_CLI_CAPTURE_KEY: "",
+              STEELENGINE_MCP_TOKEN: mcpClientGrant.token,
+              STEELENGINE_MCP_CLI_CAPTURE_KEY: "",
             }
           : undefined,
       warn: (message) => cliBackendLog.warn(message),
@@ -1018,16 +1018,16 @@ export async function prepareCliRunContext(
         `cli session reset: provider=${params.provider} reason=${invalidatedReason}`,
       );
     }
-    let openClawHistoryMessages: unknown[] | undefined;
-    const loadOpenClawHistoryMessages = async () => {
-      openClawHistoryMessages ??= await loadCliSessionHistoryMessages({
+    let steelEngineHistoryMessages: unknown[] | undefined;
+    const loadSteelEngineHistoryMessages = async () => {
+      steelEngineHistoryMessages ??= await loadCliSessionHistoryMessages({
         sessionId: params.sessionId,
         sessionFile: params.sessionFile,
         sessionKey: params.sessionKey,
         agentId: params.agentId,
         config: params.config,
       });
-      return openClawHistoryMessages;
+      return steelEngineHistoryMessages;
     };
     const heartbeatPrompt =
       isSideQuestion || params.bootstrapContextRunKind === "commitment-only"
@@ -1037,9 +1037,9 @@ export async function prepareCliRunContext(
             agentId: sessionAgentId,
             defaultAgentId,
           });
-    const openClawReferences = isSideQuestion
+    const steelEngineReferences = isSideQuestion
       ? { docsPath: null, sourcePath: null }
-      : await prepareDeps.resolveOpenClawReferencePaths({
+      : await prepareDeps.resolveSteelEngineReferencePaths({
           workspaceDir,
           argv1: process.argv[1],
           cwd,
@@ -1081,8 +1081,8 @@ export async function prepareCliRunContext(
           runtimeCapabilities,
           ownerNumbers: params.ownerNumbers,
           heartbeatPrompt,
-          docsPath: openClawReferences.docsPath ?? undefined,
-          sourcePath: openClawReferences.sourcePath ?? undefined,
+          docsPath: steelEngineReferences.docsPath ?? undefined,
+          sourcePath: steelEngineReferences.sourcePath ?? undefined,
           skillsPrompt: systemPromptSkillsPrompt,
           tools: promptTools,
           contextFiles,
@@ -1111,7 +1111,7 @@ export async function prepareCliRunContext(
         const hookResult = await resolvePromptBuildHookResult({
           config: params.config ?? getRuntimeConfig(),
           prompt: params.prompt,
-          messages: await loadOpenClawHistoryMessages(),
+          messages: await loadSteelEngineHistoryMessages(),
           hookCtx: {
             runId: params.runId,
             agentId: sessionAgentId,
@@ -1185,11 +1185,11 @@ export async function prepareCliRunContext(
       backendResolved.config.reseedFromRawTranscriptWhenUncompacted === true;
     const rawTranscriptReseedReason = reusableCliSessionId ? "session-expired" : invalidatedReason;
     // Node placement keeps this: the history prompt is built from the
-    // gateway-side OpenClaw transcript, so a fresh remote CLI session still
+    // gateway-side SteelEngine transcript, so a fresh remote CLI session still
     // receives prior conversation context via stdin.
-    const shouldPrepareOpenClawHistoryPrompt =
+    const shouldPrepareSteelEngineHistoryPrompt =
       !isSideQuestion && (!reusableCliSessionId || allowRawTranscriptReseed);
-    const openClawHistoryPrompt = shouldPrepareOpenClawHistoryPrompt
+    const steelEngineHistoryPrompt = shouldPrepareSteelEngineHistoryPrompt
       ? buildCliSessionHistoryPrompt({
           messages: await loadCliSessionReseedMessages({
             sessionId: params.sessionId,
@@ -1352,7 +1352,7 @@ export async function prepareCliRunContext(
       systemPromptReport,
       claudeSkillsPluginArgs: claudeSkillsPlugin.args,
       bootstrapPromptWarningLines: bootstrapPromptWarning.lines,
-      ...(openClawHistoryPrompt ? { openClawHistoryPrompt } : {}),
+      ...(steelEngineHistoryPrompt ? { steelEngineHistoryPrompt } : {}),
       heartbeatPrompt,
       authEpoch,
       authBindingFingerprint,

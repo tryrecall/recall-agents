@@ -3,8 +3,8 @@
  * Covers request construction, SSE parsing, aborts, tool calls, usage, and
  * provider transport hooks.
  */
-import { expectDefined } from "@openclaw/normalization-core";
-import type { Model } from "openclaw/plugin-sdk/llm";
+import { expectDefined } from "@steelengine/normalization-core";
+import type { Model } from "steelengine/plugin-sdk/llm";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { attachModelProviderRequestTransport } from "./provider-request-config.js";
 
@@ -1319,7 +1319,7 @@ describe("anthropic transport stream", () => {
     );
 
     expect(result.stopReason).toBe("error");
-    expect(result.errorMessage).toBe("OpenClaw transport error: malformed_streaming_fragment");
+    expect(result.errorMessage).toBe("SteelEngine transport error: malformed_streaming_fragment");
   });
 
   it.each([
@@ -2879,7 +2879,7 @@ describe("anthropic transport stream", () => {
     ]);
   });
 
-  it("backfills MiMo v2-flash tool-use replay when OpenClaw thinking is off", async () => {
+  it("backfills MiMo v2-flash tool-use replay when SteelEngine thinking is off", async () => {
     await runTransportStream(
       makeAnthropicTransportModel({
         id: "mimo-v2-flash",

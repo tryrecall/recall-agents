@@ -1,5 +1,5 @@
 import { migrateOrphanedSessionKeys } from "../../infra/state-migrations.js";
-import type { OpenClawConfig } from "../types.openclaw.js";
+import type { SteelEngineConfig } from "../types.steelengine.js";
 import { sweepOrphanSessionStoreTemps } from "./store-temp-cleanup.js";
 import { resolveAllAgentSessionStoreTargetsSync } from "./targets.js";
 
@@ -15,7 +15,7 @@ export type SessionStartupMigrationLogger = {
  * fails, but warnings stay visible for operator follow-up.
  */
 export async function runSessionStartupMigration(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   log: SessionStartupMigrationLogger;
   deps?: {

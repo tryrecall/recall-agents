@@ -16,8 +16,8 @@ describe("normalizeBrowserEvaluateFunctionSource", () => {
     expect(normalizeBrowserEvaluateFunctionSource("document.title")).toBe(
       [
         "() => {",
-        "const __openclawEvaluateExpressionResult = (document.title);",
-        'return typeof __openclawEvaluateExpressionResult === "function" ? __openclawEvaluateExpressionResult() : __openclawEvaluateExpressionResult;',
+        "const __steelengineEvaluateExpressionResult = (document.title);",
+        'return typeof __steelengineEvaluateExpressionResult === "function" ? __steelengineEvaluateExpressionResult() : __steelengineEvaluateExpressionResult;',
         "}",
       ].join("\n"),
     );
@@ -27,16 +27,16 @@ describe("normalizeBrowserEvaluateFunctionSource", () => {
     expect(normalizeBrowserEvaluateFunctionSource("extractTitle")).toBe(
       [
         "() => {",
-        "const __openclawEvaluateExpressionResult = (extractTitle);",
-        'return typeof __openclawEvaluateExpressionResult === "function" ? __openclawEvaluateExpressionResult() : __openclawEvaluateExpressionResult;',
+        "const __steelengineEvaluateExpressionResult = (extractTitle);",
+        'return typeof __steelengineEvaluateExpressionResult === "function" ? __steelengineEvaluateExpressionResult() : __steelengineEvaluateExpressionResult;',
         "}",
       ].join("\n"),
     );
     expect(normalizeBrowserEvaluateFunctionSource("extractText", { argumentName: "el" })).toBe(
       [
         "(el) => {",
-        "const __openclawEvaluateExpressionResult = (extractText);",
-        'return typeof __openclawEvaluateExpressionResult === "function" ? __openclawEvaluateExpressionResult(el) : __openclawEvaluateExpressionResult;',
+        "const __steelengineEvaluateExpressionResult = (extractText);",
+        'return typeof __steelengineEvaluateExpressionResult === "function" ? __steelengineEvaluateExpressionResult(el) : __steelengineEvaluateExpressionResult;',
         "}",
       ].join("\n"),
     );

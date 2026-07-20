@@ -1,7 +1,7 @@
 // Copilot Proxy API module exposes the plugin public contract.
-export { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+export { definePluginEntry } from "steelengine/plugin-sdk/plugin-entry";
 export type {
-  OpenClawPluginApi,
+  SteelEnginePluginApi,
   ProviderAuthContext,
   ProviderAuthResult,
-} from "openclaw/plugin-sdk/core";
+} from "steelengine/plugin-sdk/core";

@@ -1,6 +1,6 @@
-import type { WorkboardCard } from "@openclaw/workboard-contract";
+import type { WorkboardCard } from "@steelengine/workboard-contract";
 // Workboard plugin module implements gateway behavior.
-import type { OpenClawPluginApi } from "../api.js";
+import type { SteelEnginePluginApi } from "../api.js";
 import {
   assertNoCursorAdvance,
   createWorkboardDispatchHandler,
@@ -44,7 +44,7 @@ function redactDiagnosticsRows(result: Awaited<ReturnType<WorkboardStore["diagno
 }
 
 export function registerWorkboardGatewayMethods(params: {
-  api: OpenClawPluginApi;
+  api: SteelEnginePluginApi;
   store?: WorkboardStore;
 }) {
   const { api } = params;

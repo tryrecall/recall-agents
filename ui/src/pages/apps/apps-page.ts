@@ -4,10 +4,10 @@ import { titleForRoute } from "../../app-navigation.ts";
 import type { RouteId } from "../../app-route-paths.ts";
 import { applicationContext, type ApplicationContext } from "../../app/context.ts";
 import { renderSettingsWorkspace } from "../../components/settings-workspace.ts";
-import { OpenClawLightDomElement } from "../../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../../lit/steelengine-element.ts";
 import { renderApps } from "./view.ts";
 
-class AppsPage extends OpenClawLightDomElement {
+class AppsPage extends SteelEngineLightDomElement {
   @consume({ context: applicationContext, subscribe: true })
   private context!: ApplicationContext;
 
@@ -26,6 +26,6 @@ class AppsPage extends OpenClawLightDomElement {
   }
 }
 
-if (!customElements.get("openclaw-apps-page")) {
-  customElements.define("openclaw-apps-page", AppsPage);
+if (!customElements.get("steelengine-apps-page")) {
+  customElements.define("steelengine-apps-page", AppsPage);
 }

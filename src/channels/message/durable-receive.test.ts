@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { closeOpenClawStateDatabaseForTest } from "../../state/openclaw-state-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../../state/steelengine-state-db.js";
 import { createDurableInboundReceiveJournalFromQueue } from "./durable-receive.js";
 import { createChannelIngressQueue } from "./ingress-queue.js";
 
@@ -12,11 +12,11 @@ type TestMetadata = { source: string };
 type TestCompletedMetadata = { delivered: boolean };
 
 async function withTempState<T>(fn: (stateDir: string) => Promise<T>): Promise<T> {
-  const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-durable-receive-"));
+  const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-durable-receive-"));
   try {
     return await fn(stateDir);
   } finally {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     await fs.rm(stateDir, { recursive: true, force: true });
   }
 }

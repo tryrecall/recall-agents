@@ -7,18 +7,18 @@ import { DatabaseSync } from "node:sqlite";
 
 const SCHEMAS = [
   {
-    name: "openclaw-state",
-    schema: "src/state/openclaw-state-schema.sql",
-    outFile: "src/state/openclaw-state-db.generated.d.ts",
-    schemaOutFile: "src/state/openclaw-state-schema.generated.ts",
-    schemaExport: "OPENCLAW_STATE_SCHEMA_SQL",
+    name: "steelengine-state",
+    schema: "src/state/steelengine-state-schema.sql",
+    outFile: "src/state/steelengine-state-db.generated.d.ts",
+    schemaOutFile: "src/state/steelengine-state-schema.generated.ts",
+    schemaExport: "STEELENGINE_STATE_SCHEMA_SQL",
   },
   {
-    name: "openclaw-agent",
-    schema: "src/state/openclaw-agent-schema.sql",
-    outFile: "src/state/openclaw-agent-db.generated.d.ts",
-    schemaOutFile: "src/state/openclaw-agent-schema.generated.ts",
-    schemaExport: "OPENCLAW_AGENT_SCHEMA_SQL",
+    name: "steelengine-agent",
+    schema: "src/state/steelengine-agent-schema.sql",
+    outFile: "src/state/steelengine-agent-db.generated.d.ts",
+    schemaOutFile: "src/state/steelengine-agent-schema.generated.ts",
+    schemaExport: "STEELENGINE_AGENT_SCHEMA_SQL",
   },
 ];
 

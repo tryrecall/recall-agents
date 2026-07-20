@@ -1,7 +1,7 @@
 // CLI backend live probe helpers run cron/MCP/image probes through the gateway
 // CLI backend and poll for externally visible live results.
 import { randomUUID } from "node:crypto";
-import { normalizeLowercaseStringOrEmpty } from "@openclaw/normalization-core/string-coerce";
+import { normalizeLowercaseStringOrEmpty } from "@steelengine/normalization-core/string-coerce";
 import { renderCatFacePngBase64 } from "../../test/helpers/live-image-probe.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import { parseStrictPositiveInteger } from "../infra/parse-finite-number.js";
@@ -17,7 +17,7 @@ import {
   assertLiveImageProbeReply,
   buildLiveCronProbeMessage,
   createLiveCronProbeSpec,
-  runOpenClawCliJson,
+  runSteelEngineCliJson,
   type CronListJob,
 } from "./live-agent-probes.js";
 import { getActiveMcpLoopbackRuntime } from "./mcp-http.loopback-runtime.js";
@@ -33,8 +33,8 @@ const CLI_CRON_MCP_LOOPBACK_MAX_BODY_BYTES = 1_048_576;
 
 function shouldLogCliCronProbe(): boolean {
   return (
-    isTruthyEnvValue(process.env.OPENCLAW_LIVE_CLI_BACKEND_DEBUG) ||
-    isTruthyEnvValue(process.env.OPENCLAW_CLI_BACKEND_LOG_OUTPUT)
+    isTruthyEnvValue(process.env.STEELENGINE_LIVE_CLI_BACKEND_DEBUG) ||
+    isTruthyEnvValue(process.env.STEELENGINE_CLI_BACKEND_LOG_OUTPUT)
   );
 }
 
@@ -82,7 +82,7 @@ async function removeCliCronJobBestEffort(params: {
   env: NodeJS.ProcessEnv;
 }): Promise<void> {
   try {
-    await runOpenClawCliJson(
+    await runSteelEngineCliJson(
       [
         "cron",
         "rm",
@@ -195,20 +195,20 @@ async function callLoopbackJsonRpc(params: {
     "x-session-key": params.sessionKey,
   };
   if (params.messageProvider) {
-    headers["x-openclaw-message-channel"] = params.messageProvider;
+    headers["x-steelengine-message-channel"] = params.messageProvider;
   }
   if (params.accountId) {
-    headers["x-openclaw-account-id"] = params.accountId;
+    headers["x-steelengine-account-id"] = params.accountId;
   }
   const timeoutMs = parsePositiveInt(
-    params.env?.OPENCLAW_MCP_LOOPBACK_PROBE_TIMEOUT_MS,
+    params.env?.STEELENGINE_MCP_LOOPBACK_PROBE_TIMEOUT_MS,
     CLI_CRON_MCP_LOOPBACK_REQUEST_TIMEOUT_MS,
-    "OPENCLAW_MCP_LOOPBACK_PROBE_TIMEOUT_MS",
+    "STEELENGINE_MCP_LOOPBACK_PROBE_TIMEOUT_MS",
   );
   const maxBodyBytes = parsePositiveInt(
-    params.env?.OPENCLAW_MCP_LOOPBACK_PROBE_MAX_BODY_BYTES,
+    params.env?.STEELENGINE_MCP_LOOPBACK_PROBE_MAX_BODY_BYTES,
     CLI_CRON_MCP_LOOPBACK_MAX_BODY_BYTES,
-    "OPENCLAW_MCP_LOOPBACK_PROBE_MAX_BODY_BYTES",
+    "STEELENGINE_MCP_LOOPBACK_PROBE_MAX_BODY_BYTES",
   );
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);

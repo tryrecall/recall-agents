@@ -1,11 +1,11 @@
-import { uniqueStrings } from "@openclaw/normalization-core/string-normalization";
+import { uniqueStrings } from "@steelengine/normalization-core/string-normalization";
 import type { Selectable } from "kysely";
 import {
   executeSqliteQuerySync,
   executeSqliteQueryTakeFirstSync,
 } from "../../infra/kysely-sync.js";
-import type { DB as OpenClawAgentKyselyDatabase } from "../../state/openclaw-agent-db.generated.js";
-import type { OpenClawAgentDatabase } from "../../state/openclaw-agent-db.js";
+import type { DB as SteelEngineAgentKyselyDatabase } from "../../state/steelengine-agent-db.generated.js";
+import type { SteelEngineAgentDatabase } from "../../state/steelengine-agent-db.js";
 import {
   linkSessionConversation,
   prepareSessionConversation,
@@ -39,7 +39,7 @@ import type { SessionEntry } from "./types.js";
 
 // Canonical owner for session_entries row selection, alias snapshots, and writes.
 
-type SessionEntryRow = Selectable<OpenClawAgentKyselyDatabase["session_entries"]>;
+type SessionEntryRow = Selectable<SteelEngineAgentKyselyDatabase["session_entries"]>;
 export type ResolvedSessionEntryRow = {
   entry: SessionEntry;
   legacyKeys: string[];
@@ -62,7 +62,7 @@ class SqliteSessionMutationConflictError extends Error {
 }
 
 export function readSqliteSessionIdentitySnapshot(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionKeys: Iterable<string>,
 ): Map<string, SessionEntry> {
   const snapshot = new Map<string, SessionEntry>();
@@ -82,7 +82,7 @@ export function createSqliteSessionIdentitySnapshot(
 }
 
 export function readSessionEntryRow(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionKey: string,
 ): ResolvedSessionEntryRow | undefined {
   const db = getSessionKysely(database.db);
@@ -123,7 +123,7 @@ export function readSessionEntryRow(
 // Async updaters prepare against this complete selection. Capturing alias rows
 // prevents the commit phase from deleting a concurrently changed legacy key.
 export function readSqliteSessionEntrySelectionSnapshot(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionKey: string,
   exact: boolean,
 ): SqliteSessionEntrySelectionSnapshot {
@@ -157,7 +157,7 @@ export function assertSqliteSessionEntrySelectionUnchanged(
 }
 
 export function collectSessionEntryLookupKeys(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionKey: string,
 ): string[] {
   const trimmedKey = sessionKey.trim();
@@ -184,7 +184,7 @@ export function collectSessionEntryLookupKeys(
 }
 
 export function readExactSessionEntryRow(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionKey: string,
 ): ResolvedSessionEntryRow | undefined {
   const db = getSessionKysely(database.db);
@@ -200,7 +200,7 @@ export function readExactSessionEntryRow(
 }
 
 export function readSqliteSessionEntryStore(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
 ): Record<string, SessionEntry> {
   const db = getSessionKysely(database.db);
   const rows = executeSqliteQuerySync(
@@ -217,7 +217,7 @@ export function readSqliteSessionEntryStore(
   return store;
 }
 
-export function readSqliteSessionEntryCount(database: OpenClawAgentDatabase): number {
+export function readSqliteSessionEntryCount(database: SteelEngineAgentDatabase): number {
   const db = getSessionKysely(database.db);
   const row = executeSqliteQueryTakeFirstSync(
     database.db,
@@ -228,7 +228,7 @@ export function readSqliteSessionEntryCount(database: OpenClawAgentDatabase): nu
 }
 
 export function resolveSqliteLifecyclePrimaryEntry(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   target: { canonicalKey: string; storeKeys: string[] },
 ): { key: string; entry: SessionEntry } | undefined {
   let freshest: { key: string; entry: SessionEntry } | undefined;
@@ -245,7 +245,7 @@ export function resolveSqliteLifecyclePrimaryEntry(
 }
 
 export function readSqliteLifecycleTargetSnapshot(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   target: { canonicalKey: string; storeKeys: string[] },
 ): SqliteLifecycleTargetSnapshot {
   const normalized = normalizeSqliteLifecycleTarget(target);
@@ -286,7 +286,7 @@ export function normalizeSqliteLifecycleTarget(target: {
 }
 
 export function deleteSqliteSessionEntryRows(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionKey: string,
 ): void {
   const db = getSessionKysely(database.db);
@@ -301,7 +301,7 @@ export function deleteSqliteSessionEntryRows(
 }
 
 export function deleteSqliteLifecycleTargetRows(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   target: { canonicalKey: string; storeKeys: string[] },
 ): void {
   for (const sessionKey of uniqueStrings([target.canonicalKey, ...target.storeKeys])) {
@@ -337,7 +337,7 @@ function sqliteSessionSnapshotRowsEqual(
 }
 
 function sqliteLifecycleTargetMatchesExpectedEntry(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   target: { canonicalKey: string; storeKeys: string[] },
   expectedEntry: SessionEntry | undefined,
 ): boolean {
@@ -349,7 +349,7 @@ function sqliteLifecycleTargetMatchesExpectedEntry(
 }
 
 export function assertSqliteLifecycleTargetUnchanged(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   target: { canonicalKey: string; storeKeys: string[] },
   expectedEntry: SessionEntry | undefined,
   operation: "deleted" | "reset",
@@ -361,7 +361,7 @@ export function assertSqliteLifecycleTargetUnchanged(
 }
 
 export function deleteLegacySessionEntryRows(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   legacyKeys: string[],
   sessionKey: string,
 ): void {
@@ -385,7 +385,7 @@ export function deleteLegacySessionEntryRows(
 }
 
 export function writeSessionEntry(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionKey: string,
   entry: SessionEntry,
 ): void {

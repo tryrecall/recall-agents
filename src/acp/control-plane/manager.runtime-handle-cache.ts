@@ -2,14 +2,14 @@
 import {
   resolveRuntimeHandleIdentifiersFromIdentity,
   resolveSessionIdentityFromMeta,
-} from "@openclaw/acp-core/runtime/session-identity";
+} from "@steelengine/acp-core/runtime/session-identity";
 import type {
   AcpRuntime,
   AcpRuntimeHandle,
   AcpRuntimeStatus,
-} from "@openclaw/acp-core/runtime/types";
-import { normalizeLowercaseStringOrEmpty } from "@openclaw/normalization-core/string-coerce";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+} from "@steelengine/acp-core/runtime/types";
+import { normalizeLowercaseStringOrEmpty } from "@steelengine/normalization-core/string-coerce";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { logVerbose } from "../../globals.js";
 import type { ActiveTurnState, SessionAcpMeta } from "./manager.types.js";
 import { normalizeActorKey, resolveRuntimeIdleTtlMs } from "./manager.utils.js";
@@ -44,7 +44,7 @@ export class ManagerRuntimeHandleCache {
   }
 
   /** Returns cache counters used by ACP manager observability snapshots. */
-  getObservabilitySnapshot(cfg: OpenClawConfig) {
+  getObservabilitySnapshot(cfg: SteelEngineConfig) {
     return {
       activeSessions: this.runtimeCache.size(),
       idleTtlMs: resolveRuntimeIdleTtlMs(cfg),
@@ -84,7 +84,7 @@ export class ManagerRuntimeHandleCache {
 
   /** Closes handles that exceeded the configured idle TTL without racing active turns. */
   async evictIdle(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     actorQueue: SessionActorQueue;
     activeTurnBySession: Map<string, ActiveTurnState>;
   }): Promise<void> {

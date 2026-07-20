@@ -1,18 +1,18 @@
 {
-  "name": "@openclaw/venice-provider",
+  "name": "@steelengine/venice-provider",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw Venice provider plugin",
+  "description": "SteelEngine Venice provider plugin",
   "type": "module",
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "clawhubSpec": "clawhub:@openclaw/venice-provider",
-      "npmSpec": "@openclaw/venice-provider",
+      "clawhubSpec": "clawhub:@steelengine/venice-provider",
+      "npmSpec": "@steelengine/venice-provider",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.6.9"
     },
@@ -20,7 +20,7 @@
       "pluginApi": ">=2026.7.2-beta.3"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3",
+      "steelengineVersion": "2026.7.2-beta.3",
       "bundledDist": false
     },
     "release": {
@@ -30,6 +30,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/steelengineai/recall-agents"
   }
 }

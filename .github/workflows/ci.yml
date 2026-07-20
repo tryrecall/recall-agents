@@ -52,7 +52,7 @@ permissions:
 run-name: ${{ github.event_name == 'workflow_dispatch' && inputs.dispatch_id != '' && format('CI {0}', inputs.dispatch_id) || (github.event_name == 'workflow_dispatch' && inputs.release_gate && format('CI release gate {0}', inputs.target_ref) || 'CI') }}
 
 concurrency:
-  group: ${{ github.event_name == 'workflow_dispatch' && format('{0}-manual-v1-{1}', github.workflow, github.run_id) || (github.event_name == 'pull_request' && format('{0}-v7-{1}', github.workflow, github.event.pull_request.number) || (github.repository == 'openclaw/openclaw' && format('{0}-v7-{1}', github.workflow, github.ref) || format('{0}-v7-{1}-{2}', github.workflow, github.ref, github.sha))) }}
+  group: ${{ github.event_name == 'workflow_dispatch' && format('{0}-manual-v1-{1}', github.workflow, github.run_id) || (github.event_name == 'pull_request' && format('{0}-v7-{1}', github.workflow, github.event.pull_request.number) || (github.repository == 'steelengine/steelengine' && format('{0}-v7-{1}', github.workflow, github.ref) || format('{0}-v7-{1}-{2}', github.workflow, github.ref, github.sha))) }}
   # PRs want newest-head feedback. Canonical main instead runs one complete
   # integration cycle while GitHub's single pending slot coalesces later pushes.
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -67,7 +67,7 @@ jobs:
     permissions:
       contents: read
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
     timeout-minutes: 20
     outputs:
       checkout_revision: ${{ steps.checkout_ref.outputs.sha }}
@@ -288,7 +288,7 @@ jobs:
         run: |
           set -euo pipefail
           if [[ ! "$HISTORICAL_TARGET_TAG" =~ ^v[0-9]{4}\.[0-9]+\.[0-9]+(-(alpha|beta)\.[0-9]+)?$ ]]; then
-            echo "historical_target_tag must be a canonical OpenClaw release tag." >&2
+            echo "historical_target_tag must be a canonical SteelEngine release tag." >&2
             exit 1
           fi
           tag_ref="refs/tags/${HISTORICAL_TARGET_TAG}"
@@ -312,7 +312,7 @@ jobs:
         run: |
           set -euo pipefail
           if [[ ! "$RELEASE_CANDIDATE_REF" =~ ^(release/[0-9]{4}\.[0-9]+\.[0-9]+|extended-stable/[0-9]{4}\.[0-9]+\.33)$ ]]; then
-            echo "release_candidate_ref must be a canonical OpenClaw release branch." >&2
+            echo "release_candidate_ref must be a canonical SteelEngine release branch." >&2
             exit 1
           fi
           remote="$(git remote get-url origin)"
@@ -342,7 +342,7 @@ jobs:
         if: (github.event_name != 'workflow_dispatch' && steps.docs_scope.outputs.docs_only != 'true') || (github.event_name == 'workflow_dispatch' && inputs.release_gate)
         shell: bash
         env:
-          OPENCLAW_ALLOW_RELEASE_GENERATED_MIX: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository }}
+          STEELENGINE_ALLOW_RELEASE_GENERATED_MIX: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository }}
         run: |
           set -euo pipefail
 
@@ -361,42 +361,42 @@ jobs:
       - name: Build CI manifest
         id: manifest
         env:
-          OPENCLAW_CI_DOCS_ONLY: ${{ github.event_name == 'workflow_dispatch' && 'false' || steps.docs_scope.outputs.docs_only }}
-          OPENCLAW_CI_DOCS_CHANGED: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.docs_scope.outputs.docs_changed }}
-          OPENCLAW_CI_RUN_NODE: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_node || 'false' }}
-          OPENCLAW_CI_RUN_MACOS: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_macos || 'false' }}
-          OPENCLAW_CI_RUN_IOS_BUILD: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_ios_build || 'false' }}
-          OPENCLAW_CI_RUN_ANDROID: ${{ github.event_name == 'workflow_dispatch' && (inputs.release_gate || inputs.include_android) && 'true' || steps.changed_scope.outputs.run_android || 'false' }}
-          OPENCLAW_CI_RUN_WINDOWS: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_windows || 'false' }}
-          OPENCLAW_CI_RUN_NODE_FAST_ONLY: ${{ github.event_name == 'workflow_dispatch' && 'false' || steps.changed_scope.outputs.run_node_fast_only || 'false' }}
-          OPENCLAW_CI_RUN_NODE_FAST_PLUGIN_CONTRACTS: ${{ github.event_name == 'workflow_dispatch' && 'false' || steps.changed_scope.outputs.run_node_fast_plugin_contracts || 'false' }}
-          OPENCLAW_CI_RUN_NODE_FAST_CI_ROUTING: ${{ github.event_name == 'workflow_dispatch' && 'false' || steps.changed_scope.outputs.run_node_fast_ci_routing || 'false' }}
-          OPENCLAW_CI_RUN_SKILLS_PYTHON: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_skills_python || 'false' }}
-          OPENCLAW_CI_RUN_CONTROL_UI_I18N: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_control_ui_i18n || 'false' }}
-          OPENCLAW_CI_RUN_UI_TESTS: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_ui_tests || 'false' }}
-          OPENCLAW_CI_RUN_NATIVE_I18N: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_native_i18n || 'false' }}
-          OPENCLAW_CI_CHANGED_PATHS_JSON: ${{ steps.changed_scope.outputs.changed_paths_json || 'null' }}
-          OPENCLAW_CI_CHECKOUT_REVISION: ${{ steps.checkout_ref.outputs.sha }}
-          OPENCLAW_CI_HISTORICAL_TARGET: ${{ steps.historical_target.outputs.eligible || 'false' }}
-          OPENCLAW_CI_RELEASE_CANDIDATE_TARGET: ${{ steps.release_candidate_target.outputs.eligible || 'false' }}
-          OPENCLAW_CI_WORKFLOW_REVISION: ${{ github.sha }}
-          OPENCLAW_CI_REPOSITORY: ${{ github.repository }}
-          OPENCLAW_CI_EVENT_NAME: ${{ github.event_name }}
+          STEELENGINE_CI_DOCS_ONLY: ${{ github.event_name == 'workflow_dispatch' && 'false' || steps.docs_scope.outputs.docs_only }}
+          STEELENGINE_CI_DOCS_CHANGED: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.docs_scope.outputs.docs_changed }}
+          STEELENGINE_CI_RUN_NODE: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_node || 'false' }}
+          STEELENGINE_CI_RUN_MACOS: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_macos || 'false' }}
+          STEELENGINE_CI_RUN_IOS_BUILD: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_ios_build || 'false' }}
+          STEELENGINE_CI_RUN_ANDROID: ${{ github.event_name == 'workflow_dispatch' && (inputs.release_gate || inputs.include_android) && 'true' || steps.changed_scope.outputs.run_android || 'false' }}
+          STEELENGINE_CI_RUN_WINDOWS: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_windows || 'false' }}
+          STEELENGINE_CI_RUN_NODE_FAST_ONLY: ${{ github.event_name == 'workflow_dispatch' && 'false' || steps.changed_scope.outputs.run_node_fast_only || 'false' }}
+          STEELENGINE_CI_RUN_NODE_FAST_PLUGIN_CONTRACTS: ${{ github.event_name == 'workflow_dispatch' && 'false' || steps.changed_scope.outputs.run_node_fast_plugin_contracts || 'false' }}
+          STEELENGINE_CI_RUN_NODE_FAST_CI_ROUTING: ${{ github.event_name == 'workflow_dispatch' && 'false' || steps.changed_scope.outputs.run_node_fast_ci_routing || 'false' }}
+          STEELENGINE_CI_RUN_SKILLS_PYTHON: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_skills_python || 'false' }}
+          STEELENGINE_CI_RUN_CONTROL_UI_I18N: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_control_ui_i18n || 'false' }}
+          STEELENGINE_CI_RUN_UI_TESTS: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_ui_tests || 'false' }}
+          STEELENGINE_CI_RUN_NATIVE_I18N: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.changed_scope.outputs.run_native_i18n || 'false' }}
+          STEELENGINE_CI_CHANGED_PATHS_JSON: ${{ steps.changed_scope.outputs.changed_paths_json || 'null' }}
+          STEELENGINE_CI_CHECKOUT_REVISION: ${{ steps.checkout_ref.outputs.sha }}
+          STEELENGINE_CI_HISTORICAL_TARGET: ${{ steps.historical_target.outputs.eligible || 'false' }}
+          STEELENGINE_CI_RELEASE_CANDIDATE_TARGET: ${{ steps.release_candidate_target.outputs.eligible || 'false' }}
+          STEELENGINE_CI_WORKFLOW_REVISION: ${{ github.sha }}
+          STEELENGINE_CI_REPOSITORY: ${{ github.repository }}
+          STEELENGINE_CI_EVENT_NAME: ${{ github.event_name }}
         run: |
           node --input-type=module <<'EOF'
           import { appendFileSync, existsSync, readFileSync } from "node:fs";
 
-          const eventName = process.env.OPENCLAW_CI_EVENT_NAME ?? "";
-          const checkoutRevision = process.env.OPENCLAW_CI_CHECKOUT_REVISION ?? "";
-          const workflowRevision = process.env.OPENCLAW_CI_WORKFLOW_REVISION ?? "";
-          const historicalTargetApproved = process.env.OPENCLAW_CI_HISTORICAL_TARGET === "true";
+          const eventName = process.env.STEELENGINE_CI_EVENT_NAME ?? "";
+          const checkoutRevision = process.env.STEELENGINE_CI_CHECKOUT_REVISION ?? "";
+          const workflowRevision = process.env.STEELENGINE_CI_WORKFLOW_REVISION ?? "";
+          const historicalTargetApproved = process.env.STEELENGINE_CI_HISTORICAL_TARGET === "true";
           const historicalTarget =
             eventName === "workflow_dispatch" &&
             historicalTargetApproved &&
             checkoutRevision !== workflowRevision;
           const releaseCandidateTarget =
             eventName === "workflow_dispatch" &&
-            process.env.OPENCLAW_CI_RELEASE_CANDIDATE_TARGET === "true" &&
+            process.env.STEELENGINE_CI_RELEASE_CANDIDATE_TARGET === "true" &&
             checkoutRevision !== workflowRevision;
           const compatibilityTarget = historicalTarget || releaseCandidateTarget;
           const frozenTarget =
@@ -465,10 +465,10 @@ jobs:
           const outputPath = process.env.GITHUB_OUTPUT;
           const packageScripts = JSON.parse(readFileSync("package.json", "utf8")).scripts ?? {};
           const hasPackageScript = (name) => typeof packageScripts[name] === "string";
-          const isCanonicalRepository = process.env.OPENCLAW_CI_REPOSITORY === "openclaw/openclaw";
+          const isCanonicalRepository = process.env.STEELENGINE_CI_REPOSITORY === "steelengine/steelengine";
           const changedPaths = (() => {
             try {
-              const value = JSON.parse(process.env.OPENCLAW_CI_CHANGED_PATHS_JSON ?? "null");
+              const value = JSON.parse(process.env.STEELENGINE_CI_CHANGED_PATHS_JSON ?? "null");
               return Array.isArray(value) && value.every((path) => typeof path === "string")
                 ? value
                 : null;
@@ -476,19 +476,19 @@ jobs:
               return null;
             }
           })();
-          const docsOnly = parseBoolean(process.env.OPENCLAW_CI_DOCS_ONLY);
-          const docsChanged = parseBoolean(process.env.OPENCLAW_CI_DOCS_CHANGED);
-          const runNode = parseBoolean(process.env.OPENCLAW_CI_RUN_NODE) && !docsOnly;
+          const docsOnly = parseBoolean(process.env.STEELENGINE_CI_DOCS_ONLY);
+          const docsChanged = parseBoolean(process.env.STEELENGINE_CI_DOCS_CHANGED);
+          const runNode = parseBoolean(process.env.STEELENGINE_CI_RUN_NODE) && !docsOnly;
           const runNodeFastOnly =
-            runNode && parseBoolean(process.env.OPENCLAW_CI_RUN_NODE_FAST_ONLY);
+            runNode && parseBoolean(process.env.STEELENGINE_CI_RUN_NODE_FAST_ONLY);
           const runNodeFull = runNode && !runNodeFastOnly;
           const runNodeFastPluginContracts =
-            runNode && parseBoolean(process.env.OPENCLAW_CI_RUN_NODE_FAST_PLUGIN_CONTRACTS);
+            runNode && parseBoolean(process.env.STEELENGINE_CI_RUN_NODE_FAST_PLUGIN_CONTRACTS);
           const runNodeFastCiRouting =
-            runNode && parseBoolean(process.env.OPENCLAW_CI_RUN_NODE_FAST_CI_ROUTING);
+            runNode && parseBoolean(process.env.STEELENGINE_CI_RUN_NODE_FAST_CI_ROUTING);
           const runPluginContractShards = runNodeFull || runNodeFastPluginContracts;
           const runMacos =
-            parseBoolean(process.env.OPENCLAW_CI_RUN_MACOS) && !docsOnly && isCanonicalRepository;
+            parseBoolean(process.env.STEELENGINE_CI_RUN_MACOS) && !docsOnly && isCanonicalRepository;
           const supportsCurrentMacosSwiftCi =
             existsSync("scripts/install-swift-tools.sh") &&
             existsSync("scripts/lint-swift.sh") &&
@@ -496,29 +496,29 @@ jobs:
           const supportsIosBuild = hasPackageScript("ios:build");
           const supportsCurrentIosCi = supportsIosBuild && supportsCurrentMacosSwiftCi;
           const runIosBuild =
-            parseBoolean(process.env.OPENCLAW_CI_RUN_IOS_BUILD) &&
+            parseBoolean(process.env.STEELENGINE_CI_RUN_IOS_BUILD) &&
             !docsOnly &&
             isCanonicalRepository &&
             (!frozenTarget ||
               supportsCurrentIosCi ||
               (releaseCandidateTarget && supportsIosBuild));
           const runAndroid =
-            parseBoolean(process.env.OPENCLAW_CI_RUN_ANDROID) && !docsOnly && isCanonicalRepository;
+            parseBoolean(process.env.STEELENGINE_CI_RUN_ANDROID) && !docsOnly && isCanonicalRepository;
           const runWindows =
-            parseBoolean(process.env.OPENCLAW_CI_RUN_WINDOWS) &&
+            parseBoolean(process.env.STEELENGINE_CI_RUN_WINDOWS) &&
             !docsOnly &&
             !runNodeFastOnly &&
             isCanonicalRepository;
-          const runSkillsPython = parseBoolean(process.env.OPENCLAW_CI_RUN_SKILLS_PYTHON) && !docsOnly;
+          const runSkillsPython = parseBoolean(process.env.STEELENGINE_CI_RUN_SKILLS_PYTHON) && !docsOnly;
           const runControlUiI18n =
-            parseBoolean(process.env.OPENCLAW_CI_RUN_CONTROL_UI_I18N) && !docsOnly;
-          const runUiTests = parseBoolean(process.env.OPENCLAW_CI_RUN_UI_TESTS) && !docsOnly;
+            parseBoolean(process.env.STEELENGINE_CI_RUN_CONTROL_UI_I18N) && !docsOnly;
+          const runUiTests = parseBoolean(process.env.STEELENGINE_CI_RUN_UI_TESTS) && !docsOnly;
           const supportsNativeI18n =
             hasPackageScript("native:i18n:check") &&
             hasPackageScript("android:i18n:check") &&
             hasPackageScript("apple:i18n:check");
           const runNativeI18n =
-            parseBoolean(process.env.OPENCLAW_CI_RUN_NATIVE_I18N) &&
+            parseBoolean(process.env.STEELENGINE_CI_RUN_NATIVE_I18N) &&
             !docsOnly &&
             (!frozenTarget || supportsNativeI18n);
           const targetWorkflow = existsSync(".github/workflows/ci.yml")
@@ -749,7 +749,7 @@ jobs:
       # dependency snapshot here before fanout. Blacksmith may expose a fresh
       # commit only to a later run; readers retain the marker-checked fallback.
       - name: Refresh sticky dependency snapshot
-        if: github.repository == 'openclaw/openclaw' && github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.manifest.outputs.run_node == 'true'
+        if: github.repository == 'steelengine/steelengine' && github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.manifest.outputs.run_node == 'true'
         uses: ./.github/actions/setup-node-env
         with:
           install-bun: "false"
@@ -758,10 +758,10 @@ jobs:
           use-actions-cache: "false"
 
       - name: Maintain sticky dependency store budget
-        if: github.repository == 'openclaw/openclaw' && github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.manifest.outputs.run_node == 'true'
+        if: github.repository == 'steelengine/steelengine' && github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.manifest.outputs.run_node == 'true'
         shell: bash
         env:
-          OPENCLAW_PNPM_STORE_MAX_KIB: "8388608"
+          STEELENGINE_PNPM_STORE_MAX_KIB: "8388608"
         run: |
           set -euo pipefail
           store_dir="${PNPM_CONFIG_STORE_DIR:?}"
@@ -769,13 +769,13 @@ jobs:
           after_kib="$before_kib"
           pruned=false
 
-          if [ "$before_kib" -gt "$OPENCLAW_PNPM_STORE_MAX_KIB" ]; then
-            echo "pnpm store is ${before_kib} KiB; pruning above ${OPENCLAW_PNPM_STORE_MAX_KIB} KiB ceiling"
+          if [ "$before_kib" -gt "$STEELENGINE_PNPM_STORE_MAX_KIB" ]; then
+            echo "pnpm store is ${before_kib} KiB; pruning above ${STEELENGINE_PNPM_STORE_MAX_KIB} KiB ceiling"
             PNPM_CONFIG_STORE_DIR="$store_dir" pnpm store prune
             after_kib="$(du -sk "$store_dir" | cut -f1)"
             pruned=true
           else
-            echo "pnpm store is ${before_kib} KiB; below ${OPENCLAW_PNPM_STORE_MAX_KIB} KiB ceiling"
+            echo "pnpm store is ${before_kib} KiB; below ${STEELENGINE_PNPM_STORE_MAX_KIB} KiB ceiling"
           fi
 
           {
@@ -786,7 +786,7 @@ jobs:
             echo "- Pruned: ${pruned}"
           } >> "$GITHUB_STEP_SUMMARY"
 
-          if [ "$after_kib" -gt "$OPENCLAW_PNPM_STORE_MAX_KIB" ]; then
+          if [ "$after_kib" -gt "$STEELENGINE_PNPM_STORE_MAX_KIB" ]; then
             echo "::warning::pnpm store remains above its 8 GiB maintenance ceiling after prune"
           fi
 
@@ -949,7 +949,7 @@ jobs:
         run: |
           set -euo pipefail
           source .github/actions/setup-pnpm-store-cache/ensure-node.sh
-          openclaw_ensure_node "$REQUESTED_NODE_VERSION"
+          steelengine_ensure_node "$REQUESTED_NODE_VERSION"
 
       - name: Audit production dependencies
         run: node scripts/pre-commit/pnpm-audit-prod.mjs --audit-level=high
@@ -960,8 +960,8 @@ jobs:
     permissions:
       contents: read
     needs: [preflight]
-    if: ${{ (needs.preflight.outputs.run_node == 'true' || needs.preflight.outputs.run_check_docs == 'true') && !(github.repository == 'openclaw/openclaw' && github.event_name == 'push' && github.ref == 'refs/heads/main') }}
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
+    if: ${{ (needs.preflight.outputs.run_node == 'true' || needs.preflight.outputs.run_check_docs == 'true') && !(github.repository == 'steelengine/steelengine' && github.event_name == 'push' && github.ref == 'refs/heads/main') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
     timeout-minutes: 20
     steps:
       - &linux_node_checkout_step
@@ -1026,7 +1026,7 @@ jobs:
     # 32 vCPU: the dist build sits on the light-run critical path alongside
     # check-lint/check-dependencies; tsdown parallelizes across the extra
     # cores for roughly the same billed core-minutes.
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-32vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-32vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
     timeout-minutes: 20
     outputs:
       channels-result: ${{ steps.built_artifact_checks.outputs['channels-result'] }}
@@ -1050,8 +1050,8 @@ jobs:
           # Blacksmith same-repo runs clone dependencies from a sticky disk.
           # Fork PRs must keep actions/cache: sticky snapshots are writable,
           # repository-global state and must never be produced by fork code.
-          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'true' || 'false' }}
-          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'false' || 'true' }}
+          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'true' || 'false' }}
+          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'false' || 'true' }}
           save-node-compile-cache: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'true' || 'false' }}
 
       - name: Restore build-all step cache
@@ -1101,10 +1101,10 @@ jobs:
           retention-days: 1
 
       - name: Smoke test CLI launcher help
-        run: node openclaw.mjs --help
+        run: node steelengine.mjs --help
 
       - name: Smoke test CLI launcher status json
-        run: node openclaw.mjs status --json --timeout 1
+        run: node steelengine.mjs status --json --timeout 1
 
       - name: Smoke test built bundled plugin singleton
         run: pnpm test:build:singleton
@@ -1114,7 +1114,7 @@ jobs:
         env:
           # GitHub-hosted Linux reports a higher RSS baseline than Blacksmith for
           # the same built CLI. Keep the tighter Blacksmith regression ceiling.
-          OPENCLAW_STARTUP_MEMORY_PLUGINS_LIST_MB: ${{ runner.environment == 'github-hosted' && '425' || '400' }}
+          STEELENGINE_STARTUP_MEMORY_PLUGINS_LIST_MB: ${{ runner.environment == 'github-hosted' && '425' || '400' }}
         run: |
           set +e
           pnpm test:startup:memory
@@ -1191,14 +1191,14 @@ jobs:
           if [ "$RUN_CHANNELS" = "true" ]; then
             start_check "channels" env \
               NODE_OPTIONS=--max-old-space-size=8192 \
-              OPENCLAW_VITEST_MAX_WORKERS=1 \
+              STEELENGINE_VITEST_MAX_WORKERS=1 \
               pnpm test:channels
           fi
 
           if [ "$RUN_CORE_SUPPORT_BOUNDARY" = "true" ]; then
             start_check "core-support-boundary" env \
               NODE_OPTIONS=--max-old-space-size=8192 \
-              OPENCLAW_VITEST_MAX_WORKERS=2 \
+              STEELENGINE_VITEST_MAX_WORKERS=2 \
               node scripts/run-vitest.mjs run --config test/vitest/vitest.full-core-support-boundary.config.ts
           fi
 
@@ -1256,7 +1256,7 @@ jobs:
       contents: read
     needs: [preflight]
     if: ${{ !cancelled() && always() && needs.preflight.outputs.run_native_i18n == 'true' }}
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -1272,8 +1272,8 @@ jobs:
           # Blacksmith same-repo runs clone dependencies from a sticky disk.
           # Fork PRs must keep actions/cache: sticky snapshots are writable,
           # repository-global state and must never be produced by fork code.
-          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'true' || 'false' }}
-          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'false' || 'true' }}
+          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'true' || 'false' }}
+          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'false' || 'true' }}
 
       - name: Check native app i18n inventory
         run: pnpm native:i18n:check
@@ -1290,7 +1290,7 @@ jobs:
     name: checks-ui
     needs: [preflight]
     if: needs.preflight.outputs.run_ui_tests == 'true'
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
     timeout-minutes: 20
     env:
       COMPATIBILITY_TARGET: ${{ needs.preflight.outputs.compatibility_target }}
@@ -1304,8 +1304,8 @@ jobs:
           # Blacksmith same-repo runs clone dependencies from a sticky disk.
           # Fork PRs must keep actions/cache: sticky snapshots are writable,
           # repository-global state and must never be produced by fork code.
-          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'true' || 'false' }}
-          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'false' || 'true' }}
+          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'true' || 'false' }}
+          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'false' || 'true' }}
 
       - name: Install Playwright Chromium
         run: |
@@ -1338,7 +1338,7 @@ jobs:
     name: control-ui-i18n
     needs: [preflight]
     if: needs.preflight.outputs.run_control_ui_i18n == 'true'
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
     timeout-minutes: 10
     steps:
       - *linux_node_checkout_step
@@ -1350,8 +1350,8 @@ jobs:
           # Blacksmith same-repo runs clone dependencies from a sticky disk.
           # Fork PRs must keep actions/cache: sticky snapshots are writable,
           # repository-global state and must never be produced by fork code.
-          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'true' || 'false' }}
-          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'false' || 'true' }}
+          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'true' || 'false' }}
+          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'false' || 'true' }}
 
       - name: Check Control UI locale parity
         # Source-only drift stays advisory because the post-merge bot owns
@@ -1366,7 +1366,7 @@ jobs:
     name: ${{ matrix.check_name }}
     needs: [preflight]
     if: needs.preflight.outputs.run_checks_fast_core == 'true'
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && (matrix.runner || 'blacksmith-4vcpu-ubuntu-2404') || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && (matrix.runner || 'blacksmith-4vcpu-ubuntu-2404') || 'ubuntu-24.04') }}
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -1426,13 +1426,13 @@ jobs:
           # Blacksmith same-repo runs clone dependencies from a sticky disk.
           # Fork PRs must keep actions/cache: sticky snapshots are writable,
           # repository-global state and must never be produced by fork code.
-          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'true' || 'false' }}
-          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'false' || 'true' }}
+          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'true' || 'false' }}
+          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'false' || 'true' }}
 
       - name: Run ${{ matrix.task }} (${{ matrix.runtime }})
         env:
           GH_TOKEN: ${{ matrix.task == 'max-lines-ratchet' && github.token || '' }}
-          OPENCLAW_TEST_PROJECTS_PARALLEL: 3
+          STEELENGINE_TEST_PROJECTS_PARALLEL: 3
           RATCHET_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           RATCHET_EVENT_BASE_SHA: ${{ github.event_name == 'push' && github.event.before || '' }}
           RATCHET_MANUAL_TARGET_SHA: ${{ github.event_name == 'workflow_dispatch' && !inputs.release_gate && needs.preflight.outputs.checkout_revision || '' }}
@@ -1517,7 +1517,7 @@ jobs:
               fi
               ;;
             bun-launcher)
-              OPENCLAW_TEST_BUN_LAUNCHER=1 pnpm test test/openclaw-launcher.e2e.test.ts
+              STEELENGINE_TEST_BUN_LAUNCHER=1 pnpm test test/steelengine-launcher.e2e.test.ts
               ;;
             *)
               echo "Unsupported checks-fast task: $TASK" >&2
@@ -1531,7 +1531,7 @@ jobs:
     name: QA Smoke CI (${{ matrix.name }})
     needs: [preflight]
     if: needs.preflight.outputs.run_qa_smoke_ci == 'true'
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-16vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-16vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -1560,18 +1560,18 @@ jobs:
           # Blacksmith same-repo runs clone dependencies from a sticky disk.
           # Fork PRs must keep actions/cache: sticky snapshots are writable,
           # repository-global state and must never be produced by fork code.
-          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'true' || 'false' }}
-          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'false' || 'true' }}
+          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'true' || 'false' }}
+          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'false' || 'true' }}
 
       - name: Set up Blacksmith Docker layer cache
-        if: ${{ matrix.docker_cache == true && github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') }}
+        if: ${{ matrix.docker_cache == true && github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') }}
         uses: useblacksmith/setup-docker-builder@ab5c1da94f53f5cd75c1038092aa276dddfccbba # v1
         with:
           max-cache-size-mb: 800000
 
       - name: Build QA smoke runtime
         env:
-          OPENCLAW_BUILD_PRIVATE_QA: "1"
+          STEELENGINE_BUILD_PRIVATE_QA: "1"
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
           node scripts/build-all.mjs qaRuntime
@@ -1579,29 +1579,29 @@ jobs:
           package_args=(
             --skip-build
             --output-dir .artifacts/qa-e2e/smoke-ci-package
-            --output-name openclaw-current.tgz
+            --output-name steelengine-current.tgz
           )
-          if grep -Fq -- '--allow-unreleased-changelog' scripts/package-openclaw-for-docker.mjs; then
+          if grep -Fq -- '--allow-unreleased-changelog' scripts/package-steelengine-for-docker.mjs; then
             package_args=(--allow-unreleased-changelog "${package_args[@]}")
           fi
-          node scripts/package-openclaw-for-docker.mjs "${package_args[@]}"
+          node scripts/package-steelengine-for-docker.mjs "${package_args[@]}"
 
       - name: Run smoke profile part
         env:
           PROFILE_PART: ${{ matrix.lane }}
           PROFILE_PART_SLUG: ${{ matrix.slug }}
-          OPENCLAW_QA_SUITE_WORKER_START_STAGGER_MS: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && '0' || '1500' }}
+          STEELENGINE_QA_SUITE_WORKER_START_STAGGER_MS: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && '0' || '1500' }}
         shell: bash
         run: |
           set -euo pipefail
           output_dir=".artifacts/qa-e2e/smoke-ci-profile-${PROFILE_PART_SLUG}"
-          export OPENCLAW_BUILD_PRIVATE_QA=1
-          export OPENCLAW_ENABLE_PRIVATE_QA_CLI=1
-          export OPENCLAW_DISABLE_BUNDLED_PLUGINS=0
-          export OPENCLAW_QA_REDACT_PUBLIC_METADATA=1
-          export OPENCLAW_QA_TRANSPORT_READY_TIMEOUT_MS=180000
+          export STEELENGINE_BUILD_PRIVATE_QA=1
+          export STEELENGINE_ENABLE_PRIVATE_QA_CLI=1
+          export STEELENGINE_DISABLE_BUNDLED_PLUGINS=0
+          export STEELENGINE_QA_REDACT_PUBLIC_METADATA=1
+          export STEELENGINE_QA_TRANSPORT_READY_TIMEOUT_MS=180000
           export NODE_OPTIONS=--max-old-space-size=16384
-          export OPENCLAW_CURRENT_PACKAGE_TGZ="$PWD/.artifacts/qa-e2e/smoke-ci-package/openclaw-current.tgz"
+          export STEELENGINE_CURRENT_PACKAGE_TGZ="$PWD/.artifacts/qa-e2e/smoke-ci-package/steelengine-current.tgz"
           PROFILE_RUNS_TSV="$(
             node --import tsx --input-type=module <<'EOF'
           const smokePlan = await import("./extensions/qa-lab/src/ci-smoke-plan.ts");
@@ -1693,7 +1693,7 @@ jobs:
             for scenario_id in "${scenario_ids[@]}"; do
               scenario_args+=(--scenario "$scenario_id")
             done
-            timeout --signal=TERM --kill-after=15s 10m node openclaw.mjs qa run \
+            timeout --signal=TERM --kill-after=15s 10m node steelengine.mjs qa run \
               --repo-root . \
               --qa-profile smoke-ci \
               --concurrency 10 \
@@ -1721,7 +1721,7 @@ jobs:
     name: ${{ matrix.checkName }}
     needs: [preflight]
     if: needs.preflight.outputs.run_plugin_contracts_shards == 'true'
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -1736,12 +1736,12 @@ jobs:
           # Blacksmith same-repo runs clone dependencies from a sticky disk.
           # Fork PRs must keep actions/cache: sticky snapshots are writable,
           # repository-global state and must never be produced by fork code.
-          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'true' || 'false' }}
-          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'false' || 'true' }}
+          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'true' || 'false' }}
+          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'false' || 'true' }}
 
       - name: Run plugin contract shard
         env:
-          OPENCLAW_CONTRACT_INCLUDE_PATTERNS_JSON: ${{ toJson(matrix.includePatterns) }}
+          STEELENGINE_CONTRACT_INCLUDE_PATTERNS_JSON: ${{ toJson(matrix.includePatterns) }}
         shell: bash
         run: |
           set -euo pipefail
@@ -1749,14 +1749,14 @@ jobs:
           INCLUDE_FILE="$include_file" node --input-type=module <<'EOF'
           import { writeFileSync } from "node:fs";
 
-          const includePatterns = JSON.parse(process.env.OPENCLAW_CONTRACT_INCLUDE_PATTERNS_JSON ?? "[]");
+          const includePatterns = JSON.parse(process.env.STEELENGINE_CONTRACT_INCLUDE_PATTERNS_JSON ?? "[]");
           if (!Array.isArray(includePatterns) || includePatterns.length === 0) {
             console.error("Missing plugin contract include patterns");
             process.exit(1);
           }
           writeFileSync(process.env.INCLUDE_FILE, JSON.stringify(includePatterns), "utf8");
           EOF
-          OPENCLAW_VITEST_INCLUDE_FILE="$include_file" pnpm test:contracts:plugins
+          STEELENGINE_VITEST_INCLUDE_FILE="$include_file" pnpm test:contracts:plugins
 
   checks-fast-channel-contracts-shard:
     permissions:
@@ -1764,7 +1764,7 @@ jobs:
     name: ${{ matrix.checkName }}
     needs: [preflight]
     if: needs.preflight.outputs.run_channel_contracts_shards == 'true'
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -1779,12 +1779,12 @@ jobs:
           # Blacksmith same-repo runs clone dependencies from a sticky disk.
           # Fork PRs must keep actions/cache: sticky snapshots are writable,
           # repository-global state and must never be produced by fork code.
-          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'true' || 'false' }}
-          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'false' || 'true' }}
+          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'true' || 'false' }}
+          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'false' || 'true' }}
 
       - name: Run channel contract shard
         env:
-          OPENCLAW_CONTRACT_INCLUDE_PATTERNS_JSON: ${{ toJson(matrix.includePatterns) }}
+          STEELENGINE_CONTRACT_INCLUDE_PATTERNS_JSON: ${{ toJson(matrix.includePatterns) }}
         shell: bash
         run: |
           set -euo pipefail
@@ -1792,14 +1792,14 @@ jobs:
           INCLUDE_FILE="$include_file" node --input-type=module <<'EOF'
           import { writeFileSync } from "node:fs";
 
-          const includePatterns = JSON.parse(process.env.OPENCLAW_CONTRACT_INCLUDE_PATTERNS_JSON ?? "[]");
+          const includePatterns = JSON.parse(process.env.STEELENGINE_CONTRACT_INCLUDE_PATTERNS_JSON ?? "[]");
           if (!Array.isArray(includePatterns) || includePatterns.length === 0) {
             console.error("Missing channel contract include patterns");
             process.exit(1);
           }
           writeFileSync(process.env.INCLUDE_FILE, JSON.stringify(includePatterns), "utf8");
           EOF
-          OPENCLAW_VITEST_INCLUDE_FILE="$include_file" pnpm test:contracts:channels
+          STEELENGINE_VITEST_INCLUDE_FILE="$include_file" pnpm test:contracts:channels
 
   checks-node-compat:
     permissions:
@@ -1807,7 +1807,7 @@ jobs:
     name: checks-node-compat-node22
     needs: [preflight]
     if: needs.preflight.outputs.run_build_artifacts == 'true' && github.event_name == 'workflow_dispatch'
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
     timeout-minutes: 60
     steps:
       - *linux_node_checkout_step
@@ -1819,7 +1819,7 @@ jobs:
           build-all-cache-scope: full
 
       - name: Configure Node test resources
-        run: echo "OPENCLAW_VITEST_MAX_WORKERS=2" >> "$GITHUB_ENV"
+        run: echo "STEELENGINE_VITEST_MAX_WORKERS=2" >> "$GITHUB_ENV"
 
       - name: Run Node 22 compatibility
         env:
@@ -1827,8 +1827,8 @@ jobs:
         run: |
           pnpm build
           pnpm ui:build
-          node openclaw.mjs --help
-          node openclaw.mjs status --json --timeout 1
+          node steelengine.mjs --help
+          node steelengine.mjs status --json --timeout 1
           pnpm test:build:singleton
 
   checks-node-core-test-nondist-shard:
@@ -1837,7 +1837,7 @@ jobs:
     name: ${{ matrix.check_name }}
     needs: [preflight]
     if: needs.preflight.outputs.run_checks_node_core_nondist == 'true'
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && (matrix.runner || 'blacksmith-4vcpu-ubuntu-2404') || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && (matrix.runner || 'blacksmith-4vcpu-ubuntu-2404') || 'ubuntu-24.04') }}
     timeout-minutes: ${{ matrix.timeout_minutes || 60 }}
     strategy:
       fail-fast: false
@@ -1855,8 +1855,8 @@ jobs:
           # Blacksmith same-repo runs clone dependencies from a sticky disk.
           # Fork PRs must keep actions/cache: sticky snapshots are writable,
           # repository-global state and must never be produced by fork code.
-          sticky-disk: ${{ (matrix.node_version == null || matrix.node_version == '24.x') && github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'true' || 'false' }}
-          use-actions-cache: ${{ (matrix.node_version == null || matrix.node_version == '24.x') && github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'false' || 'true' }}
+          sticky-disk: ${{ (matrix.node_version == null || matrix.node_version == '24.x') && github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'true' || 'false' }}
+          use-actions-cache: ${{ (matrix.node_version == null || matrix.node_version == '24.x') && github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'false' || 'true' }}
           vitest-fs-cache: "true"
           node-compile-cache: "true"
           node-compile-cache-scope: "test"
@@ -1898,7 +1898,7 @@ jobs:
             workers=3
           fi
           echo "detected cores=$cores plan_concurrency=${SHARD_PLAN_CONCURRENCY:-default} -> workers=$workers"
-          echo "OPENCLAW_VITEST_MAX_WORKERS=$workers" >> "$GITHUB_ENV"
+          echo "STEELENGINE_VITEST_MAX_WORKERS=$workers" >> "$GITHUB_ENV"
 
       - name: Run Node test shard
         # actionlint 1.7.11 lacks GitHub's current job.workflow_* fields. Serialize the
@@ -1906,18 +1906,18 @@ jobs:
         env:
           JOB_CONTEXT_JSON: ${{ toJSON(job) }}
           NODE_OPTIONS: --max-old-space-size=8192
-          OPENCLAW_NODE_TEST_GROUPS_JSON: ${{ toJson(matrix.groups || null) }}
-          OPENCLAW_NODE_TEST_CONFIGS_JSON: ${{ toJson(matrix.configs) }}
-          OPENCLAW_NODE_TEST_ENV_JSON: ${{ toJson(matrix.env) }}
-          OPENCLAW_NODE_TEST_INCLUDE_PATTERNS_JSON: ${{ toJson(matrix.includePatterns) }}
-          OPENCLAW_NODE_TEST_TARGETS_JSON: ${{ toJson(matrix.targets) }}
+          STEELENGINE_NODE_TEST_GROUPS_JSON: ${{ toJson(matrix.groups || null) }}
+          STEELENGINE_NODE_TEST_CONFIGS_JSON: ${{ toJson(matrix.configs) }}
+          STEELENGINE_NODE_TEST_ENV_JSON: ${{ toJson(matrix.env) }}
+          STEELENGINE_NODE_TEST_INCLUDE_PATTERNS_JSON: ${{ toJson(matrix.includePatterns) }}
+          STEELENGINE_NODE_TEST_TARGETS_JSON: ${{ toJson(matrix.targets) }}
           # Frozen targets can carry integration hooks whose cold setup exceeds
           # the current 120-second default on shared release runners.
-          OPENCLAW_NODE_TEST_VITEST_ARGS_JSON: ${{ needs.preflight.outputs.compatibility_target == 'true' && '["--hookTimeout=300000"]' || '[]' }}
-          OPENCLAW_VITEST_SHARD_NAME: ${{ matrix.shard_name }}
-          OPENCLAW_VITEST_NO_OUTPUT_TIMEOUT_MS: "300000"
-          OPENCLAW_VITEST_NO_OUTPUT_RETRY: "1"
-          OPENCLAW_NODE_TEST_PLAN_CONCURRENCY: ${{ matrix.plan_concurrency }}
+          STEELENGINE_NODE_TEST_VITEST_ARGS_JSON: ${{ needs.preflight.outputs.compatibility_target == 'true' && '["--hookTimeout=300000"]' || '[]' }}
+          STEELENGINE_VITEST_SHARD_NAME: ${{ matrix.shard_name }}
+          STEELENGINE_VITEST_NO_OUTPUT_TIMEOUT_MS: "300000"
+          STEELENGINE_VITEST_NO_OUTPUT_RETRY: "1"
+          STEELENGINE_NODE_TEST_PLAN_CONCURRENCY: ${{ matrix.plan_concurrency }}
         shell: bash
         run: |
           set -euo pipefail
@@ -1936,7 +1936,7 @@ jobs:
               echo "invalid job workflow SHA: $job_workflow_sha" >&2
               exit 1
             fi
-            harness_root="${RUNNER_TEMP}/openclaw-ci-shard-runner"
+            harness_root="${RUNNER_TEMP}/steelengine-ci-shard-runner"
             workflow_remote="https://github.com/${job_workflow_repository}.git"
             timeout --signal=TERM --kill-after=10s 120s git fetch --no-tags --depth=1 "$workflow_remote" "$job_workflow_sha"
             for file in \
@@ -1957,7 +1957,7 @@ jobs:
     name: ${{ matrix.check_name }}
     needs: [preflight]
     if: ${{ !cancelled() && always() && needs.preflight.outputs.run_check == 'true' }}
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && (matrix.runner || 'blacksmith-4vcpu-ubuntu-2404') || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && (matrix.runner || 'blacksmith-4vcpu-ubuntu-2404') || 'ubuntu-24.04') }}
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -2000,15 +2000,15 @@ jobs:
           # Blacksmith same-repo runs clone dependencies from a sticky disk.
           # Fork PRs must keep actions/cache: sticky snapshots are writable,
           # repository-global state and must never be produced by fork code.
-          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'true' || 'false' }}
-          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'false' || 'true' }}
+          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'true' || 'false' }}
+          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'false' || 'true' }}
 
       # check-lint's shard runner rebuilds the same plugin-sdk boundary
       # artifacts the boundary lane snapshots (~72s cold); restore them from
       # the shared sticky. Strictly read-only (commit: false): only the
       # protected boundary lane may publish this repository-global snapshot.
       - name: Mount extension boundary sticky disk
-        if: matrix.task == 'lint' && github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw')
+        if: matrix.task == 'lint' && github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine')
         uses: useblacksmith/stickydisk@6d373c96a74cbde0c99fedc5ea5d3a7ba66ba494 # main (post-v1.4.0 hot-attach fix)
         with:
           # One stable disk for the whole repository. The v1 per-PR/per-config
@@ -2017,11 +2017,11 @@ jobs:
           # budget, 429-failing every mount. Snapshot validity lives in the
           # in-job marker checked below instead of the key.
           key: ${{ github.repository }}-ext-boundary-v2
-          path: /var/tmp/openclaw-ext-boundary
+          path: /var/tmp/steelengine-ext-boundary
           commit: "false"
 
       - name: Restore extension boundary artifacts from sticky disk
-        if: matrix.task == 'lint' && github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw')
+        if: matrix.task == 'lint' && github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine')
         shell: bash
         env:
           # Config/toolchain inputs the tree-OID gate below cannot see; must
@@ -2029,7 +2029,7 @@ jobs:
           BOUNDARY_CONFIG_HASH: ${{ hashFiles('tsconfig.json', 'tsconfig.plugin-sdk.dts.json', 'packages/plugin-sdk/tsconfig.json', 'scripts/check-extension-package-tsc-boundary.mjs', 'scripts/prepare-extension-package-boundary-artifacts.mjs', 'scripts/write-plugin-sdk-entry-dts.ts', 'scripts/lib/plugin-sdk-entrypoints.json', 'scripts/lib/plugin-sdk-entries.mjs', 'package.json', 'pnpm-lock.yaml') }}
         run: |
           set -euo pipefail
-          sticky_root=/var/tmp/openclaw-ext-boundary
+          sticky_root=/var/tmp/steelengine-ext-boundary
           if [ ! -f "$sticky_root/.snapshot-ready" ]; then
             echo "boundary artifact snapshot not seeded yet; lint prepares cold"
             exit 0
@@ -2054,7 +2054,7 @@ jobs:
           FORMAT_CHECK: ${{ needs.preflight.outputs.run_format_check }}
           RUN_CONTROL_UI_I18N: ${{ needs.preflight.outputs.run_control_ui_i18n }}
           RUN_UI_TESTS: ${{ needs.preflight.outputs.run_ui_tests }}
-          OPENCLAW_LOCAL_CHECK: "0"
+          STEELENGINE_LOCAL_CHECK: "0"
           TASK: ${{ matrix.task }}
           PR_BASE_SHA: ${{ github.event_name == 'pull_request' && needs.preflight.outputs.diff_base_revision || '' }}
         shell: bash
@@ -2190,7 +2190,7 @@ jobs:
     name: ${{ matrix.check_name }}
     needs: [preflight]
     if: ${{ !cancelled() && always() && needs.preflight.outputs.run_check_additional == 'true' }}
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && (matrix.runner || 'blacksmith-4vcpu-ubuntu-2404') || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && (matrix.runner || 'blacksmith-4vcpu-ubuntu-2404') || 'ubuntu-24.04') }}
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -2242,8 +2242,8 @@ jobs:
           # Blacksmith same-repo runs clone dependencies from a sticky disk.
           # Fork PRs must keep actions/cache: sticky snapshots are writable,
           # repository-global state and must never be produced by fork code.
-          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'true' || 'false' }}
-          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'false' || 'true' }}
+          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'true' || 'false' }}
+          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'false' || 'true' }}
 
       # Same-repo runs carry boundary artifacts on a Blacksmith sticky disk:
       # the GitHub cache below is evicted so quickly under the repo quota that
@@ -2251,7 +2251,7 @@ jobs:
       # plugin-sdk declarations. Fork PRs must never produce writable
       # repository-global snapshots, so they keep the GitHub cache path.
       - name: Mount extension boundary sticky disk
-        if: matrix.group == 'extension-package-boundary' && github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw')
+        if: matrix.group == 'extension-package-boundary' && github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine')
         uses: useblacksmith/stickydisk@6d373c96a74cbde0c99fedc5ea5d3a7ba66ba494 # main (post-v1.4.0 hot-attach fix)
         with:
           # One stable disk for the whole repository. The v1 per-PR/per-config
@@ -2261,7 +2261,7 @@ jobs:
           # in-job marker checked below instead of the key, so source and
           # toolchain changes refresh this disk in place.
           key: ${{ github.repository }}-ext-boundary-v2
-          path: /var/tmp/openclaw-ext-boundary
+          path: /var/tmp/steelengine-ext-boundary
           # Single semantic writer: only protected pushes commit, so
           # pull_request clones stay read-only and the snapshot tracks main.
           # Explicit true (not on-change/if-missing) because the allocated-byte
@@ -2272,7 +2272,7 @@ jobs:
 
       - name: Restore extension boundary artifacts from sticky disk
         id: boundary-sticky-restore
-        if: matrix.group == 'extension-package-boundary' && github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw')
+        if: matrix.group == 'extension-package-boundary' && github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine')
         shell: bash
         env:
           # Config/toolchain inputs the tree-OID gate below cannot see; must
@@ -2280,7 +2280,7 @@ jobs:
           BOUNDARY_CONFIG_HASH: ${{ hashFiles('tsconfig.json', 'tsconfig.plugin-sdk.dts.json', 'packages/plugin-sdk/tsconfig.json', 'scripts/check-extension-package-tsc-boundary.mjs', 'scripts/prepare-extension-package-boundary-artifacts.mjs', 'scripts/write-plugin-sdk-entry-dts.ts', 'scripts/lib/plugin-sdk-entrypoints.json', 'scripts/lib/plugin-sdk-entries.mjs', 'package.json', 'pnpm-lock.yaml') }}
         run: |
           set -euo pipefail
-          sticky_root=/var/tmp/openclaw-ext-boundary
+          sticky_root=/var/tmp/steelengine-ext-boundary
           if [ ! -f "$sticky_root/.snapshot-ready" ]; then
             echo "restored=false" >> "$GITHUB_OUTPUT"
             exit 0
@@ -2366,11 +2366,11 @@ jobs:
         env:
           ADDITIONAL_CHECK_GROUP: ${{ matrix.group }}
           RUN_PROMPT_SNAPSHOTS: ${{ needs.preflight.outputs.run_prompt_snapshots }}
-          OPENCLAW_ADDITIONAL_BOUNDARY_SHARD: ${{ matrix.boundary_shard || '' }}
-          OPENCLAW_ADDITIONAL_BOUNDARY_CONCURRENCY: 4
+          STEELENGINE_ADDITIONAL_BOUNDARY_SHARD: ${{ matrix.boundary_shard || '' }}
+          STEELENGINE_ADDITIONAL_BOUNDARY_CONCURRENCY: 4
           # Matches the boundary lane's 32 vCPU runner (cores/2); the
           # script's default caps at 6 to protect laptops.
-          OPENCLAW_EXTENSION_BOUNDARY_CONCURRENCY: 16
+          STEELENGINE_EXTENSION_BOUNDARY_CONCURRENCY: 16
         shell: bash
         run: |
           set -euo pipefail
@@ -2466,14 +2466,14 @@ jobs:
       # clone). Seed the payload before the sticky post-action flushes.
       # rsync -aR mirrors the repo-relative layout the restore step replays.
       - name: Seed extension boundary sticky disk
-        if: success() && steps.boundary-sticky-restore.outputs.restored == 'false' && matrix.group == 'extension-package-boundary' && github.event_name != 'workflow_dispatch' && github.event_name != 'pull_request' && github.repository == 'openclaw/openclaw'
+        if: success() && steps.boundary-sticky-restore.outputs.restored == 'false' && matrix.group == 'extension-package-boundary' && github.event_name != 'workflow_dispatch' && github.event_name != 'pull_request' && github.repository == 'steelengine/steelengine'
         shell: bash
         env:
           # Must stay identical to the restore gates above.
           BOUNDARY_CONFIG_HASH: ${{ hashFiles('tsconfig.json', 'tsconfig.plugin-sdk.dts.json', 'packages/plugin-sdk/tsconfig.json', 'scripts/check-extension-package-tsc-boundary.mjs', 'scripts/prepare-extension-package-boundary-artifacts.mjs', 'scripts/write-plugin-sdk-entry-dts.ts', 'scripts/lib/plugin-sdk-entrypoints.json', 'scripts/lib/plugin-sdk-entries.mjs', 'package.json', 'pnpm-lock.yaml') }}
         run: |
           set -euo pipefail
-          sticky_root=/var/tmp/openclaw-ext-boundary
+          sticky_root=/var/tmp/steelengine-ext-boundary
           # A stale marker must not survive a mid-seed failure: drop readiness
           # first so a partial payload can never be restored as valid.
           rm -rf "$sticky_root/.snapshot-ready" "$sticky_root/.source-trees" "$sticky_root/dist" "$sticky_root/packages" "$sticky_root/extensions"
@@ -2494,7 +2494,7 @@ jobs:
       contents: read
     needs: [preflight]
     if: needs.preflight.outputs.run_check_docs == 'true'
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
     timeout-minutes: 20
     steps:
       - *linux_node_checkout_step
@@ -2505,8 +2505,8 @@ jobs:
           # Blacksmith same-repo runs clone dependencies from a sticky disk.
           # Fork PRs must keep actions/cache: sticky snapshots are writable,
           # repository-global state and must never be produced by fork code.
-          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'true' || 'false' }}
-          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'false' || 'true' }}
+          sticky-disk: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'true' || 'false' }}
+          use-actions-cache: ${{ github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'false' || 'true' }}
 
       - name: Check formatting
         if: needs.preflight.outputs.run_format_check == 'true'
@@ -2530,7 +2530,7 @@ jobs:
             reset_checkout_dir
             git init "$workdir" >/dev/null
             git -C "$workdir" config gc.auto 0
-            git -C "$workdir" remote add origin "https://github.com/openclaw/clawhub.git"
+            git -C "$workdir" remote add origin "https://github.com/steelengine/clawhub.git"
 
             timeout --signal=TERM --kill-after=10s 120s git -C "$workdir" \
               -c protocol.version=2 \
@@ -2556,7 +2556,7 @@ jobs:
 
       - name: Check docs
         env:
-          OPENCLAW_DOCS_SYNC_CLAWHUB_REPO: ${{ github.workspace }}/clawhub-source
+          STEELENGINE_DOCS_SYNC_CLAWHUB_REPO: ${{ github.workspace }}/clawhub-source
         run: pnpm check:docs
 
   skills-python:
@@ -2564,7 +2564,7 @@ jobs:
       contents: read
     needs: [preflight]
     if: needs.preflight.outputs.run_skills_python_job == 'true'
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
     timeout-minutes: 20
     steps:
       - name: Checkout
@@ -2619,13 +2619,13 @@ jobs:
     name: ${{ matrix.check_name }}
     needs: [preflight]
     if: needs.preflight.outputs.run_checks_windows == 'true'
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'windows-2025' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && (matrix.runner || 'blacksmith-8vcpu-windows-2025') || 'windows-2025') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'windows-2025' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && (matrix.runner || 'blacksmith-8vcpu-windows-2025') || 'windows-2025') }}
     timeout-minutes: 60
     env:
       NODE_OPTIONS: --max-old-space-size=8192
       # Keep total concurrency predictable on the smaller Windows runner.
-      OPENCLAW_VITEST_MAX_WORKERS: 1
-      OPENCLAW_TEST_SKIP_FULL_EXTENSIONS_SHARD: 1
+      STEELENGINE_VITEST_MAX_WORKERS: 1
+      STEELENGINE_TEST_SKIP_FULL_EXTENSIONS_SHARD: 1
     defaults:
       run:
         shell: bash
@@ -2708,7 +2708,7 @@ jobs:
         run: |
           set -euo pipefail
           source .github/actions/setup-pnpm-store-cache/ensure-node.sh
-          openclaw_ensure_node "$REQUESTED_NODE_VERSION"
+          steelengine_ensure_node "$REQUESTED_NODE_VERSION"
 
       - name: Setup pnpm
         uses: ./.github/actions/setup-pnpm-store-cache
@@ -2765,7 +2765,7 @@ jobs:
     name: ${{ matrix.check_name }}
     needs: [preflight]
     if: ${{ !cancelled() && always() && needs.preflight.outputs.run_macos_node == 'true' }}
-    runs-on: ${{ (github.event_name == 'workflow_dispatch' || github.run_attempt > 1) && 'macos-15' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-6vcpu-macos-15' || 'macos-15') }}
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' || github.run_attempt > 1) && 'macos-15' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-6vcpu-macos-15' || 'macos-15') }}
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -2781,7 +2781,7 @@ jobs:
       - name: TS tests (macOS)
         env:
           NODE_OPTIONS: --max-old-space-size=4096
-          OPENCLAW_VITEST_MAX_WORKERS: 2
+          STEELENGINE_VITEST_MAX_WORKERS: 2
           TASK: ${{ matrix.task }}
         shell: bash
         run: |
@@ -2804,7 +2804,7 @@ jobs:
     name: "macos-swift"
     needs: [preflight]
     if: needs.preflight.outputs.run_macos_swift == 'true'
-    runs-on: ${{ (github.event_name == 'workflow_dispatch' || github.run_attempt > 1) && 'macos-26' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-12vcpu-macos-26' || 'macos-26') }}
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' || github.run_attempt > 1) && 'macos-26' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-12vcpu-macos-26' || 'macos-26') }}
     # Hosted runs may still be finalizing large Swift caches after every test
     # passes; keep that post-job work non-blocking.
     timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.run_attempt > 1) && 30 || 20 }}
@@ -2816,7 +2816,7 @@ jobs:
       - name: Install XcodeGen / SwiftLint / SwiftFormat
         run: |
           if [[ -x ./scripts/install-xcodegen.sh && -x ./scripts/install-swift-tools.sh ]]; then
-            swift_tools_dir="$RUNNER_TEMP/openclaw-swift-tools"
+            swift_tools_dir="$RUNNER_TEMP/steelengine-swift-tools"
             ./scripts/install-xcodegen.sh "$swift_tools_dir"
             ./scripts/install-swift-tools.sh "$swift_tools_dir"
             echo "$swift_tools_dir" >> "$GITHUB_PATH"
@@ -2844,7 +2844,7 @@ jobs:
                 ;;
             esac
             swiftformat_archive="$RUNNER_TEMP/swiftformat-$swiftformat_version.zip"
-            swift_tools_dir="$RUNNER_TEMP/openclaw-legacy-swift-tools"
+            swift_tools_dir="$RUNNER_TEMP/steelengine-legacy-swift-tools"
             curl --fail --location --silent --show-error \
               --connect-timeout 10 --max-time 120 \
               --retry 3 --retry-max-time 120 \
@@ -2886,7 +2886,7 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           path: apps/macos/.build
-          key: ${{ runner.os }}-swift-build-v3-${{ steps.swift-toolchain.outputs.key }}-${{ hashFiles('apps/macos/Package.swift', 'apps/macos/Package.resolved', 'apps/macos/Sources/**', 'apps/macos/Tests/**', 'apps/shared/OpenClawKit/Package.swift', 'apps/shared/OpenClawKit/Sources/**', 'apps/swabble/Package.swift', 'apps/swabble/Sources/**') }}
+          key: ${{ runner.os }}-swift-build-v3-${{ steps.swift-toolchain.outputs.key }}-${{ hashFiles('apps/macos/Package.swift', 'apps/macos/Package.resolved', 'apps/macos/Sources/**', 'apps/macos/Tests/**', 'apps/shared/SteelEngineKit/Package.swift', 'apps/shared/SteelEngineKit/Sources/**', 'apps/swabble/Package.swift', 'apps/swabble/Sources/**') }}
           restore-keys: |
             ${{ runner.os }}-swift-build-v3-${{ steps.swift-toolchain.outputs.key }}-
 
@@ -2909,12 +2909,12 @@ jobs:
           set -euo pipefail
           # Exact source-hash cache hits already match these inputs; checkout
           # mtimes are the only reason SwiftPM rebuilds cached products.
-          find apps/macos/Sources apps/macos/Tests apps/shared/OpenClawKit/Sources apps/swabble/Sources apps/macos/.build/checkouts \
+          find apps/macos/Sources apps/macos/Tests apps/shared/SteelEngineKit/Sources apps/swabble/Sources apps/macos/.build/checkouts \
             -type f -exec touch -t 200001010000 {} +
           touch -t 200001010000 \
             apps/macos/Package.swift \
             apps/macos/Package.resolved \
-            apps/shared/OpenClawKit/Package.swift \
+            apps/shared/SteelEngineKit/Package.swift \
             apps/swabble/Package.swift
 
       - name: Show toolchain
@@ -2931,7 +2931,7 @@ jobs:
           elif [[ "$HISTORICAL_TARGET" == "true" ]]; then
             # Frozen release targets before the shared wrappers used these commands directly.
             swiftlint lint --config config/swiftlint.yml
-            swiftformat --lint apps/macos/Sources --config config/swiftformat --exclude '**/OpenClawProtocol,**/HostEnvSecurityPolicy.generated.swift'
+            swiftformat --lint apps/macos/Sources --config config/swiftformat --exclude '**/SteelEngineProtocol,**/HostEnvSecurityPolicy.generated.swift'
           else
             echo "Current CI targets must provide the Swift lint and format wrappers." >&2
             exit 1
@@ -2944,7 +2944,7 @@ jobs:
             # The macOS lane validates the desktop app build; the CLI product is
             # intentionally left to its own narrower surfaces instead of making
             # this lane rebuild the whole package graph.
-            if swift build --package-path apps/macos --product OpenClaw --configuration release; then
+            if swift build --package-path apps/macos --product SteelEngine --configuration release; then
               exit 0
             fi
             if [[ "$attempt" -eq 3 ]]; then
@@ -2958,29 +2958,29 @@ jobs:
           done
           exit 1
 
-      - name: OpenClawKit Talk-trait opt-out (no ElevenLabsKit when default traits disabled)
+      - name: SteelEngineKit Talk-trait opt-out (no ElevenLabsKit when default traits disabled)
         run: |
           set -euo pipefail
-          # Guard: chat-only consumers build OpenClawKit with the Talk trait
+          # Guard: chat-only consumers build SteelEngineKit with the Talk trait
           # disabled and must NOT link ElevenLabsKit. Assert that future sources
-          # under OpenClawKit cannot silently reintroduce an unconditional
+          # under SteelEngineKit cannot silently reintroduce an unconditional
           # ElevenLabsKit dependency while the manifest still looks correct.
-          deps="$(swift package --package-path apps/shared/OpenClawKit show-dependencies --disable-default-traits)"
+          deps="$(swift package --package-path apps/shared/SteelEngineKit show-dependencies --disable-default-traits)"
           echo "$deps"
           if grep -qi 'elevenlabs' <<<"$deps"; then
             echo "::error::ElevenLabsKit resolved with the Talk trait disabled; keep it gated behind the Talk trait."
             exit 1
           fi
-          swift build --package-path apps/shared/OpenClawKit --target OpenClawKit --disable-default-traits
+          swift build --package-path apps/shared/SteelEngineKit --target SteelEngineKit --disable-default-traits
 
-      - name: OpenClawKit tests
+      - name: SteelEngineKit tests
         run: |
           set -euo pipefail
-          openclawkit_scratch="$(mktemp -d "$RUNNER_TEMP/openclawkit.XXXXXX")"
-          trap 'rm -rf "$openclawkit_scratch"' EXIT
+          steelenginekit_scratch="$(mktemp -d "$RUNNER_TEMP/steelenginekit.XXXXXX")"
+          trap 'rm -rf "$steelenginekit_scratch"' EXIT
           swift test \
-            --package-path apps/shared/OpenClawKit \
-            --scratch-path "$openclawkit_scratch" \
+            --package-path apps/shared/SteelEngineKit \
+            --scratch-path "$steelenginekit_scratch" \
             --parallel
 
       - name: Swift test
@@ -3001,7 +3001,7 @@ jobs:
     name: "ios-build"
     needs: [preflight]
     if: needs.preflight.outputs.run_ios_build == 'true'
-    runs-on: ${{ (github.event_name == 'workflow_dispatch' || github.run_attempt > 1) && 'macos-26' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-12vcpu-macos-26' || 'macos-26') }}
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' || github.run_attempt > 1) && 'macos-26' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-12vcpu-macos-26' || 'macos-26') }}
     timeout-minutes: 45
     env:
       HISTORICAL_TARGET: ${{ needs.preflight.outputs.compatibility_target }}
@@ -3033,7 +3033,7 @@ jobs:
       - name: Install iOS Swift tooling
         run: |
           if [[ -x ./scripts/install-xcodegen.sh && -x ./scripts/install-swift-tools.sh ]]; then
-            swift_tools_dir="$RUNNER_TEMP/openclaw-swift-tools"
+            swift_tools_dir="$RUNNER_TEMP/steelengine-swift-tools"
             ./scripts/install-xcodegen.sh "$swift_tools_dir"
             ./scripts/install-swift-tools.sh "$swift_tools_dir"
             echo "$swift_tools_dir" >> "$GITHUB_PATH"
@@ -3061,7 +3061,7 @@ jobs:
                 ;;
             esac
             swiftformat_archive="$RUNNER_TEMP/swiftformat-$swiftformat_version.zip"
-            swift_tools_dir="$RUNNER_TEMP/openclaw-legacy-swift-tools"
+            swift_tools_dir="$RUNNER_TEMP/steelengine-legacy-swift-tools"
             curl --fail --location --silent --show-error \
               --connect-timeout 10 --max-time 120 \
               --retry 3 --retry-max-time 120 \
@@ -3105,7 +3105,7 @@ jobs:
     name: ${{ matrix.check_name }}
     needs: [preflight]
     if: needs.preflight.outputs.run_android_job == 'true'
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw') && 'blacksmith-8vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && 'ubuntu-24.04' || (github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine') && 'blacksmith-8vcpu-ubuntu-2404' || 'ubuntu-24.04') }}
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -3177,7 +3177,7 @@ jobs:
       # repository-global snapshots, so they keep the GitHub cache path (their
       # runs-on already selects non-Blacksmith ubuntu-24.04 runners).
       - name: Mount Gradle sticky disk
-        if: github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw')
+        if: github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine')
         uses: useblacksmith/stickydisk@6d373c96a74cbde0c99fedc5ea5d3a7ba66ba494 # main (post-v1.4.0 hot-attach fix)
         with:
           # One stable disk per matrix task. The v1 per-PR/per-dependency-hash
@@ -3189,7 +3189,7 @@ jobs:
           # build lanes can never repair. Dependency-file changes live in the
           # runtime fingerprint marker below instead of the key.
           key: ${{ github.repository }}-gradle-v2-${{ matrix.task }}
-          path: /var/tmp/openclaw-gradle
+          path: /var/tmp/steelengine-gradle
           # Single semantic writer: only protected pushes commit, so
           # pull_request clones stay read-only and the snapshot tracks main.
           # Explicit true (not on-change) because the allocated-byte heuristic
@@ -3199,7 +3199,7 @@ jobs:
           commit: ${{ github.event_name != 'pull_request' && 'true' || 'false' }}
 
       - name: Point Gradle at the sticky disk
-        if: github.event_name != 'workflow_dispatch' && github.repository == 'openclaw/openclaw' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'openclaw/openclaw')
+        if: github.event_name != 'workflow_dispatch' && github.repository == 'steelengine/steelengine' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'steelengine/steelengine')
         shell: bash
         env:
           # Gradle caches are content-addressed, so a stale snapshot is safe
@@ -3211,8 +3211,8 @@ jobs:
           STICKY_WRITER: ${{ github.event_name != 'pull_request' && 'true' || 'false' }}
         run: |
           set -euo pipefail
-          sticky_root=/var/tmp/openclaw-gradle
-          marker="$sticky_root/.openclaw-gradle-deps-fingerprint"
+          sticky_root=/var/tmp/steelengine-gradle
+          marker="$sticky_root/.steelengine-gradle-deps-fingerprint"
           disk_fingerprint=""
           if [ -f "$marker" ]; then
             disk_fingerprint="$(<"$marker")"
@@ -3290,7 +3290,7 @@ jobs:
   ci-gate:
     permissions:
       contents: read
-    name: openclaw/ci-gate
+    name: steelengine/ci-gate
     needs:
       - preflight
       - security-fast

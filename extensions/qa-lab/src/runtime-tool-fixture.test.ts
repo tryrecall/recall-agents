@@ -2,8 +2,8 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { upsertSessionEntry } from "openclaw/plugin-sdk/session-store-runtime";
-import { appendSessionTranscriptMessageByIdentity } from "openclaw/plugin-sdk/session-transcript-runtime";
+import { upsertSessionEntry } from "steelengine/plugin-sdk/session-store-runtime";
+import { appendSessionTranscriptMessageByIdentity } from "steelengine/plugin-sdk/session-transcript-runtime";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { runRuntimeToolFixture } from "./runtime-tool-fixture.js";
 import { readRawQaSessionStore } from "./suite-runtime-agent-session.js";
@@ -42,7 +42,7 @@ async function writeQaSessionTranscript(
   const sessionId = sessionKey.replace(/[^a-z0-9]+/giu, "-");
   const sessionEnv = {
     ...process.env,
-    OPENCLAW_STATE_DIR: path.join(env.gateway.tempRoot, "state"),
+    STEELENGINE_STATE_DIR: path.join(env.gateway.tempRoot, "state"),
   };
   await upsertSessionEntry({
     agentId: "qa",
@@ -150,8 +150,8 @@ async function runMockRuntimeToolFixtureWithOutputs(params: {
     {
       toolName: params.toolName,
       toolCoverage: {
-        bucket: "openclaw-dynamic-integration",
-        expectedLayer: "openclaw-dynamic",
+        bucket: "steelengine-dynamic-integration",
+        expectedLayer: "steelengine-dynamic",
       },
       promptSnippet,
       failurePromptSnippet,
@@ -191,8 +191,8 @@ describe("runtime tool fixture", () => {
       {
         toolName: "read",
         toolCoverage: {
-          bucket: "openclaw-dynamic-integration",
-          expectedLayer: "openclaw-dynamic",
+          bucket: "steelengine-dynamic-integration",
+          expectedLayer: "steelengine-dynamic",
         },
       },
       {
@@ -235,8 +235,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "read",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
           },
         },
         {
@@ -259,8 +259,8 @@ describe("runtime tool fixture", () => {
       {
         toolName: "read",
         toolCoverage: {
-          bucket: "openclaw-dynamic-integration",
-          expectedLayer: "openclaw-dynamic",
+          bucket: "steelengine-dynamic-integration",
+          expectedLayer: "steelengine-dynamic",
         },
       },
       {
@@ -317,8 +317,8 @@ describe("runtime tool fixture", () => {
       {
         toolName: "image_generate",
         toolCoverage: {
-          bucket: "openclaw-dynamic-integration",
-          expectedLayer: "openclaw-dynamic",
+          bucket: "steelengine-dynamic-integration",
+          expectedLayer: "steelengine-dynamic",
         },
         happyPathOutputRequired: false,
       },
@@ -369,8 +369,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "image_generate",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
           },
           happyPathOutputRequired: false,
         },
@@ -432,8 +432,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "read",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
           },
         },
         {
@@ -496,8 +496,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "read",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
           },
         },
         {
@@ -511,14 +511,14 @@ describe("runtime tool fixture", () => {
     ).rejects.toThrow("expected live happy-path successful tool output for read");
   });
 
-  it("does not fail Codex-native fixtures solely because OpenClaw dynamic exposure is absent", async () => {
+  it("does not fail Codex-native fixtures solely because SteelEngine dynamic exposure is absent", async () => {
     const env = await makeEnv({
       mock: { baseUrl: "http://127.0.0.1:9999" },
       gateway: {
         baseUrl: "http://127.0.0.1:1",
         tempRoot: "",
         workspaceDir: "",
-        runtimeEnv: { OPENCLAW_QA_FORCE_RUNTIME: "codex" },
+        runtimeEnv: { STEELENGINE_QA_FORCE_RUNTIME: "codex" },
         call: vi.fn(),
       },
     });
@@ -558,7 +558,7 @@ describe("runtime tool fixture", () => {
     );
 
     expect(details).toContain("codex-native-workspace read");
-    expect(details).toContain("OpenClaw dynamic exposure is intentionally omitted");
+    expect(details).toContain("SteelEngine dynamic exposure is intentionally omitted");
     expect(details).toContain("mock provider happy planned args (diagnostic only)");
   });
 
@@ -569,7 +569,7 @@ describe("runtime tool fixture", () => {
         baseUrl: "http://127.0.0.1:1",
         tempRoot: "",
         workspaceDir: "",
-        runtimeEnv: { OPENCLAW_QA_FORCE_RUNTIME: "codex" },
+        runtimeEnv: { STEELENGINE_QA_FORCE_RUNTIME: "codex" },
         call: vi.fn(),
       },
     });
@@ -656,8 +656,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "read",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
           },
           promptSnippet: "target=read",
           failurePromptSnippet: "failure target=read",
@@ -705,8 +705,8 @@ describe("runtime tool fixture", () => {
       {
         toolName: "image_generate",
         toolCoverage: {
-          bucket: "openclaw-dynamic-integration",
-          expectedLayer: "openclaw-dynamic",
+          bucket: "steelengine-dynamic-integration",
+          expectedLayer: "steelengine-dynamic",
         },
         promptSnippet: "target=image_generate",
         failurePromptSnippet: "failure target=image_generate",
@@ -765,8 +765,8 @@ describe("runtime tool fixture", () => {
       {
         toolName: "read",
         toolCoverage: {
-          bucket: "openclaw-dynamic-integration",
-          expectedLayer: "openclaw-dynamic",
+          bucket: "steelengine-dynamic-integration",
+          expectedLayer: "steelengine-dynamic",
         },
         promptSnippet: "target=read",
         failurePromptSnippet: "failure target=read",
@@ -811,8 +811,8 @@ describe("runtime tool fixture", () => {
       {
         toolName: "image_generate",
         toolCoverage: {
-          bucket: "openclaw-dynamic-integration",
-          expectedLayer: "openclaw-dynamic",
+          bucket: "steelengine-dynamic-integration",
+          expectedLayer: "steelengine-dynamic",
           required: false,
           action: "optional runtime parity gate with async image completion coverage",
         },
@@ -866,8 +866,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "image_generate",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
             required: false,
             action: "optional runtime parity gate with async image completion coverage",
           },
@@ -918,8 +918,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "image_generate",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
             required: false,
             action: "optional runtime parity gate with async image completion coverage",
           },
@@ -965,8 +965,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "image_generate",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
             required: false,
             action: "optional runtime parity gate with async image completion coverage",
           },
@@ -1012,8 +1012,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "image_generate",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
             required: false,
             action: "optional runtime parity gate with async image completion coverage",
           },
@@ -1069,8 +1069,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "read",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
           },
           promptSnippet: "target=read",
           failurePromptSnippet: "failure target=read",
@@ -1124,8 +1124,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "read",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
           },
           promptSnippet: "target=read",
           failurePromptSnippet: "failure target=read",
@@ -1152,7 +1152,7 @@ describe("runtime tool fixture", () => {
     {
       name: "unavailable-provider",
       toolName: "web_search",
-      happyArgs: { query: "OpenClaw runtime parity fixed query" },
+      happyArgs: { query: "SteelEngine runtime parity fixed query" },
       happyOutput: "result",
       failureOutput: "web_search is disabled or no provider is available.",
     },
@@ -1177,7 +1177,7 @@ describe("runtime tool fixture", () => {
     {
       name: "unavailable-provider happy output",
       toolName: "web_search",
-      happyArgs: { query: "OpenClaw runtime parity fixed query" },
+      happyArgs: { query: "SteelEngine runtime parity fixed query" },
       happyOutput: "web_search is disabled or no provider is available.",
       failureOutput: "web_search is disabled or no provider is available.",
       expectedError: "expected mock happy-path successful tool output for web_search",
@@ -1231,8 +1231,8 @@ describe("runtime tool fixture", () => {
       {
         toolName: "read",
         toolCoverage: {
-          bucket: "openclaw-dynamic-integration",
-          expectedLayer: "openclaw-dynamic",
+          bucket: "steelengine-dynamic-integration",
+          expectedLayer: "steelengine-dynamic",
         },
         promptSnippet: "target=read",
         failurePromptSnippet: "failure target=read",
@@ -1287,8 +1287,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "read",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
           },
           promptSnippet: "target=read",
           failurePromptSnippet: "failure target=read",
@@ -1339,8 +1339,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "read",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
           },
           promptSnippet: "target=read",
           failurePromptSnippet: "failure target=read",
@@ -1356,7 +1356,7 @@ describe("runtime tool fixture", () => {
     ).rejects.toThrow("expected mock happy-path tool output for read");
   });
 
-  it("still fails required OpenClaw dynamic fixtures when the tool is absent", async () => {
+  it("still fails required SteelEngine dynamic fixtures when the tool is absent", async () => {
     const env = await makeEnv();
 
     await expect(
@@ -1365,8 +1365,8 @@ describe("runtime tool fixture", () => {
         {
           toolName: "web_search",
           toolCoverage: {
-            bucket: "openclaw-dynamic-integration",
-            expectedLayer: "openclaw-dynamic",
+            bucket: "steelengine-dynamic-integration",
+            expectedLayer: "steelengine-dynamic",
           },
         },
         {

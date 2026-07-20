@@ -1,9 +1,9 @@
-// Computes git, dependency, and registry update status for OpenClaw installs.
+// Computes git, dependency, and registry update status for SteelEngine installs.
 import fs from "node:fs/promises";
 import path from "node:path";
 import { runCommandWithTimeout } from "../process/exec.js";
 import { detectPackageManager as detectPackageManagerImpl } from "./detect-package-manager.js";
-import { compareOpenClawReleaseVersions } from "./npm-registry-spec.js";
+import { compareSteelEngineReleaseVersions } from "./npm-registry-spec.js";
 import { compareValidSemver, normalizeLegacyDotBetaVersion } from "./semver.js";
 import { channelToNpmTag, type UpdateChannel } from "./update-channels.js";
 import {
@@ -75,7 +75,7 @@ export type UpdateCheckResult = {
 };
 
 const PUBLIC_NPM_REGISTRY_URL = "https://registry.npmjs.org/";
-const PUBLIC_NPM_PACKAGE_NAME = "openclaw";
+const PUBLIC_NPM_PACKAGE_NAME = "steelengine";
 
 function isLoopbackNpmRegistry(raw: string): boolean {
   try {
@@ -95,7 +95,7 @@ function resolveExtendedStableRegistryTarget(params: {
 }): { registryUrl: string; packageName: string } {
   const env = params.env ?? process.env;
   const packageName = params.packageName?.trim() || PUBLIC_NPM_PACKAGE_NAME;
-  const packageSpecOverride = env.OPENCLAW_UPDATE_PACKAGE_SPEC?.trim();
+  const packageSpecOverride = env.STEELENGINE_UPDATE_PACKAGE_SPEC?.trim();
   const registryOverride = env.NPM_CONFIG_REGISTRY?.trim() || env.npm_config_registry?.trim() || "";
 
   // A matching package override plus a loopback registry is the explicit local
@@ -512,9 +512,9 @@ export async function resolveNpmChannelTag(params: {
 
 export function compareSemverStrings(a: string | null, b: string | null): number | null {
   if (a && b) {
-    const openClawReleaseCmp = compareOpenClawReleaseVersions(a, b);
-    if (openClawReleaseCmp != null) {
-      return openClawReleaseCmp;
+    const steelEngineReleaseCmp = compareSteelEngineReleaseVersions(a, b);
+    if (steelEngineReleaseCmp != null) {
+      return steelEngineReleaseCmp;
     }
   }
   const normalizedA = a ? normalizeLegacyDotBetaVersion(a) : null;

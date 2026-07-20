@@ -1,7 +1,7 @@
 // Signal plugin module implements identity behavior.
-import { resolveAllowlistMatchByCandidates } from "openclaw/plugin-sdk/allow-from";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { normalizeE164 } from "openclaw/plugin-sdk/text-utility-runtime";
+import { resolveAllowlistMatchByCandidates } from "steelengine/plugin-sdk/allow-from";
+import { normalizeLowercaseStringOrEmpty } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { normalizeE164 } from "steelengine/plugin-sdk/text-utility-runtime";
 import { looksLikeUuid } from "./uuid.js";
 
 type SignalSenderAliases = {

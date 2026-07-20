@@ -358,9 +358,9 @@ describe("qa scenario catalog", () => {
     expect(readQaScenarioExecutionConfig(webSearch.id)).toMatchObject({
       toolName: "web_search",
       toolCoverage: {
-        bucket: "openclaw-dynamic-integration",
-        expectedLayer: "openclaw-dynamic",
-        capabilityLayer: "openclaw-dynamic-direct",
+        bucket: "steelengine-dynamic-integration",
+        expectedLayer: "steelengine-dynamic",
+        capabilityLayer: "steelengine-dynamic-direct",
         required: true,
       },
     });
@@ -388,9 +388,9 @@ describe("qa scenario catalog", () => {
       requiredProviderMode: "mock-openai",
       toolName: "image_generate",
       toolCoverage: {
-        bucket: "openclaw-dynamic-integration",
-        expectedLayer: "openclaw-dynamic",
-        capabilityLayer: "openclaw-dynamic-direct",
+        bucket: "steelengine-dynamic-integration",
+        expectedLayer: "steelengine-dynamic",
+        capabilityLayer: "steelengine-dynamic-direct",
         required: false,
       },
     });
@@ -465,7 +465,7 @@ describe("qa scenario catalog", () => {
     expect(gatewayRestartContract).toContain("interruptedMatches.length === 1");
     expect(gatewayRestartContract).toContain("restartNotices.length === 0");
     expect(gatewayRestartContract).toContain("dispatching restart-safe recovery");
-    expect(gatewayRestartContract).toContain("[OpenClaw heartbeat poll]");
+    expect(gatewayRestartContract).toContain("[SteelEngine heartbeat poll]");
     expect(gatewayRestartContract).toContain("liveTurnTimeoutMs(env, 180000)");
     expect(gatewayRestartContract).toContain("dmScope: 'per-channel-peer'");
     const liveMultiRestart = readQaScenarioById("gateway-restart-multi-live");
@@ -541,7 +541,7 @@ describe("qa scenario catalog", () => {
 
   it("accepts the update.run producer's blocked evidence without destructive opt-in", async () => {
     const outputDir = await fs.promises.mkdtemp(
-      path.join(os.tmpdir(), "openclaw-update-run-blocked-"),
+      path.join(os.tmpdir(), "steelengine-update-run-blocked-"),
     );
     try {
       const result = await runQaTestFileScenarios({
@@ -551,8 +551,8 @@ describe("qa scenario catalog", () => {
         primaryModel: "mock-openai/gpt-5.6-luna",
         scenarios: [readQaScenarioById("update-run-package-self-upgrade")],
         env: {
-          OPENCLAW_QA_ALLOW_UPDATE_RUN_SELF: "0",
-          OPENCLAW_QA_REF: "blocked-evidence-test",
+          STEELENGINE_QA_ALLOW_UPDATE_RUN_SELF: "0",
+          STEELENGINE_QA_REF: "blocked-evidence-test",
         },
       });
 
@@ -566,7 +566,7 @@ describe("qa scenario catalog", () => {
                 status: "blocked",
                 failure: {
                   reason:
-                    "blocked destructive package self-upgrade; set OPENCLAW_QA_ALLOW_UPDATE_RUN_SELF=1 to run",
+                    "blocked destructive package self-upgrade; set STEELENGINE_QA_ALLOW_UPDATE_RUN_SELF=1 to run",
                 },
               },
             },
@@ -728,9 +728,9 @@ describe("qa scenario catalog", () => {
     expect(scenario.sourcePath).toBe("qa/scenarios/plugins/kitchen-sink-live-openai.yaml");
     expect(config?.requiredProviderMode).toBe("live-frontier");
     expect(config?.requiredProvider).toBe("openai");
-    expect(config?.pluginSpec).toBe("npm:@openclaw/kitchen-sink@latest");
+    expect(config?.pluginSpec).toBe("npm:@steelengine/kitchen-sink@latest");
     expect(JSON.stringify(scenario.execution.flow)).toContain('"--force"');
-    expect(config?.pluginId).toBe("openclaw-kitchen-sink-fixture");
+    expect(config?.pluginId).toBe("steelengine-kitchen-sink-fixture");
     expect(config?.pluginPersonality).toBe("conformance");
     expect(config?.adversarialPersonality).toBe("adversarial");
     expect(config?.expectedSurfaceIds?.webSearchProviderIds).toContain(

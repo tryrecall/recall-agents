@@ -15,14 +15,14 @@ import {
   getNodeSqliteKysely,
 } from "../infra/kysely-sync.js";
 import type {
-  DB as OpenClawStateKyselyDatabase,
+  DB as SteelEngineStateKyselyDatabase,
   OperatorApprovals,
-} from "../state/openclaw-state-db.generated.js";
+} from "../state/steelengine-state-db.generated.js";
 import {
-  openOpenClawStateDatabase,
-  runOpenClawStateWriteTransaction,
-  type OpenClawStateDatabaseOptions,
-} from "../state/openclaw-state-db.js";
+  openSteelEngineStateDatabase,
+  runSteelEngineStateWriteTransaction,
+  type SteelEngineStateDatabaseOptions,
+} from "../state/steelengine-state-db.js";
 
 const OPERATOR_APPROVAL_TERMINAL_RETENTION_MS = 30 * 24 * 60 * 60_000;
 export const OPERATOR_APPROVAL_MAX_AUDIENCE_SESSION_KEYS = 64;
@@ -141,7 +141,7 @@ type TerminalizeOperatorApprovalsResult = {
   records: OperatorApprovalRecord[];
 };
 
-type OperatorApprovalDatabase = Pick<OpenClawStateKyselyDatabase, "operator_approvals">;
+type OperatorApprovalDatabase = Pick<SteelEngineStateKyselyDatabase, "operator_approvals">;
 type OperatorApprovalRow = Selectable<OperatorApprovals>;
 
 type OperatorApprovalHistoryCursor = {
@@ -447,7 +447,7 @@ function decodeOperatorApprovalRow(row: OperatorApprovalRow): OperatorApprovalRe
 }
 
 function selectOperatorApprovalRow(
-  database: ReturnType<typeof openOpenClawStateDatabase>,
+  database: ReturnType<typeof openSteelEngineStateDatabase>,
   id: string,
 ): OperatorApprovalRow | undefined {
   const stateDb = getNodeSqliteKysely<OperatorApprovalDatabase>(database.db);
@@ -458,7 +458,7 @@ function selectOperatorApprovalRow(
 }
 
 function selectOperatorApprovalRowByLocator(
-  database: ReturnType<typeof openOpenClawStateDatabase>,
+  database: ReturnType<typeof openSteelEngineStateDatabase>,
   locator: string,
 ): OperatorApprovalRow | undefined {
   const stateDb = getNodeSqliteKysely<OperatorApprovalDatabase>(database.db);
@@ -474,7 +474,7 @@ function selectOperatorApprovalRowByLocator(
 }
 
 function hasApprovalLocatorNamespaceConflict(params: {
-  database: ReturnType<typeof openOpenClawStateDatabase>;
+  database: ReturnType<typeof openSteelEngineStateDatabase>;
   id: string;
   resolutionRef: string;
 }): boolean {
@@ -504,7 +504,7 @@ function matchesExpectedApprovalOwner(params: {
 }
 
 function denyCorruptPendingRow(params: {
-  database: ReturnType<typeof openOpenClawStateDatabase>;
+  database: ReturnType<typeof openSteelEngineStateDatabase>;
   id: string;
   nowMs: number;
   createdAtMs: number;
@@ -530,7 +530,7 @@ function denyCorruptPendingRow(params: {
 }
 
 function expirePendingRow(params: {
-  database: ReturnType<typeof openOpenClawStateDatabase>;
+  database: ReturnType<typeof openSteelEngineStateDatabase>;
   id: string;
   nowMs: number;
   createdAtMs: number;
@@ -598,7 +598,7 @@ function inputMatchesExistingRow(
 
 export function insertOperatorApproval(params: {
   approval: NewOperatorApproval;
-  databaseOptions?: OpenClawStateDatabaseOptions;
+  databaseOptions?: SteelEngineStateDatabaseOptions;
 }): InsertOperatorApprovalResult {
   const input = params.approval;
   const id = requireApprovalId(input.id);
@@ -631,7 +631,7 @@ export function insertOperatorApproval(params: {
     audienceSessionKeysJson,
   };
 
-  return runOpenClawStateWriteTransaction((database) => {
+  return runSteelEngineStateWriteTransaction((database) => {
     const stateDb = getNodeSqliteKysely<OperatorApprovalDatabase>(database.db);
     executeSqliteQuerySync(
       database.db,
@@ -706,10 +706,10 @@ export function insertOperatorApproval(params: {
 export function getOperatorApprovalDetailed(params: {
   id: string;
   nowMs?: number;
-  databaseOptions?: OpenClawStateDatabaseOptions;
+  databaseOptions?: SteelEngineStateDatabaseOptions;
 }): GetOperatorApprovalResult {
   const id = requireApprovalId(params.id);
-  return runOpenClawStateWriteTransaction((database) => {
+  return runSteelEngineStateWriteTransaction((database) => {
     const nowMs = params.nowMs ?? Date.now();
     let row = selectOperatorApprovalRow(database, id);
     if (!row) {
@@ -734,10 +734,10 @@ export function getOperatorApprovalDetailed(params: {
 export function getOperatorApprovalDetailedByLocator(params: {
   locator: string;
   nowMs?: number;
-  databaseOptions?: OpenClawStateDatabaseOptions;
+  databaseOptions?: SteelEngineStateDatabaseOptions;
 }): GetOperatorApprovalResult {
   const locator = requireApprovalId(params.locator);
-  return runOpenClawStateWriteTransaction((database) => {
+  return runSteelEngineStateWriteTransaction((database) => {
     const nowMs = params.nowMs ?? Date.now();
     let row = selectOperatorApprovalRowByLocator(database, locator);
     if (!row) {
@@ -767,11 +767,11 @@ export function listPendingOperatorApprovals(
     recordFilter?: (record: OperatorApprovalRecord) => boolean;
     limit?: number;
     nowMs?: number;
-    databaseOptions?: OpenClawStateDatabaseOptions;
+    databaseOptions?: SteelEngineStateDatabaseOptions;
   } = {},
 ): OperatorApprovalRecord[] {
   expireDueOperatorApprovals({ nowMs: params.nowMs, databaseOptions: params.databaseOptions });
-  return runOpenClawStateWriteTransaction((database) => {
+  return runSteelEngineStateWriteTransaction((database) => {
     const nowMs = params.nowMs ?? Date.now();
     const stateDb = getNodeSqliteKysely<OperatorApprovalDatabase>(database.db);
     const resultLimit = Math.max(
@@ -852,7 +852,7 @@ export function listTerminalOperatorApprovals(
     limit?: number;
     kind?: OperatorApprovalKind;
     nowMs?: number;
-    databaseOptions?: OpenClawStateDatabaseOptions;
+    databaseOptions?: SteelEngineStateDatabaseOptions;
   } = {},
 ): ListTerminalOperatorApprovalsResult {
   const requestedLimit = Number.isSafeInteger(params.limit)
@@ -864,7 +864,7 @@ export function listTerminalOperatorApprovals(
   const retentionCutoffMs = (params.nowMs ?? Date.now()) - OPERATOR_APPROVAL_TERMINAL_RETENTION_MS;
   let cursor =
     params.cursor === undefined ? undefined : decodeOperatorApprovalHistoryCursor(params.cursor);
-  const database = openOpenClawStateDatabase(params.databaseOptions);
+  const database = openSteelEngineStateDatabase(params.databaseOptions);
   const stateDb = getNodeSqliteKysely<OperatorApprovalDatabase>(database.db);
   const records: OperatorApprovalRecord[] = [];
   const pageSize = resultLimit + 1;
@@ -934,7 +934,7 @@ export function resolveOperatorApproval(params: {
   expectedKind?: OperatorApprovalKind;
   runtimeEpoch?: string;
   nowMs?: number;
-  databaseOptions?: OpenClawStateDatabaseOptions;
+  databaseOptions?: SteelEngineStateDatabaseOptions;
 }): ResolveOperatorApprovalResult {
   const id = requireApprovalId(params.id);
   const resolverId = normalizeString(params.resolver.id);
@@ -942,7 +942,7 @@ export function resolveOperatorApproval(params: {
     params.runtimeEpoch === undefined
       ? undefined
       : requireString(params.runtimeEpoch, "operator approval runtime epoch");
-  return runOpenClawStateWriteTransaction((database) => {
+  return runSteelEngineStateWriteTransaction((database) => {
     const nowMs = params.nowMs ?? Date.now();
     let row = selectOperatorApprovalRow(database, id);
     if (!row) {
@@ -1035,14 +1035,14 @@ export function forceDenyOperatorApproval(params: {
   expectedKind?: OperatorApprovalKind;
   runtimeEpoch?: string;
   nowMs?: number;
-  databaseOptions?: OpenClawStateDatabaseOptions;
+  databaseOptions?: SteelEngineStateDatabaseOptions;
 }): ForceDenyOperatorApprovalResult {
   const id = requireApprovalId(params.id);
   const runtimeEpoch =
     params.runtimeEpoch === undefined
       ? undefined
       : requireString(params.runtimeEpoch, "operator approval runtime epoch");
-  return runOpenClawStateWriteTransaction((database) => {
+  return runSteelEngineStateWriteTransaction((database) => {
     const nowMs = params.nowMs ?? Date.now();
     const row = selectOperatorApprovalRow(database, id);
     if (!row) {
@@ -1107,9 +1107,9 @@ export function forceDenyOperatorApproval(params: {
 
 export function expireDueOperatorApprovals(params: {
   nowMs?: number;
-  databaseOptions?: OpenClawStateDatabaseOptions;
+  databaseOptions?: SteelEngineStateDatabaseOptions;
 }): TerminalizeOperatorApprovalsResult {
-  return runOpenClawStateWriteTransaction((database) => {
+  return runSteelEngineStateWriteTransaction((database) => {
     const nowMs = params.nowMs ?? Date.now();
     const stateDb = getNodeSqliteKysely<OperatorApprovalDatabase>(database.db);
     const dueRows = executeSqliteQuerySync(
@@ -1166,10 +1166,10 @@ export function expireDueOperatorApprovals(params: {
 export function closeOrphanedOperatorApprovals(params: {
   runtimeEpoch: string;
   nowMs?: number;
-  databaseOptions?: OpenClawStateDatabaseOptions;
+  databaseOptions?: SteelEngineStateDatabaseOptions;
 }): TerminalizeOperatorApprovalsResult {
   const runtimeEpoch = requireString(params.runtimeEpoch, "operator approval runtime epoch");
-  return runOpenClawStateWriteTransaction((database) => {
+  return runSteelEngineStateWriteTransaction((database) => {
     const nowMs = params.nowMs ?? Date.now();
     const stateDb = getNodeSqliteKysely<OperatorApprovalDatabase>(database.db);
     const orphanRows = executeSqliteQuerySync(
@@ -1236,7 +1236,7 @@ export function consumeOperatorApprovalAllowOnce(params: {
   runtimeEpoch?: string;
   redemptionWindowMs?: number;
   nowMs?: number;
-  databaseOptions?: OpenClawStateDatabaseOptions;
+  databaseOptions?: SteelEngineStateDatabaseOptions;
 }): ConsumeOperatorApprovalResult {
   const id = requireApprovalId(params.id);
   const consumerId = requireString(params.consumerId, "operator approval consumer id");
@@ -1247,7 +1247,7 @@ export function consumeOperatorApprovalAllowOnce(params: {
   if (params.redemptionWindowMs !== undefined && !isValidTimestamp(params.redemptionWindowMs)) {
     throw new Error("operator approval redemption window must be a non-negative safe integer");
   }
-  return runOpenClawStateWriteTransaction((database) => {
+  return runSteelEngineStateWriteTransaction((database) => {
     const nowMs = params.nowMs ?? Date.now();
     const redemptionThresholdMs =
       params.redemptionWindowMs === undefined ? undefined : nowMs - params.redemptionWindowMs;
@@ -1331,13 +1331,13 @@ export function consumeOperatorApprovalAllowOnce(params: {
 export function pruneTerminalOperatorApprovals(params: {
   nowMs?: number;
   retentionMs?: number;
-  databaseOptions?: OpenClawStateDatabaseOptions;
+  databaseOptions?: SteelEngineStateDatabaseOptions;
 }): number {
   const retentionMs = params.retentionMs ?? OPERATOR_APPROVAL_TERMINAL_RETENTION_MS;
   if (!Number.isSafeInteger(retentionMs) || retentionMs < 0) {
     throw new Error("operator approval retention must be a non-negative safe integer");
   }
-  return runOpenClawStateWriteTransaction((database) => {
+  return runSteelEngineStateWriteTransaction((database) => {
     const nowMs = params.nowMs ?? Date.now();
     const cutoffMs = nowMs - retentionMs;
     const stateDb = getNodeSqliteKysely<OperatorApprovalDatabase>(database.db);

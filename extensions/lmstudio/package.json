@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/lmstudio-provider",
+  "name": "@steelengine/lmstudio-provider",
   "version": "2026.7.2-beta.3",
   "private": true,
-  "description": "OpenClaw LM Studio provider plugin",
+  "description": "SteelEngine LM Studio provider plugin",
   "type": "module",
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ]

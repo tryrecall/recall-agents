@@ -82,7 +82,7 @@ type ConfigReloadHealthSummary = {
   hotReloadStatus: import("../gateway/config-reload-status.types.js").GatewayHotReloadStatus;
 };
 
-/** Full gateway health payload consumed by `openclaw health`. */
+/** Full gateway health payload consumed by `steelengine health`. */
 export type HealthSummary = {
   ok: true;
   ts: number;

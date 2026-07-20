@@ -1,6 +1,6 @@
 // Resolves manifest contracts into runtime-facing plugin capabilities.
-import { sortUniqueStrings } from "@openclaw/normalization-core/string-normalization";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import { sortUniqueStrings } from "@steelengine/normalization-core/string-normalization";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   hasManifestContractValue,
   listAvailableManifestContractPlugins,
@@ -14,7 +14,7 @@ type ManifestContractRuntimePluginResolution = {
 };
 
 export function resolveManifestContractRuntimePluginResolution(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   contract: PluginManifestContractListKey;
   value?: string;
 }): ManifestContractRuntimePluginResolution {

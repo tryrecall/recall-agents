@@ -7,16 +7,16 @@ describe("formatCliFailureLines", () => {
     const lines = formatCliFailureLines({
       title: "Could not start the CLI.",
       error: new Error("config file is invalid"),
-      argv: ["node", "openclaw", "status"],
+      argv: ["node", "steelengine", "status"],
       env: {},
     });
 
     expect(lines).toEqual([
-      "[openclaw] Could not start the CLI.",
-      "[openclaw] Reason: config file is invalid",
-      "[openclaw] Debug: set OPENCLAW_DEBUG=1 to include the stack trace.",
-      "[openclaw] Try: openclaw doctor",
-      "[openclaw] Help: openclaw --help",
+      "[steelengine] Could not start the CLI.",
+      "[steelengine] Reason: config file is invalid",
+      "[steelengine] Debug: set STEELENGINE_DEBUG=1 to include the stack trace.",
+      "[steelengine] Try: steelengine doctor",
+      "[steelengine] Help: steelengine --help",
     ]);
   });
 
@@ -24,14 +24,14 @@ describe("formatCliFailureLines", () => {
     const lines = formatCliFailureLines({
       title: "The CLI command failed.",
       error: new Error("boom"),
-      env: { OPENCLAW_DEBUG: "1" },
+      env: { STEELENGINE_DEBUG: "1" },
     });
 
     expect(lines.slice(0, 4)).toEqual([
-      "[openclaw] The CLI command failed.",
-      "[openclaw] Reason: boom",
-      "[openclaw] Stack:",
-      "[openclaw] Error: boom",
+      "[steelengine] The CLI command failed.",
+      "[steelengine] Reason: boom",
+      "[steelengine] Stack:",
+      "[steelengine] Error: boom",
     ]);
     expect(lines.join("\n")).toContain("Error: boom");
   });

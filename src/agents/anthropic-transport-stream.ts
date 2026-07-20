@@ -31,7 +31,7 @@ import {
   type AnthropicProjectedToolChoice,
   type AnthropicThinkingDisplay,
   type AnthropicToolProjection,
-} from "@openclaw/ai/internal/anthropic";
+} from "@steelengine/ai/internal/anthropic";
 import {
   calculateCost,
   clampThinkingLevel,
@@ -39,19 +39,19 @@ import {
   getEnvApiKey,
   notifyLlmRequestActivity,
   parseStreamingJson,
-} from "@openclaw/ai/internal/runtime";
+} from "@steelengine/ai/internal/runtime";
 import {
   describeToolResultMediaPlaceholder,
   extractToolResultBlockText,
   extractToolResultText,
   isImageWithMediaPayload,
-} from "@openclaw/ai/internal/shared";
+} from "@steelengine/ai/internal/shared";
 /**
  * Native Anthropic Messages streaming transport.
- * Converts OpenClaw contexts/tools into Anthropic payloads, streams SSE events
+ * Converts SteelEngine contexts/tools into Anthropic payloads, streams SSE events
  * back into runtime output blocks, and applies provider request policy.
  */
-import { normalizeLowercaseStringOrEmpty } from "@openclaw/normalization-core/string-coerce";
+import { normalizeLowercaseStringOrEmpty } from "@steelengine/normalization-core/string-coerce";
 import { createAbortError as createNamedAbortError } from "../infra/abort-signal.js";
 import { toErrorObject } from "../infra/errors.js";
 import { readResponseTextSnippet } from "../infra/http-body.js";

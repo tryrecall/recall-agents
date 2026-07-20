@@ -1,7 +1,7 @@
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
 // Firecrawl provider module implements model/runtime integration.
-import { readPositiveIntegerParam } from "openclaw/plugin-sdk/param-readers";
-import type { WebSearchProviderPlugin } from "openclaw/plugin-sdk/provider-web-search-contract";
+import { readPositiveIntegerParam } from "steelengine/plugin-sdk/param-readers";
+import type { WebSearchProviderPlugin } from "steelengine/plugin-sdk/provider-web-search-contract";
 import { buildFirecrawlWebSearchProviderBase } from "../web-search-shared.js";
 
 const loadFirecrawlClientModule = createLazyRuntimeModule(() => import("./firecrawl-client.js"));

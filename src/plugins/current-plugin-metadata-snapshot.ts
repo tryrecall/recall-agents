@@ -1,6 +1,6 @@
 /** Tracks the current plugin metadata snapshot for control-plane lookups. */
-import { setCurrentManifestModelIdNormalizationRecords } from "@openclaw/model-catalog-core/provider-model-id-normalization";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import { setCurrentManifestModelIdNormalizationRecords } from "@steelengine/model-catalog-core/provider-model-id-normalization";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   clearCurrentPluginMetadataSnapshotState,
   getCurrentPluginMetadataSnapshotState,
@@ -19,14 +19,14 @@ import type {
 import { normalizePluginIdScope, serializePluginIdScope } from "./plugin-scope.js";
 
 type CurrentPluginMetadataSnapshotState = ReturnType<typeof getCurrentPluginMetadataSnapshotState>;
-let currentPluginMetadataConfigIdentityCache = new WeakSet<OpenClawConfig>();
+let currentPluginMetadataConfigIdentityCache = new WeakSet<SteelEngineConfig>();
 
 registerPluginMetadataProcessMemoLifecycleClear(() => {
   setCurrentManifestModelIdNormalizationRecords(undefined);
 });
 
 function resolvePluginMetadataControlPlaneFingerprint(
-  config?: OpenClawConfig,
+  config?: SteelEngineConfig,
   options: Omit<ResolvePluginControlPlaneContextParams, "config"> = {},
 ): string {
   return resolvePluginControlPlaneFingerprint({
@@ -46,8 +46,8 @@ export function isReusableCurrentPluginMetadataSnapshot(
 export function setCurrentPluginMetadataSnapshot(
   snapshot: PluginMetadataSnapshot | undefined,
   options: {
-    config?: OpenClawConfig;
-    compatibleConfigs?: readonly OpenClawConfig[];
+    config?: SteelEngineConfig;
+    compatibleConfigs?: readonly SteelEngineConfig[];
     env?: NodeJS.ProcessEnv;
     workspaceDir?: string;
   } = {},
@@ -161,7 +161,7 @@ export function restoreCurrentPluginMetadataSnapshotState(
 
 export function getCurrentPluginMetadataSnapshot(
   params: {
-    config?: OpenClawConfig;
+    config?: SteelEngineConfig;
     env?: NodeJS.ProcessEnv;
     allowScopedSnapshot?: boolean;
     pluginIds?: readonly string[];

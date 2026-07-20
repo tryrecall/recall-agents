@@ -40,7 +40,7 @@ function gatewayPrompt(overrides: Partial<QuestionPrompt> = {}): QuestionPrompt 
 }
 
 async function panelIn(container: HTMLElement): Promise<ChatQuestionPanelElement> {
-  const panel = container.querySelector("openclaw-chat-question-panel") as ChatQuestionPanelElement;
+  const panel = container.querySelector("steelengine-chat-question-panel") as ChatQuestionPanelElement;
   await panel.updateComplete;
   return panel;
 }
@@ -66,14 +66,14 @@ describe("shared question panel", () => {
   ) {
     const redraw = () => {
       render(
-        html`<openclaw-chat-question-panel
+        html`<steelengine-chat-question-panel
           .props=${createGatewayQuestionPanelProps(prompt, {
             nowMs: 2_000,
             onChange: redraw,
             onSubmit: callbacks.onSubmit ?? vi.fn(),
             onSkip: callbacks.onSkip ?? vi.fn(),
           })}
-        ></openclaw-chat-question-panel>`,
+        ></steelengine-chat-question-panel>`,
         container,
       );
     };
@@ -241,9 +241,9 @@ describe("shared question panel", () => {
 
   it("disables actions whose gateway callbacks are unavailable", async () => {
     render(
-      html`<openclaw-chat-question-panel
+      html`<steelengine-chat-question-panel
         .props=${createGatewayQuestionPanelProps(gatewayPrompt(), { nowMs: 2_000 })}
-      ></openclaw-chat-question-panel>`,
+      ></steelengine-chat-question-panel>`,
       container,
     );
     await panelIn(container);
@@ -257,12 +257,12 @@ describe("shared question panel", () => {
   it("retains answers with submit-only wiring", async () => {
     const onSubmit = vi.fn();
     render(
-      html`<openclaw-chat-question-panel
+      html`<steelengine-chat-question-panel
         .props=${createGatewayQuestionPanelProps(gatewayPrompt(), {
           nowMs: 2_000,
           onSubmit,
         })}
-      ></openclaw-chat-question-panel>`,
+      ></steelengine-chat-question-panel>`,
       container,
     );
     const panel = await panelIn(container);
@@ -277,12 +277,12 @@ describe("shared question panel", () => {
   it("keeps Skip available with skip-only wiring", async () => {
     const onSkip = vi.fn();
     render(
-      html`<openclaw-chat-question-panel
+      html`<steelengine-chat-question-panel
         .props=${createGatewayQuestionPanelProps(gatewayPrompt(), {
           nowMs: 2_000,
           onSkip,
         })}
-      ></openclaw-chat-question-panel>`,
+      ></steelengine-chat-question-panel>`,
       container,
     );
     await panelIn(container);

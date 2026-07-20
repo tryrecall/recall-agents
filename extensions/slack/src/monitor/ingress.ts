@@ -8,14 +8,14 @@ import {
   DEFAULT_INGRESS_RETRY_MAX_ATTEMPTS,
   type ChannelIngressDrain,
   type ChannelIngressQueue,
-} from "openclaw/plugin-sdk/channel-outbound";
+} from "steelengine/plugin-sdk/channel-outbound";
 import {
   collectErrorGraphCandidates,
   extractErrorCode,
   formatErrorMessage,
-} from "openclaw/plugin-sdk/error-runtime";
-import type { PluginJsonValue } from "openclaw/plugin-sdk/plugin-entry";
-import { asOptionalRecord } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/error-runtime";
+import type { PluginJsonValue } from "steelengine/plugin-sdk/plugin-entry";
+import { asOptionalRecord } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { getSlackRuntime } from "../runtime.js";
 import { isNonRecoverableSlackAuthError } from "./reconnect-policy.js";
 
@@ -28,7 +28,7 @@ const SLACK_INGRESS_FAILED_TTL_MS = 30 * 24 * 60 * 60 * 1_000;
 const SLACK_INGRESS_FAILED_MAX_ENTRIES = 20_000;
 const SLACK_BOLT_AUTHORIZATION_ERROR = "slack_bolt_authorization_error";
 
-const SLACK_INGRESS_LIFECYCLE_CONTEXT_KEY = "openclawIngressLifecycle";
+const SLACK_INGRESS_LIFECYCLE_CONTEXT_KEY = "steelengineIngressLifecycle";
 
 export type SlackIngressTurnLifecycle = ReturnType<
   typeof bindIngressLifecycleToReplyOptions

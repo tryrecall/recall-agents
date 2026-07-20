@@ -1,17 +1,17 @@
 // Qqbot tests cover active cfg plugin behavior.
-import { expectDefined } from "@openclaw/normalization-core";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import { expectDefined } from "@steelengine/normalization-core";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import { describe, expect, it, vi } from "vitest";
 import { createActiveCfgProvider } from "./active-cfg.js";
 
-const getRuntimeConfigMock = vi.hoisted(() => vi.fn<() => OpenClawConfig>());
+const getRuntimeConfigMock = vi.hoisted(() => vi.fn<() => SteelEngineConfig>());
 
-vi.mock("openclaw/plugin-sdk/runtime-config-snapshot", () => ({
+vi.mock("steelengine/plugin-sdk/runtime-config-snapshot", () => ({
   getRuntimeConfig: getRuntimeConfigMock,
 }));
 
-function asCfg(shape: { bindings: Array<{ id: string }> }): OpenClawConfig {
-  return shape as unknown as OpenClawConfig;
+function asCfg(shape: { bindings: Array<{ id: string }> }): SteelEngineConfig {
+  return shape as unknown as SteelEngineConfig;
 }
 
 describe("createActiveCfgProvider", () => {
@@ -20,7 +20,7 @@ describe("createActiveCfgProvider", () => {
     const first = asCfg({ bindings: [{ id: "first" }] });
     const second = asCfg({ bindings: [{ id: "second" }] });
     const load = vi
-      .fn<() => OpenClawConfig>()
+      .fn<() => SteelEngineConfig>()
       .mockReturnValueOnce(first)
       .mockReturnValueOnce(second);
 
@@ -33,7 +33,7 @@ describe("createActiveCfgProvider", () => {
 
   it("never caches a previously loaded value", () => {
     const fallback = asCfg({ bindings: [] });
-    const calls: OpenClawConfig[] = [
+    const calls: SteelEngineConfig[] = [
       asCfg({ bindings: [{ id: "a" }] }),
       asCfg({ bindings: [{ id: "b" }] }),
       asCfg({ bindings: [{ id: "c" }] }),

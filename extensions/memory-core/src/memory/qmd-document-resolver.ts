@@ -1,15 +1,15 @@
 import path from "node:path";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { expectDefined } from "openclaw/plugin-sdk/expect-runtime";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { expectDefined } from "steelengine/plugin-sdk/expect-runtime";
 import {
   createSubsystemLogger,
   isPathInside,
-} from "openclaw/plugin-sdk/memory-core-host-engine-foundation";
-import type { MemorySource } from "openclaw/plugin-sdk/memory-core-host-engine-storage";
+} from "steelengine/plugin-sdk/memory-core-host-engine-foundation";
+import type { MemorySource } from "steelengine/plugin-sdk/memory-core-host-engine-storage";
 import {
   localeLowercasePreservingWhitespace,
   normalizeLowercaseStringOrEmpty,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 import { isSqliteBusyError } from "./qmd-command-errors.js";
 
 type SqliteDatabase = import("node:sqlite").DatabaseSync;

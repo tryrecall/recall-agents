@@ -14,12 +14,12 @@ plain_gh_env() {
 }
 
 resolve_plain_gh_bin() {
-  if [ -n "${OPENCLAW_GH_BIN:-}" ]; then
-    if [ -x "$OPENCLAW_GH_BIN" ]; then
-      printf '%s\n' "$OPENCLAW_GH_BIN"
+  if [ -n "${STEELENGINE_GH_BIN:-}" ]; then
+    if [ -x "$STEELENGINE_GH_BIN" ]; then
+      printf '%s\n' "$STEELENGINE_GH_BIN"
       return 0
     fi
-    printf 'OPENCLAW_GH_BIN is not executable: %s\n' "$OPENCLAW_GH_BIN" >&2
+    printf 'STEELENGINE_GH_BIN is not executable: %s\n' "$STEELENGINE_GH_BIN" >&2
     return 1
   fi
 

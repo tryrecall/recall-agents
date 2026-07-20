@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import { captureEnv, setTestEnvValue } from "../test-utils/env.js";
 import {
   listCommitments,
@@ -24,7 +24,7 @@ describe("commitment SQLite store", () => {
   const sessionKey = "agent:main:telegram:user-155462274";
 
   afterEach(async () => {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     vi.unstubAllEnvs();
     stateDirEnvSnapshot?.restore();
     stateDirEnvSnapshot = undefined;
@@ -33,10 +33,10 @@ describe("commitment SQLite store", () => {
   });
 
   async function useTempStateDir(): Promise<string> {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-commitments-store-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-commitments-store-"));
     tmpDirs.push(tmpDir);
-    stateDirEnvSnapshot ??= captureEnv(["OPENCLAW_STATE_DIR"]);
-    setTestEnvValue("OPENCLAW_STATE_DIR", tmpDir);
+    stateDirEnvSnapshot ??= captureEnv(["STEELENGINE_STATE_DIR"]);
+    setTestEnvValue("STEELENGINE_STATE_DIR", tmpDir);
     return tmpDir;
   }
 

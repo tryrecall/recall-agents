@@ -3,7 +3,7 @@ import { spawn } from "node:child_process";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import { DEFAULT_GATEWAY_PORT } from "../../config/paths.js";
 import { quoteCmdScriptArg } from "../../daemon/cmd-argv.js";
 import {
@@ -38,27 +38,27 @@ function powerShellSingleQuote(value: string): string {
 }
 
 function resolveSystemdUnit(env: NodeJS.ProcessEnv): string {
-  const override = normalizeOptionalString(env.OPENCLAW_SYSTEMD_UNIT);
+  const override = normalizeOptionalString(env.STEELENGINE_SYSTEMD_UNIT);
   if (override) {
     return override.endsWith(".service") ? override : `${override}.service`;
   }
-  return `${resolveGatewaySystemdServiceName(env.OPENCLAW_PROFILE)}.service`;
+  return `${resolveGatewaySystemdServiceName(env.STEELENGINE_PROFILE)}.service`;
 }
 
 function resolveLaunchdLabel(env: NodeJS.ProcessEnv): string {
-  const override = normalizeOptionalString(env.OPENCLAW_LAUNCHD_LABEL);
+  const override = normalizeOptionalString(env.STEELENGINE_LAUNCHD_LABEL);
   if (override) {
     return override;
   }
-  return resolveGatewayLaunchAgentLabel(env.OPENCLAW_PROFILE);
+  return resolveGatewayLaunchAgentLabel(env.STEELENGINE_PROFILE);
 }
 
 function resolveWindowsTaskName(env: NodeJS.ProcessEnv): string {
-  const override = env.OPENCLAW_WINDOWS_TASK_NAME?.trim();
+  const override = env.STEELENGINE_WINDOWS_TASK_NAME?.trim();
   if (override) {
     return override;
   }
-  return resolveGatewayWindowsTaskName(env.OPENCLAW_PROFILE);
+  return resolveGatewayWindowsTaskName(env.STEELENGINE_PROFILE);
 }
 
 /**
@@ -83,33 +83,33 @@ export async function prepareRestartScript(
       const unitName = resolveSystemdUnit(env);
       const escaped = shellEscape(unitName);
       const logSetup = renderPosixRestartLogSetup({ ...process.env, ...env });
-      filename = `openclaw-restart-${timestamp}.sh`;
+      filename = `steelengine-restart-${timestamp}.sh`;
       scriptContent = `#!/bin/sh
 # Standalone restart script — survives parent process termination.
 # Wait briefly to ensure file locks are released after update.
 sleep 1
 exec 3>&2
 ${logSetup}
-printf '[%s] openclaw restart attempt source=update target=%s\\n' "$(date -u +%FT%TZ)" '${escaped}' >&2
+printf '[%s] steelengine restart attempt source=update target=%s\\n' "$(date -u +%FT%TZ)" '${escaped}' >&2
 if systemctl --user is-active --quiet '${escaped}' || systemctl --user is-enabled --quiet '${escaped}'; then
   if systemctl --user restart '${escaped}'; then
     status=0
-    printf '[%s] openclaw restart done source=update\\n' "$(date -u +%FT%TZ)" >&2
+    printf '[%s] steelengine restart done source=update\\n' "$(date -u +%FT%TZ)" >&2
   else
     status=$?
-    printf '[%s] openclaw restart failed source=update status=%s\\n' "$(date -u +%FT%TZ)" "$status" >&2
+    printf '[%s] steelengine restart failed source=update status=%s\\n' "$(date -u +%FT%TZ)" "$status" >&2
   fi
 elif systemctl is-active --quiet '${escaped}' || systemctl is-enabled --quiet '${escaped}'; then
   status=78
-  printf '[%s] system-scoped openclaw gateway unit detected; update cannot restart it without sudo. Run: sudo systemctl restart %s\\n' "$(date -u +%FT%TZ)" '${escaped}' >&2
-  printf '[%s] system-scoped openclaw gateway unit detected; update cannot restart it without sudo. Run: sudo systemctl restart %s\\n' "$(date -u +%FT%TZ)" '${escaped}' >&3 2>/dev/null || true
+  printf '[%s] system-scoped steelengine gateway unit detected; update cannot restart it without sudo. Run: sudo systemctl restart %s\\n' "$(date -u +%FT%TZ)" '${escaped}' >&2
+  printf '[%s] system-scoped steelengine gateway unit detected; update cannot restart it without sudo. Run: sudo systemctl restart %s\\n' "$(date -u +%FT%TZ)" '${escaped}' >&3 2>/dev/null || true
 else
   if systemctl --user restart '${escaped}'; then
     status=0
-    printf '[%s] openclaw restart done source=update\\n' "$(date -u +%FT%TZ)" >&2
+    printf '[%s] steelengine restart done source=update\\n' "$(date -u +%FT%TZ)" >&2
   else
     status=$?
-    printf '[%s] openclaw restart failed source=update status=%s\\n' "$(date -u +%FT%TZ)" "$status" >&2
+    printf '[%s] steelengine restart failed source=update status=%s\\n' "$(date -u +%FT%TZ)" "$status" >&2
   fi
 fi
 # Self-cleanup
@@ -130,7 +130,7 @@ exit "$status"
       const plistPath = path.join(home, "Library", "LaunchAgents", `${label}.plist`);
       const escapedPlistPath = shellEscape(plistPath);
       const logSetup = renderPosixRestartLogSetup({ ...process.env, ...env });
-      filename = `openclaw-restart-${timestamp}.sh`;
+      filename = `steelengine-restart-${timestamp}.sh`;
       scriptContent = `#!/bin/sh
 # Standalone restart script — survives parent process termination.
 # Wait briefly to ensure file locks are released after update.
@@ -139,7 +139,7 @@ sleep 1
 # audit trail. Log setup is best-effort: restart must still run if the log path
 # is temporarily unavailable.
 ${logSetup}
-printf '[%s] openclaw restart attempt source=update target=%s\\n' "$(date -u +%FT%TZ)" '${shellEscapeRestartLogValue(label)}' >&2
+printf '[%s] steelengine restart attempt source=update target=%s\\n' "$(date -u +%FT%TZ)" '${shellEscapeRestartLogValue(label)}' >&2
 # Try kickstart first (works when the service is still registered).
 # If it fails (e.g. after bootout), clear any persisted disabled state,
 # then re-register via bootstrap. Bootstrap loads RunAtLoad agents, so the
@@ -157,11 +157,11 @@ if ! launchctl kickstart -k 'gui/${uid}/${escaped}'; then
   fi
 fi
 if [ "$status" -eq 0 ]; then
-  printf '[%s] openclaw restart done source=update\\n' "$(date -u +%FT%TZ)" >&2
+  printf '[%s] steelengine restart done source=update\\n' "$(date -u +%FT%TZ)" >&2
 else
-  printf '[%s] openclaw restart failed source=update status=%s\\n' "$(date -u +%FT%TZ)" "$status" >&2
+  printf '[%s] steelengine restart failed source=update status=%s\\n' "$(date -u +%FT%TZ)" "$status" >&2
 fi
-# Self-cleanup (log is retained under the OpenClaw state logs directory).
+# Self-cleanup (log is retained under the SteelEngine state logs directory).
 script_dir=$(dirname "$0")
 rm -f "$0"
 rmdir "$script_dir" 2>/dev/null || true
@@ -180,18 +180,18 @@ exit "$status"
       const gatewayScriptPath = resolveGatewayTaskScriptPath({ ...process.env, ...env });
       const quotedGatewayScriptPath = powerShellSingleQuote(gatewayScriptPath);
       const expectedGatewayArgv = windowsGatewayArgv.map(powerShellSingleQuote).join(", ");
-      filename = `openclaw-restart-${timestamp}.cmd`;
+      filename = `steelengine-restart-${timestamp}.cmd`;
       scriptContent = `@echo off
 REM Standalone restart script - survives parent process termination.
 REM Keep this as a cmd wrapper so Group Policy script execution policies
 REM cannot block the update restart handoff before schtasks.exe runs.
 setlocal
-set "OPENCLAW_RESTART_SCRIPT=%~f0"
-set "OPENCLAW_RESTART_SCRIPT_DIR=%~dp0."
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$p=$env:OPENCLAW_RESTART_SCRIPT; $s=Get-Content -Raw -LiteralPath $p; $m='# POWERSHELL'; $i=$s.IndexOf($m); if ($i -lt 0) { exit 1 }; Invoke-Expression $s.Substring($i)"
+set "STEELENGINE_RESTART_SCRIPT=%~f0"
+set "STEELENGINE_RESTART_SCRIPT_DIR=%~dp0."
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$p=$env:STEELENGINE_RESTART_SCRIPT; $s=Get-Content -Raw -LiteralPath $p; $m='# POWERSHELL'; $i=$s.IndexOf($m); if ($i -lt 0) { exit 1 }; Invoke-Expression $s.Substring($i)"
 set "status=%ERRORLEVEL%"
 del "%~f0" >nul 2>&1
-rmdir "%OPENCLAW_RESTART_SCRIPT_DIR%" >nul 2>&1
+rmdir "%STEELENGINE_RESTART_SCRIPT_DIR%" >nul 2>&1
 exit /b %status%
 # POWERSHELL
 # Wait briefly to ensure file locks are released after update.
@@ -202,7 +202,7 @@ $logPath = ${quotedLogPath}
 try {
   $logDir = Split-Path -Parent $logPath
   New-Item -ItemType Directory -Path $logDir -Force | Out-Null
-  Add-Content -LiteralPath $logPath -Value "[$(Get-Date -Format o)] openclaw restart log initialized"
+  Add-Content -LiteralPath $logPath -Value "[$(Get-Date -Format o)] steelengine restart log initialized"
 } catch {
   # Restart should still run if log setup is unavailable.
 }
@@ -215,7 +215,7 @@ function Write-RestartLog {
   }
 }
 
-function Join-OpenClawProcessArguments {
+function Join-SteelEngineProcessArguments {
   param([string[]]$Arguments)
   ($Arguments | ForEach-Object {
     if ($_ -match "\\s") {
@@ -226,7 +226,7 @@ function Join-OpenClawProcessArguments {
   }) -join " "
 }
 
-function Invoke-OpenClawSchtasksWithTimeout {
+function Invoke-SteelEngineSchtasksWithTimeout {
   param(
     [string[]]$Arguments,
     [int]$TimeoutSeconds
@@ -235,7 +235,7 @@ function Invoke-OpenClawSchtasksWithTimeout {
   try {
     $startInfo = [System.Diagnostics.ProcessStartInfo]::new()
     $startInfo.FileName = "schtasks.exe"
-    $startInfo.Arguments = Join-OpenClawProcessArguments -Arguments $Arguments
+    $startInfo.Arguments = Join-SteelEngineProcessArguments -Arguments $Arguments
     $startInfo.UseShellExecute = $false
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
@@ -245,7 +245,7 @@ function Invoke-OpenClawSchtasksWithTimeout {
         $process.Kill()
       } catch {
       }
-      Write-RestartLog "openclaw restart schtasks timeout source=update args=$($Arguments -join ' ')"
+      Write-RestartLog "steelengine restart schtasks timeout source=update args=$($Arguments -join ' ')"
       return 124
     }
     $stdout = $process.StandardOutput.ReadToEnd()
@@ -258,12 +258,12 @@ function Invoke-OpenClawSchtasksWithTimeout {
     }
     return $process.ExitCode
   } catch {
-    Write-RestartLog "openclaw restart schtasks failed source=update args=$($Arguments -join ' ') error=$($_.Exception.Message)"
+    Write-RestartLog "steelengine restart schtasks failed source=update args=$($Arguments -join ' ') error=$($_.Exception.Message)"
     return 1
   }
 }
 
-function Get-OpenClawScheduledTaskState {
+function Get-SteelEngineScheduledTaskState {
   param([string]$TaskName)
   try {
     $task = Get-ScheduledTask -TaskName $TaskName -ErrorAction Stop
@@ -291,7 +291,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace OpenClaw.Restart {
+namespace SteelEngine.Restart {
   public sealed class ProcessLease : IDisposable {
     private IntPtr handle;
     public long CreationTimeFileTime { get; private set; }
@@ -400,11 +400,11 @@ namespace OpenClaw.Restart {
 try {
   Add-Type -TypeDefinition $nativeSource -Language CSharp -ErrorAction Stop
 } catch {
-  Write-RestartLog "openclaw restart native ownership helper unavailable source=update error=$($_.Exception.Message)"
+  Write-RestartLog "steelengine restart native ownership helper unavailable source=update error=$($_.Exception.Message)"
 }
 
-# OPENCLAW_RESTART_KILL_POLICY_BEGIN
-function Get-OpenClawListenerSnapshot {
+# STEELENGINE_RESTART_KILL_POLICY_BEGIN
+function Get-SteelEngineListenerSnapshot {
   param([int]$Port)
 
   try {
@@ -418,7 +418,7 @@ function Get-OpenClawListenerSnapshot {
       return [pscustomobject]@{ Known = $true; Pids = $listenerPids }
     }
   } catch {
-    Write-RestartLog "openclaw restart Get-NetTCPConnection query failed source=update error=$($_.Exception.Message)"
+    Write-RestartLog "steelengine restart Get-NetTCPConnection query failed source=update error=$($_.Exception.Message)"
   }
 
   try {
@@ -449,12 +449,12 @@ function Get-OpenClawListenerSnapshot {
       Pids = @($listenerPids | Sort-Object -Unique)
     }
   } catch {
-    Write-RestartLog "openclaw restart netstat query failed source=update error=$($_.Exception.Message)"
+    Write-RestartLog "steelengine restart netstat query failed source=update error=$($_.Exception.Message)"
     return [pscustomobject]@{ Known = $false; Pids = @() }
   }
 }
 
-function Get-OpenClawProcessFacts {
+function Get-SteelEngineProcessFacts {
   param([int]$ProcessId)
 
   try {
@@ -472,15 +472,15 @@ function Get-OpenClawProcessFacts {
     return [pscustomobject]@{
       ProcessId = [int]$process.ProcessId
       CreationTimeFileTime = [string]$creationTimeFileTime
-      Argv = @([OpenClaw.Restart.NativeMethods]::ParseCommandLine([string]$process.CommandLine))
+      Argv = @([SteelEngine.Restart.NativeMethods]::ParseCommandLine([string]$process.CommandLine))
     }
   } catch {
-    Write-RestartLog "openclaw restart process query failed source=update pid=$ProcessId error=$($_.Exception.Message)"
+    Write-RestartLog "steelengine restart process query failed source=update pid=$ProcessId error=$($_.Exception.Message)"
     return $null
   }
 }
 
-function Test-OpenClawArgvEqual {
+function Test-SteelEngineArgvEqual {
   param([string[]]$Actual, [string[]]$Expected)
   if ($Actual.Count -ne $Expected.Count) {
     return $false
@@ -506,17 +506,17 @@ function Test-OpenClawArgvEqual {
   return $true
 }
 
-function Test-OpenClawSameProcess {
+function Test-SteelEngineSameProcess {
   param($Expected, $Actual)
   return (
     $null -ne $Actual -and
     $Actual.ProcessId -eq $Expected.ProcessId -and
     $Actual.CreationTimeFileTime -eq $Expected.CreationTimeFileTime -and
-    (Test-OpenClawArgvEqual -Actual $Actual.Argv -Expected $Expected.Argv)
+    (Test-SteelEngineArgvEqual -Actual $Actual.Argv -Expected $Expected.Argv)
   )
 }
 
-function Get-OpenClawListenerKillDecision {
+function Get-SteelEngineListenerKillDecision {
   param(
     [int]$CandidatePid,
     [string[]]$ExpectedArgv,
@@ -531,7 +531,7 @@ function Get-OpenClawListenerKillDecision {
   if ($null -eq $ObservedProcess -or $ObservedProcess.ProcessId -ne $CandidatePid) {
     return "process-unavailable"
   }
-  if (-not (Test-OpenClawArgvEqual -Actual $ObservedProcess.Argv -Expected $ExpectedArgv)) {
+  if (-not (Test-SteelEngineArgvEqual -Actual $ObservedProcess.Argv -Expected $ExpectedArgv)) {
     return "command-mismatch"
   }
   if ($HeldProcessCreationTimeFileTime -ne $ObservedProcess.CreationTimeFileTime) {
@@ -543,33 +543,33 @@ function Get-OpenClawListenerKillDecision {
   if ($RecheckedListeners.Pids -notcontains $CandidatePid) {
     return "no-longer-listening"
   }
-  if (-not (Test-OpenClawSameProcess -Expected $ObservedProcess -Actual $RecheckedProcess)) {
+  if (-not (Test-SteelEngineSameProcess -Expected $ObservedProcess -Actual $RecheckedProcess)) {
     return "process-replaced"
   }
   return "kill"
 }
 
-function Invoke-OpenClawVerifiedListenerKill {
+function Invoke-SteelEngineVerifiedListenerKill {
   param(
     [int]$ProcessId,
     [int]$Port,
     [string[]]$ExpectedArgv,
-    [scriptblock]$ProcessQuery = { param([int]$QueryPid) Get-OpenClawProcessFacts -ProcessId $QueryPid },
-    [scriptblock]$ListenerQuery = { param([int]$QueryPort) Get-OpenClawListenerSnapshot -Port $QueryPort },
-    [scriptblock]$ProcessOpen = { param([int]$QueryPid) [OpenClaw.Restart.NativeMethods]::TryOpenProcess($QueryPid) }
+    [scriptblock]$ProcessQuery = { param([int]$QueryPid) Get-SteelEngineProcessFacts -ProcessId $QueryPid },
+    [scriptblock]$ListenerQuery = { param([int]$QueryPort) Get-SteelEngineListenerSnapshot -Port $QueryPort },
+    [scriptblock]$ProcessOpen = { param([int]$QueryPid) [SteelEngine.Restart.NativeMethods]::TryOpenProcess($QueryPid) }
   )
 
   $observedProcess = & $ProcessQuery $ProcessId
   if ($null -eq $observedProcess) {
-    Write-RestartLog "openclaw restart skipped listener source=update pid=$ProcessId decision=process-unavailable"
+    Write-RestartLog "steelengine restart skipped listener source=update pid=$ProcessId decision=process-unavailable"
     return
   }
   if ($ExpectedArgv.Count -eq 0) {
-    Write-RestartLog "openclaw restart skipped listener source=update pid=$ProcessId decision=expected-command-unavailable"
+    Write-RestartLog "steelengine restart skipped listener source=update pid=$ProcessId decision=expected-command-unavailable"
     return
   }
-  if (-not (Test-OpenClawArgvEqual -Actual $observedProcess.Argv -Expected $ExpectedArgv)) {
-    Write-RestartLog "openclaw restart skipped listener source=update pid=$ProcessId decision=command-mismatch"
+  if (-not (Test-SteelEngineArgvEqual -Actual $observedProcess.Argv -Expected $ExpectedArgv)) {
+    Write-RestartLog "steelengine restart skipped listener source=update pid=$ProcessId decision=command-mismatch"
     return
   }
 
@@ -577,7 +577,7 @@ function Invoke-OpenClawVerifiedListenerKill {
   try {
     $lease = & $ProcessOpen $ProcessId
     if ($null -eq $lease) {
-      Write-RestartLog "openclaw restart skipped listener source=update pid=$ProcessId decision=process-handle-unavailable"
+      Write-RestartLog "steelengine restart skipped listener source=update pid=$ProcessId decision=process-handle-unavailable"
       return
     }
 
@@ -591,41 +591,41 @@ function Invoke-OpenClawVerifiedListenerKill {
       RecheckedListeners = $recheckedListeners
       RecheckedProcess = $recheckedProcess
     }
-    $decision = Get-OpenClawListenerKillDecision @decisionParams
+    $decision = Get-SteelEngineListenerKillDecision @decisionParams
     if ($decision -ne "kill") {
-      Write-RestartLog "openclaw restart skipped listener source=update pid=$ProcessId decision=$decision"
+      Write-RestartLog "steelengine restart skipped listener source=update pid=$ProcessId decision=$decision"
       return
     }
 
     if ($lease.Terminate()) {
-      Write-RestartLog "openclaw restart killed stale listener source=update pid=$ProcessId"
+      Write-RestartLog "steelengine restart killed stale listener source=update pid=$ProcessId"
     } else {
-      Write-RestartLog "openclaw restart failed to kill stale listener source=update pid=$ProcessId"
+      Write-RestartLog "steelengine restart failed to kill stale listener source=update pid=$ProcessId"
     }
   } catch {
-    Write-RestartLog "openclaw restart ownership verification failed source=update pid=$ProcessId error=$($_.Exception.Message)"
+    Write-RestartLog "steelengine restart ownership verification failed source=update pid=$ProcessId error=$($_.Exception.Message)"
   } finally {
     if ($null -ne $lease) {
       $lease.Dispose()
     }
   }
 }
-# OPENCLAW_RESTART_KILL_POLICY_END
+# STEELENGINE_RESTART_KILL_POLICY_END
 
-function Invoke-OpenClawStartupLauncher {
+function Invoke-SteelEngineStartupLauncher {
   param([string]$LauncherPath)
   $launcherPath = $LauncherPath
   if (-not (Test-Path -LiteralPath $launcherPath)) {
-    Write-RestartLog "openclaw restart startup launcher missing source=update path=$launcherPath"
+    Write-RestartLog "steelengine restart startup launcher missing source=update path=$launcherPath"
     return 1
   }
 
   try {
     Start-Process -FilePath $launcherPath -WindowStyle Hidden | Out-Null
-    Write-RestartLog "openclaw restart launched startup fallback source=update path=$launcherPath"
+    Write-RestartLog "steelengine restart launched startup fallback source=update path=$launcherPath"
     return 0
   } catch {
-    Write-RestartLog "openclaw restart startup fallback failed source=update error=$($_.Exception.Message)"
+    Write-RestartLog "steelengine restart startup fallback failed source=update error=$($_.Exception.Message)"
     return 1
   }
 }
@@ -634,23 +634,23 @@ $taskName = ${quotedTaskName}
 $port = ${port}
 $gatewayScriptPath = ${quotedGatewayScriptPath}
 $expectedGatewayArgv = @(${expectedGatewayArgv})
-Write-RestartLog "openclaw restart attempt source=update target=$taskName"
+Write-RestartLog "steelengine restart attempt source=update target=$taskName"
 
-$taskState = Get-OpenClawScheduledTaskState -TaskName $taskName
+$taskState = Get-SteelEngineScheduledTaskState -TaskName $taskName
 if ($taskState -eq "Running") {
-  $endStatus = Invoke-OpenClawSchtasksWithTimeout -Arguments @("/End", "/TN", $taskName) -TimeoutSeconds 10
+  $endStatus = Invoke-SteelEngineSchtasksWithTimeout -Arguments @("/End", "/TN", $taskName) -TimeoutSeconds 10
   if ($endStatus -ne 0) {
-    Write-RestartLog "openclaw restart schtasks end did not complete cleanly source=update status=$endStatus"
+    Write-RestartLog "steelengine restart schtasks end did not complete cleanly source=update status=$endStatus"
   }
 } else {
-  Write-RestartLog "openclaw restart skipped schtasks end source=update state=$taskState"
+  Write-RestartLog "steelengine restart skipped schtasks end source=update state=$taskState"
 }
 
 for ($attempt = 1; $attempt -le 10; $attempt++) {
-  $listenerSnapshot = Get-OpenClawListenerSnapshot -Port $port
+  $listenerSnapshot = Get-SteelEngineListenerSnapshot -Port $port
   if (-not $listenerSnapshot.Known) {
     if ($attempt -eq 10) {
-      Write-RestartLog "openclaw restart listener ownership unavailable source=update; refusing force-kill"
+      Write-RestartLog "steelengine restart listener ownership unavailable source=update; refusing force-kill"
       break
     }
     Start-Sleep -Seconds 1
@@ -664,7 +664,7 @@ for ($attempt = 1; $attempt -le 10; $attempt++) {
 
   if ($attempt -eq 10) {
     foreach ($listenerPid in $listeners) {
-      Invoke-OpenClawVerifiedListenerKill -ProcessId $listenerPid -Port $port -ExpectedArgv $expectedGatewayArgv
+      Invoke-SteelEngineVerifiedListenerKill -ProcessId $listenerPid -Port $port -ExpectedArgv $expectedGatewayArgv
     }
     break
   }
@@ -672,14 +672,14 @@ for ($attempt = 1; $attempt -le 10; $attempt++) {
   Start-Sleep -Seconds 1
 }
 
-$status = Invoke-OpenClawSchtasksWithTimeout -Arguments @("/Run", "/TN", $taskName) -TimeoutSeconds 30
+$status = Invoke-SteelEngineSchtasksWithTimeout -Arguments @("/Run", "/TN", $taskName) -TimeoutSeconds 30
 if ($status -ne 0) {
-  $status = Invoke-OpenClawStartupLauncher -LauncherPath $gatewayScriptPath
+  $status = Invoke-SteelEngineStartupLauncher -LauncherPath $gatewayScriptPath
 }
 if ($status -eq 0) {
-  Write-RestartLog "openclaw restart done source=update"
+  Write-RestartLog "steelengine restart done source=update"
 } else {
-  Write-RestartLog "openclaw restart failed source=update status=$status"
+  Write-RestartLog "steelengine restart failed source=update status=$status"
 }
 
 exit $status
@@ -688,7 +688,7 @@ exit $status
       return null;
     }
 
-    const scriptDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-restart-"));
+    const scriptDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-restart-"));
     const scriptPath = path.join(scriptDir, filename);
     try {
       await fs.writeFile(scriptPath, scriptContent, { mode: 0o755, flag: "wx" });

@@ -16,10 +16,10 @@ fi
 if [[ "$scope" != "ios" ]]; then
   swiftformat --lint apps/macos/Sources \
     --config config/swiftformat \
-    --exclude '**/OpenClawProtocol'
+    --exclude '**/SteelEngineProtocol'
   swiftformat --lint \
     apps/macos-mlx-tts/Sources \
-    apps/shared/OpenClawMLXTTSProtocol/Sources \
+    apps/shared/SteelEngineMLXTTSProtocol/Sources \
     apps/swabble/Sources \
     --config config/swiftformat
 fi
@@ -33,6 +33,6 @@ node scripts/ios-write-swift-filelist.mjs
   cd apps/ios
   swiftformat --lint \
     --config ../../config/swiftformat \
-    --unexclude "$PWD/Sources,$PWD/ShareExtension,$PWD/ActivityWidget,$PWD/WatchApp,$PWD/../shared/OpenClawKit/Sources/OpenClawChatUI,$PWD/../shared/OpenClawKit/Sources/OpenClawKit,$PWD/../shared/OpenClawKit/Sources/OpenClawProtocol,$PWD/../swabble/Sources/SwabbleKit" \
+    --unexclude "$PWD/Sources,$PWD/ShareExtension,$PWD/ActivityWidget,$PWD/WatchApp,$PWD/../shared/SteelEngineKit/Sources/SteelEngineChatUI,$PWD/../shared/SteelEngineKit/Sources/SteelEngineKit,$PWD/../shared/SteelEngineKit/Sources/SteelEngineProtocol,$PWD/../swabble/Sources/SwabbleKit" \
     --filelist SwiftSources.input.xcfilelist
 )

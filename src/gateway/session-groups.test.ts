@@ -4,9 +4,9 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { SessionEntry } from "../config/sessions.js";
 import { loadSessionEntry, replaceSessionEntry } from "../config/sessions/session-accessor.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
-import { closeOpenClawAgentDatabasesForTest } from "../state/openclaw-agent-db.js";
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
+import { closeSteelEngineAgentDatabasesForTest } from "../state/steelengine-agent-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import {
   deleteSessionGroup,
   ensureSessionGroupRegistered,
@@ -18,17 +18,17 @@ import {
 describe("session groups catalog", () => {
   let root: string;
   let env: NodeJS.ProcessEnv;
-  const cfg = {} as OpenClawConfig;
+  const cfg = {} as SteelEngineConfig;
 
   beforeEach(async () => {
     const tempRoot = await fs.realpath(os.tmpdir());
-    root = await fs.mkdtemp(path.join(tempRoot, "openclaw-session-groups-"));
-    env = { ...process.env, OPENCLAW_STATE_DIR: root };
+    root = await fs.mkdtemp(path.join(tempRoot, "steelengine-session-groups-"));
+    env = { ...process.env, STEELENGINE_STATE_DIR: root };
   });
 
   afterEach(async () => {
-    closeOpenClawAgentDatabasesForTest();
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineAgentDatabasesForTest();
+    closeSteelEngineStateDatabaseForTest();
     await fs.rm(root, { recursive: true, force: true });
   });
 

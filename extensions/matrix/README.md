@@ -1,11 +1,11 @@
-# OpenClaw Matrix
+# SteelEngine Matrix
 
-Official OpenClaw channel plugin for Matrix rooms and direct messages.
+Official SteelEngine channel plugin for Matrix rooms and direct messages.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugin add @openclaw/matrix
+steelengine plugin add @steelengine/matrix
 ```
 
-Configure the Matrix homeserver and bot credentials in OpenClaw. The plugin lets agents join configured rooms, receive messages, and reply through Matrix.
+Configure the Matrix homeserver and bot credentials in SteelEngine. The plugin lets agents join configured rooms, receive messages, and reply through Matrix.

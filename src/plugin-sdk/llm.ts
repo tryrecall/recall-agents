@@ -1,7 +1,7 @@
 /**
  * Public SDK subpath for LLM provider registration, streaming, model utils, and validation.
  */
-export type { ApiProvider } from "@openclaw/ai";
+export type { ApiProvider } from "@steelengine/ai";
 export {
   calculateCost,
   clampThinkingLevel,
@@ -12,13 +12,13 @@ export {
   registerApiProvider,
   sanitizeSurrogates,
   unregisterApiProviders,
-} from "@openclaw/ai/internal/runtime";
+} from "@steelengine/ai/internal/runtime";
 export {
   adjustMaxTokensForThinking,
   buildBaseOptions,
   clampReasoning,
-} from "@openclaw/ai/internal/shared";
-export { transformMessages } from "@openclaw/ai/internal/shared";
+} from "@steelengine/ai/internal/shared";
+export { transformMessages } from "@steelengine/ai/internal/shared";
 export { complete, completeSimple, stream, streamSimple } from "../llm/stream.js";
 export type {
   Api,

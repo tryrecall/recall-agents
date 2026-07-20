@@ -1,19 +1,19 @@
 import type { AuthProfileStore } from "../../../agents/auth-profiles/types.js";
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../../config/types.steelengine.js";
 import "./stale-auth-order.js";
 
 type TestApi = {
   repairStaleConfiguredAuthOrders(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     stores: readonly AuthProfileStore[];
     activeStores?: readonly AuthProfileStore[];
     runtimeProfileIds?: ReadonlySet<string>;
-  }): { config: OpenClawConfig; changes: string[] };
+  }): { config: SteelEngineConfig; changes: string[] };
 };
 
 function getTestApi(): TestApi {
   return (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.staleAuthOrderTestApi")
+    Symbol.for("steelengine.staleAuthOrderTestApi")
   ] as TestApi;
 }
 

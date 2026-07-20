@@ -33,8 +33,8 @@ const PLUGIN_DOC_ALIASES = new Map([
   ["tokenjuice", "/tools/tokenjuice"],
 ]);
 const SKIPPED_REFERENCE_PAGE_IDS = new Set(["parallel"]);
-const MANUAL_SECTION_START = "<!-- openclaw-plugin-reference:manual-start -->";
-const MANUAL_SECTION_END = "<!-- openclaw-plugin-reference:manual-end -->";
+const MANUAL_SECTION_START = "<!-- steelengine-plugin-reference:manual-start -->";
+const MANUAL_SECTION_END = "<!-- steelengine-plugin-reference:manual-end -->";
 // Generated link labels are user-visible product names and translation source.
 const RELATED_DOC_PRODUCT_IDS = new Set([
   "chutes",
@@ -219,12 +219,12 @@ function resolveDescription({ manifest, packageJson }) {
   if (channels.length > 0) {
     const channelLabel = displayList(channels);
     const channelNoun = channelLabel.toLowerCase().includes("channel") ? "" : " channel";
-    return `Adds the ${channelLabel}${channelNoun} surface for sending and receiving OpenClaw messages.`;
+    return `Adds the ${channelLabel}${channelNoun} surface for sending and receiving SteelEngine messages.`;
   }
 
   const providers = Array.isArray(manifest.providers) ? manifest.providers : [];
   if (providers.length > 0) {
-    return `Adds ${displayList(providers)} model provider support to OpenClaw.`;
+    return `Adds ${displayList(providers)} model provider support to SteelEngine.`;
   }
 
   const contracts = Object.keys(manifest.contracts ?? {}).toSorted((left, right) =>
@@ -256,7 +256,7 @@ function resolveDescription({ manifest, packageJson }) {
   }
 
   const packageDescription = normalizePackageDescription(packageJson.description);
-  return packageDescription ? `${packageDescription}.` : "Provides an OpenClaw plugin.";
+  return packageDescription ? `${packageDescription}.` : "Provides an SteelEngine plugin.";
 }
 
 function pushUniqueDocLink(values, value) {
@@ -276,7 +276,7 @@ function resolveDocs({ dirName, manifest, packageJson }) {
     pushUniqueDocLink(links, { href: pluginAlias, label: pluginAliasLabel });
   }
 
-  const channelDoc = normalizeDocPath(packageJson.openclaw?.channel?.docsPath);
+  const channelDoc = normalizeDocPath(packageJson.steelengine?.channel?.docsPath);
   if (channelDoc) {
     pushUniqueDocLink(links, {
       href: channelDoc,
@@ -344,14 +344,14 @@ function resolveInstallRoute(packageJson, status) {
     return "source checkout only";
   }
   if (status === "core") {
-    const release = packageJson.openclaw?.release;
+    const release = packageJson.steelengine?.release;
     if (release?.publishToClawHub === true || release?.publishToNpm === true) {
-      return `included in OpenClaw; ${resolveInstallRoute(packageJson, "external")}`;
+      return `included in SteelEngine; ${resolveInstallRoute(packageJson, "external")}`;
     }
-    return "included in OpenClaw";
+    return "included in SteelEngine";
   }
-  const install = packageJson.openclaw?.install;
-  const release = packageJson.openclaw?.release;
+  const install = packageJson.steelengine?.install;
+  const release = packageJson.steelengine?.release;
   const clawhubSpec =
     typeof install?.clawhubSpec === "string" ? `: \`${install.clawhubSpec}\`` : "";
   const npmSpec =
@@ -374,10 +374,10 @@ function resolveInstallRoute(packageJson, status) {
 }
 
 function resolveStatus({ dirName, packageJson, excludedDirs }) {
-  const release = packageJson.openclaw?.release;
+  const release = packageJson.steelengine?.release;
   const hasInstallSpec =
-    typeof packageJson.openclaw?.install?.clawhubSpec === "string" ||
-    typeof packageJson.openclaw?.install?.npmSpec === "string";
+    typeof packageJson.steelengine?.install?.clawhubSpec === "string" ||
+    typeof packageJson.steelengine?.install?.npmSpec === "string";
   if (!excludedDirs.has(dirName)) {
     return "core";
   }
@@ -480,9 +480,9 @@ ${record.surface}${manualBlock ? `\n\n${manualBlock}` : ""}${relatedDocs ? `\n\n
 function renderReferenceIndex(records) {
   const referenceCount = records.filter(hasGeneratedReferencePage).length;
   return `---
-summary: "Generated index of OpenClaw plugin reference pages"
+summary: "Generated index of SteelEngine plugin reference pages"
 read_when:
-  - You need a reference page for a specific OpenClaw plugin
+  - You need a reference page for a specific SteelEngine plugin
   - You are auditing plugin docs coverage
 title: "Plugin reference"
 ---
@@ -490,7 +490,7 @@ title: "Plugin reference"
 # Plugin reference
 
 This page is generated from \`extensions/*/package.json\` and
-\`openclaw.plugin.json\`. Regenerate it with:
+\`steelengine.plugin.json\`. Regenerate it with:
 
 \`\`\`bash
 pnpm plugins:inventory:gen
@@ -507,7 +507,7 @@ function collectPluginSourceEntries() {
     .readdirSync(EXTENSIONS_DIR)
     .toSorted((left, right) => left.localeCompare(right))) {
     const packagePath = path.join(EXTENSIONS_DIR, dirName, "package.json");
-    const manifestPath = path.join(EXTENSIONS_DIR, dirName, "openclaw.plugin.json");
+    const manifestPath = path.join(EXTENSIONS_DIR, dirName, "steelengine.plugin.json");
     if (!fs.existsSync(packagePath) || !fs.existsSync(manifestPath)) {
       continue;
     }
@@ -600,7 +600,7 @@ function renderDocument() {
   };
 
   return `---
-summary: "Generated inventory of OpenClaw plugins shipped in core, published externally, or kept source-only"
+summary: "Generated inventory of SteelEngine plugins shipped in core, published externally, or kept source-only"
 read_when:
   - You are deciding whether a plugin ships in the core npm package or installs separately
   - You are updating bundled plugin package metadata or release automation
@@ -610,7 +610,7 @@ title: "Plugin inventory"
 
 # Plugin inventory
 
-This page is generated from \`extensions/*/package.json\`, \`openclaw.plugin.json\`,
+This page is generated from \`extensions/*/package.json\`, \`steelengine.plugin.json\`,
 and the root npm package \`files\` exclusions. Regenerate it with:
 
 \`\`\`bash
@@ -619,8 +619,8 @@ pnpm plugins:inventory:gen
 
 ## Definitions
 
-- **Core npm package:** built into the \`openclaw\` npm package and available without a separate plugin install.
-- **Official external package:** OpenClaw-maintained plugin omitted from the core npm package, kept in this official inventory, and installed on demand through ClawHub and/or npm.
+- **Core npm package:** built into the \`steelengine\` npm package and available without a separate plugin install.
+- **Official external package:** SteelEngine-maintained plugin omitted from the core npm package, kept in this official inventory, and installed on demand through ClawHub and/or npm.
 - **Source checkout only:** repo-local plugin omitted from published npm artifacts and not advertised as an installable package.
 
 Source checkouts are different from npm installs: after \`pnpm install\`, bundled
@@ -630,19 +630,19 @@ dependencies are available.
 ## Install a plugin
 
 Use the install route in each entry to decide whether install is needed. Plugins
-that say \`included in OpenClaw\` are already present in the core package.
+that say \`included in SteelEngine\` are already present in the core package.
 Official external packages need one install, then a Gateway restart.
 
 For example, Discord is an official external package:
 
 \`\`\`bash
-openclaw plugins install @openclaw/discord
-openclaw gateway restart
-openclaw plugins inspect discord --runtime --json
+steelengine plugins install @steelengine/discord
+steelengine gateway restart
+steelengine plugins inspect discord --runtime --json
 \`\`\`
 
 During the launch cutover, ordinary bare package specs still install from npm.
-Use \`clawhub:@openclaw/discord\` or \`npm:@openclaw/discord\` when you need an
+Use \`clawhub:@steelengine/discord\` or \`npm:@steelengine/discord\` when you need an
 explicit source. After install, follow the plugin's setup doc, such as
 [Discord](/channels/discord), to add credentials and channel config. See
 [Manage plugins](/plugins/manage-plugins) for update, uninstall, and publishing

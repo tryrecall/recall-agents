@@ -3,7 +3,7 @@
    ============================================= */
 
 /* Main chat card - flex column layout, transparent background */
-openclaw-chat-page {
+steelengine-chat-page {
   display: flex;
   flex: 1 1 0;
   min-width: 0;
@@ -4029,7 +4029,7 @@ openclaw-chat-page {
     height: 77px;
   }
 
-  .agent-chat__welcome-clawd openclaw-mascot {
+  .agent-chat__welcome-clawd steelengine-mascot {
     transform: scale(0.6875);
   }
 

@@ -7,17 +7,17 @@ export {
   listDevicePairing,
   revokeDeviceBootstrapToken,
   type DeviceBootstrapProfile,
-} from "openclaw/plugin-sdk/device-bootstrap";
-export { definePluginEntry, type OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
+} from "steelengine/plugin-sdk/device-bootstrap";
+export { definePluginEntry, type SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-entry";
 export {
   resolveGatewayBindUrl,
   resolveGatewayPort,
   resolveTailnetHostWithRunner,
   resolveTailscaleServeGatewayUrlsWithRunner,
-} from "openclaw/plugin-sdk/core";
-export { resolveAdvertisedLanHost } from "openclaw/plugin-sdk/gateway-runtime";
+} from "steelengine/plugin-sdk/core";
+export { resolveAdvertisedLanHost } from "steelengine/plugin-sdk/gateway-runtime";
 export {
-  resolvePreferredOpenClawTmpDir,
+  resolvePreferredSteelEngineTmpDir,
   runPluginCommandWithTimeout,
-} from "openclaw/plugin-sdk/sandbox";
+} from "steelengine/plugin-sdk/sandbox";
 export { renderQrPngBase64, renderQrPngDataUrl, writeQrPngTempFile } from "./qr-image.js";

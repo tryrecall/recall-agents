@@ -83,7 +83,7 @@ function renderNewSessionComposer(options: NewSessionComposerOptions) {
             ></textarea>
           </div>
           <div class="agent-chat__composer-actions">
-            <openclaw-tooltip content=${t("newSession.start")}>
+            <steelengine-tooltip content=${t("newSession.start")}>
               <button
                 type="button"
                 class="chat-send-btn"
@@ -93,7 +93,7 @@ function renderNewSessionComposer(options: NewSessionComposerOptions) {
               >
                 ${options.submitting ? icons.loader : icons.arrowUp}
               </button>
-            </openclaw-tooltip>
+            </steelengine-tooltip>
           </div>
         </div>
         ${options.modelControl && options.modelControl !== nothing

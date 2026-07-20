@@ -74,7 +74,7 @@ describe("AppSidebar multi-select", () => {
   }
 
   async function sessionMenu(sidebar: SidebarLifecycleState): Promise<TestSessionMenu> {
-    const menu = sidebar.querySelector<TestSessionMenu>("openclaw-session-menu");
+    const menu = sidebar.querySelector<TestSessionMenu>("steelengine-session-menu");
     if (!menu) {
       throw new Error("expected session menu");
     }
@@ -207,7 +207,7 @@ describe("AppSidebar transient menus", () => {
 
     const menu = sidebar.querySelector(".sidebar-session-sort-menu");
     expect(menu).not.toBeNull();
-    expect(menu?.closest("openclaw-menu-surface")).not.toBeNull();
+    expect(menu?.closest("steelengine-menu-surface")).not.toBeNull();
   });
 
   it("ignores a stale sort-menu hide after opening its replacement", async () => {
@@ -542,7 +542,7 @@ describe("AppSidebar catalog session rows", () => {
         }),
       );
       await sidebar.updateComplete;
-      const menu = sidebar.querySelector("openclaw-catalog-session-menu") as HTMLElement & {
+      const menu = sidebar.querySelector("steelengine-catalog-session-menu") as HTMLElement & {
         updateComplete: Promise<boolean>;
       };
       await menu.updateComplete;
@@ -598,7 +598,7 @@ describe("AppSidebar catalog session rows", () => {
           {
             threadId: "thread-1",
             name: "Release checklist",
-            openClawSessionKey: "agent:main:adopted-codex",
+            steelEngineSessionKey: "agent:main:adopted-codex",
           },
         ]),
         ["agent:main:main", "agent:main:adopted-codex"],

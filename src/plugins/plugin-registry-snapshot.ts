@@ -2,7 +2,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { tryReadJsonSync } from "../infra/json-files.js";
 import { resolveUserPath } from "../utils.js";
 import { resolveCompatibilityHostVersion } from "../version.js";
@@ -64,20 +64,20 @@ type PluginRegistrySnapshotResult = {
   discovery?: PluginDiscoveryResult;
 };
 
-const DISABLE_PERSISTED_PLUGIN_REGISTRY_ENV = "OPENCLAW_DISABLE_PERSISTED_PLUGIN_REGISTRY";
+const DISABLE_PERSISTED_PLUGIN_REGISTRY_ENV = "STEELENGINE_DISABLE_PERSISTED_PLUGIN_REGISTRY";
 const MAX_PLUGIN_REGISTRY_SNAPSHOT_MEMOS = 8;
 const REGISTRY_SNAPSHOT_MEMO_ENV_KEYS = [
   "APPDATA",
   "HOME",
-  "OPENCLAW_BUNDLED_PLUGINS_DIR",
-  "OPENCLAW_COMPATIBILITY_HOST_VERSION",
-  "OPENCLAW_CONFIG_PATH",
-  "OPENCLAW_DISABLE_BUNDLED_PLUGINS",
-  "OPENCLAW_DISABLE_BUNDLED_SOURCE_OVERLAYS",
+  "STEELENGINE_BUNDLED_PLUGINS_DIR",
+  "STEELENGINE_COMPATIBILITY_HOST_VERSION",
+  "STEELENGINE_CONFIG_PATH",
+  "STEELENGINE_DISABLE_BUNDLED_PLUGINS",
+  "STEELENGINE_DISABLE_BUNDLED_SOURCE_OVERLAYS",
   DISABLE_PERSISTED_PLUGIN_REGISTRY_ENV,
-  "OPENCLAW_HOME",
-  "OPENCLAW_NIX_MODE",
-  "OPENCLAW_STATE_DIR",
+  "STEELENGINE_HOME",
+  "STEELENGINE_NIX_MODE",
+  "STEELENGINE_STATE_DIR",
   "USERPROFILE",
   "XDG_CONFIG_HOME",
 ] as const;
@@ -96,7 +96,7 @@ function clearLoadPluginRegistrySnapshotMemo(): void {
 registerPluginMetadataProcessMemoLifecycleClear(clearLoadPluginRegistrySnapshotMemo);
 
 function formatDeprecatedPersistedRegistryDisableWarning(): string {
-  return `${DISABLE_PERSISTED_PLUGIN_REGISTRY_ENV} is a deprecated break-glass compatibility switch; use \`openclaw plugins registry --refresh\` or \`openclaw doctor --fix\` to repair registry state.`;
+  return `${DISABLE_PERSISTED_PLUGIN_REGISTRY_ENV} is a deprecated break-glass compatibility switch; use \`steelengine plugins registry --refresh\` or \`steelengine doctor --fix\` to repair registry state.`;
 }
 
 export type LoadPluginRegistryParams = LoadInstalledPluginIndexParams &
@@ -404,7 +404,7 @@ function isAllowedPersistedBundledPluginRoot(
   }
   if (sourcePluginOptsOutOfBundledDist(path.join(legacyRoot, relativePluginRoot))) {
     // Older index records lack packageBuild. Re-derive once so runtime loading
-    // and OpenClaw fingerprint the same source-only artifact.
+    // and SteelEngine fingerprint the same source-only artifact.
     return false;
   }
   // Discovery prefers a built plugin whenever the same child exists in the
@@ -576,49 +576,49 @@ export function loadPluginRegistrySnapshotWithMetadata(
           level: "warn",
           code: "persisted-registry-stale-policy",
           message:
-            "Persisted plugin registry policy does not match current config; using derived plugin index. Run `openclaw plugins registry --refresh` to update the persisted registry.",
+            "Persisted plugin registry policy does not match current config; using derived plugin index. Run `steelengine plugins registry --refresh` to update the persisted registry.",
         });
       } else if (hasMissingPersistedPluginSource(persistedIndex)) {
         diagnostics.push({
           level: "warn",
           code: "persisted-registry-stale-source",
           message:
-            "Persisted plugin registry points at missing plugin files; using derived plugin index. Run `openclaw plugins registry --refresh` to update the persisted registry.",
+            "Persisted plugin registry points at missing plugin files; using derived plugin index. Run `steelengine plugins registry --refresh` to update the persisted registry.",
         });
       } else if (hasMismatchedPersistedBundledPluginRoot(persistedIndex, env)) {
         diagnostics.push({
           level: "warn",
           code: "persisted-registry-stale-source",
           message:
-            "Persisted plugin registry points at a different bundled plugin tree; using derived plugin index. Run `openclaw plugins registry --refresh` to update the persisted registry.",
+            "Persisted plugin registry points at a different bundled plugin tree; using derived plugin index. Run `steelengine plugins registry --refresh` to update the persisted registry.",
         });
       } else if (hasMismatchedPersistedConfigPathPlugins(persistedIndex, params, env)) {
         diagnostics.push({
           level: "warn",
           code: "persisted-registry-stale-source",
           message:
-            "Persisted plugin registry does not match configured load-path plugins; using derived plugin index. Run `openclaw plugins registry --refresh` to update the persisted registry.",
+            "Persisted plugin registry does not match configured load-path plugins; using derived plugin index. Run `steelengine plugins registry --refresh` to update the persisted registry.",
         });
       } else if (hasStalePersistedPluginDiagnostics(persistedIndex)) {
         diagnostics.push({
           level: "warn",
           code: "persisted-registry-stale-source",
           message:
-            "Persisted plugin registry contains diagnostics referencing missing paths; using derived plugin index. Run `openclaw plugins registry --refresh` to update the persisted registry.",
+            "Persisted plugin registry contains diagnostics referencing missing paths; using derived plugin index. Run `steelengine plugins registry --refresh` to update the persisted registry.",
         });
       } else if (hasMissingConfigPathActivationMetadata(persistedIndex)) {
         diagnostics.push({
           level: "warn",
           code: "persisted-registry-stale-source",
           message:
-            "Persisted plugin registry is missing config-path startup metadata; using derived plugin index. Run `openclaw plugins registry --refresh` to update the persisted registry.",
+            "Persisted plugin registry is missing config-path startup metadata; using derived plugin index. Run `steelengine plugins registry --refresh` to update the persisted registry.",
         });
       } else if (hasStalePersistedPluginMetadata(persistedIndex)) {
         diagnostics.push({
           level: "warn",
           code: "persisted-registry-stale-source",
           message:
-            "Persisted plugin registry metadata no longer matches plugin manifest or package files; using derived plugin index. Run `openclaw plugins registry --refresh` to update the persisted registry.",
+            "Persisted plugin registry metadata no longer matches plugin manifest or package files; using derived plugin index. Run `steelengine plugins registry --refresh` to update the persisted registry.",
         });
       } else if (
         hasRecoveredInstallRecordsMissingFromPersistedIndex(
@@ -631,7 +631,7 @@ export function loadPluginRegistrySnapshotWithMetadata(
           level: "warn",
           code: "persisted-registry-stale-source",
           message:
-            "Persisted plugin registry is missing recoverable managed npm plugins; using derived plugin index. Run `openclaw plugins registry --refresh` to update the persisted registry.",
+            "Persisted plugin registry is missing recoverable managed npm plugins; using derived plugin index. Run `steelengine plugins registry --refresh` to update the persisted registry.",
         });
       } else {
         const persistedResult: PluginRegistrySnapshotResult = {

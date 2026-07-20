@@ -14,9 +14,9 @@ import {
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
-const captureUiProof = process.env.OPENCLAW_CAPTURE_UI_PROOF === "1";
+const captureUiProof = process.env.STEELENGINE_CAPTURE_UI_PROOF === "1";
 const proofDir = path.join(process.cwd(), ".artifacts", "control-ui-e2e", "agent-page-scope");
 
 let browser: Browser;
@@ -113,7 +113,7 @@ describeControlUiE2e("Control UI agent page scope", () => {
     try {
       await page.goto(`${server.baseUrl}usage`);
       await gateway.waitForRequest("agents.list");
-      const sidebar = page.locator("openclaw-app-sidebar");
+      const sidebar = page.locator("steelengine-app-sidebar");
       await sidebar.getByRole("button", { name: /Agent menu/ }).click();
       await sidebar
         .locator("wa-dropdown.sidebar-agent-menu")

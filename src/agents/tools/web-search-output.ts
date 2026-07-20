@@ -7,7 +7,7 @@
  * re-wrapped here unconditionally, so no provider-controlled metadata can
  * spoof the trust marker and transport-specific extras never reach the model.
  */
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
 import type { Static } from "typebox";
 import { Type } from "typebox";
 import { wrapWebContent } from "../../security/external-content.js";

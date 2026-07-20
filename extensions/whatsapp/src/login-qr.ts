@@ -1,10 +1,10 @@
 // Whatsapp plugin module implements login qr behavior.
 import { randomUUID } from "node:crypto";
-import { logInfo } from "openclaw/plugin-sdk/logging-core";
-import { resolveTimerTimeoutMs } from "openclaw/plugin-sdk/number-runtime";
-import { getRuntimeConfig } from "openclaw/plugin-sdk/runtime-config-snapshot";
-import { danger, info, success } from "openclaw/plugin-sdk/runtime-env";
-import { defaultRuntime, type RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import { logInfo } from "steelengine/plugin-sdk/logging-core";
+import { resolveTimerTimeoutMs } from "steelengine/plugin-sdk/number-runtime";
+import { getRuntimeConfig } from "steelengine/plugin-sdk/runtime-config-snapshot";
+import { danger, info, success } from "steelengine/plugin-sdk/runtime-env";
+import { defaultRuntime, type RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
 import { resolveWhatsAppAccount } from "./accounts.js";
 import { getActiveWebListener } from "./active-listener.js";
 import {

@@ -1,6 +1,6 @@
 import SwiftUI
 import Testing
-@testable import OpenClaw
+@testable import SteelEngine
 
 @MainActor
 @Suite struct CommandCenterTabLayoutTests {

@@ -44,13 +44,13 @@ describe("session tab registry", () => {
       sessionKey: "Agent:Main:Main",
       targetId: "tab-a",
       baseUrl: "http://127.0.0.1:9222",
-      profile: "OpenClaw",
+      profile: "SteelEngine",
     });
     trackSessionBrowserTab({
       sessionKey: "agent:main:main",
       targetId: "tab-b",
       baseUrl: "http://127.0.0.1:9222",
-      profile: "OpenClaw",
+      profile: "SteelEngine",
     });
     const closeTab = vi.fn(async () => {});
     const closed = await closeTrackedBrowserTabsForSessions({
@@ -63,12 +63,12 @@ describe("session tab registry", () => {
     expect(closeTab).toHaveBeenNthCalledWith(1, {
       targetId: "tab-a",
       baseUrl: "http://127.0.0.1:9222",
-      profile: "openclaw",
+      profile: "steelengine",
     });
     expect(closeTab).toHaveBeenNthCalledWith(2, {
       targetId: "tab-b",
       baseUrl: "http://127.0.0.1:9222",
-      profile: "openclaw",
+      profile: "steelengine",
     });
   });
 
@@ -77,7 +77,7 @@ describe("session tab registry", () => {
       sessionKey: "agent:main:main",
       targetId: "RAW_TARGET",
       baseUrl: "http://127.0.0.1:9222",
-      profile: "OpenClaw",
+      profile: "SteelEngine",
     });
 
     await expect(
@@ -87,7 +87,7 @@ describe("session tab registry", () => {
     expect(clientMocks.browserCloseTabByRawTargetId).toHaveBeenCalledWith(
       "http://127.0.0.1:9222",
       "RAW_TARGET",
-      { profile: "openclaw" },
+      { profile: "steelengine" },
     );
   });
 

@@ -2,7 +2,7 @@
 import { spawnSync } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { withTempHome } from "openclaw/plugin-sdk/test-env";
+import { withTempHome } from "steelengine/plugin-sdk/test-env";
 import { describe, expect, it } from "vitest";
 
 function runSourceCli(tempHome: string, args: string[], envOverrides: NodeJS.ProcessEnv = {}) {
@@ -10,11 +10,11 @@ function runSourceCli(tempHome: string, args: string[], envOverrides: NodeJS.Pro
     ...process.env,
     HOME: tempHome,
     USERPROFILE: tempHome,
-    OPENCLAW_TEST_FAST: "1",
+    STEELENGINE_TEST_FAST: "1",
   };
-  delete env.OPENCLAW_HOME;
-  delete env.OPENCLAW_STATE_DIR;
-  delete env.OPENCLAW_CONFIG_PATH;
+  delete env.STEELENGINE_HOME;
+  delete env.STEELENGINE_STATE_DIR;
+  delete env.STEELENGINE_CONFIG_PATH;
   delete env.VITEST;
   Object.assign(env, envOverrides);
 
@@ -53,7 +53,7 @@ describe("cli json stdout contract", () => {
         expect(stdout).not.toContain("Doctor changes");
         expect(stdout).not.toContain("Config invalid");
       },
-      { prefix: "openclaw-json-e2e-" },
+      { prefix: "steelengine-json-e2e-" },
     );
   });
 
@@ -61,7 +61,7 @@ describe("cli json stdout contract", () => {
     await withTempHome(
       async (tempHome) => {
         const result = runSourceCli(tempHome, ["config", "schema"], {
-          OPENCLAW_LOG_LEVEL: "debug",
+          STEELENGINE_LOG_LEVEL: "debug",
         });
 
         expect(result.status).toBe(0);
@@ -72,18 +72,18 @@ describe("cli json stdout contract", () => {
         expect(result.stdout).not.toContain("possibly sensitive key found");
         expect(result.stderr).not.toContain("possibly sensitive key found");
       },
-      { prefix: "openclaw-config-schema-json-e2e-" },
+      { prefix: "steelengine-config-schema-json-e2e-" },
     );
   });
 
   it("keeps `config validate --json` stdout parseable at debug log level", async () => {
     await withTempHome(
       async (tempHome) => {
-        const configPath = path.join(tempHome, "openclaw.json");
+        const configPath = path.join(tempHome, "steelengine.json");
         await fs.writeFile(configPath, "{}", "utf8");
         const result = runSourceCli(tempHome, ["config", "validate", "--json"], {
-          OPENCLAW_CONFIG_PATH: configPath,
-          OPENCLAW_LOG_LEVEL: "debug",
+          STEELENGINE_CONFIG_PATH: configPath,
+          STEELENGINE_LOG_LEVEL: "debug",
         });
 
         expect(result.status).toBe(0);
@@ -93,7 +93,7 @@ describe("cli json stdout contract", () => {
         });
         expect(result.stdout).not.toContain("possibly sensitive key found");
       },
-      { prefix: "openclaw-config-validate-json-e2e-" },
+      { prefix: "steelengine-config-validate-json-e2e-" },
     );
   });
 });

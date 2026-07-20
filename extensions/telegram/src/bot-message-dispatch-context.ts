@@ -1,8 +1,8 @@
 // Telegram plugin module recovers dispatch routing and group-history context.
-import { CURRENT_MESSAGE_MARKER } from "openclaw/plugin-sdk/channel-mention-gating";
-import { parseStrictPositiveInteger } from "openclaw/plugin-sdk/number-runtime";
-import { createChannelHistoryWindow } from "openclaw/plugin-sdk/reply-history";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
+import { CURRENT_MESSAGE_MARKER } from "steelengine/plugin-sdk/channel-mention-gating";
+import { parseStrictPositiveInteger } from "steelengine/plugin-sdk/number-runtime";
+import { createChannelHistoryWindow } from "steelengine/plugin-sdk/reply-history";
+import { logVerbose } from "steelengine/plugin-sdk/runtime-env";
 import { withTelegramApiErrorLogging } from "./api-logging.js";
 import type { TelegramMessageContext } from "./bot-message-context.js";
 import {

@@ -1,6 +1,6 @@
 /** Doctor repair for main sessions accidentally occupied by synthetic heartbeat transcripts. */
 import fs from "node:fs";
-import { asNullableObjectRecord } from "@openclaw/normalization-core/record-coerce";
+import { asNullableObjectRecord } from "@steelengine/normalization-core/record-coerce";
 import type { note } from "../../packages/terminal-core/src/note.js";
 import { isHeartbeatOkResponse, isHeartbeatUserMessage } from "../auto-reply/heartbeat-filter.js";
 import { formatSessionArchiveTimestamp } from "../config/sessions/artifacts.js";
@@ -11,7 +11,7 @@ import {
 } from "../config/sessions/paths.js";
 import { updateSessionStore } from "../config/sessions/store.js";
 import type { SessionEntry } from "../config/sessions/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { parseAgentSessionKey } from "../sessions/session-key-utils.js";
 import { clearTuiLastSessionPointers } from "../tui/tui-last-session.js";
 
@@ -193,7 +193,7 @@ function moveHeartbeatMainSessionEntry(params: {
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
   (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.doctorHeartbeatMainSessionRepairTestApi")
+    Symbol.for("steelengine.doctorHeartbeatMainSessionRepairTestApi")
   ] = {
     moveHeartbeatMainSessionEntry,
     resolveHeartbeatMainSessionRepairCandidate,
@@ -207,7 +207,7 @@ if (process.env.VITEST || process.env.NODE_ENV === "test") {
  * prevents moving a newly-human main session.
  */
 export async function repairHeartbeatPoisonedMainSession(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   store: Record<string, SessionEntry>;
   absoluteStorePath: string;
   stateDir: string;

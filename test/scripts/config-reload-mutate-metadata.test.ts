@@ -17,15 +17,15 @@ function runMutateMetadata(configPath: string) {
     encoding: "utf8",
     env: {
       ...process.env,
-      OPENCLAW_CONFIG_PATH: configPath,
+      STEELENGINE_CONFIG_PATH: configPath,
     },
   });
 }
 
 describe("config reload metadata mutator", () => {
   it("updates the config reload gateway metadata knob without dropping existing config", () => {
-    const root = makeTempDir(tempDirs, "openclaw-config-reload-metadata-");
-    const configPath = path.join(root, "openclaw.json");
+    const root = makeTempDir(tempDirs, "steelengine-config-reload-metadata-");
+    const configPath = path.join(root, "steelengine.json");
     writeFileSync(
       configPath,
       `${JSON.stringify(

@@ -1,6 +1,6 @@
 import { consume } from "@lit/context";
-import { redactSensitiveUrlLikeString } from "@openclaw/net-policy/redact-sensitive-url";
-import { asNullableRecord as asRecord } from "@openclaw/normalization-core/record-coerce";
+import { redactSensitiveUrlLikeString } from "@steelengine/net-policy/redact-sensitive-url";
+import { asNullableRecord as asRecord } from "@steelengine/normalization-core/record-coerce";
 import { html, type PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
 import type { GatewayBrowserClient } from "../../api/gateway.ts";
@@ -31,7 +31,7 @@ import {
   type PluginMutationResult,
   type PluginSearchResult,
 } from "../../lib/plugins/index.ts";
-import { OpenClawLightDomElement } from "../../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../../lit/steelengine-element.ts";
 import { SubscriptionsController } from "../../lit/subscriptions-controller.ts";
 import { fetchPluginIconBlobUrl } from "./icon-loader.ts";
 import type { ConnectorSuggestion } from "./presentation.ts";
@@ -130,7 +130,7 @@ function parseMcpTarget(target: string): Record<string, unknown> | null {
   return args.length > 0 ? { command, args } : { command };
 }
 
-class PluginsPage extends OpenClawLightDomElement {
+class PluginsPage extends SteelEngineLightDomElement {
   @consume({ context: applicationContext, subscribe: true })
   private context!: ApplicationContext;
 
@@ -587,7 +587,7 @@ class PluginsPage extends OpenClawLightDomElement {
     }
   }
 
-  private openClawHubSearch(query: string) {
+  private steelEngineHubSearch(query: string) {
     this.query = query;
     this.changeTab("discover");
   }
@@ -973,7 +973,7 @@ class PluginsPage extends OpenClawLightDomElement {
       mcp.followUp === "oauth"
         ? t("pluginsPage.connectorAddedOauth", {
             name: connector.name,
-            command: `openclaw mcp login ${mcp.serverName}`,
+            command: `steelengine mcp login ${mcp.serverName}`,
           })
         : mcp.followUp === "endpoint"
           ? t("pluginsPage.connectorAddedEndpoint", { name: connector.name })
@@ -1049,7 +1049,7 @@ class PluginsPage extends OpenClawLightDomElement {
           onCancelUninstall: (rowKey) => this.setPendingRemoval(rowKey, false),
           onUninstall: (pluginId, rowKey) => void this.uninstall(pluginId, rowKey),
           onAddConnector: (connector) => void this.addConnector(connector),
-          onSearchClawHub: (query) => this.openClawHubSearch(query),
+          onSearchClawHub: (query) => this.steelEngineHubSearch(query),
           onMcpToggle: (name, enabled) => void this.toggleMcpServer(name, enabled),
           onMcpRemove: (name) => void this.removeMcpServer(name),
           onMcpFormToggle: (open) => {
@@ -1065,13 +1065,13 @@ class PluginsPage extends OpenClawLightDomElement {
   }
 }
 
-if (!customElements.get("openclaw-plugins-page")) {
-  customElements.define("openclaw-plugins-page", PluginsPage);
+if (!customElements.get("steelengine-plugins-page")) {
+  customElements.define("steelengine-plugins-page", PluginsPage);
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    "openclaw-plugins-page": PluginsPage;
+    "steelengine-plugins-page": PluginsPage;
   }
 }
 

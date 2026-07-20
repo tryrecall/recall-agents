@@ -1,11 +1,11 @@
 // Covers retry behavior around compaction summary generation.
-import type { AgentMessage } from "openclaw/plugin-sdk/agent-core";
-import { generateSummary, type ExtensionContext } from "openclaw/plugin-sdk/agent-sessions";
-import type { AssistantMessage, UserMessage } from "openclaw/plugin-sdk/llm";
+import type { AgentMessage } from "steelengine/plugin-sdk/agent-core";
+import { generateSummary, type ExtensionContext } from "steelengine/plugin-sdk/agent-sessions";
+import type { AssistantMessage, UserMessage } from "steelengine/plugin-sdk/llm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { retryAsync } from "../infra/retry.js";
 
-vi.mock("openclaw/plugin-sdk/agent-sessions", { spy: true });
+vi.mock("steelengine/plugin-sdk/agent-sessions", { spy: true });
 
 const mockGenerateSummary = vi.mocked(generateSummary);
 type MockGenerateSummaryCompat = (

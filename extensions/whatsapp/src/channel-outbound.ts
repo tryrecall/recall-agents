@@ -3,11 +3,11 @@ import {
   createMessageReceiptFromOutboundResults,
   defineChannelMessageAdapter,
   type ChannelMessageSendResult,
-} from "openclaw/plugin-sdk/channel-outbound";
-import type { ChannelOutboundAdapter } from "openclaw/plugin-sdk/channel-send-result";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
-import { questionGatewayRuntime } from "openclaw/plugin-sdk/question-gateway-runtime";
-import { chunkText } from "openclaw/plugin-sdk/reply-chunking";
+} from "steelengine/plugin-sdk/channel-outbound";
+import type { ChannelOutboundAdapter } from "steelengine/plugin-sdk/channel-send-result";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
+import { questionGatewayRuntime } from "steelengine/plugin-sdk/question-gateway-runtime";
+import { chunkText } from "steelengine/plugin-sdk/reply-chunking";
 import { createWhatsAppOutboundBase } from "./outbound-base.js";
 import { normalizeWhatsAppPayloadTextPreservingIndentation } from "./outbound-media-contract.js";
 import { resolveWhatsAppOutboundTarget } from "./resolve-outbound-target.js";

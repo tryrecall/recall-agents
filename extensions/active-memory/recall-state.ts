@@ -1,11 +1,11 @@
 import crypto from "node:crypto";
-import { closeActiveMemorySearchManager } from "openclaw/plugin-sdk/memory-host-search";
+import { closeActiveMemorySearchManager } from "steelengine/plugin-sdk/memory-host-search";
 import {
   asDateTimestampMs,
   resolveExpiresAtMsFromDurationMs,
-} from "openclaw/plugin-sdk/number-runtime";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/number-runtime";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-entry";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import { resolveActiveMemoryCleanupConfig } from "./config.js";
 import {
   CACHE_SWEEP_INTERVAL_MS,
@@ -52,7 +52,7 @@ function resetCircuitBreaker(key: string): void {
 }
 
 function scheduleMemorySearchCleanupAfterTimeout(
-  api: OpenClawPluginApi,
+  api: SteelEnginePluginApi,
   logPrefix: string,
   agentId: string,
 ): void {

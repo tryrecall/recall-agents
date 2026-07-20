@@ -2,12 +2,12 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import type { PluginRuntime } from "openclaw/plugin-sdk/core";
+import type { PluginRuntime } from "steelengine/plugin-sdk/core";
 import {
-  closeOpenClawStateDatabaseForTest,
+  closeSteelEngineStateDatabaseForTest,
   createChannelIngressQueueForTests,
-} from "openclaw/plugin-sdk/plugin-state-test-runtime";
-import type { MockFn } from "openclaw/plugin-sdk/plugin-test-runtime";
+} from "steelengine/plugin-sdk/plugin-state-test-runtime";
+import type { MockFn } from "steelengine/plugin-sdk/plugin-test-runtime";
 import { afterEach, beforeEach, vi } from "vitest";
 import type { SignalDaemonHandle } from "./daemon.js";
 import { setSignalRuntime } from "./runtime.js";
@@ -41,7 +41,7 @@ const signalCheckMock = vi.hoisted(() => vi.fn()) as unknown as MockFn;
 const signalRpcRequestMock = vi.hoisted(() => vi.fn()) as unknown as MockFn;
 const spawnSignalDaemonMock = vi.hoisted(() => vi.fn()) as unknown as MockFn;
 const signalToolResultSessionStorePath = vi.hoisted(
-  () => `/tmp/openclaw-signal-tool-result-sessions-${process.pid}.json`,
+  () => `/tmp/steelengine-signal-tool-result-sessions-${process.pid}.json`,
 );
 let signalToolResultStateDir: string | undefined;
 let signalToolResultIngressQueue: ReturnType<typeof createChannelIngressQueueForTests> | undefined;
@@ -133,19 +133,19 @@ export function createMockSignalDaemonHandle(
 
 // Use importActual so shared-worker mocks from earlier test files do not leak
 // into this harness's partial overrides.
-vi.mock("openclaw/plugin-sdk/runtime-config-snapshot", async () => {
+vi.mock("steelengine/plugin-sdk/runtime-config-snapshot", async () => {
   const actual = await vi.importActual<
-    typeof import("openclaw/plugin-sdk/runtime-config-snapshot")
-  >("openclaw/plugin-sdk/runtime-config-snapshot");
+    typeof import("steelengine/plugin-sdk/runtime-config-snapshot")
+  >("steelengine/plugin-sdk/runtime-config-snapshot");
   return {
     ...actual,
     getRuntimeConfig: () => config,
   };
 });
 
-vi.mock("openclaw/plugin-sdk/session-store-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/session-store-runtime")>(
-    "openclaw/plugin-sdk/session-store-runtime",
+vi.mock("steelengine/plugin-sdk/session-store-runtime", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/session-store-runtime")>(
+    "steelengine/plugin-sdk/session-store-runtime",
   );
   return {
     ...actual,
@@ -156,9 +156,9 @@ vi.mock("openclaw/plugin-sdk/session-store-runtime", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/channel-inbound", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/channel-inbound")>(
-    "openclaw/plugin-sdk/channel-inbound",
+vi.mock("steelengine/plugin-sdk/channel-inbound", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/channel-inbound")>(
+    "steelengine/plugin-sdk/channel-inbound",
   );
   return {
     ...actual,
@@ -194,9 +194,9 @@ vi.mock("./send.js", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/conversation-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/conversation-runtime")>(
-    "openclaw/plugin-sdk/conversation-runtime",
+vi.mock("steelengine/plugin-sdk/conversation-runtime", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/conversation-runtime")>(
+    "steelengine/plugin-sdk/conversation-runtime",
   );
   return {
     ...actual,
@@ -205,9 +205,9 @@ vi.mock("openclaw/plugin-sdk/conversation-runtime", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/security-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/security-runtime")>(
-    "openclaw/plugin-sdk/security-runtime",
+vi.mock("steelengine/plugin-sdk/security-runtime", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/security-runtime")>(
+    "steelengine/plugin-sdk/security-runtime",
   );
   return {
     ...actual,
@@ -235,9 +235,9 @@ vi.mock("./daemon.js", async (importOriginal) => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/system-event-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/system-event-runtime")>(
-    "openclaw/plugin-sdk/system-event-runtime",
+vi.mock("steelengine/plugin-sdk/system-event-runtime", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/system-event-runtime")>(
+    "steelengine/plugin-sdk/system-event-runtime",
   );
   return {
     ...actual,
@@ -248,19 +248,19 @@ vi.mock("openclaw/plugin-sdk/system-event-runtime", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/transport-ready-runtime", () => ({
+vi.mock("steelengine/plugin-sdk/transport-ready-runtime", () => ({
   waitForTransportReady: (...args: unknown[]) => waitForTransportReadyMock(...args),
 }));
 
 export function installSignalToolResultTestHooks() {
   beforeEach(async () => {
     const [{ resetInboundDedupe }, { resetSystemEventsForTest }] = await Promise.all([
-      import("openclaw/plugin-sdk/reply-runtime"),
-      import("openclaw/plugin-sdk/system-event-runtime"),
+      import("steelengine/plugin-sdk/reply-runtime"),
+      import("steelengine/plugin-sdk/system-event-runtime"),
     ]);
     resetInboundDedupe();
     const createdStateDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "openclaw-signal-tool-result-state-"),
+      path.join(os.tmpdir(), "steelengine-signal-tool-result-state-"),
     );
     const stateDir = await fs.realpath(createdStateDir);
     signalToolResultStateDir = stateDir;
@@ -318,7 +318,7 @@ export function installSignalToolResultTestHooks() {
   afterEach(async () => {
     clearSignalRuntimeForTest();
     signalToolResultIngressQueue = undefined;
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     if (signalToolResultStateDir) {
       await fs.rm(signalToolResultStateDir, { recursive: true, force: true });
       signalToolResultStateDir = undefined;

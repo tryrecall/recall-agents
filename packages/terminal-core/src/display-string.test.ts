@@ -3,10 +3,10 @@ import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { displayString } from "./display-string.js";
 
-function stubHome(home: string, openclawHome = ""): void {
+function stubHome(home: string, steelengineHome = ""): void {
   vi.stubEnv("HOME", home);
   vi.stubEnv("USERPROFILE", "");
-  vi.stubEnv("OPENCLAW_HOME", openclawHome);
+  vi.stubEnv("STEELENGINE_HOME", steelengineHome);
 }
 
 describe("displayString", () => {
@@ -35,13 +35,13 @@ describe("displayString", () => {
     expect(displayString(`/tmp${home}/project`)).toBe(`/tmp${home}/project`);
   });
 
-  it("uses OPENCLAW_HOME as the display prefix", () => {
+  it("uses STEELENGINE_HOME as the display prefix", () => {
     const home = path.resolve("test-home", "alice");
-    const openclawHome = path.resolve("test-openclaw-home");
-    stubHome(home, openclawHome);
+    const steelengineHome = path.resolve("test-steelengine-home");
+    stubHome(home, steelengineHome);
 
-    expect(displayString(openclawHome)).toBe("$OPENCLAW_HOME");
-    expect(displayString(`${openclawHome}/state`)).toBe("$OPENCLAW_HOME/state");
-    expect(displayString(`${openclawHome}2/state`)).toBe(`${openclawHome}2/state`);
+    expect(displayString(steelengineHome)).toBe("$STEELENGINE_HOME");
+    expect(displayString(`${steelengineHome}/state`)).toBe("$STEELENGINE_HOME/state");
+    expect(displayString(`${steelengineHome}2/state`)).toBe(`${steelengineHome}2/state`);
   });
 });

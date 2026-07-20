@@ -1,4 +1,4 @@
-/** Adapts the generic gateway service manager for OpenClaw node-host services. */
+/** Adapts the generic gateway service manager for SteelEngine node-host services. */
 import {
   NODE_SERVICE_KIND,
   NODE_SERVICE_MARKER,
@@ -18,14 +18,14 @@ function withNodeServiceEnv(
   // node-specific labels, logs, task script, and service marker.
   return {
     ...env,
-    OPENCLAW_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
-    OPENCLAW_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
-    OPENCLAW_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
-    OPENCLAW_WINDOWS_TASK_HIDDEN_LAUNCHER: "1",
-    OPENCLAW_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
-    OPENCLAW_LOG_PREFIX: "node",
-    OPENCLAW_SERVICE_MARKER: NODE_SERVICE_MARKER,
-    OPENCLAW_SERVICE_KIND: NODE_SERVICE_KIND,
+    STEELENGINE_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
+    STEELENGINE_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
+    STEELENGINE_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
+    STEELENGINE_WINDOWS_TASK_HIDDEN_LAUNCHER: "1",
+    STEELENGINE_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
+    STEELENGINE_LOG_PREFIX: "node",
+    STEELENGINE_SERVICE_MARKER: NODE_SERVICE_MARKER,
+    STEELENGINE_SERVICE_KIND: NODE_SERVICE_KIND,
   };
 }
 
@@ -35,14 +35,14 @@ function withNodeInstallEnv(args: GatewayServiceInstallArgs): GatewayServiceInst
     env: withNodeServiceEnv(args.env),
     environment: {
       ...args.environment,
-      OPENCLAW_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
-      OPENCLAW_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
-      OPENCLAW_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
-      OPENCLAW_WINDOWS_TASK_HIDDEN_LAUNCHER: "1",
-      OPENCLAW_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
-      OPENCLAW_LOG_PREFIX: "node",
-      OPENCLAW_SERVICE_MARKER: NODE_SERVICE_MARKER,
-      OPENCLAW_SERVICE_KIND: NODE_SERVICE_KIND,
+      STEELENGINE_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
+      STEELENGINE_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
+      STEELENGINE_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
+      STEELENGINE_WINDOWS_TASK_HIDDEN_LAUNCHER: "1",
+      STEELENGINE_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
+      STEELENGINE_LOG_PREFIX: "node",
+      STEELENGINE_SERVICE_MARKER: NODE_SERVICE_MARKER,
+      STEELENGINE_SERVICE_KIND: NODE_SERVICE_KIND,
     },
   };
 }

@@ -1,17 +1,17 @@
 // Openai tests cover openai provider plugin behavior.
 import fs from "node:fs";
-import type { StreamFn } from "openclaw/plugin-sdk/agent-core";
-import type { Context, Model, SimpleStreamOptions } from "openclaw/plugin-sdk/llm";
+import type { StreamFn } from "steelengine/plugin-sdk/agent-core";
+import type { Context, Model, SimpleStreamOptions } from "steelengine/plugin-sdk/llm";
 import {
   clearLiveCatalogCacheForTests,
   type LiveModelCatalogFetchGuard,
-} from "openclaw/plugin-sdk/provider-catalog-live-runtime";
-import type { ModelProviderConfig } from "openclaw/plugin-sdk/provider-model-shared";
+} from "steelengine/plugin-sdk/provider-catalog-live-runtime";
+import type { ModelProviderConfig } from "steelengine/plugin-sdk/provider-model-shared";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { OPENAI_API_BASE_URL, OPENAI_CODEX_RESPONSES_BASE_URL } from "./base-url.js";
 import { OPENAI_CODEX_DEFAULT_MODEL, OPENAI_DEFAULT_MODEL } from "./default-models.js";
 import { buildOpenAIProvider } from "./openai-provider.js";
-import manifest from "./openclaw.plugin.json" with { type: "json" };
+import manifest from "./steelengine.plugin.json" with { type: "json" };
 import { resolveModelRoutes } from "./provider-policy-api.js";
 
 const mocks = vi.hoisted(() => ({
@@ -106,14 +106,14 @@ vi.mock("./openai-chatgpt-provider.runtime.js", () => ({
   refreshOpenAICodexToken: mocks.refreshOpenAICodexToken,
 }));
 
-vi.mock("openclaw/plugin-sdk/provider-auth-runtime", () => ({
+vi.mock("steelengine/plugin-sdk/provider-auth-runtime", () => ({
   resolveApiKeyForProvider: mocks.resolveApiKeyForProvider,
   resolveProviderAuthProfileMetadata: mocks.resolveProviderAuthProfileMetadata,
 }));
 
-vi.mock("openclaw/plugin-sdk/provider-stream-family", async (importOriginal) => {
+vi.mock("steelengine/plugin-sdk/provider-stream-family", async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import("openclaw/plugin-sdk/provider-stream-family")>();
+    await importOriginal<typeof import("steelengine/plugin-sdk/provider-stream-family")>();
   const wrapStreamFn: NonNullable<typeof actual.OPENAI_RESPONSES_STREAM_HOOKS.wrapStreamFn> = (
     ctx,
   ) => {
@@ -1780,10 +1780,10 @@ describe("buildOpenAIProvider", () => {
 
   it("passes the selected runtime into GPT-5.6 thinking policy", () => {
     const provider = buildOpenAIProvider();
-    const openClawLuna = provider.resolveThinkingProfile?.({
+    const steelEngineLuna = provider.resolveThinkingProfile?.({
       provider: "openai",
       modelId: "gpt-5.6-luna",
-      agentRuntime: "openclaw",
+      agentRuntime: "steelengine",
     } as never);
     const codexLuna = provider.resolveThinkingProfile?.({
       provider: "openai",
@@ -1813,7 +1813,7 @@ describe("buildOpenAIProvider", () => {
       },
     } as never);
 
-    expect(openClawLuna?.levels.map((level) => level.id)).toContain("ultra");
+    expect(steelEngineLuna?.levels.map((level) => level.id)).toContain("ultra");
     expect(codexLuna?.levels.map((level) => level.id)).not.toContain("ultra");
     expect(codexLuna?.levels.map((level) => level.id)).toContain("max");
     expect(codexSolFromDirectCatalog?.levels.map((level) => level.id)).toContain("ultra");

@@ -1,5 +1,5 @@
 ---
-summary: "Adds SGLang model provider support to OpenClaw."
+summary: "Adds SGLang model provider support to SteelEngine."
 read_when:
   - You are installing, configuring, or auditing the sglang plugin
 title: "SGLang plugin"
@@ -7,12 +7,12 @@ title: "SGLang plugin"
 
 # SGLang plugin
 
-Adds SGLang model provider support to OpenClaw.
+Adds SGLang model provider support to SteelEngine.
 
 ## Distribution
 
-- Package: `@openclaw/sglang-provider`
-- Install route: included in OpenClaw
+- Package: `@steelengine/sglang-provider`
+- Install route: included in SteelEngine
 
 ## Surface
 

@@ -1,2 +1,2 @@
 // Llm Task API module exposes the plugin public contract.
-export { resolvePreferredOpenClawTmpDir, withTempWorkspace } from "openclaw/plugin-sdk/temp-path";
+export { resolvePreferredSteelEngineTmpDir, withTempWorkspace } from "steelengine/plugin-sdk/temp-path";

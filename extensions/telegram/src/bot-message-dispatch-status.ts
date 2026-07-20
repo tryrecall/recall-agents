@@ -3,13 +3,13 @@ import {
   DEFAULT_TIMING,
   logAckFailure,
   removeAckReactionAfterReply,
-} from "openclaw/plugin-sdk/channel-feedback";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { logVerbose, sleepWithAbort } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/channel-feedback";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { logVerbose, sleepWithAbort } from "steelengine/plugin-sdk/runtime-env";
 import type { TelegramMessageContext } from "./bot-message-context.js";
 
 export function createTelegramDispatchStatus(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   context: TelegramMessageContext;
 }) {
   const { context } = params;

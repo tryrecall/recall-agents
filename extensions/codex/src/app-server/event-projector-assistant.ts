@@ -1,5 +1,5 @@
-import type { EmbeddedRunAttemptParams } from "openclaw/plugin-sdk/agent-harness-runtime";
-import type { AssistantMessage } from "openclaw/plugin-sdk/llm";
+import type { EmbeddedRunAttemptParams } from "steelengine/plugin-sdk/agent-harness-runtime";
+import type { AssistantMessage } from "steelengine/plugin-sdk/llm";
 import {
   createAssistantMessage as buildAssistantMessage,
   createAssistantMirrorMessage as buildAssistantMirrorMessage,

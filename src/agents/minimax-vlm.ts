@@ -126,7 +126,7 @@ export async function minimaxUnderstandImage(params: {
       defaultHeaders: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "MM-API-Source": "OpenClaw",
+        "MM-API-Source": "SteelEngine",
       },
       request: params.request,
       provider: params.provider ?? "minimax",

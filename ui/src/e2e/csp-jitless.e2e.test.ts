@@ -15,7 +15,7 @@ import {
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
 
 let browser: Browser;
@@ -39,7 +39,7 @@ describeControlUiE2e("Control UI strict CSP E2E", () => {
     const context = await browser.newContext({ serviceWorkers: "block" });
     await context.addInitScript(() => {
       const violations: Array<{ blockedUri: string; effectiveDirective: string }> = [];
-      Object.assign(globalThis, { __openclawCspViolations: violations });
+      Object.assign(globalThis, { __steelengineCspViolations: violations });
       document.addEventListener("securitypolicyviolation", (event) => {
         violations.push({
           blockedUri: event.blockedURI,
@@ -76,12 +76,12 @@ describeControlUiE2e("Control UI strict CSP E2E", () => {
       const evalViolations = await page.evaluate(() => {
         const violations = (
           globalThis as typeof globalThis & {
-            __openclawCspViolations?: Array<{
+            __steelengineCspViolations?: Array<{
               blockedUri: string;
               effectiveDirective: string;
             }>;
           }
-        )["__openclawCspViolations"];
+        )["__steelengineCspViolations"];
         return (violations ?? []).filter(
           (violation) =>
             violation.blockedUri === "eval" &&

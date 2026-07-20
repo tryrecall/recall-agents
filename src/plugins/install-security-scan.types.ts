@@ -1,9 +1,9 @@
 // Defines plugin install security scan result types.
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 
 /** Overrides that intentionally loosen install safety policy for trusted/operator paths. */
 export type InstallSafetyOverrides = {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   dangerouslyForceUnsafeInstall?: boolean;
   trustedSourceLinkedOfficialInstall?: boolean;
 };

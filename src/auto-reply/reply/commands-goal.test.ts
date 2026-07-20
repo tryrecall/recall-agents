@@ -5,7 +5,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { loadSessionEntry, replaceSessionEntry } from "../../config/sessions/session-accessor.js";
 import type { SessionEntry } from "../../config/sessions/types.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { takeCommandSessionMetadataChanges } from "./command-session-metadata.js";
 import {
   formatGoalContinuationPrompt,
@@ -24,7 +24,7 @@ afterEach(async () => {
 });
 
 async function createStorePath(): Promise<string> {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-goal-command-"));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-goal-command-"));
   tempRoots.push(root);
   return path.join(root, "sessions.json");
 }
@@ -51,7 +51,7 @@ function getSessionEntry(params: {
 
 function buildGoalParams(commandBodyNormalized: string, storePath: string): HandleCommandsParams {
   return {
-    cfg: {} as OpenClawConfig,
+    cfg: {} as SteelEngineConfig,
     ctx: {
       Provider: "web",
       Surface: "web",

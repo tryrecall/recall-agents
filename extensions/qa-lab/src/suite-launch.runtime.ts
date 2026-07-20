@@ -171,10 +171,10 @@ async function resolveQaFlowChannelGroups(
   }
   // Package-only live lanes mount the QA harness without its dev tree. Load
   // Crabline only for Crabline-owned runs so unrelated transports stay isolated.
-  const { OPENCLAW_CRABLINE_DEFAULT_CHANNEL, resolveOpenClawCrablineChannelDriverSelection } =
+  const { STEELENGINE_CRABLINE_DEFAULT_CHANNEL, resolveSteelEngineCrablineChannelDriverSelection } =
     await import("@openclaw/crabline");
   const channels = resolveQaSuiteScenarioChannels({
-    defaultChannel: OPENCLAW_CRABLINE_DEFAULT_CHANNEL,
+    defaultChannel: STEELENGINE_CRABLINE_DEFAULT_CHANNEL,
     explicitChannel: runParams.channelDriverSelection?.channel,
     scenarios: [...scenarios],
   });
@@ -186,7 +186,7 @@ async function resolveQaFlowChannelGroups(
         channelId: undefined,
         channelDriverSelection:
           runParams.channelDriverSelection ??
-          resolveOpenClawCrablineChannelDriverSelection({ channel: singleChannel }),
+          resolveSteelEngineCrablineChannelDriverSelection({ channel: singleChannel }),
         scenarios: [...scenarios],
       },
     ];
@@ -196,10 +196,10 @@ async function resolveQaFlowChannelGroups(
   return channels.map((channel) => ({
     channel,
     channelId: undefined,
-    channelDriverSelection: resolveOpenClawCrablineChannelDriverSelection({ channel }),
+    channelDriverSelection: resolveSteelEngineCrablineChannelDriverSelection({ channel }),
     scenarios: scenarios.filter(
       (scenario) =>
-        (normalizeQaSuiteScenarioChannel(scenario) ?? OPENCLAW_CRABLINE_DEFAULT_CHANNEL) ===
+        (normalizeQaSuiteScenarioChannel(scenario) ?? STEELENGINE_CRABLINE_DEFAULT_CHANNEL) ===
         channel,
     ),
   }));
@@ -471,7 +471,7 @@ function renderUnifiedQaSuiteReport(params: {
   startedAt: Date;
 }) {
   return renderQaMarkdownReport({
-    title: "OpenClaw QA Scenario Suite",
+    title: "SteelEngine QA Scenario Suite",
     startedAt: params.startedAt,
     finishedAt: params.finishedAt,
     checks: [],

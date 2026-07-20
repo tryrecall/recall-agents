@@ -22,7 +22,7 @@ function cancellableResponse(status: number): {
   return { response: new Response(body, { status }), cancel };
 }
 
-vi.mock("openclaw/plugin-sdk/runtime-env", () => ({
+vi.mock("steelengine/plugin-sdk/runtime-env", () => ({
   createSubsystemLogger: () => {
     const logger = {
       debug: () => {},
@@ -36,7 +36,7 @@ vi.mock("openclaw/plugin-sdk/runtime-env", () => ({
   logVerbose: () => {},
 }));
 
-vi.mock("openclaw/plugin-sdk/media-store", () => ({
+vi.mock("steelengine/plugin-sdk/media-store", () => ({
   saveMediaStream: saveMediaStreamMock,
 }));
 
@@ -67,8 +67,8 @@ describe("downloadLineMedia", () => {
 
   afterAll(() => {
     vi.doUnmock("node:timers/promises");
-    vi.doUnmock("openclaw/plugin-sdk/runtime-env");
-    vi.doUnmock("openclaw/plugin-sdk/media-store");
+    vi.doUnmock("steelengine/plugin-sdk/runtime-env");
+    vi.doUnmock("steelengine/plugin-sdk/media-store");
     vi.unstubAllGlobals();
     vi.resetModules();
   });
@@ -91,7 +91,7 @@ describe("downloadLineMedia", () => {
         }
         const buffer = Buffer.concat(chunksLocal);
         return {
-          path: `/home/user/.openclaw/media/${subdir ?? "unknown"}/saved-media`,
+          path: `/home/user/.steelengine/media/${subdir ?? "unknown"}/saved-media`,
           contentType: detectMockContentType(buffer, contentType),
           size: buffer.length,
         };
@@ -119,7 +119,7 @@ describe("downloadLineMedia", () => {
     expect(call[2]).toBe("inbound");
     expect(call[3]).toBe(10 * 1024 * 1024);
     expect(result).toEqual({
-      path: "/home/user/.openclaw/media/inbound/saved-media",
+      path: "/home/user/.steelengine/media/inbound/saved-media",
       contentType: "image/jpeg",
       size: jpeg.length,
     });

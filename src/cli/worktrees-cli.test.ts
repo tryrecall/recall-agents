@@ -2,7 +2,7 @@ import { Command } from "commander";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { managedWorktrees } from "../agents/worktrees/service.js";
 import { resetConfigRuntimeState, setRuntimeConfigSnapshot } from "../config/config.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import { defaultRuntime } from "../runtime.js";
 import { registerWorktreesCli } from "./worktrees-cli.js";
 
@@ -13,7 +13,7 @@ afterEach(() => {
 
 describe("worktrees cli", () => {
   it("passes session owner activity and configured limits to gc", async () => {
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       worktrees: { cleanup: { maxCount: 25, maxTotalSizeGb: 50 } },
     };
     setRuntimeConfigSnapshot(cfg, cfg);
@@ -23,7 +23,7 @@ describe("worktrees cli", () => {
       snapshotsPruned: 0,
     });
     vi.spyOn(defaultRuntime, "log").mockImplementation(() => undefined);
-    const program = new Command().name("openclaw");
+    const program = new Command().name("steelengine");
     registerWorktreesCli(program);
 
     await program.parseAsync(["worktrees", "gc"], { from: "user" });

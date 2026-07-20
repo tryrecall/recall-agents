@@ -1,5 +1,5 @@
 // Model probe gateway method reuses the CLI auth-probe engine behind an admin-scoped RPC.
-import { normalizeProviderId } from "@openclaw/model-catalog-core/provider-id";
+import { normalizeProviderId } from "@steelengine/model-catalog-core/provider-id";
 import {
   ErrorCodes,
   errorShape,
@@ -13,7 +13,7 @@ import {
   type AuthProbeStatus,
   runAuthProbes,
 } from "../../commands/models/list.probe.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type { GatewayRequestHandlers } from "./types.js";
 
 const DEFAULT_TIMEOUT_MS = 20_000;
@@ -46,7 +46,7 @@ function safeProbeError(status: AuthProbeStatus): string | undefined {
   return status === "ok" ? undefined : PROBE_ERROR_MESSAGES[status];
 }
 
-function modelCandidatesFromConfig(cfg: OpenClawConfig): string[] {
+function modelCandidatesFromConfig(cfg: SteelEngineConfig): string[] {
   const configured = cfg.agents?.defaults?.model;
   const primary = typeof configured === "string" ? configured : configured?.primary;
   const fallbacks = typeof configured === "string" ? [] : (configured?.fallbacks ?? []);

@@ -1,5 +1,5 @@
 // Googlechat plugin module implements secret contract behavior.
-import { normalizeAccountId } from "openclaw/plugin-sdk/account-id";
+import { normalizeAccountId } from "steelengine/plugin-sdk/account-id";
 import {
   createChannelSecretTargetRegistryEntries,
   getChannelSurface,
@@ -10,8 +10,8 @@ import {
   resolveChannelAccountSurface,
   type ResolverContext,
   type SecretDefaults,
-} from "openclaw/plugin-sdk/channel-secret-basic-runtime";
-import { coerceSecretRef } from "openclaw/plugin-sdk/secret-ref-runtime";
+} from "steelengine/plugin-sdk/channel-secret-basic-runtime";
+import { coerceSecretRef } from "steelengine/plugin-sdk/secret-ref-runtime";
 
 type GoogleChatAccountLike = {
   serviceAccount?: unknown;

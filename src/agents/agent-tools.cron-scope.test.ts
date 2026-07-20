@@ -18,16 +18,16 @@ const mocks = vi.hoisted(() => {
     }) satisfies AnyAgentTool;
 
   return {
-    createOpenClawToolsOptions: vi.fn(),
+    createSteelEngineToolsOptions: vi.fn(),
     stubTool,
   };
 });
 
-vi.mock("./openclaw-tools.js", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("./openclaw-tools.js")>();
+vi.mock("./steelengine-tools.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./steelengine-tools.js")>();
   return {
-    createOpenClawTools: (options: unknown) => {
-      mocks.createOpenClawToolsOptions(options);
+    createSteelEngineTools: (options: unknown) => {
+      mocks.createSteelEngineToolsOptions(options);
       return [mocks.stubTool("cron")];
     },
     filterToolsByClientCaps: actual.filterToolsByClientCaps,
@@ -36,35 +36,35 @@ vi.mock("./openclaw-tools.js", async (importOriginal) => {
 
 import "./test-helpers/fast-bash-tools.js";
 import "./test-helpers/fast-coding-tools.js";
-import { createOpenClawCodingTools } from "./agent-tools.js";
+import { createSteelEngineCodingTools } from "./agent-tools.js";
 
-function firstOpenClawToolsOptions(): { cronSelfRemoveOnlyJobId?: string } | undefined {
-  return mocks.createOpenClawToolsOptions.mock.calls[0]?.[0] as
+function firstSteelEngineToolsOptions(): { cronSelfRemoveOnlyJobId?: string } | undefined {
+  return mocks.createSteelEngineToolsOptions.mock.calls[0]?.[0] as
     | { cronSelfRemoveOnlyJobId?: string }
     | undefined;
 }
 
-describe("createOpenClawCodingTools cron scope", () => {
+describe("createSteelEngineCodingTools cron scope", () => {
   beforeEach(() => {
-    mocks.createOpenClawToolsOptions.mockClear();
+    mocks.createSteelEngineToolsOptions.mockClear();
   });
 
   it("scopes cron-triggered jobs to self-removal", () => {
-    const tools = createOpenClawCodingTools({
+    const tools = createSteelEngineCodingTools({
       trigger: "cron",
       jobId: "job-current",
     });
 
     expect(tools.map((tool) => tool.name)).toContain("cron");
-    expect(firstOpenClawToolsOptions()?.cronSelfRemoveOnlyJobId).toBe("job-current");
+    expect(firstSteelEngineToolsOptions()?.cronSelfRemoveOnlyJobId).toBe("job-current");
   });
 
   it("does not scope non-cron sessions", () => {
-    createOpenClawCodingTools({
+    createSteelEngineCodingTools({
       trigger: "user",
       jobId: "job-current",
     });
 
-    expect(firstOpenClawToolsOptions()?.cronSelfRemoveOnlyJobId).toBeUndefined();
+    expect(firstSteelEngineToolsOptions()?.cronSelfRemoveOnlyJobId).toBeUndefined();
   });
 });

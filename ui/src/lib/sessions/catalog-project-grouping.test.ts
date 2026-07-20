@@ -31,9 +31,9 @@ describe("groupCatalogSessionsByProject", () => {
   });
 
   it.each([
-    ["/Users/dev/openclaw/.claude/worktrees/fix-1", "/Users/dev/openclaw"],
-    ["/Users/dev/openclaw/.claude/worktrees/fix-1/ui/src", "/Users/dev/openclaw"],
-    ["C:\\Users\\dev\\openclaw\\.claude\\worktrees\\fix-1", "C:\\Users\\dev\\openclaw"],
+    ["/Users/dev/steelengine/.claude/worktrees/fix-1", "/Users/dev/steelengine"],
+    ["/Users/dev/steelengine/.claude/worktrees/fix-1/ui/src", "/Users/dev/steelengine"],
+    ["C:\\Users\\dev\\steelengine\\.claude\\worktrees\\fix-1", "C:\\Users\\dev\\steelengine"],
   ])("folds worktree cwd %s into %s", (worktreeCwd, expectedProject) => {
     const result = groupCatalogSessionsByProject([
       session("direct", expectedProject),
@@ -56,8 +56,8 @@ describe("groupCatalogSessionsByProject", () => {
   });
 
   it.each([
-    [" /Users/dev/openclaw/// ", "/Users/dev/openclaw", "openclaw"],
-    ["C:\\Users\\dev\\openclaw\\", "C:\\Users\\dev\\openclaw", "openclaw"],
+    [" /Users/dev/steelengine/// ", "/Users/dev/steelengine", "steelengine"],
+    ["C:\\Users\\dev\\steelengine\\", "C:\\Users\\dev\\steelengine", "steelengine"],
   ])("normalizes %s to key %s with label %s", (cwd, expectedKey, expectedLabel) => {
     const result = groupCatalogSessionsByProject([session("one", cwd)]);
 

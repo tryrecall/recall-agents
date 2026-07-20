@@ -4,7 +4,7 @@
 import { TOOL_NAME_SEPARATOR } from "../../agent-bundle-mcp-names.js";
 import {
   type CoreToolFactoryFamily,
-  type OpenClawCodingToolConstructionPlan,
+  type SteelEngineCodingToolConstructionPlan,
   resolveCoreToolFactoryFamily,
 } from "../../core-tool-factory-descriptors.js";
 import { isToolAllowedByPolicyName } from "../../tool-policy-match.js";
@@ -16,25 +16,25 @@ import {
   normalizeToolName,
 } from "../../tool-policy.js";
 
-const ALL_CODING_TOOL_CONSTRUCTION_PLAN: OpenClawCodingToolConstructionPlan = {
+const ALL_CODING_TOOL_CONSTRUCTION_PLAN: SteelEngineCodingToolConstructionPlan = {
   includeBaseCodingTools: true,
   includeShellTools: true,
   includeChannelTools: true,
-  includeOpenClawTools: true,
+  includeSteelEngineTools: true,
   includePluginTools: true,
 };
 
-const NO_CODING_TOOL_CONSTRUCTION_PLAN: OpenClawCodingToolConstructionPlan = {
+const NO_CODING_TOOL_CONSTRUCTION_PLAN: SteelEngineCodingToolConstructionPlan = {
   includeBaseCodingTools: false,
   includeShellTools: false,
   includeChannelTools: false,
-  includeOpenClawTools: false,
+  includeSteelEngineTools: false,
   includePluginTools: false,
 };
 
 function cloneCodingToolConstructionPlan(
-  plan: OpenClawCodingToolConstructionPlan,
-): OpenClawCodingToolConstructionPlan {
+  plan: SteelEngineCodingToolConstructionPlan,
+): SteelEngineCodingToolConstructionPlan {
   return { ...plan };
 }
 
@@ -106,7 +106,7 @@ export function mergeForcedEmbeddedAttemptToolsAllow(
 
 function resolveCodingToolConstructionPlanForAllowlist(
   toolsAllow?: string[],
-): OpenClawCodingToolConstructionPlan {
+): SteelEngineCodingToolConstructionPlan {
   if (!toolsAllow) {
     return cloneCodingToolConstructionPlan(ALL_CODING_TOOL_CONSTRUCTION_PLAN);
   }
@@ -133,7 +133,7 @@ function resolveCodingToolConstructionPlanForAllowlist(
   }
   const includeBaseCodingTools = coreFamilies.has("base-coding");
   const includeShellTools = coreFamilies.has("shell");
-  const includeOpenClawTools = coreFamilies.has("openclaw");
+  const includeSteelEngineTools = coreFamilies.has("steelengine");
   // Channel delivery tools are constructed through plugin-capable runtime setup.
   const includeChannelTools = includePluginTools;
 
@@ -141,7 +141,7 @@ function resolveCodingToolConstructionPlanForAllowlist(
     includeBaseCodingTools,
     includeShellTools,
     includeChannelTools,
-    includeOpenClawTools,
+    includeSteelEngineTools,
     includePluginTools,
   };
 }
@@ -161,7 +161,7 @@ export function resolveEmbeddedAttemptToolConstructionPlan(params: {
   constructTools: boolean;
   includeCoreTools: boolean;
   runtimeToolAllowlist?: string[];
-  codingToolConstructionPlan: OpenClawCodingToolConstructionPlan;
+  codingToolConstructionPlan: SteelEngineCodingToolConstructionPlan;
 } {
   // Model capability is authoritative: forced delivery cannot materialize a
   // tool the selected model cannot call.
@@ -183,7 +183,7 @@ export function resolveEmbeddedAttemptToolConstructionPlan(params: {
   const includeCoreTools =
     codingToolConstructionPlan.includeBaseCodingTools ||
     codingToolConstructionPlan.includeShellTools ||
-    codingToolConstructionPlan.includeOpenClawTools;
+    codingToolConstructionPlan.includeSteelEngineTools;
   const constructTools =
     includeCoreTools ||
     codingToolConstructionPlan.includeChannelTools ||

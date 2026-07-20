@@ -8,17 +8,17 @@ export type PluginNpmRuntimeBuildPlan = {
   packageFiles: string[];
   packagePeerMetadata: {
     peerDependencies: {
-      openclaw: string;
+      steelengine: string;
     };
     peerDependenciesMeta: {
-      openclaw: { optional: boolean };
+      steelengine: { optional: boolean };
     };
   };
   repoRoot: string;
   packageDir: string;
   pluginDir: string;
   packageJson: {
-    openclaw: { compat: { pluginApi: string } };
+    steelengine: { compat: { pluginApi: string } };
     [key: string]: unknown;
   };
   rootPackageJson: Record<string, unknown>;

@@ -101,7 +101,7 @@ async function writeProofPlugin(rootDir, nodeLabel, options = {}) {
   const pluginDir = path.join(rootDir, "plugin");
   const pluginPath = path.join(pluginDir, "pond-node-tools.mjs");
   await fs.mkdir(pluginDir, { recursive: true });
-  await writeJson(path.join(pluginDir, "openclaw.plugin.json"), {
+  await writeJson(path.join(pluginDir, "steelengine.plugin.json"), {
     id: PLUGIN_ID,
     name: "Pond Node Tools",
     description: "Node-hosted plugin tool proof",
@@ -116,7 +116,7 @@ async function writeProofPlugin(rootDir, nodeLabel, options = {}) {
     name: PLUGIN_ID,
     version: "0.0.0",
     type: "module",
-    openclaw: { extensions: ["./pond-node-tools.mjs"] },
+    steelengine: { extensions: ["./pond-node-tools.mjs"] },
   });
   const sharedToolRegistration = options.sharedTool
     ? `
@@ -138,7 +138,7 @@ async function writeProofPlugin(rootDir, nodeLabel, options = {}) {
   const source = `
 import os from "node:os";
 
-const nodeLabel = process.env.OPENCLAW_POND_NODE_LABEL || ${JSON.stringify(nodeLabel)};
+const nodeLabel = process.env.STEELENGINE_POND_NODE_LABEL || ${JSON.stringify(nodeLabel)};
 
 function readParams(paramsJSON) {
   if (!paramsJSON) return {};
@@ -255,7 +255,7 @@ async function writeRemoteExecProofSkill(stateDir, proofFilePath, skillName) {
 async function prepareRoleState(baseDir, role, token, nodeLabel, options = {}) {
   const rootDir = path.resolve(baseDir, role);
   const stateDir = path.join(rootDir, "state");
-  const configPath = path.join(rootDir, "openclaw.json");
+  const configPath = path.join(rootDir, "steelengine.json");
   await fs.mkdir(rootDir, { recursive: true, mode: 0o700 });
   await fs.chmod(rootDir, 0o700);
   const pluginPath = await writeProofPlugin(rootDir, nodeLabel, {
@@ -413,18 +413,18 @@ function childEnv(state, token, nodeLabel) {
     ...process.env,
     ...(process.env.OPENAI_API_KEY
       ? {}
-      : process.env.OPENCLAW_LIVE_OPENAI_KEY
-        ? { OPENAI_API_KEY: process.env.OPENCLAW_LIVE_OPENAI_KEY }
+      : process.env.STEELENGINE_LIVE_OPENAI_KEY
+        ? { OPENAI_API_KEY: process.env.STEELENGINE_LIVE_OPENAI_KEY }
         : {}),
-    OPENCLAW_CONFIG_PATH: state.configPath,
-    OPENCLAW_STATE_DIR: state.stateDir,
-    OPENCLAW_GATEWAY_TOKEN: token,
-    OPENCLAW_POND_NODE_LABEL: nodeLabel,
+    STEELENGINE_CONFIG_PATH: state.configPath,
+    STEELENGINE_STATE_DIR: state.stateDir,
+    STEELENGINE_GATEWAY_TOKEN: token,
+    STEELENGINE_POND_NODE_LABEL: nodeLabel,
   };
 }
 
-function spawnOpenClaw(args, options) {
-  const cliArgs = options.built ? ["openclaw.mjs", ...args] : ["scripts/run-node.mjs", ...args];
+function spawnSteelEngine(args, options) {
+  const cliArgs = options.built ? ["steelengine.mjs", ...args] : ["scripts/run-node.mjs", ...args];
   const child = spawn("node", cliArgs, {
     cwd: repoRoot(),
     env: options.env,
@@ -647,7 +647,7 @@ async function readProofSkills(rpc, skillName = SKILL_NAME) {
   return (result?.skills ?? []).filter(
     (skill) =>
       skill.name === skillName &&
-      skill.source === "openclaw-node" &&
+      skill.source === "steelengine-node" &&
       skill.filePath.startsWith("node://") &&
       skill.filePath.endsWith(locatorSuffix),
   );
@@ -892,7 +892,7 @@ async function runHotPlugLocal(args) {
     throw new Error("--hot-plug requires --live");
   }
   const liveModel = String(
-    args.model || process.env.OPENCLAW_POND_LIVE_MODEL || DEFAULT_HOT_PLUG_LIVE_MODEL,
+    args.model || process.env.STEELENGINE_POND_LIVE_MODEL || DEFAULT_HOT_PLUG_LIVE_MODEL,
   );
   const token = String(args.token || proofToken());
   const mcpProofToken = proofToken();
@@ -900,7 +900,7 @@ async function runHotPlugLocal(args) {
   const hotPlugSkillName = `${SKILL_NAME}-${skillProofToken.slice(-8)}`;
   const port = args.port ? Number(args.port) : await availableLoopbackPort();
   const baseDir = String(
-    args.baseDir || (await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-node-hot-plug-"))),
+    args.baseDir || (await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-node-hot-plug-"))),
   );
   const gatewayState = await prepareRoleState(baseDir, "gateway", token, "gateway", {
     liveModel,
@@ -909,12 +909,12 @@ async function runHotPlugLocal(args) {
   const children = [];
   let nodeChild;
   if (args.build === true) {
-    logStep("building OpenClaw");
+    logStep("building SteelEngine");
     await runCommand("pnpm", ["build"], {
       stdio: args.verbose ? "inherit" : ["ignore", "ignore", "ignore"],
     });
   } else {
-    logStep("using existing OpenClaw build (pass --build to rebuild)");
+    logStep("using existing SteelEngine build (pass --build to rebuild)");
   }
   const childOptions = (state, label) => ({
     env: childEnv(state, token, label),
@@ -933,7 +933,7 @@ async function runHotPlugLocal(args) {
       HOME: nodeState.rootDir,
       npm_config_cache: process.env.npm_config_cache || path.join(os.homedir(), ".npm"),
     };
-    nodeChild = spawnOpenClaw(pondNodeArgs(port), options);
+    nodeChild = spawnSteelEngine(pondNodeArgs(port), options);
     children.push(nodeChild);
     return nodeChild;
   };
@@ -952,7 +952,7 @@ async function runHotPlugLocal(args) {
   try {
     logStep("starting cold gateway and node host with no MCP servers or skills");
     children.push(
-      spawnOpenClaw(
+      spawnSteelEngine(
         [
           "gateway",
           "run",
@@ -1249,17 +1249,17 @@ async function runVerify({ url, token, expectedNodes }) {
 }
 
 async function runGateway(args) {
-  const token = String(args.token || process.env.OPENCLAW_GATEWAY_TOKEN || "");
+  const token = String(args.token || process.env.STEELENGINE_GATEWAY_TOKEN || "");
   if (!token) {
-    throw new Error("--token or OPENCLAW_GATEWAY_TOKEN required");
+    throw new Error("--token or STEELENGINE_GATEWAY_TOKEN required");
   }
   const port = Number(args.port || DEFAULT_PORT);
   const baseDir = String(
-    args.baseDir || (await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-node-plugin-tools-"))),
+    args.baseDir || (await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-node-plugin-tools-"))),
   );
   const state = await prepareRoleState(baseDir, "gateway", token, "gateway");
   console.log(JSON.stringify({ role: "gateway", port, tokenSet: true, stateDir: state.stateDir }));
-  const child = spawnOpenClaw(
+  const child = spawnSteelEngine(
     [
       "gateway",
       "run",
@@ -1279,23 +1279,23 @@ async function runGateway(args) {
 }
 
 async function runNode(args) {
-  const token = String(args.token || process.env.OPENCLAW_GATEWAY_TOKEN || "");
+  const token = String(args.token || process.env.STEELENGINE_GATEWAY_TOKEN || "");
   if (!token) {
-    throw new Error("--token or OPENCLAW_GATEWAY_TOKEN required");
+    throw new Error("--token or STEELENGINE_GATEWAY_TOKEN required");
   }
   const host = String(args.host || "127.0.0.1");
   const port = Number(args.port || DEFAULT_PORT);
   const nodeId = String(args.nodeId || `pond-${crypto.randomBytes(4).toString("hex")}`);
   const displayName = String(args.displayName || nodeId);
   const baseDir = String(
-    args.baseDir || (await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-node-plugin-tools-"))),
+    args.baseDir || (await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-node-plugin-tools-"))),
   );
   const state = await prepareRoleState(baseDir, nodeId, token, nodeId, {
     nodeSurfaces: args["plugin-only"] !== true,
     skillProofToken: String(args.skillProofToken || proofToken()),
   });
   console.log(JSON.stringify({ role: "node", nodeId, host, port, tokenSet: true }));
-  const child = spawnOpenClaw(
+  const child = spawnSteelEngine(
     [
       "node",
       "run",
@@ -1321,14 +1321,14 @@ async function runNode(args) {
 async function runLocal(args) {
   const live = args.live === true;
   const liveModel = String(
-    args.model || process.env.OPENCLAW_POND_LIVE_MODEL || DEFAULT_LIVE_MODEL,
+    args.model || process.env.STEELENGINE_POND_LIVE_MODEL || DEFAULT_LIVE_MODEL,
   );
   const token = String(args.token || proofToken());
   const mcpProofToken = proofToken();
   const skillProofToken = proofToken();
   const port = args.port ? Number(args.port) : await availableLoopbackPort();
   const baseDir = String(
-    args.baseDir || (await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-node-plugin-tools-"))),
+    args.baseDir || (await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-node-plugin-tools-"))),
   );
   const gatewayState = await prepareRoleState(baseDir, "gateway", token, "gateway", {
     liveModel: live ? liveModel : undefined,
@@ -1344,12 +1344,12 @@ async function runLocal(args) {
   });
   const children = [];
   if (args.build === true) {
-    logStep("building OpenClaw");
+    logStep("building SteelEngine");
     await runCommand("pnpm", ["build"], {
       stdio: args.verbose ? "inherit" : ["ignore", "ignore", "ignore"],
     });
   } else {
-    logStep("using existing OpenClaw build (pass --build to rebuild)");
+    logStep("using existing SteelEngine build (pass --build to rebuild)");
   }
   const childOptions = (state, label) => ({
     env: childEnv(state, token, label),
@@ -1364,7 +1364,7 @@ async function runLocal(args) {
   try {
     logStep("starting gateway");
     children.push(
-      spawnOpenClaw(
+      spawnSteelEngine(
         [
           "gateway",
           "run",
@@ -1389,7 +1389,7 @@ async function runLocal(args) {
     });
     logStep("starting pond-a and pond-b node hosts");
     children.push(
-      spawnOpenClaw(
+      spawnSteelEngine(
         [
           "node",
           "run",
@@ -1406,7 +1406,7 @@ async function runLocal(args) {
       ),
     );
     children.push(
-      spawnOpenClaw(
+      spawnSteelEngine(
         [
           "node",
           "run",
@@ -1466,7 +1466,7 @@ async function runLocal(args) {
         return skills.length === 0;
       });
       logStep("restarting pond-b and verifying publication returns");
-      const restartedB = spawnOpenClaw(
+      const restartedB = spawnSteelEngine(
         [
           "node",
           "run",
@@ -1557,11 +1557,11 @@ async function main() {
   const mode = args._[0] ?? "local";
   const defaultLiveModel =
     args["hot-plug"] === true ? DEFAULT_HOT_PLUG_LIVE_MODEL : DEFAULT_LIVE_MODEL;
-  const liveModel = String(args.model || process.env.OPENCLAW_POND_LIVE_MODEL || defaultLiveModel);
+  const liveModel = String(args.model || process.env.STEELENGINE_POND_LIVE_MODEL || defaultLiveModel);
   const liveProvider = liveModel.split("/", 1)[0];
   const liveKeyPresent =
     liveProvider === "openai"
-      ? Boolean(process.env.OPENAI_API_KEY?.trim() || process.env.OPENCLAW_LIVE_OPENAI_KEY?.trim())
+      ? Boolean(process.env.OPENAI_API_KEY?.trim() || process.env.STEELENGINE_LIVE_OPENAI_KEY?.trim())
       : liveProvider === "anthropic"
         ? Boolean(process.env.ANTHROPIC_API_KEY?.trim())
         : true;
@@ -1579,9 +1579,9 @@ async function main() {
     return;
   }
   if (mode === "verify") {
-    const token = String(args.token || process.env.OPENCLAW_GATEWAY_TOKEN || "");
+    const token = String(args.token || process.env.STEELENGINE_GATEWAY_TOKEN || "");
     if (!token) {
-      throw new Error("--token or OPENCLAW_GATEWAY_TOKEN required");
+      throw new Error("--token or STEELENGINE_GATEWAY_TOKEN required");
     }
     await runVerify({
       url: String(args.url || `ws://127.0.0.1:${args.port || DEFAULT_PORT}`),

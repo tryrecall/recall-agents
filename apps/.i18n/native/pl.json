@@ -5,8 +5,8 @@
   "entries": [
     {
       "id": "native.android.85cc8de945e3929c",
-      "source": "OpenClaw translations · $languageTag",
-      "translated": "Tłumaczenia OpenClaw · $languageTag"
+      "source": "SteelEngine translations · $languageTag",
+      "translated": "Tłumaczenia SteelEngine · $languageTag"
     },
     {
       "id": "native.android.914725056e04bd7a",
@@ -335,8 +335,8 @@
     },
     {
       "id": "native.android.ff4c22906eac1e9e",
-      "source": "OPENCLAW",
-      "translated": "OPENCLAW"
+      "source": "STEELENGINE",
+      "translated": "STEELENGINE"
     },
     {
       "id": "native.android.dec357dfc9b8c0a5",
@@ -360,13 +360,13 @@
     },
     {
       "id": "native.android.25ce6f89dd2fda90",
-      "source": "OpenClaw Node · Talk",
-      "translated": "Węzeł OpenClaw · Rozmowa"
+      "source": "SteelEngine Node · Talk",
+      "translated": "Węzeł SteelEngine · Rozmowa"
     },
     {
       "id": "native.android.b48f7aeb7a884942",
-      "source": "OpenClaw Node · Connected",
-      "translated": "Węzeł OpenClaw · Połączono"
+      "source": "SteelEngine Node · Connected",
+      "translated": "Węzeł SteelEngine · Połączono"
     },
     {
       "id": "native.android.b781a577d8da896d",
@@ -375,8 +375,8 @@
     },
     {
       "id": "native.android.97365bea9725ae80",
-      "source": "OpenClaw Node",
-      "translated": "Węzeł OpenClaw"
+      "source": "SteelEngine Node",
+      "translated": "Węzeł SteelEngine"
     },
     {
       "id": "native.android.3e0889d921c92cab",
@@ -395,8 +395,8 @@
     },
     {
       "id": "native.android.f4886ad80e8149cf",
-      "source": "OpenClaw node connection status",
-      "translated": "Stan połączenia węzła OpenClaw"
+      "source": "SteelEngine node connection status",
+      "translated": "Stan połączenia węzła SteelEngine"
     },
     {
       "id": "native.android.20fb810920ccb98c",
@@ -905,8 +905,8 @@
     },
     {
       "id": "native.android.3b076d12026fd953",
-      "source": "OpenClaw is syncing back up",
-      "translated": "OpenClaw ponownie się synchronizuje"
+      "source": "SteelEngine is syncing back up",
+      "translated": "SteelEngine ponownie się synchronizuje"
     },
     {
       "id": "native.android.8dd8abf489f1fe50",
@@ -925,8 +925,8 @@
     },
     {
       "id": "native.android.8e22550e0205b237",
-      "source": "Welcome to OpenClaw",
-      "translated": "Witamy w OpenClaw"
+      "source": "Welcome to SteelEngine",
+      "translated": "Witamy w SteelEngine"
     },
     {
       "id": "native.android.fee881b8134958ab",
@@ -1005,8 +1005,8 @@
     },
     {
       "id": "native.android.237761be968be3f4",
-      "source": "OpenClaw needs ${labels.joinToString(\", \")} permissions to continue.",
-      "translated": "OpenClaw potrzebuje uprawnień ${labels.joinToString(\", \")}, aby kontynuować."
+      "source": "SteelEngine needs ${labels.joinToString(\", \")} permissions to continue.",
+      "translated": "SteelEngine potrzebuje uprawnień ${labels.joinToString(\", \")}, aby kontynuować."
     },
     {
       "id": "native.android.f9b9d558dc078d96",
@@ -1175,18 +1175,18 @@
     },
     {
       "id": "native.android.c9b3801fdf5499a9",
-      "source": "OpenClaw Passive",
-      "translated": "OpenClaw — pasywne"
+      "source": "SteelEngine Passive",
+      "translated": "SteelEngine — pasywne"
     },
     {
       "id": "native.android.e2a79a2c3ddba922",
-      "source": "OpenClaw Time Sensitive",
-      "translated": "OpenClaw — pilne"
+      "source": "SteelEngine Time Sensitive",
+      "translated": "SteelEngine — pilne"
     },
     {
       "id": "native.android.a79d6ccab877c9ca",
-      "source": "OpenClaw Active",
-      "translated": "OpenClaw — aktywne"
+      "source": "SteelEngine Active",
+      "translated": "SteelEngine — aktywne"
     },
     {
       "id": "native.android.356609f717b92350",
@@ -1405,8 +1405,8 @@
     },
     {
       "id": "native.android.5ce94621017855b6",
-      "source": "Talk or dictate with OpenClaw",
-      "translated": "Rozmawiaj lub dyktuj z OpenClaw"
+      "source": "Talk or dictate with SteelEngine",
+      "translated": "Rozmawiaj lub dyktuj z SteelEngine"
     },
     {
       "id": "native.android.5876e15e5e92fd45",
@@ -1450,8 +1450,8 @@
     },
     {
       "id": "native.android.9f877120690b0c59",
-      "source": "Search OpenClaw",
-      "translated": "Szukaj w OpenClaw"
+      "source": "Search SteelEngine",
+      "translated": "Szukaj w SteelEngine"
     },
     {
       "id": "native.android.c142846e7b88306c",
@@ -1490,8 +1490,8 @@
     },
     {
       "id": "native.android.8f8384286317f5c9",
-      "source": "OpenClaw session",
-      "translated": "Sesja OpenClaw"
+      "source": "SteelEngine session",
+      "translated": "Sesja SteelEngine"
     },
     {
       "id": "native.android.15799e57704b20c6",
@@ -2565,18 +2565,18 @@
     },
     {
       "id": "native.android.1556c7b90c4a24ff",
-      "source": "Enter the setup code from openclaw qr.",
-      "translated": "Wprowadź kod konfiguracji z openclaw qr."
+      "source": "Enter the setup code from steelengine qr.",
+      "translated": "Wprowadź kod konfiguracji z steelengine qr."
     },
     {
       "id": "native.android.c6d2aa9f033cecc8",
-      "source": "Setup code was not accepted. Generate a fresh code with openclaw qr.",
-      "translated": "Kod konfiguracji nie został zaakceptowany. Wygeneruj nowy kod za pomocą openclaw qr."
+      "source": "Setup code was not accepted. Generate a fresh code with steelengine qr.",
+      "translated": "Kod konfiguracji nie został zaakceptowany. Wygeneruj nowy kod za pomocą steelengine qr."
     },
     {
       "id": "native.android.3c50060d3efc154d",
-      "source": "That QR code is not an OpenClaw setup QR. Generate a fresh code with openclaw qr, then try again.",
-      "translated": "Ten kod QR nie jest kodem konfiguracji OpenClaw. Wygeneruj nowy kod za pomocą openclaw qr, a następnie spróbuj ponownie."
+      "source": "That QR code is not an SteelEngine setup QR. Generate a fresh code with steelengine qr, then try again.",
+      "translated": "Ten kod QR nie jest kodem konfiguracji SteelEngine. Wygeneruj nowy kod za pomocą steelengine qr, a następnie spróbuj ponownie."
     },
     {
       "id": "native.android.f8cd1cbe29c4c582",
@@ -2585,13 +2585,13 @@
     },
     {
       "id": "native.android.63ed21b4888ba5d3",
-      "source": "Could not read that image. Choose a clear screenshot or image of the QR from openclaw qr.",
-      "translated": "Nie udało się odczytać tego obrazu. Wybierz wyraźny zrzut ekranu lub obraz kodu QR z openclaw qr."
+      "source": "Could not read that image. Choose a clear screenshot or image of the QR from steelengine qr.",
+      "translated": "Nie udało się odczytać tego obrazu. Wybierz wyraźny zrzut ekranu lub obraz kodu QR z steelengine qr."
     },
     {
       "id": "native.android.61beaad5c5279eb9",
-      "source": "No setup QR code was found in that image. Choose the QR generated by openclaw qr, or enter the setup code manually.",
-      "translated": "Na tym obrazie nie znaleziono kodu QR konfiguracji. Wybierz kod QR wygenerowany przez openclaw qr lub wprowadź kod konfiguracji ręcznie."
+      "source": "No setup QR code was found in that image. Choose the QR generated by steelengine qr, or enter the setup code manually.",
+      "translated": "Na tym obrazie nie znaleziono kodu QR konfiguracji. Wybierz kod QR wygenerowany przez steelengine qr lub wprowadź kod konfiguracji ręcznie."
     },
     {
       "id": "native.android.4c4912a456b4213a",
@@ -2615,18 +2615,18 @@
     },
     {
       "id": "native.android.64c8db13ef91513c",
-      "source": "Welcome to OpenClaw",
-      "translated": "Witamy w OpenClaw"
+      "source": "Welcome to SteelEngine",
+      "translated": "Witamy w SteelEngine"
     },
     {
       "id": "native.android.c38e106cc8f1e9ff",
-      "source": "Turn this device into a secure OpenClaw node for chat, voice, camera, and device tools.",
-      "translated": "Zmień to urządzenie w bezpieczny węzeł OpenClaw do czatu, głosu, kamery i narzędzi urządzenia."
+      "source": "Turn this device into a secure SteelEngine node for chat, voice, camera, and device tools.",
+      "translated": "Zmień to urządzenie w bezpieczny węzeł SteelEngine do czatu, głosu, kamery i narzędzi urządzenia."
     },
     {
       "id": "native.android.f941909a3fa51055",
-      "source": "OpenClaw logo",
-      "translated": "Logo OpenClaw"
+      "source": "SteelEngine logo",
+      "translated": "Logo SteelEngine"
     },
     {
       "id": "native.android.cc878f72a6b70b23",
@@ -2640,8 +2640,8 @@
     },
     {
       "id": "native.android.3bfe29d4d13d3c3e",
-      "source": "Use OpenClaw from your phone",
-      "translated": "Używaj OpenClaw z telefonu"
+      "source": "Use SteelEngine from your phone",
+      "translated": "Używaj SteelEngine z telefonu"
     },
     {
       "id": "native.android.c0b539eeb4612f5d",
@@ -2650,8 +2650,8 @@
     },
     {
       "id": "native.android.5aed4b5c8d6b246d",
-      "source": "The connected OpenClaw agent can use device capabilities you enable. Continue only if you trust the Gateway and agent you connect to.",
-      "translated": "Połączony agent OpenClaw może korzystać z włączonych przez Ciebie funkcji urządzenia. Kontynuuj tylko wtedy, gdy ufasz Gateway i agentowi, z którym się łączysz."
+      "source": "The connected SteelEngine agent can use device capabilities you enable. Continue only if you trust the Gateway and agent you connect to.",
+      "translated": "Połączony agent SteelEngine może korzystać z włączonych przez Ciebie funkcji urządzenia. Kontynuuj tylko wtedy, gdy ufasz Gateway i agentowi, z którym się łączysz."
     },
     {
       "id": "native.android.63c31ee564d63347",
@@ -2660,8 +2660,8 @@
     },
     {
       "id": "native.android.f50a9c1ee6d47055",
-      "source": "Scan a QR code or use the setup code from your OpenClaw Gateway.",
-      "translated": "Zeskanuj kod QR lub użyj kodu konfiguracji z OpenClaw Gateway."
+      "source": "Scan a QR code or use the setup code from your SteelEngine Gateway.",
+      "translated": "Zeskanuj kod QR lub użyj kodu konfiguracji z SteelEngine Gateway."
     },
     {
       "id": "native.android.58d80589d9d4b7ff",
@@ -2690,8 +2690,8 @@
     },
     {
       "id": "native.android.c8a43dbba02941f0",
-      "source": "Have a terminal open on the device running OpenClaw.",
-      "translated": "Otwórz terminal na urządzeniu, na którym działa OpenClaw."
+      "source": "Have a terminal open on the device running SteelEngine.",
+      "translated": "Otwórz terminal na urządzeniu, na którym działa SteelEngine."
     },
     {
       "id": "native.android.71ce00f359981a0b",
@@ -2725,8 +2725,8 @@
     },
     {
       "id": "native.android.d4b295b5146af4b8",
-      "source": "openclaw gateway",
-      "translated": "openclaw gateway"
+      "source": "steelengine gateway",
+      "translated": "steelengine gateway"
     },
     {
       "id": "native.android.250b7dda7cff6b5d",
@@ -2740,8 +2740,8 @@
     },
     {
       "id": "native.android.db24e4be7a1b5547",
-      "source": "openclaw qr",
-      "translated": "openclaw qr"
+      "source": "steelengine qr",
+      "translated": "steelengine qr"
     },
     {
       "id": "native.android.96d40475de2885d6",
@@ -2765,8 +2765,8 @@
     },
     {
       "id": "native.android.05987e822ac102ec",
-      "source": "Open the camera and frame the code from openclaw qr.",
-      "translated": "Otwórz aparat i wykadruj kod z openclaw qr."
+      "source": "Open the camera and frame the code from steelengine qr.",
+      "translated": "Otwórz aparat i wykadruj kod z steelengine qr."
     },
     {
       "id": "native.android.90fa932d2e0adbd9",
@@ -2935,8 +2935,8 @@
     },
     {
       "id": "native.android.f43cb6ed03dc6766",
-      "source": "Gateway pairing is complete. Approve this phone as a node so OpenClaw can use the device capabilities you enable.",
-      "translated": "Parowanie Gateway zostało ukończone. Zatwierdź ten telefon jako węzeł, aby OpenClaw mógł używać włączonych przez Ciebie możliwości urządzenia."
+      "source": "Gateway pairing is complete. Approve this phone as a node so SteelEngine can use the device capabilities you enable.",
+      "translated": "Parowanie Gateway zostało ukończone. Zatwierdź ten telefon jako węzeł, aby SteelEngine mógł używać włączonych przez Ciebie możliwości urządzenia."
     },
     {
       "id": "native.android.8e49feba12c350ac",
@@ -2980,8 +2980,8 @@
     },
     {
       "id": "native.android.d4c3bcf880727fb3",
-      "source": "Only enable access you are comfortable letting OpenClaw use while this phone is connected. You can change these later in Android Settings.",
-      "translated": "Włączaj tylko taki dostęp, na którego używanie przez OpenClaw podczas połączenia tego telefonu się zgadzasz. Możesz to później zmienić w Ustawieniach Androida."
+      "source": "Only enable access you are comfortable letting SteelEngine use while this phone is connected. You can change these later in Android Settings.",
+      "translated": "Włączaj tylko taki dostęp, na którego używanie przez SteelEngine podczas połączenia tego telefonu się zgadzasz. Możesz to później zmienić w Ustawieniach Androida."
     },
     {
       "id": "native.android.44549cfd7e6a1ab8",
@@ -3025,8 +3025,8 @@
     },
     {
       "id": "native.android.176b4f5d1c9f8ce2",
-      "source": "Approval is in progress.\nOpenClaw will reconnect automatically.",
-      "translated": "Trwa zatwierdzanie.\nOpenClaw automatycznie połączy się ponownie."
+      "source": "Approval is in progress.\nSteelEngine will reconnect automatically.",
+      "translated": "Trwa zatwierdzanie.\nSteelEngine automatycznie połączy się ponownie."
     },
     {
       "id": "native.android.466e3fb210732587",
@@ -3035,8 +3035,8 @@
     },
     {
       "id": "native.android.7b95b9e103bbbb92",
-      "source": "OpenClaw is checking gateway and node access.",
-      "translated": "OpenClaw sprawdza dostęp do Gateway i węzła."
+      "source": "SteelEngine is checking gateway and node access.",
+      "translated": "SteelEngine sprawdza dostęp do Gateway i węzła."
     },
     {
       "id": "native.android.a75fc5ca269cbb15",
@@ -3130,8 +3130,8 @@
     },
     {
       "id": "native.android.1c93d0cbb8e05a7a",
-      "source": "Gateway approval is pending. Run openclaw devices list on the gateway host, approve this phone, then retry.",
-      "translated": "Oczekiwanie na zatwierdzenie Gateway. Uruchom openclaw devices list na hoście Gateway, zatwierdź ten telefon, a następnie spróbuj ponownie."
+      "source": "Gateway approval is pending. Run steelengine devices list on the gateway host, approve this phone, then retry.",
+      "translated": "Oczekiwanie na zatwierdzenie Gateway. Uruchom steelengine devices list na hoście Gateway, zatwierdź ten telefon, a następnie spróbuj ponownie."
     },
     {
       "id": "native.android.d0c1dcc8236a1ab9",
@@ -3145,8 +3145,8 @@
     },
     {
       "id": "native.android.bdd063b9f766050b",
-      "source": "Gateway approval is in progress. OpenClaw will retry automatically.",
-      "translated": "Trwa zatwierdzanie Gateway. OpenClaw ponowi próbę automatycznie."
+      "source": "Gateway approval is in progress. SteelEngine will retry automatically.",
+      "translated": "Trwa zatwierdzanie Gateway. SteelEngine ponowi próbę automatycznie."
     },
     {
       "id": "native.android.45cfb86623fa2251",
@@ -3200,18 +3200,18 @@
     },
     {
       "id": "native.android.c94c164d474cb0db",
-      "source": "This app is older than the Gateway. Update OpenClaw on this device, then retry.",
-      "translated": "Ta aplikacja jest starsza niż Gateway. Zaktualizuj OpenClaw na tym urządzeniu, a następnie spróbuj ponownie."
+      "source": "This app is older than the Gateway. Update SteelEngine on this device, then retry.",
+      "translated": "Ta aplikacja jest starsza niż Gateway. Zaktualizuj SteelEngine na tym urządzeniu, a następnie spróbuj ponownie."
     },
     {
       "id": "native.android.48ba24436b643607",
-      "source": "The Gateway is older than this app. Update OpenClaw on the Gateway host, then retry.",
-      "translated": "Gateway jest starszy niż ta aplikacja. Zaktualizuj OpenClaw na hoście Gateway, a następnie spróbuj ponownie."
+      "source": "The Gateway is older than this app. Update SteelEngine on the Gateway host, then retry.",
+      "translated": "Gateway jest starszy niż ta aplikacja. Zaktualizuj SteelEngine na hoście Gateway, a następnie spróbuj ponownie."
     },
     {
       "id": "native.android.1473077d05ac1739",
-      "source": "The app and Gateway use incompatible protocol versions. Update OpenClaw on both, then retry.",
-      "translated": "Aplikacja i Gateway używają niezgodnych wersji protokołu. Zaktualizuj OpenClaw w obu miejscach, a następnie spróbuj ponownie."
+      "source": "The app and Gateway use incompatible protocol versions. Update SteelEngine on both, then retry.",
+      "translated": "Aplikacja i Gateway używają niezgodnych wersji protokołu. Zaktualizuj SteelEngine w obu miejscach, a następnie spróbuj ponownie."
     },
     {
       "id": "native.android.6379bfb6b09ef8cd",
@@ -3220,23 +3220,23 @@
     },
     {
       "id": "native.android.ee7dad03cd78babe",
-      "source": "openclaw devices approve $requestId",
-      "translated": "openclaw devices approve $requestId"
+      "source": "steelengine devices approve $requestId",
+      "translated": "steelengine devices approve $requestId"
     },
     {
       "id": "native.android.3792801e2951bb11",
-      "source": "openclaw devices list",
-      "translated": "openclaw devices list"
+      "source": "steelengine devices list",
+      "translated": "steelengine devices list"
     },
     {
       "id": "native.android.8fe20d8f8090064d",
-      "source": "openclaw nodes approve $requestId",
-      "translated": "openclaw nodes approve $requestId"
+      "source": "steelengine nodes approve $requestId",
+      "translated": "steelengine nodes approve $requestId"
     },
     {
       "id": "native.android.2961a521c1b6837f",
-      "source": "openclaw nodes approve REQUEST_ID",
-      "translated": "openclaw nodes approve REQUEST_ID"
+      "source": "steelengine nodes approve REQUEST_ID",
+      "translated": "steelengine nodes approve REQUEST_ID"
     },
     {
       "id": "native.android.a7933196a18ec924",
@@ -3340,8 +3340,8 @@
     },
     {
       "id": "native.android.d096df67bff5e611",
-      "source": "Show OpenClaw alerts",
-      "translated": "Wyświetlanie alertów OpenClaw"
+      "source": "Show SteelEngine alerts",
+      "translated": "Wyświetlanie alertów SteelEngine"
     },
     {
       "id": "native.android.93cbec65dbc5de69",
@@ -3630,8 +3630,8 @@
     },
     {
       "id": "native.android.8f0482425838ae64",
-      "source": "OpenClaw session",
-      "translated": "Sesja OpenClaw"
+      "source": "SteelEngine session",
+      "translated": "Sesja SteelEngine"
     },
     {
       "id": "native.android.786774c8a76e50d7",
@@ -3695,8 +3695,8 @@
     },
     {
       "id": "native.android.b5e4ae7f8c9eca2d",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.android.f46b06f8550516e4",
@@ -3885,8 +3885,8 @@
     },
     {
       "id": "native.android.5e3e4cd42004cb28",
-      "source": "Scheduled OpenClaw work from your gateway.",
-      "translated": "Zaplanowane zadania OpenClaw z Twojego gateway."
+      "source": "Scheduled SteelEngine work from your gateway.",
+      "translated": "Zaplanowane zadania SteelEngine z Twojego gateway."
     },
     {
       "id": "native.android.31a5440e22667f02",
@@ -4045,8 +4045,8 @@
     },
     {
       "id": "native.android.fea93eda5bf97d9e",
-      "source": "How this phone appears to OpenClaw.",
-      "translated": "Jak ten telefon jest widoczny dla OpenClaw."
+      "source": "How this phone appears to SteelEngine.",
+      "translated": "Jak ten telefon jest widoczny dla SteelEngine."
     },
     {
       "id": "native.android.695229fd01afbc2d",
@@ -4085,8 +4085,8 @@
     },
     {
       "id": "native.android.6e58157abced395f",
-      "source": "Runs on-device while OpenClaw is visible.",
-      "translated": "Działa na urządzeniu, gdy OpenClaw jest widoczny."
+      "source": "Runs on-device while SteelEngine is visible.",
+      "translated": "Działa na urządzeniu, gdy SteelEngine jest widoczny."
     },
     {
       "id": "native.android.6464166ab71fde3f",
@@ -4160,8 +4160,8 @@
     },
     {
       "id": "native.android.5ff888931aae2738",
-      "source": "Check that OpenClaw can speak clearly on this phone.",
-      "translated": "Sprawdź, czy OpenClaw mówi wyraźnie na tym telefonie."
+      "source": "Check that SteelEngine can speak clearly on this phone.",
+      "translated": "Sprawdź, czy SteelEngine mówi wyraźnie na tym telefonie."
     },
     {
       "id": "native.android.f82d5d81f5dc9b43",
@@ -4210,8 +4210,8 @@
     },
     {
       "id": "native.android.9feed8722db5d2cc",
-      "source": "Choose what reaches OpenClaw.",
-      "translated": "Wybierz, co trafia do OpenClaw."
+      "source": "Choose what reaches SteelEngine.",
+      "translated": "Wybierz, co trafia do SteelEngine."
     },
     {
       "id": "native.android.d32071018de11907",
@@ -4230,8 +4230,8 @@
     },
     {
       "id": "native.android.5a077bf9cf4f47c8",
-      "source": "OpenClaw can receive selected alerts.",
-      "translated": "OpenClaw może odbierać wybrane alerty."
+      "source": "SteelEngine can receive selected alerts.",
+      "translated": "SteelEngine może odbierać wybrane alerty."
     },
     {
       "id": "native.android.a04ee29c0a3b68f5",
@@ -4390,8 +4390,8 @@
     },
     {
       "id": "native.android.bdafaceb7af93f5a",
-      "source": "OpenClaw can list launcher-visible apps.",
-      "translated": "OpenClaw może wyświetlać listę aplikacji widocznych w launcherze."
+      "source": "SteelEngine can list launcher-visible apps.",
+      "translated": "SteelEngine może wyświetlać listę aplikacji widocznych w launcherze."
     },
     {
       "id": "native.android.be89d5601904322a",
@@ -4420,8 +4420,8 @@
     },
     {
       "id": "native.android.58549715b04997cc",
-      "source": "Always allows requested location checks while OpenClaw is in the background; Android shows this in the persistent node notification.",
-      "translated": "Zawsze zezwala na żądane sprawdzanie lokalizacji, gdy OpenClaw działa w tle; Android pokazuje to w stałym powiadomieniu węzła."
+      "source": "Always allows requested location checks while SteelEngine is in the background; Android shows this in the persistent node notification.",
+      "translated": "Zawsze zezwala na żądane sprawdzanie lokalizacji, gdy SteelEngine działa w tle; Android pokazuje to w stałym powiadomieniu węzła."
     },
     {
       "id": "native.android.d5a8d7f97a7971b1",
@@ -4430,8 +4430,8 @@
     },
     {
       "id": "native.android.031d3ed6fb8a6559",
-      "source": "OpenClaw only checks location when your paired Gateway requests it. On the next Android screen, choose $backgroundPermissionLabel to allow checks while the app is in the background.",
-      "translated": "OpenClaw sprawdza lokalizację tylko wtedy, gdy zażąda tego sparowany Gateway. Na następnym ekranie systemu Android wybierz $backgroundPermissionLabel, aby zezwolić na sprawdzanie, gdy aplikacja działa w tle."
+      "source": "SteelEngine only checks location when your paired Gateway requests it. On the next Android screen, choose $backgroundPermissionLabel to allow checks while the app is in the background.",
+      "translated": "SteelEngine sprawdza lokalizację tylko wtedy, gdy zażąda tego sparowany Gateway. Na następnym ekranie systemu Android wybierz $backgroundPermissionLabel, aby zezwolić na sprawdzanie, gdy aplikacja działa w tle."
     },
     {
       "id": "native.android.c48805f3de1d72ca",
@@ -4445,13 +4445,13 @@
     },
     {
       "id": "native.android.c3a001bb0191892d",
-      "source": "OpenClaw collects and sends the names, package IDs, and status of apps visible on this phone when your paired OpenClaw Gateway asks for them. This lets your assistant answer questions and take actions using installed apps.",
-      "translated": "OpenClaw zbiera i wysyła nazwy, identyfikatory pakietów oraz status aplikacji widocznych na tym telefonie, gdy poprosi o to sparowany Gateway OpenClaw. Pozwala to asystentowi odpowiadać na pytania i wykonywać działania z użyciem zainstalowanych aplikacji."
+      "source": "SteelEngine collects and sends the names, package IDs, and status of apps visible on this phone when your paired SteelEngine Gateway asks for them. This lets your assistant answer questions and take actions using installed apps.",
+      "translated": "SteelEngine zbiera i wysyła nazwy, identyfikatory pakietów oraz status aplikacji widocznych na tym telefonie, gdy poprosi o to sparowany Gateway SteelEngine. Pozwala to asystentowi odpowiadać na pytania i wykonywać działania z użyciem zainstalowanych aplikacji."
     },
     {
       "id": "native.android.b05f8909de072d71",
-      "source": "Your phone sends this information to your Gateway, not to a server run by OpenClaw. Your Gateway may include it in requests to the AI provider you chose.",
-      "translated": "Twój telefon wysyła te informacje do Twojego Gateway, a nie na serwer prowadzony przez OpenClaw. Twój Gateway może uwzględnić je w żądaniach do wybranego przez Ciebie dostawcy AI."
+      "source": "Your phone sends this information to your Gateway, not to a server run by SteelEngine. Your Gateway may include it in requests to the AI provider you chose.",
+      "translated": "Twój telefon wysyła te informacje do Twojego Gateway, a nie na serwer prowadzony przez SteelEngine. Twój Gateway może uwzględnić je w żądaniach do wybranego przez Ciebie dostawcy AI."
     },
     {
       "id": "native.android.95a3cc1b163c1edf",
@@ -4495,8 +4495,8 @@
     },
     {
       "id": "native.android.9d658ff26e59274b",
-      "source": "Connection between this phone and OpenClaw.",
-      "translated": "Połączenie między tym telefonem a OpenClaw."
+      "source": "Connection between this phone and SteelEngine.",
+      "translated": "Połączenie między tym telefonem a SteelEngine."
     },
     {
       "id": "native.android.718cb50d1bff3e32",
@@ -4605,8 +4605,8 @@
     },
     {
       "id": "native.android.de12fd162a566974",
-      "source": "Android can scan or paste an existing setup code, but this gateway does not expose setup-code generation to the app yet. Generate the QR/code on the gateway host with openclaw qr, then scan it here or paste the setup code below.",
-      "translated": "Android może zeskanować lub wkleić istniejący kod konfiguracji, ale ten gateway nie udostępnia jeszcze aplikacji generowania kodu konfiguracji. Wygeneruj QR/kod na hoście gateway za pomocą openclaw qr, a następnie zeskanuj go tutaj lub wklej kod konfiguracji poniżej."
+      "source": "Android can scan or paste an existing setup code, but this gateway does not expose setup-code generation to the app yet. Generate the QR/code on the gateway host with steelengine qr, then scan it here or paste the setup code below.",
+      "translated": "Android może zeskanować lub wkleić istniejący kod konfiguracji, ale ten gateway nie udostępnia jeszcze aplikacji generowania kodu konfiguracji. Wygeneruj QR/kod na hoście gateway za pomocą steelengine qr, a następnie zeskanuj go tutaj lub wklej kod konfiguracji poniżej."
     },
     {
       "id": "native.android.ac1032dabe06ab02",
@@ -4705,8 +4705,8 @@
     },
     {
       "id": "native.android.f6ab96d066bd583c",
-      "source": "Use a secure wss:// or Tailscale Serve Gateway, generate a full-access setup code in the Control UI or with openclaw qr, then scan or paste it below and reconnect to enable settings and upgrades.",
-      "translated": "Użyj bezpiecznego Gateway wss:// lub Tailscale Serve, wygeneruj kod konfiguracyjny z pełnym dostępem w Control UI lub za pomocą openclaw qr, następnie zeskanuj go lub wklej poniżej i połącz się ponownie, aby włączyć ustawienia i aktualizacje."
+      "source": "Use a secure wss:// or Tailscale Serve Gateway, generate a full-access setup code in the Control UI or with steelengine qr, then scan or paste it below and reconnect to enable settings and upgrades.",
+      "translated": "Użyj bezpiecznego Gateway wss:// lub Tailscale Serve, wygeneruj kod konfiguracyjny z pełnym dostępem w Control UI lub za pomocą steelengine qr, następnie zeskanuj go lub wklej poniżej i połącz się ponownie, aby włączyć ustawienia i aktualizacje."
     },
     {
       "id": "native.android.5311e446ce2bf857",
@@ -4815,8 +4815,8 @@
     },
     {
       "id": "native.android.c2d37ac2ad4c9e3c",
-      "source": "OpenClaw for Android.",
-      "translated": "OpenClaw dla Androida."
+      "source": "SteelEngine for Android.",
+      "translated": "SteelEngine dla Androida."
     },
     {
       "id": "native.android.38889ec3f682dcf8",
@@ -4860,18 +4860,18 @@
     },
     {
       "id": "native.android.aac3310699b496c8",
-      "source": "© 2026 OpenClaw Foundation — MIT License.",
-      "translated": "© 2026 OpenClaw Foundation — Licencja MIT."
+      "source": "© 2026 SteelEngine Foundation — MIT License.",
+      "translated": "© 2026 SteelEngine Foundation — Licencja MIT."
     },
     {
       "id": "native.android.a157bbb606e9b398",
-      "source": "OpenClaw logo",
-      "translated": "Logo OpenClaw"
+      "source": "SteelEngine logo",
+      "translated": "Logo SteelEngine"
     },
     {
       "id": "native.android.7b78b4869baf2160",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.android.ad4c14835d1b71ca",
@@ -4885,8 +4885,8 @@
     },
     {
       "id": "native.android.996367534eb94cc2",
-      "source": "OpenClaw appreciates its partners in the open-source community.",
-      "translated": "OpenClaw docenia swoich partnerów w społeczności open-source."
+      "source": "SteelEngine appreciates its partners in the open-source community.",
+      "translated": "SteelEngine docenia swoich partnerów w społeczności open-source."
     },
     {
       "id": "native.android.24da1d2eb750ba07",
@@ -4935,8 +4935,8 @@
     },
     {
       "id": "native.android.5a540761383fa474",
-      "source": "OpenClaw turns this phone into a clean mobile command surface for sessions, voice, providers, and Gateway.",
-      "translated": "OpenClaw zmienia ten telefon w przejrzysty mobilny interfejs do obsługi sesji, głosu, dostawców i Gateway."
+      "source": "SteelEngine turns this phone into a clean mobile command surface for sessions, voice, providers, and Gateway.",
+      "translated": "SteelEngine zmienia ten telefon w przejrzysty mobilny interfejs do obsługi sesji, głosu, dostawców i Gateway."
     },
     {
       "id": "native.android.3a3bea53e6a6ada7",
@@ -5380,8 +5380,8 @@
     },
     {
       "id": "native.android.2e33a4fd5f60b550",
-      "source": "Start a chat and your active OpenClaw conversations will appear here.",
-      "translated": "Rozpocznij czat, a Twoje aktywne rozmowy OpenClaw pojawią się tutaj."
+      "source": "Start a chat and your active SteelEngine conversations will appear here.",
+      "translated": "Rozpocznij czat, a Twoje aktywne rozmowy SteelEngine pojawią się tutaj."
     },
     {
       "id": "native.android.85726cfd4207d48a",
@@ -5590,8 +5590,8 @@
     },
     {
       "id": "native.android.4f369a09c8731092",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.android.b5ee8fce135f41e6",
@@ -5810,8 +5810,8 @@
     },
     {
       "id": "native.android.ca1451df912ed5cf",
-      "source": "OpenClaw ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
-      "translated": "OpenClaw ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+      "source": "SteelEngine ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+      "translated": "SteelEngine ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
     },
     {
       "id": "native.android.b7d8c506999a68f7",
@@ -6000,8 +6000,8 @@
     },
     {
       "id": "native.android.e197964b10ba02ce",
-      "source": "OpenClaw mobile",
-      "translated": "OpenClaw mobile"
+      "source": "SteelEngine mobile",
+      "translated": "SteelEngine mobile"
     },
     {
       "id": "native.android.45005deba537cc59",
@@ -6685,8 +6685,8 @@
     },
     {
       "id": "native.android.9d977253fdcda216",
-      "source": "OpenClaw speaking",
-      "translated": "OpenClaw mówi"
+      "source": "SteelEngine speaking",
+      "translated": "SteelEngine mówi"
     },
     {
       "id": "native.android.1babfd757bbcfeb4",
@@ -6755,8 +6755,8 @@
     },
     {
       "id": "native.android.2e2b5efe4ca2380a",
-      "source": "OpenClaw is replying",
-      "translated": "OpenClaw odpowiada"
+      "source": "SteelEngine is replying",
+      "translated": "SteelEngine odpowiada"
     },
     {
       "id": "native.android.64731fc46a862f86",
@@ -6855,8 +6855,8 @@
     },
     {
       "id": "native.android.253debc9d0714dda",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.android.24057bba4bbfa27a",
@@ -6875,8 +6875,8 @@
     },
     {
       "id": "native.android.5b8bd9f2b69b91ea",
-      "source": "OpenClaw is preparing a response.",
-      "translated": "OpenClaw przygotowuje odpowiedź."
+      "source": "SteelEngine is preparing a response.",
+      "translated": "SteelEngine przygotowuje odpowiedź."
     },
     {
       "id": "native.android.420cccbd48298a8d",
@@ -6890,8 +6890,8 @@
     },
     {
       "id": "native.android.285eeed928be0fc1",
-      "source": "OpenClaw only listens when you start Talk or Dictation.",
-      "translated": "OpenClaw nasłuchuje tylko wtedy, gdy rozpoczniesz rozmowę lub dyktowanie."
+      "source": "SteelEngine only listens when you start Talk or Dictation.",
+      "translated": "SteelEngine nasłuchuje tylko wtedy, gdy rozpoczniesz rozmowę lub dyktowanie."
     },
     {
       "id": "native.android.b10a51fe9d4b8d2d",
@@ -6900,8 +6900,8 @@
     },
     {
       "id": "native.android.c8bff891c9a442d9",
-      "source": "OpenClaw is speaking",
-      "translated": "OpenClaw mówi"
+      "source": "SteelEngine is speaking",
+      "translated": "SteelEngine mówi"
     },
     {
       "id": "native.android.248e1292eff12b84",
@@ -7300,8 +7300,8 @@
     },
     {
       "id": "native.android.dfbd755eb43b4d26",
-      "source": "OpenClaw · Live",
-      "translated": "OpenClaw · Na żywo"
+      "source": "SteelEngine · Live",
+      "translated": "SteelEngine · Na żywo"
     },
     {
       "id": "native.android.b3ff30d4e0b3ce58",
@@ -7315,8 +7315,8 @@
     },
     {
       "id": "native.android.82e9fe45e93909b6",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.android.02b4598277aca860",
@@ -7510,8 +7510,8 @@
     },
     {
       "id": "native.android.06d515351bb79576",
-      "source": "Catch me up on my recent OpenClaw sessions and suggest next steps.",
-      "translated": "Podsumuj moje ostatnie sesje OpenClaw i zaproponuj kolejne kroki."
+      "source": "Catch me up on my recent SteelEngine sessions and suggest next steps.",
+      "translated": "Podsumuj moje ostatnie sesje SteelEngine i zaproponuj kolejne kroki."
     },
     {
       "id": "native.android.79f64f0b5ecaa07c",
@@ -7535,8 +7535,8 @@
     },
     {
       "id": "native.android.1656b8b922a5e3f2",
-      "source": "Ask OpenClaw to use Android capabilities.",
-      "translated": "Poproś OpenClaw o użycie funkcji Androida."
+      "source": "Ask SteelEngine to use Android capabilities.",
+      "translated": "Poproś SteelEngine o użycie funkcji Androida."
     },
     {
       "id": "native.android.04c826e3507eb47e",
@@ -7545,8 +7545,8 @@
     },
     {
       "id": "native.android.67075c8d2ccc0bb5",
-      "source": "OpenClaw · Live",
-      "translated": "OpenClaw · Na żywo"
+      "source": "SteelEngine · Live",
+      "translated": "SteelEngine · Na żywo"
     },
     {
       "id": "native.android.869f1130ca16bab5",
@@ -7560,8 +7560,8 @@
     },
     {
       "id": "native.android.25d8575c0063aee5",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.android.e695e7b72d13e9e5",
@@ -7585,8 +7585,8 @@
     },
     {
       "id": "native.android.d851a32f367f8b31",
-      "source": "OpenClaw is working",
-      "translated": "OpenClaw działa"
+      "source": "SteelEngine is working",
+      "translated": "SteelEngine działa"
     },
     {
       "id": "native.android.0fd6b75cadc0ce75",
@@ -7600,8 +7600,8 @@
     },
     {
       "id": "native.android.98a0d4d5bba788c4",
-      "source": "OpenClaw is preparing a response.",
-      "translated": "OpenClaw przygotowuje odpowiedź."
+      "source": "SteelEngine is preparing a response.",
+      "translated": "SteelEngine przygotowuje odpowiedź."
     },
     {
       "id": "native.android.22d747642a3887cd",
@@ -7675,8 +7675,8 @@
     },
     {
       "id": "native.android.f1d69eb66c5dfa39",
-      "source": "Message OpenClaw",
-      "translated": "Napisz do OpenClaw"
+      "source": "Message SteelEngine",
+      "translated": "Napisz do SteelEngine"
     },
     {
       "id": "native.android.97602a28629a331f",
@@ -7830,8 +7830,8 @@
     },
     {
       "id": "native.android.79d7a1026ef43e80",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.android.e8318a46a213cb91",
@@ -7865,13 +7865,13 @@
     },
     {
       "id": "native.android.794873efdfcdff4f",
-      "source": "OpenClaw gateway",
-      "translated": "OpenClaw Gateway"
+      "source": "SteelEngine gateway",
+      "translated": "SteelEngine Gateway"
     },
     {
       "id": "native.android.2d3b6dd9a8f186fe",
-      "source": "Ask OpenClaw anything",
-      "translated": "Zapytaj OpenClaw o cokolwiek"
+      "source": "Ask SteelEngine anything",
+      "translated": "Zapytaj SteelEngine o cokolwiek"
     },
     {
       "id": "native.android.608ccdaeababf056",
@@ -7905,8 +7905,8 @@
     },
     {
       "id": "native.android.3457b4ee28d964ee",
-      "source": "OpenClaw will surface approvals, failed jobs, and channel issues here.",
-      "translated": "OpenClaw będzie pokazywać tutaj zatwierdzenia, nieudane zadania i problemy z kanałami."
+      "source": "SteelEngine will surface approvals, failed jobs, and channel issues here.",
+      "translated": "SteelEngine będzie pokazywać tutaj zatwierdzenia, nieudane zadania i problemy z kanałami."
     },
     {
       "id": "native.android.7a6a37643fcfb2d9",
@@ -8190,23 +8190,23 @@
     },
     {
       "id": "native.android.f392ee2d50d6b7ce",
-      "source": "ask OpenClaw $prompt",
-      "translated": "zapytaj OpenClaw $prompt"
+      "source": "ask SteelEngine $prompt",
+      "translated": "zapytaj SteelEngine $prompt"
     },
     {
       "id": "native.android.ea9d1a78cfa13033",
-      "source": "tell OpenClaw to $prompt",
-      "translated": "powiedz OpenClaw, aby $prompt"
+      "source": "tell SteelEngine to $prompt",
+      "translated": "powiedz SteelEngine, aby $prompt"
     },
     {
       "id": "native.android.7f96ac9b9e10abd0",
-      "source": "open OpenClaw and ask $prompt",
-      "translated": "otwórz OpenClaw i zapytaj $prompt"
+      "source": "open SteelEngine and ask $prompt",
+      "translated": "otwórz SteelEngine i zapytaj $prompt"
     },
     {
       "id": "native.android.a3c395b04ae7a621",
-      "source": "OpenClaw Node",
-      "translated": "Węzeł OpenClaw"
+      "source": "SteelEngine Node",
+      "translated": "Węzeł SteelEngine"
     },
     {
       "id": "native.android.cd32b06480d9bb69",
@@ -8290,13 +8290,13 @@
     },
     {
       "id": "native.android.e3661fcea979a74c",
-      "source": "OpenClaw Git commit",
-      "translated": "Commit Git OpenClaw"
+      "source": "SteelEngine Git commit",
+      "translated": "Commit Git SteelEngine"
     },
     {
       "id": "native.android.a610564c863cdef7",
-      "source": "OpenClaw build timestamp",
-      "translated": "Znacznik czasu kompilacji OpenClaw"
+      "source": "SteelEngine build timestamp",
+      "translated": "Znacznik czasu kompilacji SteelEngine"
     },
     {
       "id": "native.android.9b9a42b4f56bea2a",
@@ -8310,13 +8310,13 @@
     },
     {
       "id": "native.apple.8f741d09cc1d5495",
-      "source": "OpenClaw Activity",
-      "translated": "Aktywność OpenClaw"
+      "source": "SteelEngine Activity",
+      "translated": "Aktywność SteelEngine"
     },
     {
       "id": "native.apple.86d546e1f1247028",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.apple.417ac9273b5f63ca",
@@ -8350,8 +8350,8 @@
     },
     {
       "id": "native.apple.9168fcd110c3019a",
-      "source": "OpenClaw Share",
-      "translated": "OpenClaw Share"
+      "source": "SteelEngine Share",
+      "translated": "SteelEngine Share"
     },
     {
       "id": "native.apple.382fd936eaf238f7",
@@ -10460,8 +10460,8 @@
     },
     {
       "id": "native.apple.3548c8d1ab43e85e",
-      "source": "OpenClaw could not prepare the Markdown file.",
-      "translated": "OpenClaw nie mógł przygotować pliku Markdown."
+      "source": "SteelEngine could not prepare the Markdown file.",
+      "translated": "SteelEngine nie mógł przygotować pliku Markdown."
     },
     {
       "id": "native.apple.202b97e93b938049",
@@ -10540,13 +10540,13 @@
     },
     {
       "id": "native.apple.14492e334b87e4f2",
-      "source": "Check OpenClaw status",
-      "translated": "Sprawdź status OpenClaw"
+      "source": "Check SteelEngine status",
+      "translated": "Sprawdź status SteelEngine"
     },
     {
       "id": "native.apple.bbf7bd23da1e7865",
-      "source": "Summarize the current OpenClaw status and tell me what needs attention.",
-      "translated": "Podsumuj bieżący status OpenClaw i powiedz mi, co wymaga uwagi."
+      "source": "Summarize the current SteelEngine status and tell me what needs attention.",
+      "translated": "Podsumuj bieżący status SteelEngine i powiedz mi, co wymaga uwagi."
     },
     {
       "id": "native.apple.ea8cbb1b4230c652",
@@ -11610,8 +11610,8 @@
     },
     {
       "id": "native.apple.56935c5384889b8e",
-      "source": "Browse the current OpenClaw reference.",
-      "translated": "Przeglądaj bieżącą dokumentację OpenClaw."
+      "source": "Browse the current SteelEngine reference.",
+      "translated": "Przeglądaj bieżącą dokumentację SteelEngine."
     },
     {
       "id": "native.apple.2ee2f8c71fa2d2cc",
@@ -11640,8 +11640,8 @@
     },
     {
       "id": "native.apple.cf9bb65f8e405cc8",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.apple.20d011936ab5cd30",
@@ -12025,8 +12025,8 @@
     },
     {
       "id": "native.apple.756ff21ca904b2d8",
-      "source": "Choose when OpenClaw may share this iPhone's location with gateway tools.",
-      "translated": "Wybierz, kiedy OpenClaw może udostępniać lokalizację tego iPhone'a narzędziom Gateway."
+      "source": "Choose when SteelEngine may share this iPhone's location with gateway tools.",
+      "translated": "Wybierz, kiedy SteelEngine może udostępniać lokalizację tego iPhone'a narzędziom Gateway."
     },
     {
       "id": "native.apple.9515109ce97ec94e",
@@ -12055,8 +12055,8 @@
     },
     {
       "id": "native.apple.9bb1dae351d0e3a4",
-      "source": "Enable OpenClaw Hosted Push Relay?",
-      "translated": "Włączyć OpenClaw Hosted Push Relay?"
+      "source": "Enable SteelEngine Hosted Push Relay?",
+      "translated": "Włączyć SteelEngine Hosted Push Relay?"
     },
     {
       "id": "native.apple.f8c042a923222472",
@@ -12290,13 +12290,13 @@
     },
     {
       "id": "native.apple.3503aca018f04865",
-      "source": "Setup sent. Open OpenClaw on the watch to connect.",
-      "translated": "Konfiguracja wysłana. Otwórz OpenClaw na zegarku, aby się połączyć."
+      "source": "Setup sent. Open SteelEngine on the watch to connect.",
+      "translated": "Konfiguracja wysłana. Otwórz SteelEngine na zegarku, aby się połączyć."
     },
     {
       "id": "native.apple.a9a778465dfe1198",
-      "source": "Setup queued for the watch. Open OpenClaw before the code expires.",
-      "translated": "Konfiguracja zakolejkowana dla zegarka. Otwórz OpenClaw, zanim kod wygaśnie."
+      "source": "Setup queued for the watch. Open SteelEngine before the code expires.",
+      "translated": "Konfiguracja zakolejkowana dla zegarka. Otwórz SteelEngine, zanim kod wygaśnie."
     },
     {
       "id": "native.apple.ba8d38a642bee7f3",
@@ -12305,8 +12305,8 @@
     },
     {
       "id": "native.apple.07668650c75a20f1",
-      "source": "Pairing required. Run /pair approve in your OpenClaw chat, then connect again.",
-      "translated": "Wymagane parowanie. Uruchom /pair approve na czacie OpenClaw, a następnie połącz się ponownie."
+      "source": "Pairing required. Run /pair approve in your SteelEngine chat, then connect again.",
+      "translated": "Wymagane parowanie. Uruchom /pair approve na czacie SteelEngine, a następnie połącz się ponownie."
     },
     {
       "id": "native.apple.101b491eed1648ce",
@@ -12385,8 +12385,8 @@
     },
     {
       "id": "native.apple.3d805ac21285b092",
-      "source": "Foreground approvals still appear while OpenClaw is connected.",
-      "translated": "Prośby o zatwierdzenie nadal pojawiają się na pierwszym planie, gdy OpenClaw jest połączony."
+      "source": "Foreground approvals still appear while SteelEngine is connected.",
+      "translated": "Prośby o zatwierdzenie nadal pojawiają się na pierwszym planie, gdy SteelEngine jest połączony."
     },
     {
       "id": "native.apple.0b7a54926d06b7d8",
@@ -12525,18 +12525,18 @@
     },
     {
       "id": "native.apple.817057c658a751c7",
-      "source": "This build uses OpenClaw's hosted push relay at %@ for notification delivery data.",
-      "translated": "Ta kompilacja korzysta z hostowanego przez OpenClaw przekaźnika powiadomień push pod adresem %@ do przesyłania danych o dostarczeniu."
+      "source": "This build uses SteelEngine's hosted push relay at %@ for notification delivery data.",
+      "translated": "Ta kompilacja korzysta z hostowanego przez SteelEngine przekaźnika powiadomień push pod adresem %@ do przesyłania danych o dostarczeniu."
     },
     {
       "id": "native.apple.d70d23305da2016a",
-      "source": "This build is not configured to use OpenClaw's hosted push relay.",
-      "translated": "Ta kompilacja nie jest skonfigurowana do korzystania z hostowanego przez OpenClaw przekaźnika powiadomień push."
+      "source": "This build is not configured to use SteelEngine's hosted push relay.",
+      "translated": "Ta kompilacja nie jest skonfigurowana do korzystania z hostowanego przez SteelEngine przekaźnika powiadomień push."
     },
     {
       "id": "native.apple.6c81c3d48548ca05",
-      "source": "Enabling this sends delivery data through OpenClaw's hosted push relay.",
-      "translated": "Włączenie tej opcji powoduje przesyłanie danych o dostarczeniu przez hostowany przez OpenClaw przekaźnik powiadomień push."
+      "source": "Enabling this sends delivery data through SteelEngine's hosted push relay.",
+      "translated": "Włączenie tej opcji powoduje przesyłanie danych o dostarczeniu przez hostowany przez SteelEngine przekaźnik powiadomień push."
     },
     {
       "id": "native.apple.80fade864c8ad242",
@@ -12645,8 +12645,8 @@
     },
     {
       "id": "native.apple.7793f5de6975faef",
-      "source": "Use a secure wss:// or Tailscale Serve Gateway, then scan a full-access setup code from the Control UI or openclaw qr and reconnect to enable settings and upgrades.",
-      "translated": "Użyj bezpiecznego Gateway wss:// lub Tailscale Serve, następnie zeskanuj kod konfiguracyjny z pełnym dostępem z Control UI lub openclaw qr i połącz się ponownie, aby włączyć ustawienia i aktualizacje."
+      "source": "Use a secure wss:// or Tailscale Serve Gateway, then scan a full-access setup code from the Control UI or steelengine qr and reconnect to enable settings and upgrades.",
+      "translated": "Użyj bezpiecznego Gateway wss:// lub Tailscale Serve, następnie zeskanuj kod konfiguracyjny z pełnym dostępem z Control UI lub steelengine qr i połącz się ponownie, aby włączyć ustawienia i aktualizacje."
     },
     {
       "id": "native.apple.666cea428e126188",
@@ -12710,8 +12710,8 @@
     },
     {
       "id": "native.apple.1bd0f0b41f4d4750",
-      "source": "Install the OpenClaw watch app before enabling direct mode.",
-      "translated": "Zainstaluj aplikację OpenClaw na zegarku przed włączeniem trybu bezpośredniego."
+      "source": "Install the SteelEngine watch app before enabling direct mode.",
+      "translated": "Zainstaluj aplikację SteelEngine na zegarku przed włączeniem trybu bezpośredniego."
     },
     {
       "id": "native.apple.3710cda9cb13870f",
@@ -12750,8 +12750,8 @@
     },
     {
       "id": "native.apple.2e042499c42824f5",
-      "source": "Enable Notifications to receive approval alerts while OpenClaw is not open.",
-      "translated": "Włącz powiadomienia, aby otrzymywać alerty o zatwierdzeniu, gdy OpenClaw nie jest otwarty."
+      "source": "Enable Notifications to receive approval alerts while SteelEngine is not open.",
+      "translated": "Włącz powiadomienia, aby otrzymywać alerty o zatwierdzeniu, gdy SteelEngine nie jest otwarty."
     },
     {
       "id": "native.apple.fc1f2fdbe437cb9d",
@@ -12860,8 +12860,8 @@
     },
     {
       "id": "native.apple.d1ee91d07764faf0",
-      "source": "Turns OpenClaw notification delivery on or off",
-      "translated": "Włącza lub wyłącza dostarczanie powiadomień OpenClaw"
+      "source": "Turns SteelEngine notification delivery on or off",
+      "translated": "Włącza lub wyłącza dostarczanie powiadomień SteelEngine"
     },
     {
       "id": "native.apple.31f9c5fa6c3ca5dd",
@@ -12880,13 +12880,13 @@
     },
     {
       "id": "native.apple.a82dc4a746268028",
-      "source": "OpenClaw appreciates its partners in the open-source community.",
-      "translated": "OpenClaw docenia swoich partnerów w społeczności open-source."
+      "source": "SteelEngine appreciates its partners in the open-source community.",
+      "translated": "SteelEngine docenia swoich partnerów w społeczności open-source."
     },
     {
       "id": "native.apple.fc49f9b63e160581",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.apple.eaa4fe72f3730f3f",
@@ -12920,8 +12920,8 @@
     },
     {
       "id": "native.apple.b962116ff5bf1905",
-      "source": "© 2026 OpenClaw Foundation — MIT License.",
-      "translated": "© 2026 OpenClaw Foundation — licencja MIT."
+      "source": "© 2026 SteelEngine Foundation — MIT License.",
+      "translated": "© 2026 SteelEngine Foundation — licencja MIT."
     },
     {
       "id": "native.apple.106434d1305d153b",
@@ -13300,13 +13300,13 @@
     },
     {
       "id": "native.apple.675219772ee5adf0",
-      "source": "OpenClaw can show approval prompts and event alerts when the app is not active.",
-      "translated": "OpenClaw może wyświetlać monity o zatwierdzenie i alerty o zdarzeniach, gdy aplikacja jest nieaktywna."
+      "source": "SteelEngine can show approval prompts and event alerts when the app is not active.",
+      "translated": "SteelEngine może wyświetlać monity o zatwierdzenie i alerty o zdarzeniach, gdy aplikacja jest nieaktywna."
     },
     {
       "id": "native.apple.44133229b2b05062",
-      "source": "OpenClaw notifications are off.",
-      "translated": "Powiadomienia OpenClaw są wyłączone."
+      "source": "SteelEngine notifications are off.",
+      "translated": "Powiadomienia SteelEngine są wyłączone."
     },
     {
       "id": "native.apple.9794732a37cb580f",
@@ -13325,8 +13325,8 @@
     },
     {
       "id": "native.apple.bfe6a918d23fa20e",
-      "source": "OpenClaw cannot determine the current notification permission state.",
-      "translated": "OpenClaw nie może określić bieżącego stanu uprawnień do powiadomień."
+      "source": "SteelEngine cannot determine the current notification permission state.",
+      "translated": "SteelEngine nie może określić bieżącego stanu uprawnień do powiadomień."
     },
     {
       "id": "native.apple.fc7d007916016c0d",
@@ -13340,8 +13340,8 @@
     },
     {
       "id": "native.apple.737eb52b08f2640c",
-      "source": "Connected to openclaw-gateway.tailnet.ts.net.",
-      "translated": "Połączono z openclaw-gateway.tailnet.ts.net."
+      "source": "Connected to steelengine-gateway.tailnet.ts.net.",
+      "translated": "Połączono z steelengine-gateway.tailnet.ts.net."
     },
     {
       "id": "native.apple.b59e37e73db49f94",
@@ -13950,8 +13950,8 @@
     },
     {
       "id": "native.apple.c218ef5194d0ee56",
-      "source": "Run OpenClaw agent?",
-      "translated": "Uruchomić agenta OpenClaw?"
+      "source": "Run SteelEngine agent?",
+      "translated": "Uruchomić agenta SteelEngine?"
     },
     {
       "id": "native.apple.5d2fb30a9c85ad10",
@@ -14300,8 +14300,8 @@
     },
     {
       "id": "native.apple.c18f5bd36f119282",
-      "source": "Run openclaw gateway --port 18789.",
-      "translated": "Uruchom openclaw gateway --port 18789."
+      "source": "Run steelengine gateway --port 18789.",
+      "translated": "Uruchom steelengine gateway --port 18789."
     },
     {
       "id": "native.apple.a4eb9a9b02915961",
@@ -14345,8 +14345,8 @@
     },
     {
       "id": "native.apple.8f6f60c9a5196918",
-      "source": "Exec approvals can only be reviewed while OpenClaw is open and connected.\n\nEnable Notifications to receive approval notifications while OpenClaw is not open.",
-      "translated": "Zatwierdzenia uruchamiania poleceń można przeglądać tylko wtedy, gdy OpenClaw jest otwarty i połączony.\n\nWłącz powiadomienia, aby otrzymywać powiadomienia o zatwierdzeniach, gdy OpenClaw nie jest otwarty."
+      "source": "Exec approvals can only be reviewed while SteelEngine is open and connected.\n\nEnable Notifications to receive approval notifications while SteelEngine is not open.",
+      "translated": "Zatwierdzenia uruchamiania poleceń można przeglądać tylko wtedy, gdy SteelEngine jest otwarty i połączony.\n\nWłącz powiadomienia, aby otrzymywać powiadomienia o zatwierdzeniach, gdy SteelEngine nie jest otwarty."
     },
     {
       "id": "native.apple.a2378696390cca1e",
@@ -14395,73 +14395,73 @@
     },
     {
       "id": "native.apple.cf820096080f7031",
-      "source": "OpenClaw uses your calendars to show events and scheduling context when you enable calendar access.",
-      "translated": "OpenClaw używa Twoich kalendarzy do wyświetlania wydarzeń i kontekstu planowania, gdy włączysz dostęp do kalendarza."
+      "source": "SteelEngine uses your calendars to show events and scheduling context when you enable calendar access.",
+      "translated": "SteelEngine używa Twoich kalendarzy do wyświetlania wydarzeń i kontekstu planowania, gdy włączysz dostęp do kalendarza."
     },
     {
       "id": "native.apple.fe85b609e9a9a144",
-      "source": "OpenClaw uses your calendars to add events when you enable calendar access.",
-      "translated": "OpenClaw używa Twoich kalendarzy do dodawania wydarzeń, gdy włączysz dostęp do kalendarza."
+      "source": "SteelEngine uses your calendars to add events when you enable calendar access.",
+      "translated": "SteelEngine używa Twoich kalendarzy do dodawania wydarzeń, gdy włączysz dostęp do kalendarza."
     },
     {
       "id": "native.apple.ff5729a17d66ad91",
-      "source": "OpenClaw uses the camera when you scan a Gateway setup QR code or ask your paired Gateway or assistant to capture a photo or short video from this iPhone, for example to connect to your Gateway or show your assistant a document, device screen, or workspace.",
-      "translated": "OpenClaw używa aparatu, gdy skanujesz kod QR konfiguracji Gateway lub poprosisz sparowane Gateway albo asystenta o zrobienie zdjęcia lub nagranie krótkiego wideo z tego iPhone’a, na przykład aby połączyć się z Gateway lub pokazać asystentowi dokument, ekran urządzenia albo miejsce pracy."
+      "source": "SteelEngine uses the camera when you scan a Gateway setup QR code or ask your paired Gateway or assistant to capture a photo or short video from this iPhone, for example to connect to your Gateway or show your assistant a document, device screen, or workspace.",
+      "translated": "SteelEngine używa aparatu, gdy skanujesz kod QR konfiguracji Gateway lub poprosisz sparowane Gateway albo asystenta o zrobienie zdjęcia lub nagranie krótkiego wideo z tego iPhone’a, na przykład aby połączyć się z Gateway lub pokazać asystentowi dokument, ekran urządzenia albo miejsce pracy."
     },
     {
       "id": "native.apple.2f21aa6f5cd72915",
-      "source": "OpenClaw uses your contacts so you can search and reference people while using the assistant.",
-      "translated": "OpenClaw używa Twoich kontaktów, aby umożliwić wyszukiwanie osób i odwoływanie się do nich podczas korzystania z asystenta."
+      "source": "SteelEngine uses your contacts so you can search and reference people while using the assistant.",
+      "translated": "SteelEngine używa Twoich kontaktów, aby umożliwić wyszukiwanie osób i odwoływanie się do nich podczas korzystania z asystenta."
     },
     {
       "id": "native.apple.9d550c77a37bb165",
-      "source": "OpenClaw discovers and connects to your OpenClaw gateway on the local network.",
-      "translated": "OpenClaw wykrywa i łączy się z Twoim gateway OpenClaw w sieci lokalnej."
+      "source": "SteelEngine discovers and connects to your SteelEngine gateway on the local network.",
+      "translated": "SteelEngine wykrywa i łączy się z Twoim gateway SteelEngine w sieci lokalnej."
     },
     {
       "id": "native.apple.d822c41a0b7e9739",
-      "source": "OpenClaw can share your location in the background when you enable Always.",
-      "translated": "OpenClaw może udostępniać Twoją lokalizację w tle, gdy włączysz Zawsze."
+      "source": "SteelEngine can share your location in the background when you enable Always.",
+      "translated": "SteelEngine może udostępniać Twoją lokalizację w tle, gdy włączysz Zawsze."
     },
     {
       "id": "native.apple.441062ce99375692",
-      "source": "OpenClaw uses your location when you allow location sharing.",
-      "translated": "OpenClaw używa Twojej lokalizacji, gdy zezwolisz na udostępnianie lokalizacji."
+      "source": "SteelEngine uses your location when you allow location sharing.",
+      "translated": "SteelEngine używa Twojej lokalizacji, gdy zezwolisz na udostępnianie lokalizacji."
     },
     {
       "id": "native.apple.7c2cbe7077e4eff1",
-      "source": "OpenClaw uses the microphone for realtime chat, voice wake, push-to-talk, and voice notes.",
-      "translated": "OpenClaw używa mikrofonu do czatu w czasie rzeczywistym, aktywacji głosowej, funkcji naciśnij i mów oraz notatek głosowych."
+      "source": "SteelEngine uses the microphone for realtime chat, voice wake, push-to-talk, and voice notes.",
+      "translated": "SteelEngine używa mikrofonu do czatu w czasie rzeczywistym, aktywacji głosowej, funkcji naciśnij i mów oraz notatek głosowych."
     },
     {
       "id": "native.apple.85345f18204d67ec",
-      "source": "OpenClaw may use motion data to support device-aware interactions and automations.",
-      "translated": "OpenClaw może używać danych o ruchu do obsługi interakcji i automatyzacji zależnych od urządzenia."
+      "source": "SteelEngine may use motion data to support device-aware interactions and automations.",
+      "translated": "SteelEngine może używać danych o ruchu do obsługi interakcji i automatyzacji zależnych od urządzenia."
     },
     {
       "id": "native.apple.1d3a6099d7e11895",
-      "source": "OpenClaw reads your steps, sleep, resting heart rate, and workouts from the Apple Health app to create summaries you request and send them through your Gateway to your configured AI provider.",
-      "translated": "OpenClaw odczytuje z aplikacji Apple Health dane dotyczące kroków, snu, tętna spoczynkowego i treningów, aby tworzyć żądane podsumowania i wysyłać je za pośrednictwem Gateway do skonfigurowanego dostawcy AI."
+      "source": "SteelEngine reads your steps, sleep, resting heart rate, and workouts from the Apple Health app to create summaries you request and send them through your Gateway to your configured AI provider.",
+      "translated": "SteelEngine odczytuje z aplikacji Apple Health dane dotyczące kroków, snu, tętna spoczynkowego i treningów, aby tworzyć żądane podsumowania i wysyłać je za pośrednictwem Gateway do skonfigurowanego dostawcy AI."
     },
     {
       "id": "native.apple.c90a204b3232c401",
-      "source": "OpenClaw does not write to the Apple Health app. It uses read-only data to create summaries you request and send them through your Gateway to your configured AI provider.",
-      "translated": "OpenClaw nie zapisuje danych w aplikacji Apple Health. Korzysta z danych tylko do odczytu, aby tworzyć żądane podsumowania i wysyłać je za pośrednictwem Gateway do skonfigurowanego dostawcy AI."
+      "source": "SteelEngine does not write to the Apple Health app. It uses read-only data to create summaries you request and send them through your Gateway to your configured AI provider.",
+      "translated": "SteelEngine nie zapisuje danych w aplikacji Apple Health. Korzysta z danych tylko do odczytu, aby tworzyć żądane podsumowania i wysyłać je za pośrednictwem Gateway do skonfigurowanego dostawcy AI."
     },
     {
       "id": "native.apple.40ed4259ec869f1b",
-      "source": "OpenClaw lets your assistant read photos you allow and lets you choose photos to share.",
-      "translated": "OpenClaw pozwala Twojemu asystentowi odczytywać zdjęcia, na które zezwolisz, oraz pozwala wybrać zdjęcia do udostępnienia."
+      "source": "SteelEngine lets your assistant read photos you allow and lets you choose photos to share.",
+      "translated": "SteelEngine pozwala Twojemu asystentowi odczytywać zdjęcia, na które zezwolisz, oraz pozwala wybrać zdjęcia do udostępnienia."
     },
     {
       "id": "native.apple.81b673f0c6fc4371",
-      "source": "OpenClaw uses your reminders to list, add, and complete tasks when you enable reminders access.",
-      "translated": "OpenClaw używa Twoich przypomnień do wyświetlania, dodawania i oznaczania zadań jako ukończone, gdy włączysz dostęp do przypomnień."
+      "source": "SteelEngine uses your reminders to list, add, and complete tasks when you enable reminders access.",
+      "translated": "SteelEngine używa Twoich przypomnień do wyświetlania, dodawania i oznaczania zadań jako ukończone, gdy włączysz dostęp do przypomnień."
     },
     {
       "id": "native.apple.2275552c26460945",
-      "source": "OpenClaw uses on-device speech recognition for talk mode and voice wake.",
-      "translated": "OpenClaw używa rozpoznawania mowy na urządzeniu w trybie rozmowy i do wybudzania głosem."
+      "source": "SteelEngine uses on-device speech recognition for talk mode and voice wake.",
+      "translated": "SteelEngine używa rozpoznawania mowy na urządzeniu w trybie rozmowy i do wybudzania głosem."
     },
     {
       "id": "native.apple.46111fe0569488ab",
@@ -14500,18 +14500,18 @@
     },
     {
       "id": "native.apple.2dc593065171c201",
-      "source": "Location sharing is disabled in OpenClaw. Location Services are off in iOS Settings.",
-      "translated": "Udostępnianie lokalizacji jest wyłączone w OpenClaw. Usługi lokalizacji są wyłączone w ustawieniach iOS."
+      "source": "Location sharing is disabled in SteelEngine. Location Services are off in iOS Settings.",
+      "translated": "Udostępnianie lokalizacji jest wyłączone w SteelEngine. Usługi lokalizacji są wyłączone w ustawieniach iOS."
     },
     {
       "id": "native.apple.1dc990a9cc0500c5",
-      "source": "Location sharing is disabled in OpenClaw. iOS currently allows Always.",
-      "translated": "Udostępnianie lokalizacji jest wyłączone w OpenClaw. iOS obecnie zezwala na Zawsze."
+      "source": "Location sharing is disabled in SteelEngine. iOS currently allows Always.",
+      "translated": "Udostępnianie lokalizacji jest wyłączone w SteelEngine. iOS obecnie zezwala na Zawsze."
     },
     {
       "id": "native.apple.9a4e858d2b218d41",
-      "source": "Location sharing is disabled in OpenClaw. iOS currently allows While Using.",
-      "translated": "Udostępnianie lokalizacji jest wyłączone w OpenClaw. iOS obecnie zezwala na Podczas używania."
+      "source": "Location sharing is disabled in SteelEngine. iOS currently allows While Using.",
+      "translated": "Udostępnianie lokalizacji jest wyłączone w SteelEngine. iOS obecnie zezwala na Podczas używania."
     },
     {
       "id": "native.apple.ab481eb11214797f",
@@ -14585,8 +14585,8 @@
     },
     {
       "id": "native.apple.633f011b81108a8c",
-      "source": "OpenClaw cannot determine the current iOS location permission.",
-      "translated": "OpenClaw nie może określić bieżącego uprawnienia do lokalizacji w iOS."
+      "source": "SteelEngine cannot determine the current iOS location permission.",
+      "translated": "SteelEngine nie może określić bieżącego uprawnienia do lokalizacji w iOS."
     },
     {
       "id": "native.apple.e5673992d3aeac64",
@@ -14615,8 +14615,8 @@
     },
     {
       "id": "native.apple.f6b19113d5d8e7db",
-      "source": "OpenClaw cannot determine the current iOS location permission.",
-      "translated": "OpenClaw nie może określić bieżącego uprawnienia do lokalizacji w iOS."
+      "source": "SteelEngine cannot determine the current iOS location permission.",
+      "translated": "SteelEngine nie może określić bieżącego uprawnienia do lokalizacji w iOS."
     },
     {
       "id": "native.apple.2892e5b02c6789f0",
@@ -14890,8 +14890,8 @@
     },
     {
       "id": "native.apple.d4d9568dca8ceaa9",
-      "source": "The connected OpenClaw agent can use device capabilities you enable.",
-      "translated": "Połączony agent OpenClaw może korzystać z włączonych przez Ciebie funkcji urządzenia."
+      "source": "The connected SteelEngine agent can use device capabilities you enable.",
+      "translated": "Połączony agent SteelEngine może korzystać z włączonych przez Ciebie funkcji urządzenia."
     },
     {
       "id": "native.apple.fdd93eb6b6eef525",
@@ -14915,8 +14915,8 @@
     },
     {
       "id": "native.apple.e8b4dc00cd23ae73",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.apple.9b414850baa618da",
@@ -15090,8 +15090,8 @@
     },
     {
       "id": "native.apple.559dccb9f9dfbbad",
-      "source": "OpenClaw is checking gateway and node access.",
-      "translated": "OpenClaw sprawdza dostęp do Gateway i węzła."
+      "source": "SteelEngine is checking gateway and node access.",
+      "translated": "SteelEngine sprawdza dostęp do Gateway i węzła."
     },
     {
       "id": "native.apple.4404f435fb496b62",
@@ -15110,13 +15110,13 @@
     },
     {
       "id": "native.apple.da636328de464a40",
-      "source": "Request ID: check `openclaw devices list`.",
-      "translated": "Identyfikator żądania: sprawdź `openclaw devices list`."
+      "source": "Request ID: check `steelengine devices list`.",
+      "translated": "Identyfikator żądania: sprawdź `steelengine devices list`."
     },
     {
       "id": "native.apple.d5a5f13a1dd28c9d",
-      "source": "Approve this device on the gateway.\n1) `%1$@`\n2) `/pair approve` in your OpenClaw chat\n%2$@\nOpenClaw will also retry automatically when you return to this app.",
-      "translated": "Zatwierdź to urządzenie w Gateway.\n1) `%1$@`\n2) `/pair approve` na czacie OpenClaw\n%2$@\nOpenClaw automatycznie ponowi próbę również po powrocie do tej aplikacji."
+      "source": "Approve this device on the gateway.\n1) `%1$@`\n2) `/pair approve` in your SteelEngine chat\n%2$@\nSteelEngine will also retry automatically when you return to this app.",
+      "translated": "Zatwierdź to urządzenie w Gateway.\n1) `%1$@`\n2) `/pair approve` na czacie SteelEngine\n%2$@\nSteelEngine automatycznie ponowi próbę również po powrocie do tej aplikacji."
     },
     {
       "id": "native.apple.af3890b1e07c3084",
@@ -15200,8 +15200,8 @@
     },
     {
       "id": "native.apple.5b46de1ccb06852b",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.apple.0e07e7044608f954",
@@ -15325,13 +15325,13 @@
     },
     {
       "id": "native.apple.c23d35de8d70863f",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.apple.9e781c0183b79a76",
-      "source": "OpenClaw %@",
-      "translated": "OpenClaw %@"
+      "source": "SteelEngine %@",
+      "translated": "SteelEngine %@"
     },
     {
       "id": "native.apple.f4eea6473f43388d",
@@ -15420,8 +15420,8 @@
     },
     {
       "id": "native.apple.a55a43940452b04b",
-      "source": "OpenClaw iOS",
-      "translated": "OpenClaw iOS"
+      "source": "SteelEngine iOS",
+      "translated": "SteelEngine iOS"
     },
     {
       "id": "native.apple.35b6f99d627028f6",
@@ -15645,8 +15645,8 @@
     },
     {
       "id": "native.apple.4ebb39f445d7dbff",
-      "source": "OpenClaw reacts when any trigger appears in a transcription. Keep them short to avoid false positives.",
-      "translated": "OpenClaw reaguje, gdy w transkrypcji pojawi się dowolny wyzwalacz. Używaj krótkich wyrażeń, aby uniknąć fałszywych wykryć."
+      "source": "SteelEngine reacts when any trigger appears in a transcription. Keep them short to avoid false positives.",
+      "translated": "SteelEngine reaguje, gdy w transkrypcji pojawi się dowolny wyzwalacz. Używaj krótkich wyrażeń, aby uniknąć fałszywych wykryć."
     },
     {
       "id": "native.apple.994760420a194561",
@@ -15920,18 +15920,18 @@
     },
     {
       "id": "native.apple.5b40cb9cf4ee4d4f",
-      "source": "Asking OpenClaw",
-      "translated": "Pytanie do OpenClaw"
+      "source": "Asking SteelEngine",
+      "translated": "Pytanie do SteelEngine"
     },
     {
       "id": "native.apple.34531893ae6091b1",
-      "source": "Still asking OpenClaw",
-      "translated": "Nadal pytam OpenClaw"
+      "source": "Still asking SteelEngine",
+      "translated": "Nadal pytam SteelEngine"
     },
     {
       "id": "native.apple.027ab0bbb4553124",
-      "source": "Updating OpenClaw",
-      "translated": "Aktualizowanie OpenClaw"
+      "source": "Updating SteelEngine",
+      "translated": "Aktualizowanie SteelEngine"
     },
     {
       "id": "native.apple.471dc394d6b9e443",
@@ -15985,8 +15985,8 @@
     },
     {
       "id": "native.apple.deb282fd61fd2de3",
-      "source": "OpenClaw unavailable",
-      "translated": "OpenClaw jest niedostępny"
+      "source": "SteelEngine unavailable",
+      "translated": "SteelEngine jest niedostępny"
     },
     {
       "id": "native.apple.f703391677039fa3",
@@ -16105,13 +16105,13 @@
     },
     {
       "id": "native.apple.1065cfe92d7c1eb6",
-      "source": "Asking OpenClaw",
-      "translated": "Pytanie OpenClaw"
+      "source": "Asking SteelEngine",
+      "translated": "Pytanie SteelEngine"
     },
     {
       "id": "native.apple.d2db26b3bb266491",
-      "source": "Updating OpenClaw",
-      "translated": "Aktualizowanie OpenClaw"
+      "source": "Updating SteelEngine",
+      "translated": "Aktualizowanie SteelEngine"
     },
     {
       "id": "native.apple.8a944b06087fe8ef",
@@ -16190,8 +16190,8 @@
     },
     {
       "id": "native.apple.12a4a51d251f65c0",
-      "source": "OpenClaw connects this Apple Watch directly to your Gateway on trusted local networks.",
-      "translated": "OpenClaw łączy ten Apple Watch bezpośrednio z Twoim Gateway w zaufanych sieciach lokalnych."
+      "source": "SteelEngine connects this Apple Watch directly to your Gateway on trusted local networks.",
+      "translated": "SteelEngine łączy ten Apple Watch bezpośrednio z Twoim Gateway w zaufanych sieciach lokalnych."
     },
     {
       "id": "native.apple.130180e0065c80fc",
@@ -16240,8 +16240,8 @@
     },
     {
       "id": "native.apple.32473b10033ac0f4",
-      "source": "Reconnects when OpenClaw is active",
-      "translated": "Łączy ponownie, gdy OpenClaw jest aktywny"
+      "source": "Reconnects when SteelEngine is active",
+      "translated": "Łączy ponownie, gdy SteelEngine jest aktywny"
     },
     {
       "id": "native.apple.760267006777c454",
@@ -16530,8 +16530,8 @@
     },
     {
       "id": "native.apple.ca02fd2965efe74e",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.apple.1ba2f03dc98103c0",
@@ -16680,8 +16680,8 @@
     },
     {
       "id": "native.apple.c7d87356e6cdb374",
-      "source": "Uses Wi-Fi or cellular while OpenClaw is active",
-      "translated": "Używa Wi-Fi lub sieci komórkowej, gdy OpenClaw jest aktywny"
+      "source": "Uses Wi-Fi or cellular while SteelEngine is active",
+      "translated": "Używa Wi-Fi lub sieci komórkowej, gdy SteelEngine jest aktywny"
     },
     {
       "id": "native.apple.08583448d9b2455e",
@@ -16870,8 +16870,8 @@
     },
     {
       "id": "native.apple.3fdc651e507de84b",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.apple.c1de056da9ee1b27",
@@ -16910,8 +16910,8 @@
     },
     {
       "id": "native.apple.b816e4b9e492ae6c",
-      "source": "Message OpenClaw",
-      "translated": "Napisz do OpenClaw"
+      "source": "Message SteelEngine",
+      "translated": "Napisz do SteelEngine"
     },
     {
       "id": "native.apple.502a884cec1f0d5d",
@@ -17035,8 +17035,8 @@
     },
     {
       "id": "native.apple.5ac0c79487a492b4",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.apple.95b5730738a28d71",
@@ -17080,8 +17080,8 @@
     },
     {
       "id": "native.apple.4ec07761308f7f50",
-      "source": "© 2026 OpenClaw Foundation — MIT License.",
-      "translated": "© 2026 OpenClaw Foundation — licencja MIT."
+      "source": "© 2026 SteelEngine Foundation — MIT License.",
+      "translated": "© 2026 SteelEngine Foundation — licencja MIT."
     },
     {
       "id": "native.apple.37661ff1af405580",
@@ -17150,28 +17150,28 @@
     },
     {
       "id": "native.apple.edfef1f4b5cb081f",
-      "source": "OpenClaw couldn’t be installed in Applications. Move it there manually, then open that copy.",
-      "translated": "Nie udało się zainstalować OpenClaw w folderze Aplikacje. Przenieś go tam ręcznie, a następnie otwórz tę kopię."
+      "source": "SteelEngine couldn’t be installed in Applications. Move it there manually, then open that copy.",
+      "translated": "Nie udało się zainstalować SteelEngine w folderze Aplikacje. Przenieś go tam ręcznie, a następnie otwórz tę kopię."
     },
     {
       "id": "native.apple.7f86f5acf3d32ec2",
-      "source": "Replace the older OpenClaw in Applications?",
-      "translated": "Zastąpić starszą wersję OpenClaw w folderze Aplikacje?"
+      "source": "Replace the older SteelEngine in Applications?",
+      "translated": "Zastąpić starszą wersję SteelEngine w folderze Aplikacje?"
     },
     {
       "id": "native.apple.088b39cc34b44e54",
-      "source": "Install OpenClaw in Applications?",
-      "translated": "Zainstalować OpenClaw w folderze Aplikacje?"
+      "source": "Install SteelEngine in Applications?",
+      "translated": "Zainstalować SteelEngine w folderze Aplikacje?"
     },
     {
       "id": "native.apple.c8898d685457401f",
-      "source": "This copy is newer than the installed app. OpenClaw will replace it and reopen from Applications.",
-      "translated": "Ta kopia jest nowsza niż zainstalowana aplikacja. OpenClaw ją zastąpi i otworzy się ponownie z folderu Aplikacje."
+      "source": "This copy is newer than the installed app. SteelEngine will replace it and reopen from Applications.",
+      "translated": "Ta kopia jest nowsza niż zainstalowana aplikacja. SteelEngine ją zastąpi i otworzy się ponownie z folderu Aplikacje."
     },
     {
       "id": "native.apple.a77a46d0ca32551f",
-      "source": "OpenClaw will copy itself to Applications and reopen there so updates and launch at login stay reliable.",
-      "translated": "OpenClaw skopiuje się do folderu Aplikacje i otworzy się ponownie stamtąd, aby aktualizacje i uruchamianie przy logowaniu działały niezawodnie."
+      "source": "SteelEngine will copy itself to Applications and reopen there so updates and launch at login stay reliable.",
+      "translated": "SteelEngine skopiuje się do folderu Aplikacje i otworzy się ponownie stamtąd, aby aktualizacje i uruchamianie przy logowaniu działały niezawodnie."
     },
     {
       "id": "native.apple.22ebb7b228c8275a",
@@ -17185,8 +17185,8 @@
     },
     {
       "id": "native.apple.9ac444c15bd52f0e",
-      "source": "OpenClaw is installed in Applications, but couldn’t reopen automatically. Open it there manually.",
-      "translated": "OpenClaw jest zainstalowany w folderze Aplikacje, ale nie udało się go otworzyć ponownie automatycznie. Otwórz go tam ręcznie."
+      "source": "SteelEngine is installed in Applications, but couldn’t reopen automatically. Open it there manually.",
+      "translated": "SteelEngine jest zainstalowany w folderze Aplikacje, ale nie udało się go otworzyć ponownie automatycznie. Otwórz go tam ręcznie."
     },
     {
       "id": "native.apple.d1faee12838b677f",
@@ -17305,18 +17305,18 @@
     },
     {
       "id": "native.apple.cfc2509b8bbcf1d7",
-      "source": "OpenClaw Gateway \\(version) is ready.",
-      "translated": "OpenClaw Gateway \\(version) jest gotowy."
+      "source": "SteelEngine Gateway \\(version) is ready.",
+      "translated": "SteelEngine Gateway \\(version) jest gotowy."
     },
     {
       "id": "native.apple.9b767e46895714f9",
-      "source": "OpenClaw Gateway is not installed yet.",
-      "translated": "OpenClaw Gateway nie jest jeszcze zainstalowany."
+      "source": "SteelEngine Gateway is not installed yet.",
+      "translated": "SteelEngine Gateway nie jest jeszcze zainstalowany."
     },
     {
       "id": "native.apple.b4dc58a1b294e140",
-      "source": "The OpenClaw Gateway could not be verified. Setup will repair it.",
-      "translated": "Nie można było zweryfikować OpenClaw Gateway. Konfiguracja go naprawi."
+      "source": "The SteelEngine Gateway could not be verified. Setup will repair it.",
+      "translated": "Nie można było zweryfikować SteelEngine Gateway. Konfiguracja go naprawi."
     },
     {
       "id": "native.apple.4088056ae7b0f3b4",
@@ -17325,13 +17325,13 @@
     },
     {
       "id": "native.apple.86e7c86924ad0c70",
-      "source": "Repairing the OpenClaw Gateway update…",
-      "translated": "Naprawianie aktualizacji OpenClaw Gateway…"
+      "source": "Repairing the SteelEngine Gateway update…",
+      "translated": "Naprawianie aktualizacji SteelEngine Gateway…"
     },
     {
       "id": "native.apple.b59713e1e3e7ee65",
-      "source": "Updating the OpenClaw Gateway to \\(targetVersion)…",
-      "translated": "Aktualizowanie OpenClaw Gateway do wersji \\(targetVersion)…"
+      "source": "Updating the SteelEngine Gateway to \\(targetVersion)…",
+      "translated": "Aktualizowanie SteelEngine Gateway do wersji \\(targetVersion)…"
     },
     {
       "id": "native.apple.7772913c171b78ac",
@@ -17350,8 +17350,8 @@
     },
     {
       "id": "native.apple.66f44c526206f5de",
-      "source": "OpenClaw Gateway \\(installedVersion) is installed.",
-      "translated": "Zainstalowano OpenClaw Gateway \\(installedVersion)."
+      "source": "SteelEngine Gateway \\(installedVersion) is installed.",
+      "translated": "Zainstalowano SteelEngine Gateway \\(installedVersion)."
     },
     {
       "id": "native.apple.6f14c557e2573526",
@@ -17435,8 +17435,8 @@
     },
     {
       "id": "native.apple.81435e60c0b78093",
-      "source": "OpenClaw could not load editable settings for this channel.",
-      "translated": "OpenClaw nie mógł wczytać edytowalnych ustawień dla tego kanału."
+      "source": "SteelEngine could not load editable settings for this channel.",
+      "translated": "SteelEngine nie mógł wczytać edytowalnych ustawień dla tego kanału."
     },
     {
       "id": "native.apple.f74dfc887ee4f936",
@@ -17505,8 +17505,8 @@
     },
     {
       "id": "native.apple.60f2b09010a7809b",
-      "source": "Config invalid; fix it in ~/.openclaw/openclaw.json.",
-      "translated": "Config invalid; fix it in ~/.openclaw/openclaw.json."
+      "source": "Config invalid; fix it in ~/.steelengine/steelengine.json.",
+      "translated": "Config invalid; fix it in ~/.steelengine/steelengine.json."
     },
     {
       "id": "native.apple.313dabb10c37e00c",
@@ -17660,8 +17660,8 @@
     },
     {
       "id": "native.apple.8103e662c0e40760",
-      "source": "Edit ~/.openclaw/openclaw.json using the schema-driven form.",
-      "translated": "Edytuj ~/.openclaw/openclaw.json za pomocą formularza opartego na schemacie."
+      "source": "Edit ~/.steelengine/steelengine.json using the schema-driven form.",
+      "translated": "Edytuj ~/.steelengine/steelengine.json za pomocą formularza opartego na schemacie."
     },
     {
       "id": "native.apple.a3465ec90e435ea9",
@@ -17910,8 +17910,8 @@
     },
     {
       "id": "native.apple.df6243155293f80b",
-      "source": "What should OpenClaw do?",
-      "translated": "Co OpenClaw ma zrobić?"
+      "source": "What should SteelEngine do?",
+      "translated": "Co SteelEngine ma zrobić?"
     },
     {
       "id": "native.apple.81b5ba441a230f07",
@@ -18255,8 +18255,8 @@
     },
     {
       "id": "native.apple.d8b3e55c41a77627",
-      "source": "When enabled, OpenClaw won't install or manage \\(gatewayLaunchdLabel). It will only attach to an existing Gateway.",
-      "translated": "Po włączeniu OpenClaw nie będzie instalować ani zarządzać \\(gatewayLaunchdLabel). Będzie tylko dołączać do istniejącego Gateway."
+      "source": "When enabled, SteelEngine won't install or manage \\(gatewayLaunchdLabel). It will only attach to an existing Gateway.",
+      "translated": "Po włączeniu SteelEngine nie będzie instalować ani zarządzać \\(gatewayLaunchdLabel). Będzie tylko dołączać do istniejącego Gateway."
     },
     {
       "id": "native.apple.15e528c55a96394f",
@@ -18340,8 +18340,8 @@
     },
     {
       "id": "native.apple.f8e4e2b25dbdbd44",
-      "source": "Deep links (openclaw://…) are always enabled; the key controls unattended runs.",
-      "translated": "Głębokie linki (openclaw://…) są zawsze włączone; klucz steruje uruchomieniami bez nadzoru."
+      "source": "Deep links (steelengine://…) are always enabled; the key controls unattended runs.",
+      "translated": "Głębokie linki (steelengine://…) są zawsze włączone; klucz steruje uruchomieniami bez nadzoru."
     },
     {
       "id": "native.apple.aeba5ae43a292c55",
@@ -18390,8 +18390,8 @@
     },
     {
       "id": "native.apple.5437c7d545b749ca",
-      "source": "Writes a rotating, local-only log under ~/Library/Logs/OpenClaw/. Enable only while actively debugging.",
-      "translated": "Writes a rotating, local-only log under ~/Library/Logs/OpenClaw/. Enable only while actively debugging."
+      "source": "Writes a rotating, local-only log under ~/Library/Logs/SteelEngine/. Enable only while actively debugging.",
+      "translated": "Writes a rotating, local-only log under ~/Library/Logs/SteelEngine/. Enable only while actively debugging."
     },
     {
       "id": "native.apple.5b35a89bea603457",
@@ -18440,13 +18440,13 @@
     },
     {
       "id": "native.apple.5e9e8bf8e35c48ef",
-      "source": "OpenClaw project root",
-      "translated": "Katalog główny projektu OpenClaw"
+      "source": "SteelEngine project root",
+      "translated": "Katalog główny projektu SteelEngine"
     },
     {
       "id": "native.apple.8b01a6daf7a7b94e",
-      "source": "Path to openclaw repo",
-      "translated": "Ścieżka do repozytorium openclaw"
+      "source": "Path to steelengine repo",
+      "translated": "Ścieżka do repozytorium steelengine"
     },
     {
       "id": "native.apple.b9e064d213c6b451",
@@ -18475,8 +18475,8 @@
     },
     {
       "id": "native.apple.a8154f17cda71415",
-      "source": "Used by the CLI session loader; stored in ~/.openclaw/openclaw.json.",
-      "translated": "Używane przez loader sesji CLI; przechowywane w ~/.openclaw/openclaw.json."
+      "source": "Used by the CLI session loader; stored in ~/.steelengine/steelengine.json.",
+      "translated": "Używane przez loader sesji CLI; przechowywane w ~/.steelengine/steelengine.json."
     },
     {
       "id": "native.apple.3e472353e27107af",
@@ -18505,13 +18505,13 @@
     },
     {
       "id": "native.apple.3307505d507faf31",
-      "source": "Note: macOS may require restarting OpenClaw after enabling Accessibility or Screen Recording.",
-      "translated": "Uwaga: macOS może wymagać ponownego uruchomienia OpenClaw po włączeniu Dostępności lub Nagrywania ekranu."
+      "source": "Note: macOS may require restarting SteelEngine after enabling Accessibility or Screen Recording.",
+      "translated": "Uwaga: macOS może wymagać ponownego uruchomienia SteelEngine po włączeniu Dostępności lub Nagrywania ekranu."
     },
     {
       "id": "native.apple.e52d463773aef1e1",
-      "source": "Restart OpenClaw",
-      "translated": "Uruchom ponownie OpenClaw"
+      "source": "Restart SteelEngine",
+      "translated": "Uruchom ponownie SteelEngine"
     },
     {
       "id": "native.apple.e299e77f3ad75a75",
@@ -18630,13 +18630,13 @@
     },
     {
       "id": "native.apple.a8af393b84d63ab8",
-      "source": "OpenClaw is paused",
-      "translated": "OpenClaw jest wstrzymany"
+      "source": "SteelEngine is paused",
+      "translated": "SteelEngine jest wstrzymany"
     },
     {
       "id": "native.apple.7ba1542539c0d40b",
-      "source": "Unpause OpenClaw to run agent actions.",
-      "translated": "Wznów OpenClaw, aby uruchamiać działania agenta."
+      "source": "Unpause SteelEngine to run agent actions.",
+      "translated": "Wznów SteelEngine, aby uruchamiać działania agenta."
     },
     {
       "id": "native.apple.7c1e1dbfde976ab9",
@@ -18660,8 +18660,8 @@
     },
     {
       "id": "native.apple.50f1211af2a1945e",
-      "source": "Run OpenClaw agent?",
-      "translated": "Uruchomić agenta OpenClaw?"
+      "source": "Run SteelEngine agent?",
+      "translated": "Uruchomić agenta SteelEngine?"
     },
     {
       "id": "native.apple.4f3841d5de0135c4",
@@ -18745,8 +18745,8 @@
     },
     {
       "id": "native.apple.66ad783199ef9729",
-      "source": "Discover OpenClaw gateways on your LAN",
-      "translated": "Wykrywaj Gateway OpenClaw w swojej sieci LAN"
+      "source": "Discover SteelEngine gateways on your LAN",
+      "translated": "Wykrywaj Gateway SteelEngine w swojej sieci LAN"
     },
     {
       "id": "native.apple.110f6e64e25dcd2e",
@@ -18790,8 +18790,8 @@
     },
     {
       "id": "native.apple.1c4fca89983d7487",
-      "source": "Everyday OpenClaw app behavior.",
-      "translated": "Codzienne działanie aplikacji OpenClaw."
+      "source": "Everyday SteelEngine app behavior.",
+      "translated": "Codzienne działanie aplikacji SteelEngine."
     },
     {
       "id": "native.apple.7d03158a40ddb60a",
@@ -18805,13 +18805,13 @@
     },
     {
       "id": "native.apple.405e74c96498b7c0",
-      "source": "Automatically start OpenClaw after you sign in.",
-      "translated": "Automatycznie uruchamiaj OpenClaw po zalogowaniu."
+      "source": "Automatically start SteelEngine after you sign in.",
+      "translated": "Automatycznie uruchamiaj SteelEngine po zalogowaniu."
     },
     {
       "id": "native.apple.8b74758a60f78642",
-      "source": "Move OpenClaw to Applications before enabling launch at login.",
-      "translated": "Przenieś OpenClaw do folderu Aplikacje przed włączeniem uruchamiania przy logowaniu."
+      "source": "Move SteelEngine to Applications before enabling launch at login.",
+      "translated": "Przenieś SteelEngine do folderu Aplikacje przed włączeniem uruchamiania przy logowaniu."
     },
     {
       "id": "native.apple.927819c087ca3520",
@@ -18820,8 +18820,8 @@
     },
     {
       "id": "native.apple.e7a0819bd2f4e1dc",
-      "source": "Keep OpenClaw visible in the Dock. When off, windows still show the Dock icon while open.",
-      "translated": "Utrzymuj OpenClaw widoczny w Docku. Gdy ta opcja jest wyłączona, otwarte okna nadal pokazują ikonę w Docku."
+      "source": "Keep SteelEngine visible in the Dock. When off, windows still show the Dock icon while open.",
+      "translated": "Utrzymuj SteelEngine widoczny w Docku. Gdy ta opcja jest wyłączona, otwarte okna nadal pokazują ikonę w Docku."
     },
     {
       "id": "native.apple.af23f7b5fb03a877",
@@ -18950,13 +18950,13 @@
     },
     {
       "id": "native.apple.64e197a4a8b384ef",
-      "source": "OpenClaw paused",
-      "translated": "OpenClaw wstrzymany"
+      "source": "SteelEngine paused",
+      "translated": "SteelEngine wstrzymany"
     },
     {
       "id": "native.apple.7fe6df69d8050832",
-      "source": "OpenClaw active",
-      "translated": "OpenClaw aktywny"
+      "source": "SteelEngine active",
+      "translated": "SteelEngine aktywny"
     },
     {
       "id": "native.apple.2f4258fa73e04344",
@@ -19010,8 +19010,8 @@
     },
     {
       "id": "native.apple.8021dcd7963a4cc2",
-      "source": "OpenClaw starts and monitors the Gateway on this Mac.",
-      "translated": "OpenClaw uruchamia i monitoruje Gateway na tym Macu."
+      "source": "SteelEngine starts and monitors the Gateway on this Mac.",
+      "translated": "SteelEngine uruchamia i monitoruje Gateway na tym Macu."
     },
     {
       "id": "native.apple.fe2a790f28ffd1ae",
@@ -19025,8 +19025,8 @@
     },
     {
       "id": "native.apple.d261da13966fa812",
-      "source": "OpenClaw runs",
-      "translated": "OpenClaw działa"
+      "source": "SteelEngine runs",
+      "translated": "SteelEngine działa"
     },
     {
       "id": "native.apple.397850fa5e803f53",
@@ -19125,8 +19125,8 @@
     },
     {
       "id": "native.apple.c663b8a50de8a7d8",
-      "source": "/home/you/Projects/openclaw",
-      "translated": "/home/you/Projects/openclaw"
+      "source": "/home/you/Projects/steelengine",
+      "translated": "/home/you/Projects/steelengine"
     },
     {
       "id": "native.apple.938ee646aac4ce66",
@@ -19135,8 +19135,8 @@
     },
     {
       "id": "native.apple.09f99e863e081f9f",
-      "source": "/Applications/OpenClaw.app/.../openclaw",
-      "translated": "/Applications/OpenClaw.app/.../openclaw"
+      "source": "/Applications/SteelEngine.app/.../steelengine",
+      "translated": "/Applications/SteelEngine.app/.../steelengine"
     },
     {
       "id": "native.apple.f588f7dad51aae2e",
@@ -19210,8 +19210,8 @@
     },
     {
       "id": "native.apple.24aa092829f9a3b1",
-      "source": "The current gateway.remote.token value is not plain text. OpenClaw for macOS cannot use it directly; enter a plaintext token here to replace it.",
-      "translated": "Bieżąca wartość gateway.remote.token nie jest zwykłym tekstem. OpenClaw dla macOS nie może użyć jej bezpośrednio; wprowadź tutaj token w postaci zwykłego tekstu, aby ją zastąpić."
+      "source": "The current gateway.remote.token value is not plain text. SteelEngine for macOS cannot use it directly; enter a plaintext token here to replace it.",
+      "translated": "Bieżąca wartość gateway.remote.token nie jest zwykłym tekstem. SteelEngine dla macOS nie może użyć jej bezpośrednio; wprowadź tutaj token w postaci zwykłego tekstu, aby ją zastąpić."
     },
     {
       "id": "native.apple.d0b21bc12ab63cad",
@@ -19350,8 +19350,8 @@
     },
     {
       "id": "native.apple.876c066efa88aee3",
-      "source": "Latest presence beacons from OpenClaw nodes. Updated periodically.",
-      "translated": "Najnowsze sygnały obecności z węzłów OpenClaw. Aktualizowane okresowo."
+      "source": "Latest presence beacons from SteelEngine nodes. Updated periodically.",
+      "translated": "Najnowsze sygnały obecności z węzłów SteelEngine. Aktualizowane okresowo."
     },
     {
       "id": "native.apple.8a6bcd51fd9f1f62",
@@ -19455,13 +19455,13 @@
     },
     {
       "id": "native.apple.13a7356f48278757",
-      "source": "OpenClaw - Voice Wake live meter active",
-      "translated": "OpenClaw – aktywny miernik na żywo Voice Wake"
+      "source": "SteelEngine - Voice Wake live meter active",
+      "translated": "SteelEngine – aktywny miernik na żywo Voice Wake"
     },
     {
       "id": "native.apple.fae2cf18519da0d5",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.apple.ef59188264be95d4",
@@ -19570,8 +19570,8 @@
     },
     {
       "id": "native.apple.fbab65790d6eca89",
-      "source": "About OpenClaw",
-      "translated": "O OpenClaw"
+      "source": "About SteelEngine",
+      "translated": "O SteelEngine"
     },
     {
       "id": "native.apple.14c8f4b1a57569f3",
@@ -19585,18 +19585,18 @@
     },
     {
       "id": "native.apple.5021ed413c045620",
-      "source": "OpenClaw Not Configured",
-      "translated": "OpenClaw nie skonfigurowano"
+      "source": "SteelEngine Not Configured",
+      "translated": "SteelEngine nie skonfigurowano"
     },
     {
       "id": "native.apple.4d10ab5feb4add3f",
-      "source": "Remote OpenClaw Active",
-      "translated": "Zdalny OpenClaw aktywny"
+      "source": "Remote SteelEngine Active",
+      "translated": "Zdalny SteelEngine aktywny"
     },
     {
       "id": "native.apple.b49dea5c1fdb3dd3",
-      "source": "OpenClaw Active",
-      "translated": "OpenClaw aktywny"
+      "source": "SteelEngine Active",
+      "translated": "SteelEngine aktywny"
     },
     {
       "id": "native.apple.1df24a30d7963640",
@@ -19875,8 +19875,8 @@
     },
     {
       "id": "native.apple.e3e27d22fd2312a2",
-      "source": "OpenClaw will check again before changing any inference settings.",
-      "translated": "OpenClaw sprawdzi ponownie przed zmianą jakichkolwiek ustawień wnioskowania."
+      "source": "SteelEngine will check again before changing any inference settings.",
+      "translated": "SteelEngine sprawdzi ponownie przed zmianą jakichkolwiek ustawień wnioskowania."
     },
     {
       "id": "native.apple.a0a8f45082d0ba99",
@@ -19915,8 +19915,8 @@
     },
     {
       "id": "native.apple.a0431b20c0650139",
-      "source": "Need help? Chat with OpenClaw",
-      "translated": "Potrzebujesz pomocy? Porozmawiaj z OpenClaw"
+      "source": "Need help? Chat with SteelEngine",
+      "translated": "Potrzebujesz pomocy? Porozmawiaj z SteelEngine"
     },
     {
       "id": "native.apple.6526ced182e1fe50",
@@ -19985,8 +19985,8 @@
     },
     {
       "id": "native.apple.4a1e5a5600b907f4",
-      "source": "Use an existing subscription or provider account. OpenClaw opens the provider’s own sign-in flow, then verifies it with a real reply.",
-      "translated": "Użyj istniejącej subskrypcji lub konta dostawcy. OpenClaw otwiera własny proces logowania dostawcy, a następnie weryfikuje go prawdziwą odpowiedzią."
+      "source": "Use an existing subscription or provider account. SteelEngine opens the provider’s own sign-in flow, then verifies it with a real reply.",
+      "translated": "Użyj istniejącej subskrypcji lub konta dostawcy. SteelEngine otwiera własny proces logowania dostawcy, a następnie weryfikuje go prawdziwą odpowiedzią."
     },
     {
       "id": "native.apple.14b23c357d7a9eff",
@@ -20105,8 +20105,8 @@
     },
     {
       "id": "native.apple.e874bd0fad63f012",
-      "source": "OpenClaw — setup helper",
-      "translated": "OpenClaw — asystent konfiguracji"
+      "source": "SteelEngine — setup helper",
+      "translated": "SteelEngine — asystent konfiguracji"
     },
     {
       "id": "native.apple.bea852c8622c8214",
@@ -20165,18 +20165,18 @@
     },
     {
       "id": "native.apple.b92f94ddc6bbc8e5",
-      "source": "OpenClaw was interrupted. Restart to try again.",
-      "translated": "Działanie OpenClaw zostało przerwane. Uruchom ponownie, aby spróbować jeszcze raz."
+      "source": "SteelEngine was interrupted. Restart to try again.",
+      "translated": "Działanie SteelEngine zostało przerwane. Uruchom ponownie, aby spróbować jeszcze raz."
     },
     {
       "id": "native.apple.829845818e97978a",
-      "source": "The Gateway connection changed. Restart OpenClaw to reconnect.",
-      "translated": "Połączenie z Gateway uległo zmianie. Uruchom ponownie OpenClaw, aby połączyć się ponownie."
+      "source": "The Gateway connection changed. Restart SteelEngine to reconnect.",
+      "translated": "Połączenie z Gateway uległo zmianie. Uruchom ponownie SteelEngine, aby połączyć się ponownie."
     },
     {
       "id": "native.apple.012861f82eff0ca9",
-      "source": "OpenClaw is working…",
-      "translated": "OpenClaw działa…"
+      "source": "SteelEngine is working…",
+      "translated": "SteelEngine działa…"
     },
     {
       "id": "native.apple.2f7ad21b747fbc15",
@@ -20190,8 +20190,8 @@
     },
     {
       "id": "native.apple.35a542956f4f5497",
-      "source": "Reply to OpenClaw… (yes sets everything up)",
-      "translated": "Odpowiedz OpenClaw… („yes” skonfiguruje wszystko)"
+      "source": "Reply to SteelEngine… (yes sets everything up)",
+      "translated": "Odpowiedz SteelEngine… („yes” skonfiguruje wszystko)"
     },
     {
       "id": "native.apple.78d1ad73762a7ce8",
@@ -20210,8 +20210,8 @@
     },
     {
       "id": "native.apple.b57ee4f83cff23f3",
-      "source": "OpenClaw can bring useful context from AI tools you already use into your new assistant.",
-      "translated": "OpenClaw może przenieść do nowego asystenta przydatny kontekst z narzędzi AI, których już używasz."
+      "source": "SteelEngine can bring useful context from AI tools you already use into your new assistant.",
+      "translated": "SteelEngine może przenieść do nowego asystenta przydatny kontekst z narzędzi AI, których już używasz."
     },
     {
       "id": "native.apple.46cab71d748860b8",
@@ -20290,8 +20290,8 @@
     },
     {
       "id": "native.apple.6dbe5b174271b62a",
-      "source": "Imported \\(imported) \\(self.memoryLabel(imported)) into OpenClaw.",
-      "translated": "Zaimportowano \\(imported) \\(self.memoryLabel(imported)) do OpenClaw."
+      "source": "Imported \\(imported) \\(self.memoryLabel(imported)) into SteelEngine.",
+      "translated": "Zaimportowano \\(imported) \\(self.memoryLabel(imported)) do SteelEngine."
     },
     {
       "id": "native.apple.d47b887f98e13e24",
@@ -20305,8 +20305,8 @@
     },
     {
       "id": "native.apple.ea8beaeecef15e54",
-      "source": "Welcome to OpenClaw",
-      "translated": "Witamy w OpenClaw"
+      "source": "Welcome to SteelEngine",
+      "translated": "Witamy w SteelEngine"
     },
     {
       "id": "native.apple.0629bbbd6db95199",
@@ -20350,8 +20350,8 @@
     },
     {
       "id": "native.apple.fb64a5b187cfdc15",
-      "source": "OpenClaw can take actions using the permissions and services you enable. Review prompts and only connect tools you trust.",
-      "translated": "OpenClaw może wykonywać działania z użyciem włączonych przez Ciebie uprawnień i usług. Przeglądaj monity i łącz tylko narzędzia, którym ufasz."
+      "source": "SteelEngine can take actions using the permissions and services you enable. Review prompts and only connect tools you trust.",
+      "translated": "SteelEngine może wykonywać działania z użyciem włączonych przez Ciebie uprawnień i usług. Przeglądaj monity i łącz tylko narzędzia, którym ufasz."
     },
     {
       "id": "native.apple.a5d02aaf6208e924",
@@ -20360,8 +20360,8 @@
     },
     {
       "id": "native.apple.e6acb60b10ef1206",
-      "source": "Most people pick this Mac — OpenClaw installs everything and keeps it running in the background. You can change this anytime in Settings.",
-      "translated": "Większość osób wybiera tego Maca — OpenClaw zainstaluje wszystko i będzie utrzymywać działanie w tle. Możesz to zmienić w dowolnym momencie w Ustawieniach."
+      "source": "Most people pick this Mac — SteelEngine installs everything and keeps it running in the background. You can change this anytime in Settings.",
+      "translated": "Większość osób wybiera tego Maca — SteelEngine zainstaluje wszystko i będzie utrzymywać działanie w tle. Możesz to zmienić w dowolnym momencie w Ustawieniach."
     },
     {
       "id": "native.apple.21f1053c1054db24",
@@ -20385,8 +20385,8 @@
     },
     {
       "id": "native.apple.d54084b48f40aa0a",
-      "source": "OK — OpenClaw won’t start anything yet. Pick Local or Remote later in Settings → General.",
-      "translated": "OK — OpenClaw jeszcze niczego nie uruchomi. Wybierz Local lub Remote później w Settings → General."
+      "source": "OK — SteelEngine won’t start anything yet. Pick Local or Remote later in Settings → General.",
+      "translated": "OK — SteelEngine jeszcze niczego nie uruchomi. Wybierz Local lub Remote później w Settings → General."
     },
     {
       "id": "native.apple.8d9eb247d41a0ca7",
@@ -20485,8 +20485,8 @@
     },
     {
       "id": "native.apple.dca75ab0dd73f0a4",
-      "source": "/home/you/Projects/openclaw",
-      "translated": "/home/you/Projects/openclaw"
+      "source": "/home/you/Projects/steelengine",
+      "translated": "/home/you/Projects/steelengine"
     },
     {
       "id": "native.apple.6998a7754dea6eb1",
@@ -20495,8 +20495,8 @@
     },
     {
       "id": "native.apple.5a3f4f943c8ee86a",
-      "source": "/Applications/OpenClaw.app/.../openclaw",
-      "translated": "/Applications/OpenClaw.app/.../openclaw"
+      "source": "/Applications/SteelEngine.app/.../steelengine",
+      "translated": "/Applications/SteelEngine.app/.../steelengine"
     },
     {
       "id": "native.apple.56e9b0831ec1eded",
@@ -20540,8 +20540,8 @@
     },
     {
       "id": "native.apple.2a50c3ee94dde35d",
-      "source": "The current gateway.remote.token value is not plain text. OpenClaw for macOS cannot use it directly; enter a plaintext token here to replace it.",
-      "translated": "Bieżąca wartość gateway.remote.token nie jest tekstem jawnym. OpenClaw dla macOS nie może użyć jej bezpośrednio; wprowadź tutaj token w postaci tekstu jawnego, aby ją zastąpić."
+      "source": "The current gateway.remote.token value is not plain text. SteelEngine for macOS cannot use it directly; enter a plaintext token here to replace it.",
+      "translated": "Bieżąca wartość gateway.remote.token nie jest tekstem jawnym. SteelEngine dla macOS nie może użyć jej bezpośrednio; wprowadź tutaj token w postaci tekstu jawnego, aby ją zastąpić."
     },
     {
       "id": "native.apple.ef011af3c0e22127",
@@ -20560,8 +20560,8 @@
     },
     {
       "id": "native.apple.ce0d1241d7417406",
-      "source": "These macOS permissions let OpenClaw automate apps and capture context on this Mac. Status updates automatically.",
-      "translated": "Te uprawnienia macOS pozwalają OpenClaw automatyzować aplikacje i przechwytywać kontekst na tym Macu. Status aktualizuje się automatycznie."
+      "source": "These macOS permissions let SteelEngine automate apps and capture context on this Mac. Status updates automatically.",
+      "translated": "Te uprawnienia macOS pozwalają SteelEngine automatyzować aplikacje i przechwytywać kontekst na tym Macu. Status aktualizuje się automatycznie."
     },
     {
       "id": "native.apple.42af85cdf91d0264",
@@ -20570,8 +20570,8 @@
     },
     {
       "id": "native.apple.d0b8cf59f852b3d0",
-      "source": "Install OpenClaw",
-      "translated": "Zainstaluj OpenClaw"
+      "source": "Install SteelEngine",
+      "translated": "Zainstaluj SteelEngine"
     },
     {
       "id": "native.apple.0b0fc42b8827e01f",
@@ -20645,8 +20645,8 @@
     },
     {
       "id": "native.apple.952e85bfb2d4b4f5",
-      "source": "On your gateway host: install/update the `openclaw` package and make sure credentials exist\n(typically `~/.openclaw/credentials/oauth.json`). Then connect again if needed.",
-      "translated": "Na hoście gateway: zainstaluj/zaktualizuj pakiet `openclaw` i upewnij się, że istnieją dane logowania\n(zwykle `~/.openclaw/credentials/oauth.json`). Następnie połącz się ponownie, jeśli trzeba."
+      "source": "On your gateway host: install/update the `steelengine` package and make sure credentials exist\n(typically `~/.steelengine/credentials/oauth.json`). Then connect again if needed.",
+      "translated": "Na hoście gateway: zainstaluj/zaktualizuj pakiet `steelengine` i upewnij się, że istnieją dane logowania\n(zwykle `~/.steelengine/credentials/oauth.json`). Następnie połącz się ponownie, jeśli trzeba."
     },
     {
       "id": "native.apple.4e5ccb411db3e80f",
@@ -20655,8 +20655,8 @@
     },
     {
       "id": "native.apple.409bfb3a6e0f9f7c",
-      "source": "Click the OpenClaw menu bar icon for the compact chat panel and status.",
-      "translated": "Kliknij ikonę OpenClaw na pasku menu, aby wyświetlić kompaktowy panel czatu i stan."
+      "source": "Click the SteelEngine menu bar icon for the compact chat panel and status.",
+      "translated": "Kliknij ikonę SteelEngine na pasku menu, aby wyświetlić kompaktowy panel czatu i stan."
     },
     {
       "id": "native.apple.1b6cfcf3be8765c2",
@@ -20790,13 +20790,13 @@
     },
     {
       "id": "native.apple.11b1b5e9dd510766",
-      "source": "A node wants to connect to OpenClaw.",
-      "translated": "Węzeł chce połączyć się z OpenClaw."
+      "source": "A node wants to connect to SteelEngine.",
+      "translated": "Węzeł chce połączyć się z SteelEngine."
     },
     {
       "id": "native.apple.2e9d9d1f5d4346d4",
-      "source": "A device wants to connect to OpenClaw.",
-      "translated": "Urządzenie chce połączyć się z OpenClaw."
+      "source": "A device wants to connect to SteelEngine.",
+      "translated": "Urządzenie chce połączyć się z SteelEngine."
     },
     {
       "id": "native.apple.2412e85f7d11395e",
@@ -20805,8 +20805,8 @@
     },
     {
       "id": "native.apple.a09a61f4efe1e63e",
-      "source": "OpenClaw Mac app",
-      "translated": "Aplikacja OpenClaw na Maca"
+      "source": "SteelEngine Mac app",
+      "translated": "Aplikacja SteelEngine na Maca"
     },
     {
       "id": "native.apple.6b29ec65de666dab",
@@ -20880,8 +20880,8 @@
     },
     {
       "id": "native.apple.4344ff6c0e9d7187",
-      "source": "OpenClaw only asks for macOS capabilities when a feature needs them.",
-      "translated": "OpenClaw prosi o funkcje macOS tylko wtedy, gdy wymaga ich dana funkcja."
+      "source": "SteelEngine only asks for macOS capabilities when a feature needs them.",
+      "translated": "SteelEngine prosi o funkcje macOS tylko wtedy, gdy wymaga ich dana funkcja."
     },
     {
       "id": "native.apple.4fecdab98e2f6a11",
@@ -21005,13 +21005,13 @@
     },
     {
       "id": "native.apple.65c21de72f06fd33",
-      "source": "OpenClaw updated",
-      "translated": "Zaktualizowano OpenClaw"
+      "source": "SteelEngine updated",
+      "translated": "Zaktualizowano SteelEngine"
     },
     {
       "id": "native.apple.6197fc2d1ebd6b2e",
-      "source": "Finishing your OpenClaw update",
-      "translated": "Kończenie aktualizacji OpenClaw"
+      "source": "Finishing your SteelEngine update",
+      "translated": "Kończenie aktualizacji SteelEngine"
     },
     {
       "id": "native.apple.226b698fbbfc3cc4",
@@ -21025,8 +21025,8 @@
     },
     {
       "id": "native.apple.91debe404bb7affc",
-      "source": "The managed OpenClaw runtime could not be reinstalled.",
-      "translated": "Nie udało się ponownie zainstalować zarządzanego środowiska uruchomieniowego OpenClaw."
+      "source": "The managed SteelEngine runtime could not be reinstalled.",
+      "translated": "Nie udało się ponownie zainstalować zarządzanego środowiska uruchomieniowego SteelEngine."
     },
     {
       "id": "native.apple.1cc391ec928070c4",
@@ -21050,43 +21050,43 @@
     },
     {
       "id": "native.apple.69b54e24b90414dd",
-      "source": "OpenClaw \\(receipt.toVersion) and its Gateway are ready.",
-      "translated": "OpenClaw \\(receipt.toVersion) i jego Gateway są gotowe."
+      "source": "SteelEngine \\(receipt.toVersion) and its Gateway are ready.",
+      "translated": "SteelEngine \\(receipt.toVersion) i jego Gateway są gotowe."
     },
     {
       "id": "native.apple.f9d6fa6d7aaf23b6",
-      "source": "OpenClaw \\(receipt.toVersion) and its Mac node runtime are ready.",
-      "translated": "OpenClaw \\(receipt.toVersion) i jego środowisko uruchomieniowe węzła Mac są gotowe."
+      "source": "SteelEngine \\(receipt.toVersion) and its Mac node runtime are ready.",
+      "translated": "SteelEngine \\(receipt.toVersion) i jego środowisko uruchomieniowe węzła Mac są gotowe."
     },
     {
       "id": "native.apple.a3fa88f5fd3c2732",
-      "source": "Your agent could not be notified yet. OpenClaw will retry after the next app launch.",
-      "translated": "Nie udało się jeszcze powiadomić agenta. OpenClaw spróbuje ponownie po następnym uruchomieniu aplikacji."
+      "source": "Your agent could not be notified yet. SteelEngine will retry after the next app launch.",
+      "translated": "Nie udało się jeszcze powiadomić agenta. SteelEngine spróbuje ponownie po następnym uruchomieniu aplikacji."
     },
     {
       "id": "native.apple.e9020028ddab1ba6",
-      "source": "OpenClaw could not notify your agent automatically. The app and Gateway update are complete.",
-      "translated": "OpenClaw nie mógł automatycznie powiadomić agenta. Aktualizacja aplikacji i Gateway została ukończona."
+      "source": "SteelEngine could not notify your agent automatically. The app and Gateway update are complete.",
+      "translated": "SteelEngine nie mógł automatycznie powiadomić agenta. Aktualizacja aplikacji i Gateway została ukończona."
     },
     {
       "id": "native.apple.afc120cf0a96ea30",
-      "source": "OpenClaw could not notify your agent automatically. The app and Mac node update are complete.",
-      "translated": "OpenClaw nie mógł automatycznie powiadomić agenta. Aktualizacja aplikacji i węzła Mac została ukończona."
+      "source": "SteelEngine could not notify your agent automatically. The app and Mac node update are complete.",
+      "translated": "SteelEngine nie mógł automatycznie powiadomić agenta. Aktualizacja aplikacji i węzła Mac została ukończona."
     },
     {
       "id": "native.apple.71ad85442725f45c",
-      "source": "OpenClaw could not confirm the agent notification. It will not retry, to avoid a duplicate welcome.",
-      "translated": "OpenClaw nie mógł potwierdzić powiadomienia agenta. Nie ponowi próby, aby uniknąć powielenia wiadomości powitalnej."
+      "source": "SteelEngine could not confirm the agent notification. It will not retry, to avoid a duplicate welcome.",
+      "translated": "SteelEngine nie mógł potwierdzić powiadomienia agenta. Nie ponowi próby, aby uniknąć powielenia wiadomości powitalnej."
     },
     {
       "id": "native.apple.a3deea03e4870dd0",
-      "source": "The remote Gateway is older than this Mac app, so OpenClaw skipped the agent notification.",
-      "translated": "Zdalny Gateway jest starszy niż ta aplikacja na Maca, dlatego OpenClaw pominął powiadomienie agenta."
+      "source": "The remote Gateway is older than this Mac app, so SteelEngine skipped the agent notification.",
+      "translated": "Zdalny Gateway jest starszy niż ta aplikacja na Maca, dlatego SteelEngine pominął powiadomienie agenta."
     },
     {
       "id": "native.apple.3636a8b503ff00d2",
-      "source": "The Gateway remains paused, so OpenClaw did not wake your agent.",
-      "translated": "Gateway pozostaje wstrzymany, dlatego OpenClaw nie wybudził Twojego agenta."
+      "source": "The Gateway remains paused, so SteelEngine did not wake your agent.",
+      "translated": "Gateway pozostaje wstrzymany, dlatego SteelEngine nie wybudził Twojego agenta."
     },
     {
       "id": "native.apple.0f533623878f3d67",
@@ -21130,8 +21130,8 @@
     },
     {
       "id": "native.apple.9ac2dfa295929a92",
-      "source": "OpenClaw installed the update but could not verify the Gateway connection.",
-      "translated": "OpenClaw zainstalował aktualizację, ale nie mógł zweryfikować połączenia z Gateway."
+      "source": "SteelEngine installed the update but could not verify the Gateway connection.",
+      "translated": "SteelEngine zainstalował aktualizację, ale nie mógł zweryfikować połączenia z Gateway."
     },
     {
       "id": "native.apple.3abafcfb64b362fb",
@@ -21140,8 +21140,8 @@
     },
     {
       "id": "native.apple.00e3d2037782506c",
-      "source": "OpenClaw could not read the Gateway service ownership record. Retry after checking the Gateway LaunchAgent.",
-      "translated": "OpenClaw nie mógł odczytać informacji o właścicielu usługi Gateway. Spróbuj ponownie po sprawdzeniu LaunchAgent usługi Gateway."
+      "source": "SteelEngine could not read the Gateway service ownership record. Retry after checking the Gateway LaunchAgent.",
+      "translated": "SteelEngine nie mógł odczytać informacji o właścicielu usługi Gateway. Spróbuj ponownie po sprawdzeniu LaunchAgent usługi Gateway."
     },
     {
       "id": "native.apple.c4b8806a570dad31",
@@ -21150,8 +21150,8 @@
     },
     {
       "id": "native.apple.0483bf19d612560b",
-      "source": "OpenClaw could not read the node service ownership record. Retry after checking the node LaunchAgent.",
-      "translated": "OpenClaw nie mógł odczytać informacji o właścicielu usługi węzła. Spróbuj ponownie po sprawdzeniu LaunchAgent węzła."
+      "source": "SteelEngine could not read the node service ownership record. Retry after checking the node LaunchAgent.",
+      "translated": "SteelEngine nie mógł odczytać informacji o właścicielu usługi węzła. Spróbuj ponownie po sprawdzeniu LaunchAgent węzła."
     },
     {
       "id": "native.apple.d0f712a2ed470a3e",
@@ -21240,23 +21240,23 @@
     },
     {
       "id": "native.apple.b52cb4aae7ca6573",
-      "source": "Paste the token configured on the gateway host. On the gateway host, run `openclaw config get gateway.auth.token`. If the gateway uses an environment variable instead, use `OPENCLAW_GATEWAY_TOKEN`.",
-      "translated": "Paste the token configured on the gateway host. On the gateway host, run `openclaw config get gateway.auth.token`. If the gateway uses an environment variable instead, use `OPENCLAW_GATEWAY_TOKEN`."
+      "source": "Paste the token configured on the gateway host. On the gateway host, run `steelengine config get gateway.auth.token`. If the gateway uses an environment variable instead, use `STEELENGINE_GATEWAY_TOKEN`.",
+      "translated": "Paste the token configured on the gateway host. On the gateway host, run `steelengine config get gateway.auth.token`. If the gateway uses an environment variable instead, use `STEELENGINE_GATEWAY_TOKEN`."
     },
     {
       "id": "native.apple.bbb87d21ce8a291e",
-      "source": "Check `gateway.auth.token` or `OPENCLAW_GATEWAY_TOKEN` on the gateway host and try again.",
-      "translated": "Sprawdź `gateway.auth.token` lub `OPENCLAW_GATEWAY_TOKEN` na hoście gateway i spróbuj ponownie."
+      "source": "Check `gateway.auth.token` or `STEELENGINE_GATEWAY_TOKEN` on the gateway host and try again.",
+      "translated": "Sprawdź `gateway.auth.token` lub `STEELENGINE_GATEWAY_TOKEN` na hoście gateway i spróbuj ponownie."
     },
     {
       "id": "native.apple.c26f61d639591f81",
-      "source": "This gateway is set to token auth, but no `gateway.auth.token` is configured on the gateway host. If the gateway uses an environment variable instead, set `OPENCLAW_GATEWAY_TOKEN` before starting the gateway.",
-      "translated": "This gateway is set to token auth, but no `gateway.auth.token` is configured on the gateway host. If the gateway uses an environment variable instead, set `OPENCLAW_GATEWAY_TOKEN` before starting the gateway."
+      "source": "This gateway is set to token auth, but no `gateway.auth.token` is configured on the gateway host. If the gateway uses an environment variable instead, set `STEELENGINE_GATEWAY_TOKEN` before starting the gateway.",
+      "translated": "This gateway is set to token auth, but no `gateway.auth.token` is configured on the gateway host. If the gateway uses an environment variable instead, set `STEELENGINE_GATEWAY_TOKEN` before starting the gateway."
     },
     {
       "id": "native.apple.83145f8f53d7be34",
-      "source": "Scan or paste a fresh setup code from an already-paired OpenClaw client, then try again.",
-      "translated": "Zeskanuj lub wklej nowy kod konfiguracji z już sparowanego klienta OpenClaw, a następnie spróbuj ponownie."
+      "source": "Scan or paste a fresh setup code from an already-paired SteelEngine client, then try again.",
+      "translated": "Zeskanuj lub wklej nowy kod konfiguracji z już sparowanego klienta SteelEngine, a następnie spróbuj ponownie."
     },
     {
       "id": "native.apple.a8bf4f7ab4a35dc0",
@@ -21265,8 +21265,8 @@
     },
     {
       "id": "native.apple.52c0f97f0b3bb792",
-      "source": "Approve this device from an already-paired OpenClaw client. In your OpenClaw chat, run `/pair approve`, then click **Check connection** again.",
-      "translated": "Approve this device from an already-paired OpenClaw client. In your OpenClaw chat, run `/pair approve`, then click **Check connection** again."
+      "source": "Approve this device from an already-paired SteelEngine client. In your SteelEngine chat, run `/pair approve`, then click **Check connection** again.",
+      "translated": "Approve this device from an already-paired SteelEngine client. In your SteelEngine chat, run `/pair approve`, then click **Check connection** again."
     },
     {
       "id": "native.apple.e73170e4ab1dbe8f",
@@ -21275,8 +21275,8 @@
     },
     {
       "id": "native.apple.e3f983b8c517da29",
-      "source": "Gateway token mismatch. Check gateway.auth.token or OPENCLAW_GATEWAY_TOKEN on the gateway host.",
-      "translated": "Niezgodność tokena gateway. Sprawdź gateway.auth.token lub OPENCLAW_GATEWAY_TOKEN na hoście gateway."
+      "source": "Gateway token mismatch. Check gateway.auth.token or STEELENGINE_GATEWAY_TOKEN on the gateway host.",
+      "translated": "Niezgodność tokena gateway. Sprawdź gateway.auth.token lub STEELENGINE_GATEWAY_TOKEN na hoście gateway."
     },
     {
       "id": "native.apple.cd96754a96e5aa35",
@@ -21295,8 +21295,8 @@
     },
     {
       "id": "native.apple.3e5a2b2a24f73418",
-      "source": "Pairing required. In an already-paired OpenClaw client, run /pair approve, then check the connection again.",
-      "translated": "Pairing required. In an already-paired OpenClaw client, run /pair approve, then check the connection again."
+      "source": "Pairing required. In an already-paired SteelEngine client, run /pair approve, then check the connection again.",
+      "translated": "Pairing required. In an already-paired SteelEngine client, run /pair approve, then check the connection again."
     },
     {
       "id": "native.apple.58e76e9c8b04290a",
@@ -21340,48 +21340,48 @@
     },
     {
       "id": "native.apple.2d7556d00f123112",
-      "source": "OpenClaw needs notification permission to show alerts for agent actions.",
-      "translated": "OpenClaw potrzebuje uprawnienia do powiadomień, aby wyświetlać alerty dotyczące działań agenta."
+      "source": "SteelEngine needs notification permission to show alerts for agent actions.",
+      "translated": "SteelEngine potrzebuje uprawnienia do powiadomień, aby wyświetlać alerty dotyczące działań agenta."
     },
     {
       "id": "native.apple.d9e7be03543b508f",
-      "source": "OpenClaw captures the screen when the agent needs screenshots for context.",
-      "translated": "OpenClaw przechwytuje ekran, gdy agent potrzebuje zrzutów ekranu jako kontekstu."
+      "source": "SteelEngine captures the screen when the agent needs screenshots for context.",
+      "translated": "SteelEngine przechwytuje ekran, gdy agent potrzebuje zrzutów ekranu jako kontekstu."
     },
     {
       "id": "native.apple.eca927767423799c",
-      "source": "OpenClaw can capture photos or short video clips when requested by the agent.",
-      "translated": "OpenClaw może przechwytywać zdjęcia lub krótkie klipy wideo na żądanie agenta."
+      "source": "SteelEngine can capture photos or short video clips when requested by the agent.",
+      "translated": "SteelEngine może przechwytywać zdjęcia lub krótkie klipy wideo na żądanie agenta."
     },
     {
       "id": "native.apple.9389d1100944a1fd",
-      "source": "OpenClaw can share your location when requested by the agent.",
-      "translated": "OpenClaw może udostępniać Twoją lokalizację na żądanie agenta."
+      "source": "SteelEngine can share your location when requested by the agent.",
+      "translated": "SteelEngine może udostępniać Twoją lokalizację na żądanie agenta."
     },
     {
       "id": "native.apple.59da76aed1cb07ee",
-      "source": "OpenClaw uses the local network to connect to your remote OpenClaw gateway over LAN, Tailnet, or SSH.",
-      "translated": "OpenClaw używa sieci lokalnej do łączenia się ze zdalnym gateway OpenClaw przez LAN, Tailnet lub SSH."
+      "source": "SteelEngine uses the local network to connect to your remote SteelEngine gateway over LAN, Tailnet, or SSH.",
+      "translated": "SteelEngine używa sieci lokalnej do łączenia się ze zdalnym gateway SteelEngine przez LAN, Tailnet lub SSH."
     },
     {
       "id": "native.apple.5db9a976fd1c7fcb",
-      "source": "OpenClaw needs the mic for Voice Wake tests and agent audio capture.",
-      "translated": "OpenClaw potrzebuje mikrofonu do testów Voice Wake i przechwytywania dźwięku przez agenta."
+      "source": "SteelEngine needs the mic for Voice Wake tests and agent audio capture.",
+      "translated": "SteelEngine potrzebuje mikrofonu do testów Voice Wake i przechwytywania dźwięku przez agenta."
     },
     {
       "id": "native.apple.b7aba524ef867e7f",
-      "source": "OpenClaw uses speech recognition to detect your Voice Wake trigger phrase.",
-      "translated": "OpenClaw używa rozpoznawania mowy do wykrywania frazy wyzwalającej Voice Wake."
+      "source": "SteelEngine uses speech recognition to detect your Voice Wake trigger phrase.",
+      "translated": "SteelEngine używa rozpoznawania mowy do wykrywania frazy wyzwalającej Voice Wake."
     },
     {
       "id": "native.apple.2d5411b5cc54a93e",
-      "source": "OpenClaw needs Automation (AppleScript) permission to drive Terminal and other apps for agent actions.",
-      "translated": "OpenClaw potrzebuje uprawnienia Automatyzacja (AppleScript), aby sterować Terminalem i innymi aplikacjami na potrzeby działań agenta."
+      "source": "SteelEngine needs Automation (AppleScript) permission to drive Terminal and other apps for agent actions.",
+      "translated": "SteelEngine potrzebuje uprawnienia Automatyzacja (AppleScript), aby sterować Terminalem i innymi aplikacjami na potrzeby działań agenta."
     },
     {
       "id": "native.apple.e16fc45de0f2bb86",
-      "source": "OpenClaw can access Reminders when requested by the agent for the apple-reminders skill.",
-      "translated": "OpenClaw może uzyskiwać dostęp do Przypomnień na żądanie agenta dla umiejętności apple-reminders."
+      "source": "SteelEngine can access Reminders when requested by the agent for the apple-reminders skill.",
+      "translated": "SteelEngine może uzyskiwać dostęp do Przypomnień na żądanie agenta dla umiejętności apple-reminders."
     },
     {
       "id": "native.apple.6f7c6ef00a40a571",
@@ -21520,8 +21520,8 @@
     },
     {
       "id": "native.apple.59bed721dff1a25f",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.apple.04b9c8402f19b8ce",
@@ -21770,8 +21770,8 @@
     },
     {
       "id": "native.apple.d769a8ac65441d48",
-      "source": "Saved to openclaw.json under skills.entries.\\(self.editor.skillKey)",
-      "translated": "Zapisano w openclaw.json w skills.entries.\\(self.editor.skillKey)"
+      "source": "Saved to steelengine.json under skills.entries.\\(self.editor.skillKey)",
+      "translated": "Zapisano w steelengine.json w skills.entries.\\(self.editor.skillKey)"
     },
     {
       "id": "native.apple.af47aadb262d225d",
@@ -21810,8 +21810,8 @@
     },
     {
       "id": "native.apple.4b27b3be5f3f1f66",
-      "source": "OpenClaw",
-      "translated": "OpenClaw"
+      "source": "SteelEngine",
+      "translated": "SteelEngine"
     },
     {
       "id": "native.apple.9427da914cdbfbf3",
@@ -22160,8 +22160,8 @@
     },
     {
       "id": "native.apple.800bb607f45c05e4",
-      "source": "Stored in ~/.openclaw/openclaw.json. Prefer OPENCLAW_GATEWAY_PASSWORD for production.",
-      "translated": "Przechowywane w ~/.openclaw/openclaw.json. W środowisku produkcyjnym preferuj OPENCLAW_GATEWAY_PASSWORD."
+      "source": "Stored in ~/.steelengine/steelengine.json. Prefer STEELENGINE_GATEWAY_PASSWORD for production.",
+      "translated": "Przechowywane w ~/.steelengine/steelengine.json. W środowisku produkcyjnym preferuj STEELENGINE_GATEWAY_PASSWORD."
     },
     {
       "id": "native.apple.3942d43ca047de29",
@@ -22440,8 +22440,8 @@
     },
     {
       "id": "native.apple.237e9371a693b0ff",
-      "source": "OpenClaw reacts when any trigger appears in a transcription. Keep phrases short to avoid false positives.",
-      "translated": "OpenClaw reaguje, gdy w transkrypcji pojawi się dowolny wyzwalacz. Używaj krótkich fraz, aby uniknąć fałszywych wykryć."
+      "source": "SteelEngine reacts when any trigger appears in a transcription. Keep phrases short to avoid false positives.",
+      "translated": "SteelEngine reaguje, gdy w transkrypcji pojawi się dowolny wyzwalacz. Używaj krótkich fraz, aby uniknąć fałszywych wykryć."
     },
     {
       "id": "native.apple.2bcc6f4eca98f7f2",
@@ -22525,13 +22525,13 @@
     },
     {
       "id": "native.apple.448dfe21a7f3a883",
-      "source": "Check OpenClaw status",
-      "translated": "Sprawdź stan OpenClaw"
+      "source": "Check SteelEngine status",
+      "translated": "Sprawdź stan SteelEngine"
     },
     {
       "id": "native.apple.00f4977e0123ce7a",
-      "source": "Summarize the current OpenClaw status and tell me what needs attention.",
-      "translated": "Podsumuj bieżący stan OpenClaw i powiedz mi, co wymaga uwagi."
+      "source": "Summarize the current SteelEngine status and tell me what needs attention.",
+      "translated": "Podsumuj bieżący stan SteelEngine i powiedz mi, co wymaga uwagi."
     },
     {
       "id": "native.apple.9c1a9be47ac92727",
@@ -23705,8 +23705,8 @@
     },
     {
       "id": "native.apple.1823d7bddaa73a1a",
-      "source": "OpenClaw could not read the gateway certificate for %@.",
-      "translated": "OpenClaw nie mógł odczytać certyfikatu Gateway dla %@."
+      "source": "SteelEngine could not read the gateway certificate for %@.",
+      "translated": "SteelEngine nie mógł odczytać certyfikatu Gateway dla %@."
     },
     {
       "id": "native.apple.b737f84578f558eb",

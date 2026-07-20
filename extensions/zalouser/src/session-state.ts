@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 import os from "node:os";
 import path from "node:path";
-import type { PluginStateSyncKeyedStore } from "openclaw/plugin-sdk/plugin-state-runtime";
-import { resolveStateDir } from "openclaw/plugin-sdk/state-paths";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+import type { PluginStateSyncKeyedStore } from "steelengine/plugin-sdk/plugin-state-runtime";
+import { resolveStateDir } from "steelengine/plugin-sdk/state-paths";
+import { normalizeLowercaseStringOrEmpty } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { getZalouserRuntime } from "./runtime.js";
 import type { Credentials } from "./zca-client.js";
 

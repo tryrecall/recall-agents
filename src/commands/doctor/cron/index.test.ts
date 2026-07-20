@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../../config/config.js";
+import type { SteelEngineConfig } from "../../../config/config.js";
 import {
   loadCronJobsStoreWithConfigJobs,
   loadCronQuarantineFile,
@@ -14,7 +14,7 @@ import {
 } from "../../../cron/store.js";
 import { cronStoreKey } from "../../../cron/store/key.js";
 import { readCronTaskRunHistoryPage } from "../../../cron/task-run-history.js";
-import { runOpenClawStateWriteTransaction } from "../../../state/openclaw-state-db.js";
+import { runSteelEngineStateWriteTransaction } from "../../../state/steelengine-state-db.js";
 import { withRestoredMocks } from "../../../test-utils/vitest-spies.js";
 import {
   collectLegacyCronStoreHealthFindings,
@@ -34,7 +34,7 @@ vi.mock("../../../../packages/terminal-core/src/note.js", () => ({
 let tempRoot: string | null = null;
 
 async function makeTempStorePath() {
-  tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-doctor-cron-"));
+  tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-doctor-cron-"));
   return path.join(tempRoot, "cron", "jobs.json");
 }
 
@@ -53,7 +53,7 @@ function makePrompter(confirmResult = true) {
   };
 }
 
-function createCronConfig(storePath: string): OpenClawConfig {
+function createCronConfig(storePath: string): SteelEngineConfig {
   return {
     cron: {
       store: storePath,
@@ -128,7 +128,7 @@ function insertEarlySQLiteCronRow(
 ) {
   const schedule = requireRecord(job.schedule, "cron schedule");
   const payload = requireRecord(job.payload, "cron payload");
-  runOpenClawStateWriteTransaction(({ db }) => {
+  runSteelEngineStateWriteTransaction(({ db }) => {
     db.prepare(
       `INSERT INTO cron_jobs (
         store_key, job_id, name, enabled, created_at_ms, updated_at,
@@ -503,7 +503,7 @@ describe("maybeRepairLegacyCronStore", () => {
       expectNoteContaining("1 cron job is still marked in-flight", "Cron");
       expectNoteContaining("shows it as `running`", "Cron");
       expectNoteContaining("marks such runs interrupted the next time it starts", "Cron");
-      expectNoteContaining("openclaw cron show <id>", "Cron");
+      expectNoteContaining("steelengine cron show <id>", "Cron");
 
       // Observer-only: no repair prompt and the running marker is left untouched.
       expect(prompter.confirm).not.toHaveBeenCalled();
@@ -565,7 +565,7 @@ describe("maybeRepairLegacyCronStore", () => {
       expectNoteContaining("re-fires it on error backoff", "Cron");
       expectNoteContaining("resets on the next successful run", "Cron");
       expectNoteContaining("interrupted by a gateway restart", "Cron");
-      expectNoteContaining("openclaw cron show <id>", "Cron");
+      expectNoteContaining("steelengine cron show <id>", "Cron");
 
       // Observer-only: no repair prompt and the failure counters stay untouched.
       expect(prompter.confirm).not.toHaveBeenCalled();
@@ -1457,7 +1457,7 @@ describe("maybeRepairLegacyCronStore", () => {
     expectNoteContaining("Shell prompt job 1", "Cron");
     expectNoteContaining("Shell prompt job 2", "Cron");
     expectNoteContaining("Shell prompt job 3", "Cron");
-    expectNoNoteContaining("openclaw doctor --fix", "Cron");
+    expectNoNoteContaining("steelengine doctor --fix", "Cron");
     expectNoNoteContaining("jobs.json", "Cron");
     expect(prompter.confirm).not.toHaveBeenCalled();
 
@@ -1499,7 +1499,7 @@ describe("maybeRepairLegacyCronStore", () => {
         message: [
           "Command to run:",
           "- command: python3 scripts/check_mail.py",
-          "- workdir: /home/openclaw/.razor/clawd",
+          "- workdir: /home/steelengine/.razor/clawd",
         ].join("\n"),
         toolsAllow: ["read", "message"],
       },
@@ -1523,7 +1523,7 @@ describe("maybeRepairLegacyCronStore", () => {
     expectNoteContaining("Recreate the job as a command cron job", "Cron");
     expectNoNoteContaining("informational only", "Cron");
     expectNoNoteContaining("keep running as-is", "Cron");
-    expectNoNoteContaining("openclaw doctor --fix", "Cron");
+    expectNoNoteContaining("steelengine doctor --fix", "Cron");
     expect(prompter.confirm).not.toHaveBeenCalled();
 
     const job = requirePersistedJob(await readPersistedJobs(storePath), 0);
@@ -1795,7 +1795,7 @@ describe("maybeRepairLegacyCronStore", () => {
       }),
     ]);
 
-    const cfg = { cron: { store: storePath } } as OpenClawConfig;
+    const cfg = { cron: { store: storePath } } as SteelEngineConfig;
     await maybeRepairLegacyCronStore({
       cfg,
       options: {},
@@ -1833,7 +1833,7 @@ describe("maybeRepairLegacyCronStore", () => {
       }),
     ]);
 
-    const cfg = { cron: { store: storePath } } as OpenClawConfig;
+    const cfg = { cron: { store: storePath } } as SteelEngineConfig;
     await maybeRepairLegacyCronStore({
       cfg,
       options: {},
@@ -1928,7 +1928,7 @@ describe("maybeRepairLegacyCronStore", () => {
         wakeMode: "now",
         payload: {
           kind: "systemEvent",
-          text: "__openclaw_memory_core_short_term_promotion_dream__",
+          text: "__steelengine_memory_core_short_term_promotion_dream__",
         },
         state: {},
       },
@@ -1945,7 +1945,7 @@ describe("maybeRepairLegacyCronStore", () => {
     expect(job.sessionTarget).toBe("isolated");
     const payload = requireRecord(job.payload, "cron payload");
     expect(payload.kind).toBe("agentTurn");
-    expect(payload.message).toBe("__openclaw_memory_core_short_term_promotion_dream__");
+    expect(payload.message).toBe("__steelengine_memory_core_short_term_promotion_dream__");
     expect(payload.lightContext).toBe(true);
     const delivery = requireRecord(job.delivery, "cron delivery");
     expect(delivery.mode).toBe("none");
@@ -1984,7 +1984,7 @@ describe("legacy WhatsApp crontab health check", () => {
       readCrontab: async () => ({
         stdout: [
           "# keep comments ignored",
-          "*/5 * * * * ~/.openclaw/bin/ensure-whatsapp.sh >> ~/.openclaw/logs/whatsapp-health.log 2>&1",
+          "*/5 * * * * ~/.steelengine/bin/ensure-whatsapp.sh >> ~/.steelengine/logs/whatsapp-health.log 2>&1",
           "0 9 * * * /usr/bin/true",
           "",
         ].join("\n"),
@@ -2002,7 +2002,7 @@ describe("legacy WhatsApp crontab health check", () => {
       readCrontab: async () => ({
         stdout: [
           "# keep comments ignored",
-          "*/5 * * * * ~/.openclaw/bin/ensure-whatsapp.sh >> ~/.openclaw/logs/whatsapp-health.log 2>&1",
+          "*/5 * * * * ~/.steelengine/bin/ensure-whatsapp.sh >> ~/.steelengine/logs/whatsapp-health.log 2>&1",
           "0 9 * * * /usr/bin/true",
           "",
         ].join("\n"),
@@ -2052,7 +2052,7 @@ describe("legacy WhatsApp crontab health check", () => {
       noteLegacyWhatsAppCrontabHealthCheck({
         platform: "linux",
         readCrontab: async () => ({
-          stdout: { lines: ["*/5 * * * * ~/.openclaw/bin/ensure-whatsapp.sh"] },
+          stdout: { lines: ["*/5 * * * * ~/.steelengine/bin/ensure-whatsapp.sh"] },
         }),
       }),
     ).resolves.toBeUndefined();

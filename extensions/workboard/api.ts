@@ -1,6 +1,6 @@
 // Workboard API module exposes the plugin public contract.
 export {
   definePluginEntry,
-  type OpenClawPluginApi,
-  type OpenClawPluginService,
-} from "openclaw/plugin-sdk/plugin-entry";
+  type SteelEnginePluginApi,
+  type SteelEnginePluginService,
+} from "steelengine/plugin-sdk/plugin-entry";

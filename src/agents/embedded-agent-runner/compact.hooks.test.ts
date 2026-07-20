@@ -1,7 +1,7 @@
 // Hook integration coverage for direct and queued embedded compaction.
 
-import { expectDefined } from "@openclaw/normalization-core";
-import type { AgentMessage } from "openclaw/plugin-sdk/agent-core";
+import { expectDefined } from "@steelengine/normalization-core";
+import type { AgentMessage } from "steelengine/plugin-sdk/agent-core";
 import { beforeAll, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import { createReplyOperation } from "../../auto-reply/reply/reply-run-registry.js";
 import {
@@ -14,7 +14,7 @@ import {
   compactWithSafetyTimeoutMock,
   createAgentSessionMock,
   createPreparedEmbeddedAgentSettingsManagerMock,
-  createOpenClawCodingToolsMock,
+  createSteelEngineCodingToolsMock,
   enqueueCommandInLaneMock,
   ensureAuthProfileStoreMock,
   ensureRuntimePluginsLoaded,
@@ -451,7 +451,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
     expectRecordFields(fallbackPlanCall[0], {
       provider: "anthropic",
       modelId: "claude-fallback",
-      harnessId: "openclaw",
+      harnessId: "steelengine",
       modelRoute: undefined,
     });
   });
@@ -552,7 +552,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
           auth: { order: { openai: ["openai:subscription", "openai:platform"] } },
           agents: {
             defaults: {
-              models: { "openai/gpt-5.5": { agentRuntime: { id: "openclaw" } } },
+              models: { "openai/gpt-5.5": { agentRuntime: { id: "steelengine" } } },
             },
           },
         },
@@ -622,7 +622,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
           },
           agents: {
             defaults: {
-              models: { "openai/gpt-5.5": { agentRuntime: { id: "openclaw" } } },
+              models: { "openai/gpt-5.5": { agentRuntime: { id: "steelengine" } } },
             },
           },
         },
@@ -670,8 +670,8 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
       runAttempt: vi.fn(),
     } as never);
     selectAgentHarnessForPreparedModelProvidersMock.mockReturnValue({
-      id: "openclaw",
-      label: "OpenClaw test harness",
+      id: "steelengine",
+      label: "SteelEngine test harness",
       supports: () => ({ supported: true }),
       runAttempt: vi.fn(),
     } as never);
@@ -683,7 +683,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
     expect(result.ok).toBe(true);
     expect(selectAgentHarnessForPreparedModelProvidersMock).toHaveBeenCalledTimes(2);
     expect(buildAgentRuntimePlanMock).toHaveBeenCalledWith(
-      expect.objectContaining({ harnessId: "openclaw", harnessRuntime: "openclaw" }),
+      expect.objectContaining({ harnessId: "steelengine", harnessRuntime: "steelengine" }),
     );
   });
 
@@ -970,7 +970,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
       senderE164: "+15551234567",
     });
 
-    expectRecordFields(mockCallArg(createOpenClawCodingToolsMock), {
+    expectRecordFields(mockCallArg(createSteelEngineCodingToolsMock), {
       senderId: "sender-1",
       senderName: "Alice",
       senderUsername: "alice_u",
@@ -992,7 +992,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
         workspaceDir: "/tmp/workspace",
       });
 
-      expectRecordFields(mockCallArg(createOpenClawCodingToolsMock), { modelHasVision });
+      expectRecordFields(mockCallArg(createSteelEngineCodingToolsMock), { modelHasVision });
     },
   );
 
@@ -1004,7 +1004,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
       cwd: "/tmp/task-repo",
     });
 
-    expectRecordFields(mockCallArg(createOpenClawCodingToolsMock), {
+    expectRecordFields(mockCallArg(createSteelEngineCodingToolsMock), {
       cwd: "/tmp/task-repo",
       workspaceDir: "/tmp/workspace",
       spawnWorkspaceDir: "/tmp/workspace",
@@ -1023,7 +1023,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
       contextTokenBudget: 64_000,
     });
 
-    expectRecordFields(mockCallArg(createOpenClawCodingToolsMock), {
+    expectRecordFields(mockCallArg(createSteelEngineCodingToolsMock), {
       modelContextWindowTokens: 64_000,
     });
     expectRecordFields(mockCallArg(guardSessionManagerMock, 0, 1), {
@@ -1046,7 +1046,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
       workspaceDir: "/tmp/workspace",
     });
 
-    expect(createOpenClawCodingToolsMock).not.toHaveBeenCalled();
+    expect(createSteelEngineCodingToolsMock).not.toHaveBeenCalled();
   });
 
   it("quarantines unsupported tool schemas before creating the compaction model session", async () => {
@@ -1060,7 +1060,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
       authStorage: { setRuntimeApiKey: vi.fn() },
       modelRegistry: {},
     });
-    createOpenClawCodingToolsMock.mockReturnValueOnce([
+    createSteelEngineCodingToolsMock.mockReturnValueOnce([
       {
         name: "healthy_lookup",
         label: "Healthy Lookup",
@@ -1102,7 +1102,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
       contextTokenBudget: 64_000,
     });
 
-    expectRecordFields(mockCallArg(createOpenClawCodingToolsMock), {
+    expectRecordFields(mockCallArg(createSteelEngineCodingToolsMock), {
       modelContextWindowTokens: 32_000,
     });
   });
@@ -1163,7 +1163,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
     }
   });
 
-  it("keeps model-locked OpenClaw compaction on its exact model without fallbacks", async () => {
+  it("keeps model-locked SteelEngine compaction on its exact model without fallbacks", async () => {
     sessionCompactImpl.mockRejectedValueOnce(
       Object.assign(new Error("primary compaction rate limited"), { status: 429 }),
     );
@@ -1175,7 +1175,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
       workspaceDir: "/tmp/workspace",
       provider: "openai",
       model: "gpt-primary",
-      agentHarnessId: "openclaw",
+      agentHarnessId: "steelengine",
       modelSelectionLocked: true,
       modelFallbacksOverride: ["anthropic/claude-fallback"],
       config: {
@@ -1198,7 +1198,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
   });
 
   it("revalidates immutable Ultra for each compaction fallback candidate", async () => {
-    resolveAgentHarnessPolicyMock.mockReturnValue({ runtime: "openclaw" });
+    resolveAgentHarnessPolicyMock.mockReturnValue({ runtime: "steelengine" });
     sessionCompactImpl
       .mockRejectedValueOnce(
         Object.assign(new Error("primary compaction rate limited"), {
@@ -1226,7 +1226,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
         agents: {
           defaults: {
             models: {
-              "openai/gpt-5.6-sol": { agentRuntime: { id: "openclaw" } },
+              "openai/gpt-5.6-sol": { agentRuntime: { id: "steelengine" } },
             },
           },
         },
@@ -1322,7 +1322,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
       runtimeSource: "implicit",
     } as never);
     // Only ChatGPT OAuth is available — no API-key profile. Auth-aware
-    // selection must pick codex (harness-owned) instead of forced openclaw.
+    // selection must pick codex (harness-owned) instead of forced steelengine.
     ensureAuthProfileStoreMock.mockReturnValue({
       version: 1,
       profiles: {
@@ -1472,7 +1472,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
         modelProviders: expect.arrayContaining([
           expect.objectContaining({
             preparedAuth: expect.objectContaining({ source: "profile" }),
-            runtimePolicy: expect.objectContaining({ compatibleIds: ["openclaw", "codex"] }),
+            runtimePolicy: expect.objectContaining({ compatibleIds: ["steelengine", "codex"] }),
           }),
         ]),
       }),
@@ -1484,8 +1484,8 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
     });
   });
 
-  it("preserves direct OpenAI API-key compaction when OpenClaw runtime is active", async () => {
-    resolveAgentHarnessPolicyMock.mockReturnValue({ runtime: "openclaw" });
+  it("preserves direct OpenAI API-key compaction when SteelEngine runtime is active", async () => {
+    resolveAgentHarnessPolicyMock.mockReturnValue({ runtime: "steelengine" });
 
     const result = await compactEmbeddedAgentSessionDirect({
       sessionId: "session-1",
@@ -1506,7 +1506,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
             openai: { models: [{ id: "gpt-5.5", contextWindow: 1_000_000 }] },
           },
         },
-        agents: { defaults: { embeddedHarness: { runtime: "openclaw" } } },
+        agents: { defaults: { embeddedHarness: { runtime: "steelengine" } } },
       } as never,
     });
 
@@ -1585,7 +1585,7 @@ describe("compactEmbeddedAgentSessionDirect hooks", () => {
   });
 
   it("materializes subscription-auth OpenAI compaction while preserving logical context", async () => {
-    resolveAgentHarnessPolicyMock.mockReturnValue({ runtime: "openclaw" });
+    resolveAgentHarnessPolicyMock.mockReturnValue({ runtime: "steelengine" });
     mockResolvedModel({ contextWindow: 1_000_000 });
     ensureAuthProfileStoreMock.mockReturnValue({
       version: 1,
@@ -2955,7 +2955,7 @@ describe("compactEmbeddedAgentSession hooks (ownsCompaction engine)", () => {
           },
           agents: {
             defaults: {
-              models: { "openai/gpt-5.5": { agentRuntime: { id: "openclaw" } } },
+              models: { "openai/gpt-5.5": { agentRuntime: { id: "steelengine" } } },
             },
           },
         },
@@ -3063,7 +3063,7 @@ describe("compactEmbeddedAgentSession hooks (ownsCompaction engine)", () => {
     );
   });
 
-  it("preserves concrete OpenClaw pins over explicit Codex policy for queued compaction", async () => {
+  it("preserves concrete SteelEngine pins over explicit Codex policy for queued compaction", async () => {
     resolveAgentHarnessPolicyMock.mockReturnValue({
       runtime: "codex",
       runtimeSource: "model",
@@ -3082,7 +3082,7 @@ describe("compactEmbeddedAgentSession hooks (ownsCompaction engine)", () => {
       wrappedCompactionArgs({
         provider: "openai",
         model: "gpt-5.5",
-        agentHarnessId: "openclaw",
+        agentHarnessId: "steelengine",
         config: {
           models: {
             providers: {
@@ -3264,7 +3264,7 @@ describe("compactEmbeddedAgentSession hooks (ownsCompaction engine)", () => {
         modelProviders: expect.arrayContaining([
           expect.objectContaining({
             preparedAuth: expect.objectContaining({ source: "harness" }),
-            runtimePolicy: expect.objectContaining({ compatibleIds: ["openclaw", "codex"] }),
+            runtimePolicy: expect.objectContaining({ compatibleIds: ["steelengine", "codex"] }),
           }),
         ]),
       }),
@@ -3383,9 +3383,9 @@ describe("compactEmbeddedAgentSession hooks (ownsCompaction engine)", () => {
     );
   });
 
-  it("keeps unbound api-key queued compaction on openclaw without native harness compaction", async () => {
+  it("keeps unbound api-key queued compaction on steelengine without native harness compaction", async () => {
     resolveAgentHarnessPolicyMock.mockReturnValue({
-      runtime: "openclaw",
+      runtime: "steelengine",
       runtimeSource: "implicit",
     } as never);
 
@@ -3412,13 +3412,13 @@ describe("compactEmbeddedAgentSession hooks (ownsCompaction engine)", () => {
       }),
     );
     expect(selectAgentHarnessMock.mock.results[0]?.value).toEqual(
-      expect.objectContaining({ id: "openclaw" }),
+      expect.objectContaining({ id: "steelengine" }),
     );
   });
 
   it("resolves reusable queued direct auth without a stored profile", async () => {
     resolveAgentHarnessPolicyMock.mockReturnValue({
-      runtime: "openclaw",
+      runtime: "steelengine",
       runtimeSource: "implicit",
     } as never);
 
@@ -3527,7 +3527,7 @@ describe("compactEmbeddedAgentSession hooks (ownsCompaction engine)", () => {
 
   it("keeps queued custom OpenAI Responses compaction embedded without a harness binding", async () => {
     resolveAgentHarnessPolicyMock.mockReturnValue({
-      runtime: "openclaw",
+      runtime: "steelengine",
       runtimeSource: "implicit",
     } as never);
 
@@ -3643,7 +3643,7 @@ describe("compactEmbeddedAgentSession hooks (ownsCompaction engine)", () => {
   ])(
     "fails model-locked Codex compaction on %s without a context-engine fallback",
     async (failureReason, reason) => {
-      resolveAgentHarnessPolicyMock.mockReturnValue({ runtime: "openclaw" });
+      resolveAgentHarnessPolicyMock.mockReturnValue({ runtime: "steelengine" });
       maybeCompactAgentHarnessSessionMock.mockResolvedValueOnce({
         ok: false,
         compacted: false,

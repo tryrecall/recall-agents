@@ -4,18 +4,18 @@
 import {
   getCachedLiveProviderModelRows,
   LiveModelCatalogHttpError,
-} from "openclaw/plugin-sdk/provider-catalog-live-runtime";
-import { buildManifestModelProviderConfig } from "openclaw/plugin-sdk/provider-catalog-shared";
-import type { ModelDefinitionConfig } from "openclaw/plugin-sdk/provider-model-shared";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/runtime-env";
-import { ssrfPolicyFromHttpBaseUrlAllowedHostname } from "openclaw/plugin-sdk/ssrf-runtime";
+} from "steelengine/plugin-sdk/provider-catalog-live-runtime";
+import { buildManifestModelProviderConfig } from "steelengine/plugin-sdk/provider-catalog-shared";
+import type { ModelDefinitionConfig } from "steelengine/plugin-sdk/provider-model-shared";
+import { createSubsystemLogger } from "steelengine/plugin-sdk/runtime-env";
+import { ssrfPolicyFromHttpBaseUrlAllowedHostname } from "steelengine/plugin-sdk/ssrf-runtime";
 import {
   asPositiveSafeInteger,
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 import { isChutesModelDiscoveryTestEnvironment } from "./model-discovery-env.js";
-import manifest from "./openclaw.plugin.json" with { type: "json" };
+import manifest from "./steelengine.plugin.json" with { type: "json" };
 
 const log = createSubsystemLogger("chutes-models");
 

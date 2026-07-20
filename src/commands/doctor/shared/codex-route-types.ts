@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../../config/types.steelengine.js";
 
 export type MutableRecord = Record<string, unknown>;
 
@@ -46,7 +46,7 @@ export type DisabledCodexPluginRouteIssue = {
 export type SharedDefaultCompactionOverrideConsumers = Record<CompactionOverrideKey, boolean>;
 
 export type ConfigRouteRepairResult = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   changes: CodexRouteHit[];
   runtimePinChanges: string[];
   runtimePolicyChanges: string[];

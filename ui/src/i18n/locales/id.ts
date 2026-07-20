@@ -277,14 +277,14 @@ export const id: TranslationMap = {
     genericSubtitle: "Terjadi kesalahan saat memuat panel ini.",
     staleTitle: "Versi baru tersedia",
     staleSubtitle:
-      "OpenClaw telah diperbarui di latar belakang. Muat ulang untuk mendapatkan panel terbaru.",
+      "SteelEngine telah diperbarui di latar belakang. Muat ulang untuk mendapatkan panel terbaru.",
     retry: "Coba lagi",
   },
   nodes: {
     pairing: {
       button: "Pasangkan perangkat seluler",
       adminRequired: "Akses administrator diperlukan untuk membuat kode penyiapan.",
-      title: "OpenClaw seluler",
+      title: "SteelEngine seluler",
       subtitle: "Pindai kode QR ini di aplikasi seluler untuk menghubungkan ponsel baru.",
       generating: "Membuat kode penyiapan yang aman…",
       accessTitle: "Akses seluler",
@@ -297,14 +297,14 @@ export const id: TranslationMap = {
       transportLimitedHint:
         "URL Gateway ini menggunakan ws:// tanpa enkripsi. Gunakan wss:// atau Tailscale Serve, lalu buat kode baru untuk akses penuh.",
       failed: "Tidak dapat membuat kode penyiapan.",
-      qrAlt: "Kode QR pemasangan OpenClaw seluler",
+      qrAlt: "Kode QR pemasangan SteelEngine seluler",
       qrUnavailable: "QR tidak tersedia. Salin kode penyiapan sebagai gantinya.",
       copySetupCode: "Salin kode penyiapan",
       newCode: "Kode baru",
       showSetupCode: "Tampilkan kode penyiapan",
       pending: "Permintaan perangkat yang menunggu peninjauan: {count}",
       review: "Tinjau",
-      waiting: "Aplikasi seluler resmi OpenClaw terhubung otomatis setelah dipindai.",
+      waiting: "Aplikasi seluler resmi SteelEngine terhubung otomatis setelah dipindai.",
       help: "Bantuan pemasangan",
       manageDevices: "Kelola perangkat",
     },
@@ -449,11 +449,11 @@ export const id: TranslationMap = {
     ownerSession: "Sesi",
     ownerWorkboard: "Workboard",
     title: "Worktree Terkelola",
-    subtitle: "Checkout repositori terisolasi yang dimiliki oleh OpenClaw.",
+    subtitle: "Checkout repositori terisolasi yang dimiliki oleh SteelEngine.",
     cleanNow: "Bersihkan sekarang",
     cleanupTitle: "Pembersihan",
     cleanupSubtitle:
-      "OpenClaw secara berkala menghapus worktree lama untuk mengosongkan ruang disk. Atur seberapa agresif pembersihan dijalankan.",
+      "SteelEngine secara berkala menghapus worktree lama untuk mengosongkan ruang disk. Atur seberapa agresif pembersihan dijalankan.",
     cleanupMaxCount: "Worktree maksimum",
     cleanupMaxCountHelp:
       "Jumlah maksimum worktree terkelola yang dipertahankan di seluruh repositori. Worktree yang lebih lama dibuatkan snapshot dan dihapus terlebih dahulu. Atur ke 0 untuk menonaktifkan batas jumlah.",
@@ -503,7 +503,7 @@ export const id: TranslationMap = {
     cloudWorker: "Cloud · {profile}",
     cloudWorkerProvider: "Penyedia worker cloud: {provider}",
     cloudRequiresWorktree: "Worker cloud memerlukan worktree terkelola",
-    cloudRequiresOpenClawRuntime: "Worker cloud memerlukan runtime OpenClaw; {runtime} dipilih.",
+    cloudRequiresSteelEngineRuntime: "Worker cloud memerlukan runtime SteelEngine; {runtime} dipilih.",
     cloudSecureContextRequired:
       "Worker cloud memerlukan konteks browser yang aman agar pemulihan dapat melindungi tugas Anda.",
     cloudStartFailed: "Sesi dibuat secara lokal, tetapi proses memulai cloud gagal: {error}",
@@ -1303,7 +1303,7 @@ export const id: TranslationMap = {
     autoSaveFailed: "Gagal menyimpan",
     autoSaveConflict: "Pengaturan diubah di tempat lain",
     retry: "Coba lagi",
-    applyBannerText: "Tersimpan ke openclaw.json — mulai ulang gateway untuk menerapkan.",
+    applyBannerText: "Tersimpan ke steelengine.json — mulai ulang gateway untuk menerapkan.",
     applyBannerAction: "Mulai ulang & terapkan",
     rawDiscard: "Buang",
     rawDraftBlocksApply:
@@ -1359,7 +1359,7 @@ export const id: TranslationMap = {
     },
   },
   approvalPage: {
-    brandName: "OpenClaw",
+    brandName: "SteelEngine",
     eyebrow: "Operator approval",
     loadingTitle: "Loading approval",
     loadingDescription: "Checking the current approval state with the Gateway.",
@@ -1368,7 +1368,7 @@ export const id: TranslationMap = {
       "This approval could not be found or this device is not authorized to review it.",
     connectionErrorTitle: "Connection interrupted",
     connectionErrorDescription:
-      "OpenClaw cannot confirm or record a decision while disconnected. Reconnect to check the current status.",
+      "SteelEngine cannot confirm or record a decision while disconnected. Reconnect to check the current status.",
     retry: "Retry",
     execTitle: "Command approval",
     pending: "Waiting for your decision",
@@ -1545,7 +1545,7 @@ export const id: TranslationMap = {
     chat: "Chat",
     settings: "Pengaturan",
     settingsGeneral: "Umum",
-    askOpenClaw: "Tanya OpenClaw",
+    askSteelEngine: "Tanya SteelEngine",
     settingsGroupConnections: "Koneksi",
     settingsGroupAgents: "Agen & Alat",
     settingsGroupSecurity: "Privasi & Keamanan",
@@ -1667,7 +1667,7 @@ export const id: TranslationMap = {
     skillWorkshop: "Skill Workshop",
     nodes: "Node",
     chat: "Chat",
-    custodian: "OpenClaw",
+    custodian: "SteelEngine",
     config: "Konfigurasi",
     profile: "Profil",
     communications: "Komunikasi",
@@ -1706,7 +1706,7 @@ export const id: TranslationMap = {
     nodes: "Perangkat yang dipasangkan dan perintah.",
     chat: "Chat Gateway untuk intervensi cepat.",
     custodian: "Penyiapan dan pemeliharaan sistem.",
-    config: "Edit openclaw.json.",
+    config: "Edit steelengine.json.",
     profile: "Statistik, rentetan, dan kehidupan agen Anda di reef.",
     communications: "Saluran, pesan, dan pengaturan audio.",
     appearance: "Tema, UI, dan pengaturan wizard penyiapan.",
@@ -1728,7 +1728,7 @@ export const id: TranslationMap = {
   modelSetup: {
     heading: "Hubungkan AI Anda",
     intro:
-      "OpenClaw menggunakan kembali akses AI yang sudah Anda miliki — login CLI, kunci API, atau login penyedia.",
+      "SteelEngine menggunakan kembali akses AI yang sudah Anda miliki — login CLI, kunci API, atau login penyedia.",
     loading: "Memeriksa akses AI yang tersedia di Gateway ini…",
     retry: "Coba lagi",
     checkAgain: "Periksa lagi",
@@ -1741,7 +1741,7 @@ export const id: TranslationMap = {
     },
     access: {
       adminRequired: "Penyiapan model memerlukan akses operator.admin.",
-      gatewayTooOld: "Gateway menjalankan OpenClaw versi lama",
+      gatewayTooOld: "Gateway menjalankan SteelEngine versi lama",
     },
     candidates: {
       title: "Ditemukan di Gateway ini",
@@ -1841,12 +1841,12 @@ export const id: TranslationMap = {
     confirmDescription: "Salin {count} file memori yang dipilih ke ruang kerja agen ini.",
     confirmReplace: "File tujuan yang ada akan dicadangkan dalam laporan migrasi sebelum diganti.",
     confirmBackup:
-      "OpenClaw membuat cadangan pra-impor yang terverifikasi sebelum menyalin memori.",
+      "SteelEngine membuat cadangan pra-impor yang terverifikasi sebelum menyalin memori.",
     confirmImport: "Impor memori",
     disconnected: "Hubungkan ke Gateway untuk mengimpor memori.",
     title: "Impor memori asisten",
     subtitle:
-      "Tinjau memori gabungan Codex dan memori otomatis Claude Code sebelum menyalinnya ke OpenClaw.",
+      "Tinjau memori gabungan Codex dan memori otomatis Claude Code sebelum menyalinnya ke SteelEngine.",
     agent: "Agen tujuan",
     replaceExisting: "Ganti hasil impor yang ada",
     replaceHint: "Pratinjau kembali konflik dan simpan cadangan item sebelum penggantian.",
@@ -1854,7 +1854,7 @@ export const id: TranslationMap = {
   onboarding: {
     memoryImport: {
       title: "Bawa memori asisten Anda",
-      body: "OpenClaw menemukan memori dari asisten coding lain. Impor memori tersebut ke ruang kerja agen Anda?",
+      body: "SteelEngine menemukan memori dari asisten coding lain. Impor memori tersebut ke ruang kerja agen Anda?",
       plannedCount: "{count} siap diimpor",
       alreadyImported: "Sudah diimpor: {count}",
       sourceUnavailable: "Jalur sumber tidak tersedia",
@@ -1870,22 +1870,22 @@ export const id: TranslationMap = {
       unknownError: "Permintaan gagal",
       doneTitle: "Impor memori selesai",
       doneBody:
-        "Berhasil memigrasikan {migrated}, melewati {skipped}. Anda dapat melanjutkan penyiapan OpenClaw.",
+        "Berhasil memigrasikan {migrated}, melewati {skipped}. Anda dapat melanjutkan penyiapan SteelEngine.",
     },
   },
   custodian: {
-    title: "OpenClaw",
+    title: "SteelEngine",
     subtitle: "Panduan penyiapan sistem Anda",
     exitSetup: "Keluar dari penyiapan",
     hatchDraft: "Bangunlah, temanku!",
-    placeholder: "Kirim pesan ke OpenClaw…",
+    placeholder: "Kirim pesan ke SteelEngine…",
     sensitivePlaceholder: "Masukkan nilai sensitif…",
     sensitiveReply: "Balasan sensitif telah dikirim",
     send: "Kirim",
-    thinking: "OpenClaw sedang berpikir",
-    requestFailed: "OpenClaw tidak dapat membalas. Coba lagi.",
+    thinking: "SteelEngine sedang berpikir",
+    requestFailed: "SteelEngine tidak dapat membalas. Coba lagi.",
     connectionChanged: "Koneksi Gateway berubah. Coba lagi untuk melanjutkan penyiapan ini.",
-    unsupportedGateway: "Perbarui Gateway untuk melanjutkan penyiapan dengan OpenClaw.",
+    unsupportedGateway: "Perbarui Gateway untuk melanjutkan penyiapan dengan SteelEngine.",
   },
   mcpPage: {
     manageServersLink: "Kelola server di halaman Plugins.",
@@ -1975,7 +1975,7 @@ export const id: TranslationMap = {
       notes: "Simpan catatan ke Markdown, Obsidian, Notion, atau Bear.",
     },
     noInstalledTitle: "Tidak ada plugin opsional yang terinstal",
-    noInstalledBody: "Temukan plugin unggulan atau cari ClawHub untuk memperluas OpenClaw.",
+    noInstalledBody: "Temukan plugin unggulan atau cari ClawHub untuk memperluas SteelEngine.",
     noInstalledMatchTitle: "Tidak ada plugin terinstal yang cocok",
     noMatchBody: "Coba pencarian lain.",
     filterAll: "Semua",
@@ -2021,7 +2021,7 @@ export const id: TranslationMap = {
     detailPluginId: "ID Plugin",
     offlineTitle: "Gateway offline",
     offlineBody: "Hubungkan untuk menelusuri plugin yang terinstal dan direkomendasikan.",
-    optionalCapability: "Kapabilitas OpenClaw opsional.",
+    optionalCapability: "Kapabilitas SteelEngine opsional.",
     enabled: "Diaktifkan",
     disabled: "Dinonaktifkan",
     available: "Tersedia",
@@ -2056,7 +2056,7 @@ export const id: TranslationMap = {
       "{name} telah dinonaktifkan. Restart Gateway diperlukan untuk menerapkan perubahan.",
   },
   aboutPage: {
-    productName: "OpenClaw",
+    productName: "SteelEngine",
     tagline: "Asisten AI pribadi Anda, berjalan di perangkat Anda sendiri.",
     waveHello: "Lambaikan tangan untuk menyapa Clawd",
     linksLabel: "Komunitas dan sumber daya",
@@ -2066,7 +2066,7 @@ export const id: TranslationMap = {
     linkDiscord: "Discord",
     linkX: "X (Twitter)",
     linkChangelog: "Catatan perubahan",
-    license: "© 2026 OpenClaw Foundation — Lisensi MIT.",
+    license: "© 2026 SteelEngine Foundation — Lisensi MIT.",
     artifactTitle: "Control UI",
     artifactSubtitle: "Identitas yang disematkan saat artefak browser ini dibuat.",
     artifactDetails: "Detail build Control UI",
@@ -2084,7 +2084,7 @@ export const id: TranslationMap = {
       "Dilaporkan oleh koneksi Gateway aktif; terpisah dari build Control UI ini.",
   },
   appsPage: {
-    heroTitle: "Bawa OpenClaw ke mana saja",
+    heroTitle: "Bawa SteelEngine ke mana saja",
     heroTagline:
       "Aplikasi pendamping untuk ponsel, jam tangan, desktop, dan browser Anda — serta plugin untuk memperluas kemampuan agen Anda.",
     sectionMobile: "Di ponsel Anda",
@@ -2106,11 +2106,11 @@ export const id: TranslationMap = {
     cards: {
       ios: {
         title: "iPhone",
-        desc: "Mengobrol, berbicara, menyetujui tindakan, dan berbagi ke OpenClaw dari iOS.",
+        desc: "Mengobrol, berbicara, menyetujui tindakan, dan berbagi ke SteelEngine dari iOS.",
       },
       android: {
         title: "Android",
-        desc: "Ponsel Android Anda sebagai node OpenClaw lengkap — dengan obrolan, kamera, dan Canvas.",
+        desc: "Ponsel Android Anda sebagai node SteelEngine lengkap — dengan obrolan, kamera, dan Canvas.",
       },
       appleWatch: {
         title: "Apple Watch",
@@ -2118,7 +2118,7 @@ export const id: TranslationMap = {
       },
       wearOs: {
         title: "Wear OS",
-        desc: "Aplikasi pendamping Android memperluas OpenClaw ke jam tangan Anda.",
+        desc: "Aplikasi pendamping Android memperluas SteelEngine ke jam tangan Anda.",
       },
       macos: {
         title: "macOS",
@@ -2126,7 +2126,7 @@ export const id: TranslationMap = {
       },
       windows: {
         title: "Windows",
-        desc: "Aplikasi pendamping Windows menghubungkan PC Anda sebagai node OpenClaw.",
+        desc: "Aplikasi pendamping Windows menghubungkan PC Anda sebagai node SteelEngine.",
       },
       linux: {
         title: "Linux",
@@ -2134,11 +2134,11 @@ export const id: TranslationMap = {
       },
       chrome: {
         title: "Ekstensi Chrome",
-        desc: "Izinkan OpenClaw mengendalikan Chrome yang sudah Anda gunakan — tab, halaman, dan formulir.",
+        desc: "Izinkan SteelEngine mengendalikan Chrome yang sudah Anda gunakan — tab, halaman, dan formulir.",
       },
       plugins: {
         title: "Plugin & ClawHub",
-        desc: "Perluas OpenClaw dengan kanal, alat, dan skills dari komunitas.",
+        desc: "Perluas SteelEngine dengan kanal, alat, dan skills dari komunitas.",
       },
     },
   },
@@ -2305,7 +2305,7 @@ export const id: TranslationMap = {
     selfLearning: {
       pitchTitle: "Aktifkan pembelajaran mandiri",
       pitchBody:
-        "OpenClaw meninjau koreksi dan proses penting yang telah diselesaikan, lalu menyusun draf proposal skill untuk papan ini. Fitur ini menggunakan token latar belakang tambahan dan draf akan muncul sebagai proposal tertunda.",
+        "SteelEngine meninjau koreksi dan proses penting yang telah diselesaikan, lalu menyusun draf proposal skill untuk papan ini. Fitur ini menggunakan token latar belakang tambahan dan draf akan muncul sebagai proposal tertunda.",
       enable: "Aktifkan pembelajaran mandiri",
       enabling: "Mengaktifkan…",
       updateError: "Tidak dapat memperbarui pengaturan pembelajaran mandiri.",
@@ -3389,9 +3389,9 @@ export const id: TranslationMap = {
         summary:
           "Gateway dapat dijangkau, tetapi memerlukan token atau kata sandi yang cocok sebelum browser ini dapat terhubung.",
         stepPaste:
-          "Tempel token dari openclaw dashboard --no-open atau masukkan kata sandi yang dikonfigurasi.",
+          "Tempel token dari steelengine dashboard --no-open atau masukkan kata sandi yang dikonfigurasi.",
         stepGenerate:
-          "Jika belum ada token yang dikonfigurasi, jalankan openclaw doctor --generate-gateway-token di host Gateway.",
+          "Jika belum ada token yang dikonfigurasi, jalankan steelengine doctor --generate-gateway-token di host Gateway.",
         stepConnect: "Klik Connect lagi setelah memperbarui kredensial.",
       },
       authFailed: {
@@ -3399,7 +3399,7 @@ export const id: TranslationMap = {
         summary:
           "Kredensial yang diberikan ditolak. Penyebab paling umum adalah token kedaluwarsa atau token yang disalin dari URL Gateway lain.",
         stepDashboard:
-          "Jalankan openclaw dashboard --no-open lalu buka URL baru atau tempel tokennya.",
+          "Jalankan steelengine dashboard --no-open lalu buka URL baru atau tempel tokennya.",
         stepReplace:
           "Ganti nilai token/kata sandi yang lama; jangan gunakan ulang token dari URL Gateway lain.",
         stepMode:
@@ -3423,8 +3423,8 @@ export const id: TranslationMap = {
           "Browser ini memerlukan persetujuan satu kali dari host Gateway sebelum dapat menggunakan Control UI.",
         upgradeSummary:
           "Browser ini sudah dikenal, tetapi akses yang diminta berubah dan memerlukan persetujuan baru.",
-        stepList: "Jalankan openclaw devices list di host Gateway.",
-        stepApproveId: "Setujui permintaan ini: openclaw devices approve {requestId}.",
+        stepList: "Jalankan steelengine devices list di host Gateway.",
+        stepApproveId: "Setujui permintaan ini: steelengine devices approve {requestId}.",
         stepApprove: "Setujui permintaan browser/perangkat yang tertunda dari daftar tersebut.",
         stepReconnect: "Hubungkan ulang setelah persetujuan selesai.",
       },
@@ -3451,21 +3451,21 @@ export const id: TranslationMap = {
         summary:
           "Control UI yang disajikan dan Gateway yang berjalan tidak sepakat tentang protokol koneksi yang didukung.",
         stepDashboard:
-          "Buka kembali dashboard yang disajikan dengan openclaw dashboard agar UI dan Gateway berasal dari instalasi yang sama.",
+          "Buka kembali dashboard yang disajikan dengan steelengine dashboard agar UI dan Gateway berasal dari instalasi yang sama.",
         stepDevUi:
           "Jika menggunakan pnpm ui:dev, bangun ulang atau mulai ulang UI dev terhadap checkout saat ini.",
         stepRestart:
-          "Mulai ulang Gateway setelah memperbarui OpenClaw agar menyajikan protokol saat ini.",
+          "Mulai ulang Gateway setelah memperbarui SteelEngine agar menyajikan protokol saat ini.",
       },
       network: {
         title: "Tidak dapat terhubung",
         summary:
           "Browser tidak dapat menyelesaikan koneksi Gateway. Periksa target dan transport sebelum mencoba ulang kredensial.",
-        stepGateway: "Pastikan Gateway berjalan dengan openclaw status atau openclaw gateway run.",
+        stepGateway: "Pastikan Gateway berjalan dengan steelengine status atau steelengine gateway run.",
         stepUrl:
           "Periksa URL WebSocket dan gunakan wss:// saat Gateway berada di belakang HTTPS/Tailscale Serve.",
         stepDashboard:
-          "Buka kembali dashboard dengan openclaw dashboard --no-open untuk menyalin ulang URL dan detail auth saat ini.",
+          "Buka kembali dashboard dengan steelengine dashboard --no-open untuk menyalin ulang URL dan detail auth saat ini.",
       },
     },
   },
@@ -3490,7 +3490,7 @@ export const id: TranslationMap = {
       remoteViewOnly: "Sesi ini berada di node yang dipasangkan dan hanya dapat dilihat.",
       unsupportedViewOnly: "Sumber sesi eksternal ini hanya dapat dilihat.",
       sessionMenu: "External session actions",
-      openInOpenClaw: "Open in OpenClaw",
+      openInSteelEngine: "Open in SteelEngine",
       openInTerminal: "Open in terminal",
       terminalUnavailable: "Terminal opening is unavailable for this session.",
     },
@@ -3545,7 +3545,7 @@ export const id: TranslationMap = {
     followUpModeOverriding: "Menimpa default server ({mode})",
     followUpModeReset: "Setel ulang ke default server",
     catalogOpenTarget: "Open Codex/Claude sessions in",
-    catalogOpenTargetViewer: "OpenClaw viewer",
+    catalogOpenTargetViewer: "SteelEngine viewer",
     catalogOpenTargetTerminal: "Terminal",
     onboardingDisabled: "Dinonaktifkan selama penyiapan",
     gatewayStatus: "Status Gateway: {status}",
@@ -4008,7 +4008,7 @@ export const id: TranslationMap = {
       shownOf: "{shown} dari {total}",
       emptyTitle: "Belum ada tugas terjadwal",
       emptyHint:
-        "Jelaskan apa yang harus dilakukan OpenClaw dan kapan — ia berjalan sesuai jadwal.",
+        "Jelaskan apa yang harus dilakukan SteelEngine dan kapan — ia berjalan sesuai jadwal.",
       noMatching: "Tidak ada tugas yang cocok dengan filter saat ini.",
       loadMore: "Muat lebih banyak",
       loading: "Memuat...",
@@ -4075,7 +4075,7 @@ export const id: TranslationMap = {
     detail: {
       tabsLabel: "Detail otomatisasi",
       newTitle: "Tugas terjadwal baru",
-      newSubtitle: "Jelaskan apa yang harus dilakukan OpenClaw, lalu pilih kapan ia berjalan.",
+      newSubtitle: "Jelaskan apa yang harus dilakukan SteelEngine, lalu pilih kapan ia berjalan.",
       back: "Semua otomatisasi",
       settingsTab: "Pengaturan",
       historyTitle: "Riwayat proses",
@@ -4148,7 +4148,7 @@ export const id: TranslationMap = {
       descriptionPlaceholder: "Konteks opsional untuk tugas ini",
       agentPlaceholder: "main atau ops",
       agentHelp: "Mulai mengetik untuk memilih agen yang dikenal, atau masukkan agen kustom.",
-      promptPlaceholder: "Jelaskan apa yang harus dilakukan OpenClaw...",
+      promptPlaceholder: "Jelaskan apa yang harus dilakukan SteelEngine...",
       repeat: "Ulangi",
       repeatInterval: "Interval",
       repeatOnce: "Sekali",

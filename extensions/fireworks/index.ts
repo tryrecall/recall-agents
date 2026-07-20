@@ -1,12 +1,12 @@
-// Fireworks plugin entrypoint registers its OpenClaw integration.
-import type { ProviderResolveDynamicModelContext } from "openclaw/plugin-sdk/plugin-entry";
-import { defineSingleProviderPluginEntry } from "openclaw/plugin-sdk/provider-entry";
+// Fireworks plugin entrypoint registers its SteelEngine integration.
+import type { ProviderResolveDynamicModelContext } from "steelengine/plugin-sdk/plugin-entry";
+import { defineSingleProviderPluginEntry } from "steelengine/plugin-sdk/provider-entry";
 import {
   buildProviderReplayFamilyHooks,
   cloneFirstTemplateModel,
   DEFAULT_CONTEXT_TOKENS,
   normalizeModelCompat,
-} from "openclaw/plugin-sdk/provider-model-shared";
+} from "steelengine/plugin-sdk/provider-model-shared";
 import { isFireworksKimiModelId } from "./model-id.js";
 import { applyFireworksConfig, FIREWORKS_DEFAULT_MODEL_REF } from "./onboard.js";
 import {

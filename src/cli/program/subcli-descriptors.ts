@@ -130,7 +130,7 @@ const subCliCommandCatalog = defineCommandDescriptorCatalog([
   },
   {
     name: "docs",
-    description: "Search the live OpenClaw docs",
+    description: "Search the live SteelEngine docs",
     hasSubcommands: false,
   },
   {
@@ -140,7 +140,7 @@ const subCliCommandCatalog = defineCommandDescriptorCatalog([
   },
   {
     name: "proxy",
-    description: "Run the OpenClaw debug proxy and inspect captured traffic",
+    description: "Run the SteelEngine debug proxy and inspect captured traffic",
     hasSubcommands: true,
   },
   {
@@ -170,7 +170,7 @@ const subCliCommandCatalog = defineCommandDescriptorCatalog([
   },
   {
     name: "plugins",
-    description: "Manage OpenClaw plugins and extensions",
+    description: "Manage SteelEngine plugins and extensions",
     hasSubcommands: true,
     parentDefaultHelp: true,
   },
@@ -202,7 +202,7 @@ const subCliCommandCatalog = defineCommandDescriptorCatalog([
   },
   {
     name: "update",
-    description: "Update OpenClaw and inspect update channel status",
+    description: "Update SteelEngine and inspect update channel status",
     hasSubcommands: true,
   },
   {

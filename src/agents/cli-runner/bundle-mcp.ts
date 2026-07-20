@@ -7,14 +7,14 @@ import os from "node:os";
 import path from "node:path";
 import { applyMergePatch } from "../../config/merge-patch.js";
 import type { CliBackendConfig } from "../../config/types.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { tryReadJson } from "../../infra/json-files.js";
 import {
-  OPENCLAW_TOOLS_MCP_SYSTEM_AGENT_APPROVAL_ARMED_ENV,
-  OPENCLAW_TOOLS_MCP_SYSTEM_AGENT_PROPOSAL_ENV,
-  OPENCLAW_TOOLS_MCP_TOOLS_ENV,
-} from "../../mcp/openclaw-tools-serve-config.js";
+  STEELENGINE_TOOLS_MCP_SYSTEM_AGENT_APPROVAL_ARMED_ENV,
+  STEELENGINE_TOOLS_MCP_SYSTEM_AGENT_PROPOSAL_ENV,
+  STEELENGINE_TOOLS_MCP_TOOLS_ENV,
+} from "../../mcp/steelengine-tools-serve-config.js";
 import { extractMcpServerMap, type BundleMcpConfig } from "../../plugins/bundle-mcp.js";
 import type { CliBundleMcpMode } from "../../plugins/types.js";
 import { loadMergedBundleMcpConfig, toCliBundleMcpServerConfig } from "../bundle-mcp-config.js";
@@ -60,19 +60,19 @@ function sortJsonValue(value: unknown): unknown {
   );
 }
 
-function normalizeOpenClawLoopbackUrl(value: string): string {
+function normalizeSteelEngineLoopbackUrl(value: string): string {
   const match =
     /^(http:\/\/(?:127\.0\.0\.1|localhost|\[::1\])):\d+(\/mcp)$/.exec(value.trim()) ?? undefined;
   if (!match) {
     return value;
   }
-  return `${match[1]}:<openclaw-loopback>${match[2]}`;
+  return `${match[1]}:<steelengine-loopback>${match[2]}`;
 }
 
 function canonicalizeSystemAgentTurnStateForResume(
   server: BundleMcpConfig["mcpServers"][string],
 ): BundleMcpConfig["mcpServers"][string] {
-  if (!isRecord(server.env) || server.env[OPENCLAW_TOOLS_MCP_TOOLS_ENV] !== "openclaw") {
+  if (!isRecord(server.env) || server.env[STEELENGINE_TOOLS_MCP_TOOLS_ENV] !== "steelengine") {
     return server;
   }
   // The host reissues approval authority through a fresh stdio server each turn.
@@ -81,26 +81,26 @@ function canonicalizeSystemAgentTurnStateForResume(
     ...server,
     env: {
       ...server.env,
-      [OPENCLAW_TOOLS_MCP_SYSTEM_AGENT_APPROVAL_ARMED_ENV]: "<openclaw-turn-state>",
-      [OPENCLAW_TOOLS_MCP_SYSTEM_AGENT_PROPOSAL_ENV]: "<openclaw-turn-state>",
+      [STEELENGINE_TOOLS_MCP_SYSTEM_AGENT_APPROVAL_ARMED_ENV]: "<steelengine-turn-state>",
+      [STEELENGINE_TOOLS_MCP_SYSTEM_AGENT_PROPOSAL_ENV]: "<steelengine-turn-state>",
     },
   };
 }
 
 function canonicalizeBundleMcpConfigForResume(config: BundleMcpConfig): BundleMcpConfig {
-  // The OpenClaw loopback MCP port changes across runs. Replace it before
+  // The SteelEngine loopback MCP port changes across runs. Replace it before
   // hashing so resume compatibility tracks config shape, not ephemeral ports.
   const canonicalServers = Object.fromEntries(
     Object.entries(config.mcpServers).map(([name, server]) => {
       const canonicalServer = canonicalizeSystemAgentTurnStateForResume(server);
-      if (name !== "openclaw" || typeof canonicalServer.url !== "string") {
+      if (name !== "steelengine" || typeof canonicalServer.url !== "string") {
         return [name, sortJsonValue(canonicalServer)];
       }
       return [
         name,
         sortJsonValue({
           ...canonicalServer,
-          url: normalizeOpenClawLoopbackUrl(canonicalServer.url),
+          url: normalizeSteelEngineLoopbackUrl(canonicalServer.url),
         }),
       ];
     }),
@@ -110,26 +110,26 @@ function canonicalizeBundleMcpConfigForResume(config: BundleMcpConfig): BundleMc
   };
 }
 
-const OPENCLAW_MCP_ENV_TEMPLATE_PATTERN = /\$\{(OPENCLAW_MCP_[A-Z0-9_]+)\}/g;
+const STEELENGINE_MCP_ENV_TEMPLATE_PATTERN = /\$\{(STEELENGINE_MCP_[A-Z0-9_]+)\}/g;
 
-function resolveOpenClawMcpEnvTemplates(value: unknown, env?: Record<string, string>): unknown {
+function resolveSteelEngineMcpEnvTemplates(value: unknown, env?: Record<string, string>): unknown {
   if (!env) {
     return value;
   }
   if (typeof value === "string") {
-    return value.replace(OPENCLAW_MCP_ENV_TEMPLATE_PATTERN, (match, name: string) => {
+    return value.replace(STEELENGINE_MCP_ENV_TEMPLATE_PATTERN, (match, name: string) => {
       const replacement = env[name];
       return Object.hasOwn(env, name) && replacement !== undefined ? replacement : match;
     });
   }
   if (Array.isArray(value)) {
-    return value.map((entry) => resolveOpenClawMcpEnvTemplates(entry, env));
+    return value.map((entry) => resolveSteelEngineMcpEnvTemplates(entry, env));
   }
   if (!isRecord(value)) {
     return value;
   }
   return Object.fromEntries(
-    Object.entries(value).map(([key, entry]) => [key, resolveOpenClawMcpEnvTemplates(entry, env)]),
+    Object.entries(value).map(([key, entry]) => [key, resolveSteelEngineMcpEnvTemplates(entry, env)]),
   );
 }
 
@@ -175,9 +175,9 @@ async function prepareModeSpecificBundleMcpConfig(params: {
     };
   }
 
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-cli-mcp-"));
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-cli-mcp-"));
   const mcpConfigPath = path.join(tempDir, "mcp.json");
-  const runtimeConfig = resolveOpenClawMcpEnvTemplates(
+  const runtimeConfig = resolveSteelEngineMcpEnvTemplates(
     params.mergedConfig,
     params.env,
   ) as BundleMcpConfig;
@@ -207,13 +207,13 @@ export async function prepareCliBundleMcpConfig(params: {
   mode?: CliBundleMcpMode;
   backend: CliBackendConfig;
   workspaceDir: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentDir?: string;
   additionalConfig?: BundleMcpConfig;
   /**
    * Serve exactly these servers, skipping user/plugin/additional merges.
-   * Ring-zero OpenClaw runs use this so the CLI harness sees only the
-   * openclaw MCP server instead of the normal openclaw tool surface.
+   * Ring-zero SteelEngine runs use this so the CLI harness sees only the
+   * steelengine MCP server instead of the normal steelengine tool surface.
    */
   exclusiveConfig?: BundleMcpConfig;
   env?: Record<string, string>;
@@ -316,7 +316,7 @@ export async function prepareCliBundleMcpCaptureAttempt(params: {
   return {
     env: {
       ...params.env,
-      OPENCLAW_MCP_CLI_CAPTURE_KEY: params.captureKey,
+      STEELENGINE_MCP_CLI_CAPTURE_KEY: params.captureKey,
     },
   };
 }

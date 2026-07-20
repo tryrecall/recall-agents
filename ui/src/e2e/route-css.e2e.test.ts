@@ -11,7 +11,7 @@ import {
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
 
 let browser: Browser;
@@ -58,8 +58,8 @@ describeControlUiE2e("Control UI route CSS mocked Gateway E2E", () => {
         },
         "cron.status": { enabled: true, jobs: 0, nextWakeAtMs: null },
         "skills.status": {
-          workspaceDir: "/tmp/openclaw-e2e/workspace",
-          managedSkillsDir: "/tmp/openclaw-e2e/skills",
+          workspaceDir: "/tmp/steelengine-e2e/workspace",
+          managedSkillsDir: "/tmp/steelengine-e2e/skills",
           skills: [],
         },
       },

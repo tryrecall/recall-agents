@@ -80,7 +80,7 @@ function hostContext(element: Element | undefined, height: number): HostContext 
   };
 }
 
-class OpenClawAppBridge extends AppBridge {
+class SteelEngineAppBridge extends AppBridge {
   setMessageHandler(handler: NonNullable<AppBridge["onmessage"]>) {
     Reflect.set(this, "onmessage", handler);
   }
@@ -248,9 +248,9 @@ export class McpAppView extends LitElement {
       }
 
       let frameHeight = this.height;
-      const bridge = new OpenClawAppBridge(
+      const bridge = new SteelEngineAppBridge(
         null,
-        { name: "OpenClaw", version: "1.0.0" },
+        { name: "SteelEngine", version: "1.0.0" },
         buildMcpAppHostCapabilities(payload.csp, payload.messageSupported === true),
         { hostContext: hostContext(mount, this.height) },
       );

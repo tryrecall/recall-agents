@@ -1,4 +1,4 @@
 // Slack plugin module implements media behavior.
-export { fetchWithRuntimeDispatcher } from "openclaw/plugin-sdk/runtime-fetch";
-export type { FetchLike } from "openclaw/plugin-sdk/media-runtime";
-export { saveRemoteMedia } from "openclaw/plugin-sdk/media-runtime";
+export { fetchWithRuntimeDispatcher } from "steelengine/plugin-sdk/runtime-fetch";
+export type { FetchLike } from "steelengine/plugin-sdk/media-runtime";
+export { saveRemoteMedia } from "steelengine/plugin-sdk/media-runtime";

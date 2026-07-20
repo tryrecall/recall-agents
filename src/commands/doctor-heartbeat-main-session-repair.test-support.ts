@@ -24,7 +24,7 @@ type TestApi = {
 
 function getTestApi(): TestApi {
   return (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.doctorHeartbeatMainSessionRepairTestApi")
+    Symbol.for("steelengine.doctorHeartbeatMainSessionRepairTestApi")
   ] as TestApi;
 }
 

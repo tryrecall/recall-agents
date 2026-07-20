@@ -3,7 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAutoCleanupTempDirTracker } from "../../test/helpers/temp-dir.js";
 import {
@@ -16,16 +16,16 @@ import * as nodeSqlite from "../infra/node-sqlite.js";
 import * as replaceFile from "../infra/replace-file.js";
 import { resolveSqliteDatabaseFilePaths } from "../infra/sqlite-files.js";
 import {
-  closeOpenClawAgentDatabasesForTest,
-  openOpenClawAgentDatabase,
-  OPENCLAW_AGENT_SCHEMA_VERSION,
-  resolveOpenClawAgentSqlitePath,
-} from "../state/openclaw-agent-db.js";
+  closeSteelEngineAgentDatabasesForTest,
+  openSteelEngineAgentDatabase,
+  STEELENGINE_AGENT_SCHEMA_VERSION,
+  resolveSteelEngineAgentSqlitePath,
+} from "../state/steelengine-agent-db.js";
 import {
-  readOpenClawDatabaseQuarantine,
-  recordOpenClawDatabaseQuarantine,
-} from "../state/openclaw-quarantine-store.js";
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+  readSteelEngineDatabaseQuarantine,
+  recordSteelEngineDatabaseQuarantine,
+} from "../state/steelengine-quarantine-store.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import {
   assertSafeSessionSqliteMigrationMove,
   createSessionSqliteMigrationFailureIssue,
@@ -50,8 +50,8 @@ type TestStore = {
 };
 
 const previousEnv = {
-  OPENCLAW_CONFIG_PATH: process.env.OPENCLAW_CONFIG_PATH,
-  OPENCLAW_STATE_DIR: process.env.OPENCLAW_STATE_DIR,
+  STEELENGINE_CONFIG_PATH: process.env.STEELENGINE_CONFIG_PATH,
+  STEELENGINE_STATE_DIR: process.env.STEELENGINE_STATE_DIR,
 };
 const autoCleanupTempDirs = useAutoCleanupTempDirTracker(afterEach);
 const lexicalTempDir = path.resolve(os.tmpdir());
@@ -62,15 +62,15 @@ const realRootTempDir = canonicalTestPath(lexicalRootTempDir);
 const hasPlatformRootTempAlias = lexicalRootTempDir !== realRootTempDir;
 
 beforeEach(() => {
-  closeOpenClawAgentDatabasesForTest();
-  closeOpenClawStateDatabaseForTest();
+  closeSteelEngineAgentDatabasesForTest();
+  closeSteelEngineStateDatabaseForTest();
 });
 
 afterEach(() => {
-  closeOpenClawAgentDatabasesForTest();
-  closeOpenClawStateDatabaseForTest();
-  restoreEnvValue("OPENCLAW_CONFIG_PATH", previousEnv.OPENCLAW_CONFIG_PATH);
-  restoreEnvValue("OPENCLAW_STATE_DIR", previousEnv.OPENCLAW_STATE_DIR);
+  closeSteelEngineAgentDatabasesForTest();
+  closeSteelEngineStateDatabaseForTest();
+  restoreEnvValue("STEELENGINE_CONFIG_PATH", previousEnv.STEELENGINE_CONFIG_PATH);
+  restoreEnvValue("STEELENGINE_STATE_DIR", previousEnv.STEELENGINE_STATE_DIR);
 });
 
 describe("runDoctorSessionSqlite", () => {
@@ -118,11 +118,11 @@ describe("runDoctorSessionSqlite", () => {
   });
 
   it("inspects SQLite-only all-agent targets without requiring a legacy store", async () => {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-doctor-session-sqlite-"));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-doctor-session-sqlite-"));
     try {
       const stateDir = path.join(tempDir, "state");
       const storePath = path.join(stateDir, "agents", "main", "sessions", "sessions.json");
-      const env = { ...process.env, OPENCLAW_STATE_DIR: stateDir };
+      const env = { ...process.env, STEELENGINE_STATE_DIR: stateDir };
       await upsertSqliteSessionEntry(
         { agentId: "main", env, sessionKey: "agent:main:main", storePath },
         { sessionId: "sqlite-session", updatedAt: Date.now() },
@@ -148,9 +148,9 @@ describe("runDoctorSessionSqlite", () => {
   });
 
   it("migrates a dormant historical agent database before all-agent import compaction", async () => {
-    const tempDir = autoCleanupTempDirs.make("openclaw-doctor-session-sqlite-");
+    const tempDir = autoCleanupTempDirs.make("steelengine-doctor-session-sqlite-");
     const stateDir = path.join(tempDir, "state");
-    const env = { ...process.env, OPENCLAW_STATE_DIR: stateDir };
+    const env = { ...process.env, STEELENGINE_STATE_DIR: stateDir };
     const agentIds = ["dormant", "current"] as const;
     for (const agentId of agentIds) {
       const sessionsDir = path.join(stateDir, "agents", agentId, "sessions");
@@ -158,8 +158,8 @@ describe("runDoctorSessionSqlite", () => {
       fs.writeFileSync(path.join(sessionsDir, "sessions.json"), "{}\n", { mode: 0o600 });
     }
     const dormantPath = createHistoricalV1AgentDatabase({ agentId: "dormant", env });
-    const currentPath = openOpenClawAgentDatabase({ agentId: "current", env }).path;
-    closeOpenClawAgentDatabasesForTest();
+    const currentPath = openSteelEngineAgentDatabase({ agentId: "current", env }).path;
+    closeSteelEngineAgentDatabasesForTest();
 
     const sqlite = nodeSqlite.requireNodeSqlite();
     const currentBefore = new sqlite.DatabaseSync(currentPath);
@@ -190,13 +190,13 @@ describe("runDoctorSessionSqlite", () => {
     const currentAfter = new sqlite.DatabaseSync(currentPath);
     try {
       expect(dormantAfter.prepare("PRAGMA user_version").get()).toEqual({
-        user_version: OPENCLAW_AGENT_SCHEMA_VERSION,
+        user_version: STEELENGINE_AGENT_SCHEMA_VERSION,
       });
       expect(
         dormantAfter
           .prepare("SELECT schema_version FROM schema_meta WHERE meta_key = 'primary'")
           .get(),
-      ).toEqual({ schema_version: OPENCLAW_AGENT_SCHEMA_VERSION });
+      ).toEqual({ schema_version: STEELENGINE_AGENT_SCHEMA_VERSION });
       expect(
         dormantAfter
           .prepare("PRAGMA table_info(sessions)")
@@ -218,7 +218,7 @@ describe("runDoctorSessionSqlite", () => {
           .prepare("SELECT schema_version, updated_at FROM schema_meta WHERE meta_key = 'primary'")
           .get(),
       ).toEqual({
-        schema_version: OPENCLAW_AGENT_SCHEMA_VERSION,
+        schema_version: STEELENGINE_AGENT_SCHEMA_VERSION,
         updated_at: currentUpdatedAt,
       });
     } finally {
@@ -228,14 +228,14 @@ describe("runDoctorSessionSqlite", () => {
   });
 
   it("keeps mismatched older agent schema versions blocking during all-agent import", async () => {
-    const tempDir = autoCleanupTempDirs.make("openclaw-doctor-session-sqlite-");
+    const tempDir = autoCleanupTempDirs.make("steelengine-doctor-session-sqlite-");
     const stateDir = path.join(tempDir, "state");
     const sessionsDir = path.join(stateDir, "agents", "drifted", "sessions");
-    const env = { ...process.env, OPENCLAW_STATE_DIR: stateDir };
+    const env = { ...process.env, STEELENGINE_STATE_DIR: stateDir };
     fs.mkdirSync(sessionsDir, { recursive: true });
     fs.writeFileSync(path.join(sessionsDir, "sessions.json"), "{}\n", { mode: 0o600 });
-    const sqlitePath = openOpenClawAgentDatabase({ agentId: "drifted", env }).path;
-    closeOpenClawAgentDatabasesForTest();
+    const sqlitePath = openSteelEngineAgentDatabase({ agentId: "drifted", env }).path;
+    closeSteelEngineAgentDatabasesForTest();
 
     const sqlite = nodeSqlite.requireNodeSqlite();
     const database = new sqlite.DatabaseSync(sqlitePath);
@@ -511,7 +511,7 @@ describe("runDoctorSessionSqlite", () => {
 
   it("refuses compaction while this process owns an open agent database handle", async () => {
     const { sqlitePath, store } = await createImportedStoreForCompaction();
-    openOpenClawAgentDatabase({
+    openSteelEngineAgentDatabase({
       agentId: "main",
       env: store.env,
       path: sqlitePath,
@@ -553,16 +553,16 @@ describe("runDoctorSessionSqlite", () => {
       mutate: (database: DatabaseSync) => {
         database
           .prepare("UPDATE schema_meta SET schema_version = ? WHERE meta_key = 'primary'")
-          .run(OPENCLAW_AGENT_SCHEMA_VERSION - 1);
+          .run(STEELENGINE_AGENT_SCHEMA_VERSION - 1);
       },
       message: /metadata schema version .* does not match/iu,
     },
     {
       label: "stale user version",
       mutate: (database: DatabaseSync) => {
-        database.exec(`PRAGMA user_version = ${OPENCLAW_AGENT_SCHEMA_VERSION - 1};`);
+        database.exec(`PRAGMA user_version = ${STEELENGINE_AGENT_SCHEMA_VERSION - 1};`);
       },
-      message: /run openclaw doctor --fix before compacting/iu,
+      message: /run steelengine doctor --fix before compacting/iu,
     },
   ])("rejects $label before compaction", async ({ mutate, message }) => {
     const { sqlitePath, store } = await createImportedStoreForCompaction();
@@ -618,7 +618,7 @@ describe("runDoctorSessionSqlite", () => {
   it("clears agent quarantine after compaction", async () => {
     const { sqlitePath, store } = await createImportedStoreForCompaction();
     expect(
-      recordOpenClawDatabaseQuarantine({
+      recordSteelEngineDatabaseQuarantine({
         env: store.env,
         kind: "agent",
         path: sqlitePath,
@@ -633,8 +633,8 @@ describe("runDoctorSessionSqlite", () => {
     });
 
     expect(report.totals.issues).toBe(0);
-    expect(readOpenClawDatabaseQuarantine(sqlitePath, { env: store.env })).toBeUndefined();
-    expect(openOpenClawAgentDatabase({ agentId: "main", env: store.env }).db.isOpen).toBe(true);
+    expect(readSteelEngineDatabaseQuarantine(sqlitePath, { env: store.env })).toBeUndefined();
+    expect(openSteelEngineAgentDatabase({ agentId: "main", env: store.env }).db.isOpen).toBe(true);
   });
 
   it.skipIf(process.platform === "win32")(
@@ -682,7 +682,7 @@ describe("runDoctorSessionSqlite", () => {
     });
     expect(recovery.totals.issues).toBe(0);
     expect(recovery.targets[0]?.corruptRecovery?.movedFiles).toEqual(
-      expect.arrayContaining([expect.stringMatching(/openclaw-agent\.sqlite\.corrupt-/u)]),
+      expect.arrayContaining([expect.stringMatching(/steelengine-agent\.sqlite\.corrupt-/u)]),
     );
     expect(fs.existsSync(sqlitePath)).toBe(false);
   });
@@ -845,7 +845,7 @@ describe("runDoctorSessionSqlite", () => {
     fs.writeFileSync(
       pointerPath,
       `${JSON.stringify({
-        traceSchema: "openclaw-trajectory-pointer",
+        traceSchema: "steelengine-trajectory-pointer",
         schemaVersion: 1,
         sessionId: "session-1",
         runtimeFile: store.trajectoryPath,
@@ -918,7 +918,7 @@ describe("runDoctorSessionSqlite", () => {
       if (!sqlitePath) {
         throw new Error("expected imported SQLite path");
       }
-      closeOpenClawAgentDatabasesForTest();
+      closeSteelEngineAgentDatabasesForTest();
       for (const filePath of [sqlitePath, `${sqlitePath}-wal`, `${sqlitePath}-shm`]) {
         fs.rmSync(filePath, { force: true });
       }
@@ -1557,7 +1557,7 @@ describe("runDoctorSessionSqlite", () => {
     expectDefined(manifest.targets[0], "manifest.targets[0] test invariant").issues = [
       {
         code: "startup_failure",
-        message: `token=supersecret startup migration failed for agent:main:main at ${store.storePath} and ${process.env.HOME ?? "/Users/example"}/private/openclaw.json`,
+        message: `token=supersecret startup migration failed for agent:main:main at ${store.storePath} and ${process.env.HOME ?? "/Users/example"}/private/steelengine.json`,
         sessionKey: "agent:main:main",
       },
     ];
@@ -1586,7 +1586,7 @@ describe("runDoctorSessionSqlite", () => {
     if (process.env.HOME) {
       expect(recover.supportIssue?.body).not.toContain(process.env.HOME);
     }
-    expect(recover.supportIssue?.url).toContain("github.com/openclaw/openclaw/issues/new");
+    expect(recover.supportIssue?.url).toContain("github.com/steelengine/steelengine/issues/new");
   });
 
   it("keeps truncated GitHub issue bodies on a valid UTF-16 boundary", () => {
@@ -1598,7 +1598,7 @@ describe("runDoctorSessionSqlite", () => {
       const manifest: SessionSqliteMigrationManifest = {
         failedAt: "2030-01-01T00:00:00.000Z",
         manifestVersion: 2,
-        openClawVersion: "test",
+        steelEngineVersion: "test",
         runId: "utf16-boundary",
         startedAt: "2030-01-01T00:00:00.000Z",
         targets: Array.from({ length: targetCount }, (_, index) => {
@@ -1611,7 +1611,7 @@ describe("runDoctorSessionSqlite", () => {
             completedMoves: [],
             issues: targetMessages.map((message) => ({ code: "startup_failure", message })),
             plannedMoves: [],
-            sqlitePath: path.join(store.tempDir, "openclaw-agent.sqlite"),
+            sqlitePath: path.join(store.tempDir, "steelengine-agent.sqlite"),
             storePath: store.storePath,
             validationBeforeArchive: "failed",
           };
@@ -1871,14 +1871,14 @@ describe("runDoctorSessionSqlite", () => {
   });
 
   it("keeps a shared legacy store intact when importing only one agent", async () => {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-doctor-session-sqlite-"));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-doctor-session-sqlite-"));
     try {
       const stateDir = path.join(tempDir, "state");
       const sessionDir = path.join(tempDir, "shared-session-store");
       const storePath = path.join(sessionDir, "sessions.json");
       const mainTranscriptPath = path.join(sessionDir, "main-session.jsonl");
       const workTranscriptPath = path.join(sessionDir, "work-session.jsonl");
-      const env = { ...process.env, OPENCLAW_STATE_DIR: stateDir };
+      const env = { ...process.env, STEELENGINE_STATE_DIR: stateDir };
       fs.mkdirSync(sessionDir, { recursive: true });
       fs.writeFileSync(
         storePath,
@@ -1938,7 +1938,7 @@ describe("runDoctorSessionSqlite", () => {
   });
 
   it("imports shared custom stores into per-agent SQLite targets", async () => {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-doctor-session-sqlite-"));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-doctor-session-sqlite-"));
     try {
       const stateDir = path.join(tempDir, "state");
       const sessionDir = path.join(tempDir, "shared-session-store");
@@ -1946,7 +1946,7 @@ describe("runDoctorSessionSqlite", () => {
       const mainTranscriptPath = path.join(sessionDir, "main-session.jsonl");
       const workTranscriptPath = path.join(sessionDir, "work-session.jsonl");
       const orphanTranscriptPath = path.join(sessionDir, "orphan.jsonl");
-      const env = { ...process.env, OPENCLAW_STATE_DIR: stateDir };
+      const env = { ...process.env, STEELENGINE_STATE_DIR: stateDir };
       fs.mkdirSync(sessionDir, { recursive: true });
       fs.writeFileSync(
         storePath,
@@ -2068,7 +2068,7 @@ describe("runDoctorSessionSqlite", () => {
       "agents",
       "main",
       "agent",
-      "openclaw-agent.sqlite",
+      "steelengine-agent.sqlite",
     );
     fs.mkdirSync(path.dirname(sqlitePath), { recursive: true });
     fs.writeFileSync(sqlitePath, "not a sqlite database\n", { mode: 0o600 });
@@ -2093,7 +2093,7 @@ describe("runDoctorSessionSqlite", () => {
       "agents",
       "main",
       "agent",
-      "openclaw-agent.sqlite",
+      "steelengine-agent.sqlite",
     );
     fs.mkdirSync(path.dirname(sqlitePath), { recursive: true });
     fs.writeFileSync(sqlitePath, "not a sqlite database\n", { mode: 0o600 });
@@ -2129,7 +2129,7 @@ describe("runDoctorSessionSqlite", () => {
         "agents",
         "main",
         "agent",
-        "openclaw-agent.sqlite",
+        "steelengine-agent.sqlite",
       );
       fs.mkdirSync(path.dirname(sqlitePath), { recursive: true });
       fs.writeFileSync(sqlitePath, "not a sqlite database\n", { mode: 0o400 });
@@ -2142,7 +2142,7 @@ describe("runDoctorSessionSqlite", () => {
 
       expect(report.totals.issues).toBe(0);
       expect(report.targets[0]?.corruptRecovery?.movedFiles).toEqual([
-        expect.stringMatching(/openclaw-agent\.sqlite\.corrupt-/u),
+        expect.stringMatching(/steelengine-agent\.sqlite\.corrupt-/u),
       ]);
       expect(fs.existsSync(sqlitePath)).toBe(false);
     },
@@ -2155,7 +2155,7 @@ describe("runDoctorSessionSqlite", () => {
       "agents",
       "main",
       "agent",
-      "openclaw-agent.sqlite",
+      "steelengine-agent.sqlite",
     );
     fs.mkdirSync(path.dirname(sqlitePath), { recursive: true });
     fs.writeFileSync(`${sqlitePath}-wal`, "wal", { mode: 0o600 });
@@ -2184,7 +2184,7 @@ describe("runDoctorSessionSqlite", () => {
       "agents",
       "main",
       "agent",
-      "openclaw-agent.sqlite",
+      "steelengine-agent.sqlite",
     );
     fs.mkdirSync(path.dirname(sqlitePath), { recursive: true });
     const expectedContents = new Map<string, string>();
@@ -2239,7 +2239,7 @@ describe("runDoctorSessionSqlite", () => {
       "agents",
       "main",
       "agent",
-      "openclaw-agent.sqlite",
+      "steelengine-agent.sqlite",
     );
     fs.mkdirSync(sqlitePath, { recursive: true });
 
@@ -2262,7 +2262,7 @@ describe("runDoctorSessionSqlite", () => {
       "agents",
       "main",
       "agent",
-      "openclaw-agent.sqlite",
+      "steelengine-agent.sqlite",
     );
     fs.mkdirSync(path.dirname(sqlitePath), { recursive: true });
     fs.writeFileSync(sqlitePath, "not a sqlite database\n", { mode: 0o600 });
@@ -2345,7 +2345,7 @@ describe("runDoctorSessionSqlite", () => {
     });
 
     expect(report.targets[0]?.sqlitePath).toBe(
-      path.join(store.sessionDir, "openclaw-agent.sqlite"),
+      path.join(store.sessionDir, "steelengine-agent.sqlite"),
     );
     expect(
       fs.existsSync(
@@ -2447,7 +2447,7 @@ describe("runDoctorSessionSqlite", () => {
       "utf-8",
     );
     expect(failureReport).toContain("transcript_malformed");
-    expect(failureReport).toContain("openclaw doctor --session-sqlite recover --github-issue");
+    expect(failureReport).toContain("steelengine doctor --session-sqlite recover --github-issue");
     expect(failureReport).not.toContain("supersecret");
   });
 
@@ -2496,7 +2496,7 @@ async function createImportedStoreForCompaction(): Promise<{
   if (!sqlitePath) {
     throw new Error("expected imported agent SQLite path");
   }
-  closeOpenClawAgentDatabasesForTest();
+  closeSteelEngineAgentDatabasesForTest();
   return { sqlitePath, store };
 }
 
@@ -2507,7 +2507,7 @@ function createHistoricalV1AgentDatabase(params: {
   agentId: string;
   env: NodeJS.ProcessEnv;
 }): string {
-  const sqlitePath = resolveOpenClawAgentSqlitePath(params);
+  const sqlitePath = resolveSteelEngineAgentSqlitePath(params);
   fs.mkdirSync(path.dirname(sqlitePath), { recursive: true });
   const sqlite = nodeSqlite.requireNodeSqlite();
   const database = new sqlite.DatabaseSync(sqlitePath);
@@ -2631,9 +2631,9 @@ function createLegacyStore(
     transcriptLines?: string[];
   } = {},
 ): TestStore {
-  const tempDir = autoCleanupTempDirs.make("openclaw-doctor-session-sqlite-", params.tempRoot);
+  const tempDir = autoCleanupTempDirs.make("steelengine-doctor-session-sqlite-", params.tempRoot);
   const stateDir = path.join(tempDir, "state");
-  const configPath = path.join(tempDir, "openclaw.json");
+  const configPath = path.join(tempDir, "steelengine.json");
   const sessionDir = params.customStore
     ? path.join(tempDir, "legacy-session-store")
     : path.join(stateDir, "agents", params.agentDirName ?? "main", "sessions");
@@ -2675,11 +2675,11 @@ function createLegacyStore(
   });
   const env = {
     ...process.env,
-    OPENCLAW_CONFIG_PATH: configPath,
-    OPENCLAW_STATE_DIR: stateDir,
+    STEELENGINE_CONFIG_PATH: configPath,
+    STEELENGINE_STATE_DIR: stateDir,
   };
-  process.env.OPENCLAW_CONFIG_PATH = configPath;
-  process.env.OPENCLAW_STATE_DIR = stateDir;
+  process.env.STEELENGINE_CONFIG_PATH = configPath;
+  process.env.STEELENGINE_STATE_DIR = stateDir;
   return {
     configPath,
     env,
@@ -2729,7 +2729,7 @@ function writeFailedManifest(
       {
         failedAt,
         manifestVersion: 1,
-        openClawVersion: "test",
+        steelEngineVersion: "test",
         runId: path.basename(fileName, ".json"),
         startedAt: failedAt,
         targets: [

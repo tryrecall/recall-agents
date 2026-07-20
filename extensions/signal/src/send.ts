@@ -4,16 +4,16 @@ import {
   type MessageReceipt,
   type MessageReceiptPartKind,
   type MessageReceiptSourceResult,
-} from "openclaw/plugin-sdk/channel-outbound";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { resolveMarkdownTableMode } from "openclaw/plugin-sdk/markdown-table-runtime";
-import { kindFromMime } from "openclaw/plugin-sdk/media-runtime";
-import { resolveOutboundAttachmentFromUrl } from "openclaw/plugin-sdk/media-runtime";
-import { requireRuntimeConfig } from "openclaw/plugin-sdk/plugin-config-runtime";
+} from "steelengine/plugin-sdk/channel-outbound";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { resolveMarkdownTableMode } from "steelengine/plugin-sdk/markdown-table-runtime";
+import { kindFromMime } from "steelengine/plugin-sdk/media-runtime";
+import { resolveOutboundAttachmentFromUrl } from "steelengine/plugin-sdk/media-runtime";
+import { requireRuntimeConfig } from "steelengine/plugin-sdk/plugin-config-runtime";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 import { resolveSignalAccount } from "./accounts.js";
 import {
   appendSignalApprovalReactionHintForOutboundMessage,
@@ -26,7 +26,7 @@ import { registerSignalReplyContext } from "./reply-authors.js";
 import { resolveSignalRpcContext } from "./rpc-context.js";
 
 export type SignalSendOpts = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   baseUrl?: string;
   account?: string;
   accountId?: string;

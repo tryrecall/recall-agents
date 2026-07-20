@@ -4,7 +4,7 @@ import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import { retireSessionMcpRuntime } from "../../agents/agent-bundle-mcp-tools.js";
 import { resolveSessionAgentId } from "../../agents/agent-scope.js";
 import { clearBootstrapSnapshotOnSessionRollover } from "../../agents/bootstrap-cache.js";
@@ -47,7 +47,7 @@ import {
   type SessionEntry,
   type SessionScope,
 } from "../../config/sessions/types.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type { TtsAutoMode } from "../../config/types.tts.js";
 import {
   forgetActiveSessionForShutdown,
@@ -127,7 +127,7 @@ function resolveExplicitSessionEndReason(matchedResetTriggerLower?: string): Rep
 }
 
 function resolveSessionDefaultAccountId(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   channelRaw?: string;
   accountIdRaw?: string;
   persistedLastAccountId?: string;
@@ -183,7 +183,7 @@ export type SessionInitResult = {
 };
 
 type InitSessionStateParams = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   commandAuthorized: boolean;
   ctx: MsgContext;
   expectedExistingSessionId?: string;
@@ -206,7 +206,7 @@ type InitSessionStateAttemptOutcome =
   | { kind: "lifecycle-mutation"; sessionId: string; sessionKey: string };
 
 function resolveSessionConversationBindingContext(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   ctx: MsgContext,
 ): {
   channel: string;
@@ -232,7 +232,7 @@ function resolveSessionConversationBindingContext(
 }
 
 function resolveBoundConversationSessionKey(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   ctx: MsgContext;
   touch?: boolean;
   bindingContext?: {

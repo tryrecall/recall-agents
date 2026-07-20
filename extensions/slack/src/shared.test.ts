@@ -1,5 +1,5 @@
 // Slack tests cover shared plugin behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import { describe, expect, it } from "vitest";
 import { setSlackChannelAllowlist } from "./setup-shared.js";
 import { createSlackPluginBase, slackConfigAdapter } from "./shared.js";
@@ -78,7 +78,7 @@ describe("slackConfigAdapter", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     const next = slackConfigAdapter.deleteAccount?.({ cfg, accountId: "default" });
 
@@ -96,12 +96,12 @@ describe("slackConfigAdapter", () => {
         providers: {
           slack_bot: {
             source: "file",
-            path: "/tmp/openclaw-missing-slack-bot-token",
+            path: "/tmp/steelengine-missing-slack-bot-token",
             mode: "singleValue",
           },
           slack_app: {
             source: "file",
-            path: "/tmp/openclaw-missing-slack-app-token",
+            path: "/tmp/steelengine-missing-slack-app-token",
             mode: "singleValue",
           },
         },
@@ -114,7 +114,7 @@ describe("slackConfigAdapter", () => {
           defaultTo: "C123",
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
 
     expect(slackConfigAdapter.resolveAllowFrom?.({ cfg, accountId: "default" })).toEqual(["U123"]);
     expect(slackConfigAdapter.resolveDefaultTo?.({ cfg, accountId: "default" })).toBe("C123");

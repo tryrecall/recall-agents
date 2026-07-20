@@ -3,7 +3,7 @@ import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
 import { isAbsolute, join } from "node:path";
 import { Command } from "commander";
-import { clearConfigCache } from "openclaw/plugin-sdk/runtime-config-snapshot";
+import { clearConfigCache } from "steelengine/plugin-sdk/runtime-config-snapshot";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { registerPolicyCli } from "./cli.js";
 import { createPolicyAttestation, policyDocumentHash } from "./policy-state.js";
@@ -36,7 +36,7 @@ async function runPolicyCli(args: readonly string[]) {
   const previousExitCode = process.exitCode;
   process.exitCode = undefined;
   try {
-    const program = new Command().name("openclaw");
+    const program = new Command().name("steelengine");
     registerPolicyCli(program);
     await program.parseAsync(["policy", ...args], { from: "user" });
     const lastOutput = output.at(-1) ?? "";
@@ -83,7 +83,7 @@ async function runPolicyCompareJson(options: PolicyCompareCliOptions) {
 describe("policy commands", () => {
   beforeEach(async () => {
     workspaceDir = await fs.mkdtemp(join(tmpdir(), "policy-cli-"));
-    vi.stubEnv("OPENCLAW_WORKSPACE_DIR", workspaceDir);
+    vi.stubEnv("STEELENGINE_WORKSPACE_DIR", workspaceDir);
   });
 
   afterEach(async () => {
@@ -207,8 +207,8 @@ describe("policy commands", () => {
   });
 
   it("links policy findings to evidence and policy requirement refs", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
-    vi.stubEnv("OPENCLAW_CONFIG_PATH", configPath);
+    const configPath = join(workspaceDir, "steelengine.jsonc");
+    vi.stubEnv("STEELENGINE_CONFIG_PATH", configPath);
     await fs.writeFile(
       configPath,
       JSON.stringify({
@@ -238,15 +238,15 @@ describe("policy commands", () => {
         channels: [
           {
             id: "telegram",
-            source: "oc://openclaw.config/channels/telegram",
+            source: "oc://steelengine.config/channels/telegram",
           },
         ],
       },
       findings: [
         {
           checkId: "policy/channels-denied-provider",
-          ocPath: "oc://openclaw.config/channels/telegram",
-          target: "oc://openclaw.config/channels/telegram",
+          ocPath: "oc://steelengine.config/channels/telegram",
+          target: "oc://steelengine.config/channels/telegram",
           requirement: "oc://policy.jsonc/channels/denyRules/#0",
           policy: {
             fixRecommendation: {
@@ -283,8 +283,8 @@ describe("policy commands", () => {
   });
 
   it("attests underlying policy findings when the accepted attestation is stale", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
-    vi.stubEnv("OPENCLAW_CONFIG_PATH", configPath);
+    const configPath = join(workspaceDir, "steelengine.jsonc");
+    vi.stubEnv("STEELENGINE_CONFIG_PATH", configPath);
     await fs.writeFile(
       configPath,
       JSON.stringify({
@@ -328,8 +328,8 @@ describe("policy commands", () => {
   });
 
   it("reports stale accepted attestations in policy watch", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
-    vi.stubEnv("OPENCLAW_CONFIG_PATH", configPath);
+    const configPath = join(workspaceDir, "steelengine.jsonc");
+    vi.stubEnv("STEELENGINE_CONFIG_PATH", configPath);
     await fs.writeFile(
       configPath,
       JSON.stringify({
@@ -395,8 +395,8 @@ describe("policy commands", () => {
   });
 
   it("reports findings before stale when accepted attestation exists", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
-    vi.stubEnv("OPENCLAW_CONFIG_PATH", configPath);
+    const configPath = join(workspaceDir, "steelengine.jsonc");
+    vi.stubEnv("STEELENGINE_CONFIG_PATH", configPath);
     await fs.writeFile(
       configPath,
       JSON.stringify({
@@ -436,9 +436,9 @@ describe("policy commands", () => {
     ]);
   });
 
-  it("fails closed when the OpenClaw config is invalid", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
-    vi.stubEnv("OPENCLAW_CONFIG_PATH", configPath);
+  it("fails closed when the SteelEngine config is invalid", async () => {
+    const configPath = join(workspaceDir, "steelengine.jsonc");
+    vi.stubEnv("STEELENGINE_CONFIG_PATH", configPath);
     await fs.writeFile(configPath, "{", "utf-8");
     const { exitCode, parsed } = await runPolicyCheckJson();
 
@@ -879,8 +879,8 @@ describe("policy commands", () => {
   it("resolves the default compare policy path from the configured agent workspace", async () => {
     const agentWorkspace = join(workspaceDir, "agent-workspace");
     await fs.mkdir(agentWorkspace, { recursive: true });
-    const configPath = join(workspaceDir, "openclaw.jsonc");
-    vi.stubEnv("OPENCLAW_CONFIG_PATH", configPath);
+    const configPath = join(workspaceDir, "steelengine.jsonc");
+    vi.stubEnv("STEELENGINE_CONFIG_PATH", configPath);
     await fs.writeFile(
       configPath,
       JSON.stringify({

@@ -2,8 +2,8 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/memory-core-host-engine-foundation";
-import { resolveOpenClawAgentSqlitePath } from "openclaw/plugin-sdk/sqlite-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/memory-core-host-engine-foundation";
+import { resolveSteelEngineAgentSqlitePath } from "steelengine/plugin-sdk/sqlite-runtime";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { closeAllMemorySearchManagers, getMemorySearchManager } from "./index.js";
 import type { MemoryIndexManager } from "./manager.js";
@@ -16,17 +16,17 @@ const createEmbeddingProviderMock = vi.hoisted(() =>
     providerUnavailableReason: "No embeddings provider available.",
   })),
 );
-const originalSelfHealStateDir = process.env.OPENCLAW_STATE_DIR;
+const originalSelfHealStateDir = process.env.STEELENGINE_STATE_DIR;
 
 function setSelfHealStateDir(stateDir: string): void {
-  Reflect.set(process.env, "OPENCLAW_STATE_DIR", stateDir);
+  Reflect.set(process.env, "STEELENGINE_STATE_DIR", stateDir);
 }
 
 function restoreSelfHealStateDir(): void {
   if (originalSelfHealStateDir === undefined) {
-    Reflect.deleteProperty(process.env, "OPENCLAW_STATE_DIR");
+    Reflect.deleteProperty(process.env, "STEELENGINE_STATE_DIR");
   } else {
-    Reflect.set(process.env, "OPENCLAW_STATE_DIR", originalSelfHealStateDir);
+    Reflect.set(process.env, "STEELENGINE_STATE_DIR", originalSelfHealStateDir);
   }
 }
 
@@ -54,7 +54,7 @@ describe("memory manager self-heal missing identity with FTS-only chunks", () =>
   }
 
   beforeAll(async () => {
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-mem-self-heal-91167-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-mem-self-heal-91167-"));
   });
 
   beforeEach(async () => {
@@ -63,7 +63,7 @@ describe("memory manager self-heal missing identity with FTS-only chunks", () =>
     await fs.mkdir(path.join(workspaceDir, "memory"), { recursive: true });
     await fs.writeFile(path.join(workspaceDir, "MEMORY.md"), "Alpha topic\n\nKeep this note.");
     setSelfHealStateDir(path.join(workspaceDir, "state"));
-    indexPath = resolveOpenClawAgentSqlitePath({ agentId: "main" });
+    indexPath = resolveSteelEngineAgentSqlitePath({ agentId: "main" });
   });
 
   afterEach(async () => {
@@ -108,7 +108,7 @@ describe("memory manager self-heal missing identity with FTS-only chunks", () =>
         },
         list: [{ id: "main", default: true }],
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const result = await getMemorySearchManager({
       cfg,
       agentId: "main",

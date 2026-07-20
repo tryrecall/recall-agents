@@ -1,5 +1,5 @@
 import { ContextProvider } from "@lit/context";
-import type { UiCommandParams } from "@openclaw/gateway-protocol";
+import type { UiCommandParams } from "@steelengine/gateway-protocol";
 import type { RouteLocation, RouterState } from "@openclaw/uirouter";
 import { html, nothing } from "lit";
 import { property, query, state } from "lit/decorators.js";
@@ -48,7 +48,7 @@ import { isGatewayMethodAdvertised } from "../lib/gateway-methods.ts";
 import { isWorkboardEnabledInConfigSnapshot } from "../lib/plugin-activation.ts";
 import { searchForSession } from "../lib/sessions/index.ts";
 import { isTerminalAvailable } from "../lib/terminal-availability.ts";
-import { OpenClawLightDomElement } from "../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../lit/steelengine-element.ts";
 import { SubscriptionsController } from "../lit/subscriptions-controller.ts";
 import { findSettingsSearchBlocks } from "../pages/config/settings-search.ts";
 import { newSessionSearch, type NewSessionTarget } from "../pages/new-session/location.ts";
@@ -171,7 +171,7 @@ function renderApprovalDocument(runtime: ApplicationRuntime) {
     return nothing;
   }
   return html`
-    <openclaw-approval-page .approvalId=${documentMode.approvalId ?? ""}>
+    <steelengine-approval-page .approvalId=${documentMode.approvalId ?? ""}>
       <main class="approval-page approval-page--booting" role="status" aria-live="polite">
         <img
           class="connect-splash__logo"
@@ -180,7 +180,7 @@ function renderApprovalDocument(runtime: ApplicationRuntime) {
         />
         <span>${t("common.loading")}</span>
       </main>
-    </openclaw-approval-page>
+    </steelengine-approval-page>
   `;
 }
 
@@ -194,7 +194,7 @@ function isBrowserPanelAvailable(snapshot: ApplicationContext["gateway"]["snapsh
   );
 }
 
-class OpenClawApp extends OpenClawLightDomElement {
+class SteelEngineApp extends SteelEngineLightDomElement {
   // Pinned while a connect submitted from the visible login gate is in
   // flight, so a failed manual attempt cannot flash the shell in between.
   @state() private loginGatePinned = false;
@@ -258,7 +258,7 @@ class OpenClawApp extends OpenClawLightDomElement {
     // their lazy source getters bind on both the initial mount and reconnect.
     this.requestUpdate();
     void this.runtime.start().catch((error: unknown) => {
-      console.error("[openclaw] application start failed", error);
+      console.error("[steelengine] application start failed", error);
     });
   }
 
@@ -319,7 +319,7 @@ class OpenClawApp extends OpenClawLightDomElement {
     const gatewaySnapshot = context.gateway.snapshot;
     const gatewayUrlConfirmation = this.pendingGatewayUrl
       ? html`
-          <openclaw-gateway-url-confirmation
+          <steelengine-gateway-url-confirmation
             .props=${{
               pendingGatewayUrl: this.pendingGatewayUrl,
               onConfirm: () => {
@@ -331,7 +331,7 @@ class OpenClawApp extends OpenClawLightDomElement {
                 this.pendingGatewayUrl = null;
               },
             }}
-          ></openclaw-gateway-url-confirmation>
+          ></steelengine-gateway-url-confirmation>
         `
       : nothing;
     // Embedded mobile terminals own the whole document. Keep the generic login
@@ -343,12 +343,12 @@ class OpenClawApp extends OpenClawLightDomElement {
       );
       // Embedded clients query this host immediately; keep it stable while the chunk loads.
       return html`
-        <openclaw-terminal-panel
+        <steelengine-terminal-panel
           .client=${gatewaySnapshot.connected ? gatewaySnapshot.client : null}
           .available=${terminalAvailable}
           .themeMode=${resolveTerminalThemeMode()}
           fullscreen
-        ></openclaw-terminal-panel>
+        ></steelengine-terminal-panel>
         ${!isOptionalElementDefined(TERMINAL_PANEL_ELEMENT) && terminalAvailable
           ? renderConnectingSplash(context.basePath)
           : nothing}
@@ -372,17 +372,17 @@ class OpenClawApp extends OpenClawLightDomElement {
       gatewaySnapshot.client !== null;
     if (initialConnectPending) {
       return html`
-        <openclaw-tooltip-provider>
+        <steelengine-tooltip-provider>
           ${renderConnectingSplash(context.basePath)} ${gatewayUrlConfirmation}
-        </openclaw-tooltip-provider>
+        </steelengine-tooltip-provider>
       `;
     }
     const showLoginGate =
       !gatewaySnapshot.connected && (this.loginGatePinned || !gatewaySnapshot.reconnecting);
     if (showLoginGate) {
       return html`
-        <openclaw-tooltip-provider>
-          <openclaw-login-gate
+        <steelengine-tooltip-provider>
+          <steelengine-login-gate
             .props=${{
               basePath: context.basePath,
               connected: gatewaySnapshot.connected,
@@ -419,33 +419,33 @@ class OpenClawApp extends OpenClawLightDomElement {
                 });
               },
             }}
-          ></openclaw-login-gate>
+          ></steelengine-login-gate>
           ${gatewayUrlConfirmation}
-        </openclaw-tooltip-provider>
+        </steelengine-tooltip-provider>
       `;
     }
     if (runtime.documentMode?.kind === "approval") {
       return html`
-        <openclaw-tooltip-provider>
+        <steelengine-tooltip-provider>
           ${gatewayUrlConfirmation} ${renderApprovalDocument(runtime)}
-        </openclaw-tooltip-provider>
+        </steelengine-tooltip-provider>
       `;
     }
     return html`
-      <openclaw-tooltip-provider>
-        <openclaw-github-link-hovercard-provider .client=${gatewaySnapshot.client}>
+      <steelengine-tooltip-provider>
+        <steelengine-github-link-hovercard-provider .client=${gatewaySnapshot.client}>
           ${gatewayUrlConfirmation}
-          <openclaw-app-shell
+          <steelengine-app-shell
             .runtime=${runtime}
             .onboarding=${this.onboarding}
-          ></openclaw-app-shell>
-        </openclaw-github-link-hovercard-provider>
-      </openclaw-tooltip-provider>
+          ></steelengine-app-shell>
+        </steelengine-github-link-hovercard-provider>
+      </steelengine-tooltip-provider>
     `;
   }
 }
 
-class OpenClawShell extends OpenClawLightDomElement {
+class SteelEngineShell extends SteelEngineLightDomElement {
   @property({ attribute: false }) runtime?: ApplicationRuntime;
   @property({ attribute: false }) onboarding = false;
 
@@ -457,8 +457,8 @@ class OpenClawShell extends OpenClawLightDomElement {
   private readonly commandPaletteElement = COMMAND_PALETTE_ELEMENT;
   private readonly terminalPanelElement = TERMINAL_PANEL_ELEMENT;
   private readonly browserPanelElement = BROWSER_PANEL_ELEMENT;
-  @query("openclaw-command-palette") private commandPalette?: CommandPaletteElement;
-  @query("openclaw-exec-approval")
+  @query("steelengine-command-palette") private commandPalette?: CommandPaletteElement;
+  @query("steelengine-exec-approval")
   private approvalOverlay?: HTMLElement & { show(): void };
   private commandPaletteTarget?: CommandPaletteTargetDetail;
   private navDrawerTrigger: HTMLElement | null = null;
@@ -599,10 +599,10 @@ class OpenClawShell extends OpenClawLightDomElement {
     // Shipped Mac app builds without web chrome still drive these events; the
     // app's ⌘N menu item reuses native-new-session, while its ⌘K menu item
     // uses native-toggle-search because the legacy open-search is open-only.
-    window.addEventListener("openclaw:native-toggle-sidebar", this.handleNativeToggleSidebar);
-    window.addEventListener("openclaw:native-open-search", this.handleNativeOpenSearch);
-    window.addEventListener("openclaw:native-toggle-search", this.handleNativeToggleSearch);
-    window.addEventListener("openclaw:native-new-session", this.handleNativeNewSession);
+    window.addEventListener("steelengine:native-toggle-sidebar", this.handleNativeToggleSidebar);
+    window.addEventListener("steelengine:native-open-search", this.handleNativeOpenSearch);
+    window.addEventListener("steelengine:native-toggle-search", this.handleNativeToggleSearch);
+    window.addEventListener("steelengine:native-new-session", this.handleNativeNewSession);
     window.addEventListener(TERMINAL_PANEL_TOGGLE_EVENT, this.handleDeferredTerminalToggle);
     window.addEventListener(BROWSER_PANEL_TOGGLE_EVENT, this.handleDeferredBrowserToggle);
     // Write-through of synced display prefs to config ui.prefs. Server-applied
@@ -626,10 +626,10 @@ class OpenClawShell extends OpenClawLightDomElement {
     document.removeEventListener("keydown", this.handleDocumentKeydown);
     window.removeEventListener("resize", this.handleWindowResize);
     window.removeEventListener(NATIVE_HISTORY_STATE_EVENT, this.handleNativeHistoryState);
-    window.removeEventListener("openclaw:native-toggle-sidebar", this.handleNativeToggleSidebar);
-    window.removeEventListener("openclaw:native-open-search", this.handleNativeOpenSearch);
-    window.removeEventListener("openclaw:native-toggle-search", this.handleNativeToggleSearch);
-    window.removeEventListener("openclaw:native-new-session", this.handleNativeNewSession);
+    window.removeEventListener("steelengine:native-toggle-sidebar", this.handleNativeToggleSidebar);
+    window.removeEventListener("steelengine:native-open-search", this.handleNativeOpenSearch);
+    window.removeEventListener("steelengine:native-toggle-search", this.handleNativeToggleSearch);
+    window.removeEventListener("steelengine:native-new-session", this.handleNativeNewSession);
     window.removeEventListener(TERMINAL_PANEL_TOGGLE_EVENT, this.handleDeferredTerminalToggle);
     window.removeEventListener(BROWSER_PANEL_TOGGLE_EVENT, this.handleDeferredBrowserToggle);
     setSettingsChangeListener(null);
@@ -659,7 +659,7 @@ class OpenClawShell extends OpenClawLightDomElement {
   private readonly handleGatewayEvent = (event: GatewayEventFrame) => {
     if (event.event === "config.changed") {
       // Another writer (agent-approved config_set, other device, CLI) changed
-      // openclaw.json; refresh the snapshot so ui.prefs reconcile live. A
+      // steelengine.json; refresh the snapshot so ui.prefs reconcile live. A
       // dirty local settings draft wins — the autosave/conflict flow owns it.
       const runtimeConfig = this.context?.runtimeConfig;
       if (runtimeConfig && !runtimeConfig.state.configFormDirty) {
@@ -895,7 +895,7 @@ class OpenClawShell extends OpenClawLightDomElement {
 
   private dismissSidebarTransientMenus(): boolean {
     return (
-      this.querySelector<AppSidebarElement>("openclaw-app-sidebar")?.dismissTransientMenus() ??
+      this.querySelector<AppSidebarElement>("steelengine-app-sidebar")?.dismissTransientMenus() ??
       false
     );
   }
@@ -1293,14 +1293,14 @@ class OpenClawShell extends OpenClawLightDomElement {
     // and the upgraded panels catch the first toggle instead of dropping the event.
     return html`
       ${isOptionalElementDefined(this.commandPaletteElement)
-        ? html`<openclaw-command-palette
+        ? html`<steelengine-command-palette
             .onNavigate=${(routeId: RouteId) => this.navigate(routeId)}
             .onSelectSession=${(sessionKey: string) => {
               context.gateway.setSessionKey(sessionKey);
               this.navigate("chat", { search: searchForSession(sessionKey) });
             }}
             .onSlashCommand=${this.handleCommandPaletteSlashCommand}
-          ></openclaw-command-palette>`
+          ></steelengine-command-palette>`
         : nothing}
       <div
         class="shell ${chatLikeRoute ? "shell--chat" : ""} ${navCollapsed
@@ -1323,7 +1323,7 @@ class OpenClawShell extends OpenClawLightDomElement {
         ></button>
         ${isNativeWebChromeHost() && !onboarding
           ? html`
-              <openclaw-macos-titlebar-controls
+              <steelengine-macos-titlebar-controls
                 .navCollapsed=${this.nativeNavCollapsed()}
                 .historyOnly=${settingsTakeover}
                 .canGoBack=${this.nativeHistoryState.canGoBack}
@@ -1331,20 +1331,20 @@ class OpenClawShell extends OpenClawLightDomElement {
                 .onToggleSidebar=${() => this.toggleNavigationSurface()}
                 .onOpenPalette=${this.openPalette}
                 .onOpenNewSession=${this.handleNativeNewSession}
-              ></openclaw-macos-titlebar-controls>
+              ></steelengine-macos-titlebar-controls>
             `
           : nothing}
-        <openclaw-app-topbar
+        <steelengine-app-topbar
           .basePath=${context.basePath}
           .searchDisabled=${false}
           .navDrawerOpen=${navDrawerOpen}
           .onboarding=${onboarding}
           .onOpenPalette=${this.openPalette}
           .onToggleDrawer=${(trigger: HTMLElement) => this.toggleNavigationSurface(trigger)}
-        ></openclaw-app-topbar>
+        ></steelengine-app-topbar>
         ${navCollapsed && !onboarding
           ? html`
-              <openclaw-tooltip .content=${`${t("nav.expand")} (⌘B)`}>
+              <steelengine-tooltip .content=${`${t("nav.expand")} (⌘B)`}>
                 <button
                   type="button"
                   class="shell-nav-expand"
@@ -1354,7 +1354,7 @@ class OpenClawShell extends OpenClawLightDomElement {
                 >
                   ${icons.panelLeftOpen}
                 </button>
-              </openclaw-tooltip>
+              </steelengine-tooltip>
             `
           : nothing}
         <div class="shell-nav">
@@ -1382,7 +1382,7 @@ class OpenClawShell extends OpenClawLightDomElement {
                 },
                 preloadTimers: this.settingsPreloadTimers,
               })
-            : html`<openclaw-app-sidebar
+            : html`<steelengine-app-sidebar
                 .basePath=${context.basePath}
                 .activeRouteId=${activeRoute}
                 .activePluginTabId=${activePluginTabId}
@@ -1420,7 +1420,7 @@ class OpenClawShell extends OpenClawLightDomElement {
                   this.navigate(routeId, options)}
                 .onPreloadRoute=${(routeId: string) =>
                   isRouteId(routeId) ? context.preload(routeId) : Promise.resolve()}
-              ></openclaw-app-sidebar>`}
+              ></steelengine-app-sidebar>`}
         </div>
         ${!navCollapsed && !onboarding && !settingsTakeover
           ? html`
@@ -1446,17 +1446,17 @@ class OpenClawShell extends OpenClawLightDomElement {
         >
           ${gatewaySnapshot.connected
             ? nothing
-            : html`<openclaw-connection-banner
+            : html`<steelengine-connection-banner
                 .props=${{
                   lastError: gatewaySnapshot.lastError,
                   onRetry: () => context.gateway.connect(),
                 }}
-              ></openclaw-connection-banner>`}
-          <openclaw-update-banner
+              ></steelengine-connection-banner>`}
+          <steelengine-update-banner
             .props=${{
               statusBanner: overlaySnapshot.updateStatusBanner,
             }}
-          ></openclaw-update-banner>
+          ></steelengine-update-banner>
           ${renderFloatingUpdateCard({
             navigationSurfaceHidden,
             onboarding,
@@ -1464,18 +1464,18 @@ class OpenClawShell extends OpenClawLightDomElement {
             updateRunning: overlaySnapshot.updateRunning,
             onUpdate: () => void context.overlays.runUpdate(),
           })}
-          <openclaw-router-outlet
+          <steelengine-router-outlet
             .router=${runtime.router}
             .retryContext=${context}
             .onNotFound=${() => this.replaceChatWithCurrentSession()}
-          ></openclaw-router-outlet>
+          ></steelengine-router-outlet>
         </main>
-        <openclaw-terminal-panel
+        <steelengine-terminal-panel
           .client=${gatewaySnapshot.connected ? gatewaySnapshot.client : null}
           .available=${terminalAvailable}
           .themeMode=${resolveTerminalThemeMode()}
-        ></openclaw-terminal-panel>
-        <openclaw-browser-panel
+        ></steelengine-terminal-panel>
+        <steelengine-browser-panel
           .client=${gatewaySnapshot.connected ? gatewaySnapshot.client : null}
           .available=${browserPanelAvailable}
           .basePath=${context.basePath}
@@ -1484,8 +1484,8 @@ class OpenClawShell extends OpenClawLightDomElement {
             settings: { token: context.gateway.connection.token },
             password: context.gateway.connection.password,
           })}
-        ></openclaw-browser-panel>
-        <openclaw-exec-approval
+        ></steelengine-browser-panel>
+        <steelengine-exec-approval
           .props=${{
             queue: overlaySnapshot.approvalQueue,
             busy: overlaySnapshot.approvalBusy,
@@ -1493,7 +1493,7 @@ class OpenClawShell extends OpenClawLightDomElement {
             onDecision: (decision: Parameters<typeof context.overlays.decideApproval>[0]) =>
               context.overlays.decideApproval(decision),
           }}
-        ></openclaw-exec-approval>
+        ></steelengine-exec-approval>
         ${renderDevicePairSetup({
           open: overlaySnapshot.devicePairSetupOpen,
           loading: overlaySnapshot.devicePairSetupLoading,
@@ -1511,19 +1511,19 @@ class OpenClawShell extends OpenClawLightDomElement {
           },
         })}
         ${onboarding && activeRoute !== "custodian"
-          ? html`<openclaw-onboarding-memory-import
+          ? html`<steelengine-onboarding-memory-import
               .active=${true}
               .context=${context}
-            ></openclaw-onboarding-memory-import>`
+            ></steelengine-onboarding-memory-import>`
           : nothing}
       </div>
     `;
   }
 }
-if (!customElements.get("openclaw-app")) {
-  customElements.define("openclaw-app", OpenClawApp);
+if (!customElements.get("steelengine-app")) {
+  customElements.define("steelengine-app", SteelEngineApp);
 }
-if (!customElements.get("openclaw-app-shell")) {
-  customElements.define("openclaw-app-shell", OpenClawShell);
+if (!customElements.get("steelengine-app-shell")) {
+  customElements.define("steelengine-app-shell", SteelEngineShell);
 }
 /* oxlint-disable max-lines -- TODO: split this grandfathered oversized file. */

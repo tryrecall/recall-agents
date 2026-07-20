@@ -330,7 +330,7 @@ describe("live model switch", () => {
         {
           currentProvider: "openai",
           currentModel: "gpt-5.6-luna",
-          currentAgentRuntimeOverride: "openclaw",
+          currentAgentRuntimeOverride: "steelengine",
         },
       ),
     ).toMatchObject({ agentRuntimeOverride: "codex" });
@@ -427,7 +427,7 @@ describe("live model switch", () => {
         makeShouldSwitchParams({
           currentProvider: "openai",
           currentModel: "gpt-5.6-luna",
-          currentAgentRuntimeOverride: "openclaw",
+          currentAgentRuntimeOverride: "steelengine",
           defaultProvider: "openai",
           defaultModel: "gpt-5.6-luna",
         }),

@@ -30,7 +30,7 @@ import {
 import type { ConfigIoDeps, NormalizedConfigIoDeps, ParseConfigJson5Result } from "./io.types.js";
 import { resolveConfigPath, resolveIncludeRoots, resolveStateDir } from "./paths.js";
 import { getRuntimeConfigSourceSnapshot } from "./runtime-snapshot.js";
-import type { OpenClawConfig } from "./types.js";
+import type { SteelEngineConfig } from "./types.js";
 
 export function hashConfigRaw(raw: string | null): string {
   // Present-file hashes stay compatible with last-known-good recovery metadata.
@@ -57,11 +57,11 @@ export function resolveConfigSnapshotHash(snapshot: {
   return hashConfigRaw(snapshot.raw);
 }
 
-export function coerceConfig(value: unknown): OpenClawConfig {
+export function coerceConfig(value: unknown): SteelEngineConfig {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return {};
   }
-  return value as OpenClawConfig;
+  return value as SteelEngineConfig;
 }
 
 export function hasConfigMeta(value: unknown): boolean {
@@ -140,8 +140,8 @@ export function normalizeConfigIoDeps(overrides: ConfigIoDeps = {}): NormalizedC
     measure: overrides.measure ?? (async (_name, run) => await run()),
     suppressFutureVersionWarning:
       overrides.suppressFutureVersionWarning ??
-      (isTruthyEnvValue(env.OPENCLAW_UPDATE_IN_PROGRESS) ||
-        isTruthyEnvValue(env.OPENCLAW_UPDATE_POST_CORE)),
+      (isTruthyEnvValue(env.STEELENGINE_UPDATE_IN_PROGRESS) ||
+        isTruthyEnvValue(env.STEELENGINE_UPDATE_POST_CORE)),
     observe: overrides.observe ?? true,
   };
 }
@@ -297,7 +297,7 @@ export function resolveConfigForRead(
   lowerPrecedenceEnv: Readonly<Record<string, string>> = {},
 ): ConfigReadResolution {
   if (resolvedIncludes && typeof resolvedIncludes === "object" && "env" in resolvedIncludes) {
-    applyConfigEnvVars(resolvedIncludes as OpenClawConfig, env, { lowerPrecedenceEnv });
+    applyConfigEnvVars(resolvedIncludes as SteelEngineConfig, env, { lowerPrecedenceEnv });
   }
   const envWarnings: EnvSubstitutionWarning[] = [];
   return {
@@ -325,7 +325,7 @@ export function replaceEnvSnapshot(
 
 export function resolveManagedRuntimeEnvBaseline(): {
   generation: number;
-  sourceConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
 } {
   const published = getPublishedConfigRuntimeEnvState();
   return {

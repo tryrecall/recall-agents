@@ -7,8 +7,8 @@ import { buildCliRespawnPlan, runCliRespawnPlan } from "./entry.respawn.js";
 const EXPERIMENTAL_WARNING_FLAG = "--disable-warning=ExperimentalWarning";
 const BUNDLED_CA_FLAG = "--use-bundled-ca";
 const OPENSSL_CA_FLAG = "--use-openssl-ca";
-const OPENCLAW_NODE_EXTRA_CA_CERTS_READY = "OPENCLAW_NODE_EXTRA_CA_CERTS_READY";
-const OPENCLAW_NODE_OPTIONS_READY = "OPENCLAW_NODE_OPTIONS_READY";
+const STEELENGINE_NODE_EXTRA_CA_CERTS_READY = "STEELENGINE_NODE_EXTRA_CA_CERTS_READY";
+const STEELENGINE_NODE_OPTIONS_READY = "STEELENGINE_NODE_OPTIONS_READY";
 
 type CliRespawnPlan = NonNullable<ReturnType<typeof buildCliRespawnPlan>>;
 
@@ -31,7 +31,7 @@ describe("buildCliRespawnPlan", () => {
   it("returns null when respawn policy skips the argv", () => {
     expect(
       buildCliRespawnPlan({
-        argv: ["node", "openclaw", "--help"],
+        argv: ["node", "steelengine", "--help"],
         env: {},
         execArgv: [],
         autoNodeExtraCaCerts: "/etc/ssl/certs/ca-certificates.crt",
@@ -41,7 +41,7 @@ describe("buildCliRespawnPlan", () => {
 
   it("adds NODE_EXTRA_CA_CERTS and warning suppression in one respawn", () => {
     const plan = buildCliRespawnPlan({
-      argv: ["node", "openclaw", "status"],
+      argv: ["node", "steelengine", "status"],
       env: {},
       execArgv: [],
       autoNodeExtraCaCerts: "/etc/ssl/certs/ca-certificates.crt",
@@ -52,8 +52,8 @@ describe("buildCliRespawnPlan", () => {
     expect(respawnPlan.command).toBe(process.execPath);
     expect(respawnPlan.argv[0]).toBe(EXPERIMENTAL_WARNING_FLAG);
     expect(respawnPlan.env.NODE_EXTRA_CA_CERTS).toBe("/etc/ssl/certs/ca-certificates.crt");
-    expect(respawnPlan.env[OPENCLAW_NODE_EXTRA_CA_CERTS_READY]).toBe("1");
-    expect(respawnPlan.env[OPENCLAW_NODE_OPTIONS_READY]).toBe("1");
+    expect(respawnPlan.env[STEELENGINE_NODE_EXTRA_CA_CERTS_READY]).toBe("1");
+    expect(respawnPlan.env[STEELENGINE_NODE_OPTIONS_READY]).toBe("1");
     expect(respawnPlan.detachForProcessTree).toBe(true);
   });
 
@@ -61,7 +61,7 @@ describe("buildCliRespawnPlan", () => {
     "preserves NODE_EXTRA_CA_CERTS respawn for interactive %s",
     (command) => {
       const plan = buildCliRespawnPlan({
-        argv: ["node", "openclaw", command],
+        argv: ["node", "steelengine", command],
         env: {},
         execArgv: [],
         autoNodeExtraCaCerts: "/etc/ssl/certs/ca-certificates.crt",
@@ -69,17 +69,17 @@ describe("buildCliRespawnPlan", () => {
       });
 
       const respawnPlan = expectCliRespawnPlan(plan);
-      expect(respawnPlan.argv).toEqual(["openclaw", command]);
+      expect(respawnPlan.argv).toEqual(["steelengine", command]);
       expect(respawnPlan.env.NODE_EXTRA_CA_CERTS).toBe("/etc/ssl/certs/ca-certificates.crt");
-      expect(respawnPlan.env[OPENCLAW_NODE_EXTRA_CA_CERTS_READY]).toBe("1");
-      expect(respawnPlan.env[OPENCLAW_NODE_OPTIONS_READY]).toBeUndefined();
+      expect(respawnPlan.env[STEELENGINE_NODE_EXTRA_CA_CERTS_READY]).toBe("1");
+      expect(respawnPlan.env[STEELENGINE_NODE_OPTIONS_READY]).toBeUndefined();
       expect(respawnPlan.detachForProcessTree).toBe(false);
     },
   );
 
   it("keeps bare-root startup respawns attached to the terminal", () => {
     const plan = buildCliRespawnPlan({
-      argv: ["node", "openclaw"],
+      argv: ["node", "steelengine"],
       env: {},
       execArgv: [],
       autoNodeExtraCaCerts: "/etc/ssl/certs/ca-certificates.crt",
@@ -87,13 +87,13 @@ describe("buildCliRespawnPlan", () => {
     });
 
     const respawnPlan = expectCliRespawnPlan(plan);
-    expect(respawnPlan.argv).toEqual([EXPERIMENTAL_WARNING_FLAG, "openclaw"]);
+    expect(respawnPlan.argv).toEqual([EXPERIMENTAL_WARNING_FLAG, "steelengine"]);
     expect(respawnPlan.detachForProcessTree).toBe(false);
   });
 
   it("uses the file-backed CA store for one-shot macOS commands", () => {
     const plan = buildCliRespawnPlan({
-      argv: ["node", "openclaw", "cron", "list", "--json"],
+      argv: ["node", "steelengine", "cron", "list", "--json"],
       env: { NODE_USE_SYSTEM_CA: "1" },
       execArgv: [],
       autoNodeExtraCaCerts: undefined,
@@ -104,7 +104,7 @@ describe("buildCliRespawnPlan", () => {
     expect(respawnPlan.argv).toEqual([
       EXPERIMENTAL_WARNING_FLAG,
       OPENSSL_CA_FLAG,
-      "openclaw",
+      "steelengine",
       "cron",
       "list",
       "--json",
@@ -113,8 +113,8 @@ describe("buildCliRespawnPlan", () => {
   });
 
   it.each([
-    ["interactive commands", ["node", "openclaw", "tui"]],
-    ["the foreground Gateway", ["node", "openclaw", "gateway", "run"]],
+    ["interactive commands", ["node", "steelengine", "tui"]],
+    ["the foreground Gateway", ["node", "steelengine", "gateway", "run"]],
   ] as const)("keeps macOS system CA loading for %s", (_label, argv) => {
     expect(
       buildCliRespawnPlan({
@@ -136,7 +136,7 @@ describe("buildCliRespawnPlan", () => {
     "keeps an explicit macOS system CA runtime flag from %s",
     (_label, execArgv, nodeOptions) => {
       const plan = buildCliRespawnPlan({
-        argv: ["node", "openclaw", "cron", "list", "--json"],
+        argv: ["node", "steelengine", "cron", "list", "--json"],
         env: { NODE_OPTIONS: nodeOptions, NODE_USE_SYSTEM_CA: "1" },
         execArgv: [...execArgv],
         autoNodeExtraCaCerts: undefined,
@@ -157,7 +157,7 @@ describe("buildCliRespawnPlan", () => {
     "preserves an explicit bundled CA selection from %s",
     (_label, execArgv, nodeOptions) => {
       const plan = buildCliRespawnPlan({
-        argv: ["node", "openclaw", "cron", "list", "--json"],
+        argv: ["node", "steelengine", "cron", "list", "--json"],
         env: { NODE_OPTIONS: nodeOptions, NODE_USE_SYSTEM_CA: "1" },
         execArgv: [...execArgv],
         autoNodeExtraCaCerts: undefined,
@@ -173,10 +173,10 @@ describe("buildCliRespawnPlan", () => {
   it("does not respawn again after selecting the macOS file-backed CA store", () => {
     expect(
       buildCliRespawnPlan({
-        argv: ["node", "openclaw", "cron", "list", "--json"],
+        argv: ["node", "steelengine", "cron", "list", "--json"],
         env: {
           NODE_USE_SYSTEM_CA: "1",
-          [OPENCLAW_NODE_OPTIONS_READY]: "1",
+          [STEELENGINE_NODE_OPTIONS_READY]: "1",
         },
         execArgv: [OPENSSL_CA_FLAG, EXPERIMENTAL_WARNING_FLAG],
         autoNodeExtraCaCerts: undefined,
@@ -188,8 +188,8 @@ describe("buildCliRespawnPlan", () => {
   it("does not respawn interactive commands for warning suppression only", () => {
     expect(
       buildCliRespawnPlan({
-        argv: ["node", "openclaw", "tui"],
-        env: { [OPENCLAW_NODE_EXTRA_CA_CERTS_READY]: "1" },
+        argv: ["node", "steelengine", "tui"],
+        env: { [STEELENGINE_NODE_EXTRA_CA_CERTS_READY]: "1" },
         execArgv: [],
         autoNodeExtraCaCerts: undefined,
         platform: "linux",
@@ -199,7 +199,7 @@ describe("buildCliRespawnPlan", () => {
 
   it("does not overwrite an existing NODE_EXTRA_CA_CERTS value", () => {
     const plan = buildCliRespawnPlan({
-      argv: ["node", "openclaw", "status"],
+      argv: ["node", "steelengine", "status"],
       env: { NODE_EXTRA_CA_CERTS: "/custom/ca.pem" },
       execArgv: [],
       autoNodeExtraCaCerts: "/etc/ssl/certs/ca-certificates.crt",
@@ -213,10 +213,10 @@ describe("buildCliRespawnPlan", () => {
   it("returns null when both respawn guards are already satisfied", () => {
     expect(
       buildCliRespawnPlan({
-        argv: ["node", "openclaw", "status"],
+        argv: ["node", "steelengine", "status"],
         env: {
-          [OPENCLAW_NODE_EXTRA_CA_CERTS_READY]: "1",
-          [OPENCLAW_NODE_OPTIONS_READY]: "1",
+          [STEELENGINE_NODE_EXTRA_CA_CERTS_READY]: "1",
+          [STEELENGINE_NODE_OPTIONS_READY]: "1",
         },
         execArgv: [EXPERIMENTAL_WARNING_FLAG],
         autoNodeExtraCaCerts: "/etc/ssl/certs/ca-certificates.crt",
@@ -229,7 +229,7 @@ describe("buildCliRespawnPlan", () => {
     const plan = buildCliRespawnPlan({
       argv: [
         "node",
-        "C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\openclaw\\openclaw.mjs",
+        "C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\steelengine\\steelengine.mjs",
         "dashboard",
       ],
       env: {},
@@ -241,18 +241,18 @@ describe("buildCliRespawnPlan", () => {
     const respawnPlan = expectCliRespawnPlan(plan);
     expect(respawnPlan.argv).toEqual([
       "--stack-size=8192",
-      "C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\openclaw\\openclaw.mjs",
+      "C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\steelengine\\steelengine.mjs",
       "dashboard",
     ]);
     expect(respawnPlan.env.NODE_EXTRA_CA_CERTS).toBeUndefined();
-    expect(respawnPlan.env[OPENCLAW_NODE_EXTRA_CA_CERTS_READY]).toBeUndefined();
-    expect(respawnPlan.env[OPENCLAW_NODE_OPTIONS_READY]).toBeUndefined();
+    expect(respawnPlan.env[STEELENGINE_NODE_EXTRA_CA_CERTS_READY]).toBeUndefined();
+    expect(respawnPlan.env[STEELENGINE_NODE_OPTIONS_READY]).toBeUndefined();
     expect(respawnPlan.detachForProcessTree).toBe(false);
   });
 
   it("normalizes duplicated Windows node.exe argv before respawning", () => {
     const scriptPath =
-      "C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\openclaw\\openclaw.mjs";
+      "C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\steelengine\\steelengine.mjs";
     const plan = buildCliRespawnPlan({
       argv: [
         "C:\\Program Files\\nodejs\\node.exe",
@@ -277,7 +277,7 @@ describe("buildCliRespawnPlan", () => {
       buildCliRespawnPlan({
         argv: [
           "node",
-          "C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\openclaw\\openclaw.mjs",
+          "C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\steelengine\\steelengine.mjs",
           "dashboard",
         ],
         env: {},
@@ -293,7 +293,7 @@ describe("buildCliRespawnPlan", () => {
       buildCliRespawnPlan({
         argv: [
           "node",
-          "C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\openclaw\\openclaw.mjs",
+          "C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\steelengine\\steelengine.mjs",
           "dashboard",
         ],
         env: {},
@@ -306,7 +306,7 @@ describe("buildCliRespawnPlan", () => {
 
   it("respawns Volta shims through node so the shim is not called directly", () => {
     const plan = buildCliRespawnPlan({
-      argv: ["/home/alice/.volta/bin/volta-shim", "/usr/local/bin/openclaw", "status"],
+      argv: ["/home/alice/.volta/bin/volta-shim", "/usr/local/bin/steelengine", "status"],
       env: { PATH: "/home/alice/.volta/bin:/usr/bin:/bin" },
       execArgv: [],
       execPath: "/home/alice/.volta/bin/volta-shim",
@@ -318,7 +318,7 @@ describe("buildCliRespawnPlan", () => {
     expect(respawnPlan.command).toBe("node");
     expect(respawnPlan.argv).toEqual([
       EXPERIMENTAL_WARNING_FLAG,
-      "/usr/local/bin/openclaw",
+      "/usr/local/bin/steelengine",
       "status",
     ]);
     expect(respawnPlan.detachForProcessTree).toBe(true);
@@ -336,8 +336,8 @@ describe("runCliRespawnPlan", () => {
     runCliRespawnPlan(
       {
         command: "/usr/bin/node",
-        argv: ["/repo/openclaw/dist/entry.js", "status"],
-        env: { OPENCLAW_NODE_OPTIONS_READY: "1" },
+        argv: ["/repo/steelengine/dist/entry.js", "status"],
+        env: { STEELENGINE_NODE_OPTIONS_READY: "1" },
         detachForProcessTree: true,
       },
       {
@@ -350,10 +350,10 @@ describe("runCliRespawnPlan", () => {
 
     expect(spawn).toHaveBeenCalledWith(
       "/usr/bin/node",
-      ["/repo/openclaw/dist/entry.js", "status"],
+      ["/repo/steelengine/dist/entry.js", "status"],
       {
         stdio: "inherit",
-        env: { OPENCLAW_NODE_OPTIONS_READY: "1" },
+        env: { STEELENGINE_NODE_OPTIONS_READY: "1" },
         detached: process.platform !== "win32" && !(process.stdin.isTTY || process.stdout.isTTY),
       },
     );
@@ -383,7 +383,7 @@ describe("runCliRespawnPlan", () => {
       runCliRespawnPlan(
         {
           command: "/usr/bin/node",
-          argv: ["/repo/openclaw/dist/entry.js", "tui"],
+          argv: ["/repo/steelengine/dist/entry.js", "tui"],
           env: {},
           detachForProcessTree: false,
         },

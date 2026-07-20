@@ -1,12 +1,12 @@
 // Discord plugin module implements send.webhook behavior.
-import { recordChannelActivity } from "openclaw/plugin-sdk/channel-activity-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import { recordChannelActivity } from "steelengine/plugin-sdk/channel-activity-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   readProviderJsonResponse,
   readResponseTextLimited,
-} from "openclaw/plugin-sdk/provider-http";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/provider-http";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import { resolveDiscordClientAccountContext } from "./client.js";
 import {
   DiscordError,
@@ -22,7 +22,7 @@ import type { DiscordSendResult } from "./send.types.js";
 const DISCORD_WEBHOOK_ERROR_BODY_LIMIT_BYTES = 8 * 1024;
 
 type DiscordWebhookSendOpts = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   webhookId: string;
   webhookToken: string;
   accountId?: string;

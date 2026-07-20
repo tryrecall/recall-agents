@@ -5,25 +5,25 @@ import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
 import {
   resolveSessionTranscriptsDirForAgent,
-  type OpenClawConfig,
+  type SteelEngineConfig,
   type ResolvedMemorySearchConfig,
-} from "openclaw/plugin-sdk/memory-core-host-engine-foundation";
-import { statSessionEntrySync } from "openclaw/plugin-sdk/memory-core-host-engine-qmd";
+} from "steelengine/plugin-sdk/memory-core-host-engine-foundation";
+import { statSessionEntrySync } from "steelengine/plugin-sdk/memory-core-host-engine-qmd";
 import type {
   MemorySource,
   MemorySyncParams,
   MemorySyncProgressUpdate,
-} from "openclaw/plugin-sdk/memory-core-host-engine-storage";
+} from "steelengine/plugin-sdk/memory-core-host-engine-storage";
 import {
   clearConfigCache,
   clearRuntimeConfigSnapshot,
-} from "openclaw/plugin-sdk/runtime-config-snapshot";
-import { upsertSessionEntry } from "openclaw/plugin-sdk/session-store-runtime";
-import { appendSessionTranscriptMessageByIdentity } from "openclaw/plugin-sdk/session-transcript-runtime";
+} from "steelengine/plugin-sdk/runtime-config-snapshot";
+import { upsertSessionEntry } from "steelengine/plugin-sdk/session-store-runtime";
+import { appendSessionTranscriptMessageByIdentity } from "steelengine/plugin-sdk/session-transcript-runtime";
 import {
-  closeOpenClawAgentDatabasesForTest,
+  closeSteelEngineAgentDatabasesForTest,
   formatSqliteSessionFileMarker,
-} from "openclaw/plugin-sdk/sqlite-runtime-testing";
+} from "steelengine/plugin-sdk/sqlite-runtime-testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryManagerSyncOps } from "./manager-sync-ops.js";
 
@@ -55,8 +55,8 @@ type MemorySessionTranscriptUpdate = {
   };
 };
 
-const originalStartupStateDir = process.env.OPENCLAW_STATE_DIR;
-const originalStartupConfigPath = process.env.OPENCLAW_CONFIG_PATH;
+const originalStartupStateDir = process.env.STEELENGINE_STATE_DIR;
+const originalStartupConfigPath = process.env.STEELENGINE_CONFIG_PATH;
 let transcriptUpdateListener: ((update: MemorySessionTranscriptUpdate) => void) | undefined;
 
 type SourceStateRow = { path: string; hash: string; mtime: number; size: number };
@@ -70,23 +70,23 @@ type StartupCatchupHarnessInternals = {
 };
 
 function setStartupStateDir(stateDir: string): void {
-  Reflect.set(process.env, "OPENCLAW_STATE_DIR", stateDir);
+  Reflect.set(process.env, "STEELENGINE_STATE_DIR", stateDir);
 }
 
 function setStartupConfigPath(configPath: string): void {
-  Reflect.set(process.env, "OPENCLAW_CONFIG_PATH", configPath);
+  Reflect.set(process.env, "STEELENGINE_CONFIG_PATH", configPath);
 }
 
 function restoreStartupEnv(): void {
   if (originalStartupStateDir === undefined) {
-    Reflect.deleteProperty(process.env, "OPENCLAW_STATE_DIR");
+    Reflect.deleteProperty(process.env, "STEELENGINE_STATE_DIR");
   } else {
-    Reflect.set(process.env, "OPENCLAW_STATE_DIR", originalStartupStateDir);
+    Reflect.set(process.env, "STEELENGINE_STATE_DIR", originalStartupStateDir);
   }
   if (originalStartupConfigPath === undefined) {
-    Reflect.deleteProperty(process.env, "OPENCLAW_CONFIG_PATH");
+    Reflect.deleteProperty(process.env, "STEELENGINE_CONFIG_PATH");
   } else {
-    Reflect.set(process.env, "OPENCLAW_CONFIG_PATH", originalStartupConfigPath);
+    Reflect.set(process.env, "STEELENGINE_CONFIG_PATH", originalStartupConfigPath);
   }
 }
 
@@ -95,9 +95,9 @@ function emitSessionTranscriptUpdate(update: MemorySessionTranscriptUpdate): voi
 }
 
 class SessionStartupCatchupHarness extends MemoryManagerSyncOps {
-  protected readonly cfg = {} as OpenClawConfig;
+  protected readonly cfg = {} as SteelEngineConfig;
   protected readonly agentId = "main";
-  protected readonly workspaceDir = "/tmp/openclaw-test-workspace";
+  protected readonly workspaceDir = "/tmp/steelengine-test-workspace";
   protected readonly settings = {
     chunking: {
       overlap: 0,
@@ -275,7 +275,7 @@ describe("session startup catch-up", () => {
   let stateDir = "";
 
   beforeEach(async () => {
-    stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-session-startup-"));
+    stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-session-startup-"));
     setStartupStateDir(stateDir);
     transcriptUpdateListener = undefined;
   });
@@ -287,7 +287,7 @@ describe("session startup catch-up", () => {
     restoreStartupEnv();
     clearRuntimeConfigSnapshot();
     clearConfigCache();
-    closeOpenClawAgentDatabasesForTest();
+    closeSteelEngineAgentDatabasesForTest();
     await fs.rm(stateDir, { recursive: true, force: true });
   });
 
@@ -308,7 +308,7 @@ describe("session startup catch-up", () => {
   }
 
   async function configureTestSessionStore(storePath: string): Promise<void> {
-    const configPath = path.join(stateDir, "openclaw.json");
+    const configPath = path.join(stateDir, "steelengine.json");
     await fs.mkdir(path.dirname(storePath), { recursive: true });
     await fs.writeFile(configPath, JSON.stringify({ session: { store: storePath } }), "utf-8");
     setStartupConfigPath(configPath);
@@ -637,7 +637,7 @@ describe("session startup catch-up", () => {
 
   it("keeps targeted SQLite corpus markers during archive-file sync", async () => {
     const storePath = path.join(stateDir, "agents", "main", "sessions", "sessions.json");
-    const configPath = path.join(stateDir, "openclaw.json");
+    const configPath = path.join(stateDir, "steelengine.json");
     const sessionId = "sqlite-target";
     const sessionKey = "agent:main:chat:sqlite-target";
     const marker = formatSqliteSessionFileMarker({
@@ -664,7 +664,7 @@ describe("session startup catch-up", () => {
       message: { role: "user", content: "sqlite targeted memory content" },
     });
     await fs.writeFile(configPath, JSON.stringify({ session: { store: storePath } }), "utf-8");
-    vi.stubEnv("OPENCLAW_CONFIG_PATH", configPath);
+    vi.stubEnv("STEELENGINE_CONFIG_PATH", configPath);
     clearRuntimeConfigSnapshot();
     clearConfigCache();
     const harness = new SessionStartupCatchupHarness([]);

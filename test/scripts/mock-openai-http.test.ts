@@ -79,13 +79,13 @@ describe("mock OpenAI HTTP helpers", () => {
   it("rejects loose numeric env limits instead of parsing prefixes", () => {
     expect(() =>
       readMockOpenAiHttpLimits({
-        OPENCLAW_MOCK_OPENAI_REQUEST_MAX_BYTES: "1000ms",
+        STEELENGINE_MOCK_OPENAI_REQUEST_MAX_BYTES: "1000ms",
       }),
-    ).toThrow("invalid OPENCLAW_MOCK_OPENAI_REQUEST_MAX_BYTES: 1000ms");
+    ).toThrow("invalid STEELENGINE_MOCK_OPENAI_REQUEST_MAX_BYTES: 1000ms");
     expect(() =>
       readMockOpenAiHttpLimits({
-        OPENCLAW_MOCK_OPENAI_REQUEST_LOG_BODY_MAX_BYTES: "1e3",
+        STEELENGINE_MOCK_OPENAI_REQUEST_LOG_BODY_MAX_BYTES: "1e3",
       }),
-    ).toThrow("invalid OPENCLAW_MOCK_OPENAI_REQUEST_LOG_BODY_MAX_BYTES: 1e3");
+    ).toThrow("invalid STEELENGINE_MOCK_OPENAI_REQUEST_LOG_BODY_MAX_BYTES: 1e3");
   });
 });

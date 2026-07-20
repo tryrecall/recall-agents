@@ -1,6 +1,6 @@
 /**
  * Builds the Codex app-server dynamic tool list for one turn, including
- * OpenClaw-owned tools, Codex native-tool fallback rules, sandbox shell shims,
+ * SteelEngine-owned tools, Codex native-tool fallback rules, sandbox shell shims,
  * and provider allowlist normalization.
  */
 import {
@@ -17,14 +17,14 @@ import {
   supportsModelTools,
   type EmbeddedRunAttemptParams,
   type RuntimeToolSchemaDiagnostic,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
-import { resolveAgentDir } from "openclaw/plugin-sdk/agent-runtime";
-import { isToolAllowed } from "openclaw/plugin-sdk/sandbox";
+} from "steelengine/plugin-sdk/agent-harness-runtime";
+import { resolveAgentDir } from "steelengine/plugin-sdk/agent-runtime";
+import { isToolAllowed } from "steelengine/plugin-sdk/sandbox";
 import { readCodexPluginConfig, type CodexPluginConfig } from "./config.js";
 import { dynamicToolBuildState } from "./dynamic-tool-build-state.js";
 import {
   filterCodexDynamicTools,
-  filterCodexDynamicToolsWithOpenClawShell,
+  filterCodexDynamicToolsWithSteelEngineShell,
   isSystemAgentOnlyCodexDynamicToolAllowlist,
   isForcedPrivateQaCodexRuntime,
   normalizeCodexDynamicToolName,
@@ -47,15 +47,15 @@ import {
 import { filterToolsForVisionInputs } from "./vision-tools.js";
 import { resolveCodexWebSearchPlan, type CodexNativeWebSearchSupport } from "./web-search.js";
 
-type OpenClawCodingToolsOptions = NonNullable<
-  Parameters<(typeof import("openclaw/plugin-sdk/agent-harness"))["createOpenClawCodingTools"]>[0]
+type SteelEngineCodingToolsOptions = NonNullable<
+  Parameters<(typeof import("steelengine/plugin-sdk/agent-harness"))["createSteelEngineCodingTools"]>[0]
 >;
 
-/** Factory seam for constructing OpenClaw runtime tools without eagerly loading agent-harness. */
-type OpenClawCodingToolsFactory =
-  (typeof import("openclaw/plugin-sdk/agent-harness"))["createOpenClawCodingTools"];
-type OpenClawDynamicTool = ReturnType<OpenClawCodingToolsFactory>[number];
-type OpenClawSandboxContext = Awaited<ReturnType<typeof resolveSandboxContext>>;
+/** Factory seam for constructing SteelEngine runtime tools without eagerly loading agent-harness. */
+type SteelEngineCodingToolsFactory =
+  (typeof import("steelengine/plugin-sdk/agent-harness"))["createSteelEngineCodingTools"];
+type SteelEngineDynamicTool = ReturnType<SteelEngineCodingToolsFactory>[number];
+type SteelEngineSandboxContext = Awaited<ReturnType<typeof resolveSandboxContext>>;
 type CodexDynamicToolBuildEvent = Parameters<
   NonNullable<EmbeddedRunAttemptParams["onAgentEvent"]>
 >[0];
@@ -72,13 +72,13 @@ function preserveRingZeroSystemAgentTool<T extends { name: string; catalogMode?:
   allTools: T[],
   filteredTools: T[],
 ): T[] {
-  const openclaw = allTools.find(
-    (tool) => tool.name === "openclaw" && tool.catalogMode === "direct-only",
+  const steelengine = allTools.find(
+    (tool) => tool.name === "steelengine" && tool.catalogMode === "direct-only",
   );
-  if (!openclaw) {
+  if (!steelengine) {
     return filteredTools;
   }
-  return [openclaw, ...filteredTools.filter((tool) => tool.name !== "openclaw")];
+  return [steelengine, ...filteredTools.filter((tool) => tool.name !== "steelengine")];
 }
 /** Runtime inputs needed to derive the exact Codex dynamic tool surface for a turn. */
 type DynamicToolBuildParams = {
@@ -87,7 +87,7 @@ type DynamicToolBuildParams = {
   effectiveWorkspace: string;
   effectiveCwd?: string;
   sandboxSessionKey: string;
-  sandbox: OpenClawSandboxContext;
+  sandbox: SteelEngineSandboxContext;
   nativeToolSurfaceEnabled?: boolean;
   nativeProviderWebSearchSupport?: CodexNativeWebSearchSupport;
   runAbortController: AbortController;
@@ -110,10 +110,10 @@ type DynamicToolBuildParams = {
   };
 };
 /** Splits sandbox and run session keys so tool calls can bind to both scopes when needed. */
-function resolveOpenClawCodingToolsSessionKeys(
+function resolveSteelEngineCodingToolsSessionKeys(
   params: EmbeddedRunAttemptParams,
   sandboxSessionKey: string,
-): Pick<OpenClawCodingToolsOptions, "sessionKey" | "runSessionKey"> {
+): Pick<SteelEngineCodingToolsOptions, "sessionKey" | "runSessionKey"> {
   return {
     sessionKey: sandboxSessionKey,
     runSessionKey:
@@ -227,15 +227,15 @@ export async function buildDynamicTools(input: DynamicToolBuildParams) {
   const modelHasVision = params.model.input?.includes("image") ?? false;
   const agentDir = params.agentDir ?? resolveAgentDir(params.config ?? {}, input.sessionAgentId);
   const {
-    createOpenClawCodingTools: defaultCreateOpenClawCodingTools,
+    createSteelEngineCodingTools: defaultCreateSteelEngineCodingTools,
     resolveWebSearchToolPolicy,
-  } = await import("openclaw/plugin-sdk/agent-harness");
-  const createOpenClawCodingTools =
-    dynamicToolBuildState.openClawCodingToolsFactory ?? defaultCreateOpenClawCodingTools;
+  } = await import("steelengine/plugin-sdk/agent-harness");
+  const createSteelEngineCodingTools =
+    dynamicToolBuildState.steelEngineCodingToolsFactory ?? defaultCreateSteelEngineCodingTools;
   toolBuildStages.mark("load-agent-harness-tools");
-  const sessionKeys = resolveOpenClawCodingToolsSessionKeys(params, input.sandboxSessionKey);
+  const sessionKeys = resolveSteelEngineCodingToolsSessionKeys(params, input.sandboxSessionKey);
   const nativeExecutionPolicy = resolveCodexNativeExecutionPolicyForDynamicTools(input);
-  const allTools = createOpenClawCodingTools({
+  const allTools = createSteelEngineCodingTools({
     agentId: input.sessionAgentId,
     ...buildEmbeddedAttemptToolRunContext(params),
     exec: {
@@ -289,7 +289,7 @@ export async function buildDynamicTools(input: DynamicToolBuildParams) {
     modelId: params.modelId,
     modelCompat:
       params.model.compat && typeof params.model.compat === "object"
-        ? (params.model.compat as OpenClawCodingToolsOptions["modelCompat"])
+        ? (params.model.compat as SteelEngineCodingToolsOptions["modelCompat"])
         : undefined,
     modelApi: params.model.api,
     modelContextWindowTokens: params.model.contextWindow,
@@ -336,7 +336,7 @@ export async function buildDynamicTools(input: DynamicToolBuildParams) {
     allTools,
     params.sourceReplyDeliveryMode,
   );
-  toolBuildStages.mark("create-openclaw-coding-tools");
+  toolBuildStages.mark("create-steelengine-coding-tools");
   const preNormalizationDiagnostics: RuntimeToolSchemaDiagnostic[] = [];
   const readableAllToolProjection = filterProviderNormalizableTools(codexScopedTools);
   preNormalizationDiagnostics.push(...readableAllToolProjection.diagnostics);
@@ -347,11 +347,11 @@ export async function buildDynamicTools(input: DynamicToolBuildParams) {
     nativeProviderWebSearchSupport: input.nativeProviderWebSearchSupport,
   });
   const readableAllTools = [...readableAllToolProjection.tools];
-  const normallyProfiledTools = shouldKeepOpenClawShellDynamicTools(input, nativeExecutionPolicy)
-    ? filterCodexDynamicToolsWithOpenClawShell(readableAllTools, input.pluginConfig)
+  const normallyProfiledTools = shouldKeepSteelEngineShellDynamicTools(input, nativeExecutionPolicy)
+    ? filterCodexDynamicToolsWithSteelEngineShell(readableAllTools, input.pluginConfig)
     : filterCodexDynamicTools(readableAllTools, input.pluginConfig);
   const hostSystemAgentActive =
-    input.isHostScopedToolActive?.("openclaw") ?? isHostScopedAgentToolActive("openclaw");
+    input.isHostScopedToolActive?.("steelengine") ?? isHostScopedAgentToolActive("steelengine");
   const profileFilteredTools =
     hostSystemAgentActive && isSystemAgentOnlyCodexDynamicToolAllowlist(params.toolsAllow)
       ? preserveRingZeroSystemAgentTool(readableAllTools, normallyProfiledTools)
@@ -494,7 +494,7 @@ function includeForcedCodexDynamicToolAllow(
 /** Decides whether Codex native code mode can own shell/file tools for this turn. */
 export function shouldEnableCodexAppServerNativeToolSurface(
   params: EmbeddedRunAttemptParams,
-  sandbox?: OpenClawSandboxContext,
+  sandbox?: SteelEngineSandboxContext,
   options: {
     agentId?: string;
     runtimeSessionKey?: string;
@@ -509,20 +509,20 @@ export function shouldEnableCodexAppServerNativeToolSurface(
     return canCodexAppServerNativeToolSurfaceHonorSandbox(sandbox, options);
   }
   // Codex native code mode exposes its shell/file surface as one app-server
-  // capability, so narrow OpenClaw allowlists must fail closed rather than
+  // capability, so narrow SteelEngine allowlists must fail closed rather than
   // widening `message` or `web_search` into shell access.
   return (
     hasWildcardCodexToolsAllow(toolsAllow) &&
     canCodexAppServerNativeToolSurfaceHonorSandbox(sandbox, options)
   );
 }
-/** Returns true when OpenClaw policy requires the Node-owned exec/process tools instead. */
+/** Returns true when SteelEngine policy requires the Node-owned exec/process tools instead. */
 function isCodexNativeExecutionBlockedByNodeExecHost(
   params: EmbeddedRunAttemptParams,
   options: {
     agentId?: string;
     runtimeSessionKey?: string;
-    sandbox?: OpenClawSandboxContext;
+    sandbox?: SteelEngineSandboxContext;
   } = {},
 ): boolean {
   return !resolveCodexNativeExecutionPolicy({
@@ -547,7 +547,7 @@ function resolveCodexRuntimePolicySessionKey(
   );
 }
 function canCodexAppServerNativeToolSurfaceHonorSandbox(
-  sandbox: OpenClawSandboxContext | undefined,
+  sandbox: SteelEngineSandboxContext | undefined,
   options: { sandboxExecServerEnabled?: boolean } = {},
 ): boolean {
   if (!sandbox?.enabled) {
@@ -562,7 +562,7 @@ function canCodexAppServerNativeToolSurfaceHonorSandbox(
   }
   // Codex app-server native shell, filesystem, and user MCP execution are owned
   // by the app-server process. Without the explicit exec-server integration,
-  // active OpenClaw sandboxing must disable the native surface and route shell
+  // active SteelEngine sandboxing must disable the native surface and route shell
   // access through sandbox-backed dynamic tools instead.
   return false;
 }
@@ -583,9 +583,9 @@ function filterCodexMemoryFlushDynamicTools<T extends { name: string }>(tools: T
     CODEX_MEMORY_FLUSH_DYNAMIC_TOOL_ALLOW.has(normalizeCodexDynamicToolName(tool.name)),
   );
 }
-/** Requires a Codex sandbox environment only when native tools must run inside OpenClaw sandboxing. */
+/** Requires a Codex sandbox environment only when native tools must run inside SteelEngine sandboxing. */
 export function shouldRequireCodexSandboxExecServerEnvironment(params: {
-  sandbox?: OpenClawSandboxContext;
+  sandbox?: SteelEngineSandboxContext;
   nativeToolSurfaceEnabled: boolean;
   sandboxExecServerEnabled: boolean;
 }): boolean {
@@ -618,7 +618,7 @@ export function resolveCodexAppServerExecutionCwd(params: {
     remoteWorkspaceRoot: params.remoteWorkspaceRoot,
   });
 }
-/** Projects a local OpenClaw workspace cwd into the remote Codex app-server workspace root. */
+/** Projects a local SteelEngine workspace cwd into the remote Codex app-server workspace root. */
 function mapCodexAppServerRemoteWorkspacePath(params: {
   value: string;
   localWorkspaceRoot: string;
@@ -639,7 +639,7 @@ function mapCodexAppServerRemoteWorkspacePath(params: {
   const prefix = `${localRoot}/`;
   if (!normalizedValue.startsWith(prefix)) {
     throw new Error(
-      `Codex remoteWorkspaceRoot is configured but cwd ${params.value} is outside OpenClaw workspace root ${params.localWorkspaceRoot}; refusing to send a gateway-local cwd to the remote Codex app-server.`,
+      `Codex remoteWorkspaceRoot is configured but cwd ${params.value} is outside SteelEngine workspace root ${params.localWorkspaceRoot}; refusing to send a gateway-local cwd to the remote Codex app-server.`,
     );
   }
   return joinRemoteWorkspacePath(remoteRoot, normalizedValue.slice(prefix.length));
@@ -653,17 +653,17 @@ function trimTrailingPathSeparator(value: string): string {
 function joinRemoteWorkspacePath(remoteRoot: string, suffix: string): string {
   return remoteRoot === "/" ? `/${suffix}` : `${remoteRoot}/${suffix}`;
 }
-/** Converts OpenClaw sandbox networking into Codex's external-sandbox policy shape. */
-export function resolveCodexExternalSandboxPolicyForOpenClawSandbox(
-  sandbox: OpenClawSandboxContext | undefined,
+/** Converts SteelEngine sandbox networking into Codex's external-sandbox policy shape. */
+export function resolveCodexExternalSandboxPolicyForSteelEngineSandbox(
+  sandbox: SteelEngineSandboxContext | undefined,
 ): CodexSandboxPolicy {
   return {
     type: "externalSandbox",
-    networkAccess: codexNetworkAccessForOpenClawSandbox(sandbox) ? "enabled" : "restricted",
+    networkAccess: codexNetworkAccessForSteelEngineSandbox(sandbox) ? "enabled" : "restricted",
   };
 }
-function codexNetworkAccessForOpenClawSandbox(
-  sandbox: OpenClawSandboxContext | undefined,
+function codexNetworkAccessForSteelEngineSandbox(
+  sandbox: SteelEngineSandboxContext | undefined,
 ): boolean {
   if (sandbox?.backendId !== "docker") {
     return true;
@@ -684,10 +684,10 @@ export function disableCodexPluginThreadConfig(pluginConfig?: unknown): CodexPlu
 }
 /** Adds sandbox_exec/process aliases when native Code Mode cannot directly honor the sandbox. */
 function addSandboxShellDynamicToolsIfAvailable(
-  filteredTools: OpenClawDynamicTool[],
-  allTools: OpenClawDynamicTool[],
+  filteredTools: SteelEngineDynamicTool[],
+  allTools: SteelEngineDynamicTool[],
   input: DynamicToolBuildParams,
-): OpenClawDynamicTool[] {
+): SteelEngineDynamicTool[] {
   if (
     !shouldExposeSandboxExecDynamicTool(input) ||
     isSandboxShellDynamicToolExcluded(input.pluginConfig)
@@ -701,11 +701,11 @@ function addSandboxShellDynamicToolsIfAvailable(
   if (!execTool || !processTool) {
     return filteredTools;
   }
-  const sandboxExecTool: OpenClawDynamicTool = {
+  const sandboxExecTool: SteelEngineDynamicTool = {
     ...execTool,
     name: "sandbox_exec",
     description:
-      "Run a shell command through OpenClaw's configured sandbox backend for this session. Use when OpenClaw sandboxing is active or when a command must execute in the sandbox backend, such as an SSH-backed sandbox or Docker container-path bind layout. Use Codex's native shell only when no OpenClaw sandbox is active and native Code Mode is available.",
+      "Run a shell command through SteelEngine's configured sandbox backend for this session. Use when SteelEngine sandboxing is active or when a command must execute in the sandbox backend, such as an SSH-backed sandbox or Docker container-path bind layout. Use Codex's native shell only when no SteelEngine sandbox is active and native Code Mode is available.",
     execute: async (toolCallId, args, signal, onUpdate) => {
       const result = await execTool.execute(toolCallId, args, signal, onUpdate);
       return {
@@ -723,11 +723,11 @@ function addSandboxShellDynamicToolsIfAvailable(
       };
     },
   };
-  const sandboxProcessTool: OpenClawDynamicTool = {
+  const sandboxProcessTool: SteelEngineDynamicTool = {
     ...processTool,
     name: "sandbox_process",
     description:
-      "Manage sandbox_exec sessions that were started through OpenClaw's configured sandbox backend for this session: list, poll, log, write, send-keys, submit, paste, kill, clear, or remove. Use only for sandbox_exec follow-up; use Codex's native shell session handling only when no OpenClaw sandbox is active and native Code Mode is available.",
+      "Manage sandbox_exec sessions that were started through SteelEngine's configured sandbox backend for this session: list, poll, log, write, send-keys, submit, paste, kill, clear, or remove. Use only for sandbox_exec follow-up; use Codex's native shell session handling only when no SteelEngine sandbox is active and native Code Mode is available.",
   };
   return [...filteredTools, sandboxExecTool, sandboxProcessTool];
 }
@@ -751,11 +751,11 @@ function isSandboxShellDynamicToolExcluded(config: CodexPluginConfig): boolean {
   return isCodexDynamicToolExcluded(config, ["exec", "sandbox_exec", "process", "sandbox_process"]);
 }
 function addNodeShellDynamicToolsIfNeeded(
-  filteredTools: OpenClawDynamicTool[],
-  allTools: OpenClawDynamicTool[],
+  filteredTools: SteelEngineDynamicTool[],
+  allTools: SteelEngineDynamicTool[],
   input: DynamicToolBuildParams,
   nodePolicy: CodexNativeExecutionPolicy,
-): OpenClawDynamicTool[] {
+): SteelEngineDynamicTool[] {
   if (isCodexMemoryFlushRun(input.params)) {
     return filteredTools;
   }
@@ -772,7 +772,7 @@ function addNodeShellDynamicToolsIfNeeded(
   if (!execTool || !processTool) {
     return filteredTools;
   }
-  const toolsToAppend: OpenClawDynamicTool[] = [];
+  const toolsToAppend: SteelEngineDynamicTool[] = [];
   if (
     !isCodexDynamicToolExcluded(input.pluginConfig, ["exec", CODEX_NODE_EXEC_DYNAMIC_TOOL_NAME]) &&
     !filteredTools.some(
@@ -794,14 +794,14 @@ function addNodeShellDynamicToolsIfNeeded(
   }
   return toolsToAppend.length > 0 ? [...filteredTools, ...toolsToAppend] : filteredTools;
 }
-function shouldKeepOpenClawShellDynamicTools(
+function shouldKeepSteelEngineShellDynamicTools(
   input: DynamicToolBuildParams,
   nodePolicy: CodexNativeExecutionPolicy,
 ): boolean {
   return (
     !isCodexMemoryFlushRun(input.params) &&
     // Disabled native Code Mode sends `environments: []`, so Codex cannot
-    // advertise a shell. Preserve OpenClaw's policy-filtered direct shell.
+    // advertise a shell. Preserve SteelEngine's policy-filtered direct shell.
     input.nativeToolSurfaceEnabled === false &&
     input.sandbox?.enabled !== true &&
     nodePolicy.effectiveExecHost !== "node"

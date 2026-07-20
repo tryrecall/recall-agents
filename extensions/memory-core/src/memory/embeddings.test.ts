@@ -1,26 +1,26 @@
 // Memory Core tests cover embeddings plugin behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { EmbeddingProviderAdapter } from "openclaw/plugin-sdk/embedding-providers";
-import type { MemoryEmbeddingProviderAdapter } from "openclaw/plugin-sdk/memory-core-host-engine-embeddings";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { EmbeddingProviderAdapter } from "steelengine/plugin-sdk/embedding-providers";
+import type { MemoryEmbeddingProviderAdapter } from "steelengine/plugin-sdk/memory-core-host-engine-embeddings";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createEmbeddingProvider, resolveEmbeddingProviderFallbackModel } from "./embeddings.js";
 
 const mockEmbeddingRegistry = vi.hoisted(() => ({
   genericAdapters: [] as EmbeddingProviderAdapter[],
   adapters: [] as MemoryEmbeddingProviderAdapter[],
-  genericLookupConfigs: [] as Array<OpenClawConfig | undefined>,
+  genericLookupConfigs: [] as Array<SteelEngineConfig | undefined>,
   acquireLocalService: vi.fn(async () => undefined),
 }));
 
-vi.mock("openclaw/plugin-sdk/embedding-providers", () => ({
-  getEmbeddingProvider: (id: string, config?: OpenClawConfig) => {
+vi.mock("steelengine/plugin-sdk/embedding-providers", () => ({
+  getEmbeddingProvider: (id: string, config?: SteelEngineConfig) => {
     mockEmbeddingRegistry.genericLookupConfigs.push(config);
     return mockEmbeddingRegistry.genericAdapters.find((adapter) => adapter.id === id);
   },
   listEmbeddingProviders: () => [...mockEmbeddingRegistry.genericAdapters],
 }));
 
-vi.mock("openclaw/plugin-sdk/memory-core-host-engine-embeddings", () => ({
+vi.mock("steelengine/plugin-sdk/memory-core-host-engine-embeddings", () => ({
   DEFAULT_LOCAL_MODEL: "nomic-embed-text",
   createLocalEmbeddingProvider: async () => {
     throw new Error("local embedding provider is not used by these tests");
@@ -56,8 +56,8 @@ function createOptions(
           "voyage",
         ],
       },
-    } as OpenClawConfig,
-    agentDir: "/tmp/openclaw-agent",
+    } as SteelEngineConfig,
+    agentDir: "/tmp/steelengine-agent",
     provider,
     fallback: "none",
     model: "",
@@ -259,7 +259,7 @@ describe("createEmbeddingProvider", () => {
 
   it("reports the llama.cpp plugin install command when local is unregistered", async () => {
     await expect(createEmbeddingProvider(createOptions("local"))).rejects.toThrow(
-      "openclaw plugins install @openclaw/llama-cpp-provider",
+      "steelengine plugins install @steelengine/llama-cpp-provider",
     );
   });
 

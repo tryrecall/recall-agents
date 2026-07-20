@@ -1,16 +1,16 @@
 import { observeConfigSnapshot } from "./io.observe.js";
 import type { NormalizedConfigIoDeps, ReadConfigFileSnapshotInternalResult } from "./io.types.js";
 import { asResolvedSourceConfig, asRuntimeConfig } from "./materialize.js";
-import type { ConfigFileSnapshot, LegacyConfigIssue, OpenClawConfig } from "./types.js";
+import type { ConfigFileSnapshot, LegacyConfigIssue, SteelEngineConfig } from "./types.js";
 
 export function createConfigFileSnapshot(params: {
   path: string;
   exists: boolean;
   raw: string | null;
   parsed: unknown;
-  sourceConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
   valid: boolean;
-  runtimeConfig: OpenClawConfig;
+  runtimeConfig: SteelEngineConfig;
   hash?: string;
   readError?: { code: string | null };
   issues: ConfigFileSnapshot["issues"];

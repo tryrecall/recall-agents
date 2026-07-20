@@ -537,7 +537,7 @@ describe("secrets runtime snapshot", () => {
     if (process.platform === "win32") {
       return;
     }
-    const root = tempDirs.make("openclaw-tts-secretref-missing-");
+    const root = tempDirs.make("steelengine-tts-secretref-missing-");
     const secretsPath = path.join(root, "secrets.json");
     await fs.writeFile(secretsPath, JSON.stringify({ providers: {} }, null, 2), "utf8");
     await fs.chmod(secretsPath, 0o600);
@@ -626,7 +626,7 @@ describe("secrets runtime snapshot", () => {
     if (process.platform === "win32") {
       return;
     }
-    const root = tempDirs.make("openclaw-owner-secret-provider-failure-");
+    const root = tempDirs.make("steelengine-owner-secret-provider-failure-");
     const callLogPath = path.join(root, "calls.log");
     const commandPath = path.join(root, "provider.sh");
     await fs.writeFile(
@@ -759,7 +759,7 @@ describe("secrets runtime snapshot", () => {
     if (process.platform === "win32") {
       return;
     }
-    const root = tempDirs.make("openclaw-tts-secretref-object-");
+    const root = tempDirs.make("steelengine-tts-secretref-object-");
     const secretsPath = path.join(root, "secrets.json");
     await fs.writeFile(
       secretsPath,
@@ -905,7 +905,7 @@ describe("secrets runtime snapshot", () => {
         }),
         env: {},
         includeAuthStoreRefs: false,
-        agentDirs: ["/tmp/openclaw-agent-main"],
+        agentDirs: ["/tmp/steelengine-agent-main"],
         loadAuthStore: () => ({ version: 1, profiles: {} }),
         loadablePluginOrigins: EMPTY_LOADABLE_PLUGIN_ORIGINS,
       }),

@@ -27,11 +27,11 @@ const { registeredRoutes, registerPluginHttpRoute, waitUntilAbort } = vi.hoisted
   };
 });
 
-vi.mock("openclaw/plugin-sdk/channel-outbound", () => ({ waitUntilAbort }));
+vi.mock("steelengine/plugin-sdk/channel-outbound", () => ({ waitUntilAbort }));
 
 vi.mock("./ingress-spool.js", () => ({ createSmsIngressSpool }));
 
-vi.mock("openclaw/plugin-sdk/webhook-ingress", () => ({
+vi.mock("steelengine/plugin-sdk/webhook-ingress", () => ({
   createFixedWindowRateLimiter: () => ({
     clear: vi.fn(),
     isRateLimited: vi.fn(() => false),

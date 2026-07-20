@@ -4,7 +4,7 @@ import path from "node:path";
 import { afterAll, afterEach, describe, expect, it } from "vitest";
 import { withEnv } from "../test-utils/env.js";
 import { createHookRunner } from "./hooks.js";
-import { loadOpenClawPlugins } from "./loader.js";
+import { loadSteelEnginePlugins } from "./loader.js";
 import {
   EMPTY_PLUGIN_SCHEMA,
   makeTempDir,
@@ -25,7 +25,7 @@ import { loadPluginManifestRegistry } from "./manifest-registry.js";
 afterEach(globalAfterEach0);
 afterAll(globalAfterAll1);
 
-describe("loadOpenClawPlugins", () => {
+describe("loadSteelEnginePlugins", () => {
   it("setup-loads a trusted global channel plugin when the caller scopes to it", () => {
     useNoBundledPlugins();
     const marker = path.join(makeTempDir(), "trusted-global-channel-imported.txt");
@@ -61,7 +61,7 @@ describe("loadOpenClawPlugins", () => {
         "utf-8",
       );
       fs.writeFileSync(
-        path.join(globalDir, "openclaw.plugin.json"),
+        path.join(globalDir, "steelengine.plugin.json"),
         JSON.stringify(
           {
             id: "trusted-global-channel",
@@ -77,10 +77,10 @@ describe("loadOpenClawPlugins", () => {
         path.join(globalDir, "package.json"),
         JSON.stringify(
           {
-            name: "@openclaw/trusted-global-channel",
+            name: "@steelengine/trusted-global-channel",
             version: "0.0.0-test",
             main: "./index.cjs",
-            openclaw: {
+            steelengine: {
               extensions: ["./index.cjs"],
             },
           },
@@ -90,7 +90,7 @@ describe("loadOpenClawPlugins", () => {
         "utf-8",
       );
 
-      const scopedSetupRegistry = loadOpenClawPlugins({
+      const scopedSetupRegistry = loadSteelEnginePlugins({
         cache: false,
         config: {
           plugins: {
@@ -146,7 +146,7 @@ describe("loadOpenClawPlugins", () => {
   };`,
     });
     fs.writeFileSync(
-      path.join(plugin.dir, "openclaw.plugin.json"),
+      path.join(plugin.dir, "steelengine.plugin.json"),
       JSON.stringify(
         {
           id: "auto-enabled-load-path-channel",
@@ -159,7 +159,7 @@ describe("loadOpenClawPlugins", () => {
       "utf-8",
     );
 
-    const scopedSetupRegistry = loadOpenClawPlugins({
+    const scopedSetupRegistry = loadSteelEnginePlugins({
       cache: false,
       config: {
         channels: {
@@ -190,13 +190,13 @@ describe("loadOpenClawPlugins", () => {
       fixture: {
         id: "setup-entry-test",
         label: "Setup Entry Test",
-        packageName: "@openclaw/setup-entry-test",
+        packageName: "@steelengine/setup-entry-test",
         fullBlurb: "full entry should not run in setup-only mode",
         setupBlurb: "setup entry",
         configured: false,
       },
       load: ({ pluginDir }: { pluginDir: string }) =>
-        loadOpenClawPlugins({
+        loadSteelEnginePlugins({
           cache: false,
           config: {
             plugins: {
@@ -220,14 +220,14 @@ describe("loadOpenClawPlugins", () => {
       fixture: {
         id: "setup-only-bundled-contract-test",
         label: "Setup Only Bundled Contract Test",
-        packageName: "@openclaw/setup-only-bundled-contract-test",
+        packageName: "@steelengine/setup-only-bundled-contract-test",
         fullBlurb: "full entry should not run in setup-only mode",
         setupBlurb: "setup-only bundled contract",
         configured: false,
         useBundledSetupEntryContract: true,
       },
       load: ({ pluginDir }: { pluginDir: string }) =>
-        loadOpenClawPlugins({
+        loadSteelEnginePlugins({
           cache: false,
           config: {
             plugins: {
@@ -251,13 +251,13 @@ describe("loadOpenClawPlugins", () => {
       fixture: {
         id: "setup-runtime-test",
         label: "Setup Runtime Test",
-        packageName: "@openclaw/setup-runtime-test",
+        packageName: "@steelengine/setup-runtime-test",
         fullBlurb: "full entry should not run while unconfigured",
         setupBlurb: "setup runtime",
         configured: false,
       },
       load: ({ pluginDir }: { pluginDir: string }) =>
-        loadOpenClawPlugins({
+        loadSteelEnginePlugins({
           cache: false,
           config: {
             plugins: {
@@ -275,14 +275,14 @@ describe("loadOpenClawPlugins", () => {
       fixture: {
         id: "setup-runtime-bundled-contract-test",
         label: "Setup Runtime Bundled Contract Test",
-        packageName: "@openclaw/setup-runtime-bundled-contract-test",
+        packageName: "@steelengine/setup-runtime-bundled-contract-test",
         fullBlurb: "full entry should not run while unconfigured",
         setupBlurb: "setup runtime bundled contract",
         configured: false,
         useBundledSetupEntryContract: true,
       },
       load: ({ pluginDir }: { pluginDir: string }) =>
-        loadOpenClawPlugins({
+        loadSteelEnginePlugins({
           cache: false,
           config: {
             plugins: {
@@ -300,7 +300,7 @@ describe("loadOpenClawPlugins", () => {
       fixture: {
         id: "setup-runtime-bundled-contract-secrets-test",
         label: "Setup Runtime Bundled Contract Secrets Test",
-        packageName: "@openclaw/setup-runtime-bundled-contract-secrets-test",
+        packageName: "@steelengine/setup-runtime-bundled-contract-secrets-test",
         fullBlurb: "full entry should not run while unconfigured",
         setupBlurb: "setup runtime bundled contract secrets",
         configured: false,
@@ -308,7 +308,7 @@ describe("loadOpenClawPlugins", () => {
         splitBundledSetupSecrets: true,
       },
       load: ({ pluginDir }: { pluginDir: string }) =>
-        loadOpenClawPlugins({
+        loadSteelEnginePlugins({
           cache: false,
           config: {
             plugins: {
@@ -327,7 +327,7 @@ describe("loadOpenClawPlugins", () => {
       fixture: {
         id: "setup-runtime-bundled-contract-runtime-test",
         label: "Setup Runtime Bundled Contract Runtime Test",
-        packageName: "@openclaw/setup-runtime-bundled-contract-runtime-test",
+        packageName: "@steelengine/setup-runtime-bundled-contract-runtime-test",
         fullBlurb: "full entry should not run while unconfigured",
         setupBlurb: "setup runtime bundled contract runtime",
         configured: false,
@@ -335,7 +335,7 @@ describe("loadOpenClawPlugins", () => {
         bundledSetupRuntimeMarker: path.join(makeTempDir(), "setup-runtime-applied.txt"),
       },
       load: ({ pluginDir }: { pluginDir: string }) =>
-        loadOpenClawPlugins({
+        loadSteelEnginePlugins({
           cache: false,
           config: {
             plugins: {
@@ -354,7 +354,7 @@ describe("loadOpenClawPlugins", () => {
       fixture: {
         id: "setup-runtime-bundled-route-test",
         label: "Setup Runtime Bundled Route Test",
-        packageName: "@openclaw/setup-runtime-bundled-route-test",
+        packageName: "@steelengine/setup-runtime-bundled-route-test",
         fullBlurb: "full entry should defer while configured",
         setupBlurb: "setup runtime route",
         configured: true,
@@ -363,7 +363,7 @@ describe("loadOpenClawPlugins", () => {
         bundledSetupRuntimeRoutePath: "/setup-runtime-route",
       },
       load: ({ pluginDir }: { pluginDir: string }) =>
-        loadOpenClawPlugins({
+        loadSteelEnginePlugins({
           cache: false,
           preferSetupRuntimeForChannelPlugins: true,
           config: {
@@ -389,7 +389,7 @@ describe("loadOpenClawPlugins", () => {
       fixture: {
         id: "setup-runtime-bundled-runtime-merge-test",
         label: "Setup Runtime Bundled Runtime Merge Test",
-        packageName: "@openclaw/setup-runtime-bundled-runtime-merge-test",
+        packageName: "@steelengine/setup-runtime-bundled-runtime-merge-test",
         fullBlurb: "full runtime plugin",
         setupBlurb: "setup runtime override",
         configured: false,
@@ -398,7 +398,7 @@ describe("loadOpenClawPlugins", () => {
         bundledFullRuntimeMarker: path.join(makeTempDir(), "bundled-runtime-applied.txt"),
       },
       load: ({ pluginDir }: { pluginDir: string }) =>
-        loadOpenClawPlugins({
+        loadSteelEnginePlugins({
           cache: false,
           config: {
             plugins: {
@@ -417,7 +417,7 @@ describe("loadOpenClawPlugins", () => {
       fixture: {
         id: "setup-runtime-external-deferred-test",
         label: "Setup Runtime External Deferred Test",
-        packageName: "@openclaw/setup-runtime-external-deferred-test",
+        packageName: "@steelengine/setup-runtime-external-deferred-test",
         fullBlurb: "full entry should defer while configured",
         setupBlurb: "setup runtime external deferred",
         configured: true,
@@ -425,7 +425,7 @@ describe("loadOpenClawPlugins", () => {
         bundledSetupRuntimeMarker: path.join(makeTempDir(), "external-setup-runtime-applied.txt"),
       },
       load: ({ pluginDir }: { pluginDir: string }) =>
-        loadOpenClawPlugins({
+        loadSteelEnginePlugins({
           cache: false,
           preferSetupRuntimeForChannelPlugins: true,
           config: {
@@ -451,13 +451,13 @@ describe("loadOpenClawPlugins", () => {
       fixture: {
         id: "setup-runtime-not-preferred-test",
         label: "Setup Runtime Not Preferred Test",
-        packageName: "@openclaw/setup-runtime-not-preferred-test",
+        packageName: "@steelengine/setup-runtime-not-preferred-test",
         fullBlurb: "full entry should still load without explicit startup opt-in",
         setupBlurb: "setup runtime not preferred",
         configured: true,
       },
       load: ({ pluginDir }: { pluginDir: string }) =>
-        loadOpenClawPlugins({
+        loadSteelEnginePlugins({
           cache: false,
           preferSetupRuntimeForChannelPlugins: true,
           config: {
@@ -536,7 +536,7 @@ describe("loadOpenClawPlugins", () => {
     const built = createSetupEntryChannelPluginFixture({
       id: "setup-runtime-order-test",
       label: "Setup Runtime Order Test",
-      packageName: "@openclaw/setup-runtime-order-test",
+      packageName: "@steelengine/setup-runtime-order-test",
       fullBlurb: "full runtime plugin",
       setupBlurb: "setup runtime override",
       configured: false,
@@ -546,7 +546,7 @@ describe("loadOpenClawPlugins", () => {
       requireBundledFullRuntimeBeforeLoad: true,
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       config: {
         plugins: {
@@ -566,7 +566,7 @@ describe("loadOpenClawPlugins", () => {
     const built = createSetupEntryChannelPluginFixture({
       id: "setup-runtime-error-test",
       label: "Setup Runtime Error Test",
-      packageName: "@openclaw/setup-runtime-error-test",
+      packageName: "@steelengine/setup-runtime-error-test",
       fullBlurb: "full runtime plugin",
       setupBlurb: "setup runtime override",
       configured: false,
@@ -579,7 +579,7 @@ describe("loadOpenClawPlugins", () => {
       body: `module.exports = { id: "setup-runtime-helper-test", register() {} };`,
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       config: {
         plugins: {
@@ -604,7 +604,7 @@ describe("loadOpenClawPlugins", () => {
     const built = createSetupEntryChannelPluginFixture({
       id: "setup-runtime-route-error-test",
       label: "Setup Runtime Route Error Test",
-      packageName: "@openclaw/setup-runtime-route-error-test",
+      packageName: "@steelengine/setup-runtime-route-error-test",
       fullBlurb: "full runtime plugin",
       setupBlurb: "setup runtime route",
       configured: true,
@@ -619,7 +619,7 @@ describe("loadOpenClawPlugins", () => {
       body: `module.exports = { id: "setup-runtime-route-helper-test", register() {} };`,
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       preferSetupRuntimeForChannelPlugins: true,
       config: {
@@ -654,7 +654,7 @@ describe("loadOpenClawPlugins", () => {
     const built = createSetupEntryChannelPluginFixture({
       id: "setup-runtime-late-route-test",
       label: "Setup Runtime Late Route Test",
-      packageName: "@openclaw/setup-runtime-late-route-test",
+      packageName: "@steelengine/setup-runtime-late-route-test",
       fullBlurb: "full runtime plugin",
       setupBlurb: "setup runtime route",
       configured: true,
@@ -664,7 +664,7 @@ describe("loadOpenClawPlugins", () => {
       bundledSetupRuntimeLateRoutePath: "/setup-runtime-late-route",
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       preferSetupRuntimeForChannelPlugins: true,
       config: {
@@ -697,7 +697,7 @@ describe("loadOpenClawPlugins", () => {
       id: "setup-runtime-mismatch-test",
       bundledFullEntryId: "wrong-runtime-id",
       label: "Setup Runtime Mismatch Test",
-      packageName: "@openclaw/setup-runtime-mismatch-test",
+      packageName: "@steelengine/setup-runtime-mismatch-test",
       fullBlurb: "full runtime plugin",
       setupBlurb: "setup runtime override",
       configured: false,
@@ -706,7 +706,7 @@ describe("loadOpenClawPlugins", () => {
       bundledFullRuntimeMarker: runtimeMarker,
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       config: {
         plugins: {
@@ -732,7 +732,7 @@ describe("loadOpenClawPlugins", () => {
       id: "setup-export-mismatch-test",
       bundledSetupEntryId: "wrong-setup-id",
       label: "Setup Export Mismatch Test",
-      packageName: "@openclaw/setup-export-mismatch-test",
+      packageName: "@steelengine/setup-export-mismatch-test",
       fullBlurb: "full runtime plugin",
       setupBlurb: "setup runtime override",
       configured: false,
@@ -741,7 +741,7 @@ describe("loadOpenClawPlugins", () => {
       bundledFullRuntimeMarker: runtimeMarker,
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       config: {
         plugins: {
@@ -771,8 +771,8 @@ describe("loadOpenClawPlugins", () => {
       path.join(pluginDir, "package.json"),
       JSON.stringify(
         {
-          name: "@openclaw/setup-entry-throws-test",
-          openclaw: {
+          name: "@steelengine/setup-entry-throws-test",
+          steelengine: {
             extensions: ["./index.cjs"],
             setupEntry: "./setup-entry.cjs",
           },
@@ -783,7 +783,7 @@ describe("loadOpenClawPlugins", () => {
       "utf-8",
     );
     fs.writeFileSync(
-      path.join(pluginDir, "openclaw.plugin.json"),
+      path.join(pluginDir, "steelengine.plugin.json"),
       JSON.stringify(
         {
           id: "setup-entry-throws-test",
@@ -811,7 +811,7 @@ describe("loadOpenClawPlugins", () => {
       "utf-8",
     );
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       config: {
         plugins: {
@@ -838,8 +838,8 @@ describe("loadOpenClawPlugins", () => {
       path.join(brokenDir, "package.json"),
       JSON.stringify(
         {
-          name: "@openclaw/setup-entry-throws-sibling-test",
-          openclaw: {
+          name: "@steelengine/setup-entry-throws-sibling-test",
+          steelengine: {
             extensions: ["./index.cjs"],
             setupEntry: "./setup-entry.cjs",
           },
@@ -850,7 +850,7 @@ describe("loadOpenClawPlugins", () => {
       "utf-8",
     );
     fs.writeFileSync(
-      path.join(brokenDir, "openclaw.plugin.json"),
+      path.join(brokenDir, "steelengine.plugin.json"),
       JSON.stringify(
         {
           id: "setup-entry-throws-sibling-test",
@@ -901,7 +901,7 @@ describe("loadOpenClawPlugins", () => {
   } };`,
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       config: {
         plugins: {
@@ -936,8 +936,8 @@ describe("loadOpenClawPlugins", () => {
       path.join(brokenDir, "package.json"),
       JSON.stringify(
         {
-          name: "@openclaw/register-channel-throws-test",
-          openclaw: {
+          name: "@steelengine/register-channel-throws-test",
+          steelengine: {
             extensions: ["./index.cjs"],
             setupEntry: "./setup-entry.cjs",
           },
@@ -948,7 +948,7 @@ describe("loadOpenClawPlugins", () => {
       "utf-8",
     );
     fs.writeFileSync(
-      path.join(brokenDir, "openclaw.plugin.json"),
+      path.join(brokenDir, "steelengine.plugin.json"),
       JSON.stringify(
         {
           id: "register-channel-throws-test",
@@ -1022,7 +1022,7 @@ describe("loadOpenClawPlugins", () => {
   } };`,
     });
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       config: {
         plugins: {
@@ -1060,7 +1060,7 @@ describe("loadOpenClawPlugins", () => {
     mkdirSafe(sourceDir);
     mkdirSafe(runtimeDir);
     fs.writeFileSync(
-      path.join(sourceDir, "openclaw.plugin.json"),
+      path.join(sourceDir, "steelengine.plugin.json"),
       JSON.stringify(
         {
           id: "startup-artifact-test",
@@ -1084,12 +1084,12 @@ describe("loadOpenClawPlugins", () => {
 
     const registry = withEnv(
       {
-        OPENCLAW_BUNDLED_PLUGINS_DIR: path.join(repoRoot, "extensions"),
-        OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
-        OPENCLAW_DISABLE_BUNDLED_PLUGINS: undefined,
+        STEELENGINE_BUNDLED_PLUGINS_DIR: path.join(repoRoot, "extensions"),
+        STEELENGINE_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
+        STEELENGINE_DISABLE_BUNDLED_PLUGINS: undefined,
       },
       () =>
-        loadOpenClawPlugins({
+        loadSteelEnginePlugins({
           cache: false,
           preferBuiltPluginArtifacts: true,
           onlyPluginIds: ["startup-artifact-test"],
@@ -1118,7 +1118,7 @@ describe("loadOpenClawPlugins", () => {
     mkdirSafe(sourceDir);
     mkdirSafe(runtimeDir);
     fs.writeFileSync(
-      path.join(sourceDir, "openclaw.plugin.json"),
+      path.join(sourceDir, "steelengine.plugin.json"),
       JSON.stringify(
         {
           id: "startup-package-artifact-test",
@@ -1133,7 +1133,7 @@ describe("loadOpenClawPlugins", () => {
       path.join(sourceDir, "package.json"),
       JSON.stringify(
         {
-          openclaw: {
+          steelengine: {
             extensions: ["./index.ts"],
           },
         },
@@ -1155,12 +1155,12 @@ describe("loadOpenClawPlugins", () => {
 
     const registry = withEnv(
       {
-        OPENCLAW_BUNDLED_PLUGINS_DIR: path.join(repoRoot, "extensions"),
-        OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
-        OPENCLAW_DISABLE_BUNDLED_PLUGINS: undefined,
+        STEELENGINE_BUNDLED_PLUGINS_DIR: path.join(repoRoot, "extensions"),
+        STEELENGINE_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
+        STEELENGINE_DISABLE_BUNDLED_PLUGINS: undefined,
       },
       () =>
-        loadOpenClawPlugins({
+        loadSteelEnginePlugins({
           cache: false,
           preferBuiltPluginArtifacts: true,
           onlyPluginIds: ["startup-package-artifact-test"],
@@ -1194,7 +1194,7 @@ describe("loadOpenClawPlugins", () => {
     mkdirSafe(builtPluginDir);
     fs.writeFileSync(path.join(repoRoot, "pnpm-workspace.yaml"), "packages: []\n", "utf-8");
     fs.writeFileSync(
-      path.join(sourceDir, "openclaw.plugin.json"),
+      path.join(sourceDir, "steelengine.plugin.json"),
       JSON.stringify(
         { id: "source-only-artifact-test", configSchema: EMPTY_PLUGIN_SCHEMA },
         null,
@@ -1205,7 +1205,7 @@ describe("loadOpenClawPlugins", () => {
     fs.writeFileSync(
       path.join(sourceDir, "package.json"),
       JSON.stringify({
-        openclaw: {
+        steelengine: {
           extensions: ["./index.ts"],
           build: { bundledDist: false },
         },
@@ -1223,12 +1223,12 @@ describe("loadOpenClawPlugins", () => {
       "utf-8",
     );
     fs.copyFileSync(
-      path.join(sourceDir, "openclaw.plugin.json"),
-      path.join(builtPluginDir, "openclaw.plugin.json"),
+      path.join(sourceDir, "steelengine.plugin.json"),
+      path.join(builtPluginDir, "steelengine.plugin.json"),
     );
     fs.writeFileSync(
       path.join(builtPluginDir, "package.json"),
-      JSON.stringify({ openclaw: { extensions: ["./index.js"] } }),
+      JSON.stringify({ steelengine: { extensions: ["./index.js"] } }),
       "utf-8",
     );
     fs.writeFileSync(
@@ -1257,13 +1257,13 @@ describe("loadOpenClawPlugins", () => {
     };
     const registry = withEnv(
       {
-        OPENCLAW_BUNDLED_PLUGINS_DIR: path.join(repoRoot, "dist", "extensions"),
-        OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
-        OPENCLAW_DISABLE_BUNDLED_PLUGINS: undefined,
+        STEELENGINE_BUNDLED_PLUGINS_DIR: path.join(repoRoot, "dist", "extensions"),
+        STEELENGINE_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
+        STEELENGINE_DISABLE_BUNDLED_PLUGINS: undefined,
       },
       () => {
         const manifestRegistry = loadPluginManifestRegistry({ config });
-        return loadOpenClawPlugins({
+        return loadSteelEnginePlugins({
           cache: false,
           preferBuiltPluginArtifacts: true,
           onlyPluginIds: ["source-only-artifact-test"],
@@ -1288,7 +1288,7 @@ describe("loadOpenClawPlugins", () => {
       path.join(pluginDir, "package.json"),
       JSON.stringify(
         {
-          openclaw: {
+          steelengine: {
             extensions: ["./src/index.mts"],
           },
         },
@@ -1298,7 +1298,7 @@ describe("loadOpenClawPlugins", () => {
       "utf-8",
     );
     fs.writeFileSync(
-      path.join(pluginDir, "openclaw.plugin.json"),
+      path.join(pluginDir, "steelengine.plugin.json"),
       JSON.stringify(
         {
           id: "workspace-artifact-test",
@@ -1320,7 +1320,7 @@ describe("loadOpenClawPlugins", () => {
       "utf-8",
     );
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       preferBuiltPluginArtifacts: true,
       config: {
@@ -1351,7 +1351,7 @@ describe("loadOpenClawPlugins", () => {
       path.join(pluginDir, "package.json"),
       JSON.stringify(
         {
-          openclaw: {
+          steelengine: {
             extensions: ["./src/index.ts"],
           },
         },
@@ -1361,7 +1361,7 @@ describe("loadOpenClawPlugins", () => {
       "utf-8",
     );
     fs.writeFileSync(
-      path.join(pluginDir, "openclaw.plugin.json"),
+      path.join(pluginDir, "steelengine.plugin.json"),
       JSON.stringify(
         {
           id: "workspace-artifact-extension-test",
@@ -1383,7 +1383,7 @@ describe("loadOpenClawPlugins", () => {
       "utf-8",
     );
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       preferBuiltPluginArtifacts: true,
       config: {
@@ -1413,7 +1413,7 @@ describe("loadOpenClawPlugins", () => {
       path.join(pluginDir, "package.json"),
       JSON.stringify(
         {
-          openclaw: {
+          steelengine: {
             extensions: ["./index.js"],
           },
         },
@@ -1423,7 +1423,7 @@ describe("loadOpenClawPlugins", () => {
       "utf-8",
     );
     fs.writeFileSync(
-      path.join(pluginDir, "openclaw.plugin.json"),
+      path.join(pluginDir, "steelengine.plugin.json"),
       JSON.stringify(
         {
           id: "workspace-explicit-js-test",
@@ -1445,7 +1445,7 @@ describe("loadOpenClawPlugins", () => {
       "utf-8",
     );
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       preferBuiltPluginArtifacts: true,
       config: {
@@ -1475,7 +1475,7 @@ describe("loadOpenClawPlugins", () => {
       path.join(pluginDir, "package.json"),
       JSON.stringify(
         {
-          openclaw: {
+          steelengine: {
             extensions: ["./src/index.mts"],
           },
         },
@@ -1485,7 +1485,7 @@ describe("loadOpenClawPlugins", () => {
       "utf-8",
     );
     fs.writeFileSync(
-      path.join(pluginDir, "openclaw.plugin.json"),
+      path.join(pluginDir, "steelengine.plugin.json"),
       JSON.stringify(
         {
           id: "workspace-artifact-symlink-test",
@@ -1512,7 +1512,7 @@ describe("loadOpenClawPlugins", () => {
       return;
     }
 
-    const registry = loadOpenClawPlugins({
+    const registry = loadSteelEnginePlugins({
       cache: false,
       preferBuiltPluginArtifacts: true,
       config: {

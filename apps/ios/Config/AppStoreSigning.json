@@ -1,46 +1,46 @@
 {
   "teamId": "FWJYW4S8P8",
-  "signingRepo": "git@github.com:openclaw/apps-signing.git",
+  "signingRepo": "git@github.com:steelengine/apps-signing.git",
   "signingBranch": "main",
   "profileType": "appstore",
-  "appGroupId": "group.ai.openclawfoundation.app.shared",
+  "appGroupId": "group.ai.steelenginefoundation.app.shared",
   "targets": [
     {
-      "target": "OpenClaw",
-      "displayName": "OpenClaw",
-      "bundleId": "ai.openclawfoundation.app",
+      "target": "SteelEngine",
+      "displayName": "SteelEngine",
+      "bundleId": "ai.steelenginefoundation.app",
       "platform": "IOS",
-      "profileKey": "OPENCLAW_APP_PROFILE",
-      "profileName": "OpenClaw App Store ai.openclawfoundation.app",
+      "profileKey": "STEELENGINE_APP_PROFILE",
+      "profileName": "SteelEngine App Store ai.steelenginefoundation.app",
       "capabilities": ["PUSH_NOTIFICATIONS", "APP_GROUPS", "APP_ATTEST", "HEALTH_KIT"],
-      "appGroups": ["group.ai.openclawfoundation.app.shared"]
+      "appGroups": ["group.ai.steelenginefoundation.app.shared"]
     },
     {
-      "target": "OpenClawShareExtension",
-      "displayName": "OpenClaw Share",
-      "bundleId": "ai.openclawfoundation.app.share",
+      "target": "SteelEngineShareExtension",
+      "displayName": "SteelEngine Share",
+      "bundleId": "ai.steelenginefoundation.app.share",
       "platform": "IOS",
-      "profileKey": "OPENCLAW_SHARE_PROFILE",
-      "profileName": "OpenClaw App Store ai.openclawfoundation.app.share",
+      "profileKey": "STEELENGINE_SHARE_PROFILE",
+      "profileName": "SteelEngine App Store ai.steelenginefoundation.app.share",
       "capabilities": ["APP_GROUPS"],
-      "appGroups": ["group.ai.openclawfoundation.app.shared"]
+      "appGroups": ["group.ai.steelenginefoundation.app.shared"]
     },
     {
-      "target": "OpenClawActivityWidget",
-      "displayName": "OpenClaw Activity Widget",
-      "bundleId": "ai.openclawfoundation.app.activitywidget",
+      "target": "SteelEngineActivityWidget",
+      "displayName": "SteelEngine Activity Widget",
+      "bundleId": "ai.steelenginefoundation.app.activitywidget",
       "platform": "IOS",
-      "profileKey": "OPENCLAW_ACTIVITY_WIDGET_PROFILE",
-      "profileName": "OpenClaw App Store ai.openclawfoundation.app.activitywidget",
+      "profileKey": "STEELENGINE_ACTIVITY_WIDGET_PROFILE",
+      "profileName": "SteelEngine App Store ai.steelenginefoundation.app.activitywidget",
       "capabilities": []
     },
     {
-      "target": "OpenClawWatchApp",
-      "displayName": "OpenClaw Watch App",
-      "bundleId": "ai.openclawfoundation.app.watchkitapp",
+      "target": "SteelEngineWatchApp",
+      "displayName": "SteelEngine Watch App",
+      "bundleId": "ai.steelenginefoundation.app.watchkitapp",
       "platform": "IOS",
-      "profileKey": "OPENCLAW_WATCH_APP_PROFILE",
-      "profileName": "OpenClaw App Store ai.openclawfoundation.app.watchkitapp",
+      "profileKey": "STEELENGINE_WATCH_APP_PROFILE",
+      "profileName": "SteelEngine App Store ai.steelenginefoundation.app.watchkitapp",
       "capabilities": []
     }
   ]

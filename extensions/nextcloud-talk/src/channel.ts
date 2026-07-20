@@ -1,14 +1,14 @@
 // Nextcloud Talk plugin module implements channel behavior.
-import { describeWebhookAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
-import { createChatChannelPlugin } from "openclaw/plugin-sdk/channel-core";
-import { createLoggedPairingApprovalNotifier } from "openclaw/plugin-sdk/channel-pairing";
-import { createAllowlistProviderRouteAllowlistWarningCollector } from "openclaw/plugin-sdk/channel-policy";
+import { describeWebhookAccountSnapshot } from "steelengine/plugin-sdk/account-helpers";
+import { createChatChannelPlugin } from "steelengine/plugin-sdk/channel-core";
+import { createLoggedPairingApprovalNotifier } from "steelengine/plugin-sdk/channel-pairing";
+import { createAllowlistProviderRouteAllowlistWarningCollector } from "steelengine/plugin-sdk/channel-policy";
 import {
   buildWebhookChannelStatusSummary,
   createComputedAccountStatusAdapter,
   createDefaultChannelRuntimeState,
-} from "openclaw/plugin-sdk/status-helpers";
-import { sanitizeAssistantVisibleText } from "openclaw/plugin-sdk/text-chunking";
+} from "steelengine/plugin-sdk/status-helpers";
+import { sanitizeAssistantVisibleText } from "steelengine/plugin-sdk/text-chunking";
 import type { ResolvedNextcloudTalkAccount } from "./accounts.js";
 import { nextcloudTalkApprovalAuth } from "./approval-auth.js";
 import { probeNextcloudTalkBotResponseFeature } from "./bot-preflight.js";

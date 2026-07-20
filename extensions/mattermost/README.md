@@ -1,13 +1,13 @@
-# Mattermost OpenClaw channel
+# Mattermost SteelEngine channel
 
-Official OpenClaw channel plugin for Mattermost.
+Official SteelEngine channel plugin for Mattermost.
 
 ## Install
 
 ```sh
-openclaw plugins install @openclaw/mattermost
+steelengine plugins install @steelengine/mattermost
 ```
 
 ## Docs
 
-See `docs/channels/mattermost.md` in the OpenClaw repository, or the published docs at `https://docs.openclaw.ai/channels/mattermost`.
+See `docs/channels/mattermost.md` in the SteelEngine repository, or the published docs at `https://docs.steelengine.ai/channels/mattermost`.

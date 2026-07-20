@@ -7,18 +7,18 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 source "$ROOT_DIR/scripts/lib/docker-e2e-image.sh"
 source "$ROOT_DIR/scripts/lib/docker-e2e-package.sh"
 
-IMAGE_NAME="$(docker_e2e_resolve_image "openclaw-update-channel-switch-e2e" OPENCLAW_UPDATE_CHANNEL_SWITCH_E2E_IMAGE)"
-SKIP_BUILD="${OPENCLAW_UPDATE_CHANNEL_SWITCH_E2E_SKIP_BUILD:-0}"
+IMAGE_NAME="$(docker_e2e_resolve_image "steelengine-update-channel-switch-e2e" STEELENGINE_UPDATE_CHANNEL_SWITCH_E2E_IMAGE)"
+SKIP_BUILD="${STEELENGINE_UPDATE_CHANNEL_SWITCH_E2E_SKIP_BUILD:-0}"
 cleanup() {
   docker_e2e_cleanup_package_tgz "${PACKAGE_TGZ:-}"
 }
 trap cleanup EXIT
 
-PACKAGE_TGZ="$(docker_e2e_prepare_package_tgz update-channel-switch "${OPENCLAW_CURRENT_PACKAGE_TGZ:-}")"
+PACKAGE_TGZ="$(docker_e2e_prepare_package_tgz update-channel-switch "${STEELENGINE_CURRENT_PACKAGE_TGZ:-}")"
 # Bare lanes mount the package artifact instead of baking app sources into the image.
 docker_e2e_package_mount_args "$PACKAGE_TGZ"
-OPENCLAW_TEST_STATE_SCRIPT_B64="$(
-  node "$ROOT_DIR/scripts/lib/openclaw-test-state.mjs" shell \
+STEELENGINE_TEST_STATE_SCRIPT_B64="$(
+  node "$ROOT_DIR/scripts/lib/steelengine-test-state.mjs" shell \
     --label update-channel-switch \
     --scenario update-stable |
     base64 |
@@ -30,13 +30,13 @@ docker_e2e_build_or_reuse "$IMAGE_NAME" update-channel-switch "$ROOT_DIR/scripts
 echo "Running update channel switch E2E..."
 docker_e2e_run_with_harness \
   -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
-  -e OPENCLAW_SKIP_CHANNELS=1 \
-  -e OPENCLAW_SKIP_PROVIDERS=1 \
-  -e "OPENCLAW_TEST_STATE_SCRIPT_B64=$OPENCLAW_TEST_STATE_SCRIPT_B64" \
+  -e STEELENGINE_SKIP_CHANNELS=1 \
+  -e STEELENGINE_SKIP_PROVIDERS=1 \
+  -e "STEELENGINE_TEST_STATE_SCRIPT_B64=$STEELENGINE_TEST_STATE_SCRIPT_B64" \
   "${DOCKER_E2E_PACKAGE_ARGS[@]}" \
   "$IMAGE_NAME" \
   bash -lc 'set -euo pipefail
-source scripts/lib/openclaw-e2e-instance.sh
+source scripts/lib/steelengine-e2e-instance.sh
 
 export npm_config_loglevel=error
 export npm_config_fund=false
@@ -46,12 +46,12 @@ export NPM_CONFIG_PREFIX=/tmp/npm-prefix
 export PNPM_HOME=/tmp/pnpm-home
 export PATH="/tmp/npm-prefix/bin:/tmp/pnpm-home:$PATH"
 export CI=true
-export OPENCLAW_DISABLE_BUNDLED_PLUGINS=1
-export OPENCLAW_NO_ONBOARD=1
-export OPENCLAW_NO_PROMPT=1
+export STEELENGINE_DISABLE_BUNDLED_PLUGINS=1
+export STEELENGINE_NO_ONBOARD=1
+export STEELENGINE_NO_PROMPT=1
 
-package_tgz="${OPENCLAW_CURRENT_PACKAGE_TGZ:?missing OPENCLAW_CURRENT_PACKAGE_TGZ}"
-git_root="/tmp/openclaw-git"
+package_tgz="${STEELENGINE_CURRENT_PACKAGE_TGZ:?missing STEELENGINE_CURRENT_PACKAGE_TGZ}"
+git_root="/tmp/steelengine-git"
 mkdir -p "$git_root"
 # Build the fake git install from the packed package contents, not the checkout.
 tar -xzf "$package_tgz" -C "$git_root" --strip-components=1
@@ -61,15 +61,15 @@ node scripts/e2e/lib/package-git-fixture.mjs prepare "$git_root"
 node scripts/e2e/lib/update-channel-switch/assertions.mjs prepare-git-fixture "$git_root"
 (
   cd "$git_root"
-  if ! openclaw_e2e_maybe_timeout "${OPENCLAW_E2E_NPM_INSTALL_TIMEOUT:-600s}" npm install --omit=optional --no-fund --no-audit >/tmp/openclaw-git-install.log 2>&1; then
-    openclaw_e2e_print_log /tmp/openclaw-git-install.log >&2
+  if ! steelengine_e2e_maybe_timeout "${STEELENGINE_E2E_NPM_INSTALL_TIMEOUT:-600s}" npm install --omit=optional --no-fund --no-audit >/tmp/steelengine-git-install.log 2>&1; then
+    steelengine_e2e_print_log /tmp/steelengine-git-install.log >&2
     exit 1
   fi
 )
 node scripts/e2e/lib/update-channel-switch/assertions.mjs write-control-ui "$git_root"
 
-git config --global user.email "docker-e2e@openclaw.local"
-git config --global user.name "OpenClaw Docker E2E"
+git config --global user.email "docker-e2e@steelengine.local"
+git config --global user.name "SteelEngine Docker E2E"
 git config --global gc.auto 0
 git -C "$git_root" init -q
 git -C "$git_root" config gc.auto 0
@@ -80,27 +80,27 @@ fixture_sha="$(git -C "$git_root" rev-parse HEAD)"
 
 pkg_tgz_path="$package_tgz"
 
-package_install_log="/tmp/openclaw-update-channel-switch-package-install.log"
-if ! openclaw_e2e_maybe_timeout "${OPENCLAW_E2E_NPM_INSTALL_TIMEOUT:-600s}" npm install -g --prefix /tmp/npm-prefix --omit=optional "$pkg_tgz_path" >"$package_install_log" 2>&1; then
-  openclaw_e2e_print_log "$package_install_log" >&2
+package_install_log="/tmp/steelengine-update-channel-switch-package-install.log"
+if ! steelengine_e2e_maybe_timeout "${STEELENGINE_E2E_NPM_INSTALL_TIMEOUT:-600s}" npm install -g --prefix /tmp/npm-prefix --omit=optional "$pkg_tgz_path" >"$package_install_log" 2>&1; then
+  steelengine_e2e_print_log "$package_install_log" >&2
   exit 1
 fi
-package_version="$(node -p "JSON.parse(require(\"node:fs\").readFileSync(\"/tmp/npm-prefix/lib/node_modules/openclaw/package.json\", \"utf8\")).version")"
-OPENCLAW_PACKAGE_ACCEPTANCE_LEGACY_COMPAT="$(
+package_version="$(node -p "JSON.parse(require(\"node:fs\").readFileSync(\"/tmp/npm-prefix/lib/node_modules/steelengine/package.json\", \"utf8\")).version")"
+STEELENGINE_PACKAGE_ACCEPTANCE_LEGACY_COMPAT="$(
   node scripts/e2e/lib/package-compat.mjs "$package_version"
 )"
-export OPENCLAW_PACKAGE_ACCEPTANCE_LEGACY_COMPAT
-command -v openclaw >/dev/null
-openclaw_e2e_enable_openclaw_cli_timeout
+export STEELENGINE_PACKAGE_ACCEPTANCE_LEGACY_COMPAT
+command -v steelengine >/dev/null
+steelengine_e2e_enable_steelengine_cli_timeout
 
-openclaw_e2e_eval_test_state_from_b64 "${OPENCLAW_TEST_STATE_SCRIPT_B64:?missing OPENCLAW_TEST_STATE_SCRIPT_B64}"
+steelengine_e2e_eval_test_state_from_b64 "${STEELENGINE_TEST_STATE_SCRIPT_B64:?missing STEELENGINE_TEST_STATE_SCRIPT_B64}"
 
-export OPENCLAW_GIT_DIR="$git_root"
-export OPENCLAW_UPDATE_DEV_TARGET_REF="$fixture_sha"
+export STEELENGINE_GIT_DIR="$git_root"
+export STEELENGINE_UPDATE_DEV_TARGET_REF="$fixture_sha"
 
 echo "==> package -> git dev channel"
 set +e
-dev_json="$(openclaw update --channel dev --yes --json --no-restart)"
+dev_json="$(steelengine update --channel dev --yes --json --no-restart)"
 dev_status=$?
 set -e
 printf "%s\n" "$dev_json"
@@ -110,13 +110,13 @@ fi
 UPDATE_JSON="$dev_json" node scripts/e2e/lib/update-channel-switch/assertions.mjs assert-update dev
 node scripts/e2e/lib/update-channel-switch/assertions.mjs assert-config-channel dev
 
-status_json="$(openclaw update status --json)"
+status_json="$(steelengine update status --json)"
 printf "%s\n" "$status_json"
 STATUS_JSON="$status_json" node scripts/e2e/lib/update-channel-switch/assertions.mjs assert-status-kind git
 
 echo "==> git -> package stable channel"
 set +e
-stable_json="$(openclaw update --channel stable --tag "$pkg_tgz_path" --yes --json --no-restart)"
+stable_json="$(steelengine update --channel stable --tag "$pkg_tgz_path" --yes --json --no-restart)"
 stable_status=$?
 set -e
 printf "%s\n" "$stable_json"
@@ -126,7 +126,7 @@ fi
 UPDATE_JSON="$stable_json" node scripts/e2e/lib/update-channel-switch/assertions.mjs assert-update stable
 node scripts/e2e/lib/update-channel-switch/assertions.mjs assert-config-channel stable
 
-status_json="$(openclaw update status --json)"
+status_json="$(steelengine update status --json)"
 printf "%s\n" "$status_json"
 STATUS_JSON="$status_json" node scripts/e2e/lib/update-channel-switch/assertions.mjs assert-status-kind package
 

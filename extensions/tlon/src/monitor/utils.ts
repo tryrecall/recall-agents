@@ -1,17 +1,17 @@
-import { resolveAllowlistMatchByCandidates } from "openclaw/plugin-sdk/allow-from";
+import { resolveAllowlistMatchByCandidates } from "steelengine/plugin-sdk/allow-from";
 import {
   implicitMentionKindWhen,
   resolveInboundMentionDecision,
-} from "openclaw/plugin-sdk/channel-inbound";
+} from "steelengine/plugin-sdk/channel-inbound";
 import {
   resolveChannelImplicitMentions,
   resolveStableChannelMessageIngress,
   type StableChannelIngressIdentityParams,
-} from "openclaw/plugin-sdk/channel-ingress-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage as sharedFormatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+} from "steelengine/plugin-sdk/channel-ingress-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { formatErrorMessage as sharedFormatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 // Tlon helper module supports utils behavior.
-import { expectDefined } from "openclaw/plugin-sdk/expect-runtime";
+import { expectDefined } from "steelengine/plugin-sdk/expect-runtime";
 import { normalizeShip } from "../targets.js";
 
 export interface ParsedCite {
@@ -185,7 +185,7 @@ export async function resolveTlonCommandAuthorizationWithIngress(params: {
 }
 
 export function resolveTlonGroupMentionDecision(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId: string;
   wasMentioned: boolean;
   botParticipatedInThread: boolean;

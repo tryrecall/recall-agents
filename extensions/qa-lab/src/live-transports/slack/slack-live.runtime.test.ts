@@ -85,10 +85,10 @@ describe("Slack live QA runtime helpers", () => {
   it("resolves env credential payloads", () => {
     expect(
       testing.resolveSlackQaRuntimeEnv({
-        OPENCLAW_QA_SLACK_CHANNEL_ID: "C123456789",
-        OPENCLAW_QA_SLACK_DRIVER_BOT_TOKEN: "xoxb-driver",
-        OPENCLAW_QA_SLACK_SUT_BOT_TOKEN: "xoxb-sut",
-        OPENCLAW_QA_SLACK_SUT_APP_TOKEN: "xapp-sut",
+        STEELENGINE_QA_SLACK_CHANNEL_ID: "C123456789",
+        STEELENGINE_QA_SLACK_DRIVER_BOT_TOKEN: "xoxb-driver",
+        STEELENGINE_QA_SLACK_SUT_BOT_TOKEN: "xoxb-sut",
+        STEELENGINE_QA_SLACK_SUT_APP_TOKEN: "xapp-sut",
       }),
     ).toEqual({
       channelId: "C123456789",
@@ -101,12 +101,12 @@ describe("Slack live QA runtime helpers", () => {
   it("rejects malformed Slack channel ids", () => {
     expect(() =>
       testing.resolveSlackQaRuntimeEnv({
-        OPENCLAW_QA_SLACK_CHANNEL_ID: "qa-channel",
-        OPENCLAW_QA_SLACK_DRIVER_BOT_TOKEN: "xoxb-driver",
-        OPENCLAW_QA_SLACK_SUT_BOT_TOKEN: "xoxb-sut",
-        OPENCLAW_QA_SLACK_SUT_APP_TOKEN: "xapp-sut",
+        STEELENGINE_QA_SLACK_CHANNEL_ID: "qa-channel",
+        STEELENGINE_QA_SLACK_DRIVER_BOT_TOKEN: "xoxb-driver",
+        STEELENGINE_QA_SLACK_SUT_BOT_TOKEN: "xoxb-sut",
+        STEELENGINE_QA_SLACK_SUT_APP_TOKEN: "xapp-sut",
       }),
-    ).toThrow("OPENCLAW_QA_SLACK channelId must be a Slack id like C123 or U123.");
+    ).toThrow("STEELENGINE_QA_SLACK channelId must be a Slack id like C123 or U123.");
   });
 
   it("parses Convex credential payloads", () => {
@@ -597,7 +597,7 @@ describe("Slack live QA runtime helpers", () => {
 
   it("extracts typed Slack approval button values from blocks", () => {
     const actionValue =
-      'openclaw:approval:v1:{"approvalId":"plugin:abc","approvalKind":"plugin","decision":"allow-once"}';
+      'steelengine:approval:v1:{"approvalId":"plugin:abc","approvalKind":"plugin","decision":"allow-once"}';
     expect(
       testing.collectSlackActionValues([
         {
@@ -618,8 +618,8 @@ describe("Slack live QA runtime helpers", () => {
     expect(
       testing.extractSlackNativeApprovalId({
         actionValues: [
-          'openclaw:approval:v1:{"approvalId":"plugin:abc123","approvalKind":"plugin","decision":"allow-once"}',
-          'openclaw:approval:v1:{"approvalId":"plugin:abc123","approvalKind":"plugin","decision":"deny"}',
+          'steelengine:approval:v1:{"approvalId":"plugin:abc123","approvalKind":"plugin","decision":"allow-once"}',
+          'steelengine:approval:v1:{"approvalId":"plugin:abc123","approvalKind":"plugin","decision":"deny"}',
         ],
         decision: "allow-once",
       }),
@@ -628,7 +628,7 @@ describe("Slack live QA runtime helpers", () => {
 
   it("resolves the Codex file approval target path", () => {
     expect(testing.resolveCodexFileApprovalTargetPath("MARKER")).toMatch(
-      /\.openclaw-qa-codex-file-approval-marker\.txt$/u,
+      /\.steelengine-qa-codex-file-approval-marker\.txt$/u,
     );
   });
 
@@ -1203,7 +1203,7 @@ describe("Slack live QA runtime helpers", () => {
                 type: "button",
                 text: { type: "plain_text", text: "Allow Once" },
                 value:
-                  'openclaw:approval:v1:{"approvalId":"plugin:abc","approvalKind":"plugin","decision":"allow-once"}',
+                  'steelengine:approval:v1:{"approvalId":"plugin:abc","approvalKind":"plugin","decision":"allow-once"}',
               },
             ],
           },

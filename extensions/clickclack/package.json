@@ -1,7 +1,7 @@
 {
-  "name": "@openclaw/clickclack",
+  "name": "@steelengine/clickclack",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw ClickClack channel plugin",
+  "description": "SteelEngine ClickClack channel plugin",
   "type": "module",
   "exports": {
     ".": "./dist/index.js",
@@ -13,18 +13,18 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*",
+    "steelengine": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.7.2-beta.3"
+    "steelengine": ">=2026.7.2-beta.3"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "steelengine": {
       "optional": true
     }
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
@@ -57,8 +57,8 @@
       ]
     },
     "install": {
-      "clawhubSpec": "clawhub:@openclaw/clickclack",
-      "npmSpec": "@openclaw/clickclack",
+      "clawhubSpec": "clawhub:@steelengine/clickclack",
+      "npmSpec": "@steelengine/clickclack",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.6.9",
       "allowInvalidConfigRecovery": true
@@ -67,7 +67,7 @@
       "pluginApi": ">=2026.7.2-beta.3"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3",
+      "steelengineVersion": "2026.7.2-beta.3",
       "bundledDist": false
     },
     "release": {
@@ -77,6 +77,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/steelengineai/recall-agents"
   }
 }

@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/zalouser",
+  "name": "@steelengine/zalouser",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw Zalo Personal Account plugin via native zca-js integration.",
+  "description": "SteelEngine Zalo Personal Account plugin via native zca-js integration.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/steelengineai/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -13,18 +13,18 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*",
+    "steelengine": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.7.2-beta.3"
+    "steelengine": ">=2026.7.2-beta.3"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "steelengine": {
       "optional": true
     }
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
@@ -49,7 +49,7 @@
       }
     },
     "install": {
-      "npmSpec": "@openclaw/zalouser",
+      "npmSpec": "@steelengine/zalouser",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.10"
     },
@@ -57,7 +57,7 @@
       "pluginApi": ">=2026.7.2-beta.3"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3"
+      "steelengineVersion": "2026.7.2-beta.3"
     },
     "release": {
       "publishToClawHub": true,

@@ -2,12 +2,12 @@
 summary: "Plugin compatibility contracts, deprecation metadata, and migration expectations"
 title: "Plugin compatibility"
 read_when:
-  - You maintain an OpenClaw plugin
+  - You maintain an SteelEngine plugin
   - You see a plugin compatibility warning
   - You are planning a plugin SDK or manifest migration
 ---
 
-OpenClaw keeps older plugin contracts wired through named compatibility
+SteelEngine keeps older plugin contracts wired through named compatibility
 adapters before removing them. This protects existing bundled and external
 plugins while the SDK, manifest, setup, config, and agent runtime contracts
 evolve.
@@ -43,7 +43,7 @@ and channels move out of core.
 
 ## Deprecation policy
 
-OpenClaw should not remove a documented plugin contract in the same release
+SteelEngine should not remove a documented plugin contract in the same release
 that introduces its replacement. Migration sequence:
 
 1. Add the new contract.
@@ -67,17 +67,17 @@ areas. New plugin code should use the replacement in each area and in the
 specific migration guide; existing plugins can keep using a compatibility
 path until docs, diagnostics, and release notes announce a removal window.
 
-- legacy broad SDK imports such as `openclaw/plugin-sdk/compat`
+- legacy broad SDK imports such as `steelengine/plugin-sdk/compat`
 - legacy hook-only plugin shapes and `before_agent_start`
 - legacy `api.on("deactivate", ...)` cleanup hook names while plugins
   migrate to `gateway_stop`
 - legacy `activate(api)` plugin entrypoints while plugins migrate to
   `register(api)`
-- legacy SDK aliases such as `openclaw/extension-api`,
-  `openclaw/plugin-sdk/channel-runtime`, `openclaw/plugin-sdk/command-auth`
-  status builders, `openclaw/plugin-sdk/test-utils` (replaced by focused
-  `openclaw/plugin-sdk/*` test subpaths), and the `ClawdbotConfig` /
-  `OpenClawSchemaType` type aliases
+- legacy SDK aliases such as `steelengine/extension-api`,
+  `steelengine/plugin-sdk/channel-runtime`, `steelengine/plugin-sdk/command-auth`
+  status builders, `steelengine/plugin-sdk/test-utils` (replaced by focused
+  `steelengine/plugin-sdk/*` test subpaths), and the `ClawdbotConfig` /
+  `SteelEngineSchemaType` type aliases
 - bundled plugin allowlist and enablement behavior
 - legacy provider/channel env-var manifest metadata
 - legacy provider plugin hooks and type aliases while providers move to
@@ -95,21 +95,21 @@ path until docs, diagnostics, and release notes announce a removal window.
 - legacy channel SDK helpers for native message schemas, mention gating,
   inbound envelope formatting, and approval capability nesting
 - legacy channel route key and comparable-target helper aliases while
-  plugins move to `openclaw/plugin-sdk/channel-route`
+  plugins move to `steelengine/plugin-sdk/channel-route`
 - activation hints being replaced by manifest contribution ownership
 - `setup-api` runtime fallback while setup descriptors move to cold
   `setup.requiresRuntime: false` metadata
 - provider `discovery` hooks while provider catalog hooks move to
   `catalog.run(...)`
 - channel `showConfigured` / `showInSetup` metadata while channel packages
-  move to `openclaw.channel.exposure`
+  move to `steelengine.channel.exposure`
 - legacy runtime-policy config keys while doctor migrates operators to
   `agentRuntime`
 - generated bundled channel config metadata fallback while registry-first
   `channelConfigs` metadata lands
 - persisted plugin registry disable and install-migration env flags while
-  repair flows migrate operators to `openclaw plugins registry --refresh`
-  and `openclaw doctor --fix`
+  repair flows migrate operators to `steelengine plugins registry --refresh`
+  and `steelengine doctor --fix`
 - legacy plugin-owned web search, web fetch, and x_search config paths
   while doctor migrates them to `plugins.entries.<plugin>.config`
 - legacy `plugins.installs` authored config and bundled plugin load-path
@@ -162,31 +162,31 @@ TypeScript `@deprecated` annotation names its replacement:
 
 ## Plugin inspector package
 
-The plugin inspector should live outside the core OpenClaw repo as a
+The plugin inspector should live outside the core SteelEngine repo as a
 separate package/repository backed by the versioned compatibility and
 manifest contracts. The day-one CLI should be:
 
 ```sh
-openclaw-plugin-inspector ./my-plugin
+steelengine-plugin-inspector ./my-plugin
 ```
 
 It should emit manifest/schema validation, the contract compatibility
 version being checked, install/source metadata checks, cold-path import
 checks, and deprecation/compatibility warnings. Use `--json` for stable
-machine-readable output in CI annotations. OpenClaw core should expose
+machine-readable output in CI annotations. SteelEngine core should expose
 contracts and fixtures the inspector can consume, but should not publish the
-inspector binary from the main `openclaw` package.
+inspector binary from the main `steelengine` package.
 
 ### Maintainer acceptance lane
 
 Use Crabbox-backed Blacksmith Testbox for the installable-package acceptance
-lane when validating the external inspector against OpenClaw plugin
-packages. Run it from a clean OpenClaw checkout after the package is built:
+lane when validating the external inspector against SteelEngine plugin
+packages. Run it from a clean SteelEngine checkout after the package is built:
 
 ```sh
-pnpm crabbox:run -- --provider blacksmith-testbox --timing-json --shell -- "pnpm install && pnpm build && npm exec --yes @openclaw/plugin-inspector@0.1.0 -- ./extensions/telegram --json"
-pnpm crabbox:run -- --provider blacksmith-testbox --timing-json --shell -- "npm exec --yes @openclaw/plugin-inspector@0.1.0 -- ./extensions/discord --json"
-pnpm crabbox:run -- --provider blacksmith-testbox --timing-json --shell -- "npm exec --yes @openclaw/plugin-inspector@0.1.0 -- <clawhub-plugin-dir> --json"
+pnpm crabbox:run -- --provider blacksmith-testbox --timing-json --shell -- "pnpm install && pnpm build && npm exec --yes @steelengine/plugin-inspector@0.1.0 -- ./extensions/telegram --json"
+pnpm crabbox:run -- --provider blacksmith-testbox --timing-json --shell -- "npm exec --yes @steelengine/plugin-inspector@0.1.0 -- ./extensions/discord --json"
+pnpm crabbox:run -- --provider blacksmith-testbox --timing-json --shell -- "npm exec --yes @steelengine/plugin-inspector@0.1.0 -- <clawhub-plugin-dir> --json"
 ```
 
 Keep this lane opt-in for maintainers, since it installs an external npm

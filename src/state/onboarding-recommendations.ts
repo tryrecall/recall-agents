@@ -6,13 +6,13 @@ import {
   executeSqliteQueryTakeFirstSync,
   getNodeSqliteKysely,
 } from "../infra/kysely-sync.js";
-import type { DB as OpenClawStateKyselyDatabase } from "./openclaw-state-db.generated.js";
+import type { DB as SteelEngineStateKyselyDatabase } from "./steelengine-state-db.generated.js";
 import {
-  openOpenClawStateDatabase,
-  runOpenClawStateWriteTransaction,
-  type OpenClawStateDatabaseOptions,
-} from "./openclaw-state-db.js";
-import { resolveOpenClawStateSqlitePath } from "./openclaw-state-db.paths.js";
+  openSteelEngineStateDatabase,
+  runSteelEngineStateWriteTransaction,
+  type SteelEngineStateDatabaseOptions,
+} from "./steelengine-state-db.js";
+import { resolveSteelEngineStateSqlitePath } from "./steelengine-state-db.paths.js";
 
 const ONBOARDING_RECOMMENDATIONS_KEY = "primary";
 
@@ -48,7 +48,7 @@ type OnboardingRecommendationInventoryItem = {
 };
 
 type OnboardingRecommendationsDatabase = Pick<
-  OpenClawStateKyselyDatabase,
+  SteelEngineStateKyselyDatabase,
   "onboarding_recommendations"
 >;
 
@@ -74,13 +74,13 @@ function hashOnboardingRecommendationInventory(
 }
 
 export function readOnboardingRecommendations(
-  options: OpenClawStateDatabaseOptions = {},
+  options: SteelEngineStateDatabaseOptions = {},
 ): OnboardingRecommendationsRecord | null {
-  const pathname = options.path ?? resolveOpenClawStateSqlitePath(options.env ?? process.env);
+  const pathname = options.path ?? resolveSteelEngineStateSqlitePath(options.env ?? process.env);
   if (!existsSync(pathname)) {
     return null;
   }
-  const database = openOpenClawStateDatabase(options);
+  const database = openSteelEngineStateDatabase(options);
   const db = getNodeSqliteKysely<OnboardingRecommendationsDatabase>(database.db);
   const row = executeSqliteQueryTakeFirstSync(
     database.db,
@@ -112,13 +112,13 @@ export function writeOnboardingRecommendationsOffer(params: {
   matches: readonly OnboardingRecommendationMatch[];
   answered: boolean;
   nowMs?: number;
-  database?: OpenClawStateDatabaseOptions;
+  database?: SteelEngineStateDatabaseOptions;
 }): OnboardingRecommendationsRecord {
   const nowMs = params.nowMs ?? Date.now();
   const inventoryHash = hashOnboardingRecommendationInventory(params.inventory);
   const matches = OnboardingRecommendationMatchesSchema.parse(params.matches);
   const acceptedAt = params.answered ? nowMs : null;
-  return runOpenClawStateWriteTransaction(
+  return runSteelEngineStateWriteTransaction(
     (database) => {
       const db = getNodeSqliteKysely<OnboardingRecommendationsDatabase>(database.db);
       const existing = executeSqliteQueryTakeFirstSync(
@@ -183,11 +183,11 @@ export function writeOnboardingRecommendationsOffer(params: {
 export function acknowledgeOnboardingRecommendations(
   params: {
     nowMs?: number;
-    database?: OpenClawStateDatabaseOptions;
+    database?: SteelEngineStateDatabaseOptions;
   } = {},
 ): OnboardingRecommendationsRecord | null {
   const nowMs = params.nowMs ?? Date.now();
-  return runOpenClawStateWriteTransaction(
+  return runSteelEngineStateWriteTransaction(
     (database) => {
       const db = getNodeSqliteKysely<OnboardingRecommendationsDatabase>(database.db);
       const existing = executeSqliteQueryTakeFirstSync(
@@ -230,9 +230,9 @@ export function acknowledgeOnboardingRecommendations(
 }
 
 export function clearOnboardingRecommendations(
-  databaseOptions: OpenClawStateDatabaseOptions = {},
+  databaseOptions: SteelEngineStateDatabaseOptions = {},
 ): boolean {
-  return runOpenClawStateWriteTransaction(
+  return runSteelEngineStateWriteTransaction(
     (database) => {
       const db = getNodeSqliteKysely<OnboardingRecommendationsDatabase>(database.db);
       const result = executeSqliteQuerySync(

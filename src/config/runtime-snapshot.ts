@@ -4,14 +4,14 @@ import {
   resetPublishedConfigRuntimeEnv,
   type PreparedConfigRuntimeEnv,
 } from "./config-env-vars.js";
-import type { OpenClawConfig } from "./types.js";
+import type { SteelEngineConfig } from "./types.js";
 
 export type RuntimeConfigSnapshotRefreshOptions = {
   includeAuthStoreRefs?: boolean;
 };
 
 export type RuntimeConfigSnapshotRefreshParams = RuntimeConfigSnapshotRefreshOptions & {
-  sourceConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
   preflightResult?: unknown;
 };
 type MaybePromise<T> = T | Promise<T>;
@@ -75,8 +75,8 @@ export type RuntimeConfigSnapshotRefreshHandler = {
 
 export type RuntimeConfigWriteNotification = {
   configPath: string;
-  sourceConfig: OpenClawConfig;
-  runtimeConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
+  runtimeConfig: SteelEngineConfig;
   persistedHash: string;
   revision: number;
   fingerprint: string;
@@ -89,11 +89,11 @@ export type RuntimeConfigWriteNotification = {
 };
 
 export type RuntimeConfigWritePreparedCandidate = {
-  runtimeConfig: OpenClawConfig;
-  compareConfig: OpenClawConfig;
+  runtimeConfig: SteelEngineConfig;
+  compareConfig: SteelEngineConfig;
   runtimeEnv?: PreparedConfigRuntimeEnv;
-  reapplyRuntimeOverlays?: (config: OpenClawConfig) => OpenClawConfig;
-  reapplyCompareOverlays?: (config: OpenClawConfig) => OpenClawConfig;
+  reapplyRuntimeOverlays?: (config: SteelEngineConfig) => SteelEngineConfig;
+  reapplyCompareOverlays?: (config: SteelEngineConfig) => SteelEngineConfig;
 };
 
 export type RuntimeConfigSnapshotMetadata = {
@@ -103,14 +103,14 @@ export type RuntimeConfigSnapshotMetadata = {
   updatedAtMs: number;
 };
 
-let runtimeConfigSnapshot: OpenClawConfig | null = null;
-let runtimeConfigSourceSnapshot: OpenClawConfig | null = null;
+let runtimeConfigSnapshot: SteelEngineConfig | null = null;
+let runtimeConfigSourceSnapshot: SteelEngineConfig | null = null;
 let runtimeConfigSnapshotMetadata: RuntimeConfigSnapshotMetadata | null = null;
 let runtimeConfigAppliedHash: string | null = null;
 let runtimeConfigSnapshotRevision = 0;
 let runtimeConfigSnapshotRefreshHandler: RuntimeConfigSnapshotRefreshHandler | null = null;
 type ManagedRuntimeConfigWritePreflight = (
-  sourceConfig: OpenClawConfig,
+  sourceConfig: SteelEngineConfig,
   refreshOptions?: RuntimeConfigSnapshotRefreshOptions,
 ) => MaybePromise<RuntimeConfigWritePreparedCandidate>;
 const managedRuntimeConfigWriteOwners = new Map<
@@ -133,7 +133,7 @@ function stableConfigStringify(value: unknown): string {
     .join(",")}}`;
 }
 
-function configSnapshotsMatch(left: OpenClawConfig, right: OpenClawConfig): boolean {
+function configSnapshotsMatch(left: SteelEngineConfig, right: SteelEngineConfig): boolean {
   if (left === right) {
     return true;
   }
@@ -144,13 +144,13 @@ function configSnapshotsMatch(left: OpenClawConfig, right: OpenClawConfig): bool
   }
 }
 
-export function hashRuntimeConfigValue(value: OpenClawConfig): string {
+export function hashRuntimeConfigValue(value: SteelEngineConfig): string {
   return sha256Base64Url(stableConfigStringify(value));
 }
 
 function createRuntimeConfigSnapshotMetadata(
-  config: OpenClawConfig,
-  sourceConfig?: OpenClawConfig,
+  config: SteelEngineConfig,
+  sourceConfig?: SteelEngineConfig,
 ): RuntimeConfigSnapshotMetadata {
   runtimeConfigSnapshotRevision += 1;
   return {
@@ -162,8 +162,8 @@ function createRuntimeConfigSnapshotMetadata(
 }
 
 export function setRuntimeConfigSnapshot(
-  config: OpenClawConfig,
-  sourceConfig?: OpenClawConfig,
+  config: SteelEngineConfig,
+  sourceConfig?: SteelEngineConfig,
 ): void {
   runtimeConfigSnapshot = config;
   runtimeConfigSourceSnapshot = sourceConfig ?? null;
@@ -171,8 +171,8 @@ export function setRuntimeConfigSnapshot(
 }
 
 export function setAppliedRuntimeConfigSnapshot(
-  config: OpenClawConfig,
-  sourceConfig: OpenClawConfig,
+  config: SteelEngineConfig,
+  sourceConfig: SteelEngineConfig,
 ): void {
   setRuntimeConfigSnapshot(config, sourceConfig);
   runtimeConfigAppliedHash = hashRuntimeConfigValue(sourceConfig);
@@ -181,7 +181,7 @@ export function setAppliedRuntimeConfigSnapshot(
 /** Publish a newer canonical source without changing the active runtime object. */
 export function setRuntimeConfigSourceSnapshotIfCurrent(params: {
   expectedRevision: number;
-  sourceConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
 }): boolean {
   if (
     !runtimeConfigSnapshot ||
@@ -207,11 +207,11 @@ export function clearRuntimeConfigSnapshot(): void {
   resetConfigRuntimeState();
 }
 
-export function getRuntimeConfigSnapshot(): OpenClawConfig | null {
+export function getRuntimeConfigSnapshot(): SteelEngineConfig | null {
   return runtimeConfigSnapshot;
 }
 
-export function getRuntimeConfigSourceSnapshot(): OpenClawConfig | null {
+export function getRuntimeConfigSourceSnapshot(): SteelEngineConfig | null {
   return runtimeConfigSourceSnapshot;
 }
 
@@ -228,7 +228,7 @@ export function setRuntimeConfigAppliedHash(hash: string | null): void {
   runtimeConfigAppliedHash = hash;
 }
 
-export function resolveRuntimeConfigCacheKey(config: OpenClawConfig): string {
+export function resolveRuntimeConfigCacheKey(config: SteelEngineConfig): string {
   const metadata = runtimeConfigSnapshotMetadata;
   if (metadata && config === runtimeConfigSnapshot) {
     return `runtime:${metadata.revision}:${metadata.fingerprint}`;
@@ -238,8 +238,8 @@ export function resolveRuntimeConfigCacheKey(config: OpenClawConfig): string {
 
 export function createRuntimeConfigWriteNotification(params: {
   configPath: string;
-  sourceConfig: OpenClawConfig;
-  runtimeConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
+  runtimeConfig: SteelEngineConfig;
   persistedHash: string;
   writtenAtMs?: number;
   afterWrite?: ConfigWriteAfterWrite;
@@ -275,10 +275,10 @@ export function createRuntimeConfigWriteNotification(params: {
 }
 
 export function selectApplicableRuntimeConfig(params: {
-  inputConfig?: OpenClawConfig;
-  runtimeConfig?: OpenClawConfig | null;
-  runtimeSourceConfig?: OpenClawConfig | null;
-}): OpenClawConfig | undefined {
+  inputConfig?: SteelEngineConfig;
+  runtimeConfig?: SteelEngineConfig | null;
+  runtimeSourceConfig?: SteelEngineConfig | null;
+}): SteelEngineConfig | undefined {
   const runtimeConfig = params.runtimeConfig ?? null;
   if (!runtimeConfig) {
     return params.inputConfig;
@@ -346,7 +346,7 @@ export function registerManagedRuntimeConfigWriteOwner(
 
 export async function preflightManagedRuntimeConfigWrite(
   configPath: string,
-  sourceConfig: OpenClawConfig,
+  sourceConfig: SteelEngineConfig,
   refreshOptions?: RuntimeConfigSnapshotRefreshOptions,
 ): Promise<Map<symbol, RuntimeConfigWritePreparedCandidate>> {
   const owners = managedRuntimeConfigWriteOwners.get(configPath);
@@ -376,7 +376,7 @@ export function notifyRuntimeConfigWriteListeners(event: RuntimeConfigWriteNotif
   }
 }
 
-export function loadPinnedRuntimeConfig(loadFresh: () => OpenClawConfig): OpenClawConfig {
+export function loadPinnedRuntimeConfig(loadFresh: () => SteelEngineConfig): SteelEngineConfig {
   if (runtimeConfigSnapshot) {
     return runtimeConfigSnapshot;
   }
@@ -386,7 +386,7 @@ export function loadPinnedRuntimeConfig(loadFresh: () => OpenClawConfig): OpenCl
 }
 
 export async function preflightRuntimeSnapshotWrite(params: {
-  nextSourceConfig: OpenClawConfig;
+  nextSourceConfig: SteelEngineConfig;
   refreshOptions?: RuntimeConfigSnapshotRefreshOptions;
   createRefreshError: (detail: string, cause: unknown) => Error;
   formatRefreshError: (error: unknown) => string;
@@ -406,11 +406,11 @@ export async function preflightRuntimeSnapshotWrite(params: {
 }
 
 export async function finalizeRuntimeSnapshotWrite(params: {
-  nextSourceConfig: OpenClawConfig;
+  nextSourceConfig: SteelEngineConfig;
   refreshOptions?: RuntimeConfigSnapshotRefreshOptions;
   hadRuntimeSnapshot: boolean;
   hadBothSnapshots: boolean;
-  loadFreshConfig: () => OpenClawConfig;
+  loadFreshConfig: () => SteelEngineConfig;
   notifyCommittedWrite: () => void;
   createRefreshError: (detail: string, cause: unknown) => Error;
   formatRefreshError: (error: unknown) => string;

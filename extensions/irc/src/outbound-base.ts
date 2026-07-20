@@ -1,6 +1,6 @@
 // Irc plugin module implements outbound base behavior.
-import { sanitizeForPlainText } from "openclaw/plugin-sdk/channel-outbound";
-import { sanitizeAssistantVisibleText } from "openclaw/plugin-sdk/text-chunking";
+import { sanitizeForPlainText } from "steelengine/plugin-sdk/channel-outbound";
+import { sanitizeAssistantVisibleText } from "steelengine/plugin-sdk/text-chunking";
 import { chunkTextForOutbound } from "./channel-api.js";
 
 export const ircOutboundBaseAdapter = {

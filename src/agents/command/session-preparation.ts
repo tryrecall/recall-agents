@@ -1,6 +1,6 @@
 import type { ThinkLevel, VerboseLevel } from "../../auto-reply/thinking.js";
 import type { SessionEntry } from "../../config/sessions/types.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import {
   assertAgentRunLifecycleGenerationCurrent,
   registerAgentRunContext,
@@ -14,7 +14,7 @@ import { persistSessionEntry } from "./session-helpers.js";
 import type { AgentCommandOpts } from "./types.js";
 
 export async function prepareEmbeddedSessionState(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   opts: AgentCommandOpts;
   sessionEntry?: SessionEntry;
   sessionStore?: Record<string, SessionEntry>;

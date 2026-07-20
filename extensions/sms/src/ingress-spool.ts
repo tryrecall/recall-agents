@@ -3,8 +3,8 @@ import {
   bindIngressLifecycleToReplyOptions,
   createChannelIngressDrain,
   type ChannelIngressQueue,
-} from "openclaw/plugin-sdk/channel-outbound";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+} from "steelengine/plugin-sdk/channel-outbound";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import { dispatchSmsInboundEvent, type SmsChannelRuntime } from "./inbound.js";
 import { getSmsRuntime } from "./runtime.js";
 import {
@@ -50,7 +50,7 @@ function parseSmsIngressPayload(
 }
 
 export function createSmsIngressSpool(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   account: ResolvedSmsAccount;
   channelRuntime: SmsChannelRuntime;
   queue?: ChannelIngressQueue<SmsIngressPayload>;

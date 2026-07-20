@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 import { writePersistedInstalledPluginIndex } from "../plugins/installed-plugin-index-store.js";
 import type { InstalledPluginIndex } from "../plugins/installed-plugin-index.js";
@@ -169,7 +169,7 @@ describe("security audit install metadata findings", () => {
     return dir;
   };
 
-  const runInstallMetadataAudit = async (cfg: OpenClawConfig, stateDir: string) => {
+  const runInstallMetadataAudit = async (cfg: SteelEngineConfig, stateDir: string) => {
     return await collectPluginsTrustFindingsForTest({ cfg, stateDir });
   };
 
@@ -198,7 +198,7 @@ describe("security audit install metadata findings", () => {
       installRecords: records,
       plugins: Object.keys(records).map((pluginId) => ({
         pluginId,
-        manifestPath: path.join(stateDir, "extensions", pluginId, "openclaw.plugin.json"),
+        manifestPath: path.join(stateDir, "extensions", pluginId, "steelengine.plugin.json"),
         manifestHash: "manifest",
         rootDir: path.join(stateDir, "extensions", pluginId),
         origin: "global" as const,
@@ -217,7 +217,7 @@ describe("security audit install metadata findings", () => {
   };
 
   beforeAll(async () => {
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-security-install-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-security-install-"));
   });
 
   afterAll(async () => {
@@ -240,7 +240,7 @@ describe("security audit install metadata findings", () => {
           await writePluginIndexInstallRecords(stateDir, {
             "voice-call": {
               source: "npm",
-              spec: "@openclaw/voice-call",
+              spec: "@steelengine/voice-call",
             },
           });
           return runInstallMetadataAudit(
@@ -250,7 +250,7 @@ describe("security audit install metadata findings", () => {
                   installs: {
                     "test-hooks": {
                       source: "npm",
-                      spec: "@openclaw/test-hooks",
+                      spec: "@steelengine/test-hooks",
                     },
                   },
                 },
@@ -273,7 +273,7 @@ describe("security audit install metadata findings", () => {
           await writePluginIndexInstallRecords(stateDir, {
             "voice-call": {
               source: "npm",
-              spec: "@openclaw/voice-call@1.2.3",
+              spec: "@steelengine/voice-call@1.2.3",
               integrity: "sha512-plugin",
             },
           });
@@ -284,7 +284,7 @@ describe("security audit install metadata findings", () => {
                   installs: {
                     "test-hooks": {
                       source: "npm",
-                      spec: "@openclaw/test-hooks@1.2.3",
+                      spec: "@steelengine/test-hooks@1.2.3",
                       integrity: "sha512-hook",
                     },
                   },
@@ -308,8 +308,8 @@ describe("security audit install metadata findings", () => {
           await writePluginIndexInstallRecords(stateDir, {
             "voice-call": {
               source: "npm",
-              spec: "@openclaw/voice-call",
-              resolvedSpec: "@openclaw/voice-call@1.2.3",
+              spec: "@steelengine/voice-call",
+              resolvedSpec: "@steelengine/voice-call@1.2.3",
               integrity: "sha512-plugin",
             },
           });
@@ -320,8 +320,8 @@ describe("security audit install metadata findings", () => {
                   installs: {
                     "test-hooks": {
                       source: "npm",
-                      spec: "@openclaw/test-hooks",
-                      resolvedSpec: "@openclaw/test-hooks@1.2.3",
+                      spec: "@steelengine/test-hooks",
+                      resolvedSpec: "@steelengine/test-hooks@1.2.3",
                       integrity: "sha512-hook",
                     },
                   },
@@ -344,7 +344,7 @@ describe("security audit install metadata findings", () => {
           await writePluginIndexInstallRecords(stateDir, {
             "voice-call": {
               source: "npm",
-              spec: "@openclaw/voice-call@1.2.3",
+              spec: "@steelengine/voice-call@1.2.3",
               integrity: "sha512-plugin",
               resolvedVersion: "1.2.3",
             },
@@ -356,7 +356,7 @@ describe("security audit install metadata findings", () => {
                   installs: {
                     "test-hooks": {
                       source: "npm",
-                      spec: "@openclaw/test-hooks@1.2.3",
+                      spec: "@steelengine/test-hooks@1.2.3",
                       integrity: "sha512-hook",
                       resolvedVersion: "1.2.3",
                     },
@@ -425,7 +425,7 @@ describe("security audit install metadata findings", () => {
     const stateDir = await makeTmpDir("installed-plugin-debris");
     for (const name of [
       "live-plugin",
-      ".openclaw-install-backups",
+      ".steelengine-install-backups",
       "node_modules",
       "old-plugin.backup-20260502",
       "old-plugin.disabled.20260502",
@@ -447,7 +447,7 @@ describe("security audit install metadata findings", () => {
     );
     expect(toolsReachable.detail).toContain("Enabled extension plugins: live-plugin.");
     expect(findings.map((finding) => finding.detail).join("\n")).not.toContain(
-      ".openclaw-install-backups",
+      ".steelengine-install-backups",
     );
   });
 
@@ -491,13 +491,13 @@ describe("security audit extension tool reachability findings", () => {
     "USERPROFILE",
     "HOMEDRIVE",
     "HOMEPATH",
-    "OPENCLAW_HOME",
-    "OPENCLAW_STATE_DIR",
-    "OPENCLAW_BUNDLED_PLUGINS_DIR",
+    "STEELENGINE_HOME",
+    "STEELENGINE_STATE_DIR",
+    "STEELENGINE_BUNDLED_PLUGINS_DIR",
   ] as const;
   let pathResolutionEnvSnapshot: ReturnType<typeof captureEnv> | undefined;
 
-  const runSharedExtensionsAudit = async (config: OpenClawConfig) => {
+  const runSharedExtensionsAudit = async (config: SteelEngineConfig) => {
     return await collectPluginsTrustFindingsForTest({
       cfg: config,
       stateDir: sharedExtensionsStateDir,
@@ -507,9 +507,9 @@ describe("security audit extension tool reachability findings", () => {
   beforeAll(async () => {
     const osModule = await import("node:os");
     const vitestModule = await import("vitest");
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-security-extensions-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-security-extensions-"));
     isolatedHome = path.join(fixtureRoot, "home");
-    const isolatedEnv = createPathResolutionEnv(isolatedHome, { OPENCLAW_HOME: isolatedHome });
+    const isolatedEnv = createPathResolutionEnv(isolatedHome, { STEELENGINE_HOME: isolatedHome });
     pathResolutionEnvSnapshot = captureEnv([...pathResolutionEnvKeys]);
     for (const key of pathResolutionEnvKeys) {
       const value = isolatedEnv[key];
@@ -542,7 +542,7 @@ describe("security audit extension tool reachability findings", () => {
     const cases = [
       {
         name: "flags extensions without plugins.allow",
-        cfg: {} satisfies OpenClawConfig,
+        cfg: {} satisfies SteelEngineConfig,
         assert: (findings: Awaited<ReturnType<typeof runSharedExtensionsAudit>>) => {
           expect(
             findings.some(
@@ -557,7 +557,7 @@ describe("security audit extension tool reachability findings", () => {
         name: "flags enabled extensions when tool policy can expose plugin tools",
         cfg: {
           plugins: { allow: ["some-plugin"] },
-        } satisfies OpenClawConfig,
+        } satisfies SteelEngineConfig,
         assert: (findings: Awaited<ReturnType<typeof runSharedExtensionsAudit>>) => {
           expect(
             findings.some(
@@ -573,7 +573,7 @@ describe("security audit extension tool reachability findings", () => {
         cfg: {
           plugins: { allow: ["some-plugin"] },
           tools: { profile: "coding" },
-        } satisfies OpenClawConfig,
+        } satisfies SteelEngineConfig,
         assert: (findings: Awaited<ReturnType<typeof runSharedExtensionsAudit>>) => {
           expect(
             findings.some(
@@ -588,7 +588,7 @@ describe("security audit extension tool reachability findings", () => {
           channels: {
             discord: { enabled: true, token: "t" },
           },
-        } satisfies OpenClawConfig,
+        } satisfies SteelEngineConfig,
         assert: (findings: Awaited<ReturnType<typeof runSharedExtensionsAudit>>) => {
           expect(
             findings.some(
@@ -612,7 +612,7 @@ describe("security audit extension tool reachability findings", () => {
               } as unknown as string,
             },
           },
-        } satisfies OpenClawConfig,
+        } satisfies SteelEngineConfig,
         assert: (findings: Awaited<ReturnType<typeof runSharedExtensionsAudit>>) => {
           expect(
             findings.some(

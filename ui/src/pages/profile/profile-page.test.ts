@@ -11,7 +11,7 @@ import { waitForFast } from "../../test-helpers/wait-for.ts";
 import { USAGE_PAYLOAD_TTL_MS, type UsageRefreshReason } from "../usage/refresh-policy.ts";
 import { ProfilePage } from "./profile-page.ts";
 
-const PROFILE_PAGE_TEST_TAG = "test-openclaw-profile-page";
+const PROFILE_PAGE_TEST_TAG = "test-steelengine-profile-page";
 // Keep the element class on the same post-reset i18n module as this test.
 if (!customElements.get(PROFILE_PAGE_TEST_TAG)) {
   customElements.define(PROFILE_PAGE_TEST_TAG, class extends ProfilePage {});
@@ -121,7 +121,7 @@ function createConnectedContext(request: GatewayBrowserClient["request"]) {
     config: {
       current: {
         assistantIdentity: {
-          name: "OpenClaw",
+          name: "SteelEngine",
           avatar: null,
           avatarSource: null,
           avatarStatus: null,

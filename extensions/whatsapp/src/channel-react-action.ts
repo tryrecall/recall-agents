@@ -1,6 +1,6 @@
 // Whatsapp plugin module implements channel react action behavior.
-import { readBooleanParam } from "openclaw/plugin-sdk/boolean-param";
-import { jsonResult } from "openclaw/plugin-sdk/channel-actions";
+import { readBooleanParam } from "steelengine/plugin-sdk/boolean-param";
+import { jsonResult } from "steelengine/plugin-sdk/channel-actions";
 import {
   isWhatsAppGroupJid,
   resolveAuthorizedWhatsAppOutboundTarget,
@@ -12,7 +12,7 @@ import {
   readStringOrNumberParam,
   readStringParam,
   sendMessageWhatsApp,
-  type OpenClawConfig,
+  type SteelEngineConfig,
 } from "./channel-react-action.runtime.js";
 
 const WHATSAPP_CHANNEL = "whatsapp" as const;
@@ -20,7 +20,7 @@ const WHATSAPP_CHANNEL = "whatsapp" as const;
 type WhatsAppMessageActionParams = {
   action: string;
   params: Record<string, unknown>;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId?: string | null;
   requesterSenderId?: string | null;
   mediaAccess?: {

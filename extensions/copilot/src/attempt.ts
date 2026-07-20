@@ -6,7 +6,7 @@ import type {
   AgentHarnessAttemptResult,
   AgentMessage,
   SandboxContext,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "steelengine/plugin-sdk/agent-harness-runtime";
 import {
   buildAgentHookContextChannelFields,
   cancelPendingAgentQuestionForSession,
@@ -31,7 +31,7 @@ import {
   runAgentHarnessLlmOutputHook,
   clearActiveEmbeddedRun,
   setActiveEmbeddedRun,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "steelengine/plugin-sdk/agent-harness-runtime";
 import { createCopilotByokAuth, resolveCopilotAuth } from "./auth-bridge.js";
 import { createCopilotByokProxy } from "./byok-proxy.js";
 import {
@@ -88,9 +88,9 @@ export type CopilotSessionConfig = Pick<
   | "workingDirectory"
 >;
 // NOTE(plugin-sdk-widening): AttemptParamsLike can be removed once
-// openclaw/plugin-sdk/agent-harness-runtime declares auth, messages,
+// steelengine/plugin-sdk/agent-harness-runtime declares auth, messages,
 // onAssistantDelta, and initialReplayState.sdkSessionId fields. Tracked by
-// project openclaw-copilot-harness; reviewer-attempt-bridge note.
+// project steelengine-copilot-harness; reviewer-attempt-bridge note.
 
 type AttemptParamsLike = AgentHarnessAttemptParams & {
   auth?: {
@@ -113,7 +113,7 @@ type AttemptParamsLike = AgentHarnessAttemptParams & {
   reasoningEffort?: "low" | "medium" | "high" | "xhigh";
   // User-visible prompt body (when distinct from `prompt`, which may
   // include runtime-expanded context). Used when synthesizing the
-  // current-turn user message for the OpenClaw audit transcript so
+  // current-turn user message for the SteelEngine audit transcript so
   // dashboard/CLI history shows what the user actually typed, not the
   // internal expansion. Symmetric to `EmbeddedRunAttemptParams.transcriptPrompt`.
   transcriptPrompt?: string;
@@ -165,7 +165,7 @@ interface CopilotAttemptDeps {
   isHostScopedToolActive?: (toolName: string) => boolean;
   /**
    * Optional override for sandbox-context resolution. The default delegates to
-   * `openclaw/plugin-sdk/agent-harness-runtime#resolveSandboxContext`, which is
+   * `steelengine/plugin-sdk/agent-harness-runtime#resolveSandboxContext`, which is
    * the same path PI uses. Tests inject a stub here to avoid the real
    * resolver's side effects (container provisioning, registry writes).
    */
@@ -173,7 +173,7 @@ interface CopilotAttemptDeps {
   /**
    * Called once with the SDK session id and pooled client immediately
    * after the SDK session is created (or resumed) successfully. The
-   * harness uses this to track the openclawSessionId -> sdkSessionId
+   * harness uses this to track the steelengineSessionId -> sdkSessionId
    * mapping needed for `reset(params)` (see harness.ts). Exceptions
    * thrown from this callback are swallowed so they cannot break the
    * attempt.
@@ -368,7 +368,7 @@ export async function runCopilotAttempt(
   const input = params as AttemptParamsLike;
   const createToolBridge = deps.createToolBridge ?? createCopilotToolBridge;
   const hostSystemAgentActive =
-    deps.isHostScopedToolActive?.("openclaw") ?? isHostScopedAgentToolActive("openclaw");
+    deps.isHostScopedToolActive?.("steelengine") ?? isHostScopedAgentToolActive("steelengine");
   const ringZeroSystemAgentRun =
     hostSystemAgentActive && isSystemAgentOnlyToolAllowlist(input.toolsAllow);
   const messages = getMessagesSnapshotInput(input);
@@ -660,7 +660,7 @@ export async function runCopilotAttempt(
         // enforcement layer receives the same context PI does
         // (identity, owner-only allowlist, auth-profile store,
         // channel/routing, model context, run hooks). See
-        // tool-bridge.ts buildOpenClawCodingToolsOptions().
+        // tool-bridge.ts buildSteelEngineCodingToolsOptions().
         attemptParams: observeToolTerminal ? { ...input, observeToolTerminal } : input,
         computerContextEpoch,
         sessionRef,
@@ -701,14 +701,14 @@ export async function runCopilotAttempt(
 
     handle = await deps.pool.acquire(poolAcquire.key, poolAcquire.options);
     const client = handle.client;
-    // Load OpenClaw workspace bootstrap files (SOUL.md, IDENTITY.md,
+    // Load SteelEngine workspace bootstrap files (SOUL.md, IDENTITY.md,
     // HEARTBEAT.md, ...) before constructing the SDK SessionConfig so
     // persona/identity/heartbeat reach the model via
     // `SessionConfig.systemMessage` (append mode). Mirrors codex's
     // `buildCodexWorkspaceBootstrapContext` call in run-attempt.ts.
     // Failures here are non-fatal: workspace-bootstrap returns
     // `instructions: undefined` and the session proceeds without the
-    // OpenClaw bootstrap block (SDK still loads AGENTS.md natively).
+    // SteelEngine bootstrap block (SDK still loads AGENTS.md natively).
     const workspaceBootstrap = await resolveCopilotWorkspaceBootstrapContext({
       attempt: input,
       // Pair with `createSessionConfig`'s `workingDirectory:
@@ -754,7 +754,7 @@ export async function runCopilotAttempt(
             ? { systemPrompt: promptBuild.developerInstructions }
             : {}),
           prompt: additionalContext ? `${prompt}\n\n${additionalContext}` : prompt,
-          // Copilot SDK sessions own their own transcript. OpenClaw's
+          // Copilot SDK sessions own their own transcript. SteelEngine's
           // mirrored messages are persistence state, not provider input.
           historyMessages: [],
           imagesCount: promptImagesCount,
@@ -965,7 +965,7 @@ export async function runCopilotAttempt(
       await bridge.awaitAgentEventChain();
       if (!bridge.recordSendResult(result) && !aborted) {
         // SDK sendAndWait returning undefined is treated as a timeout by the
-        // capability inventory. Do not call session.abort() here: OpenClaw may
+        // capability inventory. Do not call session.abort() here: SteelEngine may
         // resume the in-flight SDK session on the next attempt.
         timedOut = true;
         timedOutDuringCompaction = bridge.isCompacting();
@@ -1104,7 +1104,7 @@ export async function runCopilotAttempt(
 
   // Dogfood finding #3 (mirror codex parity):
   //
-  // Without this synthesis the OpenClaw audit transcript never sees
+  // Without this synthesis the SteelEngine audit transcript never sees
   // the user's prompt for a copilot attempt. The shell's
   // `persistTextTurnTranscript` skips the user write when
   // `embeddedAssistantGapFill` is true (its `body` arrives as ""),
@@ -1153,17 +1153,17 @@ export async function runCopilotAttempt(
   ];
 
   // Best-effort dual-write mirrors this attempt's full message snapshot into
-  // OpenClaw's runtime transcript store. The Copilot SDK may still maintain
-  // its own private files; OpenClaw-side audit state is addressed only by
+  // SteelEngine's runtime transcript store. The Copilot SDK may still maintain
+  // its own private files; SteelEngine-side audit state is addressed only by
   // session identity so missing identity cannot silently recreate JSONL state.
-  const openClawSessionIdForMirror = readString(input.sessionId);
-  const openClawSessionKeyForMirror = readString((input as { sessionKey?: unknown }).sessionKey);
-  const openClawStorePathForMirror = readString(input.sessionTarget?.storePath);
-  const mirrorScopeSessionId = sessionIdUsed ?? openClawSessionIdForMirror;
+  const steelEngineSessionIdForMirror = readString(input.sessionId);
+  const steelEngineSessionKeyForMirror = readString((input as { sessionKey?: unknown }).sessionKey);
+  const steelEngineStorePathForMirror = readString(input.sessionTarget?.storePath);
+  const mirrorScopeSessionId = sessionIdUsed ?? steelEngineSessionIdForMirror;
   if (
-    openClawSessionIdForMirror &&
-    openClawSessionKeyForMirror &&
-    openClawStorePathForMirror &&
+    steelEngineSessionIdForMirror &&
+    steelEngineSessionKeyForMirror &&
+    steelEngineStorePathForMirror &&
     messagesSnapshot.length > 0
   ) {
     const taggedMessages = messagesSnapshot.map((message, index) => {
@@ -1190,10 +1190,10 @@ export async function runCopilotAttempt(
       return attachCopilotMirrorIdentity(message, `${identityScope}:${message.role}:${index}`);
     });
     await dualWriteCopilotTranscriptBestEffort({
-      sessionId: openClawSessionIdForMirror,
-      sessionKey: openClawSessionKeyForMirror,
+      sessionId: steelEngineSessionIdForMirror,
+      sessionKey: steelEngineSessionKeyForMirror,
       agentId: readString(input.agentId),
-      storePath: openClawStorePathForMirror,
+      storePath: steelEngineStorePathForMirror,
       messages: taggedMessages,
       idempotencyScope: mirrorScopeSessionId ? `copilot:${mirrorScopeSessionId}` : undefined,
       config: (input as { config?: unknown }).config as never,
@@ -1202,7 +1202,7 @@ export async function runCopilotAttempt(
       // mirror failures, but we double-guard here so any future
       // signature change or unexpected rejection cannot break the
       // attempt result. The SDK's own session storage remains
-      // authoritative; only the OpenClaw audit transcript would be
+      // authoritative; only the SteelEngine audit transcript would be
       // missing intermediate messages for this turn.
       console.warn(
         "[copilot-attempt] dual-write transcript wrapper rejected unexpectedly",
@@ -1378,7 +1378,7 @@ function createSessionConfig(
     // built-in kind that future SDK versions might surface outside
     // `availableTools`. Every bridged tool is also registered with
     // `overridesBuiltInTool: true` and `skipPermission: true` (see
-    // tool-bridge.ts) so 100% of tool calls go through OpenClaw's
+    // tool-bridge.ts) so 100% of tool calls go through SteelEngine's
     // wrapped `execute()` which runs `runBeforeToolCallHook` (loop
     // detection, trusted plugin policies, before-tool-call hooks,
     // two-phase plugin approval). This mirrors the in-tree codex
@@ -1409,10 +1409,10 @@ function createSessionConfig(
     tools: sdkTools,
     // Restrict the SDK's tool catalog to the bridged tool names returned
     // by `createCopilotToolBridge`, plus the built-in `ask_user` tool for
-    // normal runs. Ring-zero OpenClaw runs expose only OpenClaw. Without this, the SDK
+    // normal runs. Ring-zero SteelEngine runs expose only SteelEngine. Without this, the SDK
     // would still expose its native read/write/shell/url/mcp/memory/
     // hook tools to the model alongside our overrides, which would
-    // bypass OpenClaw's wrapped-tool enforcement under any permissive
+    // bypass SteelEngine's wrapped-tool enforcement under any permissive
     // permission policy and pollute the catalog with disabled tools
     // under the default reject policy. An empty list (`[]`) is
     // meaningful per the SDK contract
@@ -1449,15 +1449,15 @@ function createSessionConfig(
     ...(resolvedAuth.authMode === "gitHubToken" && resolvedAuth.gitHubToken
       ? { gitHubToken: resolvedAuth.gitHubToken }
       : {}),
-    // OpenClaw workspace bootstrap plus per-turn runtime guidance
+    // SteelEngine workspace bootstrap plus per-turn runtime guidance
     // injected via the SDK's `systemMessage` field in append mode:
-    // SDK foundation + OpenClaw context. Append keeps every SDK
+    // SDK foundation + SteelEngine context. Append keeps every SDK
     // guardrail intact while ensuring persona/identity/heartbeat and
     // channel policy guidance reach the model without native reads.
     // AGENTS.md and .github/copilot-instructions.md are filtered by
     // workspace-bootstrap.ts because the SDK auto-loads them from
     // `workingDirectory` (see `@github/copilot-sdk/dist/types.d.ts`
-    // L1036). Omitted when there is no OpenClaw-owned context so the
+    // L1036). Omitted when there is no SteelEngine-owned context so the
     // SDK default foundation applies.
     ...(systemMessageContent
       ? {
@@ -1479,7 +1479,7 @@ function buildCopilotAvailableTools(sdkTools: SdkTool[], includeAskUser: boolean
 }
 
 function isSystemAgentOnlyToolAllowlist(toolsAllow: readonly string[] | undefined): boolean {
-  return toolsAllow?.length === 1 && toolsAllow[0]?.trim().toLowerCase() === "openclaw";
+  return toolsAllow?.length === 1 && toolsAllow[0]?.trim().toLowerCase() === "steelengine";
 }
 
 async function createMessageOptions(
@@ -1643,8 +1643,8 @@ function readTailUserText(messages: AgentMessage[]): string | undefined {
 // widening the module's public surface for what is otherwise a pure
 // guard. See attempt.ts dual-write tagging block.
 function hasMirrorIdentity(message: AgentMessage): boolean {
-  const record = message as unknown as { __openclaw?: unknown };
-  const meta = record["__openclaw"];
+  const record = message as unknown as { __steelengine?: unknown };
+  const meta = record["__steelengine"];
   if (!meta || typeof meta !== "object" || Array.isArray(meta)) {
     return false;
   }

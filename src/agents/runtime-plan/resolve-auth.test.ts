@@ -1,4 +1,4 @@
-import type { Model } from "openclaw/plugin-sdk/llm";
+import type { Model } from "steelengine/plugin-sdk/llm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SecretSurfaceUnavailableError } from "../../secrets/runtime-degraded-state.js";
 import type { AuthProfileStore } from "../auth-profiles.js";
@@ -43,8 +43,8 @@ function authStore(profiles: AuthProfileStore["profiles"]): AuthProfileStore {
 
 describe("resolvePreparedRuntimeModelAuth", () => {
   beforeEach(() => {
-    vi.stubEnv("OPENCLAW_TEST_MISSING_PREPARED_AUTH", "");
-    vi.stubEnv("OPENCLAW_TEST_MISSING_BOUND_AUTH", "");
+    vi.stubEnv("STEELENGINE_TEST_MISSING_PREPARED_AUTH", "");
+    vi.stubEnv("STEELENGINE_TEST_MISSING_BOUND_AUTH", "");
   });
 
   afterEach(() => {
@@ -109,7 +109,7 @@ describe("resolvePreparedRuntimeModelAuth", () => {
         keyRef: {
           source: "env",
           provider: "default",
-          id: "OPENCLAW_TEST_MISSING_PREPARED_AUTH",
+          id: "STEELENGINE_TEST_MISSING_PREPARED_AUTH",
         },
       },
       "openai:backup": {
@@ -658,7 +658,7 @@ describe("resolvePreparedRuntimeModelAuth", () => {
         keyRef: {
           source: "env",
           provider: "default",
-          id: "OPENCLAW_TEST_MISSING_BOUND_AUTH",
+          id: "STEELENGINE_TEST_MISSING_BOUND_AUTH",
         },
       },
       "openai:unbound": {

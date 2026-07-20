@@ -3,15 +3,15 @@ import type {
   HealthFinding,
   HealthRepairContext,
   HealthRepairResult,
-  OpenClawConfig,
-} from "openclaw/plugin-sdk/health";
+  SteelEngineConfig,
+} from "steelengine/plugin-sdk/health";
 import { CHECK_IDS, type POLICY_CHECK_IDS } from "./check-ids.js";
 import { POLICY_FIX_METADATA_BY_CHECK_ID } from "./fix-metadata.js";
 
 type PolicyCheckId = (typeof POLICY_CHECK_IDS)[number];
 type ConfigRecord = Record<string, unknown>;
 type RepairPatch = {
-  readonly config: OpenClawConfig;
+  readonly config: SteelEngineConfig;
   readonly changes: readonly string[];
   readonly warnings?: readonly string[];
 };
@@ -77,7 +77,7 @@ export function repairPolicyAutomaticNarrower(
 }
 
 function applyAutomaticPatch(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   findings: readonly HealthFinding[],
   checkId: PolicyCheckId,
 ): RepairPatch {
@@ -126,7 +126,7 @@ function applyAutomaticPatch(
 }
 
 function mergeRequiredDenyTools(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   findings: readonly HealthFinding[],
 ): RepairPatch {
   const next = cloneConfig(cfg);
@@ -139,7 +139,7 @@ function mergeRequiredDenyTools(
     }
     if (
       hasScopedPolicyRequirement([finding]) &&
-      finding.ocPath === "oc://openclaw.config/tools/deny"
+      finding.ocPath === "oc://steelengine.config/tools/deny"
     ) {
       warnings.push(
         `Skipped scoped deny repair for ${tool}. The finding reports inherited root tools.deny, so changing it would affect more than the scoped policy target.`,
@@ -151,16 +151,16 @@ function mergeRequiredDenyTools(
     }
   }
   return changes.length > 0
-    ? { config: next as OpenClawConfig, changes: uniqueStrings(changes), warnings }
+    ? { config: next as SteelEngineConfig, changes: uniqueStrings(changes), warnings }
     : { config: cfg, changes, warnings: uniqueStrings(warnings) };
 }
 
 function disableElevatedTools(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   findings: readonly HealthFinding[],
 ): RepairPatch {
   if (
-    !findings.some((finding) => finding.ocPath === "oc://openclaw.config/tools/elevated/enabled")
+    !findings.some((finding) => finding.ocPath === "oc://steelengine.config/tools/elevated/enabled")
   ) {
     return { config: cfg, changes: [] };
   }
@@ -172,13 +172,13 @@ function disableElevatedTools(
   }
   elevated.enabled = false;
   return {
-    config: next as OpenClawConfig,
+    config: next as SteelEngineConfig,
     changes: ["Set tools.elevated.enabled=false for policy conformance."],
   };
 }
 
 function disableInsecureControlUi(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   findings: readonly HealthFinding[],
 ): RepairPatch {
   const next = cloneConfig(cfg);
@@ -186,14 +186,14 @@ function disableInsecureControlUi(
   const controlUi = ensureRecord(gateway, "controlUi");
   const changes: string[] = [];
   const fields = [
-    ["allowInsecureAuth", "oc://openclaw.config/gateway/controlUi/allowInsecureAuth"],
+    ["allowInsecureAuth", "oc://steelengine.config/gateway/controlUi/allowInsecureAuth"],
     [
       "dangerouslyDisableDeviceAuth",
-      "oc://openclaw.config/gateway/controlUi/dangerouslyDisableDeviceAuth",
+      "oc://steelengine.config/gateway/controlUi/dangerouslyDisableDeviceAuth",
     ],
     [
       "dangerouslyAllowHostHeaderOriginFallback",
-      "oc://openclaw.config/gateway/controlUi/dangerouslyAllowHostHeaderOriginFallback",
+      "oc://steelengine.config/gateway/controlUi/dangerouslyAllowHostHeaderOriginFallback",
     ],
   ] as const;
   const findingPaths = new Set(findings.map((finding) => finding.ocPath));
@@ -204,15 +204,15 @@ function disableInsecureControlUi(
     }
   }
   return changes.length > 0
-    ? { config: next as OpenClawConfig, changes }
+    ? { config: next as SteelEngineConfig, changes }
     : { config: cfg, changes };
 }
 
 function disableRemoteGatewayMode(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   findings: readonly HealthFinding[],
 ): RepairPatch {
-  if (!findings.some((finding) => finding.ocPath === "oc://openclaw.config/gateway/mode")) {
+  if (!findings.some((finding) => finding.ocPath === "oc://steelengine.config/gateway/mode")) {
     return { config: cfg, changes: [] };
   }
   const next = cloneConfig(cfg);
@@ -223,11 +223,11 @@ function disableRemoteGatewayMode(
     changes.push("Set gateway.mode=local for policy conformance.");
   }
   return changes.length > 0
-    ? { config: next as OpenClawConfig, changes }
+    ? { config: next as SteelEngineConfig, changes }
     : { config: cfg, changes };
 }
 
-function enableSensitiveLoggingRedaction(cfg: OpenClawConfig): RepairPatch {
+function enableSensitiveLoggingRedaction(cfg: SteelEngineConfig): RepairPatch {
   const next = cloneConfig(cfg);
   const logging = ensureRecord(next, "logging");
   if (logging.redactSensitive !== "off") {
@@ -235,12 +235,12 @@ function enableSensitiveLoggingRedaction(cfg: OpenClawConfig): RepairPatch {
   }
   logging.redactSensitive = "tools";
   return {
-    config: next as OpenClawConfig,
+    config: next as SteelEngineConfig,
     changes: ["Set logging.redactSensitive=tools for policy conformance."],
   };
 }
 
-function disableTelemetryContentCapture(cfg: OpenClawConfig): RepairPatch {
+function disableTelemetryContentCapture(cfg: SteelEngineConfig): RepairPatch {
   const next = cloneConfig(cfg);
   const diagnostics = ensureRecord(next, "diagnostics");
   const otel = ensureRecord(diagnostics, "otel");
@@ -249,13 +249,13 @@ function disableTelemetryContentCapture(cfg: OpenClawConfig): RepairPatch {
   }
   otel.captureContent = false;
   return {
-    config: next as OpenClawConfig,
+    config: next as SteelEngineConfig,
     changes: ["Set diagnostics.otel.captureContent=false for policy conformance."],
   };
 }
 
 function setFindingConfigValues(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   findings: readonly HealthFinding[],
   fieldName: string,
   value: unknown,
@@ -280,11 +280,11 @@ function setFindingConfigValues(
     changes.push(`Set ${configPathLabel(finding.ocPath)}=${String(value)} for policy conformance.`);
   }
   return changes.length > 0
-    ? { config: next as OpenClawConfig, changes: uniqueStrings(changes), warnings }
+    ? { config: next as SteelEngineConfig, changes: uniqueStrings(changes), warnings }
     : { config: cfg, changes, warnings: uniqueStrings(warnings) };
 }
 
-function cloneConfig(cfg: OpenClawConfig): ConfigRecord {
+function cloneConfig(cfg: SteelEngineConfig): ConfigRecord {
   return structuredClone(cfg) as ConfigRecord;
 }
 
@@ -333,7 +333,7 @@ function mergeStringArrayAtOcPath(cfg: ConfigRecord, ocPath: string, entry: stri
 }
 
 function configPathSegments(ocPath: string): readonly string[] {
-  const prefix = "oc://openclaw.config/";
+  const prefix = "oc://steelengine.config/";
   if (!ocPath.startsWith(prefix)) {
     return [];
   }
@@ -447,14 +447,14 @@ function hasScopedPolicyRequirement(findings: readonly HealthFinding[]): boolean
   return findings.some((finding) => finding.requirement?.includes("/scopes/") === true);
 }
 
-function skippedUnsafeScopedRepair(cfg: OpenClawConfig, warning: string): RepairPatch {
+function skippedUnsafeScopedRepair(cfg: SteelEngineConfig, warning: string): RepairPatch {
   return { config: cfg, changes: [], warnings: [warning] };
 }
 
 function isScopedInheritedChannelDefaultFinding(finding: HealthFinding): boolean {
   return (
     hasScopedPolicyRequirement([finding]) &&
-    finding.ocPath?.startsWith("oc://openclaw.config/channels/defaults/") === true
+    finding.ocPath?.startsWith("oc://steelengine.config/channels/defaults/") === true
   );
 }
 

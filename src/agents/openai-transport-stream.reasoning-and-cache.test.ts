@@ -1,6 +1,6 @@
-import { SYSTEM_PROMPT_CACHE_BOUNDARY } from "@openclaw/ai/internal/shared";
-import { expectDefined } from "@openclaw/normalization-core";
-import type { Model } from "openclaw/plugin-sdk/llm";
+import { SYSTEM_PROMPT_CACHE_BOUNDARY } from "@steelengine/ai/internal/shared";
+import { expectDefined } from "@steelengine/normalization-core";
+import type { Model } from "steelengine/plugin-sdk/llm";
 import { describe, expect, it } from "vitest";
 import { buildOpenAICompletionsParams } from "./openai-transport-stream.js";
 import {
@@ -159,18 +159,18 @@ describe("openai transport stream", () => {
       } as never,
       { sessionId: "session-123" } as never,
       {
-        openclaw_session_id: "session-123",
-        openclaw_turn_id: "turn-123",
-        openclaw_turn_attempt: "1",
-        openclaw_transport: "stream",
+        steelengine_session_id: "session-123",
+        steelengine_turn_id: "turn-123",
+        steelengine_turn_attempt: "1",
+        steelengine_transport: "stream",
       },
     ) as { metadata?: Record<string, string> };
 
     expectRecordFields(params.metadata, {
-      openclaw_session_id: "session-123",
-      openclaw_turn_id: "turn-123",
-      openclaw_turn_attempt: "1",
-      openclaw_transport: "stream",
+      steelengine_session_id: "session-123",
+      steelengine_turn_id: "turn-123",
+      steelengine_turn_attempt: "1",
+      steelengine_transport: "stream",
     });
   });
 

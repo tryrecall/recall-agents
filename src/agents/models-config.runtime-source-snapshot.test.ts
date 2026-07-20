@@ -1,7 +1,7 @@
 // Verifies generated models.json preserves source secret markers from runtime snapshots.
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { createFixtureSuite } from "../test-utils/fixture-suite.js";
 import { NON_ENV_SECRETREF_MARKER } from "./model-auth-markers.js";
 import {
@@ -26,7 +26,7 @@ vi.mock("./model-auth-env-vars.js", () => ({
 }));
 
 vi.mock("../plugins/provider-runtime.js", () => ({
-  applyProviderConfigDefaultsWithPlugin: (config: OpenClawConfig) => config,
+  applyProviderConfigDefaultsWithPlugin: (config: SteelEngineConfig) => config,
   applyProviderNativeStreamingUsageCompatWithPlugin: () => undefined,
   normalizeProviderConfigWithPlugin: () => undefined,
   resolveProviderConfigApiKeyWithPlugin: () => undefined,
@@ -48,19 +48,19 @@ installModelsConfigTestHooks();
 let clearConfigCache: typeof import("../config/io.js").clearConfigCache;
 let clearRuntimeConfigSnapshot: typeof import("../config/io.js").clearRuntimeConfigSnapshot;
 let setRuntimeConfigSnapshot: typeof import("../config/io.js").setRuntimeConfigSnapshot;
-let ensureOpenClawModelsJson: typeof import("./models-config.js").ensureOpenClawModelsJson;
+let ensureSteelEngineModelsJson: typeof import("./models-config.js").ensureSteelEngineModelsJson;
 let resetModelsJsonReadyCacheForTest: typeof import("./models-config-state.test-support.js").resetModelsJsonReadyCacheForTest;
-let planOpenClawModelsJsonWithDeps: typeof import("./models-config.plan.test-support.js").planOpenClawModelsJsonWithDeps;
+let planSteelEngineModelsJsonWithDeps: typeof import("./models-config.plan.test-support.js").planSteelEngineModelsJsonWithDeps;
 let readGeneratedModelsJson: typeof import("./models-config.test-utils.js").readGeneratedModelsJson;
-const fixtureSuite = createFixtureSuite("openclaw-models-runtime-source-");
+const fixtureSuite = createFixtureSuite("steelengine-models-runtime-source-");
 
 beforeAll(async () => {
   await fixtureSuite.setup();
   ({ clearConfigCache, clearRuntimeConfigSnapshot, setRuntimeConfigSnapshot } =
     await import("../config/io.js"));
-  ({ ensureOpenClawModelsJson } = await import("./models-config.js"));
+  ({ ensureSteelEngineModelsJson } = await import("./models-config.js"));
   ({ resetModelsJsonReadyCacheForTest } = await import("./models-config-state.test-support.js"));
-  ({ planOpenClawModelsJsonWithDeps } = await import("./models-config.plan.test-support.js"));
+  ({ planSteelEngineModelsJsonWithDeps } = await import("./models-config.plan.test-support.js"));
   ({ readGeneratedModelsJson } = await import("./models-config.test-utils.js"));
 });
 
@@ -74,7 +74,7 @@ afterAll(async () => {
   await fixtureSuite.cleanup();
 });
 
-function createOpenAiApiKeySourceConfig(): OpenClawConfig {
+function createOpenAiApiKeySourceConfig(): SteelEngineConfig {
   return {
     models: {
       providers: {
@@ -89,7 +89,7 @@ function createOpenAiApiKeySourceConfig(): OpenClawConfig {
   };
 }
 
-function createOpenAiApiKeyRuntimeConfig(): OpenClawConfig {
+function createOpenAiApiKeyRuntimeConfig(): SteelEngineConfig {
   // Runtime config simulates already-resolved secrets that must not be persisted.
   return {
     models: {
@@ -105,7 +105,7 @@ function createOpenAiApiKeyRuntimeConfig(): OpenClawConfig {
   };
 }
 
-function createCustomProviderApiKeySourceConfig(): OpenClawConfig {
+function createCustomProviderApiKeySourceConfig(): SteelEngineConfig {
   return {
     models: {
       providers: {
@@ -114,7 +114,7 @@ function createCustomProviderApiKeySourceConfig(): OpenClawConfig {
           apiKey: {
             source: "env",
             provider: "default",
-            id: "OPENCLAW_MODEL_LITELLM_API_KEY", // pragma: allowlist secret
+            id: "STEELENGINE_MODEL_LITELLM_API_KEY", // pragma: allowlist secret
           },
           api: "openai-completions" as const,
           models: [],
@@ -124,7 +124,7 @@ function createCustomProviderApiKeySourceConfig(): OpenClawConfig {
   };
 }
 
-function createCustomProviderApiKeyRuntimeConfig(): OpenClawConfig {
+function createCustomProviderApiKeyRuntimeConfig(): SteelEngineConfig {
   return {
     models: {
       providers: {
@@ -139,7 +139,7 @@ function createCustomProviderApiKeyRuntimeConfig(): OpenClawConfig {
   };
 }
 
-function createOpenAiHeaderSourceConfig(): OpenClawConfig {
+function createOpenAiHeaderSourceConfig(): SteelEngineConfig {
   return {
     models: {
       providers: {
@@ -165,7 +165,7 @@ function createOpenAiHeaderSourceConfig(): OpenClawConfig {
   };
 }
 
-function createOpenAiHeaderRuntimeConfig(): OpenClawConfig {
+function createOpenAiHeaderRuntimeConfig(): SteelEngineConfig {
   return {
     models: {
       providers: {
@@ -183,11 +183,11 @@ function createOpenAiHeaderRuntimeConfig(): OpenClawConfig {
   };
 }
 
-function getOpenAiProvider(config: OpenClawConfig) {
+function getOpenAiProvider(config: SteelEngineConfig) {
   return expectDefined(config.models?.providers?.openai, "OpenAI provider config");
 }
 
-function createOpenAiSourceConfigWithHeadersAndApiKey(): OpenClawConfig {
+function createOpenAiSourceConfigWithHeadersAndApiKey(): SteelEngineConfig {
   const config = createOpenAiHeaderSourceConfig();
   getOpenAiProvider(config).apiKey = {
     source: "env",
@@ -197,13 +197,13 @@ function createOpenAiSourceConfigWithHeadersAndApiKey(): OpenClawConfig {
   return config;
 }
 
-function createOpenAiRuntimeConfigWithHeadersAndApiKey(): OpenClawConfig {
+function createOpenAiRuntimeConfigWithHeadersAndApiKey(): SteelEngineConfig {
   const config = createOpenAiHeaderRuntimeConfig();
   getOpenAiProvider(config).apiKey = "sk-runtime-resolved"; // pragma: allowlist secret
   return config;
 }
 
-function withGatewayTokenMode(config: OpenClawConfig): OpenClawConfig {
+function withGatewayTokenMode(config: SteelEngineConfig): SteelEngineConfig {
   return {
     ...config,
     gateway: {
@@ -226,15 +226,15 @@ async function expectGeneratedProviderApiKey(
 }
 
 async function planGeneratedProviders(params: {
-  config: OpenClawConfig;
-  sourceConfigForSecrets: OpenClawConfig;
+  config: SteelEngineConfig;
+  sourceConfigForSecrets: SteelEngineConfig;
 }) {
   // Planner assertions avoid filesystem noise for marker-projection cases.
-  const plan = await planOpenClawModelsJsonWithDeps(
+  const plan = await planSteelEngineModelsJsonWithDeps(
     {
       cfg: params.config,
       sourceConfigForSecrets: params.sourceConfigForSecrets,
-      agentDir: "/tmp/openclaw-models-plan",
+      agentDir: "/tmp/steelengine-models-plan",
       env: {},
       existingRaw: "",
       existingParsed: null,
@@ -265,7 +265,7 @@ function expectOpenAiHeaderMarkers(
 
 describe("models-config runtime source snapshot", () => {
   it("uses runtime source snapshot markers when passed the active runtime config", () => {
-    const sourceConfig: OpenClawConfig = {
+    const sourceConfig: SteelEngineConfig = {
       models: {
         providers: {
           openai: getOpenAiProvider(createOpenAiApiKeySourceConfig()),
@@ -278,7 +278,7 @@ describe("models-config runtime source snapshot", () => {
         },
       },
     };
-    const runtimeConfig: OpenClawConfig = {
+    const runtimeConfig: SteelEngineConfig = {
       models: {
         providers: {
           openai: getOpenAiProvider(createOpenAiApiKeyRuntimeConfig()),
@@ -305,7 +305,7 @@ describe("models-config runtime source snapshot", () => {
       unsetEnv(MODELS_CONFIG_IMPLICIT_ENV_VARS);
       const sourceConfig = createOpenAiApiKeySourceConfig();
       const runtimeConfig = createOpenAiApiKeyRuntimeConfig();
-      const clonedRuntimeConfig: OpenClawConfig = {
+      const clonedRuntimeConfig: SteelEngineConfig = {
         ...runtimeConfig,
         agents: {
           defaults: {
@@ -316,7 +316,7 @@ describe("models-config runtime source snapshot", () => {
 
       try {
         setRuntimeConfigSnapshot(runtimeConfig, sourceConfig);
-        await ensureOpenClawModelsJson(clonedRuntimeConfig, agentDir);
+        await ensureSteelEngineModelsJson(clonedRuntimeConfig, agentDir);
         await expectGeneratedProviderApiKey(agentDir, "openai", "OPENAI_API_KEY"); // pragma: allowlist secret
       } finally {
         clearRuntimeConfigSnapshot();
@@ -334,8 +334,8 @@ describe("models-config runtime source snapshot", () => {
 
       try {
         setRuntimeConfigSnapshot(runtimeConfig, sourceConfig);
-        await ensureOpenClawModelsJson(runtimeConfig, agentDir);
-        await expectGeneratedProviderApiKey(agentDir, "litellm", "OPENCLAW_MODEL_LITELLM_API_KEY"); // pragma: allowlist secret
+        await ensureSteelEngineModelsJson(runtimeConfig, agentDir);
+        await expectGeneratedProviderApiKey(agentDir, "litellm", "STEELENGINE_MODEL_LITELLM_API_KEY"); // pragma: allowlist secret
       } finally {
         clearRuntimeConfigSnapshot();
         clearConfigCache();
@@ -349,7 +349,7 @@ describe("models-config runtime source snapshot", () => {
       unsetEnv(MODELS_CONFIG_IMPLICIT_ENV_VARS);
       const sourceConfig = createOpenAiApiKeySourceConfig();
       const runtimeConfig = createOpenAiApiKeyRuntimeConfig();
-      const firstCandidate: OpenClawConfig = {
+      const firstCandidate: SteelEngineConfig = {
         ...runtimeConfig,
         models: {
           providers: {
@@ -357,13 +357,13 @@ describe("models-config runtime source snapshot", () => {
               ...getOpenAiProvider(runtimeConfig),
               baseUrl: "https://api.openai.com/v1",
               headers: {
-                "X-OpenClaw-Test": "one",
+                "X-SteelEngine-Test": "one",
               },
             },
           },
         },
       };
-      const secondCandidate: OpenClawConfig = {
+      const secondCandidate: SteelEngineConfig = {
         ...runtimeConfig,
         models: {
           providers: {
@@ -371,7 +371,7 @@ describe("models-config runtime source snapshot", () => {
               ...getOpenAiProvider(runtimeConfig),
               baseUrl: "https://mirror.example/v1",
               headers: {
-                "X-OpenClaw-Test": "two",
+                "X-SteelEngine-Test": "two",
               },
             },
           },
@@ -380,7 +380,7 @@ describe("models-config runtime source snapshot", () => {
 
       try {
         setRuntimeConfigSnapshot(runtimeConfig, sourceConfig);
-        await ensureOpenClawModelsJson(firstCandidate, agentDir);
+        await ensureSteelEngineModelsJson(firstCandidate, agentDir);
         let parsed = await readGeneratedModelsJson<{
           providers: Record<
             string,
@@ -389,10 +389,10 @@ describe("models-config runtime source snapshot", () => {
         }>(agentDir);
         expect(parsed.providers.openai?.baseUrl).toBe("https://api.openai.com/v1");
         expect(parsed.providers.openai?.apiKey).toBe("OPENAI_API_KEY"); // pragma: allowlist secret
-        expect(parsed.providers.openai?.headers?.["X-OpenClaw-Test"]).toBe("one");
+        expect(parsed.providers.openai?.headers?.["X-SteelEngine-Test"]).toBe("one");
 
         // Header changes still rewrite models.json, but merge mode preserves the existing baseUrl.
-        await ensureOpenClawModelsJson(secondCandidate, agentDir);
+        await ensureSteelEngineModelsJson(secondCandidate, agentDir);
         parsed = await readGeneratedModelsJson<{
           providers: Record<
             string,
@@ -401,7 +401,7 @@ describe("models-config runtime source snapshot", () => {
         }>(agentDir);
         expect(parsed.providers.openai?.baseUrl).toBe("https://api.openai.com/v1");
         expect(parsed.providers.openai?.apiKey).toBe("OPENAI_API_KEY"); // pragma: allowlist secret
-        expect(parsed.providers.openai?.headers?.["X-OpenClaw-Test"]).toBe("two");
+        expect(parsed.providers.openai?.headers?.["X-SteelEngine-Test"]).toBe("two");
       } finally {
         clearRuntimeConfigSnapshot();
         clearConfigCache();
@@ -430,7 +430,7 @@ describe("models-config runtime source snapshot", () => {
     // Regression: provider keys in sourceConfigForSecrets may arrive as "OpenAI" while the
     // merge boundary canonicalizes to "openai". The source-managed marker lookup must use the
     // same provider-id normalizer, otherwise the resolved runtime apiKey leaks into models.json.
-    const mixedCaseSourceConfig: OpenClawConfig = {
+    const mixedCaseSourceConfig: SteelEngineConfig = {
       models: {
         providers: {
           OpenAI: {
@@ -452,7 +452,7 @@ describe("models-config runtime source snapshot", () => {
   });
 
   it("reapplies source header markers when sourceConfigForSecrets uses mixed-case provider keys", async () => {
-    const sourceConfig: OpenClawConfig = {
+    const sourceConfig: SteelEngineConfig = {
       models: {
         providers: {
           " OpenAI ": {
@@ -519,7 +519,7 @@ describe("models-config runtime source snapshot", () => {
     const sourceProviders = {
       openai: null,
       OpenAI: getOpenAiProvider(createOpenAiApiKeySourceConfig()),
-    } as unknown as NonNullable<NonNullable<OpenClawConfig["models"]>["providers"]>;
+    } as unknown as NonNullable<NonNullable<SteelEngineConfig["models"]>["providers"]>;
 
     const providers = enforceSourceManagedProviderSecrets({
       providers: runtimeConfig.models!.providers!,

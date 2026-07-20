@@ -1,7 +1,7 @@
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
-import { uniqueStrings } from "@openclaw/normalization-core/string-normalization";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
+import { uniqueStrings } from "@steelengine/normalization-core/string-normalization";
 import { normalizeConfiguredMcpServers } from "../config/mcp-config-normalize.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { normalizePluginsConfig } from "../plugins/config-state.js";
 import {
   isManifestPluginAvailableForControlPlane,
@@ -69,7 +69,7 @@ function denylistBlocksPluginTool(params: {
 }
 
 function collectConfiguredMcpServerNames(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   toolDenylist?: string[];
 }): string[] {
   const servers = normalizeConfiguredMcpServers(params.config?.mcp?.servers);
@@ -96,7 +96,7 @@ function collectConfiguredMcpServerNames(params: {
 
 function collectAvailableManifestToolNames(params: {
   plugin: PluginManifestRecord;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   denylist: ToolDenylist;
 }): string[] {
@@ -122,7 +122,7 @@ function collectAvailableManifestToolNames(params: {
 }
 
 function collectDeclaredPluginContext(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   workspaceDir?: string;
   toolDenylist?: string[];
   env?: NodeJS.ProcessEnv;
@@ -171,7 +171,7 @@ function collectDeclaredPluginContext(params: {
 }
 
 export function buildDeclaredToolAllowlistContext(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   workspaceDir?: string;
   toolDenylist?: string[];
   env?: NodeJS.ProcessEnv;

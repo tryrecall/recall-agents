@@ -2,11 +2,11 @@
 import type {
   ChannelDoctorConfigMutation,
   ChannelDoctorLegacyConfigRule,
-} from "openclaw/plugin-sdk/channel-contract";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { asObjectRecord, defineChannelAliasMigration } from "openclaw/plugin-sdk/runtime-doctor";
+} from "steelengine/plugin-sdk/channel-contract";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { asObjectRecord, defineChannelAliasMigration } from "steelengine/plugin-sdk/runtime-doctor";
 
-type GoogleChatChannelsConfig = NonNullable<OpenClawConfig["channels"]>;
+type GoogleChatChannelsConfig = NonNullable<SteelEngineConfig["channels"]>;
 
 // Google Chat's nested streaming schema is delivery-only ({chunkMode, block});
 // it has no preview mode (legacy streamMode is removed outright above), so
@@ -116,19 +116,19 @@ export const legacyConfigRules: ChannelDoctorLegacyConfigRule[] = [
   {
     path: ["channels", "googlechat"],
     message:
-      'channels.googlechat.groups.<id>.allow is legacy; use channels.googlechat.groups.<id>.enabled instead. Run "openclaw doctor --fix".',
+      'channels.googlechat.groups.<id>.allow is legacy; use channels.googlechat.groups.<id>.enabled instead. Run "steelengine doctor --fix".',
     match: hasLegacyGoogleChatGroupAllowAlias,
   },
   {
     path: ["channels", "googlechat", "accounts"],
     message:
-      'channels.googlechat.accounts.<id>.groups.<id>.allow is legacy; use channels.googlechat.accounts.<id>.groups.<id>.enabled instead. Run "openclaw doctor --fix".',
+      'channels.googlechat.accounts.<id>.groups.<id>.allow is legacy; use channels.googlechat.accounts.<id>.groups.<id>.enabled instead. Run "steelengine doctor --fix".',
     match: (value) => hasLegacyAccountAliases(value, hasLegacyGoogleChatGroupAllowAlias),
   },
   ...streamingAliasMigration.legacyConfigRules,
 ];
 
-function normalizeRetiredGoogleChatKeys(cfg: OpenClawConfig): ChannelDoctorConfigMutation {
+function normalizeRetiredGoogleChatKeys(cfg: SteelEngineConfig): ChannelDoctorConfigMutation {
   const rawEntry = asObjectRecord(
     (cfg.channels as Record<string, unknown> | undefined)?.googlechat,
   );
@@ -192,7 +192,7 @@ function normalizeRetiredGoogleChatKeys(cfg: OpenClawConfig): ChannelDoctorConfi
 export function normalizeCompatibilityConfig({
   cfg,
 }: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
 }): ChannelDoctorConfigMutation {
   const retired = normalizeRetiredGoogleChatKeys(cfg);
   return streamingAliasMigration.normalizeChannelConfig({

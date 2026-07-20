@@ -10,7 +10,7 @@ import {
   resolveSourceReplyDeliveryMode,
   type SourceReplyDeliveryModeContext,
 } from "../../auto-reply/reply/source-reply-delivery-mode.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { getLoadedChannelPluginForRead } from "../plugins/registry-loaded.js";
 import { normalizeAnyChannelId } from "../registry-normalize.js";
 import {
@@ -34,7 +34,7 @@ export type { SourceReplyDeliveryMode };
 /** Resolves whether a channel reply should use source delivery, message tools, or direct sending. */
 export function resolveChannelSourceReplyDeliveryMode(params: {
   /** Full config used to inspect source-reply delivery settings. */
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   /** Reply delivery context from the current channel turn. */
   ctx: SourceReplyDeliveryModeContext;
   /** Caller-requested delivery mode override. */

@@ -2,13 +2,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PluginDiscoveryResult } from "./discovery.js";
 
-const discoverOpenClawPluginsMock = vi.fn();
+const discoverSteelEnginePluginsMock = vi.fn();
 
 vi.mock("./discovery.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./discovery.js")>();
   return {
     ...actual,
-    discoverOpenClawPlugins: (...args: unknown[]) => discoverOpenClawPluginsMock(...args),
+    discoverSteelEnginePlugins: (...args: unknown[]) => discoverSteelEnginePluginsMock(...args),
   };
 });
 
@@ -20,38 +20,38 @@ const emptyDiscovery: PluginDiscoveryResult = { candidates: [], diagnostics: [] 
 
 describe("discovery threading", () => {
   beforeEach(() => {
-    discoverOpenClawPluginsMock.mockReset();
-    discoverOpenClawPluginsMock.mockReturnValue(emptyDiscovery);
+    discoverSteelEnginePluginsMock.mockReset();
+    discoverSteelEnginePluginsMock.mockReturnValue(emptyDiscovery);
   });
 
-  it("skips internal discoverOpenClawPlugins when discovery is supplied", () => {
+  it("skips internal discoverSteelEnginePlugins when discovery is supplied", () => {
     loadPluginManifestRegistry({ discovery: emptyDiscovery });
-    expect(discoverOpenClawPluginsMock).not.toHaveBeenCalled();
+    expect(discoverSteelEnginePluginsMock).not.toHaveBeenCalled();
 
-    discoverOpenClawPluginsMock.mockClear();
+    discoverSteelEnginePluginsMock.mockClear();
     resolveInstalledPluginIndexRegistry({ discovery: emptyDiscovery, installRecords: {} });
-    expect(discoverOpenClawPluginsMock).not.toHaveBeenCalled();
+    expect(discoverSteelEnginePluginsMock).not.toHaveBeenCalled();
   });
 
-  it("calls discoverOpenClawPlugins when neither discovery nor candidates supplied", () => {
+  it("calls discoverSteelEnginePlugins when neither discovery nor candidates supplied", () => {
     loadPluginManifestRegistry({});
-    expect(discoverOpenClawPluginsMock).toHaveBeenCalledTimes(1);
+    expect(discoverSteelEnginePluginsMock).toHaveBeenCalledTimes(1);
 
-    discoverOpenClawPluginsMock.mockClear();
+    discoverSteelEnginePluginsMock.mockClear();
     resolveInstalledPluginIndexRegistry({ installRecords: {} });
-    expect(discoverOpenClawPluginsMock).toHaveBeenCalledTimes(1);
+    expect(discoverSteelEnginePluginsMock).toHaveBeenCalledTimes(1);
   });
 
   it("prefers explicit candidates over discovery when both are supplied", () => {
     loadPluginManifestRegistry({ candidates: [], diagnostics: [], discovery: emptyDiscovery });
-    expect(discoverOpenClawPluginsMock).not.toHaveBeenCalled();
+    expect(discoverSteelEnginePluginsMock).not.toHaveBeenCalled();
 
-    discoverOpenClawPluginsMock.mockClear();
+    discoverSteelEnginePluginsMock.mockClear();
     resolveInstalledPluginIndexRegistry({
       candidates: [],
       discovery: emptyDiscovery,
       installRecords: {},
     });
-    expect(discoverOpenClawPluginsMock).not.toHaveBeenCalled();
+    expect(discoverSteelEnginePluginsMock).not.toHaveBeenCalled();
   });
 });

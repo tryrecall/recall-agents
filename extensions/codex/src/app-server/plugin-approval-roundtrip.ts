@@ -1,12 +1,12 @@
 /**
- * Routes Codex app-server plugin approval prompts through OpenClaw's gateway
+ * Routes Codex app-server plugin approval prompts through SteelEngine's gateway
  * approval tool and maps gateway decisions back to Codex outcomes.
  */
 import {
   callGatewayTool,
   type EmbeddedRunAttemptParams,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/agent-harness-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import { resolveCodexGatewayTimeoutWithGraceMs } from "./attempt-timeouts.js";
 
 const DEFAULT_CODEX_APPROVAL_TIMEOUT_MS = 120_000;
@@ -33,7 +33,7 @@ type ApprovalWaitResult = {
   decision?: ExecApprovalDecision | null;
 };
 
-/** Starts a two-phase plugin approval request through the OpenClaw gateway. */
+/** Starts a two-phase plugin approval request through the SteelEngine gateway. */
 export async function requestPluginApproval(params: {
   paramsForRun: EmbeddedRunAttemptParams;
   title: string;
@@ -48,7 +48,7 @@ export async function requestPluginApproval(params: {
     "plugin.approval.request",
     { timeoutMs: resolveCodexGatewayTimeoutWithGraceMs(timeoutMs) },
     {
-      pluginId: "openclaw-codex-app-server",
+      pluginId: "steelengine-codex-app-server",
       title: truncateForGateway(params.title, MAX_PLUGIN_APPROVAL_TITLE_LENGTH),
       description: truncateForGateway(params.description, MAX_PLUGIN_APPROVAL_DESCRIPTION_LENGTH),
       severity: params.severity,

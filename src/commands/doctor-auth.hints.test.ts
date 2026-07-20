@@ -1,6 +1,6 @@
 // Doctor auth hint tests cover OAuth refresh failure formatting and auth repair guidance.
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   collectAuthProfileHealthFindings,
   noteLegacyCodexProviderOverride,
@@ -26,8 +26,8 @@ vi.mock("../agents/auth-profiles.js", async () => {
   };
 });
 
-function doctorFixtureConfig(config: unknown): OpenClawConfig {
-  return config as OpenClawConfig;
+function doctorFixtureConfig(config: unknown): SteelEngineConfig {
+  return config as SteelEngineConfig;
 }
 
 describe("doctor auth hints", () => {

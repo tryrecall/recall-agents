@@ -1,4 +1,4 @@
-import { uniqueStrings } from "@openclaw/normalization-core/string-normalization";
+import { uniqueStrings } from "@steelengine/normalization-core/string-normalization";
 import { asMeetingBrowserTabs, readMeetingBrowserTab } from "./browser-request.js";
 import type {
   MeetingBrowserJoinSession,

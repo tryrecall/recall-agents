@@ -3,8 +3,8 @@
  * Maps deprecated and plugin-defined provider IDs to canonical credential
  * providers, with trusted workspace plugin handling and process-stable caching.
  */
-import { normalizeProviderId } from "@openclaw/model-catalog-core/provider-id";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import { normalizeProviderId } from "@steelengine/model-catalog-core/provider-id";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { normalizePluginsConfig } from "../plugins/config-state.js";
 import { getCurrentPluginMetadataSnapshot } from "../plugins/current-plugin-metadata-snapshot.js";
 import type { PluginManifestRecord } from "../plugins/manifest-registry.js";
@@ -19,7 +19,7 @@ import type { PluginOrigin } from "../plugins/plugin-origin.types.js";
 
 /** Inputs that control plugin metadata and trust scope for auth alias lookup. */
 export type ProviderAuthAliasLookupParams = {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   includeUntrustedWorkspacePlugins?: boolean;
@@ -63,7 +63,7 @@ function resetProviderAuthAliasMapCacheForTest(): void {
 }
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
-  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("openclaw.providerAuthAliasesTestApi")] =
+  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("steelengine.providerAuthAliasesTestApi")] =
     {
       resetProviderAuthAliasMapCacheForTest,
     };
@@ -78,7 +78,7 @@ function resolveProviderAuthAliasOriginPriority(origin: PluginOrigin | undefined
 
 function isWorkspacePluginTrustedForAuthAliases(
   plugin: PluginManifestRecord,
-  config: OpenClawConfig | undefined,
+  config: SteelEngineConfig | undefined,
 ): boolean {
   return isWorkspacePluginAllowedByConfig({
     config,

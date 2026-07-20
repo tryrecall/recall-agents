@@ -1,4 +1,4 @@
-// OpenClaw operation grammar, approval descriptions, and public types.
+// SteelEngine operation grammar, approval descriptions, and public types.
 import type { ConfigSetOptions } from "../cli/config-set-input.js";
 import type { DoctorOptions } from "../commands/doctor.types.js";
 import { isSensitiveConfigPath } from "../config/sensitive-paths.js";
@@ -24,7 +24,7 @@ export type SystemAgentOperationResult = {
   exitsInteractive?: boolean;
   message?: string;
   nextInput?: string;
-  /** Agent TUI exited via /openclaw: re-enter the shell even without a request. */
+  /** Agent TUI exited via /steelengine: re-enter the shell even without a request. */
   returnToShell?: boolean;
   followUp?: Extract<SystemAgentOperation, { kind: "model-setup" }>;
 };
@@ -98,7 +98,7 @@ const CONFIG_SET_REF_RE = new RegExp(
   "i",
 );
 const SETUP_RE = new RegExp(
-  String.raw`^(?:setup|set\s+me\s+up|set\s+up\s+openclaw|onboard(?:\s+me)?|bootstrap|first\s+run)(?:\s+workspace\s+(?<workspace>${ARG_WORD}))?(?:\s+model\s+(?<model>\S+))?$`,
+  String.raw`^(?:setup|set\s+me\s+up|set\s+up\s+steelengine|onboard(?:\s+me)?|bootstrap|first\s+run)(?:\s+workspace\s+(?<workspace>${ARG_WORD}))?(?:\s+model\s+(?<model>\S+))?$`,
   "i",
 );
 const MODEL_SETUP_RE = new RegExp(
@@ -139,7 +139,7 @@ const OPEN_CHANNEL_SETUP_RE = /^open\s+channel\s+wizard(?:\s+for\s+(?<channel>[a
 const NO_MATCH_MESSAGE =
   "I can run doctor/status/health, check or restart Gateway, list agents/models, configure a model provider, set default model, connect channels (`connect telegram`), show `channel info <channel>`, open the setup wizard, show audit, or switch to your agent TUI.";
 /**
- * Parse one user command into OpenClaw's closed operation union. Anything
+ * Parse one user command into SteelEngine's closed operation union. Anything
  * that does not match the anchored grammar exactly returns kind "none" so the
  * caller can route it to the system agent (or show guidance).
  */
@@ -184,7 +184,7 @@ export function parseSystemAgentOperation(input: string): SystemAgentOperation {
       return { kind: "open-tui" };
     case "quit":
     case "exit":
-      return { kind: "none", message: "OpenClaw retracts into shell. Bye." };
+      return { kind: "none", message: "SteelEngine retracts into shell. Bye." };
     default:
       break;
   }
@@ -395,7 +395,7 @@ export function describeSystemAgentPersistentOperation(operation: SystemAgentOpe
     case "model-setup":
       return "configure a model provider and default model";
     case "doctor-fix":
-      return "exit OpenClaw and run openclaw doctor --fix";
+      return "exit SteelEngine and run steelengine doctor --fix";
     case "plugin-install":
       return `install plugin ${operation.spec}`;
     case "plugin-uninstall":
@@ -433,5 +433,5 @@ function formatSetupPlanDescription(
   operation: Extract<SystemAgentOperation, { kind: "setup" }>,
 ): string {
   const workspace = shortenHomePath(resolveUserPath(operation.workspace ?? process.cwd()));
-  return `bootstrap OpenClaw setup for workspace ${workspace}`;
+  return `bootstrap SteelEngine setup for workspace ${workspace}`;
 }

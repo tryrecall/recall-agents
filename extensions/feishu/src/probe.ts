@@ -1,9 +1,9 @@
 // Feishu plugin module implements probe behavior.
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 import {
   asDateTimestampMs,
   resolveExpiresAtMsFromDurationMs,
-} from "openclaw/plugin-sdk/number-runtime";
+} from "steelengine/plugin-sdk/number-runtime";
 import { raceWithTimeoutAndAbort } from "./async.js";
 import { createFeishuClient, type FeishuClientCredentials } from "./client.js";
 import type { FeishuProbeResult } from "./types.js";
@@ -95,13 +95,13 @@ export async function probeFeishu(
 
   try {
     const client = createFeishuClient(creds) as FeishuRequestClient;
-    // Feishu-provided endpoint for OpenClaw, supported on both Feishu (CN)
+    // Feishu-provided endpoint for SteelEngine, supported on both Feishu (CN)
     // and Lark (international). No OAuth scopes required. Validates
     // credentials and registers the app as an AI agent (智能体).
     const responseResult = await raceWithTimeoutAndAbort<FeishuPingResponse>(
       client.request({
         method: "POST",
-        url: "/open-apis/bot/v1/openclaw_bot/ping",
+        url: "/open-apis/bot/v1/steelengine_bot/ping",
         data: { needBotInfo: true },
         timeout: timeoutMs,
       }),

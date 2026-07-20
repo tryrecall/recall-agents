@@ -1,15 +1,15 @@
 {
-  "name": "@openclaw/signal",
+  "name": "@steelengine/signal",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw Signal channel plugin",
+  "description": "SteelEngine Signal channel plugin",
   "type": "module",
   "dependencies": {
     "ws": "8.21.0"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
@@ -40,8 +40,8 @@
       ]
     },
     "install": {
-      "clawhubSpec": "clawhub:@openclaw/signal",
-      "npmSpec": "@openclaw/signal",
+      "clawhubSpec": "clawhub:@steelengine/signal",
+      "npmSpec": "@steelengine/signal",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.6.9",
       "allowInvalidConfigRecovery": true
@@ -50,7 +50,7 @@
       "pluginApi": ">=2026.7.2-beta.3"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3",
+      "steelengineVersion": "2026.7.2-beta.3",
       "bundledDist": false
     },
     "release": {
@@ -60,6 +60,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/steelengineai/recall-agents"
   }
 }

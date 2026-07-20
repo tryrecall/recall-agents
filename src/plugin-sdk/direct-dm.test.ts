@@ -2,7 +2,7 @@
  * Tests direct-message guard policy helpers exposed through the SDK.
  */
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import {
   createDirectDmPreCryptoGuardPolicy,
   createPreCryptoDirectDmAuthorizer,
@@ -12,7 +12,7 @@ import {
 
 const baseCfg = {
   commands: { useAccessGroups: true },
-} as unknown as OpenClawConfig;
+} as unknown as SteelEngineConfig;
 
 function createDirectDmRuntime() {
   const recordInboundSessionMock = vi.fn(async (_params: unknown) => {});
@@ -137,7 +137,7 @@ describe("plugin-sdk/direct-dm", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       channel: "nostr",
       accountId: "default",
       dmPolicy: "allowlist",

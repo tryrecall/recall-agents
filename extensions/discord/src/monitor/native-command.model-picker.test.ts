@@ -3,22 +3,22 @@ import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { ChannelType } from "discord-api-types/v10";
-import * as commandRegistryModule from "openclaw/plugin-sdk/command-auth-native";
+import * as commandRegistryModule from "steelengine/plugin-sdk/command-auth-native";
 import type {
   ChatCommandDefinition,
   CommandArgsParsing,
-} from "openclaw/plugin-sdk/command-auth-native";
-import type { ModelsProviderData } from "openclaw/plugin-sdk/command-auth-native";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import * as runtimeConfigSnapshotModule from "openclaw/plugin-sdk/runtime-config-snapshot";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/command-auth-native";
+import type { ModelsProviderData } from "steelengine/plugin-sdk/command-auth-native";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import * as runtimeConfigSnapshotModule from "steelengine/plugin-sdk/runtime-config-snapshot";
+import { logVerbose } from "steelengine/plugin-sdk/runtime-env";
 import {
   getSessionEntry,
   listSessionEntries,
   resolveStorePath,
   upsertSessionEntry,
-} from "openclaw/plugin-sdk/session-store-runtime";
-import * as commandTextModule from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/session-store-runtime";
+import * as commandTextModule from "steelengine/plugin-sdk/text-utility-runtime";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { defineThrowingDiscordChannelGetter } from "../test-support/partial-channel.js";
 import { resolveDiscordChannelContext } from "./agent-components-context.js";
@@ -33,7 +33,7 @@ import {
 } from "./native-command-ui.js";
 import { createNoopThreadBindingManager, type ThreadBindingManager } from "./thread-bindings.js";
 
-vi.mock("openclaw/plugin-sdk/runtime-env", { spy: true });
+vi.mock("steelengine/plugin-sdk/runtime-env", { spy: true });
 
 type ModelPickerContext = Parameters<typeof createDiscordModelPickerFallbackButton>[0]["ctx"];
 type PickerButton = ReturnType<typeof createDiscordModelPickerFallbackButton>;
@@ -77,7 +77,7 @@ function createModelPickerContext(): ModelPickerContext {
         },
       },
     },
-  } as unknown as OpenClawConfig;
+  } as unknown as SteelEngineConfig;
 
   return {
     cfg,
@@ -292,7 +292,7 @@ function createBoundThreadBindingManager(params: {
 
 describe("Discord model picker interactions", () => {
   beforeEach(async () => {
-    tempDir = await mkdtemp(path.join(os.tmpdir(), "openclaw-discord-model-picker-"));
+    tempDir = await mkdtemp(path.join(os.tmpdir(), "steelengine-discord-model-picker-"));
     vi.useRealTimers();
     vi.restoreAllMocks();
     vi.spyOn(runtimeConfigSnapshotModule, "getRuntimeConfigSnapshot").mockReturnValue(null);
@@ -363,7 +363,7 @@ describe("Discord model picker interactions", () => {
 
   it("uses the hot-reloaded runtime config when old components reset to default", async () => {
     const context = createModelPickerContext();
-    (context.cfg as { agents?: OpenClawConfig["agents"] }).agents = {
+    (context.cfg as { agents?: SteelEngineConfig["agents"] }).agents = {
       defaults: {
         model: { primary: "openai/gpt-5.5" },
         models: {
@@ -382,7 +382,7 @@ describe("Discord model picker interactions", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     vi.spyOn(runtimeConfigSnapshotModule, "getRuntimeConfigSnapshot").mockReturnValue(runtimeCfg);
     vi.spyOn(runtimeConfigSnapshotModule, "getRuntimeConfigSourceSnapshot").mockReturnValue(
       runtimeCfg,
@@ -429,7 +429,7 @@ describe("Discord model picker interactions", () => {
 
   it("keeps a pending model stable when hot reload reorders the catalog", async () => {
     const context = createModelPickerContext();
-    const runtimeCfg = { ...context.cfg } as OpenClawConfig;
+    const runtimeCfg = { ...context.cfg } as SteelEngineConfig;
     vi.spyOn(runtimeConfigSnapshotModule, "getRuntimeConfigSnapshot").mockReturnValue(runtimeCfg);
     vi.spyOn(runtimeConfigSnapshotModule, "getRuntimeConfigSourceSnapshot").mockReturnValue(
       runtimeCfg,
@@ -544,7 +544,7 @@ describe("Discord model picker interactions", () => {
         "openai",
         [
           { id: "codex", label: "Codex", description: "Use Codex." },
-          { id: "openclaw", label: "OpenClaw Default", description: "Use OpenClaw." },
+          { id: "steelengine", label: "SteelEngine Default", description: "Use SteelEngine." },
         ],
       ],
     ]);
@@ -589,7 +589,7 @@ describe("Discord model picker interactions", () => {
         "openai",
         [
           { id: "codex", label: "Codex", description: "Use Codex." },
-          { id: "openclaw", label: "OpenClaw Default", description: "Use OpenClaw." },
+          { id: "steelengine", label: "SteelEngine Default", description: "Use SteelEngine." },
         ],
       ],
     ]);
@@ -631,7 +631,7 @@ describe("Discord model picker interactions", () => {
       [
         "anthropic",
         [
-          { id: "openclaw", label: "OpenClaw Default", description: "Use OpenClaw." },
+          { id: "steelengine", label: "SteelEngine Default", description: "Use SteelEngine." },
           { id: "claude-cli", label: "Claude CLI", description: "Use Claude CLI." },
         ],
       ],
@@ -829,7 +829,7 @@ describe("Discord model picker interactions", () => {
 
   it("keeps a recent model stable when hot reload shifts its slot", async () => {
     const context = createModelPickerContext();
-    const runtimeCfg = { ...context.cfg } as OpenClawConfig;
+    const runtimeCfg = { ...context.cfg } as SteelEngineConfig;
     vi.spyOn(runtimeConfigSnapshotModule, "getRuntimeConfigSnapshot").mockReturnValue(runtimeCfg);
     vi.spyOn(runtimeConfigSnapshotModule, "getRuntimeConfigSourceSnapshot").mockReturnValue(
       runtimeCfg,
@@ -1080,7 +1080,7 @@ describe("Discord model picker interactions", () => {
         "openai",
         [
           { id: "codex", label: "Codex", description: "Use Codex." },
-          { id: "openclaw", label: "OpenClaw Default", description: "Use OpenClaw." },
+          { id: "steelengine", label: "SteelEngine Default", description: "Use SteelEngine." },
         ],
       ],
     ]);
@@ -1112,7 +1112,7 @@ describe("Discord model picker interactions", () => {
 
     await button.run(submitInteraction as unknown as PickerButtonInteraction, {
       ...createModelsViewSubmitData(),
-      r: "openclaw",
+      r: "steelengine",
     });
 
     expect(getSessionEntry({ storePath, sessionKey: "agent:worker:subagent:bound" })).toMatchObject(
@@ -1188,7 +1188,7 @@ describe("Discord model picker interactions", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     await replyWithDiscordModelPickerProviders({
       interaction: interaction as never,

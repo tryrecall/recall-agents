@@ -3,10 +3,10 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { normalizeLowercaseStringOrEmpty } from "@openclaw/normalization-core/string-coerce";
+import { normalizeLowercaseStringOrEmpty } from "@steelengine/normalization-core/string-coerce";
 import { resolveGitHeadPath } from "./git-root.js";
 import { pruneMapToMaxSize } from "./map-size.js";
-import { resolveOpenClawPackageRootSync } from "./openclaw-root.js";
+import { resolveSteelEnginePackageRootSync } from "./steelengine-root.js";
 
 const formatCommit = (value?: string | null) => {
   if (!value) {
@@ -234,7 +234,7 @@ export const resolveCommitHash = (
     cachedGitCommitBySearchDir.set(searchDir, cached);
     return cached;
   }
-  const packageRoot = resolveOpenClawPackageRootSync({
+  const packageRoot = resolveSteelEnginePackageRootSync({
     cwd: options.cwd,
     moduleUrl: options.moduleUrl,
   });

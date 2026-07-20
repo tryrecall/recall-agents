@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 // Control UI tests cover chat flow behavior.
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { SESSION_DRAG_MIME } from "../lib/sessions/drag.ts";
@@ -16,9 +16,9 @@ import {
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
-const captureUiProofEnabled = process.env.OPENCLAW_CAPTURE_UI_PROOF === "1";
+const captureUiProofEnabled = process.env.STEELENGINE_CAPTURE_UI_PROOF === "1";
 const sessionAccessibilityProofDir = path.join(
   process.cwd(),
   ".artifacts",
@@ -175,7 +175,7 @@ async function captureSessionAccessibilityProof(page: Page, name: string): Promi
     return;
   }
   await mkdir(sessionAccessibilityProofDir, { recursive: true });
-  const sidebar = page.locator("openclaw-app-sidebar");
+  const sidebar = page.locator("steelengine-app-sidebar");
   await page.screenshot({
     fullPage: true,
     path: path.join(sessionAccessibilityProofDir, `${name}.png`),
@@ -255,7 +255,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
   beforeAll(async () => {
     if (!chromiumAvailable) {
       throw new Error(
-        `Playwright Chromium is not installed or cannot start at ${chromiumExecutablePath}. Run \`pnpm --dir ui exec playwright install --with-deps chromium\`, set PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH to a compatible browser, or set OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM=1 only when intentionally skipping this lane.`,
+        `Playwright Chromium is not installed or cannot start at ${chromiumExecutablePath}. Run \`pnpm --dir ui exec playwright install --with-deps chromium\`, set PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH to a compatible browser, or set STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM=1 only when intentionally skipping this lane.`,
       );
     }
     browser = await chromium.launch({ executablePath: chromiumExecutablePath });
@@ -307,7 +307,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       await expect.poll(() => splitEntry.isVisible()).toBe(true);
       await expect.poll(() => page.locator(".chat-pane__header").count()).toBe(1);
       await page.evaluate(() => {
-        document.documentElement.classList.add("openclaw-native-macos");
+        document.documentElement.classList.add("steelengine-native-macos");
         document.querySelector(".shell")?.classList.add("shell--nav-collapsed");
       });
       await expect
@@ -318,7 +318,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
         )
         .toBe("90px");
       await page.evaluate(() => {
-        document.documentElement.classList.remove("openclaw-native-macos");
+        document.documentElement.classList.remove("steelengine-native-macos");
         document.querySelector(".shell")?.classList.remove("shell--nav-collapsed");
       });
       await page.setViewportSize({ height: 900, width: 1100 });
@@ -329,7 +329,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
           splitEntry.evaluate((node) => node.closest(".agent-chat__composer-shell") == null),
         )
         .toBe(true);
-      await page.locator("openclaw-chat-pane").evaluate((pane) => {
+      await page.locator("steelengine-chat-pane").evaluate((pane) => {
         (
           globalThis as typeof globalThis & {
             classicChatPane?: Element;
@@ -344,7 +344,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
         .toBeGreaterThan(startupRequestsBeforeSplit);
 
       // Each pane owns the same in-flow header in classic and split layouts.
-      const panes = page.locator("openclaw-chat-pane.chat-split-view__pane");
+      const panes = page.locator("steelengine-chat-pane.chat-split-view__pane");
       const headers = page.locator(".chat-pane__header");
       await expect.poll(() => panes.count()).toBe(2);
       await panes.last().getByText("Split toolbar proof.").waitFor();
@@ -388,7 +388,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       await expect
         .poll(() =>
           targetHeader.evaluate((header) => {
-            const owner = header.closest("openclaw-chat-pane");
+            const owner = header.closest("steelengine-chat-pane");
             return (
               owner === header.parentElement && owner?.classList.contains("chat-split-view__pane")
             );
@@ -524,7 +524,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       const finalText = "One authoritative final response.";
       const messageId = "assistant-authoritative-final";
       const authoritative = {
-        __openclaw: { id: messageId, seq: 2 },
+        __steelengine: { id: messageId, seq: 2 },
         content: [{ text: finalText, type: "text" }],
         role: "assistant",
         timestamp: Date.now(),
@@ -543,7 +543,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       await page.locator(".chat-bubble.streaming", { hasText: finalText }).waitFor();
       await gateway.setHistoryMessages([
         {
-          __openclaw: { id: "user-reconcile", seq: 1 },
+          __steelengine: { id: "user-reconcile", seq: 1 },
           content: [{ text: "reconcile the terminal event ordering", type: "text" }],
           role: "user",
           timestamp: Date.now() - 1,
@@ -773,11 +773,11 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       viewport: { height: 900, width: 1280 },
     });
     const page = await context.newPage();
-    const source = "/tmp/openclaw/测试 report.pdf";
-    const mediaUrl = `/__openclaw__/assistant-media?source=${encodeURIComponent(source)}&mediaTicket=ticket-download`;
+    const source = "/tmp/steelengine/测试 report.pdf";
+    const mediaUrl = `/__steelengine__/assistant-media?source=${encodeURIComponent(source)}&mediaTicket=ticket-download`;
     const requestedUrls: URL[] = [];
     // The document opens in a new tab, so intercept at the context boundary.
-    await context.route("**/__openclaw__/assistant-media?**", async (route) => {
+    await context.route("**/__steelengine__/assistant-media?**", async (route) => {
       const url = new URL(route.request().url());
       requestedUrls.push(url);
       await route.fulfill({
@@ -868,7 +868,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
     });
     const page = await context.newPage();
     const requestedMediaUrls: URL[] = [];
-    await page.route("**/__openclaw__/assistant-media?**", async (route) => {
+    await page.route("**/__steelengine__/assistant-media?**", async (route) => {
       const request = route.request();
       const url = new URL(request.url());
       requestedMediaUrls.push(url);
@@ -971,7 +971,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       fetchedMedia.push({
         authorization: request.headers().authorization,
         pathname: url.pathname,
-        requesterSessionKey: request.headers()["x-openclaw-requester-session-key"],
+        requesterSessionKey: request.headers()["x-steelengine-requester-session-key"],
       });
       await route.fulfill({
         body: '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="90"><rect width="160" height="90" rx="12" fill="#0f766e"/><text x="80" y="50" text-anchor="middle" fill="white" font-family="sans-serif" font-size="14">managed preview</text></svg>',
@@ -1135,7 +1135,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
           "utf8",
         );
       }
-      if (process.env.OPENCLAW_BEHAVIOR_PROOF === "1") {
+      if (process.env.STEELENGINE_BEHAVIOR_PROOF === "1") {
         process.stdout.write(
           `${JSON.stringify({ proof: "managed-image-cache", ...proofSummary })}\n`,
         );
@@ -1890,7 +1890,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
 
     try {
       await page.goto(`${server.baseUrl}chat`);
-      const newSessionButton = page.locator("openclaw-app-sidebar .sidebar-new-session");
+      const newSessionButton = page.locator("steelengine-app-sidebar .sidebar-new-session");
       await newSessionButton.waitFor({ state: "visible", timeout: 10_000 });
       await newSessionButton.click();
 
@@ -2112,7 +2112,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       await page.getByText("First token visible.").waitFor({ timeout: 10_000 });
       await gateway.resolveDeferred("chat.startup", {
         agentsList: {
-          agents: [{ id: "ops", name: "OpenClaw" }],
+          agents: [{ id: "ops", name: "SteelEngine" }],
           defaultId: "ops",
           mainKey: "main",
           scope: "agent",
@@ -2249,7 +2249,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
   });
 
   it("steers ordinary follow-ups when the server default is steer", async () => {
-    const artifactDir = process.env.OPENCLAW_UI_E2E_ARTIFACT_DIR?.trim();
+    const artifactDir = process.env.STEELENGINE_UI_E2E_ARTIFACT_DIR?.trim();
     const context = await newBrowserContext({
       locale: "en-US",
       serviceWorkers: "block",
@@ -2308,7 +2308,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
   });
 
   it("preserves a non-steer server default for active-run follow-ups", async () => {
-    const artifactDir = process.env.OPENCLAW_UI_E2E_ARTIFACT_DIR?.trim();
+    const artifactDir = process.env.STEELENGINE_UI_E2E_ARTIFACT_DIR?.trim();
     const context = await newBrowserContext({
       locale: "en-US",
       serviceWorkers: "block",
@@ -2722,7 +2722,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
   });
 
   it("keeps retained paginated history stable when returning to a session", async () => {
-    const artifactDir = process.env.OPENCLAW_UI_E2E_ARTIFACT_DIR?.trim();
+    const artifactDir = process.env.STEELENGINE_UI_E2E_ARTIFACT_DIR?.trim();
     const context = await newBrowserContext({
       locale: "en-US",
       ...(artifactDir
@@ -2733,7 +2733,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
     });
     const page = await context.newPage();
     const historyMessage = (seq: number, label: string) => ({
-      __openclaw: { id: `history-${seq}`, seq },
+      __steelengine: { id: `history-${seq}`, seq },
       content: [
         {
           text: `${label} ${seq}\n${"retained transcript detail\n".repeat(3)}`,
@@ -2811,7 +2811,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       await expect
         .poll(() =>
           page
-            .locator("openclaw-chat-pane")
+            .locator("steelengine-chat-pane")
             .evaluate(
               (element) =>
                 (element as HTMLElement & { state: { chatMessages: unknown[] } }).state.chatMessages
@@ -2843,7 +2843,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
         ).chatSessionReturnSamples = samples;
         const deadline = performance.now() + 750;
         const sample = () => {
-          const pane = document.querySelector("openclaw-chat-pane") as
+          const pane = document.querySelector("steelengine-chat-pane") as
             | (HTMLElement & {
                 state?: { chatMessages?: unknown[]; sessionKey?: string };
               })
@@ -2989,7 +2989,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
   });
 
   it("stores new input while offline and sends it after reconnect", async () => {
-    const artifactDir = process.env.OPENCLAW_UI_E2E_ARTIFACT_DIR?.trim();
+    const artifactDir = process.env.STEELENGINE_UI_E2E_ARTIFACT_DIR?.trim();
     const context = await newBrowserContext({
       locale: "en-US",
       ...(artifactDir
@@ -3016,7 +3016,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       await composer.waitFor({ state: "visible", timeout: 10_000 });
 
       await gateway.setOnline(false);
-      await page.locator("openclaw-connection-banner").waitFor({ timeout: 10_000 });
+      await page.locator("steelengine-connection-banner").waitFor({ timeout: 10_000 });
 
       const prompt = "send this when the Gateway returns";
       const attachmentName = "offline-proof.txt";
@@ -3049,7 +3049,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
         page.evaluate(
           ({ expectedAttachmentName, expectedAttachmentDataUrl, expectedPrompt }) => {
             const storedValues = Object.entries(sessionStorage)
-              .filter(([key]) => key.startsWith("openclaw.control.chatComposer.v2:"))
+              .filter(([key]) => key.startsWith("steelengine.control.chatComposer.v2:"))
               .map(([, value]) => value);
             const stored = storedValues.join("\n");
             let runId: string | null = null;
@@ -3123,7 +3123,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       expect(await gateway.getRequests("chat.send")).toHaveLength(0);
 
       await gateway.setOnline(true);
-      await page.locator("openclaw-chat-pane").waitFor({ state: "attached", timeout: 10_000 });
+      await page.locator("steelengine-chat-pane").waitFor({ state: "attached", timeout: 10_000 });
 
       const request = await gateway.waitForRequest("chat.send");
       const params = requireRecord(request.params);
@@ -3148,7 +3148,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       await gateway.setHistoryMessages([
         {
           role: "user",
-          __openclaw: { idempotencyKey: `${runId}:user` },
+          __steelengine: { idempotencyKey: `${runId}:user` },
         },
       ]);
       await gateway.emitChatFinal({ runId, text: "Delivered after reconnect." });
@@ -3159,12 +3159,12 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
           return proof.attachment || proof.prompt || proof.runId === runId;
         })
         .toBe(false);
-      await page.locator("openclaw-connection-banner").waitFor({ state: "detached" });
+      await page.locator("steelengine-connection-banner").waitFor({ state: "detached" });
       await expectRequestCountStable(gateway, "chat.send", 1);
       if (artifactDir) {
         await page.screenshot({ path: `${artifactDir}/03-online-delivered.png`, fullPage: true });
       }
-      if (process.env.OPENCLAW_BEHAVIOR_PROOF === "1") {
+      if (process.env.STEELENGINE_BEHAVIOR_PROOF === "1") {
         process.stdout.write(
           `${JSON.stringify({
             proof: "offline-chat-reconnect",
@@ -3711,8 +3711,8 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       await page.goto(`${server.baseUrl}chat`);
       const documentMarker = await page.evaluate(() => {
         const marker = crypto.randomUUID();
-        (window as Window & { __openclawAvatarTestDocument?: string })[
-          "__openclawAvatarTestDocument"
+        (window as Window & { __steelengineAvatarTestDocument?: string })[
+          "__steelengineAvatarTestDocument"
         ] = marker;
         return marker;
       });
@@ -3749,8 +3749,8 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       expect(
         await page.evaluate(
           () =>
-            (window as Window & { __openclawAvatarTestDocument?: string })[
-              "__openclawAvatarTestDocument"
+            (window as Window & { __steelengineAvatarTestDocument?: string })[
+              "__steelengineAvatarTestDocument"
             ],
         ),
       ).toBe(documentMarker);
@@ -3900,7 +3900,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       });
       await expect.poll(() => page.getByText(/not supported for/u).count()).toBe(0);
 
-      const artifactDir = process.env.OPENCLAW_UI_E2E_ARTIFACT_DIR?.trim();
+      const artifactDir = process.env.STEELENGINE_UI_E2E_ARTIFACT_DIR?.trim();
       if (artifactDir) {
         await page.screenshot({
           path: `${artifactDir}/model-thinking-sync.png`,
@@ -4032,7 +4032,7 @@ describeControlUiE2e("Control UI mocked Gateway E2E", () => {
       });
       await gateway.setHistoryMessages([
         {
-          __openclaw: { idempotencyKey: `${runId}:user` },
+          __steelengine: { idempotencyKey: `${runId}:user` },
           content: [{ text: prompt, type: "text" }],
           role: "user",
           timestamp: Date.now(),

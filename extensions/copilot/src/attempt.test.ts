@@ -3,20 +3,20 @@ import fsp from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import type { CopilotClient, Tool as SdkTool } from "@github/copilot-sdk";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import {
   abortAgentHarnessRun,
   attachModelProviderRequestTransport,
   queueAgentHarnessMessage,
   type AgentHarnessAttemptParams,
   type AgentHarnessAttemptResult,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
-import type { SandboxContext } from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "steelengine/plugin-sdk/agent-harness-runtime";
+import type { SandboxContext } from "steelengine/plugin-sdk/agent-harness-runtime";
 import {
   initializeGlobalHookRunner,
   resetGlobalHookRunner,
-} from "openclaw/plugin-sdk/hook-runtime";
-import { createMockPluginRegistry } from "openclaw/plugin-sdk/plugin-test-runtime";
+} from "steelengine/plugin-sdk/hook-runtime";
+import { createMockPluginRegistry } from "steelengine/plugin-sdk/plugin-test-runtime";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runCopilotAttempt } from "./attempt.js";
 import type { CopilotClientPool } from "./runtime.js";
@@ -28,8 +28,8 @@ const gatewayQuestionMock = vi.hoisted(() => ({
   warn: vi.fn(),
 }));
 
-vi.mock("openclaw/plugin-sdk/agent-harness-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/agent-harness-runtime")>();
+vi.mock("steelengine/plugin-sdk/agent-harness-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("steelengine/plugin-sdk/agent-harness-runtime")>();
   return {
     ...actual,
     embeddedAgentLog: { ...actual.embeddedAgentLog, warn: gatewayQuestionMock.warn },
@@ -83,7 +83,7 @@ const dualWriteMock = vi.hoisted(() => ({
     const record = message as unknown as Record<string, unknown>;
     return {
       ...record,
-      __openclaw: { ...(record["__openclaw"] as object | undefined), mirrorIdentity: identity },
+      __steelengine: { ...(record["__steelengine"] as object | undefined), mirrorIdentity: identity },
     } as unknown as T;
   },
 }));
@@ -336,7 +336,7 @@ function makeParams(
     sessionTarget: {
       sessionId: "session-1",
       sessionKey: "agent:main:session-1",
-      storePath: "openclaw-agent.sqlite",
+      storePath: "steelengine-agent.sqlite",
     },
     timeoutMs: 5000,
     workspaceDir: "C:\\workspace",
@@ -917,7 +917,7 @@ describe("runCopilotAttempt", () => {
     const mediaId = "telegram-photo.png";
     await fsp.mkdir(inboundDir, { recursive: true });
     await fsp.writeFile(path.join(inboundDir, mediaId), Buffer.from(TINY_PNG_BASE64, "base64"));
-    vi.stubEnv("OPENCLAW_STATE_DIR", stateDir);
+    vi.stubEnv("STEELENGINE_STATE_DIR", stateDir);
     const sdk = makeFakeSdk();
     const pool = makeFakePool(sdk);
 
@@ -1668,7 +1668,7 @@ describe("runCopilotAttempt", () => {
     expect(result.feedback).toContain("no permission policy installed");
   });
 
-  it("registers ask_user and resolves it from the active OpenClaw queue", async () => {
+  it("registers ask_user and resolves it from the active SteelEngine queue", async () => {
     const onBlockReply = vi.fn();
     const sdk = makeFakeSdk({
       onCreateSession: (session, cfg) => {
@@ -1805,7 +1805,7 @@ describe("runCopilotAttempt", () => {
       // receives it as system context without having to read the file
       // via its read tool. The SDK's `append` mode keeps the SDK
       // foundation (identity/safety/tool-instruction sections) intact
-      // while layering OpenClaw context after it. See
+      // while layering SteelEngine context after it. See
       // workspace-bootstrap.ts and @github/copilot-sdk types.d.ts
       // L1052 (SystemMessageConfig).
       const cfg = (sdk.createSession.mock.calls[0] as unknown[] | undefined)?.[0] as {
@@ -1961,7 +1961,7 @@ describe("runCopilotAttempt", () => {
 
       // SystemMessage is in ResumeSessionConfig's Pick set (per SDK
       // types.d.ts:1198), so it must be propagated on resume too,
-      // otherwise resumed sessions would silently lose OpenClaw
+      // otherwise resumed sessions would silently lose SteelEngine
       // persona/identity context after every reconnect.
       const cfg = sdk.resumeSession.mock.calls[0]?.[1] as {
         systemMessage?: { mode?: string; content?: string };
@@ -2790,9 +2790,9 @@ describe("runCopilotAttempt", () => {
 
       // No env tokens, no contract token, no explicit token: falls
       // through to default useLoggedInUser mode.
-      const prevOpenclaw = process.env.OPENCLAW_GITHUB_TOKEN;
+      const prevOpenclaw = process.env.STEELENGINE_GITHUB_TOKEN;
       const prevGithub = process.env.GITHUB_TOKEN;
-      delete process.env.OPENCLAW_GITHUB_TOKEN;
+      delete process.env.STEELENGINE_GITHUB_TOKEN;
       delete process.env.GITHUB_TOKEN;
       try {
         await runCopilotAttempt(makeParams({ auth: {} as never }), { pool });
@@ -2800,7 +2800,7 @@ describe("runCopilotAttempt", () => {
         expect("gitHubToken" in cfg).toBe(false);
       } finally {
         if (prevOpenclaw !== undefined) {
-          process.env.OPENCLAW_GITHUB_TOKEN = prevOpenclaw;
+          process.env.STEELENGINE_GITHUB_TOKEN = prevOpenclaw;
         }
         if (prevGithub !== undefined) {
           process.env.GITHUB_TOKEN = prevGithub;
@@ -2884,7 +2884,7 @@ describe("runCopilotAttempt", () => {
         messages: Array<{
           role: string;
           idempotencyKey?: string;
-          __openclaw?: { mirrorIdentity?: string };
+          __steelengine?: { mirrorIdentity?: string };
         }>;
       };
       for (const [index, message] of args.messages.entries()) {
@@ -2895,7 +2895,7 @@ describe("runCopilotAttempt", () => {
         ) {
           continue;
         }
-        const identity = message["__openclaw"]?.mirrorIdentity ?? "";
+        const identity = message["__steelengine"]?.mirrorIdentity ?? "";
         // The current user and terminal assistant carry turn-stable identities.
         // Caller-passed history without an identity falls through to
         // the positional `${scope}:role:idx`.
@@ -2929,11 +2929,11 @@ describe("runCopilotAttempt", () => {
 
     // ---------------------------------------------------------------
     // Dogfood finding #3: synthetic current-turn user message in the
-    // OpenClaw audit transcript (mirrors codex event-projector pattern).
+    // SteelEngine audit transcript (mirrors codex event-projector pattern).
     //
     // Without this synthesis the dashboard / CLI history shows only
     // assistant bubbles — the user's typed turn is lost — because the
-    // OpenClaw shell's `persistTextTurnTranscript` skips its own user
+    // SteelEngine shell's `persistTextTurnTranscript` skips its own user
     // write when `embeddedAssistantGapFill` is true, trusting the
     // harness to mirror the user turn.
     // ---------------------------------------------------------------
@@ -2958,16 +2958,16 @@ describe("runCopilotAttempt", () => {
           role: string;
           content: unknown;
           idempotencyKey?: string;
-          __openclaw?: { mirrorIdentity?: string };
+          __steelengine?: { mirrorIdentity?: string };
         }>;
       };
       expect(args.messages.length).toBe(2);
       expect(args.messages[0]?.role).toBe("user");
       expect(args.messages[0]?.content).toBe("what's my name?");
       expect(args.messages[0]?.idempotencyKey).toBe("run-A:user");
-      expect(args.messages[0]?.["__openclaw"]?.mirrorIdentity).toBe("run-A:prompt");
+      expect(args.messages[0]?.["__steelengine"]?.mirrorIdentity).toBe("run-A:prompt");
       expect(args.messages[1]?.role).toBe("assistant");
-      expect(args.messages[1]?.["__openclaw"]?.mirrorIdentity).toBe("run-A:assistant:final");
+      expect(args.messages[1]?.["__steelengine"]?.mirrorIdentity).toBe("run-A:assistant:final");
     });
 
     it("does not duplicate synthetic user when caller passed the same prompt as the messages tail", async () => {
@@ -3054,19 +3054,19 @@ describe("runCopilotAttempt", () => {
       const calls = dualWriteMock.dualWriteCopilotTranscriptBestEffort.mock.calls;
       expect(calls.length).toBe(2);
       const turn1 = calls[0]?.[0] as {
-        messages: Array<{ role: string; __openclaw?: { mirrorIdentity?: string } }>;
+        messages: Array<{ role: string; __steelengine?: { mirrorIdentity?: string } }>;
       };
       const turn2 = calls[1]?.[0] as {
-        messages: Array<{ role: string; __openclaw?: { mirrorIdentity?: string } }>;
+        messages: Array<{ role: string; __steelengine?: { mirrorIdentity?: string } }>;
       };
       const turn1User = turn1.messages.find((m) => m.role === "user");
       const turn2User = turn2.messages.find((m) => m.role === "user");
       const turn1Assistant = turn1.messages.find((m) => m.role === "assistant");
       const turn2Assistant = turn2.messages.find((m) => m.role === "assistant");
-      expect(turn1User?.["__openclaw"]?.mirrorIdentity).toBe("run-1:prompt");
-      expect(turn2User?.["__openclaw"]?.mirrorIdentity).toBe("run-2:prompt");
-      expect(turn1Assistant?.["__openclaw"]?.mirrorIdentity).toBe("run-1:assistant:final");
-      expect(turn2Assistant?.["__openclaw"]?.mirrorIdentity).toBe("run-2:assistant:final");
+      expect(turn1User?.["__steelengine"]?.mirrorIdentity).toBe("run-1:prompt");
+      expect(turn2User?.["__steelengine"]?.mirrorIdentity).toBe("run-2:prompt");
+      expect(turn1Assistant?.["__steelengine"]?.mirrorIdentity).toBe("run-1:assistant:final");
+      expect(turn2Assistant?.["__steelengine"]?.mirrorIdentity).toBe("run-2:assistant:final");
     });
 
     it("two attempts with identical prompts but different runIds remain distinct (no content-fingerprint collapse)", async () => {
@@ -3100,14 +3100,14 @@ describe("runCopilotAttempt", () => {
       const secondCall = expectDefined(calls[1], "second Copilot transcript mirror call");
       const id1 = (
         firstCall[0] as {
-          messages: Array<{ role: string; __openclaw?: { mirrorIdentity?: string } }>;
+          messages: Array<{ role: string; __steelengine?: { mirrorIdentity?: string } }>;
         }
-      ).messages.find((m) => m.role === "user")?.["__openclaw"]?.mirrorIdentity;
+      ).messages.find((m) => m.role === "user")?.["__steelengine"]?.mirrorIdentity;
       const id2 = (
         secondCall[0] as {
-          messages: Array<{ role: string; __openclaw?: { mirrorIdentity?: string } }>;
+          messages: Array<{ role: string; __steelengine?: { mirrorIdentity?: string } }>;
         }
-      ).messages.find((m) => m.role === "user")?.["__openclaw"]?.mirrorIdentity;
+      ).messages.find((m) => m.role === "user")?.["__steelengine"]?.mirrorIdentity;
       expect(id1).toBe("run-X:prompt");
       expect(id2).toBe("run-Y:prompt");
       expect(id1).not.toBe(id2);
@@ -3518,7 +3518,7 @@ describe("runCopilotAttempt", () => {
   // (`@github/copilot-sdk/dist/types.d.ts:1059-1066`). Without it, the
   // CLI keeps its native read/write/shell/url/mcp/memory/hook tools
   // visible to the model alongside our bridged overrides, which would
-  // bypass OpenClaw's wrapped-tool enforcement under any permissive
+  // bypass SteelEngine's wrapped-tool enforcement under any permissive
   // permission policy and pollute the catalog under the default reject
   // policy. `createSessionConfig` derives `availableTools` from the
   // post-filter `sdkTools` so create- and resume-session always carry
@@ -3554,19 +3554,19 @@ describe("runCopilotAttempt", () => {
       ]);
     });
 
-    it("keeps a host-scoped OpenClaw create-session surface ring-zero", async () => {
+    it("keeps a host-scoped SteelEngine create-session surface ring-zero", async () => {
       const sdk = makeFakeSdk();
       const pool = makeFakePool(sdk);
-      const sdkTools = [makeFakeSdkTool("openclaw")];
+      const sdkTools = [makeFakeSdkTool("steelengine")];
       const createToolBridge = vi.fn(async () => ({ sdkTools, sourceTools: [] }));
 
-      await runCopilotAttempt(makeParams({ toolsAllow: ["openclaw"] }), {
+      await runCopilotAttempt(makeParams({ toolsAllow: ["steelengine"] }), {
         createToolBridge,
-        isHostScopedToolActive: (toolName) => toolName === "openclaw",
+        isHostScopedToolActive: (toolName) => toolName === "steelengine",
         pool,
       });
 
-      expect(readAvailableTools(sdk.createSession.mock.calls[0])).toEqual(["openclaw"]);
+      expect(readAvailableTools(sdk.createSession.mock.calls[0])).toEqual(["steelengine"]);
     });
 
     it("forwards `[]` to the SDK when the bridge returns no tools (disable / raw / fully filtered)", async () => {
@@ -3637,31 +3637,31 @@ describe("runCopilotAttempt", () => {
       expect(resumeCfg?.availableTools).toEqual(["read", "builtin:ask_user"]);
     });
 
-    it("keeps a host-scoped OpenClaw resume-session surface ring-zero", async () => {
+    it("keeps a host-scoped SteelEngine resume-session surface ring-zero", async () => {
       const sdk = makeFakeSdk({
         onResumeSession: (session) => {
           session.sendAndWait.mockResolvedValueOnce(makeAssistantMessageEvent("resumed"));
         },
       });
       const pool = makeFakePool(sdk);
-      const sdkTools = [makeFakeSdkTool("openclaw")];
+      const sdkTools = [makeFakeSdkTool("steelengine")];
       const createToolBridge = vi.fn(async () => ({ sdkTools, sourceTools: [] }));
 
       await runCopilotAttempt(
         makeParams({
-          initialReplayState: { sdkSessionId: "sess-openclaw" },
-          toolsAllow: ["openclaw"],
+          initialReplayState: { sdkSessionId: "sess-steelengine" },
+          toolsAllow: ["steelengine"],
         } as never),
         {
           createToolBridge,
-          isHostScopedToolActive: (toolName) => toolName === "openclaw",
+          isHostScopedToolActive: (toolName) => toolName === "steelengine",
           pool,
         },
       );
 
       const resumeCall = sdk.resumeSession.mock.calls[0] as unknown[] | undefined;
       const resumeCfg = resumeCall?.[1] as { availableTools?: string[] };
-      expect(resumeCfg?.availableTools).toEqual(["openclaw"]);
+      expect(resumeCfg?.availableTools).toEqual(["steelengine"]);
     });
 
     it("forwards `[]` to resumeSession when the bridge returns no tools", async () => {

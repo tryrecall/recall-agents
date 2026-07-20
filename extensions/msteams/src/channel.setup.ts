@@ -1,9 +1,9 @@
 // Msteams plugin module implements channel.setup behavior.
-import { describeAccountSnapshot } from "openclaw/plugin-sdk/account-helpers";
-import { formatAllowFromLowercase } from "openclaw/plugin-sdk/allow-from";
-import { createTopLevelChannelConfigAdapter } from "openclaw/plugin-sdk/channel-config-helpers";
-import type { ChannelPlugin } from "openclaw/plugin-sdk/channel-core";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import { describeAccountSnapshot } from "steelengine/plugin-sdk/account-helpers";
+import { formatAllowFromLowercase } from "steelengine/plugin-sdk/allow-from";
+import { createTopLevelChannelConfigAdapter } from "steelengine/plugin-sdk/channel-config-helpers";
+import type { ChannelPlugin } from "steelengine/plugin-sdk/channel-core";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import { MSTeamsChannelConfigSchema } from "./config-schema.js";
 import { msteamsSetupAdapter } from "./setup-core.js";
 import { msteamsSetupWizard } from "./setup-surface.js";
@@ -26,7 +26,7 @@ const meta = {
   order: 60,
 } as const;
 
-const resolveMSTeamsChannelConfig = (cfg: OpenClawConfig) => ({
+const resolveMSTeamsChannelConfig = (cfg: SteelEngineConfig) => ({
   allowFrom: cfg.channels?.msteams?.allowFrom,
   defaultTo: cfg.channels?.msteams?.defaultTo,
 });

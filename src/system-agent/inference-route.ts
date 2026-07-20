@@ -1,15 +1,15 @@
-// Resolves the configured default agent route shared by OpenClaw inference calls.
+// Resolves the configured default agent route shared by SteelEngine inference calls.
 import { isDeepStrictEqual } from "node:util";
-import { normalizeProviderId } from "@openclaw/model-catalog-core/provider-id";
+import { normalizeProviderId } from "@steelengine/model-catalog-core/provider-id";
 import {
   cliBackendAcceptsAuthProfileForwarding,
   resolveCliExecutionAuthProfileId,
 } from "../agents/cli-execution-auth.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { normalizeAgentId } from "../routing/session-key.js";
 
 export type SystemAgentConfiguredRoute = {
-  runConfig: OpenClawConfig;
+  runConfig: SteelEngineConfig;
   modelLabel: string;
   provider: string;
   model: string;
@@ -38,18 +38,18 @@ export type DefaultInferenceRouteProjection = {
   defaults: unknown;
   agent?: unknown;
   executionAgent?: unknown;
-  env: OpenClawConfig["env"];
-  secrets: OpenClawConfig["secrets"];
-  plugins: OpenClawConfig["plugins"];
-  tools: OpenClawConfig["tools"];
+  env: SteelEngineConfig["env"];
+  secrets: SteelEngineConfig["secrets"];
+  plugins: SteelEngineConfig["plugins"];
+  tools: SteelEngineConfig["tools"];
 };
 
-const SYSTEM_AGENT_EXECUTION_AGENT_ID = "openclaw";
+const SYSTEM_AGENT_EXECUTION_AGENT_ID = "steelengine";
 
 function projectSystemAgentExecutionConfig(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   routeAgentId: string,
-): OpenClawConfig {
+): SteelEngineConfig {
   const agents = config.agents?.list;
   if (!agents) {
     return config;
@@ -90,7 +90,7 @@ function projectSystemAgentExecutionConfig(
 }
 
 export async function resolveSystemAgentConfiguredRouteFromConfig(
-  runConfig: OpenClawConfig,
+  runConfig: SteelEngineConfig,
   requestedAgentId?: string,
 ): Promise<SystemAgentConfiguredRoute | null> {
   const [agentScope, modelSelection, modelRuntimeAliases, simpleCompletion, harnessPolicy] =
@@ -195,14 +195,14 @@ function projectRelevantModelMap(params: {
 
 /** Project every config input that can change the configured default-agent route. */
 export async function projectDefaultInferenceRoute(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
 ): Promise<DefaultInferenceRouteProjection> {
   return await projectInferenceRoute(config);
 }
 
 /** Project every config input that can change one configured agent route. */
 export async function projectInferenceRoute(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   requestedAgentId?: string,
 ): Promise<DefaultInferenceRouteProjection> {
   const [{ resolveDefaultAgentId }, { resolveProviderIdForAuth }] = await Promise.all([

@@ -4,4 +4,4 @@ export {
   getRealtimeVoiceProvider,
   listRealtimeVoiceProviders,
   resolveConfiguredRealtimeVoiceProvider,
-} from "openclaw/plugin-sdk/realtime-voice";
+} from "steelengine/plugin-sdk/realtime-voice";

@@ -2,12 +2,12 @@
 import {
   getCachedLiveProviderModelRows,
   LiveModelCatalogHttpError,
-} from "openclaw/plugin-sdk/provider-catalog-live-runtime";
-import { buildManifestModelProviderConfig } from "openclaw/plugin-sdk/provider-catalog-shared";
-import type { ModelDefinitionConfig } from "openclaw/plugin-sdk/provider-model-shared";
-import { createSubsystemLogger, retryAsync } from "openclaw/plugin-sdk/runtime-env";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
-import manifest from "./openclaw.plugin.json" with { type: "json" };
+} from "steelengine/plugin-sdk/provider-catalog-live-runtime";
+import { buildManifestModelProviderConfig } from "steelengine/plugin-sdk/provider-catalog-shared";
+import type { ModelDefinitionConfig } from "steelengine/plugin-sdk/provider-model-shared";
+import { createSubsystemLogger, retryAsync } from "steelengine/plugin-sdk/runtime-env";
+import { normalizeLowercaseStringOrEmpty } from "steelengine/plugin-sdk/string-coerce-runtime";
+import manifest from "./steelengine.plugin.json" with { type: "json" };
 
 const log = createSubsystemLogger("venice-models");
 

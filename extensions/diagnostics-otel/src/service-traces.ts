@@ -5,7 +5,7 @@ import {
   type SpanKind,
   type Tracer,
 } from "@opentelemetry/api";
-import { waitForDiagnosticEventsDrained } from "openclaw/plugin-sdk/diagnostic-runtime";
+import { waitForDiagnosticEventsDrained } from "steelengine/plugin-sdk/diagnostic-runtime";
 import type {
   DiagnosticEventMetadata,
   DiagnosticEventPayload,
@@ -365,16 +365,16 @@ export function createDiagnosticsTraceRuntime(tracer: Tracer) {
     },
   ) => {
     if (evt.provider) {
-      spanAttrs["openclaw.provider"] = evt.provider;
+      spanAttrs["steelengine.provider"] = evt.provider;
     }
     if (evt.model) {
-      spanAttrs["openclaw.model"] = evt.model;
+      spanAttrs["steelengine.model"] = evt.model;
     }
     if (evt.channel) {
-      spanAttrs["openclaw.channel"] = evt.channel;
+      spanAttrs["steelengine.channel"] = evt.channel;
     }
     if (evt.trigger) {
-      spanAttrs["openclaw.trigger"] = evt.trigger;
+      spanAttrs["steelengine.trigger"] = evt.trigger;
     }
   };
 
@@ -385,8 +385,8 @@ export function createDiagnosticsTraceRuntime(tracer: Tracer) {
       return {};
     }
     return {
-      "openclaw.tool.params.kind": summary.kind,
-      ...("length" in summary ? { "openclaw.tool.params.length": summary.length } : {}),
+      "steelengine.tool.params.kind": summary.kind,
+      ...("length" in summary ? { "steelengine.tool.params.length": summary.length } : {}),
     };
   };
   return {

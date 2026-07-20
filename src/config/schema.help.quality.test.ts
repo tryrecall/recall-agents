@@ -1,6 +1,6 @@
 // Checks config help text quality and coverage.
 
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { describe, expect, it } from "vitest";
 import { FIELD_HELP } from "./schema.help.js";
 import {
@@ -242,14 +242,14 @@ describe("config help copy quality", () => {
       'FIELD_HELP["session.writeLock.staleMs"] test invariant',
     );
     expect(stale.includes("1800000")).toBe(true);
-    expect(stale.includes("OPENCLAW_SESSION_WRITE_LOCK_STALE_MS")).toBe(true);
+    expect(stale.includes("STEELENGINE_SESSION_WRITE_LOCK_STALE_MS")).toBe(true);
 
     const maxHold = expectDefined(
       FIELD_HELP["session.writeLock.maxHoldMs"],
       'FIELD_HELP["session.writeLock.maxHoldMs"] test invariant',
     );
     expect(maxHold.includes("300000")).toBe(true);
-    expect(maxHold.includes("OPENCLAW_SESSION_WRITE_LOCK_MAX_HOLD_MS")).toBe(true);
+    expect(maxHold.includes("STEELENGINE_SESSION_WRITE_LOCK_MAX_HOLD_MS")).toBe(true);
   });
 
   it("documents session maintenance duration/size examples and deprecations", () => {

@@ -3,15 +3,15 @@
  *
  * Classifies provider routes so transports know which attribution headers, payload features, and endpoint policies apply.
  */
-import { normalizeProviderId } from "@openclaw/model-catalog-core/provider-id";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
+import { normalizeProviderId } from "@steelengine/model-catalog-core/provider-id";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
-import { normalizeTrimmedStringList } from "@openclaw/normalization-core/string-normalization";
-import { listOpenClawPluginManifestMetadata } from "../plugins/manifest-metadata-scan.js";
+} from "@steelengine/normalization-core/string-coerce";
+import { normalizeTrimmedStringList } from "@steelengine/normalization-core/string-normalization";
+import { listSteelEnginePluginManifestMetadata } from "../plugins/manifest-metadata-scan.js";
 import { listOfficialExternalProviderEndpointManifests } from "../plugins/official-external-provider-endpoints.js";
 import { asBoolean } from "../utils/boolean.js";
 import type { RuntimeVersionEnv } from "../version.js";
@@ -143,8 +143,8 @@ function readCompatBoolean(
   return asBoolean((compat as Record<string, unknown>)[key]);
 }
 
-const OPENCLAW_ATTRIBUTION_PRODUCT = "OpenClaw";
-const OPENCLAW_ATTRIBUTION_ORIGINATOR = "openclaw";
+const STEELENGINE_ATTRIBUTION_PRODUCT = "SteelEngine";
+const STEELENGINE_ATTRIBUTION_ORIGINATOR = "steelengine";
 const OPENROUTER_ATTRIBUTION_CATEGORIES =
   "cli-agent,cloud-agent,programming-app,creative-writing,writing-assistant,general-chat,personal-agent";
 
@@ -195,8 +195,8 @@ type ManifestProviderRequestCacheEntry = {
 let manifestProviderEndpointCache: ManifestProviderEndpointCacheEntry[] | null = null;
 let manifestProviderRequestCache: Map<string, ManifestProviderRequestCacheEntry> | null = null;
 
-function formatOpenClawUserAgent(version: string): string {
-  return `${OPENCLAW_ATTRIBUTION_ORIGINATOR}/${version}`;
+function formatSteelEngineUserAgent(version: string): string {
+  return `${STEELENGINE_ATTRIBUTION_ORIGINATOR}/${version}`;
 }
 
 function tryParseHostname(value: string): string | undefined {
@@ -333,7 +333,7 @@ function readManifestProviderRequests(
 
 function collectManifestProviderEndpoints(): ManifestProviderEndpointCacheEntry[] {
   const entries: ManifestProviderEndpointCacheEntry[] = [];
-  for (const { manifest } of listOpenClawPluginManifestMetadata()) {
+  for (const { manifest } of listSteelEnginePluginManifestMetadata()) {
     entries.push(...readManifestProviderEndpoints(manifest));
   }
   // Externalized official provider plugins are excluded from dist builds, so
@@ -349,7 +349,7 @@ function collectManifestProviderEndpoints(): ManifestProviderEndpointCacheEntry[
 
 function collectManifestProviderRequests(): Map<string, ManifestProviderRequestCacheEntry> {
   const entries = new Map<string, ManifestProviderRequestCacheEntry>();
-  for (const { manifest } of listOpenClawPluginManifestMetadata()) {
+  for (const { manifest } of listSteelEnginePluginManifestMetadata()) {
     for (const [provider, request] of readManifestProviderRequests(manifest)) {
       entries.set(provider, request);
     }
@@ -481,7 +481,7 @@ function resolveProviderAttributionIdentity(
   env: RuntimeVersionEnv = process.env as RuntimeVersionEnv,
 ): ProviderAttributionIdentity {
   return {
-    product: OPENCLAW_ATTRIBUTION_PRODUCT,
+    product: STEELENGINE_ATTRIBUTION_PRODUCT,
     version: resolveRuntimeServiceVersion(env),
   };
 }
@@ -496,10 +496,10 @@ function buildOpenRouterAttributionPolicy(
     verification: "vendor-documented",
     hook: "request-headers",
     docsUrl: "https://openrouter.ai/docs/app-attribution",
-    reviewNote: "Documented app attribution headers. Verified in OpenClaw runtime wrapper.",
+    reviewNote: "Documented app attribution headers. Verified in SteelEngine runtime wrapper.",
     ...identity,
     headers: {
-      "HTTP-Referer": "https://openclaw.ai",
+      "HTTP-Referer": "https://steelengine.ai",
       "X-OpenRouter-Title": identity.product,
       "X-OpenRouter-Categories": OPENROUTER_ATTRIBUTION_CATEGORIES,
     },
@@ -518,7 +518,7 @@ function buildNvidiaAttributionPolicy(
       "NVIDIA NIM billing invoke-origin attribution header. Applied only on verified NVIDIA routes.",
     ...resolveProviderAttributionIdentity(env),
     headers: {
-      "X-BILLING-INVOKE-ORIGIN": OPENCLAW_ATTRIBUTION_PRODUCT,
+      "X-BILLING-INVOKE-ORIGIN": STEELENGINE_ATTRIBUTION_PRODUCT,
     },
   };
 }
@@ -537,7 +537,7 @@ function buildGoogleAttributionPolicy(
       "Gemini API partner integration guidance requires x-goog-api-client on partner and library traffic.",
     ...identity,
     headers: {
-      "x-goog-api-client": `${OPENCLAW_ATTRIBUTION_ORIGINATOR}/${identity.version}`,
+      "x-goog-api-client": `${STEELENGINE_ATTRIBUTION_ORIGINATOR}/${identity.version}`,
     },
   };
 }
@@ -555,9 +555,9 @@ function buildOpenAIAttributionPolicy(
       "OpenAI native traffic supports hidden originator/User-Agent attribution. Verified against the Codex wire contract.",
     ...identity,
     headers: {
-      originator: OPENCLAW_ATTRIBUTION_ORIGINATOR,
+      originator: STEELENGINE_ATTRIBUTION_ORIGINATOR,
       version: identity.version,
-      "User-Agent": formatOpenClawUserAgent(identity.version),
+      "User-Agent": formatSteelEngineUserAgent(identity.version),
     },
   };
 }
@@ -572,12 +572,12 @@ function buildXaiAttributionPolicy(
     verification: "vendor-hidden-api-spec",
     hook: "request-headers",
     reviewNote:
-      "xAI api.x.ai accepts a standard openclaw User-Agent. Companion originator/version headers mirror the OpenAI attribution shape for consistency; they are not validated against an xAI-specific spec and are expected to be ignored by xAI's OpenAI-compatible surface.",
+      "xAI api.x.ai accepts a standard steelengine User-Agent. Companion originator/version headers mirror the OpenAI attribution shape for consistency; they are not validated against an xAI-specific spec and are expected to be ignored by xAI's OpenAI-compatible surface.",
     ...identity,
     headers: {
-      originator: OPENCLAW_ATTRIBUTION_ORIGINATOR,
+      originator: STEELENGINE_ATTRIBUTION_ORIGINATOR,
       version: identity.version,
-      "User-Agent": formatOpenClawUserAgent(identity.version),
+      "User-Agent": formatSteelEngineUserAgent(identity.version),
     },
   };
 }

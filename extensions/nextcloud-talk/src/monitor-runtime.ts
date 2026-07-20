@@ -1,8 +1,8 @@
 // Nextcloud Talk plugin module implements monitor runtime behavior.
 import os from "node:os";
-import { resolveLoggerBackedRuntime } from "openclaw/plugin-sdk/extension-shared";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { resolveLoggerBackedRuntime } from "steelengine/plugin-sdk/extension-shared";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime";
+import { normalizeLowercaseStringOrEmpty } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { resolveNextcloudTalkAccount } from "./accounts.js";
 import { handleNextcloudTalkInbound } from "./inbound.js";
 import {

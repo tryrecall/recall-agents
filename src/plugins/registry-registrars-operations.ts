@@ -2,11 +2,11 @@ import path from "node:path";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import {
   normalizeStringEntries,
   normalizeUniqueStringEntries,
-} from "@openclaw/normalization-core/string-normalization";
+} from "@steelengine/normalization-core/string-normalization";
 import {
   normalizeCommandDescriptorName,
   sanitizeCommandDescriptorDescription,
@@ -25,15 +25,15 @@ import { pluginCommands } from "./command-registry-state.js";
 import type { PluginRegistryState } from "./registry-state.js";
 import type { PluginRecord } from "./registry-types.js";
 import type {
-  OpenClawGatewayDiscoveryService,
-  OpenClawPluginCliCommandDescriptor,
-  OpenClawPluginCliRegistrar,
-  OpenClawPluginCommandDefinition,
-  OpenClawPluginNodeHostCommand,
-  OpenClawPluginNodeInvokePolicy,
-  OpenClawPluginReloadRegistration,
-  OpenClawPluginSecurityAuditCollector,
-  OpenClawPluginService,
+  SteelEngineGatewayDiscoveryService,
+  SteelEnginePluginCliCommandDescriptor,
+  SteelEnginePluginCliRegistrar,
+  SteelEnginePluginCommandDefinition,
+  SteelEnginePluginNodeHostCommand,
+  SteelEnginePluginNodeInvokePolicy,
+  SteelEnginePluginReloadRegistration,
+  SteelEnginePluginSecurityAuditCollector,
+  SteelEnginePluginService,
 } from "./types.js";
 
 function isOfficialCodexPluginRecord(
@@ -42,14 +42,14 @@ function isOfficialCodexPluginRecord(
   if (record.id !== "codex" || record.origin !== "global") {
     return false;
   }
-  if (record.packageName === "@openclaw/codex") {
+  if (record.packageName === "@steelengine/codex") {
     return true;
   }
   const sourcePath = path
     .normalize(record.rootDir ?? record.source)
     .split(path.sep)
     .join("/");
-  return sourcePath.includes("/node_modules/@openclaw/codex");
+  return sourcePath.includes("/node_modules/@steelengine/codex");
 }
 
 function canClaimReservedCommandOwnership(
@@ -63,11 +63,11 @@ export function createOperationRegistrars(state: PluginRegistryState) {
 
   const registerCli = (
     record: PluginRecord,
-    registrar: OpenClawPluginCliRegistrar,
+    registrar: SteelEnginePluginCliRegistrar,
     opts?: {
       parentPath?: string[];
       commands?: string[];
-      descriptors?: OpenClawPluginCliCommandDescriptor[];
+      descriptors?: SteelEnginePluginCliCommandDescriptor[];
     },
   ) => {
     const normalizeCommandRoot = (raw: string, source: "command" | "descriptor") => {
@@ -98,7 +98,7 @@ export function createOperationRegistrars(state: PluginRegistryState) {
           : null;
       })
       .filter(
-        (descriptor): descriptor is OpenClawPluginCliCommandDescriptor => descriptor !== null,
+        (descriptor): descriptor is SteelEnginePluginCliCommandDescriptor => descriptor !== null,
       );
     const commands = [
       ...(opts?.commands ?? []),
@@ -149,8 +149,8 @@ export function createOperationRegistrars(state: PluginRegistryState) {
     });
   };
 
-  const registerReload = (record: PluginRecord, registration: OpenClawPluginReloadRegistration) => {
-    const normalized: OpenClawPluginReloadRegistration = {
+  const registerReload = (record: PluginRecord, registration: SteelEnginePluginReloadRegistration) => {
+    const normalized: SteelEnginePluginReloadRegistration = {
       restartPrefixes: normalizeStringEntries(registration.restartPrefixes),
       hotPrefixes: normalizeStringEntries(registration.hotPrefixes),
       noopPrefixes: normalizeStringEntries(registration.noopPrefixes),
@@ -185,7 +185,7 @@ export function createOperationRegistrars(state: PluginRegistryState) {
 
   const registerNodeHostCommand = (
     record: PluginRecord,
-    nodeCommand: OpenClawPluginNodeHostCommand,
+    nodeCommand: SteelEnginePluginNodeHostCommand,
   ) => {
     const command = nodeCommand.command.trim();
     if (!command) {
@@ -231,7 +231,7 @@ export function createOperationRegistrars(state: PluginRegistryState) {
 
   const registerNodeInvokePolicy = (
     record: PluginRecord,
-    policy: OpenClawPluginNodeInvokePolicy,
+    policy: SteelEnginePluginNodeInvokePolicy,
     pluginConfig?: Record<string, unknown>,
   ) => {
     const commands = normalizeUniqueStringEntries(
@@ -281,7 +281,7 @@ export function createOperationRegistrars(state: PluginRegistryState) {
 
   const registerSecurityAuditCollector = (
     record: PluginRecord,
-    collector: OpenClawPluginSecurityAuditCollector,
+    collector: SteelEnginePluginSecurityAuditCollector,
   ) => {
     registry.securityAuditCollectors.push({
       pluginId: record.id,
@@ -292,7 +292,7 @@ export function createOperationRegistrars(state: PluginRegistryState) {
     });
   };
 
-  const registerService = (record: PluginRecord, service: OpenClawPluginService) => {
+  const registerService = (record: PluginRecord, service: SteelEnginePluginService) => {
     const id = service.id.trim();
     if (!id) {
       return;
@@ -325,7 +325,7 @@ export function createOperationRegistrars(state: PluginRegistryState) {
 
   const registerGatewayDiscoveryService = (
     record: PluginRecord,
-    service: OpenClawGatewayDiscoveryService,
+    service: SteelEngineGatewayDiscoveryService,
   ) => {
     const id = service.id.trim();
     if (!id) {
@@ -354,7 +354,7 @@ export function createOperationRegistrars(state: PluginRegistryState) {
     });
   };
 
-  const registerCommand = (record: PluginRecord, command: OpenClawPluginCommandDefinition) => {
+  const registerCommand = (record: PluginRecord, command: SteelEnginePluginCommandDefinition) => {
     const name = command.name.trim();
     if (!name) {
       pushDiagnostic({

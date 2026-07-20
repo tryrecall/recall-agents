@@ -1,16 +1,16 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { upsertSessionEntry } from "openclaw/plugin-sdk/session-store-runtime";
-import type { SessionEntry } from "openclaw/plugin-sdk/session-store-runtime";
-import { closeOpenClawAgentDatabasesForTest } from "openclaw/plugin-sdk/sqlite-runtime-testing";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { upsertSessionEntry } from "steelengine/plugin-sdk/session-store-runtime";
+import type { SessionEntry } from "steelengine/plugin-sdk/session-store-runtime";
+import { closeSteelEngineAgentDatabasesForTest } from "steelengine/plugin-sdk/sqlite-runtime-testing";
 import { afterEach, describe, expect, it } from "vitest";
 import { telegramApprovalCapability } from "./approval-native.js";
 
 function buildConfig(
-  overrides?: Partial<NonNullable<NonNullable<OpenClawConfig["channels"]>["telegram"]>>,
-): OpenClawConfig {
+  overrides?: Partial<NonNullable<NonNullable<SteelEngineConfig["channels"]>["telegram"]>>,
+): SteelEngineConfig {
   return {
     channels: {
       telegram: {
@@ -23,20 +23,20 @@ function buildConfig(
         ...overrides,
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 const tempDirs: string[] = [];
 
 afterEach(() => {
-  closeOpenClawAgentDatabasesForTest();
+  closeSteelEngineAgentDatabasesForTest();
   for (const dir of tempDirs.splice(0)) {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
 
 function createTempStorePath(): string {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-telegram-approval-native-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-telegram-approval-native-"));
   tempDirs.push(dir);
   return path.join(dir, "sessions.json");
 }

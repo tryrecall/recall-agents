@@ -2,7 +2,7 @@
  * Detects, resolves, and loads prompt image references for model input.
  */
 import path from "node:path";
-import { normalizeLowercaseStringOrEmpty } from "@openclaw/normalization-core/string-coerce";
+import { normalizeLowercaseStringOrEmpty } from "@steelengine/normalization-core/string-coerce";
 import { formatErrorMessage } from "../../../infra/errors.js";
 import { assertNoWindowsNetworkPath, safeFileURLToPath } from "../../../infra/local-file-access.js";
 import type { ImageContent } from "../../../llm/types.js";
@@ -104,14 +104,14 @@ function normalizeRefForDedupe(raw: string): string {
   return process.platform === "win32" ? normalizeLowercaseStringOrEmpty(raw) : raw;
 }
 
-function isOpenClawCliImageCachePath(filePath: string): boolean {
+function isSteelEngineCliImageCachePath(filePath: string): boolean {
   const parts = filePath.replaceAll("\\", "/").split("/");
   return parts.some((part, index) => {
-    if (part === ".openclaw-cli-images") {
+    if (part === ".steelengine-cli-images") {
       return true;
     }
     const parent = parts[index - 1] ?? "";
-    return part === "openclaw-cli-images" && /^openclaw(?:-\d+)?$/.test(parent);
+    return part === "steelengine-cli-images" && /^steelengine(?:-\d+)?$/.test(parent);
   });
 }
 
@@ -358,7 +358,7 @@ export function detectImageReferences(prompt: string): DetectedImageRef[] {
       return;
     }
     const resolved = trimmed.startsWith("~") ? resolveUserPath(trimmed) : trimmed;
-    if (isOpenClawCliImageCachePath(resolved)) {
+    if (isSteelEngineCliImageCachePath(resolved)) {
       return;
     }
     seen.add(dedupeKey);
@@ -430,7 +430,7 @@ export function detectImageReferences(prompt: string): DetectedImageRef[] {
     // Use fileURLToPath for proper handling (e.g., file://localhost/path)
     try {
       const resolved = safeFileURLToPath(raw);
-      if (isOpenClawCliImageCachePath(resolved)) {
+      if (isSteelEngineCliImageCachePath(resolved)) {
         continue;
       }
       seen.add(dedupeKey);

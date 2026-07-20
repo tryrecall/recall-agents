@@ -13,7 +13,7 @@ import type { ModelCatalogSnapshot } from "../../agents/model-catalog.types.js";
 import type { ModelCatalogEntry } from "../../agents/model-catalog.types.js";
 import type { CliDeps } from "../../cli/deps.types.js";
 import type { HealthSummary } from "../../commands/health.types.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type {
   PluginApprovalRequest,
   PluginApprovalRequestPayload,
@@ -96,7 +96,7 @@ export type RespondFn = (
   meta?: Record<string, unknown>,
 ) => void;
 
-/** Minimal hosted OpenClaw contract retained by the gateway request router. */
+/** Minimal hosted SteelEngine contract retained by the gateway request router. */
 type GatewaySystemAgentSession = {
   engine: {
     handle: (message: string) => Promise<{
@@ -124,7 +124,7 @@ export type GatewayRequestContext = {
   deps: CliDeps;
   cron: GatewayCronServiceContract;
   cronStorePath: string;
-  getRuntimeConfig: () => OpenClawConfig;
+  getRuntimeConfig: () => SteelEngineConfig;
   notifyPluginMetadataChanged: () => void;
   getMcpAppSandboxPort?: () => number | undefined;
   resolveTerminalLaunchPolicy: (agentId?: string) => TerminalLaunchResolution;
@@ -185,7 +185,7 @@ export type GatewayRequestContext = {
   ) => void;
   hasConnectedClientsForDevice?: (deviceId: string) => boolean;
   disconnectClientsUsingSharedGatewayAuth?: () => void;
-  enforceSharedGatewayAuthGenerationForConfigWrite?: (nextConfig: OpenClawConfig) => void;
+  enforceSharedGatewayAuthGenerationForConfigWrite?: (nextConfig: SteelEngineConfig) => void;
   nodeRegistry: NodeRegistry;
   /** Durable cloud-worker lifecycle; absent from lightweight in-process contexts. */
   workerEnvironmentService?: WorkerEnvironmentServiceContract;

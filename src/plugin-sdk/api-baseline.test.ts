@@ -28,13 +28,13 @@ describe("Plugin SDK API baseline", () => {
   });
 
   it("normalizes dependency source paths to stable node_modules paths", () => {
-    const repoRoot = path.join(path.sep, "workspace", "openclaw-worktree");
+    const repoRoot = path.join(path.sep, "workspace", "steelengine-worktree");
     const linkedDependencyPath = path.join(
       path.sep,
       "workspace",
-      "openclaw",
+      "steelengine",
       "node_modules",
-      "@openclaw",
+      "@steelengine",
       "fs-safe",
       "dist",
       "secret-file.d.ts",
@@ -43,9 +43,9 @@ describe("Plugin SDK API baseline", () => {
       repoRoot,
       "node_modules",
       ".pnpm",
-      "@openclaw+fs-safe@1.0.0",
+      "@steelengine+fs-safe@1.0.0",
       "node_modules",
-      "@openclaw",
+      "@steelengine",
       "fs-safe",
       "dist",
       "secret-file.d.ts",
@@ -60,7 +60,7 @@ describe("Plugin SDK API baseline", () => {
   });
 
   it("keeps repo source paths relative when a parent directory is named node_modules", () => {
-    const repoRoot = path.join(path.sep, "workspace", "node_modules", "openclaw");
+    const repoRoot = path.join(path.sep, "workspace", "node_modules", "steelengine");
     const sourcePath = path.join(repoRoot, "src", "plugin-sdk", "core.ts");
 
     expect(normalizePluginSdkApiSourcePath(repoRoot, sourcePath)).toBe("src/plugin-sdk/core.ts");
@@ -90,7 +90,7 @@ describe("Plugin SDK API baseline", () => {
     expect(rendered.baseline.modules.find((entry) => entry.entrypoint === "infra-runtime")).toEqual(
       expect.objectContaining({
         category: null,
-        importSpecifier: "openclaw/plugin-sdk/infra-runtime",
+        importSpecifier: "steelengine/plugin-sdk/infra-runtime",
       }),
     );
     expect(findDeclaration("OAuthProviderInterface")).toContain("readonly id: OAuthProviderId;");
@@ -110,7 +110,7 @@ describe("Plugin SDK API baseline", () => {
     expect(findDeclaration("createWebSearchProviderContractFields")).not.toContain(
       "createBaseWebSearchProviderContractFields",
     );
-    expect(findDeclaration("OPENCLAW_VERSION")).toContain("export const OPENCLAW_VERSION:");
+    expect(findDeclaration("STEELENGINE_VERSION")).toContain("export const STEELENGINE_VERSION:");
     expect(findDeclaration("SqliteTrajectoryRuntimeEventForTest")).toContain(
       "export type SqliteTrajectoryRuntimeEventForTest =",
     );
@@ -142,7 +142,7 @@ describe("Plugin SDK API baseline", () => {
           source: { path: `src/plugin-sdk/${entrypoint}.ts` },
         },
       ],
-      importSpecifier: `openclaw/plugin-sdk/${entrypoint}`,
+      importSpecifier: `steelengine/plugin-sdk/${entrypoint}`,
       source: { path: `src/plugin-sdk/${entrypoint}.ts` },
     });
     const render = (declaration: string): PluginSdkApiBaselineRender => ({

@@ -1,9 +1,9 @@
 // Gateway exec approval manager.
 // Tracks pending operator decisions and short-lived resolved approval records.
 import { randomUUID } from "node:crypto";
-import { expectDefined } from "@openclaw/normalization-core";
-import { resolveExpiresAtMsFromDurationMs } from "@openclaw/normalization-core/number-coercion";
-import { normalizeLowercaseStringOrEmpty } from "@openclaw/normalization-core/string-coerce";
+import { expectDefined } from "@steelengine/normalization-core";
+import { resolveExpiresAtMsFromDurationMs } from "@steelengine/normalization-core/number-coercion";
+import { normalizeLowercaseStringOrEmpty } from "@steelengine/normalization-core/string-coerce";
 import { buildApprovalPresentation } from "../infra/approval-presentation.js";
 import { buildApprovalResolutionRef } from "../infra/approval-resolution-ref.js";
 import type {
@@ -11,7 +11,7 @@ import type {
   ExecApprovalRequestPayload as InfraExecApprovalRequestPayload,
 } from "../infra/exec-approvals.js";
 import { resolveTimerTimeoutMs } from "../shared/number-coercion.js";
-import type { OpenClawStateDatabaseOptions } from "../state/openclaw-state-db.js";
+import type { SteelEngineStateDatabaseOptions } from "../state/steelengine-state-db.js";
 import {
   consumeOperatorApprovalAllowOnce,
   forceDenyOperatorApproval,
@@ -85,7 +85,7 @@ export type ExecApprovalRecord<TPayload = ExecApprovalRequestPayload> = {
 
 type OperatorApprovalPersistenceRuntime = {
   runtimeEpoch: string;
-  databaseOptions?: OpenClawStateDatabaseOptions;
+  databaseOptions?: SteelEngineStateDatabaseOptions;
 };
 
 type ExecApprovalManagerOptions<TPayload> = {

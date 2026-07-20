@@ -1,7 +1,7 @@
 // Discord tests cover reply delivery plugin behavior.
-import { expectDefined } from "@openclaw/normalization-core";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import { expectDefined } from "@steelengine/normalization-core";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { RequestClient } from "../internal/discord.js";
 
@@ -14,9 +14,9 @@ const sendDurableMessageBatchMock = vi.hoisted(() =>
 const sendMessageDiscordMock = vi.hoisted(() => vi.fn());
 const sendVoiceMessageDiscordMock = vi.hoisted(() => vi.fn());
 
-vi.mock("openclaw/plugin-sdk/channel-outbound", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/channel-outbound")>(
-    "openclaw/plugin-sdk/channel-outbound",
+vi.mock("steelengine/plugin-sdk/channel-outbound", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/channel-outbound")>(
+    "steelengine/plugin-sdk/channel-outbound",
   );
   return {
     ...actual,
@@ -36,7 +36,7 @@ vi.mock("../send.js", async () => {
 let deliverDiscordReply: typeof import("./reply-delivery.js").deliverDiscordReply;
 
 type DeliverParams = Record<string, unknown> & {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   formatting?: unknown;
   deps?: Record<string, (...args: unknown[]) => Promise<unknown>>;
 };
@@ -84,7 +84,7 @@ describe("deliverDiscordReply", () => {
   const runtime = {} as RuntimeEnv;
   const cfg = {
     channels: { discord: { token: "test-token" } },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 
   beforeAll(async () => {
     ({ deliverDiscordReply } = await import("./reply-delivery.js"));
@@ -231,7 +231,7 @@ describe("deliverDiscordReply", () => {
           text: [
             "📊 Session Status: current",
             "🛠️ run git status",
-            "⚠️ 🛠️ `run openclaw definitely-not-a-real-subcommand (agent)` failed",
+            "⚠️ 🛠️ `run steelengine definitely-not-a-real-subcommand (agent)` failed",
             "🛠️ `gh pr view`",
             "🛠️ `docker compose up`",
             "🛠️ elevated · `cd /tmp && pnpm test`",
@@ -257,7 +257,7 @@ describe("deliverDiscordReply", () => {
     await deliverDiscordReply({
       replies: [
         {
-          text: "⚠️ 🛠️ `run openclaw definitely-not-a-real-subcommand (agent)` failed",
+          text: "⚠️ 🛠️ `run steelengine definitely-not-a-real-subcommand (agent)` failed",
           isError: true,
         },
       ],
@@ -280,7 +280,7 @@ describe("deliverDiscordReply", () => {
           text: [
             "[tool:exec]",
             "<parameter=command>",
-            'cat /proc/mounts 2>/dev/null | grep -i "libra|rav|openclaw" | head -20',
+            'cat /proc/mounts 2>/dev/null | grep -i "libra|rav|steelengine" | head -20',
             "</parameter>",
             "",
             "<function=exec>",
@@ -452,7 +452,7 @@ describe("deliverDiscordReply", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     await deliverDiscordReply({
       replies: [{ text: "formatted" }],
@@ -494,7 +494,7 @@ describe("deliverDiscordReply", () => {
       cfg,
       textLimit: 2000,
       replyToMode: "off",
-      mediaLocalRoots: ["/tmp/openclaw-media"],
+      mediaLocalRoots: ["/tmp/steelengine-media"],
       kind: "final",
     });
 
@@ -502,7 +502,7 @@ describe("deliverDiscordReply", () => {
     expect(params.payloads).toEqual(replies);
     expect(params.replyToId).toBeUndefined();
     expect(params.replyToMode).toBe("off");
-    expect(params.mediaAccess).toEqual({ localRoots: ["/tmp/openclaw-media"] });
+    expect(params.mediaAccess).toEqual({ localRoots: ["/tmp/steelengine-media"] });
   });
 
   it("bridges Discord voice sends through the outbound dependency bag", async () => {

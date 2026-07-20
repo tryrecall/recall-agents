@@ -1,10 +1,10 @@
 // Canvas tests cover index plugin behavior.
 import type {
   AnyAgentTool,
-  OpenClawPluginApi,
-  OpenClawPluginNodeInvokePolicyContext,
-} from "openclaw/plugin-sdk/plugin-entry";
-import { createTestPluginApi } from "openclaw/plugin-sdk/plugin-test-api";
+  SteelEnginePluginApi,
+  SteelEnginePluginNodeInvokePolicyContext,
+} from "steelengine/plugin-sdk/plugin-entry";
+import { createTestPluginApi } from "steelengine/plugin-sdk/plugin-test-api";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import canvasPlugin from "./index.js";
 import { SHOW_WIDGET_REQUIRED_CLIENT_CAPS } from "./src/tool-schema.js";
@@ -79,18 +79,18 @@ vi.mock("./src/widget-tool.js", () => ({
 }));
 
 function registerCanvas() {
-  const routes: Array<Parameters<OpenClawPluginApi["registerHttpRoute"]>[0]> = [];
-  const services: Array<Parameters<OpenClawPluginApi["registerService"]>[0]> = [];
-  const resolvers: Array<Parameters<OpenClawPluginApi["registerHostedMediaResolver"]>[0]> = [];
+  const routes: Array<Parameters<SteelEnginePluginApi["registerHttpRoute"]>[0]> = [];
+  const services: Array<Parameters<SteelEnginePluginApi["registerService"]>[0]> = [];
+  const resolvers: Array<Parameters<SteelEnginePluginApi["registerHostedMediaResolver"]>[0]> = [];
   const tools: Array<{
-    tool: Parameters<OpenClawPluginApi["registerTool"]>[0];
-    opts: Parameters<OpenClawPluginApi["registerTool"]>[1];
+    tool: Parameters<SteelEnginePluginApi["registerTool"]>[0];
+    opts: Parameters<SteelEnginePluginApi["registerTool"]>[1];
   }> = [];
   const cliFeatures: Array<{
-    registrar: Parameters<OpenClawPluginApi["registerNodeCliFeature"]>[0];
-    opts: Parameters<OpenClawPluginApi["registerNodeCliFeature"]>[1];
+    registrar: Parameters<SteelEnginePluginApi["registerNodeCliFeature"]>[0];
+    opts: Parameters<SteelEnginePluginApi["registerNodeCliFeature"]>[1];
   }> = [];
-  const nodeInvokePolicies: Array<Parameters<OpenClawPluginApi["registerNodeInvokePolicy"]>[0]> =
+  const nodeInvokePolicies: Array<Parameters<SteelEnginePluginApi["registerNodeInvokePolicy"]>[0]> =
     [];
   canvasPlugin.register?.(
     createTestPluginApi({
@@ -109,8 +109,8 @@ function registerCanvas() {
 }
 
 function createNodeInvokeContext(
-  params: Partial<OpenClawPluginNodeInvokePolicyContext>,
-): OpenClawPluginNodeInvokePolicyContext {
+  params: Partial<SteelEnginePluginNodeInvokePolicyContext>,
+): SteelEnginePluginNodeInvokePolicyContext {
   return {
     nodeId: "node-1",
     command: "canvas.a2ui.pushJSONL",
@@ -149,7 +149,7 @@ describe("Canvas plugin entry", () => {
     await services[0]?.stop?.({} as never);
     expect(mocks.createCanvasHttpRouteHandler).not.toHaveBeenCalled();
 
-    await routes[0]?.handler({ url: "/__openclaw__/canvas" } as never, {} as never);
+    await routes[0]?.handler({ url: "/__steelengine__/canvas" } as never, {} as never);
     expect(mocks.createCanvasHttpRouteHandler).toHaveBeenCalledTimes(1);
     expect(mocks.httpHandler.handleHttpRequest).toHaveBeenCalledTimes(1);
 
@@ -169,7 +169,7 @@ describe("Canvas plugin entry", () => {
     expect(mocks.createCanvasTool).not.toHaveBeenCalled();
     expect(mocks.createShowWidgetTool).not.toHaveBeenCalled();
 
-    await expect(resolvers[0]?.("/__openclaw__/canvas/documents/id/index.html")).resolves.toBe(
+    await expect(resolvers[0]?.("/__steelengine__/canvas/documents/id/index.html")).resolves.toBe(
       "/tmp/canvas-asset",
     );
     expect(mocks.resolveCanvasHttpPathToLocalPath).toHaveBeenCalledTimes(1);

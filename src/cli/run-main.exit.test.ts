@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { CommanderError } from "commander";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { GATEWAY_SERVICE_RUNTIME_PID_ENV } from "../daemon/constants.js";
@@ -139,8 +139,8 @@ const maybeRunCliInContainerMock = vi.hoisted(() =>
   >((argv: string[]) => ({ handled: false, argv })),
 );
 const serviceEnvSnapshot = captureEnv([
-  "OPENCLAW_SERVICE_MARKER",
-  "OPENCLAW_SERVICE_KIND",
+  "STEELENGINE_SERVICE_MARKER",
+  "STEELENGINE_SERVICE_KIND",
   GATEWAY_SERVICE_RUNTIME_PID_ENV,
 ]);
 
@@ -242,7 +242,7 @@ vi.mock("../utils.js", async (importOriginal) => ({
 }));
 
 vi.mock("../infra/path-env.js", () => ({
-  ensureOpenClawCliOnPath: ensurePathMock,
+  ensureSteelEngineCliOnPath: ensurePathMock,
 }));
 
 vi.mock("../infra/runtime-guard.js", () => ({
@@ -401,13 +401,13 @@ describe("runCli exit behavior", () => {
   });
 
   beforeEach(() => {
-    delete process.env.OPENCLAW_SERVICE_MARKER;
-    delete process.env.OPENCLAW_SERVICE_KIND;
+    delete process.env.STEELENGINE_SERVICE_MARKER;
+    delete process.env.STEELENGINE_SERVICE_KIND;
     // Sibling CLI suites run `gateway run --token/--password`, which exports
     // credentials into process.env; leaked values change gateway preflight
     // auth in shared vitest workers.
-    delete process.env.OPENCLAW_GATEWAY_TOKEN;
-    delete process.env.OPENCLAW_GATEWAY_PASSWORD;
+    delete process.env.STEELENGINE_GATEWAY_TOKEN;
+    delete process.env.STEELENGINE_GATEWAY_PASSWORD;
     delete process.env[GATEWAY_SERVICE_RUNTIME_PID_ENV];
     vi.clearAllMocks();
     readConfigFileSnapshotMock.mockResolvedValue({
@@ -446,8 +446,8 @@ describe("runCli exit behavior", () => {
     resolveManifestCommandAliasOwnerMock.mockReturnValue(undefined);
     resolveManifestToolOwnerMock.mockReturnValue(undefined);
     resolveManifestCliCommandSurfaceOwnerMock.mockReturnValue(undefined);
-    delete process.env.OPENCLAW_DISABLE_CLI_STARTUP_HELP_FAST_PATH;
-    delete process.env.OPENCLAW_HIDE_BANNER;
+    delete process.env.STEELENGINE_DISABLE_CLI_STARTUP_HELP_FAST_PATH;
+    delete process.env.STEELENGINE_HIDE_BANNER;
     loggingState.forceConsoleToStderr = false;
   });
 
@@ -457,10 +457,10 @@ describe("runCli exit behavior", () => {
       throw new Error(`unexpected process.exit(${String(code)})`);
     }) as typeof process.exit);
 
-    await runCli(["node", "openclaw", "status"]);
+    await runCli(["node", "steelengine", "status"]);
 
-    expect(maybeRunCliInContainerMock).toHaveBeenCalledWith(["node", "openclaw", "status"]);
-    expect(tryRouteCliMock).toHaveBeenCalledWith(["node", "openclaw", "status"]);
+    expect(maybeRunCliInContainerMock).toHaveBeenCalledWith(["node", "steelengine", "status"]);
+    expect(tryRouteCliMock).toHaveBeenCalledWith(["node", "steelengine", "status"]);
     expect(closeActiveMemorySearchManagersMock).not.toHaveBeenCalled();
     expect(disposeRegisteredAgentHarnessesMock).not.toHaveBeenCalled();
     expect(ensureTaskRegistryReadyMock).not.toHaveBeenCalled();
@@ -478,9 +478,9 @@ describe("runCli exit behavior", () => {
       parseAsync,
     });
 
-    await runCli(["node", "openclaw", "agent", "--local"]);
+    await runCli(["node", "steelengine", "agent", "--local"]);
 
-    expect(parseAsync).toHaveBeenCalledWith(["node", "openclaw", "agent", "--local"]);
+    expect(parseAsync).toHaveBeenCalledWith(["node", "steelengine", "agent", "--local"]);
     expect(disposeRegisteredAgentHarnessesMock).toHaveBeenCalledTimes(1);
   });
 
@@ -499,7 +499,7 @@ describe("runCli exit behavior", () => {
     });
     tryRouteCliMock.mockResolvedValueOnce(true);
 
-    await runCli(["node", "openclaw", "models", "status", "--probe"]);
+    await runCli(["node", "steelengine", "models", "status", "--probe"]);
 
     expect(order).toEqual(["harnesses", "memory", "exit"]);
   });
@@ -512,10 +512,10 @@ describe("runCli exit behavior", () => {
       parseAsync,
     });
 
-    await runCli(["node", "openclaw", "config"]);
+    await runCli(["node", "steelengine", "config"]);
 
     expect(createCliProgressMock).toHaveBeenCalledWith({
-      label: "Loading OpenClaw CLI…",
+      label: "Loading SteelEngine CLI…",
       indeterminate: true,
       delayMs: 0,
     });
@@ -530,17 +530,17 @@ describe("runCli exit behavior", () => {
       parseAsync,
     });
 
-    await runCli(["node", "openclaw", "sessions", "--json", "--limit", "all"]);
+    await runCli(["node", "steelengine", "sessions", "--json", "--limit", "all"]);
 
     expect(createCliProgressMock).toHaveBeenCalledWith({
-      label: "Loading OpenClaw CLI…",
+      label: "Loading SteelEngine CLI…",
       indeterminate: true,
       delayMs: 0,
       enabled: false,
     });
     expect(parseAsync).toHaveBeenCalledWith([
       "node",
-      "openclaw",
+      "steelengine",
       "sessions",
       "--json",
       "--limit",
@@ -561,9 +561,9 @@ describe("runCli exit behavior", () => {
     const pauseSpy = vi.spyOn(process.stdin, "pause").mockImplementation(() => process.stdin);
 
     try {
-      await runCli(["node", "openclaw", "channels"]);
+      await runCli(["node", "steelengine", "channels"]);
 
-      expect(parseAsync).toHaveBeenCalledWith(["node", "openclaw", "channels"]);
+      expect(parseAsync).toHaveBeenCalledWith(["node", "steelengine", "channels"]);
       expect(pauseSpy).toHaveBeenCalledTimes(1);
     } finally {
       pauseSpy.mockRestore();
@@ -576,23 +576,23 @@ describe("runCli exit behavior", () => {
   });
 
   it("emits the startup banner before gateway foreground fast-path startup", async () => {
-    await runCli(["node", "openclaw", "gateway", "--force"]);
+    await runCli(["node", "steelengine", "gateway", "--force"]);
 
     expect(tryRouteCliMock).not.toHaveBeenCalled();
     expect(emitCliBannerMock).toHaveBeenCalledWith("9.9.9-test", {
-      argv: ["node", "openclaw", "gateway", "--force"],
+      argv: ["node", "steelengine", "gateway", "--force"],
     });
     expect(addGatewayRunCommandMock).toHaveBeenCalledTimes(2);
     expect(commanderParseAsyncMock).toHaveBeenCalledWith([
       "node",
-      "openclaw",
+      "steelengine",
       "gateway",
       "--force",
     ]);
   });
 
   it("installs console capture before parsing the gateway foreground fast path", async () => {
-    await runCli(["node", "openclaw", "gateway", "--force"]);
+    await runCli(["node", "steelengine", "gateway", "--force"]);
 
     expect(enableConsoleCaptureMock).toHaveBeenCalledTimes(1);
     expect(commanderParseAsyncMock).toHaveBeenCalledTimes(1);
@@ -603,7 +603,7 @@ describe("runCli exit behavior", () => {
   });
 
   it("configures the gateway foreground fast path with the standard CLI bootstrap", async () => {
-    await runCli(["node", "openclaw", "gateway", "--force"]);
+    await runCli(["node", "steelengine", "gateway", "--force"]);
 
     expect(readConfigFileSnapshotMock.mock.calls).toEqual([[{ isolateEnv: true, observe: false }]]);
     const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
@@ -633,7 +633,7 @@ describe("runCli exit behavior", () => {
     readConfigFileSnapshotMock.mockResolvedValue({
       exists: true,
       hash: "guarded",
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       raw: "{}",
       valid: true,
       sourceConfig: {
@@ -641,7 +641,7 @@ describe("runCli exit behavior", () => {
         gateway: { mode: "local" },
       },
     });
-    await runCli(["node", "openclaw", "gateway"]);
+    await runCli(["node", "steelengine", "gateway"]);
     const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
       | { beforeRun?: (opts: { reset?: boolean }) => Promise<void> }
       | undefined;
@@ -654,7 +654,7 @@ describe("runCli exit behavior", () => {
     readConfigFileSnapshotMock.mockResolvedValue({
       exists: true,
       hash: "guarded",
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       raw: "{}",
       valid: true,
       sourceConfig: {
@@ -683,12 +683,12 @@ describe("runCli exit behavior", () => {
     readConfigFileSnapshotMock.mockResolvedValue({
       exists: true,
       hash: "guarded",
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       raw: "{}",
       valid: true,
       sourceConfig: { gateway: { mode: "local" } },
     });
-    await runCli(["node", "openclaw", "gateway"]);
+    await runCli(["node", "steelengine", "gateway"]);
     const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
       | { beforeRun?: (opts: { reset?: boolean }) => Promise<void> }
       | undefined;
@@ -702,19 +702,19 @@ describe("runCli exit behavior", () => {
     try {
       await withEnvAsync(
         {
-          OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: "1",
-          OPENCLAW_SERVICE_MARKER: undefined,
+          STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: "1",
+          STEELENGINE_SERVICE_MARKER: undefined,
         },
         async () => {
           await expect(
             beforeStateMigrations?.({
               exists: true,
               hash: "future",
-              path: "/tmp/openclaw.json",
+              path: "/tmp/steelengine.json",
               raw: "{}",
               valid: true,
               sourceConfig: {
-                env: { vars: { OPENCLAW_SERVICE_MARKER: "gateway" } },
+                env: { vars: { STEELENGINE_SERVICE_MARKER: "gateway" } },
                 meta: { lastTouchedVersion: "9999.1.1" },
               },
             }),
@@ -722,7 +722,7 @@ describe("runCli exit behavior", () => {
           expect(errorSpy).toHaveBeenCalledWith(
             expect.stringContaining("start the gateway service"),
           );
-          expect(process.env.OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
+          expect(process.env.STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
           expect(exitSpy).not.toHaveBeenCalled();
         },
       );
@@ -779,24 +779,24 @@ describe("runCli exit behavior", () => {
       valid: true,
       sourceConfig: { meta: { lastTouchedVersion: "9999.1.1" } },
     });
-    const previousMarker = process.env.OPENCLAW_SERVICE_MARKER;
-    const previousOverride = process.env.OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS;
+    const previousMarker = process.env.STEELENGINE_SERVICE_MARKER;
+    const previousOverride = process.env.STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS;
     if (params.marker) {
-      process.env.OPENCLAW_SERVICE_MARKER = params.marker;
+      process.env.STEELENGINE_SERVICE_MARKER = params.marker;
     } else {
-      delete process.env.OPENCLAW_SERVICE_MARKER;
+      delete process.env.STEELENGINE_SERVICE_MARKER;
     }
     if (params.override) {
-      process.env.OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS = params.override;
+      process.env.STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS = params.override;
     } else {
-      delete process.env.OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS;
+      delete process.env.STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS;
     }
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const exitSpy = vi.spyOn(process, "exit").mockImplementation(((code?: number) => {
       throw new Error(`exit:${String(code)}`);
     }) as typeof process.exit);
     try {
-      await expect(runCli(["node", "openclaw", "gateway", ...params.flags])).rejects.toThrow(
+      await expect(runCli(["node", "steelengine", "gateway", ...params.flags])).rejects.toThrow(
         `exit:${params.expectedExitCode}`,
       );
       expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining(params.expectedAction));
@@ -805,20 +805,20 @@ describe("runCli exit behavior", () => {
         [{ isolateEnv: true, observe: false }],
       ]);
       if (params.marker) {
-        expect(process.env.OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
+        expect(process.env.STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
       }
     } finally {
       exitSpy.mockRestore();
       errorSpy.mockRestore();
       if (previousMarker === undefined) {
-        delete process.env.OPENCLAW_SERVICE_MARKER;
+        delete process.env.STEELENGINE_SERVICE_MARKER;
       } else {
-        process.env.OPENCLAW_SERVICE_MARKER = previousMarker;
+        process.env.STEELENGINE_SERVICE_MARKER = previousMarker;
       }
       if (previousOverride === undefined) {
-        delete process.env.OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS;
+        delete process.env.STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS;
       } else {
-        process.env.OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS = previousOverride;
+        process.env.STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS = previousOverride;
       }
     }
   });
@@ -828,7 +828,7 @@ describe("runCli exit behavior", () => {
       exists: true,
       valid: true,
       sourceConfig: {
-        env: { vars: { OPENCLAW_SERVICE_MARKER: "gateway" } },
+        env: { vars: { STEELENGINE_SERVICE_MARKER: "gateway" } },
         meta: { lastTouchedVersion: "9999.1.1" },
       },
     });
@@ -839,13 +839,13 @@ describe("runCli exit behavior", () => {
     try {
       await withEnvAsync(
         {
-          OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: "1",
-          OPENCLAW_SERVICE_MARKER: undefined,
+          STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: "1",
+          STEELENGINE_SERVICE_MARKER: undefined,
         },
         async () => {
-          await expect(runCli(["node", "openclaw", "gateway"])).rejects.toThrow("exit:78");
-          expect(process.env.OPENCLAW_SERVICE_MARKER).toBeUndefined();
-          expect(process.env.OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
+          await expect(runCli(["node", "steelengine", "gateway"])).rejects.toThrow("exit:78");
+          expect(process.env.STEELENGINE_SERVICE_MARKER).toBeUndefined();
+          expect(process.env.STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
           expect(ensureCliExecutionBootstrapMock).not.toHaveBeenCalled();
         },
       );
@@ -860,35 +860,35 @@ describe("runCli exit behavior", () => {
       exists: true,
       valid: false,
       sourceConfig: {
-        env: { vars: { OPENCLAW_SERVICE_MARKER: "gateway" } },
+        env: { vars: { STEELENGINE_SERVICE_MARKER: "gateway" } },
         meta: { lastTouchedVersion: "9999.1.1" },
       },
     });
 
     await withEnvAsync(
       {
-        OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: "1",
-        OPENCLAW_SERVICE_MARKER: undefined,
+        STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: "1",
+        STEELENGINE_SERVICE_MARKER: undefined,
       },
       async () => {
-        await runCli(["node", "openclaw", "gateway"]);
+        await runCli(["node", "steelengine", "gateway"]);
 
-        expect(process.env.OPENCLAW_SERVICE_MARKER).toBeUndefined();
-        expect(process.env.OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBe("1");
+        expect(process.env.STEELENGINE_SERVICE_MARKER).toBeUndefined();
+        expect(process.env.STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBe("1");
       },
     );
   });
 
   it("guards the config selected by trusted global dotenv before the default config", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-gateway-global-selection-"));
-    const stateDir = path.join(homeDir, ".openclaw");
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-gateway-global-selection-"));
+    const stateDir = path.join(homeDir, ".steelengine");
     const selectedConfigPath = path.join(stateDir, "selected.json");
     await fs.mkdir(stateDir, { recursive: true });
     await fs.writeFile(
       path.join(stateDir, ".env"),
       [
-        `OPENCLAW_CONFIG_PATH=${selectedConfigPath}`,
-        "OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS=1",
+        `STEELENGINE_CONFIG_PATH=${selectedConfigPath}`,
+        "STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS=1",
         "",
       ].join("\n"),
     );
@@ -896,14 +896,14 @@ describe("runCli exit behavior", () => {
       await withEnvAsync(
         {
           HOME: homeDir,
-          OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: undefined,
-          OPENCLAW_CONFIG_PATH: undefined,
-          OPENCLAW_HOME: homeDir,
-          OPENCLAW_STATE_DIR: undefined,
+          STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: undefined,
+          STEELENGINE_CONFIG_PATH: undefined,
+          STEELENGINE_HOME: homeDir,
+          STEELENGINE_STATE_DIR: undefined,
         },
         async () => {
           readConfigFileSnapshotMock.mockImplementation(async () =>
-            process.env.OPENCLAW_CONFIG_PATH === selectedConfigPath
+            process.env.STEELENGINE_CONFIG_PATH === selectedConfigPath
               ? {
                   exists: true,
                   valid: true,
@@ -916,10 +916,10 @@ describe("runCli exit behavior", () => {
                 },
           );
 
-          await runCli(["node", "openclaw", "gateway"]);
+          await runCli(["node", "steelengine", "gateway"]);
 
-          expect(process.env.OPENCLAW_CONFIG_PATH).toBe(selectedConfigPath);
-          expect(process.env.OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
+          expect(process.env.STEELENGINE_CONFIG_PATH).toBe(selectedConfigPath);
+          expect(process.env.STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
           expect(readConfigFileSnapshotMock).toHaveBeenCalledOnce();
         },
       );
@@ -929,18 +929,18 @@ describe("runCli exit behavior", () => {
   });
 
   it("loads state dotenv before a custom config-root fallback", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-gateway-config-env-"));
-    const stateDir = path.join(homeDir, ".openclaw");
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-gateway-config-env-"));
+    const stateDir = path.join(homeDir, ".steelengine");
     const configDir = path.join(homeDir, "profile");
-    const configPath = path.join(configDir, "openclaw.json");
+    const configPath = path.join(configDir, "steelengine.json");
     await fs.mkdir(stateDir, { recursive: true });
     await fs.mkdir(configDir, { recursive: true });
-    await fs.writeFile(path.join(stateDir, ".env"), "OPENCLAW_GATEWAY_TOKEN=state-token\n");
+    await fs.writeFile(path.join(stateDir, ".env"), "STEELENGINE_GATEWAY_TOKEN=state-token\n");
     await fs.writeFile(
       path.join(configDir, ".env"),
       [
-        "OPENCLAW_GATEWAY_PASSWORD=config-root-password",
-        "OPENCLAW_GATEWAY_TOKEN=config-root-token",
+        "STEELENGINE_GATEWAY_PASSWORD=config-root-password",
+        "STEELENGINE_GATEWAY_TOKEN=config-root-token",
         "",
       ].join("\n"),
     );
@@ -948,17 +948,17 @@ describe("runCli exit behavior", () => {
       await withEnvAsync(
         {
           HOME: homeDir,
-          OPENCLAW_CONFIG_PATH: configPath,
-          OPENCLAW_GATEWAY_PASSWORD: undefined,
-          OPENCLAW_GATEWAY_TOKEN: undefined,
-          OPENCLAW_HOME: homeDir,
-          OPENCLAW_STATE_DIR: undefined,
+          STEELENGINE_CONFIG_PATH: configPath,
+          STEELENGINE_GATEWAY_PASSWORD: undefined,
+          STEELENGINE_GATEWAY_TOKEN: undefined,
+          STEELENGINE_HOME: homeDir,
+          STEELENGINE_STATE_DIR: undefined,
         },
         async () => {
-          await runCli(["node", "openclaw", "gateway"]);
+          await runCli(["node", "steelengine", "gateway"]);
 
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("state-token");
-          expect(process.env.OPENCLAW_GATEWAY_PASSWORD).toBe("config-root-password");
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("state-token");
+          expect(process.env.STEELENGINE_GATEWAY_PASSWORD).toBe("config-root-password");
         },
       );
     } finally {
@@ -967,32 +967,32 @@ describe("runCli exit behavior", () => {
   });
 
   it("loads and repins a legacy state dotenv after automatic state migration", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-gateway-legacy-env-"));
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-gateway-legacy-env-"));
     const legacyStateDir = path.join(homeDir, ".clawdbot");
-    const newStateDir = path.join(homeDir, ".openclaw");
+    const newStateDir = path.join(homeDir, ".steelengine");
     await fs.mkdir(legacyStateDir, { recursive: true });
-    await fs.writeFile(path.join(legacyStateDir, ".env"), "OPENCLAW_GATEWAY_TOKEN=legacy-token\n");
+    await fs.writeFile(path.join(legacyStateDir, ".env"), "STEELENGINE_GATEWAY_TOKEN=legacy-token\n");
     try {
       await withEnvAsync(
         {
           HOME: homeDir,
-          OPENCLAW_CONFIG_PATH: undefined,
-          OPENCLAW_GATEWAY_TOKEN: undefined,
-          OPENCLAW_HOME: homeDir,
-          OPENCLAW_STATE_DIR: undefined,
-          OPENCLAW_TEST_FAST: undefined,
+          STEELENGINE_CONFIG_PATH: undefined,
+          STEELENGINE_GATEWAY_TOKEN: undefined,
+          STEELENGINE_HOME: homeDir,
+          STEELENGINE_STATE_DIR: undefined,
+          STEELENGINE_TEST_FAST: undefined,
         },
         async () => {
           ensureCliExecutionBootstrapMock.mockImplementationOnce(async () => {
             await fs.rename(legacyStateDir, newStateDir);
           });
-          await runCli(["node", "openclaw", "gateway"]);
+          await runCli(["node", "steelengine", "gateway"]);
           const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
             | { beforeRun?: (opts: { reset?: boolean }) => Promise<void> }
             | undefined;
           await hooks?.beforeRun?.({});
 
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("legacy-token");
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("legacy-token");
           await expect(fs.access(path.join(newStateDir, ".env"))).resolves.toBeUndefined();
           const bootstrapOrder = ensureCliExecutionBootstrapMock.mock.invocationCallOrder[0] ?? 0;
           const finalPinOrder = pinRuntimePathsMock.mock.invocationCallOrder.at(-1) ?? 0;
@@ -1027,7 +1027,7 @@ describe("runCli exit behavior", () => {
       throw new Error(`exit:${String(code)}`);
     }) as typeof process.exit);
     try {
-      await runCli(["node", "openclaw", "gateway", "--dev", "--reset"]);
+      await runCli(["node", "steelengine", "gateway", "--dev", "--reset"]);
       const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
         | { beforeRun?: (opts: { reset?: boolean }) => Promise<void> }
         | undefined;
@@ -1065,7 +1065,7 @@ describe("runCli exit behavior", () => {
       throw new Error(`exit:${String(code)}`);
     }) as typeof process.exit);
     try {
-      await runCli(["node", "openclaw", "gateway"]);
+      await runCli(["node", "steelengine", "gateway"]);
       const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
         | { beforeRun?: (opts: { force?: boolean }) => Promise<void> }
         | undefined;
@@ -1090,7 +1090,7 @@ describe("runCli exit behavior", () => {
       if (options?.recoverSuspicious) {
         await options.allowSuspiciousRecovery?.(
           {
-            env: { vars: { OPENCLAW_SERVICE_MARKER: "gateway" } },
+            env: { vars: { STEELENGINE_SERVICE_MARKER: "gateway" } },
             gateway: { mode: "local" },
             meta: { lastTouchedVersion: "9999.1.1" },
           },
@@ -1106,11 +1106,11 @@ describe("runCli exit behavior", () => {
     try {
       await withEnvAsync(
         {
-          OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: "1",
-          OPENCLAW_SERVICE_MARKER: undefined,
+          STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: "1",
+          STEELENGINE_SERVICE_MARKER: undefined,
         },
         async () => {
-          await runCli(["node", "openclaw", "gateway"]);
+          await runCli(["node", "steelengine", "gateway"]);
           const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
             | { beforeRun?: (opts: { force?: boolean }) => Promise<void> }
             | undefined;
@@ -1126,30 +1126,30 @@ describe("runCli exit behavior", () => {
   });
 
   it("re-guards config env path selection until the gateway config is stable", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-gateway-selection-"));
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-gateway-selection-"));
     try {
       await withEnvAsync(
         {
           HOME: homeDir,
-          OPENCLAW_CONFIG_PATH: undefined,
-          OPENCLAW_HOME: homeDir,
-          OPENCLAW_STATE_DIR: undefined,
+          STEELENGINE_CONFIG_PATH: undefined,
+          STEELENGINE_HOME: homeDir,
+          STEELENGINE_STATE_DIR: undefined,
         },
         async () => {
           readConfigFileSnapshotMock.mockImplementation(async () => {
-            if (process.env.OPENCLAW_CONFIG_PATH === "/tmp/openclaw-chain-c.json") {
+            if (process.env.STEELENGINE_CONFIG_PATH === "/tmp/steelengine-chain-c.json") {
               return {
                 exists: true,
                 valid: true,
                 sourceConfig: { meta: { lastTouchedVersion: "9999.1.1" } },
               };
             }
-            if (process.env.OPENCLAW_STATE_DIR === "/tmp/openclaw-chain-b") {
+            if (process.env.STEELENGINE_STATE_DIR === "/tmp/steelengine-chain-b") {
               return {
                 exists: true,
                 valid: true,
                 sourceConfig: {
-                  env: { vars: { OPENCLAW_CONFIG_PATH: "/tmp/openclaw-chain-c.json" } },
+                  env: { vars: { STEELENGINE_CONFIG_PATH: "/tmp/steelengine-chain-c.json" } },
                   gateway: { mode: "local" },
                 },
               };
@@ -1158,7 +1158,7 @@ describe("runCli exit behavior", () => {
               exists: true,
               valid: true,
               sourceConfig: {
-                env: { vars: { OPENCLAW_STATE_DIR: "/tmp/openclaw-chain-b" } },
+                env: { vars: { STEELENGINE_STATE_DIR: "/tmp/steelengine-chain-b" } },
                 gateway: { mode: "local" },
               },
             };
@@ -1168,7 +1168,7 @@ describe("runCli exit behavior", () => {
             throw new Error(`exit:${String(code)}`);
           }) as typeof process.exit);
           try {
-            await expect(runCli(["node", "openclaw", "gateway"])).rejects.toThrow("exit:1");
+            await expect(runCli(["node", "steelengine", "gateway"])).rejects.toThrow("exit:1");
             expect(errorSpy).toHaveBeenCalledWith(
               expect.stringContaining("run automatic gateway startup migrations"),
             );
@@ -1214,7 +1214,7 @@ describe("runCli exit behavior", () => {
         throw new Error(`exit:${String(code)}`);
       }) as typeof process.exit);
       try {
-        await expect(runCli(["node", "openclaw", "gateway"])).rejects.toThrow("exit:1");
+        await expect(runCli(["node", "steelengine", "gateway"])).rejects.toThrow("exit:1");
         expect(errorSpy).toHaveBeenCalledWith(
           expect.stringContaining("run automatic gateway startup migrations"),
         );
@@ -1229,18 +1229,18 @@ describe("runCli exit behavior", () => {
   it("drops credentials from configs superseded during state selection", async () => {
     await withEnvAsync(
       {
-        OPENCLAW_GATEWAY_TOKEN: undefined,
-        OPENCLAW_HOME: undefined,
-        OPENCLAW_STATE_DIR: undefined,
+        STEELENGINE_GATEWAY_TOKEN: undefined,
+        STEELENGINE_HOME: undefined,
+        STEELENGINE_STATE_DIR: undefined,
       },
       async () => {
         readConfigFileSnapshotMock.mockImplementation(async () =>
-          process.env.OPENCLAW_STATE_DIR === "/tmp/openclaw-selected-state"
+          process.env.STEELENGINE_STATE_DIR === "/tmp/steelengine-selected-state"
             ? {
                 exists: true,
                 valid: true,
                 sourceConfig: {
-                  env: { vars: { OPENCLAW_GATEWAY_TOKEN: "selected-token" } },
+                  env: { vars: { STEELENGINE_GATEWAY_TOKEN: "selected-token" } },
                   gateway: { mode: "local" },
                 },
               }
@@ -1250,50 +1250,50 @@ describe("runCli exit behavior", () => {
                 sourceConfig: {
                   env: {
                     vars: {
-                      OPENCLAW_GATEWAY_TOKEN: "superseded-token",
-                      OPENCLAW_STATE_DIR: "/tmp/openclaw-selected-state",
+                      STEELENGINE_GATEWAY_TOKEN: "superseded-token",
+                      STEELENGINE_STATE_DIR: "/tmp/steelengine-selected-state",
                     },
                   },
                   gateway: { mode: "local" },
                 },
               },
         );
-        await runCli(["node", "openclaw", "gateway"]);
+        await runCli(["node", "steelengine", "gateway"]);
 
         const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
           | { beforeRun?: (opts: { force?: boolean }) => Promise<void> }
           | undefined;
         await hooks?.beforeRun?.({});
 
-        expect(process.env.OPENCLAW_STATE_DIR).toBe("/tmp/openclaw-selected-state");
-        expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("selected-token");
+        expect(process.env.STEELENGINE_STATE_DIR).toBe("/tmp/steelengine-selected-state");
+        expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("selected-token");
         expect(ensureCliExecutionBootstrapMock).toHaveBeenCalledOnce();
       },
     );
   });
 
   it("re-guards config selection from a newly selected state dotenv", async () => {
-    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-gateway-dotenv-"));
+    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-gateway-dotenv-"));
     const futureConfigPath = path.join(stateDir, "future.json");
     await fs.writeFile(
       path.join(stateDir, ".env"),
       [
-        `OPENCLAW_CONFIG_PATH=${futureConfigPath}`,
-        "OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS=1",
+        `STEELENGINE_CONFIG_PATH=${futureConfigPath}`,
+        "STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS=1",
         "",
       ].join("\n"),
     );
     try {
       await withEnvAsync(
         {
-          OPENCLAW_CONFIG_PATH: undefined,
-          OPENCLAW_HOME: undefined,
-          OPENCLAW_STATE_DIR: undefined,
-          OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: undefined,
+          STEELENGINE_CONFIG_PATH: undefined,
+          STEELENGINE_HOME: undefined,
+          STEELENGINE_STATE_DIR: undefined,
+          STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: undefined,
         },
         async () => {
           readConfigFileSnapshotMock.mockImplementation(async () => {
-            if (process.env.OPENCLAW_CONFIG_PATH === futureConfigPath) {
+            if (process.env.STEELENGINE_CONFIG_PATH === futureConfigPath) {
               return {
                 exists: true,
                 valid: true,
@@ -1304,7 +1304,7 @@ describe("runCli exit behavior", () => {
               exists: true,
               valid: true,
               sourceConfig: {
-                env: { vars: { OPENCLAW_STATE_DIR: stateDir } },
+                env: { vars: { STEELENGINE_STATE_DIR: stateDir } },
                 gateway: { mode: "local" },
               },
             };
@@ -1314,13 +1314,13 @@ describe("runCli exit behavior", () => {
             throw new Error(`exit:${String(code)}`);
           }) as typeof process.exit);
           try {
-            await expect(runCli(["node", "openclaw", "gateway"])).rejects.toThrow("exit:1");
+            await expect(runCli(["node", "steelengine", "gateway"])).rejects.toThrow("exit:1");
             expect(errorSpy).toHaveBeenCalledWith(
               expect.stringContaining("run automatic gateway startup migrations"),
             );
             expect(ensureCliExecutionBootstrapMock).not.toHaveBeenCalled();
             expect(readConfigFileSnapshotMock).toHaveBeenCalledTimes(2);
-            expect(process.env.OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
+            expect(process.env.STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
           } finally {
             exitSpy.mockRestore();
             errorSpy.mockRestore();
@@ -1333,8 +1333,8 @@ describe("runCli exit behavior", () => {
   });
 
   it("re-inspects recovery after recovery changes config selection", async () => {
-    await withEnvAsync({ OPENCLAW_CONFIG_PATH: undefined }, async () => {
-      const selectedConfigPath = "/tmp/openclaw-recovered-selection.json";
+    await withEnvAsync({ STEELENGINE_CONFIG_PATH: undefined }, async () => {
+      const selectedConfigPath = "/tmp/steelengine-recovered-selection.json";
       const currentSnapshot = {
         exists: true,
         valid: true,
@@ -1351,7 +1351,7 @@ describe("runCli exit behavior", () => {
             exists: true,
             valid: true,
             sourceConfig: {
-              env: { vars: { OPENCLAW_CONFIG_PATH: selectedConfigPath } },
+              env: { vars: { STEELENGINE_CONFIG_PATH: selectedConfigPath } },
               gateway: { mode: "local" },
             },
           };
@@ -1375,7 +1375,7 @@ describe("runCli exit behavior", () => {
         throw new Error(`exit:${String(code)}`);
       }) as typeof process.exit);
       try {
-        await runCli(["node", "openclaw", "gateway"]);
+        await runCli(["node", "steelengine", "gateway"]);
         const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
           | { beforeRun?: (opts: { force?: boolean }) => Promise<void> }
           | undefined;
@@ -1394,31 +1394,31 @@ describe("runCli exit behavior", () => {
 
   it("discards env from a config replaced by suspicious recovery", async () => {
     await withEnvAsync(
-      { OPENCLAW_GATEWAY_TOKEN: undefined, OPENCLAW_PROXY_ACTIVE: undefined },
+      { STEELENGINE_GATEWAY_TOKEN: undefined, STEELENGINE_PROXY_ACTIVE: undefined },
       async () => {
         const clobberedSnapshot = {
           exists: true,
           valid: true,
           sourceConfig: {
-            env: { vars: { OPENCLAW_GATEWAY_TOKEN: "discarded-token" } },
+            env: { vars: { STEELENGINE_GATEWAY_TOKEN: "discarded-token" } },
             gateway: { mode: "local" },
           },
           hash: "clobbered",
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
         };
         const recoveredSnapshot = {
           exists: true,
           valid: true,
           sourceConfig: { gateway: { mode: "local" } },
           hash: "recovered",
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
         };
         const initialSnapshot = {
           exists: true,
           valid: true,
           sourceConfig: { gateway: { mode: "local" } },
           hash: "initial",
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
         };
         let currentSnapshot = initialSnapshot;
         let recovered = false;
@@ -1433,40 +1433,40 @@ describe("runCli exit behavior", () => {
           );
           return recoveredSnapshot;
         });
-        await runCli(["node", "openclaw", "gateway"]);
+        await runCli(["node", "steelengine", "gateway"]);
 
         currentSnapshot = clobberedSnapshot;
-        process.env.OPENCLAW_PROXY_ACTIVE = "1";
+        process.env.STEELENGINE_PROXY_ACTIVE = "1";
         const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
           | { beforeRun?: (opts: { force?: boolean }) => Promise<void> }
           | undefined;
         await hooks?.beforeRun?.({});
 
-        expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBeUndefined();
-        expect(process.env.OPENCLAW_PROXY_ACTIVE).toBe("1");
+        expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBeUndefined();
+        expect(process.env.STEELENGINE_PROXY_ACTIVE).toBe("1");
         expect(ensureCliExecutionBootstrapMock).toHaveBeenCalledOnce();
       },
     );
   });
 
   it("does not apply environment variables from invalid config snapshots", async () => {
-    await withEnvAsync({ OPENCLAW_INCLUDE_ROOTS: undefined }, async () => {
+    await withEnvAsync({ STEELENGINE_INCLUDE_ROOTS: undefined }, async () => {
       readConfigFileSnapshotMock.mockResolvedValue({
         exists: true,
         valid: false,
         sourceConfig: {
-          env: { vars: { OPENCLAW_INCLUDE_ROOTS: "/tmp/openclaw-includes" } },
+          env: { vars: { STEELENGINE_INCLUDE_ROOTS: "/tmp/steelengine-includes" } },
           gateway: { mode: "local" },
         },
       });
 
-      await runCli(["node", "openclaw", "gateway"]);
+      await runCli(["node", "steelengine", "gateway"]);
       const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
         | { beforeRun?: (opts: { force?: boolean }) => Promise<void> }
         | undefined;
       await hooks?.beforeRun?.({});
 
-      expect(process.env.OPENCLAW_INCLUDE_ROOTS).toBeUndefined();
+      expect(process.env.STEELENGINE_INCLUDE_ROOTS).toBeUndefined();
       expect(readConfigFileSnapshotMock.mock.calls).toEqual([
         [{ isolateEnv: true, observe: false }],
         [{ isolateEnv: true, observe: false }],
@@ -1476,18 +1476,18 @@ describe("runCli exit behavior", () => {
   });
 
   it("loads selected state dotenv before config env and environment normalization", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-gateway-selected-env-"));
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-gateway-selected-env-"));
     const stateDir = path.join(homeDir, "state");
     await fs.mkdir(stateDir, { recursive: true });
-    await fs.writeFile(path.join(stateDir, ".env"), "OPENCLAW_GATEWAY_TOKEN=state-token\n");
+    await fs.writeFile(path.join(stateDir, ".env"), "STEELENGINE_GATEWAY_TOKEN=state-token\n");
     try {
       await withEnvAsync(
         {
           HOME: homeDir,
-          OPENCLAW_CONFIG_PATH: undefined,
-          OPENCLAW_GATEWAY_TOKEN: undefined,
-          OPENCLAW_HOME: homeDir,
-          OPENCLAW_STATE_DIR: undefined,
+          STEELENGINE_CONFIG_PATH: undefined,
+          STEELENGINE_GATEWAY_TOKEN: undefined,
+          STEELENGINE_HOME: homeDir,
+          STEELENGINE_STATE_DIR: undefined,
         },
         async () => {
           readConfigFileSnapshotMock.mockResolvedValue({
@@ -1496,8 +1496,8 @@ describe("runCli exit behavior", () => {
             sourceConfig: {
               env: {
                 vars: {
-                  OPENCLAW_GATEWAY_TOKEN: "config-token",
-                  OPENCLAW_STATE_DIR: stateDir,
+                  STEELENGINE_GATEWAY_TOKEN: "config-token",
+                  STEELENGINE_STATE_DIR: stateDir,
                 },
               },
               gateway: { mode: "local" },
@@ -1505,12 +1505,12 @@ describe("runCli exit behavior", () => {
           });
           let tokenAtNormalize: string | undefined;
           normalizeEnvMock.mockImplementation(() => {
-            tokenAtNormalize = process.env.OPENCLAW_GATEWAY_TOKEN;
+            tokenAtNormalize = process.env.STEELENGINE_GATEWAY_TOKEN;
           });
 
-          await runCli(["node", "openclaw", "gateway"]);
+          await runCli(["node", "steelengine", "gateway"]);
 
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("state-token");
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("state-token");
           expect(tokenAtNormalize).toBe("state-token");
         },
       );
@@ -1520,36 +1520,36 @@ describe("runCli exit behavior", () => {
   });
 
   it("drops credentials from a trusted dotenv superseded by state selection", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-gateway-dotenv-hop-"));
-    const defaultStateDir = path.join(homeDir, ".openclaw");
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-gateway-dotenv-hop-"));
+    const defaultStateDir = path.join(homeDir, ".steelengine");
     const selectedStateDir = path.join(homeDir, "selected-state");
     await fs.mkdir(defaultStateDir, { recursive: true });
     await fs.mkdir(selectedStateDir, { recursive: true });
     await fs.writeFile(
       path.join(defaultStateDir, ".env"),
       [
-        `OPENCLAW_STATE_DIR=${selectedStateDir}`,
-        "OPENCLAW_GATEWAY_TOKEN=superseded-token",
+        `STEELENGINE_STATE_DIR=${selectedStateDir}`,
+        "STEELENGINE_GATEWAY_TOKEN=superseded-token",
         "",
       ].join("\n"),
     );
     await fs.writeFile(
       path.join(selectedStateDir, ".env"),
-      "OPENCLAW_GATEWAY_TOKEN=selected-token\n",
+      "STEELENGINE_GATEWAY_TOKEN=selected-token\n",
     );
     try {
       await withEnvAsync(
         {
           HOME: homeDir,
-          OPENCLAW_GATEWAY_TOKEN: undefined,
-          OPENCLAW_HOME: homeDir,
-          OPENCLAW_STATE_DIR: undefined,
+          STEELENGINE_GATEWAY_TOKEN: undefined,
+          STEELENGINE_HOME: homeDir,
+          STEELENGINE_STATE_DIR: undefined,
         },
         async () => {
-          await runCli(["node", "openclaw", "gateway"]);
+          await runCli(["node", "steelengine", "gateway"]);
 
-          expect(process.env.OPENCLAW_STATE_DIR).toBe(selectedStateDir);
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("selected-token");
+          expect(process.env.STEELENGINE_STATE_DIR).toBe(selectedStateDir);
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("selected-token");
         },
       );
     } finally {
@@ -1558,30 +1558,30 @@ describe("runCli exit behavior", () => {
   });
 
   it("drops gateway.env selectors when the default state dotenv selects a custom state", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-gateway-fallback-hop-"));
-    const defaultStateDir = path.join(homeDir, ".openclaw");
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-gateway-fallback-hop-"));
+    const defaultStateDir = path.join(homeDir, ".steelengine");
     const selectedStateDir = path.join(homeDir, "selected-state");
-    const gatewayEnvDir = path.join(homeDir, ".config", "openclaw");
+    const gatewayEnvDir = path.join(homeDir, ".config", "steelengine");
     await fs.mkdir(defaultStateDir, { recursive: true });
     await fs.mkdir(selectedStateDir, { recursive: true });
     await fs.mkdir(gatewayEnvDir, { recursive: true });
     await fs.writeFile(
       path.join(defaultStateDir, ".env"),
-      `OPENCLAW_STATE_DIR=${selectedStateDir}\n`,
+      `STEELENGINE_STATE_DIR=${selectedStateDir}\n`,
     );
     await fs.writeFile(
       path.join(gatewayEnvDir, "gateway.env"),
       [
-        "OPENCLAW_CONFIG_PATH=/tmp/wrong-openclaw.json",
-        "OPENCLAW_GATEWAY_TOKEN=fallback-token",
+        "STEELENGINE_CONFIG_PATH=/tmp/wrong-steelengine.json",
+        "STEELENGINE_GATEWAY_TOKEN=fallback-token",
         "",
       ].join("\n"),
     );
     await fs.writeFile(
       path.join(selectedStateDir, ".env"),
       [
-        "OPENCLAW_GATEWAY_TOKEN=selected-token",
-        "OPENCLAW_INCLUDE_ROOTS=/tmp/untrusted-include-root",
+        "STEELENGINE_GATEWAY_TOKEN=selected-token",
+        "STEELENGINE_INCLUDE_ROOTS=/tmp/untrusted-include-root",
         "NODE_OPTIONS=--require /tmp/untrusted.js",
         "",
       ].join("\n"),
@@ -1590,18 +1590,18 @@ describe("runCli exit behavior", () => {
       await withEnvAsync(
         {
           HOME: homeDir,
-          OPENCLAW_CONFIG_PATH: undefined,
-          OPENCLAW_GATEWAY_TOKEN: undefined,
-          OPENCLAW_HOME: homeDir,
-          OPENCLAW_STATE_DIR: undefined,
+          STEELENGINE_CONFIG_PATH: undefined,
+          STEELENGINE_GATEWAY_TOKEN: undefined,
+          STEELENGINE_HOME: homeDir,
+          STEELENGINE_STATE_DIR: undefined,
           NODE_OPTIONS: undefined,
         },
         async () => {
-          await runCli(["node", "openclaw", "gateway"]);
+          await runCli(["node", "steelengine", "gateway"]);
 
-          expect(process.env.OPENCLAW_STATE_DIR).toBe(selectedStateDir);
-          expect(process.env.OPENCLAW_CONFIG_PATH).toBeUndefined();
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("selected-token");
+          expect(process.env.STEELENGINE_STATE_DIR).toBe(selectedStateDir);
+          expect(process.env.STEELENGINE_CONFIG_PATH).toBeUndefined();
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("selected-token");
         },
       );
     } finally {
@@ -1610,37 +1610,37 @@ describe("runCli exit behavior", () => {
   });
 
   it("preserves gateway.env selectors when the compatibility fallback selects the target", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-gateway-fallback-select-"));
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-gateway-fallback-select-"));
     const selectedStateDir = path.join(homeDir, "selected-state");
-    const gatewayEnvDir = path.join(homeDir, ".config", "openclaw");
+    const gatewayEnvDir = path.join(homeDir, ".config", "steelengine");
     await fs.mkdir(selectedStateDir, { recursive: true });
     await fs.mkdir(gatewayEnvDir, { recursive: true });
     await fs.writeFile(
       path.join(gatewayEnvDir, "gateway.env"),
-      [`OPENCLAW_STATE_DIR=${selectedStateDir}`, "OPENCLAW_GATEWAY_TOKEN=fallback-token", ""].join(
+      [`STEELENGINE_STATE_DIR=${selectedStateDir}`, "STEELENGINE_GATEWAY_TOKEN=fallback-token", ""].join(
         "\n",
       ),
     );
     await fs.writeFile(
       path.join(selectedStateDir, ".env"),
-      "OPENCLAW_GATEWAY_TOKEN=selected-token\n",
+      "STEELENGINE_GATEWAY_TOKEN=selected-token\n",
     );
     try {
       await withEnvAsync(
         {
           HOME: homeDir,
-          OPENCLAW_GATEWAY_TOKEN: undefined,
-          OPENCLAW_HOME: homeDir,
-          OPENCLAW_INCLUDE_ROOTS: undefined,
-          OPENCLAW_STATE_DIR: undefined,
+          STEELENGINE_GATEWAY_TOKEN: undefined,
+          STEELENGINE_HOME: homeDir,
+          STEELENGINE_INCLUDE_ROOTS: undefined,
+          STEELENGINE_STATE_DIR: undefined,
           NODE_OPTIONS: undefined,
         },
         async () => {
-          await runCli(["node", "openclaw", "gateway"]);
+          await runCli(["node", "steelengine", "gateway"]);
 
-          expect(process.env.OPENCLAW_STATE_DIR).toBe(selectedStateDir);
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("selected-token");
-          expect(process.env.OPENCLAW_INCLUDE_ROOTS).toBeUndefined();
+          expect(process.env.STEELENGINE_STATE_DIR).toBe(selectedStateDir);
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("selected-token");
+          expect(process.env.STEELENGINE_INCLUDE_ROOTS).toBeUndefined();
           expect(process.env.NODE_OPTIONS).toBeUndefined();
         },
       );
@@ -1650,44 +1650,44 @@ describe("runCli exit behavior", () => {
   });
 
   it("drops old state dotenv credentials when config selects another state", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-gateway-config-state-hop-"));
-    const defaultStateDir = path.join(homeDir, ".openclaw");
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-gateway-config-state-hop-"));
+    const defaultStateDir = path.join(homeDir, ".steelengine");
     const selectedStateDir = path.join(homeDir, "selected-state");
     await fs.mkdir(defaultStateDir, { recursive: true });
     await fs.mkdir(selectedStateDir, { recursive: true });
     await fs.writeFile(
       path.join(defaultStateDir, ".env"),
-      "OPENCLAW_GATEWAY_TOKEN=superseded-token\n",
+      "STEELENGINE_GATEWAY_TOKEN=superseded-token\n",
     );
     await fs.writeFile(
       path.join(selectedStateDir, ".env"),
-      "OPENCLAW_GATEWAY_TOKEN=selected-token\n",
+      "STEELENGINE_GATEWAY_TOKEN=selected-token\n",
     );
     try {
       await withEnvAsync(
         {
           HOME: homeDir,
-          OPENCLAW_GATEWAY_TOKEN: undefined,
-          OPENCLAW_HOME: homeDir,
-          OPENCLAW_STATE_DIR: undefined,
+          STEELENGINE_GATEWAY_TOKEN: undefined,
+          STEELENGINE_HOME: homeDir,
+          STEELENGINE_STATE_DIR: undefined,
         },
         async () => {
           readConfigFileSnapshotMock.mockImplementation(async () => ({
             exists: true,
             valid: true,
             sourceConfig:
-              process.env.OPENCLAW_STATE_DIR === selectedStateDir
+              process.env.STEELENGINE_STATE_DIR === selectedStateDir
                 ? { gateway: { mode: "local" } }
                 : {
-                    env: { vars: { OPENCLAW_STATE_DIR: selectedStateDir } },
+                    env: { vars: { STEELENGINE_STATE_DIR: selectedStateDir } },
                     gateway: { mode: "local" },
                   },
           }));
 
-          await runCli(["node", "openclaw", "gateway"]);
+          await runCli(["node", "steelengine", "gateway"]);
 
-          expect(process.env.OPENCLAW_STATE_DIR).toBe(selectedStateDir);
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("selected-token");
+          expect(process.env.STEELENGINE_STATE_DIR).toBe(selectedStateDir);
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("selected-token");
         },
       );
     } finally {
@@ -1696,23 +1696,23 @@ describe("runCli exit behavior", () => {
   });
 
   it("drops early target credentials when a later guard selects another state", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-gateway-late-state-hop-"));
-    const defaultStateDir = path.join(homeDir, ".openclaw");
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-gateway-late-state-hop-"));
+    const defaultStateDir = path.join(homeDir, ".steelengine");
     const selectedStateDir = path.join(homeDir, "selected-state");
     await fs.mkdir(defaultStateDir, { recursive: true });
     await fs.mkdir(selectedStateDir, { recursive: true });
-    await fs.writeFile(path.join(defaultStateDir, ".env"), "OPENCLAW_GATEWAY_TOKEN=early-token\n");
+    await fs.writeFile(path.join(defaultStateDir, ".env"), "STEELENGINE_GATEWAY_TOKEN=early-token\n");
     await fs.writeFile(
       path.join(selectedStateDir, ".env"),
-      "OPENCLAW_GATEWAY_TOKEN=selected-token\n",
+      "STEELENGINE_GATEWAY_TOKEN=selected-token\n",
     );
     try {
       await withEnvAsync(
         {
           HOME: homeDir,
-          OPENCLAW_GATEWAY_TOKEN: undefined,
-          OPENCLAW_HOME: homeDir,
-          OPENCLAW_STATE_DIR: undefined,
+          STEELENGINE_GATEWAY_TOKEN: undefined,
+          STEELENGINE_HOME: homeDir,
+          STEELENGINE_STATE_DIR: undefined,
         },
         async () => {
           let selectLateState = false;
@@ -1720,16 +1720,16 @@ describe("runCli exit behavior", () => {
             exists: true,
             valid: true,
             sourceConfig:
-              selectLateState && process.env.OPENCLAW_STATE_DIR !== selectedStateDir
+              selectLateState && process.env.STEELENGINE_STATE_DIR !== selectedStateDir
                 ? {
-                    env: { vars: { OPENCLAW_STATE_DIR: selectedStateDir } },
+                    env: { vars: { STEELENGINE_STATE_DIR: selectedStateDir } },
                     gateway: { mode: "local" },
                   }
                 : { gateway: { mode: "local" } },
           }));
 
-          await runCli(["node", "openclaw", "gateway"]);
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("early-token");
+          await runCli(["node", "steelengine", "gateway"]);
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("early-token");
 
           selectLateState = true;
           const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
@@ -1737,8 +1737,8 @@ describe("runCli exit behavior", () => {
             | undefined;
           await hooks?.beforeRun?.({});
 
-          expect(process.env.OPENCLAW_STATE_DIR).toBe(selectedStateDir);
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("selected-token");
+          expect(process.env.STEELENGINE_STATE_DIR).toBe(selectedStateDir);
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("selected-token");
           expect(ensureCliExecutionBootstrapMock).toHaveBeenCalledOnce();
         },
       );
@@ -1768,7 +1768,7 @@ describe("runCli exit behavior", () => {
         }
       });
 
-      await runCli(["node", "openclaw", "gateway"]);
+      await runCli(["node", "steelengine", "gateway"]);
       expect(process.env.ZAI_API_KEY).toBe("superseded-key");
 
       useReplacement = true;
@@ -1783,26 +1783,26 @@ describe("runCli exit behavior", () => {
   });
 
   it("does not let gateway.env authorize automatic mutations of a selected future config", async () => {
-    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-gateway-global-env-"));
-    const gatewayEnvDir = path.join(homeDir, ".config", "openclaw");
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-gateway-global-env-"));
+    const gatewayEnvDir = path.join(homeDir, ".config", "steelengine");
     const futureConfigPath = path.join(homeDir, "future.json");
     await fs.mkdir(gatewayEnvDir, { recursive: true });
     await fs.writeFile(
       path.join(gatewayEnvDir, "gateway.env"),
-      "OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS=1\n",
+      "STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS=1\n",
     );
     try {
       await withEnvAsync(
         {
           HOME: homeDir,
-          OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: undefined,
-          OPENCLAW_CONFIG_PATH: undefined,
-          OPENCLAW_HOME: homeDir,
-          OPENCLAW_STATE_DIR: undefined,
+          STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: undefined,
+          STEELENGINE_CONFIG_PATH: undefined,
+          STEELENGINE_HOME: homeDir,
+          STEELENGINE_STATE_DIR: undefined,
         },
         async () => {
           readConfigFileSnapshotMock.mockImplementation(async () =>
-            process.env.OPENCLAW_CONFIG_PATH === futureConfigPath
+            process.env.STEELENGINE_CONFIG_PATH === futureConfigPath
               ? {
                   exists: true,
                   valid: true,
@@ -1812,7 +1812,7 @@ describe("runCli exit behavior", () => {
                   exists: true,
                   valid: true,
                   sourceConfig: {
-                    env: { vars: { OPENCLAW_CONFIG_PATH: futureConfigPath } },
+                    env: { vars: { STEELENGINE_CONFIG_PATH: futureConfigPath } },
                     gateway: { mode: "local" },
                   },
                 },
@@ -1822,11 +1822,11 @@ describe("runCli exit behavior", () => {
             throw new Error(`exit:${String(code)}`);
           }) as typeof process.exit);
           try {
-            await expect(runCli(["node", "openclaw", "gateway"])).rejects.toThrow("exit:1");
+            await expect(runCli(["node", "steelengine", "gateway"])).rejects.toThrow("exit:1");
             expect(errorSpy).toHaveBeenCalledWith(
               expect.stringContaining("run automatic gateway startup migrations"),
             );
-            expect(process.env.OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
+            expect(process.env.STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
           } finally {
             exitSpy.mockRestore();
             errorSpy.mockRestore();
@@ -1839,7 +1839,7 @@ describe("runCli exit behavior", () => {
   });
 
   it("does not treat gateway option values as bootstrap command paths", async () => {
-    await runCli(["node", "openclaw", "gateway", "--raw-stream-path", "status"]);
+    await runCli(["node", "steelengine", "gateway", "--raw-stream-path", "status"]);
 
     const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
       | { beforeRun?: (opts: { reset?: boolean }) => Promise<void> }
@@ -1855,7 +1855,7 @@ describe("runCli exit behavior", () => {
   });
 
   it("guards then skips state migration before destructive gateway dev resets", async () => {
-    await runCli(["node", "openclaw", "gateway", "--dev", "--reset"]);
+    await runCli(["node", "steelengine", "gateway", "--dev", "--reset"]);
 
     const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
       | { beforeRun?: (opts: { reset?: boolean }) => Promise<void> }
@@ -1869,14 +1869,14 @@ describe("runCli exit behavior", () => {
   it("retains selected config paths and invocation reset targets", async () => {
     await withEnvAsync(
       {
-        OPENCLAW_CONFIG_PATH: "/tmp/openclaw-invocation/openclaw.json",
-        OPENCLAW_GATEWAY_TOKEN: undefined,
-        OPENCLAW_HOME: "/tmp/openclaw-invocation-home",
-        OPENCLAW_INCLUDE_ROOTS: undefined,
-        OPENCLAW_PROFILE: undefined,
-        OPENCLAW_STATE_DIR: "/tmp/openclaw-invocation-state",
-        OPENCLAW_TEST_FAST: "1",
-        OPENCLAW_WORKSPACE_DIR: "/tmp/openclaw-invocation-workspace",
+        STEELENGINE_CONFIG_PATH: "/tmp/steelengine-invocation/steelengine.json",
+        STEELENGINE_GATEWAY_TOKEN: undefined,
+        STEELENGINE_HOME: "/tmp/steelengine-invocation-home",
+        STEELENGINE_INCLUDE_ROOTS: undefined,
+        STEELENGINE_PROFILE: undefined,
+        STEELENGINE_STATE_DIR: "/tmp/steelengine-invocation-state",
+        STEELENGINE_TEST_FAST: "1",
+        STEELENGINE_WORKSPACE_DIR: "/tmp/steelengine-invocation-workspace",
       },
       async () => {
         readConfigFileSnapshotMock.mockResolvedValue({
@@ -1885,34 +1885,34 @@ describe("runCli exit behavior", () => {
           sourceConfig: {
             env: {
               vars: {
-                OPENCLAW_CONFIG_PATH: "/tmp/openclaw-reset/openclaw.json",
-                OPENCLAW_GATEWAY_TOKEN: "old-token",
-                OPENCLAW_HOME: "/tmp/openclaw-reset-home",
-                OPENCLAW_INCLUDE_ROOTS: "/tmp/openclaw-reset-includes",
-                OPENCLAW_PROFILE: "config-dev",
-                OPENCLAW_STATE_DIR: "/tmp/openclaw-reset",
-                OPENCLAW_TEST_FAST: "0",
-                OPENCLAW_WORKSPACE_DIR: "/tmp/openclaw-reset-workspace",
+                STEELENGINE_CONFIG_PATH: "/tmp/steelengine-reset/steelengine.json",
+                STEELENGINE_GATEWAY_TOKEN: "old-token",
+                STEELENGINE_HOME: "/tmp/steelengine-reset-home",
+                STEELENGINE_INCLUDE_ROOTS: "/tmp/steelengine-reset-includes",
+                STEELENGINE_PROFILE: "config-dev",
+                STEELENGINE_STATE_DIR: "/tmp/steelengine-reset",
+                STEELENGINE_TEST_FAST: "0",
+                STEELENGINE_WORKSPACE_DIR: "/tmp/steelengine-reset-workspace",
               },
             },
             gateway: { mode: "local" },
           },
         });
-        await runCli(["node", "openclaw", "gateway", "--dev", "--reset"]);
+        await runCli(["node", "steelengine", "gateway", "--dev", "--reset"]);
 
         const hooks = addGatewayRunCommandMock.mock.calls[0]?.[1] as
           | { beforeRun?: (opts: { reset?: boolean }) => Promise<void> }
           | undefined;
         await hooks?.beforeRun?.({ reset: true });
 
-        expect(process.env.OPENCLAW_CONFIG_PATH).toBe("/tmp/openclaw-invocation/openclaw.json");
-        expect(process.env.OPENCLAW_HOME).toBe("/tmp/openclaw-invocation-home");
-        expect(process.env.OPENCLAW_PROFILE).toBeUndefined();
-        expect(process.env.OPENCLAW_STATE_DIR).toBe("/tmp/openclaw-invocation-state");
-        expect(process.env.OPENCLAW_TEST_FAST).toBe("1");
-        expect(process.env.OPENCLAW_WORKSPACE_DIR).toBe("/tmp/openclaw-invocation-workspace");
-        expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBeUndefined();
-        expect(process.env.OPENCLAW_INCLUDE_ROOTS).toBeUndefined();
+        expect(process.env.STEELENGINE_CONFIG_PATH).toBe("/tmp/steelengine-invocation/steelengine.json");
+        expect(process.env.STEELENGINE_HOME).toBe("/tmp/steelengine-invocation-home");
+        expect(process.env.STEELENGINE_PROFILE).toBeUndefined();
+        expect(process.env.STEELENGINE_STATE_DIR).toBe("/tmp/steelengine-invocation-state");
+        expect(process.env.STEELENGINE_TEST_FAST).toBe("1");
+        expect(process.env.STEELENGINE_WORKSPACE_DIR).toBe("/tmp/steelengine-invocation-workspace");
+        expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBeUndefined();
+        expect(process.env.STEELENGINE_INCLUDE_ROOTS).toBeUndefined();
         expect(ensureCliExecutionBootstrapMock).not.toHaveBeenCalled();
       },
     );
@@ -1920,7 +1920,7 @@ describe("runCli exit behavior", () => {
 
   it("does not let config env authorize or retarget an explicit reset", async () => {
     await withEnvAsync(
-      { OPENCLAW_PROFILE: undefined, OPENCLAW_WORKSPACE_DIR: undefined },
+      { STEELENGINE_PROFILE: undefined, STEELENGINE_WORKSPACE_DIR: undefined },
       async () => {
         readConfigFileSnapshotMock.mockResolvedValue({
           exists: true,
@@ -1928,30 +1928,30 @@ describe("runCli exit behavior", () => {
           sourceConfig: {
             env: {
               vars: {
-                OPENCLAW_PROFILE: "dev",
-                OPENCLAW_WORKSPACE_DIR: "/tmp/openclaw-config-workspace",
+                STEELENGINE_PROFILE: "dev",
+                STEELENGINE_WORKSPACE_DIR: "/tmp/steelengine-config-workspace",
               },
             },
             gateway: { mode: "local" },
           },
         });
 
-        await runCli(["node", "openclaw", "gateway", "--reset"]);
+        await runCli(["node", "steelengine", "gateway", "--reset"]);
 
-        expect(process.env.OPENCLAW_PROFILE).toBeUndefined();
-        expect(process.env.OPENCLAW_WORKSPACE_DIR).toBeUndefined();
+        expect(process.env.STEELENGINE_PROFILE).toBeUndefined();
+        expect(process.env.STEELENGINE_WORKSPACE_DIR).toBeUndefined();
       },
     );
   });
 
   it("honors banner suppression on the gateway foreground fast path", async () => {
-    process.env.OPENCLAW_HIDE_BANNER = "1";
+    process.env.STEELENGINE_HIDE_BANNER = "1";
 
-    await runCli(["node", "openclaw", "gateway"]);
+    await runCli(["node", "steelengine", "gateway"]);
 
     expect(tryRouteCliMock).not.toHaveBeenCalled();
     expect(emitCliBannerMock).not.toHaveBeenCalled();
-    expect(commanderParseAsyncMock).toHaveBeenCalledWith(["node", "openclaw", "gateway"]);
+    expect(commanderParseAsyncMock).toHaveBeenCalledWith(["node", "steelengine", "gateway"]);
   });
 
   it("renders browser help from startup metadata without building the full program", async () => {
@@ -1960,11 +1960,11 @@ describe("runCli exit behavior", () => {
       throw new Error(`unexpected process.exit(${String(code)})`);
     }) as typeof process.exit);
 
-    await runCli(["node", "openclaw", "browser", "--help"]);
+    await runCli(["node", "steelengine", "browser", "--help"]);
 
     expect(maybeRunCliInContainerMock).toHaveBeenCalledWith([
       "node",
-      "openclaw",
+      "steelengine",
       "browser",
       "--help",
     ]);
@@ -1980,7 +1980,7 @@ describe("runCli exit behavior", () => {
   it("renders secrets help from startup metadata without building the full program", async () => {
     outputPrecomputedSecretsHelpTextMock.mockReturnValueOnce(true);
 
-    await runCli(["node", "openclaw", "secrets", "--help"]);
+    await runCli(["node", "steelengine", "secrets", "--help"]);
 
     expect(tryRouteCliMock).not.toHaveBeenCalled();
     expect(outputPrecomputedSecretsHelpTextMock).toHaveBeenCalledTimes(1);
@@ -1991,7 +1991,7 @@ describe("runCli exit behavior", () => {
   it("renders nodes help from startup metadata without building the full program", async () => {
     outputPrecomputedNodesHelpTextMock.mockReturnValueOnce(true);
 
-    await runCli(["node", "openclaw", "nodes", "--help"]);
+    await runCli(["node", "steelengine", "nodes", "--help"]);
 
     expect(tryRouteCliMock).not.toHaveBeenCalled();
     expect(outputPrecomputedNodesHelpTextMock).toHaveBeenCalledTimes(1);
@@ -2000,7 +2000,7 @@ describe("runCli exit behavior", () => {
   });
 
   it("defers nodes help startup metadata when plugin config can change command metadata", async () => {
-    const argv = ["node", "openclaw", "nodes", "--help"];
+    const argv = ["node", "steelengine", "nodes", "--help"];
     const parseAsync = vi.fn().mockResolvedValueOnce(undefined);
     const program = {
       commands: [{ name: () => "nodes", aliases: () => [] }],
@@ -2021,7 +2021,7 @@ describe("runCli exit behavior", () => {
   it("renders selected subcommand help from startup metadata without building the full program", async () => {
     outputPrecomputedSubcommandHelpTextMock.mockReturnValueOnce(true);
 
-    await runCli(["node", "openclaw", "doctor", "--help"]);
+    await runCli(["node", "steelengine", "doctor", "--help"]);
 
     expect(outputPrecomputedSubcommandHelpTextMock).toHaveBeenCalledWith("doctor");
     expect(tryRouteCliMock).not.toHaveBeenCalled();
@@ -2034,7 +2034,7 @@ describe("runCli exit behavior", () => {
       throw new Error("startup metadata failed");
     });
 
-    await expect(runCli(["node", "openclaw", "secrets", "--help"])).rejects.toThrow(
+    await expect(runCli(["node", "steelengine", "secrets", "--help"])).rejects.toThrow(
       "startup metadata failed",
     );
   });
@@ -2044,7 +2044,7 @@ describe("runCli exit behavior", () => {
       new Error("live config failed"),
     );
 
-    await expect(runCli(["node", "openclaw", "nodes", "--help"])).rejects.toThrow(
+    await expect(runCli(["node", "steelengine", "nodes", "--help"])).rejects.toThrow(
       "live config failed",
     );
   });
@@ -2052,7 +2052,7 @@ describe("runCli exit behavior", () => {
   it("keeps root help on the precomputed path without proxy bootstrap", async () => {
     outputPrecomputedRootHelpTextMock.mockReturnValueOnce(true);
 
-    await runCli(["node", "openclaw", "--help"]);
+    await runCli(["node", "steelengine", "--help"]);
 
     expect(loadRootHelpRenderOptionsForConfigSensitivePluginsMock).toHaveBeenCalledTimes(1);
     expect(outputPrecomputedRootHelpTextMock).toHaveBeenCalledTimes(1);
@@ -2061,11 +2061,11 @@ describe("runCli exit behavior", () => {
   });
 
   it("renders setup/onboard/configure help without building the full program", async () => {
-    await runCli(["node", "openclaw", "setup", "--help"]);
+    await runCli(["node", "steelengine", "setup", "--help"]);
 
     expect(tryOutputSetupOnboardConfigureHelpMock).toHaveBeenCalledWith([
       "node",
-      "openclaw",
+      "steelengine",
       "setup",
       "--help",
     ]);
@@ -2079,9 +2079,9 @@ describe("runCli exit behavior", () => {
       throw new Error(`unexpected process.exit(${String(code)})`);
     }) as typeof process.exit);
 
-    await runCli(["node", "openclaw", "--help"]);
+    await runCli(["node", "steelengine", "--help"]);
 
-    expect(maybeRunCliInContainerMock).toHaveBeenCalledWith(["node", "openclaw", "--help"]);
+    expect(maybeRunCliInContainerMock).toHaveBeenCalledWith(["node", "steelengine", "--help"]);
     expect(tryRouteCliMock).not.toHaveBeenCalled();
     expect(loadRootHelpRenderOptionsForConfigSensitivePluginsMock).toHaveBeenCalledTimes(1);
     expect(outputPrecomputedRootHelpTextMock).toHaveBeenCalledTimes(1);
@@ -2106,7 +2106,7 @@ describe("runCli exit behavior", () => {
     loadRootHelpRenderOptionsForConfigSensitivePluginsMock.mockResolvedValueOnce(liveOptions);
     outputPrecomputedRootHelpTextMock.mockReturnValueOnce(true);
 
-    await runCli(["node", "openclaw", "--help"]);
+    await runCli(["node", "steelengine", "--help"]);
 
     expect(loadRootHelpRenderOptionsForConfigSensitivePluginsMock).toHaveBeenCalledTimes(1);
     expect(outputPrecomputedRootHelpTextMock).not.toHaveBeenCalled();
@@ -2117,57 +2117,57 @@ describe("runCli exit behavior", () => {
   it("does not start the managed proxy for local gateway client commands", async () => {
     tryRouteCliMock.mockResolvedValueOnce(true);
 
-    await runCli(["node", "openclaw", "status"]);
+    await runCli(["node", "steelengine", "status"]);
 
     expect(startProxyMock).not.toHaveBeenCalled();
     expect(stopProxyMock).not.toHaveBeenCalled();
   });
 
   it.each([
-    ["gateway runtime", ["node", "openclaw", "gateway", "run"]],
-    ["bare gateway runtime", ["node", "openclaw", "gateway"]],
-    ["node runtime", ["node", "openclaw", "node", "run"]],
-    ["local agent runtime", ["node", "openclaw", "agent", "--local"]],
-    ["provider inference", ["node", "openclaw", "infer", "web", "fetch", "https://example.com"]],
-    ["model command", ["node", "openclaw", "models", "auth", "login", "openai"]],
-    ["plugin command", ["node", "openclaw", "plugins", "marketplace", "list"]],
-    ["skill command", ["node", "openclaw", "skills", "search", "browser"]],
-    ["update command", ["node", "openclaw", "update", "check"]],
-    ["channel probe", ["node", "openclaw", "channels", "status", "--probe"]],
-    ["channel capabilities probe", ["node", "openclaw", "channels", "capabilities"]],
-    ["directory plugin command", ["node", "openclaw", "directory", "peers", "list"]],
-    ["message plugin command", ["node", "openclaw", "message", "send", "--to", "demo"]],
-    ["metadata-owned plugin command", ["node", "openclaw", "googlemeet", "login"]],
+    ["gateway runtime", ["node", "steelengine", "gateway", "run"]],
+    ["bare gateway runtime", ["node", "steelengine", "gateway"]],
+    ["node runtime", ["node", "steelengine", "node", "run"]],
+    ["local agent runtime", ["node", "steelengine", "agent", "--local"]],
+    ["provider inference", ["node", "steelengine", "infer", "web", "fetch", "https://example.com"]],
+    ["model command", ["node", "steelengine", "models", "auth", "login", "openai"]],
+    ["plugin command", ["node", "steelengine", "plugins", "marketplace", "list"]],
+    ["skill command", ["node", "steelengine", "skills", "search", "browser"]],
+    ["update command", ["node", "steelengine", "update", "check"]],
+    ["channel probe", ["node", "steelengine", "channels", "status", "--probe"]],
+    ["channel capabilities probe", ["node", "steelengine", "channels", "capabilities"]],
+    ["directory plugin command", ["node", "steelengine", "directory", "peers", "list"]],
+    ["message plugin command", ["node", "steelengine", "message", "send", "--to", "demo"]],
+    ["metadata-owned plugin command", ["node", "steelengine", "googlemeet", "login"]],
   ])("starts managed proxy routing for %s", (_name, argv) => {
     expect(shouldStartProxyForCli(argv)).toBe(true);
   });
 
   it.each([
-    ["root help", ["node", "openclaw", "--help"]],
-    ["root version", ["node", "openclaw", "--version"]],
-    ["gateway help", ["node", "openclaw", "gateway", "--help"]],
-    ["gateway run help", ["node", "openclaw", "gateway", "run", "--help"]],
-    ["status", ["node", "openclaw", "status"]],
-    ["health", ["node", "openclaw", "health"]],
-    ["gateway status", ["node", "openclaw", "gateway", "status"]],
-    ["gateway health", ["node", "openclaw", "gateway", "health"]],
-    ["remote agent control-plane", ["node", "openclaw", "agent", "run"]],
-    ["chat control-plane", ["node", "openclaw", "chat"]],
-    ["terminal control-plane", ["node", "openclaw", "terminal"]],
-    ["config", ["node", "openclaw", "config", "get", "proxy.enabled"]],
-    ["channels parent help", ["node", "openclaw", "channels"]],
-    ["completion", ["node", "openclaw", "completion", "zsh"]],
-    ["debug proxy cli", ["node", "openclaw", "proxy", "start"]],
-    ["agents list", ["node", "openclaw", "agents", "list"]],
-    ["models list", ["node", "openclaw", "models", "list"]],
-    ["models status without live probe", ["node", "openclaw", "models", "status"]],
-    ["skills check", ["node", "openclaw", "skills", "check"]],
-    ["skills info", ["node", "openclaw", "skills", "info", "weather"]],
-    ["skills list", ["node", "openclaw", "skills", "list"]],
-    ["tasks list", ["node", "openclaw", "tasks", "list"]],
-    ["legacy singular tool namespace", ["node", "openclaw", "tool", "image_generate"]],
-    ["gateway tools namespace typo", ["node", "openclaw", "tools", "effective"]],
-    ["migrate", ["node", "openclaw", "migrate"]],
+    ["root help", ["node", "steelengine", "--help"]],
+    ["root version", ["node", "steelengine", "--version"]],
+    ["gateway help", ["node", "steelengine", "gateway", "--help"]],
+    ["gateway run help", ["node", "steelengine", "gateway", "run", "--help"]],
+    ["status", ["node", "steelengine", "status"]],
+    ["health", ["node", "steelengine", "health"]],
+    ["gateway status", ["node", "steelengine", "gateway", "status"]],
+    ["gateway health", ["node", "steelengine", "gateway", "health"]],
+    ["remote agent control-plane", ["node", "steelengine", "agent", "run"]],
+    ["chat control-plane", ["node", "steelengine", "chat"]],
+    ["terminal control-plane", ["node", "steelengine", "terminal"]],
+    ["config", ["node", "steelengine", "config", "get", "proxy.enabled"]],
+    ["channels parent help", ["node", "steelengine", "channels"]],
+    ["completion", ["node", "steelengine", "completion", "zsh"]],
+    ["debug proxy cli", ["node", "steelengine", "proxy", "start"]],
+    ["agents list", ["node", "steelengine", "agents", "list"]],
+    ["models list", ["node", "steelengine", "models", "list"]],
+    ["models status without live probe", ["node", "steelengine", "models", "status"]],
+    ["skills check", ["node", "steelengine", "skills", "check"]],
+    ["skills info", ["node", "steelengine", "skills", "info", "weather"]],
+    ["skills list", ["node", "steelengine", "skills", "list"]],
+    ["tasks list", ["node", "steelengine", "tasks", "list"]],
+    ["legacy singular tool namespace", ["node", "steelengine", "tool", "image_generate"]],
+    ["gateway tools namespace typo", ["node", "steelengine", "tools", "effective"]],
+    ["migrate", ["node", "steelengine", "migrate"]],
   ])("skips managed proxy routing for %s", (_name, argv) => {
     expect(shouldStartProxyForCli(argv)).toBe(false);
   });
@@ -2175,16 +2175,16 @@ describe("runCli exit behavior", () => {
   it("starts the managed proxy for network-capable commands by default", async () => {
     tryRouteCliMock.mockResolvedValueOnce(true);
 
-    await runCli(["node", "openclaw", "plugins", "marketplace", "list"]);
+    await runCli(["node", "steelengine", "plugins", "marketplace", "list"]);
 
     expect(startProxyMock).toHaveBeenCalledWith(undefined);
   });
 
   it.each([
-    ["fast path", ["node", "openclaw", "gateway", "run"]],
+    ["fast path", ["node", "steelengine", "gateway", "run"]],
     [
       "full Commander path with root options",
-      ["node", "openclaw", "--log-level", "debug", "gateway", "run"],
+      ["node", "steelengine", "--log-level", "debug", "gateway", "run"],
     ],
   ])("loads trusted dotenv and isolates %s gateway proxy config reads", async (_name, argv) => {
     if (_name === "full Commander path with root options") {
@@ -2198,7 +2198,7 @@ describe("runCli exit behavior", () => {
   });
 
   it("validates the runtime before selecting gateway config", async () => {
-    await runCli(["node", "openclaw", "gateway", "run"]);
+    await runCli(["node", "steelengine", "gateway", "run"]);
 
     const runtimeGuardOrder = assertRuntimeMock.mock.invocationCallOrder[0] ?? 0;
     const configReadOrder = readConfigFileSnapshotMock.mock.invocationCallOrder[0] ?? 0;
@@ -2207,7 +2207,7 @@ describe("runCli exit behavior", () => {
   });
 
   it("re-pins runtime paths after selecting gateway config", async () => {
-    await runCli(["node", "openclaw", "gateway", "run"]);
+    await runCli(["node", "steelengine", "gateway", "run"]);
 
     expect(pinRuntimePathsMock).toHaveBeenCalledWith(process.env);
     expect(pinConfigDirMock).toHaveBeenCalledWith(process.env);
@@ -2217,20 +2217,20 @@ describe("runCli exit behavior", () => {
   });
 
   it("selects gateway config env before starting its managed proxy", async () => {
-    await withEnvAsync({ OPENCLAW_TEST_PROXY_SELECTION: undefined }, async () => {
+    await withEnvAsync({ STEELENGINE_TEST_PROXY_SELECTION: undefined }, async () => {
       readConfigFileSnapshotMock.mockResolvedValue({
         exists: true,
         valid: true,
         sourceConfig: {
-          env: { vars: { OPENCLAW_TEST_PROXY_SELECTION: "selected" } },
+          env: { vars: { STEELENGINE_TEST_PROXY_SELECTION: "selected" } },
           gateway: { mode: "local" },
         },
       });
       loadConfigMock.mockImplementationOnce(() => ({
-        proxy: { selected: process.env.OPENCLAW_TEST_PROXY_SELECTION },
+        proxy: { selected: process.env.STEELENGINE_TEST_PROXY_SELECTION },
       }));
 
-      await runCli(["node", "openclaw", "gateway", "run"]);
+      await runCli(["node", "steelengine", "gateway", "run"]);
 
       expect(startProxyMock).toHaveBeenCalledWith({ selected: "selected" });
     });
@@ -2251,7 +2251,7 @@ describe("runCli exit behavior", () => {
       await getGatewayRunRuntimeHooks().refreshManagedProxy?.(finalProxy);
     });
 
-    await runCli(["node", "openclaw", "gateway", "run"]);
+    await runCli(["node", "steelengine", "gateway", "run"]);
 
     expect(startProxyMock).toHaveBeenNthCalledWith(1, earlyProxy);
     expect(startProxyMock).toHaveBeenNthCalledWith(2, finalProxy);
@@ -2285,7 +2285,7 @@ describe("runCli exit behavior", () => {
     });
 
     try {
-      await runCli(["node", "openclaw", "gateway", "run"]);
+      await runCli(["node", "steelengine", "gateway", "run"]);
     } finally {
       processOffSpy.mockRestore();
       processOnceSpy.mockRestore();
@@ -2300,13 +2300,13 @@ describe("runCli exit behavior", () => {
   it("starts the managed proxy for metadata-owned plugin commands by default", async () => {
     tryRouteCliMock.mockResolvedValueOnce(true);
 
-    await runCli(["node", "openclaw", "googlemeet", "login"]);
+    await runCli(["node", "steelengine", "googlemeet", "login"]);
 
     expect(startProxyMock).toHaveBeenCalledWith(undefined);
   });
 
   it("rejects unowned command roots before proxy and plugin runtime registration", async () => {
-    await expect(runCli(["node", "openclaw", "foo"])).rejects.toThrow(
+    await expect(runCli(["node", "steelengine", "foo"])).rejects.toThrow(
       'No built-in command or plugin CLI metadata owns "foo"',
     );
 
@@ -2317,8 +2317,8 @@ describe("runCli exit behavior", () => {
   });
 
   it("suggests close known commands for unowned command roots before proxy startup", async () => {
-    await expect(runCli(["node", "openclaw", "upate"])).rejects.toThrow(
-      "Did you mean this?\n  openclaw update",
+    await expect(runCli(["node", "steelengine", "upate"])).rejects.toThrow(
+      "Did you mean this?\n  steelengine update",
     );
 
     expect(startProxyMock).not.toHaveBeenCalled();
@@ -2336,7 +2336,7 @@ describe("runCli exit behavior", () => {
 
     let error: unknown;
     try {
-      await runCli(["node", "openclaw", "codex"]);
+      await runCli(["node", "steelengine", "codex"]);
     } catch (caught) {
       error = caught;
     }
@@ -2352,7 +2352,7 @@ describe("runCli exit behavior", () => {
   });
 
   it("rejects unowned command roots even when --help is appended (regression for #81077)", async () => {
-    await expect(runCli(["node", "openclaw", "foo", "--help"])).rejects.toThrow(
+    await expect(runCli(["node", "steelengine", "foo", "--help"])).rejects.toThrow(
       'No built-in command or plugin CLI metadata owns "foo"',
     );
 
@@ -2363,7 +2363,7 @@ describe("runCli exit behavior", () => {
   });
 
   it("rejects unowned command roots even when --version is appended", async () => {
-    await expect(runCli(["node", "openclaw", "foo", "--version"])).rejects.toThrow(
+    await expect(runCli(["node", "steelengine", "foo", "--version"])).rejects.toThrow(
       'No built-in command or plugin CLI metadata owns "foo"',
     );
 
@@ -2380,7 +2380,7 @@ describe("runCli exit behavior", () => {
 
     let error: unknown;
     try {
-      await runCli(["node", "openclaw", "totally-unknown"]);
+      await runCli(["node", "steelengine", "totally-unknown"]);
     } catch (caught) {
       error = caught;
     }
@@ -2410,7 +2410,7 @@ describe("runCli exit behavior", () => {
       }) => (primaryCommand === "qa" && cfg?.plugins?.allow?.length === 0 ? ["qa-lab"] : []),
     );
 
-    await expect(runCli(["node", "openclaw", "qa"])).rejects.toThrow(
+    await expect(runCli(["node", "steelengine", "qa"])).rejects.toThrow(
       'Add "qa-lab" to `plugins.allow` instead of "qa"',
     );
     expect(startProxyMock).not.toHaveBeenCalled();
@@ -2425,7 +2425,7 @@ describe("runCli exit behavior", () => {
       availability: "loaded",
     });
 
-    await expect(runCli(["node", "openclaw", "lcm_recent"])).rejects.toThrow(
+    await expect(runCli(["node", "steelengine", "lcm_recent"])).rejects.toThrow(
       '"lcm_recent" is an agent tool available from the "lossless-claw" plugin',
     );
 
@@ -2438,16 +2438,16 @@ describe("runCli exit behavior", () => {
     hasEnvHttpProxyAgentConfiguredMock.mockReturnValue(true);
     tryRouteCliMock.mockResolvedValueOnce(true);
 
-    await runCli(["node", "openclaw", "skills", "check"]);
+    await runCli(["node", "steelengine", "skills", "check"]);
 
     expect(hasEnvHttpProxyAgentConfiguredMock).not.toHaveBeenCalled();
     expect(ensureGlobalUndiciEnvProxyDispatcherMock).not.toHaveBeenCalled();
   });
 
   it.each([
-    ["auth", ["node", "openclaw", "auth", "--help"]],
-    ["tool", ["node", "openclaw", "tool", "image_generate"]],
-    ["tools", ["node", "openclaw", "tools", "effective"]],
+    ["auth", ["node", "steelengine", "auth", "--help"]],
+    ["tool", ["node", "steelengine", "tool", "image_generate"]],
+    ["tools", ["node", "steelengine", "tools", "effective"]],
   ])("keeps reserved %s command roots out of plugin command discovery", async (_name, argv) => {
     const parseAsync = vi.fn().mockResolvedValueOnce(undefined);
     const program = {
@@ -2484,7 +2484,7 @@ describe("runCli exit behavior", () => {
       parseAsync,
     });
 
-    await runCli(["node", "openclaw", "memory", "search", "query", "--json"]);
+    await runCli(["node", "steelengine", "memory", "search", "query", "--json"]);
 
     expect(registerPluginCliCommandsFromValidatedConfigMock).toHaveBeenCalledWith(
       expect.anything(),
@@ -2514,7 +2514,7 @@ describe("runCli exit behavior", () => {
       parseAsync,
     });
 
-    await runCli(["node", "openclaw", "memory", "--", "--json"]);
+    await runCli(["node", "steelengine", "memory", "--", "--json"]);
 
     expect(registerPluginCliCommandsFromValidatedConfigMock).toHaveBeenCalledWith(
       expect.anything(),
@@ -2529,7 +2529,7 @@ describe("runCli exit behavior", () => {
   it("fails protected commands when managed proxy activation fails", async () => {
     startProxyMock.mockRejectedValueOnce(new Error("proxy: enabled but no HTTP proxy URL"));
 
-    await expect(runCli(["node", "openclaw", "gateway", "run"])).rejects.toThrow(
+    await expect(runCli(["node", "steelengine", "gateway", "run"])).rejects.toThrow(
       "proxy: enabled but no HTTP proxy URL",
     );
 
@@ -2542,7 +2542,7 @@ describe("runCli exit behavior", () => {
       throw new Error("config parse failed");
     });
 
-    await expect(runCli(["node", "openclaw", "gateway", "run"])).rejects.toThrow(
+    await expect(runCli(["node", "steelengine", "gateway", "run"])).rejects.toThrow(
       "config parse failed",
     );
 
@@ -2554,7 +2554,7 @@ describe("runCli exit behavior", () => {
     const handle = makeProxyHandle();
     startProxyMock.mockResolvedValueOnce(handle);
 
-    await runCli(["node", "openclaw", "gateway", "run"]);
+    await runCli(["node", "steelengine", "gateway", "run"]);
 
     expect(startProxyMock).toHaveBeenCalledWith(undefined);
     expect(stopProxyMock).toHaveBeenCalledOnce();
@@ -2585,7 +2585,7 @@ describe("runCli exit behavior", () => {
     );
 
     try {
-      const runPromise = runCli(["node", "openclaw", "plugins", "marketplace", "list"]);
+      const runPromise = runCli(["node", "steelengine", "plugins", "marketplace", "list"]);
       await vi.waitFor(() => {
         expect(
           processOnceSpy.mock.calls.some(
@@ -2634,7 +2634,7 @@ describe("runCli exit behavior", () => {
 
     const processOnceSpy = vi.spyOn(process, "once");
     try {
-      const runPromise = runCli(["node", "openclaw", "plugins", "marketplace", "list"]);
+      const runPromise = runCli(["node", "steelengine", "plugins", "marketplace", "list"]);
       await vi.waitFor(() => {
         expect(
           processOnceSpy.mock.calls.reduce(
@@ -2667,7 +2667,7 @@ describe("runCli exit behavior", () => {
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(readConfigFileSnapshotMock).toHaveBeenCalledTimes(1);
@@ -2684,7 +2684,7 @@ describe("runCli exit behavior", () => {
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(readConfigFileSnapshotMock).toHaveBeenCalledTimes(1);
@@ -2698,13 +2698,13 @@ describe("runCli exit behavior", () => {
       exists: true,
       valid: true,
       sourceConfig: {
-        $schema: "https://openclaw.ai/config.json",
+        $schema: "https://steelengine.ai/config.json",
         meta: { updatedBy: "fixture" },
       },
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(readConfigFileSnapshotMock).toHaveBeenCalledTimes(1);
@@ -2724,7 +2724,7 @@ describe("runCli exit behavior", () => {
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(setupWizardCommandMock).toHaveBeenCalledWith({});
@@ -2747,11 +2747,11 @@ describe("runCli exit behavior", () => {
     Object.defineProperty(process.stdout, "isTTY", { configurable: true, value: false });
 
     try {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
 
       expect(process.exitCode).toBe(1);
       expect(errorSpy).toHaveBeenCalledWith(
-        "Onboarding needs an interactive TTY. Use `openclaw onboard --non-interactive --accept-risk ...` for automation.",
+        "Onboarding needs an interactive TTY. Use `steelengine onboard --non-interactive --accept-risk ...` for automation.",
       );
       expect(setupWizardCommandMock).not.toHaveBeenCalled();
       expect(tryRouteCliMock).not.toHaveBeenCalled();
@@ -2784,16 +2784,16 @@ describe("runCli exit behavior", () => {
             password: {
               source: "env",
               provider: "default",
-              id: "OPENCLAW_GATEWAY_PASSWORD",
+              id: "STEELENGINE_GATEWAY_PASSWORD",
             },
           },
         },
       },
     });
 
-    await withEnvAsync({ OPENCLAW_GATEWAY_PASSWORD: "gateway-ref-password" }, async () => {
+    await withEnvAsync({ STEELENGINE_GATEWAY_PASSWORD: "gateway-ref-password" }, async () => {
       await withInteractiveTty(async () => {
-        await runCli(["node", "openclaw"]);
+        await runCli(["node", "steelengine"]);
       });
     });
 
@@ -2833,7 +2833,7 @@ describe("runCli exit behavior", () => {
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(setupWizardCommandMock).not.toHaveBeenCalled();
@@ -2860,7 +2860,7 @@ describe("runCli exit behavior", () => {
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(setupWizardCommandMock).toHaveBeenCalledWith({});
@@ -2891,11 +2891,11 @@ describe("runCli exit behavior", () => {
     Object.defineProperty(process.stdout, "isTTY", { configurable: true, value: false });
 
     try {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
 
       expect(process.exitCode).toBe(1);
       expect(errorSpy).toHaveBeenCalledWith(
-        "Remote Gateway inference setup needs an interactive TTY. Re-run `openclaw` in a terminal connected to this Gateway.",
+        "Remote Gateway inference setup needs an interactive TTY. Re-run `steelengine` in a terminal connected to this Gateway.",
       );
       expect(setupWizardCommandMock).not.toHaveBeenCalled();
       expect(runRemoteGatewayInferenceOnboardingMock).not.toHaveBeenCalled();
@@ -2930,7 +2930,7 @@ describe("runCli exit behavior", () => {
     readActiveGatewayLockPortMock.mockResolvedValueOnce(48789);
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(probeGatewayConfiguredModelMock).toHaveBeenCalledWith({
@@ -2957,9 +2957,9 @@ describe("runCli exit behavior", () => {
     });
     readActiveGatewayLockPortMock.mockResolvedValueOnce(48789);
 
-    await withEnvAsync({ OPENCLAW_GATEWAY_PORT: "19001" }, async () => {
+    await withEnvAsync({ STEELENGINE_GATEWAY_PORT: "19001" }, async () => {
       await withInteractiveTty(async () => {
-        await runCli(["node", "openclaw"]);
+        await runCli(["node", "steelengine"]);
       });
     });
 
@@ -2990,7 +2990,7 @@ describe("runCli exit behavior", () => {
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(probeGatewayConfiguredModelMock).toHaveBeenCalledWith({
@@ -3017,9 +3017,9 @@ describe("runCli exit behavior", () => {
       },
     });
 
-    await withEnvAsync({ OPENCLAW_GATEWAY_TOKEN: "env-token" }, async () => {
+    await withEnvAsync({ STEELENGINE_GATEWAY_TOKEN: "env-token" }, async () => {
       await withInteractiveTty(async () => {
-        await runCli(["node", "openclaw"]);
+        await runCli(["node", "steelengine"]);
       });
     });
 
@@ -3034,7 +3034,7 @@ describe("runCli exit behavior", () => {
   });
 
   it("resolves only the configured auth-mode SecretRef for bare root preflight", async () => {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-bare-auth-mode-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-bare-auth-mode-"));
     const tokenMarker = path.join(tempDir, "token-provider-ran");
     const passwordMarker = path.join(tempDir, "password-provider-ran");
     const tokenProgram = [
@@ -3084,7 +3084,7 @@ describe("runCli exit behavior", () => {
 
     try {
       await withInteractiveTty(async () => {
-        await runCli(["node", "openclaw"]);
+        await runCli(["node", "steelengine"]);
       });
 
       expect(probeGatewayConfiguredModelMock).toHaveBeenCalledWith({
@@ -3119,7 +3119,7 @@ describe("runCli exit behavior", () => {
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(readActiveGatewayLockPortMock).toHaveBeenCalledTimes(1);
@@ -3164,7 +3164,7 @@ describe("runCli exit behavior", () => {
       .mockResolvedValueOnce({ kind: "configured" });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(probeGatewayConfiguredModelMock).toHaveBeenNthCalledWith(1, {
@@ -3206,7 +3206,7 @@ describe("runCli exit behavior", () => {
       .mockResolvedValueOnce({ kind: "configured" });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(setupWizardCommandMock).not.toHaveBeenCalled();
@@ -3245,7 +3245,7 @@ describe("runCli exit behavior", () => {
       });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(setupWizardCommandMock).toHaveBeenCalledWith({});
@@ -3268,7 +3268,7 @@ describe("runCli exit behavior", () => {
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(setupWizardCommandMock).not.toHaveBeenCalled();
@@ -3293,7 +3293,7 @@ describe("runCli exit behavior", () => {
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(setupWizardCommandMock).not.toHaveBeenCalled();
@@ -3318,7 +3318,7 @@ describe("runCli exit behavior", () => {
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(setupWizardCommandMock).not.toHaveBeenCalled();
@@ -3342,7 +3342,7 @@ describe("runCli exit behavior", () => {
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(launchTuiCliMock).toHaveBeenCalledWith({ deliver: false, local: true }, {});
@@ -3367,9 +3367,9 @@ describe("runCli exit behavior", () => {
       },
     });
 
-    await withEnvAsync({ OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: undefined }, async () => {
+    await withEnvAsync({ STEELENGINE_ALLOW_INSECURE_PRIVATE_WS: undefined }, async () => {
       await withInteractiveTty(async () => {
-        await runCli(["node", "openclaw"]);
+        await runCli(["node", "steelengine"]);
       });
     });
 
@@ -3394,9 +3394,9 @@ describe("runCli exit behavior", () => {
       },
     });
 
-    await withEnvAsync({ OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: undefined }, async () => {
+    await withEnvAsync({ STEELENGINE_ALLOW_INSECURE_PRIVATE_WS: undefined }, async () => {
       await withInteractiveTty(async () => {
-        await runCli(["node", "openclaw"]);
+        await runCli(["node", "steelengine"]);
       });
     });
 
@@ -3427,9 +3427,9 @@ describe("runCli exit behavior", () => {
       },
     });
 
-    await withEnvAsync({ OPENCLAW_GATEWAY_PASSWORD: "stale-env-password" }, async () => {
+    await withEnvAsync({ STEELENGINE_GATEWAY_PASSWORD: "stale-env-password" }, async () => {
       await withInteractiveTty(async () => {
-        await runCli(["node", "openclaw"]);
+        await runCli(["node", "steelengine"]);
       });
     });
 
@@ -3472,12 +3472,12 @@ describe("runCli exit behavior", () => {
       {
         MISSING_REMOTE_GATEWAY_TOKEN: undefined,
         MISSING_REMOTE_GATEWAY_PASSWORD: undefined,
-        OPENCLAW_GATEWAY_TOKEN: "env-remote-token",
-        OPENCLAW_GATEWAY_PASSWORD: "env-remote-password",
+        STEELENGINE_GATEWAY_TOKEN: "env-remote-token",
+        STEELENGINE_GATEWAY_PASSWORD: "env-remote-password",
       },
       async () => {
         await withInteractiveTty(async () => {
-          await runCli(["node", "openclaw"]);
+          await runCli(["node", "steelengine"]);
         });
       },
     );
@@ -3507,9 +3507,9 @@ describe("runCli exit behavior", () => {
       },
     });
 
-    await withEnvAsync({ OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: "1" }, async () => {
+    await withEnvAsync({ STEELENGINE_ALLOW_INSECURE_PRIVATE_WS: "1" }, async () => {
       await withInteractiveTty(async () => {
-        await runCli(["node", "openclaw"]);
+        await runCli(["node", "steelengine"]);
       });
     });
 
@@ -3541,7 +3541,7 @@ describe("runCli exit behavior", () => {
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(probeGatewayConfiguredModelMock).toHaveBeenCalledWith({
@@ -3570,9 +3570,9 @@ describe("runCli exit behavior", () => {
       },
     });
 
-    await withEnvAsync({ OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: undefined }, async () => {
+    await withEnvAsync({ STEELENGINE_ALLOW_INSECURE_PRIVATE_WS: undefined }, async () => {
       await withInteractiveTty(async () => {
-        await runCli(["node", "openclaw"]);
+        await runCli(["node", "steelengine"]);
       });
     });
 
@@ -3591,11 +3591,11 @@ describe("runCli exit behavior", () => {
     Object.defineProperty(process.stdout, "isTTY", { configurable: true, value: false });
 
     try {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
 
       expect(process.exitCode).toBe(1);
       expect(errorSpy).toHaveBeenCalledWith(
-        "OpenClaw TUI needs an interactive TTY. Use `openclaw agent --local ...` for automation.",
+        "SteelEngine TUI needs an interactive TTY. Use `steelengine agent --local ...` for automation.",
       );
       expect(launchTuiCliMock).not.toHaveBeenCalled();
     } finally {
@@ -3622,7 +3622,7 @@ describe("runCli exit behavior", () => {
     });
 
     await withInteractiveTty(async () => {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     });
 
     expect(setupWizardCommandMock).toHaveBeenCalledWith({ classic: true });
@@ -3644,11 +3644,11 @@ describe("runCli exit behavior", () => {
     Object.defineProperty(process.stdout, "isTTY", { configurable: true, value: false });
 
     try {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
 
       expect(process.exitCode).toBe(1);
       expect(errorSpy).toHaveBeenCalledWith(
-        "OpenClaw config is invalid. Run `openclaw doctor --fix` before onboarding.",
+        "SteelEngine config is invalid. Run `steelengine doctor --fix` before onboarding.",
       );
       expect(setupWizardCommandMock).not.toHaveBeenCalled();
     } finally {
@@ -3675,7 +3675,7 @@ describe("runCli exit behavior", () => {
     Object.defineProperty(process.stdout, "isTTY", { configurable: true, value: true });
 
     try {
-      await runCli(["node", "openclaw"]);
+      await runCli(["node", "steelengine"]);
     } finally {
       if (stdinTty) {
         Object.defineProperty(process.stdin, "isTTY", stdinTty);
@@ -3709,7 +3709,7 @@ describe("runCli exit behavior", () => {
     tryRouteCliMock.mockResolvedValueOnce(true);
     hasMemoryRuntimeMock.mockReturnValue(true);
 
-    await runCli(["node", "openclaw", "status"]);
+    await runCli(["node", "steelengine", "status"]);
 
     expect(closeActiveMemorySearchManagersMock).toHaveBeenCalledTimes(1);
   });
@@ -3720,7 +3720,7 @@ describe("runCli exit behavior", () => {
       throw new Error("stale memory-state chunk");
     });
 
-    await expect(runCli(["node", "openclaw", "status"])).resolves.toBeUndefined();
+    await expect(runCli(["node", "steelengine", "status"])).resolves.toBeUndefined();
 
     expect(closeActiveMemorySearchManagersMock).not.toHaveBeenCalled();
   });
@@ -3728,11 +3728,11 @@ describe("runCli exit behavior", () => {
   it("returns after a handled container-target invocation", async () => {
     maybeRunCliInContainerMock.mockReturnValueOnce({ handled: true, exitCode: 0 });
 
-    await runCli(["node", "openclaw", "--container", "demo", "status"]);
+    await runCli(["node", "steelengine", "--container", "demo", "status"]);
 
     expect(maybeRunCliInContainerMock).toHaveBeenCalledWith([
       "node",
-      "openclaw",
+      "steelengine",
       "--container",
       "demo",
       "status",
@@ -3746,7 +3746,7 @@ describe("runCli exit behavior", () => {
     const exitCode = process.exitCode;
     maybeRunCliInContainerMock.mockReturnValueOnce({ handled: true, exitCode: 7 });
 
-    await runCli(["node", "openclaw", "--container", "demo", "status"]);
+    await runCli(["node", "steelengine", "--container", "demo", "status"]);
 
     expect(process.exitCode).toBe(7);
     process.exitCode = exitCode;
@@ -3764,10 +3764,10 @@ describe("runCli exit behavior", () => {
     };
     buildProgramMock.mockReturnValueOnce(program);
 
-    await expect(runCli(["node", "openclaw", "status"])).resolves.toBeUndefined();
+    await expect(runCli(["node", "steelengine", "status"])).resolves.toBeUndefined();
 
     expect(registerSubCliByNameMock.mock.calls).toEqual([
-      [program, "status", ["node", "openclaw", "status"]],
+      [program, "status", ["node", "steelengine", "status"]],
     ]);
     expect(process.exitCode).toBe(1);
     process.exitCode = exitCode;
@@ -3782,13 +3782,13 @@ describe("runCli exit behavior", () => {
     const ctx = { programVersion: "0.0.0-test" };
     getProgramContextMock.mockReturnValueOnce(ctx as never);
 
-    await runCli(["node", "openclaw", "doctor", "--help"]);
+    await runCli(["node", "steelengine", "doctor", "--help"]);
 
     expect(registerCoreCliByNameMock.mock.calls).toEqual([
-      [program, ctx, "doctor", ["node", "openclaw", "doctor", "--help"]],
+      [program, ctx, "doctor", ["node", "steelengine", "doctor", "--help"]],
     ]);
     expect(registerSubCliByNameMock.mock.calls).toEqual([
-      [program, "doctor", ["node", "openclaw", "doctor", "--help"]],
+      [program, "doctor", ["node", "steelengine", "doctor", "--help"]],
     ]);
   });
 
@@ -3804,7 +3804,7 @@ describe("runCli exit behavior", () => {
       throw new Error(`process.exit(${String(code)})`);
     }) as typeof process.exit);
 
-    await runCli(["node", "openclaw", "status"]);
+    await runCli(["node", "steelengine", "status"]);
 
     const handler = processOnSpy.mock.calls.find(([event]) => event === "uncaughtException")?.[1];
     if (typeof handler !== "function") {
@@ -3814,9 +3814,9 @@ describe("runCli exit behavior", () => {
     try {
       expect(() => handler(new Error("boom"))).toThrow("process.exit(1)");
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "[openclaw] OpenClaw hit an unexpected runtime error.",
+        "[steelengine] SteelEngine hit an unexpected runtime error.",
       );
-      expect(consoleErrorSpy).toHaveBeenCalledWith("[openclaw] Reason: boom");
+      expect(consoleErrorSpy).toHaveBeenCalledWith("[steelengine] Reason: boom");
       expect(restoreTerminalStateMock).toHaveBeenCalledWith("uncaught exception", {
         resumeStdinIfPaused: false,
       });
@@ -3842,7 +3842,7 @@ describe("runCli exit behavior", () => {
       throw new Error(`process.exit(${String(code)})`);
     }) as typeof process.exit);
 
-    await runCli(["node", "openclaw", "status"]);
+    await runCli(["node", "steelengine", "status"]);
 
     const handler = processOnSpy.mock.calls.find(([event]) => event === "uncaughtException")?.[1];
     if (typeof handler !== "function") {
@@ -3855,7 +3855,7 @@ describe("runCli exit behavior", () => {
       });
       expect(handler(hostUnreachable)).toBeUndefined();
       expect(consoleWarnSpy.mock.calls).toEqual([
-        ["[openclaw] Non-fatal uncaught exception (continuing):", hostUnreachable.stack],
+        ["[steelengine] Non-fatal uncaught exception (continuing):", hostUnreachable.stack],
       ]);
       expect(restoreTerminalStateMock).not.toHaveBeenCalled();
       expect(exitSpy).not.toHaveBeenCalled();

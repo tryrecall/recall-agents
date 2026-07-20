@@ -6,29 +6,29 @@ import { withEnv } from "../test-utils/env.js";
 import { resolveDefaultAgentWorkspaceDir } from "./workspace.js";
 
 describe("DEFAULT_AGENT_WORKSPACE_DIR", () => {
-  it("uses OPENCLAW_HOME when resolving the default workspace dir", () => {
-    const home = path.join(path.sep, "srv", "openclaw-home");
+  it("uses STEELENGINE_HOME when resolving the default workspace dir", () => {
+    const home = path.join(path.sep, "srv", "steelengine-home");
 
     const resolved = withEnv(
       {
-        OPENCLAW_WORKSPACE_DIR: undefined,
-        OPENCLAW_PROFILE: undefined,
-        OPENCLAW_HOME: home,
+        STEELENGINE_WORKSPACE_DIR: undefined,
+        STEELENGINE_PROFILE: undefined,
+        STEELENGINE_HOME: home,
         HOME: path.join(path.sep, "home", "other"),
       },
       () => resolveDefaultAgentWorkspaceDir(),
     );
 
-    expect(resolved).toBe(path.join(path.resolve(home), ".openclaw", "workspace"));
+    expect(resolved).toBe(path.join(path.resolve(home), ".steelengine", "workspace"));
   });
 
-  it("uses OPENCLAW_WORKSPACE_DIR before OPENCLAW_HOME", () => {
-    const workspaceDir = path.join(path.sep, "srv", "openclaw-workspace");
+  it("uses STEELENGINE_WORKSPACE_DIR before STEELENGINE_HOME", () => {
+    const workspaceDir = path.join(path.sep, "srv", "steelengine-workspace");
 
     const resolved = withEnv(
       {
-        OPENCLAW_WORKSPACE_DIR: workspaceDir,
-        OPENCLAW_HOME: path.join(path.sep, "srv", "openclaw-home"),
+        STEELENGINE_WORKSPACE_DIR: workspaceDir,
+        STEELENGINE_HOME: path.join(path.sep, "srv", "steelengine-home"),
       },
       () => resolveDefaultAgentWorkspaceDir(),
     );

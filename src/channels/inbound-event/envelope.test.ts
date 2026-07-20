@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import {
   createChannelInboundEnvelopeBuilder,
   resolveChannelInboundRouteEnvelope,
@@ -22,7 +22,7 @@ vi.mock("../../routing/resolve-route.js", () => ({ resolveAgentRoute }));
 const cfg = {
   agents: { defaults: { envelopeTimestamp: "off" } },
   session: { store: "/state/{agentId}/sessions.json" },
-} as OpenClawConfig;
+} as SteelEngineConfig;
 
 describe("channel inbound envelope", () => {
   beforeEach(() => vi.clearAllMocks());

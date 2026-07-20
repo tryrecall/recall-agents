@@ -18,14 +18,14 @@ import {
   syncWorkboardLifecycle,
   WORKBOARD_CHANGED_EVENT,
 } from "../../lib/workboard/index.ts";
-import { OpenClawLightDomElement } from "../../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../../lit/steelengine-element.ts";
 import { SubscriptionsController } from "../../lit/subscriptions-controller.ts";
 import { matchesAgentScope } from "./agent-filter.ts";
 import { searchForBoardFilter } from "./board-filter.ts";
 import type { WorkboardRouteData } from "./route.ts";
 import { renderWorkboard } from "./view.ts";
 
-class WorkboardPage extends OpenClawLightDomElement {
+class WorkboardPage extends SteelEngineLightDomElement {
   @consume({ context: applicationContext, subscribe: true })
   private context?: ApplicationContext;
 
@@ -287,6 +287,6 @@ class WorkboardPage extends OpenClawLightDomElement {
   }
 }
 
-if (!customElements.get("openclaw-workboard-page")) {
-  customElements.define("openclaw-workboard-page", WorkboardPage);
+if (!customElements.get("steelengine-workboard-page")) {
+  customElements.define("steelengine-workboard-page", WorkboardPage);
 }

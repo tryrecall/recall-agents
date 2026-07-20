@@ -1,5 +1,5 @@
 // Plugin state store exposes persisted per-plugin state operations.
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import {
   clearPluginStateDatabaseForTests,
   closePluginStateDatabase,
@@ -483,13 +483,13 @@ function clearPluginStateStoreForTests(): void {
 export function resetPluginStateStoreForTests(options: { closeDatabase?: boolean } = {}): void {
   if (options.closeDatabase !== false) {
     closePluginStateDatabase();
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
   }
   namespaceOptionSignatures.clear();
 }
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
-  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("openclaw.pluginStateStoreTestApi")] = {
+  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("steelengine.pluginStateStoreTestApi")] = {
     clearPluginStateStoreForTests,
   };
 }

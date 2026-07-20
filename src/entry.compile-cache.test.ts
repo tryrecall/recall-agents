@@ -7,12 +7,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanupTempDirs, makeTempDir } from "../test/helpers/temp-dir.js";
 import { resolveEntryInstallRoot } from "./entry.compile-cache.js";
 import {
-  buildOpenClawCompileCacheRespawnPlan,
+  buildSteelEngineCompileCacheRespawnPlan,
   isNodeVersionAffectedByCompileCacheDeadlock,
   isSourceCheckoutInstallRoot,
-  resolveOpenClawCompileCacheDirectory,
-  runOpenClawCompileCacheRespawnPlan,
-  shouldEnableOpenClawCompileCache,
+  resolveSteelEngineCompileCacheDirectory,
+  runSteelEngineCompileCacheRespawnPlan,
+  shouldEnableSteelEngineCompileCache,
 } from "./entry.compile-cache.test-support.js";
 
 function requireFirstMockCall(mock: { mock: { calls: unknown[][] } }, label: string): unknown[] {
@@ -31,25 +31,25 @@ describe("entry compile cache", () => {
   });
 
   it("resolves install roots from source and dist entry paths", () => {
-    expect(resolveEntryInstallRoot("/repo/openclaw/src/entry.ts")).toBe("/repo/openclaw");
-    expect(resolveEntryInstallRoot("/repo/openclaw/dist/entry.js")).toBe("/repo/openclaw");
-    expect(resolveEntryInstallRoot("/pkg/openclaw/entry.js")).toBe("/pkg/openclaw");
+    expect(resolveEntryInstallRoot("/repo/steelengine/src/entry.ts")).toBe("/repo/steelengine");
+    expect(resolveEntryInstallRoot("/repo/steelengine/dist/entry.js")).toBe("/repo/steelengine");
+    expect(resolveEntryInstallRoot("/pkg/steelengine/entry.js")).toBe("/pkg/steelengine");
   });
 
   it("treats git and source entry markers as source checkouts", async () => {
-    const root = makeTempDir(tempDirs, "openclaw-compile-cache-source-");
-    await fs.writeFile(path.join(root, ".git"), "gitdir: .git/worktrees/openclaw\n", "utf8");
+    const root = makeTempDir(tempDirs, "steelengine-compile-cache-source-");
+    await fs.writeFile(path.join(root, ".git"), "gitdir: .git/worktrees/steelengine\n", "utf8");
 
     expect(isSourceCheckoutInstallRoot(root)).toBe(true);
   });
 
   it("disables compile cache for source-checkout installs", async () => {
-    const root = makeTempDir(tempDirs, "openclaw-compile-cache-src-entry-");
+    const root = makeTempDir(tempDirs, "steelengine-compile-cache-src-entry-");
     await fs.mkdir(path.join(root, "src"), { recursive: true });
     await fs.writeFile(path.join(root, "src", "entry.ts"), "export {};\n", "utf8");
 
     expect(
-      shouldEnableOpenClawCompileCache({
+      shouldEnableSteelEngineCompileCache({
         env: {},
         installRoot: root,
       }),
@@ -57,10 +57,10 @@ describe("entry compile cache", () => {
   });
 
   it("keeps compile cache enabled for packaged installs unless disabled by env", () => {
-    const root = makeTempDir(tempDirs, "openclaw-compile-cache-package-");
+    const root = makeTempDir(tempDirs, "steelengine-compile-cache-package-");
 
     expect(
-      shouldEnableOpenClawCompileCache({
+      shouldEnableSteelEngineCompileCache({
         env: {},
         installRoot: root,
         nodeVersion: "24.15.0",
@@ -68,7 +68,7 @@ describe("entry compile cache", () => {
       }),
     ).toBe(true);
     expect(
-      shouldEnableOpenClawCompileCache({
+      shouldEnableSteelEngineCompileCache({
         env: { NODE_DISABLE_COMPILE_CACHE: "1" },
         installRoot: root,
         nodeVersion: "24.15.0",
@@ -78,28 +78,28 @@ describe("entry compile cache", () => {
   });
 
   it("scopes packaged compile cache by package install metadata", async () => {
-    const root = makeTempDir(tempDirs, "openclaw-compile-cache-package-key-");
+    const root = makeTempDir(tempDirs, "steelengine-compile-cache-package-key-");
     const packageJsonPath = path.join(root, "package.json");
     await fs.writeFile(packageJsonPath, '{"version":"2026.4.29"}\n', "utf8");
 
-    const directory = resolveOpenClawCompileCacheDirectory({
+    const directory = resolveSteelEngineCompileCacheDirectory({
       env: { NODE_COMPILE_CACHE: path.join(root, ".node-cache") },
       installRoot: root,
     });
 
-    expect(directory).toContain(path.join(".node-cache", "openclaw"));
+    expect(directory).toContain(path.join(".node-cache", "steelengine"));
     expect(directory).toContain("2026.4.29");
     expect(path.basename(directory)).toMatch(/^\d+-\d+$/);
   });
 
   it("builds a one-shot no-cache respawn plan when source checkout inherits NODE_COMPILE_CACHE", async () => {
-    const root = makeTempDir(tempDirs, "openclaw-compile-cache-respawn-");
+    const root = makeTempDir(tempDirs, "steelengine-compile-cache-respawn-");
     await fs.mkdir(path.join(root, "src"), { recursive: true });
     await fs.writeFile(path.join(root, "src", "entry.ts"), "export {};\n", "utf8");
 
-    const plan = buildOpenClawCompileCacheRespawnPlan({
+    const plan = buildSteelEngineCompileCacheRespawnPlan({
       currentFile: path.join(root, "dist", "entry.js"),
-      env: { NODE_COMPILE_CACHE: "/tmp/openclaw-cache" },
+      env: { NODE_COMPILE_CACHE: "/tmp/steelengine-cache" },
       execArgv: ["--no-warnings"],
       execPath: "/usr/bin/node",
       installRoot: root,
@@ -111,21 +111,21 @@ describe("entry compile cache", () => {
       args: ["--no-warnings", path.join(root, "dist", "entry.js"), "status", "--json"],
       env: {
         NODE_DISABLE_COMPILE_CACHE: "1",
-        OPENCLAW_COMPILE_CACHE_DISABLED_RESPAWNED: "1",
+        STEELENGINE_COMPILE_CACHE_DISABLED_RESPAWNED: "1",
       },
       detachForProcessTree: true,
     });
   });
 
   it("keeps interactive no-cache respawn plans attached to the terminal", async () => {
-    const root = makeTempDir(tempDirs, "openclaw-compile-cache-interactive-");
+    const root = makeTempDir(tempDirs, "steelengine-compile-cache-interactive-");
     const entryFile = path.join(root, "dist", "entry.js");
     await fs.mkdir(path.join(root, "src"), { recursive: true });
     await fs.writeFile(path.join(root, "src", "entry.ts"), "export {};\n", "utf8");
 
-    const plan = buildOpenClawCompileCacheRespawnPlan({
+    const plan = buildSteelEngineCompileCacheRespawnPlan({
       currentFile: entryFile,
-      env: { NODE_COMPILE_CACHE: "/tmp/openclaw-cache" },
+      env: { NODE_COMPILE_CACHE: "/tmp/steelengine-cache" },
       execPath: "/usr/bin/node",
       installRoot: root,
       argv: ["/usr/bin/node", entryFile, "tui"],
@@ -135,14 +135,14 @@ describe("entry compile cache", () => {
   });
 
   it("keeps bare-root no-cache respawn plans attached to the terminal", async () => {
-    const root = makeTempDir(tempDirs, "openclaw-compile-cache-root-");
+    const root = makeTempDir(tempDirs, "steelengine-compile-cache-root-");
     const entryFile = path.join(root, "dist", "entry.js");
     await fs.mkdir(path.join(root, "src"), { recursive: true });
     await fs.writeFile(path.join(root, "src", "entry.ts"), "export {};\n", "utf8");
 
-    const plan = buildOpenClawCompileCacheRespawnPlan({
+    const plan = buildSteelEngineCompileCacheRespawnPlan({
       currentFile: entryFile,
-      env: { NODE_COMPILE_CACHE: "/tmp/openclaw-cache" },
+      env: { NODE_COMPILE_CACHE: "/tmp/steelengine-cache" },
       execPath: "/usr/bin/node",
       installRoot: root,
       argv: ["/usr/bin/node", entryFile],
@@ -152,12 +152,12 @@ describe("entry compile cache", () => {
   });
 
   it("does not respawn unaffected packaged installs when NODE_COMPILE_CACHE is configured", () => {
-    const root = makeTempDir(tempDirs, "openclaw-compile-cache-package-respawn-");
+    const root = makeTempDir(tempDirs, "steelengine-compile-cache-package-respawn-");
 
     expect(
-      buildOpenClawCompileCacheRespawnPlan({
+      buildSteelEngineCompileCacheRespawnPlan({
         currentFile: path.join(root, "dist", "entry.js"),
-        env: { NODE_COMPILE_CACHE: "/tmp/openclaw-cache" },
+        env: { NODE_COMPILE_CACHE: "/tmp/steelengine-cache" },
         installRoot: root,
         nodeVersion: "24.1.0",
         platform: "linux",
@@ -166,12 +166,12 @@ describe("entry compile cache", () => {
   });
 
   it("builds a no-cache respawn plan for affected Windows packaged installs", () => {
-    const root = makeTempDir(tempDirs, "openclaw-compile-cache-package-win24-");
+    const root = makeTempDir(tempDirs, "steelengine-compile-cache-package-win24-");
     const entryFile = path.join(root, "dist", "entry.js");
 
-    const plan = buildOpenClawCompileCacheRespawnPlan({
+    const plan = buildSteelEngineCompileCacheRespawnPlan({
       currentFile: entryFile,
-      env: { NODE_COMPILE_CACHE: "/tmp/openclaw-cache" },
+      env: { NODE_COMPILE_CACHE: "/tmp/steelengine-cache" },
       execArgv: ["--no-warnings"],
       execPath: "/usr/bin/node",
       installRoot: root,
@@ -185,23 +185,23 @@ describe("entry compile cache", () => {
       args: ["--no-warnings", entryFile, "doctor", "--fix", "--non-interactive"],
       env: {
         NODE_DISABLE_COMPILE_CACHE: "1",
-        OPENCLAW_COMPILE_CACHE_DISABLED_RESPAWNED: "1",
+        STEELENGINE_COMPILE_CACHE_DISABLED_RESPAWNED: "1",
       },
       detachForProcessTree: false,
     });
   });
 
   it("does not respawn source checkouts twice", async () => {
-    const root = makeTempDir(tempDirs, "openclaw-compile-cache-respawn-once-");
+    const root = makeTempDir(tempDirs, "steelengine-compile-cache-respawn-once-");
     await fs.mkdir(path.join(root, "src"), { recursive: true });
     await fs.writeFile(path.join(root, "src", "entry.ts"), "export {};\n", "utf8");
 
     expect(
-      buildOpenClawCompileCacheRespawnPlan({
+      buildSteelEngineCompileCacheRespawnPlan({
         currentFile: path.join(root, "dist", "entry.js"),
         env: {
-          NODE_COMPILE_CACHE: "/tmp/openclaw-cache",
-          OPENCLAW_COMPILE_CACHE_DISABLED_RESPAWNED: "1",
+          NODE_COMPILE_CACHE: "/tmp/steelengine-cache",
+          STEELENGINE_COMPILE_CACHE_DISABLED_RESPAWNED: "1",
         },
         installRoot: root,
       }),
@@ -215,10 +215,10 @@ describe("entry compile cache", () => {
     const exit = vi.fn();
     const writeError = vi.fn();
 
-    runOpenClawCompileCacheRespawnPlan(
+    runSteelEngineCompileCacheRespawnPlan(
       {
         command: "/usr/bin/node",
-        args: ["/repo/openclaw/dist/entry.js", "status"],
+        args: ["/repo/steelengine/dist/entry.js", "status"],
         env: { NODE_DISABLE_COMPILE_CACHE: "1" },
         detachForProcessTree: true,
       },
@@ -232,7 +232,7 @@ describe("entry compile cache", () => {
 
     expect(spawn).toHaveBeenCalledWith(
       "/usr/bin/node",
-      ["/repo/openclaw/dist/entry.js", "status"],
+      ["/repo/steelengine/dist/entry.js", "status"],
       {
         stdio: "inherit",
         env: { NODE_DISABLE_COMPILE_CACHE: "1" },
@@ -257,10 +257,10 @@ describe("entry compile cache", () => {
     const spawn = vi.fn(() => child);
     const exit = vi.fn();
 
-    runOpenClawCompileCacheRespawnPlan(
+    runSteelEngineCompileCacheRespawnPlan(
       {
         command: "/usr/bin/node",
-        args: ["/repo/openclaw/dist/entry.js"],
+        args: ["/repo/steelengine/dist/entry.js"],
         env: {},
         detachForProcessTree: true,
       },
@@ -287,10 +287,10 @@ describe("entry compile cache", () => {
     let onSignal: ((signal: NodeJS.Signals) => void) | undefined;
 
     try {
-      runOpenClawCompileCacheRespawnPlan(
+      runSteelEngineCompileCacheRespawnPlan(
         {
           command: "/usr/bin/node",
-          args: ["/repo/openclaw/dist/entry.js"],
+          args: ["/repo/steelengine/dist/entry.js"],
           env: {},
           detachForProcessTree: false,
         },
@@ -325,9 +325,9 @@ describe("entry compile cache", () => {
   });
 
   it("disables compile cache for early Node 24.x versions on Windows", () => {
-    const root = makeTempDir(tempDirs, "openclaw-compile-cache-node24-");
+    const root = makeTempDir(tempDirs, "steelengine-compile-cache-node24-");
     expect(
-      shouldEnableOpenClawCompileCache({
+      shouldEnableSteelEngineCompileCache({
         env: {},
         installRoot: root,
         nodeVersion: "24.1.0",
@@ -335,7 +335,7 @@ describe("entry compile cache", () => {
       }),
     ).toBe(false);
     expect(
-      shouldEnableOpenClawCompileCache({
+      shouldEnableSteelEngineCompileCache({
         env: {},
         installRoot: root,
         nodeVersion: "24.14.0",
@@ -345,9 +345,9 @@ describe("entry compile cache", () => {
   });
 
   it("keeps compile cache enabled for early Node 24.x on non-Windows packaged installs", () => {
-    const root = makeTempDir(tempDirs, "openclaw-compile-cache-node24-nonwin-");
+    const root = makeTempDir(tempDirs, "steelengine-compile-cache-node24-nonwin-");
     expect(
-      shouldEnableOpenClawCompileCache({
+      shouldEnableSteelEngineCompileCache({
         env: {},
         installRoot: root,
         nodeVersion: "24.1.0",
@@ -355,7 +355,7 @@ describe("entry compile cache", () => {
       }),
     ).toBe(true);
     expect(
-      shouldEnableOpenClawCompileCache({
+      shouldEnableSteelEngineCompileCache({
         env: {},
         installRoot: root,
         nodeVersion: "24.14.0",
@@ -365,9 +365,9 @@ describe("entry compile cache", () => {
   });
 
   it("keeps compile cache enabled for Node 24.15+ and other majors on Windows", () => {
-    const root = makeTempDir(tempDirs, "openclaw-compile-cache-node2415-");
+    const root = makeTempDir(tempDirs, "steelengine-compile-cache-node2415-");
     expect(
-      shouldEnableOpenClawCompileCache({
+      shouldEnableSteelEngineCompileCache({
         env: {},
         installRoot: root,
         nodeVersion: "24.15.0",
@@ -375,7 +375,7 @@ describe("entry compile cache", () => {
       }),
     ).toBe(true);
     expect(
-      shouldEnableOpenClawCompileCache({
+      shouldEnableSteelEngineCompileCache({
         env: {},
         installRoot: root,
         nodeVersion: "22.22.0",
@@ -383,7 +383,7 @@ describe("entry compile cache", () => {
       }),
     ).toBe(true);
     expect(
-      shouldEnableOpenClawCompileCache({
+      shouldEnableSteelEngineCompileCache({
         env: {},
         installRoot: root,
         nodeVersion: "25.0.0",

@@ -312,8 +312,8 @@ const UI_VITEST_CONFIG = "test/vitest/vitest.ui.config.ts";
 const UI_E2E_VITEST_CONFIG = "test/vitest/vitest.ui-e2e.config.ts";
 const UTILS_VITEST_CONFIG = "test/vitest/vitest.utils.config.ts";
 const WIZARD_VITEST_CONFIG = "test/vitest/vitest.wizard.config.ts";
-const INCLUDE_FILE_ENV_KEY = "OPENCLAW_VITEST_INCLUDE_FILE";
-const FS_MODULE_CACHE_PATH_ENV_KEY = "OPENCLAW_VITEST_FS_MODULE_CACHE_PATH";
+const INCLUDE_FILE_ENV_KEY = "STEELENGINE_VITEST_INCLUDE_FILE";
+const FS_MODULE_CACHE_PATH_ENV_KEY = "STEELENGINE_VITEST_FS_MODULE_CACHE_PATH";
 const FAILED_SHARD_DIGEST_LIMIT = 12;
 const CHANGED_ARGS_PATTERN = /^--changed(?:=(.+))?$/u;
 const VITEST_CONFIG_BY_KIND = {
@@ -411,7 +411,7 @@ const VITEST_CONFIG_BY_KIND = {
 const BROAD_CHANGED_FALLBACK_PATTERNS = [
   /^package\.json$/u,
   /^pnpm-lock\.yaml$/u,
-  /^test\/setup(?:\.shared|\.extensions|-openclaw-runtime)?\.ts$/u,
+  /^test\/setup(?:\.shared|\.extensions|-steelengine-runtime)?\.ts$/u,
   /^vitest(?:\..+)?\.(?:config\.ts|paths\.mjs)$/u,
   /^test\/vitest\/vitest\.(?:config|shared\.config|scoped-config|performance-config)\.ts$/u,
   /^test\/helpers\//u,
@@ -443,7 +443,7 @@ const RUNTIME_SIDECAR_PATH_CONSUMER_TEST_TARGETS = [
   ...RUNTIME_SIDECAR_BASELINE_OWNER_TEST_TARGETS,
   "src/infra/update-global.test.ts",
   "src/infra/update-runner.test.ts",
-  "test/openclaw-npm-postpublish-verify.test.ts",
+  "test/steelengine-npm-postpublish-verify.test.ts",
 ];
 const OFFICIAL_EXTERNAL_CATALOG_TEST_TARGETS = [
   "src/plugins/official-external-plugin-catalog.test.ts",
@@ -526,7 +526,7 @@ const GITHUB_WORKFLOW_OWNER_TEST_TARGETS = new Map([
     ["test/scripts/ios-periphery-comment-workflow.test.ts"],
   ],
   [
-    ".github/workflows/shared-openclawkit-periphery.yml",
+    ".github/workflows/shared-steelenginekit-periphery.yml",
     ["test/scripts/periphery-intersection.test.ts"],
   ],
   [
@@ -581,15 +581,15 @@ const GITHUB_WORKFLOW_OWNER_TEST_TARGETS = new Map([
   ],
   [".github/workflows/android-release.yml", ["test/scripts/package-acceptance-workflow.test.ts"]],
   [
-    ".github/workflows/openclaw-cross-os-release-checks-reusable.yml",
+    ".github/workflows/steelengine-cross-os-release-checks-reusable.yml",
     [
-      "test/scripts/openclaw-cross-os-release-checks.test.ts",
-      "test/scripts/openclaw-cross-os-release-workflow.test.ts",
+      "test/scripts/steelengine-cross-os-release-checks.test.ts",
+      "test/scripts/steelengine-cross-os-release-workflow.test.ts",
       "test/scripts/package-acceptance-workflow.test.ts",
     ],
   ],
   [
-    ".github/workflows/openclaw-live-and-e2e-checks-reusable.yml",
+    ".github/workflows/steelengine-live-and-e2e-checks-reusable.yml",
     [
       "test/scripts/package-acceptance-workflow.test.ts",
       "test/scripts/release-workflow-matrix-plan.test.ts",
@@ -597,38 +597,38 @@ const GITHUB_WORKFLOW_OWNER_TEST_TARGETS = new Map([
     ],
   ],
   [
-    ".github/workflows/openclaw-npm-release.yml",
+    ".github/workflows/steelengine-npm-release.yml",
     [
-      "test/openclaw-npm-postpublish-verify.test.ts",
+      "test/steelengine-npm-postpublish-verify.test.ts",
       "test/scripts/package-acceptance-workflow.test.ts",
     ],
   ],
   [
-    ".github/workflows/openclaw-performance.yml",
-    ["test/scripts/openclaw-performance-workflow.test.ts"],
+    ".github/workflows/steelengine-performance.yml",
+    ["test/scripts/steelengine-performance-workflow.test.ts"],
   ],
   [
-    ".github/workflows/openclaw-release-checks.yml",
+    ".github/workflows/steelengine-release-checks.yml",
     [
-      "test/scripts/openclaw-cross-os-release-checks.test.ts",
+      "test/scripts/steelengine-cross-os-release-checks.test.ts",
       "test/scripts/package-acceptance-workflow.test.ts",
       "test/scripts/plugin-prerelease-test-plan.test.ts",
       "test/scripts/test-install-sh-docker.test.ts",
     ],
   ],
   [
-    ".github/workflows/openclaw-release-publish.yml",
+    ".github/workflows/steelengine-release-publish.yml",
     ["test/scripts/package-acceptance-workflow.test.ts"],
   ],
   [
-    ".github/workflows/openclaw-scheduled-live-checks.yml",
+    ".github/workflows/steelengine-scheduled-live-checks.yml",
     [
       "test/scripts/package-acceptance-workflow.test.ts",
       "test/scripts/release-no-push-workflow.test.ts",
     ],
   ],
   [
-    ".github/workflows/openclaw-stable-main-closeout.yml",
+    ".github/workflows/steelengine-stable-main-closeout.yml",
     ["test/scripts/package-acceptance-workflow.test.ts"],
   ],
   [
@@ -681,7 +681,7 @@ const GITHUB_WORKFLOW_OWNER_TEST_TARGETS = new Map([
 const TOOLING_SOURCE_TEST_TARGETS = new Map([
   ["Dockerfile", ROOT_DOCKERFILE_TEST_TARGETS],
   [
-    ".agents/skills/openclaw-changelog-update/scripts/verify-release-notes.mjs",
+    ".agents/skills/steelengine-changelog-update/scripts/verify-release-notes.mjs",
     ["test/scripts/release-notes-ledger.test.ts", "test/scripts/verify-release-notes.test.ts"],
   ],
   [".crabbox.yaml", ["test/scripts/package-acceptance-workflow.test.ts"]],
@@ -743,11 +743,11 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
     [...LIVE_MEDIA_RUNNER_IMAGE_TEST_TARGETS, "test/scripts/ci-workflow-guards.test.ts"],
   ],
   [
-    ".github/workflows/openclaw-live-and-e2e-checks-reusable.yml",
+    ".github/workflows/steelengine-live-and-e2e-checks-reusable.yml",
     ["test/scripts/package-acceptance-workflow.test.ts", "test/scripts/ci-workflow-guards.test.ts"],
   ],
   [
-    ".github/workflows/openclaw-release-checks.yml",
+    ".github/workflows/steelengine-release-checks.yml",
     ["test/scripts/package-acceptance-workflow.test.ts"],
   ],
   ["scripts/clawtributors-map.json", ["test/scripts/update-clawtributors.test.ts"]],
@@ -1077,11 +1077,11 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
       "test/scripts/security-sensitive-guard-workflow.test.ts",
     ],
   ],
-  ["scripts/github/resolve-openclaw-ref.sh", ["test/scripts/resolve-openclaw-ref.test.ts"]],
+  ["scripts/github/resolve-steelengine-ref.sh", ["test/scripts/resolve-steelengine-ref.test.ts"]],
   ["scripts/ci-hydrate-testbox-env.sh", ["test/scripts/ci-hydrate-testbox-env.test.ts"]],
   [
-    "scripts/github/run-openclaw-cross-os-release-checks.sh",
-    ["test/scripts/openclaw-cross-os-release-workflow.test.ts"],
+    "scripts/github/run-steelengine-cross-os-release-checks.sh",
+    ["test/scripts/steelengine-cross-os-release-workflow.test.ts"],
   ],
   ["scripts/mobile-release-ref.ts", ["test/scripts/mobile-release-ref.test.ts"]],
   ["scripts/apple-release-source-check.sh", ["test/scripts/apple-release-source-check.test.ts"]],
@@ -1111,16 +1111,16 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
   ["scripts/ios-validate-app-store-ipa.sh", ["test/scripts/ios-validate-app-store-ipa.test.ts"]],
   ["scripts/lib/restart-mac-gateway.sh", ["test/scripts/restart-mac.test.ts"]],
   [
-    "scripts/openclaw-release-clawhub-runtime-state.ts",
-    ["test/scripts/openclaw-release-clawhub-runtime-state.test.ts"],
+    "scripts/steelengine-release-clawhub-runtime-state.ts",
+    ["test/scripts/steelengine-release-clawhub-runtime-state.test.ts"],
   ],
-  ["scripts/openclaw-release-clawhub-plan.ts", ["test/scripts/release-wrapper-scripts.test.ts"]],
+  ["scripts/steelengine-release-clawhub-plan.ts", ["test/scripts/release-wrapper-scripts.test.ts"]],
   [
     "scripts/plan-release-workflow-matrix.mjs",
     ["test/scripts/release-workflow-matrix-plan.test.ts"],
   ],
   ["scripts/release-fast-pretag-check.sh", ["test/scripts/package-acceptance-workflow.test.ts"]],
-  ["scripts/openclaw-npm-resume-run.mjs", ["test/scripts/openclaw-npm-resume-run.test.ts"]],
+  ["scripts/steelengine-npm-resume-run.mjs", ["test/scripts/steelengine-npm-resume-run.test.ts"]],
   ["scripts/plugin-clawhub-release-check.ts", ["test/scripts/release-wrapper-scripts.test.ts"]],
   ["scripts/plugin-clawhub-release-plan.ts", ["test/scripts/release-wrapper-scripts.test.ts"]],
   ["scripts/plugin-npm-release-check.ts", ["test/scripts/release-wrapper-scripts.test.ts"]],
@@ -1293,10 +1293,10 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
       "src/infra/run-node.test.ts",
       "src/infra/package-dist-inventory.test.ts",
       "test/release-check.test.ts",
-      "test/openclaw-npm-release-check.test.ts",
+      "test/steelengine-npm-release-check.test.ts",
       "test/scripts/check-gateway-watch-regression.test.ts",
-      "test/scripts/check-openclaw-package-tarball.test.ts",
-      "test/scripts/openclaw-cross-os-release-checks.test.ts",
+      "test/scripts/check-steelengine-package-tarball.test.ts",
+      "test/scripts/steelengine-cross-os-release-checks.test.ts",
     ],
   ],
   [
@@ -1307,23 +1307,23 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
       "src/infra/run-node.test.ts",
       "src/infra/package-dist-inventory.test.ts",
       "test/release-check.test.ts",
-      "test/openclaw-npm-release-check.test.ts",
+      "test/steelengine-npm-release-check.test.ts",
       "test/scripts/check-gateway-watch-regression.test.ts",
-      "test/scripts/check-openclaw-package-tarball.test.ts",
-      "test/scripts/openclaw-cross-os-release-checks.test.ts",
+      "test/scripts/check-steelengine-package-tarball.test.ts",
+      "test/scripts/steelengine-cross-os-release-checks.test.ts",
     ],
   ],
   ["scripts/lib/npm-verify-exec.ts", ["test/scripts/npm-verify-exec.test.ts"]],
-  ["scripts/lib/openclaw-test-state.mjs", ["test/scripts/openclaw-test-state.test.ts"]],
+  ["scripts/lib/steelengine-test-state.mjs", ["test/scripts/steelengine-test-state.test.ts"]],
   [
     "scripts/lib/workspace-bootstrap-smoke.mjs",
-    ["test/release-check.test.ts", "test/openclaw-npm-release-check.test.ts"],
+    ["test/release-check.test.ts", "test/steelengine-npm-release-check.test.ts"],
   ],
   [
     "scripts/lib/package-dist-imports.mjs",
     [
       "test/scripts/check-package-dist-imports.test.ts",
-      "test/scripts/check-openclaw-package-tarball.test.ts",
+      "test/scripts/check-steelengine-package-tarball.test.ts",
       "test/scripts/postinstall-bundled-plugins.test.ts",
       "test/release-check.test.ts",
     ],
@@ -1358,8 +1358,8 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
     "scripts/lib/npm-publish-plan.mjs",
     [
       "test/npm-publish-plan.test.ts",
-      "test/openclaw-npm-release-check.test.ts",
-      "test/openclaw-npm-postpublish-verify.test.ts",
+      "test/steelengine-npm-release-check.test.ts",
+      "test/steelengine-npm-postpublish-verify.test.ts",
       "test/plugin-npm-release.test.ts",
       "test/plugin-clawhub-release.test.ts",
       "test/scripts/release-upgrade-baseline.test.ts",
@@ -1378,7 +1378,7 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
     "scripts/lib/npm-pack-budget.d.mts",
     ["test/release-check.test.ts", "test/scripts/test-install-sh-docker.test.ts"],
   ],
-  ["scripts/lib/openclaw-release-clawhub-plan.ts", ["test/plugin-clawhub-release.test.ts"]],
+  ["scripts/lib/steelengine-release-clawhub-plan.ts", ["test/plugin-clawhub-release.test.ts"]],
   [
     "scripts/lib/actions-artifact-archive.mjs",
     ["test/scripts/plugin-publication-artifact.test.ts"],
@@ -1532,8 +1532,8 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
   ["scripts/pr-prepare", ["test/scripts/pr-wrappers.test.ts"]],
   ["scripts/pr-review", ["test/scripts/pr-wrappers.test.ts"]],
   ["scripts/setup-auth-system.sh", ["test/scripts/auth-monitor.test.ts"]],
-  ["scripts/systemd/openclaw-auth-monitor.service", ["test/scripts/auth-monitor.test.ts"]],
-  ["scripts/systemd/openclaw-auth-monitor.timer", ["test/scripts/auth-monitor.test.ts"]],
+  ["scripts/systemd/steelengine-auth-monitor.service", ["test/scripts/auth-monitor.test.ts"]],
+  ["scripts/systemd/steelengine-auth-monitor.timer", ["test/scripts/auth-monitor.test.ts"]],
   ["scripts/termux-auth-widget.sh", ["test/scripts/auth-monitor.test.ts"]],
   ["scripts/termux-quick-auth.sh", ["test/scripts/auth-monitor.test.ts"]],
   ["scripts/termux-sync-widget.sh", ["test/scripts/auth-monitor.test.ts"]],
@@ -1551,7 +1551,7 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
       "test/scripts/install-sh.test.ts",
       "test/scripts/test-install-sh-docker.test.ts",
       "test/scripts/website-installer-sync-workflow.test.ts",
-      "test/scripts/openclaw-cross-os-release-checks.test.ts",
+      "test/scripts/steelengine-cross-os-release-checks.test.ts",
       "src/scripts/ci-changed-scope.test.ts",
     ],
   ],
@@ -1560,24 +1560,24 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
     [
       "test/scripts/install-ps1.test.ts",
       "test/scripts/website-installer-sync-workflow.test.ts",
-      "test/scripts/openclaw-cross-os-release-checks.test.ts",
+      "test/scripts/steelengine-cross-os-release-checks.test.ts",
       "src/scripts/ci-changed-scope.test.ts",
     ],
   ],
-  ["scripts/podman/openclaw.container.in", ["test/scripts/test-install-sh-docker.test.ts"]],
+  ["scripts/podman/steelengine.container.in", ["test/scripts/test-install-sh-docker.test.ts"]],
   ["scripts/ios-run.sh", ["test/scripts/ios-run.test.ts"]],
   ["scripts/ios-write-version-xcconfig.sh", ["test/scripts/ios-version.test.ts"]],
   ["scripts/create-dmg.sh", ["test/scripts/create-dmg.test.ts"]],
   ["scripts/kova-ci-summary.mjs", ["test/scripts/kova-ci-summary.test.ts"]],
   ["scripts/make_appcast.sh", ["test/scripts/make-appcast.test.ts"]],
   ["scripts/ocm-npm-workspace-deps.mjs", ["test/scripts/ocm-npm-workspace-deps.test.ts"]],
-  ["scripts/openclaw-npm-prepublish-verify.ts", ["test/openclaw-npm-prepublish-verify.test.ts"]],
-  ["scripts/openclaw-npm-postpublish-verify.ts", ["test/openclaw-npm-postpublish-verify.test.ts"]],
-  ["scripts/openclaw-npm-release-check.ts", ["test/openclaw-npm-release-check.test.ts"]],
-  ["scripts/openclaw-prepack.ts", ["test/openclaw-prepack.test.ts"]],
+  ["scripts/steelengine-npm-prepublish-verify.ts", ["test/steelengine-npm-prepublish-verify.test.ts"]],
+  ["scripts/steelengine-npm-postpublish-verify.ts", ["test/steelengine-npm-postpublish-verify.test.ts"]],
+  ["scripts/steelengine-npm-release-check.ts", ["test/steelengine-npm-release-check.test.ts"]],
+  ["scripts/steelengine-prepack.ts", ["test/steelengine-prepack.test.ts"]],
   [
-    "scripts/check-openclaw-package-tarball.mjs",
-    ["test/scripts/check-openclaw-package-tarball.test.ts"],
+    "scripts/check-steelengine-package-tarball.mjs",
+    ["test/scripts/check-steelengine-package-tarball.test.ts"],
   ],
   ["scripts/check-package-dist-imports.mjs", ["test/scripts/check-package-dist-imports.test.ts"]],
   [
@@ -1598,8 +1598,8 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
     ],
   ],
   [
-    "scripts/package-openclaw-for-docker.mjs",
-    ["test/e2e/qa-lab/runtime/package-openclaw-for-docker.e2e.test.ts"],
+    "scripts/package-steelengine-for-docker.mjs",
+    ["test/e2e/qa-lab/runtime/package-steelengine-for-docker.e2e.test.ts"],
   ],
   ["scripts/postinstall-bundled-plugins.mjs", ["test/scripts/postinstall-bundled-plugins.test.ts"]],
   ["scripts/prepare-git-hooks.mjs", ["test/scripts/prepare-git-hooks.test.ts"]],
@@ -1678,7 +1678,7 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
   ],
   [
     "scripts/e2e/onboard-docker.sh",
-    ["test/scripts/docker-build-helper.test.ts", "test/scripts/openclaw-test-state.test.ts"],
+    ["test/scripts/docker-build-helper.test.ts", "test/scripts/steelengine-test-state.test.ts"],
   ],
   [
     "scripts/e2e/agents-delete-shared-workspace-docker.sh",
@@ -1771,7 +1771,7 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
       "test/scripts/package-acceptance-workflow.test.ts",
       "test/scripts/upgrade-survivor-probe-gateway.test.ts",
       "test/scripts/upgrade-survivor-assertions.test.ts",
-      "test/scripts/openclaw-test-state.test.ts",
+      "test/scripts/steelengine-test-state.test.ts",
     ],
   ],
   ["scripts/e2e/plugin-lifecycle-matrix-docker.sh", ["test/scripts/docker-build-helper.test.ts"]],
@@ -1897,7 +1897,7 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
   ],
   [
     "scripts/e2e/lib/onboard/scenario.sh",
-    ["test/scripts/e2e-shell-tempfiles.test.ts", "test/scripts/openclaw-test-state.test.ts"],
+    ["test/scripts/e2e-shell-tempfiles.test.ts", "test/scripts/steelengine-test-state.test.ts"],
   ],
   ["scripts/e2e/lib/onboard/assert-config.mjs", ["test/scripts/onboard-config-fixtures.test.ts"]],
   ["scripts/e2e/lib/onboard/write-config.mjs", ["test/scripts/onboard-config-fixtures.test.ts"]],
@@ -2128,8 +2128,8 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
   ],
   ["scripts/profile-extension-memory.mjs", ["test/scripts/profile-extension-memory.test.ts"]],
   [
-    "scripts/openclaw-performance-source-summary.mjs",
-    ["test/scripts/openclaw-performance-source-summary.test.ts"],
+    "scripts/steelengine-performance-source-summary.mjs",
+    ["test/scripts/steelengine-performance-source-summary.test.ts"],
   ],
   ["scripts/check-gateway-cpu-scenarios.mjs", ["test/scripts/check-gateway-cpu-scenarios.test.ts"]],
   [
@@ -2152,7 +2152,7 @@ const TOOLING_SOURCE_TEST_TARGETS = new Map([
 ]);
 
 const CROSS_OS_RELEASE_CHECK_SOURCE_PATHS = [
-  "scripts/openclaw-cross-os-release-checks.ts",
+  "scripts/steelengine-cross-os-release-checks.ts",
   "scripts/lib/cross-os-release-checks/agent.ts",
   "scripts/lib/cross-os-release-checks/config.ts",
   "scripts/lib/cross-os-release-checks/index.ts",
@@ -2168,7 +2168,7 @@ const CROSS_OS_RELEASE_CHECK_SOURCE_PATHS = [
 ];
 for (const sourcePath of CROSS_OS_RELEASE_CHECK_SOURCE_PATHS) {
   TOOLING_SOURCE_TEST_TARGETS.set(sourcePath, [
-    "test/scripts/openclaw-cross-os-release-checks.test.ts",
+    "test/scripts/steelengine-cross-os-release-checks.test.ts",
   ]);
 }
 
@@ -2177,7 +2177,7 @@ const TOOLING_DECLARATION_SOURCE_MIRRORS = [
   ["scripts/ci-changed-scope.d.mts", "scripts/ci-changed-scope.mjs"],
   ["scripts/copy-bundled-plugin-metadata.d.mts", "scripts/copy-bundled-plugin-metadata.mjs"],
   ["scripts/docs-link-audit.d.mts", "scripts/docs-link-audit.mjs"],
-  ["scripts/openclaw-npm-resume-run.d.mts", "scripts/openclaw-npm-resume-run.mjs"],
+  ["scripts/steelengine-npm-resume-run.d.mts", "scripts/steelengine-npm-resume-run.mjs"],
   ["scripts/periphery-intersection.d.mts", "scripts/periphery-intersection.mjs"],
   [
     "scripts/lib/bundled-plugin-build-entries.d.mts",
@@ -2218,7 +2218,7 @@ const TOOLING_TEST_TARGETS = new Map([
   ["test/scripts/docker-e2e-helper-cli.test.ts", ["test/scripts/docker-e2e-helper-cli.test.ts"]],
   ["test/scripts/kova-ci-summary.test.ts", ["test/scripts/kova-ci-summary.test.ts"]],
   ["test/scripts/live-docker-stage.test.ts", ["test/scripts/live-docker-stage.test.ts"]],
-  ["test/scripts/openclaw-test-state.test.ts", ["test/scripts/openclaw-test-state.test.ts"]],
+  ["test/scripts/steelengine-test-state.test.ts", ["test/scripts/steelengine-test-state.test.ts"]],
   ["test/scripts/qa-lab-up.test.ts", ["test/scripts/qa-lab-up.test.ts"]],
   [
     "test/scripts/mantis-publish-pr-evidence.test.ts",
@@ -2283,7 +2283,7 @@ const HAPPY_PATH_PROMPT_SNAPSHOT_HELPER_TEST_TARGETS = ["test/scripts/prompt-sna
 const APPCAST_TEST_TARGETS = ["test/appcast.test.ts", "test/scripts/make-appcast.test.ts"];
 const SOURCE_TEST_TARGETS = new Map([
   ...PRECISE_SOURCE_TEST_TARGETS,
-  ["src/test-utils/openclaw-test-state.ts", ["src/test-utils/openclaw-test-state.test.ts"]],
+  ["src/test-utils/steelengine-test-state.ts", ["src/test-utils/steelengine-test-state.test.ts"]],
   [
     "src/channels/plugins/contracts/test-helpers/manifest.ts",
     [
@@ -2405,10 +2405,10 @@ const IMPORT_SPECIFIER_PATTERN =
   /\b(?:import|export)\s+(?:type\s+)?(?:[^'"]*?\s+from\s+)?["']([^"']+)["']|\bimport\s*\(\s*["']([^"']+)["']\s*\)/gu;
 const REEXPORT_SPECIFIER_PATTERN =
   /\bexport\s+(?:type\s+)?(?:\*\s+(?:as\s+\w+\s+)?from\s+|[^"']+?\s+from\s+)["']([^"']+)["']/gu;
-const BROAD_CHANGED_ENV_KEY = "OPENCLAW_TEST_CHANGED_BROAD";
-const VITEST_NO_OUTPUT_TIMEOUT_ENV_KEY = "OPENCLAW_VITEST_NO_OUTPUT_TIMEOUT_MS";
-const VITEST_NO_OUTPUT_HEARTBEAT_ENV_KEY = "OPENCLAW_VITEST_NO_OUTPUT_HEARTBEAT_MS";
-const VITEST_NO_OUTPUT_RETRY_ENV_KEY = "OPENCLAW_VITEST_NO_OUTPUT_RETRY";
+const BROAD_CHANGED_ENV_KEY = "STEELENGINE_TEST_CHANGED_BROAD";
+const VITEST_NO_OUTPUT_TIMEOUT_ENV_KEY = "STEELENGINE_VITEST_NO_OUTPUT_TIMEOUT_MS";
+const VITEST_NO_OUTPUT_HEARTBEAT_ENV_KEY = "STEELENGINE_VITEST_NO_OUTPUT_HEARTBEAT_MS";
+const VITEST_NO_OUTPUT_RETRY_ENV_KEY = "STEELENGINE_VITEST_NO_OUTPUT_RETRY";
 /** Default no-output timeout applied to test-projects Vitest children. */
 export const DEFAULT_TEST_PROJECTS_VITEST_NO_OUTPUT_TIMEOUT_MS = String(900_000);
 /** Default heartbeat interval applied to test-projects Vitest children. */
@@ -2427,7 +2427,7 @@ export function formatNoChangedTestTargetLines(skippedBroadFallbackPaths) {
       skippedBroadFallbackPaths.length === 1 ? "" : "s"
     } require broad Vitest fallback:`,
     ...skippedBroadFallbackPaths.map((changedPath) => `[test]   ${changedPath}`),
-    "[test] run `OPENCLAW_TEST_CHANGED_BROAD=1 pnpm test:changed` for broad coverage.",
+    "[test] run `STEELENGINE_TEST_CHANGED_BROAD=1 pnpm test:changed` for broad coverage.",
   ];
 }
 
@@ -4448,16 +4448,16 @@ export function buildFullSuiteVitestRunPlans(args, cwd = process.cwd()) {
     ];
   }
   const parallelShardCount = parsePositiveInt(
-    process.env.OPENCLAW_TEST_PROJECTS_PARALLEL,
-    "OPENCLAW_TEST_PROJECTS_PARALLEL",
+    process.env.STEELENGINE_TEST_PROJECTS_PARALLEL,
+    "STEELENGINE_TEST_PROJECTS_PARALLEL",
   );
   const expandToProjectConfigs =
-    process.env.OPENCLAW_TEST_PROJECTS_LEAF_SHARDS === "1" ||
+    process.env.STEELENGINE_TEST_PROJECTS_LEAF_SHARDS === "1" ||
     (Number.isFinite(parallelShardCount) && parallelShardCount > 1) ||
     shouldExpandLocalFullSuiteShardsByDefault(process.env);
   return fullSuiteVitestShards.flatMap((shard) => {
     if (
-      process.env.OPENCLAW_TEST_SKIP_FULL_EXTENSIONS_SHARD === "1" &&
+      process.env.STEELENGINE_TEST_SKIP_FULL_EXTENSIONS_SHARD === "1" &&
       shard.config === FULL_EXTENSIONS_VITEST_CONFIG
     ) {
       return [];
@@ -4518,7 +4518,7 @@ function shouldUseLocalFullSuiteParallelByDefault(env = process.env) {
     return false;
   }
   return (
-    env.OPENCLAW_TEST_PROJECTS_SERIAL !== "1" && env.CI !== "true" && env.GITHUB_ACTIONS !== "true"
+    env.STEELENGINE_TEST_PROJECTS_SERIAL !== "1" && env.CI !== "true" && env.GITHUB_ACTIONS !== "true"
   );
 }
 
@@ -4543,10 +4543,10 @@ function parsePositiveInt(value, label) {
 
 function hasConservativeVitestWorkerBudget(env) {
   const workerBudget = parsePositiveInt(
-    env.OPENCLAW_VITEST_MAX_WORKERS ?? env.OPENCLAW_TEST_WORKERS,
-    env.OPENCLAW_VITEST_MAX_WORKERS === undefined
-      ? "OPENCLAW_TEST_WORKERS"
-      : "OPENCLAW_VITEST_MAX_WORKERS",
+    env.STEELENGINE_VITEST_MAX_WORKERS ?? env.STEELENGINE_TEST_WORKERS,
+    env.STEELENGINE_VITEST_MAX_WORKERS === undefined
+      ? "STEELENGINE_TEST_WORKERS"
+      : "STEELENGINE_VITEST_MAX_WORKERS",
   );
   return workerBudget !== null && workerBudget <= 1;
 }
@@ -4555,13 +4555,13 @@ export function resolveParallelFullSuiteConcurrency(specCount, envInput, hostInf
   let env = envInput;
   env ??= process.env;
   const override = parsePositiveInt(
-    env.OPENCLAW_TEST_PROJECTS_PARALLEL,
-    "OPENCLAW_TEST_PROJECTS_PARALLEL",
+    env.STEELENGINE_TEST_PROJECTS_PARALLEL,
+    "STEELENGINE_TEST_PROJECTS_PARALLEL",
   );
   if (override !== null) {
     return Math.min(override, specCount);
   }
-  if (env.OPENCLAW_TEST_PROJECTS_SERIAL === "1") {
+  if (env.STEELENGINE_TEST_PROJECTS_SERIAL === "1") {
     return 1;
   }
   if (isCiLikeEnv(env)) {
@@ -4571,7 +4571,7 @@ export function resolveParallelFullSuiteConcurrency(specCount, envInput, hostInf
     return 1;
   }
   if (
-    env.OPENCLAW_TEST_PROJECTS_LEAF_SHARDS !== "1" &&
+    env.STEELENGINE_TEST_PROJECTS_LEAF_SHARDS !== "1" &&
     !shouldUseLocalFullSuiteParallelByDefault(env)
   ) {
     return 1;
@@ -4697,7 +4697,7 @@ export function createVitestRunSpecs(args, params = {}) {
     const includeFilePath = plan.includePatterns
       ? path.join(
           params.tempDir ?? os.tmpdir(),
-          `openclaw-vitest-include-${randomUUID()}-${index}.json`,
+          `steelengine-vitest-include-${randomUUID()}-${index}.json`,
         )
       : null;
     return {
@@ -4752,11 +4752,11 @@ function filterPlansForContractIncludeFile(plans, env) {
 }
 
 export function shouldAcquireLocalHeavyCheckLock(runSpecs, env = process.env) {
-  if (env.OPENCLAW_TEST_HEAVY_CHECK_LOCK_HELD === "1") {
+  if (env.STEELENGINE_TEST_HEAVY_CHECK_LOCK_HELD === "1") {
     return false;
   }
 
-  if (env.OPENCLAW_TEST_PROJECTS_FORCE_LOCK === "1") {
+  if (env.STEELENGINE_TEST_PROJECTS_FORCE_LOCK === "1") {
     return true;
   }
 

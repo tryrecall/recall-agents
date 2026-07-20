@@ -1,16 +1,16 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { resolveDefaultAgentId } from "openclaw/plugin-sdk/agent-runtime";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
-import type { PluginRuntime } from "openclaw/plugin-sdk/plugin-runtime";
-import { withTimeout } from "openclaw/plugin-sdk/security-runtime";
+import { resolveDefaultAgentId } from "steelengine/plugin-sdk/agent-runtime";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-entry";
+import type { PluginRuntime } from "steelengine/plugin-sdk/plugin-runtime";
+import { withTimeout } from "steelengine/plugin-sdk/security-runtime";
 import type {
   SessionCatalogHost,
   SessionCatalogProvider,
   SessionCatalogTranscriptItem,
-} from "openclaw/plugin-sdk/session-catalog";
-import { isRecord } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/session-catalog";
+import { isRecord } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { CLAUDE_CLI_BACKEND_ID, CLAUDE_CLI_DEFAULT_MODEL_REF } from "./cli-constants.js";
 import {
   adoptedSessionKey,
@@ -1266,7 +1266,7 @@ async function resolveNodeClaudeRecord(params: {
 }
 
 async function continueClaudeSession(
-  api: OpenClawPluginApi,
+  api: SteelEnginePluginApi,
   hostId: string,
   threadId: string,
 ): Promise<{ sessionKey: string }> {
@@ -1449,7 +1449,7 @@ function toGenericClaudeHost(
         ...(session.cliVersion ? { cliVersion: session.cliVersion } : {}),
         ...(session.gitBranch ? { gitBranch: session.gitBranch } : {}),
         archived: session.archived,
-        ...(continuable && existingSessionKey ? { openClawSessionKey: existingSessionKey } : {}),
+        ...(continuable && existingSessionKey ? { steelEngineSessionKey: existingSessionKey } : {}),
         canContinue: continuable,
         canArchive: false,
         canOpenTerminal: terminal.canOpenTerminal,
@@ -1460,7 +1460,7 @@ function toGenericClaudeHost(
   };
 }
 
-export function registerClaudeSessionCatalog(api: OpenClawPluginApi): void {
+export function registerClaudeSessionCatalog(api: SteelEnginePluginApi): void {
   const provider: SessionCatalogProvider = {
     id: "claude",
     label: "Claude Code",

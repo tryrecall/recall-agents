@@ -1,5 +1,5 @@
 // Slack tests cover setup surface plugin behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   createQueuedWizardPrompter,
   createSetupWizardAdapter,
@@ -7,8 +7,8 @@ import {
   runSetupWizardConfigure,
   runSetupWizardPrepare,
   runSetupWizardFinalize,
-} from "openclaw/plugin-sdk/plugin-test-runtime";
-import type { WizardPrompter } from "openclaw/plugin-sdk/plugin-test-runtime";
+} from "steelengine/plugin-sdk/plugin-test-runtime";
+import type { WizardPrompter } from "steelengine/plugin-sdk/plugin-test-runtime";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createSlackSetupWizardBase, slackSetupAdapter } from "./setup-core.js";
 import { buildSlackSetupLines } from "./setup-shared.js";
@@ -43,7 +43,7 @@ const baseCfg = {
       appToken: "xapp-test",
     },
   },
-} as OpenClawConfig;
+} as SteelEngineConfig;
 
 function requireFirstStringArg(mock: ReturnType<typeof vi.fn>, label: string): string {
   const [call] = mock.mock.calls;
@@ -116,7 +116,7 @@ describe("slackSetupWizard.prepare", () => {
 
     await runSetupWizardPrepare({
       prepare: slackSetupWizard.prepare,
-      cfg: { channels: { slack: {} } } as OpenClawConfig,
+      cfg: { channels: { slack: {} } } as SteelEngineConfig,
       prompter: createTestWizardPrompter({
         plain,
         note,
@@ -128,12 +128,12 @@ describe("slackSetupWizard.prepare", () => {
     const manifest = requireFirstStringArg(plain, "Slack manifest plain text");
     expect(JSON.parse(manifest)).toEqual({
       display_information: {
-        name: "OpenClaw",
-        description: "OpenClaw connector for OpenClaw",
+        name: "SteelEngine",
+        description: "SteelEngine connector for SteelEngine",
       },
       features: {
         bot_user: {
-          display_name: "OpenClaw",
+          display_name: "SteelEngine",
           always_online: true,
         },
         app_home: {
@@ -142,7 +142,7 @@ describe("slackSetupWizard.prepare", () => {
           messages_tab_read_only_enabled: false,
         },
         assistant_view: {
-          assistant_description: "OpenClaw connects Slack assistant threads to OpenClaw agents.",
+          assistant_description: "SteelEngine connects Slack assistant threads to SteelEngine agents.",
           suggested_prompts: [
             {
               title: "What can you do?",
@@ -160,8 +160,8 @@ describe("slackSetupWizard.prepare", () => {
         },
         slash_commands: [
           {
-            command: "/openclaw",
-            description: "Send a message to OpenClaw",
+            command: "/steelengine",
+            description: "Send a message to SteelEngine",
             should_escape: false,
           },
         ],
@@ -240,7 +240,7 @@ describe("slackSetupWizard.prepare", () => {
 
     const result = await runSetupWizardConfigure({
       configure,
-      cfg: {} as OpenClawConfig,
+      cfg: {} as SteelEngineConfig,
       prompter: queued.prompter,
       options: { secretInputMode: "plaintext" as const },
     });
@@ -285,7 +285,7 @@ describe("slackSetupWizard.prepare", () => {
 
     const result = await runSetupWizardConfigure({
       configure,
-      cfg: { channels: { slack: { mode: "http" } } } as OpenClawConfig,
+      cfg: { channels: { slack: { mode: "http" } } } as SteelEngineConfig,
       prompter: queued.prompter,
       options: { secretInputMode: "plaintext" as const },
     });
@@ -335,7 +335,7 @@ describe("slackSetupWizard.prepare", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       prompter: queued.prompter,
       options: { secretInputMode: "plaintext" as const },
     });
@@ -348,10 +348,10 @@ describe("slackSetupWizard.prepare", () => {
   });
 
   it.each([
-    { name: "new setup", cfg: {} as OpenClawConfig },
+    { name: "new setup", cfg: {} as SteelEngineConfig },
     {
       name: "switch from user identity",
-      cfg: { channels: { slack: { identity: "user" } } } as OpenClawConfig,
+      cfg: { channels: { slack: { identity: "user" } } } as SteelEngineConfig,
     },
   ])("keeps bot identity implicit for $name", async ({ cfg }) => {
     vi.stubEnv("SLACK_BOT_TOKEN", "");
@@ -422,7 +422,7 @@ describe("slackSetupWizard.prepare", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       prompter: queued.prompter,
       options: { secretInputMode: "plaintext" as const },
     });
@@ -449,7 +449,7 @@ describe("slackSetupWizard.prepare", () => {
             appToken: "test-app-token",
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       prompter: queued.prompter,
     });
 
@@ -493,7 +493,7 @@ describe("slackSetupWizard.dmPolicy", () => {
               },
             },
           },
-        } as OpenClawConfig,
+        } as SteelEngineConfig,
         "alerts",
       ),
     ).toBe("allowlist");
@@ -520,7 +520,7 @@ describe("slackSetupWizard.dmPolicy", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       "open",
       "alerts",
     );
@@ -557,7 +557,7 @@ describe("slackSetupWizard.status", () => {
   ])("treats a complete user-identity $name account as configured", async ({ slack }) => {
     expect(
       await slackSetupWizard.status.resolveConfigured({
-        cfg: { channels: { slack } } as OpenClawConfig,
+        cfg: { channels: { slack } } as SteelEngineConfig,
       }),
     ).toBe(true);
   });
@@ -582,7 +582,7 @@ describe("slackSetupWizard.status", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(configured).toBe(false);

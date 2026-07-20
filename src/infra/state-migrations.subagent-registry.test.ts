@@ -6,11 +6,11 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { useAutoCleanupTempDirTracker } from "../../test/helpers/temp-dir.js";
 import type { SubagentRunRecord } from "../agents/subagent-registry.types.js";
-import type { DB as OpenClawStateKyselyDatabase } from "../state/openclaw-state-db.generated.js";
+import type { DB as SteelEngineStateKyselyDatabase } from "../state/steelengine-state-db.generated.js";
 import {
-  closeOpenClawStateDatabaseForTest,
-  openOpenClawStateDatabase,
-} from "../state/openclaw-state-db.js";
+  closeSteelEngineStateDatabaseForTest,
+  openSteelEngineStateDatabase,
+} from "../state/steelengine-state-db.js";
 import { acquireGatewayLock } from "./gateway-lock.js";
 import {
   executeSqliteQuerySync,
@@ -22,19 +22,19 @@ import {
   migrateLegacySubagentRegistry,
 } from "./state-migrations.subagent-registry.js";
 
-type MigrationDatabase = Pick<OpenClawStateKyselyDatabase, "migration_sources" | "subagent_runs">;
+type MigrationDatabase = Pick<SteelEngineStateKyselyDatabase, "migration_sources" | "subagent_runs">;
 
 describe("legacy subagent registry Doctor migration", () => {
   const tempDirs = useAutoCleanupTempDirTracker((cleanup) => {
     afterEach(() => {
-      closeOpenClawStateDatabaseForTest();
+      closeSteelEngineStateDatabaseForTest();
       cleanup();
     });
   });
 
   function useStateDir(): { env: NodeJS.ProcessEnv; stateDir: string } {
-    const stateDir = tempDirs.make("openclaw-subagent-migration-");
-    return { env: { ...process.env, OPENCLAW_STATE_DIR: stateDir }, stateDir };
+    const stateDir = tempDirs.make("steelengine-subagent-migration-");
+    return { env: { ...process.env, STEELENGINE_STATE_DIR: stateDir }, stateDir };
   }
 
   function createRun(runId: string): SubagentRunRecord {
@@ -63,7 +63,7 @@ describe("legacy subagent registry Doctor migration", () => {
   }
 
   function database(env: NodeJS.ProcessEnv) {
-    return openOpenClawStateDatabase({ env }).db;
+    return openSteelEngineStateDatabase({ env }).db;
   }
 
   function seedCanonical(env: NodeJS.ProcessEnv, run: SubagentRunRecord): void {

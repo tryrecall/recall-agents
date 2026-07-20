@@ -1,5 +1,5 @@
-import type { ChannelSetupInput } from "openclaw/plugin-sdk/channel-setup";
-import { normalizeSecretInputString } from "openclaw/plugin-sdk/secret-input";
+import type { ChannelSetupInput } from "steelengine/plugin-sdk/channel-setup";
+import { normalizeSecretInputString } from "steelengine/plugin-sdk/secret-input";
 // Slack plugin module implements setup core behavior.
 import {
   createAccountScopedAllowFromSection,
@@ -17,14 +17,14 @@ import {
   type ChannelSetupAdapter,
   type ChannelSetupDmPolicy,
   type ChannelSetupWizard,
-  type OpenClawConfig,
-} from "openclaw/plugin-sdk/setup-runtime";
-import { formatDocsLink } from "openclaw/plugin-sdk/setup-tools";
+  type SteelEngineConfig,
+} from "steelengine/plugin-sdk/setup-runtime";
+import { formatDocsLink } from "steelengine/plugin-sdk/setup-tools";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
   uniqueStrings,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 import { inspectSlackAccount } from "./account-inspect.js";
 import {
   buildSlackManifest,
@@ -35,7 +35,7 @@ import {
 
 const t = createSetupTranslator();
 
-function enableSlackAccount(cfg: OpenClawConfig, accountId: string): OpenClawConfig {
+function enableSlackAccount(cfg: SteelEngineConfig, accountId: string): SteelEngineConfig {
   return patchChannelConfigForAccount({
     cfg,
     channel,
@@ -45,10 +45,10 @@ function enableSlackAccount(cfg: OpenClawConfig, accountId: string): OpenClawCon
 }
 
 function setSlackSetupIdentity(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId: string;
   identity: "bot" | "user";
-}): OpenClawConfig {
+}): SteelEngineConfig {
   const next = patchChannelConfigForAccount({
     cfg: params.cfg,
     channel,
@@ -74,7 +74,7 @@ function setSlackSetupIdentity(params: {
         ...next.channels,
         slack: nextSlack,
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
   }
 
   const account = slack.accounts?.[params.accountId];
@@ -101,10 +101,10 @@ function setSlackSetupIdentity(params: {
         },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
-function hasSlackInteractiveRepliesConfig(cfg: OpenClawConfig, accountId: string): boolean {
+function hasSlackInteractiveRepliesConfig(cfg: SteelEngineConfig, accountId: string): boolean {
   const capabilities = inspectSlackAccount({ cfg, accountId }).config.capabilities;
   if (Array.isArray(capabilities)) {
     return capabilities.some(
@@ -118,10 +118,10 @@ function hasSlackInteractiveRepliesConfig(cfg: OpenClawConfig, accountId: string
 }
 
 function setSlackInteractiveReplies(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   accountId: string,
   interactiveReplies: boolean,
-): OpenClawConfig {
+): SteelEngineConfig {
   const capabilities = inspectSlackAccount({ cfg, accountId }).config.capabilities;
   const nextCapabilities = Array.isArray(capabilities)
     ? interactiveReplies
@@ -297,7 +297,7 @@ export function createSlackSetupWizardBase(handlers: {
         return { cfg };
       }
       const identity = await prompter.select<"bot" | "user">({
-        message: "How should OpenClaw appear in Slack?",
+        message: "How should SteelEngine appear in Slack?",
         options: [
           { value: "bot", label: "Slack bot", hint: "Post as the Slack app (default)" },
           { value: "user", label: "Slack user", hint: "Post as the authorizing human" },
@@ -433,13 +433,13 @@ export function createSlackSetupWizardBase(handlers: {
       channel,
       label: t("wizard.slack.channelsLabel"),
       placeholder: "#general, #private, C123",
-      currentPolicy: ({ cfg, accountId }: { cfg: OpenClawConfig; accountId: string }) =>
+      currentPolicy: ({ cfg, accountId }: { cfg: SteelEngineConfig; accountId: string }) =>
         inspectSlackAccount({ cfg, accountId }).config.groupPolicy ?? "allowlist",
-      currentEntries: ({ cfg, accountId }: { cfg: OpenClawConfig; accountId: string }) =>
+      currentEntries: ({ cfg, accountId }: { cfg: SteelEngineConfig; accountId: string }) =>
         Object.entries(inspectSlackAccount({ cfg, accountId }).config.channels ?? {})
           .filter(([, value]) => value?.enabled !== false)
           .map(([key]) => key),
-      updatePrompt: ({ cfg, accountId }: { cfg: OpenClawConfig; accountId: string }) =>
+      updatePrompt: ({ cfg, accountId }: { cfg: SteelEngineConfig; accountId: string }) =>
         Boolean(inspectSlackAccount({ cfg, accountId }).config.channels),
       resolveAllowlist: handlers.resolveGroupAllowlist,
       fallbackResolved: (entries) => entries,
@@ -448,7 +448,7 @@ export function createSlackSetupWizardBase(handlers: {
         accountId,
         resolved,
       }: {
-        cfg: OpenClawConfig;
+        cfg: SteelEngineConfig;
         accountId: string;
         resolved: unknown;
       }) => setSlackChannelAllowlist(cfg, accountId, resolved as string[]),
@@ -470,7 +470,7 @@ export function createSlackSetupWizardBase(handlers: {
         cfg: setSlackInteractiveReplies(cfg, accountId, enableInteractiveReplies),
       };
     },
-    disable: (cfg: OpenClawConfig) => setSetupChannelEnabled(cfg, channel, false),
+    disable: (cfg: SteelEngineConfig) => setSetupChannelEnabled(cfg, channel, false),
   } satisfies ChannelSetupWizard;
 }
 export function createSlackSetupWizardProxy(

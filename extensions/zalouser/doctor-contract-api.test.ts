@@ -6,13 +6,13 @@ import {
   createPluginStateSyncKeyedStoreForTests,
   createPluginStateKeyedStoreForTests,
   resetPluginStateStoreForTests,
-} from "openclaw/plugin-sdk/plugin-state-test-runtime";
-import { createPluginRuntimeMock } from "openclaw/plugin-sdk/plugin-test-runtime";
+} from "steelengine/plugin-sdk/plugin-state-test-runtime";
+import { createPluginRuntimeMock } from "steelengine/plugin-sdk/plugin-test-runtime";
 import type {
   OpenKeyedStoreOptions,
   PluginDoctorStateMigrationContext,
-} from "openclaw/plugin-sdk/runtime-doctor";
-import { listSessionEntries, upsertSessionEntry } from "openclaw/plugin-sdk/session-store-runtime";
+} from "steelengine/plugin-sdk/runtime-doctor";
+import { listSessionEntries, upsertSessionEntry } from "steelengine/plugin-sdk/session-store-runtime";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { stateMigrations } from "./doctor-contract-api.js";
 import { setZalouserRuntime } from "./src/runtime.js";
@@ -51,9 +51,9 @@ describe("zalouser doctor state migration", () => {
 
   beforeEach(async () => {
     resetPluginStateStoreForTests();
-    stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-zalouser-doctor-"));
+    stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-zalouser-doctor-"));
     storePath = path.join(stateDir, "sessions.json");
-    env = { ...process.env, OPENCLAW_STATE_DIR: stateDir };
+    env = { ...process.env, STEELENGINE_STATE_DIR: stateDir };
   });
 
   afterEach(async () => {

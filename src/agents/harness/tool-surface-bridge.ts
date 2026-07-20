@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type { HookContext } from "../agent-tools.before-tool-call.js";
 import { getActiveAgentRingZeroTools } from "../agent-tools.ring-zero-context.js";
 import {
@@ -49,7 +49,7 @@ export type AgentHarnessToolSurfaceRuntime = {
   ) => {
     tools: AnyAgentTool[];
   };
-  config: OpenClawConfig | undefined;
+  config: SteelEngineConfig | undefined;
   includeToolSearchControls: boolean;
   runtimeToolAllowlist: string[] | undefined;
   toolSearchCatalogRef: ToolSearchCatalogRef | undefined;
@@ -61,7 +61,7 @@ export type AgentHarnessToolSurfaceRuntime = {
 export function createAgentHarnessToolSurfaceRuntime(params: {
   abortSignal?: AbortSignal;
   agentId?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   disableTools?: boolean;
   executeTool: ToolSearchCatalogToolExecutor;
   forceMessageTool?: boolean;

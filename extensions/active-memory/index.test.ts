@@ -2,16 +2,16 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
-import type { OpenKeyedStoreOptions } from "openclaw/plugin-sdk/plugin-state-runtime";
+import { expectDefined } from "@steelengine/normalization-core";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-entry";
+import type { OpenKeyedStoreOptions } from "steelengine/plugin-sdk/plugin-state-runtime";
 import {
   createPluginStateKeyedStoreForTests,
   resetPluginStateStoreForTests,
-} from "openclaw/plugin-sdk/plugin-state-test-runtime";
-import { parseAgentSessionKey } from "openclaw/plugin-sdk/routing";
-import { parseSqliteSessionFileMarker } from "openclaw/plugin-sdk/session-store-runtime";
-import { appendSessionTranscriptMessageByIdentity } from "openclaw/plugin-sdk/session-transcript-runtime";
+} from "steelengine/plugin-sdk/plugin-state-test-runtime";
+import { parseAgentSessionKey } from "steelengine/plugin-sdk/routing";
+import { parseSqliteSessionFileMarker } from "steelengine/plugin-sdk/session-store-runtime";
+import { appendSessionTranscriptMessageByIdentity } from "steelengine/plugin-sdk/session-transcript-runtime";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { applyCliRuntimeRecallTimeoutDefault } from "./config.js";
 import plugin, { testing } from "./index.js";
@@ -64,13 +64,13 @@ const hoisted = vi.hoisted(() => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/memory-host-search", () => ({
+vi.mock("steelengine/plugin-sdk/memory-host-search", () => ({
   closeActiveMemorySearchManager: hoisted.closeActiveMemorySearchManager,
 }));
 
-vi.mock("openclaw/plugin-sdk/session-store-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/session-store-runtime")>(
-    "openclaw/plugin-sdk/session-store-runtime",
+vi.mock("steelengine/plugin-sdk/session-store-runtime", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/session-store-runtime")>(
+    "steelengine/plugin-sdk/session-store-runtime",
   );
   return {
     ...actual,
@@ -80,10 +80,10 @@ vi.mock("openclaw/plugin-sdk/session-store-runtime", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/session-transcript-runtime", async () => {
+vi.mock("steelengine/plugin-sdk/session-transcript-runtime", async () => {
   const actual = await vi.importActual<
-    typeof import("openclaw/plugin-sdk/session-transcript-runtime")
-  >("openclaw/plugin-sdk/session-transcript-runtime");
+    typeof import("steelengine/plugin-sdk/session-transcript-runtime")
+  >("steelengine/plugin-sdk/session-transcript-runtime");
   return {
     ...actual,
     readSessionTranscriptEvents: async (
@@ -291,7 +291,7 @@ describe("active-memory plugin", () => {
         openKeyedStore: (options: OpenKeyedStoreOptions) =>
           createPluginStateKeyedStoreForTests("active-memory", {
             ...options,
-            env: { ...process.env, OPENCLAW_STATE_DIR: pluginStateDir },
+            env: { ...process.env, STEELENGINE_STATE_DIR: pluginStateDir },
           }),
       },
       config: {
@@ -488,7 +488,7 @@ describe("active-memory plugin", () => {
   };
 
   beforeAll(async () => {
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-active-memory-test-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-active-memory-test-"));
     pluginStateDir = path.join(fixtureRoot, "plugin-state");
     stateDir = path.join(fixtureRoot, "state");
   });
@@ -501,7 +501,7 @@ describe("active-memory plugin", () => {
     await createPluginStateKeyedStoreForTests("active-memory", {
       namespace: "session-toggles",
       maxEntries: 10_000,
-      env: { ...process.env, OPENCLAW_STATE_DIR: pluginStateDir },
+      env: { ...process.env, STEELENGINE_STATE_DIR: pluginStateDir },
     }).clear();
     runEmbeddedAgent.mockReset();
     configFile = {
@@ -603,7 +603,7 @@ describe("active-memory plugin", () => {
     );
     testing.resetActiveRecallCacheForTests();
     testing.setTimeoutPartialDataGraceMsForTests(5);
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
   });
 
   afterEach(() => {
@@ -633,7 +633,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       timeoutMs: 90_000,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     expect(hookOptions.before_prompt_build?.timeoutMs).toBe(153_000);
   });
@@ -644,7 +644,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 90_000,
       setupGraceTimeoutMs: 30_000,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     expect(hookOptions.before_prompt_build?.timeoutMs).toBe(153_000);
   });
@@ -812,7 +812,7 @@ describe("active-memory plugin", () => {
 
     expect(result).toBeUndefined();
     expect(hoisted.cleanupSessionLifecycleArtifacts).toHaveBeenCalledTimes(3);
-    expect(rmSpy).toHaveBeenCalledWith(expect.stringMatching(/openclaw-active-memory-.*/), {
+    expect(rmSpy).toHaveBeenCalledWith(expect.stringMatching(/steelengine-active-memory-.*/), {
       recursive: true,
       force: true,
     });
@@ -924,7 +924,7 @@ describe("active-memory plugin", () => {
       allowedChatTypes: ["direct", "group"],
       deniedChatIds: ["AbCdEfGh=="],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "hi", messages: [] },
@@ -1217,7 +1217,7 @@ describe("active-memory plugin", () => {
       agents: ["sandbox"],
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const statusResult = await registeredCommands["active-memory"].handler({
       channel: "webchat",
@@ -1763,7 +1763,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       allowedChatTypes: ["direct", "group"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "what wings should we order?", messages: [] },
@@ -1788,7 +1788,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       allowedChatTypes: ["direct", "group"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "what wings should we order?", messages: [] },
@@ -1838,7 +1838,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       allowedChatTypes: ["direct"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "what did we decide?", messages: [] },
@@ -1864,7 +1864,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       allowedChatTypes: ["explicit"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "what should i work on next?", messages: [] },
@@ -1886,7 +1886,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       allowedChatTypes: ["explicit"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "what should i work on next?", messages: [] },
@@ -1909,7 +1909,7 @@ describe("active-memory plugin", () => {
       allowedChatTypes: ["direct", "group"],
       allowedChatIds: ["oc_allowed_group"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "hi", messages: [] },
@@ -1932,7 +1932,7 @@ describe("active-memory plugin", () => {
       allowedChatTypes: ["direct", "group"],
       allowedChatIds: ["oc_allowed_group", "OC_OTHER"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "hi", messages: [] },
@@ -1958,7 +1958,7 @@ describe("active-memory plugin", () => {
       allowedChatTypes: ["group"],
       allowedChatIds: ["OC_MIXED_Case"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "hi", messages: [] },
@@ -1981,7 +1981,7 @@ describe("active-memory plugin", () => {
       allowedChatTypes: ["direct", "group"],
       deniedChatIds: ["oc_blocked_group"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "hi", messages: [] },
@@ -2004,7 +2004,7 @@ describe("active-memory plugin", () => {
       allowedChatTypes: ["direct"],
       allowedChatIds: ["oc_some_group"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     // The default main session key (agent:main:main) exposes no chat id; the
     // allowlist must not accidentally match it.
@@ -2033,7 +2033,7 @@ describe("active-memory plugin", () => {
       allowedChatTypes: ["direct", "group"],
       allowedChatIds: ["oc_allowed_group"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "hi", messages: [] },
@@ -2060,7 +2060,7 @@ describe("active-memory plugin", () => {
       allowedChatTypes: ["direct", "group"],
       allowedChatIds: ["oc_allowed_group", "ou_allowed_direct_user"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "hi", messages: [] },
@@ -2084,7 +2084,7 @@ describe("active-memory plugin", () => {
       allowedChatTypes: ["direct"],
       allowedChatIds: ["ou_per_peer_user"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "hi", messages: [] },
@@ -2109,7 +2109,7 @@ describe("active-memory plugin", () => {
       allowedChatTypes: ["direct"],
       allowedChatIds: ["ou_per_account_user"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "hi", messages: [] },
@@ -2136,7 +2136,7 @@ describe("active-memory plugin", () => {
       allowedChatTypes: ["group"],
       allowedChatIds: ["oc_threaded_group"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "hi", messages: [] },
@@ -2161,7 +2161,7 @@ describe("active-memory plugin", () => {
       allowedChatTypes: ["direct"],
       deniedChatIds: ["ou_threaded_blocked_user"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "hi", messages: [] },
@@ -2232,7 +2232,7 @@ describe("active-memory plugin", () => {
         searchMode: "inherit",
       },
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -2321,7 +2321,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       toolsAllow: [" lcm_grep ", "lcm_describe", "", "lcm_expand_query", "lcm_grep"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -2427,7 +2427,7 @@ describe("active-memory plugin", () => {
         "lcm_describe",
       ],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -2452,7 +2452,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       toolsAllow: ["*", "group:plugins", "read", "exec", "message", "web_search"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -2502,7 +2502,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       queryMode: "message",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -2530,7 +2530,7 @@ describe("active-memory plugin", () => {
       queryMode: "message",
       promptStyle: "preference-only",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -2576,7 +2576,7 @@ describe("active-memory plugin", () => {
       fastMode: true,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -2616,7 +2616,7 @@ describe("active-memory plugin", () => {
       fastMode: false,
     };
     api.pluginConfig = { agents: ["main"], logging: true };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -2659,7 +2659,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       promptAppend: "Prefer stable long-term preferences over one-off events.",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -2688,7 +2688,7 @@ describe("active-memory plugin", () => {
       promptOverride: "Custom memory prompt. Return NONE or one user fact.",
       promptAppend: "Extra custom instruction.",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -2762,7 +2762,7 @@ describe("active-memory plugin", () => {
     api.pluginConfig = {
       agents: ["main"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       { prompt: "what wings should i order? temp transcript", messages: [] },
@@ -2809,7 +2809,7 @@ describe("active-memory plugin", () => {
     api.pluginConfig = {
       agents: ["main"],
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       { prompt: "what wings should i order? bare model default", messages: [] },
@@ -2831,7 +2831,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       modelFallbackPolicy: "resolved-only",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "what wings should i order? no fallback", messages: [] },
@@ -2854,7 +2854,7 @@ describe("active-memory plugin", () => {
       modelFallback: "google/gemini-3-flash",
       modelFallbackPolicy: "default-remote",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       { prompt: "what wings should i order? custom fallback", messages: [] },
@@ -2893,7 +2893,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       modelFallbackPolicy: "default-remote",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const result = await requireHook("before_prompt_build")(
       { prompt: "what wings should i order? built-in fallback", messages: [] },
@@ -3503,7 +3503,7 @@ describe("active-memory plugin", () => {
       toolsAllow: ["lcm_grep", "lcm_describe", "lcm_expand_query"],
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:missing-custom-memory-tools";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-missing-custom-memory-tools",
@@ -3621,7 +3621,7 @@ describe("active-memory plugin", () => {
       persistTranscripts: true,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:timeout-partial";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-timeout-partial",
@@ -3681,7 +3681,7 @@ describe("active-memory plugin", () => {
       maxSummaryChars: 80,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:timeout-partial-temp-transcript";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-timeout-partial-temp-transcript",
@@ -3728,7 +3728,7 @@ describe("active-memory plugin", () => {
       maxSummaryChars: 80,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:timeout-partial-sqlite-transcript";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-timeout-partial-sqlite-transcript",
@@ -3793,7 +3793,7 @@ describe("active-memory plugin", () => {
       persistTranscripts: true,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:timeout-empty-transcript";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-timeout-empty-transcript",
@@ -3827,7 +3827,7 @@ describe("active-memory plugin", () => {
       persistTranscripts: true,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:timeout-missing-transcript";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-timeout-missing-transcript",
@@ -3857,7 +3857,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 100,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:timeout-boilerplate-transcript";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-timeout-boilerplate-transcript",
@@ -3904,7 +3904,7 @@ describe("active-memory plugin", () => {
       persistTranscripts: true,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:abort-timeout-partial";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-abort-timeout-partial",
@@ -3949,7 +3949,7 @@ describe("active-memory plugin", () => {
       persistTranscripts: true,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:generic-error-partial-ignored";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-generic-error-partial-ignored",
@@ -4165,7 +4165,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     runEmbeddedAgent.mockResolvedValue({
       payloads: [{ text: "NONE" }],
     });
@@ -4225,7 +4225,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 1,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     let lastAbortSignal: AbortSignal | undefined;
     runEmbeddedAgent.mockImplementation(async (params: { abortSignal?: AbortSignal }) => {
       lastAbortSignal = params.abortSignal;
@@ -4277,7 +4277,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 1,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     runEmbeddedAgent.mockImplementationOnce(() => new Promise<never>(() => {}));
 
     const result = await requireHook("before_prompt_build")(
@@ -4309,7 +4309,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 1,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     runEmbeddedAgent.mockImplementationOnce(() => new Promise<never>(() => {}));
     hoisted.updateSessionStore.mockImplementationOnce(
       async () =>
@@ -4342,7 +4342,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 25,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     let markPersistenceStarted: (() => void) | undefined;
     const persistenceStarted = new Promise<void>((resolve) => {
       markPersistenceStarted = resolve;
@@ -4375,7 +4375,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       { prompt: "what wings should i order? session id cache", messages: [] },
@@ -4415,7 +4415,7 @@ describe("active-memory plugin", () => {
       timeoutMs: CONFIGURED_TIMEOUT_MS,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     runEmbeddedAgent.mockImplementationOnce(async (params: { timeoutMs?: number }) => {
       await new Promise((resolve) => {
         setTimeout(resolve, (params.timeoutMs ?? 0) + 5);
@@ -4460,7 +4460,7 @@ describe("active-memory plugin", () => {
       setupGraceTimeoutMs: SETUP_GRACE_TIMEOUT_MS,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     runEmbeddedAgent.mockImplementationOnce(async (params: { sessionFile: string }) => {
       await new Promise((resolve) => {
         setTimeout(resolve, CONFIGURED_TIMEOUT_MS + 5);
@@ -4497,7 +4497,7 @@ describe("active-memory plugin", () => {
       timeoutMs: CONFIGURED_TIMEOUT_MS,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     // Simulate a subagent that never cooperatively checks the abort signal.
     runEmbeddedAgent.mockImplementationOnce(() => new Promise<never>(() => {}));
 
@@ -4533,7 +4533,7 @@ describe("active-memory plugin", () => {
       timeoutMs: CONFIGURED_TIMEOUT_MS,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:terminal-zero-hit";
     hoisted.sessionStore[sessionKey] = { sessionId: "s-terminal-zero-hit", updatedAt: 0 };
     runEmbeddedAgent.mockImplementationOnce(
@@ -4576,7 +4576,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 100,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:terminal-zero-hit-with-results";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-terminal-zero-hit-with-results",
@@ -4625,7 +4625,7 @@ describe("active-memory plugin", () => {
       maxSummaryChars: 120,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:terminal-unavailable-then-summary";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-terminal-unavailable-then-summary",
@@ -4730,7 +4730,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 100,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:grounded-terminal-timeout-partial";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-grounded-terminal-timeout-partial",
@@ -4789,7 +4789,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 100,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:late-unavailable-timeout";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-late-unavailable-timeout",
@@ -4846,7 +4846,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 100,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:unsettled-timeout";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-unsettled-timeout",
@@ -4924,7 +4924,7 @@ describe("active-memory plugin", () => {
       toolsAllow: ["memory_lookup_custom"],
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:custom-tool-timeout-failure";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-custom-tool-timeout-failure",
@@ -4987,7 +4987,7 @@ describe("active-memory plugin", () => {
       toolsAllow: ["memory_lookup_custom", "memory_search"],
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:custom-tool-evidence";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-custom-tool-evidence",
@@ -5053,7 +5053,7 @@ describe("active-memory plugin", () => {
       toolsAllow: [" MEMORY_SEARCH "],
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:case-insensitive-tool-evidence";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-case-insensitive-tool-evidence",
@@ -5082,7 +5082,7 @@ describe("active-memory plugin", () => {
       toolsAllow: ["memory_lookup_custom"],
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:custom-tool-retry";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-custom-tool-retry",
@@ -5132,7 +5132,7 @@ describe("active-memory plugin", () => {
       toolsAllow: ["memory_search"],
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:harness-tool-evidence";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-harness-tool-evidence",
@@ -5181,7 +5181,7 @@ describe("active-memory plugin", () => {
       toolsAllow: ["memory_lookup_custom"],
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:custom-tool-content-failure";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-custom-tool-content-failure",
@@ -5235,7 +5235,7 @@ describe("active-memory plugin", () => {
           resolveLookup = resolve;
         }),
     });
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const resultPromise = requireHook("before_prompt_build")(
       { prompt: "what food do i usually order? stalled toggle lookup", messages: [] },
@@ -5275,7 +5275,7 @@ describe("active-memory plugin", () => {
           setTimeout(() => resolve(undefined), 1_490);
         }),
     });
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     runEmbeddedAgent.mockImplementationOnce(() => new Promise<never>(() => {}));
 
     const resultPromise = requireHook("before_prompt_build")(
@@ -5321,7 +5321,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 1_000,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:empty-search-completed-output";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-empty-search-completed-output",
@@ -5360,7 +5360,7 @@ describe("active-memory plugin", () => {
       timeoutMs: CONFIGURED_TIMEOUT_MS,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:terminal-unavailable-then-diagnostic";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-terminal-unavailable-then-diagnostic",
@@ -5412,7 +5412,7 @@ describe("active-memory plugin", () => {
       toolsAllow: ["memory_get", "memory_search"],
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:rotated-memory-evidence";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-rotated-memory-evidence",
@@ -5464,7 +5464,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 1_000,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:rotated-memory-unavailable";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-rotated-memory-unavailable",
@@ -5507,7 +5507,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 1_000,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:rotated-sqlite-memory-unavailable";
     hoisted.sessionStore[sessionKey] = {
       sessionId: "s-rotated-sqlite-memory-unavailable",
@@ -5573,7 +5573,7 @@ describe("active-memory plugin", () => {
       timeoutMs: CONFIGURED_TIMEOUT_MS,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionKey = "agent:main:terminal-unavailable";
     hoisted.sessionStore[sessionKey] = { sessionId: "s-terminal-unavailable", updatedAt: 0 };
     runEmbeddedAgent.mockImplementationOnce(
@@ -5624,7 +5624,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       timeoutMs: 1_000,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     hoisted.sessionStore["agent:main:memory-get-miss"] = {
       sessionId: "s-memory-get-miss",
       updatedAt: 0,
@@ -5683,7 +5683,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 90_000,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       { prompt: "what wings should i order? high timeout", messages: [] },
@@ -5705,7 +5705,7 @@ describe("active-memory plugin", () => {
       timeoutMs: 200_000,
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       { prompt: "what wings should i order? capped timeout", messages: [] },
@@ -5726,7 +5726,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       { prompt: "what wings should i order? log sanitization", messages: [] },
@@ -5760,7 +5760,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const sessionPrefix = `agent:main:${"x".repeat(288)}`;
     const hugeSession = `${sessionPrefix}😀tail`;
 
@@ -6016,7 +6016,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       queryMode: "message",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -6049,7 +6049,7 @@ describe("active-memory plugin", () => {
       recentUserChars: 40,
       recentAssistantChars: 40,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -6087,7 +6087,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       queryMode: "message",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const prefix = "a".repeat(479);
 
     await requireHook("before_prompt_build")(
@@ -6112,7 +6112,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       queryMode: "recent",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -6155,7 +6155,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       queryMode: "full",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -6186,7 +6186,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       queryMode: "recent",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -6240,7 +6240,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       queryMode: "recent",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -6282,7 +6282,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       queryMode: "recent",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -6315,7 +6315,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       queryMode: "recent",
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       {
@@ -6377,7 +6377,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       maxSummaryChars: 40,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const prependContext = await runRecallWithSummary({
       prompt: "what wings should i order? word-boundary-truncation-40",
       summary: "alpha beta gamma delta epsilon zetalongword",
@@ -6405,7 +6405,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       maxSummaryChars: 40,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     const prependContext = await runRecallWithSummary({
       prompt: `recall summary boundary: ${name}`,
@@ -6439,7 +6439,7 @@ describe("active-memory plugin", () => {
       agents: ["main"],
       maxSummaryChars: 90,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     await requireHook("before_prompt_build")(
       { prompt: "what wings should i order? prompt-count-check", messages: [] },
@@ -6471,7 +6471,7 @@ describe("active-memory plugin", () => {
     );
 
     expect(mkdtempSpy).toHaveBeenCalled();
-    expect(rmSpy).toHaveBeenCalledWith(expect.stringMatching(/openclaw-active-memory-.*/), {
+    expect(rmSpy).toHaveBeenCalledWith(expect.stringMatching(/steelengine-active-memory-.*/), {
       recursive: true,
       force: true,
     });
@@ -6484,7 +6484,7 @@ describe("active-memory plugin", () => {
       transcriptDir: "active-memory-subagents",
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const mkdirSpy = vi.spyOn(fs, "mkdir");
     const mkdtempSpy = vi.spyOn(fs, "mkdtemp");
     const rmSpy = vi.spyOn(fs, "rm").mockResolvedValue(undefined);
@@ -6524,7 +6524,7 @@ describe("active-memory plugin", () => {
       transcriptDir: "C:/temp/escape",
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const mkdirSpy = vi.spyOn(fs, "mkdir").mockResolvedValue(undefined);
 
     await requireHook("before_prompt_build")(
@@ -6563,7 +6563,7 @@ describe("active-memory plugin", () => {
       transcriptDir: "active-memory-subagents",
       logging: true,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     const mkdirSpy = vi.spyOn(fs, "mkdir").mockResolvedValue(undefined);
 
     await requireHook("before_prompt_build")(
@@ -6719,7 +6719,7 @@ describe("active-memory plugin", () => {
       circuitBreakerMaxTimeouts: 2,
       circuitBreakerCooldownMs: 60_000,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     runEmbeddedAgent.mockImplementation(
       async (params: { abortSignal?: AbortSignal }) => await waitForAbort(params.abortSignal),
     );
@@ -6775,7 +6775,7 @@ describe("active-memory plugin", () => {
       circuitBreakerMaxTimeouts: 1,
       circuitBreakerCooldownMs: 60_000,
     };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
 
     // First call: timeout (trips the breaker with max=1).
     runEmbeddedAgent.mockImplementationOnce(
@@ -6870,7 +6870,7 @@ describe("active-memory plugin", () => {
 
   it("applies the CLI dispatch recall budget to the embedded run", async () => {
     api.pluginConfig = { agents: ["main"], logging: true };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     resolveCliBackendDispatchEligibility.mockReturnValueOnce({ provider: "claude-cli" });
     runEmbeddedAgent.mockImplementationOnce(async () => ({
       payloads: [{ text: "- lemon pepper wings" }],
@@ -6898,7 +6898,7 @@ describe("active-memory plugin", () => {
     // API-key and missing-backend routes resolve to no eligibility: the run
     // stays on the direct passthrough, so the plain 15s default applies.
     api.pluginConfig = { agents: ["main"], logging: true };
-    plugin.register(api as unknown as OpenClawPluginApi);
+    plugin.register(api as unknown as SteelEnginePluginApi);
     resolveCliBackendDispatchEligibility.mockReturnValueOnce(undefined);
     runEmbeddedAgent.mockImplementationOnce(async () => ({
       payloads: [{ text: "- lemon pepper wings" }],

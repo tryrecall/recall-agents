@@ -3,7 +3,7 @@ import { property } from "lit/decorators.js";
 import { pathForRoute } from "../app-route-paths.ts";
 import { CONTROL_UI_BUILD_INFO } from "../build-info.ts";
 import { t } from "../i18n/index.ts";
-import { OpenClawLightDomContentsElement } from "../lit/openclaw-element.ts";
+import { SteelEngineLightDomContentsElement } from "../lit/steelengine-element.ts";
 import { PollController } from "../lit/poll-controller.ts";
 import { formatBuildChipText } from "./sidebar-build-chip-format.ts";
 import "./tooltip.ts";
@@ -20,7 +20,7 @@ function shouldHandleNavigationClick(event: MouseEvent): boolean {
   );
 }
 
-class SidebarBuildChip extends OpenClawLightDomContentsElement {
+class SidebarBuildChip extends SteelEngineLightDomContentsElement {
   @property({ attribute: false }) basePath = "";
   @property({ attribute: false }) gatewayVersion: string | null = null;
   @property({ attribute: false }) onNavigate?: (routeId: "about") => void;
@@ -51,7 +51,7 @@ class SidebarBuildChip extends OpenClawLightDomContentsElement {
       .filter((line): line is string => Boolean(line))
       .join("\n");
     return html`
-      <openclaw-tooltip .content=${tooltip}>
+      <steelengine-tooltip .content=${tooltip}>
         <a
           class="sidebar-footer-build"
           href=${pathForRoute("about", this.basePath)}
@@ -65,11 +65,11 @@ class SidebarBuildChip extends OpenClawLightDomContentsElement {
           }}
           >${text}</a
         >
-      </openclaw-tooltip>
+      </steelengine-tooltip>
     `;
   }
 }
 
-if (globalThis.customElements && !customElements.get("openclaw-sidebar-build-chip")) {
-  customElements.define("openclaw-sidebar-build-chip", SidebarBuildChip);
+if (globalThis.customElements && !customElements.get("steelengine-sidebar-build-chip")) {
+  customElements.define("steelengine-sidebar-build-chip", SidebarBuildChip);
 }

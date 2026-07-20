@@ -3,13 +3,13 @@
  *
  * Defines erased tool types, parameter readers, JSON results, progress blocks, and media sanitization.
  */
-import { detectMime } from "@openclaw/media-core/mime";
+import { detectMime } from "@steelengine/media-core/mime";
 import {
   asPositiveSafeInteger,
   asSafeIntegerInRange,
   parseStrictFiniteNumber,
-} from "@openclaw/normalization-core/number-coercion";
-import { normalizeStringEntries } from "@openclaw/normalization-core/string-normalization";
+} from "@steelengine/normalization-core/number-coercion";
+import { normalizeStringEntries } from "@steelengine/normalization-core/string-normalization";
 import type { TSchema } from "typebox";
 import { readLocalFileSafely } from "../../infra/fs-safe.js";
 import { readSnakeCaseParamRaw } from "../../param-key.js";

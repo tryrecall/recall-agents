@@ -1,5 +1,5 @@
 // Control UI view renders dreaming screen content.
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { html, nothing } from "lit";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import {
@@ -26,8 +26,8 @@ type DiaryEntryNav = {
   page: number;
 };
 
-const DIARY_START_RE = /<!--\s*openclaw:dreaming:diary:start\s*-->/;
-const DIARY_END_RE = /<!--\s*openclaw:dreaming:diary:end\s*-->/;
+const DIARY_START_RE = /<!--\s*steelengine:dreaming:diary:start\s*-->/;
+const DIARY_END_RE = /<!--\s*steelengine:dreaming:diary:end\s*-->/;
 
 function parseDiaryEntries(raw: string): DiaryEntry[] {
   // Extract content between diary markers, or use full content.
@@ -633,9 +633,9 @@ function renderWikiPreviewOverlay(props: DreamingProps) {
     return nothing;
   }
   return html`
-    <openclaw-modal-dialog
+    <steelengine-modal-dialog
       .label=${state.wikiPreviewTitle || t("dreaming.wiki.previewFallbackTitle")}
-      style="--openclaw-modal-width: 1120px"
+      style="--steelengine-modal-width: 1120px"
       @modal-cancel=${() => closeWikiPreview(props)}
     >
       <div class="dreams-diary__preview-panel">
@@ -677,7 +677,7 @@ function renderWikiPreviewOverlay(props: DreamingProps) {
                 `}
         </div>
       </div>
-    </openclaw-modal-dialog>
+    </steelengine-modal-dialog>
   `;
 }
 

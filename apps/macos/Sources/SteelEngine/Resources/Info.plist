@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleExecutable</key>
+    <string>SteelEngine</string>
+    <key>CFBundleIdentifier</key>
+    <string>ai.steelengine.mac</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>SteelEngine</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>2026.7.2</string>
+    <key>CFBundleVersion</key>
+    <string>2026070200</string>
+    <key>CFBundleIconFile</key>
+    <string>SteelEngine</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>ai.steelengine.mac.deeplink</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>steelengine</string>
+            </array>
+        </dict>
+    </array>
+    <key>LSMinimumSystemVersion</key>
+    <string>15.0</string>
+    <key>LSUIElement</key>
+    <true/>
+
+    <key>SteelEngineBuildTimestamp</key>
+    <string></string>
+    <key>SteelEngineGitCommit</key>
+    <string></string>
+
+    <key>NSUserNotificationUsageDescription</key>
+    <string>SteelEngine needs notification permission to show alerts for agent actions.</string>
+    <key>NSScreenCaptureDescription</key>
+    <string>SteelEngine captures the screen when the agent needs screenshots for context.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>SteelEngine can capture photos or short video clips when requested by the agent.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>SteelEngine can share your location when requested by the agent.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>SteelEngine can share your location when requested by the agent.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>SteelEngine can share your location when requested by the agent.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>SteelEngine uses the local network to connect to your remote SteelEngine gateway over LAN, Tailnet, or SSH.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>SteelEngine needs the mic for Voice Wake tests and agent audio capture.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>SteelEngine uses speech recognition to detect your Voice Wake trigger phrase.</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>SteelEngine needs Automation (AppleScript) permission to drive Terminal and other apps for agent actions.</string>
+    <key>NSRemindersUsageDescription</key>
+    <string>SteelEngine can access Reminders when requested by the agent for the apple-reminders skill.</string>
+
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoadsInWebContent</key>
+        <true/>
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>100.100.100.100</key>
+            <dict>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+                <key>NSIncludesSubdomains</key>
+                <true/>
+            </dict>
+        </dict>
+    </dict>
+</dict>
+</plist>

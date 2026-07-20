@@ -1,10 +1,10 @@
 import { executeSqliteQuerySync, getNodeSqliteKysely } from "../infra/kysely-sync.js";
 // Stores config health fingerprints in shared SQLite state.
-import type { DB as OpenClawStateKyselyDatabase } from "../state/openclaw-state-db.generated.js";
+import type { DB as SteelEngineStateKyselyDatabase } from "../state/steelengine-state-db.generated.js";
 import {
-  openOpenClawStateDatabase,
-  runOpenClawStateWriteTransaction,
-} from "../state/openclaw-state-db.js";
+  openSteelEngineStateDatabase,
+  runSteelEngineStateWriteTransaction,
+} from "../state/steelengine-state-db.js";
 
 export type ConfigHealthFingerprint = {
   hash: string;
@@ -32,7 +32,7 @@ export type ConfigHealthState = {
   entries?: Record<string, ConfigHealthEntry>;
 };
 
-type ConfigHealthDatabase = Pick<OpenClawStateKyselyDatabase, "config_health_entries">;
+type ConfigHealthDatabase = Pick<SteelEngineStateKyselyDatabase, "config_health_entries">;
 
 type ConfigHealthStateDeps = {
   env: NodeJS.ProcessEnv;
@@ -41,7 +41,7 @@ type ConfigHealthStateDeps = {
 };
 
 function resolveConfigHealthStateEnv(deps: ConfigHealthStateDeps): NodeJS.ProcessEnv {
-  if (deps.env.OPENCLAW_HOME || deps.env.HOME || deps.env.USERPROFILE || deps.env.PREFIX) {
+  if (deps.env.STEELENGINE_HOME || deps.env.HOME || deps.env.USERPROFILE || deps.env.PREFIX) {
     return deps.env;
   }
   return { ...deps.env, HOME: deps.homedir() };
@@ -71,7 +71,7 @@ function formatConfigHealthStateError(error: unknown): string {
 
 export function readConfigHealthStateFromStore(deps: ConfigHealthStateDeps): ConfigHealthState {
   try {
-    const database = openOpenClawStateDatabase({ env: resolveConfigHealthStateEnv(deps) });
+    const database = openSteelEngineStateDatabase({ env: resolveConfigHealthStateEnv(deps) });
     const healthDb = getNodeSqliteKysely<ConfigHealthDatabase>(database.db);
     const rows = executeSqliteQuerySync(
       database.db,
@@ -112,7 +112,7 @@ export function writeConfigHealthStateToStore(
       return;
     }
     const updatedAtMs = Date.now();
-    runOpenClawStateWriteTransaction(
+    runSteelEngineStateWriteTransaction(
       ({ db }) => {
         const healthDb = getNodeSqliteKysely<ConfigHealthDatabase>(db);
         executeSqliteQuerySync(

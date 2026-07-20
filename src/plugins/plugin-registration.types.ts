@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Duplex } from "node:stream";
 import type { Command } from "commander";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type {
   DiagnosticEventPrivateData,
   DiagnosticEventInput,
@@ -29,28 +29,28 @@ export type PluginInteractiveRegistration<
 
 export type PluginInteractiveHandlerRegistration = PluginInteractiveRegistration;
 
-export type OpenClawPluginHttpRouteAuth = "gateway" | "plugin";
-export type OpenClawPluginHttpRouteMatch = "exact" | "prefix";
-export type OpenClawPluginGatewayRuntimeScopeSurface = "write-default" | "trusted-operator";
+export type SteelEnginePluginHttpRouteAuth = "gateway" | "plugin";
+export type SteelEnginePluginHttpRouteMatch = "exact" | "prefix";
+export type SteelEnginePluginGatewayRuntimeScopeSurface = "write-default" | "trusted-operator";
 
-export type OpenClawPluginHttpRouteHandler = (
+export type SteelEnginePluginHttpRouteHandler = (
   req: IncomingMessage,
   res: ServerResponse,
 ) => Promise<boolean | void> | boolean | void;
 
-export type OpenClawPluginHttpRouteUpgradeHandler = (
+export type SteelEnginePluginHttpRouteUpgradeHandler = (
   req: IncomingMessage,
   socket: Duplex,
   head: Buffer,
 ) => Promise<boolean | void> | boolean | void;
 
-export type OpenClawPluginHttpRouteParams = {
+export type SteelEnginePluginHttpRouteParams = {
   path: string;
-  handler: OpenClawPluginHttpRouteHandler;
-  handleUpgrade?: OpenClawPluginHttpRouteUpgradeHandler;
-  auth: OpenClawPluginHttpRouteAuth;
-  match?: OpenClawPluginHttpRouteMatch;
-  gatewayRuntimeScopeSurface?: OpenClawPluginGatewayRuntimeScopeSurface;
+  handler: SteelEnginePluginHttpRouteHandler;
+  handleUpgrade?: SteelEnginePluginHttpRouteUpgradeHandler;
+  auth: SteelEnginePluginHttpRouteAuth;
+  match?: SteelEnginePluginHttpRouteMatch;
+  gatewayRuntimeScopeSurface?: SteelEnginePluginGatewayRuntimeScopeSurface;
   nodeCapability?: {
     surface: string;
     ttlMs?: number;
@@ -58,65 +58,65 @@ export type OpenClawPluginHttpRouteParams = {
   replaceExisting?: boolean;
 };
 
-export type OpenClawPluginHostedMediaResolver = (
+export type SteelEnginePluginHostedMediaResolver = (
   mediaUrl: string,
 ) => string | null | undefined | Promise<string | null | undefined>;
 
-export type OpenClawPluginCliContext = {
+export type SteelEnginePluginCliContext = {
   /**
    * Command object where this plugin should register its commands.
    *
-   * For root CLI registrations this is the root `openclaw` program. For nested
+   * For root CLI registrations this is the root `steelengine` program. For nested
    * registrations it is the resolved parent command from `parentPath`.
    */
   program: Command;
   parentPath: readonly string[];
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   workspaceDir?: string;
   logger: PluginLogger;
 };
 
-export type OpenClawPluginCliRegistrar = (ctx: OpenClawPluginCliContext) => void | Promise<void>;
+export type SteelEnginePluginCliRegistrar = (ctx: SteelEnginePluginCliContext) => void | Promise<void>;
 
 /**
  * Top-level CLI metadata for plugin-owned commands.
  *
  * Descriptors are the parse-time contract for lazy plugin CLI registration.
- * If you want OpenClaw to keep a plugin command lazy-loaded while still
+ * If you want SteelEngine to keep a plugin command lazy-loaded while still
  * advertising it at the root CLI level, provide descriptors that cover every
  * top-level command root registered by that plugin CLI surface.
  */
-export type OpenClawPluginCliCommandDescriptor = {
+export type SteelEnginePluginCliCommandDescriptor = {
   name: string;
   description: string;
   hasSubcommands: boolean;
 };
 
-export type OpenClawPluginNodeCliFeatureOptions = {
-  /** Explicit node feature command names owned under `openclaw nodes`. */
+export type SteelEnginePluginNodeCliFeatureOptions = {
+  /** Explicit node feature command names owned under `steelengine nodes`. */
   commands?: string[];
   /**
    * Parse-time command descriptors for lazy node feature CLI registration.
    *
-   * Descriptors are registered under `openclaw nodes`, so a descriptor named
-   * `"camera"` exposes `openclaw nodes camera`.
+   * Descriptors are registered under `steelengine nodes`, so a descriptor named
+   * `"camera"` exposes `steelengine nodes camera`.
    */
-  descriptors?: OpenClawPluginCliCommandDescriptor[];
+  descriptors?: SteelEnginePluginCliCommandDescriptor[];
 };
 
-export type OpenClawPluginReloadRegistration = {
+export type SteelEnginePluginReloadRegistration = {
   restartPrefixes?: string[];
   hotPrefixes?: string[];
   noopPrefixes?: string[];
 };
 
 export type {
-  OpenClawPluginNodeHostCommand,
-  OpenClawPluginNodeHostCommandAvailabilityContext,
-  OpenClawPluginNodeHostCommandIo,
+  SteelEnginePluginNodeHostCommand,
+  SteelEnginePluginNodeHostCommandAvailabilityContext,
+  SteelEnginePluginNodeHostCommandIo,
 } from "./types.node-host.js";
 
-export type OpenClawPluginNodeInvokeTransportResult =
+export type SteelEnginePluginNodeInvokeTransportResult =
   | {
       ok: true;
       payload?: unknown;
@@ -129,9 +129,9 @@ export type OpenClawPluginNodeInvokeTransportResult =
       details?: Record<string, unknown>;
     };
 
-type OpenClawPluginNodeInvokeApprovalDecision = "allow-once" | "allow-always" | "deny";
+type SteelEnginePluginNodeInvokeApprovalDecision = "allow-once" | "allow-always" | "deny";
 
-type OpenClawPluginNodeInvokePolicyApprovalRuntime = {
+type SteelEnginePluginNodeInvokePolicyApprovalRuntime = {
   request: (input: {
     title: string;
     description: string;
@@ -143,17 +143,17 @@ type OpenClawPluginNodeInvokePolicyApprovalRuntime = {
     timeoutMs?: number;
   }) => Promise<{
     id?: string;
-    decision?: OpenClawPluginNodeInvokeApprovalDecision | null;
+    decision?: SteelEnginePluginNodeInvokeApprovalDecision | null;
   }>;
 };
 
-export type OpenClawPluginNodeInvokePolicyContext = {
+export type SteelEnginePluginNodeInvokePolicyContext = {
   nodeId: string;
   command: string;
   params: unknown;
   timeoutMs?: number;
   idempotencyKey?: string;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   pluginConfig?: Record<string, unknown>;
   node?: {
     nodeId: string;
@@ -166,15 +166,15 @@ export type OpenClawPluginNodeInvokePolicyContext = {
     connId?: string;
     scopes?: string[];
   } | null;
-  approvals?: OpenClawPluginNodeInvokePolicyApprovalRuntime;
+  approvals?: SteelEnginePluginNodeInvokePolicyApprovalRuntime;
   invokeNode: (input?: {
     params?: unknown;
     timeoutMs?: number;
     idempotencyKey?: string;
-  }) => Promise<OpenClawPluginNodeInvokeTransportResult>;
+  }) => Promise<SteelEnginePluginNodeInvokeTransportResult>;
 };
 
-export type OpenClawPluginNodeInvokePolicyResult =
+export type SteelEnginePluginNodeInvokePolicyResult =
   | {
       ok: true;
       payload?: unknown;
@@ -188,7 +188,7 @@ export type OpenClawPluginNodeInvokePolicyResult =
       unavailable?: boolean;
     };
 
-export type OpenClawPluginNodeInvokePolicy = {
+export type SteelEnginePluginNodeInvokePolicy = {
   commands: string[];
   /**
    * Platforms where these node-handled commands should be allowlisted by default.
@@ -206,23 +206,23 @@ export type OpenClawPluginNodeInvokePolicy = {
    */
   foregroundRestrictedOnIos?: boolean;
   handle: (
-    ctx: OpenClawPluginNodeInvokePolicyContext,
-  ) => Promise<OpenClawPluginNodeInvokePolicyResult> | OpenClawPluginNodeInvokePolicyResult;
+    ctx: SteelEnginePluginNodeInvokePolicyContext,
+  ) => Promise<SteelEnginePluginNodeInvokePolicyResult> | SteelEnginePluginNodeInvokePolicyResult;
 };
 
-export type OpenClawPluginSecurityAuditContext = {
-  config: OpenClawConfig;
-  sourceConfig: OpenClawConfig;
+export type SteelEnginePluginSecurityAuditContext = {
+  config: SteelEngineConfig;
+  sourceConfig: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   stateDir: string;
   configPath: string;
 };
 
-export type OpenClawPluginSecurityAuditCollector = (
-  ctx: OpenClawPluginSecurityAuditContext,
+export type SteelEnginePluginSecurityAuditCollector = (
+  ctx: SteelEnginePluginSecurityAuditContext,
 ) => SecurityAuditFinding[] | Promise<SecurityAuditFinding[]>;
 
-export type OpenClawGatewayDiscoveryAdvertiseContext = {
+export type SteelEngineGatewayDiscoveryAdvertiseContext = {
   machineDisplayName: string;
   gatewayPort: number;
   gatewayTlsEnabled: boolean;
@@ -235,20 +235,20 @@ export type OpenClawGatewayDiscoveryAdvertiseContext = {
   minimal: boolean;
 };
 
-export type OpenClawGatewayDiscoveryService = {
+export type SteelEngineGatewayDiscoveryService = {
   id: string;
   advertise: (
-    ctx: OpenClawGatewayDiscoveryAdvertiseContext,
+    ctx: SteelEngineGatewayDiscoveryAdvertiseContext,
   ) => void | Promise<void | { stop?: () => void | Promise<void> }>;
 };
 
 /** Context passed to long-lived plugin services. */
-export type OpenClawPluginServiceContext = {
-  config: OpenClawConfig;
+export type SteelEnginePluginServiceContext = {
+  config: SteelEngineConfig;
   workspaceDir?: string;
   stateDir: string;
   logger: PluginLogger;
-  gatewayEvents?: import("./gateway-events.js").OpenClawPluginGatewayEvents;
+  gatewayEvents?: import("./gateway-events.js").SteelEnginePluginGatewayEvents;
   startupTrace?: {
     detail?: (name: string, metrics: ReadonlyArray<readonly [string, number | string]>) => void;
     measure: <T>(name: string, run: () => T | Promise<T>) => Promise<T>;
@@ -266,13 +266,13 @@ export type OpenClawPluginServiceContext = {
 };
 
 /** Background service registered by a plugin during `register(api)`. */
-export type OpenClawPluginService = {
+export type SteelEnginePluginService = {
   id: string;
-  start: (ctx: OpenClawPluginServiceContext) => void | Promise<void>;
-  stop?: (ctx: OpenClawPluginServiceContext) => void | Promise<void>;
+  start: (ctx: SteelEnginePluginServiceContext) => void | Promise<void>;
+  stop?: (ctx: SteelEnginePluginServiceContext) => void | Promise<void>;
 };
 
-export type OpenClawPluginChannelRegistration = {
+export type SteelEnginePluginChannelRegistration = {
   plugin: ChannelPlugin;
 };
 

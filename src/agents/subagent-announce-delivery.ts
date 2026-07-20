@@ -3,18 +3,18 @@
  *
  * Routes completion payloads through gateway/channel/session paths and records delivery evidence.
  */
-import { clampTimerTimeoutMs } from "@openclaw/normalization-core/number-coercion";
-import { normalizeOptionalLowercaseString } from "@openclaw/normalization-core/string-coerce";
+import { clampTimerTimeoutMs } from "@steelengine/normalization-core/number-coercion";
+import { normalizeOptionalLowercaseString } from "@steelengine/normalization-core/string-coerce";
 import {
   normalizeStringEntries,
   uniqueStrings,
-} from "@openclaw/normalization-core/string-normalization";
+} from "@steelengine/normalization-core/string-normalization";
 import { completionRequiresMessageToolDelivery } from "../auto-reply/reply/completion-delivery-policy.js";
 import { isSilentReplyPayloadText, SILENT_REPLY_TOKEN } from "../auto-reply/tokens.js";
 import { getLoadedChannelPluginForRead } from "../channels/plugins/registry-loaded.js";
 import type { ChannelId } from "../channels/plugins/types.public.js";
 import { routeFromConversationRef, routeToDeliveryFields } from "../channels/route-projection.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { isOutboundDeliveryError } from "../infra/outbound/deliver-types.js";
 import type { ConversationRef } from "../infra/outbound/session-binding-service.js";
 import { sourceDeliveryTargetsMatch } from "../infra/outbound/source-delivery-plan.js";
@@ -240,7 +240,7 @@ function resolveRequesterSessionActivity(requesterSessionKey: string) {
 }
 
 function resolveDirectAnnounceTransientRetryDelaysMs() {
-  return process.env.OPENCLAW_TEST_FAST === "1"
+  return process.env.STEELENGINE_TEST_FAST === "1"
     ? ([8, 16, 32] as const)
     : ([5_000, 10_000, 20_000] as const);
 }
@@ -250,7 +250,7 @@ function resolveDirectAnnounceTransientRetryDelaysMs() {
 // schedule is used than for transient delivery errors. Total wait stays well
 // within the announce delivery timeout, and the loop also stops on cancellation.
 function resolveCompactionSteerRetryDelaysMs() {
-  return process.env.OPENCLAW_TEST_FAST === "1"
+  return process.env.STEELENGINE_TEST_FAST === "1"
     ? ([8, 16, 32, 64] as const)
     : ([1_000, 2_000, 4_000, 8_000] as const);
 }
@@ -357,7 +357,7 @@ async function resolveActiveWakeWithRetries(
   return outcome;
 }
 
-export function resolveSubagentAnnounceTimeoutMs(cfg: OpenClawConfig): number {
+export function resolveSubagentAnnounceTimeoutMs(cfg: SteelEngineConfig): number {
   const configured = cfg.agents?.defaults?.subagents?.announceTimeoutMs;
   return clampTimerTimeoutMs(configured) ?? DEFAULT_SUBAGENT_ANNOUNCE_TIMEOUT_MS;
 }
@@ -1014,7 +1014,7 @@ function resolveGeneratedMediaFailureNotice(params: {
 }
 
 async function deliverGeneratedMediaCompletionDirect(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   requesterSessionKey: string;
   directIdempotencyKey: string;
   deliveryTarget: {
@@ -1172,7 +1172,7 @@ function hasFailedSubagentNoOutputCompletion(events: readonly AgentInternalEvent
 }
 
 async function deliverTextCompletionDirect(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   requesterSessionKey: string;
   directIdempotencyKey: string;
   deliveryTarget: {
@@ -2370,7 +2370,7 @@ const testing = {
 };
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
   (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.subagentAnnounceDeliveryTestApi")
+    Symbol.for("steelengine.subagentAnnounceDeliveryTestApi")
   ] = testing;
 }
 /* oxlint-disable max-lines -- TODO: split this grandfathered oversized file. */

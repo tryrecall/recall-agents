@@ -3,12 +3,12 @@ import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
-import { formatErrorMessage as formatQaErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { formatMemoryDreamingDay } from "openclaw/plugin-sdk/memory-core-host-status";
-import { resolveSessionTranscriptsDirForAgent } from "openclaw/plugin-sdk/memory-host-core";
-import { buildAgentSessionKey } from "openclaw/plugin-sdk/routing";
-import { createPluginStateSyncKeyedStore } from "openclaw/plugin-sdk/runtime-doctor";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { formatErrorMessage as formatQaErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { formatMemoryDreamingDay } from "steelengine/plugin-sdk/memory-core-host-status";
+import { resolveSessionTranscriptsDirForAgent } from "steelengine/plugin-sdk/memory-host-core";
+import { buildAgentSessionKey } from "steelengine/plugin-sdk/routing";
+import { createPluginStateSyncKeyedStore } from "steelengine/plugin-sdk/runtime-doctor";
+import { normalizeLowercaseStringOrEmpty } from "steelengine/plugin-sdk/string-coerce-runtime";
 import {
   callQaBrowserRequest,
   qaBrowserAct,
@@ -110,7 +110,7 @@ function setActiveMemorySessionDisabled(
     maxEntries: 10_000,
     env: {
       ...process.env,
-      OPENCLAW_STATE_DIR: path.join(env.gateway.tempRoot, "state"),
+      STEELENGINE_STATE_DIR: path.join(env.gateway.tempRoot, "state"),
     },
   });
   const key = activeMemoryToggleKey(sessionKey);
@@ -148,11 +148,11 @@ export async function runQaSuiteScenarioSteps(
   const stepResults: QaSuiteScenarioResult["steps"] = [];
   for (const step of steps) {
     try {
-      if (process.env.OPENCLAW_QA_DEBUG === "1") {
+      if (process.env.STEELENGINE_QA_DEBUG === "1") {
         console.error(`[qa-suite] start scenario="${name}" step="${step.name}"`);
       }
       const details = await step.run();
-      if (process.env.OPENCLAW_QA_DEBUG === "1") {
+      if (process.env.STEELENGINE_QA_DEBUG === "1") {
         console.error(`[qa-suite] pass scenario="${name}" step="${step.name}"`);
       }
       stepResults.push({
@@ -166,7 +166,7 @@ export async function runQaSuiteScenarioSteps(
         stepResults.push({ name: step.name, status: "skip", details });
         return { name, status: "skip", steps: stepResults, details };
       }
-      if (process.env.OPENCLAW_QA_DEBUG === "1") {
+      if (process.env.STEELENGINE_QA_DEBUG === "1") {
         console.error(`[qa-suite] fail scenario="${name}" step="${step.name}" details=${details}`);
       }
       stepResults.push({ name: step.name, status: "fail", details });

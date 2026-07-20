@@ -1,6 +1,6 @@
 // QA Lab WhatsApp observed-message matching and diagnostics.
-import type { WhatsAppQaDriverObservedMessage } from "@openclaw/whatsapp/api.js";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import type { WhatsAppQaDriverObservedMessage } from "@steelengine/whatsapp/api.js";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 import type {
   WhatsAppObservedMessage,
   WhatsAppQaDriverQuotedMessageKey,

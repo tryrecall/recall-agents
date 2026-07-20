@@ -1,6 +1,6 @@
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import { createSuiteTempRootTracker } from "../test-helpers/temp-dir.js";
 import {
   acquireFleetCellOperation,
@@ -17,15 +17,15 @@ describe("fleet cell registry", () => {
   let root: string | undefined;
   let env: NodeJS.ProcessEnv;
 
-  const tempRoot = createSuiteTempRootTracker({ prefix: "openclaw-fleet-registry-" });
+  const tempRoot = createSuiteTempRootTracker({ prefix: "steelengine-fleet-registry-" });
 
   beforeEach(async () => {
     root = await tempRoot.setup();
-    env = { ...process.env, OPENCLAW_STATE_DIR: root };
+    env = { ...process.env, STEELENGINE_STATE_DIR: root };
   });
 
   afterEach(async () => {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     await tempRoot.cleanup();
     root = undefined;
   });
@@ -37,9 +37,9 @@ describe("fleet cell registry", () => {
     return {
       tenantId,
       createdAtMs: 1,
-      image: "ghcr.io/openclaw/openclaw:latest",
+      image: "ghcr.io/steelengine/steelengine:latest",
       runtime: "docker",
-      containerName: `openclaw-cell-${tenantId}`,
+      containerName: `steelengine-cell-${tenantId}`,
       dataDir: path.join(root, "fleet", "cells", tenantId),
       ...(requestedPort === undefined ? {} : { requestedPort }),
     };
@@ -61,8 +61,8 @@ describe("fleet cell registry", () => {
     expect(listFleetCells(env).map((cell) => cell.tenantId)).toEqual(["alpha", "zulu"]);
     expect(getFleetCell(env, "zulu")).toEqual(zulu);
 
-    updateFleetCellImage(env, "zulu", "ghcr.io/openclaw/openclaw:v2");
-    expect(getFleetCell(env, "zulu")?.image).toBe("ghcr.io/openclaw/openclaw:v2");
+    updateFleetCellImage(env, "zulu", "ghcr.io/steelengine/steelengine:v2");
+    expect(getFleetCell(env, "zulu")?.image).toBe("ghcr.io/steelengine/steelengine:v2");
 
     deleteFleetCell(env, "alpha");
     expect(getFleetCell(env, "alpha")).toBeUndefined();
@@ -74,7 +74,7 @@ describe("fleet cell registry", () => {
     expect(() =>
       reserveFleetCell(env, {
         ...params("alpha", 19_301),
-        image: "ghcr.io/openclaw/openclaw:other",
+        image: "ghcr.io/steelengine/steelengine:other",
       }),
     ).toThrow("Fleet cell already exists: alpha");
     expect(getFleetCell(env, "alpha")).toEqual(original);

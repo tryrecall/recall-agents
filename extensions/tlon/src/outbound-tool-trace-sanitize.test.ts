@@ -2,15 +2,15 @@
 // shared delivery hook, target routing, Markdown rendering, and media captions
 // cannot drift apart unnoticed.
 import http from "node:http";
-import { expectDefined } from "@openclaw/normalization-core";
-import { sendDurableMessageBatch } from "openclaw/plugin-sdk/channel-outbound";
+import { expectDefined } from "@steelengine/normalization-core";
+import { sendDurableMessageBatch } from "steelengine/plugin-sdk/channel-outbound";
 import {
   createTestRegistry,
   releasePinnedPluginChannelRegistry,
   setActivePluginRegistry,
-} from "openclaw/plugin-sdk/channel-test-helpers";
+} from "steelengine/plugin-sdk/channel-test-helpers";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../runtime-api.js";
+import type { SteelEngineConfig } from "../runtime-api.js";
 import { tlonPlugin } from "./channel.js";
 
 const uploadImageFromUrl = vi.hoisted(() => vi.fn(async () => "https://media.example/image.png"));
@@ -100,7 +100,7 @@ describe("tlon outbound assistant-visible sanitization", () => {
           network: { dangerouslyAllowPrivateNetwork: true },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     await sendDurableMessageBatch({
       cfg,

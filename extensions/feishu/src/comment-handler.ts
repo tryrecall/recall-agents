@@ -1,7 +1,7 @@
 // Feishu plugin module implements comment handler behavior.
-import { buildChannelInboundEventContext } from "openclaw/plugin-sdk/channel-inbound";
-import { parseStrictNonNegativeInteger } from "openclaw/plugin-sdk/number-runtime";
-import type { ResolvedAgentRoute } from "openclaw/plugin-sdk/routing";
+import { buildChannelInboundEventContext } from "steelengine/plugin-sdk/channel-inbound";
+import { parseStrictNonNegativeInteger } from "steelengine/plugin-sdk/number-runtime";
+import type { ResolvedAgentRoute } from "steelengine/plugin-sdk/routing";
 import { resolveFeishuRuntimeAccount } from "./accounts.js";
 import { createFeishuClient } from "./client.js";
 import { createFeishuCommentReplyDispatcher } from "./comment-dispatcher.js";

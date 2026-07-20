@@ -1,5 +1,5 @@
 // Shared harness for extra-params wrapper tests.
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type { Context, Model, SimpleStreamOptions } from "../../llm/types.js";
 import type {
   prepareProviderExtraParams,
@@ -25,7 +25,7 @@ type ExtraParamsTestApi = {
 
 function getTestApi(): ExtraParamsTestApi {
   const api = (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.extraParamsTestApi")
+    Symbol.for("steelengine.extraParamsTestApi")
   ];
   if (!api) {
     throw new Error("extra params test API is unavailable");
@@ -62,7 +62,7 @@ type RunExtraParamsCaseParams<
   applyModelId?: string;
   applyProvider?: string;
   callerHeaders?: Record<string, string>;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   model: Model<TApi>;
   mockProviderRuntime?: boolean;
   options?: SimpleStreamOptions;

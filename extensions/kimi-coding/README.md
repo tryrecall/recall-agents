@@ -1,12 +1,12 @@
-# OpenClaw Kimi Coding Provider
+# SteelEngine Kimi Coding Provider
 
-Official OpenClaw provider plugin for Kimi Coding.
+Official SteelEngine provider plugin for Kimi Coding.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/kimi-provider
-openclaw gateway restart
+steelengine plugins install @steelengine/kimi-provider
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/providers/moonshot> for setup and configuration.
+See <https://docs.steelengine.ai/providers/moonshot> for setup and configuration.

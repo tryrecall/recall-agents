@@ -2,7 +2,7 @@
 // inside the accessor's write transactions (session-transcript-index.ts);
 // this module owns the query path and schedules the shared reconcile owner
 // when doctor imports or out-of-band writes leave derived rows behind.
-import { openOpenClawAgentDatabase } from "../../state/openclaw-agent-db.js";
+import { openSteelEngineAgentDatabase } from "../../state/steelengine-agent-db.js";
 import { truncateUtf16Safe } from "../../utils.js";
 import { listSessionsNeedingTranscriptIndexReconcile } from "./session-transcript-index.js";
 import {
@@ -57,7 +57,7 @@ export function searchSessionTranscripts(params: {
     agentId: params.agentId,
     ...(params.env ? { env: params.env } : {}),
   };
-  const database = openOpenClawAgentDatabase(databaseOptions);
+  const database = openSteelEngineAgentDatabase(databaseOptions);
   const dirtySessions = listSessionsNeedingTranscriptIndexReconcile(database.db);
   if (dirtySessions.length > 0) {
     startSessionTranscriptIndexReconcile(params);

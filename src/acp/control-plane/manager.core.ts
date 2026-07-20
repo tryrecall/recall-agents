@@ -4,8 +4,8 @@ import type {
   AcpRuntimeCapabilities,
   AcpRuntimeHandle,
   AcpRuntimeStatus,
-} from "@openclaw/acp-core/runtime/types";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+} from "@steelengine/acp-core/runtime/types";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { logVerbose } from "../../globals.js";
 import { toErrorObject } from "../../infra/errors.js";
 import { isAcpSessionKey } from "../../sessions/session-key-utils.js";
@@ -79,7 +79,7 @@ export class AcpSessionManager {
     this.deps = deps;
   }
 
-  resolveSession(params: { cfg: OpenClawConfig; sessionKey: string }): AcpSessionResolution {
+  resolveSession(params: { cfg: SteelEngineConfig; sessionKey: string }): AcpSessionResolution {
     const sessionKey = canonicalizeAcpSessionKey(params);
     if (!sessionKey) {
       return {
@@ -114,7 +114,7 @@ export class AcpSessionManager {
     };
   }
 
-  getObservabilitySnapshot(cfg: OpenClawConfig): AcpManagerObservabilitySnapshot {
+  getObservabilitySnapshot(cfg: SteelEngineConfig): AcpManagerObservabilitySnapshot {
     const completedTurns = this.turnLatencyStats.completed + this.turnLatencyStats.failed;
     const averageLatencyMs =
       completedTurns > 0 ? Math.round(this.turnLatencyStats.totalMs / completedTurns) : 0;
@@ -135,7 +135,7 @@ export class AcpSessionManager {
   }
 
   async reconcilePendingSessionIdentities(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
   }): Promise<AcpStartupIdentityReconcileResult> {
     return await runManagerStartupIdentityReconcile({
       cfg: params.cfg,
@@ -173,7 +173,7 @@ export class AcpSessionManager {
   }
 
   async getSessionStatus(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     sessionKey: string;
     signal?: AbortSignal;
   }): Promise<AcpSessionStatus> {
@@ -201,7 +201,7 @@ export class AcpSessionManager {
   }
 
   async setSessionRuntimeMode(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     sessionKey: string;
     runtimeMode: string;
   }): Promise<AcpSessionRuntimeOptions> {
@@ -223,7 +223,7 @@ export class AcpSessionManager {
   }
 
   async setSessionConfigOption(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     sessionKey: string;
     key: string;
     value: string;
@@ -249,7 +249,7 @@ export class AcpSessionManager {
   }
 
   async updateSessionRuntimeOptions(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     sessionKey: string;
     patch: Partial<AcpSessionRuntimeOptions>;
   }): Promise<AcpSessionRuntimeOptions> {
@@ -271,7 +271,7 @@ export class AcpSessionManager {
   }
 
   async resetSessionRuntimeOptions(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     sessionKey: string;
   }): Promise<AcpSessionRuntimeOptions> {
     const sessionKey = canonicalizeAcpSessionKey(params);
@@ -319,7 +319,7 @@ export class AcpSessionManager {
   }
 
   async cancelSession(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     sessionKey: string;
     reason?: string;
   }): Promise<void> {
@@ -365,7 +365,7 @@ export class AcpSessionManager {
   }
 
   private async ensureRuntimeHandle(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     sessionKey: string;
     meta: SessionAcpMeta;
   }): Promise<{ runtime: AcpRuntime; handle: AcpRuntimeHandle; meta: SessionAcpMeta }> {
@@ -389,7 +389,7 @@ export class AcpSessionManager {
     };
   }
 
-  private enforceConcurrentSessionLimit(params: { cfg: OpenClawConfig; sessionKey: string }): void {
+  private enforceConcurrentSessionLimit(params: { cfg: SteelEngineConfig; sessionKey: string }): void {
     const configuredLimit = params.cfg.acp?.maxConcurrentSessions;
     if (typeof configuredLimit !== "number" || !Number.isFinite(configuredLimit)) {
       return;
@@ -432,7 +432,7 @@ export class AcpSessionManager {
     return await resolveManagerRuntimeCapabilities(params);
   }
 
-  private async evictIdleRuntimeHandles(cfg: OpenClawConfig): Promise<void> {
+  private async evictIdleRuntimeHandles(cfg: SteelEngineConfig): Promise<void> {
     await this.runtimeHandles.evictIdle({
       cfg,
       actorQueue: this.actorQueue,
@@ -453,7 +453,7 @@ export class AcpSessionManager {
   }
 
   private async setSessionState(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     sessionKey: string;
     state: SessionAcpMeta["state"];
     lastError?: string;
@@ -496,7 +496,7 @@ export class AcpSessionManager {
   }
 
   private async reconcileRuntimeSessionIdentifiers(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     sessionKey: string;
     runtime: AcpRuntime;
     handle: AcpRuntimeHandle;
@@ -521,7 +521,7 @@ export class AcpSessionManager {
   }
 
   private async writeSessionMeta(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     sessionKey: string;
     mutate: (
       current: SessionAcpMeta | undefined,

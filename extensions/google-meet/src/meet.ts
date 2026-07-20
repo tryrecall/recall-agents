@@ -1,7 +1,7 @@
-import { readProviderJsonResponse } from "openclaw/plugin-sdk/provider-http";
+import { readProviderJsonResponse } from "steelengine/plugin-sdk/provider-http";
 // Google Meet plugin module implements meet behavior.
-import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
-import { uniqueStrings } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { fetchWithSsrFGuard } from "steelengine/plugin-sdk/ssrf-runtime";
+import { uniqueStrings } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { exportGoogleDriveDocumentText, extractGoogleDriveDocumentId } from "./drive.js";
 import { googleApiError } from "./google-api-errors.js";
 

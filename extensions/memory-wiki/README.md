@@ -1,6 +1,6 @@
-# @openclaw/memory-wiki
+# @steelengine/memory-wiki
 
-Persistent wiki compiler and Obsidian-friendly knowledge vault for **OpenClaw**.
+Persistent wiki compiler and Obsidian-friendly knowledge vault for **SteelEngine**.
 
 This plugin is separate from the active memory plugin. The active memory plugin still handles recall, promotion, and dreaming. `memory-wiki` compiles durable knowledge into a navigable markdown vault with deterministic indexes, provenance, structured claim/evidence metadata, and optional Obsidian CLI workflows.
 
@@ -28,14 +28,14 @@ Put config under `plugins.entries.memory-wiki.config`:
 
   vault: {
     scope: "global", // or "agent"
-    path: "~/.openclaw/wiki/main",
+    path: "~/.steelengine/wiki/main",
     renderMode: "obsidian", // or "native"
   },
 
   obsidian: {
     enabled: true,
     useOfficialCli: true,
-    vaultName: "OpenClaw Wiki",
+    vaultName: "SteelEngine Wiki",
     openAfterWrites: false,
   },
 
@@ -78,7 +78,7 @@ Put config under `plugins.entries.memory-wiki.config`:
 
 ### Per-agent vaults
 
-In agent scope, `vault.path` is a parent directory. OpenClaw appends the
+In agent scope, `vault.path` is a parent directory. SteelEngine appends the
 normalized agent id:
 
 ```json5
@@ -86,7 +86,7 @@ normalized agent id:
   vaultMode: "bridge",
   vault: {
     scope: "agent",
-    path: "~/.openclaw/wiki",
+    path: "~/.steelengine/wiki",
   },
   bridge: {
     enabled: true,
@@ -99,16 +99,16 @@ normalized agent id:
 ```
 
 This resolves agents such as `support` and `marketing` to
-`~/.openclaw/wiki/support` and `~/.openclaw/wiki/marketing`. With no explicit
-path, the parent defaults to `~/.openclaw/wiki`; the default `main` agent
-therefore keeps the existing `~/.openclaw/wiki/main` path. In global scope,
+`~/.steelengine/wiki/support` and `~/.steelengine/wiki/marketing`. With no explicit
+path, the parent defaults to `~/.steelengine/wiki`; the default `main` agent
+therefore keeps the existing `~/.steelengine/wiki/main` path. In global scope,
 `vault.path` remains the exact shared vault path.
 
 Wiki tools and compiled prompt/corpus supplements resolve the active runtime
 agent on each call. In bridge mode, an agent vault imports only public memory
 artifacts whose `agentIds` includes that agent; unowned and other-agent
 artifacts are skipped. CLI and Gateway operations require an explicit agent in
-multi-agent setups; use `openclaw wiki --agent <agentId> ...` or pass `agentId`
+multi-agent setups; use `steelengine wiki --agent <agentId> ...` or pass `agentId`
 to the `wiki.*` RPC request. A single configured agent may remain implicit.
 
 Configuration validation rejects agent scope with either
@@ -138,52 +138,52 @@ The plugin initializes a vault like this:
   reports/
   _attachments/
   _views/
-  .openclaw-wiki/
+  .steelengine-wiki/
 ```
 
 Generated content stays inside managed blocks. Human note blocks are preserved.
 
-Key beliefs can live in structured `claims` frontmatter with per-claim evidence, confidence, and status. Compile also persists a machine-readable snapshot in OpenClaw plugin state so agent/runtime consumers do not have to scrape markdown pages.
+Key beliefs can live in structured `claims` frontmatter with per-claim evidence, confidence, and status. Compile also persists a machine-readable snapshot in SteelEngine plugin state so agent/runtime consumers do not have to scrape markdown pages.
 
 When `render.createBacklinks` is enabled, compile adds deterministic `## Related` blocks to pages. Those blocks list source pages, pages that reference the current page, and nearby pages that share the same source ids.
 
 When `render.createDashboards` is enabled, compile also maintains report dashboards under `reports/` for open questions, contradictions, low-confidence pages, and stale pages.
 
-Unmanaged raw Markdown can live under `sources/` without OpenClaw page frontmatter. Add `<!-- openclaw:wiki:raw-source -->` near the top of the page body to opt it out of wiki page metadata and freshness lint; generated or source-sync tracked imports still require their structured metadata.
+Unmanaged raw Markdown can live under `sources/` without SteelEngine page frontmatter. Add `<!-- steelengine:wiki:raw-source -->` near the top of the page body to opt it out of wiki page metadata and freshness lint; generated or source-sync tracked imports still require their structured metadata.
 
 ## CLI
 
 ```bash
-openclaw wiki status
-openclaw wiki doctor
-openclaw wiki init
-openclaw wiki ingest ./notes/alpha.md
-openclaw wiki compile
-openclaw wiki lint
-openclaw wiki search "alpha"
-openclaw wiki get entity.alpha --from 1 --lines 80
+steelengine wiki status
+steelengine wiki doctor
+steelengine wiki init
+steelengine wiki ingest ./notes/alpha.md
+steelengine wiki compile
+steelengine wiki lint
+steelengine wiki search "alpha"
+steelengine wiki get entity.alpha --from 1 --lines 80
 
-openclaw wiki apply synthesis "Alpha Summary" \
+steelengine wiki apply synthesis "Alpha Summary" \
   --body "Short synthesis body" \
   --source-id source.alpha
 
-openclaw wiki apply metadata entity.alpha \
+steelengine wiki apply metadata entity.alpha \
   --source-id source.alpha \
   --status review \
   --question "Still active?"
 
-openclaw wiki bridge import
-openclaw wiki unsafe-local import
+steelengine wiki bridge import
+steelengine wiki unsafe-local import
 
-openclaw wiki obsidian status
-openclaw wiki obsidian search "alpha"
-openclaw wiki obsidian open syntheses/alpha-summary.md
-openclaw wiki obsidian command workspace:quick-switcher
-openclaw wiki obsidian daily
+steelengine wiki obsidian status
+steelengine wiki obsidian search "alpha"
+steelengine wiki obsidian open syntheses/alpha-summary.md
+steelengine wiki obsidian command workspace:quick-switcher
+steelengine wiki obsidian daily
 
 # Agent-scoped vault
-openclaw wiki --agent support status
-openclaw wiki --agent support search "refund policy"
+steelengine wiki --agent support status
+steelengine wiki --agent support search "refund policy"
 ```
 
 ## Agent tools

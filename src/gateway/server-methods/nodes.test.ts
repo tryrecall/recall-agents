@@ -1,4 +1,4 @@
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   approveDevicePairing,
@@ -15,16 +15,16 @@ import {
 import { approveNodePairing, requestNodePairing } from "../../infra/node-pairing.js";
 import { resetRemoteNodeSkillsForTests } from "../../skills/runtime/remote-skills.test-support.js";
 import {
-  createOpenClawTestState,
-  type OpenClawTestState,
-} from "../../test-utils/openclaw-test-state.js";
+  createSteelEngineTestState,
+  type SteelEngineTestState,
+} from "../../test-utils/steelengine-test-state.js";
 import { nodeHandlers } from "./nodes.js";
 import type { GatewayRequestHandlerOptions } from "./types.js";
 
-const createdStates: OpenClawTestState[] = [];
+const createdStates: SteelEngineTestState[] = [];
 
-async function createState(label: string): Promise<OpenClawTestState> {
-  const state = await createOpenClawTestState({ label, layout: "state-only" });
+async function createState(label: string): Promise<SteelEngineTestState> {
+  const state = await createSteelEngineTestState({ label, layout: "state-only" });
   createdStates.push(state);
   return state;
 }
@@ -144,7 +144,7 @@ async function pairAndroidNodeDevice(stateDir: string, nodeId: string): Promise<
       displayName: "Galaxy A54 5G",
       platform: "android",
       deviceFamily: "Android",
-      clientId: "openclaw-android",
+      clientId: "steelengine-android",
       clientMode: "node",
       role: "node",
       roles: ["node"],
@@ -168,7 +168,7 @@ async function pairMixedRoleAndroidDevice(stateDir: string, nodeId: string): Pro
       displayName: "Galaxy A54 5G",
       platform: "android",
       deviceFamily: "Android",
-      clientId: "openclaw-android",
+      clientId: "steelengine-android",
       clientMode: "node",
       role: "operator",
       roles: ["operator", "node"],
@@ -190,7 +190,7 @@ async function approveNodeSurface(stateDir: string, nodeId: string): Promise<voi
       nodeId,
       platform: "android",
       deviceFamily: "Android",
-      clientId: "openclaw-android",
+      clientId: "steelengine-android",
       clientMode: "node",
       displayName: "Galaxy A54 5G",
     },

@@ -1,12 +1,12 @@
-# OpenClaw Exa Plugin
+# SteelEngine Exa Plugin
 
-Official OpenClaw plugin for Exa.
+Official SteelEngine plugin for Exa.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/exa-plugin
-openclaw gateway restart
+steelengine plugins install @steelengine/exa-plugin
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/tools/exa-search> for setup and configuration.
+See <https://docs.steelengine.ai/tools/exa-search> for setup and configuration.

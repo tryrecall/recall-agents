@@ -1,11 +1,11 @@
 // Whatsapp plugin module implements outbound media contract behavior.
 import path from "node:path";
-import { sanitizeForPlainText } from "openclaw/plugin-sdk/channel-outbound";
-import { MEDIA_FFMPEG_MAX_AUDIO_DURATION_SECS, runFfmpeg } from "openclaw/plugin-sdk/media-runtime";
-import { resolveOutboundMediaUrls } from "openclaw/plugin-sdk/reply-payload";
-import { writeExternalFileWithinRoot } from "openclaw/plugin-sdk/security-runtime";
-import { normalizeUniqueStringEntries } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { resolvePreferredOpenClawTmpDir, withTempWorkspace } from "openclaw/plugin-sdk/temp-path";
+import { sanitizeForPlainText } from "steelengine/plugin-sdk/channel-outbound";
+import { MEDIA_FFMPEG_MAX_AUDIO_DURATION_SECS, runFfmpeg } from "steelengine/plugin-sdk/media-runtime";
+import { resolveOutboundMediaUrls } from "steelengine/plugin-sdk/reply-payload";
+import { writeExternalFileWithinRoot } from "steelengine/plugin-sdk/security-runtime";
+import { normalizeUniqueStringEntries } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { resolvePreferredSteelEngineTmpDir, withTempWorkspace } from "steelengine/plugin-sdk/temp-path";
 import { resolveWhatsAppDocumentFileName } from "./document-filename.js";
 import {
   sanitizeAssistantVisibleText,
@@ -212,7 +212,7 @@ async function transcodeToWhatsAppVoiceOpus(params: {
   fileName: string;
 }): Promise<Buffer> {
   return await withTempWorkspace(
-    { rootDir: resolvePreferredOpenClawTmpDir(), prefix: "whatsapp-voice-" },
+    { rootDir: resolvePreferredSteelEngineTmpDir(), prefix: "whatsapp-voice-" },
     async (workspace) => {
       const ext = path.extname(params.fileName).toLowerCase();
       const inputExt = ext && ext.length <= 12 ? ext : ".audio";

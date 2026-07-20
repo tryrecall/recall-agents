@@ -1,7 +1,7 @@
 {
-  "name": "@openclaw/reef",
+  "name": "@steelengine/reef",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw Reef channel plugin — guarded end-to-end encrypted claw-to-claw messaging",
+  "description": "SteelEngine Reef channel plugin — guarded end-to-end encrypted claw-to-claw messaging",
   "type": "module",
   "dependencies": {
     "@noble/ciphers": "2.2.0",
@@ -10,7 +10,7 @@
     "ws": "8.21.0",
     "zod": "4.4.3"
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
@@ -30,6 +30,6 @@
     }
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*"
   }
 }

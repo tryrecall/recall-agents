@@ -21,8 +21,8 @@ export type CodexSessionCatalogSession = {
   modelProvider?: string;
   cliVersion?: string;
   gitBranch?: string;
-  /** Existing locked OpenClaw chat already mapped to this native source thread. */
-  openClawSessionKey?: string;
+  /** Existing locked SteelEngine chat already mapped to this native source thread. */
+  steelEngineSessionKey?: string;
   archived: boolean;
 };
 

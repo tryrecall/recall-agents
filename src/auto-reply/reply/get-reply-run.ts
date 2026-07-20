@@ -1,8 +1,8 @@
 /** Prepares and runs auto-reply agent turns, including prompt context and session policy. */
 import crypto from "node:crypto";
-import { normalizeProviderId } from "@openclaw/model-catalog-core/provider-id";
-import { asDateTimestampMs } from "@openclaw/normalization-core/number-coercion";
-import { type FastMode, normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { normalizeProviderId } from "@steelengine/model-catalog-core/provider-id";
+import { asDateTimestampMs } from "@steelengine/normalization-core/number-coercion";
+import { type FastMode, normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import {
   clearAutoFallbackPrimaryProbeSelection,
   hasLegacyAutoFallbackWithoutOrigin,
@@ -36,7 +36,7 @@ import {
 } from "../../config/sessions/sqlite-marker.js";
 import type { PendingSkillSuggestion, SessionEntry } from "../../config/sessions/types.js";
 import { resolveSilentReplySettings } from "../../config/silent-reply.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { logVerbose } from "../../globals.js";
 import { measureDiagnosticsTimelineSpan } from "../../infra/diagnostics-timeline.js";
 import { resolveHeartbeatRunScope } from "../../infra/heartbeat-run-scope.js";
@@ -156,7 +156,7 @@ type InternalGetReplyOptions = BaseInternalGetReplyOptions & {
   extractedFileImages?: ExtractedFileImage[];
 };
 
-type AgentDefaults = NonNullable<OpenClawConfig["agents"]>["defaults"];
+type AgentDefaults = NonNullable<SteelEngineConfig["agents"]>["defaults"];
 type ExecOverrides = Pick<ExecToolDefaults, "host" | "security" | "ask" | "node" | "nodeCwd">;
 const EPOCH_MILLISECONDS_THRESHOLD = 1_000_000_000_000;
 
@@ -431,11 +431,11 @@ function hasReplyTargetContext(ctx: MsgContext | TemplateContext): boolean {
 type RunPreparedReplyParams = {
   ctx: MsgContext;
   sessionCtx: TemplateContext;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId: string;
   agentDir: string;
   agentCfg: AgentDefaults;
-  sessionCfg: OpenClawConfig["session"];
+  sessionCfg: SteelEngineConfig["session"];
   commandAuthorized: boolean;
   command: ReturnType<typeof buildCommandContext>;
   commandSource?: string;
@@ -586,7 +586,7 @@ export async function runPreparedReply(
   });
   const useFastReplyRuntime = shouldUseReplyFastTestRuntime({
     cfg,
-    isFastTestEnv: process.env.OPENCLAW_TEST_FAST === "1",
+    isFastTestEnv: process.env.STEELENGINE_TEST_FAST === "1",
   });
   const thinkingRuntime = resolveEffectiveAgentRuntime({
     cfg,
@@ -964,7 +964,7 @@ export async function runPreparedReply(
     });
   };
   const skillResult =
-    process.env.OPENCLAW_TEST_FAST === "1"
+    process.env.STEELENGINE_TEST_FAST === "1"
       ? {
           sessionEntry,
           skillsSnapshot: sessionEntry?.skillsSnapshot,
@@ -1517,7 +1517,7 @@ export async function runPreparedReply(
           // LLM-boundary stamping site (normalizeMessagesForLlmBoundary) can
           // derive a stable per-message `[DOW YYYY-MM-DD HH:MM TZ]` prefix that
           // is identical whether this turn is sent as the current turn or
-          // replayed as history. See: https://github.com/openclaw/openclaw/issues/3658
+          // replayed as history. See: https://github.com/steelengineai/recall-agents/issues/3658
           ...(userTurnTimestamp ? { timestamp: userTurnTimestamp } : {}),
           // Direct transcripts keep their existing identity-storage boundary.
           sender: persistGroupSender

@@ -1,18 +1,18 @@
 import { createHash } from "node:crypto";
-import { resolveDefaultAgentDir, resolveDefaultAgentId } from "openclaw/plugin-sdk/agent-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import { resolveDefaultAgentDir, resolveDefaultAgentId } from "steelengine/plugin-sdk/agent-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import type {
-  OpenClawPluginApi,
-  OpenClawPluginNodeHostCommand,
-  OpenClawPluginNodeInvokePolicy,
-} from "openclaw/plugin-sdk/plugin-entry";
-import type { PluginRuntime } from "openclaw/plugin-sdk/plugin-runtime";
+  SteelEnginePluginApi,
+  SteelEnginePluginNodeHostCommand,
+  SteelEnginePluginNodeInvokePolicy,
+} from "steelengine/plugin-sdk/plugin-entry";
+import type { PluginRuntime } from "steelengine/plugin-sdk/plugin-runtime";
 import type {
   SessionCatalogHost,
   SessionCatalogProvider,
-} from "openclaw/plugin-sdk/session-catalog";
-import { resolveStorePath } from "openclaw/plugin-sdk/session-store-runtime";
-import { isRecord } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/session-catalog";
+import { resolveStorePath } from "steelengine/plugin-sdk/session-store-runtime";
+import { isRecord } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { CODEX_CONTROL_METHODS } from "./app-server/capabilities.js";
 import { resolveCodexSupervisionAppServerRuntimeOptions } from "./app-server/config.js";
 import { buildCodexAppServerConnectionFingerprint } from "./app-server/plugin-app-cache-key.js";
@@ -165,7 +165,7 @@ function createCodexSessionCatalogControlFromRequests(params: {
             limit: remaining,
             modelProviders: [],
             // Match Codex's resume picker/latest-session ordering so a session
-            // created outside OpenClaw enters the first catalog page immediately.
+            // created outside SteelEngine enters the first catalog page immediately.
             sortKey: "updated_at",
             sortDirection: "desc",
             ...(cwd ? { cwd } : {}),
@@ -222,7 +222,7 @@ function createCodexSessionCatalogControlFromRequests(params: {
 /** Builds the passive catalog over the Codex plugin's canonical shared client. */
 export function createCodexSessionCatalogControl(params: {
   getPluginConfig: () => unknown;
-  getRuntimeConfig: () => OpenClawConfig | undefined;
+  getRuntimeConfig: () => SteelEngineConfig | undefined;
   now?: () => number;
 }): CodexSessionCatalogControl {
   const now = params.now ?? Date.now;
@@ -342,7 +342,7 @@ export function createCodexSessionCatalogControl(params: {
 
 async function listGatewayHost(params: {
   bindingStore: CodexAppServerBindingStore;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   control: CodexSessionCatalogControl;
   query: CodexSessionCatalogParams;
   runtime: PluginRuntime;
@@ -370,7 +370,7 @@ async function listGatewayHost(params: {
       ...page,
       sessions: page.sessions.map((session) => {
         const adopted = adoptedSessions.get(session.threadId);
-        return adopted ? Object.assign({}, session, { openClawSessionKey: adopted.key }) : session;
+        return adopted ? Object.assign({}, session, { steelEngineSessionKey: adopted.key }) : session;
       }),
     };
   } catch (error) {
@@ -388,7 +388,7 @@ async function listGatewayHost(params: {
 /** Lists Gateway-local and paired-node Codex sessions with per-host failures. */
 async function listCodexSessionCatalog(params: {
   bindingStore: CodexAppServerBindingStore;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   runtime: PluginRuntime;
   control: CodexSessionCatalogControl;
   query?: CodexSessionCatalogParams;
@@ -461,7 +461,7 @@ async function listCodexSessionCatalog(params: {
 /** Builds the node-local read-only Codex app-server catalog command. */
 export function createCodexSessionCatalogNodeHostCommands(
   control: CodexSessionCatalogControl,
-): OpenClawPluginNodeHostCommand[] {
+): SteelEnginePluginNodeHostCommand[] {
   return [
     {
       command: CODEX_APP_SERVER_THREADS_LIST_COMMAND,
@@ -644,7 +644,7 @@ type CodexSupervisionMarker = { sourceThreadId: string };
 
 async function listAdoptedSessionEntries(params: {
   bindingStore: CodexAppServerBindingStore;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   runtime: PluginRuntime;
 }): Promise<Map<string, AdoptedSessionEntry>> {
   const adopted = new Map<string, AdoptedSessionEntry>();
@@ -679,7 +679,7 @@ async function listAdoptedSessionEntries(params: {
         continue;
       }
       if (adopted.has(sourceThreadId)) {
-        throw new Error(`multiple OpenClaw sessions adopt Codex thread ${sourceThreadId}`);
+        throw new Error(`multiple SteelEngine sessions adopt Codex thread ${sourceThreadId}`);
       }
       adopted.set(sourceThreadId, { key: sessionKey, sessionId, agentId, boundThreadId });
     }
@@ -689,7 +689,7 @@ async function listAdoptedSessionEntries(params: {
 
 async function findAdoptedSessionEntry(params: {
   bindingStore: CodexAppServerBindingStore;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   runtime: PluginRuntime;
   threadId: string;
 }): Promise<AdoptedSessionEntry | undefined> {
@@ -726,7 +726,7 @@ async function clearCreatedAdoptionBinding(params: {
   } catch (readError) {
     throw new CodexAdoptionBindingCleanupError(
       [params.cause, ...(clearError ? [clearError] : []), readError],
-      `OpenClaw session creation failed and the Codex binding could not be verified for ${params.sourceThreadId}`,
+      `SteelEngine session creation failed and the Codex binding could not be verified for ${params.sourceThreadId}`,
     );
   }
   // Pending state is the cleanup CAS token. Once lifecycle work changes it,
@@ -736,7 +736,7 @@ async function clearCreatedAdoptionBinding(params: {
   }
   throw new CodexAdoptionBindingCleanupError(
     [params.cause, ...(clearError ? [clearError] : [])],
-    `OpenClaw session creation failed and the Codex binding could not be cleared for ${params.sourceThreadId}`,
+    `SteelEngine session creation failed and the Codex binding could not be cleared for ${params.sourceThreadId}`,
   );
 }
 
@@ -787,7 +787,7 @@ function matchesPendingSupervisionOwner(
 
 async function ensurePendingAdoptionBinding(params: {
   bindingStore: CodexAppServerBindingStore;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   identity: ReturnType<typeof sessionBindingIdentity>;
   sourceThreadId: string;
   connectionFingerprint: string;
@@ -805,14 +805,14 @@ async function ensurePendingAdoptionBinding(params: {
     config: params.config,
   });
   if (!ownsGeneration) {
-    throw new Error(`failed to claim the OpenClaw session generation for ${params.sourceThreadId}`);
+    throw new Error(`failed to claim the SteelEngine session generation for ${params.sourceThreadId}`);
   }
   const existing = await params.bindingStore.read(params.identity);
   if (existing) {
     if (matchesPendingAdoptionBinding(existing, params)) {
       return;
     }
-    throw new Error(`OpenClaw session is already bound to Codex thread ${existing.threadId}`);
+    throw new Error(`SteelEngine session is already bound to Codex thread ${existing.threadId}`);
   }
   const binding = {
     threadId: params.sourceThreadId,
@@ -843,14 +843,14 @@ async function ensurePendingAdoptionBinding(params: {
   }
   const raced = await params.bindingStore.read(params.identity);
   if (!matchesPendingAdoptionBinding(raced, params)) {
-    throw new Error(`failed to bind OpenClaw session to Codex thread ${params.sourceThreadId}`);
+    throw new Error(`failed to bind SteelEngine session to Codex thread ${params.sourceThreadId}`);
   }
 }
 
 async function createOrReuseAdoptedSession(params: {
-  api: OpenClawPluginApi;
+  api: SteelEnginePluginApi;
   bindingStore: CodexAppServerBindingStore;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   sourceThread: CodexThread;
   connectionFingerprint: string;
 }): Promise<AdoptedSessionEntry> {
@@ -976,9 +976,9 @@ async function createOrReuseAdoptedSession(params: {
 }
 
 async function continueLocalCodexSessionInner(params: {
-  api: OpenClawPluginApi;
+  api: SteelEnginePluginApi;
   bindingStore: CodexAppServerBindingStore;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   control: CodexSessionCatalogControl;
   threadId: string;
   onContinued?: (upstream: CodexUpstreamBaseline & { connectionFingerprint: string }) => void;
@@ -999,7 +999,7 @@ async function continueLocalCodexSessionInner(params: {
     // Catalog state can race archive/reset. Restore only the same locked generation
     // under the session-store write lock so a stale Open Chat cannot revive a replacement.
     const changedError = () =>
-      new CatalogParamsError("Codex OpenClaw session changed before it could be opened. Retry.");
+      new CatalogParamsError("Codex SteelEngine session changed before it could be opened. Retry.");
     const restored = await params.api.runtime.agent.session.patchSessionEntry({
       sessionKey: existing.key,
       readConsistency: "latest",
@@ -1062,11 +1062,11 @@ async function continueLocalCodexSessionInner(params: {
   return { sessionKey: adopted.key, disposition: "forked" };
 }
 
-/** Creates one locked OpenClaw branch whose first harness run forks the Codex source. */
+/** Creates one locked SteelEngine branch whose first harness run forks the Codex source. */
 async function continueLocalCodexSession(params: {
-  api: OpenClawPluginApi;
+  api: SteelEnginePluginApi;
   bindingStore: CodexAppServerBindingStore;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   control: CodexSessionCatalogControl;
   threadId: string;
   onContinued?: (upstream: CodexUpstreamBaseline & { connectionFingerprint: string }) => void;
@@ -1093,7 +1093,7 @@ async function continueLocalCodexSession(params: {
 
 async function assertNoPendingSupervisionBranch(params: {
   bindingStore: CodexAppServerBindingStore;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   runtime: PluginRuntime;
   threadId: string;
 }): Promise<void> {
@@ -1103,7 +1103,7 @@ async function assertNoPendingSupervisionBranch(params: {
   for (const adopted of adoptedEntries) {
     if (adopted.entry.initializationPending === true) {
       throw new CatalogParamsError(
-        "Codex session cannot be archived while its OpenClaw branch is initializing",
+        "Codex session cannot be archived while its SteelEngine branch is initializing",
       );
     }
     const sessionId = adopted.entry.sessionId?.trim();
@@ -1123,7 +1123,7 @@ async function assertNoPendingSupervisionBranch(params: {
       binding.pendingSupervisionBranch?.sourceThreadId === params.threadId
     ) {
       throw new CatalogParamsError(
-        "Codex session cannot be archived until its OpenClaw branch starts",
+        "Codex session cannot be archived until its SteelEngine branch starts",
       );
     }
   }
@@ -1132,7 +1132,7 @@ async function assertNoPendingSupervisionBranch(params: {
 /** Archives one inactive Gateway-local Codex thread after a fresh status read. */
 async function archiveLocalCodexSession(params: {
   bindingStore: CodexAppServerBindingStore;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   control: CodexSessionCatalogControl;
   runtime: PluginRuntime;
   threadId: string;
@@ -1151,7 +1151,7 @@ async function archiveLocalCodexSession(params: {
           requireIdleThread(thread, "archive");
           if (await params.bindingStore.hasOtherThreadOwner(params.threadId)) {
             throw new CatalogParamsError(
-              "Codex session cannot be archived while it is attached to an OpenClaw session",
+              "Codex session cannot be archived while it is attached to an SteelEngine session",
             );
           }
           await assertCodexArchiveDescendantsUnowned({
@@ -1175,7 +1175,7 @@ async function archiveLocalCodexSession(params: {
 }
 
 /** Allows read-only catalog and transcript commands on supported paired-node platforms. */
-export function createCodexSessionCatalogNodeInvokePolicies(): OpenClawPluginNodeInvokePolicy[] {
+export function createCodexSessionCatalogNodeInvokePolicies(): SteelEnginePluginNodeInvokePolicy[] {
   return [
     {
       commands: [
@@ -1225,7 +1225,7 @@ function toGenericCatalogHost(
         ...(session.cliVersion ? { cliVersion: session.cliVersion } : {}),
         ...(session.gitBranch ? { gitBranch: session.gitBranch } : {}),
         archived: session.archived,
-        ...(session.openClawSessionKey ? { openClawSessionKey: session.openClawSessionKey } : {}),
+        ...(session.steelEngineSessionKey ? { steelEngineSessionKey: session.steelEngineSessionKey } : {}),
         canContinue,
         canArchive,
         canOpenTerminal,
@@ -1237,10 +1237,10 @@ function toGenericCatalogHost(
 }
 
 function registerCodexSessionCatalog(params: {
-  api: OpenClawPluginApi;
+  api: SteelEnginePluginApi;
   bindingStore: CodexAppServerBindingStore;
   control: CodexSessionCatalogControl;
-  getRuntimeConfig: () => OpenClawConfig | undefined;
+  getRuntimeConfig: () => SteelEngineConfig | undefined;
 }): void {
   const provider: SessionCatalogProvider = {
     id: "codex",
@@ -1275,7 +1275,7 @@ function registerCodexSessionCatalog(params: {
     continueSession: async (request) => {
       const config = params.getRuntimeConfig();
       if (!config) {
-        throw new Error("OpenClaw runtime config is unavailable");
+        throw new Error("SteelEngine runtime config is unavailable");
       }
       if (request.hostId.startsWith("node:")) {
         return await continueNodeCodexSession({
@@ -1315,7 +1315,7 @@ function registerCodexSessionCatalog(params: {
       }
       const config = params.getRuntimeConfig();
       if (!config) {
-        throw new Error("OpenClaw runtime config is unavailable");
+        throw new Error("SteelEngine runtime config is unavailable");
       }
       await archiveLocalCodexSession({
         bindingStore: params.bindingStore,

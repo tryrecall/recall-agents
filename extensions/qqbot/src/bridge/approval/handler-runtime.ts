@@ -9,10 +9,10 @@
  * heavy dependencies on the critical startup path.
  */
 
-import type { ChannelApprovalNativeRuntimeSpec } from "openclaw/plugin-sdk/approval-handler-runtime";
-import { createChannelApprovalNativeRuntimeAdapter } from "openclaw/plugin-sdk/approval-handler-runtime";
-import type { ChannelApprovalNativeRuntimeAdapter } from "openclaw/plugin-sdk/approval-handler-runtime";
-import { resolveApprovalRequestSessionConversation } from "openclaw/plugin-sdk/approval-native-runtime";
+import type { ChannelApprovalNativeRuntimeSpec } from "steelengine/plugin-sdk/approval-handler-runtime";
+import { createChannelApprovalNativeRuntimeAdapter } from "steelengine/plugin-sdk/approval-handler-runtime";
+import type { ChannelApprovalNativeRuntimeAdapter } from "steelengine/plugin-sdk/approval-handler-runtime";
+import { resolveApprovalRequestSessionConversation } from "steelengine/plugin-sdk/approval-native-runtime";
 import {
   buildExecApprovalText,
   buildPluginApprovalText,

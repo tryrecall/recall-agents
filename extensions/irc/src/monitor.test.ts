@@ -176,8 +176,8 @@ describe("irc monitor reconnect", () => {
           tls: false,
           nick: "bot",
           username: "bot",
-          realname: "OpenClaw",
-          channels: ["#openclaw"],
+          realname: "SteelEngine",
+          channels: ["#steelengine"],
         },
       },
     } as CoreConfig;
@@ -188,7 +188,7 @@ describe("irc monitor reconnect", () => {
       await waitForIrcCondition(
         () =>
           server.connectionCount >= 2 &&
-          server.lines.filter((line) => line === "USER bot 0 * :OpenClaw").length >= 2,
+          server.lines.filter((line) => line === "USER bot 0 * :SteelEngine").length >= 2,
         "expected IRC monitor to reconnect after the first socket closed",
       );
 
@@ -204,13 +204,13 @@ describe("irc monitor inbound target", () => {
   it.each([
     {
       label: "channel",
-      serverTarget: "#openclaw",
-      expected: { isGroup: true, target: "#openclaw", rawTarget: "#openclaw" },
+      serverTarget: "#steelengine",
+      expected: { isGroup: true, target: "#steelengine", rawTarget: "#steelengine" },
     },
     {
       label: "DM",
-      serverTarget: "openclaw-bot",
-      expected: { isGroup: false, target: "alice", rawTarget: "openclaw-bot" },
+      serverTarget: "steelengine-bot",
+      expected: { isGroup: false, target: "alice", rawTarget: "steelengine-bot" },
     },
   ])("maps $label targets through the monitor boundary", async ({ serverTarget, expected }) => {
     installMonitorRuntime();
@@ -227,7 +227,7 @@ describe("irc monitor inbound target", () => {
               tls: false,
               nick: "bot",
               username: "bot",
-              realname: "OpenClaw",
+              realname: "SteelEngine",
             },
           },
         } as CoreConfig,

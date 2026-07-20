@@ -41,7 +41,7 @@ describe("renderAbout", () => {
     render(renderAbout(createProps({ onPokeClawd })), container);
 
     const hero = container.querySelector(".about-hero");
-    expect(hero?.querySelector(".about-hero__name")?.textContent).toBe("OpenClaw");
+    expect(hero?.querySelector(".about-hero__name")?.textContent).toBe("SteelEngine");
     expect(hero?.querySelector(".about-hero__version")?.textContent).toBe("v2026.7.10");
     expect(hero?.querySelector(".about-hero__clawd svg")).not.toBeNull();
 
@@ -52,12 +52,12 @@ describe("renderAbout", () => {
 
     const links = Array.from(hero?.querySelectorAll<HTMLAnchorElement>(".about-hero__link") ?? []);
     expect(links.map((link) => link.getAttribute("href"))).toEqual([
-      "https://openclaw.ai",
-      "https://docs.openclaw.ai",
-      "https://github.com/openclaw/openclaw",
+      "https://steelengine.ai",
+      "https://docs.steelengine.ai",
+      "https://github.com/steelengineai/recall-agents",
       "https://discord.gg/clawd",
-      "https://x.com/openclaw",
-      "https://docs.openclaw.ai/releases",
+      "https://x.com/steelengine",
+      "https://docs.steelengine.ai/releases",
     ]);
     for (const link of links) {
       expect(link.getAttribute("target")).toBe("_blank");

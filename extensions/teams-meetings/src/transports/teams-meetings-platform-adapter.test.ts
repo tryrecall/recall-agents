@@ -11,7 +11,7 @@ import {
 
 const URL =
   "https://teams.microsoft.com/l/meetup-join/19%3ameeting_test%40thread.v2/0?context=%7b%7d";
-const MEETING_STATE_KEY = "__openclawTeamsMeeting";
+const MEETING_STATE_KEY = "__steelengineTeamsMeeting";
 
 function status(manualActionReason: string, manualActionMessage = "manual action") {
   const health = TEAMS_MEETINGS_PLATFORM_ADAPTER.browser.parseStatus({
@@ -144,7 +144,7 @@ async function runStatusScript(params: {
   const script = teamsMeetingStatusScript({
     allowMicrophone: params.allowMicrophone,
     autoJoin: true,
-    guestName: "OpenClaw Guest",
+    guestName: "SteelEngine Guest",
     meetingSessionId: "session-1",
     meetingUrl: URL,
     readOnly: params.readOnly,
@@ -348,7 +348,7 @@ describe("Microsoft Teams meeting platform adapter", () => {
     });
 
     expect(result.inCall).toBe(false);
-    expect(window).not.toHaveProperty("__openclawTeamsMeeting");
+    expect(window).not.toHaveProperty("__steelengineTeamsMeeting");
   });
 
   it("preserves a verified identity only across an in-call URL transition", async () => {
@@ -559,7 +559,7 @@ describe("Microsoft Teams meeting platform adapter", () => {
     const script = teamsMeetingStatusScript({
       allowMicrophone: true,
       autoJoin: true,
-      guestName: "OpenClaw Guest",
+      guestName: "SteelEngine Guest",
       meetingSessionId: "session-1",
       meetingUrl: URL,
     });

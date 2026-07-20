@@ -3,9 +3,9 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import {
-  closeOpenClawStateDatabaseForTest,
+  closeSteelEngineStateDatabaseForTest,
   createChannelIngressQueueForTests,
-} from "openclaw/plugin-sdk/plugin-state-test-runtime";
+} from "steelengine/plugin-sdk/plugin-state-test-runtime";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildIMessageFlushIngressLifecycle,
@@ -44,12 +44,12 @@ function createQueue(stateDir: string): IMessageIngressQueue {
 async function withQueue<T>(
   run: (queue: IMessageIngressQueue, stateDir: string) => Promise<T>,
 ): Promise<T> {
-  const created = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-imessage-ingress-"));
+  const created = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-imessage-ingress-"));
   const stateDir = await fs.realpath(created);
   try {
     return await run(createQueue(stateDir), stateDir);
   } finally {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     await fs.rm(stateDir, { recursive: true, force: true });
   }
 }
@@ -69,7 +69,7 @@ function lifecycle() {
 }
 
 afterEach(() => {
-  closeOpenClawStateDatabaseForTest();
+  closeSteelEngineStateDatabaseForTest();
   vi.restoreAllMocks();
 });
 
@@ -116,7 +116,7 @@ describe("iMessage durable ingress", () => {
       await interrupted.receive(event);
       await interrupted.stop();
 
-      closeOpenClawStateDatabaseForTest();
+      closeSteelEngineStateDatabaseForTest();
       const recoveredDispatch = vi.fn(async (_message, claimLifecycle) => {
         await claimLifecycle.onAdopted();
         return { kind: "deferred" } as const;

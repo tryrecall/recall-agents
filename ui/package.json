@@ -1,5 +1,5 @@
 {
-  "name": "openclaw-control-ui",
+  "name": "steelengine-control-ui",
   "private": true,
   "type": "module",
   "scripts": {
@@ -21,11 +21,11 @@
     "@modelcontextprotocol/ext-apps": "1.7.4",
     "@modelcontextprotocol/sdk": "1.29.0",
     "@noble/ed25519": "3.1.0",
-    "@openclaw/gateway-client": "workspace:*",
+    "@steelengine/gateway-client": "workspace:*",
     "@openclaw/libterminal": "0.3.2",
-    "@openclaw/media-core": "workspace:*",
-    "@openclaw/normalization-core": "workspace:*",
-    "@openclaw/workboard-contract": "workspace:*",
+    "@steelengine/media-core": "workspace:*",
+    "@steelengine/normalization-core": "workspace:*",
+    "@steelengine/workboard-contract": "workspace:*",
     "@openclaw/uirouter": "0.1.0",
     "@tanstack/lit-virtual": "3.13.33",
     "@tanstack/virtual-core": "3.17.4",
@@ -44,7 +44,7 @@
     "@vitest/browser": "4.1.10",
     "@vitest/browser-playwright": "4.1.10",
     "jsdom": "29.1.1",
-    "openclaw": "workspace:*",
+    "steelengine": "workspace:*",
     "playwright": "1.61.1",
     "vite": "8.1.3",
     "vitest": "4.1.10"

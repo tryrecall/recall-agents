@@ -1,6 +1,6 @@
 import { formatCliCommand } from "../cli/command-format.js";
 import { formatConfigIssueLines } from "../config/issue-format.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { withConsoleSubsystemsSuppressed } from "../logging/console.js";
 import type { RuntimeEnv } from "../runtime.js";
 // Guided onboarding: detect AI access, live-test it, then persist only a working route.
@@ -43,13 +43,13 @@ export type GuidedOnboardingDeps = {
     acceptRisk: boolean,
   ) => Promise<void>;
   createPrompter?: () => WizardPrompter | Promise<WizardPrompter>;
-  persistRiskAcknowledgement?: (config: OpenClawConfig) => Promise<void>;
+  persistRiskAcknowledgement?: (config: SteelEngineConfig) => Promise<void>;
   persistAccessMode?: (mode: GuidedAccessMode) => Promise<void>;
   listManualOptions?: typeof import("../system-agent/setup-inference.js").listManualSetupInferenceOptions;
   /**
    * "hatch" (default) runs the local custodian flow: question zero, quiet
    * failure collection, deterministic setup apply, then the agent TUI.
-   * "chat" preserves the legacy handoff into the OpenClaw system-agent chat —
+   * "chat" preserves the legacy handoff into the SteelEngine system-agent chat —
    * remote-gateway onboarding requires it because setup must apply remotely.
    */
   handoffMode?: "hatch" | "chat";
@@ -90,7 +90,7 @@ async function openSystemAgentChat(
   await runChat(workspace, runtime, acceptRisk);
 }
 
-async function persistRiskAcknowledgement(config: OpenClawConfig): Promise<void> {
+async function persistRiskAcknowledgement(config: SteelEngineConfig): Promise<void> {
   const securityAcknowledgedAt = config.wizard?.securityAcknowledgedAt;
   if (!securityAcknowledgedAt) {
     return;
@@ -134,8 +134,8 @@ async function runGuidedOnboardingFlow(
     );
     await prompter.outro(
       t("wizard.guided.invalidConfigRepair", {
-        fixCommand: formatCliCommand("openclaw doctor --fix"),
-        inspectCommand: formatCliCommand("openclaw config validate"),
+        fixCommand: formatCliCommand("steelengine doctor --fix"),
+        inspectCommand: formatCliCommand("steelengine config validate"),
       }),
     );
     runtime.exit(1);
@@ -184,8 +184,8 @@ async function runGuidedOnboardingFlow(
     }
   }
 
-  // Inference is the only prerequisite for OpenClaw. Use the caller's or
-  // current default workspace as isolated probe context; OpenClaw owns any
+  // Inference is the only prerequisite for SteelEngine. Use the caller's or
+  // current default workspace as isolated probe context; SteelEngine owns any
   // workspace choice and persistence after the live completion succeeds.
   const workspace = resolveUserPath(
     opts.workspace?.trim() ||
@@ -417,7 +417,7 @@ async function runGuidedOnboardingFlow(
     await prompter.note(t("wizard.guided.alreadySetUp"), t("wizard.guided.welcomeTitle"));
   } else {
     // Announced default: apply the same setup plan the conversational "yes"
-    // would, then hand off to the hatch instead of parking in the OpenClaw chat.
+    // would, then hand off to the hatch instead of parking in the SteelEngine chat.
     const applySetup =
       deps.applySetup ?? (await import("../system-agent/setup-apply.js")).applySystemAgentSetup;
     const applyProgress = prompter.progress(t("wizard.guided.settingUp"));
@@ -431,7 +431,7 @@ async function runGuidedOnboardingFlow(
       }
       const appliedSnapshot = await readConfigFileSnapshot();
       if (!appliedSnapshot.valid) {
-        throw new Error("Setup wrote an invalid OpenClaw config.");
+        throw new Error("Setup wrote an invalid SteelEngine config.");
       }
       persistedConfig = appliedSnapshot.sourceConfig ?? appliedSnapshot.config;
     } catch (error) {
@@ -459,7 +459,7 @@ async function runGuidedOnboardingFlow(
     if (recommendedConfig !== persistedConfig) {
       const latestSnapshot = await readConfigFileSnapshot();
       if (!latestSnapshot.valid) {
-        throw new Error("App recommendations could not update an invalid OpenClaw config.");
+        throw new Error("App recommendations could not update an invalid SteelEngine config.");
       }
       const latestConfig = latestSnapshot.sourceConfig ?? latestSnapshot.config;
       const { mergeWizardConfigOntoLatest, writeWizardConfigFile } =

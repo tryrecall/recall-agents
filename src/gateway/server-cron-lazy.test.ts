@@ -3,7 +3,7 @@
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { CliDeps } from "../cli/deps.types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { GatewayCronServiceContract } from "./server-cron-contract.js";
 import type { GatewayCronState } from "./server-cron.js";
 
@@ -38,10 +38,10 @@ describe("createLazyGatewayCronState", () => {
   });
 
   it("resolves its default store path from the prepared env", () => {
-    const stateRoot = "/tmp/openclaw-candidate-state";
+    const stateRoot = "/tmp/steelengine-candidate-state";
     const lazy = createLazyGatewayCronState({
       ...createParams(),
-      env: { ...process.env, OPENCLAW_STATE_DIR: stateRoot },
+      env: { ...process.env, STEELENGINE_STATE_DIR: stateRoot },
     });
 
     expect(lazy.storePath).toBe(`${stateRoot}/cron/jobs.json`);
@@ -165,7 +165,7 @@ describe("createLazyGatewayCronState", () => {
   });
 
   it("preserves the startup cron enabled flag without loading cron runtime", () => {
-    vi.stubEnv("OPENCLAW_SKIP_CRON", "1");
+    vi.stubEnv("STEELENGINE_SKIP_CRON", "1");
 
     const lazy = createLazyGatewayCronState(createParams());
 
@@ -288,11 +288,11 @@ describe("createLazyGatewayCronState", () => {
   });
 });
 
-function createParams(overrides: Partial<OpenClawConfig> = {}) {
+function createParams(overrides: Partial<SteelEngineConfig> = {}) {
   return {
     cfg: {
       ...overrides,
-    } as OpenClawConfig,
+    } as SteelEngineConfig,
     deps: {} as CliDeps,
     broadcast: vi.fn(),
   };
@@ -301,7 +301,7 @@ function createParams(overrides: Partial<OpenClawConfig> = {}) {
 function createCronState(cron: GatewayCronServiceContract): GatewayCronState {
   return {
     cron,
-    storePath: "/tmp/openclaw-cron.json",
+    storePath: "/tmp/steelengine-cron.json",
     cronEnabled: true,
   } as GatewayCronState;
 }

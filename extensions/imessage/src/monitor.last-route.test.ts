@@ -2,11 +2,11 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import * as channelInbound from "openclaw/plugin-sdk/channel-inbound";
-import { recordInboundSession } from "openclaw/plugin-sdk/conversation-runtime";
-import type { dispatchReplyWithBufferedBlockDispatcher } from "openclaw/plugin-sdk/reply-runtime";
-import { getSessionEntry, resolveStorePath } from "openclaw/plugin-sdk/session-store-runtime";
-import type { waitForTransportReady } from "openclaw/plugin-sdk/transport-ready-runtime";
+import * as channelInbound from "steelengine/plugin-sdk/channel-inbound";
+import { recordInboundSession } from "steelengine/plugin-sdk/conversation-runtime";
+import type { dispatchReplyWithBufferedBlockDispatcher } from "steelengine/plugin-sdk/reply-runtime";
+import { getSessionEntry, resolveStorePath } from "steelengine/plugin-sdk/session-store-runtime";
+import type { waitForTransportReady } from "steelengine/plugin-sdk/transport-ready-runtime";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { createIMessageRpcClient } from "./client.js";
 import { monitorIMessageProvider } from "./monitor.js";
@@ -80,12 +80,12 @@ const createChannelInboundDebouncerMock = vi.hoisted(() =>
   })),
 );
 
-vi.mock("openclaw/plugin-sdk/transport-ready-runtime", () => ({
+vi.mock("steelengine/plugin-sdk/transport-ready-runtime", () => ({
   waitForTransportReady: waitForTransportReadyMock,
 }));
 
-vi.mock("openclaw/plugin-sdk/conversation-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/conversation-runtime")>();
+vi.mock("steelengine/plugin-sdk/conversation-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("steelengine/plugin-sdk/conversation-runtime")>();
   return {
     ...actual,
     readChannelAllowFromStore: readChannelAllowFromStoreMock,
@@ -93,8 +93,8 @@ vi.mock("openclaw/plugin-sdk/conversation-runtime", async (importOriginal) => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/channel-inbound", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/channel-inbound")>();
+vi.mock("steelengine/plugin-sdk/channel-inbound", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("steelengine/plugin-sdk/channel-inbound")>();
   return {
     ...actual,
     createChannelInboundDebouncer: createChannelInboundDebouncerMock,
@@ -965,7 +965,7 @@ describe("iMessage monitor last-route updates", () => {
   );
 
   it("keeps per-channel-peer direct-message last-route writes on the isolated session", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-imsg-last-route-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-imsg-last-route-"));
     tempDirs.push(stateDir);
     const configuredStore = path.join(stateDir, "sessions.json");
     const storePath = resolveStorePath(configuredStore, { agentId: "main" });
@@ -1088,7 +1088,7 @@ describe("iMessage monitor last-route updates", () => {
           imessage: {
             // Unreadable dbPath => no startup rowid watermark, so this test
             // isolates the age-fence behavior on the live path.
-            dbPath: path.join(os.tmpdir(), `openclaw-missing-chat-${Date.now()}.db`),
+            dbPath: path.join(os.tmpdir(), `steelengine-missing-chat-${Date.now()}.db`),
             dmPolicy: "allowlist",
             allowFrom: ["+15550001111"],
           },
@@ -1116,7 +1116,7 @@ describe("iMessage monitor last-route updates", () => {
     // Regression guard: the watermark is captured before the transport-ready
     // probe so messages that land during the startup window are not skipped by
     // imsg's self-fence at subscribe time.
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-imsg-startup-rowid-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-imsg-startup-rowid-"));
     tempDirs.push(stateDir);
     const dbPath = path.join(stateDir, "chat.db");
     const { DatabaseSync } = await import("node:sqlite");
@@ -1188,7 +1188,7 @@ describe("iMessage monitor last-route updates", () => {
   });
 
   it("routes legacy catchup through durable ingress and rejects a live GUID overlap", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-imsg-catchup-window-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-imsg-catchup-window-"));
     tempDirs.push(stateDir);
     const dbPath = path.join(stateDir, "chat.db");
     const { DatabaseSync } = await import("node:sqlite");
@@ -1272,7 +1272,7 @@ describe("iMessage monitor last-route updates", () => {
   });
 
   it("recovers downtime messages: replays from the cursor and delivers replay rows older than the live fence", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-imsg-recovery-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-imsg-recovery-"));
     tempDirs.push(stateDir);
     const dbPath = path.join(stateDir, "chat.db");
     advanceIMessageRecoveryCursor(
@@ -1364,7 +1364,7 @@ describe("iMessage monitor last-route updates", () => {
   });
 
   it("does not treat startup-boundary rows as recovery replay without a prior cursor", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-imsg-first-run-boundary-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-imsg-first-run-boundary-"));
     tempDirs.push(stateDir);
     const dbPath = path.join(stateDir, "chat.db");
     const { DatabaseSync } = await import("node:sqlite");
@@ -1429,7 +1429,7 @@ describe("iMessage monitor last-route updates", () => {
   });
 
   it("records a suppressed live row so a later replay of the same row is deduped, not delivered", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-imsg-suppress-record-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-imsg-suppress-record-"));
     tempDirs.push(stateDir);
     const dbPath = path.join(stateDir, "chat.db");
     const { DatabaseSync } = await import("node:sqlite");
@@ -1509,7 +1509,7 @@ describe("iMessage monitor last-route updates", () => {
 
   it("advances the recovery cursor after durable enqueue before dispatch", async () => {
     debouncerControl.holdEntries = true;
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-imsg-recovery-failed-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-imsg-recovery-failed-"));
     tempDirs.push(stateDir);
     const dbPath = path.join(stateDir, "chat.db");
     advanceIMessageRecoveryCursor(
@@ -1583,7 +1583,7 @@ describe("iMessage monitor last-route updates", () => {
 
   it("keeps the durable recovery cursor independent of later dispatch order", async () => {
     debouncerControl.holdEntries = true;
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-imsg-recovery-ordered-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-imsg-recovery-ordered-"));
     tempDirs.push(stateDir);
     const dbPath = path.join(stateDir, "chat.db");
     advanceIMessageRecoveryCursor(
@@ -1651,9 +1651,9 @@ describe("iMessage monitor last-route updates", () => {
   });
 
   it("repairs anchorless group watch payloads before routing or cursor updates", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-imsg-anchor-repair-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-imsg-anchor-repair-"));
     tempDirs.push(stateDir);
-    vi.stubEnv("OPENCLAW_STATE_DIR", stateDir);
+    vi.stubEnv("STEELENGINE_STATE_DIR", stateDir);
 
     let onNotification: ((message: { method: string; params: unknown }) => void) | undefined;
     const client = {
@@ -1696,7 +1696,7 @@ describe("iMessage monitor last-route updates", () => {
               chat_id: 0,
               sender: "+15550001111",
               is_from_me: false,
-              text: "@openclaw check this https://example.com",
+              text: "@steelengine check this https://example.com",
               is_group: false,
               chat_guid: "",
               chat_identifier: "",
@@ -1728,7 +1728,7 @@ describe("iMessage monitor last-route updates", () => {
           },
         },
         messages: {
-          groupChat: { mentionPatterns: ["@openclaw"] },
+          groupChat: { mentionPatterns: ["@steelengine"] },
           inbound: { debounceMs: 0 },
         },
         session: { mainKey: "main" },
@@ -2176,7 +2176,7 @@ describe("iMessage monitor last-route updates", () => {
         channels: {
           imessage: {
             coalesceSameSenderDms: true,
-            dbPath: path.join(os.tmpdir(), `openclaw-missing-chat-${Date.now()}.db`),
+            dbPath: path.join(os.tmpdir(), `steelengine-missing-chat-${Date.now()}.db`),
             dmPolicy: "allowlist",
             allowFrom: ["+15550001111"],
             sendReadReceipts: false,

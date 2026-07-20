@@ -29,15 +29,15 @@ function setControlUiBasePath(value: string | undefined) {
       "window",
       value == null
         ? ({} as TestWindow)
-        : ({ __OPENCLAW_CONTROL_UI_BASE_PATH__: value } as unknown as TestWindow),
+        : ({ __STEELENGINE_CONTROL_UI_BASE_PATH__: value } as unknown as TestWindow),
     );
     return;
   }
   if (value == null) {
-    delete (window as TestWindow)["__OPENCLAW_CONTROL_UI_BASE_PATH__"];
+    delete (window as TestWindow)["__STEELENGINE_CONTROL_UI_BASE_PATH__"];
     return;
   }
-  Object.defineProperty(window, "__OPENCLAW_CONTROL_UI_BASE_PATH__", {
+  Object.defineProperty(window, "__STEELENGINE_CONTROL_UI_BASE_PATH__", {
     value,
     writable: true,
     configurable: true,
@@ -131,28 +131,28 @@ describe("loadSettings default gateway URL derivation", () => {
       host: "gateway.example:8443",
       pathname: "/ignored/path",
     });
-    setControlUiBasePath(" /openclaw/ ");
+    setControlUiBasePath(" /steelengine/ ");
 
-    expect(loadSettings().gatewayUrl).toBe(expectedGatewayUrl("/openclaw"));
+    expect(loadSettings().gatewayUrl).toBe(expectedGatewayUrl("/steelengine"));
   });
 
   it("binds standalone documents to the page Gateway without persisting a selection", () => {
     setTestLocation({
       protocol: "https:",
       host: "gateway.example:8443",
-      pathname: "/openclaw/approve/exec%3A1",
+      pathname: "/steelengine/approve/exec%3A1",
     });
-    setControlUiBasePath("/openclaw");
+    setControlUiBasePath("/steelengine");
     const remote = makeSettings("wss://remote.example:8443", {
       sessionKey: "agent:remote:main",
       lastActiveSessionKey: "agent:remote:main",
     });
     const sessionCredential = ["page", "session", "credential"].join("-");
-    persistSessionToken(expectedGatewayUrl("/openclaw"), sessionCredential);
+    persistSessionToken(expectedGatewayUrl("/steelengine"), sessionCredential);
     const before = [...Array(localStorage.length)].map((_, index) => localStorage.key(index));
 
     expect(resolvePageGatewaySettings(remote)).toMatchObject({
-      gatewayUrl: expectedGatewayUrl("/openclaw"),
+      gatewayUrl: expectedGatewayUrl("/steelengine"),
       token: sessionCredential,
       sessionKey: "main",
       lastActiveSessionKey: "main",
@@ -176,10 +176,10 @@ describe("loadSettings default gateway URL derivation", () => {
     setTestLocation({
       protocol: "http:",
       host: "gateway.example:18789",
-      pathname: "/apps/openclaw/chat",
+      pathname: "/apps/steelengine/chat",
     });
 
-    expect(loadSettings().gatewayUrl).toBe(expectedGatewayUrl("/apps/openclaw"));
+    expect(loadSettings().gatewayUrl).toBe(expectedGatewayUrl("/apps/steelengine"));
   });
 
   it("skips node sessionStorage accessors that warn without a storage file", () => {
@@ -210,9 +210,9 @@ describe("loadSettings default gateway URL derivation", () => {
       host: "gateway.example:8443",
       pathname: "/",
     });
-    sessionStorage.setItem("openclaw.control.token.v1", "legacy-session-token");
-    const gatewayUrl = "wss://gateway.example:8443/openclaw";
-    const scopedKey = `openclaw.control.settings.v1:${gatewayUrl}`;
+    sessionStorage.setItem("steelengine.control.token.v1", "legacy-session-token");
+    const gatewayUrl = "wss://gateway.example:8443/steelengine";
+    const scopedKey = `steelengine.control.settings.v1:${gatewayUrl}`;
     localStorage.setItem(
       scopedKey,
       JSON.stringify({
@@ -222,7 +222,7 @@ describe("loadSettings default gateway URL derivation", () => {
       }),
     );
     localStorage.setItem(
-      "openclaw.control.currentGateway.v1:wss://gateway.example:8443",
+      "steelengine.control.currentGateway.v1:wss://gateway.example:8443",
       gatewayUrl,
     );
 
@@ -236,7 +236,7 @@ describe("loadSettings default gateway URL derivation", () => {
     >;
     expect(rewritten.token).toBeUndefined();
     expect(rewritten.sessionsByGateway).toEqual({
-      "wss://gateway.example:8443/openclaw": {
+      "wss://gateway.example:8443/steelengine": {
         sessionKey: "agent",
         lastActiveSessionKey: "agent",
       },
@@ -343,7 +343,7 @@ describe("loadSettings default gateway URL derivation", () => {
     expect(settings.gatewayUrl).toBe(gwUrl);
     expect(settings.token).toBe("memory-only-token");
 
-    const scopedKey = `openclaw.control.settings.v1:${gwUrl}`;
+    const scopedKey = `steelengine.control.settings.v1:${gwUrl}`;
     expect(JSON.parse(localStorage.getItem(scopedKey) ?? "{}")).toEqual({
       gatewayUrl: gwUrl,
       theme: "claw",
@@ -394,7 +394,7 @@ describe("loadSettings default gateway URL derivation", () => {
     expect(loadSettings().navWidth).toBe(258);
 
     // Corrupt the persisted list; load falls back to the default pinned set.
-    const scopedKey = `openclaw.control.settings.v1:${gwUrl}`;
+    const scopedKey = `steelengine.control.settings.v1:${gwUrl}`;
     const persisted = JSON.parse(localStorage.getItem(scopedKey) ?? "{}") as Record<
       string,
       unknown
@@ -432,7 +432,7 @@ describe("loadSettings default gateway URL derivation", () => {
     });
     expect(loadSettings().pinnedAgentIds).toEqual(["main", "research"]);
 
-    const scopedKey = `openclaw.control.settings.v1:${gwUrl}`;
+    const scopedKey = `steelengine.control.settings.v1:${gwUrl}`;
     const persisted = JSON.parse(localStorage.getItem(scopedKey) ?? "{}") as Record<
       string,
       unknown
@@ -451,7 +451,7 @@ describe("loadSettings default gateway URL derivation", () => {
 
     const gwUrl = expectedGatewayUrl("");
     localStorage.setItem(
-      `openclaw.control.settings.v1:${gwUrl}`,
+      `steelengine.control.settings.v1:${gwUrl}`,
       JSON.stringify({
         gatewayUrl: gwUrl,
         textScale: 123,
@@ -490,7 +490,7 @@ describe("loadSettings default gateway URL derivation", () => {
     });
 
     const gwUrl = expectedGatewayUrl("");
-    const scopedKey = `openclaw.control.settings.v1:${gwUrl}`;
+    const scopedKey = `steelengine.control.settings.v1:${gwUrl}`;
     saveSettings({ ...loadSettings(), chatSendShortcut: "modifier-enter" });
     expect(JSON.parse(localStorage.getItem(scopedKey) ?? "{}").chatSendShortcut).toBe(
       "modifier-enter",
@@ -517,7 +517,7 @@ describe("loadSettings default gateway URL derivation", () => {
     });
 
     const gwUrl = expectedGatewayUrl("");
-    const scopedKey = `openclaw.control.settings.v1:${gwUrl}`;
+    const scopedKey = `steelengine.control.settings.v1:${gwUrl}`;
     expect(loadSettings().chatFollowUpMode).toBeUndefined();
     saveSettings({ ...loadSettings(), chatFollowUpMode: "queue" });
     expect(JSON.parse(localStorage.getItem(scopedKey) ?? "{}").chatFollowUpMode).toBe("queue");
@@ -546,7 +546,7 @@ describe("loadSettings default gateway URL derivation", () => {
     });
 
     const gwUrl = expectedGatewayUrl("");
-    const scopedKey = `openclaw.control.settings.v1:${gwUrl}`;
+    const scopedKey = `steelengine.control.settings.v1:${gwUrl}`;
     expect(loadSettings().catalogOpenTarget).toBe("viewer");
     saveSettings({ ...loadSettings(), catalogOpenTarget: "terminal" });
     expect(JSON.parse(localStorage.getItem(scopedKey) ?? "{}").catalogOpenTarget).toBe("terminal");
@@ -571,7 +571,7 @@ describe("loadSettings default gateway URL derivation", () => {
     });
 
     const gwUrl = expectedGatewayUrl("");
-    const scopedKey = `openclaw.control.settings.v1:${gwUrl}`;
+    const scopedKey = `steelengine.control.settings.v1:${gwUrl}`;
     saveSettings({ ...loadSettings(), realtimeTalkInputDeviceId: " usb-mic " });
     expect(JSON.parse(localStorage.getItem(scopedKey) ?? "{}").realtimeTalkInputDeviceId).toBe(
       "usb-mic",
@@ -648,7 +648,7 @@ describe("loadSettings default gateway URL derivation", () => {
       sidebarPinnedRoutes: [],
     });
 
-    const scopedKey = `openclaw.control.settings.v1:${gwUrl}`;
+    const scopedKey = `steelengine.control.settings.v1:${gwUrl}`;
     const persisted = JSON.parse(localStorage.getItem(scopedKey) ?? "{}") as Record<
       string,
       unknown
@@ -687,7 +687,7 @@ describe("loadSettings default gateway URL derivation", () => {
     });
     const gwUrl = expectedGatewayUrl("");
     localStorage.setItem(
-      `openclaw.control.settings.v1:${gwUrl}`,
+      `steelengine.control.settings.v1:${gwUrl}`,
       JSON.stringify({ gatewayUrl: gwUrl, chatSplitLayout: { columns: "invalid" } }),
     );
 
@@ -734,7 +734,7 @@ describe("loadSettings default gateway URL derivation", () => {
 
     const gwUrl = expectedGatewayUrl("");
     localStorage.setItem(
-      `openclaw.control.settings.v1:${gwUrl}`,
+      `steelengine.control.settings.v1:${gwUrl}`,
       JSON.stringify({
         gatewayUrl: gwUrl,
         theme: "custom",
@@ -804,7 +804,7 @@ describe("loadSettings default gateway URL derivation", () => {
     });
 
     const gwUrl = expectedGatewayUrl("");
-    const scopedKey = `openclaw.control.settings.v1:wss://gateway.example:8443`;
+    const scopedKey = `steelengine.control.settings.v1:wss://gateway.example:8443`;
 
     // Pre-seed sessionsByGateway with 11 stale gateway entries so the next
     // saveSettings call pushes the total to 12 and triggers the cap (10).
@@ -865,7 +865,7 @@ describe("loadSettings default gateway URL derivation", () => {
     setControlUiBasePath("/gateway-b");
 
     expect(loadSettings().gatewayUrl).toBe(expectedGatewayUrl("/gateway-b"));
-    expect(localStorage.getItem("openclaw.control.settings.v1")).toBeNull();
+    expect(localStorage.getItem("steelengine.control.settings.v1")).toBeNull();
   });
 
   it("keeps custom gateway selections isolated per Control UI base path", () => {
@@ -899,7 +899,7 @@ describe("loadSettings default gateway URL derivation", () => {
       pathname: "/",
     });
     localStorage.setItem(
-      "openclaw.control.user.v1",
+      "steelengine.control.user.v1",
       JSON.stringify({ name: "Buns", avatar: "🦞" }),
     );
 
@@ -907,7 +907,7 @@ describe("loadSettings default gateway URL derivation", () => {
       name: "Buns",
       avatar: "🦞",
     });
-    expect(JSON.parse(localStorage.getItem("openclaw.control.user.v1") ?? "{}")).toEqual({
+    expect(JSON.parse(localStorage.getItem("steelengine.control.user.v1") ?? "{}")).toEqual({
       name: "Buns",
       avatar: "🦞",
     });
@@ -924,12 +924,12 @@ describe("loadSettings default gateway URL derivation", () => {
       name: null,
       avatar: null,
     });
-    expect(localStorage.getItem("openclaw.control.user.v1")).toBeNull();
+    expect(localStorage.getItem("steelengine.control.user.v1")).toBeNull();
   });
 
   it("normalizes invalid local user identity values on load", () => {
     localStorage.setItem(
-      "openclaw.control.user.v1",
+      "steelengine.control.user.v1",
       JSON.stringify({
         name: "  ",
         avatar: "https://example.com/avatar.png",

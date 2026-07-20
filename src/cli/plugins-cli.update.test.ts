@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { Command } from "commander";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import { hashConfigIncludeRaw } from "../config/includes.js";
 import { CLAWHUB_INSTALL_ERROR_CODE } from "../plugins/clawhub-error-codes.js";
 import {
@@ -25,7 +25,7 @@ import {
   writePersistedInstalledPluginIndexInstallRecords,
 } from "./plugins-cli-test-helpers.js";
 
-const ORIGINAL_OPENCLAW_NIX_MODE = process.env.OPENCLAW_NIX_MODE;
+const ORIGINAL_STEELENGINE_NIX_MODE = process.env.STEELENGINE_NIX_MODE;
 const ORIGINAL_STDIN_TTY = Object.getOwnPropertyDescriptor(process.stdin, "isTTY");
 const ORIGINAL_STDOUT_TTY = Object.getOwnPropertyDescriptor(process.stdout, "isTTY");
 
@@ -57,7 +57,7 @@ function createTrackedPluginConfig(params: {
   pluginId: string;
   spec: string;
   resolvedName?: string;
-}): OpenClawConfig {
+}): SteelEngineConfig {
   return {
     plugins: {
       installs: {
@@ -69,7 +69,7 @@ function createTrackedPluginConfig(params: {
         },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 function expectRestartNoticeLogged() {
@@ -90,18 +90,18 @@ function expectSingleCallParams(mockFn: ReturnType<typeof vi.fn>) {
 }
 
 function primeUpdateConfigSnapshot(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   configPath?: string;
   hash?: string;
-  loadedConfig?: OpenClawConfig;
+  loadedConfig?: SteelEngineConfig;
   parsed?: Record<string, unknown>;
-  runtimeConfig?: OpenClawConfig;
-  sourceConfig?: OpenClawConfig;
+  runtimeConfig?: SteelEngineConfig;
+  sourceConfig?: SteelEngineConfig;
   valid?: boolean;
   includeFileHashesForWrite?: Record<string, string>;
   includeFileTargetsForWrite?: Record<string, string>;
 }) {
-  const configPath = params.configPath ?? path.join(process.cwd(), "openclaw.json5");
+  const configPath = params.configPath ?? path.join(process.cwd(), "steelengine.json5");
   const parsed = params.parsed ?? (params.config as Record<string, unknown>);
   const sourceConfig = params.sourceConfig ?? params.config;
   const runtimeConfig = params.runtimeConfig ?? params.config;
@@ -134,10 +134,10 @@ function primeUpdateConfigSnapshot(params: {
   return prepared;
 }
 
-function primeBlockedUpdateConfig(section: "hooks" | "plugins", config: OpenClawConfig): void {
+function primeBlockedUpdateConfig(section: "hooks" | "plugins", config: SteelEngineConfig): void {
   const externalPath = path.join(
     path.parse(process.cwd()).root,
-    "external-openclaw",
+    "external-steelengine",
     `${section}.json5`,
   );
   primeUpdateConfigSnapshot({
@@ -156,10 +156,10 @@ describe("plugins cli update", () => {
 
   afterEach(() => {
     restoreTty();
-    if (ORIGINAL_OPENCLAW_NIX_MODE === undefined) {
-      delete process.env.OPENCLAW_NIX_MODE;
+    if (ORIGINAL_STEELENGINE_NIX_MODE === undefined) {
+      delete process.env.STEELENGINE_NIX_MODE;
     } else {
-      process.env.OPENCLAW_NIX_MODE = ORIGINAL_OPENCLAW_NIX_MODE;
+      process.env.STEELENGINE_NIX_MODE = ORIGINAL_STEELENGINE_NIX_MODE;
     }
   });
 
@@ -178,17 +178,17 @@ describe("plugins cli update", () => {
   });
 
   it("refuses plugin updates in Nix mode before package-manager work", async () => {
-    const previous = process.env.OPENCLAW_NIX_MODE;
-    process.env.OPENCLAW_NIX_MODE = "1";
+    const previous = process.env.STEELENGINE_NIX_MODE;
+    process.env.STEELENGINE_NIX_MODE = "1";
     try {
       await expect(runPluginsCommand(["plugins", "update", "--all"])).rejects.toThrow(
-        "OPENCLAW_NIX_MODE=1",
+        "STEELENGINE_NIX_MODE=1",
       );
     } finally {
       if (previous === undefined) {
-        delete process.env.OPENCLAW_NIX_MODE;
+        delete process.env.STEELENGINE_NIX_MODE;
       } else {
-        process.env.OPENCLAW_NIX_MODE = previous;
+        process.env.STEELENGINE_NIX_MODE = previous;
       }
     }
 
@@ -211,7 +211,7 @@ describe("plugins cli update", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const nextConfig = {
       hooks: {
         internal: {
@@ -224,7 +224,7 @@ describe("plugins cli update", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     primeUpdateConfigSnapshot({
       config: cfg,
@@ -286,7 +286,7 @@ describe("plugins cli update", () => {
           alpha: { enabled: true },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const snapshotConfig = {
       hooks: {
         internal: {
@@ -294,7 +294,7 @@ describe("plugins cli update", () => {
             "new-hooks": {
               source: "npm",
               spec: "@acme/new-hooks@1.0.0",
-              installPath: "~/.openclaw/hooks/new-hooks",
+              installPath: "~/.steelengine/hooks/new-hooks",
             },
           },
         },
@@ -304,11 +304,11 @@ describe("plugins cli update", () => {
           alpha: { enabled: false },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const installRecords = {
       alpha: {
         source: "npm",
-        spec: "@openclaw/alpha@1.0.0",
+        spec: "@steelengine/alpha@1.0.0",
         installPath: "/tmp/alpha",
       },
     } as const;
@@ -323,7 +323,7 @@ describe("plugins cli update", () => {
               "new-hooks": {
                 source: "npm",
                 spec: "@acme/new-hooks@1.0.0",
-                installPath: "/home/test/.openclaw/hooks/new-hooks",
+                installPath: "/home/test/.steelengine/hooks/new-hooks",
               },
             },
           },
@@ -334,12 +334,12 @@ describe("plugins cli update", () => {
       },
     });
     setInstalledPluginIndexInstallRecords(installRecords);
-    updateNpmInstalledPlugins.mockImplementation(async (params: { config: OpenClawConfig }) => ({
+    updateNpmInstalledPlugins.mockImplementation(async (params: { config: SteelEngineConfig }) => ({
       config: params.config,
       changed: false,
       outcomes: [],
     }));
-    updateNpmInstalledHookPacks.mockImplementation(async (params: { config: OpenClawConfig }) => ({
+    updateNpmInstalledHookPacks.mockImplementation(async (params: { config: SteelEngineConfig }) => ({
       config: params.config,
       changed: false,
       outcomes: [],
@@ -357,7 +357,7 @@ describe("plugins cli update", () => {
             "new-hooks": {
               source: "npm",
               spec: "@acme/new-hooks@1.0.0",
-              installPath: "/home/test/.openclaw/hooks/new-hooks",
+              installPath: "/home/test/.steelengine/hooks/new-hooks",
             },
           },
         },
@@ -376,7 +376,7 @@ describe("plugins cli update", () => {
   it("uses resolved shipped install records instead of raw env placeholders", async () => {
     const cfg = createTrackedPluginConfig({
       pluginId: "alpha",
-      spec: "@openclaw/alpha@1.0.0",
+      spec: "@steelengine/alpha@1.0.0",
     });
     primeUpdateConfigSnapshot({
       config: cfg,
@@ -407,7 +407,7 @@ describe("plugins cli update", () => {
   it("rejects invalid config snapshots before updater side effects", async () => {
     const cfg = createTrackedPluginConfig({
       pluginId: "alpha",
-      spec: "@openclaw/alpha@1.0.0",
+      spec: "@steelengine/alpha@1.0.0",
     });
     primeUpdateConfigSnapshot({
       config: cfg,
@@ -439,7 +439,7 @@ describe("plugins cli update", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     primeBlockedUpdateConfig("hooks", cfg);
 
     await expect(runPluginsCommand(["plugins", "update", "--all"])).rejects.toThrow("__exit__:1");
@@ -453,23 +453,23 @@ describe("plugins cli update", () => {
   });
 
   it("allows index-only legacy id migration when an included plugins section has no references", async () => {
-    const cfg = { plugins: {} } as OpenClawConfig;
+    const cfg = { plugins: {} } as SteelEngineConfig;
     const pluginRecords = createTrackedPluginConfig({
       pluginId: "voice-call",
-      spec: "@openclaw/voice-call@1.0.0",
+      spec: "@steelengine/voice-call@1.0.0",
     }).plugins?.installs;
     const nextConfig = {
       ...cfg,
       plugins: {
         ...cfg.plugins,
         installs: {
-          "@openclaw/voice-call": {
+          "@steelengine/voice-call": {
             source: "npm",
-            spec: "@openclaw/voice-call@1.1.0",
+            spec: "@steelengine/voice-call@1.1.0",
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     primeBlockedUpdateConfig("plugins", cfg);
     setInstalledPluginIndexInstallRecords(pluginRecords ?? {});
     updateNpmInstalledPlugins.mockResolvedValue({
@@ -477,9 +477,9 @@ describe("plugins cli update", () => {
       changed: true,
       outcomes: [
         {
-          pluginId: "@openclaw/voice-call",
+          pluginId: "@steelengine/voice-call",
           status: "updated",
-          message: "Updated @openclaw/voice-call.",
+          message: "Updated @steelengine/voice-call.",
         },
       ],
     });
@@ -503,7 +503,7 @@ describe("plugins cli update", () => {
           [pluginId]: { enabled: true },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const pluginRecords = {
       [pluginId]: {
         source: "git",
@@ -517,7 +517,7 @@ describe("plugins cli update", () => {
         ...cfg.plugins,
         installs: pluginRecords,
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     primeBlockedUpdateConfig("plugins", cfg);
     setInstalledPluginIndexInstallRecords(pluginRecords);
     updateNpmInstalledPlugins.mockResolvedValue({
@@ -555,22 +555,22 @@ describe("plugins cli update", () => {
           brave: { enabled: true },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const sourceCfg = structuredClone(cfg);
     delete sourceCfg.gateway;
     const previousRecords = {
       brave: {
         source: "npm",
-        spec: "@openclaw/brave-plugin@2026.6.11-beta.2",
+        spec: "@steelengine/brave-plugin@2026.6.11-beta.2",
         installPath: "/tmp/brave-beta",
-        resolvedName: "@openclaw/brave-plugin",
+        resolvedName: "@steelengine/brave-plugin",
         resolvedVersion: "2026.6.11-beta.2",
       },
     } as const;
     const nextRecords = {
       brave: {
         ...previousRecords.brave,
-        spec: "@openclaw/brave-plugin@2026.6.11",
+        spec: "@steelengine/brave-plugin@2026.6.11",
         installPath: "/tmp/brave-stable",
         resolvedVersion: "2026.6.11",
       },
@@ -589,7 +589,7 @@ describe("plugins cli update", () => {
           ...cfg.plugins,
           installs: nextRecords,
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       changed: true,
       outcomes: [{ pluginId: "brave", status: "updated", message: "Updated brave." }],
     });
@@ -620,27 +620,27 @@ describe("plugins cli update", () => {
           brave: { enabled: true },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const changedCfg = {
       ...cfg,
       gateway: {
         ...cfg.gateway,
         port: 18890,
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const previousRecords = {
       brave: {
         source: "npm",
-        spec: "@openclaw/brave-plugin@2026.6.11-beta.2",
+        spec: "@steelengine/brave-plugin@2026.6.11-beta.2",
         installPath: "/tmp/brave-beta",
-        resolvedName: "@openclaw/brave-plugin",
+        resolvedName: "@steelengine/brave-plugin",
         resolvedVersion: "2026.6.11-beta.2",
       },
     } as const;
     const nextRecords = {
       brave: {
         ...previousRecords.brave,
-        spec: "@openclaw/brave-plugin@2026.6.11",
+        spec: "@steelengine/brave-plugin@2026.6.11",
         installPath: "/tmp/brave-stable",
         resolvedVersion: "2026.6.11",
       },
@@ -670,7 +670,7 @@ describe("plugins cli update", () => {
           ...cfg.plugins,
           installs: nextRecords,
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       changed: true,
       outcomes: [{ pluginId: "brave", status: "updated", message: "Updated brave." }],
     });
@@ -702,20 +702,20 @@ describe("plugins cli update", () => {
           brave: { enabled: true },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const previousRecords = {
       brave: {
         source: "npm",
-        spec: "@openclaw/brave-plugin@2026.6.11-beta.2",
+        spec: "@steelengine/brave-plugin@2026.6.11-beta.2",
         installPath: "/tmp/brave-beta",
-        resolvedName: "@openclaw/brave-plugin",
+        resolvedName: "@steelengine/brave-plugin",
         resolvedVersion: "2026.6.11-beta.2",
       },
     } as const;
     const nextRecords = {
       brave: {
         ...previousRecords.brave,
-        spec: "@openclaw/brave-plugin@2026.6.11",
+        spec: "@steelengine/brave-plugin@2026.6.11",
         installPath: "/tmp/brave-stable",
         resolvedVersion: "2026.6.11",
       },
@@ -754,7 +754,7 @@ describe("plugins cli update", () => {
           ...cfg.plugins,
           installs: nextRecords,
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       changed: true,
       outcomes: [{ pluginId: "brave", status: "updated", message: "Updated brave." }],
     });
@@ -788,20 +788,20 @@ describe("plugins cli update", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const previousRecords = {
       brave: {
         source: "npm",
-        spec: "@openclaw/brave-plugin@2026.6.11-beta.2",
+        spec: "@steelengine/brave-plugin@2026.6.11-beta.2",
         installPath: "/tmp/brave-beta",
-        resolvedName: "@openclaw/brave-plugin",
+        resolvedName: "@steelengine/brave-plugin",
         resolvedVersion: "2026.6.11-beta.2",
       },
     } as const;
     const nextRecords = {
       brave: {
         ...previousRecords.brave,
-        spec: "@openclaw/brave-plugin@2026.6.11",
+        spec: "@steelengine/brave-plugin@2026.6.11",
         installPath: "/tmp/brave-stable",
         resolvedVersion: "2026.6.11",
       },
@@ -831,7 +831,7 @@ describe("plugins cli update", () => {
           ...cfg.plugins,
           installs: nextRecords,
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       changed: true,
       outcomes: [{ pluginId: "brave", status: "updated", message: "Updated brave." }],
     });
@@ -860,12 +860,12 @@ describe("plugins cli update", () => {
           "voice-call": { enabled: true },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     primeBlockedUpdateConfig("plugins", cfg);
     setInstalledPluginIndexInstallRecords({
       "voice-call": {
         source: "npm",
-        spec: "@openclaw/voice-call",
+        spec: "@steelengine/voice-call",
         installPath: "/tmp/voice-call",
       },
     });
@@ -887,8 +887,8 @@ describe("plugins cli update", () => {
       label: "ClawHub",
       record: {
         source: "clawhub",
-        spec: "clawhub:@openclaw/voice-call",
-        clawhubPackage: "@openclaw/voice-call",
+        spec: "clawhub:@steelengine/voice-call",
+        clawhubPackage: "@steelengine/voice-call",
         installPath: "/tmp/voice-call",
       },
     },
@@ -896,7 +896,7 @@ describe("plugins cli update", () => {
       label: "git",
       record: {
         source: "git",
-        spec: "https://github.com/openclaw/voice-call.git",
+        spec: "https://github.com/steelengine/voice-call.git",
         installPath: "/tmp/voice-call",
       },
     },
@@ -918,7 +918,7 @@ describe("plugins cli update", () => {
             "voice-call": { enabled: true },
           },
         },
-      } as OpenClawConfig;
+      } as SteelEngineConfig;
       primeBlockedUpdateConfig("plugins", cfg);
       setInstalledPluginIndexInstallRecords({
         "voice-call": record,
@@ -939,14 +939,14 @@ describe("plugins cli update", () => {
   it("blocks possible legacy id migration when an included plugins section is unresolved", async () => {
     const externalPath = path.join(
       path.parse(process.cwd()).root,
-      "external-openclaw",
+      "external-steelengine",
       "plugins.json5",
     );
-    const cfg = { plugins: {} } as OpenClawConfig;
+    const cfg = { plugins: {} } as SteelEngineConfig;
     primeUpdateConfigSnapshot({
       config: cfg,
       parsed: { plugins: { $include: externalPath } },
-      sourceConfig: { plugins: { $include: externalPath } } as unknown as OpenClawConfig,
+      sourceConfig: { plugins: { $include: externalPath } } as unknown as SteelEngineConfig,
       includeFileTargetsForWrite: {
         [externalPath]: externalPath,
       },
@@ -954,7 +954,7 @@ describe("plugins cli update", () => {
     setInstalledPluginIndexInstallRecords({
       "voice-call": {
         source: "npm",
-        spec: "@openclaw/voice-call",
+        spec: "@steelengine/voice-call",
         installPath: "/tmp/voice-call",
       },
     });
@@ -987,12 +987,12 @@ describe("plugins cli update", () => {
         installs: {
           legacy: {
             source: "npm",
-            spec: "@openclaw/legacy@1.0.0",
+            spec: "@steelengine/legacy@1.0.0",
             installPath: "/tmp/legacy",
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     primeBlockedUpdateConfig("plugins", cfg);
 
     await expect(runPluginsCommand(["plugins", "update", "demo-hooks"])).rejects.toThrow(
@@ -1018,7 +1018,7 @@ describe("plugins cli update", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     primeBlockedUpdateConfig("plugins", cfg);
     setInstalledPluginIndexInstallRecords(cfg.plugins?.installs ?? {});
     updateNpmInstalledPlugins.mockResolvedValue({
@@ -1041,7 +1041,7 @@ describe("plugins cli update", () => {
           demo: { enabled: true },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     primeBlockedUpdateConfig("plugins", cfg);
     setInstalledPluginIndexInstallRecords({
       demo: {
@@ -1071,17 +1071,17 @@ describe("plugins cli update", () => {
   });
 
   it("preserves an include-owned plugins section during legacy-record cleanup", async () => {
-    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-plugin-update-"));
-    const configPath = path.join(tempRoot, "openclaw.json5");
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-plugin-update-"));
+    const configPath = path.join(tempRoot, "steelengine.json5");
     const pluginsPath = path.join(tempRoot, "plugins.json5");
     const cfg = createTrackedPluginConfig({
       pluginId: "alpha",
-      spec: "@openclaw/alpha@1.0.0",
+      spec: "@steelengine/alpha@1.0.0",
     });
     const pluginsRaw = `${JSON.stringify(cfg.plugins, null, 2)}\n`;
     const nextConfig = createTrackedPluginConfig({
       pluginId: "alpha",
-      spec: "@openclaw/alpha@1.1.0",
+      spec: "@steelengine/alpha@1.1.0",
     });
     fs.writeFileSync(pluginsPath, pluginsRaw);
     primeUpdateConfigSnapshot({
@@ -1117,22 +1117,22 @@ describe("plugins cli update", () => {
   });
 
   it("migrates included legacy install records while updating another indexed plugin", async () => {
-    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-plugin-update-"));
-    const configPath = path.join(tempRoot, "openclaw.json5");
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-plugin-update-"));
+    const configPath = path.join(tempRoot, "steelengine.json5");
     const pluginsPath = path.join(tempRoot, "plugins.json5");
     const legacyRecord = {
       source: "npm",
-      spec: "@openclaw/legacy@1.0.0",
+      spec: "@steelengine/legacy@1.0.0",
       installPath: "/tmp/legacy",
     } as const;
     const indexedRecord = {
       source: "npm",
-      spec: "@openclaw/alpha@1.0.0",
+      spec: "@steelengine/alpha@1.0.0",
       installPath: "/tmp/alpha",
     } as const;
     const updatedIndexedRecord = {
       ...indexedRecord,
-      spec: "@openclaw/alpha@1.1.0",
+      spec: "@steelengine/alpha@1.1.0",
     } as const;
     const cfg = {
       plugins: {
@@ -1140,7 +1140,7 @@ describe("plugins cli update", () => {
           legacy: legacyRecord,
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const pluginsRaw = `${JSON.stringify(cfg.plugins, null, 2)}\n`;
     const nextInstallRecords = {
       alpha: updatedIndexedRecord,
@@ -1166,7 +1166,7 @@ describe("plugins cli update", () => {
         plugins: {
           installs: nextInstallRecords,
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       changed: true,
       outcomes: [{ pluginId: "alpha", status: "updated", message: "Updated alpha." }],
     });
@@ -1194,8 +1194,8 @@ describe("plugins cli update", () => {
   });
 
   it("blocks combined plugin and hook updates when either config section uses an include", async () => {
-    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-plugin-update-"));
-    const configPath = path.join(tempRoot, "openclaw.json5");
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-plugin-update-"));
+    const configPath = path.join(tempRoot, "steelengine.json5");
     const pluginsPath = path.join(tempRoot, "plugins.json5");
     const pluginsRaw = "{}\n";
     fs.writeFileSync(pluginsPath, pluginsRaw);
@@ -1215,12 +1215,12 @@ describe("plugins cli update", () => {
         installs: {
           alpha: {
             source: "npm",
-            spec: "@openclaw/alpha@1.0.0",
+            spec: "@steelengine/alpha@1.0.0",
             installPath: "/tmp/alpha",
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     primeUpdateConfigSnapshot({
       config: cfg,
       configPath,
@@ -1255,7 +1255,7 @@ describe("plugins cli update", () => {
       plugins: {
         installs: {},
       },
-    } as OpenClawConfig);
+    } as SteelEngineConfig);
 
     await expect(runPluginsCommand(["plugins", "update"])).rejects.toThrow("__exit__:1");
 
@@ -1268,7 +1268,7 @@ describe("plugins cli update", () => {
       plugins: {
         installs: {},
       },
-    } as OpenClawConfig);
+    } as SteelEngineConfig);
 
     await runPluginsCommand(["plugins", "update", "--all"]);
 
@@ -1279,8 +1279,8 @@ describe("plugins cli update", () => {
 
   it("passes dangerous force unsafe install to plugin updates", async () => {
     const config = createTrackedPluginConfig({
-      pluginId: "openclaw-codex-app-server",
-      spec: "openclaw-codex-app-server@beta",
+      pluginId: "steelengine-codex-app-server",
+      spec: "steelengine-codex-app-server@beta",
     });
     loadConfig.mockReturnValue(config);
     setInstalledPluginIndexInstallRecords(config.plugins?.installs ?? {});
@@ -1293,13 +1293,13 @@ describe("plugins cli update", () => {
     await runPluginsCommand([
       "plugins",
       "update",
-      "openclaw-codex-app-server",
+      "steelengine-codex-app-server",
       "--dangerously-force-unsafe-install",
     ]);
 
     const updateParams = expectSingleCallParams(updateNpmInstalledPlugins);
     expect(updateParams.config).toEqual(config);
-    expect(updateParams.pluginIds).toEqual(["openclaw-codex-app-server"]);
+    expect(updateParams.pluginIds).toEqual(["steelengine-codex-app-server"]);
     expect(updateParams.dangerouslyForceUnsafeInstall).toBe(true);
     expect(
       runtimeLogs.some((message) =>
@@ -1313,8 +1313,8 @@ describe("plugins cli update", () => {
   it("does not sync official catalog specs for manual plugin updates", async () => {
     const config = createTrackedPluginConfig({
       pluginId: "codex",
-      spec: "@openclaw/codex@2026.5.28",
-      resolvedName: "@openclaw/codex",
+      spec: "@steelengine/codex@2026.5.28",
+      resolvedName: "@steelengine/codex",
     });
     loadConfig.mockReturnValue(config);
     setInstalledPluginIndexInstallRecords(config.plugins?.installs ?? {});
@@ -1336,8 +1336,8 @@ describe("plugins cli update", () => {
   it("syncs official catalog specs with beta channel context for update --all", async () => {
     const config = createTrackedPluginConfig({
       pluginId: "codex",
-      spec: "@openclaw/codex@2026.6.8-beta.1",
-      resolvedName: "@openclaw/codex",
+      spec: "@steelengine/codex@2026.6.8-beta.1",
+      resolvedName: "@steelengine/codex",
     });
     config.update = { channel: "beta" };
     loadConfig.mockReturnValue(config);
@@ -1360,8 +1360,8 @@ describe("plugins cli update", () => {
   it("passes extended-stable channel and installed core version to update --all", async () => {
     const config = createTrackedPluginConfig({
       pluginId: "codex",
-      spec: "@openclaw/codex",
-      resolvedName: "@openclaw/codex",
+      spec: "@steelengine/codex",
+      resolvedName: "@steelengine/codex",
     });
     config.update = { channel: "extended-stable" };
     loadConfig.mockReturnValue(config);
@@ -1385,8 +1385,8 @@ describe("plugins cli update", () => {
 
   it("passes ClawHub risk acknowledgement to plugin updates", async () => {
     const config = createTrackedPluginConfig({
-      pluginId: "openclaw-codex-app-server",
-      spec: "openclaw-codex-app-server@beta",
+      pluginId: "steelengine-codex-app-server",
+      spec: "steelengine-codex-app-server@beta",
     });
     loadConfig.mockReturnValue(config);
     setInstalledPluginIndexInstallRecords(config.plugins?.installs ?? {});
@@ -1399,14 +1399,14 @@ describe("plugins cli update", () => {
     await runPluginsCommand([
       "plugins",
       "update",
-      "openclaw-codex-app-server",
+      "steelengine-codex-app-server",
       "--acknowledge-clawhub-risk",
     ]);
 
     expect(updateNpmInstalledPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config,
-        pluginIds: ["openclaw-codex-app-server"],
+        pluginIds: ["steelengine-codex-app-server"],
         acknowledgeClawHubRisk: true,
       }),
     );
@@ -1415,8 +1415,8 @@ describe("plugins cli update", () => {
   it("does not pass an interactive ClawHub risk prompt to dry-run plugin updates", async () => {
     setTty(true);
     const config = createTrackedPluginConfig({
-      pluginId: "openclaw-codex-app-server",
-      spec: "clawhub:openclaw-codex-app-server",
+      pluginId: "steelengine-codex-app-server",
+      spec: "clawhub:steelengine-codex-app-server",
     });
     loadConfig.mockReturnValue(config);
     setInstalledPluginIndexInstallRecords(config.plugins?.installs ?? {});
@@ -1426,7 +1426,7 @@ describe("plugins cli update", () => {
       outcomes: [],
     });
 
-    await runPluginsCommand(["plugins", "update", "openclaw-codex-app-server", "--dry-run"]);
+    await runPluginsCommand(["plugins", "update", "steelengine-codex-app-server", "--dry-run"]);
 
     const updateParams = expectSingleCallParams(updateNpmInstalledPlugins);
     expect(updateParams.dryRun).toBe(true);
@@ -1440,31 +1440,31 @@ describe("plugins cli update", () => {
         installs: {
           alpha: {
             source: "npm",
-            spec: "@openclaw/alpha@1.0.0",
+            spec: "@steelengine/alpha@1.0.0",
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const nextConfig = {
       plugins: {
         installs: {
           alpha: {
             source: "npm",
-            spec: "@openclaw/alpha@1.1.0",
+            spec: "@steelengine/alpha@1.1.0",
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const runtimeConfig = {
       ...cfg,
       messages: {
         ackReactionScope: "group-mentions",
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const nextRuntimeConfig = {
       ...nextConfig,
       messages: runtimeConfig.messages,
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     primeUpdateConfigSnapshot({
       config: cfg,
       runtimeConfig,
@@ -1518,29 +1518,29 @@ describe("plugins cli update", () => {
         installs: {
           alpha: {
             source: "npm",
-            spec: "@openclaw/alpha@1.0.0",
+            spec: "@steelengine/alpha@1.0.0",
           },
           beta: {
             source: "npm",
-            spec: "@openclaw/beta@1.0.0",
+            spec: "@steelengine/beta@1.0.0",
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const nextConfig = {
       plugins: {
         installs: {
           alpha: {
             source: "npm",
-            spec: "@openclaw/alpha@1.1.0",
+            spec: "@steelengine/alpha@1.1.0",
           },
           beta: {
             source: "npm",
-            spec: "@openclaw/beta@1.0.0",
+            spec: "@steelengine/beta@1.0.0",
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     loadConfig.mockReturnValue(cfg);
     setInstalledPluginIndexInstallRecords(cfg.plugins?.installs ?? {});
     updateNpmInstalledPlugins.mockResolvedValue({
@@ -1576,12 +1576,12 @@ describe("plugins cli update", () => {
         installs: {
           demo: {
             source: "clawhub",
-            spec: "clawhub:@openclaw/plugin-demo@1.0.0",
-            clawhubPackage: "@openclaw/plugin-demo",
+            spec: "clawhub:@steelengine/plugin-demo@1.0.0",
+            clawhubPackage: "@steelengine/plugin-demo",
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     loadConfig.mockReturnValue(cfg);
     setInstalledPluginIndexInstallRecords(cfg.plugins?.installs ?? {});
     updateNpmInstalledPlugins.mockResolvedValue({
@@ -1615,12 +1615,12 @@ describe("plugins cli update", () => {
         installs: {
           demo: {
             source: "clawhub",
-            spec: "clawhub:@openclaw/plugin-demo",
-            clawhubPackage: "@openclaw/plugin-demo",
+            spec: "clawhub:@steelengine/plugin-demo",
+            clawhubPackage: "@steelengine/plugin-demo",
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     loadConfig.mockReturnValue(cfg);
     setInstalledPluginIndexInstallRecords(cfg.plugins?.installs ?? {});
     updateNpmInstalledPlugins.mockResolvedValue({
@@ -1654,12 +1654,12 @@ describe("plugins cli update", () => {
         installs: {
           demo: {
             source: "clawhub",
-            spec: "clawhub:@openclaw/plugin-demo",
-            clawhubPackage: "@openclaw/plugin-demo",
+            spec: "clawhub:@steelengine/plugin-demo",
+            clawhubPackage: "@steelengine/plugin-demo",
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     loadConfig.mockReturnValue(cfg);
     setInstalledPluginIndexInstallRecords(cfg.plugins?.installs ?? {});
     updateNpmInstalledPlugins.mockResolvedValue({
@@ -1669,7 +1669,7 @@ describe("plugins cli update", () => {
           status: "skipped",
           code: "clawhub_security_unavailable",
           message:
-            'Skipped demo ClawHub update: ClawHub security data for "@openclaw/plugin-demo@1.1.0" is unavailable, so OpenClaw left the existing installed plugin unchanged. Try again later or choose a different version.',
+            'Skipped demo ClawHub update: ClawHub security data for "@steelengine/plugin-demo@1.1.0" is unavailable, so SteelEngine left the existing installed plugin unchanged. Try again later or choose a different version.',
         },
       ],
       changed: false,
@@ -1701,7 +1701,7 @@ describe("plugins cli update", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     loadConfig.mockReturnValue(cfg);
     updateNpmInstalledPlugins.mockResolvedValue({
       config: cfg,

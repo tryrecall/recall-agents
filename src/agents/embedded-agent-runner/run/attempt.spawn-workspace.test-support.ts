@@ -5,7 +5,7 @@ import path from "node:path";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import { expect, vi, type Mock } from "vitest";
 import type {
   AssembleResult,
@@ -86,7 +86,7 @@ type AttemptSpawnWorkspaceHoisted = {
   ensureGlobalUndiciDispatcherStreamTimeoutsMock: UnknownMock;
   ensureGlobalUndiciStreamTimeoutsMock: UnknownMock;
   buildEmbeddedMessageActionDiscoveryInputMock: UnknownMock;
-  createOpenClawCodingToolsMock: UnknownMock;
+  createSteelEngineCodingToolsMock: UnknownMock;
   subscribeEmbeddedAgentSessionMock: Mock<SubscribeEmbeddedAgentSessionFn>;
   acquireSessionWriteLockMock: Mock<AcquireSessionWriteLockFn>;
   installToolResultContextGuardMock: UnknownMock;
@@ -170,7 +170,7 @@ const hoisted = vi.hoisted((): AttemptSpawnWorkspaceHoisted => {
   const ensureGlobalUndiciDispatcherStreamTimeoutsMock = vi.fn();
   const ensureGlobalUndiciStreamTimeoutsMock = vi.fn();
   const buildEmbeddedMessageActionDiscoveryInputMock = vi.fn((params: unknown) => params);
-  const createOpenClawCodingToolsMock = vi.fn(() => []);
+  const createSteelEngineCodingToolsMock = vi.fn(() => []);
   const installToolResultContextGuardMock = vi.fn(() => () => {});
   const installContextEngineLoopHookMock = vi.fn(() => () => {});
   const flushPendingToolResultsAfterIdleMock = vi.fn(async () => {});
@@ -252,7 +252,7 @@ const hoisted = vi.hoisted((): AttemptSpawnWorkspaceHoisted => {
     ensureGlobalUndiciDispatcherStreamTimeoutsMock,
     ensureGlobalUndiciStreamTimeoutsMock,
     buildEmbeddedMessageActionDiscoveryInputMock,
-    createOpenClawCodingToolsMock,
+    createSteelEngineCodingToolsMock,
     subscribeEmbeddedAgentSessionMock,
     acquireSessionWriteLockMock,
     installToolResultContextGuardMock,
@@ -491,7 +491,7 @@ vi.mock("../context-engine-maintenance.js", () => ({
 }));
 
 vi.mock("../../docs-path.js", () => ({
-  resolveOpenClawReferencePaths: async () => ({ docsPath: undefined, sourcePath: undefined }),
+  resolveSteelEngineReferencePaths: async () => ({ docsPath: undefined, sourcePath: undefined }),
 }));
 
 vi.mock("../../agent-project-settings.js", () => ({
@@ -671,8 +671,8 @@ vi.mock("../../cache-trace.js", () => ({
 }));
 
 vi.mock("../../agent-tools.js", () => ({
-  createOpenClawCodingTools: (options?: { workspaceDir?: string; spawnWorkspaceDir?: string }) =>
-    hoisted.createOpenClawCodingToolsMock(options),
+  createSteelEngineCodingTools: (options?: { workspaceDir?: string; spawnWorkspaceDir?: string }) =>
+    hoisted.createSteelEngineCodingToolsMock(options),
   resolveProcessToolScopeKey: ({
     scopeKey,
     sessionKey,
@@ -785,7 +785,7 @@ vi.mock("../cache-ttl.js", () => ({
   appendCacheTtlTimestamp: (
     sessionManager: { appendCustomEntry?: (customType: string, data: unknown) => void },
     data: unknown,
-  ) => sessionManager.appendCustomEntry?.("openclaw.cache-ttl", data),
+  ) => sessionManager.appendCustomEntry?.("steelengine.cache-ttl", data),
   isCacheTtlEligibleProvider: (provider?: string) => provider === "anthropic",
   readLastCacheTtlTimestamp: (
     sessionManager: {
@@ -796,7 +796,7 @@ vi.mock("../cache-ttl.js", () => ({
     const calls = sessionManager.appendCustomEntry?.mock?.calls ?? [];
     for (let index = calls.length - 1; index >= 0; index -= 1) {
       const [customType, data] = calls[index] ?? [];
-      if (customType !== "openclaw.cache-ttl") {
+      if (customType !== "steelengine.cache-ttl") {
         continue;
       }
       const entry = data as
@@ -1042,7 +1042,7 @@ export function resetEmbeddedAttemptHarness(
   hoisted.buildEmbeddedMessageActionDiscoveryInputMock
     .mockReset()
     .mockImplementation((paramsLocal) => paramsLocal);
-  hoisted.createOpenClawCodingToolsMock.mockReset().mockImplementation((...args: unknown[]) => {
+  hoisted.createSteelEngineCodingToolsMock.mockReset().mockImplementation((...args: unknown[]) => {
     const options = args[0] as
       | {
           workspaceDir?: string;
@@ -1315,8 +1315,8 @@ export async function createContextEngineAttemptRunner(params: {
   trajectory?: boolean;
 }) {
   const { maintain: rawMaintain, ...contextEngineRest } = params.contextEngine;
-  const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-ctx-engine-workspace-"));
-  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-ctx-engine-agent-"));
+  const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-ctx-engine-workspace-"));
+  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-ctx-engine-agent-"));
   const sessionFile = path.join(workspaceDir, "session.jsonl");
   const sessionStore = path.join(workspaceDir, "sessions.json");
   params.tempPaths.push(workspaceDir, agentDir);
@@ -1351,14 +1351,14 @@ export async function createContextEngineAttemptRunner(params: {
       }),
   }));
 
-  const previousTrajectoryEnv = process.env.OPENCLAW_TRAJECTORY;
-  const previousTrajectoryDirEnv = process.env.OPENCLAW_TRAJECTORY_DIR;
+  const previousTrajectoryEnv = process.env.STEELENGINE_TRAJECTORY;
+  const previousTrajectoryDirEnv = process.env.STEELENGINE_TRAJECTORY_DIR;
   if (params.trajectory !== true) {
-    process.env.OPENCLAW_TRAJECTORY = "0";
-    delete process.env.OPENCLAW_TRAJECTORY_DIR;
+    process.env.STEELENGINE_TRAJECTORY = "0";
+    delete process.env.STEELENGINE_TRAJECTORY_DIR;
   } else {
-    delete process.env.OPENCLAW_TRAJECTORY;
-    process.env.OPENCLAW_TRAJECTORY_DIR = workspaceDir;
+    delete process.env.STEELENGINE_TRAJECTORY;
+    process.env.STEELENGINE_TRAJECTORY_DIR = workspaceDir;
   }
   try {
     return await (
@@ -1409,14 +1409,14 @@ export async function createContextEngineAttemptRunner(params: {
     });
   } finally {
     if (previousTrajectoryEnv === undefined) {
-      delete process.env.OPENCLAW_TRAJECTORY;
+      delete process.env.STEELENGINE_TRAJECTORY;
     } else {
-      process.env.OPENCLAW_TRAJECTORY = previousTrajectoryEnv;
+      process.env.STEELENGINE_TRAJECTORY = previousTrajectoryEnv;
     }
     if (previousTrajectoryDirEnv === undefined) {
-      delete process.env.OPENCLAW_TRAJECTORY_DIR;
+      delete process.env.STEELENGINE_TRAJECTORY_DIR;
     } else {
-      process.env.OPENCLAW_TRAJECTORY_DIR = previousTrajectoryDirEnv;
+      process.env.STEELENGINE_TRAJECTORY_DIR = previousTrajectoryDirEnv;
     }
   }
 }

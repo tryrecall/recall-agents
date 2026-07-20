@@ -15,10 +15,10 @@ future `tsx`/esbuild upgrade reintroduces it.
 
 ## Original symptom
 
-Running OpenClaw dev scripts through `tsx` failed at startup with:
+Running SteelEngine dev scripts through `tsx` failed at startup with:
 
 ```text
-[openclaw] Failed to start CLI: TypeError: __name is not a function
+[steelengine] Failed to start CLI: TypeError: __name is not a function
     at createSubsystemLogger (src/logging/subsystem.ts)
     at <caller> (src/agents/auth-profiles/constants.ts)
 ```
@@ -66,7 +66,7 @@ function` again, capture the exact Node version, `tsx` version
 
   ```bash
   pnpm tsgo
-  node openclaw.mjs status
+  node steelengine.mjs status
   ```
 
 - Try a different `tsx` version (`pnpm add -D tsx@<version>` is a dependency

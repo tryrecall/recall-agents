@@ -52,12 +52,12 @@ export function writeManagedNpmPlugin(params: {
     JSON.stringify({
       name: params.packageName,
       version: params.version,
-      openclaw: { extensions: ["./dist/index.js"] },
+      steelengine: { extensions: ["./dist/index.js"] },
     }),
     "utf8",
   );
   fs.writeFileSync(
-    path.join(packageDir, "openclaw.plugin.json"),
+    path.join(packageDir, "steelengine.plugin.json"),
     JSON.stringify({
       id: params.pluginId,
       ...(params.name ? { name: params.name } : {}),

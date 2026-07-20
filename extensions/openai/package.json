@@ -1,16 +1,16 @@
 {
-  "name": "@openclaw/openai-provider",
+  "name": "@steelengine/openai-provider",
   "version": "2026.7.2-beta.3",
   "private": true,
-  "description": "OpenClaw OpenAI provider plugins",
+  "description": "SteelEngine OpenAI provider plugins",
   "type": "module",
   "dependencies": {
     "ws": "8.21.0"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ]

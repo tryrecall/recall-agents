@@ -1,7 +1,7 @@
 import { constants as fsConstants } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { LiveTransportQaCommandOptions } from "openclaw/plugin-sdk/qa-runtime";
+import type { LiveTransportQaCommandOptions } from "steelengine/plugin-sdk/qa-runtime";
 import type { QaGatewayChildCommand } from "../../gateway-child.js";
 import { runQaFlowSuiteFromRuntime } from "../../suite-launch.runtime.js";
 import type { QaSuiteRoundTripProbe } from "../../suite-round-trip.js";
@@ -12,14 +12,14 @@ import { createTelegramQaTransportAdapter } from "./adapter.runtime.js";
 import { listTelegramQaScenarios, resolveTelegramQaScenarioIds } from "./profiles.js";
 import { resolveTelegramQaRunOptions } from "./run-options.runtime.js";
 
-const TELEGRAM_QA_SUT_OPENCLAW_COMMAND_ENV = "OPENCLAW_QA_TELEGRAM_SUT_OPENCLAW_COMMAND";
-const TELEGRAM_QA_SUT_UID_ENV = "OPENCLAW_QA_TELEGRAM_SUT_UID";
-const TELEGRAM_QA_SUT_GID_ENV = "OPENCLAW_QA_TELEGRAM_SUT_GID";
-const TELEGRAM_QA_SUT_BOUNDARY_DIR_ENV = "OPENCLAW_QA_TELEGRAM_SUT_PROCESS_BOUNDARY_DIR";
-const TELEGRAM_QA_SUT_CLEANUP_TIMEOUT_ENV = "OPENCLAW_QA_TELEGRAM_SUT_CLEANUP_TIMEOUT_MS";
-const TELEGRAM_QA_SUT_RUNTIME_EXECUTABLE_ENV = "OPENCLAW_QA_TELEGRAM_SUT_RUNTIME_EXECUTABLE";
-const TELEGRAM_QA_SUT_PRELOAD_PATH_ENV = "OPENCLAW_QA_TELEGRAM_SUT_PRELOAD_PATH";
-const TELEGRAM_QA_SUT_FORWARDED_ENV_KEYS_ENV = "OPENCLAW_QA_TELEGRAM_SUT_FORWARDED_ENV_KEYS";
+const TELEGRAM_QA_SUT_STEELENGINE_COMMAND_ENV = "STEELENGINE_QA_TELEGRAM_SUT_STEELENGINE_COMMAND";
+const TELEGRAM_QA_SUT_UID_ENV = "STEELENGINE_QA_TELEGRAM_SUT_UID";
+const TELEGRAM_QA_SUT_GID_ENV = "STEELENGINE_QA_TELEGRAM_SUT_GID";
+const TELEGRAM_QA_SUT_BOUNDARY_DIR_ENV = "STEELENGINE_QA_TELEGRAM_SUT_PROCESS_BOUNDARY_DIR";
+const TELEGRAM_QA_SUT_CLEANUP_TIMEOUT_ENV = "STEELENGINE_QA_TELEGRAM_SUT_CLEANUP_TIMEOUT_MS";
+const TELEGRAM_QA_SUT_RUNTIME_EXECUTABLE_ENV = "STEELENGINE_QA_TELEGRAM_SUT_RUNTIME_EXECUTABLE";
+const TELEGRAM_QA_SUT_PRELOAD_PATH_ENV = "STEELENGINE_QA_TELEGRAM_SUT_PRELOAD_PATH";
+const TELEGRAM_QA_SUT_FORWARDED_ENV_KEYS_ENV = "STEELENGINE_QA_TELEGRAM_SUT_FORWARDED_ENV_KEYS";
 
 function parseSutId(env: NodeJS.ProcessEnv, key: string) {
   const value = env[key]?.trim();
@@ -74,17 +74,17 @@ async function resolveRegularPath(params: {
   return value;
 }
 
-async function resolveTelegramQaSutOpenClawCommand(
+async function resolveTelegramQaSutSteelEngineCommand(
   repoRoot: string,
   env: NodeJS.ProcessEnv = process.env,
 ): Promise<QaGatewayChildCommand | undefined> {
-  const configuredCommand = env[TELEGRAM_QA_SUT_OPENCLAW_COMMAND_ENV];
+  const configuredCommand = env[TELEGRAM_QA_SUT_STEELENGINE_COMMAND_ENV];
   if (configuredCommand === undefined) {
     return undefined;
   }
   const command = await resolveRegularPath({
     env,
-    key: TELEGRAM_QA_SUT_OPENCLAW_COMMAND_ENV,
+    key: TELEGRAM_QA_SUT_STEELENGINE_COMMAND_ENV,
     executable: true,
   });
   const runtimeExecutablePath = await resolveRegularPath({
@@ -138,7 +138,7 @@ async function resolveTelegramQaSutOpenClawCommand(
 type TelegramQaSuiteOptions = LiveTransportQaCommandOptions & {
   resolvedScenarioIds?: readonly string[];
   roundTripProbe?: QaSuiteRoundTripProbe;
-  sutOpenClawCommand?: QaGatewayChildCommand;
+  sutSteelEngineCommand?: QaGatewayChildCommand;
 };
 
 export async function runQaTelegramSuite(opts: TelegramQaSuiteOptions) {
@@ -187,7 +187,7 @@ export async function runQaTelegramSuite(opts: TelegramQaSuiteOptions) {
     repoRoot: runOptions.repoRoot,
     roundTripProbe: opts.roundTripProbe,
     scenarioIds,
-    sutOpenClawCommand: opts.sutOpenClawCommand,
+    sutSteelEngineCommand: opts.sutSteelEngineCommand,
   });
   printLiveTransportQaArtifacts("Telegram QA", {
     report: result.reportPath,
@@ -212,10 +212,10 @@ export async function runQaTelegramCommand(opts: LiveTransportQaCommandOptions) 
     providerMode: runOptions.providerMode,
     scenarioIds: runOptions.scenarioIds,
   });
-  const sutOpenClawCommand = await resolveTelegramQaSutOpenClawCommand(runOptions.repoRoot);
+  const sutSteelEngineCommand = await resolveTelegramQaSutSteelEngineCommand(runOptions.repoRoot);
   return await runQaTelegramSuite({
     ...opts,
     resolvedScenarioIds,
-    ...(sutOpenClawCommand ? { sutOpenClawCommand } : {}),
+    ...(sutSteelEngineCommand ? { sutSteelEngineCommand } : {}),
   });
 }

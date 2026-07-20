@@ -1,6 +1,6 @@
 /** Tests web_fetch runtime provider selection, credential discovery, and sandbox filtering. */
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.js";
+import type { SteelEngineConfig } from "../config/types.js";
 import type { PluginWebFetchProviderEntry } from "../plugins/types.js";
 import type { RuntimeWebFetchMetadata } from "../secrets/runtime-web-tools.types.js";
 import { withEnv } from "../test-utils/env.js";
@@ -38,7 +38,7 @@ vi.mock("../plugins/web-fetch-providers.runtime.js", () => ({
   resolveRuntimeWebFetchProviders: resolveRuntimeWebFetchProvidersMock,
 }));
 
-function getFirecrawlApiKey(config?: OpenClawConfig): unknown {
+function getFirecrawlApiKey(config?: SteelEngineConfig): unknown {
   const pluginConfig = config?.plugins?.entries?.firecrawl?.config as
     | TestPluginWebFetchConfig
     | undefined;
@@ -67,7 +67,7 @@ function createThirdPartyFetchProvider(): PluginWebFetchProviderEntry {
   });
 }
 
-function createFirecrawlPluginConfig(apiKey: unknown): OpenClawConfig {
+function createFirecrawlPluginConfig(apiKey: unknown): SteelEngineConfig {
   return {
     plugins: {
       entries: {
@@ -211,7 +211,7 @@ describe("web fetch runtime", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(requireResolvedWebFetch(resolved).provider.id).toBe("firecrawl");
@@ -296,7 +296,7 @@ describe("web fetch runtime", () => {
       .mockReturnValueOnce([external]);
     const config = {
       tools: { web: { fetch: { provider: "firecrawl" } } },
-    } as OpenClawConfig & { tools: { web: { fetch: { provider: string } } } };
+    } as SteelEngineConfig & { tools: { web: { fetch: { provider: string } } } };
 
     const first = requireResolvedWebFetch(resolveWebFetchDefinition({ config }));
     config.tools.web.fetch.provider = "thirdparty";
@@ -341,7 +341,7 @@ describe("web fetch runtime", () => {
     });
     const external = createThirdPartyFetchProvider();
     resolveRuntimeWebFetchProvidersMock.mockReturnValue([firecrawl, external]);
-    const config = {} as OpenClawConfig;
+    const config = {} as SteelEngineConfig;
 
     const first = requireResolvedWebFetch(
       resolveWebFetchDefinition({
@@ -402,7 +402,7 @@ describe("web fetch runtime", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(requireResolvedWebFetch(resolved).provider.id).toBe("firecrawl");
@@ -441,7 +441,7 @@ describe("web fetch runtime", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(requireResolvedWebFetch(resolved).provider.id).toBe("firecrawl");
@@ -462,7 +462,7 @@ describe("web fetch runtime", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(requireResolvedWebFetch(resolved).provider.id).toBe("firecrawl");
@@ -517,7 +517,7 @@ describe("web fetch runtime", () => {
     const resolved = resolveWebFetchDefinition({
       config: {
         tools: { web: { fetch: { provider: "thirdparty" } } },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       sandboxed: false,
       preferRuntimeProviders: false,
     });
@@ -535,7 +535,7 @@ describe("web fetch runtime", () => {
     const resolved = resolveWebFetchDefinition({
       config: {
         tools: { web: { fetch: { provider: "thirdparty" } } },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       runtimeWebFetch: {
         providerSource: "auto-detect",
         selectedProvider: "firecrawl",

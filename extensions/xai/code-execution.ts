@@ -1,6 +1,6 @@
 // Xai plugin module implements code execution behavior.
-import { jsonResult, readStringParam } from "openclaw/plugin-sdk/provider-web-search";
-import { getRuntimeConfigSnapshot } from "openclaw/plugin-sdk/runtime-config-snapshot";
+import { jsonResult, readStringParam } from "steelengine/plugin-sdk/provider-web-search";
+import { getRuntimeConfigSnapshot } from "steelengine/plugin-sdk/runtime-config-snapshot";
 import {
   buildMissingCodeExecutionApiKeyPayload,
   createCodeExecutionToolDefinition,

@@ -9,8 +9,8 @@ import {
   CONFIG_COMMAND_TIMEOUT_MS,
   isReleaseBefore,
   resolveScenarioConfigSteps,
-  resolveUpgradeSurvivorOpenClawCommand,
-  runUpgradeSurvivorOpenClawStep,
+  resolveUpgradeSurvivorSteelEngineCommand,
+  runUpgradeSurvivorSteelEngineStep,
 } from "../../scripts/e2e/lib/upgrade-survivor/config-recipe.mjs";
 
 const RECIPE_PATH = "scripts/e2e/lib/upgrade-survivor/config-recipe.mjs";
@@ -25,9 +25,9 @@ describe("upgrade survivor config recipe command resolution", () => {
     expect(isReleaseBefore("2026.3.9007199254740993", "2026.4.0")).toBe(false);
   });
 
-  it("wraps Windows openclaw npm shims through cmd.exe", () => {
+  it("wraps Windows steelengine npm shims through cmd.exe", () => {
     expect(
-      resolveUpgradeSurvivorOpenClawCommand(
+      resolveUpgradeSurvivorSteelEngineCommand(
         ["config", "set", "models.providers.openai", '{"apiKey":"sk test"}', "--strict-json"],
         {
           comSpec: String.raw`C:\Windows\System32\cmd.exe`,
@@ -39,25 +39,25 @@ describe("upgrade survivor config recipe command resolution", () => {
         "/d",
         "/s",
         "/c",
-        'openclaw.cmd config set models.providers.openai "{""apiKey"":""sk test""}" --strict-json',
+        'steelengine.cmd config set models.providers.openai "{""apiKey"":""sk test""}" --strict-json',
       ],
       command: String.raw`C:\Windows\System32\cmd.exe`,
       commandLabel:
-        'openclaw config set models.providers.openai {"apiKey":"sk test"} --strict-json',
+        'steelengine config set models.providers.openai {"apiKey":"sk test"} --strict-json',
       shell: false,
       windowsVerbatimArguments: true,
     });
   });
 
-  it("keeps POSIX openclaw invocations direct", () => {
+  it("keeps POSIX steelengine invocations direct", () => {
     expect(
-      resolveUpgradeSurvivorOpenClawCommand(["config", "validate"], {
+      resolveUpgradeSurvivorSteelEngineCommand(["config", "validate"], {
         platform: "linux",
       }),
     ).toEqual({
       args: ["config", "validate"],
-      command: "openclaw",
-      commandLabel: "openclaw config validate",
+      command: "steelengine",
+      commandLabel: "steelengine config validate",
       shell: false,
     });
   });
@@ -80,11 +80,11 @@ describe("upgrade survivor config recipe command resolution", () => {
 
   it("bounds baseline config commands and reports spawn errors", () => {
     const calls: unknown[] = [];
-    const timeoutError = Object.assign(new Error("spawnSync openclaw ETIMEDOUT"), {
+    const timeoutError = Object.assign(new Error("spawnSync steelengine ETIMEDOUT"), {
       code: "ETIMEDOUT",
     });
 
-    const outcome = runUpgradeSurvivorOpenClawStep(
+    const outcome = runUpgradeSurvivorSteelEngineStep(
       {
         argv: ["config", "validate"],
         id: "validate",
@@ -107,7 +107,7 @@ describe("upgrade survivor config recipe command resolution", () => {
     expect(calls).toHaveLength(1);
     expect(calls[0]).toMatchObject({
       args: ["config", "validate"],
-      command: "openclaw",
+      command: "steelengine",
       options: {
         killSignal: "SIGTERM",
         maxBuffer: CONFIG_COMMAND_MAX_BUFFER_BYTES,
@@ -115,9 +115,9 @@ describe("upgrade survivor config recipe command resolution", () => {
       },
     });
     expect(outcome).toMatchObject({
-      command: "openclaw config validate",
+      command: "steelengine config validate",
       errorCode: "ETIMEDOUT",
-      errorMessage: "spawnSync openclaw ETIMEDOUT",
+      errorMessage: "spawnSync steelengine ETIMEDOUT",
       ok: false,
       signal: "SIGTERM",
       status: null,
@@ -127,28 +127,28 @@ describe("upgrade survivor config recipe command resolution", () => {
   });
 
   it("skips ACPX bridge config on baselines before the bridge field existed", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-upgrade-recipe-acpx-"));
+    const root = mkdtempSync(join(tmpdir(), "steelengine-upgrade-recipe-acpx-"));
     try {
       const binDir = join(root, "bin");
-      const logPath = join(root, "openclaw-argv.jsonl");
+      const logPath = join(root, "steelengine-argv.jsonl");
       const summaryPath = join(root, "summary.json");
       mkdirSync(binDir, { recursive: true });
-      const openclawLogPath = join(binDir, "openclaw-log.js");
-      const openclawPath = join(binDir, "openclaw");
-      const openclawCmdPath = join(binDir, "openclaw.cmd");
+      const steelengineLogPath = join(binDir, "steelengine-log.js");
+      const steelenginePath = join(binDir, "steelengine");
+      const steelengineCmdPath = join(binDir, "steelengine.cmd");
       writeFileSync(
-        openclawLogPath,
+        steelengineLogPath,
         `
 const fs = require("node:fs");
 fs.appendFileSync(${JSON.stringify(logPath)}, JSON.stringify(process.argv.slice(2)) + "\\n");
 process.exit(0);
 `,
       );
-      writeFileSync(openclawPath, `#!/usr/bin/env node\nrequire("./openclaw-log.js");\n`);
-      chmodSync(openclawPath, 0o755);
+      writeFileSync(steelenginePath, `#!/usr/bin/env node\nrequire("./steelengine-log.js");\n`);
+      chmodSync(steelenginePath, 0o755);
       writeFileSync(
-        openclawCmdPath,
-        `@echo off\r\n"${process.execPath}" "%~dp0openclaw-log.js" %*\r\n`,
+        steelengineCmdPath,
+        `@echo off\r\n"${process.execPath}" "%~dp0steelengine-log.js" %*\r\n`,
       );
 
       execFileSync(
@@ -157,7 +157,7 @@ process.exit(0);
         {
           env: {
             ...process.env,
-            OPENCLAW_UPGRADE_SURVIVOR_SCENARIO: "acpx-openclaw-tools-bridge",
+            STEELENGINE_UPGRADE_SURVIVOR_SCENARIO: "acpx-steelengine-tools-bridge",
             PATH: `${binDir}${process.platform === "win32" ? ";" : ":"}${process.env.PATH ?? ""}`,
           },
           stdio: "pipe",
@@ -169,12 +169,12 @@ process.exit(0);
         .trim()
         .split("\n")
         .map((line) => JSON.parse(line));
-      expect(summary.skippedIntents).toContain("acpx-openclaw-tools-bridge");
+      expect(summary.skippedIntents).toContain("acpx-steelengine-tools-bridge");
       expect(loggedArgs).not.toContainEqual(
         expect.arrayContaining([
           "set",
           "plugins",
-          expect.stringContaining("openClawToolsMcpBridge"),
+          expect.stringContaining("steelEngineToolsMcpBridge"),
         ]),
       );
     } finally {

@@ -67,7 +67,7 @@ describe("printWizardHeader", () => {
     const log = vi.fn();
     await withColumns(50, () => printWizardHeader({ log } as unknown as RuntimeEnv));
     const output = String(log.mock.calls[0]?.[0]);
-    expect(output).toContain("OPENCLAW");
+    expect(output).toContain("STEELENGINE");
     expect(output).not.toContain("█");
   });
 });
@@ -146,10 +146,10 @@ function expectedTrashSourcePath(targetPath: string): string {
 
 describe("handleReset", () => {
   it("uses active profile paths for destructive reset targets", async () => {
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-reset-profile-"));
-    const profileStateDir = path.join(homeDir, ".openclaw-work");
-    const defaultStateDir = path.join(homeDir, ".openclaw");
-    const profileConfigPath = path.join(profileStateDir, "openclaw.json");
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-reset-profile-"));
+    const profileStateDir = path.join(homeDir, ".steelengine-work");
+    const defaultStateDir = path.join(homeDir, ".steelengine");
+    const profileConfigPath = path.join(profileStateDir, "steelengine.json");
     const profileCredentialsDir = path.join(profileStateDir, "credentials");
     const profileSessionsDir = path.join(profileStateDir, "agents", "main", "sessions");
     const workspaceDir = path.join(profileStateDir, "workspace");
@@ -174,10 +174,10 @@ describe("handleReset", () => {
       await withEnvAsync(
         {
           HOME: homeDir,
-          OPENCLAW_HOME: homeDir,
-          OPENCLAW_PROFILE: "work",
-          OPENCLAW_STATE_DIR: profileStateDir,
-          OPENCLAW_CONFIG_PATH: profileConfigPath,
+          STEELENGINE_HOME: homeDir,
+          STEELENGINE_PROFILE: "work",
+          STEELENGINE_STATE_DIR: profileStateDir,
+          STEELENGINE_CONFIG_PATH: profileConfigPath,
         },
         async () => await handleReset("full", workspaceDir, runtime),
       );
@@ -192,9 +192,9 @@ describe("handleReset", () => {
   });
 
   it("retains workspace state when workspace removal fails", async () => {
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-reset-profile-"));
-    const profileStateDir = path.join(homeDir, ".openclaw-work");
-    const profileConfigPath = path.join(profileStateDir, "openclaw.json");
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-reset-profile-"));
+    const profileStateDir = path.join(homeDir, ".steelengine-work");
+    const profileConfigPath = path.join(profileStateDir, "steelengine.json");
     const profileCredentialsDir = path.join(profileStateDir, "credentials");
     const profileSessionsDir = path.join(profileStateDir, "agents", "main", "sessions");
     const workspaceDir = path.join(profileStateDir, "workspace");
@@ -215,10 +215,10 @@ describe("handleReset", () => {
       await withEnvAsync(
         {
           HOME: homeDir,
-          OPENCLAW_HOME: homeDir,
-          OPENCLAW_PROFILE: "work",
-          OPENCLAW_STATE_DIR: profileStateDir,
-          OPENCLAW_CONFIG_PATH: profileConfigPath,
+          STEELENGINE_HOME: homeDir,
+          STEELENGINE_PROFILE: "work",
+          STEELENGINE_STATE_DIR: profileStateDir,
+          STEELENGINE_CONFIG_PATH: profileConfigPath,
         },
         async () => await handleReset("full", workspaceDir, runtime),
       );
@@ -232,7 +232,7 @@ describe("handleReset", () => {
 
 describe("moveToTrash", () => {
   it("uses fs-safe trash instead of resolving a PATH trash command", async () => {
-    const testRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-trash-helper-"));
+    const testRoot = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-trash-helper-"));
     const targetPath = path.join(testRoot, "target");
     fs.mkdirSync(targetPath, { recursive: true });
     const runtime = { log: vi.fn() } as unknown as RuntimeEnv;
@@ -252,9 +252,9 @@ describe("moveToTrash", () => {
   });
 
   it("allows fs-safe trash to move a symlink whose target resolves outside the parent", async () => {
-    const testRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-trash-symlink-"));
+    const testRoot = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-trash-symlink-"));
     const targetPath = path.join(testRoot, "target-link");
-    const outsideTarget = path.join(os.tmpdir(), "openclaw-trash-symlink-target");
+    const outsideTarget = path.join(os.tmpdir(), "steelengine-trash-symlink-target");
     fs.writeFileSync(targetPath, "link placeholder");
     vi.spyOn(fsPromises, "lstat").mockResolvedValue({
       isSymbolicLink: () => true,
@@ -276,7 +276,7 @@ describe("moveToTrash", () => {
   });
 
   it("moves a dangling symlink instead of treating it as already removed", async () => {
-    const testRoot = tempDirs.make("openclaw-trash-dangling-link-");
+    const testRoot = tempDirs.make("steelengine-trash-dangling-link-");
     const targetPath = path.join(testRoot, "workspace-link");
     fs.symlinkSync(path.join(testRoot, "missing-target"), targetPath, "dir");
     const runtime = { log: vi.fn() } as unknown as RuntimeEnv;
@@ -294,11 +294,11 @@ describe("moveToTrash", () => {
   });
 
   it("canonicalizes a symlinked parent before calling fs-safe trash", async () => {
-    const testRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-trash-parent-link-"));
+    const testRoot = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-trash-parent-link-"));
     const lexicalParent = path.join(testRoot, "state-link");
     const realParent = path.join(testRoot, "state-real");
-    const targetPath = path.join(lexicalParent, "openclaw.json");
-    const sourcePath = path.join(realParent, "openclaw.json");
+    const targetPath = path.join(lexicalParent, "steelengine.json");
+    const sourcePath = path.join(realParent, "steelengine.json");
     fs.mkdirSync(lexicalParent, { recursive: true });
     fs.writeFileSync(targetPath, "{}\n");
     vi.spyOn(fsPromises, "realpath").mockImplementation(async (candidate) =>
@@ -570,7 +570,7 @@ describe("probeGatewayReachable", () => {
       ok: false,
       connectLatencyMs: 42,
       error: "foreign protocol error",
-      connectErrorDetails: { code: "NOT_AN_OPENCLAW_CONNECT_ERROR" },
+      connectErrorDetails: { code: "NOT_AN_STEELENGINE_CONNECT_ERROR" },
       auth: { role: null, scopes: [], capability: "unknown" },
       server: { version: null, connId: null },
     });

@@ -1,6 +1,6 @@
 // Agent method tests cover run/steer/reset/wait behavior, task/subagent state,
 // approval followups, lifecycle hooks, and emitted gateway events.
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { expect, vi } from "vitest";
 import type { readAcpSessionMeta } from "../../acp/runtime/session-meta.js";
 import type { AgentInternalEvent } from "../../agents/internal-events.js";
@@ -21,7 +21,7 @@ import { agentHandlers } from "./agent.js";
 import { suspendHandlers } from "./suspend.js";
 import type { GatewayRequestContext } from "./types.js";
 
-const envSnapshot = captureEnv(["OPENCLAW_STATE_DIR"]);
+const envSnapshot = captureEnv(["STEELENGINE_STATE_DIR"]);
 
 export const REAL_PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
@@ -632,7 +632,7 @@ export function resetTimeConfig() {
 }
 
 export function useTestStateDir(root: string): void {
-  setTestEnvValue("OPENCLAW_STATE_DIR", root);
+  setTestEnvValue("STEELENGINE_STATE_DIR", root);
 }
 
 export async function expectResetCall(expectedMessage: string) {
@@ -798,7 +798,7 @@ export function operatorWriteGatewayClient(): AgentHandlerArgs["client"] {
       minProtocol: 1,
       maxProtocol: 1,
       client: {
-        id: "openclaw-control-ui",
+        id: "steelengine-control-ui",
         version: "test",
         platform: "test",
         mode: "ui",
@@ -942,7 +942,7 @@ function toLintErrorObject(value: unknown, fallbackMessage: string): Error {
 /**
  * Pins subagent-registry deps for gateway handler tests, always keeping
  * `ensureRuntimePluginsLoaded` a no-op. Real ended-run hooks reload the
- * standalone plugin runtime in the background, and `loadOpenClawPlugins`
+ * standalone plugin runtime in the background, and `loadSteelEnginePlugins`
  * starts by wiping process-wide plugin registrations — including the detached
  * task lifecycle runtime a later test just installed via
  * `setDetachedTaskLifecycleRuntime`. Without this pin, a prior test's async

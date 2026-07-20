@@ -11,8 +11,8 @@ Adds agent-callable tools.
 
 ## Distribution
 
-- Package: `@openclaw/browser-plugin`
-- Install route: included in OpenClaw
+- Package: `@steelengine/browser-plugin`
+- Install route: included in SteelEngine
 
 ## Surface
 

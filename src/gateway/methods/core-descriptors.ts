@@ -71,14 +71,14 @@ const CORE_GATEWAY_METHOD_SPECS: readonly CoreGatewayMethodSpec[] = [
   { name: "plugin.approval.resolve", scope: "operator.approvals" },
   { name: "plugins.uiDescriptors", scope: "operator.read" },
   { name: "plugins.sessionAction", scope: "dynamic" },
-  { name: "openclaw.chat", scope: "operator.admin" },
-  { name: "openclaw.approval.list", scope: "operator.approvals" },
-  { name: "openclaw.setup.detect", scope: "operator.admin" },
+  { name: "steelengine.chat", scope: "operator.admin" },
+  { name: "steelengine.approval.list", scope: "operator.approvals" },
+  { name: "steelengine.setup.detect", scope: "operator.admin" },
   // Failed activation candidates are non-mutating probes. Keep this admin-only
   // without the shared three-write budget so the automatic ladder can finish.
-  { name: "openclaw.setup.activate", scope: "operator.admin" },
-  { name: "openclaw.setup.auth.start", scope: "operator.admin" },
-  { name: "openclaw.setup.prepare.start", scope: "operator.admin" },
+  { name: "steelengine.setup.activate", scope: "operator.admin" },
+  { name: "steelengine.setup.auth.start", scope: "operator.admin" },
+  { name: "steelengine.setup.prepare.start", scope: "operator.admin" },
   { name: "wizard.start", scope: "operator.admin" },
   { name: "wizard.next", scope: "operator.admin" },
   { name: "wizard.cancel", scope: "operator.admin" },
@@ -337,7 +337,7 @@ const CORE_GATEWAY_METHOD_SPECS: readonly CoreGatewayMethodSpec[] = [
   // sessions.files.* trusted-operator read domain.
   { name: "sessions.diff", scope: "operator.read" },
   // Additive protocol methods append here to preserve existing advertised indices.
-  { name: "openclaw.setup.verify", scope: "operator.admin" },
+  { name: "steelengine.setup.verify", scope: "operator.admin" },
   // Cloud-worker mutations depend on the loaded provider registry and owned
   // reconciler, so advertise them early but gate dispatch until sidecars are ready.
   {

@@ -1,17 +1,17 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   consultMeetingAgent,
   handleMeetingRealtimeConsultToolCall,
   resolveMeetingRealtimeTools,
   type MeetingAgentConsultSurface,
-} from "openclaw/plugin-sdk/meeting-runtime";
-import type { PluginRuntime, RuntimeLogger } from "openclaw/plugin-sdk/plugin-runtime";
+} from "steelengine/plugin-sdk/meeting-runtime";
+import type { PluginRuntime, RuntimeLogger } from "steelengine/plugin-sdk/plugin-runtime";
 import type {
   RealtimeVoiceBridgeSession,
   RealtimeVoiceTool,
   RealtimeVoiceToolCallEvent,
   TalkEventInput,
-} from "openclaw/plugin-sdk/realtime-voice";
+} from "steelengine/plugin-sdk/realtime-voice";
 import type { TeamsMeetingsConfig, TeamsMeetingsToolPolicy } from "./config.js";
 
 const TEAMS_MEETINGS_CONSULT_SURFACE: MeetingAgentConsultSurface = {
@@ -38,9 +38,9 @@ export function resolveTeamsMeetingsRealtimeTools(
   return resolveMeetingRealtimeTools(policy);
 }
 
-export async function consultOpenClawAgentForTeamsMeeting(params: {
+export async function consultSteelEngineAgentForTeamsMeeting(params: {
   config: TeamsMeetingsConfig;
-  fullConfig: OpenClawConfig;
+  fullConfig: SteelEngineConfig;
   runtime: PluginRuntime;
   logger: RuntimeLogger;
   meetingSessionId: string;
@@ -67,7 +67,7 @@ export async function handleTeamsMeetingsRealtimeConsultToolCall(params: {
   session: RealtimeVoiceBridgeSession;
   event: RealtimeVoiceToolCallEvent;
   config: TeamsMeetingsConfig;
-  fullConfig: OpenClawConfig;
+  fullConfig: SteelEngineConfig;
   runtime: PluginRuntime;
   logger: RuntimeLogger;
   meetingSessionId: string;

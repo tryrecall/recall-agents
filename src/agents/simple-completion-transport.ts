@@ -1,10 +1,10 @@
-import { getApiProvider } from "@openclaw/ai/internal/runtime";
+import { getApiProvider } from "@steelengine/ai/internal/runtime";
 /**
  * Simple completion transport preparation.
  *
- * Registers provider-specific stream functions and rewrites models that need OpenClaw-managed transport semantics.
+ * Registers provider-specific stream functions and rewrites models that need SteelEngine-managed transport semantics.
  */
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { Api, Model } from "../llm/types.js";
 import { wrapProviderSimpleCompletionStreamFn } from "../plugins/provider-runtime.js";
 import { createAnthropicVertexStreamFnForModel } from "./anthropic-vertex-stream.js";
@@ -13,17 +13,17 @@ import { prepareGoogleSimpleCompletionModel } from "./google-simple-completion-s
 import { registerProviderStreamForModel } from "./provider-stream.js";
 import {
   buildTransportAwareSimpleStreamFn,
-  createOpenClawTransportStreamFnForModel,
+  createSteelEngineTransportStreamFnForModel,
   prepareTransportAwareSimpleModel,
   resolveTransportAwareSimpleApi,
 } from "./provider-transport-stream.js";
 import type { StreamFn } from "./runtime/index.js";
 
-const PROVIDER_SIMPLE_COMPLETION_API_PREFIX = "openclaw-provider-simple:";
+const PROVIDER_SIMPLE_COMPLETION_API_PREFIX = "steelengine-provider-simple:";
 
 function resolveAnthropicVertexSimpleApi(baseUrl?: string): Api {
   const suffix = baseUrl?.trim() ? encodeURIComponent(baseUrl.trim()) : "default";
-  return `openclaw-anthropic-vertex-simple:${suffix}`;
+  return `steelengine-anthropic-vertex-simple:${suffix}`;
 }
 
 export function normalizeCodexResponsesBaseUrlForOpenAISdk(baseUrl?: string): string {
@@ -65,7 +65,7 @@ function resolveProviderSimpleCompletionApi(model: Model): Api {
     .join(":")}`;
 }
 
-function applyProviderSimpleCompletionWrapper(model: Model, cfg?: OpenClawConfig): Model {
+function applyProviderSimpleCompletionWrapper(model: Model, cfg?: SteelEngineConfig): Model {
   if (model.api.startsWith(PROVIDER_SIMPLE_COMPLETION_API_PREFIX)) {
     return model;
   }
@@ -99,20 +99,20 @@ function applyProviderSimpleCompletionWrapper(model: Model, cfg?: OpenClawConfig
 
 function prepareCodexSimpleTransportModel<TApi extends Api>(
   model: Model<TApi>,
-  cfg?: OpenClawConfig,
+  cfg?: SteelEngineConfig,
 ): Model | undefined {
   if (model.provider !== "openai" || model.api !== "openai-chatgpt-responses") {
     return undefined;
   }
 
   // Static Codex provider catalogs intentionally omit credentials; the simple
-  // completion path must use OpenClaw's transport so resolved request auth is applied.
+  // completion path must use SteelEngine's transport so resolved request auth is applied.
   const transportModel = {
     ...model,
     baseUrl: normalizeCodexResponsesBaseUrlForOpenAISdk(model.baseUrl),
   } as Model;
   const api = resolveTransportAwareSimpleApi(model.api);
-  const streamFn = createOpenClawTransportStreamFnForModel(transportModel, { cfg });
+  const streamFn = createSteelEngineTransportStreamFnForModel(transportModel, { cfg });
   if (!api || !streamFn) {
     return undefined;
   }
@@ -126,7 +126,7 @@ function prepareCodexSimpleTransportModel<TApi extends Api>(
 
 export function prepareModelForSimpleCompletion<TApi extends Api>(params: {
   model: Model<TApi>;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
 }): Model {
   const { model, cfg } = params;
   // Only provider-owned custom APIs need runtime stream registration here.

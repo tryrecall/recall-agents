@@ -2,7 +2,7 @@
 import {
   describeImagesWithModel,
   describeImageWithModel,
-} from "openclaw/plugin-sdk/media-understanding";
+} from "steelengine/plugin-sdk/media-understanding";
 import { afterAll, describe, expect, it, vi } from "vitest";
 import { deepinfraMediaUnderstandingProvider } from "./media-understanding-provider.js";
 
@@ -10,9 +10,9 @@ const { transcribeOpenAiCompatibleAudioMock } = vi.hoisted(() => ({
   transcribeOpenAiCompatibleAudioMock: vi.fn(async () => ({ text: "hello", model: "whisper" })),
 }));
 
-vi.mock("openclaw/plugin-sdk/media-understanding", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/media-understanding")>(
-    "openclaw/plugin-sdk/media-understanding",
+vi.mock("steelengine/plugin-sdk/media-understanding", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/media-understanding")>(
+    "steelengine/plugin-sdk/media-understanding",
   );
   return {
     ...actual,
@@ -21,7 +21,7 @@ vi.mock("openclaw/plugin-sdk/media-understanding", async () => {
 });
 
 afterAll(() => {
-  vi.doUnmock("openclaw/plugin-sdk/media-understanding");
+  vi.doUnmock("steelengine/plugin-sdk/media-understanding");
   vi.resetModules();
 });
 

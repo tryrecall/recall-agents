@@ -1,6 +1,6 @@
 // Memory host dreaming tests cover dreaming artifact persistence and lookup.
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import {
   formatMemoryDreamingDay,
   isSameMemoryDreamingDay,
@@ -148,7 +148,7 @@ describe("memory dreaming host helpers", () => {
           userTimezone: "America/Los_Angeles",
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     const resolved = resolveMemoryDreamingConfig({
       pluginConfig: {},
@@ -215,7 +215,7 @@ describe("memory dreaming host helpers", () => {
           { id: "gamma", workspace: "/workspace/shared" },
         ],
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     expect(resolveMemoryDreamingWorkspaces(cfg)).toEqual([
       {
@@ -237,7 +237,7 @@ describe("memory dreaming host helpers", () => {
           { id: "agi-cdo", workspace: "/workspace/agi-cdo" },
         ],
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     expect(
       resolveMemoryDreamingWorkspaces(cfg, {
@@ -267,7 +267,7 @@ describe("memory dreaming host helpers", () => {
           workspace: "/workspace",
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     expect(resolveMemoryDreamingWorkspaces(cfg)).toEqual([
       {
@@ -293,11 +293,11 @@ describe("memory dreaming host helpers", () => {
       resolveMemoryDreamingPluginId({
         plugins: {
           slots: {
-            memory: "memos-local-openclaw-plugin",
+            memory: "memos-local-steelengine-plugin",
           },
         },
-      } as OpenClawConfig),
-    ).toBe("memos-local-openclaw-plugin");
+      } as SteelEngineConfig),
+    ).toBe("memos-local-steelengine-plugin");
   });
 
   it("reads dreaming config from the configured memory-slot owner", () => {
@@ -305,10 +305,10 @@ describe("memory dreaming host helpers", () => {
       resolveMemoryDreamingPluginConfig({
         plugins: {
           slots: {
-            memory: "memos-local-openclaw-plugin",
+            memory: "memos-local-steelengine-plugin",
           },
           entries: {
-            "memos-local-openclaw-plugin": {
+            "memos-local-steelengine-plugin": {
               config: {
                 dreaming: {
                   enabled: true,
@@ -317,7 +317,7 @@ describe("memory dreaming host helpers", () => {
             },
           },
         },
-      } as OpenClawConfig),
+      } as SteelEngineConfig),
     ).toEqual({
       dreaming: {
         enabled: true,
@@ -343,7 +343,7 @@ describe("memory dreaming host helpers", () => {
             },
           },
         },
-      } as OpenClawConfig),
+      } as SteelEngineConfig),
     ).toEqual({
       dreaming: {
         enabled: true,
@@ -366,7 +366,7 @@ describe("memory dreaming host helpers", () => {
             },
           },
         },
-      } as OpenClawConfig),
+      } as SteelEngineConfig),
     ).toEqual({
       dreaming: {
         enabled: true,
@@ -382,7 +382,7 @@ describe("memory dreaming host helpers", () => {
             memory: "none",
           },
         },
-      } as OpenClawConfig),
+      } as SteelEngineConfig),
     ).toBe("memory-core");
 
     expect(
@@ -401,7 +401,7 @@ describe("memory dreaming host helpers", () => {
             },
           },
         },
-      } as OpenClawConfig),
+      } as SteelEngineConfig),
     ).toEqual({
       dreaming: {
         enabled: true,

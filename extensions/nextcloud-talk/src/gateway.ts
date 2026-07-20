@@ -1,12 +1,12 @@
 // Nextcloud Talk plugin module implements gateway behavior.
-import { createAccountStatusSink } from "openclaw/plugin-sdk/channel-outbound";
-import { runStoppablePassiveMonitor } from "openclaw/plugin-sdk/extension-shared";
+import { createAccountStatusSink } from "steelengine/plugin-sdk/channel-outbound";
+import { runStoppablePassiveMonitor } from "steelengine/plugin-sdk/extension-shared";
 import { resolveNextcloudTalkAccount, type ResolvedNextcloudTalkAccount } from "./accounts.js";
 import {
   clearAccountEntryFields,
   DEFAULT_ACCOUNT_ID,
   type ChannelPlugin,
-  type OpenClawConfig,
+  type SteelEngineConfig,
 } from "./channel-api.js";
 import { monitorNextcloudTalkProvider } from "./monitor-runtime.js";
 import { getNextcloudTalkRuntime } from "./runtime.js";
@@ -43,7 +43,7 @@ export const nextcloudTalkGatewayAdapter: NonNullable<
     });
   },
   logoutAccount: async ({ accountId, cfg }) => {
-    const nextCfg = { ...cfg } as OpenClawConfig;
+    const nextCfg = { ...cfg } as SteelEngineConfig;
     const nextSection = cfg.channels?.["nextcloud-talk"]
       ? { ...cfg.channels["nextcloud-talk"] }
       : undefined;
@@ -81,7 +81,7 @@ export const nextcloudTalkGatewayAdapter: NonNullable<
         const nextChannels = { ...nextCfg.channels } as Record<string, unknown>;
         delete nextChannels["nextcloud-talk"];
         if (Object.keys(nextChannels).length > 0) {
-          nextCfg.channels = nextChannels as OpenClawConfig["channels"];
+          nextCfg.channels = nextChannels as SteelEngineConfig["channels"];
         } else {
           delete nextCfg.channels;
         }

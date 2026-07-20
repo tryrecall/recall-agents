@@ -5,9 +5,9 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { root as fsRoot, sanitizeUntrustedFileName } from "openclaw/plugin-sdk/security-runtime";
-import { resolveStateDir } from "openclaw/plugin-sdk/state-paths";
-import { escapeHtml, resolveUserPath } from "openclaw/plugin-sdk/text-utility-runtime";
+import { root as fsRoot, sanitizeUntrustedFileName } from "steelengine/plugin-sdk/security-runtime";
+import { resolveStateDir } from "steelengine/plugin-sdk/state-paths";
+import { escapeHtml, resolveUserPath } from "steelengine/plugin-sdk/text-utility-runtime";
 import { CANVAS_HOST_PATH } from "./host/a2ui.js";
 
 type CanvasDocumentKind = "html_bundle" | "url_embed" | "document" | "image" | "video_asset";

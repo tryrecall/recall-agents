@@ -19,18 +19,18 @@ const moduleLoaders: PluginModuleLoaderCache = new Map();
 const loadedFacadeModules = new Map<string, unknown>();
 const loadedFacadePluginIds = new Set<string>();
 let facadeLoaderSourceTransformFactory: PluginModuleLoaderFactory | undefined;
-let cachedOpenClawPackageRoot: string | undefined;
+let cachedSteelEnginePackageRoot: string | undefined;
 
-function getOpenClawPackageRoot() {
-  if (cachedOpenClawPackageRoot) {
-    return cachedOpenClawPackageRoot;
+function getSteelEnginePackageRoot() {
+  if (cachedSteelEnginePackageRoot) {
+    return cachedSteelEnginePackageRoot;
   }
-  cachedOpenClawPackageRoot =
+  cachedSteelEnginePackageRoot =
     resolveLoaderPackageRoot({
       modulePath: fileURLToPath(import.meta.url),
       moduleUrl: import.meta.url,
     }) ?? fileURLToPath(new URL("../..", import.meta.url));
-  return cachedOpenClawPackageRoot;
+  return cachedSteelEnginePackageRoot;
 }
 
 function resolveFacadeModuleLocation(params: {
@@ -42,7 +42,7 @@ function resolveFacadeModuleLocation(params: {
   return resolveBundledFacadeModuleLocation({
     ...params,
     currentModulePath: CURRENT_MODULE_PATH,
-    packageRoot: getOpenClawPackageRoot(),
+    packageRoot: getSteelEnginePackageRoot(),
     bundledPluginsDir,
   });
 }
@@ -143,8 +143,8 @@ function resolveFacadeBoundaryOpenParams(boundaryRoot: string): {
   boundaryLabel: string;
   rejectHardlinks: boolean;
 } {
-  if (isPathAtOrInside(boundaryRoot, getOpenClawPackageRoot())) {
-    return { boundaryLabel: "OpenClaw package root", rejectHardlinks: false };
+  if (isPathAtOrInside(boundaryRoot, getSteelEnginePackageRoot())) {
+    return { boundaryLabel: "SteelEngine package root", rejectHardlinks: false };
   }
   const bundledDir = resolveBundledPluginsDir();
   if (bundledDir && isPathAtOrInside(boundaryRoot, bundledDir)) {
@@ -280,7 +280,7 @@ export function resetFacadeLoaderStateForTest(): void {
   loadedFacadePluginIds.clear();
   moduleLoaders.clear();
   facadeLoaderSourceTransformFactory = undefined;
-  cachedOpenClawPackageRoot = undefined;
+  cachedSteelEnginePackageRoot = undefined;
 }
 
 /** Override source transform loader creation for facade-loader tests. */

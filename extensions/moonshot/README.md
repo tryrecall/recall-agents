@@ -1,13 +1,13 @@
-# Moonshot OpenClaw provider
+# Moonshot SteelEngine provider
 
-Official OpenClaw provider plugin for Moonshot.
+Official SteelEngine provider plugin for Moonshot.
 
 ## Install
 
 ```sh
-openclaw plugins install @openclaw/moonshot-provider
+steelengine plugins install @steelengine/moonshot-provider
 ```
 
 ## Docs
 
-See `docs/providers/moonshot.md` in the OpenClaw repository, or the published docs at `https://docs.openclaw.ai/providers/moonshot`.
+See `docs/providers/moonshot.md` in the SteelEngine repository, or the published docs at `https://docs.steelengine.ai/providers/moonshot`.

@@ -1,21 +1,21 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "OpenClaw",
+  "productName": "SteelEngine",
   "version": "0.1.0",
-  "identifier": "ai.openclaw.linux",
+  "identifier": "ai.steelengine.linux",
   "build": {
     "frontendDist": "../ui"
   },
   "plugins": {
     "deep-link": {
       "desktop": {
-        "schemes": ["openclaw"]
+        "schemes": ["steelengine"]
       }
     },
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDRDODJFMzU1QTQ0MUMwNkYKUldSdndFR2tWZU9DVE9RYnlIcHFoNG1xUlQzUlloa0plQmZjY0dPbHpjWlEzWFozdmt0cHBlY2gK",
       "endpoints": [
-        "https://github.com/openclaw/openclaw/releases/latest/download/latest.json"
+        "https://github.com/steelengineai/recall-agents/releases/latest/download/latest.json"
       ]
     }
   },
@@ -24,7 +24,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "OpenClaw",
+        "title": "SteelEngine",
         "url": "index.html",
         "width": 1080,
         "height": 720,
@@ -84,8 +84,8 @@
     "active": true,
     "createUpdaterArtifacts": true,
     "category": "Utility",
-    "shortDescription": "OpenClaw Linux companion",
-    "longDescription": "Installs OpenClaw, manages the local Gateway service, and hosts the Control UI.",
+    "shortDescription": "SteelEngine Linux companion",
+    "longDescription": "Installs SteelEngine, manages the local Gateway service, and hosts the Control UI.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

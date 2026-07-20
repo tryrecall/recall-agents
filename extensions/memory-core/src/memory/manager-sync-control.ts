@@ -1,12 +1,12 @@
 // Memory Core plugin module implements manager sync control behavior.
 import type { DatabaseSync } from "node:sqlite";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/memory-core-host-engine-foundation";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { createSubsystemLogger } from "steelengine/plugin-sdk/memory-core-host-engine-foundation";
 import type {
   MemorySessionSyncTarget,
   MemorySyncParams,
   MemorySyncProgressUpdate,
-} from "openclaw/plugin-sdk/memory-core-host-engine-storage";
+} from "steelengine/plugin-sdk/memory-core-host-engine-storage";
 
 const log = createSubsystemLogger("memory");
 

@@ -24,7 +24,7 @@ const SKIPPED_DIRS = new Set([
 ]);
 const TEXT_FILE_PATTERN = /\.(?:[cm]?[jt]sx?|json|mdx?|ya?ml)$/u;
 const PLUGIN_SDK_SPECIFIER_PATTERN =
-  /\b(?:from\s*["']|import\s*\(\s*["']|require\s*\(\s*["']|vi\.(?:mock|doMock)\s*\(\s*["'])(openclaw\/plugin-sdk\/([a-z0-9][a-z0-9-]*))["']/g;
+  /\b(?:from\s*["']|import\s*\(\s*["']|require\s*\(\s*["']|vi\.(?:mock|doMock)\s*\(\s*["'])(steelengine\/plugin-sdk\/([a-z0-9][a-z0-9-]*))["']/g;
 
 type CliOptions = {
   json: boolean;
@@ -227,7 +227,7 @@ function collectWorkspaceTextFileSources(): WorkspaceTextFile[] {
 
 function collectSummaryWorkspaceTextFileSources(): WorkspaceTextFile[] {
   const pluginSdkFiles = collectWorkspaceTextFilesMatchingGit(
-    String.raw`openclaw/plugin-sdk/[a-z0-9][a-z0-9-]*`,
+    String.raw`steelengine/plugin-sdk/[a-z0-9][a-z0-9-]*`,
   );
   if (!pluginSdkFiles) {
     return collectWorkspaceTextFileSources();
@@ -330,10 +330,10 @@ function extractCompatTokens(record: PluginCompatRecord): string[] {
         tokens.add(token);
       }
     }
-    for (const match of value.matchAll(/\bopenclaw\/[a-z0-9/-]+\b/g)) {
+    for (const match of value.matchAll(/\bsteelengine\/[a-z0-9/-]+\b/g)) {
       tokens.add(match[0]);
     }
-    for (const match of value.matchAll(/\bOPENCLAW_[A-Z0-9_]+\b/g)) {
+    for (const match of value.matchAll(/\bSTEELENGINE_[A-Z0-9_]+\b/g)) {
       tokens.add(match[0]);
     }
     for (const match of value.matchAll(/\b[a-z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)+\b/g)) {

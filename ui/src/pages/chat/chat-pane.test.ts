@@ -169,7 +169,7 @@ function createInitializationContext(): ApplicationContext {
 }
 
 function createTestChatPane(params: { client: GatewayBrowserClient; sessions: SessionCapability }) {
-  const pane = document.createElement("openclaw-chat-pane") as unknown as TestChatPane;
+  const pane = document.createElement("steelengine-chat-pane") as unknown as TestChatPane;
   Object.defineProperty(pane, "isConnected", {
     configurable: true,
     value: true,
@@ -215,7 +215,7 @@ function nativeHistoryMessage(seq: number, text = `message ${seq}`) {
   return {
     role: seq % 2 === 0 ? "assistant" : "user",
     content: [{ type: "text", text }],
-    __openclaw: { seq },
+    __steelengine: { seq },
   };
 }
 
@@ -273,10 +273,10 @@ describe("chat pane header state", () => {
       updatedAt: 0,
     } satisfies GatewaySessionRow;
     const copy = vi.fn(async () => true);
-    pane.handleHeaderMenuAction("copy-path", session, "/src/openclaw", "feature/header", copy);
-    pane.handleHeaderMenuAction("copy-branch", session, "/src/openclaw", "feature/header", copy);
+    pane.handleHeaderMenuAction("copy-path", session, "/src/steelengine", "feature/header", copy);
+    pane.handleHeaderMenuAction("copy-branch", session, "/src/steelengine", "feature/header", copy);
     await Promise.resolve();
-    expect(copy).toHaveBeenNthCalledWith(1, "/src/openclaw");
+    expect(copy).toHaveBeenNthCalledWith(1, "/src/steelengine");
     expect(copy).toHaveBeenNthCalledWith(2, "feature/header");
   });
 
@@ -315,7 +315,7 @@ describe("chat pane header state", () => {
       key: "agent:main:worktree",
       kind: "direct",
       updatedAt: 0,
-      worktree: { id: "wt-1", branch: "feature", repoRoot: "/src/openclaw" },
+      worktree: { id: "wt-1", branch: "feature", repoRoot: "/src/steelengine" },
     } satisfies GatewaySessionRow;
     await pane.loadHeaderMenuData(session, "/src/default", true);
     await pane.loadHeaderMenuData(session, "/src/default", true);
@@ -336,8 +336,8 @@ describe("chat pane header state", () => {
       kind: "direct",
       updatedAt: 0,
     } satisfies GatewaySessionRow;
-    await pane.loadHeaderMenuData(session, "/src/openclaw", true);
-    await pane.loadHeaderMenuData(session, "/src/openclaw", true);
+    await pane.loadHeaderMenuData(session, "/src/steelengine", true);
+    await pane.loadHeaderMenuData(session, "/src/steelengine", true);
     expect(request).toHaveBeenCalledTimes(2);
   });
 
@@ -382,7 +382,7 @@ describe("chat pane header state", () => {
       key: "agent:main:reused",
       kind: "direct",
       updatedAt: 0,
-      worktree: { id: "wt-1", branch: "feature", repoRoot: "/src/openclaw" },
+      worktree: { id: "wt-1", branch: "feature", repoRoot: "/src/steelengine" },
     } satisfies GatewaySessionRow;
     await pane.loadHeaderMenuData(worktreeRow, "/src/agent-workspace", true);
 
@@ -411,7 +411,7 @@ describe("chat pane header state", () => {
       updatedAt: 0,
       placement: { state: "active" } as GatewaySessionRow["placement"],
     } satisfies GatewaySessionRow;
-    await pane.loadHeaderMenuData(dispatched, "/src/openclaw", true);
+    await pane.loadHeaderMenuData(dispatched, "/src/steelengine", true);
     expect(request).not.toHaveBeenCalled();
   });
 
@@ -429,8 +429,8 @@ describe("chat pane header state", () => {
       kind: "direct",
       updatedAt: 0,
     } satisfies GatewaySessionRow;
-    await pane.loadHeaderMenuData(session, "/src/openclaw", true);
-    await pane.loadHeaderMenuData(session, "/src/openclaw", true);
+    await pane.loadHeaderMenuData(session, "/src/steelengine", true);
+    await pane.loadHeaderMenuData(session, "/src/steelengine", true);
     expect(request).toHaveBeenCalledTimes(2);
   });
 
@@ -445,14 +445,14 @@ describe("chat pane header state", () => {
       kind: "direct",
       updatedAt: 0,
     } satisfies GatewaySessionRow;
-    pane.handleHeaderMenuAction("reveal", session, "/src/openclaw", null);
+    pane.handleHeaderMenuAction("reveal", session, "/src/steelengine", null);
     await vi.waitFor(() => expect(state.chatError).toBe("No desktop available."));
   });
 });
 
 describe("chat pane initialization", () => {
   it("sets the pane route before attaching outbox projection", () => {
-    const pane = document.createElement("openclaw-chat-pane") as unknown as TestChatPane;
+    const pane = document.createElement("steelengine-chat-pane") as unknown as TestChatPane;
     const targetSessionKey = "agent:main:pane-b";
     const sharedMessages = new Map();
     pane.sessionKey = targetSessionKey;
@@ -477,7 +477,7 @@ describe("chat pane initialization", () => {
   });
 
   it("hydrates a new split pane from the shared session snapshot before startup", () => {
-    const pane = document.createElement("openclaw-chat-pane") as unknown as TestChatPane;
+    const pane = document.createElement("steelengine-chat-pane") as unknown as TestChatPane;
     const targetSessionKey = "agent:main:pane-b";
     const messages = [nativeHistoryMessage(1, "retained split history")];
     const sharedMessages: ChatMessageCache = new Map();
@@ -584,7 +584,7 @@ describe("chat pane keyboard shortcuts", () => {
     const canvasContent: SidebarContent = {
       kind: "canvas",
       docId: "canvas-1",
-      entryUrl: "/__openclaw__/canvas/canvas-1/index.html",
+      entryUrl: "/__steelengine__/canvas/canvas-1/index.html",
     };
     pane.active = true;
     state.connected = false;
@@ -719,11 +719,11 @@ describe("chat pane catalog session lifecycle", () => {
     const listener = (event: Event) => {
       detail = (event as CustomEvent).detail;
     };
-    window.addEventListener("openclaw:terminal-toggle", listener);
+    window.addEventListener("steelengine:terminal-toggle", listener);
     try {
       (container.querySelector('[aria-label="Open in terminal"]') as HTMLElement).click();
     } finally {
-      window.removeEventListener("openclaw:terminal-toggle", listener);
+      window.removeEventListener("steelengine:terminal-toggle", listener);
     }
     expect(detail).toEqual({ open: true, catalog: key });
   });

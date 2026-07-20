@@ -1,15 +1,15 @@
-// ClawRouter provider catalog maps credential-scoped routes to OpenClaw transports.
-import type { ProviderRuntimeModel } from "openclaw/plugin-sdk/plugin-entry";
+// ClawRouter provider catalog maps credential-scoped routes to SteelEngine transports.
+import type { ProviderRuntimeModel } from "steelengine/plugin-sdk/plugin-entry";
 import {
   getCachedLiveProviderModelRows,
   type LiveModelCatalogFetchGuard,
-} from "openclaw/plugin-sdk/provider-catalog-live-runtime";
+} from "steelengine/plugin-sdk/provider-catalog-live-runtime";
 import type {
   ModelDefinitionConfig,
   ModelProviderConfig,
-} from "openclaw/plugin-sdk/provider-model-shared";
+} from "steelengine/plugin-sdk/provider-model-shared";
 
-const CLAWROUTER_DEFAULT_BASE_URL = "https://clawrouter.openclaw.ai";
+const CLAWROUTER_DEFAULT_BASE_URL = "https://clawrouter.steelengine.ai";
 
 const PROVIDER_ID = "clawrouter";
 const CATALOG_CACHE_TTL_MS = 60_000;

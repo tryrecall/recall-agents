@@ -1,11 +1,11 @@
 /**
  * Formats configured model aliases for prompt-visible model guidance.
  */
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 
 /** Builds deterministic prompt lines for configured model aliases. */
-export function buildModelAliasLines(cfg?: OpenClawConfig) {
+export function buildModelAliasLines(cfg?: SteelEngineConfig) {
   const models = cfg?.agents?.defaults?.models ?? {};
   const entries: Array<{ alias: string; model: string }> = [];
   for (const [keyRaw, entryRaw] of Object.entries(models)) {

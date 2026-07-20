@@ -4,7 +4,7 @@ import {
   DEFAULT_SUBAGENT_MAX_SPAWN_DEPTH,
 } from "../../config/agent-limits.js";
 import { getRuntimeConfig } from "../../config/config.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { callGateway } from "../../gateway/call.js";
 import {
   isValidAgentId,
@@ -53,7 +53,7 @@ type VisibleSessionsSpawnOptions = VisibleSessionsSpawnDeps & {
   currentChannelId?: string;
   currentThreadTs?: string;
   sandboxed?: boolean;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   requesterAgentIdOverride?: string;
   inheritedToolAllowlist?: string[];
   inheritedToolDenylist?: string[];

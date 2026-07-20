@@ -1,12 +1,12 @@
 /** Tests configured channel-to-ACP binding resolution and generated session keys. */
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { resolveAgentWorkspaceDir } from "../agents/agent-scope.js";
 import type {
   ChannelConfiguredBindingProvider,
   ChannelPlugin,
 } from "../channels/plugins/types.public.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createChannelTestPluginBase, createTestRegistry } from "../test-utils/channel-plugins.js";
 import { buildConfiguredAcpSessionKey } from "./persistent-bindings.types.js";
@@ -21,7 +21,7 @@ let persistentBindingsResolveModule: Pick<
   "resolveConfiguredAcpBindingRecord" | "resolveConfiguredAcpBindingSpecBySessionKey"
 >;
 
-type ConfiguredBinding = NonNullable<OpenClawConfig["bindings"]>[number];
+type ConfiguredBinding = NonNullable<SteelEngineConfig["bindings"]>[number];
 type BindingRecordInput = Parameters<
   PersistentBindingsModule["resolveConfiguredAcpBindingRecord"]
 >[0];
@@ -31,7 +31,7 @@ const baseCfg = {
   agents: {
     list: [{ id: "codex" }, { id: "claude" }],
   },
-} satisfies OpenClawConfig;
+} satisfies SteelEngineConfig;
 
 const defaultDiscordConversationId = "1478836151241412759";
 const defaultDiscordAccountId = "default";
@@ -273,13 +273,13 @@ function createConfiguredBindingTestPlugin(
 
 function createCfgWithBindings(
   bindings: ConfiguredBinding[],
-  overrides?: Partial<OpenClawConfig>,
-): OpenClawConfig {
+  overrides?: Partial<SteelEngineConfig>,
+): SteelEngineConfig {
   return {
     ...baseCfg,
     ...overrides,
     bindings,
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 function createDiscordBinding(params: {
@@ -338,7 +338,7 @@ function createFeishuBinding(params: {
   } as ConfiguredBinding;
 }
 
-function resolveBindingRecord(cfg: OpenClawConfig, overrides: Partial<BindingRecordInput> = {}) {
+function resolveBindingRecord(cfg: SteelEngineConfig, overrides: Partial<BindingRecordInput> = {}) {
   return persistentBindings.resolveConfiguredAcpBindingRecord({
     cfg,
     channel: "discord",
@@ -349,7 +349,7 @@ function resolveBindingRecord(cfg: OpenClawConfig, overrides: Partial<BindingRec
 }
 
 function resolveDiscordBindingSpecBySession(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   conversationId = defaultDiscordConversationId,
 ) {
   const resolved = resolveBindingRecord(cfg, { conversationId });
@@ -397,7 +397,7 @@ describe("resolveConfiguredAcpBindingRecord", () => {
       createDiscordBinding({
         agentId: "codex",
         conversationId: defaultDiscordConversationId,
-        acp: { cwd: "/repo/openclaw" },
+        acp: { cwd: "/repo/steelengine" },
       }),
     ]);
     const resolved = resolveBindingRecord(cfg);
@@ -721,7 +721,7 @@ describe("resolveConfiguredAcpBindingRecord", () => {
       ],
       {
         agents: {
-          list: [{ id: "codex", workspace: "/workspace/openclaw" }, { id: "claude" }],
+          list: [{ id: "codex", workspace: "/workspace/steelengine" }, { id: "claude" }],
         },
       },
     );

@@ -40,7 +40,7 @@ declare const chrome: {
   };
 };
 
-const runE2E = process.env.OPENCLAW_BROWSER_COPILOT_E2E === "1";
+const runE2E = process.env.STEELENGINE_BROWSER_COPILOT_E2E === "1";
 const extensionDir = path.dirname(fileURLToPath(import.meta.url));
 
 type RequestFrame = {
@@ -368,7 +368,7 @@ async function createFixtureServer(): Promise<{ baseUrl: string; close: () => Pr
 }
 
 async function copyExtension(): Promise<string> {
-  const target = tempDirs.make("openclaw-copilot-extension-");
+  const target = tempDirs.make("steelengine-copilot-extension-");
   await fs.cp(extensionDir, target, {
     recursive: true,
     filter: (source) => !source.endsWith(".test.ts"),
@@ -621,7 +621,7 @@ describe.runIf(runE2E)("browser copilot Chromium side panel", () => {
     const fixture = await createFixtureServer();
     cleanups.push(fixture.close);
     const unpackedExtension = await copyExtension();
-    const userDataDir = tempDirs.make("openclaw-copilot-profile-");
+    const userDataDir = tempDirs.make("steelengine-copilot-profile-");
     const executablePath = await resolveChromiumExecutable();
     const context = await chromium.launchPersistentContext(userDataDir, {
       ...(executablePath ? { executablePath } : { channel: "chromium" }),
@@ -655,8 +655,8 @@ describe.runIf(runE2E)("browser copilot Chromium side panel", () => {
     await expect.poll(() => relay.hellos.length, { timeout: 10_000 }).toBe(1);
 
     const artifactDir =
-      process.env.OPENCLAW_BROWSER_COPILOT_ARTIFACT_DIR ??
-      path.join(os.tmpdir(), "openclaw-browser-copilot-artifacts");
+      process.env.STEELENGINE_BROWSER_COPILOT_ARTIFACT_DIR ??
+      path.join(os.tmpdir(), "steelengine-browser-copilot-artifacts");
     await fs.mkdir(artifactDir, { recursive: true });
 
     const alphaPanel = await openTabPanel({ browserCdp, extensionId, page: alphaTab });
@@ -697,7 +697,7 @@ describe.runIf(runE2E)("browser copilot Chromium side panel", () => {
       )
       .toEqual({
         detail:
-          "Sharing adds this tab to the OpenClaw group. The copilot can act here, but nowhere else.",
+          "Sharing adds this tab to the SteelEngine group. The copilot can act here, but nowhere else.",
         title: "Keep the boundary visible",
       });
     expect(await alphaPanel.disabled("#message-input")).toBe(true);

@@ -1,20 +1,20 @@
 /** Agent runtime id normalization and retired runtime-selection compatibility helpers. */
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { normalizeAgentId } from "../routing/session-key.js";
 
-export type EmbeddedAgentRuntime = "openclaw" | "auto" | (string & {});
+export type EmbeddedAgentRuntime = "steelengine" | "auto" | (string & {});
 
-export const OPENCLAW_AGENT_RUNTIME_ID = "openclaw";
+export const STEELENGINE_AGENT_RUNTIME_ID = "steelengine";
 export const AUTO_AGENT_RUNTIME_ID = "auto";
 
 /** Normalizes configured runtime aliases to the current embedded-agent runtime id vocabulary. */
 export function normalizeEmbeddedAgentRuntime(raw: string | undefined): EmbeddedAgentRuntime {
   const value = raw?.trim();
   if (!value) {
-    return OPENCLAW_AGENT_RUNTIME_ID;
+    return STEELENGINE_AGENT_RUNTIME_ID;
   }
-  if (value === "openclaw" || value === "pi") {
-    return OPENCLAW_AGENT_RUNTIME_ID;
+  if (value === "steelengine" || value === "pi") {
+    return STEELENGINE_AGENT_RUNTIME_ID;
   }
   if (value === "auto") {
     return AUTO_AGENT_RUNTIME_ID;
@@ -36,7 +36,7 @@ export function normalizeOptionalAgentRuntimeId(raw: unknown): EmbeddedAgentRunt
 
 /** Resolves the deprecated explicit whole-agent runtime override, when present. */
 export function resolveAgentScopedRuntimeOverride(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentId?: string;
 }): EmbeddedAgentRuntime | undefined {
   const agentId = params.agentId ? normalizeAgentId(params.agentId) : undefined;
@@ -56,7 +56,7 @@ export function resolveAgentScopedRuntimeOverride(params: {
 export function resolveEmbeddedAgentRuntime(
   _env: NodeJS.ProcessEnv = process.env,
 ): EmbeddedAgentRuntime {
-  return OPENCLAW_AGENT_RUNTIME_ID;
+  return STEELENGINE_AGENT_RUNTIME_ID;
 }
 
 /** Returns whether a runtime id should be treated as the default runtime selection. */

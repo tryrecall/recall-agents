@@ -1,7 +1,7 @@
 // Tlon tests cover channel.message adapter plugin behavior.
-import { verifyChannelMessageAdapterCapabilityProofs } from "openclaw/plugin-sdk/channel-outbound";
+import { verifyChannelMessageAdapterCapabilityProofs } from "steelengine/plugin-sdk/channel-outbound";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../runtime-api.js";
+import type { SteelEngineConfig } from "../runtime-api.js";
 
 const mocks = vi.hoisted(() => ({
   sendText: vi.fn(),
@@ -25,7 +25,7 @@ const cfg = {
       code: "lidlut-tabwed-pillex-ridrup",
     },
   },
-} as OpenClawConfig;
+} as SteelEngineConfig;
 
 describe("tlon channel message adapter", () => {
   beforeEach(() => {

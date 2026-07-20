@@ -7,7 +7,7 @@ import {
 
 describeChannelCatalogEntryContract({
   channelId: "msteams",
-  npmSpec: "@openclaw/msteams",
+  npmSpec: "@steelengine/msteams",
   alias: "teams",
 });
 
@@ -22,17 +22,17 @@ const whatsappMeta = {
 
 describeBundledMetadataOnlyChannelCatalogContract({
   pluginId: "whatsapp",
-  packageName: "@openclaw/whatsapp",
-  npmSpec: "@openclaw/whatsapp",
+  packageName: "@steelengine/whatsapp",
+  npmSpec: "@steelengine/whatsapp",
   meta: whatsappMeta,
   defaultChoice: "npm",
 });
 
 describeOfficialFallbackChannelCatalogContract({
   channelId: "whatsapp",
-  npmSpec: "@openclaw/whatsapp",
+  npmSpec: "@steelengine/whatsapp",
   meta: whatsappMeta,
-  packageName: "@openclaw/whatsapp",
+  packageName: "@steelengine/whatsapp",
   pluginId: "whatsapp",
   externalNpmSpec: "@vendor/whatsapp-fork",
   externalLabel: "WhatsApp Fork",
@@ -40,18 +40,18 @@ describeOfficialFallbackChannelCatalogContract({
 
 describeChannelCatalogEntryContract({
   channelId: "wecom",
-  npmSpec: "@wecom/wecom-openclaw-plugin@2026.5.7",
+  npmSpec: "@wecom/wecom-steelengine-plugin@2026.5.7",
   alias: "wework",
 });
 
 describeChannelCatalogEntryContract({
   channelId: "yuanbao",
-  npmSpec: "openclaw-plugin-yuanbao@2.15.0",
+  npmSpec: "steelengine-plugin-yuanbao@2.15.0",
   alias: "yb",
 });
 
 describeChannelCatalogEntryContract({
-  channelId: "openclaw-zaloclawbot",
-  npmSpec: "@zalo-platforms/openclaw-zaloclawbot@0.1.4",
+  channelId: "steelengine-zaloclawbot",
+  npmSpec: "@zalo-platforms/steelengine-zaloclawbot@0.1.4",
   alias: "zaloclawbot",
 });

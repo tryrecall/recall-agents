@@ -1,9 +1,9 @@
 // Discord plugin module implements probe behavior.
-import type { BaseProbeResult } from "openclaw/plugin-sdk/channel-contract";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { resolveFetch } from "openclaw/plugin-sdk/fetch-runtime";
-import { readResponseWithLimit } from "openclaw/plugin-sdk/response-limit-runtime";
-import { fetchWithTimeout } from "openclaw/plugin-sdk/text-utility-runtime";
+import type { BaseProbeResult } from "steelengine/plugin-sdk/channel-contract";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { resolveFetch } from "steelengine/plugin-sdk/fetch-runtime";
+import { readResponseWithLimit } from "steelengine/plugin-sdk/response-limit-runtime";
+import { fetchWithTimeout } from "steelengine/plugin-sdk/text-utility-runtime";
 import { DiscordApiError, fetchDiscord } from "./api.js";
 import { normalizeDiscordToken } from "./token.js";
 

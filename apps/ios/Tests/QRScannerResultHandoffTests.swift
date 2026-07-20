@@ -1,6 +1,6 @@
-import OpenClawKit
+import SteelEngineKit
 import Testing
-@testable import OpenClaw
+@testable import SteelEngine
 
 @MainActor
 struct QRScannerResultHandoffTests {

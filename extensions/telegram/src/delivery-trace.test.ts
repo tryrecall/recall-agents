@@ -7,7 +7,7 @@
 // The scripted IN steps stand in for the model loop; OUT events are the grammY
 // Bot API calls (sendMessage / editMessageText / sendChatAction /
 // deleteMessage) observed at a recording API mock with scripted message ids.
-// Refresh goldens with OPENCLAW_TRACE_UPDATE=1 (see delivery-trace harness docs).
+// Refresh goldens with STEELENGINE_TRACE_UPDATE=1 (see delivery-trace harness docs).
 import type { Bot } from "grammy";
 import {
   deliveryTraceScenarios,
@@ -16,9 +16,9 @@ import {
   type DeliveryTraceInStep,
   type DeliveryTraceScenarioName,
   type WireRecorder,
-} from "openclaw/plugin-sdk/channel-contract-testing";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-payload";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/channel-contract-testing";
+import type { ReplyPayload } from "steelengine/plugin-sdk/reply-payload";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
 import { describe, it, vi } from "vitest";
 import type { TelegramBotDeps } from "./bot-deps.js";
 import {
@@ -36,8 +36,8 @@ const traceInboundDispatch = vi.hoisted(
   } => ({}),
 );
 
-vi.mock("openclaw/plugin-sdk/channel-inbound", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/channel-inbound")>();
+vi.mock("steelengine/plugin-sdk/channel-inbound", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("steelengine/plugin-sdk/channel-inbound")>();
   const { createTelegramChannelInboundTestRunner } =
     await import("./bot-channel-inbound.test-support.js");
   return {
@@ -175,7 +175,7 @@ function createTraceTelegramDeps(captured: {
       config: baseTelegramMessageContextConfig,
     })) as unknown as TelegramBotDeps["getRuntimeConfig"],
     resolveStorePath: (() =>
-      "/tmp/openclaw-trace-unused.json") as TelegramBotDeps["resolveStorePath"],
+      "/tmp/steelengine-trace-unused.json") as TelegramBotDeps["resolveStorePath"],
     // No session entry: keeps the transcript mirror and final-text recovery
     // inert so the trace stays a pure wire recording.
     getSessionEntry: (() => undefined) as TelegramBotDeps["getSessionEntry"],

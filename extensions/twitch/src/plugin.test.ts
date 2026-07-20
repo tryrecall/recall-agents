@@ -1,6 +1,6 @@
 // Twitch tests cover plugin plugin behavior.
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../api.js";
+import type { SteelEngineConfig } from "../api.js";
 import { twitchPlugin } from "./plugin.js";
 
 describe("twitchPlugin pairing", () => {
@@ -16,16 +16,16 @@ describe("twitchPlugin outbound session routing", () => {
       cfg: {},
       agentId: "ops",
       accountId: "stream",
-      target: "twitch:channel:OpenClaw",
+      target: "twitch:channel:SteelEngine",
     });
 
     expect(route).toMatchObject({
-      sessionKey: "agent:ops:twitch:group:openclaw",
-      baseSessionKey: "agent:ops:twitch:group:openclaw",
+      sessionKey: "agent:ops:twitch:group:steelengine",
+      baseSessionKey: "agent:ops:twitch:group:steelengine",
       recipientSessionExact: true,
-      peer: { kind: "group", id: "openclaw" },
+      peer: { kind: "group", id: "steelengine" },
       chatType: "group",
-      to: "openclaw",
+      to: "steelengine",
     });
   });
 
@@ -68,7 +68,7 @@ describe("twitchPlugin.status.buildAccountSnapshot", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     const snapshot = await twitchPlugin.status?.buildAccountSnapshot?.({
       account: secondary,
@@ -103,7 +103,7 @@ describe("twitchPlugin.config", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     expect(twitchPlugin.config.defaultAccountId?.(cfg)).toBe("secondary");
     expect(twitchPlugin.config.resolveAccount(cfg).accountId).toBe("secondary");

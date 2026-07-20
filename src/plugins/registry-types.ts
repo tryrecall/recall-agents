@@ -35,8 +35,8 @@ import type { PluginRuntime } from "./runtime/types.js";
 import type { SessionCatalogProvider } from "./session-catalog.js";
 import type { PluginDependencyStatus } from "./status-dependencies-core.js";
 import type {
-  OpenClawPluginHttpRouteAuth,
-  OpenClawPluginHttpRouteUpgradeHandler,
+  SteelEnginePluginHttpRouteAuth,
+  SteelEnginePluginHttpRouteUpgradeHandler,
 } from "./types.js";
 import type { PluginMcpServerConnectionResolverRegistration } from "./types.mcp-connection.js";
 type ChannelPlugin = import("../channels/plugins/types.plugin.js").ChannelPlugin;
@@ -45,22 +45,22 @@ type ImageGenerationProviderPlugin = import("./types.js").ImageGenerationProvide
 type MediaUnderstandingProviderPlugin = import("./types.js").MediaUnderstandingProviderPlugin;
 type TranscriptSourceProvider = import("./types.js").TranscriptSourceProvider;
 type MusicGenerationProviderPlugin = import("./types.js").MusicGenerationProviderPlugin;
-type OpenClawPluginCliCommandDescriptor = import("./types.js").OpenClawPluginCliCommandDescriptor;
-type OpenClawPluginCliRegistrar = import("./types.js").OpenClawPluginCliRegistrar;
-type OpenClawPluginCommandDefinition = import("./types.js").OpenClawPluginCommandDefinition;
+type SteelEnginePluginCliCommandDescriptor = import("./types.js").SteelEnginePluginCliCommandDescriptor;
+type SteelEnginePluginCliRegistrar = import("./types.js").SteelEnginePluginCliRegistrar;
+type SteelEnginePluginCommandDefinition = import("./types.js").SteelEnginePluginCommandDefinition;
 type PluginInteractiveHandlerRegistration =
   import("./types.js").PluginInteractiveHandlerRegistration;
-type OpenClawPluginGatewayRuntimeScopeSurface =
-  import("./types.js").OpenClawPluginGatewayRuntimeScopeSurface;
-type OpenClawGatewayDiscoveryService = import("./types.js").OpenClawGatewayDiscoveryService;
-type OpenClawPluginHttpRouteHandler = import("./types.js").OpenClawPluginHttpRouteHandler;
-type OpenClawPluginHttpRouteMatch = import("./types.js").OpenClawPluginHttpRouteMatch;
-type OpenClawPluginHostedMediaResolver = import("./types.js").OpenClawPluginHostedMediaResolver;
-type OpenClawPluginReloadRegistration = import("./types.js").OpenClawPluginReloadRegistration;
-type OpenClawPluginSecurityAuditCollector =
-  import("./types.js").OpenClawPluginSecurityAuditCollector;
-type OpenClawPluginService = import("./types.js").OpenClawPluginService;
-type OpenClawPluginToolFactory = import("./types.js").OpenClawPluginToolFactory;
+type SteelEnginePluginGatewayRuntimeScopeSurface =
+  import("./types.js").SteelEnginePluginGatewayRuntimeScopeSurface;
+type SteelEngineGatewayDiscoveryService = import("./types.js").SteelEngineGatewayDiscoveryService;
+type SteelEnginePluginHttpRouteHandler = import("./types.js").SteelEnginePluginHttpRouteHandler;
+type SteelEnginePluginHttpRouteMatch = import("./types.js").SteelEnginePluginHttpRouteMatch;
+type SteelEnginePluginHostedMediaResolver = import("./types.js").SteelEnginePluginHostedMediaResolver;
+type SteelEnginePluginReloadRegistration = import("./types.js").SteelEnginePluginReloadRegistration;
+type SteelEnginePluginSecurityAuditCollector =
+  import("./types.js").SteelEnginePluginSecurityAuditCollector;
+type SteelEnginePluginService = import("./types.js").SteelEnginePluginService;
+type SteelEnginePluginToolFactory = import("./types.js").SteelEnginePluginToolFactory;
 type PluginConversationBindingResolvedEvent =
   import("./types.js").PluginConversationBindingResolvedEvent;
 type TypedPluginHookRegistration = import("./types.js").PluginHookRegistration;
@@ -82,7 +82,7 @@ type UnifiedModelCatalogProviderPlugin = import("./types.js").UnifiedModelCatalo
 export type PluginToolRegistration = {
   pluginId: string;
   pluginName?: string;
-  factory: OpenClawPluginToolFactory;
+  factory: SteelEnginePluginToolFactory;
   names: string[];
   declaredNames?: string[];
   optional: boolean;
@@ -94,10 +94,10 @@ export type PluginToolRegistration = {
 type PluginCliRegistration = {
   pluginId: string;
   pluginName?: string;
-  register: OpenClawPluginCliRegistrar;
+  register: SteelEnginePluginCliRegistrar;
   parentPath: string[];
   commands: string[];
-  descriptors: OpenClawPluginCliCommandDescriptor[];
+  descriptors: SteelEnginePluginCliCommandDescriptor[];
   source: string;
   rootDir?: string;
 };
@@ -106,11 +106,11 @@ type PluginCliRegistration = {
 export type PluginHttpRouteRegistration = {
   pluginId?: string;
   path: string;
-  handler: OpenClawPluginHttpRouteHandler;
-  handleUpgrade?: OpenClawPluginHttpRouteUpgradeHandler;
-  auth: OpenClawPluginHttpRouteAuth;
-  match: OpenClawPluginHttpRouteMatch;
-  gatewayRuntimeScopeSurface?: OpenClawPluginGatewayRuntimeScopeSurface;
+  handler: SteelEnginePluginHttpRouteHandler;
+  handleUpgrade?: SteelEnginePluginHttpRouteUpgradeHandler;
+  auth: SteelEnginePluginHttpRouteAuth;
+  match: SteelEnginePluginHttpRouteMatch;
+  gatewayRuntimeScopeSurface?: SteelEnginePluginGatewayRuntimeScopeSurface;
   gatewayMethodDispatchAllowed?: boolean;
   nodeCapability?: {
     surface: string;
@@ -122,7 +122,7 @@ export type PluginHttpRouteRegistration = {
 type PluginHostedMediaResolverRegistration = {
   pluginId: string;
   pluginName?: string;
-  resolver: OpenClawPluginHostedMediaResolver;
+  resolver: SteelEnginePluginHostedMediaResolver;
   source: string;
   rootDir?: string;
 };
@@ -255,7 +255,7 @@ type PluginHookRegistration = {
 export type PluginServiceRegistration = {
   pluginId: string;
   pluginName?: string;
-  service: OpenClawPluginService;
+  service: SteelEnginePluginService;
   source: string;
   origin: PluginOrigin;
   trustedOfficialInstall?: boolean;
@@ -265,7 +265,7 @@ export type PluginServiceRegistration = {
 export type PluginGatewayDiscoveryServiceRegistration = {
   pluginId: string;
   pluginName?: string;
-  service: OpenClawGatewayDiscoveryService;
+  service: SteelEngineGatewayDiscoveryService;
   source: string;
   rootDir?: string;
 };
@@ -273,7 +273,7 @@ export type PluginGatewayDiscoveryServiceRegistration = {
 type PluginReloadRegistration = {
   pluginId: string;
   pluginName?: string;
-  registration: OpenClawPluginReloadRegistration;
+  registration: SteelEnginePluginReloadRegistration;
   source: string;
   rootDir?: string;
 };
@@ -281,7 +281,7 @@ type PluginReloadRegistration = {
 export type PluginNodeHostCommandRegistration = {
   pluginId: string;
   pluginName?: string;
-  command: import("./types.js").OpenClawPluginNodeHostCommand;
+  command: import("./types.js").SteelEnginePluginNodeHostCommand;
   source: string;
   rootDir?: string;
 };
@@ -289,7 +289,7 @@ export type PluginNodeHostCommandRegistration = {
 type PluginNodeInvokePolicyRegistration = {
   pluginId: string;
   pluginName?: string;
-  policy: import("./types.js").OpenClawPluginNodeInvokePolicy;
+  policy: import("./types.js").SteelEnginePluginNodeInvokePolicy;
   pluginConfig?: Record<string, unknown>;
   source: string;
   rootDir?: string;
@@ -298,7 +298,7 @@ type PluginNodeInvokePolicyRegistration = {
 type PluginSecurityAuditCollectorRegistration = {
   pluginId: string;
   pluginName?: string;
-  collector: OpenClawPluginSecurityAuditCollector;
+  collector: SteelEnginePluginSecurityAuditCollector;
   source: string;
   rootDir?: string;
 };
@@ -306,7 +306,7 @@ type PluginSecurityAuditCollectorRegistration = {
 export type PluginCommandRegistration = {
   pluginId: string;
   pluginName?: string;
-  command: OpenClawPluginCommandDefinition;
+  command: SteelEnginePluginCommandDefinition;
   source: string;
   rootDir?: string;
 };

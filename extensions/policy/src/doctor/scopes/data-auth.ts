@@ -1,5 +1,5 @@
 // Policy doctor health-check factories for one policy scope.
-import type { HealthCheck } from "openclaw/plugin-sdk/health";
+import type { HealthCheck } from "steelengine/plugin-sdk/health";
 import { repairPolicyAutomaticNarrower } from "../automatic-repairs.js";
 import { CHECK_IDS } from "../check-ids.js";
 import type { PolicyDoctorCheckDeps } from "../types.js";
@@ -73,7 +73,7 @@ export function createPolicyDataAuthChecks(deps: PolicyDoctorCheckDeps): readonl
     id: CHECK_IDS.policySecretsUnmanagedProvider,
     kind: "plugin",
     description:
-      "OpenClaw config SecretRefs use configured secret providers when policy requires managed providers.",
+      "SteelEngine config SecretRefs use configured secret providers when policy requires managed providers.",
     source: "policy",
     async detect(ctx) {
       return findingsForCheck(await evaluatePolicy(ctx), CHECK_IDS.policySecretsUnmanagedProvider);
@@ -83,7 +83,7 @@ export function createPolicyDataAuthChecks(deps: PolicyDoctorCheckDeps): readonl
     id: CHECK_IDS.policySecretsDeniedProviderSource,
     kind: "plugin",
     description:
-      "OpenClaw config secret providers and SecretRefs do not use sources denied by policy.",
+      "SteelEngine config secret providers and SecretRefs do not use sources denied by policy.",
     source: "policy",
     async detect(ctx) {
       return findingsForCheck(
@@ -105,7 +105,7 @@ export function createPolicyDataAuthChecks(deps: PolicyDoctorCheckDeps): readonl
   const policyAuthProfileInvalidMetadataCheck: HealthCheck = {
     id: CHECK_IDS.policyAuthProfileInvalidMetadata,
     kind: "plugin",
-    description: "OpenClaw config auth profiles declare required provider and mode metadata.",
+    description: "SteelEngine config auth profiles declare required provider and mode metadata.",
     source: "policy",
     async detect(ctx) {
       return findingsForCheck(
@@ -117,7 +117,7 @@ export function createPolicyDataAuthChecks(deps: PolicyDoctorCheckDeps): readonl
   const policyAuthProfileUnapprovedModeCheck: HealthCheck = {
     id: CHECK_IDS.policyAuthProfileUnapprovedMode,
     kind: "plugin",
-    description: "OpenClaw config auth profile modes stay within the policy allowlist.",
+    description: "SteelEngine config auth profile modes stay within the policy allowlist.",
     source: "policy",
     async detect(ctx) {
       return findingsForCheck(await evaluatePolicy(ctx), CHECK_IDS.policyAuthProfileUnapprovedMode);

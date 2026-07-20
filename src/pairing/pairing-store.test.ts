@@ -6,11 +6,11 @@ import path from "node:path";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { executeSqliteQuerySync, getNodeSqliteKysely } from "../infra/kysely-sync.js";
 import { DEFAULT_ACCOUNT_ID } from "../routing/session-key.js";
-import type { DB as OpenClawStateKyselyDatabase } from "../state/openclaw-state-db.generated.js";
+import type { DB as SteelEngineStateKyselyDatabase } from "../state/steelengine-state-db.generated.js";
 import {
-  closeOpenClawStateDatabaseForTest,
-  openOpenClawStateDatabase,
-} from "../state/openclaw-state-db.js";
+  closeSteelEngineStateDatabaseForTest,
+  openSteelEngineStateDatabase,
+} from "../state/steelengine-state-db.js";
 
 const pairingMocks = vi.hoisted(() => ({
   getPairingAdapter: vi.fn<
@@ -37,7 +37,7 @@ import {
 } from "./pairing-store.js";
 
 type PairingTestDatabase = Pick<
-  OpenClawStateKyselyDatabase,
+  SteelEngineStateKyselyDatabase,
   "channel_pairing_allow_entries" | "channel_pairing_requests"
 >;
 
@@ -46,11 +46,11 @@ let caseId = 0;
 type RandomIntSync = (minOrMax: number, max?: number) => number;
 
 beforeAll(() => {
-  fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-pairing-"));
+  fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-pairing-"));
 });
 
 afterAll(() => {
-  closeOpenClawStateDatabaseForTest();
+  closeSteelEngineStateDatabaseForTest();
   fs.rmSync(fixtureRoot, { recursive: true, force: true });
 });
 
@@ -63,13 +63,13 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
-  closeOpenClawStateDatabaseForTest();
+  closeSteelEngineStateDatabaseForTest();
 });
 
 function createTestEnv(): { stateDir: string; env: NodeJS.ProcessEnv } {
   const stateDir = path.join(fixtureRoot, `case-${caseId++}`);
   fs.mkdirSync(stateDir, { recursive: true });
-  return { stateDir, env: { ...process.env, OPENCLAW_STATE_DIR: stateDir } };
+  return { stateDir, env: { ...process.env, STEELENGINE_STATE_DIR: stateDir } };
 }
 
 function requireFirstPairingRequest(
@@ -155,7 +155,7 @@ describe("pairing store", () => {
 
   it("skips malformed persisted requests while approving valid codes", async () => {
     const { env } = createTestEnv();
-    const database = openOpenClawStateDatabase({ env });
+    const database = openSteelEngineStateDatabase({ env });
     const db = getNodeSqliteKysely<PairingTestDatabase>(database.db);
     executeSqliteQuerySync(
       database.db,

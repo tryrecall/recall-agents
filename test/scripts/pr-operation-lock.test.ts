@@ -22,7 +22,7 @@ import {
 import { tmpdir } from "node:os";
 import { delimiter, dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { useAutoCleanupTempDirTracker } from "../helpers/temp-dir.js";
 
@@ -33,7 +33,7 @@ const lockScript = join(repoRoot, "scripts/pr-lib/operation-lock.sh");
 const processGroupRunner = join(repoRoot, "scripts/pr-lib/process-group-runner.mjs");
 const managedChildUrl = pathToFileURL(join(repoRoot, "scripts/lib/managed-child-process.mjs")).href;
 const worktreeScript = join(repoRoot, "scripts/pr-lib/worktree.sh");
-const lockRef = "refs/openclaw/pr-operation-locks/42";
+const lockRef = "refs/steelengine/pr-operation-locks/42";
 const detachedChildren = new WeakSet<ChildProcess>();
 const goneProcessGroups = new Set<number>();
 let templateRepo = "";
@@ -41,7 +41,7 @@ let templateRepo = "";
 // Direct preload affects only the supervisor; operation fixtures keep real clocks.
 // The source assertions below pin the production safety durations being accelerated.
 function createProcessGroupTimingPreload() {
-  const dir = tempDirs.make("openclaw-pr-operation-lock-timing-");
+  const dir = tempDirs.make("steelengine-pr-operation-lock-timing-");
   const preloadPath = join(dir, "preload.cjs");
   writeFileSync(
     preloadPath,
@@ -67,10 +67,10 @@ function spawnDetached(command: string, args: readonly string[], options: SpawnO
 }
 
 function createTemplateRepo() {
-  const dir = mkdtempSync(join(tmpdir(), "openclaw-pr-operation-lock-template-"));
+  const dir = mkdtempSync(join(tmpdir(), "steelengine-pr-operation-lock-template-"));
   execFileSync("git", ["init", "-q", "-b", "main"], { cwd: dir });
-  execFileSync("git", ["config", "user.name", "OpenClaw Test"], { cwd: dir });
-  execFileSync("git", ["config", "user.email", "test@openclaw.invalid"], { cwd: dir });
+  execFileSync("git", ["config", "user.name", "SteelEngine Test"], { cwd: dir });
+  execFileSync("git", ["config", "user.email", "test@steelengine.invalid"], { cwd: dir });
   writeFileSync(join(dir, "base.txt"), "base\n");
   execFileSync("git", ["add", "base.txt"], { cwd: dir });
   execFileSync("git", ["commit", "-qm", "base"], { cwd: dir });
@@ -86,7 +86,7 @@ afterAll(() => {
 });
 
 function createRepo(nestedName?: string) {
-  const tempRoot = tempDirs.make("openclaw-pr-operation-lock-");
+  const tempRoot = tempDirs.make("steelengine-pr-operation-lock-");
   const dir = nestedName ? join(tempRoot, nestedName) : tempRoot;
   if (nestedName) {
     mkdirSync(dir);
@@ -101,7 +101,7 @@ function bashSource(repoDir: string, supervised = false) {
     "set -euo pipefail",
     ...(supervised
       ? []
-      : ["unset OPENCLAW_PR_LOCK_NOTIFY_FD", "unset OPENCLAW_PR_LOCK_SUPERVISOR_PID"]),
+      : ["unset STEELENGINE_PR_LOCK_NOTIFY_FD", "unset STEELENGINE_PR_LOCK_SUPERVISOR_PID"]),
     `source '${worktreeScript}'`,
     `source '${lockScript}'`,
     `source '${commonScript}'`,
@@ -781,11 +781,11 @@ describePosix("scripts/pr per-PR operation lock", () => {
     }
     const env: NodeJS.ProcessEnv = {
       ...process.env,
-      OPENCLAW_PR_DEDICATED_PROCESS_GROUP: "1",
+      STEELENGINE_PR_DEDICATED_PROCESS_GROUP: "1",
       PATH: `${binDir}:${process.env.PATH ?? ""}`,
     };
-    delete env.OPENCLAW_PR_LOCK_NOTIFY_FD;
-    delete env.OPENCLAW_PR_LOCK_SUPERVISOR_PID;
+    delete env.STEELENGINE_PR_LOCK_NOTIFY_FD;
+    delete env.STEELENGINE_PR_LOCK_SUPERVISOR_PID;
 
     const result = spawnSync(cli, ["review-init", "42"], {
       cwd: repoDir,
@@ -1031,7 +1031,7 @@ describePosix("scripts/pr per-PR operation lock", () => {
 
   it("releases the lock after the operation deletes its runner worktree", async () => {
     const repoDir = createRepo();
-    const doomedDir = tempDirs.make("openclaw-pr-self-deleting-runner-");
+    const doomedDir = tempDirs.make("steelengine-pr-self-deleting-runner-");
     const copiedLibDir = join(doomedDir, "pr-lib");
     mkdirSync(copiedLibDir, { recursive: true });
     for (const file of ["operation-lock.sh", "process-group-runner.mjs"]) {
@@ -1075,7 +1075,7 @@ describePosix("scripts/pr per-PR operation lock", () => {
     const sleepPath = join(binDir, "sleep");
     writeFileSync(sleepPath, "#!/bin/sh\nexit 0\n");
     chmodSync(sleepPath, 0o755);
-    const refLock = join(repoDir, ".git/refs/openclaw/pr-operation-locks/42.lock");
+    const refLock = join(repoDir, ".git/refs/steelengine/pr-operation-locks/42.lock");
     const fixture = writeOperationFixture(repoDir, "blocked-release.sh", [
       "acquire_pr_operation_lock 42",
       `: >'${refLock}'`,
@@ -1103,7 +1103,7 @@ describePosix("scripts/pr per-PR operation lock", () => {
   it("reports exact recovery when lock notification fails", () => {
     const repoDir = createRepo();
     const result = runLockShell(repoDir, [
-      "OPENCLAW_PR_LOCK_NOTIFY_FD=9",
+      "STEELENGINE_PR_LOCK_NOTIFY_FD=9",
       "set +e",
       "acquire_pr_operation_lock 42",
       "lock_status=$?",
@@ -1127,7 +1127,7 @@ describePosix("scripts/pr per-PR operation lock", () => {
 
   it("rejects a notification for a lock owned by another process group", async () => {
     const repoDir = createRepo();
-    const foreignRef = "refs/openclaw/pr-operation-locks/43";
+    const foreignRef = "refs/steelengine/pr-operation-locks/43";
     const foreignHeld = join(repoDir, "foreign-held");
     const foreignHolder = spawnHolder(repoDir, foreignHeld, 43);
     try {
@@ -1135,7 +1135,7 @@ describePosix("scripts/pr per-PR operation lock", () => {
       const foreignOid = refOid(repoDir, foreignRef);
       const fixture = writeOperationFixture(repoDir, "forged-notification.sh", [
         "acquire_pr_operation_lock 42",
-        `printf '%s\\t%s\\n' '${foreignRef}' '${foreignOid}' >&"$OPENCLAW_PR_LOCK_NOTIFY_FD"`,
+        `printf '%s\\t%s\\n' '${foreignRef}' '${foreignOid}' >&"$STEELENGINE_PR_LOCK_NOTIFY_FD"`,
       ]);
       const result = await runSupervisedFixture(repoDir, fixture);
 
@@ -1161,7 +1161,7 @@ describePosix("scripts/pr per-PR operation lock", () => {
     const repoDir = createRepo();
     const fixture = writeOperationFixture(repoDir, "malformed-notification.sh", [
       "acquire_pr_operation_lock 42",
-      `${command} >&"$OPENCLAW_PR_LOCK_NOTIFY_FD"`,
+      `${command} >&"$STEELENGINE_PR_LOCK_NOTIFY_FD"`,
     ]);
     const result = await runSupervisedFixture(repoDir, fixture);
     const ownerOid = refOid(repoDir);
@@ -1184,7 +1184,7 @@ describePosix("scripts/pr per-PR operation lock", () => {
     const repoDir = createRepo();
     const fixture = writeOperationFixture(repoDir, "oversized-notification.sh", [
       "acquire_pr_operation_lock 42",
-      `node -e 'process.stdout.write("x".repeat(8192))' >&"$OPENCLAW_PR_LOCK_NOTIFY_FD"`,
+      `node -e 'process.stdout.write("x".repeat(8192))' >&"$STEELENGINE_PR_LOCK_NOTIFY_FD"`,
     ]);
     const result = await runSupervisedFixture(repoDir, fixture);
     const ownerOid = refOid(repoDir);
@@ -1920,7 +1920,7 @@ describePosix("scripts/pr per-PR operation lock", () => {
       expect(await waitFor(() => existsSync(held))).toBe(true);
 
       const result = runLockShell(repoDir, [
-        "gh() { if [ \"$1 $2\" = 'repo view' ]; then printf 'openclaw/openclaw\\n'; else printf 'MERGED\\n'; fi; }",
+        "gh() { if [ \"$1 $2\" = 'repo view' ]; then printf 'steelengine/steelengine\\n'; else printf 'MERGED\\n'; fi; }",
         "gc_pr_worktrees false",
       ]);
       expect(result.status).toBe(0);

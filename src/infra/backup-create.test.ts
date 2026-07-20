@@ -3,23 +3,23 @@ import { rmSync } from "node:fs";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import * as tar from "tar";
 import { describe, expect, it, vi } from "vitest";
 import { saveAuthProfileStore } from "../agents/auth-profiles/store.js";
 import { backupVerifyCommand } from "../commands/backup-verify.js";
 import type { RuntimeEnv } from "../runtime.js";
-import { closeOpenClawAgentDatabasesForTest } from "../state/openclaw-agent-db.js";
+import { closeSteelEngineAgentDatabasesForTest } from "../state/steelengine-agent-db.js";
 import {
-  closeOpenClawStateDatabase,
-  openOpenClawStateDatabase,
-} from "../state/openclaw-state-db.js";
-import { resolveOpenClawStateSqlitePath } from "../state/openclaw-state-db.paths.js";
+  closeSteelEngineStateDatabase,
+  openSteelEngineStateDatabase,
+} from "../state/steelengine-state-db.js";
+import { resolveSteelEngineStateSqlitePath } from "../state/steelengine-state-db.paths.js";
 import {
-  sanitizeOpenClawGlobalStateSnapshot,
-  sanitizeOpenClawStateLeaseRows,
-} from "../state/openclaw-state-snapshot-sanitizer.js";
-import { withOpenClawTestState } from "../test-utils/openclaw-test-state.js";
+  sanitizeSteelEngineGlobalStateSnapshot,
+  sanitizeSteelEngineStateLeaseRows,
+} from "../state/steelengine-state-snapshot-sanitizer.js";
+import { withSteelEngineTestState } from "../test-utils/steelengine-test-state.js";
 import {
   createBackupArchive,
   formatBackupCreateSummary,
@@ -33,8 +33,8 @@ import { requireNodeSqlite } from "./node-sqlite.js";
 function makeResult(overrides: Partial<BackupCreateResult> = {}): BackupCreateResult {
   return {
     createdAt: "2026-01-01T00:00:00.000Z",
-    archiveRoot: "openclaw-backup-2026-01-01",
-    archivePath: "/tmp/openclaw-backup.tar.gz",
+    archiveRoot: "steelengine-backup-2026-01-01",
+    archivePath: "/tmp/steelengine-backup.tar.gz",
     dryRun: false,
     includeWorkspace: true,
     onlyConfig: false,
@@ -109,7 +109,7 @@ function createUnsafeIndexDrift(sqlitePath: string): void {
 }
 
 describe("formatBackupCreateSummary", () => {
-  const backupArchiveLine = "Backup archive: /tmp/openclaw-backup.tar.gz";
+  const backupArchiveLine = "Backup archive: /tmp/steelengine-backup.tar.gz";
 
   it.each([
     {
@@ -121,26 +121,26 @@ describe("formatBackupCreateSummary", () => {
             kind: "state",
             sourcePath: "/state",
             archivePath: "archive/state",
-            displayPath: "~/.openclaw",
+            displayPath: "~/.steelengine",
           },
         ],
         skipped: [
           {
             kind: "workspace",
             sourcePath: "/workspace",
-            displayPath: "~/Projects/openclaw",
+            displayPath: "~/Projects/steelengine",
             reason: "covered",
-            coveredBy: "~/.openclaw",
+            coveredBy: "~/.steelengine",
           },
         ],
       }),
       expected: [
         backupArchiveLine,
         "Included 1 path:",
-        "- state: ~/.openclaw",
+        "- state: ~/.steelengine",
         "Skipped 1 path:",
-        "- workspace: ~/Projects/openclaw (covered by ~/.openclaw)",
-        "Created /tmp/openclaw-backup.tar.gz",
+        "- workspace: ~/Projects/steelengine (covered by ~/.steelengine)",
+        "Created /tmp/steelengine-backup.tar.gz",
         "Archive verification: passed",
       ],
     },
@@ -153,21 +153,21 @@ describe("formatBackupCreateSummary", () => {
             kind: "config",
             sourcePath: "/config",
             archivePath: "archive/config",
-            displayPath: "~/.openclaw/config.json",
+            displayPath: "~/.steelengine/config.json",
           },
           {
             kind: "credentials",
             sourcePath: "/oauth",
             archivePath: "archive/oauth",
-            displayPath: "~/.openclaw/oauth",
+            displayPath: "~/.steelengine/oauth",
           },
         ],
       }),
       expected: [
         backupArchiveLine,
         "Included 2 paths:",
-        "- config: ~/.openclaw/config.json",
-        "- credentials: ~/.openclaw/oauth",
+        "- config: ~/.steelengine/config.json",
+        "- credentials: ~/.steelengine/oauth",
         "Dry run only; archive was not written.",
       ],
     },
@@ -184,28 +184,28 @@ describe("formatBackupCreateSummary", () => {
               kind: "state",
               sourcePath: "/state",
               archivePath: "archive/state",
-              displayPath: "~/.openclaw",
+              displayPath: "~/.steelengine",
             },
           ],
           skippedVolatileCount: 3,
         }),
       ),
     ).toEqual([
-      "Backup archive: /tmp/openclaw-backup.tar.gz",
+      "Backup archive: /tmp/steelengine-backup.tar.gz",
       "Included 1 path:",
-      "- state: ~/.openclaw",
-      "Created /tmp/openclaw-backup.tar.gz",
+      "- state: ~/.steelengine",
+      "Created /tmp/steelengine-backup.tar.gz",
       "Skipped 3 volatile files (live sessions, cron logs, queues, sockets, pid/tmp).",
     ]);
   });
 });
 
-describe("sanitizeOpenClawGlobalStateSnapshot", () => {
+describe("sanitizeSteelEngineGlobalStateSnapshot", () => {
   it("tolerates legacy databases without current transient tables", () => {
     const sqlite = requireNodeSqlite();
     const database = new sqlite.DatabaseSync(":memory:");
     try {
-      expect(() => sanitizeOpenClawGlobalStateSnapshot(database)).not.toThrow();
+      expect(() => sanitizeSteelEngineGlobalStateSnapshot(database)).not.toThrow();
     } finally {
       database.close();
     }
@@ -224,7 +224,7 @@ describe("sanitizeOpenClawGlobalStateSnapshot", () => {
         INSERT INTO plugin_blob_entries VALUES ('keep', 1);
       `);
 
-      sanitizeOpenClawStateLeaseRows(database);
+      sanitizeSteelEngineStateLeaseRows(database);
 
       expect(database.prepare("SELECT COUNT(*) AS count FROM state_leases").get()).toEqual({
         count: 0,
@@ -450,10 +450,10 @@ describe("writeTarArchiveWithRetry", () => {
 
 describe("createBackupVolatileStatCache", () => {
   it("lets tar filter a volatile file that disappears before lstat", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-volatile-stat-cache-",
+        prefix: "steelengine-backup-volatile-stat-cache-",
         scenario: "minimal",
       },
       async (state) => {
@@ -496,10 +496,10 @@ describe("createBackupVolatileStatCache", () => {
 
 describe("createBackupArchive", () => {
   it("falls back when injected nowMs is outside Date range", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-invalid-now-",
+        prefix: "steelengine-backup-invalid-now-",
         scenario: "minimal",
       },
       async (state) => {
@@ -516,7 +516,7 @@ describe("createBackupArchive", () => {
           });
 
           expect(result.createdAt).toBe("2026-05-30T12:00:00.000Z");
-          expect(path.basename(result.archivePath)).toContain("openclaw-backup.tar.gz");
+          expect(path.basename(result.archivePath)).toContain("steelengine-backup.tar.gz");
           expect(path.basename(result.archivePath)).not.toContain("NaN");
         } finally {
           dateNowSpy.mockRestore();
@@ -526,10 +526,10 @@ describe("createBackupArchive", () => {
   });
 
   it("falls back to epoch when injected nowMs and Date.now are outside Date range", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-invalid-fallback-now-",
+        prefix: "steelengine-backup-invalid-fallback-now-",
         scenario: "minimal",
       },
       async (state) => {
@@ -546,7 +546,7 @@ describe("createBackupArchive", () => {
           });
 
           expect(result.createdAt).toBe("1970-01-01T00:00:00.000Z");
-          expect(path.basename(result.archivePath)).toContain("openclaw-backup.tar.gz");
+          expect(path.basename(result.archivePath)).toContain("steelengine-backup.tar.gz");
           expect(path.basename(result.archivePath)).not.toContain("NaN");
         } finally {
           dateNowSpy.mockRestore();
@@ -556,10 +556,10 @@ describe("createBackupArchive", () => {
   });
 
   it("skips current live volatile state files while preserving workspace locks", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "split",
-        prefix: "openclaw-backup-volatile-",
+        prefix: "steelengine-backup-volatile-",
         scenario: "minimal",
       },
       async (state) => {
@@ -622,10 +622,10 @@ describe("createBackupArchive", () => {
   });
 
   it("scrubs transient SQLite queue and plugin blob rows from archive snapshots", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-sqlite-queue-",
+        prefix: "steelengine-backup-sqlite-queue-",
         scenario: "minimal",
       },
       async (state) => {
@@ -633,7 +633,7 @@ describe("createBackupArchive", () => {
         const extractDir = state.path("extract");
         await fs.mkdir(outputDir, { recursive: true });
         await fs.mkdir(extractDir, { recursive: true });
-        const { db } = openOpenClawStateDatabase({ env: state.env });
+        const { db } = openSteelEngineStateDatabase({ env: state.env });
         db.prepare(
           `
             INSERT INTO delivery_queue_entries (
@@ -685,10 +685,10 @@ describe("createBackupArchive", () => {
           });
           const entries = await listArchiveEntries(result.archivePath);
           const archivedDbEntry = entries.find((entry) =>
-            entry.endsWith("/state/state/openclaw.sqlite"),
+            entry.endsWith("/state/state/steelengine.sqlite"),
           );
           expect(archivedDbEntry).toBeDefined();
-          expect(entries.some((entry) => entry.endsWith("/state/state/openclaw.sqlite-wal"))).toBe(
+          expect(entries.some((entry) => entry.endsWith("/state/state/steelengine.sqlite-wal"))).toBe(
             false,
           );
 
@@ -735,25 +735,25 @@ describe("createBackupArchive", () => {
             count: 1,
           });
         } finally {
-          closeOpenClawStateDatabase();
+          closeSteelEngineStateDatabase();
         }
       },
     );
   });
 
   it("rejects stale secondary indexes before creating a backup archive", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-unsafe-index-",
+        prefix: "steelengine-backup-unsafe-index-",
         scenario: "minimal",
       },
       async (state) => {
         const outputDir = state.path("backups");
         await fs.mkdir(outputDir, { recursive: true });
-        openOpenClawStateDatabase({ env: state.env });
-        closeOpenClawStateDatabase();
-        createUnsafeIndexDrift(resolveOpenClawStateSqlitePath(state.env));
+        openSteelEngineStateDatabase({ env: state.env });
+        closeSteelEngineStateDatabase();
+        createUnsafeIndexDrift(resolveSteelEngineStateSqlitePath(state.env));
 
         await expect(
           createBackupArchive({
@@ -770,20 +770,20 @@ describe("createBackupArchive", () => {
   });
 
   it("rejects foreign-key violations before creating a backup archive", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-foreign-key-",
+        prefix: "steelengine-backup-foreign-key-",
         scenario: "minimal",
       },
       async (state) => {
         const outputDir = state.path("backups");
         await fs.mkdir(outputDir, { recursive: true });
-        openOpenClawStateDatabase({ env: state.env });
-        closeOpenClawStateDatabase();
+        openSteelEngineStateDatabase({ env: state.env });
+        closeSteelEngineStateDatabase();
 
         const sqlite = requireNodeSqlite();
-        const database = new sqlite.DatabaseSync(resolveOpenClawStateSqlitePath(state.env));
+        const database = new sqlite.DatabaseSync(resolveSteelEngineStateSqlitePath(state.env));
         try {
           database.exec("PRAGMA foreign_keys = OFF;");
           database
@@ -812,10 +812,10 @@ describe("createBackupArchive", () => {
   });
 
   it("snapshots per-agent SQLite auth stores without deleted secret pages", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-agent-sqlite-",
+        prefix: "steelengine-backup-agent-sqlite-",
         scenario: "minimal",
       },
       async (state) => {
@@ -837,10 +837,10 @@ describe("createBackupArchive", () => {
           state.agentDir(),
           { syncExternalCli: false },
         );
-        closeOpenClawAgentDatabasesForTest();
+        closeSteelEngineAgentDatabasesForTest();
         const sqlite = requireNodeSqlite();
-        const liveDbPath = path.join(state.agentDir(), "openclaw-agent.sqlite");
-        const deletedSecretMarker = "OPENCLAW_DELETED_SECRET_PAGE_MARKER";
+        const liveDbPath = path.join(state.agentDir(), "steelengine-agent.sqlite");
+        const deletedSecretMarker = "STEELENGINE_DELETED_SECRET_PAGE_MARKER";
         const deletedSecret = `${deletedSecretMarker}-${"x".repeat(16_384)}`;
         const liveDb = new sqlite.DatabaseSync(liveDbPath);
         try {
@@ -875,12 +875,12 @@ describe("createBackupArchive", () => {
         });
         const entries = await listArchiveEntries(result.archivePath);
         const archivedDbEntry = entries.find((entry) =>
-          entry.endsWith("/state/agents/main/agent/openclaw-agent.sqlite"),
+          entry.endsWith("/state/agents/main/agent/steelengine-agent.sqlite"),
         );
         expect(archivedDbEntry).toBeDefined();
         expect(
           entries.some((entry) =>
-            entry.endsWith("/state/agents/main/agent/openclaw-agent.sqlite-wal"),
+            entry.endsWith("/state/agents/main/agent/steelengine-agent.sqlite-wal"),
           ),
         ).toBe(false);
 
@@ -921,16 +921,16 @@ describe("createBackupArchive", () => {
   });
 
   it("snapshots and verifies a canonical agent database when the agent id is node_modules", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-agent-node-modules-",
+        prefix: "steelengine-backup-agent-node-modules-",
         scenario: "minimal",
       },
       async (state) => {
         const outputDir = state.path("backups");
         const extractDir = state.path("extract");
-        const dbPath = state.statePath("agents", "node_modules", "agent", "openclaw-agent.sqlite");
+        const dbPath = state.statePath("agents", "node_modules", "agent", "steelengine-agent.sqlite");
         await fs.mkdir(path.dirname(dbPath), { recursive: true });
         await fs.mkdir(outputDir, { recursive: true });
         await fs.mkdir(extractDir, { recursive: true });
@@ -958,12 +958,12 @@ describe("createBackupArchive", () => {
           });
           const entries = await listArchiveEntries(result.archivePath);
           const archivedDbEntry = entries.find((entry) =>
-            entry.endsWith("/state/agents/node_modules/agent/openclaw-agent.sqlite"),
+            entry.endsWith("/state/agents/node_modules/agent/steelengine-agent.sqlite"),
           );
           expect(archivedDbEntry).toBeDefined();
           expect(
             entries.some((entry) =>
-              entry.endsWith("/state/agents/node_modules/agent/openclaw-agent.sqlite-wal"),
+              entry.endsWith("/state/agents/node_modules/agent/steelengine-agent.sqlite-wal"),
             ),
           ).toBe(false);
 
@@ -991,10 +991,10 @@ describe("createBackupArchive", () => {
   });
 
   it("snapshots nested live SQLite databases with transaction continuity", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-nested-sqlite-",
+        prefix: "steelengine-backup-nested-sqlite-",
         scenario: "minimal",
       },
       async (state) => {
@@ -1098,10 +1098,10 @@ describe("createBackupArchive", () => {
   });
 
   it("fails closed when a plugin SQLite schema cannot be compacted safely", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-plugin-capability-",
+        prefix: "steelengine-backup-plugin-capability-",
         scenario: "minimal",
       },
       async (state) => {
@@ -1131,10 +1131,10 @@ describe("createBackupArchive", () => {
   });
 
   it("scrubs deleted plugin SQLite bytes from archive snapshots", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-plugin-deleted-bytes-",
+        prefix: "steelengine-backup-plugin-deleted-bytes-",
         scenario: "minimal",
       },
       async (state) => {
@@ -1182,10 +1182,10 @@ describe("createBackupArchive", () => {
   });
 
   it("fails instead of raw-copying malformed nested SQLite databases", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-malformed-sqlite-",
+        prefix: "steelengine-backup-malformed-sqlite-",
         scenario: "minimal",
       },
       async (state) => {
@@ -1209,10 +1209,10 @@ describe("createBackupArchive", () => {
   it.each(["late.sqlite", "late.sqlite-wal"])(
     "fails when SQLite-looking state appears after snapshot discovery: %s",
     async (lateName) => {
-      await withOpenClawTestState(
+      await withSteelEngineTestState(
         {
           layout: "state-only",
-          prefix: "openclaw-backup-late-sqlite-",
+          prefix: "steelengine-backup-late-sqlite-",
           scenario: "minimal",
         },
         async (state) => {
@@ -1257,10 +1257,10 @@ describe("createBackupArchive", () => {
   );
 
   it("omits pre-existing orphan SQLite sidecars without failing backup", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-orphan-sqlite-sidecars-",
+        prefix: "steelengine-backup-orphan-sqlite-sidecars-",
         scenario: "minimal",
       },
       async (state) => {
@@ -1291,10 +1291,10 @@ describe("createBackupArchive", () => {
   });
 
   it("omits transient memory reindex databases and sidecars", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-memory-reindex-lock-",
+        prefix: "steelengine-backup-memory-reindex-lock-",
         scenario: "minimal",
       },
       async (state) => {
@@ -1344,10 +1344,10 @@ describe("createBackupArchive", () => {
       return;
     }
 
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-symlinked-sqlite-",
+        prefix: "steelengine-backup-symlinked-sqlite-",
         scenario: "minimal",
       },
       async (state) => {
@@ -1381,17 +1381,17 @@ describe("createBackupArchive", () => {
       return;
     }
 
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-global-sqlite-symlink-",
+        prefix: "steelengine-backup-global-sqlite-symlink-",
         scenario: "minimal",
       },
       async (state) => {
         const outputDir = state.path("backups");
         const extractDir = state.path("extract");
         const backingDbPath = state.statePath("state", "backing-global.sqlite");
-        const linkedDbPath = state.statePath("state", "openclaw.sqlite");
+        const linkedDbPath = state.statePath("state", "steelengine.sqlite");
         const hardlinkedDbPath = state.statePath("state", "hardlinked-global.sqlite");
         await state.writeConfig({
           agents: {
@@ -1460,7 +1460,7 @@ describe("createBackupArchive", () => {
           const entries = await listArchiveEntryDetails(result.archivePath);
           const archivedDbEntries = entries.filter(
             (entry) =>
-              entry.path.endsWith("/state/state/openclaw.sqlite") ||
+              entry.path.endsWith("/state/state/steelengine.sqlite") ||
               entry.path.endsWith("/state/state/backing-global.sqlite") ||
               entry.path.endsWith("/state/state/hardlinked-global.sqlite"),
           );
@@ -1514,10 +1514,10 @@ describe("createBackupArchive", () => {
       return;
     }
 
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-agent-sqlite-alias-",
+        prefix: "steelengine-backup-agent-sqlite-alias-",
         scenario: "minimal",
       },
       async (state) => {
@@ -1525,7 +1525,7 @@ describe("createBackupArchive", () => {
         const extractDir = state.path("extract");
         const agentDir = state.statePath("agents", "main", "agent");
         const backingDbPath = path.join(agentDir, "backing-agent.sqlite");
-        const linkedDbPath = path.join(agentDir, "openclaw-agent.sqlite");
+        const linkedDbPath = path.join(agentDir, "steelengine-agent.sqlite");
         const hardlinkedDbPath = state.statePath("plugins", "dedicated", "agent-alias.sqlite");
         await fs.mkdir(agentDir, { recursive: true });
         await fs.mkdir(path.dirname(hardlinkedDbPath), { recursive: true });
@@ -1568,7 +1568,7 @@ describe("createBackupArchive", () => {
           const entries = await listArchiveEntryDetails(result.archivePath);
           const archivedDbEntries = entries.filter(
             (entry) =>
-              entry.path.endsWith("/state/agents/main/agent/openclaw-agent.sqlite") ||
+              entry.path.endsWith("/state/agents/main/agent/steelengine-agent.sqlite") ||
               entry.path.endsWith("/state/agents/main/agent/backing-agent.sqlite") ||
               entry.path.endsWith("/state/plugins/dedicated/agent-alias.sqlite"),
           );
@@ -1610,15 +1610,15 @@ describe("createBackupArchive", () => {
   });
 
   it("fails when the canonical global SQLite path is not a file", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-global-sqlite-directory-",
+        prefix: "steelengine-backup-global-sqlite-directory-",
         scenario: "minimal",
       },
       async (state) => {
         const outputDir = state.path("backups");
-        const globalDbPath = state.statePath("state", "openclaw.sqlite");
+        const globalDbPath = state.statePath("state", "steelengine.sqlite");
         await fs.mkdir(globalDbPath, { recursive: true });
         await fs.mkdir(outputDir, { recursive: true });
 
@@ -1635,10 +1635,10 @@ describe("createBackupArchive", () => {
   });
 
   it("omits reinstallable runtime trees and plugin dependencies while keeping plugin files", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-plugin-deps-",
+        prefix: "steelengine-backup-plugin-deps-",
         scenario: "minimal",
       },
       async (state) => {
@@ -1661,7 +1661,7 @@ describe("createBackupArchive", () => {
           );
         }
         await fs.writeFile(
-          path.join(stateDir, "extensions", "demo", "openclaw.plugin.json"),
+          path.join(stateDir, "extensions", "demo", "steelengine.plugin.json"),
           '{"id":"demo"}\n',
           "utf8",
         );
@@ -1705,7 +1705,7 @@ describe("createBackupArchive", () => {
         const entries = await listArchiveEntries(result.archivePath);
 
         const entrySuffixes = entries.map((entry) => entry.replace(/^.*\/state\//, "/state/"));
-        expect(entrySuffixes).toContain("/state/extensions/demo/openclaw.plugin.json");
+        expect(entrySuffixes).toContain("/state/extensions/demo/steelengine.plugin.json");
         expect(entrySuffixes).toContain("/state/extensions/demo/src/index.js");
         expect(entrySuffixes).toContain("/state/node_modules/root-dep/index.js");
         expect(entrySuffixes).toContain("/state/node_modules/root-dep/fixture.sqlite");
@@ -1731,24 +1731,24 @@ describe("createBackupArchive", () => {
   });
 
   it("preserves configured state paths nested under managed runtime roots", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-managed-root-workspace-",
+        prefix: "steelengine-backup-managed-root-workspace-",
         scenario: "minimal",
-        env: { OPENCLAW_OAUTH_DIR: undefined },
+        env: { STEELENGINE_OAUTH_DIR: undefined },
       },
       async (state) => {
         const stateDir = state.stateDir;
         const workspaceDir = path.join(stateDir, "dev", "workspace");
-        const runtimeDir = path.join(stateDir, "dev", "openclaw");
-        const configPath = path.join(stateDir, "git", "config", "openclaw.json");
+        const runtimeDir = path.join(stateDir, "dev", "steelengine");
+        const configPath = path.join(stateDir, "git", "config", "steelengine.json");
         const oauthDir = path.join(stateDir, "tools", "oauth");
         const toolRuntimeDir = path.join(stateDir, "tools", "runtime");
         const workspaceDbPath = path.join(workspaceDir, "workspace.sqlite");
         const outputDir = state.path("backups");
-        state.envVars.OPENCLAW_CONFIG_PATH = configPath;
-        state.envVars.OPENCLAW_OAUTH_DIR = oauthDir;
+        state.envVars.STEELENGINE_CONFIG_PATH = configPath;
+        state.envVars.STEELENGINE_OAUTH_DIR = oauthDir;
         state.applyEnv();
         await fs.mkdir(workspaceDir, { recursive: true });
         await fs.mkdir(runtimeDir, { recursive: true });
@@ -1792,13 +1792,13 @@ describe("createBackupArchive", () => {
         expect(
           entries.some((entry) => entry.endsWith("/state/dev/workspace/workspace.sqlite")),
         ).toBe(true);
-        expect(entries.some((entry) => entry.endsWith("/state/git/config/openclaw.json"))).toBe(
+        expect(entries.some((entry) => entry.endsWith("/state/git/config/steelengine.json"))).toBe(
           true,
         );
         expect(entries.some((entry) => entry.endsWith("/state/tools/oauth/credentials.json"))).toBe(
           true,
         );
-        expect(entries.some((entry) => entry.includes("/state/dev/openclaw/"))).toBe(false);
+        expect(entries.some((entry) => entry.includes("/state/dev/steelengine/"))).toBe(false);
         expect(entries.some((entry) => entry.includes("/state/tools/runtime/"))).toBe(false);
 
         const runtime: RuntimeEnv = { log: vi.fn(), error: vi.fn(), exit: vi.fn() };
@@ -1810,16 +1810,16 @@ describe("createBackupArchive", () => {
   });
 
   it("dereferences hardlinks instead of emitting restore-hostile Link entries", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-hardlink-",
+        prefix: "steelengine-backup-hardlink-",
         scenario: "minimal",
       },
       async (state) => {
         const stateDir = state.stateDir;
         const outputDir = state.path("backups");
-        const sourcePath = path.join(stateDir, "workspace-adx", "openclaw-src", "node_modules");
+        const sourcePath = path.join(stateDir, "workspace-adx", "steelengine-src", "node_modules");
         const targetPath = path.join(sourcePath, "esbuild", "bin", "esbuild");
         const hardlinkPath = path.join(sourcePath, "@esbuild", "darwin-arm64", "bin", "esbuild");
         await fs.mkdir(path.dirname(targetPath), { recursive: true });
@@ -1849,10 +1849,10 @@ describe("createBackupArchive", () => {
   });
 
   it("does not duplicate the root manifest when the system tempdir lives inside the state dir", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-tmp-overlap-",
+        prefix: "steelengine-backup-tmp-overlap-",
         scenario: "minimal",
       },
       async (state) => {
@@ -1886,10 +1886,10 @@ describe("createBackupArchive", () => {
   });
 
   it("does not duplicate the root manifest when the system tempdir is the state dir itself", async () => {
-    await withOpenClawTestState(
+    await withSteelEngineTestState(
       {
         layout: "state-only",
-        prefix: "openclaw-backup-tmp-equals-state-",
+        prefix: "steelengine-backup-tmp-equals-state-",
         scenario: "minimal",
       },
       async (state) => {
@@ -1917,7 +1917,7 @@ describe("createBackupArchive", () => {
             entry.endsWith("/state/plugins/dedicated/empty.sqlite"),
           );
           expect(emptyDbEntries).toHaveLength(1);
-          expect(entries.some((entry) => entry.includes("/openclaw-state-db-"))).toBe(false);
+          expect(entries.some((entry) => entry.includes("/steelengine-state-db-"))).toBe(false);
 
           await tar.x({ file: result.archivePath, gzip: true, cwd: extractDir });
           const sqlite = requireNodeSqlite();
@@ -1961,10 +1961,10 @@ describe("createBackupArchive", () => {
             )
         : undefined;
       try {
-        await withOpenClawTestState(
+        await withSteelEngineTestState(
           {
             layout: "state-only",
-            prefix: "openclaw-backup-mode-",
+            prefix: "steelengine-backup-mode-",
             scenario: "minimal",
           },
           async (state) => {

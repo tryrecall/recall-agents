@@ -1,13 +1,13 @@
-import { extensionForMime } from "openclaw/plugin-sdk/media-mime";
+import { extensionForMime } from "steelengine/plugin-sdk/media-mime";
 import {
   assertOkOrThrowHttpError,
   executeProviderOperationWithRetry,
   fetchWithTimeoutGuarded,
   type ProviderOperationTimeoutMs,
-} from "openclaw/plugin-sdk/provider-http";
-import { readResponseWithLimit } from "openclaw/plugin-sdk/response-limit-runtime";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
-import type { GeneratedVideoAsset } from "openclaw/plugin-sdk/video-generation";
+} from "steelengine/plugin-sdk/provider-http";
+import { readResponseWithLimit } from "steelengine/plugin-sdk/response-limit-runtime";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
+import type { GeneratedVideoAsset } from "steelengine/plugin-sdk/video-generation";
 
 export type XaiVideoRequestPolicy = {
   allowPrivateNetwork: boolean;

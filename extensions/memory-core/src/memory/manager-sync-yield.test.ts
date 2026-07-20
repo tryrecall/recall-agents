@@ -4,34 +4,34 @@ import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
 import {
   resolveSessionTranscriptsDirForAgent,
-  type OpenClawConfig,
+  type SteelEngineConfig,
   type ResolvedMemorySearchConfig,
-} from "openclaw/plugin-sdk/memory-core-host-engine-foundation";
+} from "steelengine/plugin-sdk/memory-core-host-engine-foundation";
 import {
   ensureMemoryIndexSchema,
   requireNodeSqlite,
   type MemorySource,
-} from "openclaw/plugin-sdk/memory-core-host-engine-storage";
+} from "steelengine/plugin-sdk/memory-core-host-engine-storage";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { buildSessionEntryMock } = vi.hoisted(() => ({
   buildSessionEntryMock: vi.fn(),
 }));
-const originalSyncYieldStateDir = process.env.OPENCLAW_STATE_DIR;
+const originalSyncYieldStateDir = process.env.STEELENGINE_STATE_DIR;
 
 function setSyncYieldStateDir(): void {
   Reflect.set(
     process.env,
-    "OPENCLAW_STATE_DIR",
-    path.join(os.tmpdir(), "openclaw-session-sync-yield"),
+    "STEELENGINE_STATE_DIR",
+    path.join(os.tmpdir(), "steelengine-session-sync-yield"),
   );
 }
 
 function restoreSyncYieldStateDir(): void {
   if (originalSyncYieldStateDir === undefined) {
-    Reflect.deleteProperty(process.env, "OPENCLAW_STATE_DIR");
+    Reflect.deleteProperty(process.env, "STEELENGINE_STATE_DIR");
   } else {
-    Reflect.set(process.env, "OPENCLAW_STATE_DIR", originalSyncYieldStateDir);
+    Reflect.set(process.env, "STEELENGINE_STATE_DIR", originalSyncYieldStateDir);
   }
 }
 
@@ -48,9 +48,9 @@ vi.mock("undici", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/memory-core-host-engine-qmd", async (importOriginal) => {
+vi.mock("steelengine/plugin-sdk/memory-core-host-engine-qmd", async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import("openclaw/plugin-sdk/memory-core-host-engine-qmd")>();
+    await importOriginal<typeof import("steelengine/plugin-sdk/memory-core-host-engine-qmd")>();
   const basename = (filePath: string) => filePath.split(/[\\/]/).pop() ?? filePath;
   return {
     ...actual,
@@ -104,9 +104,9 @@ function createDbMock(): DatabaseSync {
 }
 
 class SessionSyncYieldHarness extends MemoryManagerSyncOps {
-  protected readonly cfg = {} as OpenClawConfig;
+  protected readonly cfg = {} as SteelEngineConfig;
   protected readonly agentId = "main";
-  protected readonly workspaceDir = "/tmp/openclaw-test-workspace";
+  protected readonly workspaceDir = "/tmp/steelengine-test-workspace";
   protected readonly settings = {
     sync: {
       sessions: {

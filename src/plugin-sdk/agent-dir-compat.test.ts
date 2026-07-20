@@ -2,23 +2,23 @@
  * Tests agent directory compatibility helpers.
  */
 import { describe, expect, it } from "vitest";
-import { resolveOpenClawAgentDir } from "./agent-dir-compat.js";
+import { resolveSteelEngineAgentDir } from "./agent-dir-compat.js";
 
-describe("resolveOpenClawAgentDir", () => {
+describe("resolveSteelEngineAgentDir", () => {
   it("keeps the shipped Pi env alias for deprecated plugin SDK callers", () => {
     expect(
-      resolveOpenClawAgentDir({
-        PI_CODING_AGENT_DIR: "/tmp/openclaw-legacy-agent",
+      resolveSteelEngineAgentDir({
+        PI_CODING_AGENT_DIR: "/tmp/steelengine-legacy-agent",
       }),
-    ).toBe("/tmp/openclaw-legacy-agent");
+    ).toBe("/tmp/steelengine-legacy-agent");
   });
 
-  it("prefers the OpenClaw env override over the deprecated Pi alias", () => {
+  it("prefers the SteelEngine env override over the deprecated Pi alias", () => {
     expect(
-      resolveOpenClawAgentDir({
-        OPENCLAW_AGENT_DIR: "/tmp/openclaw-agent",
-        PI_CODING_AGENT_DIR: "/tmp/openclaw-legacy-agent",
+      resolveSteelEngineAgentDir({
+        STEELENGINE_AGENT_DIR: "/tmp/steelengine-agent",
+        PI_CODING_AGENT_DIR: "/tmp/steelengine-legacy-agent",
       }),
-    ).toBe("/tmp/openclaw-agent");
+    ).toBe("/tmp/steelengine-agent");
   });
 });

@@ -2,13 +2,13 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   listManagedPluginNpmRoots: vi.fn(),
   repairMissingConfiguredPluginInstalls: vi.fn(),
-  relinkOpenClawPeerDependenciesInManagedNpmRoot: vi.fn(),
+  relinkSteelEnginePeerDependenciesInManagedNpmRoot: vi.fn(),
   runPluginPayloadSmokeCheck: vi.fn(),
 }));
 
@@ -16,8 +16,8 @@ vi.mock("../../commands/doctor/shared/missing-configured-plugin-install.js", () 
   repairMissingConfiguredPluginInstalls: mocks.repairMissingConfiguredPluginInstalls,
 }));
 vi.mock("../../plugins/plugin-peer-link.js", () => ({
-  relinkOpenClawPeerDependenciesInManagedNpmRoot:
-    mocks.relinkOpenClawPeerDependenciesInManagedNpmRoot,
+  relinkSteelEnginePeerDependenciesInManagedNpmRoot:
+    mocks.relinkSteelEnginePeerDependenciesInManagedNpmRoot,
 }));
 vi.mock("../../plugins/npm-project-roots.js", () => ({
   listManagedPluginNpmRoots: mocks.listManagedPluginNpmRoots,
@@ -26,7 +26,7 @@ vi.mock("./plugin-payload-validation.js", () => ({
   runPluginPayloadSmokeCheck: mocks.runPluginPayloadSmokeCheck,
 }));
 
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { VERSION } from "../../version.js";
 import {
   filterRecordsToActive,
@@ -50,7 +50,7 @@ describe("runPostCorePluginConvergence", () => {
       warnings: [],
       records: {},
     });
-    mocks.relinkOpenClawPeerDependenciesInManagedNpmRoot.mockResolvedValue({
+    mocks.relinkSteelEnginePeerDependenciesInManagedNpmRoot.mockResolvedValue({
       checked: 0,
       attempted: 0,
       repaired: 0,
@@ -66,7 +66,7 @@ describe("runPostCorePluginConvergence", () => {
   });
 
   function makeTempDir(): string {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-post-core-convergence-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-post-core-convergence-"));
     tempDirs.push(dir);
     return dir;
   }
@@ -76,7 +76,7 @@ describe("runPostCorePluginConvergence", () => {
     fs.mkdirSync(pluginDir, { recursive: true });
     fs.writeFileSync(path.join(pluginDir, "index.js"), "export default {};\n", "utf8");
     fs.writeFileSync(
-      path.join(pluginDir, "openclaw.plugin.json"),
+      path.join(pluginDir, "steelengine.plugin.json"),
       JSON.stringify({
         id: pluginId,
         name: pluginId,
@@ -88,7 +88,7 @@ describe("runPostCorePluginConvergence", () => {
     fs.writeFileSync(
       path.join(pluginDir, "package.json"),
       JSON.stringify({
-        name: `@openclaw/${pluginId}`,
+        name: `@steelengine/${pluginId}`,
         version: "2026.5.20-beta.1",
       }),
       "utf8",
@@ -96,19 +96,19 @@ describe("runPostCorePluginConvergence", () => {
     return pluginDir;
   }
 
-  it("calls repair with OPENCLAW_UPDATE_POST_CORE_CONVERGENCE=1 set", async () => {
-    const cfg = { plugins: { entries: {} } } as unknown as OpenClawConfig;
+  it("calls repair with STEELENGINE_UPDATE_POST_CORE_CONVERGENCE=1 set", async () => {
+    const cfg = { plugins: { entries: {} } } as unknown as SteelEngineConfig;
     await runPostCorePluginConvergence({
       cfg,
-      env: { OPENCLAW_UPDATE_IN_PROGRESS: "1" },
+      env: { STEELENGINE_UPDATE_IN_PROGRESS: "1" },
     });
     expect(mocks.repairMissingConfiguredPluginInstalls).toHaveBeenCalledTimes(1);
     expect(mocks.repairMissingConfiguredPluginInstalls).toHaveBeenCalledWith({
       cfg,
       env: {
-        OPENCLAW_UPDATE_IN_PROGRESS: "1",
-        OPENCLAW_COMPATIBILITY_HOST_VERSION: VERSION,
-        OPENCLAW_UPDATE_POST_CORE_CONVERGENCE: "1",
+        STEELENGINE_UPDATE_IN_PROGRESS: "1",
+        STEELENGINE_COMPATIBILITY_HOST_VERSION: VERSION,
+        STEELENGINE_UPDATE_POST_CORE_CONVERGENCE: "1",
       },
     });
   });
@@ -119,33 +119,33 @@ describe("runPostCorePluginConvergence", () => {
         deny: ["disabled"],
         entries: { active: { enabled: true }, disabled: { enabled: true } },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     const records = {
       active: { source: "npm" as const, installPath: "/p/active" },
       disabled: { source: "npm" as const, installPath: "/p/disabled" },
     };
 
-    await runActivePluginPayloadSmokeCheck({ cfg, records, env: { OPENCLAW_STATE_DIR: "/state" } });
+    await runActivePluginPayloadSmokeCheck({ cfg, records, env: { STEELENGINE_STATE_DIR: "/state" } });
 
     expect(mocks.runPluginPayloadSmokeCheck).toHaveBeenCalledWith({
       records: { active: records.active },
-      env: { OPENCLAW_STATE_DIR: "/state" },
+      env: { STEELENGINE_STATE_DIR: "/state" },
     });
     expect(mocks.repairMissingConfiguredPluginInstalls).not.toHaveBeenCalled();
-    expect(mocks.relinkOpenClawPeerDependenciesInManagedNpmRoot).not.toHaveBeenCalled();
+    expect(mocks.relinkSteelEnginePeerDependenciesInManagedNpmRoot).not.toHaveBeenCalled();
   });
 
   it("uses the candidate runtime version over a stale inherited host version", async () => {
-    const cfg = { plugins: { entries: {} } } as unknown as OpenClawConfig;
+    const cfg = { plugins: { entries: {} } } as unknown as SteelEngineConfig;
     await runPostCorePluginConvergence({
       cfg,
-      env: { OPENCLAW_COMPATIBILITY_HOST_VERSION: "2026.5.12" },
+      env: { STEELENGINE_COMPATIBILITY_HOST_VERSION: "2026.5.12" },
     });
     expect(mocks.repairMissingConfiguredPluginInstalls).toHaveBeenCalledWith({
       cfg,
       env: {
-        OPENCLAW_COMPATIBILITY_HOST_VERSION: VERSION,
-        OPENCLAW_UPDATE_POST_CORE_CONVERGENCE: "1",
+        STEELENGINE_COMPATIBILITY_HOST_VERSION: VERSION,
+        STEELENGINE_UPDATE_POST_CORE_CONVERGENCE: "1",
       },
     });
   });
@@ -159,7 +159,7 @@ describe("runPostCorePluginConvergence", () => {
     const result = await runPostCorePluginConvergence({
       cfg: {
         plugins: { entries: { discord: { enabled: true } } },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       env: {},
     });
     expect(result.errored).toBe(false);
@@ -174,7 +174,7 @@ describe("runPostCorePluginConvergence", () => {
       records: { discord: { source: "npm", installPath: "/p/discord" } },
     });
     const result = await runPostCorePluginConvergence({
-      cfg: { plugins: { entries: { discord: { enabled: true } } } } as unknown as OpenClawConfig,
+      cfg: { plugins: { entries: { discord: { enabled: true } } } } as unknown as SteelEngineConfig,
       env: {},
     });
     expect(result.installRecords).toEqual({
@@ -182,17 +182,17 @@ describe("runPostCorePluginConvergence", () => {
     });
   });
 
-  it("repairs managed npm openclaw peer links in every managed npm project before payload smoke checks", async () => {
+  it("repairs managed npm steelengine peer links in every managed npm project before payload smoke checks", async () => {
     mocks.repairMissingConfiguredPluginInstalls.mockResolvedValue({
       changes: [],
       warnings: [],
       records: { codex: { source: "npm", installPath: "/p/codex" } },
     });
     mocks.listManagedPluginNpmRoots.mockResolvedValue([
-      "/tmp/openclaw-state/npm",
-      "/tmp/openclaw-state/npm/projects/codex",
+      "/tmp/steelengine-state/npm",
+      "/tmp/steelengine-state/npm/projects/codex",
     ]);
-    mocks.relinkOpenClawPeerDependenciesInManagedNpmRoot
+    mocks.relinkSteelEnginePeerDependenciesInManagedNpmRoot
       .mockResolvedValueOnce({
         checked: 0,
         attempted: 0,
@@ -207,25 +207,25 @@ describe("runPostCorePluginConvergence", () => {
       });
 
     const result = await runPostCorePluginConvergence({
-      cfg: { plugins: { entries: { codex: { enabled: true } } } } as unknown as OpenClawConfig,
-      env: { OPENCLAW_STATE_DIR: "/tmp/openclaw-state" },
+      cfg: { plugins: { entries: { codex: { enabled: true } } } } as unknown as SteelEngineConfig,
+      env: { STEELENGINE_STATE_DIR: "/tmp/steelengine-state" },
     });
 
-    expect(mocks.relinkOpenClawPeerDependenciesInManagedNpmRoot).toHaveBeenNthCalledWith(1, {
-      npmRoot: "/tmp/openclaw-state/npm",
+    expect(mocks.relinkSteelEnginePeerDependenciesInManagedNpmRoot).toHaveBeenNthCalledWith(1, {
+      npmRoot: "/tmp/steelengine-state/npm",
       logger: {},
       onPackageReadError: expect.any(Function),
     });
-    expect(mocks.relinkOpenClawPeerDependenciesInManagedNpmRoot).toHaveBeenNthCalledWith(2, {
-      npmRoot: "/tmp/openclaw-state/npm/projects/codex",
+    expect(mocks.relinkSteelEnginePeerDependenciesInManagedNpmRoot).toHaveBeenNthCalledWith(2, {
+      npmRoot: "/tmp/steelengine-state/npm/projects/codex",
       logger: {},
       onPackageReadError: expect.any(Function),
     });
     expect(result.changes).toEqual([
-      "Repaired OpenClaw host peer link(s) for 1 managed npm plugin package(s).",
+      "Repaired SteelEngine host peer link(s) for 1 managed npm plugin package(s).",
     ]);
     expect(
-      mocks.relinkOpenClawPeerDependenciesInManagedNpmRoot.mock.invocationCallOrder[0],
+      mocks.relinkSteelEnginePeerDependenciesInManagedNpmRoot.mock.invocationCallOrder[0],
     ).toBeLessThan(
       expectDefined(
         mocks.runPluginPayloadSmokeCheck.mock.invocationCallOrder[0],
@@ -238,7 +238,7 @@ describe("runPostCorePluginConvergence", () => {
     const baseline = { matrix: { source: "npm" as const, installPath: "/p/matrix" } };
     const cfg = {
       plugins: { entries: { matrix: { enabled: true } } },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     mocks.repairMissingConfiguredPluginInstalls.mockResolvedValue({
       changes: [],
       warnings: [],
@@ -253,8 +253,8 @@ describe("runPostCorePluginConvergence", () => {
     expect(mocks.repairMissingConfiguredPluginInstalls).toHaveBeenCalledWith({
       cfg,
       env: {
-        OPENCLAW_COMPATIBILITY_HOST_VERSION: VERSION,
-        OPENCLAW_UPDATE_POST_CORE_CONVERGENCE: "1",
+        STEELENGINE_COMPATIBILITY_HOST_VERSION: VERSION,
+        STEELENGINE_UPDATE_POST_CORE_CONVERGENCE: "1",
       },
       baselineRecords: baseline,
     });
@@ -278,13 +278,13 @@ describe("runPostCorePluginConvergence", () => {
     });
     const cfg = {
       plugins: { entries: { discord: { enabled: true }, brave: { enabled: true } } },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
 
     const result = await runPostCorePluginConvergence({
       cfg,
       env: {
-        OPENCLAW_BUNDLED_PLUGINS_DIR: bundledRoot,
-        OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
+        STEELENGINE_BUNDLED_PLUGINS_DIR: bundledRoot,
+        STEELENGINE_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
         VITEST: "true",
       },
       baselineInstallRecords: baseline,
@@ -293,11 +293,11 @@ describe("runPostCorePluginConvergence", () => {
     expect(mocks.repairMissingConfiguredPluginInstalls).toHaveBeenCalledWith({
       cfg,
       env: {
-        OPENCLAW_BUNDLED_PLUGINS_DIR: bundledRoot,
-        OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
+        STEELENGINE_BUNDLED_PLUGINS_DIR: bundledRoot,
+        STEELENGINE_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
         VITEST: "true",
-        OPENCLAW_COMPATIBILITY_HOST_VERSION: VERSION,
-        OPENCLAW_UPDATE_POST_CORE_CONVERGENCE: "1",
+        STEELENGINE_COMPATIBILITY_HOST_VERSION: VERSION,
+        STEELENGINE_UPDATE_POST_CORE_CONVERGENCE: "1",
       },
       baselineRecords: {
         brave: baseline.brave,
@@ -312,7 +312,7 @@ describe("runPostCorePluginConvergence", () => {
   it("forwards ClawHub risk acknowledgement options to repair", async () => {
     const cfg = {
       plugins: { entries: { matrix: { enabled: true } } },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     const onClawHubRisk = vi.fn(async () => true);
     await runPostCorePluginConvergence({
       cfg,
@@ -324,8 +324,8 @@ describe("runPostCorePluginConvergence", () => {
     expect(mocks.repairMissingConfiguredPluginInstalls).toHaveBeenCalledWith({
       cfg,
       env: {
-        OPENCLAW_COMPATIBILITY_HOST_VERSION: VERSION,
-        OPENCLAW_UPDATE_POST_CORE_CONVERGENCE: "1",
+        STEELENGINE_COMPATIBILITY_HOST_VERSION: VERSION,
+        STEELENGINE_UPDATE_POST_CORE_CONVERGENCE: "1",
       },
       acknowledgeClawHubRisk: true,
       onClawHubRisk,
@@ -336,24 +336,24 @@ describe("runPostCorePluginConvergence", () => {
     mocks.repairMissingConfiguredPluginInstalls.mockResolvedValue({
       changes: [],
       warnings: [
-        'Failed to install missing configured plugin "discord" from @openclaw/discord: ENETUNREACH.',
+        'Failed to install missing configured plugin "discord" from @steelengine/discord: ENETUNREACH.',
       ],
       records: {},
     });
     const result = await runPostCorePluginConvergence({
       cfg: {
         plugins: { entries: { discord: { enabled: true } } },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       env: {},
     });
     expect(result.errored).toBe(false);
     expect(result.warnings).toStrictEqual([
       {
         reason:
-          'Failed to install missing configured plugin "discord" from @openclaw/discord: ENETUNREACH.',
+          'Failed to install missing configured plugin "discord" from @steelengine/discord: ENETUNREACH.',
         message:
-          'Failed to install missing configured plugin "discord" from @openclaw/discord: ENETUNREACH.',
-        guidance: ["Run `openclaw update repair` to retry plugin repair."],
+          'Failed to install missing configured plugin "discord" from @steelengine/discord: ENETUNREACH.',
+        guidance: ["Run `steelengine update repair` to retry plugin repair."],
       },
     ]);
   });
@@ -362,7 +362,7 @@ describe("runPostCorePluginConvergence", () => {
     mocks.repairMissingConfiguredPluginInstalls.mockResolvedValue({
       changes: [],
       warnings: [
-        'Failed to install missing configured plugin "matrix" from clawhub:@openclaw/matrix@beta: ClawHub ClawPack download for @openclaw/matrix@2026.6.1-beta.1 body stalled after 30000ms.',
+        'Failed to install missing configured plugin "matrix" from clawhub:@steelengine/matrix@beta: ClawHub ClawPack download for @steelengine/matrix@2026.6.1-beta.1 body stalled after 30000ms.',
       ],
       failedPluginIds: ["matrix"],
       records: {},
@@ -370,17 +370,17 @@ describe("runPostCorePluginConvergence", () => {
     const result = await runPostCorePluginConvergence({
       cfg: {
         plugins: { entries: { matrix: { enabled: true } } },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       env: {},
     });
     expect(result.errored).toBe(false);
     expect(result.warnings).toStrictEqual([
       {
         reason:
-          'Failed to install missing configured plugin "matrix" from clawhub:@openclaw/matrix@beta: ClawHub ClawPack download for @openclaw/matrix@2026.6.1-beta.1 body stalled after 30000ms.',
+          'Failed to install missing configured plugin "matrix" from clawhub:@steelengine/matrix@beta: ClawHub ClawPack download for @steelengine/matrix@2026.6.1-beta.1 body stalled after 30000ms.',
         message:
-          'Failed to install missing configured plugin "matrix" from clawhub:@openclaw/matrix@beta: ClawHub ClawPack download for @openclaw/matrix@2026.6.1-beta.1 body stalled after 30000ms.',
-        guidance: ["Run `openclaw update repair` to retry plugin repair."],
+          'Failed to install missing configured plugin "matrix" from clawhub:@steelengine/matrix@beta: ClawHub ClawPack download for @steelengine/matrix@2026.6.1-beta.1 body stalled after 30000ms.',
+        guidance: ["Run `steelengine update repair` to retry plugin repair."],
       },
     ]);
     expect(mocks.runPluginPayloadSmokeCheck).toHaveBeenCalledWith({
@@ -393,7 +393,7 @@ describe("runPostCorePluginConvergence", () => {
     mocks.repairMissingConfiguredPluginInstalls.mockResolvedValue({
       changes: [],
       warnings: [
-        'Failed to install missing configured plugin "discord" from @openclaw/discord: ENETUNREACH.',
+        'Failed to install missing configured plugin "discord" from @steelengine/discord: ENETUNREACH.',
       ],
       failedPluginIds: ["discord"],
       records: {
@@ -410,7 +410,7 @@ describe("runPostCorePluginConvergence", () => {
           deny: ["discord"],
           entries: { discord: { enabled: true } },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       env: {},
     });
     expect(result.errored).toBe(false);
@@ -424,7 +424,7 @@ describe("runPostCorePluginConvergence", () => {
     mocks.repairMissingConfiguredPluginInstalls.mockResolvedValue({
       changes: ['Installed missing configured plugin "discord".'],
       notices: [
-        'ClawHub trust warning for "@openclaw/discord@1.2.3": ClawHub has not completed a fresh clean security check for this release. Status: security scan is pending. Review the package before enabling it.',
+        'ClawHub trust warning for "@steelengine/discord@1.2.3": ClawHub has not completed a fresh clean security check for this release. Status: security scan is pending. Review the package before enabling it.',
       ],
       warnings: [],
       records: { discord: { source: "clawhub", installPath: "/p/discord" } },
@@ -432,7 +432,7 @@ describe("runPostCorePluginConvergence", () => {
     const result = await runPostCorePluginConvergence({
       cfg: {
         plugins: { entries: { discord: { enabled: true } } },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       env: {},
     });
     expect(result.errored).toBe(false);
@@ -440,9 +440,9 @@ describe("runPostCorePluginConvergence", () => {
     expect(result.notices).toStrictEqual([
       {
         reason:
-          'ClawHub trust warning for "@openclaw/discord@1.2.3": ClawHub has not completed a fresh clean security check for this release. Status: security scan is pending. Review the package before enabling it.',
+          'ClawHub trust warning for "@steelengine/discord@1.2.3": ClawHub has not completed a fresh clean security check for this release. Status: security scan is pending. Review the package before enabling it.',
         message:
-          'ClawHub trust warning for "@openclaw/discord@1.2.3": ClawHub has not completed a fresh clean security check for this release. Status: security scan is pending. Review the package before enabling it.',
+          'ClawHub trust warning for "@steelengine/discord@1.2.3": ClawHub has not completed a fresh clean security check for this release. Status: security scan is pending. Review the package before enabling it.',
         guidance: [],
       },
     ]);
@@ -473,7 +473,7 @@ describe("runPostCorePluginConvergence", () => {
     const result = await runPostCorePluginConvergence({
       cfg: {
         plugins: { entries: { brave: { enabled: true } } },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       env: {},
     });
     expect(result.errored).toBe(true);
@@ -485,8 +485,8 @@ describe("runPostCorePluginConvergence", () => {
         message:
           'Plugin "brave" failed post-core payload smoke check (missing-main-entry): Plugin main entry "dist/index.js" not found at /p/brave/dist/index.js',
         guidance: [
-          "Run `openclaw update repair` to retry plugin repair.",
-          "Run `openclaw plugins inspect brave --runtime --json` for details.",
+          "Run `steelengine update repair` to retry plugin repair.",
+          "Run `steelengine plugins inspect brave --runtime --json` for details.",
         ],
       },
     ]);
@@ -511,7 +511,7 @@ describe("runPostCorePluginConvergence", () => {
     const result = await runPostCorePluginConvergence({
       cfg: {
         plugins: { entries: { brave: { enabled: true } } },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       env: {},
     });
     expect(result.errored).toBe(true);
@@ -522,8 +522,8 @@ describe("runPostCorePluginConvergence", () => {
         message:
           'Plugin "brave" failed post-core payload smoke check (missing-install-path): Install path is missing from the plugin install record.',
         guidance: [
-          "Run `openclaw update repair` to retry plugin repair.",
-          "Run `openclaw plugins inspect brave --runtime --json` for details.",
+          "Run `steelengine update repair` to retry plugin repair.",
+          "Run `steelengine plugins inspect brave --runtime --json` for details.",
         ],
       },
     ]);
@@ -550,15 +550,15 @@ describe("runPostCorePluginConvergence", () => {
     const result = await runPostCorePluginConvergence({
       cfg: {
         plugins: { entries: { brave: { enabled: true } } },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       env: {},
     });
 
     const message =
       'Plugin "brave" failed post-core payload smoke check (unreadable-package-json): Could not read package.json at /p/brave/package.json: EACCES: permission denied';
     const guidance = [
-      "Fix file access for /p/brave/package.json so it is readable by the user running OpenClaw. For EACCES or EPERM, correct its ownership or permissions; otherwise resolve the reported filesystem I/O error, then retry.",
-      "Run `openclaw plugins inspect brave --runtime --json` for details.",
+      "Fix file access for /p/brave/package.json so it is readable by the user running SteelEngine. For EACCES or EPERM, correct its ownership or permissions; otherwise resolve the reported filesystem I/O error, then retry.",
+      "Run `steelengine plugins inspect brave --runtime --json` for details.",
     ];
     expect(result.warnings).toStrictEqual([
       {
@@ -577,13 +577,13 @@ describe("runPostCorePluginConvergence", () => {
   });
 
   it("does not duplicate a package-scoped repair error owned by a smoke failure", async () => {
-    const installPath = "/tmp/openclaw-state/npm/projects/brave/node_modules/brave";
+    const installPath = "/tmp/steelengine-state/npm/projects/brave/node_modules/brave";
     mocks.repairMissingConfiguredPluginInstalls.mockResolvedValue({
       changes: [],
       warnings: [],
       records: { brave: { source: "npm", installPath } },
     });
-    mocks.relinkOpenClawPeerDependenciesInManagedNpmRoot.mockImplementation(
+    mocks.relinkSteelEnginePeerDependenciesInManagedNpmRoot.mockImplementation(
       async (params: { onPackageReadError?: (error: unknown, packageDir: string) => void }) => {
         params.onPackageReadError?.(
           new Error(`EACCES: permission denied, open '${installPath}/package.json'`),
@@ -607,8 +607,8 @@ describe("runPostCorePluginConvergence", () => {
     const result = await runPostCorePluginConvergence({
       cfg: {
         plugins: { entries: { brave: { enabled: true } } },
-      } as unknown as OpenClawConfig,
-      env: { OPENCLAW_STATE_DIR: "/tmp/openclaw-state" },
+      } as unknown as SteelEngineConfig,
+      env: { STEELENGINE_STATE_DIR: "/tmp/steelengine-state" },
     });
 
     expect(result.warnings).toHaveLength(1);
@@ -620,13 +620,13 @@ describe("runPostCorePluginConvergence", () => {
   });
 
   it("does not promote an inactive package read error into an ownerless blocker", async () => {
-    const installPath = "/tmp/openclaw-state/npm/projects/brave/node_modules/brave";
+    const installPath = "/tmp/steelengine-state/npm/projects/brave/node_modules/brave";
     mocks.repairMissingConfiguredPluginInstalls.mockResolvedValue({
       changes: [],
       warnings: [],
       records: { brave: { source: "npm", installPath } },
     });
-    mocks.relinkOpenClawPeerDependenciesInManagedNpmRoot.mockImplementation(
+    mocks.relinkSteelEnginePeerDependenciesInManagedNpmRoot.mockImplementation(
       async (params: { onPackageReadError?: (error: unknown, packageDir: string) => void }) => {
         params.onPackageReadError?.(
           new Error(`EACCES: permission denied, open '${installPath}/package.json'`),
@@ -639,8 +639,8 @@ describe("runPostCorePluginConvergence", () => {
     const result = await runPostCorePluginConvergence({
       cfg: {
         plugins: { entries: { brave: { enabled: false } } },
-      } as unknown as OpenClawConfig,
-      env: { OPENCLAW_STATE_DIR: "/tmp/openclaw-state" },
+      } as unknown as SteelEngineConfig,
+      env: { STEELENGINE_STATE_DIR: "/tmp/steelengine-state" },
     });
 
     expect(mocks.runPluginPayloadSmokeCheck).toHaveBeenCalledWith({
@@ -652,8 +652,8 @@ describe("runPostCorePluginConvergence", () => {
   });
 
   it("keeps an unowned package read error visible for startup to block", async () => {
-    const packageDir = "/tmp/openclaw-state/npm/node_modules/untracked";
-    mocks.relinkOpenClawPeerDependenciesInManagedNpmRoot.mockImplementation(
+    const packageDir = "/tmp/steelengine-state/npm/node_modules/untracked";
+    mocks.relinkSteelEnginePeerDependenciesInManagedNpmRoot.mockImplementation(
       async (params: { onPackageReadError?: (error: unknown, packageDir: string) => void }) => {
         params.onPackageReadError?.(new Error("EACCES: permission denied"), packageDir);
         return { checked: 0, attempted: 0, repaired: 0, skipped: 1 };
@@ -661,15 +661,15 @@ describe("runPostCorePluginConvergence", () => {
     );
 
     const result = await runPostCorePluginConvergence({
-      cfg: { plugins: { entries: {} } } as unknown as OpenClawConfig,
-      env: { OPENCLAW_STATE_DIR: "/tmp/openclaw-state" },
+      cfg: { plugins: { entries: {} } } as unknown as SteelEngineConfig,
+      env: { STEELENGINE_STATE_DIR: "/tmp/steelengine-state" },
     });
 
     expect(result.warnings).toStrictEqual([
       {
-        reason: "Failed to repair managed npm OpenClaw host peer links: EACCES: permission denied",
-        message: "Failed to repair managed npm OpenClaw host peer links: EACCES: permission denied",
-        guidance: ["Run `openclaw update repair` to retry plugin repair."],
+        reason: "Failed to repair managed npm SteelEngine host peer links: EACCES: permission denied",
+        message: "Failed to repair managed npm SteelEngine host peer links: EACCES: permission denied",
+        guidance: ["Run `steelengine update repair` to retry plugin repair."],
       },
     ]);
     expect(result.errored).toBe(false);
@@ -685,15 +685,15 @@ describe("runPostCorePluginConvergence", () => {
     await runPostCorePluginConvergence({
       cfg: {
         plugins: { entries: { brave: { enabled: true } } },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       env: {},
     });
     expect(mocks.runPluginPayloadSmokeCheck).toHaveBeenCalledTimes(1);
     expect(mocks.runPluginPayloadSmokeCheck).toHaveBeenCalledWith({
       records,
       env: {
-        OPENCLAW_COMPATIBILITY_HOST_VERSION: VERSION,
-        OPENCLAW_UPDATE_POST_CORE_CONVERGENCE: "1",
+        STEELENGINE_COMPATIBILITY_HOST_VERSION: VERSION,
+        STEELENGINE_UPDATE_POST_CORE_CONVERGENCE: "1",
       },
     });
   });
@@ -708,12 +708,12 @@ describe("convergenceWarningsToOutcomes", () => {
           pluginId: "brave",
           reason: "missing-main-entry: …",
           message: 'Plugin "brave" failed payload smoke check.',
-          guidance: ["Run `openclaw update repair`."],
+          guidance: ["Run `steelengine update repair`."],
         },
         {
           reason: "Failed install",
           message: "Failed install for some plugin.",
-          guidance: ["Run `openclaw update repair`."],
+          guidance: ["Run `steelengine update repair`."],
         },
       ],
       errored: true,
@@ -747,7 +747,7 @@ describe("filterRecordsToActive", () => {
     const filtered = filterRecordsToActive({
       cfg: {
         plugins: { enabled: true, entries: { enabled: { enabled: true } } },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       records,
     });
     expect(filtered).toEqual(records);
@@ -767,7 +767,7 @@ describe("filterRecordsToActive", () => {
             "active-plugin": { enabled: true },
           },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       records,
     });
     expect(filtered).toEqual({
@@ -785,7 +785,7 @@ describe("filterRecordsToActive", () => {
           enabled: true,
           deny: ["denied"],
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       records,
     });
     expect(filtered).toEqual({});
@@ -798,7 +798,7 @@ describe("filterRecordsToActive", () => {
     const records = {
       codex: {
         source: "npm" as const,
-        spec: "@openclaw/codex",
+        spec: "@steelengine/codex",
         installPath: "/p/codex",
         trustedSourceLinkedOfficial: true,
       },
@@ -809,7 +809,7 @@ describe("filterRecordsToActive", () => {
           enabled: true,
           entries: { codex: { enabled: false } },
         },
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       records,
     });
     expect(filtered).toEqual(records);

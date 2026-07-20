@@ -1,4 +1,4 @@
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 // Session store caches share parsed stores, immutable snapshots, and serialized JSON.
 import { parseStrictNonNegativeInteger } from "../../infra/parse-finite-number.js";
 import { createExpiringMapCache, isCacheEnabled, resolveCacheTtlMs } from "../cache-utils.js";
@@ -59,7 +59,7 @@ function parseNonNegativeInteger(value: string | undefined): number | null {
 
 function getSerializedSessionStoreCacheMaxBytes(): number {
   return (
-    parseNonNegativeInteger(process.env.OPENCLAW_SESSION_SERIALIZED_CACHE_MAX_BYTES) ??
+    parseNonNegativeInteger(process.env.STEELENGINE_SESSION_SERIALIZED_CACHE_MAX_BYTES) ??
     DEFAULT_SESSION_STORE_SERIALIZED_CACHE_MAX_BYTES
   );
 }
@@ -185,7 +185,7 @@ export function cloneSessionStoreSnapshotEntry(entry: SessionEntry): SessionStor
 
 function getSessionStoreTtl(): number {
   return resolveCacheTtlMs({
-    envValue: process.env.OPENCLAW_SESSION_CACHE_TTL_MS,
+    envValue: process.env.STEELENGINE_SESSION_CACHE_TTL_MS,
     defaultTtlMs: DEFAULT_SESSION_STORE_TTL_MS,
   });
 }

@@ -1,9 +1,9 @@
 // Feishu tests cover app registration plugin behavior.
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { MAX_TIMER_TIMEOUT_MS } from "openclaw/plugin-sdk/number-runtime";
-import { readProviderJsonResponse } from "openclaw/plugin-sdk/provider-http";
-import type { LookupFn } from "openclaw/plugin-sdk/ssrf-runtime";
-import { withFetchPreconnect } from "openclaw/plugin-sdk/test-env";
+import { MAX_TIMER_TIMEOUT_MS } from "steelengine/plugin-sdk/number-runtime";
+import { readProviderJsonResponse } from "steelengine/plugin-sdk/provider-http";
+import type { LookupFn } from "steelengine/plugin-sdk/ssrf-runtime";
+import { withFetchPreconnect } from "steelengine/plugin-sdk/test-env";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   beginAppRegistration,

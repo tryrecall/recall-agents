@@ -12,9 +12,9 @@ export function mergeGatewayServiceEnv(
     ...command.environment,
   };
   for (const key of [
-    "OPENCLAW_LAUNCHD_LABEL",
-    "OPENCLAW_SYSTEMD_UNIT",
-    "OPENCLAW_WINDOWS_TASK_NAME",
+    "STEELENGINE_LAUNCHD_LABEL",
+    "STEELENGINE_SYSTEMD_UNIT",
+    "STEELENGINE_WINDOWS_TASK_NAME",
   ]) {
     // Explicit caller env selects the target service identity; installed command
     // env may come from a different profile or stale service file.

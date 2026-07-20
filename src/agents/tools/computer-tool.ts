@@ -7,12 +7,12 @@
  * tell how a node fulfills computer.act; macOS nodes are the first fulfiller.
  */
 import crypto from "node:crypto";
-import { imageMimeFromFormat } from "@openclaw/media-core/mime";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
-import { normalizeOptionalLowercaseString } from "@openclaw/normalization-core/string-coerce";
+import { imageMimeFromFormat } from "@steelengine/media-core/mime";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
+import { normalizeOptionalLowercaseString } from "@steelengine/normalization-core/string-coerce";
 import { Type } from "typebox";
 import { parseScreenSnapshotPayload } from "../../cli/nodes-screen.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import {
   DEFAULT_IMAGE_MAX_DIMENSION_PX,
@@ -322,7 +322,7 @@ function isEligibleComputerNode(node: NodeListNode): boolean {
 }
 
 const NOT_COMPUTER_CAPABLE_HINT =
-  "enable Computer Control in the OpenClaw app and approve the pairing update";
+  "enable Computer Control in the SteelEngine app and approve the pairing update";
 
 function nodeMatchesQuery(node: NodeListNode, query: string): boolean {
   const lowered = query.toLowerCase();
@@ -592,7 +592,7 @@ function isButtonAlreadyReleasedError(err: unknown): boolean {
 }
 
 export function createComputerTool(options?: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   modelHasVision?: boolean;
   /** Stable run scope used to deduplicate a replayed model tool call on the node. */
   idempotencyScope?: string;
@@ -796,7 +796,7 @@ export function createComputerTool(options?: {
           // >= referenceWidth, so it is a no-op and the node maps coordinates
           // against this same width for both portrait and landscape captures. A
           // portrait frame (height > referenceWidth) is uniformly scaled down here,
-          // matching OpenClawComputerInputGeometry.capturedWidth on the node.
+          // matching SteelEngineComputerInputGeometry.capturedWidth on the node.
           // media.outbound=false keeps desktop pixels model-only (#44759).
           const result = await sanitizeToolResultImages(
             {

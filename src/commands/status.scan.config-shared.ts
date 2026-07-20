@@ -3,7 +3,7 @@
 
 import { existsSync } from "node:fs";
 import { resolveConfigPath } from "../config/paths.js";
-import type { OpenClawConfig } from "../config/types.js";
+import type { SteelEngineConfig } from "../config/types.js";
 import { resolveGatewayAuthTokenSourceConflict } from "../gateway/auth-token-source-conflict.js";
 
 /** Returns true when tests should avoid the missing-config cold-start fast path. */
@@ -26,18 +26,18 @@ function resolveStatusScanColdStart(params?: {
 export async function loadStatusScanCommandConfig(params: {
   commandName: string;
   readConfigSnapshot: () => Promise<{
-    config: OpenClawConfig;
-    sourceConfig: OpenClawConfig;
+    config: SteelEngineConfig;
+    sourceConfig: SteelEngineConfig;
   }>;
   resolveConfig: (
-    sourceConfig: OpenClawConfig,
-  ) => Promise<{ resolvedConfig: OpenClawConfig; diagnostics: string[] }>;
+    sourceConfig: SteelEngineConfig,
+  ) => Promise<{ resolvedConfig: SteelEngineConfig; diagnostics: string[] }>;
   env?: NodeJS.ProcessEnv;
   allowMissingConfigFastPath?: boolean;
 }): Promise<{
   coldStart: boolean;
-  sourceConfig: OpenClawConfig;
-  resolvedConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
+  resolvedConfig: SteelEngineConfig;
   secretDiagnostics: string[];
 }> {
   const env = params.env ?? process.env;

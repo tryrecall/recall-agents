@@ -69,7 +69,7 @@ function relayReq(
   headers: Record<string, string> = {},
 ): IncomingMessage {
   return req(url, {
-    "sec-websocket-protocol": `openclaw-extension-relay, openclaw-extension-token.${token}`,
+    "sec-websocket-protocol": `steelengine-extension-relay, steelengine-extension-token.${token}`,
     ...headers,
   });
 }

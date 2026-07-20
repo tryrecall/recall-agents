@@ -5,8 +5,8 @@ import type { Dirent } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
-import { reclaimDefinitelyStaleFileLock } from "openclaw/plugin-sdk/file-lock";
-import { resolveUserPath } from "openclaw/plugin-sdk/memory-core-host-engine-foundation";
+import { reclaimDefinitelyStaleFileLock } from "steelengine/plugin-sdk/file-lock";
+import { resolveUserPath } from "steelengine/plugin-sdk/memory-core-host-engine-foundation";
 import {
   ensureMemoryIndexSchema,
   loadSqliteVecExtension,
@@ -17,18 +17,18 @@ import {
   MEMORY_INDEX_SOURCES_TABLE,
   MEMORY_INDEX_VECTOR_TABLE,
   requireNodeSqlite,
-} from "openclaw/plugin-sdk/memory-core-host-engine-storage";
-import { resolveMemoryDreamingWorkspaces } from "openclaw/plugin-sdk/memory-core-host-status";
-import { normalizeAgentId } from "openclaw/plugin-sdk/routing";
+} from "steelengine/plugin-sdk/memory-core-host-engine-storage";
+import { resolveMemoryDreamingWorkspaces } from "steelengine/plugin-sdk/memory-core-host-status";
+import { normalizeAgentId } from "steelengine/plugin-sdk/routing";
 import {
   archiveLegacyStateSource,
   legacyStateFileExists,
   type PluginDoctorStateMigration,
-} from "openclaw/plugin-sdk/runtime-doctor";
+} from "steelengine/plugin-sdk/runtime-doctor";
 import {
-  ensureOpenClawAgentDatabaseSchema,
-  resolveOpenClawAgentSqlitePath,
-} from "openclaw/plugin-sdk/sqlite-runtime";
+  ensureSteelEngineAgentDatabaseSchema,
+  resolveSteelEngineAgentSqlitePath,
+} from "steelengine/plugin-sdk/sqlite-runtime";
 import {
   DAILY_INGESTION_STATE_RELATIVE_PATH,
   SESSION_INGESTION_STATE_RELATIVE_PATH,
@@ -731,7 +731,7 @@ async function collectLegacyMemorySidecarSources(params: {
     }
   } catch {}
 
-  const migrationEnv = { ...params.env, OPENCLAW_STATE_DIR: params.stateDir };
+  const migrationEnv = { ...params.env, STEELENGINE_STATE_DIR: params.stateDir };
   const sources: LegacyMemorySidecarSource[] = [];
   const seen = new Set<string>();
   async function addSource(agentId: string, legacyPath: string): Promise<void> {
@@ -745,7 +745,7 @@ async function collectLegacyMemorySidecarSources(params: {
       agentId,
       legacyPath: normalizedPath,
       stateDir: params.stateDir,
-      agentDatabasePath: resolveOpenClawAgentSqlitePath({ agentId, env: migrationEnv }),
+      agentDatabasePath: resolveSteelEngineAgentSqlitePath({ agentId, env: migrationEnv }),
     });
   }
   for (const agentId of agentIds) {
@@ -911,9 +911,9 @@ async function migrateLegacyMemorySidecarSource(params: {
   try {
     const migrationEnv = {
       ...params.env,
-      OPENCLAW_STATE_DIR: params.source.stateDir,
+      STEELENGINE_STATE_DIR: params.source.stateDir,
     };
-    ensureOpenClawAgentDatabaseSchema(db, {
+    ensureSteelEngineAgentDatabaseSchema(db, {
       agentId: params.source.agentId,
       env: migrationEnv,
       path: params.source.agentDatabasePath,

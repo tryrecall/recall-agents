@@ -3,9 +3,9 @@
  * JSONL streaming, Claude stream-json dialects, usage metadata, and tool event
  * reconstruction.
  */
-import { normalizeLowercaseStringOrEmpty } from "@openclaw/normalization-core/string-coerce";
-import { normalizeStringEntries } from "@openclaw/normalization-core/string-normalization";
-import { truncateUtf16Safe } from "@openclaw/normalization-core/utf16-slice";
+import { normalizeLowercaseStringOrEmpty } from "@steelengine/normalization-core/string-coerce";
+import { normalizeStringEntries } from "@steelengine/normalization-core/string-normalization";
+import { truncateUtf16Safe } from "@steelengine/normalization-core/utf16-slice";
 import type { AgentPlanStep } from "../channels/streaming.js";
 import type { CliBackendConfig } from "../config/types.js";
 import { extractBalancedJsonFragments } from "../shared/balanced-json.js";
@@ -81,8 +81,8 @@ export function formatCliOutputError(
   const sessionId = normalizeCliContextValue(attribution.sessionId);
   const cliSessionId = normalizeCliContextValue(output.sessionId);
   const context = [
-    runId ? `OpenClaw run: ${runId}.` : undefined,
-    sessionId ? `OpenClaw session: ${sessionId}.` : undefined,
+    runId ? `SteelEngine run: ${runId}.` : undefined,
+    sessionId ? `SteelEngine session: ${sessionId}.` : undefined,
     cliSessionId ? `Claude session: ${cliSessionId}.` : undefined,
   ].filter((entry): entry is string => Boolean(entry));
   const limit = output.terminalFailure.limit;

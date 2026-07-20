@@ -1,10 +1,10 @@
 // Line plugin module implements rich menu behavior.
 import { messagingApi } from "@line/bot-sdk";
-import { getAgentScopedMediaLocalRoots } from "openclaw/plugin-sdk/agent-media-payload";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { mimeTypeFromFilePath } from "openclaw/plugin-sdk/media-mime";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
-import { loadWebMediaRaw } from "openclaw/plugin-sdk/web-media";
+import { getAgentScopedMediaLocalRoots } from "steelengine/plugin-sdk/agent-media-payload";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { mimeTypeFromFilePath } from "steelengine/plugin-sdk/media-mime";
+import { logVerbose } from "steelengine/plugin-sdk/runtime-env";
+import { loadWebMediaRaw } from "steelengine/plugin-sdk/web-media";
 import { resolveLineAccount } from "./accounts.js";
 import { messageAction } from "./actions.js";
 import { resolveLineChannelAccessToken } from "./channel-access-token.js";
@@ -40,7 +40,7 @@ export interface CreateRichMenuParams {
 }
 
 interface RichMenuOpts {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   channelAccessToken?: string;
   accountId?: string;
   verbose?: boolean;

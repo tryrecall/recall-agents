@@ -11,8 +11,8 @@ Adds text-to-speech provider support.
 
 ## Distribution
 
-- Package: `@openclaw/microsoft-speech`
-- Install route: included in OpenClaw
+- Package: `@steelengine/microsoft-speech`
+- Install route: included in SteelEngine
 
 ## Surface
 

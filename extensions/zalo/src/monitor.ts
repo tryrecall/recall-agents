@@ -1,26 +1,26 @@
 // Zalo plugin module implements monitor behavior.
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { logTypingFailure } from "openclaw/plugin-sdk/channel-feedback";
+import { logTypingFailure } from "steelengine/plugin-sdk/channel-feedback";
 import {
   formatInboundMediaUnavailableText,
   resolveChannelInboundRouteEnvelope,
-} from "openclaw/plugin-sdk/channel-inbound";
-import { resolveStableChannelMessageIngress } from "openclaw/plugin-sdk/channel-ingress-runtime";
-import { createChannelPairingController } from "openclaw/plugin-sdk/channel-pairing";
-import type { MarkdownTableMode, OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
+} from "steelengine/plugin-sdk/channel-inbound";
+import { resolveStableChannelMessageIngress } from "steelengine/plugin-sdk/channel-ingress-runtime";
+import { createChannelPairingController } from "steelengine/plugin-sdk/channel-pairing";
+import type { MarkdownTableMode, SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
 import {
   deliverTextOrMediaReply,
   resolveSendableOutboundReplyParts,
   type OutboundReplyPayload,
-} from "openclaw/plugin-sdk/reply-payload";
-import { sleepWithAbort, waitForAbortSignal } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/reply-payload";
+import { sleepWithAbort, waitForAbortSignal } from "steelengine/plugin-sdk/runtime-env";
 import {
   resolveDefaultGroupPolicy,
   warnMissingProviderGroupPolicyFallbackOnce,
-} from "openclaw/plugin-sdk/runtime-group-policy";
-import { normalizeStringEntries } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { registerPluginHttpRoute, resolveWebhookPath } from "openclaw/plugin-sdk/webhook-ingress";
+} from "steelengine/plugin-sdk/runtime-group-policy";
+import { normalizeStringEntries } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { registerPluginHttpRoute, resolveWebhookPath } from "steelengine/plugin-sdk/webhook-ingress";
 import type { ResolvedZaloAccount } from "./accounts.js";
 import {
   ZaloApiError,
@@ -57,7 +57,7 @@ const ZALO_MEDIA_RESPONSE_HEADER_TIMEOUT_MS = 120_000;
 type ZaloMonitorOptions = {
   token: string;
   account: ResolvedZaloAccount;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   runtime: ZaloRuntimeEnv;
   abortSignal: AbortSignal;
   useWebhook?: boolean;
@@ -79,7 +79,7 @@ type ZaloStatusSink = (patch: { lastInboundAt?: number; lastOutboundAt?: number 
 type ZaloProcessingContext = {
   token: string;
   account: ResolvedZaloAccount;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   runtime: ZaloRuntimeEnv;
   core: ZaloCoreRuntime;
   mediaMaxMb: number;
@@ -734,7 +734,7 @@ async function deliverZaloReply(params: {
   chatId: string;
   runtime: ZaloRuntimeEnv;
   core: ZaloCoreRuntime;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   webhookUrl?: string;
   webhookPath?: string;
   proxyUrl?: string;

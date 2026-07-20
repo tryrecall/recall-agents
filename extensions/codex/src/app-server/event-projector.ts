@@ -11,7 +11,7 @@ import {
   type HeartbeatToolResponse,
   type MessagingToolSend,
   type MessagingToolSourceReplyPayload,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "steelengine/plugin-sdk/agent-harness-runtime";
 import { CodexAssistantProjection } from "./event-projector-assistant.js";
 import { CodexProjectionDiagnostics } from "./event-projector-diagnostics.js";
 import { CodexEventProjection } from "./event-projector-events.js";
@@ -361,7 +361,7 @@ export class CodexAppServerEventProjector {
     const turnId = this.turnId;
     const messagesSnapshot = promptSnapshot(this.params, turnId, this.options.upstreamUserText);
     // Codex owns the canonical thread. These mirror records keep enough local
-    // context for OpenClaw history, search, and future harness switching.
+    // context for SteelEngine history, search, and future harness switching.
     if (reasoningText) {
       messagesSnapshot.push(
         attachCodexMirrorIdentity(

@@ -8,7 +8,7 @@ import {
   resolveAuthProfileDatabasePath,
   writePersistedAuthProfileStoreRaw,
 } from "../agents/auth-profiles/sqlite.js";
-import { closeOpenClawAgentDatabasesForTest } from "../state/openclaw-agent-db.js";
+import { closeSteelEngineAgentDatabasesForTest } from "../state/steelengine-agent-db.js";
 import { runSecretsAudit } from "./audit.js";
 
 type AuditFixture = {
@@ -138,9 +138,9 @@ async function expectPathMissing(filePath: string): Promise<void> {
 }
 
 async function createAuditFixture(): Promise<AuditFixture> {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-secrets-audit-"));
-  const stateDir = path.join(rootDir, ".openclaw");
-  const configPath = path.join(stateDir, "openclaw.json");
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-secrets-audit-"));
+  const stateDir = path.join(rootDir, ".steelengine");
+  const configPath = path.join(stateDir, "steelengine.json");
   const agentDir = path.join(stateDir, "agents", "main", "agent");
   const authStorePath = resolveAuthProfileDatabasePath(agentDir);
   const authJsonPath = path.join(agentDir, "auth.json");
@@ -160,8 +160,8 @@ async function createAuditFixture(): Promise<AuditFixture> {
     modelsPath,
     envPath,
     env: {
-      OPENCLAW_STATE_DIR: stateDir,
-      OPENCLAW_CONFIG_PATH: configPath,
+      STEELENGINE_STATE_DIR: stateDir,
+      STEELENGINE_CONFIG_PATH: configPath,
       OPENAI_API_KEY: "env-openai-key", // pragma: allowlist secret
       PATH: resolveRuntimePathEnv(),
     },
@@ -220,7 +220,7 @@ describe("secrets audit", () => {
       await writeJsonFile(warmFixture.configPath, {});
       await runSecretsAudit({ env: warmFixture.env });
     } finally {
-      closeOpenClawAgentDatabasesForTest();
+      closeSteelEngineAgentDatabasesForTest();
       await fs.rm(warmFixture.rootDir, { recursive: true, force: true });
     }
   });
@@ -265,7 +265,7 @@ describe("secrets audit", () => {
   });
 
   afterEach(async () => {
-    closeOpenClawAgentDatabasesForTest();
+    closeSteelEngineAgentDatabasesForTest();
     await fs.rm(fixture.rootDir, { recursive: true, force: true });
   });
 
@@ -578,7 +578,7 @@ describe("secrets audit", () => {
     const report = await runSecretsAudit({
       env: {
         ...fixture.env,
-        OPENCLAW_AGENT_DIR: externalAgentDir,
+        STEELENGINE_AGENT_DIR: externalAgentDir,
       },
     });
     expect(
@@ -688,7 +688,7 @@ describe("secrets audit", () => {
     },
   );
 
-  it("does not flag non-sensitive routing headers in openclaw config", async () => {
+  it("does not flag non-sensitive routing headers in steelengine config", async () => {
     await writeJsonFile(fixture.configPath, {
       models: {
         providers: {
@@ -717,7 +717,7 @@ describe("secrets audit", () => {
     ).toBe(false);
   });
 
-  it("keeps request headers in openclaw config covered by plaintext audit", async () => {
+  it("keeps request headers in steelengine config covered by plaintext audit", async () => {
     await writeJsonFile(fixture.configPath, {
       models: {
         providers: {
@@ -748,7 +748,7 @@ describe("secrets audit", () => {
     ).toBe(true);
   });
 
-  it("does not flag openclaw.json model provider apiKey marker values as plaintext", async () => {
+  it("does not flag steelengine.json model provider apiKey marker values as plaintext", async () => {
     await writeJsonFile(fixture.configPath, {
       models: {
         providers: {
@@ -805,15 +805,15 @@ describe("secrets audit", () => {
   });
 
   it("scans .env in legacy .clawdbot state directory via automatic fallback", async () => {
-    // Do NOT set OPENCLAW_STATE_DIR or OPENCLAW_CONFIG_PATH — rely on
+    // Do NOT set STEELENGINE_STATE_DIR or STEELENGINE_CONFIG_PATH — rely on
     // resolveStateDir's automatic legacy-directory fallback. A controlled
-    // HOME that contains only .clawdbot (no .openclaw) exercises the exact
+    // HOME that contains only .clawdbot (no .steelengine) exercises the exact
     // path the old resolveConfigDir call could not reach: resolveConfigDir
-    // always returns $HOME/.openclaw, so it would miss the .env inside
+    // always returns $HOME/.steelengine, so it would miss the .env inside
     // .clawdbot.  resolveStateDir finds .clawdbot via its legacy-dir scan.
-    const homeDir = tempDirs.make("openclaw-secrets-audit-legacy-");
+    const homeDir = tempDirs.make("steelengine-secrets-audit-legacy-");
     const legacyStateDir = path.join(homeDir, ".clawdbot");
-    const configPath = path.join(legacyStateDir, "openclaw.json");
+    const configPath = path.join(legacyStateDir, "steelengine.json");
     const envPath = path.join(legacyStateDir, ".env");
     const agentDir = path.join(legacyStateDir, "agents", "main", "agent");
 
@@ -853,7 +853,7 @@ describe("secrets audit", () => {
         true,
       );
     } finally {
-      closeOpenClawAgentDatabasesForTest();
+      closeSteelEngineAgentDatabasesForTest();
       await fs.rm(homeDir, { recursive: true, force: true });
     }
   });
@@ -861,12 +861,12 @@ describe("secrets audit", () => {
   it("scans config and state .env files when the config path is external", async () => {
     await seedAuditFixture(fixture);
     const configDir = path.join(fixture.rootDir, "config");
-    const configPath = path.join(configDir, "openclaw.json");
+    const configPath = path.join(configDir, "steelengine.json");
     const configEnvPath = path.join(configDir, ".env");
     await fs.mkdir(configDir, { recursive: true });
     await fs.copyFile(fixture.configPath, configPath);
     await fs.copyFile(fixture.envPath, configEnvPath);
-    fixture.env.OPENCLAW_CONFIG_PATH = configPath;
+    fixture.env.STEELENGINE_CONFIG_PATH = configPath;
 
     const report = await runSecretsAudit({ env: fixture.env });
 

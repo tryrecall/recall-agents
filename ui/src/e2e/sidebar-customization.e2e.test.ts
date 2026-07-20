@@ -13,12 +13,12 @@ import {
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
 
 let browser: Browser;
 let server: ControlUiE2eServer;
-const captureUiProofEnabled = process.env.OPENCLAW_CAPTURE_UI_PROOF === "1";
+const captureUiProofEnabled = process.env.STEELENGINE_CAPTURE_UI_PROOF === "1";
 const uiProofArtifactDir = path.join(
   process.cwd(),
   ".artifacts",
@@ -108,7 +108,7 @@ describeControlUiE2e("Control UI sidebar customization mocked Gateway E2E", () =
   beforeAll(async () => {
     if (!chromiumAvailable) {
       throw new Error(
-        `Playwright Chromium is not installed or cannot start at ${chromiumExecutablePath}. Run \`pnpm --dir ui exec playwright install --with-deps chromium\`, or set OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM=1 only when intentionally skipping this lane.`,
+        `Playwright Chromium is not installed or cannot start at ${chromiumExecutablePath}. Run \`pnpm --dir ui exec playwright install --with-deps chromium\`, or set STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM=1 only when intentionally skipping this lane.`,
       );
     }
     server = await startControlUiE2eServer();
@@ -167,13 +167,13 @@ describeControlUiE2e("Control UI sidebar customization mocked Gateway E2E", () =
     try {
       await page.goto(`${server.baseUrl}chat`);
 
-      const sidebar = page.locator("openclaw-app-sidebar");
+      const sidebar = page.locator("steelengine-app-sidebar");
       const pinnedItems = sidebar.locator(
         ".sidebar-nav > .nav-section__items > .nav-item:not(.nav-item--action)",
       );
       await expect
         .poll(() => trimmedTextContents(pinnedItems))
-        .toEqual(["OpenClaw", "Usage", "Automations", "Plugins"]);
+        .toEqual(["SteelEngine", "Usage", "Automations", "Plugins"]);
       await expect.poll(() => sidebar.locator(".sidebar-brand").count()).toBe(1);
       // Desktop renders no topbar row: the sidebar owns navigation.
       await expect.poll(() => page.locator(".topbar").isVisible()).toBe(false);
@@ -290,7 +290,7 @@ describeControlUiE2e("Control UI sidebar customization mocked Gateway E2E", () =
       await expect
         .poll(() => trimmedTextContents(settingsLinks))
         .toEqual([
-          "Ask OpenClaw",
+          "Ask SteelEngine",
           "Approvals",
           "Infrastructure",
           "Advanced",
@@ -348,7 +348,7 @@ describeControlUiE2e("Control UI sidebar customization mocked Gateway E2E", () =
       await expect.poll(() => settingsSearch.inputValue()).toBe("");
       await captureSettingsSidebarProof(settingsSidebar, "01g-settings-search-reset.png");
       await holdUiProof(page);
-      await settingsSidebar.getByRole("link", { name: "Ask OpenClaw" }).click();
+      await settingsSidebar.getByRole("link", { name: "Ask SteelEngine" }).click();
       await expect.poll(() => new URL(page.url()).pathname).toBe("/custodian");
       await expect
         .poll(() => page.locator(".shell").getAttribute("class"))
@@ -385,7 +385,7 @@ describeControlUiE2e("Control UI sidebar customization mocked Gateway E2E", () =
         .not.toContain("Workboard");
       const tasksItem = menu.getByRole("menuitemcheckbox", { name: "Tasks" });
       await expect.poll(() => tasksItem.getAttribute("aria-checked")).toBe("false");
-      const custodianItem = menu.getByRole("menuitemcheckbox", { name: "OpenClaw" });
+      const custodianItem = menu.getByRole("menuitemcheckbox", { name: "SteelEngine" });
       await expect.poll(() => custodianItem.getAttribute("aria-checked")).toBe("true");
       await expect
         .poll(() => custodianItem.evaluate((element) => element === document.activeElement))
@@ -409,14 +409,14 @@ describeControlUiE2e("Control UI sidebar customization mocked Gateway E2E", () =
       await moreButton.click();
       await expect
         .poll(() => trimmedTextContents(moreMenu.getByRole("menuitem")))
-        .toContain("OpenClaw");
+        .toContain("SteelEngine");
       await captureUiProof(page, "03-persisted-customization.png");
 
       await moreMenu.getByRole("menuitem", { name: "Edit pinned items" }).click();
       await menu.getByRole("menuitem", { name: "Reset pinned items" }).click();
       await expect
         .poll(() => trimmedTextContents(pinnedItems))
-        .toEqual(["OpenClaw", "Usage", "Automations", "Plugins"]);
+        .toEqual(["SteelEngine", "Usage", "Automations", "Plugins"]);
 
       // The sidebar search field is the command palette entry point.
       const searchButton = sidebar.locator(".sidebar-search");
@@ -542,7 +542,7 @@ describeControlUiE2e("Control UI sidebar customization mocked Gateway E2E", () =
 
     try {
       await page.goto(`${server.baseUrl}chat`);
-      const sidebar = page.locator("openclaw-app-sidebar");
+      const sidebar = page.locator("steelengine-app-sidebar");
       await sidebar.locator("button.nav-item--action").click();
       await expect
         .poll(() =>
@@ -567,7 +567,7 @@ describeControlUiE2e("Control UI sidebar customization mocked Gateway E2E", () =
 
     try {
       await page.goto(`${server.baseUrl}chat?session=${encodeURIComponent("agent:main:work")}`);
-      const brand = page.locator("openclaw-app-sidebar").getByRole("link", { name: "New session" });
+      const brand = page.locator("steelengine-app-sidebar").getByRole("link", { name: "New session" });
       await expect.poll(() => brand.getAttribute("href")).toBe("/new");
 
       await brand.click();
@@ -617,8 +617,8 @@ describeControlUiE2e("Control UI sidebar customization mocked Gateway E2E", () =
 
     try {
       await page.goto(`${server.baseUrl}chat`);
-      const sidebar = page.locator("openclaw-app-sidebar");
-      const pet = sidebar.locator(".sidebar-shell openclaw-lobster-pet");
+      const sidebar = page.locator("steelengine-app-sidebar");
+      const pet = sidebar.locator(".sidebar-shell steelengine-lobster-pet");
       await expect.poll(() => pet.count()).toBe(1);
       await expect.poll(() => outcome(pet)).toBe("error");
       await expect.poll(() => page.locator(".topbar").isVisible()).toBe(false);
@@ -639,8 +639,8 @@ describeControlUiE2e("Control UI sidebar customization mocked Gateway E2E", () =
     const { context, page } = await openSidebarTestPage();
 
     try {
-      const sidebar = page.locator("openclaw-app-sidebar");
-      const pet = sidebar.locator("openclaw-lobster-pet");
+      const sidebar = page.locator("steelengine-app-sidebar");
+      const pet = sidebar.locator("steelengine-lobster-pet");
       const movement = await pet.evaluate(async (element) => {
         const lobster = element as HTMLElement & {
           anchor: "bar";
@@ -689,7 +689,7 @@ describeControlUiE2e("Control UI sidebar customization mocked Gateway E2E", () =
     const { context, page } = await openSidebarTestPage();
 
     try {
-      const sidebar = page.locator("openclaw-app-sidebar");
+      const sidebar = page.locator("steelengine-app-sidebar");
       const moreButton = sidebar.locator("button.nav-item--action");
       await moreButton.click();
       await sidebar
@@ -724,7 +724,7 @@ describeControlUiE2e("Control UI sidebar customization mocked Gateway E2E", () =
     const { context, page } = await openSidebarTestPage();
 
     try {
-      const sidebar = page.locator("openclaw-app-sidebar");
+      const sidebar = page.locator("steelengine-app-sidebar");
       await sidebar.locator("button.nav-item--action").click();
       const moreMenu = sidebar.locator("wa-dropdown.sidebar-more-menu");
       await expect
@@ -803,7 +803,7 @@ describeControlUiE2e("Control UI sidebar customization mocked Gateway E2E", () =
 
     try {
       await page.goto(`${server.baseUrl}chat`);
-      const sidebar = page.locator("openclaw-app-sidebar");
+      const sidebar = page.locator("steelengine-app-sidebar");
       await sidebar.getByRole("button", { name: /Agent menu/ }).click();
       const menu = sidebar.locator("wa-dropdown.sidebar-agent-menu");
       const mainSwitch = menu.getByRole("menuitemradio", { name: "Main" });

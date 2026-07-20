@@ -4,7 +4,7 @@ import {
   ConversationRole,
   StopReason as BedrockStopReason,
 } from "@aws-sdk/client-bedrock-runtime";
-import { onLlmRequestActivity } from "openclaw/plugin-sdk/provider-stream-shared";
+import { onLlmRequestActivity } from "steelengine/plugin-sdk/provider-stream-shared";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { streamBedrock, streamSimpleBedrock } from "./stream.runtime.js";
 import { streamTesting as testing } from "./test-support.js";

@@ -1,13 +1,13 @@
-# OpenClaw GMI Cloud Provider
+# SteelEngine GMI Cloud Provider
 
-Official OpenClaw provider plugin for hosted GMI Cloud models through an
+Official SteelEngine provider plugin for hosted GMI Cloud models through an
 OpenAI-compatible API.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/gmi-provider
-openclaw gateway restart
+steelengine plugins install @steelengine/gmi-provider
+steelengine gateway restart
 ```
 
 Configure a GMI Cloud API key, then select models with refs such as

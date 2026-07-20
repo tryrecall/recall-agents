@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { resetPluginStateStoreForTests } from "openclaw/plugin-sdk/plugin-state-test-runtime";
+import { resetPluginStateStoreForTests } from "steelengine/plugin-sdk/plugin-state-test-runtime";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { feishuDedupeState } from "./dedup-state.js";
 import {
@@ -17,9 +17,9 @@ let tempDir: string | undefined;
 let previousStateDir: string | undefined;
 
 beforeEach(() => {
-  previousStateDir = process.env.OPENCLAW_STATE_DIR;
-  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-feishu-dedup-"));
-  process.env.OPENCLAW_STATE_DIR = tempDir;
+  previousStateDir = process.env.STEELENGINE_STATE_DIR;
+  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-feishu-dedup-"));
+  process.env.STEELENGINE_STATE_DIR = tempDir;
   feishuDedupeState.reset();
 });
 
@@ -27,9 +27,9 @@ afterEach(() => {
   vi.useRealTimers();
   resetPluginStateStoreForTests();
   if (previousStateDir === undefined) {
-    delete process.env.OPENCLAW_STATE_DIR;
+    delete process.env.STEELENGINE_STATE_DIR;
   } else {
-    process.env.OPENCLAW_STATE_DIR = previousStateDir;
+    process.env.STEELENGINE_STATE_DIR = previousStateDir;
   }
   if (tempDir) {
     fs.rmSync(tempDir, { recursive: true, force: true });
@@ -114,7 +114,7 @@ describe("Feishu claimable dedupe", () => {
     // A regular file where the state dir should be makes every SQLite open fail.
     const blockedPath = path.join(tempDir as string, "not-a-dir");
     fs.writeFileSync(blockedPath, "x", "utf8");
-    process.env.OPENCLAW_STATE_DIR = path.join(blockedPath, "nested");
+    process.env.STEELENGINE_STATE_DIR = path.join(blockedPath, "nested");
     const log = vi.fn();
 
     await expect(recordProcessedFeishuMessage("msg-9", "account-a", log)).resolves.toBe(true);

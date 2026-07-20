@@ -37,7 +37,7 @@ import {
 } from "../../lib/sessions/session-key.ts";
 import { normalizeOptionalString } from "../../lib/string-coerce.ts";
 import { captureSessionToWorkboard } from "../../lib/workboard/index.ts";
-import { OpenClawLightDomElement } from "../../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../../lit/steelengine-element.ts";
 import { SubscriptionsController } from "../../lit/subscriptions-controller.ts";
 import {
   searchVisibleSessionTranscripts,
@@ -67,7 +67,7 @@ type SessionsPageRequestScope = {
   client: GatewayBrowserClient;
 };
 
-class SessionsPage extends OpenClawLightDomElement {
+class SessionsPage extends SteelEngineLightDomElement {
   @consume({ context: applicationContext, subscribe: true })
   private context?: ApplicationContext;
 
@@ -1066,7 +1066,7 @@ class SessionsPage extends OpenClawLightDomElement {
       }),
     );
     return html`
-      <openclaw-session-menu
+      <steelengine-session-menu
         .session=${{
           label: normalizeOptionalString(row.label) ?? row.key,
           pinned: row.pinned === true,
@@ -1135,7 +1135,7 @@ class SessionsPage extends OpenClawLightDomElement {
               break;
           }
         }}
-      ></openclaw-session-menu>
+      ></steelengine-session-menu>
     `;
   }
 
@@ -1298,7 +1298,7 @@ class SessionsPage extends OpenClawLightDomElement {
   }
 }
 
-if (!customElements.get("openclaw-sessions-page")) {
-  customElements.define("openclaw-sessions-page", SessionsPage);
+if (!customElements.get("steelengine-sessions-page")) {
+  customElements.define("steelengine-sessions-page", SessionsPage);
 }
 /* oxlint-disable max-lines -- TODO: split this grandfathered oversized file. */

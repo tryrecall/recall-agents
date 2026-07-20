@@ -1,9 +1,9 @@
 // Migrate Claude provider module implements model/runtime integration.
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { MigrationProviderContext } from "openclaw/plugin-sdk/plugin-entry";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/provider-auth";
-import { resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/temp-path";
+import type { MigrationProviderContext } from "steelengine/plugin-sdk/plugin-entry";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/provider-auth";
+import { resolvePreferredSteelEngineTmpDir } from "steelengine/plugin-sdk/temp-path";
 
 const tempRoots = new Set<string>();
 
@@ -16,7 +16,7 @@ const logger = {
 
 export async function makeTempRoot() {
   const root = await fs.mkdtemp(
-    path.join(resolvePreferredOpenClawTmpDir(), "openclaw-migrate-claude-"),
+    path.join(resolvePreferredSteelEngineTmpDir(), "steelengine-migrate-claude-"),
   );
   tempRoots.add(root);
   return root;
@@ -35,11 +35,11 @@ export async function writeFile(filePath: string, content: string) {
 }
 
 export function makeConfigRuntime(
-  config: OpenClawConfig,
-  onWrite?: (next: OpenClawConfig) => void,
+  config: SteelEngineConfig,
+  onWrite?: (next: SteelEngineConfig) => void,
 ): NonNullable<MigrationProviderContext["runtime"]> {
-  const commitConfig = (next: OpenClawConfig) => {
-    for (const key of Object.keys(config) as Array<keyof OpenClawConfig>) {
+  const commitConfig = (next: SteelEngineConfig) => {
+    for (const key of Object.keys(config) as Array<keyof SteelEngineConfig>) {
       delete config[key];
     }
     Object.assign(config, next);
@@ -54,12 +54,12 @@ export function makeConfigRuntime(
         mutate,
       }: {
         afterWrite?: unknown;
-        mutate: (draft: OpenClawConfig, context: unknown) => Promise<unknown> | void;
+        mutate: (draft: SteelEngineConfig, context: unknown) => Promise<unknown> | void;
       }) => {
         const next = structuredClone(config);
         const result = await mutate(next, {
           snapshot: {
-            path: "/tmp/openclaw.json",
+            path: "/tmp/steelengine.json",
             exists: true,
             raw: "{}",
             parsed: {},
@@ -87,7 +87,7 @@ export function makeConfigRuntime(
         nextConfig,
       }: {
         afterWrite?: unknown;
-        nextConfig: OpenClawConfig;
+        nextConfig: SteelEngineConfig;
       }) => {
         commitConfig(nextConfig);
         return {
@@ -104,7 +104,7 @@ export function makeContext(params: {
   source: string;
   stateDir: string;
   workspaceDir: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   includeSecrets?: boolean;
   overwrite?: boolean;
   targetAgentId?: string;
@@ -120,7 +120,7 @@ export function makeContext(params: {
           workspace: params.workspaceDir,
         },
       },
-    } as OpenClawConfig);
+    } as SteelEngineConfig);
   return {
     config,
     stateDir: params.stateDir,

@@ -1,18 +1,18 @@
 import { replaceConfigFile } from "../../config/config.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { commitConfigWithPendingPluginInstalls } from "../../plugins/install-record-commit.js";
 import { refreshPluginRegistryAfterConfigMutation } from "../../plugins/registry-refresh.js";
 import type { RuntimeEnv } from "../../runtime.js";
 
 export async function persistResolvedChannelPluginConfig(params: {
   resolved: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     configChanged: boolean;
     pluginInstalled: boolean;
   };
   baseHash?: string;
   runtime: RuntimeEnv;
-}): Promise<OpenClawConfig> {
+}): Promise<SteelEngineConfig> {
   if (!params.resolved.configChanged) {
     return params.resolved.cfg;
   }

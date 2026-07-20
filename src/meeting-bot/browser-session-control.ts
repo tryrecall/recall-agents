@@ -198,7 +198,7 @@ export async function readMeetingTranscriptWithBrowser<
   }
   if (snapshot.sessionMatched === false) {
     throw new Error(
-      `The tracked ${params.adapter.browserLabel} tab now belongs to another OpenClaw meeting session.`,
+      `The tracked ${params.adapter.browserLabel} tab now belongs to another SteelEngine meeting session.`,
     );
   }
   return {

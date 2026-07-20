@@ -1,11 +1,11 @@
-// OpenClaw rescue-message Docker harness.
+// SteelEngine rescue-message Docker harness.
 // Imports packaged dist modules so the Docker lane verifies the npm tarball,
 // while this small test driver stays mounted from the checkout.
 import fs from "node:fs/promises";
 import path from "node:path";
 import { handleSystemAgentCommand } from "../../dist/auto-reply/reply/commands-system-agent.js";
 import { clearConfigCache } from "../../dist/config/config.js";
-import type { OpenClawConfig } from "../../dist/config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../dist/config/types.steelengine.js";
 import { runSystemAgentRescueMessage } from "../../dist/system-agent/rescue-message.js";
 import { createE2eStateDir } from "./lib/temp-state-dir.ts";
 
@@ -17,7 +17,7 @@ function assert(condition: unknown, message: string): asserts condition {
   }
 }
 
-function makeParams(commandBody: string, cfg: OpenClawConfig, isGroup = false) {
+function makeParams(commandBody: string, cfg: SteelEngineConfig, isGroup = false) {
   return {
     cfg,
     command: {
@@ -39,7 +39,7 @@ function makeParams(commandBody: string, cfg: OpenClawConfig, isGroup = false) {
   } as Parameters<typeof handleSystemAgentCommand>[0];
 }
 
-async function invoke(commandBody: string, cfg: OpenClawConfig, isGroup = false): Promise<string> {
+async function invoke(commandBody: string, cfg: SteelEngineConfig, isGroup = false): Promise<string> {
   const result: CommandResult = await handleSystemAgentCommand(
     makeParams(commandBody, cfg, isGroup),
     true,
@@ -53,7 +53,7 @@ async function invoke(commandBody: string, cfg: OpenClawConfig, isGroup = false)
 
 async function invokeWithDeps(
   commandBody: string,
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   deps: NonNullable<Parameters<typeof runSystemAgentRescueMessage>[0]["deps"]>,
 ): Promise<string> {
   const result = await runSystemAgentRescueMessage({
@@ -69,12 +69,12 @@ async function invokeWithDeps(
 }
 
 async function main() {
-  const tempState = await createE2eStateDir("openclaw-openclaw-");
+  const tempState = await createE2eStateDir("steelengine-steelengine-");
   tempState.registerExitCleanup();
   const stateDir = tempState.stateDir;
-  const configPath = process.env.OPENCLAW_CONFIG_PATH ?? path.join(stateDir, "openclaw.json");
-  process.env.OPENCLAW_STATE_DIR = stateDir;
-  process.env.OPENCLAW_CONFIG_PATH = configPath;
+  const configPath = process.env.STEELENGINE_CONFIG_PATH ?? path.join(stateDir, "steelengine.json");
+  process.env.STEELENGINE_STATE_DIR = stateDir;
+  process.env.STEELENGINE_CONFIG_PATH = configPath;
   await fs.mkdir(stateDir, { recursive: true });
   await fs.writeFile(
     configPath,
@@ -89,13 +89,13 @@ async function main() {
   );
   clearConfigCache();
 
-  const denied = await invoke("/openclaw status", {
+  const denied = await invoke("/steelengine status", {
     systemAgent: { rescue: { enabled: true } },
     agents: { defaults: { sandbox: { mode: "all" } } },
   });
   assert(denied.includes("sandboxing is active"), "sandboxed rescue was not denied");
 
-  const cfg: OpenClawConfig = {};
+  const cfg: SteelEngineConfig = {};
   const deterministicInference = {
     verifyInferenceConfig: async () => ({
       ok: true as const,
@@ -103,7 +103,7 @@ async function main() {
       latencyMs: 1,
     }),
   };
-  const refusedTui = await invoke("/openclaw talk to agent", cfg);
+  const refusedTui = await invoke("/steelengine talk to agent", cfg);
   assert(
     refusedTui.includes("cannot open the local TUI"),
     "remote rescue TUI handoff was not refused",
@@ -111,62 +111,62 @@ async function main() {
 
   // This packaged smoke verifies rescue persistence, not live provider credentials.
   const plan = await invokeWithDeps(
-    "/openclaw set default model openai/gpt-5.2",
+    "/steelengine set default model openai/gpt-5.2",
     cfg,
     deterministicInference,
   );
   assert(
-    plan.includes("Reply /openclaw yes to apply"),
+    plan.includes("Reply /steelengine yes to apply"),
     "persistent change did not require approval",
   );
-  const applied = await invokeWithDeps("/openclaw yes", cfg, deterministicInference);
+  const applied = await invokeWithDeps("/steelengine yes", cfg, deterministicInference);
   assert(applied.includes("Default model: openai/gpt-5.2"), "approved change did not apply");
 
-  const configValid = await invoke("/openclaw validate config", cfg);
+  const configValid = await invoke("/steelengine validate config", cfg);
   assert(configValid.includes("Config valid:"), "config validation did not report valid config");
 
-  const configSetPlan = await invoke("/openclaw config set gateway.port 19001", cfg);
+  const configSetPlan = await invoke("/steelengine config set gateway.port 19001", cfg);
   assert(
-    configSetPlan.includes("Reply /openclaw yes to apply"),
+    configSetPlan.includes("Reply /steelengine yes to apply"),
     "generic config set did not require approval",
   );
-  const configSetApplied = await invoke("/openclaw yes", cfg);
-  assert(configSetApplied.includes("[openclaw] done: config.set"), "generic config set failed");
+  const configSetApplied = await invoke("/steelengine yes", cfg);
+  assert(configSetApplied.includes("[steelengine] done: config.set"), "generic config set failed");
 
   const refPlan = await invoke(
-    "/openclaw config set-ref gateway.auth.token env OPENCLAW_GATEWAY_TOKEN",
+    "/steelengine config set-ref gateway.auth.token env STEELENGINE_GATEWAY_TOKEN",
     cfg,
   );
   assert(
-    refPlan.includes("Reply /openclaw yes to apply"),
+    refPlan.includes("Reply /steelengine yes to apply"),
     "SecretRef set did not require approval",
   );
-  const refApplied = await invoke("/openclaw yes", cfg);
-  assert(refApplied.includes("[openclaw] done: config.setRef"), "SecretRef set failed");
+  const refApplied = await invoke("/steelengine yes", cfg);
+  assert(refApplied.includes("[steelengine] done: config.setRef"), "SecretRef set failed");
 
-  const agentPlan = await invoke("/openclaw create agent work workspace /tmp/openclaw-work", cfg);
+  const agentPlan = await invoke("/steelengine create agent work workspace /tmp/steelengine-work", cfg);
   assert(
-    agentPlan.includes("Reply /openclaw yes to apply"),
+    agentPlan.includes("Reply /steelengine yes to apply"),
     "agent creation did not require approval",
   );
-  const agentApplied = await invoke("/openclaw yes", cfg);
-  assert(agentApplied.includes("[openclaw] done: agents.create"), "agent creation did not apply");
+  const agentApplied = await invoke("/steelengine yes", cfg);
+  assert(agentApplied.includes("[steelengine] done: agents.create"), "agent creation did not apply");
 
   const setupPlan = await invokeWithDeps(
-    "/openclaw setup workspace /tmp/openclaw-setup model openai/gpt-5.2",
+    "/steelengine setup workspace /tmp/steelengine-setup model openai/gpt-5.2",
     cfg,
     deterministicInference,
   );
-  assert(setupPlan.includes("Reply /openclaw yes to apply"), "setup did not require approval");
-  const setupApplied = await invokeWithDeps("/openclaw yes", cfg, deterministicInference);
-  assert(setupApplied.includes("[openclaw] done: openclaw.setup"), "setup did not apply");
+  assert(setupPlan.includes("Reply /steelengine yes to apply"), "setup did not require approval");
+  const setupApplied = await invokeWithDeps("/steelengine yes", cfg, deterministicInference);
+  assert(setupApplied.includes("[steelengine] done: steelengine.setup"), "setup did not apply");
 
   const gatewayRestarts: string[] = [];
-  const gatewayCommand = makeParams("/openclaw restart gateway", cfg).command;
+  const gatewayCommand = makeParams("/steelengine restart gateway", cfg).command;
   const gatewayPlan = await runSystemAgentRescueMessage({
     cfg,
     command: gatewayCommand,
-    commandBody: "/openclaw restart gateway",
+    commandBody: "/steelengine restart gateway",
     agentId: "default",
     isGroup: false,
     deps: {
@@ -176,13 +176,13 @@ async function main() {
     },
   });
   assert(
-    gatewayPlan?.includes("Reply /openclaw yes to apply"),
+    gatewayPlan?.includes("Reply /steelengine yes to apply"),
     "gateway restart did not require approval",
   );
   const pluginList = await runSystemAgentRescueMessage({
     cfg,
     command: gatewayCommand,
-    commandBody: "/openclaw plugins list",
+    commandBody: "/steelengine plugins list",
     agentId: "default",
     isGroup: false,
     deps: {
@@ -193,7 +193,7 @@ async function main() {
   const revokedApproval = await runSystemAgentRescueMessage({
     cfg,
     command: gatewayCommand,
-    commandBody: "/openclaw yes",
+    commandBody: "/steelengine yes",
     agentId: "default",
     isGroup: false,
     deps: {
@@ -203,21 +203,21 @@ async function main() {
     },
   });
   assert(
-    revokedApproval === "No pending OpenClaw rescue change is waiting for approval.",
+    revokedApproval === "No pending SteelEngine rescue change is waiting for approval.",
     "fresh rescue command did not revoke the older pending change",
   );
   assert(gatewayRestarts.length === 0, "revoked gateway restart was invoked");
   await runSystemAgentRescueMessage({
     cfg,
     command: gatewayCommand,
-    commandBody: "/openclaw restart gateway",
+    commandBody: "/steelengine restart gateway",
     agentId: "default",
     isGroup: false,
   });
   const gatewayApplied = await runSystemAgentRescueMessage({
     cfg,
     command: gatewayCommand,
-    commandBody: "/openclaw yes",
+    commandBody: "/steelengine yes",
     agentId: "default",
     isGroup: false,
     deps: {
@@ -227,17 +227,17 @@ async function main() {
     },
   });
   assert(
-    gatewayApplied?.includes("[openclaw] done: gateway.restart"),
+    gatewayApplied?.includes("[steelengine] done: gateway.restart"),
     "gateway restart did not apply",
   );
   assert(gatewayRestarts.length === 1, "gateway restart dependency was not invoked once");
 
   const doctorRuns: string[] = [];
-  const doctorCommand = makeParams("/openclaw doctor fix", cfg).command;
+  const doctorCommand = makeParams("/steelengine doctor fix", cfg).command;
   const doctorReply = await runSystemAgentRescueMessage({
     cfg,
     command: doctorCommand,
-    commandBody: "/openclaw doctor fix",
+    commandBody: "/steelengine doctor fix",
     agentId: "default",
     isGroup: false,
     deps: {
@@ -247,12 +247,12 @@ async function main() {
     },
   });
   assert(
-    doctorReply?.includes("openclaw doctor --fix"),
+    doctorReply?.includes("steelengine doctor --fix"),
     "remote doctor fix did not point to the local repair command",
   );
   assert(doctorRuns.length === 0, "remote rescue must not invoke doctor repair");
 
-  const updatedConfig = JSON.parse(await fs.readFile(configPath, "utf8")) as OpenClawConfig;
+  const updatedConfig = JSON.parse(await fs.readFile(configPath, "utf8")) as SteelEngineConfig;
   const updatedModel = updatedConfig.agents?.defaults?.model;
   assert(
     (typeof updatedModel === "string" ? updatedModel : updatedModel?.primary) === "openai/gpt-5.2",
@@ -263,16 +263,16 @@ async function main() {
     updatedConfig.gateway?.auth?.token &&
       typeof updatedConfig.gateway.auth.token === "object" &&
       "id" in updatedConfig.gateway.auth.token &&
-      updatedConfig.gateway.auth.token.id === "OPENCLAW_GATEWAY_TOKEN",
+      updatedConfig.gateway.auth.token.id === "STEELENGINE_GATEWAY_TOKEN",
     "SecretRef set did not update gateway.auth.token",
   );
   assert(
-    updatedConfig.agents?.defaults?.workspace === "/tmp/openclaw-setup",
+    updatedConfig.agents?.defaults?.workspace === "/tmp/steelengine-setup",
     "setup did not update default workspace",
   );
   assert(
     updatedConfig.agents?.list?.some(
-      (agent) => agent.id === "work" && agent.workspace === "/tmp/openclaw-work",
+      (agent) => agent.id === "work" && agent.workspace === "/tmp/steelengine-work",
     ),
     "agent config was not updated",
   );
@@ -294,7 +294,7 @@ async function main() {
     "SecretRef config audit missing",
   );
   assert(
-    audits.some((audit) => audit.operation === "openclaw.setup"),
+    audits.some((audit) => audit.operation === "steelengine.setup"),
     "setup audit missing",
   );
   const agentAudit = audits.find((audit) => audit.operation === "agents.create");
@@ -308,7 +308,7 @@ async function main() {
     "gateway restart audit operation missing",
   );
 
-  console.log("OpenClaw rescue Docker E2E passed");
+  console.log("SteelEngine rescue Docker E2E passed");
 }
 
 main().catch((err: unknown) => {

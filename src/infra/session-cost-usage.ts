@@ -3,9 +3,9 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import readline from "node:readline";
-import { asFiniteNumber } from "@openclaw/normalization-core/number-coercion";
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
-import { truncateUtf16Safe } from "@openclaw/normalization-core/utf16-slice";
+import { asFiniteNumber } from "@steelengine/normalization-core/number-coercion";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
+import { truncateUtf16Safe } from "@steelengine/normalization-core/utf16-slice";
 import type { NormalizedUsage, UsageLike } from "../agents/usage.js";
 import { normalizeUsage } from "../agents/usage.js";
 import { stripInboundMetadata } from "../auto-reply/reply/strip-inbound-meta.js";
@@ -45,11 +45,11 @@ import {
 } from "../config/sessions/transcript-tree.js";
 import { selectVisibleTranscriptEvents } from "../config/sessions/transcript-visible-events.js";
 import type { SessionEntry } from "../config/sessions/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { normalizeAgentId } from "../routing/session-key.js";
 import { stripEnvelope, stripMessageIdHints } from "../shared/chat-envelope.js";
-import { resolveOpenClawAgentSqlitePath } from "../state/openclaw-agent-db.js";
+import { resolveSteelEngineAgentSqlitePath } from "../state/steelengine-agent-db.js";
 import { runTasksWithConcurrency } from "../utils/run-with-concurrency.js";
 import { countToolResults, extractToolCallNames } from "../utils/transcript-tools.js";
 import {
@@ -115,7 +115,7 @@ const logger = createSubsystemLogger("usage-cost-cache");
 
 type UsageCostRefreshState = {
   agentId?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   databasePath: string;
   fullRefreshRequested: boolean;
   pendingSessionFiles: Set<string>;
@@ -129,7 +129,7 @@ type UsageCostRefreshResult = "refreshed" | "busy";
 const usageCostRefreshes = new Map<string, UsageCostRefreshState>();
 
 function resolveUsageCostCacheDatabasePath(agentId?: string): string {
-  return resolveOpenClawAgentSqlitePath({ agentId: normalizeAgentId(agentId) });
+  return resolveSteelEngineAgentSqlitePath({ agentId: normalizeAgentId(agentId) });
 }
 
 type UsageCostJsonlCheckpoint = {
@@ -179,7 +179,7 @@ type UsageCostTranscriptFile = {
   maxSeq?: number;
 };
 
-function resolveUsageCostPricingFingerprint(config?: OpenClawConfig): string {
+function resolveUsageCostPricingFingerprint(config?: SteelEngineConfig): string {
   return resolveModelCostConfigFingerprint(config);
 }
 
@@ -346,7 +346,7 @@ function listUsageCountedSqliteTranscriptStats(
 function formatCanonicalUsageCostSqliteMarker(marker: SqliteSessionFileMarker): string {
   const storePath =
     resolveSqliteTargetFromSessionStorePath(marker.storePath, { agentId: marker.agentId }).path ??
-    resolveOpenClawAgentSqlitePath({ agentId: marker.agentId });
+    resolveSteelEngineAgentSqlitePath({ agentId: marker.agentId });
   return formatSqliteSessionFileMarker({ ...marker, storePath });
 }
 
@@ -858,7 +858,7 @@ type UsageCostResolver = (params: {
   model?: string;
 }) => ReturnType<typeof resolveModelCostConfig>;
 
-function createUsageCostResolver(config?: OpenClawConfig): UsageCostResolver {
+function createUsageCostResolver(config?: SteelEngineConfig): UsageCostResolver {
   const cache = new Map<string, ReturnType<typeof resolveModelCostConfig>>();
   return ({ provider, model }) => {
     const key = `${provider ?? ""}\0${model ?? ""}`;
@@ -1081,7 +1081,7 @@ function parseUsageCostTranscriptEntry(
 
 async function scanTranscriptFile(params: {
   filePath: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   resolveCost?: UsageCostResolver;
   startOffset?: number;
   endOffset?: number;
@@ -1103,7 +1103,7 @@ async function scanTranscriptFile(params: {
 
 async function scanUsageFile(params: {
   filePath: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   resolveCost?: UsageCostResolver;
   startOffset?: number;
   endOffset?: number;
@@ -1207,7 +1207,7 @@ export async function loadCostUsageSummary(params?: {
   startMs?: number;
   endMs?: number;
   dayBucket?: UsageDailyBucket;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentId?: string;
 }): Promise<CostUsageSummary> {
   const now = Date.now();
@@ -1510,7 +1510,7 @@ async function scanUsageFileForRollup(params: {
 }
 
 async function refreshCostUsageCacheForAgent(params?: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentId?: string;
   databasePath?: string;
   maxFiles?: number;
@@ -1599,7 +1599,7 @@ async function refreshCostUsageCacheForAgent(params?: {
 }
 
 async function refreshCostUsageCache(params?: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentId?: string;
   maxFiles?: number;
   sessionFiles?: string[];
@@ -1612,7 +1612,7 @@ export async function loadCostUsageSummaryFromCache(params: {
   startMs: number;
   endMs: number;
   dayBucket?: UsageDailyBucket;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentId?: string;
   requestRefresh?: boolean;
   refreshMode?: "background" | "sync-when-empty";
@@ -1653,7 +1653,7 @@ export async function loadCostUsageSummaryFromCache(params: {
 
 export async function loadSessionCostSummariesFromCache(params: {
   sessions: Array<{ sessionId?: string; sessionFile: string }>;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentId?: string;
   startMs?: number;
   endMs?: number;
@@ -1724,7 +1724,7 @@ export async function loadSessionCostSummariesFromCache(params: {
 }
 
 function requestCostUsageCacheRefresh(params?: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentId?: string;
   sessionFiles?: string[];
 }): void {
@@ -1753,7 +1753,7 @@ function requestCostUsageCacheRefresh(params?: {
 function mergeUsageCostRefreshRequest(
   state: UsageCostRefreshState,
   params?: {
-    config?: OpenClawConfig;
+    config?: SteelEngineConfig;
     agentId?: string;
     sessionFiles?: string[];
   },
@@ -1932,7 +1932,7 @@ export async function loadSessionCostSummary(params: {
   sessionId?: string;
   sessionEntry?: SessionEntry;
   sessionFile?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentId?: string;
   startMs?: number;
   endMs?: number;
@@ -1989,7 +1989,7 @@ export async function loadSessionUsageTimeSeries(params: {
   sessionId?: string;
   sessionEntry?: SessionEntry;
   sessionFile?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentId?: string;
   maxPoints?: number;
 }): Promise<SessionUsageTimeSeries | null> {
@@ -2102,7 +2102,7 @@ export async function loadSessionLogs(params: {
   sessionId?: string;
   sessionEntry?: SessionEntry;
   sessionFile?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentId?: string;
   limit?: number;
 }): Promise<SessionLogEntry[] | null> {

@@ -2,9 +2,9 @@ import {
   WORKBOARD_STATUSES,
   type WorkboardCard,
   type WorkboardStatus,
-} from "@openclaw/workboard-contract";
+} from "@steelengine/workboard-contract";
 // Workboard plugin module implements command behavior.
-import type { OpenClawPluginApi } from "../api.js";
+import type { SteelEnginePluginApi } from "../api.js";
 import { resolveWorkboardCardByIdOrPrefix } from "./card-lookup.js";
 import {
   dispatchAndStartWorkboardCards,
@@ -211,7 +211,7 @@ async function handleWorkboardCommand(params: {
 }
 
 export function registerWorkboardCommand(params: {
-  api: OpenClawPluginApi;
+  api: SteelEnginePluginApi;
   store: WorkboardStore;
 }): void {
   params.api.registerCommand({

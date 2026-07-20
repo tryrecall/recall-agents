@@ -13,7 +13,7 @@ import {
 } from "../config/config.js";
 import type { ConfigWriteOptions } from "../config/io.js";
 import { extractShippedPluginInstallConfigRecords } from "../config/plugin-install-config-migration.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 import { isPathInside } from "../infra/path-guards.js";
 import {
@@ -39,14 +39,14 @@ function mergeUnsetPaths(
 }
 
 /** Return whether config still contains legacy/transient plugin install records. */
-export function hasPendingPluginInstallRecords(config: OpenClawConfig): boolean {
+export function hasPendingPluginInstallRecords(config: SteelEngineConfig): boolean {
   return Object.keys(config.plugins?.installs ?? {}).length > 0;
 }
 
 /** Find pending install records that match the base config and can be stripped as unchanged. */
 export function unchangedPendingPluginInstallRecordIds(
-  config: OpenClawConfig,
-  baseConfig: OpenClawConfig,
+  config: SteelEngineConfig,
+  baseConfig: SteelEngineConfig,
 ): string[] {
   const pendingInstalls = config.plugins?.installs ?? {};
   return Object.entries(baseConfig.plugins?.installs ?? {})
@@ -56,9 +56,9 @@ export function unchangedPendingPluginInstallRecordIds(
 
 /** Remove pending plugin install records from config, optionally only for selected ids. */
 export function stripPendingPluginInstallRecords(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   pluginIds?: Iterable<string>,
-): OpenClawConfig {
+): SteelEngineConfig {
   if (!pluginIds) {
     return withoutPluginInstallRecords(config);
   }
@@ -82,7 +82,7 @@ export function stripPendingPluginInstallRecords(
 }
 
 type ConfigCommit = (
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   writeOptions?: ConfigWriteOptions,
 ) => Promise<ConfigReplaceResult | void>;
 const PLUGIN_SOURCE_CHANGED_RESTART_REASON = "plugin source changed";
@@ -134,7 +134,7 @@ function resolveRetainedManagedNpmInstallMarkerTarget(params: {
           [params.pluginId]: params.previousRecord,
         },
       },
-    } as OpenClawConfig,
+    } as SteelEngineConfig,
     pluginId: params.pluginId,
     deleteFiles: true,
   });
@@ -275,7 +275,7 @@ async function restoreClearedRetainedManagedNpmInstallMarkers(
 async function commitPluginInstallRecordsWithWriter(params: {
   previousInstallRecords?: Record<string, PluginInstallRecord>;
   nextInstallRecords: Record<string, PluginInstallRecord>;
-  nextConfig: OpenClawConfig;
+  nextConfig: SteelEngineConfig;
   writeOptions?: ConfigWriteOptions;
   commit: ConfigCommit;
 }): Promise<ConfigReplaceResult | void> {
@@ -331,7 +331,7 @@ async function commitPluginInstallRecordsWithWriter(params: {
 export async function commitPluginInstallRecordsWithConfig(params: {
   previousInstallRecords?: Record<string, PluginInstallRecord>;
   nextInstallRecords: Record<string, PluginInstallRecord>;
-  nextConfig: OpenClawConfig;
+  nextConfig: SteelEngineConfig;
   baseHash?: string;
   writeOptions?: ConfigWriteOptions;
 }): Promise<void> {
@@ -366,13 +366,13 @@ export async function commitPluginInstallRecordsOnly(params: {
 
 /** Commit config while migrating any pending install records into the install index. */
 export async function commitConfigWriteWithPendingPluginInstalls(params: {
-  nextConfig: OpenClawConfig;
+  nextConfig: SteelEngineConfig;
   /** Source snapshot whose transient records migrate below the canonical index. */
-  sourceConfig?: OpenClawConfig;
+  sourceConfig?: SteelEngineConfig;
   writeOptions?: ConfigWriteOptions;
   commit: ConfigCommit;
 }): Promise<{
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   installRecords: Record<string, PluginInstallRecord>;
   movedInstallRecords: boolean;
   persistedHash: string | null;
@@ -426,11 +426,11 @@ export async function commitConfigWriteWithPendingPluginInstalls(params: {
 
 /** Replace the config file after moving pending plugin install records into the install index. */
 export async function commitConfigWithPendingPluginInstalls(params: {
-  nextConfig: OpenClawConfig;
+  nextConfig: SteelEngineConfig;
   baseHash?: string;
   writeOptions?: ConfigWriteOptions;
 }): Promise<{
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   installRecords: Record<string, PluginInstallRecord>;
   movedInstallRecords: boolean;
   persistedHash: string | null;

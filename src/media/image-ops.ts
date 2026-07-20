@@ -9,12 +9,12 @@ import {
   type ImageMetadata,
 } from "rastermill";
 import { resolveSystemBin } from "../infra/resolve-system-bin.js";
-import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
+import { resolvePreferredSteelEngineTmpDir } from "../infra/tmp-steelengine-dir.js";
 import { createLazyRuntimeModule } from "../shared/lazy-runtime.js";
 
 export type { ImageMetadata, ImageProbe };
 
-/** OpenClaw-facing image backend availability error, preserving the failed operation and causes. */
+/** SteelEngine-facing image backend availability error, preserving the failed operation and causes. */
 class ImageProcessorUnavailableError extends Error {
   readonly code = "IMAGE_PROCESSOR_UNAVAILABLE";
   readonly operation: string;
@@ -45,7 +45,7 @@ export const MAX_IMAGE_INPUT_PIXELS = 25_000_000;
 
 const loadPhotonRuntime = createLazyRuntimeModule(() => import("./photon.runtime.js"));
 
-/** Creates a Rastermill processor with OpenClaw temp-dir, pixel-limit, and command trust policy. */
+/** Creates a Rastermill processor with SteelEngine temp-dir, pixel-limit, and command trust policy. */
 export function createImageProcessor() {
   return createRastermill({
     execution: "auto",
@@ -54,15 +54,15 @@ export function createImageProcessor() {
       outputPixels: MAX_IMAGE_INPUT_PIXELS,
     },
     temp: {
-      rootDir: resolvePreferredOpenClawTmpDir(),
-      prefix: "openclaw-img-",
+      rootDir: resolvePreferredSteelEngineTmpDir(),
+      prefix: "steelengine-img-",
     },
     commandResolver: (command) =>
       resolveSystemBin(command, { trust: command === "powershell" ? "strict" : "standard" }),
   });
 }
 
-/** Detects either OpenClaw's wrapper error or Rastermill's native unavailable error. */
+/** Detects either SteelEngine's wrapper error or Rastermill's native unavailable error. */
 export function isImageProcessorUnavailableError(err: unknown): boolean {
   return err instanceof ImageProcessorUnavailableError || isRastermillUnavailableError(err);
 }

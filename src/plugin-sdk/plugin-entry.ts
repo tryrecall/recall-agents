@@ -1,5 +1,5 @@
 // Plugin entry contracts define the manifest-facing hooks implemented by plugin packages.
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { emptyPluginConfigSchema } from "../plugins/config-schema.js";
 import type {
   AgentHarness as _AgentHarness,
@@ -16,25 +16,25 @@ import type {
   MigrationProviderPlugin as _MigrationProviderPlugin,
   ProviderPlugin as _ProviderPlugin,
   MigrationSummary as _MigrationSummary,
-  OpenClawGatewayDiscoveryAdvertiseContext as _OpenClawGatewayDiscoveryAdvertiseContext,
-  OpenClawGatewayDiscoveryService as _OpenClawGatewayDiscoveryService,
-  OpenClawPluginApi as _OpenClawPluginApi,
-  OpenClawPluginCommandDefinition as _OpenClawPluginCommandDefinition,
-  OpenClawPluginConfigSchema as _OpenClawPluginConfigSchema,
-  OpenClawPluginDefinition as _OpenClawPluginDefinition,
-  OpenClawPluginHttpRouteHandler as _OpenClawPluginHttpRouteHandler,
-  OpenClawPluginNodeHostCommand as _OpenClawPluginNodeHostCommand,
-  OpenClawPluginNodeHostCommandAvailabilityContext as _OpenClawPluginNodeHostCommandAvailabilityContext,
-  OpenClawPluginNodeInvokePolicy as _OpenClawPluginNodeInvokePolicy,
-  OpenClawPluginNodeInvokePolicyContext as _OpenClawPluginNodeInvokePolicyContext,
-  OpenClawPluginNodeInvokePolicyResult as _OpenClawPluginNodeInvokePolicyResult,
-  OpenClawPluginReloadRegistration as _OpenClawPluginReloadRegistration,
-  OpenClawPluginSecurityAuditCollector as _OpenClawPluginSecurityAuditCollector,
-  OpenClawPluginSecurityAuditContext as _OpenClawPluginSecurityAuditContext,
-  OpenClawPluginService as _OpenClawPluginService,
-  OpenClawPluginServiceContext as _OpenClawPluginServiceContext,
-  OpenClawPluginToolContext as _OpenClawPluginToolContext,
-  OpenClawPluginToolFactory as _OpenClawPluginToolFactory,
+  SteelEngineGatewayDiscoveryAdvertiseContext as _SteelEngineGatewayDiscoveryAdvertiseContext,
+  SteelEngineGatewayDiscoveryService as _SteelEngineGatewayDiscoveryService,
+  SteelEnginePluginApi as _SteelEnginePluginApi,
+  SteelEnginePluginCommandDefinition as _SteelEnginePluginCommandDefinition,
+  SteelEnginePluginConfigSchema as _SteelEnginePluginConfigSchema,
+  SteelEnginePluginDefinition as _SteelEnginePluginDefinition,
+  SteelEnginePluginHttpRouteHandler as _SteelEnginePluginHttpRouteHandler,
+  SteelEnginePluginNodeHostCommand as _SteelEnginePluginNodeHostCommand,
+  SteelEnginePluginNodeHostCommandAvailabilityContext as _SteelEnginePluginNodeHostCommandAvailabilityContext,
+  SteelEnginePluginNodeInvokePolicy as _SteelEnginePluginNodeInvokePolicy,
+  SteelEnginePluginNodeInvokePolicyContext as _SteelEnginePluginNodeInvokePolicyContext,
+  SteelEnginePluginNodeInvokePolicyResult as _SteelEnginePluginNodeInvokePolicyResult,
+  SteelEnginePluginReloadRegistration as _SteelEnginePluginReloadRegistration,
+  SteelEnginePluginSecurityAuditCollector as _SteelEnginePluginSecurityAuditCollector,
+  SteelEnginePluginSecurityAuditContext as _SteelEnginePluginSecurityAuditContext,
+  SteelEnginePluginService as _SteelEnginePluginService,
+  SteelEnginePluginServiceContext as _SteelEnginePluginServiceContext,
+  SteelEnginePluginToolContext as _SteelEnginePluginToolContext,
+  SteelEnginePluginToolFactory as _SteelEnginePluginToolFactory,
   PluginAgentEventEmitParams as _PluginAgentEventEmitParams,
   PluginAgentEventEmitResult as _PluginAgentEventEmitResult,
   PluginAgentEventSubscriptionRegistration as _PluginAgentEventSubscriptionRegistration,
@@ -152,26 +152,26 @@ export type MigrationProviderPlugin = _MigrationProviderPlugin;
 // The plugin-authoring scaffold generates code importing ProviderPlugin from this entrypoint.
 export type ProviderPlugin = _ProviderPlugin;
 export type MigrationSummary = _MigrationSummary;
-export type OpenClawGatewayDiscoveryAdvertiseContext = _OpenClawGatewayDiscoveryAdvertiseContext;
-export type OpenClawGatewayDiscoveryService = _OpenClawGatewayDiscoveryService;
-export type OpenClawPluginApi = _OpenClawPluginApi;
-export type OpenClawPluginCommandDefinition = _OpenClawPluginCommandDefinition;
-export type OpenClawPluginConfigSchema = _OpenClawPluginConfigSchema;
-export type OpenClawPluginDefinition = _OpenClawPluginDefinition;
-export type OpenClawPluginHttpRouteHandler = _OpenClawPluginHttpRouteHandler;
-export type OpenClawPluginNodeHostCommand = _OpenClawPluginNodeHostCommand;
-export type OpenClawPluginNodeHostCommandAvailabilityContext =
-  _OpenClawPluginNodeHostCommandAvailabilityContext;
-export type OpenClawPluginNodeInvokePolicy = _OpenClawPluginNodeInvokePolicy;
-export type OpenClawPluginNodeInvokePolicyContext = _OpenClawPluginNodeInvokePolicyContext;
-export type OpenClawPluginNodeInvokePolicyResult = _OpenClawPluginNodeInvokePolicyResult;
-export type OpenClawPluginReloadRegistration = _OpenClawPluginReloadRegistration;
-export type OpenClawPluginSecurityAuditCollector = _OpenClawPluginSecurityAuditCollector;
-export type OpenClawPluginSecurityAuditContext = _OpenClawPluginSecurityAuditContext;
-export type OpenClawPluginService = _OpenClawPluginService;
-export type OpenClawPluginServiceContext = _OpenClawPluginServiceContext;
-export type OpenClawPluginToolContext = _OpenClawPluginToolContext;
-export type OpenClawPluginToolFactory = _OpenClawPluginToolFactory;
+export type SteelEngineGatewayDiscoveryAdvertiseContext = _SteelEngineGatewayDiscoveryAdvertiseContext;
+export type SteelEngineGatewayDiscoveryService = _SteelEngineGatewayDiscoveryService;
+export type SteelEnginePluginApi = _SteelEnginePluginApi;
+export type SteelEnginePluginCommandDefinition = _SteelEnginePluginCommandDefinition;
+export type SteelEnginePluginConfigSchema = _SteelEnginePluginConfigSchema;
+export type SteelEnginePluginDefinition = _SteelEnginePluginDefinition;
+export type SteelEnginePluginHttpRouteHandler = _SteelEnginePluginHttpRouteHandler;
+export type SteelEnginePluginNodeHostCommand = _SteelEnginePluginNodeHostCommand;
+export type SteelEnginePluginNodeHostCommandAvailabilityContext =
+  _SteelEnginePluginNodeHostCommandAvailabilityContext;
+export type SteelEnginePluginNodeInvokePolicy = _SteelEnginePluginNodeInvokePolicy;
+export type SteelEnginePluginNodeInvokePolicyContext = _SteelEnginePluginNodeInvokePolicyContext;
+export type SteelEnginePluginNodeInvokePolicyResult = _SteelEnginePluginNodeInvokePolicyResult;
+export type SteelEnginePluginReloadRegistration = _SteelEnginePluginReloadRegistration;
+export type SteelEnginePluginSecurityAuditCollector = _SteelEnginePluginSecurityAuditCollector;
+export type SteelEnginePluginSecurityAuditContext = _SteelEnginePluginSecurityAuditContext;
+export type SteelEnginePluginService = _SteelEnginePluginService;
+export type SteelEnginePluginServiceContext = _SteelEnginePluginServiceContext;
+export type SteelEnginePluginToolContext = _SteelEnginePluginToolContext;
+export type SteelEnginePluginToolFactory = _SteelEnginePluginToolFactory;
 export type PluginAgentEventEmitParams = _PluginAgentEventEmitParams;
 export type PluginAgentEventEmitResult = _PluginAgentEventEmitResult;
 export type PluginAgentEventSubscriptionRegistration = _PluginAgentEventSubscriptionRegistration;
@@ -271,10 +271,10 @@ export type WorkerSshEndpoint = _WorkerSshEndpoint;
 export type WorkerSshIdentity = _WorkerSshIdentity;
 export type WorkerSshIdentityRequest = _WorkerSshIdentityRequest;
 
-export type OpenClawPluginGatewayEventScope =
-  import("../plugins/gateway-events.js").OpenClawPluginGatewayEventScope;
-export type OpenClawPluginGatewayEvents =
-  import("../plugins/gateway-events.js").OpenClawPluginGatewayEvents;
+export type SteelEnginePluginGatewayEventScope =
+  import("../plugins/gateway-events.js").SteelEnginePluginGatewayEventScope;
+export type SteelEnginePluginGatewayEvents =
+  import("../plugins/gateway-events.js").SteelEnginePluginGatewayEvents;
 export { WorkerProviderError } from "../plugins/types.js";
 
 export type {
@@ -293,8 +293,8 @@ export type {
   UnifiedModelCatalogEntry,
   UnifiedModelCatalogKind,
   UnifiedModelCatalogSource,
-} from "@openclaw/model-catalog-core/model-catalog-types";
-export type { OpenClawConfig };
+} from "@steelengine/model-catalog-core/model-catalog-types";
+export type { SteelEngineConfig };
 
 export {
   buildJsonPluginConfigSchema,
@@ -308,27 +308,27 @@ type DefinePluginEntryOptions = {
   name: string;
   description: string;
   /**
-   * @deprecated Declare exclusive plugin kind in `openclaw.plugin.json` via
+   * @deprecated Declare exclusive plugin kind in `steelengine.plugin.json` via
    * manifest `kind`. Runtime-entry `kind` remains only as a compatibility
    * fallback for older plugins.
    */
-  kind?: OpenClawPluginDefinition["kind"];
-  configSchema?: OpenClawPluginConfigSchema | (() => OpenClawPluginConfigSchema);
-  reload?: OpenClawPluginDefinition["reload"];
-  nodeHostCommands?: OpenClawPluginDefinition["nodeHostCommands"];
-  securityAuditCollectors?: OpenClawPluginDefinition["securityAuditCollectors"];
-  register: (api: OpenClawPluginApi) => void;
+  kind?: SteelEnginePluginDefinition["kind"];
+  configSchema?: SteelEnginePluginConfigSchema | (() => SteelEnginePluginConfigSchema);
+  reload?: SteelEnginePluginDefinition["reload"];
+  nodeHostCommands?: SteelEnginePluginDefinition["nodeHostCommands"];
+  securityAuditCollectors?: SteelEnginePluginDefinition["securityAuditCollectors"];
+  register: (api: SteelEnginePluginApi) => void;
 };
 
-/** Normalized object shape that OpenClaw loads from a plugin entry module. */
+/** Normalized object shape that SteelEngine loads from a plugin entry module. */
 type DefinedPluginEntry = {
   id: string;
   name: string;
   description: string;
-  configSchema: OpenClawPluginConfigSchema;
-  register: NonNullable<OpenClawPluginDefinition["register"]>;
+  configSchema: SteelEnginePluginConfigSchema;
+  register: NonNullable<SteelEnginePluginDefinition["register"]>;
 } & Pick<
-  OpenClawPluginDefinition,
+  SteelEnginePluginDefinition,
   "kind" | "reload" | "nodeHostCommands" | "securityAuditCollectors"
 >;
 
@@ -337,7 +337,7 @@ type DefinedPluginEntry = {
  *
  * Use this for provider, tool, command, service, memory, and context-engine
  * plugins. Channel plugins should use `defineChannelPluginEntry(...)` from
- * `openclaw/plugin-sdk/core` so they inherit the channel capability wiring.
+ * `steelengine/plugin-sdk/core` so they inherit the channel capability wiring.
  */
 export function definePluginEntry({
   id,

@@ -1,13 +1,13 @@
 // Zalo plugin module implements monitor mocks test support behavior.
-import { createPluginRuntimeMock } from "openclaw/plugin-sdk/channel-test-helpers";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
+import { createPluginRuntimeMock } from "steelengine/plugin-sdk/channel-test-helpers";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
 import {
   createEmptyPluginRegistry,
   createRuntimeEnv,
   setActivePluginRegistry,
-} from "openclaw/plugin-sdk/plugin-test-runtime";
+} from "steelengine/plugin-sdk/plugin-test-runtime";
 import { vi, type Mock } from "vitest";
-import type { OpenClawConfig } from "../runtime-api.js";
+import type { SteelEngineConfig } from "../runtime-api.js";
 import type { ResolvedZaloAccount } from "../types.js";
 
 type MonitorModule = typeof import("../monitor.js");
@@ -144,7 +144,7 @@ export async function loadCachedLifecycleMonitorModule(cacheKey: string): Promis
 
 export async function startWebhookLifecycleMonitor(params: {
   account: ResolvedZaloAccount;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   token?: string;
   webhookUrl?: string;
   webhookSecret?: string;

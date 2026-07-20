@@ -1,21 +1,21 @@
 import {
   buildChannelInboundEventContext,
   resolveChannelInboundRouteEnvelope,
-} from "openclaw/plugin-sdk/channel-inbound";
+} from "steelengine/plugin-sdk/channel-inbound";
 // Qa Channel plugin module implements inbound behavior.
-import { resolveStableChannelMessageIngress } from "openclaw/plugin-sdk/channel-ingress-runtime";
-import { resolveNativeCommandSessionTargets } from "openclaw/plugin-sdk/command-auth-native";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import { resolveStableChannelMessageIngress } from "steelengine/plugin-sdk/channel-ingress-runtime";
+import { resolveNativeCommandSessionTargets } from "steelengine/plugin-sdk/command-auth-native";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 import {
   buildAgentMediaPayload,
   saveMediaBuffer,
   saveMediaSource,
-} from "openclaw/plugin-sdk/media-runtime";
+} from "steelengine/plugin-sdk/media-runtime";
 import {
   sanitizeQaBusToolCallArguments,
   type QaBusToolCall,
-} from "openclaw/plugin-sdk/qa-channel-protocol";
+} from "steelengine/plugin-sdk/qa-channel-protocol";
 import {
   buildQaTarget,
   deleteQaBusMessage,
@@ -223,7 +223,7 @@ export async function handleQaInbound(params: {
     toolCalls,
   });
   const { route, buildEnvelope } = resolveChannelInboundRouteEnvelope({
-    cfg: params.config as OpenClawConfig,
+    cfg: params.config as SteelEngineConfig,
     channel: params.channelId,
     accountId: params.account.accountId,
     peer: {
@@ -241,7 +241,7 @@ export async function handleQaInbound(params: {
     ? runtime.channel.mentions.matchesMentionPatterns(
         inbound.text,
         runtime.channel.mentions.buildMentionRegexes(
-          params.config as OpenClawConfig,
+          params.config as SteelEngineConfig,
           route.agentId,
         ),
       )
@@ -359,7 +359,7 @@ export async function handleQaInbound(params: {
   });
 
   await runtime.channel.inbound.dispatch({
-    cfg: params.config as OpenClawConfig,
+    cfg: params.config as SteelEngineConfig,
     channel: params.channelId,
     accountId: params.account.accountId,
     route: { agentId: route.agentId, dmScope: route.dmScope, sessionKey: route.sessionKey },

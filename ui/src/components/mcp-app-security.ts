@@ -6,7 +6,7 @@ export type McpAppHostSandboxCsp = NonNullable<
 >;
 
 /** Bubbling event handled by the owning chat pane through its normal send path. */
-export const WIDGET_PROMPT_EVENT = "openclaw-widget-prompt";
+export const WIDGET_PROMPT_EVENT = "steelengine-widget-prompt";
 export type WidgetPromptEventDetail = { text: string };
 
 const WIDGET_PROMPT_MAX_CHARS = 4_000;

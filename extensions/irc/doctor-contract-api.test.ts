@@ -1,10 +1,10 @@
 // Irc tests cover doctor contract api plugin behavior.
-import { expectDefined } from "@openclaw/normalization-core";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import { expectDefined } from "@steelengine/normalization-core";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import { describe, expect, it } from "vitest";
 import { legacyConfigRules, normalizeCompatibilityConfig } from "./doctor-contract-api.js";
 
-function ircConfig(entry: Record<string, unknown>): OpenClawConfig {
+function ircConfig(entry: Record<string, unknown>): SteelEngineConfig {
   return { channels: { irc: entry } } as never;
 }
 

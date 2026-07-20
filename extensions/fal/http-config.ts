@@ -1,21 +1,21 @@
 // Fal helper module supports http config behavior.
-import type { AuthProfileStore, OpenClawConfig } from "openclaw/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "openclaw/plugin-sdk/provider-auth-runtime";
+import type { AuthProfileStore, SteelEngineConfig } from "steelengine/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "steelengine/plugin-sdk/provider-auth-runtime";
 import {
   resolveProviderHttpRequestConfig,
   type ProviderRequestCapability,
-} from "openclaw/plugin-sdk/provider-http";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/provider-http";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
 
 const DEFAULT_FAL_BASE_URL = "https://fal.run";
 
 type FalAuthenticatedRequest = {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   agentDir?: string;
   authStore?: AuthProfileStore;
 };
 
-function resolveFalConfiguredBaseUrl(cfg?: OpenClawConfig): string | undefined {
+function resolveFalConfiguredBaseUrl(cfg?: SteelEngineConfig): string | undefined {
   return normalizeOptionalString(cfg?.models?.providers?.fal?.baseUrl);
 }
 

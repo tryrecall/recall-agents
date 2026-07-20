@@ -1,12 +1,12 @@
 ---
-summary: "CLI reference for `openclaw voicecall` (voice-call plugin command surface)"
+summary: "CLI reference for `steelengine voicecall` (voice-call plugin command surface)"
 read_when:
   - You use the voice-call plugin and want every CLI entry point
   - You need flag tables and defaults for setup, smoke, call, continue, speak, dtmf, end, status, tail, latency, expose, and start
 title: "Voicecall"
 ---
 
-# `openclaw voicecall`
+# `steelengine voicecall`
 
 `voicecall` is a plugin-provided command. It only appears when the voice-call
 plugin is installed and enabled.
@@ -19,18 +19,18 @@ CLI runtime.
 ## Subcommands
 
 ```bash
-openclaw voicecall setup    [--json]
-openclaw voicecall smoke    [-t <phone>] [--message <text>] [--mode <m>] [--yes] [--json]
-openclaw voicecall call     -m <text> [-t <phone>] [--mode <m>]
-openclaw voicecall start    --to <phone> [--message <text>] [--mode <m>]
-openclaw voicecall continue --call-id <id> --message <text>
-openclaw voicecall speak    --call-id <id> --message <text>
-openclaw voicecall dtmf     --call-id <id> --digits <digits>
-openclaw voicecall end      --call-id <id>
-openclaw voicecall status   [--call-id <id>] [--json]
-openclaw voicecall tail     [--file <path>] [--since <n>] [--poll <ms>]
-openclaw voicecall latency  [--file <path>] [--last <n>]
-openclaw voicecall expose   [--mode <m>] [--path <p>] [--port <port>] [--serve-path <p>]
+steelengine voicecall setup    [--json]
+steelengine voicecall smoke    [-t <phone>] [--message <text>] [--mode <m>] [--yes] [--json]
+steelengine voicecall call     -m <text> [-t <phone>] [--mode <m>]
+steelengine voicecall start    --to <phone> [--message <text>] [--mode <m>]
+steelengine voicecall continue --call-id <id> --message <text>
+steelengine voicecall speak    --call-id <id> --message <text>
+steelengine voicecall dtmf     --call-id <id> --digits <digits>
+steelengine voicecall end      --call-id <id>
+steelengine voicecall status   [--call-id <id>] [--json]
+steelengine voicecall tail     [--file <path>] [--since <n>] [--poll <ms>]
+steelengine voicecall latency  [--file <path>] [--last <n>]
+steelengine voicecall expose   [--mode <m>] [--path <p>] [--port <port>] [--serve-path <p>]
 ```
 
 | Subcommand | Description                                                     |
@@ -55,8 +55,8 @@ openclaw voicecall expose   [--mode <m>] [--path <p>] [--port <port>] [--serve-p
 Prints human-readable readiness checks by default. Pass `--json` for scripts.
 
 ```bash
-openclaw voicecall setup
-openclaw voicecall setup --json
+steelengine voicecall setup
+steelengine voicecall setup --json
 ```
 
 ### `smoke`
@@ -67,15 +67,15 @@ Runs the same readiness checks. Places a real phone call only when both
 | Flag               | Default                           | Description                             |
 | ------------------ | --------------------------------- | --------------------------------------- |
 | `-t, --to <phone>` | (none)                            | Phone number to call for a live smoke.  |
-| `--message <text>` | `OpenClaw voice call smoke test.` | Message to speak during the smoke call. |
+| `--message <text>` | `SteelEngine voice call smoke test.` | Message to speak during the smoke call. |
 | `--mode <mode>`    | `notify`                          | Call mode: `notify` or `conversation`.  |
 | `--yes`            | `false`                           | Actually place the live outbound call.  |
 | `--json`           | `false`                           | Print machine-readable JSON.            |
 
 ```bash
-openclaw voicecall smoke
-openclaw voicecall smoke --to "+15555550123"        # dry run
-openclaw voicecall smoke --to "+15555550123" --yes  # live notify call
+steelengine voicecall smoke
+steelengine voicecall smoke --to "+15555550123"        # dry run
+steelengine voicecall smoke --to "+15555550123" --yes  # live notify call
 ```
 
 <Note>
@@ -95,8 +95,8 @@ Initiate an outbound voice call.
 | `--mode <mode>`        | no       | `conversation`    | Call mode: `notify` (hang up after message) or `conversation` (stay open). |
 
 ```bash
-openclaw voicecall call --to "+15555550123" --message "Hello"
-openclaw voicecall call -m "Heads up" --mode notify
+steelengine voicecall call --to "+15555550123" --message "Hello"
+steelengine voicecall call -m "Heads up" --mode notify
 ```
 
 ### `start`
@@ -154,9 +154,9 @@ Inspect active calls.
 | `--json`         | `false` | Print machine-readable JSON. |
 
 ```bash
-openclaw voicecall status
-openclaw voicecall status --json
-openclaw voicecall status --call-id <id>
+steelengine voicecall status
+steelengine voicecall status --json
+steelengine voicecall status --call-id <id>
 ```
 
 ## Logs and metrics
@@ -197,9 +197,9 @@ voice webhook.
 | `--serve-path <path>` | config `serve.path` or `/voice/webhook`   | Local webhook path.                             |
 
 ```bash
-openclaw voicecall expose --mode serve
-openclaw voicecall expose --mode funnel
-openclaw voicecall expose --mode off
+steelengine voicecall expose --mode serve
+steelengine voicecall expose --mode funnel
+steelengine voicecall expose --mode off
 ```
 
 <Warning>

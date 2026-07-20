@@ -1,31 +1,31 @@
-"CFBundleDisplayName" = "$(OPENCLAW_APP_DISPLAY_NAME)";
-/* OpenClaw source: "OpenClaw uses your calendars to show events and scheduling context when you enable calendar access." */
-"NSCalendarsFullAccessUsageDescription" = "OpenClaw använder dina kalendrar för att visa händelser och schemaläggningssammanhang när du aktiverar kalenderåtkomst.";
-/* OpenClaw source: "OpenClaw uses your calendars to show events and scheduling context when you enable calendar access." */
-"NSCalendarsUsageDescription" = "OpenClaw använder dina kalendrar för att visa händelser och schemaläggningssammanhang när du aktiverar kalenderåtkomst.";
-/* OpenClaw source: "OpenClaw uses your calendars to add events when you enable calendar access." */
-"NSCalendarsWriteOnlyAccessUsageDescription" = "OpenClaw använder dina kalendrar för att lägga till händelser när du aktiverar kalenderåtkomst.";
-/* OpenClaw source: "OpenClaw uses the camera when you scan a Gateway setup QR code or ask your paired Gateway or assistant to capture a photo or short video from this iPhone, for example to connect to your Gateway or show your assistant a document, device screen, or workspace." */
-"NSCameraUsageDescription" = "OpenClaw använder kameran när du skannar en QR-kod för Gateway-konfiguration eller ber din parkopplade Gateway eller assistent att ta ett foto eller en kort video från denna iPhone, till exempel för att ansluta till din Gateway eller visa din assistent ett dokument, en enhetsskärm eller en arbetsyta.";
-/* OpenClaw source: "OpenClaw uses your contacts so you can search and reference people while using the assistant." */
-"NSContactsUsageDescription" = "OpenClaw använder dina kontakter så att du kan söka efter och referera till personer när du använder assistenten.";
-/* OpenClaw source: "OpenClaw discovers and connects to your OpenClaw gateway on the local network." */
-"NSLocalNetworkUsageDescription" = "OpenClaw hittar och ansluter till din OpenClaw-gateway i det lokala nätverket.";
-/* OpenClaw source: "OpenClaw can share your location in the background when you enable Always." */
-"NSLocationAlwaysAndWhenInUseUsageDescription" = "OpenClaw kan dela din plats i bakgrunden när du aktiverar Alltid.";
-/* OpenClaw source: "OpenClaw uses your location when you allow location sharing." */
-"NSLocationWhenInUseUsageDescription" = "OpenClaw använder din plats när du tillåter platsdelning.";
-/* OpenClaw source: "OpenClaw uses the microphone for realtime chat, voice wake, push-to-talk, and voice notes." */
-"NSMicrophoneUsageDescription" = "OpenClaw använder mikrofonen för realtidschatt, röstväckning, tryck-och-tala och röstanteckningar.";
-/* OpenClaw source: "OpenClaw may use motion data to support device-aware interactions and automations." */
-"NSMotionUsageDescription" = "OpenClaw kan använda rörelsedata för att stödja enhetsmedvetna interaktioner och automatiseringar.";
-/* OpenClaw source: "OpenClaw reads your steps, sleep, resting heart rate, and workouts from the Apple Health app to create summaries you request and send them through your Gateway to your configured AI provider." */
-"NSHealthShareUsageDescription" = "OpenClaw läser dina steg, din sömn, din vilopuls och dina träningspass från appen Apple Hälsa för att skapa sammanfattningar som du begär och skicka dem via din Gateway till din konfigurerade AI-leverantör.";
-/* OpenClaw source: "OpenClaw does not write to the Apple Health app. It uses read-only data to create summaries you request and send them through your Gateway to your configured AI provider." */
-"NSHealthUpdateUsageDescription" = "OpenClaw skriver inte till appen Apple Hälsa. Skrivskyddade data används för att skapa sammanfattningar som du begär och skicka dem via din Gateway till din konfigurerade AI-leverantör.";
-/* OpenClaw source: "OpenClaw lets your assistant read photos you allow and lets you choose photos to share." */
-"NSPhotoLibraryUsageDescription" = "OpenClaw låter din assistent läsa foton du tillåter och låter dig välja foton att dela.";
-/* OpenClaw source: "OpenClaw uses your reminders to list, add, and complete tasks when you enable reminders access." */
-"NSRemindersFullAccessUsageDescription" = "OpenClaw använder dina påminnelser för att lista, lägga till och slutföra uppgifter när du aktiverar åtkomst till påminnelser.";
-/* OpenClaw source: "OpenClaw uses on-device speech recognition for talk mode and voice wake." */
-"NSSpeechRecognitionUsageDescription" = "OpenClaw använder taligenkänning på enheten för talläge och röstaktivering.";
+"CFBundleDisplayName" = "$(STEELENGINE_APP_DISPLAY_NAME)";
+/* SteelEngine source: "SteelEngine uses your calendars to show events and scheduling context when you enable calendar access." */
+"NSCalendarsFullAccessUsageDescription" = "SteelEngine använder dina kalendrar för att visa händelser och schemaläggningssammanhang när du aktiverar kalenderåtkomst.";
+/* SteelEngine source: "SteelEngine uses your calendars to show events and scheduling context when you enable calendar access." */
+"NSCalendarsUsageDescription" = "SteelEngine använder dina kalendrar för att visa händelser och schemaläggningssammanhang när du aktiverar kalenderåtkomst.";
+/* SteelEngine source: "SteelEngine uses your calendars to add events when you enable calendar access." */
+"NSCalendarsWriteOnlyAccessUsageDescription" = "SteelEngine använder dina kalendrar för att lägga till händelser när du aktiverar kalenderåtkomst.";
+/* SteelEngine source: "SteelEngine uses the camera when you scan a Gateway setup QR code or ask your paired Gateway or assistant to capture a photo or short video from this iPhone, for example to connect to your Gateway or show your assistant a document, device screen, or workspace." */
+"NSCameraUsageDescription" = "SteelEngine använder kameran när du skannar en QR-kod för Gateway-konfiguration eller ber din parkopplade Gateway eller assistent att ta ett foto eller en kort video från denna iPhone, till exempel för att ansluta till din Gateway eller visa din assistent ett dokument, en enhetsskärm eller en arbetsyta.";
+/* SteelEngine source: "SteelEngine uses your contacts so you can search and reference people while using the assistant." */
+"NSContactsUsageDescription" = "SteelEngine använder dina kontakter så att du kan söka efter och referera till personer när du använder assistenten.";
+/* SteelEngine source: "SteelEngine discovers and connects to your SteelEngine gateway on the local network." */
+"NSLocalNetworkUsageDescription" = "SteelEngine hittar och ansluter till din SteelEngine-gateway i det lokala nätverket.";
+/* SteelEngine source: "SteelEngine can share your location in the background when you enable Always." */
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "SteelEngine kan dela din plats i bakgrunden när du aktiverar Alltid.";
+/* SteelEngine source: "SteelEngine uses your location when you allow location sharing." */
+"NSLocationWhenInUseUsageDescription" = "SteelEngine använder din plats när du tillåter platsdelning.";
+/* SteelEngine source: "SteelEngine uses the microphone for realtime chat, voice wake, push-to-talk, and voice notes." */
+"NSMicrophoneUsageDescription" = "SteelEngine använder mikrofonen för realtidschatt, röstväckning, tryck-och-tala och röstanteckningar.";
+/* SteelEngine source: "SteelEngine may use motion data to support device-aware interactions and automations." */
+"NSMotionUsageDescription" = "SteelEngine kan använda rörelsedata för att stödja enhetsmedvetna interaktioner och automatiseringar.";
+/* SteelEngine source: "SteelEngine reads your steps, sleep, resting heart rate, and workouts from the Apple Health app to create summaries you request and send them through your Gateway to your configured AI provider." */
+"NSHealthShareUsageDescription" = "SteelEngine läser dina steg, din sömn, din vilopuls och dina träningspass från appen Apple Hälsa för att skapa sammanfattningar som du begär och skicka dem via din Gateway till din konfigurerade AI-leverantör.";
+/* SteelEngine source: "SteelEngine does not write to the Apple Health app. It uses read-only data to create summaries you request and send them through your Gateway to your configured AI provider." */
+"NSHealthUpdateUsageDescription" = "SteelEngine skriver inte till appen Apple Hälsa. Skrivskyddade data används för att skapa sammanfattningar som du begär och skicka dem via din Gateway till din konfigurerade AI-leverantör.";
+/* SteelEngine source: "SteelEngine lets your assistant read photos you allow and lets you choose photos to share." */
+"NSPhotoLibraryUsageDescription" = "SteelEngine låter din assistent läsa foton du tillåter och låter dig välja foton att dela.";
+/* SteelEngine source: "SteelEngine uses your reminders to list, add, and complete tasks when you enable reminders access." */
+"NSRemindersFullAccessUsageDescription" = "SteelEngine använder dina påminnelser för att lista, lägga till och slutföra uppgifter när du aktiverar åtkomst till påminnelser.";
+/* SteelEngine source: "SteelEngine uses on-device speech recognition for talk mode and voice wake." */
+"NSSpeechRecognitionUsageDescription" = "SteelEngine använder taligenkänning på enheten för talläge och röstaktivering.";

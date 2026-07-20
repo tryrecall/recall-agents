@@ -9,7 +9,7 @@ read_when:
   - You want to enable multimodal memory indexing
 ---
 
-This page lists every configuration knob for OpenClaw memory search. For conceptual overviews, see:
+This page lists every configuration knob for SteelEngine memory search. For conceptual overviews, see:
 
 <CardGroup cols={2}>
   <Card title="Memory overview" href="/concepts/memory">
@@ -29,7 +29,7 @@ This page lists every configuration knob for OpenClaw memory search. For concept
   </Card>
 </CardGroup>
 
-All memory search settings live under `agents.defaults.memorySearch` in `openclaw.json` (or a per-agent `agents.list[].memorySearch` override) unless noted otherwise.
+All memory search settings live under `agents.defaults.memorySearch` in `steelengine.json` (or a per-agent `agents.list[].memorySearch` override) unless noted otherwise.
 
 <Note>
 For the recommended personal-agent workflow, use
@@ -72,11 +72,11 @@ adds `sessions` to the agent's resolved memory sources. With QMD, it also
 enables that agent's session export; no separate
 `memory.qmd.sessions.enabled` setting is required for this mode.
 
-OpenClaw's built-in memory provider supports this protected path with both the
+SteelEngine's built-in memory provider supports this protected path with both the
 builtin and QMD backends. Alternate memory providers can keep using their own
 recall hooks and advanced Active Memory tools, but this setting is skipped
 unless the current provider supports protected private transcript recall.
-`openclaw doctor` reports an unsupported provider or an explicit Active Memory
+`steelengine doctor` reports an unsupported provider or an explicit Active Memory
 `toolsAllow` list that omits `memory_search`.
 
 The retrieval boundary is narrower than general session search:
@@ -104,7 +104,7 @@ reply.
 | `model`    | `string`  | provider default | Embedding model name                                                                                                                                                                                                                                                                        |
 | `fallback` | `string`  | `"none"`         | Fallback adapter ID when the primary fails                                                                                                                                                                                                                                                  |
 
-When `provider` is not set, OpenClaw uses OpenAI embeddings. Set `provider`
+When `provider` is not set, SteelEngine uses OpenAI embeddings. Set `provider`
 explicitly to use Bedrock, DeepInfra, Gemini, GitHub Copilot, Mistral, Ollama,
 Voyage, a local GGUF model, or an OpenAI-compatible `/v1/embeddings` endpoint.
 Legacy configs that still say `provider: "auto"` resolve to `openai`.
@@ -112,10 +112,10 @@ Legacy configs that still say `provider: "auto"` resolve to `openai`.
 <Warning>
 Changing the embedding provider, model, provider settings, sources, scope,
 chunking, or tokenizer can make the existing SQLite vector index incompatible.
-OpenClaw pauses vector search and reports an index identity warning instead of
+SteelEngine pauses vector search and reports an index identity warning instead of
 automatically re-embedding everything. Rebuild when you are ready with
-`openclaw memory status --index --agent <id>` or
-`openclaw memory index --force --agent <id>`.
+`steelengine memory status --index --agent <id>` or
+`steelengine memory index --force --agent <id>`.
 </Warning>
 
 When `provider` is unset, legacy `provider: "auto"` is present, or
@@ -132,7 +132,7 @@ provider/auth configuration, switch to a reachable provider, or set
 
 ### Custom provider ids
 
-`memorySearch.provider` can point at a custom `models.providers.<id>` entry for memory-specific provider adapters such as `ollama`, or for OpenAI-compatible model APIs such as `openai-responses` / `openai-completions`. OpenClaw resolves that provider's `api` owner for the embedding adapter while preserving the custom provider id for endpoint, auth, and model-prefix handling. This lets multi-GPU or multi-host setups dedicate memory embeddings to a specific local endpoint:
+`memorySearch.provider` can point at a custom `models.providers.<id>` entry for memory-specific provider adapters such as `ollama`, or for OpenAI-compatible model APIs such as `openai-responses` / `openai-completions`. SteelEngine resolves that provider's `api` owner for the embedding adapter while preserving the custom provider id for endpoint, auth, and model-prefix handling. This lets multi-GPU or multi-host setups dedicate memory embeddings to a specific local endpoint:
 
 ```json5
 {
@@ -222,7 +222,7 @@ Use `provider: "openai-compatible"` for a generic OpenAI-compatible
     | `outputDimensionality` | `number` | `3072`                 | For Embedding 2: 768, 1536, or 3072        |
 
     <Warning>
-    Changing model or `outputDimensionality` changes the index identity. OpenClaw
+    Changing model or `outputDimensionality` changes the index identity. SteelEngine
     pauses vector search until you explicitly rebuild the memory index.
     </Warning>
 
@@ -261,7 +261,7 @@ Use `provider: "openai-compatible"` for a generic OpenAI-compatible
   <Accordion title="Bedrock">
     ### Bedrock embedding config
 
-    Bedrock uses the AWS SDK default credential chain plus an OpenClaw-checked bearer token, so no API keys are stored in config. If OpenClaw runs on EC2 with a Bedrock-enabled instance role, just set the provider and model:
+    Bedrock uses the AWS SDK default credential chain plus an SteelEngine-checked bearer token, so no API keys are stored in config. If SteelEngine runs on EC2 with a Bedrock-enabled instance role, just set the provider and model:
 
     ```json5
     {
@@ -300,7 +300,7 @@ Use `provider: "openai-compatible"` for a generic OpenAI-compatible
 
     **Region:** resolved in this order: the `memorySearch.remote.baseUrl` override, the `models.providers.amazon-bedrock.baseUrl` config, `AWS_REGION`, `AWS_DEFAULT_REGION`, then a default of `us-east-1`.
 
-    **Authentication:** OpenClaw checks for `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` or `AWS_BEARER_TOKEN_BEDROCK` first, then falls through to the standard AWS SDK default credential provider chain:
+    **Authentication:** SteelEngine checks for `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` or `AWS_BEARER_TOKEN_BEDROCK` first, then falls through to the standard AWS SDK default credential provider chain:
 
     1. Environment variables (`AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY`), unless `AWS_PROFILE` is also set
     2. SSO (only when SSO fields are configured)
@@ -333,17 +333,17 @@ Use `provider: "openai-compatible"` for a generic OpenAI-compatible
     | `local.modelCacheDir` | `string`           | node-llama-cpp default | Cache dir for downloaded models                                                                                                                                                                                                                                                                                      |
     | `local.contextSize`   | `number \| "auto"` | `4096`                 | Context window size for the embedding context. 4096 covers typical chunks (128-512 tokens) while bounding non-weight VRAM. Lower to 1024-2048 on constrained hosts. `"auto"` uses the model's trained maximum -- not recommended for 8B+ models (Qwen3-Embedding-8B: up to 40 960 tokens can push VRAM to ~32 GB). |
 
-    Install the official llama.cpp provider first: `openclaw plugins install @openclaw/llama-cpp-provider`.
+    Install the official llama.cpp provider first: `steelengine plugins install @steelengine/llama-cpp-provider`.
     Default model: `embeddinggemma-300m-qat-Q8_0.gguf` (~0.6 GB, auto-downloaded). Source checkouts still require native build approval: `pnpm approve-builds` then `pnpm rebuild node-llama-cpp`.
 
     Use the standalone CLI to verify the same provider path the Gateway uses:
 
     ```bash
-    openclaw memory status --deep --agent main
-    openclaw memory index --force --agent main
+    steelengine memory status --deep --agent main
+    steelengine memory index --force --agent main
     ```
 
-    Numeric `local.contextSize` values also inform node-llama-cpp's automatic GPU-layer placement so model weights and the requested embedding context are fitted together. `openclaw memory status --deep` reports last-known llama.cpp backend, device, offload, requested-context, and timestamped memory facts after the runtime has loaded; passive status does not load a model.
+    Numeric `local.contextSize` values also inform node-llama-cpp's automatic GPU-layer placement so model weights and the requested embedding context are fitted together. `steelengine memory status --deep` reports last-known llama.cpp backend, device, offload, requested-context, and timestamped memory facts after the runtime has loaded; passive status does not load a model.
 
     Set `provider: "local"` explicitly for local GGUF embeddings. `hf:` and HTTP(S) model references are supported for explicit local configs (via node-llama-cpp's model resolution), but they do not change the default provider.
 
@@ -615,14 +615,14 @@ exported transcripts part of the ordinary memory corpus.
 | `store.vector.enabled`       | `boolean` | `true`  | Use sqlite-vec for vector queries |
 | `store.vector.extensionPath` | `string`  | bundled | Override sqlite-vec path          |
 
-When sqlite-vec is unavailable, OpenClaw falls back to in-process cosine similarity automatically.
+When sqlite-vec is unavailable, SteelEngine falls back to in-process cosine similarity automatically.
 
 ---
 
 ## Index storage
 
-Built-in memory indexes live in each agent's OpenClaw SQLite database at
-`agents/<agentId>/agent/openclaw-agent.sqlite`.
+Built-in memory indexes live in each agent's SteelEngine SQLite database at
+`agents/<agentId>/agent/steelengine-agent.sqlite`.
 
 | Key                   | Type     | Default     | Description                               |
 | --------------------- | -------- | ----------- | ----------------------------------------- |
@@ -645,14 +645,14 @@ Set `memory.backend = "qmd"` to enable. All QMD settings live under `memory.qmd`
 | `sessions.retentionDays` | `number`  | --       | Transcript retention                                                                  |
 | `sessions.exportDir`     | `string`  | --       | Export directory                                                                      |
 
-`searchMode: "search"` is lexical/BM25-only. OpenClaw does not run semantic vector readiness probes or QMD embedding maintenance for that mode, including during `memory status --deep`; `vsearch` and `query` continue to require QMD vector readiness and embeddings.
+`searchMode: "search"` is lexical/BM25-only. SteelEngine does not run semantic vector readiness probes or QMD embedding maintenance for that mode, including during `memory status --deep`; `vsearch` and `query` continue to require QMD vector readiness and embeddings.
 
-`rerank: false` only changes QMD `query` mode and requires QMD 2.1 or newer. In direct CLI mode OpenClaw passes `--no-rerank`; in mcporter-backed MCP mode it passes `rerank: false` to QMD's unified query tool. Leave it unset to use QMD's default query reranking behavior.
+`rerank: false` only changes QMD `query` mode and requires QMD 2.1 or newer. In direct CLI mode SteelEngine passes `--no-rerank`; in mcporter-backed MCP mode it passes `rerank: false` to QMD's unified query tool. Leave it unset to use QMD's default query reranking behavior.
 
-OpenClaw prefers current QMD collection and MCP query shapes, but keeps older QMD releases working by trying compatible collection pattern flags and older MCP tool names when needed. When QMD advertises support for multiple collection filters, same-source collections are searched with one QMD process; older QMD builds keep the per-collection compatibility path. Same-source means durable memory collections (default memory files plus custom paths) are grouped together, while session transcript collections remain a separate group so source diversification still has both inputs.
+SteelEngine prefers current QMD collection and MCP query shapes, but keeps older QMD releases working by trying compatible collection pattern flags and older MCP tool names when needed. When QMD advertises support for multiple collection filters, same-source collections are searched with one QMD process; older QMD builds keep the per-collection compatibility path. Same-source means durable memory collections (default memory files plus custom paths) are grouped together, while session transcript collections remain a separate group so source diversification still has both inputs.
 
 <Note>
-QMD model overrides stay on the QMD side, not OpenClaw config. If you need to override QMD's models globally, set environment variables such as `QMD_EMBED_MODEL`, `QMD_RERANK_MODEL`, and `QMD_GENERATE_MODEL` in the gateway runtime environment.
+QMD model overrides stay on the QMD side, not SteelEngine config. If you need to override QMD's models globally, set environment variables such as `QMD_EMBED_MODEL`, `QMD_RERANK_MODEL`, and `QMD_GENERATE_MODEL` in the gateway runtime environment.
 </Note>
 
 ### mcporter integration
@@ -721,7 +721,7 @@ Requires `mcporter` installed and on PATH, plus a configured mcporter server tha
   </Accordion>
 </AccordionGroup>
 
-When gateway-start QMD initialization is enabled, OpenClaw starts QMD only for eligible agents. If `update.onBoot` is true and no interval/embed maintenance is configured, startup uses a one-shot manager for the boot refresh and closes it. If an update or embed interval is configured, startup opens the long-lived QMD manager so it can own the watcher and interval timers; `update.onBoot: false` skips only the immediate boot refresh.
+When gateway-start QMD initialization is enabled, SteelEngine starts QMD only for eligible agents. If `update.onBoot` is true and no interval/embed maintenance is configured, startup uses a one-shot manager for the boot refresh and closes it. If an update or embed interval is configured, startup opens the long-lived QMD manager so it can own the watcher and interval timers; `update.onBoot: false` skips only the immediate boot refresh.
 
 ### Full QMD example
 

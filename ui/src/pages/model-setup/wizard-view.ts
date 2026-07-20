@@ -236,7 +236,7 @@ export function renderModelSetupWizard(props: WizardViewProps): TemplateResult |
     props.state.phase === "step" ||
     props.state.phase === "done";
   return html`
-    <openclaw-modal-dialog
+    <steelengine-modal-dialog
       label=${t("modelSetup.wizard.dialogLabel")}
       @modal-cancel=${canCancel ? props.onCancel : props.onClose}
     >
@@ -273,6 +273,6 @@ export function renderModelSetupWizard(props: WizardViewProps): TemplateResult |
           </button>
         </div>
       </div>
-    </openclaw-modal-dialog>
+    </steelengine-modal-dialog>
   `;
 }

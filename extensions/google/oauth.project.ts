@@ -1,6 +1,6 @@
 // Google plugin module implements oauth.project behavior.
-import { readProviderJsonResponse } from "openclaw/plugin-sdk/provider-http";
-import { sleepWithAbort } from "openclaw/plugin-sdk/runtime-env";
+import { readProviderJsonResponse } from "steelengine/plugin-sdk/provider-http";
+import { sleepWithAbort } from "steelengine/plugin-sdk/runtime-env";
 import { fetchWithTimeout } from "./oauth.http.js";
 import {
   CODE_ASSIST_ENDPOINT_PROD,

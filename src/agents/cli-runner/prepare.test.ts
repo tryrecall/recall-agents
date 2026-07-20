@@ -3,14 +3,14 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { SYSTEM_PROMPT_CACHE_BOUNDARY } from "@openclaw/ai/internal/shared";
-import { expectDefined } from "@openclaw/normalization-core";
-import { CURRENT_SESSION_VERSION } from "openclaw/plugin-sdk/agent-sessions";
+import { SYSTEM_PROMPT_CACHE_BOUNDARY } from "@steelengine/ai/internal/shared";
+import { expectDefined } from "@steelengine/normalization-core";
+import { CURRENT_SESSION_VERSION } from "steelengine/plugin-sdk/agent-sessions";
 import { Type } from "typebox";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { buildGroupChatContext, buildGroupIntro } from "../../auto-reply/reply/groups.js";
 import type { ChannelPlugin } from "../../channels/plugins/types.plugin.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { registerLegacyContextEngine } from "../../context-engine/legacy.registration.js";
 import {
   registerContextEngine,
@@ -110,7 +110,7 @@ const mockBuildActiveMusicGenerationTaskPromptContextForSession = vi.mocked(
 );
 
 function wrappedPluginSystemContext(text: string): string {
-  return `---\n\nOpenClaw plugin-injected system context. This block is not workspace file content.\n\n${text}\n\n---`;
+  return `---\n\nSteelEngine plugin-injected system context. This block is not workspace file content.\n\n${text}\n\n---`;
 }
 
 function createTestMcpLoopbackServerConfig(port: number) {
@@ -118,13 +118,13 @@ function createTestMcpLoopbackServerConfig(port: number) {
   // substitution without starting the real MCP HTTP server.
   return {
     mcpServers: {
-      openclaw: {
+      steelengine: {
         type: "http",
         url: `http://127.0.0.1:${port}/mcp`,
         alwaysLoad: true,
         headers: {
-          Authorization: "Bearer ${OPENCLAW_MCP_TOKEN}",
-          "x-openclaw-cli-capture-key": "${OPENCLAW_MCP_CLI_CAPTURE_KEY}",
+          Authorization: "Bearer ${STEELENGINE_MCP_TOKEN}",
+          "x-steelengine-cli-capture-key": "${STEELENGINE_MCP_CLI_CAPTURE_KEY}",
         },
       },
     },
@@ -153,7 +153,7 @@ function createCliBackendConfig(
     reseedFromRawTranscriptWhenUncompacted?: boolean;
     systemPromptWhen?: "first" | "always" | "never";
   } = {},
-): OpenClawConfig {
+): SteelEngineConfig {
   return {
     agents: {
       defaults: {
@@ -176,7 +176,7 @@ function createCliBackendConfig(
         },
       },
     },
-  } satisfies OpenClawConfig;
+  } satisfies SteelEngineConfig;
 }
 
 function setCliBackendForPrepareTest(
@@ -229,11 +229,11 @@ function setCliBackendForPrepareTest(
 }
 
 function createSessionFile() {
-  // Prepare tests use canonical OpenClaw session paths because several cases
+  // Prepare tests use canonical SteelEngine session paths because several cases
   // assert that external or stale transcript paths are ignored.
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-cli-prepare-"));
-  sessionFileEnvSnapshot ??= captureEnv(["OPENCLAW_STATE_DIR"]);
-  setTestEnvValue("OPENCLAW_STATE_DIR", dir);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-cli-prepare-"));
+  sessionFileEnvSnapshot ??= captureEnv(["STEELENGINE_STATE_DIR"]);
+  setTestEnvValue("STEELENGINE_STATE_DIR", dir);
   const sessionFile = path.join(dir, "agents", "main", "sessions", "session-test.jsonl");
   fs.mkdirSync(path.dirname(sessionFile), { recursive: true });
   fs.writeFileSync(
@@ -393,7 +393,7 @@ describe("prepareCliRunContext", () => {
               },
             },
           },
-        } satisfies OpenClawConfig,
+        } satisfies SteelEngineConfig,
       });
 
       expect(context.backendResolved.modelProvider).toBe("fixture-anthropic");
@@ -426,7 +426,7 @@ describe("prepareCliRunContext", () => {
       mintMcpLoopbackClientGrant: vi.fn(createTestMcpLoopbackClientGrant),
       revokeMcpLoopbackClientGrant: vi.fn(() => true),
       resolveMcpLoopbackScopedTools: vi.fn(() => ({ agentId: "main", tools: [] })),
-      resolveOpenClawReferencePaths: vi.fn(async () => ({ docsPath: null, sourcePath: null })),
+      resolveSteelEngineReferencePaths: vi.fn(async () => ({ docsPath: null, sourcePath: null })),
       prepareClaudeCliSkillsPlugin: vi.fn(async () => ({
         args: [],
         cleanup: vi.fn(async () => undefined),
@@ -463,7 +463,7 @@ describe("prepareCliRunContext", () => {
   it("honors an explicit auth agent directory independently of session identity", async () => {
     const { dir, sessionFile } = createSessionFile();
     const modelOwnerAgentDir = path.join(dir, "ops-agent");
-    const systemAgentDir = path.join(dir, "openclaw-agent");
+    const systemAgentDir = path.join(dir, "steelengine-agent");
     const prepareExecution = vi.fn(async () => undefined);
     fs.mkdirSync(modelOwnerAgentDir, { recursive: true });
     cliBackendsTesting.setDepsForTest({
@@ -488,8 +488,8 @@ describe("prepareCliRunContext", () => {
     try {
       const context = await prepareCliRunContext({
         sessionId: "session-test",
-        sessionKey: "agent:openclaw:main",
-        agentId: "openclaw",
+        sessionKey: "agent:steelengine:main",
+        agentId: "steelengine",
         sessionFile,
         workspaceDir: dir,
         agentDir: modelOwnerAgentDir,
@@ -503,7 +503,7 @@ describe("prepareCliRunContext", () => {
           agents: {
             list: [
               { id: "ops", default: true, agentDir: modelOwnerAgentDir },
-              { id: "openclaw", agentDir: systemAgentDir },
+              { id: "steelengine", agentDir: systemAgentDir },
             ],
           },
         },
@@ -785,7 +785,7 @@ describe("prepareCliRunContext", () => {
               },
             },
           },
-        } as OpenClawConfig,
+        } as SteelEngineConfig,
       });
 
       expect(resolveApiKeyForProfile).toHaveBeenCalledWith(
@@ -1105,8 +1105,8 @@ describe("prepareCliRunContext", () => {
         mcp?: { allowed?: string[] };
         mcpServers?: Record<string, { url?: string }>;
       };
-      expect(generatedSettings.mcp?.allowed).toEqual(["openclaw"]);
-      expect(generatedSettings.mcpServers?.openclaw?.url).toBe("http://127.0.0.1:31783/mcp");
+      expect(generatedSettings.mcp?.allowed).toEqual(["steelengine"]);
+      expect(generatedSettings.mcpServers?.steelengine?.url).toBe("http://127.0.0.1:31783/mcp");
       expect(context.preparedBackend.env?.GEMINI_CLI_SYSTEM_SETTINGS_PATH).toBe(
         profileSystemSettingsPath,
       );
@@ -1310,7 +1310,7 @@ describe("prepareCliRunContext", () => {
         args: ["--plugin-dir", skillsPluginDir],
         cleanup: skillsCleanup,
       })),
-      resolveOpenClawReferencePaths: vi.fn(async () => {
+      resolveSteelEngineReferencePaths: vi.fn(async () => {
         throw new Error("reference path lookup failed");
       }),
     });
@@ -1334,7 +1334,7 @@ describe("prepareCliRunContext", () => {
       expect(skillsCleanup).toHaveBeenCalledOnce();
       expect(fs.existsSync(skillsPluginDir)).toBe(false);
       expect(
-        fs.readdirSync(tempRoot).filter((entry) => entry.startsWith("openclaw-cli-mcp-")),
+        fs.readdirSync(tempRoot).filter((entry) => entry.startsWith("steelengine-cli-mcp-")),
       ).toEqual([]);
     } finally {
       tempEnvSnapshot.restore();
@@ -1404,7 +1404,7 @@ describe("prepareCliRunContext", () => {
           },
         ],
       })),
-      resolveOpenClawReferencePaths: vi.fn(async () => ({ docsPath: "docs", sourcePath: "src" })),
+      resolveSteelEngineReferencePaths: vi.fn(async () => ({ docsPath: "docs", sourcePath: "src" })),
     });
 
     const context = await prepareCliRunContext({
@@ -1433,7 +1433,7 @@ describe("prepareCliRunContext", () => {
     );
     expect(context.systemPrompt).toBe("BTW system prompt");
     expect(context.params.prompt).toBe("side question prompt");
-    expect(context.openClawHistoryPrompt).toBeUndefined();
+    expect(context.steelEngineHistoryPrompt).toBeUndefined();
     expect(context.contextEngine).toBeUndefined();
     expect(context.contextEngineTurnPrompt).toBeUndefined();
     expect(context.hadSessionFile).toBe(false);
@@ -1469,7 +1469,7 @@ describe("prepareCliRunContext", () => {
     const bootstrapPath = path.join(dir, "BOOTSTRAP.md");
     const config = {
       agents: { defaults: { workspace: dir } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     cliBackendsTesting.setDepsForTest({
       resolvePluginSetupCliBackend: () => undefined,
       resolveRuntimeCliBackends: () => [
@@ -1756,7 +1756,7 @@ describe("prepareCliRunContext", () => {
     });
     try {
       // Room resumes carry compact event text into the CLI prompt but keep the
-      // richer room context in OpenClaw history for reseed and audits.
+      // richer room context in SteelEngine history for reseed and audits.
       const context = await prepareCliRunContext({
         sessionId: "session-test",
         sessionKey: "agent:main:test",
@@ -1764,7 +1764,7 @@ describe("prepareCliRunContext", () => {
         trigger: "user",
         sessionFile,
         workspaceDir: dir,
-        prompt: "[OpenClaw room event]",
+        prompt: "[SteelEngine room event]",
         currentInboundEventKind: "room_event",
         currentInboundContext: {
           text: "Room context:\nAlice: lunch?\n\nCurrent event:\nBob: yes",
@@ -1783,9 +1783,9 @@ describe("prepareCliRunContext", () => {
       });
 
       expect(context.reusableCliSession).toEqual({ mode: "reuse", sessionId: "cli-session" });
-      expect(context.params.prompt).toBe("Current event:\nBob: yes\n\n[OpenClaw room event]");
-      expect(context.openClawHistoryPrompt).toContain("Room context:\nAlice: lunch?");
-      expect(context.openClawHistoryPrompt).toContain("Current event:\nBob: yes");
+      expect(context.params.prompt).toBe("Current event:\nBob: yes\n\n[SteelEngine room event]");
+      expect(context.steelEngineHistoryPrompt).toContain("Room context:\nAlice: lunch?");
+      expect(context.steelEngineHistoryPrompt).toContain("Current event:\nBob: yes");
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
@@ -1987,7 +1987,7 @@ describe("prepareCliRunContext", () => {
 
       expect(context.params.prompt).toBe("latest ask");
       expect(context.systemPrompt).toContain(
-        "You are a personal assistant running inside OpenClaw.",
+        "You are a personal assistant running inside SteelEngine.",
       );
       expect(context.systemPrompt).toContain("Current model identity: test-cli/test-model.");
       expect(context.systemPrompt).not.toContain("hook exploded");
@@ -2012,7 +2012,7 @@ describe("prepareCliRunContext", () => {
     });
     registerContextEngine(engineId, factory);
     setCliRunnerPrepareTestDeps({
-      resolveOpenClawReferencePaths: vi.fn(async () => {
+      resolveSteelEngineReferencePaths: vi.fn(async () => {
         throw new Error("reference path lookup failed");
       }),
     });
@@ -2109,7 +2109,7 @@ describe("prepareCliRunContext", () => {
           hostRequirements: {
             "agent-run": {
               requiredCapabilities: ["assemble-before-prompt"],
-              unsupportedMessage: "Use the native Codex or OpenClaw embedded runtime.",
+              unsupportedMessage: "Use the native Codex or SteelEngine embedded runtime.",
             },
           },
         },
@@ -2152,7 +2152,7 @@ describe("prepareCliRunContext", () => {
         list: [{ id: "main", default: true, agentDir: runtimeAgentDir }],
       },
       plugins: { slots: { contextEngine: engineId } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const factory = vi.fn((_ctx: unknown): ContextEngine => {
       return {
         info: { id: engineId, name: "CLI runtime config engine" },
@@ -2308,7 +2308,7 @@ describe("prepareCliRunContext", () => {
 
   it("uses cwd for CLI system prompt workspace guidance", async () => {
     const { dir, sessionFile } = createSessionFile();
-    const taskDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-cli-task-"));
+    const taskDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-cli-task-"));
     try {
       const context = await prepareCliRunContext({
         sessionId: "session-test",
@@ -2432,9 +2432,9 @@ describe("prepareCliRunContext", () => {
         sessionId: "cli-session",
         drift: { reasons: ["system-prompt"] },
       });
-      expect(context.openClawHistoryPrompt).toBeUndefined();
+      expect(context.steelEngineHistoryPrompt).toBeUndefined();
       expect(context.params.prompt).toContain(
-        "OpenClaw resumed this CLI session after prompt content changed.",
+        "SteelEngine resumed this CLI session after prompt content changed.",
       );
       expect(context.params.prompt).toContain("changed=system-prompt");
       expect(context.params.prompt).toContain("latest ask");
@@ -2470,7 +2470,7 @@ describe("prepareCliRunContext", () => {
         invalidatedReason: "system-prompt",
       });
       expect(context.params.prompt).not.toContain(
-        "OpenClaw resumed this CLI session after prompt content changed.",
+        "SteelEngine resumed this CLI session after prompt content changed.",
       );
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
@@ -2843,8 +2843,8 @@ describe("prepareCliRunContext", () => {
         sessionId: "cli-session",
         drift: { reasons: ["system-prompt"] },
       });
-      expect(context.openClawHistoryPrompt).toContain("prior no-compaction ask");
-      expect(context.openClawHistoryPrompt).toContain("latest ask");
+      expect(context.steelEngineHistoryPrompt).toContain("prior no-compaction ask");
+      expect(context.steelEngineHistoryPrompt).toContain("latest ask");
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
@@ -2883,8 +2883,8 @@ describe("prepareCliRunContext", () => {
       });
 
       expect(context.reusableCliSession).toEqual({ mode: "reuse", sessionId: "cli-session" });
-      expect(context.openClawHistoryPrompt).toContain("prior resumable ask");
-      expect(context.openClawHistoryPrompt).toContain("latest ask");
+      expect(context.steelEngineHistoryPrompt).toContain("prior resumable ask");
+      expect(context.steelEngineHistoryPrompt).toContain("latest ask");
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
@@ -3316,8 +3316,8 @@ describe("prepareCliRunContext", () => {
       });
 
       expect(context.preparedBackend.env).toMatchObject({
-        OPENCLAW_MCP_TOKEN: "loopback-token",
-        OPENCLAW_MCP_CLI_CAPTURE_KEY: "",
+        STEELENGINE_MCP_TOKEN: "loopback-token",
+        STEELENGINE_MCP_CLI_CAPTURE_KEY: "",
       });
       expect(mintMcpLoopbackClientGrant).toHaveBeenCalledWith({
         context: {
@@ -3482,7 +3482,7 @@ describe("prepareCliRunContext", () => {
 
       expect(context.mcpDeliveryCapture).toBe(true);
       expect(context.preparedBackend.env).toMatchObject({
-        OPENCLAW_MCP_CLI_CAPTURE_KEY: "",
+        STEELENGINE_MCP_CLI_CAPTURE_KEY: "",
       });
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
@@ -3585,7 +3585,7 @@ describe("prepareCliRunContext", () => {
         },
         cliToolAvailability: {
           native: [],
-          mcp: ["mcp__openclaw__memory_search", "mcp__openclaw__memory_get", "mcp__other__thing"],
+          mcp: ["mcp__steelengine__memory_search", "mcp__steelengine__memory_get", "mcp__other__thing"],
         },
       });
       cleanup = context.preparedBackend.cleanup;
@@ -3602,14 +3602,14 @@ describe("prepareCliRunContext", () => {
       const rawBundle = JSON.parse(fs.readFileSync(mcpConfigPath ?? "", "utf-8")) as {
         mcpServers?: Record<string, unknown>;
       };
-      expect(Object.keys(rawBundle.mcpServers ?? {})).toEqual(["openclaw"]);
+      expect(Object.keys(rawBundle.mcpServers ?? {})).toEqual(["steelengine"]);
     } finally {
       await cleanup?.();
       fs.rmSync(dir, { recursive: true, force: true });
     }
   });
 
-  it("serves only the openclaw MCP server for ring-zero runs", async () => {
+  it("serves only the steelengine MCP server for ring-zero runs", async () => {
     const { dir, sessionFile } = createSessionFile();
     try {
       const getActiveMcpLoopbackRuntime = vi.fn(() => undefined);
@@ -3657,12 +3657,12 @@ describe("prepareCliRunContext", () => {
         provider: "claude-cli",
         model: "test-model",
         timeoutMs: 1_000,
-        runId: "run-test-openclaw-mcp",
+        runId: "run-test-steelengine-mcp",
         config: createCliBackendConfig(),
         systemAgentTool: { surface: "cli" },
         cliToolAvailability: {
           native: [],
-          mcp: ["mcp__openclaw__openclaw"],
+          mcp: ["mcp__steelengine__steelengine"],
         },
       };
       const context = await prepareCliRunContext(params);
@@ -3680,7 +3680,7 @@ describe("prepareCliRunContext", () => {
       expect(resolveExecutionArgs).not.toHaveBeenCalled();
       expect(context.params.cliToolAvailability).toEqual({
         native: [],
-        mcp: ["mcp__openclaw__openclaw"],
+        mcp: ["mcp__steelengine__steelengine"],
       });
       const mcpConfigPath = expectDefined(
         args[args.indexOf("--mcp-config") + 1],
@@ -3689,10 +3689,10 @@ describe("prepareCliRunContext", () => {
       const raw = JSON.parse(fs.readFileSync(mcpConfigPath, "utf-8")) as {
         mcpServers?: Record<string, { env?: Record<string, string> }>;
       };
-      expect(Object.keys(raw.mcpServers ?? {})).toEqual(["openclaw"]);
-      expect(raw.mcpServers?.openclaw?.env).toMatchObject({
-        OPENCLAW_TOOLS_MCP_TOOLS: "openclaw",
-        OPENCLAW_TOOLS_MCP_SYSTEM_AGENT_SURFACE: "cli",
+      expect(Object.keys(raw.mcpServers ?? {})).toEqual(["steelengine"]);
+      expect(raw.mcpServers?.steelengine?.env).toMatchObject({
+        STEELENGINE_TOOLS_MCP_TOOLS: "steelengine",
+        STEELENGINE_TOOLS_MCP_SYSTEM_AGENT_SURFACE: "cli",
       });
 
       await context.preparedBackend.cleanup?.();
@@ -3835,13 +3835,13 @@ describe("prepareCliRunContext", () => {
       });
 
       // Candidate is invalidated (no native --resume) yet reseed still fires:
-      // prepare hands the prior OpenClaw conversation forward as history.
+      // prepare hands the prior SteelEngine conversation forward as history.
       expect(context.reusableCliSession).toEqual({
         mode: "invalidate",
         invalidatedReason: "missing-transcript",
       });
-      expect(context.openClawHistoryPrompt).toContain("prior claude-cli ask");
-      expect(context.openClawHistoryPrompt).toContain("latest ask");
+      expect(context.steelEngineHistoryPrompt).toContain("prior claude-cli ask");
+      expect(context.steelEngineHistoryPrompt).toContain("latest ask");
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
@@ -3926,7 +3926,7 @@ describe("prepareCliRunContext", () => {
       });
       // The reseed prompt is gateway-built text, so node placement keeps the
       // backend's raw-transcript reseed semantics for fresh-retry paths.
-      expect(context.openClawHistoryPrompt).toContain("gateway-only history");
+      expect(context.steelEngineHistoryPrompt).toContain("gateway-only history");
       expect(context.claudeSkillsPluginArgs).toEqual([]);
       expect(context.systemPrompt).not.toContain("GATEWAY_ONLY_SKILL_PATH");
       expect(context.mcpDeliveryCapture).toBeUndefined();
@@ -3998,8 +3998,8 @@ describe("prepareCliRunContext", () => {
         sessionId: "warm-claude-sid",
       });
       expect(context.requiredClaudeLiveSessionGeneration).toBe("warm-live-generation");
-      expect(context.openClawHistoryPrompt).toContain("earlier warm context");
-      expect(context.openClawHistoryPrompt).toContain("warm follow-up");
+      expect(context.steelEngineHistoryPrompt).toContain("earlier warm context");
+      expect(context.steelEngineHistoryPrompt).toContain("warm follow-up");
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
@@ -4017,14 +4017,14 @@ describe("prepareCliRunContext", () => {
 
       const context = await prepareCliRunContext({
         sessionId: "session-test",
-        sessionKey: "agent:openclaw:main",
+        sessionKey: "agent:steelengine:main",
         sessionFile,
         workspaceDir: dir,
         prompt: "approve the proposal",
         provider: "claude-cli",
         model: "opus",
         timeoutMs: 1_000,
-        runId: "run-openclaw-process-per-turn",
+        runId: "run-steelengine-process-per-turn",
         cliSessionBinding: { sessionId: "native-claude-sid" },
         config: createCliBackendConfig(),
         disableCliLiveSession: true,
@@ -4269,7 +4269,7 @@ describe("prepareCliRunContext", () => {
 
   it("renders CLI skills from sandbox-readable paths instead of persisted host snapshots", async () => {
     const { dir, sessionFile } = createSessionFile();
-    const hostSkillDir = "/home/tzdai/.npm-global/lib/node_modules/openclaw/skills/gog";
+    const hostSkillDir = "/home/tzdai/.npm-global/lib/node_modules/steelengine/skills/gog";
     const hostSkillPath = `${hostSkillDir}/SKILL.md`;
     const materializedWorkspace = path.join(dir, "state", "sandbox-skills");
     const materializedSkillDir = path.join(materializedWorkspace, "skills", "gog");
@@ -4324,10 +4324,10 @@ describe("prepareCliRunContext", () => {
               description: "Read Gmail safely.",
               filePath: hostSkillPath,
               baseDir: hostSkillDir,
-              source: "openclaw-bundled",
+              source: "steelengine-bundled",
               sourceInfo: {
                 path: hostSkillPath,
-                source: "openclaw-bundled",
+                source: "steelengine-bundled",
                 scope: "project",
                 origin: "top-level",
                 baseDir: hostSkillDir,
@@ -4344,7 +4344,7 @@ describe("prepareCliRunContext", () => {
         workspaceDir: dir,
       });
       expect(context.systemPrompt).toContain(
-        "/workspace/.openclaw/sandbox-skills/skills/gog/SKILL.md",
+        "/workspace/.steelengine/sandbox-skills/skills/gog/SKILL.md",
       );
       expect(context.systemPrompt).not.toContain(hostSkillPath);
       expect(context.systemPromptReport.skills.promptChars).toBeGreaterThan(0);
@@ -4394,9 +4394,9 @@ describe("prepareCliRunContext", () => {
       });
       setCliRunnerPrepareTestDeps({
         prepareClaudeCliSkillsPlugin: vi.fn(async () => ({
-          args: ["--plugin-dir", path.join(dir, "openclaw-skills")],
+          args: ["--plugin-dir", path.join(dir, "steelengine-skills")],
           cleanup: vi.fn(async () => undefined),
-          pluginDir: path.join(dir, "openclaw-skills"),
+          pluginDir: path.join(dir, "steelengine-skills"),
         })),
       });
 
@@ -4446,7 +4446,7 @@ describe("prepareCliRunContext", () => {
       expect(context.systemPromptReport.skills.promptChars).toBe(0);
       expect(context.claudeSkillsPluginArgs).toEqual([
         "--plugin-dir",
-        path.join(dir, "openclaw-skills"),
+        path.join(dir, "steelengine-skills"),
       ]);
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
@@ -4692,9 +4692,9 @@ describe("prepareCliRunContext", () => {
         config: createCliBackendConfig(),
       });
 
-      expect(context.openClawHistoryPrompt).toBeDefined();
-      expect(context.openClawHistoryPrompt).toContain(summaryMarker);
-      expect(context.openClawHistoryPrompt).not.toContain("OpenClaw reseed history truncated");
+      expect(context.steelEngineHistoryPrompt).toBeDefined();
+      expect(context.steelEngineHistoryPrompt).toContain(summaryMarker);
+      expect(context.steelEngineHistoryPrompt).not.toContain("SteelEngine reseed history truncated");
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
@@ -4747,9 +4747,9 @@ describe("prepareCliRunContext", () => {
         config: createCliBackendConfig(),
       });
 
-      expect(context.openClawHistoryPrompt).toBeDefined();
-      expect(context.openClawHistoryPrompt).toContain(summaryMarker);
-      expect(context.openClawHistoryPrompt).not.toContain("OpenClaw reseed history truncated");
+      expect(context.steelEngineHistoryPrompt).toBeDefined();
+      expect(context.steelEngineHistoryPrompt).toContain(summaryMarker);
+      expect(context.steelEngineHistoryPrompt).not.toContain("SteelEngine reseed history truncated");
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
@@ -4781,8 +4781,8 @@ describe("prepareCliRunContext", () => {
         config: createCliBackendConfig(),
       });
 
-      expect(context.openClawHistoryPrompt).toBeDefined();
-      expect(context.openClawHistoryPrompt).toContain("OpenClaw reseed history truncated");
+      expect(context.steelEngineHistoryPrompt).toBeDefined();
+      expect(context.steelEngineHistoryPrompt).toContain("SteelEngine reseed history truncated");
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
@@ -4857,10 +4857,10 @@ describe("prepareCliRunContext", () => {
       });
 
       expect(context.reusableCliSession).toEqual({ mode: "reuse", sessionId: "cli-session" });
-      expect(context.openClawHistoryPrompt).toBeDefined();
-      expect(context.openClawHistoryPrompt).toContain(recentMarker);
-      expect(context.openClawHistoryPrompt).toContain("EARLIEST_USER");
-      expect(context.openClawHistoryPrompt).not.toContain("OpenClaw reseed history truncated");
+      expect(context.steelEngineHistoryPrompt).toBeDefined();
+      expect(context.steelEngineHistoryPrompt).toContain(recentMarker);
+      expect(context.steelEngineHistoryPrompt).toContain("EARLIEST_USER");
+      expect(context.steelEngineHistoryPrompt).not.toContain("SteelEngine reseed history truncated");
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }

@@ -7,7 +7,7 @@ import { prepareConfigRuntimeEnv } from "../config/config-env-vars.js";
 import type {
   ConfigFileSnapshot,
   ConfigWriteNotification,
-  OpenClawConfig,
+  SteelEngineConfig,
 } from "../config/config.js";
 import { hashRuntimeConfigValue } from "../config/runtime-snapshot.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
@@ -404,7 +404,7 @@ describe("buildGatewayReloadPlan", () => {
         },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 
   it.each([
     {
@@ -584,7 +584,7 @@ function makeSnapshot(partial: Partial<ConfigFileSnapshot> = {}): ConfigFileSnap
     {}) as ConfigFileSnapshot["sourceConfig"];
   const runtimeConfig = partial.runtimeConfig ?? partial.config ?? {};
   return {
-    path: "/tmp/openclaw.json",
+    path: "/tmp/steelengine.json",
     exists: true,
     raw: "{}",
     parsed: {},
@@ -620,7 +620,7 @@ function makeZeroDebounceHookSnapshot(hash: string): ConfigFileSnapshot {
 
 function makeZeroDebounceHookWrite(persistedHash: string): ConfigWriteNotification {
   return {
-    configPath: "/tmp/openclaw.json",
+    configPath: "/tmp/steelengine.json",
     sourceConfig: { gateway: { reload: { debounceMs: 0 } }, hooks: { enabled: true } },
     runtimeConfig: {
       gateway: { reload: { debounceMs: 0 } },
@@ -637,15 +637,15 @@ function makeZeroDebounceHookWrite(persistedHash: string): ConfigWriteNotificati
 function createReloaderHarness(
   readSnapshot: () => Promise<ConfigFileSnapshot>,
   options: {
-    initialConfig?: OpenClawConfig;
-    initialCompareConfig?: OpenClawConfig;
+    initialConfig?: SteelEngineConfig;
+    initialCompareConfig?: SteelEngineConfig;
     prepareConfigCandidate?: (params: {
-      runtimeConfig: OpenClawConfig;
-      sourceConfig: OpenClawConfig;
-      previousSourceConfig: OpenClawConfig;
+      runtimeConfig: SteelEngineConfig;
+      sourceConfig: SteelEngineConfig;
+      previousSourceConfig: SteelEngineConfig;
     }) => {
-      runtimeConfig: OpenClawConfig;
-      compareConfig: OpenClawConfig;
+      runtimeConfig: SteelEngineConfig;
+      compareConfig: SteelEngineConfig;
       runtimeEnv?: ReturnType<typeof prepareConfigRuntimeEnv>;
     };
     initialInternalWriteHash?: string | null;
@@ -655,50 +655,50 @@ function createReloaderHarness(
     runTransaction?: <T>(run: () => Promise<T>) => Promise<T>;
     onConfigCandidateObserved?: () => void;
     onConfigAccepted?: (
-      nextConfig: OpenClawConfig,
+      nextConfig: SteelEngineConfig,
       ownership: GatewayConfigReloadTransactionOwnership,
-      sourceConfig: OpenClawConfig,
+      sourceConfig: SteelEngineConfig,
       acceptance: {
         runtimeApplied: boolean;
         publishSource?: () => Promise<() => Promise<void>>;
       },
     ) => void | (() => Promise<void>) | Promise<void | (() => Promise<void>)>;
     onEffectiveConfigUnchanged?: (
-      nextConfig: OpenClawConfig,
+      nextConfig: SteelEngineConfig,
       ownership: GatewayConfigReloadTransactionOwnership,
-      sourceConfig: OpenClawConfig,
+      sourceConfig: SteelEngineConfig,
     ) => Promise<() => Promise<void>>;
-    onConfigApplied?: (plan: GatewayReloadPlan, nextConfig: OpenClawConfig) => void | Promise<void>;
+    onConfigApplied?: (plan: GatewayReloadPlan, nextConfig: SteelEngineConfig) => void | Promise<void>;
     onConfigRevisionApplied?: (hash: string) => void;
-    onConfigChange?: (plan: GatewayReloadPlan, nextConfig: OpenClawConfig) => void | Promise<void>;
+    onConfigChange?: (plan: GatewayReloadPlan, nextConfig: SteelEngineConfig) => void | Promise<void>;
     onNoopConfigCommit?: (
       plan: GatewayReloadPlan,
-      nextConfig: OpenClawConfig,
+      nextConfig: SteelEngineConfig,
       ownership: GatewayConfigReloadTransactionOwnership,
-      sourceConfig: OpenClawConfig,
+      sourceConfig: SteelEngineConfig,
     ) => Promise<void>;
     onHotReload?: (
       plan: GatewayReloadPlan,
-      nextConfig: OpenClawConfig,
+      nextConfig: SteelEngineConfig,
       ownership: GatewayConfigReloadTransactionOwnership,
-      sourceConfig: OpenClawConfig,
+      sourceConfig: SteelEngineConfig,
     ) => Promise<void>;
     onRestart?: (
       plan: GatewayReloadPlan,
-      nextConfig: OpenClawConfig,
+      nextConfig: SteelEngineConfig,
       ownership: GatewayConfigReloadTransactionOwnership,
-      sourceConfig: OpenClawConfig,
+      sourceConfig: SteelEngineConfig,
     ) => void | Promise<void>;
   } = {},
 ) {
   const watcher = createWatcherMock();
   vi.spyOn(chokidar, "watch").mockReturnValue(watcher as unknown as never);
   const onConfigChange = vi.fn(
-    options.onConfigChange ?? (async (_plan: GatewayReloadPlan, _nextConfig: OpenClawConfig) => {}),
+    options.onConfigChange ?? (async (_plan: GatewayReloadPlan, _nextConfig: SteelEngineConfig) => {}),
   );
   const onConfigApplied = vi.fn(
     options.onConfigApplied ??
-      (async (_plan: GatewayReloadPlan, _nextConfig: OpenClawConfig) => {}),
+      (async (_plan: GatewayReloadPlan, _nextConfig: SteelEngineConfig) => {}),
   );
   const onConfigAccepted = vi.fn(options.onConfigAccepted ?? (async () => {}));
   const onConfigRevisionApplied = vi.fn(options.onConfigRevisionApplied ?? (() => {}));
@@ -709,7 +709,7 @@ function createReloaderHarness(
     options.onNoopConfigCommit ??
       (async (
         _plan: GatewayReloadPlan,
-        _nextConfig: OpenClawConfig,
+        _nextConfig: SteelEngineConfig,
         _ownership: GatewayConfigReloadTransactionOwnership,
       ) => {}),
   );
@@ -717,12 +717,12 @@ function createReloaderHarness(
     options.onHotReload ??
       (async (
         _plan: GatewayReloadPlan,
-        _nextConfig: OpenClawConfig,
+        _nextConfig: SteelEngineConfig,
         _ownership: GatewayConfigReloadTransactionOwnership,
       ) => {}),
   );
   const onRestart = vi.fn(
-    options.onRestart ?? ((_plan: GatewayReloadPlan, _nextConfig: OpenClawConfig) => {}),
+    options.onRestart ?? ((_plan: GatewayReloadPlan, _nextConfig: SteelEngineConfig) => {}),
   );
   let writeListener: ((event: ConfigWriteNotification) => void) | null = null;
   const subscribeToWrites = vi.fn((listener: (event: ConfigWriteNotification) => void) => {
@@ -764,7 +764,7 @@ function createReloaderHarness(
     onRestart,
     ...(options.runTransaction ? { runTransaction: options.runTransaction } : {}),
     log,
-    watchPath: "/tmp/openclaw.json",
+    watchPath: "/tmp/steelengine.json",
   });
   return {
     watcher,
@@ -786,7 +786,7 @@ function createReloaderHarness(
 
 type ReloaderHarness = ReturnType<typeof createReloaderHarness>;
 
-function getOnlyRestartCall(harness: ReloaderHarness): [GatewayReloadPlan, OpenClawConfig] {
+function getOnlyRestartCall(harness: ReloaderHarness): [GatewayReloadPlan, SteelEngineConfig] {
   expect(harness.onRestart).toHaveBeenCalledTimes(1);
   const call = harness.onRestart.mock.calls[0];
   if (!call) {
@@ -795,7 +795,7 @@ function getOnlyRestartCall(harness: ReloaderHarness): [GatewayReloadPlan, OpenC
   return [call[0], call[1]];
 }
 
-function getOnlyHotReloadCall(harness: ReloaderHarness): [GatewayReloadPlan, OpenClawConfig] {
+function getOnlyHotReloadCall(harness: ReloaderHarness): [GatewayReloadPlan, SteelEngineConfig] {
   expect(harness.onHotReload).toHaveBeenCalledTimes(1);
   const call = harness.onHotReload.mock.calls[0];
   if (!call) {
@@ -849,7 +849,7 @@ describe("startGatewayConfigReloader", () => {
   );
 
   it("notifies lifecycle owners when a persisted edit reverts to the current baseline", async () => {
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 }, port: 18789 },
     };
     const readSnapshot = vi.fn(async () =>
@@ -873,7 +873,7 @@ describe("startGatewayConfigReloader", () => {
   it("reaccepts a same-hash watcher echo after synchronously pausing lifecycle work", async () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const onConfigCandidateObserved = vi.fn();
     const readSnapshot = vi.fn(async () =>
       makeSnapshot({ config: initialConfig, hash: "accepted-write" }),
@@ -898,7 +898,7 @@ describe("startGatewayConfigReloader", () => {
   it("revalidates changed effective config when an accepted write hash is unchanged", async () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 }, port: 18_789 },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const unavailableSecret = {
       source: "env" as const,
       provider: "default",
@@ -910,7 +910,7 @@ describe("startGatewayConfigReloader", () => {
         port: 19_001,
         auth: { mode: "token" as const, token: unavailableSecret },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const readSnapshot = vi.fn(async () =>
       makeSnapshot({
         config: effectiveConfig,
@@ -922,9 +922,9 @@ describe("startGatewayConfigReloader", () => {
     const onRestart = vi.fn(
       async (
         _plan: GatewayReloadPlan,
-        _nextConfig: OpenClawConfig,
+        _nextConfig: SteelEngineConfig,
         _ownership: GatewayConfigReloadTransactionOwnership,
-        _sourceConfig: OpenClawConfig,
+        _sourceConfig: SteelEngineConfig,
       ) => {
         throw new Error("required SecretRef INCLUDED_GATEWAY_TOKEN is unavailable");
       },
@@ -936,7 +936,7 @@ describe("startGatewayConfigReloader", () => {
     });
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: initialConfig,
       runtimeConfig: initialConfig,
       persistedHash: "unchanged-root-hash",
@@ -965,22 +965,22 @@ describe("startGatewayConfigReloader", () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 }, terminal: { enabled: true } },
       agents: { defaults: { sandbox: { mode: "off" as const } } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const appliedConfig = {
       gateway: { reload: { debounceMs: 0 }, terminal: { enabled: true } },
       agents: { defaults: { sandbox: { mode: "all" as const } } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const terminalPolicy = createTerminalLaunchPolicy(initialConfig);
     const events: string[] = [];
     const onNoopConfigCommit = async (
       plan: GatewayReloadPlan,
-      nextConfig: OpenClawConfig,
+      nextConfig: SteelEngineConfig,
       ownership: GatewayConfigReloadTransactionOwnership,
     ) => {
       terminalPolicy.prepareConfig(nextConfig, { restartPending: false });
       ownership.markRuntimeCommitted(nextConfig, plan);
       harness.emitWrite({
-        configPath: "/tmp/openclaw.json",
+        configPath: "/tmp/steelengine.json",
         sourceConfig: initialConfig,
         runtimeConfig: initialConfig,
         persistedHash: "baseline-only-b",
@@ -1007,7 +1007,7 @@ describe("startGatewayConfigReloader", () => {
     });
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: appliedConfig,
       runtimeConfig: appliedConfig,
       persistedHash: "runtime-a",
@@ -1036,15 +1036,15 @@ describe("startGatewayConfigReloader", () => {
       const initialConfig = {
         gateway: { reload: { debounceMs: 0 }, terminal: { enabled: true } },
         agents: { defaults: { sandbox: { mode: "off" as const } } },
-      } satisfies OpenClawConfig;
+      } satisfies SteelEngineConfig;
       const appliedConfig = {
         ...initialConfig,
         agents: { defaults: { sandbox: { mode: "all" as const } } },
-      } satisfies OpenClawConfig;
+      } satisfies SteelEngineConfig;
       const terminalPolicy = createTerminalLaunchPolicy(initialConfig);
       const onNoopConfigCommit = async (
         plan: GatewayReloadPlan,
-        nextConfig: OpenClawConfig,
+        nextConfig: SteelEngineConfig,
         ownership: GatewayConfigReloadTransactionOwnership,
       ) => {
         terminalPolicy.prepareConfig(nextConfig, { restartPending: false });
@@ -1062,7 +1062,7 @@ describe("startGatewayConfigReloader", () => {
       );
 
       harness.emitWrite({
-        configPath: "/tmp/openclaw.json",
+        configPath: "/tmp/steelengine.json",
         sourceConfig: appliedConfig,
         runtimeConfig: appliedConfig,
         persistedHash: "runtime-a-before-rejected-b",
@@ -1087,26 +1087,26 @@ describe("startGatewayConfigReloader", () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 }, terminal: { enabled: true } },
       agents: { defaults: { sandbox: { mode: "off" as const } } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const appliedConfig = {
       gateway: { reload: { debounceMs: 0 }, terminal: { enabled: true } },
       agents: { defaults: { sandbox: { mode: "all" as const } } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const restartConfig = {
       ...initialConfig,
       gateway: { ...initialConfig.gateway, port: 19_001 },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const terminalPolicy = createTerminalLaunchPolicy(initialConfig);
     const events: string[] = [];
     const onNoopConfigCommit = async (
       plan: GatewayReloadPlan,
-      nextConfig: OpenClawConfig,
+      nextConfig: SteelEngineConfig,
       ownership: GatewayConfigReloadTransactionOwnership,
     ) => {
       terminalPolicy.prepareConfig(nextConfig, { restartPending: false });
       ownership.markRuntimeCommitted(nextConfig, plan);
       harness.emitWrite({
-        configPath: "/tmp/openclaw.json",
+        configPath: "/tmp/steelengine.json",
         sourceConfig: restartConfig,
         runtimeConfig: restartConfig,
         persistedHash: "restart-b",
@@ -1135,7 +1135,7 @@ describe("startGatewayConfigReloader", () => {
     });
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: appliedConfig,
       runtimeConfig: appliedConfig,
       persistedHash: "runtime-a-before-restart",
@@ -1158,7 +1158,7 @@ describe("startGatewayConfigReloader", () => {
   it("does not reaccept an invalid snapshot whose root hash matches the startup write", async () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const readSnapshot = vi.fn(async () =>
       makeSnapshot({ config: initialConfig, valid: false, hash: "accepted-write" }),
     );
@@ -1182,7 +1182,7 @@ describe("startGatewayConfigReloader", () => {
       const initialConfig = {
         gateway: { reload: { mode: "off" as const, debounceMs: 0 } },
         hooks: { enabled: true, token: "test-token", path: "/old" },
-      } satisfies OpenClawConfig;
+      } satisfies SteelEngineConfig;
       const configA = {
         gateway: { reload: { mode: "hot" as const, debounceMs: 0 } },
         hooks: {
@@ -1190,7 +1190,7 @@ describe("startGatewayConfigReloader", () => {
           token: "test-token",
           path: kind === "hot" ? "/a" : "/old",
         },
-      } satisfies OpenClawConfig;
+      } satisfies SteelEngineConfig;
       const configB = structuredClone(initialConfig);
       const readSnapshot = vi
         .fn<() => Promise<ConfigFileSnapshot>>()
@@ -1220,7 +1220,7 @@ describe("startGatewayConfigReloader", () => {
       });
       const publishA = async (
         _plan: GatewayReloadPlan,
-        _nextConfig: OpenClawConfig,
+        _nextConfig: SteelEngineConfig,
         ownership: GatewayConfigReloadTransactionOwnership,
       ) => {
         markStarted?.();
@@ -1264,11 +1264,11 @@ describe("startGatewayConfigReloader", () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
       hooks: { enabled: true, token: "test-token", path: "/old" },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const configA = {
       ...initialConfig,
       hooks: { ...initialConfig.hooks, path: "/a" },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const readSnapshot = vi
       .fn<() => Promise<ConfigFileSnapshot>>()
       .mockResolvedValueOnce(makeSnapshot({ config: configA, hash: "post-commit-a" }))
@@ -1284,7 +1284,7 @@ describe("startGatewayConfigReloader", () => {
     const onHotReload = vi.fn(
       async (
         plan: GatewayReloadPlan,
-        nextConfig: OpenClawConfig,
+        nextConfig: SteelEngineConfig,
         ownership: GatewayConfigReloadTransactionOwnership,
       ) => {
         ownership.markRuntimeCommitted(nextConfig, plan);
@@ -1325,23 +1325,23 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("prepares a superseding config against the env owner committed at the runtime edge", async () => {
-    const envKey = "OPENCLAW_TEST_COMMITTED_ENV_SOURCE";
+    const envKey = "STEELENGINE_TEST_COMMITTED_ENV_SOURCE";
     const targetEnv: NodeJS.ProcessEnv = { [envKey]: "old" };
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
       hooks: { enabled: true, token: "test-token", path: "/old" },
       env: { vars: { [envKey]: "old" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const configA = {
       ...initialConfig,
       hooks: { ...initialConfig.hooks, path: "/a" },
       env: { vars: { [envKey]: "a" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const configB = {
       ...initialConfig,
       hooks: { ...initialConfig.hooks, path: "/b" },
       env: { vars: { [envKey]: "b" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const preparedEnvValues: Array<string | undefined> = [];
     const harness = createReloaderHarness(vi.fn(), {
       initialConfig,
@@ -1366,9 +1366,9 @@ describe("startGatewayConfigReloader", () => {
         }
       },
     });
-    const emitWrite = (config: OpenClawConfig, hash: string, revision: number) => {
+    const emitWrite = (config: SteelEngineConfig, hash: string, revision: number) => {
       harness.emitWrite({
-        configPath: "/tmp/openclaw.json",
+        configPath: "/tmp/steelengine.json",
         sourceConfig: config,
         runtimeConfig: config,
         persistedHash: hash,
@@ -1391,11 +1391,11 @@ describe("startGatewayConfigReloader", () => {
     const initialConfig = {
       gateway: { reload: { mode: "off" as const, debounceMs: 0 } },
       hooks: { enabled: true, token: "test-token", path: "/old" },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const queuedConfig = {
       gateway: { reload: { mode: "hot" as const, debounceMs: 0 } },
       hooks: { enabled: true, token: "test-token", path: "/queued" },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const externalConfig = structuredClone(initialConfig);
     const readSnapshot = vi.fn(async () =>
       makeSnapshot({
@@ -1408,7 +1408,7 @@ describe("startGatewayConfigReloader", () => {
     const harness = createReloaderHarness(readSnapshot, { initialConfig });
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: queuedConfig,
       runtimeConfig: queuedConfig,
       persistedHash: "queued-in-process",
@@ -1432,10 +1432,10 @@ describe("startGatewayConfigReloader", () => {
   it("does not restart stale external config A before rejecting invalid SecretRef config B", async () => {
     const initialConfig = {
       gateway: { reload: { mode: "off" as const, debounceMs: 0 }, port: 18789 },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const configA = {
       gateway: { reload: { mode: "restart" as const, debounceMs: 0 }, port: 18790 },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const configB = {
       gateway: {
         reload: { mode: "restart" as const, debounceMs: 0 },
@@ -1449,7 +1449,7 @@ describe("startGatewayConfigReloader", () => {
           },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const readSnapshot = vi
       .fn<() => Promise<ConfigFileSnapshot>>()
       .mockResolvedValueOnce(
@@ -1476,7 +1476,7 @@ describe("startGatewayConfigReloader", () => {
     const blocked = new Promise<void>((resolve) => {
       releaseA = resolve;
     });
-    const restartRequests: OpenClawConfig[] = [];
+    const restartRequests: SteelEngineConfig[] = [];
     const harness = createReloaderHarness(readSnapshot, {
       initialConfig,
       onRestart: async (_plan, nextConfig, ownership) => {
@@ -1517,11 +1517,11 @@ describe("startGatewayConfigReloader", () => {
     const initialConfig = {
       gateway: { reload: { mode: "off" as const, debounceMs: 0 } },
       hooks: { enabled: true, token: "test-token", path: "/old" },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const configA = {
       gateway: { reload: { mode: "hot" as const, debounceMs: 0 } },
       hooks: { enabled: true, token: "test-token", path: "/a" },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const configB = structuredClone(initialConfig);
     const readSnapshot = vi
       .fn<() => Promise<ConfigFileSnapshot>>()
@@ -1583,10 +1583,10 @@ describe("startGatewayConfigReloader", () => {
   it("does not accept stale config A when config B arrives during plugin-index discovery", async () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const invalidConfigB = {
       gateway: { reload: { debounceMs: 0 }, port: 18790 },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const readSnapshot = vi
       .fn<() => Promise<ConfigFileSnapshot>>()
       .mockResolvedValueOnce(
@@ -1646,11 +1646,11 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("waits for an active reload transaction before stop resolves", async () => {
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       hooks: { enabled: true, token: "test-token", path: "/old" },
     };
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       hooks: { enabled: true, token: "test-token", path: "/next" },
     };
@@ -1694,11 +1694,11 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("notifies lifecycle owners for no-op sandbox policy changes", async () => {
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       agents: { defaults: { sandbox: { mode: "off" } } },
     };
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       agents: { defaults: { sandbox: { mode: "all" } } },
     };
@@ -1720,11 +1720,11 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("commits runtime snapshot changes for no-op visible reply reloads", async () => {
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       messages: { visibleReplies: "automatic" },
     };
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       messages: { visibleReplies: "message_tool" },
     };
@@ -1775,11 +1775,11 @@ describe("startGatewayConfigReloader", () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
       channels: { mattermost: { accounts: { alpha: { enabled: false } } } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const nextConfig = {
       gateway: { reload: { debounceMs: 0 } },
       channels: { mattermost: { accounts: { alpha: { enabled: true } } } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const harness = createReloaderHarness(
       vi.fn(async () => makeSnapshot({ config: nextConfig, hash: "account-reload" })),
       { initialConfig },
@@ -1800,7 +1800,7 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("plans one immutable runtime override snapshot per candidate", async () => {
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       meta: { lastTouchedVersion: "initial" },
       messages: { visibleReplies: "automatic" },
@@ -1808,7 +1808,7 @@ describe("startGatewayConfigReloader", () => {
     let visibleRepliesOverride: "message_tool" | undefined;
     const prepareConfigCandidate = vi.fn(({ runtimeConfig, sourceConfig }) => {
       const override = visibleRepliesOverride;
-      const applyCapturedOverride = (config: OpenClawConfig): OpenClawConfig =>
+      const applyCapturedOverride = (config: SteelEngineConfig): SteelEngineConfig =>
         override
           ? { ...config, messages: { ...config.messages, visibleReplies: override } }
           : config;
@@ -1823,10 +1823,10 @@ describe("startGatewayConfigReloader", () => {
       prepareConfigCandidate,
     });
     const makeOverrideWrite = (
-      config: OpenClawConfig,
+      config: SteelEngineConfig,
       persistedHash: string,
     ): ConfigWriteNotification => ({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: config,
       runtimeConfig: config,
       persistedHash,
@@ -1837,7 +1837,7 @@ describe("startGatewayConfigReloader", () => {
     });
 
     visibleRepliesOverride = "message_tool";
-    const overrideSource: OpenClawConfig = {
+    const overrideSource: SteelEngineConfig = {
       ...initialConfig,
       meta: { lastTouchedVersion: "override-active" },
     };
@@ -1852,7 +1852,7 @@ describe("startGatewayConfigReloader", () => {
     );
 
     visibleRepliesOverride = undefined;
-    const resetSource: OpenClawConfig = {
+    const resetSource: SteelEngineConfig = {
       ...initialConfig,
       meta: { lastTouchedVersion: "override-reset" },
     };
@@ -1869,15 +1869,15 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("does not publish a restart-only hot-mode candidate through a later safe edit", async () => {
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: {
         reload: { mode: "hot", debounceMs: 0 },
         auth: { mode: "token", token: "old-token" },
       },
       logging: { level: "info" },
     };
-    const makeWrite = (config: OpenClawConfig, persistedHash: string): ConfigWriteNotification => ({
-      configPath: "/tmp/openclaw.json",
+    const makeWrite = (config: SteelEngineConfig, persistedHash: string): ConfigWriteNotification => ({
+      configPath: "/tmp/steelengine.json",
       sourceConfig: config,
       runtimeConfig: config,
       persistedHash,
@@ -1888,7 +1888,7 @@ describe("startGatewayConfigReloader", () => {
     });
     let watcherSnapshot = makeSnapshot({ config: initialConfig, hash: "initial" });
     const harness = createReloaderHarness(async () => watcherSnapshot, { initialConfig });
-    const restartOnlyConfig: OpenClawConfig = {
+    const restartOnlyConfig: SteelEngineConfig = {
       ...initialConfig,
       gateway: {
         ...initialConfig.gateway,
@@ -1922,12 +1922,12 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("notifies lifecycle owners before hot reload and commits after success", async () => {
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       agents: { defaults: { sandbox: { mode: "off" } } },
       hooks: { enabled: false },
     };
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       agents: { defaults: { sandbox: { mode: "all" } } },
       hooks: { enabled: true },
@@ -1951,10 +1951,10 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("notifies lifecycle owners before queuing a terminal disable restart", async () => {
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 }, terminal: { enabled: true } },
     };
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 }, terminal: { enabled: false } },
     };
     const readSnapshot = vi.fn(async () => makeSnapshot({ config: nextConfig, hash: "terminal" }));
@@ -1983,10 +1983,10 @@ describe("startGatewayConfigReloader", () => {
     const restartPending = new Promise<void>((resolve) => {
       releaseRestart = resolve;
     });
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 }, terminal: { enabled: true } },
     };
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 }, terminal: { enabled: false } },
     };
     const harness = createReloaderHarness(
@@ -2012,10 +2012,10 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("does not notify lifecycle owners when reload mode ignores the change", async () => {
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: { reload: { mode: "off", debounceMs: 0 }, terminal: { enabled: true } },
     };
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       gateway: { reload: { mode: "off", debounceMs: 0 }, terminal: { enabled: false } },
     };
     const readSnapshot = vi.fn(async () => makeSnapshot({ config: nextConfig, hash: "off" }));
@@ -2031,10 +2031,10 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("does not notify lifecycle owners when hot mode ignores a restart-only change", async () => {
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: { reload: { mode: "hot", debounceMs: 0 }, terminal: { enabled: true } },
     };
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       gateway: { reload: { mode: "hot", debounceMs: 0 }, terminal: { enabled: false } },
     };
     const readSnapshot = vi.fn(async () => makeSnapshot({ config: nextConfig, hash: "hot" }));
@@ -2198,7 +2198,7 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("skips plugin-local invalid reloads without degraded mode", async () => {
-    const activeConfig: OpenClawConfig = {
+    const activeConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       agents: { defaults: { model: "gpt-5.4" } },
       plugins: {
@@ -2229,7 +2229,7 @@ describe("startGatewayConfigReloader", () => {
       .fn<() => Promise<ConfigFileSnapshot>>()
       .mockResolvedValueOnce(invalidSnapshot);
     const promoteSnapshot = vi.fn(async (_snapshot: ConfigFileSnapshot, _reason: string) => true);
-    const previousConfig: OpenClawConfig = {
+    const previousConfig: SteelEngineConfig = {
       ...activeConfig,
       plugins: {
         entries: {
@@ -2289,7 +2289,7 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("hot-reloads direct diagnostics memory pressure snapshot edits", async () => {
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       diagnostics: { memoryPressureSnapshot: false },
     };
@@ -2301,7 +2301,7 @@ describe("startGatewayConfigReloader", () => {
         hash: "diagnostics-memory-pressure-snapshot-1",
       }),
     );
-    const previousConfig: OpenClawConfig = {
+    const previousConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       diagnostics: { memoryPressureSnapshot: true },
     };
@@ -2497,17 +2497,17 @@ describe("startGatewayConfigReloader", () => {
   ] as const)(
     "publishes config env only for a runtime-applied $label transaction",
     async (testCase) => {
-      const envKey = "OPENCLAW_TEST_RELOAD_TRANSACTION_ENV";
+      const envKey = "STEELENGINE_TEST_RELOAD_TRANSACTION_ENV";
       const targetEnv: NodeJS.ProcessEnv = { [envKey]: "old" };
       const initialConfig = {
         gateway: { reload: { debounceMs: 0, mode: testCase.reloadMode } },
         env: { vars: { [envKey]: "old" } },
-      } satisfies OpenClawConfig;
+      } satisfies SteelEngineConfig;
       const nextConfig = {
         ...initialConfig,
         gateway: { ...initialConfig.gateway, port: 19001 },
         env: { vars: { [envKey]: "candidate" } },
-      } satisfies OpenClawConfig;
+      } satisfies SteelEngineConfig;
       const runtimeEnv = prepareConfigRuntimeEnv({
         previousConfig: initialConfig,
         nextConfig,
@@ -2517,7 +2517,7 @@ describe("startGatewayConfigReloader", () => {
       const harness = createReloaderHarness(vi.fn(), { initialConfig });
 
       harness.emitWrite({
-        configPath: "/tmp/openclaw.json",
+        configPath: "/tmp/steelengine.json",
         sourceConfig: nextConfig,
         runtimeConfig: nextConfig,
         preparedCandidate: { runtimeConfig: nextConfig, compareConfig: nextConfig, runtimeEnv },
@@ -2540,22 +2540,22 @@ describe("startGatewayConfigReloader", () => {
     { label: "rejected before runtime commit", markCommitted: false, expected: "old" },
     { label: "failed after runtime commit", markCommitted: true, expected: "candidate" },
   ] as const)("$label handles published config env ownership", async (testCase) => {
-    const envKey = "OPENCLAW_TEST_RELOAD_ENV_COMMIT_EDGE";
+    const envKey = "STEELENGINE_TEST_RELOAD_ENV_COMMIT_EDGE";
     const targetEnv: NodeJS.ProcessEnv = { [envKey]: "old" };
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
       hooks: { enabled: true, token: "test", path: "/old" },
       env: { vars: { [envKey]: "old" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const nextConfig = {
       ...initialConfig,
       hooks: { ...initialConfig.hooks, path: "/next" },
       env: { vars: { [envKey]: "candidate" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const compareConfig = {
       ...nextConfig,
       env: initialConfig.env,
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const runtimeEnv = prepareConfigRuntimeEnv({
       previousConfig: initialConfig,
       nextConfig,
@@ -2575,7 +2575,7 @@ describe("startGatewayConfigReloader", () => {
     });
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: nextConfig,
       runtimeConfig: nextConfig,
       preparedCandidate: { runtimeConfig: nextConfig, compareConfig, runtimeEnv },
@@ -2592,17 +2592,17 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("keeps a deferred config env candidate isolated when a watcher supersedes it", async () => {
-    const envKey = "OPENCLAW_TEST_SUPERSEDED_RELOAD_ENV";
+    const envKey = "STEELENGINE_TEST_SUPERSEDED_RELOAD_ENV";
     const targetEnv: NodeJS.ProcessEnv = { [envKey]: "old" };
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
       env: { vars: { [envKey]: "old" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const nextConfig = {
       ...initialConfig,
       gateway: { ...initialConfig.gateway, port: 19001 },
       env: { vars: { [envKey]: "candidate" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const runtimeEnv = prepareConfigRuntimeEnv({
       previousConfig: initialConfig,
       nextConfig,
@@ -2622,7 +2622,7 @@ describe("startGatewayConfigReloader", () => {
     );
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: nextConfig,
       runtimeConfig: nextConfig,
       preparedCandidate: { runtimeConfig: nextConfig, compareConfig: nextConfig, runtimeEnv },
@@ -2644,9 +2644,9 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("reprepares a stale managed-write env candidate after another transaction accepts", async () => {
-    const envKey = "OPENCLAW_TEST_INTERLEAVED_RELOAD_ENV";
+    const envKey = "STEELENGINE_TEST_INTERLEAVED_RELOAD_ENV";
     const targetEnv: NodeJS.ProcessEnv = { [envKey]: "a" };
-    const makeConfig = (value: string, port: number): OpenClawConfig => ({
+    const makeConfig = (value: string, port: number): SteelEngineConfig => ({
       gateway: { reload: { debounceMs: 0 }, port },
       env: { vars: { [envKey]: value } },
     });
@@ -2688,7 +2688,7 @@ describe("startGatewayConfigReloader", () => {
     expect(targetEnv[envKey]).toBe("c");
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: configB,
       runtimeConfig: configB,
       preparedCandidate: {
@@ -2797,7 +2797,7 @@ describe("startGatewayConfigReloader", () => {
   it("discards slow in-process intent when the watcher proves different bytes", async () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     let releasePluginRead = () => {};
     let recordPluginReadStarted: (() => void) | undefined;
     const pluginReadStarted = new Promise<void>((resolve) => {
@@ -2843,7 +2843,7 @@ describe("startGatewayConfigReloader", () => {
     const freshConfig = {
       gateway: { reload: { debounceMs: 0 } },
       hooks: { enabled: false },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const readSnapshot = vi.fn(async () =>
       makeSnapshot({
         config: freshConfig,
@@ -2887,13 +2887,13 @@ describe("startGatewayConfigReloader", () => {
         reload: { debounceMs: 0 },
         auth: { mode: "token" as const, token: secretRef },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const runtimeConfig = {
       gateway: {
         reload: { debounceMs: 0 },
         auth: { mode: "token" as const, token: "resolved-test-token" },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const readSnapshot = vi.fn(async () =>
       makeSnapshot({
         config: sourceConfig,
@@ -2905,7 +2905,7 @@ describe("startGatewayConfigReloader", () => {
     const harness = createReloaderHarness(readSnapshot);
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig,
       runtimeConfig,
       persistedHash: "secret-ref-write",
@@ -2937,15 +2937,15 @@ describe("startGatewayConfigReloader", () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
       logging: { level: "info" as const },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const sourceConfig = {
       ...initialConfig,
       logging: { level: "debug" as const },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const harness = createReloaderHarness(vi.fn(), { initialConfig });
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig,
       runtimeConfig: sourceConfig,
       preparedCandidate: {
@@ -2975,11 +2975,11 @@ describe("startGatewayConfigReloader", () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
       logging: { level: "info" as const },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const sourceConfig = {
       ...initialConfig,
       logging: { level: "debug" as const },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const harness = createReloaderHarness(vi.fn(), {
       initialConfig,
       onConfigAccepted: async () => {
@@ -2988,7 +2988,7 @@ describe("startGatewayConfigReloader", () => {
     });
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig,
       runtimeConfig: sourceConfig,
       preparedCandidate: {
@@ -3016,11 +3016,11 @@ describe("startGatewayConfigReloader", () => {
     const initialConfig = {
       gateway: { reload: { debounceMs: 0 } },
       logging: { level: "info" as const },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const sourceConfig = {
       ...initialConfig,
       logging: { level: "debug" as const },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const rollbackSource = vi.fn(async () => {});
     let emitSupersedingChange = () => {};
     const harness = createReloaderHarness(
@@ -3041,7 +3041,7 @@ describe("startGatewayConfigReloader", () => {
     };
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig,
       runtimeConfig: sourceConfig,
       preparedCandidate: {
@@ -3069,7 +3069,7 @@ describe("startGatewayConfigReloader", () => {
 
   it("retains the accepted candidate overlay when a watcher echoes the same hash", async () => {
     const sourceConfig = makeZeroDebounceHookWrite("overlay-echo").sourceConfig;
-    const applyDebugOverride = (config: OpenClawConfig): OpenClawConfig => ({
+    const applyDebugOverride = (config: SteelEngineConfig): SteelEngineConfig => ({
       ...config,
       logging: { level: "debug" },
     });
@@ -3097,7 +3097,7 @@ describe("startGatewayConfigReloader", () => {
 
   it("rebinds a source-only restart target when its watcher echo advances ownership", async () => {
     const sourceConfig = makeZeroDebounceHookWrite("source-only-echo").sourceConfig;
-    const applyDebugOverride = (config: OpenClawConfig): OpenClawConfig => ({
+    const applyDebugOverride = (config: SteelEngineConfig): SteelEngineConfig => ({
       ...config,
       logging: { level: "debug" },
     });
@@ -3143,17 +3143,17 @@ describe("startGatewayConfigReloader", () => {
         reload: { debounceMs: 0 },
         auth: { mode: "token" as const, token: secretRef },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const runtimeConfig = {
       gateway: {
         reload: { debounceMs: 0 },
         auth: { mode: "token" as const, token: "resolved-direct-token" },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const harness = createReloaderHarness(vi.fn());
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig,
       runtimeConfig,
       persistedHash: "direct-secret-restart",
@@ -3183,13 +3183,13 @@ describe("startGatewayConfigReloader", () => {
         reload: { debounceMs: 0 },
         auth: { mode: "token" as const, token: secretRef },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const runtimeConfig = {
       gateway: {
         reload: { debounceMs: 0 },
         auth: { mode: "token" as const, token: "resolved-replay-token" },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     let releasePluginRead = () => {};
     let recordPluginReadStarted: (() => void) | undefined;
     const pluginReadStarted = new Promise<void>((resolve) => {
@@ -3214,7 +3214,7 @@ describe("startGatewayConfigReloader", () => {
     const harness = createReloaderHarness(readSnapshot, { readPluginInstallRecords });
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig,
       runtimeConfig,
       persistedHash: "replay-secret-restart",
@@ -3381,7 +3381,7 @@ describe("startGatewayConfigReloader", () => {
       installedAt: "2026-04-22T00:00:00.000Z",
       resolvedAt: "2026-04-22T00:00:00.000Z",
     };
-    const sourceConfig: OpenClawConfig = {
+    const sourceConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 }, auth: { mode: "token" } },
       plugins: {
         installs: {
@@ -3409,7 +3409,7 @@ describe("startGatewayConfigReloader", () => {
     const harness = createReloaderHarness(readSnapshot, { initialCompareConfig: sourceConfig });
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: {
         ...sourceConfig,
         plugins: {
@@ -3461,7 +3461,7 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("does not suppress functional install changes that collide with timestamp paths", async () => {
-    const sourceConfig: OpenClawConfig = {
+    const sourceConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       plugins: {
         installs: {
@@ -3472,7 +3472,7 @@ describe("startGatewayConfigReloader", () => {
         },
       },
     };
-    const nextSourceConfig: OpenClawConfig = {
+    const nextSourceConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       plugins: {
         installs: {
@@ -3497,7 +3497,7 @@ describe("startGatewayConfigReloader", () => {
     const harness = createReloaderHarness(readSnapshot, { initialCompareConfig: sourceConfig });
 
     harness.emitWrite({
-      configPath: "/tmp/openclaw.json",
+      configPath: "/tmp/steelengine.json",
       sourceConfig: nextSourceConfig,
       runtimeConfig: nextSourceConfig,
       persistedHash: "plugin-collision-1",
@@ -3525,7 +3525,7 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("queues restart when an external plugin source write only changes the managed index", async () => {
-    const activeConfig: OpenClawConfig = {
+    const activeConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       plugins: {
         allow: ["lossless-claw"],
@@ -3546,7 +3546,7 @@ describe("startGatewayConfigReloader", () => {
       "lossless-claw": {
         source: "npm",
         spec: "@martian-engineering/lossless-claw",
-        installPath: "/tmp/openclaw/plugins/lossless-claw",
+        installPath: "/tmp/steelengine/plugins/lossless-claw",
         installedAt: "2026-04-22T00:00:00.000Z",
       },
     } satisfies Record<string, PluginInstallRecord>);
@@ -3570,7 +3570,7 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("reloads explicitly signaled plugin metadata when config bytes stay identical", async () => {
-    const activeConfig: OpenClawConfig = {
+    const activeConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
     };
     const readSnapshot = vi.fn(async () =>
@@ -3584,8 +3584,8 @@ describe("startGatewayConfigReloader", () => {
     const readPluginInstallRecords = vi.fn(async () => ({
       brave: {
         source: "npm" as const,
-        spec: "@openclaw/brave",
-        installPath: "/tmp/openclaw/plugins/brave",
+        spec: "@steelengine/brave",
+        installPath: "/tmp/steelengine/plugins/brave",
       },
     }));
     const harness = createReloaderHarness(readSnapshot, {
@@ -3610,7 +3610,7 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("keeps external plugin policy-only writes on the hot reload path", async () => {
-    const previousConfig: OpenClawConfig = {
+    const previousConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       plugins: {
         entries: {
@@ -3618,7 +3618,7 @@ describe("startGatewayConfigReloader", () => {
         },
       },
     };
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       plugins: {
         entries: {
@@ -3629,8 +3629,8 @@ describe("startGatewayConfigReloader", () => {
     const installRecords = {
       telegram: {
         source: "npm",
-        spec: "@openclaw/telegram",
-        installPath: "/tmp/openclaw/plugins/telegram",
+        spec: "@steelengine/telegram",
+        installPath: "/tmp/steelengine/plugins/telegram",
       },
     } satisfies Record<string, PluginInstallRecord>;
     const readSnapshot = vi.fn<() => Promise<ConfigFileSnapshot>>().mockResolvedValueOnce(
@@ -3663,7 +3663,7 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("keeps external auth cooldown writes on the hot reload path", async () => {
-    const previousConfig: OpenClawConfig = {
+    const previousConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       auth: {
         cooldowns: {
@@ -3672,7 +3672,7 @@ describe("startGatewayConfigReloader", () => {
         },
       },
     };
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       auth: {
         cooldowns: {
@@ -3714,13 +3714,13 @@ describe("startGatewayConfigReloader", () => {
   });
 
   it("queues restart when an external plugin source write also changes plugin config", async () => {
-    const previousConfig: OpenClawConfig = {
+    const previousConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       plugins: {
         allow: ["lossless-claw"],
       },
     };
-    const nextConfig: OpenClawConfig = {
+    const nextConfig: SteelEngineConfig = {
       gateway: { reload: { debounceMs: 0 } },
       plugins: {
         allow: ["lossless-claw"],
@@ -3741,7 +3741,7 @@ describe("startGatewayConfigReloader", () => {
       "lossless-claw": {
         source: "npm",
         spec: "@martian-engineering/lossless-claw",
-        installPath: "/tmp/openclaw/plugins/lossless-claw",
+        installPath: "/tmp/steelengine/plugins/lossless-claw",
         installedAt: "2026-04-22T00:00:00.000Z",
       },
     } satisfies Record<string, PluginInstallRecord>);
@@ -3796,7 +3796,7 @@ describe("startGatewayConfigReloader", () => {
   it("dedupes only the first watcher reread for startup internal writes", async () => {
     const startupConfig = {
       gateway: { reload: { debounceMs: 0 }, auth: { mode: "token" as const, token: "startup" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const readSnapshot = vi
       .fn<() => Promise<ConfigFileSnapshot>>()
       .mockResolvedValueOnce(
@@ -3913,7 +3913,7 @@ describe("startGatewayConfigReloader watcher error recovery", () => {
       onHotReload: vi.fn(async () => {}),
       onRestart: vi.fn(),
       log,
-      watchPath: "/tmp/openclaw.json",
+      watchPath: "/tmp/steelengine.json",
     });
     return { watchSpy, log, reloader };
   }

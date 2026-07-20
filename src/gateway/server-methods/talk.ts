@@ -1,10 +1,10 @@
 // Gateway RPC handlers for Talk voice, transcription, and speech synthesis surfaces.
-import { asOptionalRecord } from "@openclaw/normalization-core/record-coerce";
+import { asOptionalRecord } from "@steelengine/normalization-core/record-coerce";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import {
   ErrorCodes,
   errorShape,
@@ -32,7 +32,7 @@ import type {
   TalkProviderConfig,
   TalkRealtimeConfig,
 } from "../../config/types.gateway.js";
-import type { OpenClawConfig, TtsConfig, TtsProviderConfigMap } from "../../config/types.js";
+import type { SteelEngineConfig, TtsConfig, TtsProviderConfigMap } from "../../config/types.js";
 import { resolveProviderRawConfig } from "../../plugin-sdk/provider-selection-runtime.js";
 import { canonicalizeRealtimeTranscriptionProviderId } from "../../realtime-transcription/provider-registry.js";
 import {
@@ -166,9 +166,9 @@ function withTalkBaseTtsSpeakerSelectionCompat(
 }
 
 function buildTalkTtsConfig(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
 ):
-  | { cfg: OpenClawConfig; provider: string; providerConfig: TalkProviderConfig }
+  | { cfg: SteelEngineConfig; provider: string; providerConfig: TalkProviderConfig }
   | { error: string; reason: TalkSpeakReason } {
   const resolved = resolveActiveTalkProviderConfig(config.talk);
   const provider = canonicalizeSpeechProviderId(resolved?.provider, config);
@@ -221,7 +221,7 @@ function buildTalkTtsConfig(
   };
 }
 
-function buildTalkCatalog(config: OpenClawConfig) {
+function buildTalkCatalog(config: SteelEngineConfig) {
   const ttsConfig = resolveTtsConfig(config);
   const talkResolved = resolveActiveTalkProviderConfig(config.talk);
   const activeSpeechProvider = canonicalizeSpeechProviderId(talkResolved?.provider, config);
@@ -423,7 +423,7 @@ function resolveTalkSpeed(params: TalkSpeakParams): number | undefined {
 function buildTalkSpeakOverrides(
   provider: string,
   providerConfig: TalkProviderConfig,
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   params: TalkSpeakParams,
 ): TtsDirectiveOverrides {
   const speechProvider = getSpeechProvider(provider, config);
@@ -456,8 +456,8 @@ function buildTalkSpeakOverrides(
 
 async function resolveTalkResponseFromConfig(params: {
   includeSecrets: boolean;
-  sourceConfig: OpenClawConfig;
-  runtimeConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
+  runtimeConfig: SteelEngineConfig;
 }): Promise<TalkConfigResponse | undefined> {
   const normalizedTalk = normalizeTalkSection(params.sourceConfig.talk);
   const configuredPayload = normalizedTalk ? buildTalkConfigResponse(normalizedTalk) : undefined;
@@ -620,7 +620,7 @@ function projectTalkSourcePayloadForSecrets(payload: TalkConfigResponse): TalkCo
 
 async function resolveTalkProviderInputConfig(params: {
   includeSecrets: boolean;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   providerConfig: TalkProviderConfig;
   provider: string;
 }): Promise<TalkProviderConfig> {

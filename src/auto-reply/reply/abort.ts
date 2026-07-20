@@ -2,7 +2,7 @@
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import { getAcpSessionManager } from "../../acp/control-plane/manager.js";
 import { resolveSessionAgentId } from "../../agents/agent-scope.js";
 import {
@@ -28,7 +28,7 @@ import {
   type SessionAbortTargetIdentity,
   type SessionAbortTargetResult,
 } from "../../config/sessions/session-accessor.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { logVerbose } from "../../globals.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { isAcpSessionKey, parseAgentSessionKey } from "../../routing/session-key.js";
@@ -98,7 +98,7 @@ const abortTestApi = {
 };
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
-  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("openclaw.abortTestApi")] = abortTestApi;
+  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("steelengine.abortTestApi")] = abortTestApi;
 }
 
 export function abortSessionRunTargetWithOutcome(params: { key?: string; sessionId?: string }): {
@@ -147,7 +147,7 @@ export function formatAbortReplyText(
 }
 
 function resolveStoredSessionId(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   sessionKey: string;
 }): string | undefined {
   const agentId = resolveSessionAgentId({
@@ -169,7 +169,7 @@ function resolveStoredSessionId(params: {
 
 function resolveBoundAcpAbortTargetSessionKey(params: {
   ctx: FinalizedMsgContext;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   activeSessionKey: string;
 }): string | undefined {
   const bindingContext = resolveConversationBindingContextFromMessage({
@@ -192,7 +192,7 @@ function resolveBoundAcpAbortTargetSessionKey(params: {
 }
 
 function normalizeRequesterSessionKey(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   key: string | undefined,
 ): string | undefined {
   const cleaned = normalizeOptionalString(key);
@@ -219,7 +219,7 @@ function markSubagentRunTerminatedBestEffort(
 }
 
 export function stopSubagentsForRequester(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   requesterSessionKey?: string;
 }): { stopped: number } {
   const requesterKey = normalizeRequesterSessionKey(params.cfg, params.requesterSessionKey);
@@ -316,7 +316,7 @@ export function stopSubagentsForRequester(params: {
 
 export async function tryFastAbortFromMessage(params: {
   ctx: FinalizedMsgContext;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
 }): Promise<{
   handled: boolean;
   aborted: boolean;

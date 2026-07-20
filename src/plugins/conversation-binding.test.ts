@@ -6,22 +6,22 @@ import type {
   SessionBindingAdapter,
   SessionBindingRecord,
 } from "../infra/outbound/session-binding-service.js";
-import type { DB as OpenClawStateKyselyDatabase } from "../state/openclaw-state-db.generated.js";
+import type { DB as SteelEngineStateKyselyDatabase } from "../state/steelengine-state-db.generated.js";
 import {
-  closeOpenClawStateDatabaseForTest,
-  openOpenClawStateDatabase,
-  runOpenClawStateWriteTransaction,
-} from "../state/openclaw-state-db.js";
+  closeSteelEngineStateDatabaseForTest,
+  openSteelEngineStateDatabase,
+  runSteelEngineStateWriteTransaction,
+} from "../state/steelengine-state-db.js";
 import { resetPluginConversationBindingStateForTest } from "./conversation-binding.test-fixtures.js";
 import { createEmptyPluginRegistry } from "./registry-empty.js";
 import type { PluginRegistry } from "./registry.js";
 import { cleanupTrackedTempDirs, makeTrackedTempDir } from "./test-helpers/fs-fixtures.js";
 
 const tempDirs: string[] = [];
-const tempRoot = makeTrackedTempDir("openclaw-plugin-binding", tempDirs);
-const previousStateDir = process.env.OPENCLAW_STATE_DIR;
+const tempRoot = makeTrackedTempDir("steelengine-plugin-binding", tempDirs);
+const previousStateDir = process.env.STEELENGINE_STATE_DIR;
 
-type PluginBindingApprovalsDatabase = Pick<OpenClawStateKyselyDatabase, "plugin_binding_approvals">;
+type PluginBindingApprovalsDatabase = Pick<SteelEngineStateKyselyDatabase, "plugin_binding_approvals">;
 
 const sessionBindingState = vi.hoisted(() => {
   const records = new Map<string, SessionBindingRecord>();
@@ -159,11 +159,11 @@ function createAdapter(channel: string, accountId: string): SessionBindingAdapte
 }
 
 afterAll(() => {
-  closeOpenClawStateDatabaseForTest();
+  closeSteelEngineStateDatabaseForTest();
   if (previousStateDir == null) {
-    delete process.env.OPENCLAW_STATE_DIR;
+    delete process.env.STEELENGINE_STATE_DIR;
   } else {
-    process.env.OPENCLAW_STATE_DIR = previousStateDir;
+    process.env.STEELENGINE_STATE_DIR = previousStateDir;
   }
   cleanupTrackedTempDirs(tempDirs);
 });
@@ -416,7 +416,7 @@ async function expectResolutionDoesNotWait(params: {
 }
 
 function clearPluginBindingApprovalRows(): void {
-  runOpenClawStateWriteTransaction(({ db }) => {
+  runSteelEngineStateWriteTransaction(({ db }) => {
     const approvalsDb = getNodeSqliteKysely<PluginBindingApprovalsDatabase>(db);
     executeSqliteQuerySync(db, approvalsDb.deleteFrom("plugin_binding_approvals"));
   });
@@ -428,7 +428,7 @@ function readPluginBindingApprovalRows(): Array<{
   plugin_id: string;
   plugin_root: string;
 }> {
-  const { db } = openOpenClawStateDatabase();
+  const { db } = openSteelEngineStateDatabase();
   const approvalsDb = getNodeSqliteKysely<PluginBindingApprovalsDatabase>(db);
   return executeSqliteQuerySync(
     db,
@@ -446,7 +446,7 @@ function insertPluginBindingApprovalRow(params: {
   accountId: string;
   pluginId: string;
 }): void {
-  runOpenClawStateWriteTransaction(({ db }) => {
+  runSteelEngineStateWriteTransaction(({ db }) => {
     const approvalsDb = getNodeSqliteKysely<PluginBindingApprovalsDatabase>(db);
     executeSqliteQuerySync(
       db,
@@ -464,7 +464,7 @@ function insertPluginBindingApprovalRow(params: {
 
 describe("plugin conversation binding approvals", () => {
   beforeEach(() => {
-    process.env.OPENCLAW_STATE_DIR = tempRoot;
+    process.env.STEELENGINE_STATE_DIR = tempRoot;
     clearPluginBindingApprovalRows();
     sessionBindingState.reset();
     resetPluginConversationBindingStateForTest();
@@ -820,8 +820,8 @@ describe("plugin conversation binding approvals", () => {
     const data = {
       kind: "codex-app-server-session",
       version: 1,
-      sessionFile: "/tmp/openclaw/session.jsonl",
-      workspaceDir: "/workspace/openclaw",
+      sessionFile: "/tmp/steelengine/session.jsonl",
+      workspaceDir: "/workspace/steelengine",
     };
     const binding = await requestResolvedBinding(
       createCodexBindRequest({
@@ -1122,7 +1122,7 @@ describe("plugin conversation binding approvals", () => {
       name: "migrates a legacy codex thread binding session key through the new approval flow",
       existingRecord: {
         bindingId: "binding-legacy-codex-thread",
-        targetSessionKey: "openclaw-app-server:thread:019ce411-6322-7db2-a821-1a61c530e7d9",
+        targetSessionKey: "steelengine-app-server:thread:019ce411-6322-7db2-a821-1a61c530e7d9",
         targetKind: "session" as const,
         conversation: {
           channel: "telegram",
@@ -1139,10 +1139,10 @@ describe("plugin conversation binding approvals", () => {
         accountId: "default",
         conversationId: "8460800771",
         summary: "Bind this conversation to Codex thread 019ce411-6322-7db2-a821-1a61c530e7d9.",
-        pluginId: "openclaw-codex-app-server",
+        pluginId: "steelengine-codex-app-server",
       }),
       expectedBinding: {
-        pluginId: "openclaw-codex-app-server",
+        pluginId: "steelengine-codex-app-server",
         pluginRoot: "/plugins/codex-a",
         conversationId: "8460800771",
       },

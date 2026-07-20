@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import { withEnvAsync } from "../test-utils/env.js";
 import { createDoctorPrompter } from "./doctor-prompter.js";
 import {
@@ -134,15 +134,15 @@ import { EXTERNAL_SERVICE_REPAIR_NOTE } from "./doctor-service-repair-policy.js"
 
 const originalStdinIsTTY = process.stdin.isTTY;
 const originalPlatform = process.platform;
-const originalUpdateInProgress = process.env.OPENCLAW_UPDATE_IN_PROGRESS;
+const originalUpdateInProgress = process.env.STEELENGINE_UPDATE_IN_PROGRESS;
 const originalParentSupportsConfigWrite =
-  process.env.OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE;
+  process.env.STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE;
 const originalParentSupportsGatewayRestart =
-  process.env.OPENCLAW_UPDATE_PARENT_SUPPORTS_GATEWAY_RESTART;
+  process.env.STEELENGINE_UPDATE_PARENT_SUPPORTS_GATEWAY_RESTART;
 const originalParentAllowsGatewayServiceRepair =
-  process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR;
+  process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR;
 const originalParentAllowsGatewayActivation =
-  process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION;
+  process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION;
 
 function makeDoctorIo() {
   return { log: vi.fn(), error: vi.fn(), exit: vi.fn() };
@@ -174,12 +174,12 @@ function mockProcessPlatform(platform: NodeJS.Platform) {
   });
 }
 
-async function runRepair(cfg: OpenClawConfig, options: { allowExecSecretRefs?: boolean } = {}) {
+async function runRepair(cfg: SteelEngineConfig, options: { allowExecSecretRefs?: boolean } = {}) {
   await maybeRepairGatewayServiceConfig(cfg, "local", makeDoctorIo(), makeDoctorPrompts(), options);
 }
 
 async function runNonInteractiveRepair(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   updateInProgress?: boolean;
   lastTouchedVersionOverride?: string;
 }) {
@@ -188,9 +188,9 @@ async function runNonInteractiveRepair(params: {
     configurable: true,
   });
   if (params.updateInProgress) {
-    process.env.OPENCLAW_UPDATE_IN_PROGRESS = "1";
+    process.env.STEELENGINE_UPDATE_IN_PROGRESS = "1";
   } else {
-    delete process.env.OPENCLAW_UPDATE_IN_PROGRESS;
+    delete process.env.STEELENGINE_UPDATE_IN_PROGRESS;
   }
   await maybeRepairGatewayServiceConfig(
     params.cfg ?? { gateway: {} },
@@ -211,7 +211,7 @@ async function runNonInteractiveRepair(params: {
 
 const gatewayProgramArguments = [
   "/usr/bin/node",
-  "/usr/local/bin/openclaw",
+  "/usr/local/bin/steelengine",
   "gateway",
   "--port",
   "18789",
@@ -326,7 +326,7 @@ function setupGatewayTokenRepairScenario() {
   mocks.readCommand.mockResolvedValue({
     programArguments: gatewayProgramArguments,
     environment: {
-      OPENCLAW_GATEWAY_TOKEN: "stale-token",
+      STEELENGINE_GATEWAY_TOKEN: "stale-token",
     },
   });
   mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -334,7 +334,7 @@ function setupGatewayTokenRepairScenario() {
     issues: [
       {
         code: "gateway-token-mismatch",
-        message: "Gateway service OPENCLAW_GATEWAY_TOKEN does not match gateway.auth.token",
+        message: "Gateway service STEELENGINE_GATEWAY_TOKEN does not match gateway.auth.token",
         level: "recommended",
       },
     ],
@@ -358,11 +358,11 @@ describe("maybeRepairGatewayServiceConfig", () => {
     mocks.renderSystemNodeWarning.mockReturnValue(undefined);
     mocks.resolveSystemNodeInfo.mockResolvedValue(null);
     mocks.isSystemdUnitActive.mockResolvedValue(false);
-    mocks.readWindowsProcessArgsSync.mockReturnValue(["node", "openclaw.mjs", "update"]);
-    mocks.resolveGatewayAuthTokenForService.mockImplementation(async (cfg: OpenClawConfig, env) => {
+    mocks.readWindowsProcessArgsSync.mockReturnValue(["node", "steelengine.mjs", "update"]);
+    mocks.resolveGatewayAuthTokenForService.mockImplementation(async (cfg: SteelEngineConfig, env) => {
       const configToken =
         typeof cfg.gateway?.auth?.token === "string" ? cfg.gateway.auth.token.trim() : undefined;
-      const envToken = env.OPENCLAW_GATEWAY_TOKEN?.trim() || undefined;
+      const envToken = env.STEELENGINE_GATEWAY_TOKEN?.trim() || undefined;
       return { token: configToken || envToken };
     });
   });
@@ -374,38 +374,38 @@ describe("maybeRepairGatewayServiceConfig", () => {
     });
     mockProcessPlatform(originalPlatform);
     if (originalUpdateInProgress === undefined) {
-      delete process.env.OPENCLAW_UPDATE_IN_PROGRESS;
+      delete process.env.STEELENGINE_UPDATE_IN_PROGRESS;
     } else {
-      process.env.OPENCLAW_UPDATE_IN_PROGRESS = originalUpdateInProgress;
+      process.env.STEELENGINE_UPDATE_IN_PROGRESS = originalUpdateInProgress;
     }
     if (originalParentSupportsConfigWrite === undefined) {
-      delete process.env.OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE;
+      delete process.env.STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE;
     } else {
-      process.env.OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE =
+      process.env.STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE =
         originalParentSupportsConfigWrite;
     }
     if (originalParentSupportsGatewayRestart === undefined) {
-      delete process.env.OPENCLAW_UPDATE_PARENT_SUPPORTS_GATEWAY_RESTART;
+      delete process.env.STEELENGINE_UPDATE_PARENT_SUPPORTS_GATEWAY_RESTART;
     } else {
-      process.env.OPENCLAW_UPDATE_PARENT_SUPPORTS_GATEWAY_RESTART =
+      process.env.STEELENGINE_UPDATE_PARENT_SUPPORTS_GATEWAY_RESTART =
         originalParentSupportsGatewayRestart;
     }
     if (originalParentAllowsGatewayServiceRepair === undefined) {
-      delete process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR;
+      delete process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR;
     } else {
-      process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR =
+      process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR =
         originalParentAllowsGatewayServiceRepair;
     }
     if (originalParentAllowsGatewayActivation === undefined) {
-      delete process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION;
+      delete process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION;
     } else {
-      process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION =
+      process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION =
         originalParentAllowsGatewayActivation;
     }
   });
 
   it("reports the installed Gateway heap limit and derivation", async () => {
-    const command = createGatewayCommand("/opt/openclaw/dist/index.js");
+    const command = createGatewayCommand("/opt/steelengine/dist/index.js");
     command.environment = { NODE_OPTIONS: "--max-old-space-size=6144" };
     mocks.readCommand.mockResolvedValue(command);
     mocks.auditGatewayServiceConfig.mockResolvedValue({ ok: true, issues: [] });
@@ -420,7 +420,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("treats gateway.auth.token as source of truth for service token repairs", async () => {
     setupGatewayTokenRepairScenario();
 
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       gateway: {
         auth: {
           mode: "token",
@@ -441,7 +441,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("passes exec SecretRef policy into service token resolution", async () => {
     setupGatewayTokenRepairScenario();
 
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       gateway: {
         auth: {
           mode: "token",
@@ -472,7 +472,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("does not duplicate gateway runtime warnings already emitted by the node install plan", async () => {
     const nvmNode = "/home/test/.nvm/versions/node/v22.22.3/bin/node";
     mocks.readCommand.mockResolvedValue({
-      programArguments: [nvmNode, "/usr/local/bin/openclaw", "gateway", "--port", "18789"],
+      programArguments: [nvmNode, "/usr/local/bin/steelengine", "gateway", "--port", "18789"],
       environment: {},
     });
     mocks.buildGatewayInstallPlan.mockImplementation(async ({ warn }) => {
@@ -481,7 +481,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
         "Gateway runtime",
       );
       return {
-        programArguments: [nvmNode, "/usr/local/bin/openclaw", "gateway", "--port", "18789"],
+        programArguments: [nvmNode, "/usr/local/bin/steelengine", "gateway", "--port", "18789"],
         workingDirectory: "/tmp",
         environment: {},
       };
@@ -520,7 +520,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
       programArguments: gatewayProgramArguments,
       workingDirectory: "/tmp",
       environment: {
-        OPENCLAW_SERVICE_MANAGED_ENV_KEYS: "TAVILY_API_KEY",
+        STEELENGINE_SERVICE_MANAGED_ENV_KEYS: "TAVILY_API_KEY",
       },
     });
     mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -553,7 +553,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
       environment: {},
     });
     mocks.buildGatewayInstallPlan.mockResolvedValue({
-      programArguments: ["/usr/bin/node", "/usr/local/bin/openclaw", "gateway", "--port", "18888"],
+      programArguments: ["/usr/bin/node", "/usr/local/bin/steelengine", "gateway", "--port", "18888"],
       workingDirectory: "/tmp",
       environment: {},
     });
@@ -616,11 +616,11 @@ describe("maybeRepairGatewayServiceConfig", () => {
     expect(Object.hasOwn(environment, "HTTPS_PROXY")).toBe(false);
   });
 
-  it("uses OPENCLAW_GATEWAY_TOKEN when config token is missing", async () => {
-    await withEnvAsync({ OPENCLAW_GATEWAY_TOKEN: "env-token" }, async () => {
+  it("uses STEELENGINE_GATEWAY_TOKEN when config token is missing", async () => {
+    await withEnvAsync({ STEELENGINE_GATEWAY_TOKEN: "env-token" }, async () => {
       setupGatewayTokenRepairScenario();
 
-      const cfg: OpenClawConfig = {
+      const cfg: SteelEngineConfig = {
         gateway: {},
       };
 
@@ -641,15 +641,15 @@ describe("maybeRepairGatewayServiceConfig", () => {
 
   it("does not flag entrypoint mismatch when symlink and realpath match", async () => {
     setupGatewayEntrypointRepairScenario({
-      currentEntrypoint: "/Users/test/Library/pnpm/global/5/node_modules/openclaw/dist/index.js",
+      currentEntrypoint: "/Users/test/Library/pnpm/global/5/node_modules/steelengine/dist/index.js",
       installEntrypoint:
-        "/Users/test/Library/pnpm/global/5/node_modules/.pnpm/openclaw@2026.3.12/node_modules/openclaw/dist/index.js",
+        "/Users/test/Library/pnpm/global/5/node_modules/.pnpm/steelengine@2026.3.12/node_modules/steelengine/dist/index.js",
       realpath: async (value: string) => {
         const normalized = value.replaceAll("\\", "/").replace(/^[A-Z]:/i, "");
-        if (normalized.includes("/global/5/node_modules/openclaw/")) {
+        if (normalized.includes("/global/5/node_modules/steelengine/")) {
           return normalized.replace(
-            "/global/5/node_modules/openclaw/",
-            "/global/5/node_modules/.pnpm/openclaw@2026.3.12/node_modules/openclaw/",
+            "/global/5/node_modules/steelengine/",
+            "/global/5/node_modules/.pnpm/steelengine@2026.3.12/node_modules/steelengine/",
           );
         }
         return normalized;
@@ -668,8 +668,8 @@ describe("maybeRepairGatewayServiceConfig", () => {
 
   it("does not flag entrypoint mismatch when realpath fails but normalized absolute paths match", async () => {
     setupGatewayEntrypointRepairScenario({
-      currentEntrypoint: "/opt/openclaw/../openclaw/dist/index.js",
-      installEntrypoint: "/opt/openclaw/dist/index.js",
+      currentEntrypoint: "/opt/steelengine/../steelengine/dist/index.js",
+      installEntrypoint: "/opt/steelengine/dist/index.js",
       realpathError: new Error("no realpath"),
     });
 
@@ -684,11 +684,11 @@ describe("maybeRepairGatewayServiceConfig", () => {
   });
 
   it("keeps wrapper-managed gateway services aligned during entrypoint drift checks", async () => {
-    const wrapperPath = "/usr/local/bin/openclaw-doppler";
+    const wrapperPath = "/usr/local/bin/steelengine-doppler";
     mocks.readCommand.mockResolvedValue({
       programArguments: [wrapperPath, "gateway", "--port", "18789"],
       environment: {
-        OPENCLAW_WRAPPER: wrapperPath,
+        STEELENGINE_WRAPPER: wrapperPath,
       },
     });
     mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -696,9 +696,9 @@ describe("maybeRepairGatewayServiceConfig", () => {
       issues: [],
     });
     mocks.buildGatewayInstallPlan.mockImplementation(async ({ env }) => ({
-      programArguments: [env.OPENCLAW_WRAPPER, "gateway", "--port", "18789"],
+      programArguments: [env.STEELENGINE_WRAPPER, "gateway", "--port", "18789"],
       environment: {
-        OPENCLAW_WRAPPER: env.OPENCLAW_WRAPPER,
+        STEELENGINE_WRAPPER: env.STEELENGINE_WRAPPER,
       },
     }));
 
@@ -708,17 +708,17 @@ describe("maybeRepairGatewayServiceConfig", () => {
       callArg(mocks.buildGatewayInstallPlan, 0, "buildGatewayInstallPlan call"),
       "buildGatewayInstallPlan options",
     );
-    expect(requireRecord(installPlanOptions.env, "install env").OPENCLAW_WRAPPER).toBe(wrapperPath);
+    expect(requireRecord(installPlanOptions.env, "install env").STEELENGINE_WRAPPER).toBe(wrapperPath);
     expect(
       requireRecord(installPlanOptions.existingEnvironment, "install existing environment")
-        .OPENCLAW_WRAPPER,
+        .STEELENGINE_WRAPPER,
     ).toBe(wrapperPath);
     expectNoNoteContaining(
       "Gateway service entrypoint does not match the current install.",
       "Gateway service config",
     );
     expect(mocks.note).toHaveBeenCalledWith(
-      "Gateway service invokes OPENCLAW_WRAPPER: /usr/local/bin/openclaw-doppler",
+      "Gateway service invokes STEELENGINE_WRAPPER: /usr/local/bin/steelengine-doppler",
       "Gateway",
     );
     expect(mocks.stage).not.toHaveBeenCalled();
@@ -728,8 +728,8 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("still flags entrypoint mismatch when canonicalized paths differ", async () => {
     setupGatewayEntrypointRepairScenario({
       currentEntrypoint:
-        "/Users/test/.nvm/versions/node/v22.0.0/lib/node_modules/openclaw/dist/index.js",
-      installEntrypoint: "/Users/test/Library/pnpm/global/5/node_modules/openclaw/dist/index.js",
+        "/Users/test/.nvm/versions/node/v22.0.0/lib/node_modules/steelengine/dist/index.js",
+      installEntrypoint: "/Users/test/Library/pnpm/global/5/node_modules/steelengine/dist/index.js",
     });
 
     await runRepair({ gateway: {} });
@@ -745,7 +745,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("skips entrypoint rewrites for an active systemd unit", async () => {
     mockProcessPlatform("linux");
     mocks.readCommand.mockResolvedValue({
-      ...createGatewayCommand("/opt/old-openclaw/dist/index.js"),
+      ...createGatewayCommand("/opt/old-steelengine/dist/index.js"),
       sourcePath: "/etc/systemd/system/custom-gateway.service",
     });
     mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -753,7 +753,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
       issues: [],
     });
     mocks.buildGatewayInstallPlan.mockResolvedValue({
-      ...createGatewayCommand("/opt/new-openclaw/dist/index.js"),
+      ...createGatewayCommand("/opt/new-steelengine/dist/index.js"),
       workingDirectory: "/tmp",
     });
     mocks.isSystemdUnitActive.mockResolvedValue(true);
@@ -773,7 +773,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("repairs entrypoint drift when the systemd unit is stopped", async () => {
     mockProcessPlatform("linux");
     mocks.readCommand.mockResolvedValue({
-      ...createGatewayCommand("/opt/old-openclaw/dist/index.js"),
+      ...createGatewayCommand("/opt/old-steelengine/dist/index.js"),
       sourcePath: "/home/test/.config/systemd/user/custom-gateway.service",
     });
     mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -781,7 +781,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
       issues: [],
     });
     mocks.buildGatewayInstallPlan.mockResolvedValue({
-      ...createGatewayCommand("/opt/new-openclaw/dist/index.js"),
+      ...createGatewayCommand("/opt/new-steelengine/dist/index.js"),
       workingDirectory: "/tmp",
     });
     mocks.isSystemdUnitActive.mockResolvedValue(false);
@@ -800,9 +800,9 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("leaves all service metadata unchanged when an active unit has command drift plus other issues", async () => {
     mockProcessPlatform("linux");
     mocks.readCommand.mockResolvedValue({
-      programArguments: ["/usr/bin/openclaw", "run"],
+      programArguments: ["/usr/bin/steelengine", "run"],
       environment: {},
-      sourcePath: "/home/test/.config/systemd/user/openclaw-gateway.service",
+      sourcePath: "/home/test/.config/systemd/user/steelengine-gateway.service",
     });
     mocks.auditGatewayServiceConfig.mockResolvedValue({
       ok: false,
@@ -840,8 +840,8 @@ describe("maybeRepairGatewayServiceConfig", () => {
 
   it("skips entrypoint rewrite in non-interactive fix mode", async () => {
     setupGatewayEntrypointRepairScenario({
-      currentEntrypoint: "/Users/test/Library/npm/node_modules/openclaw/dist/entry.js",
-      installEntrypoint: "/Users/test/Library/npm/node_modules/openclaw/dist/index.js",
+      currentEntrypoint: "/Users/test/Library/npm/node_modules/steelengine/dist/entry.js",
+      installEntrypoint: "/Users/test/Library/npm/node_modules/steelengine/dist/index.js",
       installWorkingDirectory: "/tmp",
     });
 
@@ -854,17 +854,17 @@ describe("maybeRepairGatewayServiceConfig", () => {
       "Gateway service entrypoint does not match the current install.",
       "Gateway service config",
     );
-    expectNoteContaining("openclaw gateway install --force", "Gateway service config");
+    expectNoteContaining("steelengine gateway install --force", "Gateway service config");
     expect(mocks.stage).not.toHaveBeenCalled();
     expect(mocks.install).not.toHaveBeenCalled();
   });
 
   it("defers systemd service config rewrites during non-interactive update repairs", async () => {
     mockProcessPlatform("linux");
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
     setupGatewayEntrypointRepairScenario({
-      currentEntrypoint: "/Users/test/Library/npm/node_modules/openclaw/dist/entry.js",
-      installEntrypoint: "/Users/test/Library/npm/node_modules/openclaw/dist/index.js",
+      currentEntrypoint: "/Users/test/Library/npm/node_modules/steelengine/dist/entry.js",
+      installEntrypoint: "/Users/test/Library/npm/node_modules/steelengine/dist/index.js",
       installWorkingDirectory: "/tmp",
     });
 
@@ -884,10 +884,10 @@ describe("maybeRepairGatewayServiceConfig", () => {
 
   it("keeps staging non-systemd service config repairs during non-interactive update repairs", async () => {
     mockProcessPlatform("darwin");
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
     setupGatewayEntrypointRepairScenario({
-      currentEntrypoint: "/Users/test/Library/npm/node_modules/openclaw/dist/entry.js",
-      installEntrypoint: "/Users/test/Library/npm/node_modules/openclaw/dist/index.js",
+      currentEntrypoint: "/Users/test/Library/npm/node_modules/steelengine/dist/entry.js",
+      installEntrypoint: "/Users/test/Library/npm/node_modules/steelengine/dist/index.js",
       installWorkingDirectory: "/tmp",
     });
 
@@ -909,7 +909,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
     mocks.readCommand.mockResolvedValue({
       programArguments: gatewayProgramArguments,
       environment: {
-        OPENCLAW_GATEWAY_TOKEN: "stale-token",
+        STEELENGINE_GATEWAY_TOKEN: "stale-token",
       },
     });
     mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -923,14 +923,14 @@ describe("maybeRepairGatewayServiceConfig", () => {
     });
     mocks.install.mockResolvedValue(undefined);
 
-    const cfg: OpenClawConfig = {
+    const cfg: SteelEngineConfig = {
       gateway: {
         auth: {
           mode: "token",
           token: {
             source: "env",
             provider: "default",
-            id: "OPENCLAW_GATEWAY_TOKEN",
+            id: "STEELENGINE_GATEWAY_TOKEN",
           },
         },
       },
@@ -947,12 +947,12 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("falls back to embedded service token when config and env tokens are missing", async () => {
     await withEnvAsync(
       {
-        OPENCLAW_GATEWAY_TOKEN: undefined,
+        STEELENGINE_GATEWAY_TOKEN: undefined,
       },
       async () => {
         setupGatewayTokenRepairScenario();
 
-        const cfg: OpenClawConfig = {
+        const cfg: SteelEngineConfig = {
           gateway: {},
         };
 
@@ -978,18 +978,18 @@ describe("maybeRepairGatewayServiceConfig", () => {
       value: false,
       configurable: true,
     });
-    process.env.OPENCLAW_UPDATE_IN_PROGRESS = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
+    process.env.STEELENGINE_UPDATE_IN_PROGRESS = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
 
     await withEnvAsync(
       {
-        OPENCLAW_GATEWAY_TOKEN: undefined,
+        STEELENGINE_GATEWAY_TOKEN: undefined,
       },
       async () => {
         setupGatewayTokenRepairScenario();
 
-        const cfg: OpenClawConfig = {
+        const cfg: SteelEngineConfig = {
           gateway: {},
         };
 
@@ -1015,22 +1015,22 @@ describe("maybeRepairGatewayServiceConfig", () => {
   });
 
   it.each([
-    ["update command", ["node", "openclaw.mjs", "update"]],
-    ["--update shorthand", ["node", "openclaw.mjs", "--update"]],
-    ["doctor update prompt", ["node", "openclaw.mjs", "doctor"]],
+    ["update command", ["node", "steelengine.mjs", "update"]],
+    ["--update shorthand", ["node", "steelengine.mjs", "--update"]],
+    ["doctor update prompt", ["node", "steelengine.mjs", "doctor"]],
   ])("does not rewrite a service for a legacy %s parent", async (_, args) => {
     mockProcessPlatform("win32");
     Object.defineProperty(process.stdin, "isTTY", {
       value: false,
       configurable: true,
     });
-    process.env.OPENCLAW_UPDATE_IN_PROGRESS = "1";
+    process.env.STEELENGINE_UPDATE_IN_PROGRESS = "1";
     mocks.readWindowsProcessArgsSync.mockReturnValue(args);
     mocks.readCommand.mockResolvedValue({
       programArguments: gatewayProgramArguments,
       environment: {
-        OPENCLAW_SERVICE_VERSION: "2026.5.25",
-        OPENCLAW_WINDOWS_TASK_NAME: "OpenClaw Gateway Work",
+        STEELENGINE_SERVICE_VERSION: "2026.5.25",
+        STEELENGINE_WINDOWS_TASK_NAME: "SteelEngine Gateway Work",
       },
     });
     mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -1038,7 +1038,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
       issues: [
         {
           code: "gateway-service-version-mismatch",
-          message: "Gateway service was installed by an older OpenClaw version.",
+          message: "Gateway service was installed by an older SteelEngine version.",
           level: "recommended",
         },
       ],
@@ -1047,7 +1047,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
       programArguments: gatewayProgramArguments,
       workingDirectory: "/tmp",
       environment: {
-        OPENCLAW_SERVICE_VERSION: "2026.5.26",
+        STEELENGINE_SERVICE_VERSION: "2026.5.26",
       },
     });
     mocks.readRuntime.mockResolvedValue({ status: "running" });
@@ -1055,7 +1055,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
     await runNonInteractiveRepair({ updateInProgress: true });
 
     expectNoteContaining(
-      "Gateway service was installed by an older OpenClaw version.",
+      "Gateway service was installed by an older SteelEngine version.",
       "Gateway service config",
     );
     expect(mocks.stage).not.toHaveBeenCalled();
@@ -1070,14 +1070,14 @@ describe("maybeRepairGatewayServiceConfig", () => {
       value: false,
       configurable: true,
     });
-    process.env.OPENCLAW_UPDATE_IN_PROGRESS = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION = "0";
+    process.env.STEELENGINE_UPDATE_IN_PROGRESS = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION = "0";
     mocks.readCommand.mockResolvedValue({
       programArguments: gatewayProgramArguments,
       environment: {
-        OPENCLAW_SERVICE_VERSION: "2026.5.25",
+        STEELENGINE_SERVICE_VERSION: "2026.5.25",
       },
     });
     mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -1085,7 +1085,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
       issues: [
         {
           code: "gateway-service-version-mismatch",
-          message: "Gateway service was installed by an older OpenClaw version.",
+          message: "Gateway service was installed by an older SteelEngine version.",
           level: "recommended",
         },
       ],
@@ -1094,7 +1094,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
       programArguments: gatewayProgramArguments,
       workingDirectory: "/tmp",
       environment: {
-        OPENCLAW_SERVICE_VERSION: "2026.5.26",
+        STEELENGINE_SERVICE_VERSION: "2026.5.26",
       },
     });
     mocks.readRuntime.mockResolvedValue({ status: "running" });
@@ -1109,13 +1109,13 @@ describe("maybeRepairGatewayServiceConfig", () => {
 
   it("does not rewrite a service when the update parent rejects ownership", async () => {
     mockProcessPlatform("win32");
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "0";
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION = "0";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "0";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION = "0";
     mocks.readCommand.mockResolvedValue({
       programArguments: gatewayProgramArguments,
       environment: {
-        OPENCLAW_GATEWAY_TOKEN: "stale-token",
-        OPENCLAW_SERVICE_VERSION: "2026.5.25",
+        STEELENGINE_GATEWAY_TOKEN: "stale-token",
+        STEELENGINE_SERVICE_VERSION: "2026.5.25",
       },
     });
     mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -1123,7 +1123,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
       issues: [
         {
           code: "gateway-service-version-mismatch",
-          message: "Gateway service was installed by an older OpenClaw version.",
+          message: "Gateway service was installed by an older SteelEngine version.",
           level: "recommended",
         },
       ],
@@ -1144,15 +1144,15 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it.each([
     {
       parent: "direct --no-restart update",
-      args: ["node", "openclaw.mjs", "update", "--no-restart"],
+      args: ["node", "steelengine.mjs", "update", "--no-restart"],
     },
     {
       parent: "--update shorthand with --no-restart",
-      args: ["node", "openclaw.mjs", "--update", "--no-restart"],
+      args: ["node", "steelengine.mjs", "--update", "--no-restart"],
     },
     {
       parent: "interactive update wizard",
-      args: ["node", "openclaw.mjs", "update", "wizard"],
+      args: ["node", "steelengine.mjs", "update", "wizard"],
     },
     {
       parent: "unrecognized shell",
@@ -1160,7 +1160,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
     },
     {
       parent: "gateway RPC process",
-      args: ["node", "openclaw.mjs", "gateway"],
+      args: ["node", "steelengine.mjs", "gateway"],
     },
   ])("stages repairs for a $parent parent without an activation marker", async ({ args }) => {
     mockProcessPlatform("win32");
@@ -1168,19 +1168,19 @@ describe("maybeRepairGatewayServiceConfig", () => {
       value: false,
       configurable: true,
     });
-    process.env.OPENCLAW_UPDATE_IN_PROGRESS = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
+    process.env.STEELENGINE_UPDATE_IN_PROGRESS = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
     mocks.readWindowsProcessArgsSync.mockReturnValue(args);
     mocks.readCommand.mockResolvedValue({
       programArguments: gatewayProgramArguments,
-      environment: { OPENCLAW_SERVICE_VERSION: "2026.5.25" },
+      environment: { STEELENGINE_SERVICE_VERSION: "2026.5.25" },
     });
     mocks.auditGatewayServiceConfig.mockResolvedValue({
       ok: false,
       issues: [
         {
           code: "gateway-service-version-mismatch",
-          message: "Gateway service was installed by an older OpenClaw version.",
+          message: "Gateway service was installed by an older SteelEngine version.",
           level: "recommended",
         },
       ],
@@ -1188,7 +1188,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
     mocks.buildGatewayInstallPlan.mockResolvedValue({
       programArguments: gatewayProgramArguments,
       workingDirectory: "/tmp",
-      environment: { OPENCLAW_SERVICE_VERSION: "2026.5.26" },
+      environment: { STEELENGINE_SERVICE_VERSION: "2026.5.26" },
     });
     mocks.readRuntime.mockResolvedValue({ status: "running" });
 
@@ -1207,22 +1207,22 @@ describe("maybeRepairGatewayServiceConfig", () => {
       value: false,
       configurable: true,
     });
-    process.env.OPENCLAW_UPDATE_IN_PROGRESS = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_SUPPORTS_GATEWAY_RESTART = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION = "1";
+    process.env.STEELENGINE_UPDATE_IN_PROGRESS = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_SUPPORTS_GATEWAY_RESTART = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION = "1";
 
     await withEnvAsync(
       {
-        OPENCLAW_GATEWAY_TOKEN: undefined,
+        STEELENGINE_GATEWAY_TOKEN: undefined,
       },
       async () => {
         mocks.readCommand.mockResolvedValue({
           programArguments: gatewayProgramArguments,
           environment: {
-            OPENCLAW_GATEWAY_TOKEN: "stale-token",
-            OPENCLAW_SERVICE_VERSION: "2026.5.25",
+            STEELENGINE_GATEWAY_TOKEN: "stale-token",
+            STEELENGINE_SERVICE_VERSION: "2026.5.25",
           },
         });
         mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -1239,7 +1239,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
           programArguments: gatewayProgramArguments,
           workingDirectory: "/tmp",
           environment: {
-            OPENCLAW_SERVICE_VERSION: "2026.5.26",
+            STEELENGINE_SERVICE_VERSION: "2026.5.26",
           },
         });
         mocks.readRuntime.mockResolvedValue({ status: "running" });
@@ -1288,10 +1288,10 @@ describe("maybeRepairGatewayServiceConfig", () => {
       value: false,
       configurable: true,
     });
-    process.env.OPENCLAW_UPDATE_IN_PROGRESS = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION = "1";
+    process.env.STEELENGINE_UPDATE_IN_PROGRESS = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION = "1";
     setupGatewayTokenRepairScenario();
     mocks.readRuntime.mockResolvedValue({ status: "running" });
     mocks.readWindowsStartupFallbackRuntimeForUpdate.mockResolvedValue(null);
@@ -1309,19 +1309,19 @@ describe("maybeRepairGatewayServiceConfig", () => {
       value: false,
       configurable: true,
     });
-    process.env.OPENCLAW_UPDATE_IN_PROGRESS = "1";
-    delete process.env.OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE;
+    process.env.STEELENGINE_UPDATE_IN_PROGRESS = "1";
+    delete process.env.STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE;
 
     await withEnvAsync(
       {
-        OPENCLAW_GATEWAY_TOKEN: undefined,
+        STEELENGINE_GATEWAY_TOKEN: undefined,
       },
       async () => {
         mocks.readCommand.mockResolvedValue({
           programArguments: gatewayProgramArguments,
           environment: {
-            OPENCLAW_GATEWAY_TOKEN: "stale-token",
-            OPENCLAW_SERVICE_VERSION: "2026.5.25",
+            STEELENGINE_GATEWAY_TOKEN: "stale-token",
+            STEELENGINE_SERVICE_VERSION: "2026.5.25",
           },
         });
         mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -1338,7 +1338,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
           programArguments: gatewayProgramArguments,
           workingDirectory: "/tmp",
           environment: {
-            OPENCLAW_SERVICE_VERSION: "2026.5.26",
+            STEELENGINE_SERVICE_VERSION: "2026.5.26",
           },
         });
         mocks.readRuntime.mockResolvedValue({ status: "running" });
@@ -1362,13 +1362,13 @@ describe("maybeRepairGatewayServiceConfig", () => {
       value: false,
       configurable: true,
     });
-    process.env.OPENCLAW_UPDATE_IN_PROGRESS = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
-    process.env.OPENCLAW_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION = "1";
+    process.env.STEELENGINE_UPDATE_IN_PROGRESS = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_SERVICE_REPAIR = "1";
+    process.env.STEELENGINE_UPDATE_PARENT_ALLOWS_GATEWAY_ACTIVATION = "1";
     mocks.readCommand.mockResolvedValue({
       programArguments: gatewayProgramArguments,
       environment: {
-        OPENCLAW_SERVICE_VERSION: "2026.5.25",
+        STEELENGINE_SERVICE_VERSION: "2026.5.25",
       },
     });
     mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -1376,7 +1376,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
       issues: [
         {
           code: "gateway-service-version-mismatch",
-          message: "Gateway service was installed by an older OpenClaw version.",
+          message: "Gateway service was installed by an older SteelEngine version.",
           level: "recommended",
         },
       ],
@@ -1385,7 +1385,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
       programArguments: gatewayProgramArguments,
       workingDirectory: "/tmp",
       environment: {
-        OPENCLAW_SERVICE_VERSION: "2026.5.26",
+        STEELENGINE_SERVICE_VERSION: "2026.5.26",
       },
     });
     mocks.readRuntime.mockResolvedValue({ status: "stopped" });
@@ -1399,16 +1399,16 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("does not persist EnvironmentFile-backed service tokens into config", async () => {
     await withEnvAsync(
       {
-        OPENCLAW_GATEWAY_TOKEN: undefined,
+        STEELENGINE_GATEWAY_TOKEN: undefined,
       },
       async () => {
         mocks.readCommand.mockResolvedValue({
           programArguments: gatewayProgramArguments,
           environment: {
-            OPENCLAW_GATEWAY_TOKEN: "env-file-token",
+            STEELENGINE_GATEWAY_TOKEN: "env-file-token",
           },
           environmentValueSources: {
-            OPENCLAW_GATEWAY_TOKEN: "file",
+            STEELENGINE_GATEWAY_TOKEN: "file",
           },
         });
         mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -1422,7 +1422,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
         });
         mocks.install.mockResolvedValue(undefined);
 
-        const cfg: OpenClawConfig = {
+        const cfg: SteelEngineConfig = {
           gateway: {},
         };
 
@@ -1436,10 +1436,10 @@ describe("maybeRepairGatewayServiceConfig", () => {
   });
 
   it("reports service config drift but skips service rewrite when service repair policy is external", async () => {
-    await withEnvAsync({ OPENCLAW_SERVICE_REPAIR_POLICY: "external" }, async () => {
+    await withEnvAsync({ STEELENGINE_SERVICE_REPAIR_POLICY: "external" }, async () => {
       setupGatewayEntrypointRepairScenario({
-        currentEntrypoint: "/Users/test/Library/npm/node_modules/openclaw/dist/entry.js",
-        installEntrypoint: "/Users/test/Library/npm/node_modules/openclaw/dist/index.js",
+        currentEntrypoint: "/Users/test/Library/npm/node_modules/steelengine/dist/entry.js",
+        installEntrypoint: "/Users/test/Library/npm/node_modules/steelengine/dist/index.js",
         installWorkingDirectory: "/tmp",
       });
 
@@ -1462,7 +1462,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
 
   it("warns when the gateway service entrypoint resolves to a source checkout", async () => {
     await withEnvAsync({}, async () => {
-      const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-doctor-service-layout-"));
+      const root = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-doctor-service-layout-"));
       try {
         await fs.mkdir(path.join(root, ".git"), { recursive: true });
         await fs.mkdir(path.join(root, "src"), { recursive: true });
@@ -1470,7 +1470,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
         await fs.mkdir(path.join(root, "dist"), { recursive: true });
         await fs.writeFile(
           path.join(root, "package.json"),
-          JSON.stringify({ name: "openclaw", version: "0.0.0-test" }),
+          JSON.stringify({ name: "steelengine", version: "0.0.0-test" }),
           "utf8",
         );
         const entrypoint = path.join(root, "dist", "index.js");
@@ -1492,7 +1492,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("does not duplicate Gateway service config panels for a source-checkout entrypoint with audit findings", async () => {
     await withEnvAsync({}, async () => {
       const root = await fs.mkdtemp(
-        path.join(os.tmpdir(), "openclaw-doctor-service-config-dedup-"),
+        path.join(os.tmpdir(), "steelengine-doctor-service-config-dedup-"),
       );
       try {
         await fs.mkdir(path.join(root, ".git"), { recursive: true });
@@ -1501,12 +1501,12 @@ describe("maybeRepairGatewayServiceConfig", () => {
         await fs.mkdir(path.join(root, "dist"), { recursive: true });
         await fs.writeFile(
           path.join(root, "package.json"),
-          JSON.stringify({ name: "openclaw", version: "0.0.0-test" }),
+          JSON.stringify({ name: "steelengine", version: "0.0.0-test" }),
           "utf8",
         );
         const sourceCheckoutEntrypoint = path.join(root, "dist", "index.js");
         await fs.writeFile(sourceCheckoutEntrypoint, "export {};\n", "utf8");
-        const installEntrypoint = "/usr/local/lib/node_modules/openclaw/dist/index.js";
+        const installEntrypoint = "/usr/local/lib/node_modules/steelengine/dist/index.js";
         setupGatewayEntrypointRepairScenario({
           currentEntrypoint: sourceCheckoutEntrypoint,
           installEntrypoint,
@@ -1524,7 +1524,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
           "Gateway service entrypoint does not match the current install.",
         );
         expect(consolidated).not.toContain("resolves to a source checkout");
-        const forceMatches = consolidated.match(/openclaw gateway install --force/g) ?? [];
+        const forceMatches = consolidated.match(/steelengine gateway install --force/g) ?? [];
         expect(forceMatches).toHaveLength(0);
       } finally {
         await fs.rm(root, { recursive: true, force: true });
@@ -1535,7 +1535,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("keeps the gateway install force hint when a source-checkout warning is suppressed and repair is declined", async () => {
     await withEnvAsync({}, async () => {
       const root = await fs.mkdtemp(
-        path.join(os.tmpdir(), "openclaw-doctor-service-config-force-hint-"),
+        path.join(os.tmpdir(), "steelengine-doctor-service-config-force-hint-"),
       );
       try {
         await fs.mkdir(path.join(root, ".git"), { recursive: true });
@@ -1544,12 +1544,12 @@ describe("maybeRepairGatewayServiceConfig", () => {
         await fs.mkdir(path.join(root, "dist"), { recursive: true });
         await fs.writeFile(
           path.join(root, "package.json"),
-          JSON.stringify({ name: "openclaw", version: "0.0.0-test" }),
+          JSON.stringify({ name: "steelengine", version: "0.0.0-test" }),
           "utf8",
         );
         const sourceCheckoutEntrypoint = path.join(root, "dist", "index.js");
         await fs.writeFile(sourceCheckoutEntrypoint, "export {};\n", "utf8");
-        const installEntrypoint = "/usr/local/lib/node_modules/openclaw/dist/index.js";
+        const installEntrypoint = "/usr/local/lib/node_modules/steelengine/dist/index.js";
         setupGatewayEntrypointRepairScenario({
           currentEntrypoint: sourceCheckoutEntrypoint,
           installEntrypoint,
@@ -1578,7 +1578,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
           "Gateway service entrypoint does not match the current install.",
         );
         expect(auditNote).not.toContain("resolves to a source checkout");
-        expect(gatewayServiceConfigNotes[1]?.[0]).toContain("openclaw gateway install --force");
+        expect(gatewayServiceConfigNotes[1]?.[0]).toContain("steelengine gateway install --force");
       } finally {
         await fs.rm(root, { recursive: true, force: true });
       }
@@ -1676,7 +1676,7 @@ describe("maybeScanExtraGatewayServices", () => {
     expect(
       extraGatewayServiceToHealthFinding({
         platform: "linux",
-        label: "openclaw-gateway.service",
+        label: "steelengine-gateway.service",
         detail: "legacy unit",
         scope: "user",
         legacy: true,
@@ -1686,7 +1686,7 @@ describe("maybeScanExtraGatewayServices", () => {
         checkId: "core/doctor/gateway-services/extra",
         severity: "warning",
         source: "linux",
-        target: "openclaw-gateway.service",
+        target: "steelengine-gateway.service",
       }),
     );
   });
@@ -1769,12 +1769,12 @@ describe("maybeScanExtraGatewayServices", () => {
     });
     expectNoteContaining("clawdbot-gateway.service", "Legacy gateway removed");
     expect(runtime.log).toHaveBeenCalledWith(
-      "Legacy gateway services removed. Installing OpenClaw gateway next.",
+      "Legacy gateway services removed. Installing SteelEngine gateway next.",
     );
   });
 
   it("reports legacy services but skips cleanup when service repair policy is external", async () => {
-    await withEnvAsync({ OPENCLAW_SERVICE_REPAIR_POLICY: "external" }, async () => {
+    await withEnvAsync({ STEELENGINE_SERVICE_REPAIR_POLICY: "external" }, async () => {
       mocks.findExtraGatewayServices.mockResolvedValue([
         {
           platform: "linux",
@@ -1795,7 +1795,7 @@ describe("maybeScanExtraGatewayServices", () => {
       );
       expect(mocks.uninstallLegacySystemdUnits).not.toHaveBeenCalled();
       expect(runtime.log).not.toHaveBeenCalledWith(
-        "Legacy gateway services removed. Installing OpenClaw gateway next.",
+        "Legacy gateway services removed. Installing SteelEngine gateway next.",
       );
     });
   });

@@ -1,7 +1,7 @@
 // Slack tests cover context plugin behavior.
 import type { App } from "@slack/bolt";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
 import { describe, expect, it, vi } from "vitest";
 import { createSlackMonitorContext } from "./context.js";
 import type { SlackEventScope } from "./event-scope.js";
@@ -16,7 +16,7 @@ function createTestContext(params?: {
     cfg: {
       channels: { slack: { enabled: true } },
       session: { dmScope: params?.dmScope ?? "main" },
-    } as OpenClawConfig,
+    } as SteelEngineConfig,
     accountId: "default",
     botToken: "xoxb-test",
     app: { client: params?.appClient ?? {} } as App,
@@ -44,7 +44,7 @@ function createTestContext(params?: {
     threadInheritParent: false,
     slashCommand: {
       enabled: true,
-      name: "openclaw",
+      name: "steelengine",
       ephemeral: true,
       sessionPrefix: "slack:slash",
     },

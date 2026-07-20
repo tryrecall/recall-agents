@@ -2,7 +2,7 @@
  * Static identity for names that select core agent factory families before assembly.
  */
 
-export type CoreToolFactoryFamily = "base-coding" | "shell" | "openclaw";
+export type CoreToolFactoryFamily = "base-coding" | "shell" | "steelengine";
 
 type CoreToolFactoryDescriptor = {
   name: string;
@@ -16,55 +16,55 @@ const CORE_TOOL_FACTORY_DESCRIPTORS = [
   { name: "apply_patch", family: "shell" },
   { name: "exec", family: "shell" },
   { name: "process", family: "shell" },
-  { name: "agents_list", family: "openclaw" },
-  { name: "ask_user", family: "openclaw" },
-  { name: "openclaw", family: "openclaw" },
-  { name: "computer", family: "openclaw" },
-  { name: "conversations_list", family: "openclaw" },
-  { name: "conversations_send", family: "openclaw" },
-  { name: "conversations_turn", family: "openclaw" },
-  { name: "cron", family: "openclaw" },
-  { name: "gateway", family: "openclaw" },
-  { name: "get_goal", family: "openclaw" },
-  { name: "heartbeat_respond", family: "openclaw" },
-  { name: "image", family: "openclaw" },
-  { name: "image_generate", family: "openclaw" },
-  { name: "message", family: "openclaw" },
-  { name: "music_generate", family: "openclaw" },
-  { name: "nodes", family: "openclaw" },
-  { name: "pdf", family: "openclaw" },
-  { name: "session_status", family: "openclaw" },
-  { name: "sessions", family: "openclaw" },
-  { name: "sessions_history", family: "openclaw" },
-  { name: "sessions_list", family: "openclaw" },
-  { name: "sessions_search", family: "openclaw" },
-  { name: "sessions_send", family: "openclaw" },
-  { name: "sessions_spawn", family: "openclaw" },
-  { name: "sessions_yield", family: "openclaw" },
-  { name: "skill_workshop", family: "openclaw" },
-  { name: "spawn_task", family: "openclaw" },
-  { name: "create_goal", family: "openclaw" },
-  { name: "subagents", family: "openclaw" },
-  { name: "terminal", family: "openclaw" },
-  { name: "transcripts", family: "openclaw" },
-  { name: "tts", family: "openclaw" },
-  { name: "update_goal", family: "openclaw" },
-  { name: "update_plan", family: "openclaw" },
-  { name: "dismiss_task", family: "openclaw" },
-  { name: "video_generate", family: "openclaw" },
-  { name: "web_fetch", family: "openclaw" },
-  { name: "web_search", family: "openclaw" },
+  { name: "agents_list", family: "steelengine" },
+  { name: "ask_user", family: "steelengine" },
+  { name: "steelengine", family: "steelengine" },
+  { name: "computer", family: "steelengine" },
+  { name: "conversations_list", family: "steelengine" },
+  { name: "conversations_send", family: "steelengine" },
+  { name: "conversations_turn", family: "steelengine" },
+  { name: "cron", family: "steelengine" },
+  { name: "gateway", family: "steelengine" },
+  { name: "get_goal", family: "steelengine" },
+  { name: "heartbeat_respond", family: "steelengine" },
+  { name: "image", family: "steelengine" },
+  { name: "image_generate", family: "steelengine" },
+  { name: "message", family: "steelengine" },
+  { name: "music_generate", family: "steelengine" },
+  { name: "nodes", family: "steelengine" },
+  { name: "pdf", family: "steelengine" },
+  { name: "session_status", family: "steelengine" },
+  { name: "sessions", family: "steelengine" },
+  { name: "sessions_history", family: "steelengine" },
+  { name: "sessions_list", family: "steelengine" },
+  { name: "sessions_search", family: "steelengine" },
+  { name: "sessions_send", family: "steelengine" },
+  { name: "sessions_spawn", family: "steelengine" },
+  { name: "sessions_yield", family: "steelengine" },
+  { name: "skill_workshop", family: "steelengine" },
+  { name: "spawn_task", family: "steelengine" },
+  { name: "create_goal", family: "steelengine" },
+  { name: "subagents", family: "steelengine" },
+  { name: "terminal", family: "steelengine" },
+  { name: "transcripts", family: "steelengine" },
+  { name: "tts", family: "steelengine" },
+  { name: "update_goal", family: "steelengine" },
+  { name: "update_plan", family: "steelengine" },
+  { name: "dismiss_task", family: "steelengine" },
+  { name: "video_generate", family: "steelengine" },
+  { name: "web_fetch", family: "steelengine" },
+  { name: "web_search", family: "steelengine" },
 ] as const satisfies readonly CoreToolFactoryDescriptor[];
 
 const CORE_TOOL_FACTORY_FAMILY_BY_NAME = new Map<string, CoreToolFactoryFamily>(
   CORE_TOOL_FACTORY_DESCRIPTORS.map(({ name, family }) => [name, family]),
 );
 
-export type OpenClawCodingToolConstructionPlan = {
+export type SteelEngineCodingToolConstructionPlan = {
   includeBaseCodingTools: boolean;
   includeShellTools: boolean;
   includeChannelTools: boolean;
-  includeOpenClawTools: boolean;
+  includeSteelEngineTools: boolean;
   includePluginTools: boolean;
 };
 

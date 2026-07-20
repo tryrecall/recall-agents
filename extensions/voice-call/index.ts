@@ -1,18 +1,18 @@
-// Voice Call plugin entrypoint registers its OpenClaw integration.
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { ErrorCodes, errorShape } from "openclaw/plugin-sdk/gateway-runtime";
-import { timestampMsToIsoString } from "openclaw/plugin-sdk/number-runtime";
-import { normalizeAgentId } from "openclaw/plugin-sdk/routing";
+// Voice Call plugin entrypoint registers its SteelEngine integration.
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { ErrorCodes, errorShape } from "steelengine/plugin-sdk/gateway-runtime";
+import { timestampMsToIsoString } from "steelengine/plugin-sdk/number-runtime";
+import { normalizeAgentId } from "steelengine/plugin-sdk/routing";
 import {
   asOptionalRecord,
   normalizeOptionalString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
-import { jsonResult as json } from "openclaw/plugin-sdk/tool-results";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
+import { jsonResult as json } from "steelengine/plugin-sdk/tool-results";
 import { Type } from "typebox";
 import {
   definePluginEntry,
   type GatewayRequestHandlerOptions,
-  type OpenClawPluginApi,
+  type SteelEnginePluginApi,
 } from "./api.js";
 import { createVoiceCallRuntime, type VoiceCallRuntime } from "./runtime-entry.js";
 import { registerVoiceCallCli } from "./src/cli.js";
@@ -103,12 +103,12 @@ const voiceCallConfigSchema = {
     "realtime.instructions": { label: "Realtime Instructions", advanced: true },
     "realtime.toolPolicy": {
       label: "Realtime Tool Policy",
-      help: "Controls the shared openclaw_agent_consult tool.",
+      help: "Controls the shared steelengine_agent_consult tool.",
       advanced: true,
     },
     "realtime.consultPolicy": {
       label: "Realtime Consult Policy",
-      help: "Guides when the realtime voice model should call openclaw_agent_consult.",
+      help: "Guides when the realtime voice model should call steelengine_agent_consult.",
       advanced: true,
     },
     "realtime.fastContext.enabled": {
@@ -187,9 +187,9 @@ const VoiceCallToolSchema = Type.Union([
     to: Type.Optional(Type.String({ description: "Call target" })),
     message: Type.String({ description: "Intro message" }),
     mode: Type.Optional(Type.Union([Type.Literal("notify"), Type.Literal("conversation")])),
-    sessionKey: Type.Optional(Type.String({ description: "OpenClaw session key for the call" })),
+    sessionKey: Type.Optional(Type.String({ description: "SteelEngine session key for the call" })),
     requesterSessionKey: Type.Optional(
-      Type.String({ description: "OpenClaw session key that initiated the call" }),
+      Type.String({ description: "SteelEngine session key that initiated the call" }),
     ),
     dtmfSequence: Type.Optional(Type.String({ description: "DTMF digits to play before connect" })),
   }),
@@ -221,9 +221,9 @@ const VoiceCallToolSchema = Type.Union([
     to: Type.Optional(Type.String({ description: "Call target" })),
     sid: Type.Optional(Type.String({ description: "Call SID" })),
     message: Type.Optional(Type.String({ description: "Optional intro message" })),
-    sessionKey: Type.Optional(Type.String({ description: "OpenClaw session key for the call" })),
+    sessionKey: Type.Optional(Type.String({ description: "SteelEngine session key for the call" })),
     requesterSessionKey: Type.Optional(
-      Type.String({ description: "OpenClaw session key that initiated the call" }),
+      Type.String({ description: "SteelEngine session key that initiated the call" }),
     ),
     dtmfSequence: Type.Optional(Type.String({ description: "DTMF digits to play before connect" })),
   }),
@@ -236,7 +236,7 @@ function asParamRecord(params: unknown): Record<string, unknown> {
 }
 
 function isCliOnlyProcess(): boolean {
-  return process.env.OPENCLAW_CLI === "1" && !process.argv.slice(2).includes("gateway");
+  return process.env.STEELENGINE_CLI === "1" && !process.argv.slice(2).includes("gateway");
 }
 
 type VoiceCallStatus = Pick<
@@ -266,9 +266,9 @@ function toVoiceCallStatus(call: CallRecord): VoiceCallStatus {
   };
 }
 
-const VOICE_CALL_RUNTIME_KEY = Symbol.for("openclaw.voice-call.runtime");
-const VOICE_CALL_RUNTIME_PROMISE_KEY = Symbol.for("openclaw.voice-call.runtimePromise");
-const VOICE_CALL_RUNTIME_STOP_PROMISE_KEY = Symbol.for("openclaw.voice-call.runtimeStopPromise");
+const VOICE_CALL_RUNTIME_KEY = Symbol.for("steelengine.voice-call.runtime");
+const VOICE_CALL_RUNTIME_PROMISE_KEY = Symbol.for("steelengine.voice-call.runtimePromise");
+const VOICE_CALL_RUNTIME_STOP_PROMISE_KEY = Symbol.for("steelengine.voice-call.runtimeStopPromise");
 
 type VoiceCallRuntimeGlobalState = typeof globalThis & {
   [VOICE_CALL_RUNTIME_KEY]?: VoiceCallRuntime | null;
@@ -289,7 +289,7 @@ export default definePluginEntry({
   name: "Voice Call",
   description: "Voice-call plugin with Telnyx/Twilio/Plivo providers",
   configSchema: voiceCallConfigSchema,
-  register(api: OpenClawPluginApi) {
+  register(api: SteelEnginePluginApi) {
     const config = resolveVoiceCallConfig(voiceCallConfigSchema.parse(api.pluginConfig));
     const validation = validateProviderConfig(config);
 

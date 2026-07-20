@@ -8,9 +8,9 @@ import {
   type ClientCapabilities,
 } from "@modelcontextprotocol/sdk/types.js";
 import type { ServerCapabilities } from "@modelcontextprotocol/sdk/types.js";
-import { redactSensitiveUrlLikeString } from "@openclaw/net-policy/redact-sensitive-url";
-import { normalizeLowercaseStringOrEmpty } from "@openclaw/normalization-core/string-coerce";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import { redactSensitiveUrlLikeString } from "@steelengine/net-policy/redact-sensitive-url";
+import { normalizeLowercaseStringOrEmpty } from "@steelengine/normalization-core/string-coerce";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { toErrorObject } from "../infra/errors.js";
 import { logWarn } from "../logger.js";
 import type { PluginManifestRegistry } from "../plugins/manifest-registry.js";
@@ -56,7 +56,7 @@ import {
 } from "./mcp-connection-resolver.js";
 import { createMcpJsonSchemaValidator } from "./mcp-json-schema-validator.js";
 import { sanitizeMcpMetadataText } from "./mcp-metadata.js";
-import { OpenClawStdioClientTransport } from "./mcp-stdio-transport.js";
+import { SteelEngineStdioClientTransport } from "./mcp-stdio-transport.js";
 import { resolveMcpTransport } from "./mcp-transport.js";
 
 type BundleMcpSession = {
@@ -84,7 +84,7 @@ const BUNDLE_MCP_CATALOG_LIST_TIMEOUT_MS = 1_500;
 const BUNDLE_MCP_DISPOSE_TIMEOUT_MS = 5_000;
 const BUNDLE_MCP_CATALOG_CONNECT_CONCURRENCY = 6;
 let bundleMcpCatalogListTimeoutMs: number | undefined;
-const BUNDLE_MCP_TEST_STATE_KEY = Symbol.for("openclaw.bundleMcpTestState");
+const BUNDLE_MCP_TEST_STATE_KEY = Symbol.for("steelengine.bundleMcpTestState");
 type BundleMcpTestState = { disposeTimeoutMs?: number };
 
 function getBundleMcpTestState(): BundleMcpTestState {
@@ -342,7 +342,7 @@ async function disposeSession(session: BundleMcpSession) {
     // gets its AbortSignal triggered by teardown. Stdio owns a process group,
     // so force it dead before disposal can report completion.
     const transportClose =
-      session.transport instanceof OpenClawStdioClientTransport
+      session.transport instanceof SteelEngineStdioClientTransport
         ? session.transport.forceClose()
         : session.transport.close();
     await settleWithin(Promise.allSettled([transportClose, session.client.close()]), timeoutMs);
@@ -358,7 +358,7 @@ export function createSessionMcpRuntime(params: {
   sessionKey?: string;
   workspaceDir: string;
   agentDir?: string;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   manifestRegistry?: Pick<PluginManifestRegistry, "plugins">;
   includeServerNames?: ReadonlySet<string>;
   excludeServerNames?: ReadonlySet<string>;
@@ -588,7 +588,7 @@ export function createSessionMcpRuntime(params: {
               if (!session) {
                 const client = new Client(
                   {
-                    name: "openclaw-bundle-mcp",
+                    name: "steelengine-bundle-mcp",
                     version: "0.0.0",
                   },
                   {

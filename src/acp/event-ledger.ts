@@ -1,12 +1,12 @@
 /** Persistent/replayable ACP event ledger implementations for session rehydration. */
 import type { DatabaseSync } from "node:sqlite";
 import type { ContentBlock, SessionUpdate } from "@agentclientprotocol/sdk";
-import { resolveIntegerOption } from "@openclaw/acp-core/numeric-options";
+import { resolveIntegerOption } from "@steelengine/acp-core/numeric-options";
 import {
-  openOpenClawStateDatabase,
-  type OpenClawStateDatabaseOptions,
-  runOpenClawStateWriteTransaction,
-} from "../state/openclaw-state-db.js";
+  openSteelEngineStateDatabase,
+  type SteelEngineStateDatabaseOptions,
+  runSteelEngineStateWriteTransaction,
+} from "../state/steelengine-state-db.js";
 import { isRecord } from "../utils.js";
 
 const LEDGER_VERSION = 1;
@@ -747,7 +747,7 @@ function buildSqliteReplay(session: LedgerSession | undefined): AcpEventLedgerRe
 
 /** Creates the SQLite-backed ACP event ledger used by the state database. */
 export function createSqliteAcpEventLedger(
-  params: OpenClawStateDatabaseOptions & LedgerOptions = {},
+  params: SteelEngineStateDatabaseOptions & LedgerOptions = {},
 ): AcpEventLedger {
   const normalized = normalizeLedgerOptions(params);
   const dbOptions = { env: params.env, path: params.path };
@@ -755,8 +755,8 @@ export function createSqliteAcpEventLedger(
     ...normalized,
   };
   const mutate = (fn: (db: DatabaseSync) => void) =>
-    runOpenClawStateWriteTransaction((database) => fn(database.db), dbOptions);
-  const read = <T>(fn: (db: DatabaseSync) => T): T => fn(openOpenClawStateDatabase(dbOptions).db);
+    runSteelEngineStateWriteTransaction((database) => fn(database.db), dbOptions);
+  const read = <T>(fn: (db: DatabaseSync) => T): T => fn(openSteelEngineStateDatabase(dbOptions).db);
 
   return {
     async startSession(sessionParams) {

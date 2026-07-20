@@ -1,17 +1,17 @@
 {
-  "name": "@openclaw/google-plugin",
+  "name": "@steelengine/google-plugin",
   "version": "2026.7.2-beta.3",
   "private": true,
-  "description": "OpenClaw Google plugin",
+  "description": "SteelEngine Google plugin",
   "type": "module",
   "dependencies": {
     "@google/genai": "2.10.0",
     "google-auth-library": "10.9.0"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ]

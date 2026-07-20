@@ -1,6 +1,6 @@
 /** Dispatches isolated cron output to direct delivery, mirrors, and follow-up queues. */
-import { isAudioFileName } from "@openclaw/media-core/mime";
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { isAudioFileName } from "@steelengine/media-core/mime";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import type { ReplyPayload } from "../../auto-reply/reply-payload.js";
 import {
   isSilentReplyText,
@@ -18,7 +18,7 @@ import {
   resolveMainSessionKey,
 } from "../../config/sessions/main-session.js";
 import { resolveMirroredTranscriptText } from "../../config/sessions/transcript-mirror.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type { TtsAutoMode } from "../../config/types.tts.js";
 import { isSuppressedControlReplyText } from "../../gateway/control-reply-text.js";
 import { sleepWithAbort } from "../../infra/backoff.js";
@@ -109,8 +109,8 @@ export function resolveCronDeliveryBestEffort(job: CronJob): boolean {
 type SuccessfulDeliveryTarget = Extract<DeliveryTargetResolution, { ok: true }>;
 
 type DispatchCronDeliveryParams = {
-  cfg: OpenClawConfig;
-  cfgWithAgentDefaults: OpenClawConfig;
+  cfg: SteelEngineConfig;
+  cfgWithAgentDefaults: SteelEngineConfig;
   deps: CliDeps;
   job: CronJob;
   agentId: string;
@@ -152,7 +152,7 @@ type DirectCronTranscriptMirror = {
   mediaUrls?: string[];
   storePath?: string;
   idempotencyKey: string;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
 };
 
 /** Mutable delivery-dispatch accumulator returned to the isolated cron runner. */
@@ -294,7 +294,7 @@ function cloneDeliveryResults(
 }
 
 function pruneCompletedDirectCronDeliveries(now: number) {
-  const ttlMs = process.env.OPENCLAW_TEST_FAST === "1" ? 60_000 : 24 * 60 * 60 * 1000;
+  const ttlMs = process.env.STEELENGINE_TEST_FAST === "1" ? 60_000 : 24 * 60 * 60 * 1000;
   for (const [key, entry] of COMPLETED_DIRECT_CRON_DELIVERIES) {
     if (now - entry.ts >= ttlMs) {
       COMPLETED_DIRECT_CRON_DELIVERIES.delete(key);
@@ -357,7 +357,7 @@ function getCompletedDirectCronDelivery(
 }
 
 async function maybeApplyTtsToCronPayloads(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   payloads: ReplyPayload[];
   delivery: SuccessfulDeliveryTarget;
   agentId: string;
@@ -422,7 +422,7 @@ function shouldQueueCronAwareness(params: {
 }
 
 function resolveCronAwarenessMainSessionKey(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId: string;
 }): string {
   return params.cfg.session?.scope === "global"
@@ -483,7 +483,7 @@ function formatTargetCronDeliveryFailureAwarenessText(params: {
 }
 
 async function queueCronAwarenessSystemEvent(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   jobId: string;
   agentId: string;
   deliveryIdempotencyKey: string;
@@ -606,7 +606,7 @@ function projectDeliveredDirectCronPayloadsForMirror(
 }
 
 function canonicalizeDirectCronRouteSessionKey(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId: string;
   sessionKey: string;
 }): string {
@@ -637,7 +637,7 @@ function canonicalizeDirectCronRouteSessionKey(params: {
 // Resolves the session for a concrete visible delivery target and ensures the
 // outbound session exists before cron awareness or transcript code references it.
 async function resolveCronDeliveryRouteSessionKey(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   jobId: string;
   agentId: string;
   agentSessionKey: string;
@@ -698,7 +698,7 @@ async function resolveCronDeliveryRouteSessionKey(params: {
 
 /** Resolves the transcript mirror session for direct cron delivery. */
 async function resolveDirectCronDeliverySessionKey(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   job: CronJob;
   agentId: string;
   agentSessionKey: string;
@@ -770,7 +770,7 @@ function resolveCronMessageToolAwarenessTarget(params: {
 
 /** Queues target-session context awareness for cron deliveries made via message tool. */
 export async function queueCronMessageToolDeliveryAwareness(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   job: CronJob;
   agentId: string;
   agentSessionKey: string;
@@ -925,7 +925,7 @@ function getCompletedDirectCronDeliveriesCountForTests(): number {
 }
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
-  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("openclaw.cronDeliveryDispatchTestApi")] =
+  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("steelengine.cronDeliveryDispatchTestApi")] =
     {
       resetCompletedDirectCronDeliveriesForTests,
       getCompletedDirectCronDeliveriesCountForTests,
@@ -957,7 +957,7 @@ function isTransientDirectCronDeliveryError(error: unknown): boolean {
   return isProvenDeliveryNotSentError(error);
 }
 function resolveDirectCronRetryDelaysMs(): readonly number[] {
-  return process.env.NODE_ENV === "test" && process.env.OPENCLAW_TEST_FAST === "1"
+  return process.env.NODE_ENV === "test" && process.env.STEELENGINE_TEST_FAST === "1"
     ? [0, 0, 0]
     : [5_000, 10_000, 20_000];
 }
@@ -1027,7 +1027,7 @@ export async function dispatchCronDelivery(
   });
   const formatDeliveryTargetError = (error: string) =>
     params.sourceDeliveryOutcome.unverifiedMessageToolDelivery
-      ? `${error}; the agent used the message tool, but OpenClaw could not verify that message matched the cron delivery target`
+      ? `${error}; the agent used the message tool, but SteelEngine could not verify that message matched the cron delivery target`
       : error;
   const failDeliveryTarget = (error: string) =>
     params.withRunSession({
@@ -1236,7 +1236,7 @@ export async function dispatchCronDelivery(
           // Keep all attempts out of the write-ahead delivery queue so a
           // late-successful first send cannot leave behind a failed queue
           // entry that replays on the next restart.
-          // See: https://github.com/openclaw/openclaw/issues/40545
+          // See: https://github.com/steelengineai/recall-agents/issues/40545
           skipQueue: true,
         });
         // No durable id is still ambiguous: the adapter was already invoked.

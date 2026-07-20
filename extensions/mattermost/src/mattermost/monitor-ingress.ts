@@ -6,9 +6,9 @@ import {
   DEFAULT_INGRESS_RETRY_MAX_ATTEMPTS,
   type ChannelIngressDrain,
   type ChannelIngressQueue,
-} from "openclaw/plugin-sdk/channel-outbound";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/channel-outbound";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
 import { getMattermostRuntime } from "../runtime.js";
 import type { MattermostPost } from "./client.js";
 import {

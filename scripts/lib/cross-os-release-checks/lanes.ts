@@ -72,7 +72,7 @@ import {
   runDashboardSmoke,
   runModelsSet,
   runOnboard,
-  runOpenClaw,
+  runSteelEngine,
   startGateway,
   waitForGateway,
 } from "./runtime.ts";
@@ -240,7 +240,7 @@ export async function runUpgradeLane(
     let usedWindowsPackagedUpgradeTimeoutFallback = false;
     await runTimedLanePhase(lane, "update", async () => {
       try {
-        updateResult = await runOpenClaw({
+        updateResult = await runSteelEngine({
           lane,
           env: updateEnv,
           args: updateArgs,
@@ -302,7 +302,7 @@ export async function runUpgradeLane(
       })
     ) {
       await runTimedLanePhase(lane, "update-status", async () => {
-        await runOpenClaw({
+        await runSteelEngine({
           lane,
           env: updateEnv,
           args: ["update", "status", "--json"],
@@ -617,7 +617,7 @@ export async function runDevUpdateSuite(
       args: ["update", "--channel", "dev", "--yes", "--json"],
       env: {
         ...buildRealUpdateEnv(env),
-        OPENCLAW_UPDATE_DEV_TARGET_REF: verificationRef,
+        STEELENGINE_UPDATE_DEV_TARGET_REF: verificationRef,
       },
       cwd: lane.homeDir,
       logPath: join(params.logsDir, "dev-update.log"),
@@ -628,7 +628,7 @@ export async function runDevUpdateSuite(
     const updatedShell = await verifyFreshShellCommand({
       lane,
       env,
-      expectedNeedle: "OpenClaw",
+      expectedNeedle: "SteelEngine",
       logPath: join(params.logsDir, "dev-update-shell.log"),
     });
 
@@ -738,10 +738,10 @@ export async function runDevUpdateSuite(
 }
 
 function createLaneState(name: string): LaneState {
-  const rootDir = mkdtempSync(join(tmpdir(), `openclaw-${name}-`));
+  const rootDir = mkdtempSync(join(tmpdir(), `steelengine-${name}-`));
   const prefixDir = join(rootDir, "prefix");
   const homeDir = join(rootDir, "home");
-  const stateDir = join(homeDir, ".openclaw");
+  const stateDir = join(homeDir, ".steelengine");
   const appDataDir = process.platform === "win32" ? join(homeDir, "AppData", "Roaming") : stateDir;
   mkdirSync(prefixDir, { recursive: true });
   mkdirSync(homeDir, { recursive: true });
@@ -775,11 +775,11 @@ function buildLaneEnv(
     USERPROFILE: lane.homeDir,
     APPDATA: lane.appDataDir,
     LOCALAPPDATA: join(lane.homeDir, "AppData", "Local"),
-    OPENCLAW_HOME: lane.homeDir,
-    OPENCLAW_STATE_DIR: lane.stateDir,
-    OPENCLAW_CONFIG_PATH: join(lane.stateDir, "openclaw.json"),
-    OPENCLAW_DISABLE_BONJOUR: "1",
-    OPENCLAW_DISABLE_BUNDLED_PLUGIN_POSTINSTALL: "1",
+    STEELENGINE_HOME: lane.homeDir,
+    STEELENGINE_STATE_DIR: lane.stateDir,
+    STEELENGINE_CONFIG_PATH: join(lane.stateDir, "steelengine.json"),
+    STEELENGINE_DISABLE_BONJOUR: "1",
+    STEELENGINE_DISABLE_BUNDLED_PLUGIN_POSTINSTALL: "1",
     NPM_CONFIG_PREFIX: lane.prefixDir,
     PATH: `${binDirForPrefix(lane.prefixDir)}${process.platform === "win32" ? ";" : ":"}${process.env.PATH ?? ""}`,
     [providerMeta.secretEnv]: providerSecretValue,
@@ -799,12 +799,12 @@ function buildInstallerEnv(
     USERPROFILE: lane.homeDir,
     APPDATA: lane.appDataDir,
     LOCALAPPDATA: localAppData,
-    OPENCLAW_HOME: lane.homeDir,
-    OPENCLAW_STATE_DIR: lane.stateDir,
-    OPENCLAW_CONFIG_PATH: join(lane.stateDir, "openclaw.json"),
-    OPENCLAW_DISABLE_BONJOUR: "1",
-    OPENCLAW_NO_ONBOARD: "1",
-    OPENCLAW_NO_PROMPT: "1",
+    STEELENGINE_HOME: lane.homeDir,
+    STEELENGINE_STATE_DIR: lane.stateDir,
+    STEELENGINE_CONFIG_PATH: join(lane.stateDir, "steelengine.json"),
+    STEELENGINE_DISABLE_BONJOUR: "1",
+    STEELENGINE_NO_ONBOARD: "1",
+    STEELENGINE_NO_PROMPT: "1",
     CI: "1",
     NODE_OPTIONS: "--max-old-space-size=8192",
     [providerMeta.secretEnv]: providerSecretValue,

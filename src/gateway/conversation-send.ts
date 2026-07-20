@@ -8,7 +8,7 @@ import {
   type ConversationRegistryScope,
 } from "../config/sessions/conversation-registry.js";
 import { resolveStorePath } from "../config/sessions/paths.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   ConversationDeliveryRejectedError,
   defaultConversationDeliveryDeps,
@@ -31,7 +31,7 @@ const defaultDeps: ConversationSendDeps = {
 
 function resolveConversationScope(params: {
   agentId: string;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
 }): ConversationRegistryScope {
   const configuredStore = params.config.session?.store;
   return {
@@ -83,7 +83,7 @@ function resultForCompletedOperation(
 /** Performs one durable conversation send inside the Gateway channel owner. */
 export async function runGatewayConversationSend(
   params: {
-    config: OpenClawConfig;
+    config: SteelEngineConfig;
     agentId: string;
     senderIsOwner: boolean;
     sourceSessionKey?: string;

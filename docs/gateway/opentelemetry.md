@@ -1,13 +1,13 @@
 ---
-summary: "Export OpenClaw diagnostics to OpenTelemetry collectors or stdout JSONL via the diagnostics-otel plugin"
+summary: "Export SteelEngine diagnostics to OpenTelemetry collectors or stdout JSONL via the diagnostics-otel plugin"
 title: "OpenTelemetry export"
 read_when:
-  - You want to send OpenClaw model usage, message flow, or session metrics to an OpenTelemetry collector
+  - You want to send SteelEngine model usage, message flow, or session metrics to an OpenTelemetry collector
   - You are wiring traces, metrics, or logs into Grafana, Datadog, Honeycomb, New Relic, Tempo, or another OTLP backend
   - You need the exact metric names, span names, or attribute shapes to build dashboards or alerts
 ---
 
-OpenClaw exports diagnostics through the official `diagnostics-otel` plugin
+SteelEngine exports diagnostics through the official `diagnostics-otel` plugin
 using **OTLP/HTTP (protobuf)**. Logs can also be written as stdout JSONL for
 container and sandbox log pipelines. Any collector or backend that accepts
 OTLP/HTTP works without code changes. For local file logs, see
@@ -19,7 +19,7 @@ OTLP/HTTP works without code changes. For local file logs, see
 - **`diagnostics-otel`** subscribes to those events and exports them as
   OpenTelemetry **metrics**, **traces**, and **logs** over OTLP/HTTP, and can
   mirror log records to stdout JSONL.
-- **Provider calls** receive a W3C `traceparent` header from OpenClaw's
+- **Provider calls** receive a W3C `traceparent` header from SteelEngine's
   trusted model-call span context when the provider transport accepts custom
   headers. Plugin-emitted trace context is not propagated.
 - Exporters attach only when both the diagnostics surface and the plugin are
@@ -28,7 +28,7 @@ OTLP/HTTP works without code changes. For local file logs, see
 ## Quick start
 
 ```bash
-openclaw plugins install clawhub:@openclaw/diagnostics-otel
+steelengine plugins install clawhub:@steelengine/diagnostics-otel
 ```
 
 ```json5
@@ -45,7 +45,7 @@ openclaw plugins install clawhub:@openclaw/diagnostics-otel
       enabled: true,
       endpoint: "http://otel-collector:4318",
       protocol: "http/protobuf",
-      serviceName: "openclaw-gateway",
+      serviceName: "steelengine-gateway",
       traces: true,
       metrics: true,
       logs: true,
@@ -56,7 +56,7 @@ openclaw plugins install clawhub:@openclaw/diagnostics-otel
 }
 ```
 
-Or enable the plugin from the CLI: `openclaw plugins enable diagnostics-otel`.
+Or enable the plugin from the CLI: `steelengine plugins enable diagnostics-otel`.
 
 <Note>
 `protocol` supports `http/protobuf` only. Since `traces` and `metrics` default to enabled, any other value (including `grpc`) aborts the entire diagnostics-otel subscription with an `unsupported protocol` warning - this also stops stdout log export. Explicitly set `traces: false` and `metrics: false` if you only want `logsExporter: "stdout"` with a non-OTLP protocol value.
@@ -89,7 +89,7 @@ stdout, or `both` for both.
       metricsEndpoint: "http://otel-collector:4318/v1/metrics",
       logsEndpoint: "http://otel-collector:4318/v1/logs",
       protocol: "http/protobuf", // grpc disables OTLP export
-      serviceName: "openclaw-gateway", // unset falls back to OTEL_SERVICE_NAME, then "openclaw"
+      serviceName: "steelengine-gateway", // unset falls back to OTEL_SERVICE_NAME, then "steelengine"
       headers: { "x-collector-token": "..." },
       traces: true,
       metrics: true,
@@ -117,10 +117,10 @@ stdout, or `both` for both.
 | ----------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `OTEL_EXPORTER_OTLP_ENDPOINT`                                                                                     | Fallback for `diagnostics.otel.endpoint` when the config key is unset.                                                                                                                                                                                                                                         |
 | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` / `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` / `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT` | Signal-specific endpoint fallbacks used when the matching `diagnostics.otel.*Endpoint` config key is unset. Signal-specific config wins over signal-specific env, which wins over the shared endpoint.                                                                                                         |
-| `OTEL_SERVICE_NAME`                                                                                               | Fallback for `diagnostics.otel.serviceName` when the config key is unset. Default service name is `openclaw`.                                                                                                                                                                                                  |
+| `OTEL_SERVICE_NAME`                                                                                               | Fallback for `diagnostics.otel.serviceName` when the config key is unset. Default service name is `steelengine`.                                                                                                                                                                                                  |
 | `OTEL_EXPORTER_OTLP_PROTOCOL`                                                                                     | Fallback for the wire protocol when `diagnostics.otel.protocol` is unset. Only `http/protobuf` enables export.                                                                                                                                                                                                 |
 | `OTEL_SEMCONV_STABILITY_OPT_IN`                                                                                   | Set to `gen_ai_latest_experimental` to emit the latest GenAI inference span shape: `{gen_ai.operation.name} {gen_ai.request.model}` span names, `CLIENT` span kind, and `gen_ai.provider.name` instead of the legacy `gen_ai.system`. GenAI metrics always use bounded, low-cardinality attributes regardless. |
-| `OPENCLAW_OTEL_PRELOADED`                                                                                         | Set to `1` when another preload or host process already registered the global OpenTelemetry SDK. The plugin then skips its own NodeSDK lifecycle but still wires diagnostic listeners and honors `traces`/`metrics`/`logs`.                                                                                    |
+| `STEELENGINE_OTEL_PRELOADED`                                                                                         | Set to `1` when another preload or host process already registered the global OpenTelemetry SDK. The plugin then skips its own NodeSDK lifecycle but still wires diagnostic listeners and honors `traces`/`metrics`/`logs`.                                                                                    |
 
 ## Privacy and content capture
 
@@ -139,7 +139,7 @@ transcripts, audio payloads, session ids, turn ids, call ids, room ids, or
 handoff tokens.
 
 Outbound model requests may include a W3C `traceparent` header generated only
-from OpenClaw-owned diagnostic trace context for the active model call.
+from SteelEngine-owned diagnostic trace context for the active model call.
 Existing caller-supplied `traceparent` headers are replaced, so plugins or
 custom provider options cannot spoof cross-service trace ancestry.
 
@@ -155,17 +155,17 @@ system-prompt text. Each subkey is independent:
 - `toolDefinitions` - model tool names, descriptions, and schemas.
 
 When any subkey is enabled, model and tool spans get bounded, redacted
-`openclaw.content.*` attributes for that class only.
+`steelengine.content.*` attributes for that class only.
 
 <Note>
 Boolean `captureContent: true` enables `inputMessages`, `outputMessages`, `toolInputs`, `toolOutputs`, `toolDefinitions`, and OTLP log bodies together, but **not** `systemPrompt` - set `captureContent.systemPrompt: true` explicitly if you also need the assembled system prompt.
 </Note>
 
 `toolInputs`/`toolOutputs` content is captured for the built-in agent
-runtime's tool executions (`openclaw.content.tool_input` and
+runtime's tool executions (`steelengine.content.tool_input` and
 `gen_ai.tool.call.arguments` on completed/error spans;
-`openclaw.content.tool_output` and `gen_ai.tool.call.result` on completed
-spans). The `openclaw.content.*` names remain the stable OpenClaw attribute
+`steelengine.content.tool_output` and `gen_ai.tool.call.result` on completed
+spans). The `steelengine.content.*` names remain the stable SteelEngine attribute
 names; the `gen_ai.tool.call.*` copies mirror them for semconv-native viewers.
 External harness tool calls (Codex, Claude CLI) emit
 `tool.execution.*` spans without content payloads. Captured content travels on a
@@ -196,17 +196,17 @@ bus.
   scope inherit the request trace by default, while agent run and model-call
   spans are created as children so provider `traceparent` headers stay on the
   same trace.
-- **Model-call correlation:** `openclaw.model.call` spans include safe prompt
+- **Model-call correlation:** `steelengine.model.call` spans include safe prompt
   component sizes by default and per-call token attributes when the provider
-  result exposes usage. `openclaw.model.usage` remains the run-level
+  result exposes usage. `steelengine.model.usage` remains the run-level
   accounting span for aggregate cost, context, and channel dashboards, and
   stays on the same diagnostic trace when the emitting runtime has trusted
   trace context.
 
 ### Model-call observation units
 
-Every `openclaw.model.call` span identifies what its lifecycle measures through
-`openclaw.model_call.observation_unit`:
+Every `steelengine.model.call` span identifies what its lifecycle measures through
+`steelengine.model_call.observation_unit`:
 
 - `request` - one observable model/provider request. Native embedded model
   calls use this unit, and exporters treat a missing value as `request` for
@@ -220,18 +220,18 @@ output, usage, and hierarchy. Request spans use the API-derived GenAI operation
 (`chat`, `generate_content`, or `text_completion`), while turn spans use
 `gen_ai.operation.name = invoke_agent`. Both contribute to
 `gen_ai.client.operation.duration`, where the operation name keeps direct
-request latency separate from full-turn latency. OpenClaw's OTEL model-call
-metrics also include `openclaw.model_call.observation_unit`; the Prometheus
+request latency separate from full-turn latency. SteelEngine's OTEL model-call
+metrics also include `steelengine.model_call.observation_unit`; the Prometheus
 model-call metrics expose the equivalent `observation_unit` label.
 
 ### Claude Code CLI model-call fidelity
 
-Claude Code CLI turns emit one synthetic, turn-level `openclaw.model.call`
-span. These are not Anthropic HTTP request spans. They use `openclaw.api =
-claude-code`, `openclaw.model_call.observation_unit = turn`, and identify
+Claude Code CLI turns emit one synthetic, turn-level `steelengine.model.call`
+span. These are not Anthropic HTTP request spans. They use `steelengine.api =
+claude-code`, `steelengine.model_call.observation_unit = turn`, and identify
 the operation as `gen_ai.operation.name = invoke_agent`. They identify
-OpenClaw's CLI boundary through
-`openclaw.transport`:
+SteelEngine's CLI boundary through
+`steelengine.transport`:
 
 - `stdio` - one-shot local Claude Code process.
 - `stdio-live` - one turn on a managed persistent Claude stdio session.
@@ -247,43 +247,43 @@ are capped at 128 KiB each; assistant output is capped at 128 KiB across at
 most 200 envelopes, with 16 KiB and one item reserved for a final visible
 fallback response. A marker records truncation when the limit is reached.
 
-OpenClaw gives Claude CLI turns the same ownership hierarchy used by other
-agent runtimes: `openclaw.harness.run` (`openclaw.harness.id = claude-cli`)
-contains `openclaw.run`, which contains the Claude `openclaw.model.call`
-span. The harness and run spans are synthetic OpenClaw turn boundaries, not
+SteelEngine gives Claude CLI turns the same ownership hierarchy used by other
+agent runtimes: `steelengine.harness.run` (`steelengine.harness.id = claude-cli`)
+contains `steelengine.run`, which contains the Claude `steelengine.model.call`
+span. The harness and run spans are synthetic SteelEngine turn boundaries, not
 Claude Code internal phases. One-shot and managed stdio turns use the same
 hierarchy; a real fresh-session retry creates another model-call child inside
-the same OpenClaw run.
+the same SteelEngine run.
 
-The span starts when OpenClaw admits the prepared CLI turn and ends only after
+The span starts when SteelEngine admits the prepared CLI turn and ends only after
 that turn succeeds or fails. For managed sessions, an interim success result
 does not end the span while Claude reports result-holding background agents or
 workflows; the final post-drain result does. Abort, timeout, process failure,
 output/parse failure, and other turn failures end the same span with an error.
 
 Claude Code reports per-assistant-message usage and may also report cumulative
-usage on its terminal result. OpenClaw reply accounting continues to use the
+usage on its terminal result. SteelEngine reply accounting continues to use the
 last assistant message so existing cost semantics do not change; the
 turn-level model-call span uses terminal cumulative usage when available,
 including cache-read and cache-creation tokens.
 
-For these CLI spans, byte and timing fields describe the observable OpenClaw
+For these CLI spans, byte and timing fields describe the observable SteelEngine
 CLI boundary:
 
-- `openclaw.model_call.request_bytes` is the UTF-8 size of the prompt value
+- `steelengine.model_call.request_bytes` is the UTF-8 size of the prompt value
   sent over one-shot stdin/argv, or the managed stdio JSONL user envelope. It
   is not the size of Claude Code's hidden model request.
-- `openclaw.model_call.response_bytes` is the UTF-8 size of Claude CLI stdout
+- `steelengine.model_call.response_bytes` is the UTF-8 size of Claude CLI stdout
   observed during the turn. It is not Anthropic HTTP response size.
-- `openclaw.model_call.time_to_first_byte_ms` is time to the first observable
+- `steelengine.model_call.time_to_first_byte_ms` is time to the first observable
   Claude CLI stdout or stderr output. It is not network TTFB.
 
 With the matching granular `captureContent` fields enabled, the span exports
-the effective prompt OpenClaw sends to Claude Code, OpenClaw's appended system
+the effective prompt SteelEngine sends to Claude Code, SteelEngine's appended system
 prompt, and visible assistant text/reasoning/tool-call identity through
 `gen_ai.input.messages`, `gen_ai.output.messages`, and
 `gen_ai.system_instructions`. Tool arguments, opaque thinking signatures, and
-tool results are omitted from the Claude assistant envelope. OpenClaw does not
+tool results are omitted from the Claude assistant envelope. SteelEngine does not
 claim access to Claude Code's private system prompt, hidden resumed or
 compacted request payload, native internal tool schemas, raw Anthropic HTTP
 request, internal retries, upstream request id, or true network TTFB. Because
@@ -299,64 +299,64 @@ bounds; content remains off by default.
 
 ### Model usage
 
-- `openclaw.tokens` (counter, attrs: `openclaw.token`, `openclaw.channel`, `openclaw.provider`, `openclaw.model`, `openclaw.agent`)
-- `openclaw.cost.usd` (counter, attrs: `openclaw.channel`, `openclaw.provider`, `openclaw.model`)
-- `openclaw.run.duration_ms` (histogram, attrs: `openclaw.channel`, `openclaw.provider`, `openclaw.model`)
-- `openclaw.context.tokens` (histogram, attrs: `openclaw.context`, `openclaw.channel`, `openclaw.provider`, `openclaw.model`)
+- `steelengine.tokens` (counter, attrs: `steelengine.token`, `steelengine.channel`, `steelengine.provider`, `steelengine.model`, `steelengine.agent`)
+- `steelengine.cost.usd` (counter, attrs: `steelengine.channel`, `steelengine.provider`, `steelengine.model`)
+- `steelengine.run.duration_ms` (histogram, attrs: `steelengine.channel`, `steelengine.provider`, `steelengine.model`)
+- `steelengine.context.tokens` (histogram, attrs: `steelengine.context`, `steelengine.channel`, `steelengine.provider`, `steelengine.model`)
 - `gen_ai.client.token.usage` (histogram, GenAI semantic-conventions metric, attrs: `gen_ai.token.type` = `input`/`output`, `gen_ai.provider.name`, `gen_ai.operation.name`, `gen_ai.request.model`)
 - `gen_ai.client.operation.duration` (histogram, seconds, GenAI semantic-conventions metric for model requests and synthetic agent turns; attrs: `gen_ai.provider.name`, `gen_ai.operation.name`, `gen_ai.request.model`, optional `error.type`; turn observations use `gen_ai.operation.name = invoke_agent`)
-- `openclaw.model_call.duration_ms` (histogram, attrs: `openclaw.provider`, `openclaw.model`, `openclaw.api`, `openclaw.transport`, `openclaw.model_call.observation_unit`, plus `openclaw.errorCategory` and `openclaw.failureKind` on classified errors)
-- `openclaw.model_call.request_bytes` (histogram, UTF-8 byte size of the final model request payload; for Claude Code CLI, the observable prompt input/envelope described above; no raw payload content)
-- `openclaw.model_call.response_bytes` (histogram, UTF-8 byte size of streamed response chunk payloads; high-frequency text, thinking, and tool-call deltas count only incremental `delta` bytes; for Claude Code CLI, observed stdout bytes; no raw response content)
-- `openclaw.model_call.time_to_first_byte_ms` (histogram, elapsed time before the first streamed response event; for Claude Code CLI, first observable CLI output rather than network TTFB)
-- `openclaw.model.failover` (counter, attrs: `openclaw.provider`, `openclaw.model`, `openclaw.failover.to_provider`, `openclaw.failover.to_model`, `openclaw.failover.reason`, `openclaw.failover.suspended`, `openclaw.lane`)
-- `openclaw.skill.used` (counter, attrs: `openclaw.skill.name`, `openclaw.skill.source`, `openclaw.skill.activation`, optional `openclaw.agent`, optional `openclaw.toolName`)
+- `steelengine.model_call.duration_ms` (histogram, attrs: `steelengine.provider`, `steelengine.model`, `steelengine.api`, `steelengine.transport`, `steelengine.model_call.observation_unit`, plus `steelengine.errorCategory` and `steelengine.failureKind` on classified errors)
+- `steelengine.model_call.request_bytes` (histogram, UTF-8 byte size of the final model request payload; for Claude Code CLI, the observable prompt input/envelope described above; no raw payload content)
+- `steelengine.model_call.response_bytes` (histogram, UTF-8 byte size of streamed response chunk payloads; high-frequency text, thinking, and tool-call deltas count only incremental `delta` bytes; for Claude Code CLI, observed stdout bytes; no raw response content)
+- `steelengine.model_call.time_to_first_byte_ms` (histogram, elapsed time before the first streamed response event; for Claude Code CLI, first observable CLI output rather than network TTFB)
+- `steelengine.model.failover` (counter, attrs: `steelengine.provider`, `steelengine.model`, `steelengine.failover.to_provider`, `steelengine.failover.to_model`, `steelengine.failover.reason`, `steelengine.failover.suspended`, `steelengine.lane`)
+- `steelengine.skill.used` (counter, attrs: `steelengine.skill.name`, `steelengine.skill.source`, `steelengine.skill.activation`, optional `steelengine.agent`, optional `steelengine.toolName`)
 
 ### Message flow
 
-- `openclaw.webhook.received` (counter, attrs: `openclaw.channel`, `openclaw.webhook`)
-- `openclaw.webhook.error` (counter, attrs: `openclaw.channel`, `openclaw.webhook`)
-- `openclaw.webhook.duration_ms` (histogram, attrs: `openclaw.channel`, `openclaw.webhook`)
-- `openclaw.message.queued` (counter, attrs: `openclaw.channel`, `openclaw.source`)
-- `openclaw.message.received` (counter, attrs: `openclaw.channel`, `openclaw.source`)
-- `openclaw.message.dispatch.started` (counter, attrs: `openclaw.channel`, `openclaw.source`)
-- `openclaw.message.dispatch.completed` (counter, attrs: `openclaw.channel`, `openclaw.outcome`, `openclaw.reason`, `openclaw.source`)
-- `openclaw.message.dispatch.duration_ms` (histogram, attrs: `openclaw.channel`, `openclaw.outcome`, `openclaw.reason`, `openclaw.source`)
-- `openclaw.message.processed` (counter, attrs: `openclaw.channel`, `openclaw.outcome`)
-- `openclaw.message.duration_ms` (histogram, attrs: `openclaw.channel`, `openclaw.outcome`)
-- `openclaw.message.delivery.started` (counter, attrs: `openclaw.channel`, `openclaw.delivery.kind`)
-- `openclaw.message.delivery.duration_ms` (histogram, attrs: `openclaw.channel`, `openclaw.delivery.kind`, `openclaw.outcome`, `openclaw.errorCategory`)
+- `steelengine.webhook.received` (counter, attrs: `steelengine.channel`, `steelengine.webhook`)
+- `steelengine.webhook.error` (counter, attrs: `steelengine.channel`, `steelengine.webhook`)
+- `steelengine.webhook.duration_ms` (histogram, attrs: `steelengine.channel`, `steelengine.webhook`)
+- `steelengine.message.queued` (counter, attrs: `steelengine.channel`, `steelengine.source`)
+- `steelengine.message.received` (counter, attrs: `steelengine.channel`, `steelengine.source`)
+- `steelengine.message.dispatch.started` (counter, attrs: `steelengine.channel`, `steelengine.source`)
+- `steelengine.message.dispatch.completed` (counter, attrs: `steelengine.channel`, `steelengine.outcome`, `steelengine.reason`, `steelengine.source`)
+- `steelengine.message.dispatch.duration_ms` (histogram, attrs: `steelengine.channel`, `steelengine.outcome`, `steelengine.reason`, `steelengine.source`)
+- `steelengine.message.processed` (counter, attrs: `steelengine.channel`, `steelengine.outcome`)
+- `steelengine.message.duration_ms` (histogram, attrs: `steelengine.channel`, `steelengine.outcome`)
+- `steelengine.message.delivery.started` (counter, attrs: `steelengine.channel`, `steelengine.delivery.kind`)
+- `steelengine.message.delivery.duration_ms` (histogram, attrs: `steelengine.channel`, `steelengine.delivery.kind`, `steelengine.outcome`, `steelengine.errorCategory`)
 
 ### Talk
 
-- `openclaw.talk.event` (counter, attrs: `openclaw.talk.event_type`, `openclaw.talk.mode`, `openclaw.talk.transport`, `openclaw.talk.brain`, `openclaw.talk.provider`)
-- `openclaw.talk.event.duration_ms` (histogram, attrs: same as `openclaw.talk.event`; emitted when a Talk event reports duration)
-- `openclaw.talk.audio.bytes` (histogram, attrs: same as `openclaw.talk.event`; emitted for Talk audio frame events that report byte length)
+- `steelengine.talk.event` (counter, attrs: `steelengine.talk.event_type`, `steelengine.talk.mode`, `steelengine.talk.transport`, `steelengine.talk.brain`, `steelengine.talk.provider`)
+- `steelengine.talk.event.duration_ms` (histogram, attrs: same as `steelengine.talk.event`; emitted when a Talk event reports duration)
+- `steelengine.talk.audio.bytes` (histogram, attrs: same as `steelengine.talk.event`; emitted for Talk audio frame events that report byte length)
 
 ### Queues and sessions
 
-- `openclaw.queue.lane.enqueue` (counter, attrs: `openclaw.lane`)
-- `openclaw.queue.lane.dequeue` (counter, attrs: `openclaw.lane`)
-- `openclaw.queue.depth` (histogram, attrs: `openclaw.lane` or `openclaw.channel=heartbeat`)
-- `openclaw.queue.wait_ms` (histogram, attrs: `openclaw.lane`)
-- `openclaw.session.state` (counter, attrs: `openclaw.state`, `openclaw.reason`)
-- `openclaw.session.stuck` (counter, attrs: `openclaw.state`; emitted for recoverable stale session bookkeeping)
-- `openclaw.session.stuck_age_ms` (histogram, attrs: `openclaw.state`; emitted for recoverable stale session bookkeeping)
-- `openclaw.session.turn.created` (counter, attrs: `openclaw.agent`, `openclaw.channel`, `openclaw.trigger`)
-- `openclaw.session.recovery.requested` (counter, attrs: `openclaw.state`, `openclaw.action`, `openclaw.active_work_kind`, `openclaw.reason`)
-- `openclaw.session.recovery.completed` (counter, attrs: `openclaw.state`, `openclaw.action`, `openclaw.status`, `openclaw.active_work_kind`, `openclaw.reason`)
-- `openclaw.session.recovery.age_ms` (histogram, attrs: same as the matching recovery counter)
-- `openclaw.run.attempt` (counter, attrs: `openclaw.attempt`)
+- `steelengine.queue.lane.enqueue` (counter, attrs: `steelengine.lane`)
+- `steelengine.queue.lane.dequeue` (counter, attrs: `steelengine.lane`)
+- `steelengine.queue.depth` (histogram, attrs: `steelengine.lane` or `steelengine.channel=heartbeat`)
+- `steelengine.queue.wait_ms` (histogram, attrs: `steelengine.lane`)
+- `steelengine.session.state` (counter, attrs: `steelengine.state`, `steelengine.reason`)
+- `steelengine.session.stuck` (counter, attrs: `steelengine.state`; emitted for recoverable stale session bookkeeping)
+- `steelengine.session.stuck_age_ms` (histogram, attrs: `steelengine.state`; emitted for recoverable stale session bookkeeping)
+- `steelengine.session.turn.created` (counter, attrs: `steelengine.agent`, `steelengine.channel`, `steelengine.trigger`)
+- `steelengine.session.recovery.requested` (counter, attrs: `steelengine.state`, `steelengine.action`, `steelengine.active_work_kind`, `steelengine.reason`)
+- `steelengine.session.recovery.completed` (counter, attrs: `steelengine.state`, `steelengine.action`, `steelengine.status`, `steelengine.active_work_kind`, `steelengine.reason`)
+- `steelengine.session.recovery.age_ms` (histogram, attrs: same as the matching recovery counter)
+- `steelengine.run.attempt` (counter, attrs: `steelengine.attempt`)
 
 ### Session liveness telemetry
 
 `diagnostics.stuckSessionWarnMs` is the no-progress age threshold for session
 liveness diagnostics. A `processing` session does not age toward this
-threshold while OpenClaw observes reply, tool, status, block, or ACP runtime
+threshold while SteelEngine observes reply, tool, status, block, or ACP runtime
 progress. Typing keepalives do not count as progress, so a silent model or
 harness can still be detected.
 
-OpenClaw classifies sessions by the work it can still observe:
+SteelEngine classifies sessions by the work it can still observe:
 
 - `session.long_running`: active embedded work, model calls, or tool calls
   are still making progress. Owned model calls that stay silent past
@@ -381,8 +381,8 @@ Recovery emits structured `session.recovery.requested` and
 only after a mutating recovery outcome (`aborted` or `released`) and only if
 the same processing generation is still current.
 
-Only `session.stuck` emits the `openclaw.session.stuck` counter, the
-`openclaw.session.stuck_age_ms` histogram, and the `openclaw.session.stuck`
+Only `session.stuck` emits the `steelengine.session.stuck` counter, the
+`steelengine.session.stuck_age_ms` histogram, and the `steelengine.session.stuck`
 span. Repeated `session.stuck` diagnostics back off while the session remains
 unchanged, so dashboards should alert on sustained increases rather than
 every heartbeat tick. For the config knob and defaults, see
@@ -390,81 +390,81 @@ every heartbeat tick. For the config knob and defaults, see
 
 Liveness warnings also emit:
 
-- `openclaw.liveness.warning` (counter, attrs: `openclaw.liveness.reason`)
-- `openclaw.liveness.event_loop_delay_p99_ms` (histogram, attrs: `openclaw.liveness.reason`)
-- `openclaw.liveness.event_loop_delay_max_ms` (histogram, attrs: `openclaw.liveness.reason`)
-- `openclaw.liveness.event_loop_utilization` (histogram, attrs: `openclaw.liveness.reason`)
-- `openclaw.liveness.cpu_core_ratio` (histogram, attrs: `openclaw.liveness.reason`)
+- `steelengine.liveness.warning` (counter, attrs: `steelengine.liveness.reason`)
+- `steelengine.liveness.event_loop_delay_p99_ms` (histogram, attrs: `steelengine.liveness.reason`)
+- `steelengine.liveness.event_loop_delay_max_ms` (histogram, attrs: `steelengine.liveness.reason`)
+- `steelengine.liveness.event_loop_utilization` (histogram, attrs: `steelengine.liveness.reason`)
+- `steelengine.liveness.cpu_core_ratio` (histogram, attrs: `steelengine.liveness.reason`)
 
 ### Harness lifecycle
 
-- `openclaw.harness.duration_ms` (histogram, attrs: `openclaw.harness.id`, `openclaw.harness.plugin`, `openclaw.outcome`, `openclaw.harness.phase` on errors)
+- `steelengine.harness.duration_ms` (histogram, attrs: `steelengine.harness.id`, `steelengine.harness.plugin`, `steelengine.outcome`, `steelengine.harness.phase` on errors)
 
 ### Tool execution and loop detection
 
-- `openclaw.tool.execution.duration_ms` (histogram, attrs: `gen_ai.tool.name`, `openclaw.toolName`, `openclaw.tool.source`, `openclaw.tool.owner`, `openclaw.tool.params.kind`, plus `openclaw.errorCategory` on errors)
-- `openclaw.tool.execution.blocked` (counter, attrs: `gen_ai.tool.name`, `openclaw.toolName`, `openclaw.tool.source`, `openclaw.tool.owner`, `openclaw.tool.params.kind`, `openclaw.deniedReason`)
-- `openclaw.tool.loop` (counter, attrs: `openclaw.toolName`, `openclaw.loop.level`, `openclaw.loop.action`, `openclaw.loop.detector`, `openclaw.loop.count`, optional `openclaw.loop.paired_tool`; emitted when a repetitive tool-call loop is detected)
+- `steelengine.tool.execution.duration_ms` (histogram, attrs: `gen_ai.tool.name`, `steelengine.toolName`, `steelengine.tool.source`, `steelengine.tool.owner`, `steelengine.tool.params.kind`, plus `steelengine.errorCategory` on errors)
+- `steelengine.tool.execution.blocked` (counter, attrs: `gen_ai.tool.name`, `steelengine.toolName`, `steelengine.tool.source`, `steelengine.tool.owner`, `steelengine.tool.params.kind`, `steelengine.deniedReason`)
+- `steelengine.tool.loop` (counter, attrs: `steelengine.toolName`, `steelengine.loop.level`, `steelengine.loop.action`, `steelengine.loop.detector`, `steelengine.loop.count`, optional `steelengine.loop.paired_tool`; emitted when a repetitive tool-call loop is detected)
 
 ### Exec
 
-- `openclaw.exec.duration_ms` (histogram, attrs: `openclaw.exec.target`, `openclaw.exec.mode`, `openclaw.outcome`, `openclaw.failureKind`)
+- `steelengine.exec.duration_ms` (histogram, attrs: `steelengine.exec.target`, `steelengine.exec.mode`, `steelengine.outcome`, `steelengine.failureKind`)
 
 ### Diagnostics internals (memory, payloads, exporter health)
 
-- `openclaw.payload.large` (counter, attrs: `openclaw.payload.surface`, `openclaw.payload.action`, `openclaw.channel`, `openclaw.plugin`, `openclaw.reason`)
-- `openclaw.payload.large_bytes` (histogram, attrs: same as `openclaw.payload.large`)
-- `openclaw.memory.rss_bytes` / `openclaw.memory.heap_used_bytes` / `openclaw.memory.heap_total_bytes` / `openclaw.memory.external_bytes` / `openclaw.memory.array_buffers_bytes` (histograms, no attrs; process memory samples)
-- `openclaw.memory.pressure` (counter, attrs: `openclaw.memory.level`, `openclaw.memory.reason`)
-- `openclaw.diagnostic.async_queue.dropped` (counter, attrs: `openclaw.diagnostic.async_queue.drop_class`; internal diagnostic-queue backpressure drops)
-- `openclaw.telemetry.exporter.events` (counter, attrs: `openclaw.exporter`, `openclaw.signal`, `openclaw.status`, optional `openclaw.reason`, optional `openclaw.errorCategory`; exporter lifecycle/failure self-telemetry)
+- `steelengine.payload.large` (counter, attrs: `steelengine.payload.surface`, `steelengine.payload.action`, `steelengine.channel`, `steelengine.plugin`, `steelengine.reason`)
+- `steelengine.payload.large_bytes` (histogram, attrs: same as `steelengine.payload.large`)
+- `steelengine.memory.rss_bytes` / `steelengine.memory.heap_used_bytes` / `steelengine.memory.heap_total_bytes` / `steelengine.memory.external_bytes` / `steelengine.memory.array_buffers_bytes` (histograms, no attrs; process memory samples)
+- `steelengine.memory.pressure` (counter, attrs: `steelengine.memory.level`, `steelengine.memory.reason`)
+- `steelengine.diagnostic.async_queue.dropped` (counter, attrs: `steelengine.diagnostic.async_queue.drop_class`; internal diagnostic-queue backpressure drops)
+- `steelengine.telemetry.exporter.events` (counter, attrs: `steelengine.exporter`, `steelengine.signal`, `steelengine.status`, optional `steelengine.reason`, optional `steelengine.errorCategory`; exporter lifecycle/failure self-telemetry)
 
 ## Exported spans
 
-- `openclaw.model.usage`
-  - `openclaw.channel`, `openclaw.provider`, `openclaw.model`
-  - `openclaw.tokens.*` (input/output/cache_read/cache_write/total)
+- `steelengine.model.usage`
+  - `steelengine.channel`, `steelengine.provider`, `steelengine.model`
+  - `steelengine.tokens.*` (input/output/cache_read/cache_write/total)
   - `gen_ai.system` by default, or `gen_ai.provider.name` when the latest GenAI semantic conventions are opted in
   - `gen_ai.request.model`, `gen_ai.operation.name`, `gen_ai.usage.*`
-- `openclaw.run`
-  - `openclaw.outcome`, `openclaw.channel`, `openclaw.provider`, `openclaw.model`, `openclaw.errorCategory`
-- `openclaw.model.call`
+- `steelengine.run`
+  - `steelengine.outcome`, `steelengine.channel`, `steelengine.provider`, `steelengine.model`, `steelengine.errorCategory`
+- `steelengine.model.call`
   - `gen_ai.system` by default, or `gen_ai.provider.name` when the latest GenAI semantic conventions are opted in
-  - `gen_ai.request.model`, `gen_ai.operation.name`, `openclaw.provider`, `openclaw.model`, `openclaw.api`, `openclaw.transport`, `openclaw.model_call.observation_unit` (`request` or `turn`)
-  - `openclaw.errorCategory`, `error.type`, and optional `openclaw.failureKind` on errors
-  - `openclaw.model_call.request_bytes`, `openclaw.model_call.response_bytes`, `openclaw.model_call.time_to_first_byte_ms`
-  - `openclaw.model_call.prompt.input_messages_count`, `openclaw.model_call.prompt.input_messages_chars`, `openclaw.model_call.prompt.system_prompt_chars`, `openclaw.model_call.prompt.tool_definitions_count`, `openclaw.model_call.prompt.tool_definitions_chars`, `openclaw.model_call.prompt.total_chars` (safe component sizes only, no prompt text)
-  - `openclaw.model_call.usage.*` and `gen_ai.usage.*` when the result carries usage for that request or aggregate turn
-  - Span event `openclaw.provider.request` with attribute `openclaw.upstreamRequestIdHash` (bounded, hash-based) when the upstream provider result exposes a request id; raw ids are never exported
-  - With `OTEL_SEMCONV_STABILITY_OPT_IN=gen_ai_latest_experimental`, request spans use the latest GenAI inference span name `{gen_ai.operation.name} {gen_ai.request.model}`. Turn spans use `invoke_agent` because OpenClaw does not claim a native agent name from the opaque CLI boundary. Both use `CLIENT` span kind instead of `openclaw.model.call`.
-- `openclaw.harness.run`
-  - `openclaw.harness.id`, `openclaw.harness.plugin`, `openclaw.outcome`, `openclaw.provider`, `openclaw.model`, `openclaw.channel`
-  - On completion: `openclaw.harness.result_classification`, `openclaw.harness.yield_detected`, `openclaw.harness.items.started`, `openclaw.harness.items.completed`, `openclaw.harness.items.active`
-  - On error: `openclaw.harness.phase`, `openclaw.errorCategory`, optional `openclaw.harness.cleanup_failed`
-- `openclaw.tool.execution`
-  - `gen_ai.tool.name`, `gen_ai.operation.name` (`execute_tool`), `openclaw.toolName`, `openclaw.tool.source`, optional `gen_ai.tool.call.id`, `openclaw.tool.owner`, `openclaw.tool.params.*`
-  - Optional `openclaw.errorCategory`/`openclaw.errorCode` on errors, `openclaw.deniedReason` and `openclaw.outcome=blocked` when denied by policy or sandbox
-- `openclaw.exec`
-  - `openclaw.exec.target`, `openclaw.exec.mode`, `openclaw.outcome`, `openclaw.failureKind`, `openclaw.exec.command_length`, `openclaw.exec.exit_code`, `openclaw.exec.exit_signal`, `openclaw.exec.timed_out`
-- `openclaw.webhook.processed`
-  - `openclaw.channel`, `openclaw.webhook`
-- `openclaw.webhook.error`
-  - `openclaw.channel`, `openclaw.webhook`, `openclaw.error`
-- `openclaw.message.processed`
-  - `openclaw.channel`, `openclaw.outcome`, `openclaw.reason`
-- `openclaw.message.delivery`
-  - `openclaw.channel`, `openclaw.delivery.kind`, `openclaw.outcome`, `openclaw.errorCategory`, `openclaw.delivery.result_count`
-- `openclaw.session.stuck`
-  - `openclaw.state`, `openclaw.ageMs`, `openclaw.queueDepth`
-- `openclaw.context.assembled`
-  - `openclaw.prompt.size`, `openclaw.history.size`, `openclaw.context.tokens`, `openclaw.errorCategory` (no prompt, history, response, or session-key content)
-- `openclaw.tool.loop`
-  - `openclaw.toolName`, `openclaw.loop.level`, `openclaw.loop.action`, `openclaw.loop.detector`, `openclaw.loop.count`, optional `openclaw.loop.paired_tool` (no loop messages, params, or tool output)
-- `openclaw.memory.pressure`
-  - `openclaw.memory.level`, `openclaw.memory.reason`, `openclaw.memory.rss_bytes`, `openclaw.memory.heap_used_bytes`, `openclaw.memory.heap_total_bytes`, `openclaw.memory.external_bytes`, `openclaw.memory.array_buffers_bytes`, optional `openclaw.memory.threshold_bytes`/`openclaw.memory.rss_growth_bytes`/`openclaw.memory.window_ms`
+  - `gen_ai.request.model`, `gen_ai.operation.name`, `steelengine.provider`, `steelengine.model`, `steelengine.api`, `steelengine.transport`, `steelengine.model_call.observation_unit` (`request` or `turn`)
+  - `steelengine.errorCategory`, `error.type`, and optional `steelengine.failureKind` on errors
+  - `steelengine.model_call.request_bytes`, `steelengine.model_call.response_bytes`, `steelengine.model_call.time_to_first_byte_ms`
+  - `steelengine.model_call.prompt.input_messages_count`, `steelengine.model_call.prompt.input_messages_chars`, `steelengine.model_call.prompt.system_prompt_chars`, `steelengine.model_call.prompt.tool_definitions_count`, `steelengine.model_call.prompt.tool_definitions_chars`, `steelengine.model_call.prompt.total_chars` (safe component sizes only, no prompt text)
+  - `steelengine.model_call.usage.*` and `gen_ai.usage.*` when the result carries usage for that request or aggregate turn
+  - Span event `steelengine.provider.request` with attribute `steelengine.upstreamRequestIdHash` (bounded, hash-based) when the upstream provider result exposes a request id; raw ids are never exported
+  - With `OTEL_SEMCONV_STABILITY_OPT_IN=gen_ai_latest_experimental`, request spans use the latest GenAI inference span name `{gen_ai.operation.name} {gen_ai.request.model}`. Turn spans use `invoke_agent` because SteelEngine does not claim a native agent name from the opaque CLI boundary. Both use `CLIENT` span kind instead of `steelengine.model.call`.
+- `steelengine.harness.run`
+  - `steelengine.harness.id`, `steelengine.harness.plugin`, `steelengine.outcome`, `steelengine.provider`, `steelengine.model`, `steelengine.channel`
+  - On completion: `steelengine.harness.result_classification`, `steelengine.harness.yield_detected`, `steelengine.harness.items.started`, `steelengine.harness.items.completed`, `steelengine.harness.items.active`
+  - On error: `steelengine.harness.phase`, `steelengine.errorCategory`, optional `steelengine.harness.cleanup_failed`
+- `steelengine.tool.execution`
+  - `gen_ai.tool.name`, `gen_ai.operation.name` (`execute_tool`), `steelengine.toolName`, `steelengine.tool.source`, optional `gen_ai.tool.call.id`, `steelengine.tool.owner`, `steelengine.tool.params.*`
+  - Optional `steelengine.errorCategory`/`steelengine.errorCode` on errors, `steelengine.deniedReason` and `steelengine.outcome=blocked` when denied by policy or sandbox
+- `steelengine.exec`
+  - `steelengine.exec.target`, `steelengine.exec.mode`, `steelengine.outcome`, `steelengine.failureKind`, `steelengine.exec.command_length`, `steelengine.exec.exit_code`, `steelengine.exec.exit_signal`, `steelengine.exec.timed_out`
+- `steelengine.webhook.processed`
+  - `steelengine.channel`, `steelengine.webhook`
+- `steelengine.webhook.error`
+  - `steelengine.channel`, `steelengine.webhook`, `steelengine.error`
+- `steelengine.message.processed`
+  - `steelengine.channel`, `steelengine.outcome`, `steelengine.reason`
+- `steelengine.message.delivery`
+  - `steelengine.channel`, `steelengine.delivery.kind`, `steelengine.outcome`, `steelengine.errorCategory`, `steelengine.delivery.result_count`
+- `steelengine.session.stuck`
+  - `steelengine.state`, `steelengine.ageMs`, `steelengine.queueDepth`
+- `steelengine.context.assembled`
+  - `steelengine.prompt.size`, `steelengine.history.size`, `steelengine.context.tokens`, `steelengine.errorCategory` (no prompt, history, response, or session-key content)
+- `steelengine.tool.loop`
+  - `steelengine.toolName`, `steelengine.loop.level`, `steelengine.loop.action`, `steelengine.loop.detector`, `steelengine.loop.count`, optional `steelengine.loop.paired_tool` (no loop messages, params, or tool output)
+- `steelengine.memory.pressure`
+  - `steelengine.memory.level`, `steelengine.memory.reason`, `steelengine.memory.rss_bytes`, `steelengine.memory.heap_used_bytes`, `steelengine.memory.heap_total_bytes`, `steelengine.memory.external_bytes`, `steelengine.memory.array_buffers_bytes`, optional `steelengine.memory.threshold_bytes`/`steelengine.memory.rss_growth_bytes`/`steelengine.memory.window_ms`
 
 When content capture is explicitly enabled, model and tool spans can also
-include bounded, redacted `openclaw.content.*` attributes for the specific
+include bounded, redacted `steelengine.content.*` attributes for the specific
 content classes you opted into.
 
 ## Diagnostic event catalog
@@ -542,7 +542,7 @@ flags. Flags are case-insensitive and support wildcards (`telegram.*` or
 Or as a one-off env override:
 
 ```bash
-OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload openclaw gateway
+STEELENGINE_DIAGNOSTICS=telegram.http,telegram.payload steelengine gateway
 ```
 
 Flag output goes to the standard log file (`logging.file`) and is still
@@ -558,7 +558,7 @@ redacted by `logging.redactSensitive`. Full guide:
 ```
 
 Or leave `diagnostics-otel` out of `plugins.allow`, or run
-`openclaw plugins disable diagnostics-otel`.
+`steelengine plugins disable diagnostics-otel`.
 
 ## Related
 

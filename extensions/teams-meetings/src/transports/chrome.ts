@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   callMeetingBrowserProxyOnNode,
   createLocalMeetingRealtimeAudioTransport,
@@ -16,11 +16,11 @@ import {
   type MeetingRealtimeAudioEngineHandle,
   type MeetingRealtimeToolCallParams,
   type MeetingRuntimePlatform,
-} from "openclaw/plugin-sdk/meeting-runtime";
-import { addTimerTimeoutGraceMs } from "openclaw/plugin-sdk/number-runtime";
-import type { PluginRuntime, RuntimeLogger } from "openclaw/plugin-sdk/plugin-runtime";
+} from "steelengine/plugin-sdk/meeting-runtime";
+import { addTimerTimeoutGraceMs } from "steelengine/plugin-sdk/number-runtime";
+import type { PluginRuntime, RuntimeLogger } from "steelengine/plugin-sdk/plugin-runtime";
 import {
-  consultOpenClawAgentForTeamsMeeting,
+  consultSteelEngineAgentForTeamsMeeting,
   handleTeamsMeetingsRealtimeConsultToolCall,
   resolveTeamsMeetingsRealtimeTools,
 } from "../agent-consult.js";
@@ -128,14 +128,14 @@ async function rollbackTeamsBrowserJoin(params: {
 
 function realtimeBindings(params: {
   config: TeamsMeetingsConfig;
-  fullConfig: OpenClawConfig;
+  fullConfig: SteelEngineConfig;
   runtime: PluginRuntime;
   logger: RuntimeLogger;
 }) {
   return {
     platform: TEAMS_MEETINGS_RUNTIME_PLATFORM,
     consultAgent: (consult: MeetingAgentConsultParams) =>
-      consultOpenClawAgentForTeamsMeeting({
+      consultSteelEngineAgentForTeamsMeeting({
         config: params.config,
         fullConfig: params.fullConfig,
         runtime: params.runtime,
@@ -183,7 +183,7 @@ export async function assertBlackHole2chAvailable(params: {
 async function startLocalAudioBridge(params: {
   runtime: PluginRuntime;
   config: TeamsMeetingsConfig;
-  fullConfig: OpenClawConfig;
+  fullConfig: SteelEngineConfig;
   meetingSessionId: string;
   requesterSessionKey?: string;
   mode: TeamsMeetingsMode;
@@ -240,7 +240,7 @@ async function startLocalAudioBridge(params: {
 export async function launchTeamsMeetingInChrome(params: {
   runtime: PluginRuntime;
   config: TeamsMeetingsConfig;
-  fullConfig: OpenClawConfig;
+  fullConfig: SteelEngineConfig;
   meetingSessionId: string;
   requesterSessionKey?: string;
   mode: TeamsMeetingsMode;
@@ -331,7 +331,7 @@ function parseNodeStartResult(raw: unknown): TeamsMeetingsNodeStartResult {
 export async function launchTeamsMeetingOnNode(params: {
   runtime: PluginRuntime;
   config: TeamsMeetingsConfig;
-  fullConfig: OpenClawConfig;
+  fullConfig: SteelEngineConfig;
   meetingSessionId: string;
   requesterSessionKey?: string;
   mode: TeamsMeetingsMode;

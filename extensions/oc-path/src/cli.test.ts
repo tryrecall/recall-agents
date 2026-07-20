@@ -1,5 +1,5 @@
 /**
- * Smoke tests for the `openclaw path` CLI handlers.
+ * Smoke tests for the `steelengine path` CLI handlers.
  *
  * Tests invoke each subcommand through the retained Commander registration.
  * Assertions inspect captured process output and the resulting exit code.
@@ -98,7 +98,7 @@ async function invokePathCli(args: string[], runtime: TestRuntime): Promise<void
   });
   registerPathCli(program);
   try {
-    await program.parseAsync(["node", "openclaw", "path", ...args]);
+    await program.parseAsync(["node", "steelengine", "path", ...args]);
     runtime.exitCode = process.exitCode ?? 0;
   } catch (error) {
     if (!(error instanceof CommanderError)) {
@@ -173,7 +173,7 @@ async function pathEmitCommand(
   );
 }
 
-describe("openclaw path CLI", () => {
+describe("steelengine path CLI", () => {
   let workspaceDir: string;
 
   beforeEach(() => {
@@ -389,7 +389,7 @@ describe("openclaw path CLI", () => {
     });
 
     it("CLI-S08 sets slash-deep JSONC paths and parsed JSON values", async () => {
-      const filePath = join(workspaceDir, "openclaw.json");
+      const filePath = join(workspaceDir, "steelengine.json");
       writeFileSync(
         filePath,
         '{ "agents": { "list": [{ "tools": { "exec": { "security": "deny" } } }] }, "gateway": { "auth": { "token": "${TOKEN}" } } }\n',
@@ -398,7 +398,7 @@ describe("openclaw path CLI", () => {
       const rt = createTestRuntime();
 
       await pathSetCommand(
-        "oc://openclaw.json/gateway/auth/token",
+        "oc://steelengine.json/gateway/auth/token",
         '{"source":"file","provider":"secrets","id":"/test"}',
         { cwd: workspaceDir, json: true, valueJson: true },
         rt,
@@ -413,7 +413,7 @@ describe("openclaw path CLI", () => {
 
       const rt2 = createTestRuntime();
       await pathSetCommand(
-        "oc://openclaw.json/agents/list/0/tools/exec/security",
+        "oc://steelengine.json/agents/list/0/tools/exec/security",
         "allowlist",
         { cwd: workspaceDir, json: true },
         rt2,
@@ -438,7 +438,7 @@ describe("openclaw path CLI", () => {
       // exit code 1, stable code OC_EMIT_SENTINEL, message scrubbed.
       await pathSetCommand(
         "oc://gateway.jsonc/token",
-        "__OPENCLAW_REDACTED__",
+        "__STEELENGINE_REDACTED__",
         { cwd: workspaceDir, json: true },
         rt,
       );

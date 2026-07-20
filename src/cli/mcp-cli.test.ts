@@ -22,7 +22,7 @@ const mocks = vi.hoisted(() => {
   };
   return {
     runtime,
-    serveOpenClawChannelMcp: vi.fn(),
+    serveSteelEngineChannelMcp: vi.fn(),
     clearMcpOAuthCredentials: vi.fn(),
     readMcpOAuthCredentialsStatus: vi.fn(),
     runMcpOAuthLogin: vi.fn(),
@@ -32,7 +32,7 @@ const mocks = vi.hoisted(() => {
 const defaultRuntime = mocks.runtime;
 const mockLog = defaultRuntime.log;
 const mockError = defaultRuntime.error;
-const serveOpenClawChannelMcp = mocks.serveOpenClawChannelMcp;
+const serveSteelEngineChannelMcp = mocks.serveSteelEngineChannelMcp;
 const clearMcpOAuthCredentials = mocks.clearMcpOAuthCredentials;
 const readMcpOAuthCredentialsStatus = mocks.readMcpOAuthCredentialsStatus;
 const runMcpOAuthLogin = mocks.runMcpOAuthLogin;
@@ -42,7 +42,7 @@ vi.mock("../runtime.js", () => ({
 }));
 
 vi.mock("../mcp/channel-server.js", () => ({
-  serveOpenClawChannelMcp: mocks.serveOpenClawChannelMcp,
+  serveSteelEngineChannelMcp: mocks.serveSteelEngineChannelMcp,
 }));
 
 vi.mock("../agents/mcp-oauth.js", () => ({
@@ -54,7 +54,7 @@ vi.mock("../agents/mcp-oauth.js", () => ({
 const tempDirs: string[] = [];
 
 async function createWorkspace(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-cli-mcp-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-cli-mcp-"));
   tempDirs.push(dir);
   return dir;
 }
@@ -105,9 +105,9 @@ describe("mcp cli", () => {
   });
 
   it("sets and shows a configured MCP server", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async (home) => {
+    await withTempHome("steelengine-cli-mcp-home-", async (home) => {
       const workspaceDir = await createWorkspace();
-      const configPath = path.join(home, ".openclaw", "openclaw.json");
+      const configPath = path.join(home, ".steelengine", "steelengine.json");
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
       await runMcpCommand(["mcp", "set", "context7", '{"command":"uvx","args":["context7-mcp"]}']);
@@ -120,7 +120,7 @@ describe("mcp cli", () => {
   });
 
   it("adds a configured MCP server from flags without replacing operator knobs", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -165,9 +165,9 @@ describe("mcp cli", () => {
   });
 
   it("rejects hexadecimal MCP timeout options before writing configuration", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async (home) => {
+    await withTempHome("steelengine-cli-mcp-home-", async (home) => {
       const workspaceDir = await createWorkspace();
-      const configPath = path.join(home, ".openclaw", "openclaw.json");
+      const configPath = path.join(home, ".steelengine", "steelengine.json");
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
       await expect(
@@ -202,8 +202,8 @@ describe("mcp cli", () => {
     });
   });
 
-  it("labels listed MCP servers as OpenClaw-managed", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+  it("labels listed MCP servers as SteelEngine-managed", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -213,17 +213,17 @@ describe("mcp cli", () => {
       await runMcpCommand(["mcp", "list"]);
 
       const output = mockLog.mock.calls.map((call) => String(call[0])).join("\n");
-      expect(output).toContain("OpenClaw-managed MCP servers (");
+      expect(output).toContain("SteelEngine-managed MCP servers (");
       expect(output).toContain("- context7");
-      expect(output).toContain("OpenClaw-managed mcp.servers entries");
+      expect(output).toContain("SteelEngine-managed mcp.servers entries");
       expect(output).toContain("does not include mcporter servers from config/mcporter.json");
     });
   });
 
   it("updates per-server MCP tool filters", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async (home) => {
+    await withTempHome("steelengine-cli-mcp-home-", async (home) => {
       const workspaceDir = await createWorkspace();
-      const configPath = path.join(home, ".openclaw", "openclaw.json");
+      const configPath = path.join(home, ".steelengine", "steelengine.json");
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
       await runMcpCommand(["mcp", "set", "docs", '{"command":"node","args":["server.mjs"]}']);
@@ -249,7 +249,7 @@ describe("mcp cli", () => {
   });
 
   it("requires an explicit MCP tool filter operation", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -261,7 +261,7 @@ describe("mcp cli", () => {
   });
 
   it("clears per-server MCP tool filters only when requested", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -276,7 +276,7 @@ describe("mcp cli", () => {
   });
 
   it("shows MCP transport status without connecting", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -307,7 +307,7 @@ describe("mcp cli", () => {
   });
 
   it("includes OAuth credential status in MCP status output", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
       readMcpOAuthCredentialsStatus.mockResolvedValueOnce({
@@ -345,7 +345,7 @@ describe("mcp cli", () => {
   });
 
   it("surfaces required OAuth authorization in status and doctor", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
       readMcpOAuthCredentialsStatus.mockResolvedValue({
@@ -384,7 +384,7 @@ describe("mcp cli", () => {
               {
                 level: "warning",
                 message:
-                  "OAuth credentials require additional authorization; run openclaw mcp login docs",
+                  "OAuth credentials require additional authorization; run steelengine mcp login docs",
               },
             ],
           },
@@ -394,7 +394,7 @@ describe("mcp cli", () => {
   });
 
   it("configures enablement, timeouts, and OAuth login", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
       const buildMcpHttpFetch = vi.spyOn(mcpHttpFetch, "buildMcpHttpFetch");
@@ -446,7 +446,7 @@ describe("mcp cli", () => {
   });
 
   it("clears stored OAuth credentials on logout", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -468,7 +468,7 @@ describe("mcp cli", () => {
   });
 
   it("clears stored OAuth credentials after auth is removed", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -489,7 +489,7 @@ describe("mcp cli", () => {
   });
 
   it("reports MCP doctor setup errors and sensitive literals", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -529,7 +529,7 @@ describe("mcp cli", () => {
   });
 
   it("bounds concurrent MCP doctor server checks", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
       for (let index = 0; index < 6; index += 1) {
@@ -577,7 +577,7 @@ describe("mcp cli", () => {
   });
 
   it("surfaces unexpected MCP doctor check errors", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
       await runMcpCommand([
@@ -595,7 +595,7 @@ describe("mcp cli", () => {
   });
 
   it("does not fail MCP doctor for disabled-only overrides", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -637,7 +637,7 @@ describe("mcp cli", () => {
   });
 
   it("uses configured PATH when checking MCP stdio commands", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       const binDir = path.join(workspaceDir, "bin");
       const commandPath = path.join(binDir, "docs-mcp");
@@ -664,7 +664,7 @@ describe("mcp cli", () => {
   });
 
   it("resolves relative configured PATH entries from the MCP stdio cwd", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       const appDir = path.join(workspaceDir, "app");
       const binDir = path.join(appDir, "node_modules", ".bin");
@@ -696,7 +696,7 @@ describe("mcp cli", () => {
   });
 
   it("clears stored OAuth credentials when auth is cleared", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -720,7 +720,7 @@ describe("mcp cli", () => {
   });
 
   it("clears stored OAuth credentials when an MCP server is removed", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -740,7 +740,7 @@ describe("mcp cli", () => {
   });
 
   it("clears stored OAuth credentials when set replaces an OAuth server", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -761,7 +761,7 @@ describe("mcp cli", () => {
   });
 
   it("clears stored OAuth credentials when add changes an OAuth server URL", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -793,7 +793,7 @@ describe("mcp cli", () => {
   });
 
   it("clears timeout and parallel aliases when reconfiguring MCP servers", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -814,7 +814,7 @@ describe("mcp cli", () => {
   });
 
   it("removes pure disabled tombstones when enabling MCP servers", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -824,41 +824,41 @@ describe("mcp cli", () => {
       mockLog.mockClear();
       await runMcpCommand(["mcp", "list"]);
       const output = mockLog.mock.calls.map((call) => String(call[0])).join("\n");
-      expect(output).toContain("No OpenClaw-managed MCP servers configured in ");
+      expect(output).toContain("No SteelEngine-managed MCP servers configured in ");
       expect(output).toContain("does not include mcporter servers from config/mcporter.json");
     });
   });
 
   it("fails named probes for disabled MCP servers", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async (home) => {
+    await withTempHome("steelengine-cli-mcp-home-", async (home) => {
       const workspaceDir = await createWorkspace();
-      const configPath = path.join(home, ".openclaw", "openclaw.json");
+      const configPath = path.join(home, ".steelengine", "steelengine.json");
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
       await runMcpCommand(["mcp", "set", "docs", '{"enabled":false}']);
 
       await expect(runMcpCommand(["mcp", "probe", "docs"])).rejects.toThrow("__exit__:1");
       expect(lastErrorLine()).toBe(
-        `MCP server "docs" is disabled in ${configPath}. Run openclaw mcp configure docs --enable before probing it.`,
+        `MCP server "docs" is disabled in ${configPath}. Run steelengine mcp configure docs --enable before probing it.`,
       );
     });
   });
 
   it("fails when removing an unknown MCP server", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async (home) => {
+    await withTempHome("steelengine-cli-mcp-home-", async (home) => {
       const workspaceDir = await createWorkspace();
-      const configPath = path.join(home, ".openclaw", "openclaw.json");
+      const configPath = path.join(home, ".steelengine", "steelengine.json");
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
       await expect(runMcpCommand(["mcp", "unset", "missing"])).rejects.toThrow("__exit__:1");
       expect(lastErrorLine()).toBe(
-        `No MCP server named "missing" in ${configPath}. Run openclaw mcp list to see configured servers.`,
+        `No MCP server named "missing" in ${configPath}. Run steelengine mcp list to see configured servers.`,
       );
     });
   });
 
   it("starts the channel bridge with parsed serve options", async () => {
-    await withTempHome("openclaw-cli-mcp-home-", async () => {
+    await withTempHome("steelengine-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       const tokenFile = path.join(workspaceDir, "gateway.token");
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
@@ -876,7 +876,7 @@ describe("mcp cli", () => {
         "--verbose",
       ]);
 
-      expect(serveOpenClawChannelMcp).toHaveBeenCalledWith({
+      expect(serveSteelEngineChannelMcp).toHaveBeenCalledWith({
         gatewayUrl: "ws://127.0.0.1:18789",
         gatewayToken: "secret-token",
         gatewayPassword: undefined,

@@ -9,8 +9,8 @@ import type {
 } from "../app/exec-approval.ts";
 import "./modal-dialog.ts";
 import { t } from "../i18n/index.ts";
-import { OpenClawLightDomContentsElement } from "../lit/openclaw-element.ts";
-import type { OpenClawModalDialog } from "./modal-dialog.ts";
+import { SteelEngineLightDomContentsElement } from "../lit/steelengine-element.ts";
+import type { SteelEngineModalDialog } from "./modal-dialog.ts";
 
 const DEFAULT_EXEC_APPROVAL_DECISIONS = [
   "allow-once",
@@ -191,7 +191,7 @@ function renderExecApprovalPrompt(props: ExecApprovalProps) {
     }
   };
   return html`
-    <openclaw-modal-dialog label=${title} description=${remaining} @modal-cancel=${handleCancel}>
+    <steelengine-modal-dialog label=${title} description=${remaining} @modal-cancel=${handleCancel}>
       <div class="exec-approval-card">
         <div class="exec-approval-header">
           <div>
@@ -221,13 +221,13 @@ function renderExecApprovalPrompt(props: ExecApprovalProps) {
           )}
         </div>
       </div>
-    </openclaw-modal-dialog>
+    </steelengine-modal-dialog>
   `;
 }
 
-class ExecApproval extends OpenClawLightDomContentsElement {
+class ExecApproval extends SteelEngineLightDomContentsElement {
   @property({ attribute: false }) props?: ExecApprovalProps;
-  @query("openclaw-modal-dialog") private dialog?: OpenClawModalDialog;
+  @query("steelengine-modal-dialog") private dialog?: SteelEngineModalDialog;
 
   show(): void {
     void this.updateComplete.then(() => this.dialog?.show());
@@ -238,6 +238,6 @@ class ExecApproval extends OpenClawLightDomContentsElement {
   }
 }
 
-if (!customElements.get("openclaw-exec-approval")) {
-  customElements.define("openclaw-exec-approval", ExecApproval);
+if (!customElements.get("steelengine-exec-approval")) {
+  customElements.define("steelengine-exec-approval", ExecApproval);
 }

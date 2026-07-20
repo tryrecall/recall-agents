@@ -1,8 +1,8 @@
 // Mattermost plugin module implements doctor contract behavior.
-import type { ChannelDoctorConfigMutation } from "openclaw/plugin-sdk/channel-contract";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { defineChannelAliasMigration } from "openclaw/plugin-sdk/runtime-doctor";
-import { createLegacyPrivateNetworkDoctorContract } from "openclaw/plugin-sdk/ssrf-runtime";
+import type { ChannelDoctorConfigMutation } from "steelengine/plugin-sdk/channel-contract";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { defineChannelAliasMigration } from "steelengine/plugin-sdk/runtime-doctor";
+import { createLegacyPrivateNetworkDoctorContract } from "steelengine/plugin-sdk/ssrf-runtime";
 
 const networkContract = createLegacyPrivateNetworkDoctorContract({
   channelKey: "mattermost",
@@ -28,7 +28,7 @@ export const legacyConfigRules = [
 export function normalizeCompatibilityConfig({
   cfg,
 }: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
 }): ChannelDoctorConfigMutation {
   const network = networkContract.normalizeCompatibilityConfig({ cfg });
   return streamingAliasMigration.normalizeChannelConfig({

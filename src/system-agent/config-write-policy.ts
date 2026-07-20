@@ -14,12 +14,12 @@
  * config-write-parity contract test enforces that classification.
  */
 export const SYSTEM_AGENT_CONFIG_WRITE_DENYLIST: Readonly<Record<string, string>> = {
-  $include: "alternate-config inclusion; edit openclaw.json in a trusted shell",
-  auth: "provider auth; exit OpenClaw and run `openclaw onboard`",
-  env: "environment/credential injection; edit openclaw.json in a trusted shell",
+  $include: "alternate-config inclusion; edit steelengine.json in a trusted shell",
+  auth: "provider auth; exit SteelEngine and run `steelengine onboard`",
+  env: "environment/credential injection; edit steelengine.json in a trusted shell",
   models:
-    "provider/catalog definitions feed routing; use `set_default_model` or `openclaw onboard`",
-  secrets: "secret providers; edit openclaw.json in a trusted shell",
+    "provider/catalog definitions feed routing; use `set_default_model` or `steelengine onboard`",
+  secrets: "secret providers; edit steelengine.json in a trusted shell",
 };
 
 export type InferenceRoutePathVerdict = "allowed" | "blocked" | "agent-route" | "plugin-entry";

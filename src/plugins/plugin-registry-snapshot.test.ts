@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   clearCurrentPluginMetadataSnapshot,
   setCurrentPluginMetadataSnapshot,
@@ -32,14 +32,14 @@ afterEach(() => {
 });
 
 function makeTempDir() {
-  return makeTrackedTempDir("openclaw-plugin-registry-snapshot", tempDirs);
+  return makeTrackedTempDir("steelengine-plugin-registry-snapshot", tempDirs);
 }
 
 function createHermeticEnv(rootDir: string): NodeJS.ProcessEnv {
   return {
-    OPENCLAW_BUNDLED_PLUGINS_DIR: path.join(rootDir, "bundled"),
-    OPENCLAW_STATE_DIR: path.join(rootDir, "state"),
-    OPENCLAW_VERSION: "2026.4.26",
+    STEELENGINE_BUNDLED_PLUGINS_DIR: path.join(rootDir, "bundled"),
+    STEELENGINE_STATE_DIR: path.join(rootDir, "state"),
+    STEELENGINE_VERSION: "2026.4.26",
     VITEST: "true",
   };
 }
@@ -61,7 +61,7 @@ function writePackagePlugin(
   fs.mkdirSync(rootDir, { recursive: true });
   fs.writeFileSync(path.join(rootDir, "index.ts"), "export default { register() {} };\n", "utf8");
   fs.writeFileSync(
-    path.join(rootDir, "openclaw.plugin.json"),
+    path.join(rootDir, "steelengine.plugin.json"),
     JSON.stringify({
       id: pluginId,
       name: pluginId,
@@ -83,7 +83,7 @@ function writeBundledPlugin(rootDir: string, pluginId: string, entryPath: string
   fs.mkdirSync(rootDir, { recursive: true });
   fs.writeFileSync(path.join(rootDir, entryPath), "export default { register() {} };\n", "utf8");
   fs.writeFileSync(
-    path.join(rootDir, "openclaw.plugin.json"),
+    path.join(rootDir, "steelengine.plugin.json"),
     JSON.stringify({
       id: pluginId,
       name: pluginId,
@@ -95,9 +95,9 @@ function writeBundledPlugin(rootDir: string, pluginId: string, entryPath: string
   fs.writeFileSync(
     path.join(rootDir, "package.json"),
     JSON.stringify({
-      name: `@openclaw/${pluginId}`,
+      name: `@steelengine/${pluginId}`,
       version: "1.0.0",
-      openclaw: { extensions: [`./${entryPath}`] },
+      steelengine: { extensions: [`./${entryPath}`] },
     }),
     "utf8",
   );
@@ -121,7 +121,7 @@ function createCandidate(rootDir: string, pluginId = "demo"): PluginCandidate {
   fs.mkdirSync(rootDir, { recursive: true });
   fs.writeFileSync(path.join(rootDir, "index.ts"), "export default { register() {} };\n", "utf8");
   fs.writeFileSync(
-    path.join(rootDir, "openclaw.plugin.json"),
+    path.join(rootDir, "steelengine.plugin.json"),
     JSON.stringify({
       id: pluginId,
       name: pluginId,
@@ -278,7 +278,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
   it("does not treat diagnostic current metadata as provided registry input", () => {
     const env = {
       ...createHermeticEnv(makeTempDir()),
-      OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1",
+      STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1",
     };
     const config = {};
     const workspaceDir = path.join(makeTempDir(), "workspace");
@@ -343,7 +343,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const tempRoot = makeTempDir();
     const env = {
       ...createHermeticEnv(tempRoot),
-      OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1",
+      STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1",
     };
     const config = {};
     const workspaceDir = path.join(tempRoot, "workspace");
@@ -409,13 +409,13 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const stateDir = path.join(tempRoot, "state");
     const env = {
       ...createHermeticEnv(tempRoot),
-      OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1",
-      OPENCLAW_STATE_DIR: stateDir,
+      STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1",
+      STEELENGINE_STATE_DIR: stateDir,
     };
     const config = {};
     const whatsappDir = writeManagedNpmPlugin({
       stateDir,
-      packageName: "@openclaw/whatsapp",
+      packageName: "@steelengine/whatsapp",
       pluginId: "whatsapp",
       version: "2026.5.2",
     });
@@ -438,12 +438,12 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     expectDiagnosticsContainCode(result.diagnostics, "persisted-registry-stale-source");
     expect(result.snapshot.installRecords.whatsapp).toEqual({
       source: "npm",
-      spec: "@openclaw/whatsapp@2026.5.2",
+      spec: "@steelengine/whatsapp@2026.5.2",
       installPath: whatsappDir,
       version: "2026.5.2",
-      resolvedName: "@openclaw/whatsapp",
+      resolvedName: "@steelengine/whatsapp",
       resolvedVersion: "2026.5.2",
-      resolvedSpec: "@openclaw/whatsapp@2026.5.2",
+      resolvedSpec: "@steelengine/whatsapp@2026.5.2",
     });
     const whatsappPlugin = requirePluginRecord(result.snapshot.plugins, "whatsapp");
     expect(whatsappPlugin.origin).toBe("global");
@@ -454,13 +454,13 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const stateDir = path.join(tempRoot, "state");
     const env = {
       ...createHermeticEnv(tempRoot),
-      OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1",
-      OPENCLAW_STATE_DIR: stateDir,
+      STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1",
+      STEELENGINE_STATE_DIR: stateDir,
     };
     const config = {};
     const codexDir = writeManagedNpmPlugin({
       stateDir,
-      packageName: "@openclaw/codex",
+      packageName: "@steelengine/codex",
       pluginId: "codex",
       version: "2026.6.10-beta.1",
     });
@@ -494,17 +494,17 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const stateDir = path.join(tempRoot, "state");
     const env = {
       ...createHermeticEnv(tempRoot),
-      OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1",
-      OPENCLAW_STATE_DIR: stateDir,
+      STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1",
+      STEELENGINE_STATE_DIR: stateDir,
     };
     const codexDir = writeManagedNpmPlugin({
       stateDir,
-      packageName: "@openclaw/codex",
+      packageName: "@steelengine/codex",
       pluginId: "codex",
       version: "2026.6.10-beta.1",
     });
     fs.writeFileSync(
-      path.join(codexDir, ".openclaw-retained-npm-install.json"),
+      path.join(codexDir, ".steelengine-retained-npm-install.json"),
       '{"version":1,"pluginId":"codex"}\n',
       "utf8",
     );
@@ -518,8 +518,8 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const goneDir = path.join(tempRoot, "gone");
     const env = {
       ...createHermeticEnv(tempRoot),
-      OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1",
-      OPENCLAW_STATE_DIR: stateDir,
+      STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1",
+      STEELENGINE_STATE_DIR: stateDir,
     };
     writePersistedInstalledPluginIndexSync(
       {
@@ -539,7 +539,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const tempRoot = makeTempDir();
     const rootDir = path.join(tempRoot, "workspace");
     const stateDir = path.join(tempRoot, "state");
-    const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+    const env = { ...createHermeticEnv(tempRoot), STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1" };
     const config = {
       plugins: {
         load: { paths: [rootDir] },
@@ -562,12 +562,12 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
   it("refreshes a memoized derived snapshot when workspace plugins are installed", () => {
     const tempRoot = makeTempDir();
     const workspaceDir = path.join(tempRoot, "workspace");
-    const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+    const env = { ...createHermeticEnv(tempRoot), STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1" };
 
     const first = loadPluginRegistrySnapshotWithMetadata({ config: {}, env, workspaceDir });
     expect(first.snapshot.plugins.map((plugin) => plugin.pluginId)).not.toContain("demo");
 
-    writePackagePlugin(path.join(workspaceDir, ".openclaw", "extensions", "demo"));
+    writePackagePlugin(path.join(workspaceDir, ".steelengine", "extensions", "demo"));
 
     const second = loadPluginRegistrySnapshotWithMetadata({ config: {}, env, workspaceDir });
     expect(second.snapshot.plugins.map((plugin) => plugin.pluginId)).toContain("demo");
@@ -575,12 +575,12 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
 
   it("ignores malformed load paths while fingerprinting memoized snapshots", () => {
     const tempRoot = makeTempDir();
-    const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+    const env = { ...createHermeticEnv(tempRoot), STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1" };
     const config = {
       plugins: {
         load: { paths: "not-an-array" },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
 
     expect(() => loadPluginRegistrySnapshotWithMetadata({ config, env })).not.toThrow();
   });
@@ -589,7 +589,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const tempRoot = makeTempDir();
     const rootDir = path.join(tempRoot, "workspace");
     const stateDir = path.join(tempRoot, "state");
-    const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+    const env = { ...createHermeticEnv(tempRoot), STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1" };
     const config = {
       plugins: {
         load: { paths: [rootDir] },
@@ -602,7 +602,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
       throw new Error("expected package plugin index record with file signatures");
     }
     expect(record.manifestFile.size).toBe(
-      fs.statSync(path.join(rootDir, "openclaw.plugin.json")).size,
+      fs.statSync(path.join(rootDir, "steelengine.plugin.json")).size,
     );
     expect(record.packageJson.fileSignature.size).toBe(
       fs.statSync(path.join(rootDir, "package.json")).size,
@@ -624,7 +624,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const firstRoot = path.join(tempRoot, "first");
     const secondRoot = path.join(tempRoot, "second");
     const stateDir = path.join(tempRoot, "state");
-    const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+    const env = { ...createHermeticEnv(tempRoot), STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1" };
     const staleConfig = {
       plugins: {
         load: { paths: [firstRoot] },
@@ -675,7 +675,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const firstRoot = path.join(tempRoot, "first");
     const secondRoot = path.join(tempRoot, "second");
     const stateDir = path.join(tempRoot, "state");
-    const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+    const env = { ...createHermeticEnv(tempRoot), STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1" };
     const originalConfig = {
       plugins: {
         load: { paths: [firstRoot, secondRoot] },
@@ -713,7 +713,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const tempRoot = makeTempDir();
     const rootDir = path.join(tempRoot, "workspace");
     const stateDir = path.join(tempRoot, "state");
-    const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+    const env = { ...createHermeticEnv(tempRoot), STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1" };
     const config = {
       plugins: {
         load: { paths: [rootDir] },
@@ -742,7 +742,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const tempRoot = makeTempDir();
     const rootDir = path.join(tempRoot, "workspace");
     const stateDir = path.join(tempRoot, "state");
-    const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+    const env = { ...createHermeticEnv(tempRoot), STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1" };
     const config = {
       plugins: {
         load: { paths: [rootDir] },
@@ -795,7 +795,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
       const outsideDir = path.join(tempRoot, "outside");
       const packageJsonPath = path.join(rootDir, "package.json");
       const outsidePackageJsonPath = path.join(outsideDir, "package.json");
-      const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+      const env = { ...createHermeticEnv(tempRoot), STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1" };
       const config = {
         plugins: {
           load: { paths: [rootDir] },
@@ -848,7 +848,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const tempRoot = makeTempDir();
     const rootDir = path.join(tempRoot, "workspace");
     const stateDir = path.join(tempRoot, "state");
-    const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+    const env = { ...createHermeticEnv(tempRoot), STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1" };
     const config = {
       plugins: {
         load: { paths: [rootDir] },
@@ -859,7 +859,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     writePersistedInstalledPluginIndexSync(index, { stateDir });
 
     replaceFilePreservingSizeAndMtime(
-      path.join(rootDir, "openclaw.plugin.json"),
+      path.join(rootDir, "steelengine.plugin.json"),
       JSON.stringify({
         id: "demo",
         name: "Demo",
@@ -882,7 +882,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const tempRoot = makeTempDir();
     const rootDir = path.join(tempRoot, "workspace");
     const stateDir = path.join(tempRoot, "state");
-    const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+    const env = { ...createHermeticEnv(tempRoot), STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1" };
     const config = {
       plugins: {
         load: { paths: [rootDir] },
@@ -911,7 +911,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const tempRoot = makeTempDir();
     const rootDir = path.join(tempRoot, "workspace");
     const stateDir = path.join(tempRoot, "state");
-    const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+    const env = { ...createHermeticEnv(tempRoot), STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1" };
     const config = {
       plugins: {
         load: { paths: [rootDir] },
@@ -958,14 +958,14 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
 
   it("keeps mixed source-checkout bundled roots from the same checkout", () => {
     const tempRoot = makeTempDir();
-    const packageRoot = path.join(tempRoot, "openclaw");
+    const packageRoot = path.join(tempRoot, "steelengine");
     const bundledRoot = path.join(packageRoot, "dist", "extensions");
     const sourceRoot = path.join(packageRoot, "extensions");
     const stateDir = path.join(tempRoot, "state");
     const env = {
-      OPENCLAW_BUNDLED_PLUGINS_DIR: bundledRoot,
-      OPENCLAW_STATE_DIR: stateDir,
-      OPENCLAW_VERSION: "2026.4.26",
+      STEELENGINE_BUNDLED_PLUGINS_DIR: bundledRoot,
+      STEELENGINE_STATE_DIR: stateDir,
+      STEELENGINE_VERSION: "2026.4.26",
       VITEST: "true",
     };
 
@@ -992,14 +992,14 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
 
   it("treats a persisted source bundled root as stale once its built peer appears", () => {
     const tempRoot = makeTempDir();
-    const packageRoot = path.join(tempRoot, "openclaw");
+    const packageRoot = path.join(tempRoot, "steelengine");
     const bundledRoot = path.join(packageRoot, "dist", "extensions");
     const sourceRoot = path.join(packageRoot, "extensions");
     const stateDir = path.join(tempRoot, "state");
     const env = {
-      OPENCLAW_BUNDLED_PLUGINS_DIR: bundledRoot,
-      OPENCLAW_STATE_DIR: stateDir,
-      OPENCLAW_VERSION: "2026.4.26",
+      STEELENGINE_BUNDLED_PLUGINS_DIR: bundledRoot,
+      STEELENGINE_STATE_DIR: stateDir,
+      STEELENGINE_VERSION: "2026.4.26",
       VITEST: "true",
     };
 
@@ -1027,14 +1027,14 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
 
   it("keeps a persisted bind-mounted source overlay when its built peer exists", () => {
     const tempRoot = makeTempDir();
-    const packageRoot = path.join(tempRoot, "openclaw");
+    const packageRoot = path.join(tempRoot, "steelengine");
     const bundledRoot = path.join(packageRoot, "dist", "extensions");
     const sourcePluginDir = path.join(packageRoot, "extensions", "whatsapp");
     const stateDir = path.join(tempRoot, "state");
     const env = {
-      OPENCLAW_BUNDLED_PLUGINS_DIR: bundledRoot,
-      OPENCLAW_STATE_DIR: stateDir,
-      OPENCLAW_VERSION: "2026.4.26",
+      STEELENGINE_BUNDLED_PLUGINS_DIR: bundledRoot,
+      STEELENGINE_STATE_DIR: stateDir,
+      STEELENGINE_VERSION: "2026.4.26",
       VITEST: "true",
     };
 
@@ -1063,8 +1063,8 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
     const stateDir = path.join(tempRoot, "state");
     const env = {
       ...createHermeticEnv(tempRoot),
-      OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1",
-      OPENCLAW_STATE_DIR: stateDir,
+      STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1",
+      STEELENGINE_STATE_DIR: stateDir,
     };
     const config = {};
     const ghostDir = path.join(tempRoot, "extensions", "lossless-claw");
@@ -1103,7 +1103,7 @@ describe("loadPluginRegistrySnapshotWithMetadata", () => {
   it("keeps persisted registry when a non-plugin diagnostic source path still does not exist", () => {
     const tempRoot = makeTempDir();
     const stateDir = path.join(tempRoot, "state");
-    const env = { ...createHermeticEnv(tempRoot), OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1" };
+    const env = { ...createHermeticEnv(tempRoot), STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1" };
     const config = {};
     const missingConfiguredPath = path.join(tempRoot, "missing-configured-plugin");
     const index: InstalledPluginIndex = {

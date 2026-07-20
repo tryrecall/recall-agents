@@ -176,7 +176,7 @@ describe("provider auth aliases", () => {
     const config = {};
     const env = {
       HOME: "/home/one",
-      OPENCLAW_HOME: undefined,
+      STEELENGINE_HOME: undefined,
     } as NodeJS.ProcessEnv;
     setCurrentPluginMetadataSnapshot(
       createPluginMetadataSnapshot({

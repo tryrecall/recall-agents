@@ -1,5 +1,5 @@
-// Web Readability plugin entrypoint registers its OpenClaw integration.
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+// Web Readability plugin entrypoint registers its SteelEngine integration.
+import { definePluginEntry } from "steelengine/plugin-sdk/plugin-entry";
 
 export default definePluginEntry({
   id: "web-readability",

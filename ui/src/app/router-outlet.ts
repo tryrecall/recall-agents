@@ -4,7 +4,7 @@ import type { ReactiveController, ReactiveControllerHost } from "lit";
 import { property } from "lit/decorators.js";
 import { icon } from "../components/icons.ts";
 import { t } from "../i18n/index.ts";
-import { OpenClawLightDomElement } from "../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../lit/steelengine-element.ts";
 import {
   RouterOutletController,
   selectRenderedRouteMatch,
@@ -40,7 +40,7 @@ function measureRoutedRender<T>(routeId: string, render: () => T): T {
   const result = render();
   const durationMs = Math.round((globalThis.performance?.now() ?? startedAt) - startedAt);
   if (durationMs >= 16) {
-    console.debug("[openclaw] routed render", { routeId, durationMs });
+    console.debug("[steelengine] routed render", { routeId, durationMs });
   }
   return result;
 }
@@ -209,12 +209,12 @@ class LitRouterOutletController<
   }
 }
 
-class OpenClawRouterOutlet<
+class SteelEngineRouterOutlet<
   TRouteId extends string = string,
   TLoadContext = unknown,
   TModule = unknown,
   TData = unknown,
-> extends OpenClawLightDomElement {
+> extends SteelEngineLightDomElement {
   @property({ attribute: false }) router?: Router<TRouteId, TLoadContext, TModule, TData>;
   @property({ attribute: false }) retryContext?: TLoadContext;
   @property({ attribute: false }) onNotFound?: () => void;
@@ -233,6 +233,6 @@ class OpenClawRouterOutlet<
   }
 }
 
-if (!customElements.get("openclaw-router-outlet")) {
-  customElements.define("openclaw-router-outlet", OpenClawRouterOutlet);
+if (!customElements.get("steelengine-router-outlet")) {
+  customElements.define("steelengine-router-outlet", SteelEngineRouterOutlet);
 }

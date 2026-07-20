@@ -9,7 +9,7 @@ import { upsertAuthProfileWithLock } from "../agents/auth-profiles.js";
 import { formatLiteralProviderPrefixedModelRef } from "../agents/model-ref-shared.js";
 import { resolveDefaultAgentWorkspaceDir } from "../agents/workspace.js";
 import { normalizeAgentModelRefForConfig } from "../config/model-input.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { openUrl } from "../infra/browser-open.js";
 import { isRemoteEnvironment } from "../infra/remote-env.js";
 import type { RuntimeEnv } from "../runtime.js";
@@ -35,7 +35,7 @@ type UpsertAuthProfileParams = Parameters<typeof upsertAuthProfileWithLock>[0];
 
 type ApplyProviderAuthChoiceParams = {
   authChoice: string;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   prompter: WizardPrompter;
   runtime: RuntimeEnv;
@@ -51,7 +51,7 @@ type ApplyProviderAuthChoiceParams = {
 };
 
 type ApplyProviderAuthChoiceResult = {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   agentModelOverride?: string;
   retrySelection?: boolean;
 };
@@ -64,9 +64,9 @@ function formatModelRefForDisplay(modelRef: string, provider: ProviderPlugin): s
 }
 
 function restoreConfiguredPrimaryModel(
-  nextConfig: OpenClawConfig,
-  originalConfig: OpenClawConfig,
-): OpenClawConfig {
+  nextConfig: SteelEngineConfig,
+  originalConfig: SteelEngineConfig,
+): SteelEngineConfig {
   const originalModel = originalConfig.agents?.defaults?.model;
   const nextAgents = nextConfig.agents;
   const nextDefaults = nextAgents?.defaults;
@@ -95,7 +95,7 @@ function restoreConfiguredPrimaryModel(
   };
 }
 
-function resolveConfiguredDefaultModelPrimary(cfg: OpenClawConfig): string | undefined {
+function resolveConfiguredDefaultModelPrimary(cfg: SteelEngineConfig): string | undefined {
   const model = cfg.agents?.defaults?.model;
   if (typeof model === "string") {
     return model;
@@ -136,16 +136,16 @@ async function noteDefaultModelResult(params: {
 }
 
 async function applyDefaultModelFromAuthChoice(params: {
-  config: OpenClawConfig;
-  configBeforeProviderAuth?: OpenClawConfig;
+  config: SteelEngineConfig;
+  configBeforeProviderAuth?: SteelEngineConfig;
   selectedModel: string;
   selectedModelDisplay?: string;
   preserveExistingDefaultModel: boolean | undefined;
   prompter: WizardPrompter;
   runtime: RuntimeEnv;
   workspaceDir?: string;
-  runSelectedModelHook: (config: OpenClawConfig) => Promise<void>;
-}): Promise<OpenClawConfig> {
+  runSelectedModelHook: (config: SteelEngineConfig) => Promise<void>;
+}): Promise<SteelEngineConfig> {
   const defaultModelBaseConfig = params.configBeforeProviderAuth ?? params.config;
   const previousPrimary = resolveConfiguredDefaultModelPrimary(defaultModelBaseConfig);
   const preservesDifferentPrimary =
@@ -216,7 +216,7 @@ async function loadPluginProviderRuntime(): Promise<ProviderAuthChoiceRuntime> {
 
 function resolveManifestAuthChoiceScope(params: {
   authChoice: string;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   workspaceDir: string;
   env?: NodeJS.ProcessEnv;
 }): ProviderAuthChoiceMetadata | undefined {
@@ -232,7 +232,7 @@ function withProviderPluginId(provider: ProviderPlugin, pluginId: string): Provi
   return provider.pluginId === pluginId ? provider : { ...provider, pluginId };
 }
 export async function runProviderPluginAuthMethodUnpersisted(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   runtime: RuntimeEnv;
   signal?: AbortSignal;
@@ -272,9 +272,9 @@ export async function runProviderPluginAuthMethodUnpersisted(params: {
 }
 
 export function applyProviderPluginAuthMethodResultConfig(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   result: ProviderAuthResult;
-}): OpenClawConfig {
+}): SteelEngineConfig {
   const { result } = params;
   let nextConfig = params.config;
 
@@ -301,7 +301,7 @@ export function applyProviderPluginAuthMethodResultConfig(params: {
 }
 
 export async function runProviderPluginAuthMethod(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   runtime: RuntimeEnv;
   prompter: WizardPrompter;
@@ -316,7 +316,7 @@ export async function runProviderPluginAuthMethod(params: {
   secretInputMode?: ProviderAuthOptionBag["secretInputMode"];
   allowSecretRefPrompt?: boolean;
   opts?: Partial<ProviderAuthOptionBag>;
-}): Promise<{ config: OpenClawConfig; defaultModel?: string }> {
+}): Promise<{ config: SteelEngineConfig; defaultModel?: string }> {
   const agentId = params.agentId ?? resolveDefaultAgentId(params.config);
   const agentDir = params.agentDir ?? resolveAgentDir(params.config, agentId);
   const workspaceDir =
@@ -412,7 +412,7 @@ export async function applyAuthChoiceLoadedPluginProvider(
     enabledConfig = enableResult.config;
   }
 
-  const resolveScopedRuntimeProviders = (config: OpenClawConfig): ProviderPlugin[] =>
+  const resolveScopedRuntimeProviders = (config: SteelEngineConfig): ProviderPlugin[] =>
     resolvePluginProviders({
       config,
       workspaceDir,

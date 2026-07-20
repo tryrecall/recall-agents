@@ -46,8 +46,8 @@ export {
   createBrowserRuntimeState,
   DEFAULT_AI_SNAPSHOT_MAX_CHARS,
   DEFAULT_BROWSER_EVALUATE_ENABLED,
-  DEFAULT_OPENCLAW_BROWSER_COLOR,
-  DEFAULT_OPENCLAW_BROWSER_PROFILE_NAME,
+  DEFAULT_STEELENGINE_BROWSER_COLOR,
+  DEFAULT_STEELENGINE_BROWSER_PROFILE_NAME,
   DEFAULT_UPLOAD_DIR,
   ensureBrowserControlAuth,
   getBrowserControlState,
@@ -89,7 +89,7 @@ export { handleBrowserGatewayRequest } from "./src/gateway/browser-request.js";
 export { browserHandlers } from "./src/gateway/browser-request.js";
 export {
   definePluginEntry,
-  type OpenClawPluginApi,
-  type OpenClawPluginToolContext,
-  type OpenClawPluginToolFactory,
-} from "openclaw/plugin-sdk/plugin-entry";
+  type SteelEnginePluginApi,
+  type SteelEnginePluginToolContext,
+  type SteelEnginePluginToolFactory,
+} from "steelengine/plugin-sdk/plugin-entry";

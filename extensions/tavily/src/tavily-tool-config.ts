@@ -1,16 +1,16 @@
 // Tavily helper module supports tavily tool config behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { OpenClawPluginToolContext } from "openclaw/plugin-sdk/plugin-entry";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { SteelEnginePluginToolContext } from "steelengine/plugin-sdk/plugin-entry";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-runtime";
 
 export type TavilyToolConfigContext = Pick<
-  OpenClawPluginToolContext,
+  SteelEnginePluginToolContext,
   "config" | "runtimeConfig" | "getRuntimeConfig"
 >;
 
 export function resolveTavilyToolConfig(
-  api: OpenClawPluginApi,
+  api: SteelEnginePluginApi,
   ctx?: TavilyToolConfigContext,
-): OpenClawConfig {
+): SteelEngineConfig {
   return ctx?.getRuntimeConfig?.() ?? ctx?.runtimeConfig ?? ctx?.config ?? api.config;
 }

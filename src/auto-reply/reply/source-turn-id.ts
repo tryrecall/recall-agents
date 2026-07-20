@@ -2,14 +2,14 @@ import { createHash } from "node:crypto";
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import { normalizeAccountId } from "../../routing/account-id.js";
 import { isInternalMessageChannel } from "../../utils/message-channel.js";
 
 const CHANNEL_SOURCE_TURN_ID_PREFIX = "channel-user:v1:";
-const CHANNEL_SOURCE_TURN_ID = Symbol("openclaw.channelSourceTurnId");
+const CHANNEL_SOURCE_TURN_ID = Symbol("steelengine.channelSourceTurnId");
 const CHANNEL_SOURCE_TURN_SAME_THREAD_REQUIRED = Symbol(
-  "openclaw.channelSourceTurnSameThreadRequired",
+  "steelengine.channelSourceTurnSameThreadRequired",
 );
 
 type ChannelSourceTurnContext = object & {

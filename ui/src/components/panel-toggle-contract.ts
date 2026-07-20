@@ -1,8 +1,8 @@
-import type { UiCommandParams } from "@openclaw/gateway-protocol";
+import type { UiCommandParams } from "@steelengine/gateway-protocol";
 
-export const TERMINAL_PANEL_TOGGLE_EVENT = "openclaw:terminal-toggle";
-export const BROWSER_PANEL_TOGGLE_EVENT = "openclaw:browser-toggle";
-export const UI_COMMAND_EVENT = "openclaw:ui-command";
+export const TERMINAL_PANEL_TOGGLE_EVENT = "steelengine:terminal-toggle";
+export const BROWSER_PANEL_TOGGLE_EVENT = "steelengine:browser-toggle";
+export const UI_COMMAND_EVENT = "steelengine:ui-command";
 
 export type UiCommandDetail = UiCommandParams;
 

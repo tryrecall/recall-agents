@@ -6,22 +6,22 @@ read_when:
 title: Feishu
 ---
 
-OpenClaw connects to Feishu/Lark (the all-in-one collaboration platform) through the official `@openclaw/feishu` plugin: bot DMs, group chats, streaming card replies, and Feishu doc/wiki/drive/Bitable tools.
+SteelEngine connects to Feishu/Lark (the all-in-one collaboration platform) through the official `@steelengine/feishu` plugin: bot DMs, group chats, streaming card replies, and Feishu doc/wiki/drive/Bitable tools.
 
 **Status:** production-ready for bot DMs + group chats. WebSocket is the default event transport (no public URL needed); webhook mode is optional.
 
 ## Quick start
 
 <Note>
-Requires OpenClaw 2026.5.29 or above. Run `openclaw --version` to check. Upgrade with `openclaw update`.
+Requires SteelEngine 2026.5.29 or above. Run `steelengine --version` to check. Upgrade with `steelengine update`.
 </Note>
 
 <Steps>
   <Step title="Run the channel setup wizard">
   ```bash
-  openclaw channels login --channel feishu
+  steelengine channels login --channel feishu
   ```
-  This installs the `@openclaw/feishu` plugin if it is missing, then walks through setup:
+  This installs the `@steelengine/feishu` plugin if it is missing, then walks through setup:
 
 - **Manual setup**: paste an App ID and App Secret from Feishu Open Platform (`https://open.feishu.cn`) or Lark Developer (`https://open.larksuite.com`).
 - **QR setup**: scan a QR code in the Feishu app to create a bot automatically. This flow locks DMs to your own account (`dmPolicy: "allowlist"` with your `open_id`).
@@ -31,7 +31,7 @@ The wizard also asks for the API domain (Feishu vs Lark) and the group policy. I
 
   <Step title="After setup completes, restart the gateway to apply the changes">
   ```bash
-  openclaw gateway restart
+  steelengine gateway restart
   ```
   </Step>
 </Steps>
@@ -51,8 +51,8 @@ Configure `channels.feishu.dmPolicy` (default: `pairing`) to control who can DM 
 **Approve a pairing request:**
 
 ```bash
-openclaw pairing list feishu
-openclaw pairing approve feishu <CODE>
+steelengine pairing list feishu
+steelengine pairing approve feishu <CODE>
 ```
 
 ### Group chats
@@ -164,7 +164,7 @@ Feishu ignores messages authored by other bots by default. To allow bot-to-bot g
 }
 ```
 
-Feishu only delivers bot-authored group events when another bot mentions this bot. Existing group policy, sender allowlists, and mention requirements still apply. OpenClaw drops self-authored messages, mentions the peer bot on every text or card reply, and applies the shared [`channels.defaults.botLoopProtection`](/channels/bot-loop-protection) guard.
+Feishu only delivers bot-authored group events when another bot mentions this bot. Existing group policy, sender allowlists, and mention requirements still apply. SteelEngine drops self-authored messages, mentions the peer bot on every text or card reply, and applies the shared [`channels.defaults.botLoopProtection`](/channels/bot-loop-protection) guard.
 
 <a id="get-groupuser-ids"></a>
 
@@ -181,13 +181,13 @@ Open the group in Feishu/Lark, click the menu icon in the top-right corner, and 
 Start the gateway, send a DM to the bot, then check the logs:
 
 ```bash
-openclaw logs --follow
+steelengine logs --follow
 ```
 
 Look for `open_id` in the log output. You can also check pending pairing requests:
 
 ```bash
-openclaw pairing list feishu
+steelengine pairing list feishu
 ```
 
 ## Common commands
@@ -209,7 +209,7 @@ Feishu/Lark does not support native slash-command menus, so send these as plain 
 1. Ensure the bot is added to the group
 2. Ensure you @mention the bot (required by default)
 3. Verify `groupPolicy` is not `"disabled"`
-4. Check logs: `openclaw logs --follow`
+4. Check logs: `steelengine logs --follow`
 
 ### Bot does not receive messages
 
@@ -218,8 +218,8 @@ Feishu/Lark does not support native slash-command menus, so send these as plain 
 3. For meeting invite auto-join, also subscribe to `vc.bot.meeting_invited_v1`
 4. Ensure **persistent connection** (WebSocket) is selected
 5. Ensure all required permission scopes are granted
-6. Ensure the gateway is running: `openclaw gateway status`
-7. Check logs: `openclaw logs --follow`
+6. Ensure the gateway is running: `steelengine gateway status`
+7. Check logs: `steelengine logs --follow`
 
 Subscribing to `vc.bot.meeting_invited_v1` only delivers the event. Automatic joins are
 default-off; enable them globally or for one account:
@@ -246,7 +246,7 @@ provides `vc +meeting-join`.
 
 ### QR setup does not react in the Feishu mobile app
 
-1. Rerun setup: `openclaw channels login --channel feishu`
+1. Rerun setup: `steelengine channels login --channel feishu`
 2. Choose manual setup
 3. In Feishu Open Platform, create a self-built app and copy its App ID and App Secret
 4. Paste those credentials into the setup wizard
@@ -255,7 +255,7 @@ provides `vc +meeting-join`.
 
 1. Reset the App Secret in Feishu Open Platform / Lark Developer
 2. Update the value in your config
-3. Restart the gateway: `openclaw gateway restart`
+3. Restart the gateway: `steelengine gateway restart`
 
 ## Advanced configuration
 
@@ -315,7 +315,7 @@ Feishu/Lark supports streaming replies via interactive cards (Card Kit streaming
 }
 ```
 
-Set `streaming.mode: "off"` to send the complete reply in one message; `renderMode: "raw"` (plain text instead of cards) also disables streaming cards. `streaming.block.enabled` is off by default; enable it only when you want completed assistant blocks flushed before the final reply. Legacy boolean `streaming` and the flat `blockStreaming` / `blockStreamingCoalesce` / `chunkMode` keys migrate to this nested shape via `openclaw doctor --fix`.
+Set `streaming.mode: "off"` to send the complete reply in one message; `renderMode: "raw"` (plain text instead of cards) also disables streaming cards. `streaming.block.enabled` is off by default; enable it only when you want completed assistant blocks flushed before the final reply. Legacy boolean `streaming` and the flat `blockStreaming` / `blockStreamingCoalesce` / `chunkMode` keys migrate to this nested shape via `steelengine doctor --fix`.
 
 ### Quota optimization
 
@@ -346,7 +346,7 @@ Reduce the number of Feishu/Lark API calls with two optional flags:
 | `"group_topic"`        | One session per topic thread; falls back to the group session    |
 | `"group_topic_sender"` | One session per (topic + sender); falls back to (group + sender) |
 
-For the topic scopes, native Feishu/Lark topic groups use the event `thread_id` (`omt_*`) as the canonical topic session key. If a native topic starter event omits `thread_id`, OpenClaw hydrates it from Feishu before routing the turn. Normal group replies that OpenClaw turns into threads keep using the reply root message ID (`om_*`) so the first turn and follow-up turns stay in the same session.
+For the topic scopes, native Feishu/Lark topic groups use the event `thread_id` (`omt_*`) as the canonical topic session key. If a native topic starter event omits `thread_id`, SteelEngine hydrates it from Feishu before routing the turn. Normal group replies that SteelEngine turns into threads keep using the reply root message ID (`om_*`) so the first turn and follow-up turns stay in the same session.
 
 Set `replyInThread: "enabled"` (top-level or per group) to make bot replies create or continue a Feishu topic thread instead of replying inline. `topicSessionMode` is the deprecated predecessor of `groupSessionScope`; prefer `groupSessionScope`.
 
@@ -388,7 +388,7 @@ Feishu/Lark supports ACP for DMs and group thread messages. Feishu/Lark ACP is t
             agent: "codex",
             backend: "acpx",
             mode: "persistent",
-            cwd: "/workspace/openclaw",
+            cwd: "/workspace/steelengine",
           },
         },
       },
@@ -482,7 +482,7 @@ This is essential for public bots where you want each user to have their own pri
 <Note>
 Dynamic bindings include the normalized Feishu `accountId`, so default and named accounts route each sender to the correct dynamic agent.
 
-If a named account created an unscoped dynamic agent on an older release, that legacy agent still counts toward `maxAgents`. Confirm that it is not used by the default account before removing it, or temporarily increase `maxAgents`; OpenClaw cannot safely infer which account owns ambiguous legacy state.
+If a named account created an unscoped dynamic agent on an older release, that legacy agent still counts toward `maxAgents`. Confirm that it is not used by the default account before removing it, or temporarily increase `maxAgents`; SteelEngine cannot safely infer which account owns ambiguous legacy state.
 </Note>
 
 ### Quick setup
@@ -495,8 +495,8 @@ If a named account created an unscoped dynamic agent on an older release, that l
       allowFrom: ["*"],
       dynamicAgentCreation: {
         enabled: true,
-        workspaceTemplate: "~/.openclaw/workspace-{agentId}",
-        agentDirTemplate: "~/.openclaw/agents/{agentId}/agent",
+        workspaceTemplate: "~/.steelengine/workspace-{agentId}",
+        agentDirTemplate: "~/.steelengine/agents/{agentId}/agent",
       },
     },
   },
@@ -524,8 +524,8 @@ When a new user sends their first DM:
 | Setting                                                  | Description                                | Default                              |
 | -------------------------------------------------------- | ------------------------------------------ | ------------------------------------ |
 | `channels.feishu.dynamicAgentCreation.enabled`           | Enable automatic per-user agent creation   | `false`                              |
-| `channels.feishu.dynamicAgentCreation.workspaceTemplate` | Path template for dynamic agent workspaces | `~/.openclaw/workspace-{agentId}`    |
-| `channels.feishu.dynamicAgentCreation.agentDirTemplate`  | Agent directory name template              | `~/.openclaw/agents/{agentId}/agent` |
+| `channels.feishu.dynamicAgentCreation.workspaceTemplate` | Path template for dynamic agent workspaces | `~/.steelengine/workspace-{agentId}`    |
+| `channels.feishu.dynamicAgentCreation.agentDirTemplate`  | Agent directory name template              | `~/.steelengine/agents/{agentId}/agent` |
 | `channels.feishu.dynamicAgentCreation.maxAgents`         | Maximum number of dynamic agents to create | unlimited                            |
 
 Template variables:
@@ -564,8 +564,8 @@ Use `"per-account-channel-peer"` when named Feishu accounts should keep separate
       requireMention: true,
       dynamicAgentCreation: {
         enabled: true,
-        workspaceTemplate: "~/.openclaw/workspace-{agentId}",
-        agentDirTemplate: "~/.openclaw/agents/{agentId}/agent",
+        workspaceTemplate: "~/.steelengine/workspace-{agentId}",
+        agentDirTemplate: "~/.steelengine/agents/{agentId}/agent",
       },
     },
   },
@@ -584,14 +584,14 @@ Check gateway logs to confirm dynamic creation is working:
 
 ```text
 feishu: creating dynamic agent "feishu-ou_xxxxxx" for user ou_xxxxxx
-  workspace: /home/user/.openclaw/workspace-feishu-ou_xxxxxx
-  agentDir: /home/user/.openclaw/agents/feishu-ou_xxxxxx/agent
+  workspace: /home/user/.steelengine/workspace-feishu-ou_xxxxxx
+  agentDir: /home/user/.steelengine/agents/feishu-ou_xxxxxx/agent
 ```
 
 List all created workspaces:
 
 ```bash
-ls -la ~/.openclaw/workspace-*
+ls -la ~/.steelengine/workspace-*
 ```
 
 ### Notes
@@ -636,8 +636,8 @@ Full configuration: [Gateway configuration](/gateway/configuration)
 | `channels.feishu.reactionNotifications`                  | Inbound reaction events (`off`, `own`, `all`)                                        | `own`                                |
 | `channels.feishu.vcAutoJoin`                             | Join invited VC meetings after normal DM authorization                               | `false`                              |
 | `channels.feishu.dynamicAgentCreation.enabled`           | Enable automatic per-user agent creation                                             | `false`                              |
-| `channels.feishu.dynamicAgentCreation.workspaceTemplate` | Path template for dynamic agent workspaces                                           | `~/.openclaw/workspace-{agentId}`    |
-| `channels.feishu.dynamicAgentCreation.agentDirTemplate`  | Agent directory name template                                                        | `~/.openclaw/agents/{agentId}/agent` |
+| `channels.feishu.dynamicAgentCreation.workspaceTemplate` | Path template for dynamic agent workspaces                                           | `~/.steelengine/workspace-{agentId}`    |
+| `channels.feishu.dynamicAgentCreation.agentDirTemplate`  | Agent directory name template                                                        | `~/.steelengine/agents/{agentId}/agent` |
 | `channels.feishu.dynamicAgentCreation.maxAgents`         | Maximum number of dynamic agents to create                                           | unlimited                            |
 | `channels.feishu.textChunkLimit`                         | Message chunk size                                                                   | `4000`                               |
 | `channels.feishu.streaming.chunkMode`                    | Chunk splitting (`length` or `newline`)                                              | `length`                             |
@@ -672,7 +672,7 @@ Full configuration: [Gateway configuration](/gateway/configuration)
 - ✅ Stickers
 
 Inbound Feishu/Lark audio messages are normalized as media placeholders instead
-of raw `file_key` JSON. When `tools.media.audio` is configured, OpenClaw
+of raw `file_key` JSON. When `tools.media.audio` is configured, SteelEngine
 downloads the voice-note resource and runs shared audio transcription before the
 agent turn, so the agent receives the spoken transcript. If Feishu includes
 transcript text directly in the audio payload, that text is used without another
@@ -696,7 +696,7 @@ is sent directly as native audio. MP3/WAV/M4A and other likely audio formats are
 transcoded to 48kHz Ogg/Opus with `ffmpeg` only when the reply requests voice
 delivery (`audioAsVoice` / message tool `asVoice`, including TTS voice-note
 replies). Ordinary MP3 attachments stay regular files. If `ffmpeg` is missing or
-conversion fails, OpenClaw falls back to a file attachment and logs the reason.
+conversion fails, SteelEngine falls back to a file attachment and logs the reason.
 
 ### Threads and replies
 

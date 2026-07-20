@@ -1,10 +1,10 @@
 import { posix, win32 } from "node:path";
-import { buildPluginConfigSchema, type OpenClawPluginConfigSchema } from "openclaw/plugin-sdk/core";
+import { buildPluginConfigSchema, type SteelEnginePluginConfigSchema } from "steelengine/plugin-sdk/core";
 import {
   formatPluginConfigIssue,
   mapPluginConfigIssues,
-} from "openclaw/plugin-sdk/extension-shared";
-import { MAX_TIMER_TIMEOUT_SECONDS } from "openclaw/plugin-sdk/number-runtime";
+} from "steelengine/plugin-sdk/extension-shared";
+import { MAX_TIMER_TIMEOUT_SECONDS } from "steelengine/plugin-sdk/number-runtime";
 import { z } from "zod";
 
 const MXC_CONTAINMENTS = ["process", "processcontainer"] as const;
@@ -70,7 +70,7 @@ const MxcPluginConfigSchema = z.strictObject({
     .optional(),
 });
 
-export function createMxcPluginConfigSchema(): OpenClawPluginConfigSchema {
+export function createMxcPluginConfigSchema(): SteelEnginePluginConfigSchema {
   return buildPluginConfigSchema(MxcPluginConfigSchema, {
     safeParse(value) {
       if (value === undefined) {

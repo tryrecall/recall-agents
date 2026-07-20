@@ -1,13 +1,13 @@
-# Venice OpenClaw provider
+# Venice SteelEngine provider
 
-Official OpenClaw provider plugin for Venice.
+Official SteelEngine provider plugin for Venice.
 
 ## Install
 
 ```sh
-openclaw plugins install @openclaw/venice-provider
+steelengine plugins install @steelengine/venice-provider
 ```
 
 ## Docs
 
-See `docs/providers/venice.md` in the OpenClaw repository, or the published docs at `https://docs.openclaw.ai/providers/venice`.
+See `docs/providers/venice.md` in the SteelEngine repository, or the published docs at `https://docs.steelengine.ai/providers/venice`.

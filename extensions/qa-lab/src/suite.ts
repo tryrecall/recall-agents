@@ -2,12 +2,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
-import type { OpenClawCrablineChannelDriverSelection } from "@openclaw/crabline";
-import { disposeRegisteredAgentHarnesses } from "openclaw/plugin-sdk/agent-harness";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { parseStrictPositiveInteger } from "openclaw/plugin-sdk/number-runtime";
-import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
+import type { SteelEngineCrablineChannelDriverSelection } from "@openclaw/crabline";
+import { disposeRegisteredAgentHarnesses } from "steelengine/plugin-sdk/agent-harness";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { parseStrictPositiveInteger } from "steelengine/plugin-sdk/number-runtime";
+import { fetchWithSsrFGuard } from "steelengine/plugin-sdk/ssrf-runtime";
 import { assertQaSuiteArtifactWritten } from "./artifact-assertion.js";
 import {
   hasQaCrablineArtifactPath,
@@ -94,7 +94,7 @@ import { closeQaWebSessions } from "./web-runtime.js";
 
 type QaCrablineRuntime = typeof import("@openclaw/crabline");
 type QaCrablineChannelDriverSmokeResult = Awaited<
-  ReturnType<QaCrablineRuntime["runOpenClawCrablineChannelDriverSmoke"]>
+  ReturnType<QaCrablineRuntime["runSteelEngineCrablineChannelDriverSmoke"]>
 >;
 function resolveQaSuiteControlUiEnabled(params: {
   explicit?: boolean;
@@ -126,7 +126,7 @@ async function createQaSuiteTransportAdapter(params: {
   adapterFactories?: readonly QaTransportAdapterFactory[];
   channelDriver?: QaScorecardChannelDriver | null;
   channelId?: string;
-  channelDriverSelection?: OpenClawCrablineChannelDriverSelection | null;
+  channelDriverSelection?: SteelEngineCrablineChannelDriverSelection | null;
   cleanupOnFailure?: () => Promise<void>;
   outputDir: string;
   transportPolicy?: NonNullable<QaSuiteRunParams["adapterOptions"]>["transportPolicy"];
@@ -174,12 +174,12 @@ export type QaSuiteRunParams = {
   channelId?: string;
   evidenceMode?: QaScorecardEvidenceMode;
   repoRoot?: string;
-  sutOpenClawCommand?: QaGatewayChildCommand;
+  sutSteelEngineCommand?: QaGatewayChildCommand;
   outputDir?: string;
   providerMode?: QaProviderMode;
   transportId?: QaTransportId;
   channelDriver?: QaScorecardChannelDriver;
-  channelDriverSelection?: OpenClawCrablineChannelDriverSelection | null;
+  channelDriverSelection?: SteelEngineCrablineChannelDriverSelection | null;
   primaryModel?: string;
   alternateModel?: string;
   fastMode?: boolean;
@@ -204,7 +204,7 @@ export type QaSuiteRunParams = {
 };
 
 function shouldLogQaSuiteProgress(env: NodeJS.ProcessEnv = process.env) {
-  const override = parseQaSuiteBooleanEnv(env.OPENCLAW_QA_SUITE_PROGRESS);
+  const override = parseQaSuiteBooleanEnv(env.STEELENGINE_QA_SUITE_PROGRESS);
   if (override !== undefined) {
     return override;
   }
@@ -222,7 +222,7 @@ function resolveQaSuiteTransportReadyTimeoutMs(
   ) {
     return Math.floor(explicitTimeoutMs);
   }
-  const raw = env.OPENCLAW_QA_TRANSPORT_READY_TIMEOUT_MS;
+  const raw = env.STEELENGINE_QA_TRANSPORT_READY_TIMEOUT_MS;
   if (!raw) {
     return 120_000;
   }
@@ -245,7 +245,7 @@ function formatQaSuiteRunStartProgress(params: {
   concurrency: number;
   transportId: QaTransportId;
   channelDriver?: QaScorecardChannelDriver | null;
-  channelDriverSelection?: OpenClawCrablineChannelDriverSelection | null;
+  channelDriverSelection?: SteelEngineCrablineChannelDriverSelection | null;
 }) {
   const channelDriver = params.channelDriver ?? params.channelDriverSelection?.channelDriver;
   const channel = params.channelDriverSelection?.channel;
@@ -492,17 +492,17 @@ function buildRuntimeParityScenarioResult(params: {
   result: RuntimeParityResult;
 }): QaSuiteScenarioResult {
   const driftStepStatus = isRuntimeParityPass(params.result) ? "pass" : "fail";
-  const openclawCell = params.result.cells.openclaw;
+  const steelengineCell = params.result.cells.steelengine;
   return {
     name: params.scenarioName,
     status: driftStepStatus,
     details: params.result.driftDetails ?? `runtime drift classified as ${params.result.drift}`,
     steps: [
       {
-        name: openclawCell.runtime,
+        name: steelengineCell.runtime,
         status:
-          openclawCell.runtimeErrorClass || openclawCell.transportErrorClass ? "fail" : "pass",
-        details: formatRuntimeParityCellDetails(openclawCell),
+          steelengineCell.runtimeErrorClass || steelengineCell.transportErrorClass ? "fail" : "pass",
+        details: formatRuntimeParityCellDetails(steelengineCell),
       },
       {
         name: params.result.cells.codex.runtime,
@@ -532,13 +532,13 @@ function createQaSuiteReportNotes(params: {
   fastMode: boolean;
   concurrency: number;
   isolatedWorkers?: boolean;
-  createCrablineChannelReportNotes?: QaCrablineRuntime["createOpenClawCrablineChannelReportNotes"];
+  createCrablineChannelReportNotes?: QaCrablineRuntime["createSteelEngineCrablineChannelReportNotes"];
 }) {
   return [
     ...params.transport.createReportNotes(params),
     // Crabline reports completed generation paths through this filename-narrowed selection.
     ...(params.createCrablineChannelReportNotes?.(
-      params.channelDriverSelection as OpenClawCrablineChannelDriverSelection | null | undefined,
+      params.channelDriverSelection as SteelEngineCrablineChannelDriverSelection | null | undefined,
     ) ?? []),
   ];
 }
@@ -549,7 +549,7 @@ function buildQaIsolatedScenarioWorkerParams(params: {
   providerMode: QaProviderMode;
   transportId: QaTransportId;
   channelDriver?: QaScorecardChannelDriver;
-  channelDriverSelection?: OpenClawCrablineChannelDriverSelection | null;
+  channelDriverSelection?: SteelEngineCrablineChannelDriverSelection | null;
   primaryModel: string;
   alternateModel: string;
   fastMode: boolean;
@@ -562,7 +562,7 @@ function buildQaIsolatedScenarioWorkerParams(params: {
     adapterOptions: params.input?.adapterOptions,
     channelId: params.input?.channelId,
     repoRoot: params.repoRoot,
-    sutOpenClawCommand: params.input?.sutOpenClawCommand,
+    sutSteelEngineCommand: params.input?.sutSteelEngineCommand,
     outputDir: params.outputDir,
     providerMode: params.providerMode,
     transportId: params.transportId,
@@ -611,8 +611,8 @@ function buildQaRuntimeEnvPatch(params: {
 }): NodeJS.ProcessEnv | undefined {
   const patch: NodeJS.ProcessEnv = {};
   if (params.forcedRuntime) {
-    patch.OPENCLAW_BUILD_PRIVATE_QA = "1";
-    patch.OPENCLAW_QA_FORCE_RUNTIME = params.forcedRuntime;
+    patch.STEELENGINE_BUILD_PRIVATE_QA = "1";
+    patch.STEELENGINE_QA_FORCE_RUNTIME = params.forcedRuntime;
   }
   if (params.forcedRuntime !== "codex" || params.providerMode !== "mock-openai") {
     return Object.keys(patch).length > 0 ? patch : undefined;
@@ -624,7 +624,7 @@ function buildQaRuntimeEnvPatch(params: {
   // The forced codex lane uses the Codex app-server's native OpenAI provider
   // path, so pin the managed app-server to the QA mock endpoint instead of
   // leaking to the maintainer's real OpenAI config.
-  patch.OPENCLAW_CODEX_APP_SERVER_ARGS = `app-server -c openai_base_url=${mockBaseUrl}/v1 --listen stdio://`;
+  patch.STEELENGINE_CODEX_APP_SERVER_ARGS = `app-server -c openai_base_url=${mockBaseUrl}/v1 --listen stdio://`;
   patch.OPENAI_API_KEY = "qa-mock-openai-key";
   patch.CODEX_API_KEY = "qa-mock-openai-key";
   return patch;
@@ -636,7 +636,7 @@ function appendNodeOption(raw: string | undefined, option: string) {
 }
 
 function shouldCaptureGatewayHeapCheckpoints(env: NodeJS.ProcessEnv = process.env) {
-  return parseQaSuiteBooleanEnv(env.OPENCLAW_QA_GATEWAY_HEAP_CHECKPOINTS) === true;
+  return parseQaSuiteBooleanEnv(env.STEELENGINE_QA_GATEWAY_HEAP_CHECKPOINTS) === true;
 }
 
 function buildQaGatewayHeapCheckpointRuntimeEnvPatch(
@@ -763,7 +763,7 @@ async function runQaRuntimeParitySuite(params: {
   claudeCliAuthMode?: QaCliBackendAuthMode;
   enabledPluginIds?: string[];
   channelDriver?: QaScorecardChannelDriver | null;
-  channelDriverSelection?: OpenClawCrablineChannelDriverSelection | null;
+  channelDriverSelection?: SteelEngineCrablineChannelDriverSelection | null;
   concurrency: number;
   selectedScenarios: ReturnType<typeof readQaBootstrapScenarioCatalog>["scenarios"];
   startLab?: QaSuiteStartLabFn;
@@ -1016,13 +1016,13 @@ async function writeQaSuiteArtifacts(params: {
   fastMode: boolean;
   concurrency: number;
   channelDriver?: QaScorecardChannelDriver | null;
-  channelDriverSelection?: OpenClawCrablineChannelDriverSelection | null;
+  channelDriverSelection?: SteelEngineCrablineChannelDriverSelection | null;
   isolatedWorkers?: boolean;
   scenarioIds?: readonly string[];
   runtimePair?: [RuntimeId, RuntimeId];
   writeEvidenceFile?: boolean;
   runCrablineChannelDriverSmoke?: (
-    params: Parameters<QaCrablineRuntime["runOpenClawCrablineChannelDriverSmoke"]>[0],
+    params: Parameters<QaCrablineRuntime["runSteelEngineCrablineChannelDriverSmoke"]>[0],
   ) => Promise<QaCrablineChannelDriverSmokeResult>;
 }) {
   const reportPath = path.join(params.outputDir, "qa-suite-report.md");
@@ -1038,7 +1038,7 @@ async function writeQaSuiteArtifacts(params: {
   if (crablineChannelDriverSelection) {
     const runCrablineChannelDriverSmoke =
       params.runCrablineChannelDriverSmoke ??
-      crablineRuntime?.runOpenClawCrablineChannelDriverSmoke;
+      crablineRuntime?.runSteelEngineCrablineChannelDriverSmoke;
     if (!runCrablineChannelDriverSmoke) {
       throw new Error("Crabline runtime did not provide its channel-driver smoke helper.");
     }
@@ -1059,7 +1059,7 @@ async function writeQaSuiteArtifacts(params: {
         }
       : crablineChannelDriverSelection;
   const report = renderQaMarkdownReport({
-    title: "OpenClaw QA Scenario Suite",
+    title: "SteelEngine QA Scenario Suite",
     startedAt: params.startedAt,
     finishedAt: params.finishedAt,
     checks: [],
@@ -1072,7 +1072,7 @@ async function writeQaSuiteArtifacts(params: {
     notes: createQaSuiteReportNotes({
       ...params,
       channelDriverSelection: effectiveChannelDriverSelection,
-      createCrablineChannelReportNotes: crablineRuntime?.createOpenClawCrablineChannelReportNotes,
+      createCrablineChannelReportNotes: crablineRuntime?.createSteelEngineCrablineChannelReportNotes,
     }),
   });
   const evidence =
@@ -1116,7 +1116,7 @@ async function writeQaSuiteArtifacts(params: {
       `${JSON.stringify(
         {
           version: 1,
-          source: "openclaw/crabline",
+          source: "steelengine/crabline",
           channelDriver: crablineChannelDriverSelection.channelDriver,
           selectedChannel: crablineChannelDriverSelection.channel,
           manifestPath: crablineChannelDriverSmoke.manifestPath,
@@ -1138,7 +1138,7 @@ async function writeQaSuiteArtifacts(params: {
       `${JSON.stringify(
         {
           version: 1,
-          source: "openclaw/crabline",
+          source: "steelengine/crabline",
           channelDriver: crablineChannelDriverSelection.channelDriver,
           selectedChannel: crablineChannelDriverSelection.channel,
           manifestPath: crablineChannelDriverSmoke.manifestPath,
@@ -1343,7 +1343,7 @@ export async function runQaFlowSuite(params?: QaSuiteRunParams): Promise<QaSuite
     ...new Set([
       ...collectQaSuitePluginIds(selectedScenarios),
       ...(params?.enabledPluginIds ?? []).map((pluginId) => pluginId.trim()).filter(Boolean),
-      ...(params?.forcedRuntime && params.forcedRuntime !== "openclaw"
+      ...(params?.forcedRuntime && params.forcedRuntime !== "steelengine"
         ? [params.forcedRuntime]
         : []),
     ]),
@@ -1750,7 +1750,7 @@ export async function runQaFlowSuite(params?: QaSuiteRunParams): Promise<QaSuite
     writeQaSuiteProgress(progressEnabled, "gateway start");
     const activeGateway = await startQaGatewayChild({
       repoRoot,
-      command: params?.sutOpenClawCommand,
+      command: params?.sutSteelEngineCommand,
       providerBaseUrl: activeMock ? `${activeMock.baseUrl}/v1` : undefined,
       transport,
       transportBaseUrl: lab.listenUrl,
@@ -1766,7 +1766,7 @@ export async function runQaFlowSuite(params?: QaSuiteRunParams): Promise<QaSuite
       enabledPluginIds,
       forwardHostHome: gatewayRuntimeOptions?.forwardHostHome,
       mutateConfig: gatewayConfigPatch
-        ? (cfg) => applyQaMergePatch(cfg, gatewayConfigPatch) as OpenClawConfig
+        ? (cfg) => applyQaMergePatch(cfg, gatewayConfigPatch) as SteelEngineConfig
         : undefined,
       runtimeEnvPatch: mergeQaRuntimeEnvPatches(
         buildQaRuntimeEnvPatch({
@@ -2035,7 +2035,7 @@ export async function runQaFlowSuite(params?: QaSuiteRunParams): Promise<QaSuite
     throw error;
   } finally {
     const activeEnv = env;
-    const keepTemp = process.env.OPENCLAW_QA_KEEP_TEMP === "1" || false;
+    const keepTemp = process.env.STEELENGINE_QA_KEEP_TEMP === "1" || false;
     const activeGateway = gateway;
     const activeMock = mock;
     const cleanupErrors = await runQaFlowSuiteCleanupPlan({

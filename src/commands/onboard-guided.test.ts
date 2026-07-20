@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createWizardPrompter } from "../../test/helpers/wizard-prompter.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { CallGatewayCliOptions } from "../gateway/call.js";
 import { createSuiteLogPathTracker } from "../logging/log-test-helpers.js";
 import { resetLogger, setLoggerOverride } from "../logging/logger.js";
@@ -40,18 +40,18 @@ const readConfigFileSnapshot = vi.hoisted(() =>
   vi.fn(async () => ({
     exists: false,
     valid: true,
-    path: "/tmp/openclaw.json",
+    path: "/tmp/steelengine.json",
     issues: [] as Array<{ path?: string; message: string }>,
     config: {},
   })),
 );
 
-const logPathTracker = createSuiteLogPathTracker("openclaw-guided-onboard-log-");
+const logPathTracker = createSuiteLogPathTracker("steelengine-guided-onboard-log-");
 
 vi.mock("../config/config.js", () => ({ readConfigFileSnapshot }));
 
 vi.mock("./onboard-helpers.js", () => ({
-  DEFAULT_WORKSPACE: "/tmp/openclaw-workspace",
+  DEFAULT_WORKSPACE: "/tmp/steelengine-workspace",
   printWizardHeader: vi.fn(),
 }));
 
@@ -94,7 +94,7 @@ function detection(
     manualProviders: [],
     authOptions: [],
     recommendedInstalls: [],
-    workspace: "/tmp/openclaw-workspace",
+    workspace: "/tmp/steelengine-workspace",
     setupComplete: false,
     ...overrides,
   };
@@ -102,7 +102,7 @@ function detection(
 
 function setupApplyResult() {
   return {
-    configPath: "/tmp/openclaw.json",
+    configPath: "/tmp/steelengine.json",
     configHashBefore: null,
     configHashAfter: null,
     bootstrapPending: false,
@@ -135,7 +135,7 @@ function setupDeps(params: {
     listManualOptions: vi.fn(async () => ({
       manualProviders: [],
       authOptions: [],
-      workspace: "/tmp/openclaw-workspace",
+      workspace: "/tmp/steelengine-workspace",
       setupComplete: false,
     })),
     detect: params.detect ?? vi.fn(async () => detection()),
@@ -178,7 +178,7 @@ describe("runGuidedOnboarding", () => {
     readConfigFileSnapshot.mockResolvedValue({
       exists: false,
       valid: true,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       issues: [],
       config: {},
     });
@@ -194,10 +194,10 @@ describe("runGuidedOnboarding", () => {
   });
 
   it("auto-connects one credentialed candidate before any workspace prompt", async () => {
-    const persistedConfig: OpenClawConfig = {
+    const persistedConfig: SteelEngineConfig = {
       agents: { defaults: { model: { primary: "claude-cli/opus" } } },
     };
-    const appliedConfig: OpenClawConfig = {
+    const appliedConfig: SteelEngineConfig = {
       ...persistedConfig,
       gateway: { mode: "local" },
     };
@@ -205,21 +205,21 @@ describe("runGuidedOnboarding", () => {
       .mockResolvedValueOnce({
         exists: false,
         valid: true,
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         issues: [],
         config: {},
       })
       .mockResolvedValueOnce({
         exists: true,
         valid: true,
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         issues: [],
         config: persistedConfig,
       })
       .mockResolvedValueOnce({
         exists: true,
         valid: true,
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         issues: [],
         config: appliedConfig,
       });
@@ -364,21 +364,21 @@ describe("runGuidedOnboarding", () => {
   });
 
   it("offers memory import after successful inference using the persisted config", async () => {
-    const persistedConfig: OpenClawConfig = {
+    const persistedConfig: SteelEngineConfig = {
       agents: { defaults: { workspace: "/tmp/persisted-workspace" } },
     };
     readConfigFileSnapshot
       .mockResolvedValueOnce({
         exists: false,
         valid: true,
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         issues: [],
         config: {},
       })
       .mockResolvedValueOnce({
         exists: true,
         valid: true,
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         issues: [],
         config: persistedConfig,
       });
@@ -435,11 +435,11 @@ describe("runGuidedOnboarding", () => {
     );
   });
 
-  it("uses the configured workspace only as inference and OpenClaw context", async () => {
+  it("uses the configured workspace only as inference and SteelEngine context", async () => {
     readConfigFileSnapshot.mockResolvedValueOnce({
       exists: true,
       valid: true,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       issues: [],
       config: { agents: { defaults: { workspace: "/tmp/configured" } } },
     });
@@ -467,9 +467,9 @@ describe("runGuidedOnboarding", () => {
 
     expect(text).not.toHaveBeenCalled();
     expect(deps.activate).toHaveBeenCalledWith(
-      expect.objectContaining({ workspace: "/tmp/openclaw-workspace" }),
+      expect.objectContaining({ workspace: "/tmp/steelengine-workspace" }),
     );
-    expect(deps.launchHatchTui).toHaveBeenCalledWith("/tmp/openclaw-workspace");
+    expect(deps.launchHatchTui).toHaveBeenCalledWith("/tmp/steelengine-workspace");
   });
 
   it("live-tests an unverified CLI before automatic setup", async () => {
@@ -839,7 +839,7 @@ describe("runGuidedOnboarding", () => {
     );
   });
 
-  it("keeps OpenClaw unavailable until a manual key passes", async () => {
+  it("keeps SteelEngine unavailable until a manual key passes", async () => {
     promptAuthChoiceGrouped.mockResolvedValue("openai-api-key");
     const text = vi.fn().mockResolvedValueOnce("bad-key").mockResolvedValueOnce("good-key");
     const prompter = createWizardPrompter({
@@ -918,7 +918,7 @@ describe("runGuidedOnboarding", () => {
     readConfigFileSnapshot.mockResolvedValueOnce({
       exists: true,
       valid: false,
-      path: "/tmp/broken-openclaw.json",
+      path: "/tmp/broken-steelengine.json",
       issues: [{ path: "agents.defaults.model", message: "Expected a model reference" }],
       config: {},
     });
@@ -929,11 +929,11 @@ describe("runGuidedOnboarding", () => {
     await runGuidedOnboarding({ workspace: "/tmp/repair" }, runtime, deps);
 
     const notes = JSON.stringify((prompter.note as ReturnType<typeof vi.fn>).mock.calls);
-    expect(notes).toContain("/tmp/broken-openclaw.json");
+    expect(notes).toContain("/tmp/broken-steelengine.json");
     expect(notes).toContain("agents.defaults.model: Expected a model reference");
-    expect(prompter.outro).toHaveBeenCalledWith(expect.stringContaining("openclaw doctor --fix"));
+    expect(prompter.outro).toHaveBeenCalledWith(expect.stringContaining("steelengine doctor --fix"));
     expect(prompter.outro).toHaveBeenCalledWith(
-      expect.stringContaining("openclaw config validate"),
+      expect.stringContaining("steelengine config validate"),
     );
     expect(runtime.exit).toHaveBeenCalledWith(1);
     expect(deps.runSystemAgentChat).not.toHaveBeenCalled();
@@ -941,7 +941,7 @@ describe("runGuidedOnboarding", () => {
     expect(deps.activate).not.toHaveBeenCalled();
   });
 
-  it("converges remote inference before remote OpenClaw without mutating local config", async () => {
+  it("converges remote inference before remote SteelEngine without mutating local config", async () => {
     const localConfig = {
       wizard: { securityAcknowledgedAt: "2026-07-11T00:00:00.000Z" },
       agents: {
@@ -954,12 +954,12 @@ describe("runGuidedOnboarding", () => {
         mode: "remote",
         remote: { url: "wss://configured.example/ws", token: "configured-token" },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const localConfigBefore = structuredClone(localConfig);
     readConfigFileSnapshot.mockResolvedValueOnce({
       exists: true,
       valid: true,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       issues: [],
       config: localConfig,
     });
@@ -973,7 +973,7 @@ describe("runGuidedOnboarding", () => {
       expect(options.ignoreEnvUrlOverride).toBe(true);
       expect(options.config?.gateway?.remote?.url).toBe("wss://selected.example/ws");
       order.push(options.method);
-      if (options.method === "openclaw.setup.detect") {
+      if (options.method === "steelengine.setup.detect") {
         return {
           candidates: [
             {
@@ -1001,7 +1001,7 @@ describe("runGuidedOnboarding", () => {
           setupComplete: false,
         };
       }
-      if (options.method === "openclaw.setup.activate") {
+      if (options.method === "steelengine.setup.activate") {
         expect(options.params).toEqual({
           kind: "claude-cli",
           modelRef: "claude-cli/opus",
@@ -1015,11 +1015,11 @@ describe("runGuidedOnboarding", () => {
           lines: ["Default model: claude-cli/opus"],
         };
       }
-      if (options.method === "openclaw.setup.verify") {
+      if (options.method === "steelengine.setup.verify") {
         expect(remoteConfig.modelRef).toBe("claude-cli/opus");
         return { ok: true, modelRef: remoteConfig.modelRef, latencyMs: 100 };
       }
-      if (options.method === "openclaw.chat") {
+      if (options.method === "steelengine.chat") {
         expect(remoteConfig.modelRef).toBe("claude-cli/opus");
         expect(options.params).toEqual({
           sessionId: expect.any(String),
@@ -1072,10 +1072,10 @@ describe("runGuidedOnboarding", () => {
     );
 
     expect(order).toEqual([
-      "openclaw.setup.detect",
-      "openclaw.setup.activate",
-      "openclaw.setup.verify",
-      "openclaw.chat",
+      "steelengine.setup.detect",
+      "steelengine.setup.activate",
+      "steelengine.setup.verify",
+      "steelengine.chat",
       "tui",
     ]);
     expect(remoteConfig.modelRef).toBe("claude-cli/opus");

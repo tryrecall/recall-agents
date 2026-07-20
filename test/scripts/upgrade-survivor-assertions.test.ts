@@ -18,7 +18,7 @@ function writeMigratedSessionState(stateDir: string): void {
   mkdirSync(agentSessionsDir, { recursive: true });
   mkdirSync(agentDbDir, { recursive: true });
 
-  const db = new DatabaseSync(join(agentDbDir, "openclaw-agent.sqlite"));
+  const db = new DatabaseSync(join(agentDbDir, "steelengine-agent.sqlite"));
   try {
     db.exec(`
       CREATE TABLE sessions (
@@ -103,7 +103,7 @@ function writeMigratedSessionState(stateDir: string): void {
 }
 
 function assertConfiguredPluginState(params: { installPath?: string } = {}): void {
-  const root = mkdtempSync(join(tmpdir(), "openclaw-upgrade-survivor-"));
+  const root = mkdtempSync(join(tmpdir(), "steelengine-upgrade-survivor-"));
   try {
     const stateDir = join(root, "state");
     const workspace = join(root, "workspace");
@@ -118,15 +118,15 @@ function assertConfiguredPluginState(params: { installPath?: string } = {}): voi
     });
     writeMigratedSessionState(stateDir);
     writeJson(join(matrixInstallDir, "package.json"), {
-      name: "@openclaw/matrix",
+      name: "@steelengine/matrix",
     });
     writeJson(join(stateDir, "plugins", "installs.json"), {
       installRecords: {
         matrix: {
           source: "clawhub",
-          spec: "clawhub:@openclaw/matrix",
+          spec: "clawhub:@steelengine/matrix",
           installPath: matrixInstallDir,
-          clawhubPackage: "@openclaw/matrix",
+          clawhubPackage: "@steelengine/matrix",
           clawhubChannel: "official",
           artifactKind: "npm-pack",
         },
@@ -142,10 +142,10 @@ function assertConfiguredPluginState(params: { installPath?: string } = {}): voi
     execFileSync(process.execPath, [ASSERTIONS_PATH, "assert-state"], {
       env: {
         ...process.env,
-        OPENCLAW_STATE_DIR: stateDir,
-        OPENCLAW_TEST_WORKSPACE_DIR: workspace,
-        OPENCLAW_UPGRADE_SURVIVOR_CONFIG_COVERAGE_JSON: coveragePath,
-        OPENCLAW_UPGRADE_SURVIVOR_SCENARIO: "configured-plugin-installs",
+        STEELENGINE_STATE_DIR: stateDir,
+        STEELENGINE_TEST_WORKSPACE_DIR: workspace,
+        STEELENGINE_UPGRADE_SURVIVOR_CONFIG_COVERAGE_JSON: coveragePath,
+        STEELENGINE_UPGRADE_SURVIVOR_SCENARIO: "configured-plugin-installs",
       },
       stdio: "pipe",
     });
@@ -160,7 +160,7 @@ function createUpdateRunSelfUpgradeSummary() {
   const note = "QA-UPDATE-RUN-PACKAGE-SELF-UPGRADE";
   return {
     status: "passed",
-    source: { spec: `openclaw@${sourceVersion}`, version: sourceVersion },
+    source: { spec: `steelengine@${sourceVersion}`, version: sourceVersion },
     target: { tag: "latest", resolvedVersion: targetVersion },
     installedVersion: targetVersion,
     expectedRestartNote: note,
@@ -205,7 +205,7 @@ function createUpdateRunSelfUpgradeSummary() {
     },
     supervisorHandoff: {
       servicePid: 4242,
-      systemctlInvocations: ["--user start openclaw-gateway.service"],
+      systemctlInvocations: ["--user start steelengine-gateway.service"],
       monitorEvents: [
         "source Gateway exited through supervised update handoff",
         "starting installed service without provider suppression",
@@ -233,7 +233,7 @@ function createUpdateRunSelfUpgradeSummary() {
 }
 
 function assertUpdateRunSelfUpgrade(summary: ReturnType<typeof createUpdateRunSelfUpgradeSummary>) {
-  const root = mkdtempSync(join(tmpdir(), "openclaw-update-run-self-upgrade-"));
+  const root = mkdtempSync(join(tmpdir(), "steelengine-update-run-self-upgrade-"));
   try {
     const summaryPath = join(root, "summary.json");
     writeJson(summaryPath, summary);
@@ -256,12 +256,12 @@ describe("upgrade survivor assertions", () => {
     ) as string[];
 
     expect(scenarios).toContain("base");
-    expect(scenarios).toContain("acpx-openclaw-tools-bridge");
+    expect(scenarios).toContain("acpx-steelengine-tools-bridge");
     expect(new Set(scenarios).size).toBe(scenarios.length);
   });
 
-  it("accepts the ACPX OpenClaw tools bridge scenario during seed", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-upgrade-survivor-acpx-"));
+  it("accepts the ACPX SteelEngine tools bridge scenario during seed", () => {
+    const root = mkdtempSync(join(tmpdir(), "steelengine-upgrade-survivor-acpx-"));
     try {
       const stateDir = join(root, "state");
       const workspace = join(root, "workspace");
@@ -271,9 +271,9 @@ describe("upgrade survivor assertions", () => {
       execFileSync(process.execPath, [ASSERTIONS_PATH, "seed"], {
         env: {
           ...process.env,
-          OPENCLAW_STATE_DIR: stateDir,
-          OPENCLAW_TEST_WORKSPACE_DIR: workspace,
-          OPENCLAW_UPGRADE_SURVIVOR_SCENARIO: "acpx-openclaw-tools-bridge",
+          STEELENGINE_STATE_DIR: stateDir,
+          STEELENGINE_TEST_WORKSPACE_DIR: workspace,
+          STEELENGINE_UPGRADE_SURVIVOR_SCENARIO: "acpx-steelengine-tools-bridge",
         },
         stdio: "pipe",
       });
@@ -282,10 +282,10 @@ describe("upgrade survivor assertions", () => {
     }
   });
 
-  it("asserts the ACPX OpenClaw tools bridge config survived", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-upgrade-survivor-acpx-config-"));
+  it("asserts the ACPX SteelEngine tools bridge config survived", () => {
+    const root = mkdtempSync(join(tmpdir(), "steelengine-upgrade-survivor-acpx-config-"));
     try {
-      const configPath = join(root, "openclaw.json");
+      const configPath = join(root, "steelengine.json");
       const coveragePath = join(root, "coverage.json");
       writeJson(configPath, {
         plugins: {
@@ -294,23 +294,23 @@ describe("upgrade survivor assertions", () => {
             acpx: {
               enabled: true,
               config: {
-                openClawToolsMcpBridge: true,
+                steelEngineToolsMcpBridge: true,
               },
             },
           },
         },
       });
       writeJson(coveragePath, {
-        acceptedIntents: ["acpx-openclaw-tools-bridge"],
+        acceptedIntents: ["acpx-steelengine-tools-bridge"],
         skippedIntents: [],
       });
 
       execFileSync(process.execPath, [ASSERTIONS_PATH, "assert-config"], {
         env: {
           ...process.env,
-          OPENCLAW_CONFIG_PATH: configPath,
-          OPENCLAW_UPGRADE_SURVIVOR_CONFIG_COVERAGE_JSON: coveragePath,
-          OPENCLAW_UPGRADE_SURVIVOR_SCENARIO: "acpx-openclaw-tools-bridge",
+          STEELENGINE_CONFIG_PATH: configPath,
+          STEELENGINE_UPGRADE_SURVIVOR_CONFIG_COVERAGE_JSON: coveragePath,
+          STEELENGINE_UPGRADE_SURVIVOR_SCENARIO: "acpx-steelengine-tools-bridge",
         },
         stdio: "pipe",
       });
@@ -324,7 +324,7 @@ describe("upgrade survivor assertions", () => {
   });
 
   it("rejects ClawHub npm-pack installs outside the managed extensions root", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-upgrade-survivor-outside-"));
+    const root = mkdtempSync(join(tmpdir(), "steelengine-upgrade-survivor-outside-"));
     try {
       expect(() =>
         assertConfiguredPluginState({ installPath: join(root, "outside-matrix") }),
@@ -384,7 +384,7 @@ describe("upgrade survivor assertions", () => {
   it("rejects duplicate target service starts during the supervised handoff", () => {
     const summary = createUpdateRunSelfUpgradeSummary();
     summary.supervisorHandoff.systemctlInvocations.push(
-      "--user --quiet start openclaw-gateway.service",
+      "--user --quiet start steelengine-gateway.service",
     );
 
     expect(() => assertUpdateRunSelfUpgrade(summary)).toThrow(/target exactly once/);

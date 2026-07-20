@@ -5,7 +5,7 @@ import {
   ensureOnboardingPluginInstalled,
   type OnboardingPluginInstallEntry,
 } from "../commands/onboarding-plugin-install.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { scanInstalledApps } from "../infra/installed-apps.js";
 import {
@@ -80,14 +80,14 @@ function uniqueSelectedMatches(
 }
 
 export async function setupAppRecommendations(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   prompter: WizardPrompter;
   runtime: RuntimeEnv;
   workspaceDir: string;
   modelRouteVerified: boolean;
   platform?: NodeJS.Platform;
   deps?: SetupAppRecommendationDeps;
-}): Promise<OpenClawConfig> {
+}): Promise<SteelEngineConfig> {
   const platform = params.platform ?? process.platform;
   // Product decision: default-on "magical" scan with a kill switch, not
   // consent-first. App labels/bundle ids go to the user's configured model and

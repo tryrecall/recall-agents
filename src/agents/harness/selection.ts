@@ -1,7 +1,7 @@
 /**
  * Selects and invokes native agent harnesses for embedded run attempts.
  */
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import {
   createChildDiagnosticTraceContext,
   createDiagnosticTraceContext,
@@ -32,7 +32,7 @@ import { resolveSandboxRuntimeStatus } from "../sandbox/runtime-status.js";
 import { expandToolGroups, mergeAlsoAllowPolicy, normalizeToolName } from "../tool-policy.js";
 import type { SystemAgentToolOptions } from "../tools/system-agent-tool.js";
 import { resolveAgentHarnessAutoSelectionHint } from "./auto-selection.js";
-import { createOpenClawAgentHarness } from "./builtin-openclaw.js";
+import { createSteelEngineAgentHarness } from "./builtin-steelengine.js";
 import { MissingAgentHarnessError } from "./errors.js";
 import { runAgentHarnessLifecycleAttempt } from "./lifecycle.js";
 import {
@@ -55,7 +55,7 @@ type AgentHarnessAvailabilityParams = {
   provider?: string;
   modelId?: string;
   modelProvider?: AgentHarnessSupportContext["modelProvider"];
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentId?: string;
   sessionKey?: string;
   env?: NodeJS.ProcessEnv;
@@ -66,7 +66,7 @@ type AgentHarnessSelectionParams = {
   provider: string;
   modelId?: string;
   modelProvider?: AgentHarnessSupportContext["modelProvider"];
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentId?: string;
   sessionKey?: string;
   agentHarnessId?: string;
@@ -108,18 +108,18 @@ type AgentHarnessSelectionDecision = {
   policy: AgentHarnessPolicy;
   selectedHarnessId: string;
   selectedReason:
-    | "forced_openclaw"
+    | "forced_steelengine"
     | "forced_plugin"
-    // Implicit Codex preference found no registered Codex harness, so OpenClaw handled the run.
-    | "implicit_plugin_unavailable_openclaw"
-    // Implicit Codex preference cannot reproduce the prepared transport, so OpenClaw handled it.
-    | "implicit_plugin_unsupported_openclaw"
+    // Implicit Codex preference found no registered Codex harness, so SteelEngine handled the run.
+    | "implicit_plugin_unavailable_steelengine"
+    // Implicit Codex preference cannot reproduce the prepared transport, so SteelEngine handled it.
+    | "implicit_plugin_unsupported_steelengine"
     // Provider-owned CLI runtime aliases have no agent harness plugin counterpart.
-    | "cli_runtime_passthrough_openclaw"
+    | "cli_runtime_passthrough_steelengine"
     // Auto mode chose a registered plugin harness that supports the provider/model.
     | "auto_plugin"
-    // Auto mode found no supporting plugin harness, so OpenClaw handled the run.
-    | "auto_openclaw";
+    // Auto mode found no supporting plugin harness, so SteelEngine handled the run.
+    | "auto_steelengine";
   candidates: AgentHarnessSelectionCandidate[];
 };
 
@@ -180,7 +180,7 @@ function resolveAgentHarnessAvailabilityDecision(
   if (!codexHarness) {
     return {
       kind: "implicit-unavailable",
-      policy: { ...policy, runtime: "openclaw" },
+      policy: { ...policy, runtime: "steelengine" },
     };
   }
   const provider = params.provider?.trim();
@@ -204,7 +204,7 @@ function resolveAgentHarnessAvailabilityDecision(
   }
   return {
     kind: "implicit-unsupported",
-    policy: { ...policy, runtime: "openclaw" },
+    policy: { ...policy, runtime: "steelengine" },
   };
 }
 
@@ -239,19 +239,19 @@ export function selectAgentHarnessForPreparedModelProviders(
   // Only implicit/auto selection can produce different supported harnesses. One embedded
   // runtime owns the complete retry set; explicit and pinned plugins fail during probing above.
   return (
-    decisions.find((decision) => decision.selectedHarnessId === "openclaw")?.harness ??
-    createOpenClawAgentHarness()
+    decisions.find((decision) => decision.selectedHarnessId === "steelengine")?.harness ??
+    createSteelEngineAgentHarness()
   );
 }
 
-/** Returns whether a plugin harness constructs OpenClaw tools inside its runtime. */
-export function agentHarnessBuildsOpenClawTools(harnessId: string): boolean {
+/** Returns whether a plugin harness constructs SteelEngine tools inside its runtime. */
+export function agentHarnessBuildsSteelEngineTools(harnessId: string): boolean {
   return harnessId === "codex" || harnessId === "copilot";
 }
 
-/** Returns whether the selected harness exposes OpenClaw's agent-tool surface. */
-export function agentHarnessExposesOpenClawTools(harnessId: string): boolean {
-  return harnessId === "openclaw" || agentHarnessBuildsOpenClawTools(harnessId);
+/** Returns whether the selected harness exposes SteelEngine's agent-tool surface. */
+export function agentHarnessExposesSteelEngineTools(harnessId: string): boolean {
+  return harnessId === "steelengine" || agentHarnessBuildsSteelEngineTools(harnessId);
 }
 
 function selectAgentHarnessDecision(
@@ -285,21 +285,21 @@ function selectAgentHarnessDecision(
         runtimeSource: "model",
       } as AgentHarnessPolicy)
     : resolvedPolicy;
-  // OpenClaw's built-in harness is intentionally not part of the plugin candidate list. Explicit plugin
-  // runtimes fail closed; only `auto` may route an unmatched turn to OpenClaw.
+  // SteelEngine's built-in harness is intentionally not part of the plugin candidate list. Explicit plugin
+  // runtimes fail closed; only `auto` may route an unmatched turn to SteelEngine.
   const pluginHarnesses = listPluginAgentHarnesses();
-  const openClawHarness = createOpenClawAgentHarness();
+  const steelEngineHarness = createSteelEngineAgentHarness();
   const runtime = policy.runtime;
-  if (runtime === "openclaw") {
+  if (runtime === "steelengine") {
     const selectedReason = selectedRuntimeOverride
-      ? "forced_openclaw"
+      ? "forced_steelengine"
       : availability.kind === "implicit-unavailable"
-        ? "implicit_plugin_unavailable_openclaw"
+        ? "implicit_plugin_unavailable_steelengine"
         : availability.kind === "implicit-unsupported"
-          ? "implicit_plugin_unsupported_openclaw"
-          : "forced_openclaw";
+          ? "implicit_plugin_unsupported_steelengine"
+          : "forced_steelengine";
     return buildSelectionDecision({
-      harness: openClawHarness,
+      harness: steelEngineHarness,
       policy,
       selectedReason,
       candidates: listHarnessCandidates(pluginHarnesses),
@@ -343,12 +343,12 @@ function selectAgentHarnessDecision(
       }
       if (isCliRuntimeAliasForProvider({ runtime, provider: params.provider })) {
         return buildSelectionDecision({
-          harness: openClawHarness,
+          harness: steelEngineHarness,
           policy: {
             ...policy,
-            runtime: "openclaw",
+            runtime: "steelengine",
           },
-          selectedReason: "cli_runtime_passthrough_openclaw",
+          selectedReason: "cli_runtime_passthrough_steelengine",
           candidates: listHarnessCandidates(pluginHarnesses),
         });
       }
@@ -360,12 +360,12 @@ function selectAgentHarnessDecision(
     }
     if (runtime === "codex" && policy.runtimeSource === "implicit") {
       return buildSelectionDecision({
-        harness: openClawHarness,
+        harness: steelEngineHarness,
         policy: {
           ...policy,
-          runtime: "openclaw",
+          runtime: "steelengine",
         },
-        selectedReason: "implicit_plugin_unavailable_openclaw",
+        selectedReason: "implicit_plugin_unavailable_steelengine",
         candidates: listHarnessCandidates(pluginHarnesses),
       });
     }
@@ -377,12 +377,12 @@ function selectAgentHarnessDecision(
       })
     ) {
       return buildSelectionDecision({
-        harness: openClawHarness,
+        harness: steelEngineHarness,
         policy: {
           ...policy,
-          runtime: "openclaw",
+          runtime: "steelengine",
         },
-        selectedReason: "cli_runtime_passthrough_openclaw",
+        selectedReason: "cli_runtime_passthrough_steelengine",
         candidates: listHarnessCandidates(pluginHarnesses),
       });
     }
@@ -439,9 +439,9 @@ function selectAgentHarnessDecision(
     });
   }
   return buildSelectionDecision({
-    harness: openClawHarness,
+    harness: steelEngineHarness,
     policy,
-    selectedReason: "auto_openclaw",
+    selectedReason: "auto_steelengine",
     candidates: candidates.map(toSelectionCandidate),
   });
 }
@@ -474,7 +474,7 @@ export async function runAgentHarnessAttempt(
   });
   const harness = selection.harness;
   if (internalParams.systemAgentTool && !isSystemAgentOnlyAllowlist(internalParams.toolsAllow)) {
-    throw new Error('OpenClaw host authority requires toolsAllow: ["openclaw"]');
+    throw new Error('SteelEngine host authority requires toolsAllow: ["steelengine"]');
   }
   const ringZeroTools = internalParams.systemAgentTool
     ? [
@@ -495,17 +495,17 @@ export async function runAgentHarnessAttempt(
       // Resolve plugin policy after entering the host scope. Ring-zero tools are
       // trusted setup authority and must survive ordinary deny-all policy.
       const attemptParams =
-        harness.id === "openclaw" ? pluginParams : preparePluginHarnessParams(pluginParams);
+        harness.id === "steelengine" ? pluginParams : preparePluginHarnessParams(pluginParams);
       return runAgentHarnessLifecycleAttempt(harness, attemptParams);
     });
-  if (harness.id === "openclaw") {
+  if (harness.id === "steelengine") {
     return await runWithDiagnosticTraceContext(harnessTrace, runAttempt);
   }
 
   try {
     return await runWithDiagnosticTraceContext(harnessTrace, runAttempt);
   } catch (error) {
-    log.warn(`${harness.label} failed; not falling back to embedded OpenClaw backend`, {
+    log.warn(`${harness.label} failed; not falling back to embedded SteelEngine backend`, {
       harnessId: harness.id,
       provider: params.provider,
       modelId: params.modelId,
@@ -516,7 +516,7 @@ export async function runAgentHarnessAttempt(
 }
 
 function isSystemAgentOnlyAllowlist(toolsAllow: readonly string[] | undefined): boolean {
-  return toolsAllow?.length === 1 && normalizeToolName(toolsAllow[0] ?? "") === "openclaw";
+  return toolsAllow?.length === 1 && normalizeToolName(toolsAllow[0] ?? "") === "steelengine";
 }
 
 function withoutInternalHarnessAuthority(
@@ -549,9 +549,9 @@ function applyPluginHarnessDenyAllToolPolicy(
   params: EmbeddedRunAttemptParams,
 ): EmbeddedRunAttemptParams {
   if (
-    isHostScopedAgentToolActive("openclaw") &&
+    isHostScopedAgentToolActive("steelengine") &&
     params.toolsAllow?.length === 1 &&
-    normalizeToolName(params.toolsAllow[0] ?? "") === "openclaw"
+    normalizeToolName(params.toolsAllow[0] ?? "") === "steelengine"
   ) {
     return params;
   }

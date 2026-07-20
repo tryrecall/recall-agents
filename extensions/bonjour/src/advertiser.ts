@@ -2,8 +2,8 @@
 import fs from "node:fs";
 import os from "node:os";
 import type { CiaoService } from "@homebridge/ciao";
-import type { PluginLogger } from "openclaw/plugin-sdk/plugin-entry";
-import { isTruthyEnvValue } from "openclaw/plugin-sdk/runtime-env";
+import type { PluginLogger } from "steelengine/plugin-sdk/plugin-entry";
+import { isTruthyEnvValue } from "steelengine/plugin-sdk/runtime-env";
 import { classifyCiaoProcessError } from "./ciao.js";
 import { formatBonjourError } from "./errors.js";
 
@@ -11,7 +11,7 @@ type GatewayBonjourAdvertiser = {
   stop: () => Promise<void>;
 };
 
-/** Input data used to publish OpenClaw gateway Bonjour records. */
+/** Input data used to publish SteelEngine gateway Bonjour records. */
 type GatewayBonjourAdvertiseOpts = {
   instanceName?: string;
   gatewayPort: number;
@@ -47,7 +47,7 @@ const defaultLogger = {
 };
 
 function readBonjourDisableOverride(): boolean | null {
-  const raw = process.env.OPENCLAW_DISABLE_BONJOUR;
+  const raw = process.env.STEELENGINE_DISABLE_BONJOUR;
   const normalized = raw?.trim().toLowerCase();
   if (!normalized) {
     return null;
@@ -133,7 +133,7 @@ function resolveSystemMdnsHostname(): string | null {
 const MAX_DNS_LABEL_BYTES = 63;
 const utf8Encoder = new TextEncoder();
 
-function truncateToDnsLabel(name: string, fallback = "OpenClaw"): string {
+function truncateToDnsLabel(name: string, fallback = "SteelEngine"): string {
   const encoded = utf8Encoder.encode(name);
   if (encoded.byteLength <= MAX_DNS_LABEL_BYTES) {
     return name;
@@ -151,12 +151,12 @@ function truncateToDnsLabel(name: string, fallback = "OpenClaw"): string {
 
 function safeServiceName(name: string) {
   const trimmed = name.trim();
-  return trimmed.length > 0 ? truncateToDnsLabel(trimmed) : "OpenClaw";
+  return trimmed.length > 0 ? truncateToDnsLabel(trimmed) : "SteelEngine";
 }
 
 function prettifyInstanceName(name: string) {
   const normalized = name.trim().replace(/\s+/g, " ");
-  return normalized.replace(/\s+\(OpenClaw\)\s*$/i, "").trim() || normalized;
+  return normalized.replace(/\s+\(SteelEngine\)\s*$/i, "").trim() || normalized;
 }
 
 function serviceSummary(label: string, svc: CiaoService): string {
@@ -238,16 +238,16 @@ export async function startGatewayBonjourAdvertiser(
     cleanupUncaughtException = deps.registerUncaughtExceptionHandler(handleCiaoProcessError);
 
     const hostnameRaw =
-      process.env.OPENCLAW_MDNS_HOSTNAME?.trim() || resolveSystemMdnsHostname() || "openclaw";
+      process.env.STEELENGINE_MDNS_HOSTNAME?.trim() || resolveSystemMdnsHostname() || "steelengine";
     const hostnameWithoutLocal = hostnameRaw.replace(/\.local$/i, "");
     const dotIndex = hostnameWithoutLocal.indexOf(".");
     const labelEnd = dotIndex === -1 ? hostnameWithoutLocal.length : dotIndex;
-    const hostnameLabel = hostnameWithoutLocal.slice(0, labelEnd).trim() || "openclaw";
-    const hostname = truncateToDnsLabel(hostnameLabel, "openclaw");
+    const hostnameLabel = hostnameWithoutLocal.slice(0, labelEnd).trim() || "steelengine";
+    const hostname = truncateToDnsLabel(hostnameLabel, "steelengine");
     const instanceName =
       typeof opts.instanceName === "string" && opts.instanceName.trim()
         ? opts.instanceName.trim()
-        : `${hostname} (OpenClaw)`;
+        : `${hostname} (SteelEngine)`;
     const displayName = prettifyInstanceName(instanceName);
 
     const txtBase: Record<string, string> = {
@@ -290,7 +290,7 @@ export async function startGatewayBonjourAdvertiser(
 
       const gateway = responder.createService({
         name: safeServiceName(instanceName),
-        type: "openclaw-gw",
+        type: "steelengine-gw",
         port: opts.gatewayPort,
         domain: "local",
         hostname,

@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { monitorEventLoopDelay, performance } from "node:perf_hooks";
-import { uniqueStrings } from "@openclaw/normalization-core/string-normalization";
+import { uniqueStrings } from "@steelengine/normalization-core/string-normalization";
 import { getActiveBackgroundExecSessionCount } from "../agents/bash-process-registry.js";
 import {
   getActiveEmbeddedRunCount,
@@ -35,7 +35,7 @@ import { isNixMode, normalizeStateDirEnv } from "../config/paths.js";
 import { captureConfigOverrideApplier } from "../config/runtime-overrides.js";
 import { resolveMainSessionKey } from "../config/sessions.js";
 import type { GatewayAuthConfig } from "../config/types.gateway.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { isSecretRef } from "../config/types.secrets.js";
 import { getActiveCronJobCount } from "../cron/active-jobs.js";
 import {
@@ -47,7 +47,7 @@ import {
   isDiagnosticsTimelineEnabled,
 } from "../infra/diagnostics-timeline.js";
 import { isTruthyEnvValue, isVitestRuntimeEnv, logAcceptedEnvOption } from "../infra/env.js";
-import { ensureOpenClawCliOnPath } from "../infra/path-env.js";
+import { ensureSteelEngineCliOnPath } from "../infra/path-env.js";
 import { readGatewayRestartHandoffSync } from "../infra/restart-handoff.js";
 import {
   type GatewayRestartEmitter,
@@ -172,7 +172,7 @@ export async function resetModelCatalogCacheForTest(): Promise<void> {
   await resetModelCatalogCacheForTestLocal();
 }
 
-ensureOpenClawCliOnPath();
+ensureSteelEngineCliOnPath();
 
 const MAX_MEDIA_TTL_HOURS = 24 * 7;
 const POST_READY_MAINTENANCE_DELAY_MS = 250;
@@ -265,8 +265,8 @@ const logSecrets = log.child("secrets");
 const gatewayRuntime = runtimeForLogger(log);
 
 function createGatewayStartupTrace() {
-  const logEnabled = isTruthyEnvValue(process.env.OPENCLAW_GATEWAY_STARTUP_TRACE);
-  let timelineConfig: OpenClawConfig | undefined;
+  const logEnabled = isTruthyEnvValue(process.env.STEELENGINE_GATEWAY_STARTUP_TRACE);
+  let timelineConfig: SteelEngineConfig | undefined;
   let eventLoopDelay: ReturnType<typeof monitorEventLoopDelay> | undefined;
   const timelineOptions = () => ({
     ...(timelineConfig ? { config: timelineConfig } : {}),
@@ -274,7 +274,7 @@ function createGatewayStartupTrace() {
   });
   const eventLoopTimelineEnabled = () =>
     isDiagnosticsTimelineEnabled(timelineOptions()) &&
-    isTruthyEnvValue(process.env.OPENCLAW_DIAGNOSTICS_EVENT_LOOP);
+    isTruthyEnvValue(process.env.STEELENGINE_DIAGNOSTICS_EVENT_LOOP);
   const ensureEventLoopDelay = () => {
     if (eventLoopDelay || (!logEnabled && !eventLoopTimelineEnabled())) {
       return;
@@ -362,7 +362,7 @@ function createGatewayStartupTrace() {
     }
   };
   return {
-    setConfig(config: OpenClawConfig) {
+    setConfig(config: SteelEngineConfig) {
       timelineConfig = config;
       ensureEventLoopDelay();
     },
@@ -472,12 +472,12 @@ function formatRuntimeGatewayAuthTokenWarning(): string {
   const base =
     "Gateway auth token was missing. Generated a runtime token for this startup without changing config; restart will generate a different token.";
   if (!isNixMode) {
-    return `${base} Persist one with \`openclaw config set gateway.auth.mode token\` and \`openclaw config set gateway.auth.token <token>\`.`;
+    return `${base} Persist one with \`steelengine config set gateway.auth.mode token\` and \`steelengine config set gateway.auth.token <token>\`.`;
   }
   return [
     base,
-    "In Nix mode, set gateway.auth.token in your Nix-managed OpenClaw config and rebuild.",
-    "For the first-party Nix flow, see https://github.com/openclaw/nix-openclaw#quick-start and https://docs.openclaw.ai/install/nix.",
+    "In Nix mode, set gateway.auth.token in your Nix-managed SteelEngine config and rebuild.",
+    "For the first-party Nix flow, see https://github.com/steelengine/nix-steelengine#quick-start and https://docs.steelengine.ai/install/nix.",
   ].join(" ");
 }
 
@@ -562,7 +562,7 @@ export type GatewayServerOptions = {
   startupStartedAt?: number;
   /**
    * Config snapshot already read by the CLI gateway preflight. Passing it avoids
-   * reparsing openclaw.json during server startup.
+   * reparsing steelengine.json during server startup.
    */
   startupConfigSnapshotRead?: ReadConfigFileSnapshotWithPluginMetadataResult;
   /** Restart request override; direct servers fail closed on restart-required reloads. */
@@ -576,22 +576,22 @@ export async function startGatewayServer(
   normalizeStateDirEnv(process.env);
   const [
     {
-      OPENCLAW_DATABASE_SCHEMA_DOCS_URL,
-      OpenClawDatabaseSchemaPreflightError,
-      preflightOpenClawDatabaseSchemas,
+      STEELENGINE_DATABASE_SCHEMA_DOCS_URL,
+      SteelEngineDatabaseSchemaPreflightError,
+      preflightSteelEngineDatabaseSchemas,
     },
     agentDatabase,
     stateDatabase,
   ] = await Promise.all([
-    import("../state/openclaw-database-preflight.js"),
-    import("../state/openclaw-agent-db.js"),
-    import("../state/openclaw-state-db.js"),
+    import("../state/steelengine-database-preflight.js"),
+    import("../state/steelengine-agent-db.js"),
+    import("../state/steelengine-state-db.js"),
   ]);
-  const databaseSchemas = preflightOpenClawDatabaseSchemas({
+  const databaseSchemas = preflightSteelEngineDatabaseSchemas({
     env: process.env,
     supportedVersions: {
-      state: stateDatabase.OPENCLAW_STATE_SCHEMA_VERSION,
-      agent: agentDatabase.OPENCLAW_AGENT_SCHEMA_VERSION,
+      state: stateDatabase.STEELENGINE_STATE_SCHEMA_VERSION,
+      agent: agentDatabase.STEELENGINE_AGENT_SCHEMA_VERSION,
     },
   });
   if (databaseSchemas.incompatible.length > 0) {
@@ -603,33 +603,33 @@ export async function startGatewayServer(
         foundVersion: database.foundVersion,
         supportedVersion: database.supportedVersion,
         writerAppVersion: database.writerAppVersion ?? "unknown",
-        docsUrl: OPENCLAW_DATABASE_SCHEMA_DOCS_URL,
+        docsUrl: STEELENGINE_DATABASE_SCHEMA_DOCS_URL,
       });
     }
-    throw new OpenClawDatabaseSchemaPreflightError(databaseSchemas.incompatible);
+    throw new SteelEngineDatabaseSchemaPreflightError(databaseSchemas.incompatible);
   }
   for (const database of databaseSchemas.indeterminate) {
     log.warn("database schema preflight could not inspect database; continuing to real open", {
       kind: database.kind,
       path: database.path,
       reason: database.reason,
-      docsUrl: OPENCLAW_DATABASE_SCHEMA_DOCS_URL,
+      docsUrl: STEELENGINE_DATABASE_SCHEMA_DOCS_URL,
     });
   }
   const { bootstrapGatewayNetworkRuntime } = await import("./server-network-runtime.js");
   bootstrapGatewayNetworkRuntime();
 
   const minimalTestGateway =
-    isVitestRuntimeEnv() && process.env.OPENCLAW_TEST_MINIMAL_GATEWAY === "1";
+    isVitestRuntimeEnv() && process.env.STEELENGINE_TEST_MINIMAL_GATEWAY === "1";
 
   // Ensure all default port derivations (browser/canvas) see the actual runtime port.
-  process.env.OPENCLAW_GATEWAY_PORT = String(port);
+  process.env.STEELENGINE_GATEWAY_PORT = String(port);
   logAcceptedEnvOption({
-    key: "OPENCLAW_RAW_STREAM",
+    key: "STEELENGINE_RAW_STREAM",
     description: "raw stream logging enabled",
   });
   logAcceptedEnvOption({
-    key: "OPENCLAW_RAW_STREAM_PATH",
+    key: "STEELENGINE_RAW_STREAM_PATH",
     description: "raw stream log path override",
   });
   if (!resumeGatewayRestartTraceFromEnv(process.env, [["source", "env"]])) {
@@ -684,7 +684,7 @@ export async function startGatewayServer(
   const emitSecretsStateEvent = (
     code: "SECRETS_RELOADER_DEGRADED" | "SECRETS_RELOADER_RECOVERED",
     message: string,
-    cfg: OpenClawConfig,
+    cfg: SteelEngineConfig,
   ) => {
     enqueueSystemEvent(`[${code}] ${message}`, {
       sessionKey: resolveMainSessionKey(cfg),
@@ -783,7 +783,7 @@ export async function startGatewayServer(
   const seededControlUiAllowedOrigins = controlUiSeed.seededAllowedOrigins
     ? cfgAtStart.gateway?.controlUi?.allowedOrigins
     : undefined;
-  const applyFixedGatewayOverlays = (config: OpenClawConfig): OpenClawConfig => {
+  const applyFixedGatewayOverlays = (config: SteelEngineConfig): SteelEngineConfig => {
     let runtimeConfig = config;
     if (reloadAuthOverride || startupTailscaleOverride) {
       runtimeConfig = {
@@ -821,7 +821,7 @@ export async function startGatewayServer(
     }
     return runtimeConfig;
   };
-  const applyReloadableGatewayAuthRefs = (config: OpenClawConfig): OpenClawConfig => {
+  const applyReloadableGatewayAuthRefs = (config: SteelEngineConfig): SteelEngineConfig => {
     if (!startupAuthSecretRefOverride?.token && !startupAuthSecretRefOverride?.password) {
       return config;
     }
@@ -834,9 +834,9 @@ export async function startGatewayServer(
     };
   };
   const prepareReloadCandidate = (params: {
-    runtimeConfig: OpenClawConfig;
-    sourceConfig: OpenClawConfig;
-    previousSourceConfig?: OpenClawConfig;
+    runtimeConfig: SteelEngineConfig;
+    sourceConfig: SteelEngineConfig;
+    previousSourceConfig?: SteelEngineConfig;
   }) => {
     const previousSourceConfig =
       params.previousSourceConfig ??
@@ -857,14 +857,14 @@ export async function startGatewayServer(
           discovery: metadata?.discovery,
         });
     const applyCandidateOverrides = captureConfigOverrideApplier();
-    const reapplyCompareOverlays = (config: OpenClawConfig): OpenClawConfig =>
+    const reapplyCompareOverlays = (config: SteelEngineConfig): SteelEngineConfig =>
       applyCandidateOverrides(
         mergeActivationSectionsIntoRuntimeConfig({
           runtimeConfig: config,
           activationConfig: pluginCandidate.compareConfig,
         }),
       );
-    const reapplyRuntimeOverlays = (config: OpenClawConfig): OpenClawConfig =>
+    const reapplyRuntimeOverlays = (config: SteelEngineConfig): SteelEngineConfig =>
       applyFixedGatewayOverlays(applyReloadableGatewayAuthRefs(reapplyCompareOverlays(config)));
     return {
       runtimeConfig: reapplyRuntimeOverlays(params.runtimeConfig),
@@ -1054,7 +1054,7 @@ export async function startGatewayServer(
       env: process.env,
       tailscaleMode,
     });
-  const resolveSharedGatewaySessionGenerationForConfig = (config: OpenClawConfig) =>
+  const resolveSharedGatewaySessionGenerationForConfig = (config: SteelEngineConfig) =>
     resolveSharedGatewaySessionGeneration(
       resolveGatewayAuth({
         authConfig: config.gateway?.auth,
@@ -1160,8 +1160,8 @@ export async function startGatewayServer(
     getGatewayDraining: isGatewayDraining,
     getEventLoopHealth: readinessEventLoopHealth.snapshot,
     shouldSkipChannelReadiness: () =>
-      isTruthyEnvValue(process.env.OPENCLAW_SKIP_CHANNELS) ||
-      isTruthyEnvValue(process.env.OPENCLAW_SKIP_PROVIDERS),
+      isTruthyEnvValue(process.env.STEELENGINE_SKIP_CHANNELS) ||
+      isTruthyEnvValue(process.env.STEELENGINE_SKIP_PROVIDERS),
   });
   log.info("starting HTTP server...");
   let currentPluginRegistryGatewayContext: GatewayRequestContext | undefined;
@@ -1766,7 +1766,7 @@ export async function startGatewayServer(
         ]),
       );
     const reloadAttachedGatewayPlugins = async (params: {
-      nextConfig: OpenClawConfig;
+      nextConfig: SteelEngineConfig;
       changedPaths: readonly string[];
       beforeReplace: (channels: ReadonlySet<ChannelId>) => Promise<void>;
       commitRuntime: () => Promise<void>;
@@ -1917,7 +1917,7 @@ export async function startGatewayServer(
           clients,
           invalidateDeviceTransports: watchNodeHttpRuntime.invalidateSessionsForDevice,
           disconnectDeviceTransports: watchNodeHttpRuntime.disconnectSessionsForDevice,
-          enforceSharedGatewayAuthGenerationForConfigWrite: (nextConfig: OpenClawConfig) => {
+          enforceSharedGatewayAuthGenerationForConfigWrite: (nextConfig: SteelEngineConfig) => {
             enforceSharedGatewaySessionGenerationForConfigWrite({
               state: sharedGatewaySessionGenerationState,
               nextConfig,
@@ -2223,10 +2223,10 @@ export async function startGatewayServer(
     }
     finishGatewayRestartTrace("restart.ready", collectGatewayProcessMemoryUsageMb());
     if (!minimalTestGateway) {
-      const { startOpenClawDatabaseIntegrityVerifier } =
-        await import("../state/openclaw-database-verify.js");
+      const { startSteelEngineDatabaseIntegrityVerifier } =
+        await import("../state/steelengine-database-verify.js");
       runtimeState.gatewayLifetimeSidecars.push(
-        startOpenClawDatabaseIntegrityVerifier({ env: process.env }),
+        startSteelEngineDatabaseIntegrityVerifier({ env: process.env }),
       );
     }
     postAttachRuntimeReturned = true;

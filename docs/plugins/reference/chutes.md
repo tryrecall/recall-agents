@@ -1,5 +1,5 @@
 ---
-summary: "Adds Chutes model provider support to OpenClaw."
+summary: "Adds Chutes model provider support to SteelEngine."
 read_when:
   - You are installing, configuring, or auditing the chutes plugin
 title: "Chutes plugin"
@@ -7,12 +7,12 @@ title: "Chutes plugin"
 
 # Chutes plugin
 
-Adds Chutes model provider support to OpenClaw.
+Adds Chutes model provider support to SteelEngine.
 
 ## Distribution
 
-- Package: `@openclaw/chutes-provider`
-- Install route: npm; ClawHub: `clawhub:@openclaw/chutes-provider`
+- Package: `@steelengine/chutes-provider`
+- Install route: npm; ClawHub: `clawhub:@steelengine/chutes-provider`
 
 ## Surface
 

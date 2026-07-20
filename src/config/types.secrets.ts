@@ -1,4 +1,4 @@
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 // Defines secret reference and resolution configuration types.
 import { isRecord } from "../utils.js";
 

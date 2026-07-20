@@ -2,9 +2,9 @@ import fsSync from "node:fs";
 import {
   findNormalizedProviderValue,
   normalizeProviderId,
-} from "@openclaw/model-catalog-core/provider-id";
-import { formatByteSize } from "@openclaw/normalization-core";
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/model-catalog-core/provider-id";
+import { formatByteSize } from "@steelengine/normalization-core";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import { note } from "../../packages/terminal-core/src/note.js";
 import {
   resolveAgentDir,
@@ -23,7 +23,7 @@ import {
   resolveUsableCustomProviderApiKey,
 } from "../agents/model-auth.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { DoctorMemoryEmbeddingRuntimePayload } from "../gateway/server-methods/doctor.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import {
@@ -178,7 +178,7 @@ function resolveSuggestedRemoteMemoryProvider(): string | undefined {
   )?.providerId;
 }
 
-function hasConfiguredAwsSdkAuthForProvider(provider: string, cfg: OpenClawConfig): boolean {
+function hasConfiguredAwsSdkAuthForProvider(provider: string, cfg: SteelEngineConfig): boolean {
   const providerConfig = findNormalizedProviderValue(cfg.models?.providers, provider);
   if (providerConfig?.auth === "aws-sdk") {
     return true;
@@ -191,7 +191,7 @@ function hasConfiguredAwsSdkAuthForProvider(provider: string, cfg: OpenClawConfi
   );
 }
 
-function isOpenAICompatibleMemoryProvider(providerId: string, cfg: OpenClawConfig): boolean {
+function isOpenAICompatibleMemoryProvider(providerId: string, cfg: SteelEngineConfig): boolean {
   const normalizedProviderId = normalizeProviderId(providerId);
   if (normalizedProviderId === OPENAI_COMPATIBLE_MEMORY_EMBEDDING_PROVIDER) {
     return true;
@@ -219,7 +219,7 @@ function isOpenAICompatibleMemoryProvider(providerId: string, cfg: OpenClawConfi
 
 function resolveOpenAICompatibleMemoryBaseUrl(
   providerId: string,
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   remoteBaseUrl: string | undefined,
 ): string | undefined {
   return (
@@ -228,7 +228,7 @@ function resolveOpenAICompatibleMemoryBaseUrl(
   );
 }
 
-function isKeyOptionalMemoryProvider(providerId: string, cfg: OpenClawConfig): boolean {
+function isKeyOptionalMemoryProvider(providerId: string, cfg: SteelEngineConfig): boolean {
   return (
     providerId === "local" ||
     providerId === "ollama" ||
@@ -238,7 +238,7 @@ function isKeyOptionalMemoryProvider(providerId: string, cfg: OpenClawConfig): b
 }
 
 async function resolveRuntimeMemoryAuditContext(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
 ): Promise<RuntimeMemoryAuditContext | null> {
   const agentId = resolveDefaultAgentId(cfg);
   const result = await getActiveMemorySearchManager({
@@ -273,8 +273,8 @@ function buildMemoryRecallIssueNote(audit: ShortTermAuditSummary): string | null
   const issueLines = audit.issues.map((issue) => `- ${issue.message}`);
   const hasFixableIssue = audit.issues.some((issue) => issue.fixable);
   const guidance = hasFixableIssue
-    ? `Fix: ${formatCliCommand("openclaw doctor --fix")} or ${formatCliCommand("openclaw memory status --fix")}`
-    : `Verify: ${formatCliCommand("openclaw memory status --deep")}`;
+    ? `Fix: ${formatCliCommand("steelengine doctor --fix")} or ${formatCliCommand("steelengine memory status --fix")}`
+    : `Verify: ${formatCliCommand("steelengine memory status --deep")}`;
   return [
     "Memory recall artifacts need attention:",
     ...issueLines,
@@ -294,12 +294,12 @@ function buildDreamingArtifactIssueNote(audit: DreamingArtifactsAuditSummary): s
     ...issueLines,
     `Dream corpus: ${audit.sessionCorpusDir}`,
     hasFixableIssue
-      ? `Fix: ${formatCliCommand("openclaw doctor --fix")} or ${formatCliCommand("openclaw memory status --fix")}`
-      : `Verify: ${formatCliCommand("openclaw memory status --deep")}`,
+      ? `Fix: ${formatCliCommand("steelengine doctor --fix")} or ${formatCliCommand("steelengine memory status --fix")}`
+      : `Verify: ${formatCliCommand("steelengine memory status --deep")}`,
   ].join("\n");
 }
 
-export async function noteMemoryRecallHealth(cfg: OpenClawConfig): Promise<void> {
+export async function noteMemoryRecallHealth(cfg: SteelEngineConfig): Promise<void> {
   try {
     const context = await resolveRuntimeMemoryAuditContext(cfg);
     const workspaceDir = context?.workspaceDir?.trim();
@@ -331,7 +331,7 @@ export async function noteMemoryRecallHealth(cfg: OpenClawConfig): Promise<void>
 }
 
 export async function maybeRepairMemoryRecallHealth(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   prompter: DoctorPrompter;
 }): Promise<void> {
   await maybeRepairWorkspaceMemoryHealth(params);
@@ -374,7 +374,7 @@ export async function maybeRepairMemoryRecallHealth(params: {
             "Memory recall artifacts repaired:",
             repair.rewroteStore ? `- rewrote recall store${details ? ` (${details})` : ""}` : null,
             repair.removedStaleLock ? "- removed stale promotion lock" : null,
-            `Verify: ${formatCliCommand("openclaw memory status --deep")}`,
+            `Verify: ${formatCliCommand("steelengine memory status --deep")}`,
           ].filter(Boolean);
           note(lines.join("\n"), "Doctor changes");
         }
@@ -404,7 +404,7 @@ export async function maybeRepairMemoryRecallHealth(params: {
       dreamingRepair.archivedDreamsDiary ? "- archived dream diary" : null,
       dreamingRepair.archiveDir ? `- archive dir: ${dreamingRepair.archiveDir}` : null,
       ...dreamingRepair.warnings.map((warning) => `- warning: ${warning}`),
-      `Verify: ${formatCliCommand("openclaw memory status --deep")}`,
+      `Verify: ${formatCliCommand("steelengine memory status --deep")}`,
     ].filter(Boolean);
     note(lines.join("\n"), "Doctor changes");
   } catch (err) {
@@ -415,7 +415,7 @@ export async function maybeRepairMemoryRecallHealth(params: {
   }
 }
 
-function hasActiveAlternateMemoryPluginSlot(cfg: OpenClawConfig): boolean {
+function hasActiveAlternateMemoryPluginSlot(cfg: SteelEngineConfig): boolean {
   const plugins = normalizePluginsConfig(cfg.plugins);
   if (!plugins.enabled) {
     return false;
@@ -441,7 +441,7 @@ function hasActiveAlternateMemoryPluginSlot(cfg: OpenClawConfig): boolean {
 }
 
 function listRememberAcrossConversationAgentIds(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   defaultAgentId: string,
 ): string[] {
   const defaultsEnabled = cfg.agents?.defaults?.memorySearch?.rememberAcrossConversations === true;
@@ -467,7 +467,7 @@ function listRememberAcrossConversationAgentIds(
   return [...new Set(enabledAgentIds)];
 }
 
-function isActiveMemoryPluginAvailable(cfg: OpenClawConfig): boolean {
+function isActiveMemoryPluginAvailable(cfg: SteelEngineConfig): boolean {
   const plugins = normalizePluginsConfig(cfg.plugins);
   if (!plugins.enabled || plugins.deny.includes("active-memory")) {
     return false;
@@ -483,7 +483,7 @@ function isActiveMemoryPluginAvailable(cfg: OpenClawConfig): boolean {
   return pluginConfig?.enabled !== false;
 }
 
-function resolveActiveMemoryConversationRecallSupport(cfg: OpenClawConfig): {
+function resolveActiveMemoryConversationRecallSupport(cfg: SteelEngineConfig): {
   providerSupported: boolean;
   memorySearchAllowed: boolean;
 } {
@@ -504,7 +504,7 @@ function resolveActiveMemoryConversationRecallSupport(cfg: OpenClawConfig): {
 }
 
 function noteRememberAcrossConversationsHealth(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   defaultAgentId: string;
   noteFn: typeof note;
 }): { defaultAgentEnabled: boolean } {
@@ -548,12 +548,12 @@ function noteRememberAcrossConversationsHealth(params: {
 
 /**
  * Check whether memory search has a usable embedding provider.
- * Runs as part of `openclaw doctor` — config-only checks where possible;
+ * Runs as part of `steelengine doctor` — config-only checks where possible;
  * may spawn a short-lived probe process when `memory.backend=qmd` to verify
  * the configured `qmd` binary is available.
  */
 export async function noteMemorySearchHealth(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   opts?: {
     gatewayMemoryProbe?: {
       checked: boolean;
@@ -632,10 +632,10 @@ export async function noteMemorySearchHealth(
               : "- Install the supported QMD package: npm install -g @tobilu/qmd (or bun install -g @tobilu/qmd)",
             workspaceProbeFailed
               ? "- Verify the resolved workspace path for the affected agent before retrying."
-              : `- Set an explicit binary path: ${formatCliCommand("openclaw config set memory.qmd.command /absolute/path/to/qmd")}`,
-            `- Or switch back to builtin memory: ${formatCliCommand("openclaw config set memory.backend builtin")}`,
+              : `- Set an explicit binary path: ${formatCliCommand("steelengine config set memory.qmd.command /absolute/path/to/qmd")}`,
+            `- Or switch back to builtin memory: ${formatCliCommand("steelengine config set memory.backend builtin")}`,
             "",
-            `Verify: ${formatCliCommand("openclaw memory status --deep")}`,
+            `Verify: ${formatCliCommand("steelengine memory status --deep")}`,
           ]
             .filter(Boolean)
             .join("\n"),
@@ -656,11 +656,11 @@ export async function noteMemorySearchHealth(
           "",
           "Fix (pick one):",
           `- Enable QMD session export: ${formatCliCommand(
-            "openclaw config set memory.qmd.sessions.enabled true",
+            "steelengine config set memory.qmd.sessions.enabled true",
           )}`,
           "- Or remove sessions from the default agent's memorySearch.sources if QMD session recall is not intended.",
           "",
-          `Verify: ${formatCliCommand("openclaw memory status --deep")}`,
+          `Verify: ${formatCliCommand("steelengine memory status --deep")}`,
         ].join("\n"),
         "Memory search",
       );
@@ -699,13 +699,13 @@ export async function noteMemorySearchHealth(
         gatewayDetail ? `Gateway probe: ${gatewayDetail}` : null,
         "",
         "Fix (pick one):",
-        `- Install the llama.cpp provider plugin: ${formatCliCommand("openclaw plugins install @openclaw/llama-cpp-provider")}`,
+        `- Install the llama.cpp provider plugin: ${formatCliCommand("steelengine plugins install @steelengine/llama-cpp-provider")}`,
         `- Set a local GGUF model path in config`,
         suggestedRemoteProvider
-          ? `- Switch to a remote provider: ${formatCliCommand(`openclaw config set agents.defaults.memorySearch.provider ${suggestedRemoteProvider}`)}`
+          ? `- Switch to a remote provider: ${formatCliCommand(`steelengine config set agents.defaults.memorySearch.provider ${suggestedRemoteProvider}`)}`
           : `- Switch to a remote embedding provider in config`,
         "",
-        `Verify: ${formatCliCommand("openclaw memory status --deep")}`,
+        `Verify: ${formatCliCommand("steelengine memory status --deep")}`,
       ]
         .filter(Boolean)
         .join("\n"),
@@ -724,9 +724,9 @@ export async function noteMemorySearchHealth(
         "Set agents.defaults.memorySearch.remote.baseUrl to the /v1 endpoint for your embeddings server.",
         "",
         "Fix:",
-        `- ${formatCliCommand("openclaw config set agents.defaults.memorySearch.remote.baseUrl http://127.0.0.1:1234/v1")}`,
+        `- ${formatCliCommand("steelengine config set agents.defaults.memorySearch.remote.baseUrl http://127.0.0.1:1234/v1")}`,
         "",
-        `Verify: ${formatCliCommand("openclaw memory status --deep")}`,
+        `Verify: ${formatCliCommand("steelengine memory status --deep")}`,
       ].join("\n"),
       "Memory search",
     );
@@ -740,9 +740,9 @@ export async function noteMemorySearchHealth(
         "Set agents.defaults.memorySearch.model to the embedding model id your server expects.",
         "",
         "Fix:",
-        `- ${formatCliCommand("openclaw config set agents.defaults.memorySearch.model text-embedding-bge-m3")}`,
+        `- ${formatCliCommand("steelengine config set agents.defaults.memorySearch.model text-embedding-bge-m3")}`,
         "",
-        `Verify: ${formatCliCommand("openclaw memory status --deep")}`,
+        `Verify: ${formatCliCommand("steelengine memory status --deep")}`,
       ].join("\n"),
       "Memory search",
     );
@@ -755,7 +755,7 @@ export async function noteMemorySearchHealth(
     }
     // When the probe was intentionally skipped (skipped: true / checked: false
     // due to probe:false path), we have no embedding status information — do
-    // not warn. A skipped probe means the user ran `openclaw doctor` without
+    // not warn. A skipped probe means the user ran `steelengine doctor` without
     // --deep; it does not mean embeddings are unavailable.
     // NOTE: a transport timeout also sets checked: false, but skipped stays
     // false/absent — a timeout is a real diagnostic signal and should fall
@@ -770,7 +770,7 @@ export async function noteMemorySearchHealth(
           ? `Memory search provider "${provider}" is configured, but the gateway reports embeddings are not ready.`
           : `Memory search provider "${provider}" is configured, but the gateway could not confirm embeddings are ready.`,
         gatewayProbeWarning,
-        `Verify: ${formatCliCommand("openclaw memory status --deep")}`,
+        `Verify: ${formatCliCommand("steelengine memory status --deep")}`,
       ]
         .filter(Boolean)
         .join("\n"),
@@ -794,7 +794,7 @@ export async function noteMemorySearchHealth(
       [
         `Memory search provider is set to "${provider}" but the API key was not found in the CLI environment.`,
         "The running gateway reports memory embeddings are ready for the default agent.",
-        `Verify: ${formatCliCommand("openclaw memory status --deep")}`,
+        `Verify: ${formatCliCommand("steelengine memory status --deep")}`,
       ].join("\n"),
       "Memory search",
     );
@@ -811,10 +811,10 @@ export async function noteMemorySearchHealth(
       "",
       "Fix (pick one):",
       `- Set ${envVar} in your environment`,
-      `- Configure credentials: ${formatCliCommand("openclaw configure --section model")}`,
-      `- To disable: ${formatCliCommand("openclaw config set agents.defaults.memorySearch.enabled false")}`,
+      `- Configure credentials: ${formatCliCommand("steelengine configure --section model")}`,
+      `- To disable: ${formatCliCommand("steelengine config set agents.defaults.memorySearch.enabled false")}`,
       "",
-      `Verify: ${formatCliCommand("openclaw memory status --deep")}`,
+      `Verify: ${formatCliCommand("steelengine memory status --deep")}`,
     ].join("\n"),
     "Memory search",
   );
@@ -845,7 +845,7 @@ function hasLocalEmbeddings(local: { modelPath?: string }): boolean {
 
 async function hasApiKeyForProvider(
   provider: string,
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   agentDir: string,
   opts?: { skipProfileResolution?: boolean },
 ): Promise<boolean> {

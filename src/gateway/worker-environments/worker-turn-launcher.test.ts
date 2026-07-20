@@ -11,10 +11,10 @@ import {
 import type { SpawnResult } from "../../process/exec.js";
 import { createDeferred } from "../../shared/deferred.js";
 import {
-  closeOpenClawStateDatabaseForTest,
-  openOpenClawStateDatabase,
-  type OpenClawStateDatabase,
-} from "../../state/openclaw-state-db.js";
+  closeSteelEngineStateDatabaseForTest,
+  openSteelEngineStateDatabase,
+  type SteelEngineStateDatabase,
+} from "../../state/steelengine-state-db.js";
 import {
   parseWorkerLaunchDescriptor,
   type WorkerLaunchDescriptor,
@@ -49,13 +49,13 @@ function hasLoneSurrogate(value: string): boolean {
 
 describe("worker turn launcher", () => {
   let root: string;
-  let database: OpenClawStateDatabase;
+  let database: SteelEngineStateDatabase;
   let placements: WorkerSessionPlacementStore;
   let sessionFile: string;
 
   beforeEach(async () => {
-    root = await fs.mkdtemp(path.join(await fs.realpath(os.tmpdir()), "openclaw-worker-turn-"));
-    database = openOpenClawStateDatabase({ env: { OPENCLAW_STATE_DIR: root } });
+    root = await fs.mkdtemp(path.join(await fs.realpath(os.tmpdir()), "steelengine-worker-turn-"));
+    database = openSteelEngineStateDatabase({ env: { STEELENGINE_STATE_DIR: root } });
     placements = createWorkerSessionPlacementStore({ database });
     const manager = SessionManager.create(path.join(root, "sessions"), path.join(root, "sessions"));
     const file = manager.getSessionFile();
@@ -66,7 +66,7 @@ describe("worker turn launcher", () => {
   });
 
   afterEach(async () => {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     await fs.rm(root, { recursive: true, force: true });
   });
 
@@ -148,7 +148,7 @@ describe("worker turn launcher", () => {
       provisionOperationId: "provision-worker-turn",
       bootstrapReceipt: {
         bundleHash: BUNDLE_HASH,
-        openclawVersion: "2026.7.2",
+        steelengineVersion: "2026.7.2",
         protocolFeatures: [],
       },
       ownerEpoch: OWNER_EPOCH,
@@ -224,7 +224,7 @@ describe("worker turn launcher", () => {
         agents: {
           defaults: {
             models: {
-              "openai/gpt-test": { agentRuntime: { id: "openclaw" } },
+              "openai/gpt-test": { agentRuntime: { id: "steelengine" } },
             },
           },
         },
@@ -462,7 +462,7 @@ describe("worker turn launcher", () => {
           },
           runLocal,
         ),
-      ).rejects.toThrow(`Cloud worker turns require the OpenClaw runtime, not ${runtimeId}`);
+      ).rejects.toThrow(`Cloud worker turns require the SteelEngine runtime, not ${runtimeId}`);
 
       expect(runLocal).not.toHaveBeenCalled();
       expect(getEnvironment).not.toHaveBeenCalled();
@@ -518,8 +518,8 @@ describe("worker turn launcher", () => {
         expect(command.argv).toEqual([
           "sh",
           "-c",
-          'exec node "$HOME/.openclaw-worker/$1/openclaw.mjs" worker',
-          "openclaw-worker",
+          'exec node "$HOME/.steelengine-worker/$1/steelengine.mjs" worker',
+          "steelengine-worker",
           BUNDLE_HASH,
         ]);
         expect(command.argv.join(" ")).not.toContain(credential().credential);

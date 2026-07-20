@@ -1,6 +1,6 @@
 // Nextcloud Talk tests cover monitor.replay plugin behavior.
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { createMockIncomingRequest } from "openclaw/plugin-sdk/test-env";
+import { createMockIncomingRequest } from "steelengine/plugin-sdk/test-env";
 import { describe, expect, it, vi } from "vitest";
 import {
   createNextcloudTalkWebhookServer,

@@ -5,8 +5,8 @@
  */
 import os from "node:os";
 import path from "node:path";
-import { addTimerTimeoutGraceMs } from "@openclaw/normalization-core/number-coercion";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import { addTimerTimeoutGraceMs } from "@steelengine/normalization-core/number-coercion";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { ToolLoopDetectionConfig } from "../config/types.tools.js";
 import { GatewayClientRequestError } from "../gateway/client.js";
 import {
@@ -136,7 +136,7 @@ export type ToolOutcomeObserver = (observation: ToolOutcomeObservation) => void;
 
 export type HookContext = {
   agentId?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   /** Tool execution cwd for host-derived path facts. */
   cwd?: string;
   /** Host workspace used to resolve relative tool params for diagnostics only. */
@@ -378,7 +378,7 @@ class BeforeToolCallBlockedError extends Error {
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
   (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.beforeToolCallBlockedErrorTestApi")
+    Symbol.for("steelengine.beforeToolCallBlockedErrorTestApi")
   ] = {
     create(message: string): Error {
       return new BeforeToolCallBlockedError(message);

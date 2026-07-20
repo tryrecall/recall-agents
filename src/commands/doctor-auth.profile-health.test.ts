@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AuthProfileFailureReason, AuthProfileStore } from "../agents/auth-profiles/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { DoctorPrompter } from "./doctor-prompter.js";
 
 const authProfileMocks = vi.hoisted(() => ({
@@ -44,7 +44,7 @@ describe("noteAuthProfileHealth", () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-doctor-auth-"));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-doctor-auth-"));
     authProfileMocks.ensureAuthProfileStore.mockReset();
     authProfileMocks.hasAnyAuthProfileStoreSource.mockReset();
     authProfileMocks.hasAnyAuthProfileStoreSource.mockReturnValue(false);
@@ -66,7 +66,7 @@ describe("noteAuthProfileHealth", () => {
   }
 
   function expectedAuthStorePath(agentDir: string): string {
-    return path.join(agentDir, "openclaw-agent.sqlite");
+    return path.join(agentDir, "steelengine-agent.sqlite");
   }
 
   function expiredStore(profileId: string, expires: number) {
@@ -98,7 +98,7 @@ describe("noteAuthProfileHealth", () => {
         agents: {
           list: [{ id: "main", default: true, agentDir: mainDir }],
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(authProfileMocks.resolveApiKeyForProfile).not.toHaveBeenCalled();
@@ -134,7 +134,7 @@ describe("noteAuthProfileHealth", () => {
     const findings = await collectAuthProfileHealthFindings({
       cfg: {
         agents: { list: [{ id: "main", default: true, agentDir: mainDir }] },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(findings).toEqual([]);
@@ -167,7 +167,7 @@ describe("noteAuthProfileHealth", () => {
     const findings = await collectAuthProfileHealthFindings({
       cfg: {
         agents: { list: [{ id: "main", default: true, agentDir: mainDir }] },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(findings.map((finding) => finding.target)).toEqual([
@@ -197,7 +197,7 @@ describe("noteAuthProfileHealth", () => {
     const findings = await collectAuthProfileHealthFindings({
       cfg: {
         agents: { list: [{ id: "main", default: true, agentDir: mainDir }] },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(findings).toEqual([
@@ -230,7 +230,7 @@ describe("noteAuthProfileHealth", () => {
         agents: {
           list: [{ id: "main", default: true, agentDir: mainDir }],
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(findings).toEqual([
@@ -269,7 +269,7 @@ describe("noteAuthProfileHealth", () => {
       const findings = await collectAuthProfileHealthFindings({
         cfg: {
           agents: { list: [{ id: "main", default: true, agentDir: mainDir }] },
-        } as OpenClawConfig,
+        } as SteelEngineConfig,
       });
 
       expect(findings).toEqual([expect.objectContaining({ fixHint: expectedHint })]);
@@ -291,7 +291,7 @@ describe("noteAuthProfileHealth", () => {
     const findings = await collectAuthProfileHealthFindings({
       cfg: {
         agents: { list: [{ id: "main", default: true, agentDir: mainDir }] },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(findings).toEqual([
@@ -308,7 +308,7 @@ describe("noteAuthProfileHealth", () => {
         "zai:default": {
           type: "api_key",
           provider: "zai",
-          key: "openclaw onboard --auth-choice zai-coding-global",
+          key: "steelengine onboard --auth-choice zai-coding-global",
         },
       },
     } satisfies AuthProfileStore);
@@ -318,7 +318,7 @@ describe("noteAuthProfileHealth", () => {
         agents: {
           list: [{ id: "main", default: true, agentDir: mainDir }],
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(findings).toEqual([
@@ -329,7 +329,7 @@ describe("noteAuthProfileHealth", () => {
         path: expectedAuthStorePath(mainDir),
         target: "zai:default",
         requirement: "malformed_api_key",
-        fixHint: "Paste the API key value, not an OpenClaw onboarding command.",
+        fixHint: "Paste the API key value, not an SteelEngine onboarding command.",
       }),
     ]);
   });
@@ -359,7 +359,7 @@ describe("noteAuthProfileHealth", () => {
             { id: "coder", agentDir: coderDir },
           ],
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(findings.map((finding) => finding.message)).toEqual([
@@ -369,7 +369,7 @@ describe("noteAuthProfileHealth", () => {
   });
   it("skips external auth profile resolution when no auth source exists", async () => {
     await noteAuthProfileHealth({
-      cfg: { channels: { telegram: { enabled: true } } } as OpenClawConfig,
+      cfg: { channels: { telegram: { enabled: true } } } as SteelEngineConfig,
       prompter: {} as DoctorPrompter,
       allowKeychainPrompt: false,
     });
@@ -393,7 +393,7 @@ describe("noteAuthProfileHealth", () => {
         agents: {
           list: [{ id: "main", default: true, agentDir: defaultDir }],
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       prompter: {} as DoctorPrompter,
       allowKeychainPrompt: false,
     });
@@ -431,7 +431,7 @@ describe("noteAuthProfileHealth", () => {
             { id: "coder", agentDir: coderDir },
           ],
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       prompter: {
         confirmAutoFix: vi.fn(async () => false),
       } as unknown as DoctorPrompter,
@@ -468,7 +468,7 @@ describe("noteAuthProfileHealth", () => {
             { id: "coder", agentDir: coderDir },
           ],
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       prompter: {
         confirmAutoFix: vi.fn(async () => false),
       } as unknown as DoctorPrompter,
@@ -506,7 +506,7 @@ describe("noteAuthProfileHealth", () => {
             { id: "coder", agentDir: coderDir },
           ],
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       prompter: {
         confirmAutoFix: vi.fn(async () => false),
       } as unknown as DoctorPrompter,
@@ -537,7 +537,7 @@ describe("noteAuthProfileHealth", () => {
               "zai:default": {
                 type: "api_key",
                 provider: "zai",
-                key: "openclaw onboard --auth-choice zai-coding-global",
+                key: "steelengine onboard --auth-choice zai-coding-global",
               },
             },
           };
@@ -551,7 +551,7 @@ describe("noteAuthProfileHealth", () => {
         agents: {
           list: [{ id: "main", default: true, agentDir }],
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       prompter: {
         confirmAutoFix: vi.fn(async () => false),
       } as unknown as DoctorPrompter,
@@ -589,7 +589,7 @@ describe("noteAuthProfileHealth", () => {
             { id: "coder", agentDir: coderDir },
           ],
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       prompter: {
         confirmAutoFix: vi.fn(async () => true),
       } as unknown as DoctorPrompter,
@@ -609,22 +609,22 @@ describe("noteAuthProfileHealth", () => {
     [
       "openai-codex:default",
       "OAuth token refresh failed for openai-codex: refresh_token_reused. Please try again or re-authenticate.",
-      "- openai-codex:default: re-auth required [refresh_token_reused] — Run `openclaw models auth login --provider openai`.",
+      "- openai-codex:default: re-auth required [refresh_token_reused] — Run `steelengine models auth login --provider openai`.",
     ],
     [
       "openai-codex:default",
       "OAuth token refresh failed for openai-codex: temporary upstream issue. Please try again or re-authenticate.",
-      "- openai-codex:default: OAuth refresh failed — Try again; if this persists, run `openclaw models auth login --provider openai`.",
+      "- openai-codex:default: OAuth refresh failed — Try again; if this persists, run `steelengine models auth login --provider openai`.",
     ],
     [
       "OpenAI Work Profile",
       "OAuth token refresh failed for openai: invalid_grant. Please try again or re-authenticate.",
-      "- OpenAI Work Profile: re-auth required [invalid_grant] — Run `openclaw models auth login --provider openai --profile-id 'OpenAI Work Profile'`.",
+      "- OpenAI Work Profile: re-auth required [invalid_grant] — Run `steelengine models auth login --provider openai --profile-id 'OpenAI Work Profile'`.",
     ],
     [
       "openai-codex:default",
       "OAuth token refresh failed for openai-codex`\nrm -rf /: invalid_grant. Please try again or re-authenticate.",
-      "- openai-codex:default: re-auth required [invalid_grant] — Run `openclaw models auth login --provider openai`.",
+      "- openai-codex:default: re-auth required [invalid_grant] — Run `steelengine models auth login --provider openai`.",
     ],
   ])(
     "formats OAuth refresh failures through the doctor command path",
@@ -641,7 +641,7 @@ describe("noteAuthProfileHealth", () => {
       await noteAuthProfileHealth({
         cfg: {
           agents: { list: [{ id: "main", default: true, agentDir }] },
-        } as OpenClawConfig,
+        } as SteelEngineConfig,
         prompter: { confirmAutoFix: vi.fn(async () => true) } as unknown as DoctorPrompter,
         allowKeychainPrompt: false,
       });

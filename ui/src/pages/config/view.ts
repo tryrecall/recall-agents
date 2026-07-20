@@ -1,5 +1,5 @@
 // Control UI view renders config screen content.
-import { truncateUtf16Safe } from "@openclaw/normalization-core/utf16-slice";
+import { truncateUtf16Safe } from "@steelengine/normalization-core/utf16-slice";
 import JSON5 from "json5";
 import { html, nothing, type TemplateResult } from "lit";
 import type { QueueMode } from "../../../../src/auto-reply/reply/queue/types.js";
@@ -1532,7 +1532,7 @@ export function renderConfigAutoSaveStatus(props: {
         <button class="btn btn--sm" @click=${props.onRetry}>${t("configView.retry")}</button>
       `;
     case "conflict":
-      // Another writer changed openclaw.json; retrying this whole-form draft
+      // Another writer changed steelengine.json; retrying this whole-form draft
       // would clobber their edit, so the only offered recovery is a reload.
       return html`
         ${renderSettingsStatus({ kind: "danger", label: t("configView.autoSaveConflict") })}
@@ -2099,7 +2099,7 @@ export function renderConfig(props: ConfigProps) {
                                       ? t("configView.redacted")
                                       : t("configView.visible")}</span
                                   >
-                                  <openclaw-tooltip
+                                  <steelengine-tooltip
                                     .content=${blurred
                                       ? t("configView.revealSensitive")
                                       : t("configView.hideSensitive")}
@@ -2117,7 +2117,7 @@ export function renderConfig(props: ConfigProps) {
                                     >
                                       ${blurred ? icons.eyeOff : icons.eye}
                                     </button>
-                                  </openclaw-tooltip>
+                                  </steelengine-tooltip>
                                 `
                               : nothing}
                           </span>

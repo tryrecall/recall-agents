@@ -1,24 +1,24 @@
 // Telegram plugin module implements outbound adapter behavior.
-import type { OutboundDeliveryFormattingOptions } from "openclaw/plugin-sdk/channel-outbound";
+import type { OutboundDeliveryFormattingOptions } from "steelengine/plugin-sdk/channel-outbound";
 import {
   resolveOutboundSendDep,
   sanitizeForPlainText,
   type OutboundSendDeps,
-} from "openclaw/plugin-sdk/channel-outbound";
-import type { ChannelOutboundAdapter } from "openclaw/plugin-sdk/channel-send-result";
+} from "steelengine/plugin-sdk/channel-outbound";
+import type { ChannelOutboundAdapter } from "steelengine/plugin-sdk/channel-send-result";
 import {
   attachChannelToResult,
   createAttachedChannelResultAdapter,
-} from "openclaw/plugin-sdk/channel-send-result";
-import { questionGatewayRuntime } from "openclaw/plugin-sdk/question-gateway-runtime";
-import { chunkMarkdownTextWithMode } from "openclaw/plugin-sdk/reply-chunking";
+} from "steelengine/plugin-sdk/channel-send-result";
+import { questionGatewayRuntime } from "steelengine/plugin-sdk/question-gateway-runtime";
+import { chunkMarkdownTextWithMode } from "steelengine/plugin-sdk/reply-chunking";
 import {
   resolveSendableOutboundReplyParts,
   sendPayloadMediaSequenceOrFallback,
-} from "openclaw/plugin-sdk/reply-payload";
-import { isSingleUseReplyToMode } from "openclaw/plugin-sdk/reply-reference";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
-import { sanitizeAssistantVisibleText } from "openclaw/plugin-sdk/text-chunking";
+} from "steelengine/plugin-sdk/reply-payload";
+import { isSingleUseReplyToMode } from "steelengine/plugin-sdk/reply-reference";
+import type { ReplyPayload } from "steelengine/plugin-sdk/reply-runtime";
+import { sanitizeAssistantVisibleText } from "steelengine/plugin-sdk/text-chunking";
 import { mergeTelegramAccountConfig, resolveDefaultTelegramAccountId } from "./accounts.js";
 import type { TelegramInlineButtons } from "./button-types.js";
 import { resolveTelegramInlineButtons } from "./button-types.js";

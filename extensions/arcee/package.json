@@ -1,22 +1,22 @@
 {
-  "name": "@openclaw/arcee-provider",
+  "name": "@steelengine/arcee-provider",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw Arcee provider plugin.",
+  "description": "SteelEngine Arcee provider plugin.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/steelengineai/recall-agents"
   },
   "type": "module",
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "clawhubSpec": "clawhub:@openclaw/arcee-provider",
-      "npmSpec": "@openclaw/arcee-provider",
+      "clawhubSpec": "clawhub:@steelengine/arcee-provider",
+      "npmSpec": "@steelengine/arcee-provider",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.6.8"
     },
@@ -24,7 +24,7 @@
       "pluginApi": ">=2026.7.2-beta.3"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3",
+      "steelengineVersion": "2026.7.2-beta.3",
       "bundledDist": false
     },
     "release": {

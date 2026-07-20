@@ -1,17 +1,17 @@
-// Google plugin entrypoint registers its OpenClaw integration.
-import type { ImageGenerationProvider } from "openclaw/plugin-sdk/image-generation";
-import type { MediaUnderstandingProvider } from "openclaw/plugin-sdk/media-understanding";
-import type { MusicGenerationProvider } from "openclaw/plugin-sdk/music-generation";
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+// Google plugin entrypoint registers its SteelEngine integration.
+import type { ImageGenerationProvider } from "steelengine/plugin-sdk/image-generation";
+import type { MediaUnderstandingProvider } from "steelengine/plugin-sdk/media-understanding";
+import type { MusicGenerationProvider } from "steelengine/plugin-sdk/music-generation";
+import { definePluginEntry } from "steelengine/plugin-sdk/plugin-entry";
 import type {
   RealtimeVoiceBridge,
   RealtimeVoiceBridgeCreateRequest,
   RealtimeVoiceProviderConfig,
   RealtimeVoiceProviderPlugin,
-} from "openclaw/plugin-sdk/realtime-voice";
-import { normalizeResolvedSecretInputString } from "openclaw/plugin-sdk/secret-input";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
-import type { VideoGenerationProvider } from "openclaw/plugin-sdk/video-generation";
+} from "steelengine/plugin-sdk/realtime-voice";
+import { normalizeResolvedSecretInputString } from "steelengine/plugin-sdk/secret-input";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
+import type { VideoGenerationProvider } from "steelengine/plugin-sdk/video-generation";
 import { buildGoogleGeminiCliBackend } from "./cli-backend.js";
 import { registerGoogleGeminiCliProvider } from "./gemini-cli-provider.js";
 import {

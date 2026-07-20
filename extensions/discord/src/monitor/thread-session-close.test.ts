@@ -1,17 +1,17 @@
 // Discord tests cover thread session close plugin behavior.
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const hoisted = vi.hoisted(() => {
   const listSessionEntries = vi.fn();
   const patchSessionEntry = vi.fn();
-  const resolveStorePath = vi.fn(() => "/tmp/openclaw-sessions.json");
+  const resolveStorePath = vi.fn(() => "/tmp/steelengine-sessions.json");
   return { listSessionEntries, patchSessionEntry, resolveStorePath };
 });
 
-vi.mock("openclaw/plugin-sdk/session-store-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/session-store-runtime")>(
-    "openclaw/plugin-sdk/session-store-runtime",
+vi.mock("steelengine/plugin-sdk/session-store-runtime", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/session-store-runtime")>(
+    "steelengine/plugin-sdk/session-store-runtime",
   );
   return {
     ...actual,
@@ -64,7 +64,7 @@ describe("closeDiscordThreadSessions", () => {
     hoisted.listSessionEntries.mockReset();
     hoisted.patchSessionEntry.mockReset();
     hoisted.resolveStorePath.mockClear();
-    hoisted.resolveStorePath.mockReturnValue("/tmp/openclaw-sessions.json");
+    hoisted.resolveStorePath.mockReturnValue("/tmp/steelengine-sessions.json");
   });
 
   it("resets updatedAt to 0 for sessions whose key contains the threadId", async () => {

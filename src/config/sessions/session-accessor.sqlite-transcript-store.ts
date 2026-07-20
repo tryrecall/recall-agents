@@ -5,7 +5,7 @@ import {
   executeSqliteQueryTakeFirstSync,
 } from "../../infra/kysely-sync.js";
 import { redactSecrets } from "../../logging/redact.js";
-import type { OpenClawAgentDatabase } from "../../state/openclaw-agent-db.js";
+import type { SteelEngineAgentDatabase } from "../../state/steelengine-agent-db.js";
 import type {
   TranscriptEvent,
   TranscriptMessageAppendOptions,
@@ -36,7 +36,7 @@ import {
 import { resolveVisibleTranscriptAppendParentId } from "./transcript-visible-events.js";
 
 export function appendTranscriptEventInTransaction(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   scope: ResolvedTranscriptScope,
   event: TranscriptEvent,
   options: {
@@ -123,7 +123,7 @@ export function appendTranscriptEventInTransaction(
 }
 
 function scheduleTranscriptProjectionReconcile(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   scope: ResolvedTranscriptScope,
   projectionNeedsRebuild: boolean,
   options: { scheduleProjectionReconcile?: boolean },
@@ -141,7 +141,7 @@ function scheduleTranscriptProjectionReconcile(
 }
 
 export function appendTranscriptEventsInTransaction(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   scope: ResolvedTranscriptScope,
   events: readonly TranscriptEvent[],
 ): number {
@@ -168,7 +168,7 @@ export function appendTranscriptEventsInTransaction(
 }
 
 function appendTranscriptEventRowInTransaction(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   scope: ResolvedTranscriptScope,
   event: TranscriptEvent,
   seq: number,
@@ -224,7 +224,7 @@ function appendTranscriptEventRowInTransaction(
 }
 
 export function ensureTranscriptHeader(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   scope: ResolvedTranscriptScope,
   cwd: string | undefined,
   now: number,
@@ -250,7 +250,7 @@ export function ensureTranscriptHeader(
 }
 
 export function readActiveTranscriptAppendParentId(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionId: string,
 ): string | null {
   const db = getSessionKysely(database.db);
@@ -296,7 +296,7 @@ export function readActiveTranscriptAppendParentId(
 }
 
 function transcriptTreeReferenceExists(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionId: string,
   eventId: string | null,
 ): boolean {
@@ -306,7 +306,7 @@ function transcriptTreeReferenceExists(
 }
 
 export function replaceSqliteTranscriptEventsInTransaction(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   resolved: ResolvedTranscriptScope,
   events: readonly TranscriptEvent[],
 ): void {
@@ -338,7 +338,7 @@ export function replaceSqliteTranscriptEventsInTransaction(
 }
 
 export function readTranscriptIdentityByEventId(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionId: string,
   eventId: string,
 ): { eventId: string; seq: number } | undefined {
@@ -355,7 +355,7 @@ export function readTranscriptIdentityByEventId(
 }
 
 function readTranscriptIdentityByMessageIdempotencyKey(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   sessionId: string,
   idempotencyKey: string,
 ): { eventId: string; seq: number } | undefined {
@@ -374,7 +374,7 @@ function readTranscriptIdentityByMessageIdempotencyKey(
 }
 
 function readTranscriptMessageByIdempotencyKey(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   scope: ResolvedTranscriptScope,
   idempotencyKey: string,
 ): { messageId: string; message: unknown } | undefined {
@@ -387,7 +387,7 @@ function readTranscriptMessageByIdempotencyKey(
 }
 
 export function readTranscriptMessageByScopedIdempotencyKey(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   scope: ResolvedTranscriptScope,
   idempotencyKey: string,
   lookup: TranscriptMessageAppendOptions<unknown>["idempotencyLookup"],
@@ -409,7 +409,7 @@ export function readTranscriptMessageByScopedIdempotencyKey(
 }
 
 export function readTranscriptMessageByEventId(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   scope: ResolvedTranscriptScope,
   eventId: string,
 ): { messageId: string; message: unknown } | undefined {
@@ -418,7 +418,7 @@ export function readTranscriptMessageByEventId(
 }
 
 function readTranscriptMessageByIdentity(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   scope: ResolvedTranscriptScope,
   identity: { eventId: string; seq: number },
 ): { messageId: string; message: unknown } | undefined {

@@ -10,12 +10,12 @@
  * Separated from gateway.ts for testability and to keep handleMessage thin.
  */
 
-import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "openclaw/plugin-sdk/agent-runtime";
-import { buildChannelInboundEventContext } from "openclaw/plugin-sdk/channel-inbound";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { isSilentReplyPayloadText, SILENT_REPLY_TOKEN } from "openclaw/plugin-sdk/reply-chunking";
-import type { FinalizedMsgContext } from "openclaw/plugin-sdk/reply-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "steelengine/plugin-sdk/agent-runtime";
+import { buildChannelInboundEventContext } from "steelengine/plugin-sdk/channel-inbound";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { isSilentReplyPayloadText, SILENT_REPLY_TOKEN } from "steelengine/plugin-sdk/reply-chunking";
+import type { FinalizedMsgContext } from "steelengine/plugin-sdk/reply-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import { createQQBotMarkdownChunker } from "../messaging/markdown-table-chunking.js";
 import {
   parseAndSendMediaTags,
@@ -138,9 +138,9 @@ export async function dispatchOutbound(
   const { runtime, cfg, account, log } = deps;
   const { event, qualifiedTarget } = inbound;
 
-  const openClawCfg = cfg as OpenClawConfig;
-  const routeAgentId = inbound.route.agentId ?? resolveDefaultAgentId(openClawCfg);
-  const workspaceDir = resolveAgentWorkspaceDir(openClawCfg, routeAgentId);
+  const steelEngineCfg = cfg as SteelEngineConfig;
+  const routeAgentId = inbound.route.agentId ?? resolveDefaultAgentId(steelEngineCfg);
+  const workspaceDir = resolveAgentWorkspaceDir(steelEngineCfg, routeAgentId);
   const gatewayMediaContext = workspaceDir
     ? { mediaAccess: { workspaceDir }, mediaLocalRoots: [workspaceDir] }
     : {};
@@ -434,7 +434,7 @@ export async function dispatchOutbound(
         raw: inbound,
       }),
       resolveTurn: () => ({
-        cfg: openClawCfg,
+        cfg: steelEngineCfg,
         channel: "qqbot",
         accountId: inbound.route.accountId,
         route: {
@@ -777,7 +777,7 @@ async function buildCtxPayload(
       id: inbound.peerId,
     },
     route: {
-      agentId: inbound.route.agentId ?? resolveDefaultAgentId(cfg as OpenClawConfig),
+      agentId: inbound.route.agentId ?? resolveDefaultAgentId(cfg as SteelEngineConfig),
       dmScope: inbound.route.dmScope,
       routeSessionKey: inbound.route.sessionKey,
       accountId: inbound.route.accountId,

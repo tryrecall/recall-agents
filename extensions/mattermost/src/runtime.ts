@@ -1,6 +1,6 @@
 // Mattermost plugin module implements runtime behavior.
-import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
-import type { PluginRuntime } from "openclaw/plugin-sdk/runtime-store";
+import { createPluginRuntimeStore } from "steelengine/plugin-sdk/runtime-store";
+import type { PluginRuntime } from "steelengine/plugin-sdk/runtime-store";
 
 const {
   setRuntime: setMattermostRuntime,

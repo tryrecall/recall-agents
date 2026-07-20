@@ -1,22 +1,22 @@
 import { collectConfigRuntimeEnvVars } from "./env-vars.js";
-import type { OpenClawConfig } from "./types.js";
+import type { SteelEngineConfig } from "./types.js";
 
 export const GATEWAY_CONFIG_SELECTION_ENV_KEYS: ReadonlySet<string> = new Set([
   "ANDROID_DATA",
   "HOME",
   "HOMEDRIVE",
   "HOMEPATH",
-  "OPENCLAW_AGENT_DIR",
-  "OPENCLAW_CONFIG_PATH",
-  "OPENCLAW_HOME",
-  "OPENCLAW_INCLUDE_ROOTS",
-  "OPENCLAW_NIX_MODE",
-  "OPENCLAW_OAUTH_DIR",
-  "OPENCLAW_PACKAGE_DIR",
-  "OPENCLAW_PROFILE",
-  "OPENCLAW_STATE_DIR",
-  "OPENCLAW_TEST_FAST",
-  "OPENCLAW_WORKSPACE_DIR",
+  "STEELENGINE_AGENT_DIR",
+  "STEELENGINE_CONFIG_PATH",
+  "STEELENGINE_HOME",
+  "STEELENGINE_INCLUDE_ROOTS",
+  "STEELENGINE_NIX_MODE",
+  "STEELENGINE_OAUTH_DIR",
+  "STEELENGINE_PACKAGE_DIR",
+  "STEELENGINE_PROFILE",
+  "STEELENGINE_STATE_DIR",
+  "STEELENGINE_TEST_FAST",
+  "STEELENGINE_WORKSPACE_DIR",
   "PI_CODING_AGENT_DIR",
   "PREFIX",
   "USERPROFILE",
@@ -24,10 +24,10 @@ export const GATEWAY_CONFIG_SELECTION_ENV_KEYS: ReadonlySet<string> = new Set([
 
 /** Rejects config.env changes that would retarget a running Gateway process. */
 export function assertGatewayConfigEnvSelectionUnchanged(
-  previousConfig: OpenClawConfig,
-  nextConfig: OpenClawConfig,
+  previousConfig: SteelEngineConfig,
+  nextConfig: SteelEngineConfig,
 ): void {
-  const normalize = (config: OpenClawConfig) =>
+  const normalize = (config: SteelEngineConfig) =>
     new Map(
       Object.entries(collectConfigRuntimeEnvVars(config)).map(([key, value]) => [
         key.toUpperCase(),

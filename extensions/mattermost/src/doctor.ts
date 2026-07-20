@@ -1,10 +1,10 @@
 // Mattermost plugin module implements doctor behavior.
-import type { ChannelDoctorAdapter } from "openclaw/plugin-sdk/channel-contract";
+import type { ChannelDoctorAdapter } from "steelengine/plugin-sdk/channel-contract";
 import {
   buildMutableAllowEntryDetector,
   collectStandardAllowlistLists,
   createDangerousNameMatchingMutableAllowlistWarningCollector,
-} from "openclaw/plugin-sdk/channel-policy";
+} from "steelengine/plugin-sdk/channel-policy";
 import {
   legacyConfigRules as MATTERMOST_LEGACY_CONFIG_RULES,
   normalizeCompatibilityConfig as normalizeMattermostCompatibilityConfig,

@@ -10,7 +10,7 @@ function createProps(overrides: Partial<IdentitySectionProps> = {}): IdentitySec
   return {
     userAvatar: null,
     onUserAvatarChange: vi.fn(),
-    assistantName: "OpenClaw",
+    assistantName: "SteelEngine",
     assistantAvatar: null,
     assistantAvatarUrl: null,
     assistantAvatarSource: null,
@@ -72,9 +72,9 @@ describe("renderIdentitySection", () => {
         createProps({
           assistantName: "Nova",
           assistantAvatar: "assets/avatars/nova-portrait.png",
-          assistantAvatarUrl: "/openclaw/avatar/main",
+          assistantAvatarUrl: "/steelengine/avatar/main",
           assistantAvatarStatus: "local",
-          basePath: "/openclaw",
+          basePath: "/steelengine",
         }),
       ),
       container,
@@ -83,15 +83,15 @@ describe("renderIdentitySection", () => {
     const avatar = container.querySelector<HTMLImageElement>(
       ".config-identity--assistant .config-identity__avatar",
     );
-    expect(avatar?.getAttribute("src")).toBe("/openclaw/avatar/main");
+    expect(avatar?.getAttribute("src")).toBe("/steelengine/avatar/main");
 
     avatar?.dispatchEvent(new Event("error"));
 
-    expect(avatar?.getAttribute("src")).toBe("/openclaw/apple-touch-icon.png");
+    expect(avatar?.getAttribute("src")).toBe("/steelengine/apple-touch-icon.png");
     expect(avatar?.classList.contains("config-identity__avatar--fallback")).toBe(true);
 
     avatar?.dispatchEvent(new Event("error"));
-    expect(avatar?.getAttribute("src")).toBe("/openclaw/apple-touch-icon.png");
+    expect(avatar?.getAttribute("src")).toBe("/steelengine/apple-touch-icon.png");
   });
 
   it("clears the fallback class after a rerendered assistant avatar loads", () => {

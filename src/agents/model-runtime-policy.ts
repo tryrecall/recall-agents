@@ -4,12 +4,12 @@
  * Agent execution uses this to choose a model/provider-specific runtime policy
  * from agent entries, model catalog config, provider config, or QA overrides.
  */
-import { parseModelCatalogRef } from "@openclaw/model-catalog-core/model-catalog-refs";
-import { normalizeProviderId } from "@openclaw/model-catalog-core/provider-id";
+import { parseModelCatalogRef } from "@steelengine/model-catalog-core/model-catalog-refs";
+import { normalizeProviderId } from "@steelengine/model-catalog-core/provider-id";
 import type { AgentModelEntryConfig } from "../config/types.agent-defaults.js";
 import type { AgentRuntimePolicyConfig } from "../config/types.agents-shared.js";
 import type { ModelDefinitionConfig, ModelProviderConfig } from "../config/types.models.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { normalizeAgentId } from "../routing/session-key.js";
 import { listAgentEntries, resolveSessionAgentIds } from "./agent-scope.js";
 
@@ -39,7 +39,7 @@ function hasRuntimePolicy(value: AgentRuntimePolicyConfig | undefined): boolean 
 }
 
 function resolveProviderConfig(
-  config: OpenClawConfig | undefined,
+  config: SteelEngineConfig | undefined,
   provider: string | undefined,
 ): ModelProviderConfig | undefined {
   if (!config?.models?.providers || !provider?.trim()) {
@@ -179,7 +179,7 @@ function modelKeyIsProviderWildcard(params: {
 }
 
 function resolveAgentModelEntryRuntimePolicy(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   provider?: string;
   modelId?: string;
   agentId?: string;
@@ -241,7 +241,7 @@ function resolveModelConfig(params: {
 
 /** Resolves the effective runtime policy for an agent/model/provider selection. */
 export function resolveModelRuntimePolicy(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   provider?: string;
   modelId?: string;
   agentId?: string;
@@ -250,9 +250,9 @@ export function resolveModelRuntimePolicy(params: {
   const callerProvider = normalizeProviderId(params.provider ?? "");
   const effectiveProvider = resolveEffectiveProvider(params.provider, params.modelId);
   const inferredMatchedProvider = callerProvider ? undefined : effectiveProvider;
-  if (process.env.OPENCLAW_BUILD_PRIVATE_QA === "1") {
-    const forcedRuntime = process.env.OPENCLAW_QA_FORCE_RUNTIME?.trim().toLowerCase();
-    if (forcedRuntime === "openclaw" || forcedRuntime === "codex") {
+  if (process.env.STEELENGINE_BUILD_PRIVATE_QA === "1") {
+    const forcedRuntime = process.env.STEELENGINE_QA_FORCE_RUNTIME?.trim().toLowerCase();
+    if (forcedRuntime === "steelengine" || forcedRuntime === "codex") {
       return { policy: { id: forcedRuntime }, source: "model" };
     }
   }

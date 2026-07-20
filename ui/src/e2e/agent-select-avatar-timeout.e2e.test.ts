@@ -13,9 +13,9 @@ import {
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
-const captureUiProof = process.env.OPENCLAW_CAPTURE_UI_PROOF === "1";
+const captureUiProof = process.env.STEELENGINE_CAPTURE_UI_PROOF === "1";
 const proofDir = path.join(
   process.cwd(),
   ".artifacts",
@@ -88,7 +88,7 @@ describeControlUiE2e("Control UI agent picker avatar timeout", () => {
     try {
       const response = await page.goto(`${server.baseUrl}agents`);
       expect(response?.status()).toBe(200);
-      const picker = page.locator("openclaw-agent-select");
+      const picker = page.locator("steelengine-agent-select");
       await expect
         .poll(() => picker.locator(".agent-select__avatar--text").first().textContent())
         .toBe("O");

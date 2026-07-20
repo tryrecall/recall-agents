@@ -77,16 +77,16 @@ async function startCronListGateway(token: string): Promise<{ url: string }> {
 
 describe("gateway-backed CLI process exit", () => {
   it("exits promptly after cron list emits complete output", async () => {
-    const root = tempDirs.make("openclaw-gateway-cli-exit-");
+    const root = tempDirs.make("steelengine-gateway-cli-exit-");
     const stateDir = path.join(root, "state");
-    const configPath = path.join(stateDir, "openclaw.json");
+    const configPath = path.join(stateDir, "steelengine.json");
     const caTriggerPath = path.join(root, "load-default-ca.mjs");
     const token = "test-token";
     const gateway = await startCronListGateway(token);
     await fs.mkdir(stateDir, { recursive: true });
     await fs.writeFile(
       caTriggerPath,
-      `if (process.env.OPENCLAW_NODE_OPTIONS_READY === "1") {
+      `if (process.env.STEELENGINE_NODE_OPTIONS_READY === "1") {
   const { getCACertificates } = await import("node:tls");
   getCACertificates("default");
 }
@@ -119,10 +119,10 @@ describe("gateway-backed CLI process exit", () => {
           NODE_ENV: undefined,
           NODE_OPTIONS: undefined,
           NODE_USE_SYSTEM_CA: "1",
-          OPENCLAW_CONFIG_PATH: configPath,
-          OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1",
-          OPENCLAW_NODE_OPTIONS_READY: undefined,
-          OPENCLAW_STATE_DIR: stateDir,
+          STEELENGINE_CONFIG_PATH: configPath,
+          STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1",
+          STEELENGINE_NODE_OPTIONS_READY: undefined,
+          STEELENGINE_STATE_DIR: stateDir,
           VITEST: undefined,
         },
         stdio: ["pipe", "pipe", "pipe"],

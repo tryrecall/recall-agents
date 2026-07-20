@@ -114,7 +114,7 @@ function requireStoredSessionEntry(storePath: string, sessionKey = "main"): Sess
 }
 
 async function createSessionStoreFile(entry: SessionEntry): Promise<string> {
-  const dir = tempDirs.make("openclaw-agent-runner-");
+  const dir = tempDirs.make("steelengine-agent-runner-");
   const storePath = join(dir, "sessions.json");
   await replaceSessionEntry({ storePath, sessionKey: "main" }, entry);
   return storePath;
@@ -241,7 +241,7 @@ beforeEach(() => {
   vi.mocked(enqueueFollowupRun).mockReset().mockReturnValue(true);
   vi.mocked(refreshQueuedFollowupSession).mockReset();
   vi.mocked(scheduleFollowupDrain).mockReset();
-  vi.stubEnv("OPENCLAW_TEST_FAST", "1");
+  vi.stubEnv("STEELENGINE_TEST_FAST", "1");
 });
 
 function createMinimalRun(params?: {
@@ -313,7 +313,7 @@ function createMinimalRun(params?: {
       },
       timeoutMs: 1_000,
       blockReplyBreak: "message_end",
-      skipProviderRuntimeHints: process.env.OPENCLAW_TEST_FAST === "1",
+      skipProviderRuntimeHints: process.env.STEELENGINE_TEST_FAST === "1",
       ...params?.runOverrides,
     },
   } as unknown as FollowupRun;
@@ -2423,7 +2423,7 @@ describe("runReplyAgent typing (heartbeat)", () => {
   });
 
   it("does not persist heartbeat ack text as pending final delivery", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "openclaw-heartbeat-pending-"));
+    const dir = await mkdtemp(join(tmpdir(), "steelengine-heartbeat-pending-"));
     const storePath = join(dir, "sessions.json");
     await replaceSessionEntry(
       { storePath, sessionKey: "main" },
@@ -2860,7 +2860,7 @@ describe("runReplyAgent typing (heartbeat)", () => {
   });
 
   it("announces model fallback transitions across verbose levels", async () => {
-    const storeRoot = await mkdtemp(join(tmpdir(), "openclaw-fallback-pin-"));
+    const storeRoot = await mkdtemp(join(tmpdir(), "steelengine-fallback-pin-"));
     const storePath = join(storeRoot, "sessions.json");
     const cases = [
       { name: "verbose on", verbose: "on" as const },
@@ -2950,7 +2950,7 @@ describe("runReplyAgent typing (heartbeat)", () => {
   });
 
   it("does not report an exhausted fallback candidate as a successful winner", async () => {
-    const root = await mkdtemp(join(tmpdir(), "openclaw-exhausted-trace-"));
+    const root = await mkdtemp(join(tmpdir(), "steelengine-exhausted-trace-"));
     const storePath = join(root, "sessions.json");
     const sessionFile = join(root, "session.jsonl");
     const runId = "run-exhausted-trace";
@@ -3264,7 +3264,7 @@ describe("runReplyAgent typing (heartbeat)", () => {
       responseUsage: "tokens",
     };
     const sessionStore = { main: sessionEntry };
-    const storeRoot = await mkdtemp(join(tmpdir(), "openclaw-internal-fallback-"));
+    const storeRoot = await mkdtemp(join(tmpdir(), "steelengine-internal-fallback-"));
     const storePath = join(storeRoot, "sessions.json");
     await replaceSessionEntry({ storePath, sessionKey: "main" }, sessionStore.main);
     try {
@@ -4408,7 +4408,7 @@ describe("runReplyAgent typing (heartbeat)", () => {
       fallbackNoticeReason: "selected model unavailable",
     };
     const sessionStore = { main: sessionEntry };
-    const dir = await mkdtemp(join(tmpdir(), "openclaw-agent-runner-cli-alias-"));
+    const dir = await mkdtemp(join(tmpdir(), "steelengine-agent-runner-cli-alias-"));
     const storePath = join(dir, "sessions.json");
     await replaceSessionEntry({ storePath, sessionKey: "main" }, sessionEntry);
 

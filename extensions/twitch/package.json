@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/twitch",
+  "name": "@steelengine/twitch",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw Twitch channel plugin for chat and moderation workflows.",
+  "description": "SteelEngine Twitch channel plugin for chat and moderation workflows.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/steelengineai/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -14,15 +14,15 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
     "setupEntry": "./setup-entry.ts",
     "install": {
-      "npmSpec": "@openclaw/twitch",
+      "npmSpec": "@steelengine/twitch",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.10"
     },
@@ -30,7 +30,7 @@
       "pluginApi": ">=2026.7.2-beta.3"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3"
+      "steelengineVersion": "2026.7.2-beta.3"
     },
     "channel": {
       "id": "twitch",

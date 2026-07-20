@@ -2,9 +2,9 @@
 import {
   createDirectoryTestRuntime,
   expectDirectorySurface,
-} from "openclaw/plugin-sdk/channel-test-helpers";
+} from "steelengine/plugin-sdk/channel-test-helpers";
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig, RuntimeEnv } from "../runtime-api.js";
+import type { SteelEngineConfig, RuntimeEnv } from "../runtime-api.js";
 import { zaloPlugin } from "./channel.js";
 
 describe("zalo directory", () => {
@@ -18,7 +18,7 @@ describe("zalo directory", () => {
           allowFrom,
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
 
     const peers = await directory.listPeers({
       cfg,

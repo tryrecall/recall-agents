@@ -11,10 +11,10 @@ import {
 const roots: string[] = [];
 
 function createFixture(config: Record<string, unknown>, stateEntries: string[] = []) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-pristine-startup-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-pristine-startup-"));
   roots.push(root);
   const stateDir = path.join(root, "state");
-  const configPath = path.join(root, "openclaw.json");
+  const configPath = path.join(root, "steelengine.json");
   fs.writeFileSync(configPath, `${JSON.stringify(config)}\n`);
   fs.mkdirSync(stateDir, { recursive: true });
   for (const entry of stateEntries) {
@@ -22,9 +22,9 @@ function createFixture(config: Record<string, unknown>, stateEntries: string[] =
   }
   return {
     HOME: root,
-    OPENCLAW_CONFIG: configPath,
-    OPENCLAW_CONFIG_PATH: configPath,
-    OPENCLAW_STATE_DIR: stateDir,
+    STEELENGINE_CONFIG: configPath,
+    STEELENGINE_CONFIG_PATH: configPath,
+    STEELENGINE_STATE_DIR: stateDir,
   };
 }
 
@@ -37,7 +37,7 @@ function addBundledPlugin(
   const pluginDir = path.join(bundledPluginsDir, pluginId);
   fs.mkdirSync(pluginDir, { recursive: true });
   fs.writeFileSync(
-    path.join(pluginDir, "openclaw.plugin.json"),
+    path.join(pluginDir, "steelengine.plugin.json"),
     `${JSON.stringify({ id: pluginId })}\n`,
   );
   if (options.doctorContract) {
@@ -46,8 +46,8 @@ function addBundledPlugin(
   return {
     ...env,
     VITEST: "true",
-    OPENCLAW_BUNDLED_PLUGINS_DIR: bundledPluginsDir,
-    OPENCLAW_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
+    STEELENGINE_BUNDLED_PLUGINS_DIR: bundledPluginsDir,
+    STEELENGINE_TEST_TRUST_BUNDLED_PLUGINS_DIR: "1",
   };
 }
 
@@ -83,7 +83,7 @@ describe("pristine startup state", () => {
         agents: {
           defaults: {
             model: { primary: "openai/gpt-5.6" },
-            models: { "openai/gpt-5.6": { agentRuntime: { id: "openclaw" } } },
+            models: { "openai/gpt-5.6": { agentRuntime: { id: "steelengine" } } },
             workspace: "/tmp/workspace",
           },
           list: [{ id: "main", workspace: "/tmp/workspace" }],

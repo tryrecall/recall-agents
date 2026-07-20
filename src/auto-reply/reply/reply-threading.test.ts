@@ -1,11 +1,11 @@
 // Tests reply-to threading mode resolution across global and plugin config.
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { SteelEngineConfig } from "../../config/config.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import { createTestRegistry } from "../../test-utils/channel-plugins.js";
 import { resolveReplyDeliveryAccountId, resolveReplyToMode } from "./reply-threading.js";
 
-const emptyCfg = {} as OpenClawConfig;
+const emptyCfg = {} as SteelEngineConfig;
 
 describe("resolveReplyToMode", () => {
   beforeEach(() => {
@@ -23,7 +23,7 @@ describe("resolveReplyToMode", () => {
         discord: { replyToMode: "first" },
         slack: { replyToMode: "all" },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const chatTypeCfg = {
       channels: {
         slack: {
@@ -31,14 +31,14 @@ describe("resolveReplyToMode", () => {
           replyToModeByChatType: { direct: "all", group: "first" },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const topLevelFallbackCfg = {
       channels: {
         slack: {
           replyToMode: "first",
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const legacyDmCfg = {
       channels: {
         slack: {
@@ -46,10 +46,10 @@ describe("resolveReplyToMode", () => {
           dm: { replyToMode: "all" },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     const cases: Array<{
-      cfg: OpenClawConfig;
+      cfg: SteelEngineConfig;
       channel?: "telegram" | "discord" | "slack";
       chatType?: "direct" | "group" | "channel";
       expected: "off" | "all" | "first";
@@ -106,8 +106,8 @@ describe("resolveReplyToMode", () => {
       ]),
     );
 
-    expect(resolveReplyToMode({} as OpenClawConfig, "whatsapp", "work", "group")).toBe("first");
-    expect(resolveReplyToMode({} as OpenClawConfig, "whatsapp", "default", "group")).toBe("all");
+    expect(resolveReplyToMode({} as SteelEngineConfig, "whatsapp", "work", "group")).toBe("first");
+    expect(resolveReplyToMode({} as SteelEngineConfig, "whatsapp", "default", "group")).toBe("all");
   });
 
   it("resolves the same listed default account used by routed delivery", () => {

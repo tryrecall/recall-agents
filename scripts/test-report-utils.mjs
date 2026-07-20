@@ -70,7 +70,7 @@ function defaultVitestJsonReportPath(prefix) {
 export function runVitestJsonReport({
   config,
   reportPath = "",
-  prefix = "openclaw-vitest-report",
+  prefix = "steelengine-vitest-report",
 }) {
   const resolvedReportPath = reportPath || defaultVitestJsonReportPath(prefix);
 

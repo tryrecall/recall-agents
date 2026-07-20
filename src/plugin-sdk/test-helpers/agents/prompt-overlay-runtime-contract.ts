@@ -1,7 +1,7 @@
 /**
  * Shared contract fixtures for agent prompt overlay runtime behavior.
  */
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../../config/types.steelengine.js";
 import type { ProviderSystemPromptContributionContext } from "../../../plugins/types.js";
 
 export const GPT5_CONTRACT_MODEL_ID = "gpt-5.4";
@@ -12,7 +12,7 @@ export const OPENAI_CODEX_CONTRACT_PROVIDER_ID = "openai";
 export const CODEX_CONTRACT_PROVIDER_ID = "codex";
 export const NON_OPENAI_CONTRACT_PROVIDER_ID = "openrouter";
 
-export function openAiPluginPersonalityConfig(personality: "friendly" | "off"): OpenClawConfig {
+export function openAiPluginPersonalityConfig(personality: "friendly" | "off"): SteelEngineConfig {
   return {
     plugins: {
       entries: {
@@ -21,10 +21,10 @@ export function openAiPluginPersonalityConfig(personality: "friendly" | "off"): 
         },
       },
     },
-  } satisfies OpenClawConfig;
+  } satisfies SteelEngineConfig;
 }
 
-export function sharedGpt5PersonalityConfig(personality: "friendly" | "off"): OpenClawConfig {
+export function sharedGpt5PersonalityConfig(personality: "friendly" | "off"): SteelEngineConfig {
   return {
     agents: {
       defaults: {
@@ -33,19 +33,19 @@ export function sharedGpt5PersonalityConfig(personality: "friendly" | "off"): Op
         },
       },
     },
-  } satisfies OpenClawConfig;
+  } satisfies SteelEngineConfig;
 }
 
 export function codexPromptOverlayContext(params?: {
   modelId?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
 }): ProviderSystemPromptContributionContext {
   return {
     provider: CODEX_CONTRACT_PROVIDER_ID,
     modelId: params?.modelId ?? GPT5_CONTRACT_MODEL_ID,
     promptMode: "full",
-    agentDir: "/tmp/openclaw-codex-prompt-contract-agent",
-    workspaceDir: "/tmp/openclaw-codex-prompt-contract-workspace",
+    agentDir: "/tmp/steelengine-codex-prompt-contract-agent",
+    workspaceDir: "/tmp/steelengine-codex-prompt-contract-workspace",
     ...(params?.config ? { config: params.config } : {}),
   };
 }

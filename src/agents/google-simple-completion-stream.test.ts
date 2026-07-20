@@ -26,7 +26,7 @@ vi.mock("./custom-api-registry.js", () => ({
 
 const { prepareGoogleSimpleCompletionModel } = await import("./google-simple-completion-stream.js");
 
-const GOOGLE_SIMPLE_COMPLETION_API = "openclaw-google-generative-ai-simple";
+const GOOGLE_SIMPLE_COMPLETION_API = "steelengine-google-generative-ai-simple";
 
 // Mirrors the provider catalog shape closely enough for wrapper registration
 // without pulling live Google model discovery into unit tests.
@@ -78,7 +78,7 @@ describe("prepareGoogleSimpleCompletionModel", () => {
     expect(ensureCustomApiRegistered).not.toHaveBeenCalled();
   });
 
-  it("registers an OpenClaw-owned Google simple-completion api alias", () => {
+  it("registers an SteelEngine-owned Google simple-completion api alias", () => {
     const model = makeGoogleModel();
 
     const result = prepareGoogleSimpleCompletionModel(model);

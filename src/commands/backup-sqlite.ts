@@ -9,8 +9,8 @@ import type {
   SnapshotRef,
   SnapshotSummary,
 } from "../snapshot/snapshot-provider.js";
-import { resolveOpenClawAgentSqlitePath } from "../state/openclaw-agent-db.paths.js";
-import { resolveOpenClawStateSqlitePath } from "../state/openclaw-state-db.paths.js";
+import { resolveSteelEngineAgentSqlitePath } from "../state/steelengine-agent-db.paths.js";
+import { resolveSteelEngineStateSqlitePath } from "../state/steelengine-state-db.paths.js";
 import { resolveUserPath, shortenHomePath } from "../utils.js";
 
 type BackupSqliteCreateOptions = {
@@ -64,7 +64,7 @@ type ResolvedSnapshotDatabase = {
   identity: { role: "global" } | { role: "agent"; agentId: string };
 };
 
-const OPENCLAW_SNAPSHOT_READ_OPTIONS = {
+const STEELENGINE_SNAPSHOT_READ_OPTIONS = {
   allowedDatabaseRoles: ["global", "agent"],
 } as const;
 
@@ -91,7 +91,7 @@ export async function backupSqliteListCommand(
   const repositoryPath = resolveRequiredPath(options.repository, "--repository");
   const snapshots = await createLocalSqliteSnapshotProvider({
     repositoryPath,
-    ...OPENCLAW_SNAPSHOT_READ_OPTIONS,
+    ...STEELENGINE_SNAPSHOT_READ_OPTIONS,
   }).list();
   const report: BackupSqliteListResult = {
     ok: true,
@@ -148,13 +148,13 @@ async function resolveSnapshotDatabase(
   }
   if (options.global === true) {
     return {
-      path: await fs.realpath(resolveOpenClawStateSqlitePath()),
+      path: await fs.realpath(resolveSteelEngineStateSqlitePath()),
       identity: { role: "global" },
     };
   }
   const agentId = normalizeAgentId(rawAgentId);
   return {
-    path: await fs.realpath(resolveOpenClawAgentSqlitePath({ agentId })),
+    path: await fs.realpath(resolveSteelEngineAgentSqlitePath({ agentId })),
     identity: { role: "agent", agentId },
   };
 }
@@ -175,7 +175,7 @@ function resolveSnapshot(
     provider: createLocalSqliteSnapshotProvider({
       repositoryPath,
       validationRootPath,
-      ...OPENCLAW_SNAPSHOT_READ_OPTIONS,
+      ...STEELENGINE_SNAPSHOT_READ_OPTIONS,
     }),
     ref: { path: snapshotPath },
   };

@@ -31,13 +31,13 @@ async function flushUntil(predicate: () => boolean): Promise<void> {
 function makeProfileRuntime(): ProfileRuntimeState {
   return {
     profile: {
-      name: "openclaw",
+      name: "steelengine",
       cdpPort: 18800,
       cdpUrl: "http://127.0.0.1:18800",
       cdpHost: "127.0.0.1",
       cdpIsLoopback: true,
       color: "#FF4500",
-      driver: "openclaw",
+      driver: "steelengine",
       headless: true,
       headlessSource: "config",
       attachOnly: false,
@@ -130,12 +130,12 @@ describe("browser tab discovery poll abort", () => {
       return { ok: true, json: async () => [] } as unknown as Response;
     });
     globalThis.fetch = withBrowserFetchPreconnect(fetchMock);
-    const state = makeState("openclaw");
-    const openclaw = createTestBrowserRouteContext({ getState: () => state }).forProfile(
-      "openclaw",
+    const state = makeState("steelengine");
+    const steelengine = createTestBrowserRouteContext({ getState: () => state }).forProfile(
+      "steelengine",
     );
     const controller = new AbortController();
-    const openPromise = openclaw.openTab("about:blank", { signal: controller.signal });
+    const openPromise = steelengine.openTab("about:blank", { signal: controller.signal });
 
     await vi.advanceTimersByTimeAsync(0);
     expect(setTimeoutSpy.mock.calls.some((call) => call[1] === OPEN_TAB_DISCOVERY_POLL_MS)).toBe(

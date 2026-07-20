@@ -26,7 +26,7 @@ import {
   isMissingOperatorReadScopeError,
 } from "../../lib/gateway-errors.ts";
 import { buildSessionUsageDateParams, requestSessionsUsage } from "../../lib/sessions/index.ts";
-import { OpenClawLightDomElement } from "../../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../../lit/steelengine-element.ts";
 import {
   decideUsageRefresh,
   USAGE_PAYLOAD_TTL_MS,
@@ -95,7 +95,7 @@ function toErrorMessage(error: unknown): string {
   return typeof error === "string" ? error : "request failed";
 }
 
-export class ProfilePage extends OpenClawLightDomElement {
+export class ProfilePage extends SteelEngineLightDomElement {
   @consume({ context: applicationContext, subscribe: false })
   private context!: ApplicationContext;
 
@@ -350,7 +350,7 @@ export class ProfilePage extends OpenClawLightDomElement {
         <div class="profile-hero__name">${name}</div>
         <div class="profile-hero__handle">
           <span>@${agentId}</span>
-          <span class="profile-hero__badge">OpenClaw</span>
+          <span class="profile-hero__badge">SteelEngine</span>
         </div>
         <div class="profile-hero__chips">
           ${since
@@ -610,6 +610,6 @@ export class ProfilePage extends OpenClawLightDomElement {
   }
 }
 
-if (!customElements.get("openclaw-profile-page")) {
-  customElements.define("openclaw-profile-page", ProfilePage);
+if (!customElements.get("steelengine-profile-page")) {
+  customElements.define("steelengine-profile-page", ProfilePage);
 }

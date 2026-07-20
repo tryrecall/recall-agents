@@ -1,5 +1,5 @@
 ---
-summary: "OpenClaw LongCat provider plugin."
+summary: "SteelEngine LongCat provider plugin."
 read_when:
   - You are installing, configuring, or auditing the longcat plugin
 title: "LongCat plugin"
@@ -7,12 +7,12 @@ title: "LongCat plugin"
 
 # LongCat plugin
 
-OpenClaw LongCat provider plugin.
+SteelEngine LongCat provider plugin.
 
 ## Distribution
 
-- Package: `@openclaw/longcat-provider`
-- Install route: npm; ClawHub: `clawhub:@openclaw/longcat-provider`
+- Package: `@steelengine/longcat-provider`
+- Install route: npm; ClawHub: `clawhub:@steelengine/longcat-provider`
 
 ## Surface
 

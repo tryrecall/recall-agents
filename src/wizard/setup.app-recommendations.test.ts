@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { refreshOnboardRecommendationsCommand } from "../commands/onboard-recommendations.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { OnboardingRecommendationsRecord } from "../state/onboarding-recommendations.js";
 import type { SetupAppRecommendationsResult } from "../system-agent/setup-app-recommendations.js";
@@ -162,7 +162,7 @@ describe("setupAppRecommendations", () => {
       acceptedAt: null,
       updatedAt: 1,
     };
-    const ensurePlugin = vi.fn(async ({ cfg }: { cfg: OpenClawConfig }) => ({
+    const ensurePlugin = vi.fn(async ({ cfg }: { cfg: SteelEngineConfig }) => ({
       cfg,
       installed: true as const,
       status: "installed" as const,
@@ -253,7 +253,7 @@ describe("setupAppRecommendations", () => {
   });
 
   it("preselects recommended matches and installs selected plugin and skill", async () => {
-    const config: OpenClawConfig = {};
+    const config: SteelEngineConfig = {};
     const prompter = createPrompter(["recommendation:0", "recommendation:1"]);
     const ensurePlugin = vi.fn(async () => ({
       cfg: { ...config, plugins: { entries: { "chat-plugin": { enabled: true } } } },
@@ -283,7 +283,7 @@ describe("setupAppRecommendations", () => {
         resolveOfficialEntry: (pluginId) => ({
           pluginId,
           label: "Chat plugin",
-          install: { npmSpec: "@openclaw/chat-plugin" },
+          install: { npmSpec: "@steelengine/chat-plugin" },
         }),
       },
     });
@@ -299,7 +299,7 @@ describe("setupAppRecommendations", () => {
   it("installs nothing when the explicit skip entry is selected", async () => {
     const ensurePlugin = vi.fn();
     const installSkill = vi.fn();
-    const config: OpenClawConfig = {};
+    const config: SteelEngineConfig = {};
     const store = storeDeps();
 
     await expect(

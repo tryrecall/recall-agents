@@ -6,8 +6,8 @@
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
-import { mapAllowFromEntries } from "openclaw/plugin-sdk/channel-config-helpers";
+} from "@steelengine/normalization-core/string-coerce";
+import { mapAllowFromEntries } from "steelengine/plugin-sdk/channel-config-helpers";
 import type { RuntimeEnv } from "../../runtime.js";
 import { summarizeStringEntries } from "../../shared/string-sample.js";
 

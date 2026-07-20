@@ -4,10 +4,10 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
-  closeOpenClawStateDatabaseForTest,
-  openOpenClawStateDatabase,
-  type OpenClawStateDatabase,
-} from "../../state/openclaw-state-db.js";
+  closeSteelEngineStateDatabaseForTest,
+  openSteelEngineStateDatabase,
+  type SteelEngineStateDatabase,
+} from "../../state/steelengine-state-db.js";
 import type { WorkerSessionPlacementIdentity } from "./placement-record.js";
 import {
   createWorkerSessionPlacementStore,
@@ -22,19 +22,19 @@ const SESSION: WorkerSessionPlacementIdentity = {
 
 describe("worker session placement store", () => {
   let root: string;
-  let database: OpenClawStateDatabase;
+  let database: SteelEngineStateDatabase;
   let store: WorkerSessionPlacementStore;
   let nowMs: number;
 
   beforeEach(async () => {
-    root = await fs.mkdtemp(path.join(await fs.realpath(os.tmpdir()), "openclaw-placement-"));
-    database = openOpenClawStateDatabase({ env: { OPENCLAW_STATE_DIR: root } });
+    root = await fs.mkdtemp(path.join(await fs.realpath(os.tmpdir()), "steelengine-placement-"));
+    database = openSteelEngineStateDatabase({ env: { STEELENGINE_STATE_DIR: root } });
     nowMs = 1_000;
     store = createWorkerSessionPlacementStore({ database, now: () => nowMs });
   });
 
   afterEach(async () => {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     await fs.rm(root, { recursive: true, force: true });
   });
 
@@ -503,8 +503,8 @@ describe("worker session placement store", () => {
       runId: "worker-restart-run",
     });
 
-    closeOpenClawStateDatabaseForTest();
-    database = openOpenClawStateDatabase({ env: { OPENCLAW_STATE_DIR: root } });
+    closeSteelEngineStateDatabaseForTest();
+    database = openSteelEngineStateDatabase({ env: { STEELENGINE_STATE_DIR: root } });
     store = createWorkerSessionPlacementStore({ database, now: () => nowMs });
 
     expect(store.clearLocalTurnClaimsAfterRestart()).toBe(1);
@@ -966,8 +966,8 @@ describe("worker session placement store", () => {
       basePack,
     });
 
-    closeOpenClawStateDatabaseForTest();
-    database = openOpenClawStateDatabase({ env: { OPENCLAW_STATE_DIR: root } });
+    closeSteelEngineStateDatabaseForTest();
+    database = openSteelEngineStateDatabase({ env: { STEELENGINE_STATE_DIR: root } });
     store = createWorkerSessionPlacementStore({ database, now: () => nowMs });
     expect(store.listWorkspaceReconciliationOwners()).toEqual([owner]);
     const loaded = store.loadWorkspaceReconciliation(owner);

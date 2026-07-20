@@ -1,18 +1,18 @@
 // Toggles plugin enablement config for channels and agents.
 import { normalizeChatChannelId } from "../channels/ids.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 
 /** Returns config with a plugin enabled/disabled and optional built-in channel state synced. */
 export function setPluginEnabledInConfig(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   pluginId: string,
   enabled: boolean,
   options: { updateChannelConfig?: boolean } = {},
-): OpenClawConfig {
+): SteelEngineConfig {
   const builtInChannelId = normalizeChatChannelId(pluginId);
   const resolvedId = builtInChannelId ?? pluginId;
 
-  const next: OpenClawConfig = {
+  const next: SteelEngineConfig = {
     ...config,
     plugins: {
       ...config.plugins,

@@ -1,7 +1,7 @@
 /** Tests diagnostic cache-trace event writing, redaction, and stream wrapping. */
 import crypto from "node:crypto";
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import { resolveUserPath } from "../utils.js";
 import { createCacheTrace } from "./cache-trace.js";
 
@@ -36,7 +36,7 @@ describe("createCacheTrace", () => {
 
   it("returns null when diagnostics cache tracing is disabled", () => {
     const trace = createCacheTrace({
-      cfg: {} as OpenClawConfig,
+      cfg: {} as SteelEngineConfig,
       env: {},
     });
 
@@ -50,7 +50,7 @@ describe("createCacheTrace", () => {
         diagnostics: {
           cacheTrace: {
             enabled: true,
-            filePath: "~/.openclaw/logs/cache-trace.jsonl",
+            filePath: "~/.steelengine/logs/cache-trace.jsonl",
           },
         },
       },
@@ -63,7 +63,7 @@ describe("createCacheTrace", () => {
     });
 
     expect(typeof trace?.recordStage).toBe("function");
-    expect(trace?.filePath).toBe(resolveUserPath("~/.openclaw/logs/cache-trace.jsonl"));
+    expect(trace?.filePath).toBe(resolveUserPath("~/.steelengine/logs/cache-trace.jsonl"));
 
     trace?.recordStage("session:loaded", {
       messages: [],
@@ -168,7 +168,7 @@ describe("createCacheTrace", () => {
         },
       },
       env: {
-        OPENCLAW_CACHE_TRACE: "0",
+        STEELENGINE_CACHE_TRACE: "0",
       },
       writer: {
         filePath: "memory",

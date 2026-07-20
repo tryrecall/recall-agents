@@ -8,7 +8,7 @@ import path from "node:path";
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 import type { Readable } from "node:stream";
 import { fileURLToPath } from "node:url";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import {
   readSessionArchiveContentSync,
   stripSessionArchiveCompressionSuffix,
@@ -36,7 +36,7 @@ import {
   resolveSessionTranscriptIdentity,
 } from "../../src/plugin-sdk/session-transcript-runtime.js";
 import { sleep } from "../../src/utils.js";
-import { createOpenClawTestInstance } from "./openclaw-test-instance.js";
+import { createSteelEngineTestInstance } from "./steelengine-test-instance.js";
 
 type DoctorMode = "import" | "inspect" | "validate" | "restore";
 type ProofChildProcess = ChildProcessByStdio<null, Readable, Readable>;
@@ -256,7 +256,7 @@ const CONCURRENT_DELETE_TEXT = "sqlite concurrent delete while send is active";
 const CLEANUP_PRUNE_SESSION_ID = "sqlite-cleanup-prune";
 const CLEANUP_PRUNE_SESSION_KEY = "agent:main:dashboard:sqlite-cleanup-prune";
 const CLEANUP_PRUNE_TEXT = "sqlite cleanup prune me";
-const FULL_TURN_ASSISTANT_TEXT = "OPENCLAW_E2E_OK_12";
+const FULL_TURN_ASSISTANT_TEXT = "STEELENGINE_E2E_OK_12";
 const FULL_TURN_SESSION_KEY = "agent:main:sqlite-full-turn";
 const MANUAL_COMPACTION_SESSION_KEY = "agent:main:dashboard:sqlite-manual-compact";
 const PLUGIN_SDK_APPEND_TEXT = "sqlite sdk consumer appended by identity";
@@ -290,13 +290,13 @@ export async function runSqliteSessionsTranscriptsFlipProof(
 ): Promise<SqliteSessionsTranscriptsFlipProofReport> {
   const print = options.print ?? false;
   const mockOpenAiPort = await getFreeTcpPort();
-  const inst = await createOpenClawTestInstance({
+  const inst = await createSteelEngineTestInstance({
     name: `sqlite-sessions-transcripts-flip-${randomUUID()}`,
     config: buildMockOpenAiConfig(mockOpenAiPort),
     env: {
-      OPENAI_API_KEY: "sk-openclaw-e2e-mock",
-      OPENCLAW_TEST_MINIMAL_GATEWAY: undefined,
-      OPENCLAW_SKIP_PROVIDERS: undefined,
+      OPENAI_API_KEY: "sk-steelengine-e2e-mock",
+      STEELENGINE_TEST_MINIMAL_GATEWAY: undefined,
+      STEELENGINE_SKIP_PROVIDERS: undefined,
     },
     startTimeoutMs: 90_000,
     stopTimeoutMs: 3_000,
@@ -580,7 +580,7 @@ function buildProofContext(stateDir: string): ProofContext {
   const legacySessionsDir = path.join(stateDir, "sessions");
   return {
     activeSessionsDir,
-    agentDbPath: path.join(agentDir, "agent", "openclaw-agent.sqlite"),
+    agentDbPath: path.join(agentDir, "agent", "steelengine-agent.sqlite"),
     agentId: AGENT_ID,
     archiveRoots: [path.join(agentDir, "session-sqlite-import-archive"), activeSessionsDir],
     cleanupPruneSessionKey: CLEANUP_PRUNE_SESSION_KEY,
@@ -630,7 +630,7 @@ function buildMockOpenAiConfig(mockPort: number): Record<string, unknown> {
         model: { primary: modelRef },
         models: {
           [modelRef]: {
-            agentRuntime: { id: "openclaw" },
+            agentRuntime: { id: "steelengine" },
             params: { openaiWsWarmup: false, transport: "sse" },
           },
         },
@@ -640,13 +640,13 @@ function buildMockOpenAiConfig(mockPort: number): Record<string, unknown> {
       mode: "merge",
       providers: {
         openai: {
-          agentRuntime: { id: "openclaw" },
+          agentRuntime: { id: "steelengine" },
           api: "openai-responses",
           apiKey: { source: "env", provider: "default", id: "OPENAI_API_KEY" },
           baseUrl: `http://127.0.0.1:${mockPort}/v1`,
           models: [
             {
-              agentRuntime: { id: "openclaw" },
+              agentRuntime: { id: "steelengine" },
               api: "openai-responses",
               contextTokens: 96_000,
               contextWindow: 128_000,
@@ -915,7 +915,7 @@ async function writeTranscript(
 }
 
 async function runDoctor(
-  inst: Awaited<ReturnType<typeof createOpenClawTestInstance>>,
+  inst: Awaited<ReturnType<typeof createSteelEngineTestInstance>>,
   mode: DoctorMode,
   storePath: string,
 ): Promise<DoctorCommandEvidence> {
@@ -979,7 +979,7 @@ function parseDoctorRestore(parsed: Record<string, unknown>): { restore?: Doctor
 }
 
 async function runRollbackRestoreProof(
-  inst: Awaited<ReturnType<typeof createOpenClawTestInstance>>,
+  inst: Awaited<ReturnType<typeof createSteelEngineTestInstance>>,
   context: ProofContext,
 ): Promise<RollbackRestoreEvidence> {
   const drillDir = path.join(context.stateDir, "rollback-drill");
@@ -987,7 +987,7 @@ async function runRollbackRestoreProof(
   const sessionId = "sqlite-rollback-restore";
   const sessionKey = "agent:main:rollback-restore";
   const sourcePath = path.join(drillDir, `${sessionId}.jsonl`);
-  const sqlitePath = path.join(drillDir, "openclaw-agent.sqlite");
+  const sqlitePath = path.join(drillDir, "steelengine-agent.sqlite");
   await fs.mkdir(drillDir, { recursive: true });
   await fs.writeFile(
     storePath,
@@ -1430,7 +1430,7 @@ async function runGatewayCleanupPruningProof(
 }
 
 async function runDoctorIdempotenceProof(
-  inst: Awaited<ReturnType<typeof createOpenClawTestInstance>>,
+  inst: Awaited<ReturnType<typeof createSteelEngineTestInstance>>,
   context: ProofContext,
 ): Promise<DoctorCommandEvidence> {
   const before = readSqliteEvidence(context.agentDbPath, context.trackedSessionKeys);
@@ -1486,7 +1486,7 @@ function requireScaleMigrationProof(
 }
 
 async function runDowngradeReupgradeProof(
-  inst: Awaited<ReturnType<typeof createOpenClawTestInstance>>,
+  inst: Awaited<ReturnType<typeof createSteelEngineTestInstance>>,
   context: ProofContext,
 ): Promise<DowngradeReupgradeEvidence> {
   await fs.mkdir(context.activeSessionsDir, { recursive: true });
@@ -1529,7 +1529,7 @@ async function runDowngradeReupgradeProof(
   await fs.writeFile(
     trajectoryPointerPath,
     `${JSON.stringify({
-      traceSchema: "openclaw-trajectory-pointer",
+      traceSchema: "steelengine-trajectory-pointer",
       schemaVersion: 1,
       sessionId: DOWNGRADE_REUPGRADE_SESSION_ID,
       runtimeFile: trajectoryPath,
@@ -1606,22 +1606,22 @@ async function runSqliteBusyContentionProof(
       `
         import fs from "node:fs";
         import { DatabaseSync } from "node:sqlite";
-        const db = new DatabaseSync(process.env.OPENCLAW_E2E_BUSY_DB_PATH);
+        const db = new DatabaseSync(process.env.STEELENGINE_E2E_BUSY_DB_PATH);
         db.exec("PRAGMA busy_timeout = 30000; BEGIN IMMEDIATE;");
-        fs.writeFileSync(process.env.OPENCLAW_E2E_BUSY_READY_PATH, "ready");
+        fs.writeFileSync(process.env.STEELENGINE_E2E_BUSY_READY_PATH, "ready");
         setTimeout(() => {
           db.exec("COMMIT");
           db.close();
-        }, Number(process.env.OPENCLAW_E2E_BUSY_HOLD_MS));
+        }, Number(process.env.STEELENGINE_E2E_BUSY_HOLD_MS));
       `,
     ],
     {
       cwd: process.cwd(),
       env: {
         ...process.env,
-        OPENCLAW_E2E_BUSY_DB_PATH: context.agentDbPath,
-        OPENCLAW_E2E_BUSY_HOLD_MS: String(holdMs),
-        OPENCLAW_E2E_BUSY_READY_PATH: readyPath,
+        STEELENGINE_E2E_BUSY_DB_PATH: context.agentDbPath,
+        STEELENGINE_E2E_BUSY_HOLD_MS: String(holdMs),
+        STEELENGINE_E2E_BUSY_READY_PATH: readyPath,
       },
       stdio: ["ignore", "pipe", "pipe"],
     },
@@ -1715,7 +1715,7 @@ async function runSecondStartupAfterResetProof(
 }
 
 async function runConcurrentMultiClientLifecycle(
-  inst: Awaited<ReturnType<typeof createOpenClawTestInstance>>,
+  inst: Awaited<ReturnType<typeof createSteelEngineTestInstance>>,
   context: ProofContext,
   primaryClient: Awaited<ReturnType<typeof connectGatewayClient>>,
 ): Promise<void> {

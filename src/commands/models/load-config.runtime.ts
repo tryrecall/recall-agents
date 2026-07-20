@@ -4,5 +4,5 @@ export {
   getRuntimeConfig,
   getRuntimeConfigSourceSnapshot,
   setRuntimeConfigSnapshot,
-  type OpenClawConfig,
+  type SteelEngineConfig,
 } from "../../config/config.js";

@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { ChannelRuntimeSurface } from "openclaw/plugin-sdk/channel-contract";
+import type { ChannelRuntimeSurface } from "steelengine/plugin-sdk/channel-contract";
 // Slack helper module supports monitor helpers behavior.
-import { closeOpenClawStateDatabaseForTest } from "openclaw/plugin-sdk/plugin-state-test-runtime";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
-import { resolvePreferredOpenClawTmpDir } from "openclaw/plugin-sdk/temp-path";
+import { closeSteelEngineStateDatabaseForTest } from "steelengine/plugin-sdk/plugin-state-test-runtime";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
+import { resolvePreferredSteelEngineTmpDir } from "steelengine/plugin-sdk/temp-path";
 import { vi } from "vitest";
 import type { Mock } from "vitest";
 
@@ -21,7 +21,7 @@ type SlackProviderMonitor = (params: {
 }) => Promise<unknown>;
 type SlackStartupAuthClientFactory = typeof import("./client.js").createSlackStartupAuthClient;
 
-const SLACK_INGRESS_LIFECYCLE_CONTEXT_KEY = "openclawIngressLifecycle";
+const SLACK_INGRESS_LIFECYCLE_CONTEXT_KEY = "steelengineIngressLifecycle";
 
 type SlackRunOnceOptions = {
   botToken?: string;
@@ -306,7 +306,7 @@ export function resetSlackTestState(config: Record<string, unknown> = defaultSla
   // message keys to the state DB, and fixture ts values repeat across tests,
   // so a carried-over DB would dedupe unrelated test messages. realpath keeps
   // macOS /var vs /private/var symlinks out of resolver assertions.
-  closeOpenClawStateDatabaseForTest();
+  closeSteelEngineStateDatabaseForTest();
   // Clear worker-global Bolt handler registrations from previous test files:
   // with isolate=false a stale "message" handler makes waitForSlackEvent
   // return before THIS test's provider registers, dispatching through the old
@@ -316,9 +316,9 @@ export function resetSlackTestState(config: Record<string, unknown> = defaultSla
     fs.rmSync(lastSlackTestStateDir, { recursive: true, force: true });
   }
   lastSlackTestStateDir = fs.realpathSync(
-    fs.mkdtempSync(path.join(resolvePreferredOpenClawTmpDir(), "openclaw-slack-monitor-state-")),
+    fs.mkdtempSync(path.join(resolvePreferredSteelEngineTmpDir(), "steelengine-slack-monitor-state-")),
   );
-  process.env.OPENCLAW_STATE_DIR = lastSlackTestStateDir;
+  process.env.STEELENGINE_STATE_DIR = lastSlackTestStateDir;
   slackTestState.config = config;
   slackTestState.appConstructorArgs = undefined;
   slackTestState.socketModeLogger = undefined;
@@ -372,13 +372,13 @@ vi.mock("./monitor/config.runtime.js", async () => {
     loadConfig: () => slackTestState.config,
     readSessionUpdatedAt: vi.fn(() => undefined),
     recordSessionMetaFromInbound: vi.fn().mockResolvedValue(undefined),
-    resolveStorePath: vi.fn(() => "/tmp/openclaw-sessions.json"),
+    resolveStorePath: vi.fn(() => "/tmp/steelengine-sessions.json"),
     updateLastRoute: (...args: unknown[]) => slackTestState.updateLastRouteMock(...args),
   };
 });
 
-vi.mock("openclaw/plugin-sdk/channel-inbound", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/channel-inbound")>();
+vi.mock("steelengine/plugin-sdk/channel-inbound", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("steelengine/plugin-sdk/channel-inbound")>();
   type DispatchParams = Parameters<typeof actual.dispatchChannelInboundTurn>[0];
   type ReplyResolver = NonNullable<DispatchParams["replyResolver"]>;
   const replyResolver: ReplyResolver = (...args) =>

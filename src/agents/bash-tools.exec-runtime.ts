@@ -1,6 +1,6 @@
 import path from "node:path";
-import { normalizeStringEntries } from "@openclaw/normalization-core/string-normalization";
-import { truncateUtf16Safe } from "@openclaw/normalization-core/utf16-slice";
+import { normalizeStringEntries } from "@steelengine/normalization-core/string-normalization";
+import { truncateUtf16Safe } from "@steelengine/normalization-core/utf16-slice";
 import { emitDiagnosticEvent } from "../infra/diagnostic-events.js";
 import {
   type EventSessionRoutingPolicy,
@@ -86,14 +86,14 @@ function detectCursorKeyMode(raw: string): "application" | "normal" | null {
 
 /** Default retained aggregate output cap for exec sessions. */
 export const DEFAULT_MAX_OUTPUT = clampWithDefault(
-  readEnvInt("OPENCLAW_BASH_MAX_OUTPUT_CHARS", "PI_BASH_MAX_OUTPUT_CHARS"),
+  readEnvInt("STEELENGINE_BASH_MAX_OUTPUT_CHARS", "PI_BASH_MAX_OUTPUT_CHARS"),
   200_000,
   1_000,
   200_000,
 );
 /** Default pending output cap for poll/update buffers. */
 export const DEFAULT_PENDING_MAX_OUTPUT = clampWithDefault(
-  readEnvInt("OPENCLAW_BASH_PENDING_MAX_OUTPUT_CHARS"),
+  readEnvInt("STEELENGINE_BASH_PENDING_MAX_OUTPUT_CHARS"),
   30_000,
   1_000,
   200_000,
@@ -452,8 +452,8 @@ function formatExecFailureReason(params: {
       return "Command not executable (permission denied)";
     case "overall-timeout":
       return typeof params.timeoutSec === "number" && params.timeoutSec > 0
-        ? `Command timed out after ${params.timeoutSec} seconds. If this command is expected to take longer, re-run with a higher timeout (e.g., exec timeout=300). If it should keep running, start it with exec background=true or yieldMs so OpenClaw can register a pollable process session. Do not rely on shell backgrounding with a trailing &.`
-        : "Command timed out. If this command is expected to take longer, re-run with a higher timeout (e.g., exec timeout=300). If it should keep running, start it with exec background=true or yieldMs so OpenClaw can register a pollable process session. Do not rely on shell backgrounding with a trailing &.";
+        ? `Command timed out after ${params.timeoutSec} seconds. If this command is expected to take longer, re-run with a higher timeout (e.g., exec timeout=300). If it should keep running, start it with exec background=true or yieldMs so SteelEngine can register a pollable process session. Do not rely on shell backgrounding with a trailing &.`
+        : "Command timed out. If this command is expected to take longer, re-run with a higher timeout (e.g., exec timeout=300). If it should keep running, start it with exec background=true or yieldMs so SteelEngine can register a pollable process session. Do not rely on shell backgrounding with a trailing &.";
     case "no-output-timeout":
       return "Command timed out waiting for output";
     case "signal":
@@ -562,9 +562,9 @@ function wrapPosixCommandWithPathPrepend(
   }
 
   // Pass the prepend string safely via a temporary environment variable.
-  env.OPENCLAW_PREPEND_PATH = pathPrepend.join(path.delimiter);
+  env.STEELENGINE_PREPEND_PATH = pathPrepend.join(path.delimiter);
 
-  return `export PATH="\${OPENCLAW_PREPEND_PATH}\${PATH:+:$PATH}"; unset OPENCLAW_PREPEND_PATH; ${command}`;
+  return `export PATH="\${STEELENGINE_PREPEND_PATH}\${PATH:+:$PATH}"; unset STEELENGINE_PREPEND_PATH; ${command}`;
 }
 
 /** Starts a host or sandbox exec process and registers it for polling/backgrounding. */
@@ -610,7 +610,7 @@ export async function runExecProcess(opts: {
   const supervisor = getProcessSupervisor();
   const shellRuntimeEnv: Record<string, string> = {
     ...opts.env,
-    OPENCLAW_SHELL: "exec",
+    STEELENGINE_SHELL: "exec",
   };
 
   const session: ProcessSession = {

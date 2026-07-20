@@ -1,12 +1,12 @@
-# OpenClaw Inworld Plugin
+# SteelEngine Inworld Plugin
 
-Official OpenClaw plugin for Inworld.
+Official SteelEngine plugin for Inworld.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/inworld-speech
-openclaw gateway restart
+steelengine plugins install @steelengine/inworld-speech
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/providers/inworld> for setup and configuration.
+See <https://docs.steelengine.ai/providers/inworld> for setup and configuration.

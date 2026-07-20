@@ -1,11 +1,11 @@
 // Tlon plugin module implements channel behavior.
 import crypto from "node:crypto";
-import type { ChannelAccountSnapshot } from "openclaw/plugin-sdk/channel-contract";
-import type { ChannelOutboundAdapter } from "openclaw/plugin-sdk/channel-send-result";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { ChannelPlugin } from "openclaw/plugin-sdk/core";
-import { expectDefined } from "openclaw/plugin-sdk/expect-runtime";
-import { readResponseTextLimited } from "openclaw/plugin-sdk/provider-http";
+import type { ChannelAccountSnapshot } from "steelengine/plugin-sdk/channel-contract";
+import type { ChannelOutboundAdapter } from "steelengine/plugin-sdk/channel-send-result";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { ChannelPlugin } from "steelengine/plugin-sdk/core";
+import { expectDefined } from "steelengine/plugin-sdk/expect-runtime";
+import { readResponseTextLimited } from "steelengine/plugin-sdk/provider-http";
 import { monitorTlonProvider } from "./monitor/index.js";
 import { tlonSetupWizard } from "./setup-surface.js";
 import {
@@ -94,7 +94,7 @@ async function createHttpPokeApi(params: {
 }
 
 function resolveOutboundContext(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId?: string | null;
   to: string;
 }) {

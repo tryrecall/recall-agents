@@ -25,14 +25,14 @@ describe("OCM npm workspace dependency adapter", () => {
     expect(resolveNpmEnvironment(["pack", "--silent"], env)).toEqual({
       KEEP: "value",
       OCM_INTERNAL_NPM_BIN: adapterPath,
-      OPENCLAW_PREPACK_ALLOW_UNRELEASED_CHANGELOG: "1",
+      STEELENGINE_PREPACK_ALLOW_UNRELEASED_CHANGELOG: "1",
     });
   });
 
   it("uses a prepared runtime-only pack for the diagnostic build profile", () => {
     expect(
       resolveRuntimePackPlan(["pack", "--pack-destination", "/tmp/out"], {
-        OPENCLAW_OCM_RUNTIME_BUILD_PROFILE: "sourcePerformance",
+        STEELENGINE_OCM_RUNTIME_BUILD_PROFILE: "sourcePerformance",
       }),
     ).toEqual({
       profile: "sourcePerformance",
@@ -44,7 +44,7 @@ describe("OCM npm workspace dependency adapter", () => {
     expect(resolveRuntimePackPlan(["pack"], {})).toBeNull();
     expect(
       resolveRuntimePackPlan(["install"], {
-        OPENCLAW_OCM_RUNTIME_BUILD_PROFILE: "sourcePerformance",
+        STEELENGINE_OCM_RUNTIME_BUILD_PROFILE: "sourcePerformance",
       }),
     ).toBeNull();
   });
@@ -52,9 +52,9 @@ describe("OCM npm workspace dependency adapter", () => {
   it("rejects unsupported runtime build profiles", () => {
     expect(() =>
       resolveRuntimePackPlan(["pack"], {
-        OPENCLAW_OCM_RUNTIME_BUILD_PROFILE: "qaRuntime",
+        STEELENGINE_OCM_RUNTIME_BUILD_PROFILE: "qaRuntime",
       }),
-    ).toThrow("invalid OPENCLAW_OCM_RUNTIME_BUILD_PROFILE: qaRuntime");
+    ).toThrow("invalid STEELENGINE_OCM_RUNTIME_BUILD_PROFILE: qaRuntime");
   });
 
   it("pins one timestamp and commit across the prepared runtime pack", () => {
@@ -67,7 +67,7 @@ describe("OCM npm workspace dependency adapter", () => {
     expect(env).toMatchObject({
       KEEP: "value",
       GIT_COMMIT: "abcdef0123456789abcdef0123456789abcdef01",
-      OPENCLAW_BUILD_TIMESTAMP: "2026-07-11T12:34:56.000Z",
+      STEELENGINE_BUILD_TIMESTAMP: "2026-07-11T12:34:56.000Z",
     });
   });
 
@@ -97,7 +97,7 @@ describe("OCM npm workspace dependency adapter", () => {
           "--omit=dev",
           "--no-save",
           "--package-lock=false",
-          "openclaw.tgz",
+          "steelengine.tgz",
         ],
         ["/repo/packages/ai"],
         "/repo",
@@ -112,25 +112,25 @@ describe("OCM npm workspace dependency adapter", () => {
         "--package-lock=false",
       ],
       prefixDir: "/repo/runtime",
-      rootArchive: "/repo/openclaw.tgz",
+      rootArchive: "/repo/steelengine.tgz",
     });
   });
 
   it("keeps normal npm commands unchanged", () => {
     expect(resolveWorkspaceInstallPlan(["pack", "--silent"], ["/repo/packages/ai"])).toBeNull();
-    expect(resolveWorkspaceInstallPlan(["install", "openclaw.tgz"], [])).toBeNull();
+    expect(resolveWorkspaceInstallPlan(["install", "steelengine.tgz"], [])).toBeNull();
   });
 
   it("builds a manifest with the root and local workspace tarballs", () => {
     expect(
-      buildInstallManifest("/tmp/openclaw.tgz", [
-        { name: "@openclaw/ai", tarball: "/tmp/openclaw-ai.tgz" },
+      buildInstallManifest("/tmp/steelengine.tgz", [
+        { name: "@steelengine/ai", tarball: "/tmp/steelengine-ai.tgz" },
       ]),
     ).toEqual({
       private: true,
       dependencies: {
-        "@openclaw/ai": "file:///tmp/openclaw-ai.tgz",
-        openclaw: "file:///tmp/openclaw.tgz",
+        "@steelengine/ai": "file:///tmp/steelengine-ai.tgz",
+        steelengine: "file:///tmp/steelengine.tgz",
       },
     });
   });
@@ -138,7 +138,7 @@ describe("OCM npm workspace dependency adapter", () => {
   it("rewrites packed workspace protocols to the local package version", () => {
     const packageJson = {
       dependencies: {
-        "@openclaw/ai": "workspace:*",
+        "@steelengine/ai": "workspace:*",
         chalk: "5.6.2",
       },
     };
@@ -146,40 +146,40 @@ describe("OCM npm workspace dependency adapter", () => {
     expect(
       rewriteWorkspaceDependencyVersions(packageJson, [
         {
-          name: "@openclaw/ai",
+          name: "@steelengine/ai",
           version: "2026.7.1-beta.3",
-          tarball: "/tmp/openclaw-ai.tgz",
+          tarball: "/tmp/steelengine-ai.tgz",
         },
       ]),
     ).toBe(1);
     expect(packageJson.dependencies).toEqual({
-      "@openclaw/ai": "2026.7.1-beta.3",
+      "@steelengine/ai": "2026.7.1-beta.3",
       chalk: "5.6.2",
     });
   });
 
   it("installs a packed root with a local workspace dependency", () => {
-    const root = mkdtempSync(join(tmpdir(), "openclaw-ocm-adapter-test-"));
+    const root = mkdtempSync(join(tmpdir(), "steelengine-ocm-adapter-test-"));
     try {
       const archiveRoot = join(root, "archive");
       const packagedRoot = join(archiveRoot, "package");
       const workspaceDir = join(root, "ai");
       const installDir = join(root, "install");
-      const rootArchive = join(root, "openclaw.tgz");
+      const rootArchive = join(root, "steelengine.tgz");
       mkdirSync(packagedRoot, { recursive: true });
       mkdirSync(workspaceDir, { recursive: true });
       writeFileSync(
         join(packagedRoot, "package.json"),
         `${JSON.stringify({
-          name: "openclaw",
+          name: "steelengine",
           version: "1.0.0",
-          dependencies: { "@openclaw/ai": "workspace:*" },
+          dependencies: { "@steelengine/ai": "workspace:*" },
         })}\n`,
       );
       writeFileSync(
         join(workspaceDir, "package.json"),
         `${JSON.stringify({
-          name: "@openclaw/ai",
+          name: "@steelengine/ai",
           version: "1.0.0",
           main: "index.js",
         })}\n`,
@@ -202,8 +202,8 @@ describe("OCM npm workspace dependency adapter", () => {
         {
           env: {
             ...process.env,
-            OPENCLAW_OCM_REAL_NPM_BIN: process.platform === "win32" ? "npm.cmd" : "npm",
-            OPENCLAW_OCM_WORKSPACE_DEPENDENCY_DIRS: workspaceDir,
+            STEELENGINE_OCM_REAL_NPM_BIN: process.platform === "win32" ? "npm.cmd" : "npm",
+            STEELENGINE_OCM_WORKSPACE_DEPENDENCY_DIRS: workspaceDir,
             npm_config_audit: "false",
             npm_config_cache: join(root, "npm-cache"),
             npm_config_fund: "false",
@@ -213,11 +213,11 @@ describe("OCM npm workspace dependency adapter", () => {
       );
 
       expect(
-        JSON.parse(readFileSync(join(installDir, "node_modules/openclaw/package.json"), "utf8"))
+        JSON.parse(readFileSync(join(installDir, "node_modules/steelengine/package.json"), "utf8"))
           .version,
       ).toBe("1.0.0");
       expect(
-        JSON.parse(readFileSync(join(installDir, "node_modules/@openclaw/ai/package.json"), "utf8"))
+        JSON.parse(readFileSync(join(installDir, "node_modules/@steelengine/ai/package.json"), "utf8"))
           .version,
       ).toBe("1.0.0");
     } finally {

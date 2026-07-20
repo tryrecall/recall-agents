@@ -1,11 +1,11 @@
-# OpenClaw Feishu/Lark
+# SteelEngine Feishu/Lark
 
-Official OpenClaw channel plugin for Feishu and Lark workplace chats. Community maintained by @m1heng.
+Official SteelEngine channel plugin for Feishu and Lark workplace chats. Community maintained by @m1heng.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugin add @openclaw/feishu
+steelengine plugin add @steelengine/feishu
 ```
 
-Configure the Feishu/Lark app credentials in OpenClaw, then connect the plugin to the chats where agents should receive and send messages.
+Configure the Feishu/Lark app credentials in SteelEngine, then connect the plugin to the chats where agents should receive and send messages.

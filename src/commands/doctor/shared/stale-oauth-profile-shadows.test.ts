@@ -14,7 +14,7 @@ import {
   saveAuthProfileStore,
 } from "../../../agents/auth-profiles/store.js";
 import type { AuthProfileStore, OAuthCredential } from "../../../agents/auth-profiles/types.js";
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../../config/types.steelengine.js";
 import { captureEnv } from "../../../test-utils/env.js";
 import {
   collectStaleOAuthProfileShadowWarnings,
@@ -55,16 +55,16 @@ async function writeRawAuthStore(agentDir: string, store: unknown): Promise<void
 }
 
 describe("stale OAuth profile shadow doctor repair", () => {
-  const envSnapshot = captureEnv(["OPENCLAW_STATE_DIR", "OPENCLAW_HOME"]);
+  const envSnapshot = captureEnv(["STEELENGINE_STATE_DIR", "STEELENGINE_HOME"]);
   let tempRoot = "";
   let stateDir = "";
 
   beforeEach(async () => {
     clearRuntimeAuthProfileStoreSnapshots();
-    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-stale-oauth-shadow-"));
+    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-stale-oauth-shadow-"));
     stateDir = path.join(tempRoot, "state");
-    process.env.OPENCLAW_STATE_DIR = stateDir;
-    process.env.OPENCLAW_HOME = stateDir;
+    process.env.STEELENGINE_STATE_DIR = stateDir;
+    process.env.STEELENGINE_HOME = stateDir;
   });
 
   afterEach(async () => {
@@ -102,17 +102,17 @@ describe("stale OAuth profile shadow doctor repair", () => {
     );
 
     const hits = await scanStaleOAuthProfileShadows({
-      cfg: {} satisfies OpenClawConfig,
+      cfg: {} satisfies SteelEngineConfig,
       now,
     });
     const warnings = collectStaleOAuthProfileShadowWarnings({
       hits,
-      doctorFixCommand: "openclaw doctor --fix",
+      doctorFixCommand: "steelengine doctor --fix",
     });
 
     expect(hits).toHaveLength(1);
     expect(warnings[0]).toContain("stale OAuth auth profile anthropic:default");
-    expect(warnings[0]).toContain("openclaw doctor --fix");
+    expect(warnings[0]).toContain("steelengine doctor --fix");
     expect(loadPersistedAuthProfileStore(childAgentDir)?.profiles[profileId]).toBeDefined();
   });
 
@@ -145,7 +145,7 @@ describe("stale OAuth profile shadow doctor repair", () => {
     );
 
     const hits = await scanStaleOAuthProfileShadows({
-      cfg: {} satisfies OpenClawConfig,
+      cfg: {} satisfies SteelEngineConfig,
       now,
     });
 
@@ -166,8 +166,8 @@ describe("stale OAuth profile shadow doctor repair", () => {
     const injectedStateDir = path.join(tempRoot, "injected-state");
     const injectedEnv = {
       ...process.env,
-      OPENCLAW_STATE_DIR: injectedStateDir,
-      OPENCLAW_HOME: injectedStateDir,
+      STEELENGINE_STATE_DIR: injectedStateDir,
+      STEELENGINE_HOME: injectedStateDir,
     };
     saveAuthProfileStore(
       storeWith(
@@ -206,7 +206,7 @@ describe("stale OAuth profile shadow doctor repair", () => {
     );
 
     const hits = await scanStaleOAuthProfileShadows({
-      cfg: {} satisfies OpenClawConfig,
+      cfg: {} satisfies SteelEngineConfig,
       env: injectedEnv,
       now,
     });
@@ -232,7 +232,7 @@ describe("stale OAuth profile shadow doctor repair", () => {
           accountId: "acct-shared",
           expires: now - 60_000,
           oauthRef: {
-            source: "openclaw-credentials",
+            source: "steelengine-credentials",
             provider: "openai-codex",
             id: "0123456789abcdef0123456789abcdef",
           },
@@ -253,11 +253,11 @@ describe("stale OAuth profile shadow doctor repair", () => {
     );
 
     const hits = await scanStaleOAuthProfileShadows({
-      cfg: {} satisfies OpenClawConfig,
+      cfg: {} satisfies SteelEngineConfig,
       now,
     });
     const repair = await repairStaleOAuthProfileShadows({
-      cfg: {} satisfies OpenClawConfig,
+      cfg: {} satisfies SteelEngineConfig,
       now,
     });
 
@@ -309,7 +309,7 @@ describe("stale OAuth profile shadow doctor repair", () => {
     );
 
     const result = await repairStaleOAuthProfileShadows({
-      cfg: { agents: { list: [{ id: "telegram" }] } } satisfies OpenClawConfig,
+      cfg: { agents: { list: [{ id: "telegram" }] } } satisfies SteelEngineConfig,
       now,
     });
 
@@ -350,7 +350,7 @@ describe("stale OAuth profile shadow doctor repair", () => {
     );
 
     const result = await repairStaleOAuthProfileShadows({
-      cfg: {} satisfies OpenClawConfig,
+      cfg: {} satisfies SteelEngineConfig,
       now,
     });
 
@@ -383,7 +383,7 @@ describe("stale OAuth profile shadow doctor repair", () => {
     );
 
     const result = await repairStaleOAuthProfileShadows({
-      cfg: {} satisfies OpenClawConfig,
+      cfg: {} satisfies SteelEngineConfig,
       now,
     });
 

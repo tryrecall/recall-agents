@@ -2,8 +2,8 @@ import type {
   AnyAgentTool,
   ProviderNormalizeToolSchemasContext,
   ProviderToolSchemaDiagnostic,
-} from "openclaw/plugin-sdk/plugin-entry";
-import { findUnsupportedSchemaKeywords } from "openclaw/plugin-sdk/provider-tools";
+} from "steelengine/plugin-sdk/plugin-entry";
+import { findUnsupportedSchemaKeywords } from "steelengine/plugin-sdk/provider-tools";
 
 const PERPLEXITY_UNSUPPORTED_SCHEMA_KEYWORDS = new Set([
   "patternProperties",

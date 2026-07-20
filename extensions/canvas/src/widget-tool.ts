@@ -1,10 +1,10 @@
 /** Agent-facing inline chat widget tool. */
 import { createHash } from "node:crypto";
-import { jsonResult, readStringParam } from "openclaw/plugin-sdk/channel-actions";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { AnyAgentTool } from "openclaw/plugin-sdk/plugin-entry";
-import { escapeHtml } from "openclaw/plugin-sdk/text-utility-runtime";
-import { assertWidgetHtmlSize, WidgetHtmlInputError } from "openclaw/plugin-sdk/widget-html";
+import { jsonResult, readStringParam } from "steelengine/plugin-sdk/channel-actions";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { AnyAgentTool } from "steelengine/plugin-sdk/plugin-entry";
+import { escapeHtml } from "steelengine/plugin-sdk/text-utility-runtime";
+import { assertWidgetHtmlSize, WidgetHtmlInputError } from "steelengine/plugin-sdk/widget-html";
 import { resolveCanvasHostConfig } from "./config.js";
 import { createCanvasDocument } from "./documents.js";
 import { SHOW_WIDGET_REQUIRED_CLIENT_CAPS, ShowWidgetToolSchema } from "./tool-schema.js";
@@ -13,7 +13,7 @@ export const WIDGET_CODE_MAX_CHARS = 262_144;
 export const WIDGET_MAX_PER_SCOPE = 32;
 
 type ShowWidgetToolOptions = {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   sessionId?: string;
   agentId?: string;
   stateDir?: string;
@@ -32,7 +32,7 @@ function buildWidgetDocument(title: string, widgetCode: string): string {
     // measure the body box, which tracks the actual widget height.
     "let last=0;const report=()=>{const b=document.body;if(!b)return;" +
     "const h=Math.ceil(Math.max(b.scrollHeight,b.offsetHeight,b.getBoundingClientRect().height));" +
-    'if(h&&h!==last){last=h;window.parent.postMessage({type:"openclaw:widget-size",height:h},"*");}};' +
+    'if(h&&h!==last){last=h;window.parent.postMessage({type:"steelengine:widget-size",height:h},"*");}};' +
     "addEventListener('load',report);new ResizeObserver(report).observe(document.body);" +
     "setTimeout(report,50);setTimeout(report,500);})();</script>";
   // The prompt bridge precedes widget code so inline handlers can reference
@@ -56,9 +56,9 @@ function buildWidgetDocument(title: string, widgetCode: string): string {
     "try{const ua=navigator.userActivation;" +
     'const d=ua&&Object.getOwnPropertyDescriptor(Object.getPrototypeOf(ua),"isActive");' +
     "if(d&&d.get)act=d.get.bind(ua);}catch{}" +
-    'window.parent.postMessage({type:"openclaw:widget-prompt-offer"},"*",[c.port2]);' +
+    'window.parent.postMessage({type:"steelengine:widget-prompt-offer"},"*",[c.port2]);' +
     "window.sendPrompt=text=>{if(!act||act()!==true)return;" +
-    'post({type:"openclaw:widget-prompt",prompt:String(text)});};})();</script>';
+    'post({type:"steelengine:widget-prompt",prompt:String(text)});};})();</script>';
   return `<!doctype html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:;"><title>${escapeHtml(title)}</title><style>:root{color-scheme:light dark}*{box-sizing:border-box}html,body{margin:0}body{font:14px system-ui,sans-serif}.svg-widget{display:grid;place-items:center}.svg-widget>svg{max-width:100%}</style></head><body${bodyClass}>${promptBridge}${widgetCode}${sizeReporter}</body></html>`;
 }

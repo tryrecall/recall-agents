@@ -32,15 +32,15 @@ export function formatSidebarTimestamp(timestampMs: number | null | undefined): 
   return value.endsWith(" ago") ? value.slice(0, -" ago".length) : value;
 }
 
-/** Session keys already adopted into OpenClaw sessions; the regular list hides
+/** Session keys already adopted into SteelEngine sessions; the regular list hides
     these so each adopted session stays a single selectable catalog row. */
 export function adoptedCatalogSessionKeys(catalogs: readonly SessionCatalog[]): Set<string> {
   const keys = new Set<string>();
   for (const catalog of catalogs) {
     for (const host of catalog.hosts) {
       for (const session of host.sessions) {
-        if (session.openClawSessionKey) {
-          keys.add(session.openClawSessionKey);
+        if (session.steelEngineSessionKey) {
+          keys.add(session.steelEngineSessionKey);
         }
       }
     }
@@ -78,7 +78,7 @@ export function bindAdoptedCatalogSession(
                   ...host,
                   sessions: host.sessions.map((session) =>
                     session.threadId === detail.threadId
-                      ? { ...session, openClawSessionKey: detail.sessionKey }
+                      ? { ...session, steelEngineSessionKey: detail.sessionKey }
                       : session,
                   ),
                 }
@@ -170,8 +170,8 @@ export function renderSessionCatalogGroups(params: SessionCatalogGroupsParams) {
       host.sessions.map((session) => ({ host, session })),
     );
     const liveRows = rows.flatMap(({ session }) => {
-      const row = session.openClawSessionKey
-        ? liveRowsByKey.get(session.openClawSessionKey)
+      const row = session.steelEngineSessionKey
+        ? liveRowsByKey.get(session.steelEngineSessionKey)
         : undefined;
       return row ? [row] : [];
     });
@@ -344,8 +344,8 @@ function renderCatalogSessionRow(
     typeof rawTimestamp === "number" && rawTimestamp < 1_000_000_000_000
       ? rawTimestamp * 1000
       : rawTimestamp;
-  const adoptedRow = session.openClawSessionKey
-    ? liveRowsByKey.get(session.openClawSessionKey)
+  const adoptedRow = session.steelEngineSessionKey
+    ? liveRowsByKey.get(session.steelEngineSessionKey)
     : undefined;
   if (adoptedRow) {
     const label = session.name || session.threadId;
@@ -360,7 +360,7 @@ function renderCatalogSessionRow(
     hostId: host.hostId,
     threadId: session.threadId,
   } satisfies CatalogSessionKey;
-  const key = session.openClawSessionKey ?? buildCatalogSessionKey(catalogKey);
+  const key = session.steelEngineSessionKey ?? buildCatalogSessionKey(catalogKey);
   const label = session.name || session.threadId;
   const meta = formatSidebarTimestamp(timestamp);
   const search = searchForSession(key);

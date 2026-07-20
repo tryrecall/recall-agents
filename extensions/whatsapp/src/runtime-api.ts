@@ -1,8 +1,8 @@
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
 // Whatsapp API module exposes the plugin public contract.
-export { getChatChannelMeta, type ChannelPlugin } from "openclaw/plugin-sdk/core";
+export { getChatChannelMeta, type ChannelPlugin } from "steelengine/plugin-sdk/core";
 export { buildChannelConfigSchema, WhatsAppConfigSchema } from "../config-api.js";
-export { DEFAULT_ACCOUNT_ID } from "openclaw/plugin-sdk/account-id";
+export { DEFAULT_ACCOUNT_ID } from "steelengine/plugin-sdk/account-id";
 export {
   formatWhatsAppConfigAllowFromEntries,
   resolveWhatsAppConfigAllowFrom,
@@ -14,12 +14,12 @@ export {
   readReactionParams,
   readStringParam,
   ToolAuthorizationError,
-} from "openclaw/plugin-sdk/channel-actions";
-export { normalizeE164 } from "openclaw/plugin-sdk/account-resolution";
-export type { DmPolicy, GroupPolicy } from "openclaw/plugin-sdk/config-contracts";
-import type { OpenClawConfig as RuntimeOpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+} from "steelengine/plugin-sdk/channel-actions";
+export { normalizeE164 } from "steelengine/plugin-sdk/account-resolution";
+export type { DmPolicy, GroupPolicy } from "steelengine/plugin-sdk/config-contracts";
+import type { SteelEngineConfig as RuntimeSteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 
-export { type ChannelMessageActionName } from "openclaw/plugin-sdk/channel-contract";
+export { type ChannelMessageActionName } from "steelengine/plugin-sdk/channel-contract";
 export { loadOutboundMediaFromUrl } from "./outbound-media.runtime.js";
 export {
   resolveWhatsAppGroupRequireMention,
@@ -41,7 +41,7 @@ export {
 export { resolveWhatsAppOutboundTarget } from "./resolve-outbound-target.js";
 export { resolveWhatsAppReactionLevel } from "./reaction-level.js";
 
-export type OpenClawConfig = RuntimeOpenClawConfig;
+export type SteelEngineConfig = RuntimeSteelEngineConfig;
 export type { WhatsAppAccountConfig } from "./account-types.js";
 
 type MonitorWebChannel = typeof import("./channel.runtime.js").monitorWebChannel;

@@ -8,7 +8,7 @@ import {
   UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE_ENV,
 } from "../commands/doctor/shared/update-phase.js";
 import { resolveIsNixMode } from "../config/paths.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { buildGatewayConnectionDetails } from "../gateway/call.js";
 import type { UpdatePostInstallDoctorResult } from "../infra/update-doctor-result.js";
 import type { RuntimeEnv } from "../runtime.js";
@@ -22,7 +22,7 @@ type PluginVersionDriftReport =
   import("../plugins/plugin-version-drift.js").PluginVersionDriftReport;
 
 type DoctorConfigResult = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   path?: string;
   shouldWriteConfig?: boolean;
   sourceConfigValid?: boolean;
@@ -38,8 +38,8 @@ export type DoctorHealthFlowContext = {
   options: DoctorOptions;
   prompter: DoctorPrompter;
   configResult: DoctorConfigResult;
-  cfg: OpenClawConfig;
-  cfgForPersistence: OpenClawConfig;
+  cfg: SteelEngineConfig;
+  cfgForPersistence: SteelEngineConfig;
   sourceConfigValid: boolean;
   configPath: string;
   env?: NodeJS.ProcessEnv;
@@ -89,11 +89,11 @@ const loadOnboardHelpersModule = async () => await import("../commands/onboard-h
 const loadSecretTypesModule = async () => await import("../config/types.secrets.js");
 
 function isUpdateDoctorRun(env: NodeJS.ProcessEnv | Record<string, string | undefined>): boolean {
-  const value = env.OPENCLAW_UPDATE_IN_PROGRESS;
+  const value = env.STEELENGINE_UPDATE_IN_PROGRESS;
   return value === "1" || value === "true";
 }
 
-function resolveDoctorMode(cfg: OpenClawConfig): DoctorFlowMode {
+function resolveDoctorMode(cfg: SteelEngineConfig): DoctorFlowMode {
   return cfg.gateway?.mode === "remote" ? "remote" : "local";
 }
 
@@ -106,7 +106,7 @@ function isTruthyEnvValue(value: string | undefined): boolean {
 }
 
 function shouldSkipLegacyUpdateDoctorConfigWrite(params: { env: NodeJS.ProcessEnv }): boolean {
-  if (!isTruthyEnvValue(params.env.OPENCLAW_UPDATE_IN_PROGRESS)) {
+  if (!isTruthyEnvValue(params.env.STEELENGINE_UPDATE_IN_PROGRESS)) {
     return false;
   }
   if (isTruthyEnvValue(params.env[UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE_ENV])) {
@@ -265,11 +265,11 @@ async function runGatewayConfigHealth(ctx: DoctorHealthFlowContext): Promise<voi
   if (!ctx.cfg.gateway?.mode) {
     const lines = [
       "gateway.mode is unset; gateway start will be blocked.",
-      `Fix: run ${formatCliCommand("openclaw configure")} and set Gateway mode (local/remote).`,
-      `Or set directly: ${formatCliCommand("openclaw config set gateway.mode local")}`,
+      `Fix: run ${formatCliCommand("steelengine configure")} and set Gateway mode (local/remote).`,
+      `Or set directly: ${formatCliCommand("steelengine config set gateway.mode local")}`,
     ];
     if (!fs.existsSync(ctx.configPath)) {
-      lines.push(`Missing config: run ${formatCliCommand("openclaw setup")} first.`);
+      lines.push(`Missing config: run ${formatCliCommand("steelengine setup")} first.`);
     }
     note(lines.join("\n"), "Gateway");
   }
@@ -278,8 +278,8 @@ async function runGatewayConfigHealth(ctx: DoctorHealthFlowContext): Promise<voi
       [
         "gateway.auth.token and gateway.auth.password are both configured while gateway.auth.mode is unset.",
         "Set an explicit mode to avoid ambiguous auth selection and startup/runtime failures.",
-        `Set token mode: ${formatCliCommand("openclaw config set gateway.auth.mode token")}`,
-        `Set password mode: ${formatCliCommand("openclaw config set gateway.auth.mode password")}`,
+        `Set token mode: ${formatCliCommand("steelengine config set gateway.auth.mode token")}`,
+        `Set password mode: ${formatCliCommand("steelengine config set gateway.auth.mode password")}`,
       ].join("\n"),
       "Gateway auth",
     );
@@ -719,7 +719,7 @@ async function runGatewayServicesHealth(ctx: DoctorHealthFlowContext): Promise<v
   const {
     noteMacLaunchAgentOverrides,
     noteMacLaunchctlGatewayEnvOverrides,
-    noteMacStaleOpenClawUpdateLaunchdJobs,
+    noteMacStaleSteelEngineUpdateLaunchdJobs,
   } = await import("../commands/doctor-platform-notes.js");
   await maybeScanExtraGatewayServices(ctx.options, ctx.runtime, ctx.prompter);
   const updateDoctorRun = isUpdateDoctorRun(ctx.env ?? process.env);
@@ -738,7 +738,7 @@ async function runGatewayServicesHealth(ctx: DoctorHealthFlowContext): Promise<v
     },
   );
   await noteMacLaunchAgentOverrides();
-  await noteMacStaleOpenClawUpdateLaunchdJobs();
+  await noteMacStaleSteelEngineUpdateLaunchdJobs();
   await noteMacLaunchctlGatewayEnvOverrides(ctx.cfg);
 }
 
@@ -835,7 +835,7 @@ type ToolResultCapTarget = {
 };
 
 async function collectToolResultCapFindings(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
 ): Promise<readonly HealthFinding[]> {
   const { resolveAgentContextLimits } = await loadAgentScopeModule();
   const { normalizeAgentId } = await import("../routing/session-key.js");
@@ -887,7 +887,7 @@ async function collectToolResultCapFindings(
 }
 
 async function collectToolResultCapTargetAdvice(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   readOnlyCatalog?: boolean;
   targets: readonly ToolResultCapTarget[];
 }): Promise<
@@ -1086,7 +1086,7 @@ async function hasActiveGatewayExecCredential(
 }
 
 async function collectWorkspaceStatusPluginVersionDrift(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   options?: Pick<DoctorOptions, "allowExec" | "deep" | "nonInteractive">;
 }): Promise<PluginVersionDriftReport | undefined> {
   if (params.cfg.gateway?.mode !== "remote") {
@@ -1157,7 +1157,7 @@ async function runGatewayHealthChecks(ctx: DoctorHealthFlowContext): Promise<voi
   const { note } = await loadNoteModule();
   if ((await hasActiveGatewayExecCredential(ctx)) && ctx.options.allowExec !== true) {
     note(
-      "Gateway health probes skipped because gateway credentials use an exec SecretRef. Run `openclaw doctor --allow-exec` to verify Gateway health with exec SecretRefs.",
+      "Gateway health probes skipped because gateway credentials use an exec SecretRef. Run `steelengine doctor --allow-exec` to verify Gateway health with exec SecretRefs.",
       "Gateway",
     );
     ctx.gatewayHealthSkipped = true;
@@ -1368,7 +1368,7 @@ async function collectWriteConfigHealthFindings(
     findings.push({
       checkId: "core/doctor/write-config",
       severity: "warning",
-      message: "Doctor config writes are disabled because OpenClaw is running in Nix mode.",
+      message: "Doctor config writes are disabled because SteelEngine is running in Nix mode.",
       ...(configPath ? { path: configPath } : {}),
       requirement: "mutable-config-write-path",
       fixHint:
@@ -1759,7 +1759,7 @@ function resolveDoctorHealthContributions(): DoctorHealthContribution[] {
       label: "Disk space",
       healthChecks: {
         id: "core/doctor/disk-space",
-        description: "Low disk space around the OpenClaw state directory is a finding.",
+        description: "Low disk space around the SteelEngine state directory is a finding.",
         defaultEnabled: false,
         async detect(ctx) {
           const { collectDiskSpaceHealthFindings } =
@@ -2316,7 +2316,7 @@ export async function runDoctorHealthContributions(ctx: DoctorHealthFlowContext)
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
   (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.doctorHealthContributionsTestApi")
+    Symbol.for("steelengine.doctorHealthContributionsTestApi")
   ] = { createDoctorHealthContribution, resolveDoctorHealthContributions };
 }
 /* oxlint-disable max-lines -- TODO: split this grandfathered oversized file. */

@@ -1,7 +1,7 @@
 // Verifies requester and owner access checks for task records.
 import { afterEach, describe, expect, it } from "vitest";
 import { captureEnv } from "../test-utils/env.js";
-import { withOpenClawTestState } from "../test-utils/openclaw-test-state.js";
+import { withSteelEngineTestState } from "../test-utils/steelengine-test-state.js";
 import {
   findLatestTaskForRelatedSessionKeyForOwner,
   findTaskByRunIdForOwner,
@@ -12,7 +12,7 @@ import { createTaskRecord as createTaskRecordOrNull } from "./task-registry.js";
 import type { TaskRecord } from "./task-registry.types.js";
 import { resetTaskRegistryForTests } from "./task-runtime.test-helpers.js";
 
-const ORIGINAL_ENV = captureEnv(["OPENCLAW_STATE_DIR"]);
+const ORIGINAL_ENV = captureEnv(["STEELENGINE_STATE_DIR"]);
 
 function createTaskRecord(params: Parameters<typeof createTaskRecordOrNull>[0]): TaskRecord {
   const task = createTaskRecordOrNull(params);
@@ -28,10 +28,10 @@ afterEach(() => {
 });
 
 async function withTaskRegistryTempDir<T>(run: () => Promise<T> | T): Promise<T> {
-  return await withOpenClawTestState(
+  return await withSteelEngineTestState(
     {
       layout: "state-only",
-      prefix: "openclaw-task-owner-access-",
+      prefix: "steelengine-task-owner-access-",
     },
     async () => {
       resetTaskRegistryForTests({ persist: false });

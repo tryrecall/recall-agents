@@ -1,4 +1,4 @@
-import type { OpenClawPluginToolContext } from "openclaw/plugin-sdk/plugin-entry";
+import type { SteelEnginePluginToolContext } from "steelengine/plugin-sdk/plugin-entry";
 import { describe, expect, it, vi } from "vitest";
 import {
   buildDiscordActivityCustomId,
@@ -10,13 +10,13 @@ import { createDiscordSendReceipt } from "../send.receipt.js";
 import { createActivityTestRuntime } from "./test-helpers.test-support.js";
 import { createDiscordShowWidgetTool, createDiscordWidgetTool } from "./tool.js";
 
-function discordContext(overrides: Partial<OpenClawPluginToolContext> = {}) {
+function discordContext(overrides: Partial<SteelEnginePluginToolContext> = {}) {
   return {
     messageChannel: "discord",
     nativeChannelId: "987654321",
     agentAccountId: "default",
     ...overrides,
-  } satisfies OpenClawPluginToolContext;
+  } satisfies SteelEnginePluginToolContext;
 }
 
 describe("discord_widget", () => {

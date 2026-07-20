@@ -6,7 +6,7 @@ type ModelDiscoveryCacheTestApi = {
 
 function getTestApi(): ModelDiscoveryCacheTestApi {
   return (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.modelDiscoveryCacheTestApi")
+    Symbol.for("steelengine.modelDiscoveryCacheTestApi")
   ] as ModelDiscoveryCacheTestApi;
 }
 

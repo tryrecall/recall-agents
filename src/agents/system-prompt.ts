@@ -1,5 +1,5 @@
 /**
- * OpenClaw system prompt renderer.
+ * SteelEngine system prompt renderer.
  *
  * Assembles runtime, workspace, tooling, memory, delegation, channel, and cache-boundary prompt sections.
  */
@@ -8,16 +8,16 @@ import {
   normalizePromptCapabilityIds,
   normalizeStructuredPromptSection,
   SYSTEM_PROMPT_CACHE_BOUNDARY,
-} from "@openclaw/ai/internal/shared";
+} from "@steelengine/ai/internal/shared";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import {
   normalizeStringEntries,
   normalizeStringEntriesLower,
   normalizeUniqueStringEntries,
-} from "@openclaw/normalization-core/string-normalization";
+} from "@steelengine/normalization-core/string-normalization";
 import type { SourceReplyDeliveryMode } from "../auto-reply/get-reply-options.types.js";
 import type { ReasoningLevel, ThinkLevel } from "../auto-reply/thinking.js";
 import { SILENT_REPLY_TOKEN } from "../auto-reply/tokens.js";
@@ -49,8 +49,8 @@ import type {
 } from "./embedded-agent-runner/types.js";
 import { buildPromisedWorkPromptSection } from "./promised-work-prompt.js";
 import {
-  buildOpenClawToolFallbackText,
-  shouldRenderOpenClawToolWorkflowHints,
+  buildSteelEngineToolFallbackText,
+  shouldRenderSteelEngineToolWorkflowHints,
 } from "./prompt-surface.js";
 import { sanitizeForPromptLiteral } from "./sanitize-for-prompt.js";
 import {
@@ -459,8 +459,8 @@ function buildWebchatCanvasSection(params: {
     params.sourceMessageToolOnly
       ? "- Files: message attachment fields. Web rich render: `[embed ...]`."
       : "- Attachments: `MEDIA:`. Web rich render: `[embed ...]`.",
-    '- Hosted doc: `[embed ref="cv_123" title="Status" height="320" /]`; URL form: `[embed url="/__openclaw__/canvas/documents/cv_123/index.html" title="Status" height="320" /]`.',
-    "- Never local/file:// or arbitrary URL. URL must start `/__openclaw__/canvas/`; else use `ref`.",
+    '- Hosted doc: `[embed ref="cv_123" title="Status" height="320" /]`; URL form: `[embed url="/__steelengine__/canvas/documents/cv_123/index.html" title="Status" height="320" /]`.',
+    "- Never local/file:// or arbitrary URL. URL must start `/__steelengine__/canvas/`; else use `ref`.",
     "- Hosted root is profile-, not workspace-scoped; stage there.",
     "- Quote attributes. Prefer `ref`; use `url` only with full hosted URL.",
     "",
@@ -544,7 +544,7 @@ function buildMessagingSection(params: {
     "- Cross-session: `sessions_send(sessionKey, message)`.",
     subagentOrchestrationGuidance,
     completionEventGuidance,
-    "- Provider messaging: never exec/curl; OpenClaw routes.",
+    "- Provider messaging: never exec/curl; SteelEngine routes.",
     params.availableTools.has("message")
       ? [
           "",
@@ -617,17 +617,17 @@ function buildDocsSection(params: {
   }
   const lines = [
     "## Documentation",
-    docsPath ? `Docs: ${docsPath}` : "Docs: https://docs.openclaw.ai",
-    docsPath ? "Mirror: https://docs.openclaw.ai" : undefined,
-    sourcePath ? `Source: ${sourcePath}` : "Source: https://github.com/openclaw/openclaw",
+    docsPath ? `Docs: ${docsPath}` : "Docs: https://docs.steelengine.ai",
+    docsPath ? "Mirror: https://docs.steelengine.ai" : undefined,
+    sourcePath ? `Source: ${sourcePath}` : "Source: https://github.com/steelengineai/recall-agents",
     docsPath
-      ? `OpenClaw behavior questions: docs first via \`${params.readToolName}\`/local search. AGENTS/project/workspace/profile/memory = instructions/user memory, not product design truth.`
-      : "OpenClaw behavior questions: docs mirror first when web exists. AGENTS/project/workspace/profile/memory = instructions/user memory, not product design truth.",
+      ? `SteelEngine behavior questions: docs first via \`${params.readToolName}\`/local search. AGENTS/project/workspace/profile/memory = instructions/user memory, not product design truth.`
+      : "SteelEngine behavior questions: docs mirror first when web exists. AGENTS/project/workspace/profile/memory = instructions/user memory, not product design truth.",
     "Config field: `gateway(config.schema.lookup)` exact path. Broader: `docs/gateway/configuration.md`, `docs/gateway/configuration-reference.md`.",
     sourcePath
       ? "If docs are silent/stale, say so and inspect local source."
       : "If docs are silent/stale, say so and inspect GitHub source.",
-    "Diagnosis: run `openclaw status` when possible; ask only if blocked.",
+    "Diagnosis: run `steelengine status` when possible; ask only if blocked.",
     "",
   ];
   return lines.filter((line): line is string => line !== undefined);
@@ -728,7 +728,7 @@ export function buildAgentSystemPrompt(params: {
   proactiveSubagentOrchestration?: boolean;
   /** Whether ACP-specific routing guidance should be included. Defaults to true. */
   acpEnabled?: boolean;
-  /** Prompt surface controls runtime-specific fallback fragments. Defaults to OpenClaw main. */
+  /** Prompt surface controls runtime-specific fallback fragments. Defaults to SteelEngine main. */
   promptSurface?: AgentPromptSurfaceKind;
   /** Registered runtime slash/native command names such as `codex`. */
   nativeCommandNames?: string[];
@@ -769,7 +769,7 @@ export function buildAgentSystemPrompt(params: {
   promptContribution?: ProviderSystemPromptContribution;
 }) {
   const acpEnabled = params.acpEnabled === true;
-  const promptSurface = params.promptSurface ?? "openclaw_main";
+  const promptSurface = params.promptSurface ?? "steelengine_main";
   const sandboxedRuntime = params.sandboxInfo?.enabled === true;
   const acpSpawnRuntimeEnabled = acpEnabled && !sandboxedRuntime;
   const coreToolSummaries: Record<string, string> = {
@@ -799,10 +799,10 @@ export function buildAgentSystemPrompt(params: {
     conversations_list: "List exact external conversation addresses",
     conversations_send: "Send directly to an external conversation",
     conversations_turn: "Send and wait for one correlated external reply",
-    openclaw: "System setup/config expert; writes need human approval",
+    steelengine: "System setup/config expert; writes need human approval",
     gateway: "Read gateway config/schema",
     agents_list: acpSpawnRuntimeEnabled
-      ? "List allowed OpenClaw subagent ids; not ACP ids"
+      ? "List allowed SteelEngine subagent ids; not ACP ids"
       : "List allowed subagent ids",
     sessions_list: "List other sessions/subagents; filters/last",
     sessions_history: "Read other session/subagent history",
@@ -841,7 +841,7 @@ export function buildAgentSystemPrompt(params: {
     "conversations_list",
     "conversations_send",
     "conversations_turn",
-    "openclaw",
+    "steelengine",
     "gateway",
     "agents_list",
     "sessions_list",
@@ -904,13 +904,13 @@ export function buildAgentSystemPrompt(params: {
     toolLines.push(summary ? `- ${name}: ${summary}` : `- ${name}`);
   }
   const toolSchemaDirectoryPrompt = params.toolSchemaDirectoryPrompt?.trim();
-  const renderOpenClawToolWorkflowHints = shouldRenderOpenClawToolWorkflowHints({
+  const renderSteelEngineToolWorkflowHints = shouldRenderSteelEngineToolWorkflowHints({
     surface: promptSurface,
     hasToolList: toolLines.length > 0,
   });
 
   const hasGateway = availableTools.has("gateway");
-  const hasOpenClaw = availableTools.has("openclaw");
+  const hasSteelEngine = availableTools.has("steelengine");
   const readToolName = resolveToolName("read");
   const execToolName = resolveToolName("exec");
   const processToolName = resolveToolName("process");
@@ -985,7 +985,7 @@ export function buildAgentSystemPrompt(params: {
       : "Single global file workspace unless explicitly told otherwise.";
   const workspaceOnlyGuidance =
     params.fsWorkspaceOnly === true
-      ? "tools.fs.workspaceOnly ON: file-tool scratch/temp/meta stays in workspace, preferably `.openclaw/tmp/`. If file tools need it later, never exec-write `/tmp`; use workspace path."
+      ? "tools.fs.workspaceOnly ON: file-tool scratch/temp/meta stays in workspace, preferably `.steelengine/tmp/`. If file tools need it later, never exec-write `/tmp`; use workspace path."
       : "";
   const safetySection = [
     "## Safety",
@@ -1023,7 +1023,7 @@ export function buildAgentSystemPrompt(params: {
 
   // For "none" mode, return just the basic identity line
   if (promptMode === "none") {
-    return ["You are a personal assistant running inside OpenClaw.", modelIdentityLine]
+    return ["You are a personal assistant running inside SteelEngine.", modelIdentityLine]
       .filter(Boolean)
       .join("\n");
   }
@@ -1041,9 +1041,9 @@ export function buildAgentSystemPrompt(params: {
     toolLines,
     toolSchemaDirectoryPrompt,
     capabilityToolNames: [...availableTools].toSorted(),
-    renderOpenClawToolWorkflowHints,
+    renderSteelEngineToolWorkflowHints,
     hasGateway,
-    hasOpenClaw,
+    hasSteelEngine,
     readToolName,
     execToolName,
     processToolName,
@@ -1078,13 +1078,13 @@ export function buildAgentSystemPrompt(params: {
   });
   const stablePrefix = cacheStablePromptPrefix(stablePrefixCacheKey, () => {
     const lines = [
-      "You are a personal assistant running inside OpenClaw.",
+      "You are a personal assistant running inside SteelEngine.",
       "",
       "## Tooling",
       "Tools policy-filtered. Names case-sensitive; call exact.",
       toolLines.length > 0
         ? toolLines.join("\n")
-        : buildOpenClawToolFallbackText({
+        : buildSteelEngineToolFallbackText({
             surface: promptSurface,
             execToolName,
             processToolName,
@@ -1093,7 +1093,7 @@ export function buildAgentSystemPrompt(params: {
         ? ["", "### Deferred Tool Schemas", toolSchemaDirectoryPrompt]
         : []),
       "TOOLS.md guides usage; never grants availability.",
-      ...(renderOpenClawToolWorkflowHints
+      ...(renderSteelEngineToolWorkflowHints
         ? [
             `Long wait: no rapid poll. Use ${execToolName} yieldMs or ${processToolName}(poll, timeout=<ms>).`,
             "Large work: `sessions_spawn`; completion push-based.",
@@ -1122,7 +1122,7 @@ export function buildAgentSystemPrompt(params: {
               : []),
           ]
         : []),
-      ...(renderOpenClawToolWorkflowHints
+      ...(renderSteelEngineToolWorkflowHints
         ? [
             availableTools.has("sessions_yield")
               ? "Never loop-poll `subagents list`/`sessions_list`; wait with `sessions_yield`. Status only on-demand/intervention/debug/request."
@@ -1170,11 +1170,11 @@ export function buildAgentSystemPrompt(params: {
         fallback: [],
       }),
       ...safetySection,
-      "## OpenClaw Control",
+      "## SteelEngine Control",
       "Do not invent commands.",
-      ...(hasOpenClaw
+      ...(hasSteelEngine
         ? [
-            "Config, channels, plugins, new agents, model/provider, updates: ask `openclaw`. Never write own config; OpenClaw is system expert.",
+            "Config, channels, plugins, new agents, model/provider, updates: ask `steelengine`. Never write own config; SteelEngine is system expert.",
           ]
         : [
             "Config read: `gateway` (`config.get|config.schema.lookup`). Write/restart unavailable; ask human.",
@@ -1268,7 +1268,7 @@ export function buildAgentSystemPrompt(params: {
       }),
       ...bootstrapSystemPromptSections,
       "## Workspace Files (injected)",
-      "User-editable; OpenClaw loads below as Project Context.",
+      "User-editable; SteelEngine loads below as Project Context.",
       "",
       ...buildAssistantOutputDirectivesSection({ isMinimal, sourceMessageToolOnly }),
     ];

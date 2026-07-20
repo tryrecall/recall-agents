@@ -1,9 +1,9 @@
 // Nostr plugin module implements setup adapter behavior.
-import type { ChannelSetupAdapter } from "openclaw/plugin-sdk/channel-setup";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { DEFAULT_ACCOUNT_ID } from "openclaw/plugin-sdk/routing";
-import { patchTopLevelChannelConfigSection, splitSetupEntries } from "openclaw/plugin-sdk/setup";
-import { uniqueStrings } from "openclaw/plugin-sdk/string-coerce-runtime";
+import type { ChannelSetupAdapter } from "steelengine/plugin-sdk/channel-setup";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { DEFAULT_ACCOUNT_ID } from "steelengine/plugin-sdk/routing";
+import { patchTopLevelChannelConfigSection, splitSetupEntries } from "steelengine/plugin-sdk/setup";
+import { uniqueStrings } from "steelengine/plugin-sdk/string-coerce-runtime";
 
 const channel = "nostr" as const;
 
@@ -31,7 +31,7 @@ export function parseRelayUrls(raw: string): { relays: string[]; error?: string 
 }
 
 export function createNostrSetupAdapter(params: {
-  resolveAccountId: (cfg: OpenClawConfig, accountId?: string | null) => string;
+  resolveAccountId: (cfg: SteelEngineConfig, accountId?: string | null) => string;
   validatePrivateKey: (privateKey: string) => boolean;
 }): ChannelSetupAdapter {
   return {

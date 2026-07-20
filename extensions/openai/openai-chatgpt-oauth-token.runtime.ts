@@ -1,9 +1,9 @@
 import {
   resolveOAuthTokenExpiresAt,
   resolveOAuthTokenLifetimeMs,
-} from "openclaw/plugin-sdk/provider-oauth-runtime";
-import { readResponseWithLimit } from "openclaw/plugin-sdk/response-limit-runtime";
-import { fetchWithSsrFGuard, type SsrFPolicy } from "openclaw/plugin-sdk/ssrf-runtime";
+} from "steelengine/plugin-sdk/provider-oauth-runtime";
+import { readResponseWithLimit } from "steelengine/plugin-sdk/response-limit-runtime";
+import { fetchWithSsrFGuard, type SsrFPolicy } from "steelengine/plugin-sdk/ssrf-runtime";
 import { throwIfOAuthLoginAborted } from "./openai-chatgpt-oauth-abort.runtime.js";
 
 const CLIENT_ID = "app_EMoamEEZ73f0CkXaXp7hrann";

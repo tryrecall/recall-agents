@@ -9,11 +9,11 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   sortUniqueStrings,
   uniqueStrings,
-} from "@openclaw/normalization-core/string-normalization";
+} from "@steelengine/normalization-core/string-normalization";
 import { sanitizeForLog } from "../../../packages/terminal-core/src/ansi.js";
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../../agents/agent-scope.js";
 import { resolveRuntimeConfigCacheKey } from "../../config/runtime-snapshot.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { isBlockedObjectKey } from "../../infra/prototype-keys.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
@@ -64,9 +64,9 @@ const moduleLoaders: PluginModuleLoaderCache = new Map();
 const log = createSubsystemLogger("channels");
 
 type PluginLoaderModule = {
-  loadOpenClawPlugins: (params: {
-    config: OpenClawConfig;
-    activationSourceConfig?: OpenClawConfig;
+  loadSteelEnginePlugins: (params: {
+    config: SteelEngineConfig;
+    activationSourceConfig?: SteelEngineConfig;
     env?: NodeJS.ProcessEnv;
     workspaceDir?: string;
     cache?: boolean;
@@ -99,7 +99,7 @@ function listBuiltPluginLoaderModuleCandidateUrls(importerUrl: string): URL[] {
     return [];
   }
   // Bundled read-only chunks live under dist/ with hashed names. Source-relative
-  // ../../plugins candidates would escape the installed openclaw package there.
+  // ../../plugins candidates would escape the installed steelengine package there.
   const distRoot = importerPath.slice(0, distMarkerIndex + distMarker.length - 1);
   return BUILT_PLUGIN_LOADER_MODULE_CANDIDATES.map((candidate) =>
     pathToFileURL(path.join(distRoot, candidate)),
@@ -142,7 +142,7 @@ type ReadOnlyChannelPluginOptions = {
   env?: NodeJS.ProcessEnv;
   stateDir?: string;
   workspaceDir?: string;
-  activationSourceConfig?: OpenClawConfig;
+  activationSourceConfig?: SteelEngineConfig;
   includePersistedAuthState?: boolean;
   includeSetupFallbackPlugins?: boolean;
 };
@@ -201,7 +201,7 @@ function rememberReadOnlyChannelPluginResolution(
 }
 
 function resolveReadOnlyChannelPluginResolutionCacheKey(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   options: ReadOnlyChannelPluginOptions;
   env: NodeJS.ProcessEnv;
   loadedChannelPlugins: readonly ChannelPlugin[];
@@ -299,10 +299,10 @@ function normalizeManifestText(value: string | undefined, fallback: string): str
 }
 
 function rebindChannelConfig(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   sourceChannelId: string,
   targetChannelId: string,
-): OpenClawConfig {
+): SteelEngineConfig {
   if (sourceChannelId === targetChannelId || !cfg.channels) {
     return cfg;
   }
@@ -316,11 +316,11 @@ function rebindChannelConfig(
 }
 
 function restoreReboundChannelConfig(params: {
-  original: OpenClawConfig;
-  updated: OpenClawConfig;
+  original: SteelEngineConfig;
+  updated: SteelEngineConfig;
   sourceChannelId: string;
   targetChannelId: string;
-}): OpenClawConfig {
+}): SteelEngineConfig {
   if (params.sourceChannelId === params.targetChannelId || !params.updated.channels) {
     return params.updated;
   }
@@ -341,7 +341,7 @@ function restoreReboundChannelConfig(params: {
   };
 }
 
-function getChannelConfigRecord(cfg: OpenClawConfig, channelId: string): Record<string, unknown> {
+function getChannelConfigRecord(cfg: SteelEngineConfig, channelId: string): Record<string, unknown> {
   if (!isSafeManifestChannelId(channelId)) {
     return {};
   }
@@ -359,7 +359,7 @@ function normalizeManifestAccountConfigKey(accountId: string): string {
   return normalizeOptionalAccountId(accountId) ?? "";
 }
 
-function listManifestChannelAccountIds(cfg: OpenClawConfig, channelId: string): string[] {
+function listManifestChannelAccountIds(cfg: SteelEngineConfig, channelId: string): string[] {
   const channelConfig = getChannelConfigRecord(cfg, channelId);
   const accounts = channelConfig.accounts;
   if (accounts && typeof accounts === "object" && !Array.isArray(accounts)) {
@@ -373,7 +373,7 @@ function listManifestChannelAccountIds(cfg: OpenClawConfig, channelId: string): 
   return hasExplicitChannelConfig({ config: cfg, channelId }) ? [DEFAULT_ACCOUNT_ID] : [];
 }
 
-function resolveManifestChannelDefaultAccountId(cfg: OpenClawConfig, channelId: string): string {
+function resolveManifestChannelDefaultAccountId(cfg: SteelEngineConfig, channelId: string): string {
   const channelConfig = getChannelConfigRecord(cfg, channelId);
   const configuredDefaultAccountId = normalizeOptionalAccountId(
     typeof channelConfig.defaultAccount === "string" ? channelConfig.defaultAccount : undefined,
@@ -385,7 +385,7 @@ function resolveManifestChannelDefaultAccountId(cfg: OpenClawConfig, channelId: 
 }
 
 function resolveManifestChannelAccountConfig(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   channelId: string;
   accountId?: string | null;
 }): Record<string, unknown> {
@@ -603,7 +603,7 @@ function rebindChannelPluginConfig(
   sourceChannelId: string,
   targetChannelId: string,
 ): ChannelPlugin["config"] {
-  const rebind = (cfg: OpenClawConfig) =>
+  const rebind = (cfg: SteelEngineConfig) =>
     rebindChannelConfig(cfg, sourceChannelId, targetChannelId);
   return {
     ...config,
@@ -807,7 +807,7 @@ function addManifestChannelPlugins(
 }
 
 function resolveReadOnlyWorkspaceDir(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   options: ReadOnlyChannelPluginOptions,
 ): string | undefined {
   return options.workspaceDir ?? resolveAgentWorkspaceDir(cfg, resolveDefaultAgentId(cfg));
@@ -837,8 +837,8 @@ function listPluginIdsForChannels(
 }
 
 function resolveExternalReadOnlyChannelPluginIds(params: {
-  cfg: OpenClawConfig;
-  activationSourceConfig?: OpenClawConfig;
+  cfg: SteelEngineConfig;
+  activationSourceConfig?: SteelEngineConfig;
   channelIds: readonly string[];
   records: readonly PluginManifestRecord[];
   workspaceDir?: string;
@@ -872,14 +872,14 @@ function resolveExternalReadOnlyChannelPluginIds(params: {
 }
 
 export function listReadOnlyChannelPluginsForConfig(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   options?: ReadOnlyChannelPluginOptions,
 ): ChannelPlugin[] {
   return resolveReadOnlyChannelPluginsForConfig(cfg, options).plugins;
 }
 
 export function resolveReadOnlyChannelPluginsForConfig(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   options: ReadOnlyChannelPluginOptions = {},
 ): ReadOnlyChannelPluginResolution {
   const env = options.env ?? process.env;
@@ -995,7 +995,7 @@ export function resolveReadOnlyChannelPluginsForConfig(
             ] as const,
         ),
       );
-      const registry = loadPluginLoaderModule().loadOpenClawPlugins({
+      const registry = loadPluginLoaderModule().loadSteelEnginePlugins({
         config: cfg,
         activationSourceConfig: options.activationSourceConfig ?? cfg,
         env,

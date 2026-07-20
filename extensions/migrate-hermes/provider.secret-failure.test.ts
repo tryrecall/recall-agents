@@ -2,9 +2,9 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { resolveAuthStorePathForDisplay } from "openclaw/plugin-sdk/agent-runtime";
-import type { MigrationProviderContext } from "openclaw/plugin-sdk/plugin-entry";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/provider-auth";
+import { resolveAuthStorePathForDisplay } from "steelengine/plugin-sdk/agent-runtime";
+import type { MigrationProviderContext } from "steelengine/plugin-sdk/plugin-entry";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/provider-auth";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { HERMES_REASON_AUTH_PROFILE_WRITE_FAILED } from "./items.js";
 
@@ -12,8 +12,8 @@ const mocks = vi.hoisted(() => ({
   updateAuthProfileStoreWithLock: vi.fn(async () => null),
 }));
 
-vi.mock("openclaw/plugin-sdk/provider-auth", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("openclaw/plugin-sdk/provider-auth")>()),
+vi.mock("steelengine/plugin-sdk/provider-auth", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("steelengine/plugin-sdk/provider-auth")>()),
   updateAuthProfileStoreWithLock: mocks.updateAuthProfileStoreWithLock,
 }));
 
@@ -28,7 +28,7 @@ const logger = {
 };
 
 async function makeTempRoot() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-hermes-secret-failure-"));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-hermes-secret-failure-"));
   tempRoots.add(root);
   return root;
 }
@@ -51,7 +51,7 @@ function makeContext(params: {
           workspace: params.workspaceDir,
         },
       },
-    } as OpenClawConfig,
+    } as SteelEngineConfig,
     stateDir: params.stateDir,
     source: params.source,
     includeSecrets: true,

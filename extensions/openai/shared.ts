@@ -1,13 +1,13 @@
 // Openai plugin module implements shared behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { findCatalogTemplate } from "openclaw/plugin-sdk/provider-catalog-shared";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { findCatalogTemplate } from "steelengine/plugin-sdk/provider-catalog-shared";
 import {
   cloneFirstTemplateModel,
   matchesExactOrPrefix,
   type ProviderPlugin,
-} from "openclaw/plugin-sdk/provider-model-shared";
-import { buildProviderStreamFamilyHooks } from "openclaw/plugin-sdk/provider-stream-family";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/provider-model-shared";
+import { buildProviderStreamFamilyHooks } from "steelengine/plugin-sdk/provider-stream-family";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { createOpenAINativeWebSearchWrapper } from "./native-web-search.js";
 import { buildOpenAIReplayPolicy } from "./replay-policy.js";
 import {
@@ -35,7 +35,7 @@ type SyntheticOpenAIModelCatalogEntry = {
 
 const OPENAI_API_BASE_URL = "https://api.openai.com/v1";
 
-export function resolveConfiguredOpenAIBaseUrl(cfg: OpenClawConfig | undefined): string {
+export function resolveConfiguredOpenAIBaseUrl(cfg: SteelEngineConfig | undefined): string {
   return normalizeOptionalString(cfg?.models?.providers?.openai?.baseUrl) ?? OPENAI_API_BASE_URL;
 }
 

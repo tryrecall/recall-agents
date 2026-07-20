@@ -1,5 +1,5 @@
 ---
-summary: "OpenClaw Featherless AI provider plugin."
+summary: "SteelEngine Featherless AI provider plugin."
 read_when:
   - You are installing, configuring, or auditing the featherless plugin
 title: "Featherless plugin"
@@ -7,12 +7,12 @@ title: "Featherless plugin"
 
 # Featherless plugin
 
-OpenClaw Featherless AI provider plugin.
+SteelEngine Featherless AI provider plugin.
 
 ## Distribution
 
-- Package: `@openclaw/featherless-provider`
-- Install route: npm; ClawHub: `clawhub:@openclaw/featherless-provider`
+- Package: `@steelengine/featherless-provider`
+- Install route: npm; ClawHub: `clawhub:@steelengine/featherless-provider`
 
 ## Surface
 

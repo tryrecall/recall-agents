@@ -1,6 +1,6 @@
 // Qqbot tests cover framework context adapter plugin behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { PluginCommandContext } from "openclaw/plugin-sdk/plugin-entry";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { PluginCommandContext } from "steelengine/plugin-sdk/plugin-entry";
 import { describe, expect, it } from "vitest";
 import { buildFrameworkSlashContext } from "./framework-context-adapter.js";
 
@@ -11,7 +11,7 @@ function createCommandContext(isAuthorizedSender: boolean): PluginCommandContext
     isAuthorizedSender,
     args: "on",
     commandBody: "/bot-streaming on",
-    config: {} as OpenClawConfig,
+    config: {} as SteelEngineConfig,
     from: "qqbot:c2c:SENDER_OPENID",
     requestConversationBinding: async () => undefined,
     detachConversationBinding: async () => ({ removed: false }),

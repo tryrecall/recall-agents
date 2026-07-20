@@ -1,5 +1,5 @@
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
-import { normalizeStringEntries } from "@openclaw/normalization-core/string-normalization";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
+import { normalizeStringEntries } from "@steelengine/normalization-core/string-normalization";
 import { ErrorCodes, errorShape } from "../../../packages/gateway-protocol/src/index.js";
 import { readAcpSessionMeta } from "../../acp/runtime/session-meta.js";
 import { resolveDefaultAgentId } from "../../agents/agent-scope.js";
@@ -8,7 +8,7 @@ import {
   resolveAgentMainSessionKey,
   resolveExplicitAgentSessionKey,
 } from "../../config/sessions.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { formatUncaughtError } from "../../infra/errors.js";
 import {
   loadVoiceWakeRoutingConfig,
@@ -87,7 +87,7 @@ function logAttachmentFailure(
 
 export async function prepareAgentContentPhase(params: {
   request: AgentRunRequest;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   context: GatewayRequestHandlerOptions["context"];
   respond: GatewayRequestHandlerOptions["respond"];
   isRawModelRun: boolean;

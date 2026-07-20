@@ -1,18 +1,18 @@
 import {
   isProviderAuthProfileConfigured,
-  type OpenClawConfig,
-} from "openclaw/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "openclaw/plugin-sdk/provider-auth-runtime";
+  type SteelEngineConfig,
+} from "steelengine/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "steelengine/plugin-sdk/provider-auth-runtime";
 import type {
   RealtimeVoiceBridgeCreateRequest,
   RealtimeVoiceProviderConfig,
-} from "openclaw/plugin-sdk/realtime-voice";
-import { normalizeResolvedSecretInputString } from "openclaw/plugin-sdk/secret-input";
+} from "steelengine/plugin-sdk/realtime-voice";
+import { normalizeResolvedSecretInputString } from "steelengine/plugin-sdk/secret-input";
 import {
   asFiniteNumber,
   normalizeOptionalString,
   parseBooleanValue as readBoolean,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 import { XAI_BASE_URL } from "./model-definitions.js";
 
 type XaiRealtimeVoice = "eve" | "ara" | "rex" | "sal" | "leo";
@@ -223,7 +223,7 @@ export function toXaiRealtimeWsUrl(
 
 export async function resolveXaiRealtimeApiKey(
   configApiKey: string | undefined,
-  cfg: OpenClawConfig | undefined,
+  cfg: SteelEngineConfig | undefined,
 ): Promise<string> {
   const direct =
     normalizeOptionalString(configApiKey) ?? normalizeOptionalString(process.env.XAI_API_KEY);
@@ -236,13 +236,13 @@ export async function resolveXaiRealtimeApiKey(
     return oauthKey;
   }
   throw new Error(
-    "xAI credentials missing for realtime voice. Sign in with `openclaw onboard --auth-choice xai-oauth`, run `openclaw onboard --auth-choice xai-api-key`, or set XAI_API_KEY.",
+    "xAI credentials missing for realtime voice. Sign in with `steelengine onboard --auth-choice xai-oauth`, run `steelengine onboard --auth-choice xai-api-key`, or set XAI_API_KEY.",
   );
 }
 
 export function hasXaiRealtimeApiKeyInput(
   configApiKey: string | undefined,
-  cfg: OpenClawConfig | undefined,
+  cfg: SteelEngineConfig | undefined,
 ): boolean {
   if (normalizeOptionalString(configApiKey) || normalizeOptionalString(process.env.XAI_API_KEY)) {
     return true;

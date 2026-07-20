@@ -1,21 +1,21 @@
 import { accessSync, constants, statSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import { resolveNodeHostExecutable } from "openclaw/plugin-sdk/node-host";
+import { resolveNodeHostExecutable } from "steelengine/plugin-sdk/node-host";
 import type {
-  OpenClawPluginApi,
-  OpenClawPluginNodeHostCommand,
-  OpenClawPluginNodeInvokePolicy,
-} from "openclaw/plugin-sdk/plugin-entry";
-import type { PluginRuntime } from "openclaw/plugin-sdk/plugin-runtime";
+  SteelEnginePluginApi,
+  SteelEnginePluginNodeHostCommand,
+  SteelEnginePluginNodeInvokePolicy,
+} from "steelengine/plugin-sdk/plugin-entry";
+import type { PluginRuntime } from "steelengine/plugin-sdk/plugin-runtime";
 import type {
   SessionCatalogHost,
   SessionCatalogProvider,
   SessionCatalogSession,
   SessionCatalogTranscriptItem,
   SessionsCatalogReadResult,
-} from "openclaw/plugin-sdk/session-catalog";
-import { isRecord } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/session-catalog";
+import { isRecord } from "steelengine/plugin-sdk/string-coerce-runtime";
 import {
   OPENCODE_LOCAL_SESSION_HOST_ID as LOCAL_HOST_ID,
   OPENCODE_NODE_INVOKE_TIMEOUT_MS as NODE_TIMEOUT_MS,
@@ -72,7 +72,7 @@ function isNodeSession(value: unknown): value is SessionCatalogSession {
     isOptionalString(value.modelProvider) &&
     isOptionalString(value.cliVersion) &&
     isOptionalString(value.gitBranch) &&
-    isOptionalString(value.openClawSessionKey) &&
+    isOptionalString(value.steelEngineSessionKey) &&
     isOptionalNumber(value.createdAt) &&
     isOptionalNumber(value.updatedAt) &&
     isOptionalNumber(value.recencyAt)
@@ -149,7 +149,7 @@ function isOpenCodeSessionCatalogEnabled(pluginConfig: unknown): boolean {
   );
 }
 
-function createOpenCodeSessionNodeHostCommands(): OpenClawPluginNodeHostCommand[] {
+function createOpenCodeSessionNodeHostCommands(): SteelEnginePluginNodeHostCommand[] {
   const available = ({ config, env }: { config: unknown; env: NodeJS.ProcessEnv }) =>
     fullConfigCatalogEnabled(config) && executableOnPath("opencode", env);
   return [
@@ -173,7 +173,7 @@ function createOpenCodeSessionNodeHostCommands(): OpenClawPluginNodeHostCommand[
   ];
 }
 
-function createOpenCodeSessionNodeInvokePolicies(): OpenClawPluginNodeInvokePolicy[] {
+function createOpenCodeSessionNodeInvokePolicies(): SteelEnginePluginNodeInvokePolicy[] {
   return [
     {
       commands: [
@@ -401,7 +401,7 @@ async function readOpenCodeTranscript(
   };
 }
 
-export function registerOpenCodeSessionCatalog(api: OpenClawPluginApi): void {
+export function registerOpenCodeSessionCatalog(api: SteelEnginePluginApi): void {
   if (!isOpenCodeSessionCatalogEnabled(api.pluginConfig)) {
     return;
   }

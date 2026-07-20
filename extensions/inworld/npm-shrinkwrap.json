@@ -1,11 +1,11 @@
 {
-  "name": "@openclaw/inworld-speech",
+  "name": "@steelengine/inworld-speech",
   "version": "2026.7.2-beta.3",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
-      "name": "@openclaw/inworld-speech",
+      "name": "@steelengine/inworld-speech",
       "version": "2026.7.2-beta.3"
     }
   }

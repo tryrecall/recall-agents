@@ -1,34 +1,34 @@
 {
-  "name": "@openclaw/raft",
+  "name": "@steelengine/raft",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw Raft channel plugin for Raft CLI wake bridges.",
+  "description": "SteelEngine Raft channel plugin for Raft CLI wake bridges.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/steelengineai/recall-agents"
   },
   "type": "module",
   "dependencies": {
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*",
+    "steelengine": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.7.2-beta.3"
+    "steelengine": ">=2026.7.2-beta.3"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "steelengine": {
       "optional": true
     }
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
     "setupEntry": "./setup-entry.ts",
     "install": {
-      "npmSpec": "@openclaw/raft",
+      "npmSpec": "@steelengine/raft",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.6.8"
     },
@@ -36,7 +36,7 @@
       "pluginApi": ">=2026.7.2-beta.3"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3"
+      "steelengineVersion": "2026.7.2-beta.3"
     },
     "channel": {
       "id": "raft",

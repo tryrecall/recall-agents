@@ -1,5 +1,5 @@
 import type { FinalizedMsgContext } from "../auto-reply/templating.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   normalizeOutboundReplyPayload,
   type OutboundReplyPayload,
@@ -30,7 +30,7 @@ type DirectDmRoutePeer = { kind: "direct"; id: string };
 type DirectDmRoute = { agentId: string; sessionKey: string; accountId?: string };
 
 type DispatchInboundDirectDmParams = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   channel: string;
   channelLabel: string;
   accountId: string;

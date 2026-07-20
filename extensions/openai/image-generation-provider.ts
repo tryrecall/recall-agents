@@ -1,28 +1,28 @@
 // Openai provider module implements model/runtime integration.
 import path from "node:path";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import type {
   ImageGenerationOutputFormat,
   ImageGenerationProvider,
   ImageGenerationResult,
-} from "openclaw/plugin-sdk/image-generation";
+} from "steelengine/plugin-sdk/image-generation";
 import {
   parseOpenAiCompatibleImageResponse,
   resolveInlineImageJsonResponseMaxBytes,
   toImageDataUrl,
-} from "openclaw/plugin-sdk/image-generation";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/logging-core";
-import { resolveClosestSize } from "openclaw/plugin-sdk/media-generation-runtime";
-import { extensionForMime } from "openclaw/plugin-sdk/media-mime";
-import { MAX_IMAGE_BYTES } from "openclaw/plugin-sdk/media-runtime";
+} from "steelengine/plugin-sdk/image-generation";
+import { createSubsystemLogger } from "steelengine/plugin-sdk/logging-core";
+import { resolveClosestSize } from "steelengine/plugin-sdk/media-generation-runtime";
+import { extensionForMime } from "steelengine/plugin-sdk/media-mime";
+import { MAX_IMAGE_BYTES } from "steelengine/plugin-sdk/media-runtime";
 import {
   ensureAuthProfileStore,
   hasConfiguredSecretInput,
   isProviderApiKeyConfigured,
   listProfilesForProvider,
   type AuthProfileStore,
-} from "openclaw/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "openclaw/plugin-sdk/provider-auth-runtime";
+} from "steelengine/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "steelengine/plugin-sdk/provider-auth-runtime";
 import {
   assertOkOrThrowHttpError,
   postJsonRequest,
@@ -30,9 +30,9 @@ import {
   readProviderJsonResponse,
   resolveProviderHttpRequestConfig,
   sanitizeConfiguredModelProviderRequest,
-} from "openclaw/plugin-sdk/provider-http";
-import { isPrivateNetworkOptInEnabled } from "openclaw/plugin-sdk/ssrf-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/provider-http";
+import { isPrivateNetworkOptInEnabled } from "steelengine/plugin-sdk/ssrf-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import {
   canonicalizeCodexResponsesBaseUrl,
   isOpenAICodexBaseUrl,
@@ -126,7 +126,7 @@ function resolveOpenAIImageCount(count: number | undefined): number {
   return Math.max(1, Math.min(OPENAI_MAX_IMAGE_RESULTS, Math.trunc(count)));
 }
 
-function resolveGeneratedImageMaxBytes(cfg: OpenClawConfig): number {
+function resolveGeneratedImageMaxBytes(cfg: SteelEngineConfig): number {
   const configured = cfg.agents?.defaults?.mediaMaxMb;
   if (typeof configured === "number" && Number.isFinite(configured) && configured > 0) {
     return Math.floor(configured * MB);
@@ -265,7 +265,7 @@ function resolveNativeOpenAIImageSizesForModel(model: string): readonly string[]
   }
 }
 
-function resolveConfiguredOpenAIImageBaseUrl(cfg: OpenClawConfig | undefined, model: string) {
+function resolveConfiguredOpenAIImageBaseUrl(cfg: SteelEngineConfig | undefined, model: string) {
   const modelId = model.trim().replace(/^openai\//u, "");
   const modelBaseUrl = cfg?.models?.providers?.openai?.models
     ?.find((candidate) => candidate.id.trim().replace(/^openai\//u, "") === modelId)
@@ -306,7 +306,7 @@ function resolveOpenAIImageRequestSize(params: {
 function shouldAllowPrivateImageEndpoint(req: {
   provider: string;
   model: string;
-  cfg: OpenClawConfig | undefined;
+  cfg: SteelEngineConfig | undefined;
 }) {
   if (req.provider === MOCK_OPENAI_PROVIDER_ID) {
     return true;
@@ -318,7 +318,7 @@ function shouldAllowPrivateImageEndpoint(req: {
   if (!baseUrl.startsWith("http://127.0.0.1:") && !baseUrl.startsWith("http://localhost:")) {
     return false;
   }
-  return process.env.OPENCLAW_QA_ALLOW_LOCAL_IMAGE_PROVIDER === "1";
+  return process.env.STEELENGINE_QA_ALLOW_LOCAL_IMAGE_PROVIDER === "1";
 }
 
 function resolveRequestAuthStore(req: {
@@ -338,7 +338,7 @@ function resolveRequestAuthStore(req: {
 }
 
 function hasDirectOpenAIImageApiKeyAuth(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   agentDir?: string;
 }): boolean {
   if (hasExplicitOpenAIImageApiKeyConfig(params.cfg)) {
@@ -377,7 +377,7 @@ function hasCodexResponseTransportProfileConfigured(req: {
 }
 
 function resolveOpenAIImageAuthProvider(req: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   authStore?: AuthProfileStore;
   agentDir?: string;
 }): string {
@@ -392,12 +392,12 @@ function resolveOpenAIImageAuthProvider(req: {
   return "openai";
 }
 
-function hasExplicitOpenAIImageApiKeyConfig(cfg: OpenClawConfig | undefined): boolean {
+function hasExplicitOpenAIImageApiKeyConfig(cfg: SteelEngineConfig | undefined): boolean {
   const providerConfig = cfg?.models?.providers?.openai;
   return providerConfig?.apiKey !== undefined || providerConfig?.auth === "api-key";
 }
 
-function hasExplicitDirectOpenAIImageConfig(cfg: OpenClawConfig | undefined): boolean {
+function hasExplicitDirectOpenAIImageConfig(cfg: SteelEngineConfig | undefined): boolean {
   const providerConfig = cfg?.models?.providers?.openai;
   if (!providerConfig) {
     return false;
@@ -411,7 +411,7 @@ function hasExplicitDirectOpenAIImageConfig(cfg: OpenClawConfig | undefined): bo
   );
 }
 
-function hasChatGPTImageRouteConfig(cfg: OpenClawConfig | undefined): boolean {
+function hasChatGPTImageRouteConfig(cfg: SteelEngineConfig | undefined): boolean {
   const providerConfig = cfg?.models?.providers?.openai;
   return (
     isOpenAICodexBaseUrl(resolveConfiguredOpenAIBaseUrl(cfg)) ||
@@ -420,7 +420,7 @@ function hasChatGPTImageRouteConfig(cfg: OpenClawConfig | undefined): boolean {
 }
 
 function resolveConfiguredOpenAIImageHeaders(
-  cfg: OpenClawConfig | undefined,
+  cfg: SteelEngineConfig | undefined,
 ): Record<string, string> | undefined {
   const headers = cfg?.models?.providers?.openai?.headers;
   if (!headers) {
@@ -434,7 +434,7 @@ function resolveConfiguredOpenAIImageHeaders(
   return Object.keys(stringHeaders).length > 0 ? stringHeaders : undefined;
 }
 
-function forceOpenAIImageApiKeyAuth(cfg: OpenClawConfig | undefined): OpenClawConfig | undefined {
+function forceOpenAIImageApiKeyAuth(cfg: SteelEngineConfig | undefined): SteelEngineConfig | undefined {
   if (!hasExplicitOpenAIImageApiKeyConfig(cfg)) {
     return cfg;
   }
@@ -458,7 +458,7 @@ function forceOpenAIImageApiKeyAuth(cfg: OpenClawConfig | undefined): OpenClawCo
 }
 
 async function resolveOpenAIImageAuth(req: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   agentDir?: string;
   authStore?: AuthProfileStore;
 }) {

@@ -1,11 +1,11 @@
 /**
- * In-memory registry that associates browser tabs with OpenClaw sessions for
+ * In-memory registry that associates browser tabs with SteelEngine sessions for
  * cleanup on session end or idle sweeps.
  */
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 import { browserCloseTabByRawTargetId } from "./client.js";
 
 type TrackedSessionBrowserTab = {

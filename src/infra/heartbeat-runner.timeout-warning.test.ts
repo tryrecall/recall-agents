@@ -1,14 +1,14 @@
 // Covers heartbeat timeout warning emission and suppression behavior.
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 
-function createHeartbeatConfig(every: string): OpenClawConfig {
+function createHeartbeatConfig(every: string): SteelEngineConfig {
   return {
     agents: {
       defaults: { heartbeat: { every } },
       list: [{ id: "main", heartbeat: { every } }],
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 describe("startHeartbeatRunner timeout overflow warnings", () => {

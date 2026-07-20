@@ -1,15 +1,15 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-entry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const nodeHostMocks = vi.hoisted(() => ({
   runNodePtyCommand: vi.fn(async () => ({ exitCode: 0 })),
 }));
 
-vi.mock("openclaw/plugin-sdk/node-host", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/node-host")>();
+vi.mock("steelengine/plugin-sdk/node-host", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("steelengine/plugin-sdk/node-host")>();
   return {
     ...actual,
     runNodePtyCommand: nodeHostMocks.runNodePtyCommand,
@@ -52,7 +52,7 @@ async function createPiStore(
   sessionName = "Pi catalog session",
   toolArguments: unknown = { command: "pwd" },
 ): Promise<string> {
-  const directory = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-pi-catalog-"));
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-pi-catalog-"));
   temporaryDirectories.push(directory);
   process.env.PI_CODING_AGENT_SESSION_DIR = directory;
   const entries = [
@@ -116,7 +116,7 @@ async function createPiStore(
 }
 
 async function installFakePi(): Promise<string> {
-  const directory = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-pi-cli-"));
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-pi-cli-"));
   temporaryDirectories.push(directory);
   const executable = path.join(directory, "pi");
   await fs.writeFile(executable, "#!/bin/sh\nexit 0\n");
@@ -126,17 +126,17 @@ async function installFakePi(): Promise<string> {
 }
 
 function registerPiNodeHostCommands(): Parameters<
-  OpenClawPluginApi["registerNodeHostCommand"]
+  SteelEnginePluginApi["registerNodeHostCommand"]
 >[0][] {
-  const commands: Parameters<OpenClawPluginApi["registerNodeHostCommand"]>[0][] = [];
+  const commands: Parameters<SteelEnginePluginApi["registerNodeHostCommand"]>[0][] = [];
   registerPiSessionCatalog({
     pluginConfig: {},
     registerSessionCatalog: vi.fn(),
     registerNodeHostCommand: (
-      command: Parameters<OpenClawPluginApi["registerNodeHostCommand"]>[0],
+      command: Parameters<SteelEnginePluginApi["registerNodeHostCommand"]>[0],
     ) => commands.push(command),
     registerNodeInvokePolicy: vi.fn(),
-  } as unknown as OpenClawPluginApi);
+  } as unknown as SteelEnginePluginApi);
   return commands;
 }
 
@@ -196,8 +196,8 @@ describe("Pi session catalog", () => {
   });
 
   it("resolves relative project and global session directories like Pi", async () => {
-    const projectDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-pi-project-"));
-    const agentDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-pi-agent-"));
+    const projectDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-pi-project-"));
+    const agentDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-pi-agent-"));
     temporaryDirectories.push(projectDirectory, agentDirectory);
     await fs.mkdir(path.join(projectDirectory, ".pi"), { recursive: true });
     await fs.writeFile(
@@ -266,7 +266,7 @@ describe("Pi session catalog", () => {
       readLocalPiTranscriptPage({ threadId: "pi-session", cursor: 123 }),
     ).rejects.toThrow("cursor is invalid");
 
-    let provider: Parameters<OpenClawPluginApi["registerSessionCatalog"]>[0] | undefined;
+    let provider: Parameters<SteelEnginePluginApi["registerSessionCatalog"]>[0] | undefined;
     registerPiSessionCatalog({
       pluginConfig: {},
       runtime: { nodes: { list: vi.fn().mockResolvedValue({ nodes: [] }) } },
@@ -275,7 +275,7 @@ describe("Pi session catalog", () => {
       },
       registerNodeHostCommand: vi.fn(),
       registerNodeInvokePolicy: vi.fn(),
-    } as unknown as OpenClawPluginApi);
+    } as unknown as SteelEnginePluginApi);
     await expect(
       provider!.read({ hostId: "gateway", threadId: "pi-session", limit: 2 }),
     ).resolves.toMatchObject({ threadId: "pi-session", items: expect.any(Array) });
@@ -499,7 +499,7 @@ describe("Pi session catalog", () => {
   });
 
   it("paginates, searches, and reads beyond the newest summary batch", async () => {
-    const directory = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-pi-catalog-"));
+    const directory = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-pi-catalog-"));
     temporaryDirectories.push(directory);
     process.env.PI_CODING_AGENT_SESSION_DIR = directory;
     const baseTime = Date.parse("2026-07-13T10:00:00Z") / 1_000;
@@ -544,8 +544,8 @@ describe("Pi session catalog", () => {
   });
 
   it("uses the configured Pi session directory and lists oversized sessions", async () => {
-    const agentDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-pi-agent-"));
-    const homeDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-pi-home-"));
+    const agentDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-pi-agent-"));
+    const homeDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-pi-home-"));
     temporaryDirectories.push(agentDirectory, homeDirectory);
     const sessionDirectory = path.join(homeDirectory, "custom-sessions");
     await fs.mkdir(sessionDirectory, { recursive: true });
@@ -657,8 +657,8 @@ describe("Pi session catalog", () => {
     async () => {
       await createPiStore();
       await installFakePi();
-      let provider: Parameters<OpenClawPluginApi["registerSessionCatalog"]>[0] | undefined;
-      const commands: Parameters<OpenClawPluginApi["registerNodeHostCommand"]>[0][] = [];
+      let provider: Parameters<SteelEnginePluginApi["registerSessionCatalog"]>[0] | undefined;
+      const commands: Parameters<SteelEnginePluginApi["registerNodeHostCommand"]>[0][] = [];
       registerPiSessionCatalog({
         pluginConfig: {},
         runtime: { nodes: { list: vi.fn().mockResolvedValue({ nodes: [] }) } },
@@ -666,10 +666,10 @@ describe("Pi session catalog", () => {
           provider = value;
         },
         registerNodeHostCommand: (
-          command: Parameters<OpenClawPluginApi["registerNodeHostCommand"]>[0],
+          command: Parameters<SteelEnginePluginApi["registerNodeHostCommand"]>[0],
         ) => commands.push(command),
         registerNodeInvokePolicy: vi.fn(),
-      } as unknown as OpenClawPluginApi);
+      } as unknown as SteelEnginePluginApi);
 
       await expect(provider!.list({ hostIds: ["gateway"] })).resolves.toEqual([
         expect.objectContaining({
@@ -717,7 +717,7 @@ describe("Pi session catalog", () => {
   );
 
   it("opens paired-node Pi sessions only through the advertised terminal command", async () => {
-    let provider: Parameters<OpenClawPluginApi["registerSessionCatalog"]>[0] | undefined;
+    let provider: Parameters<SteelEnginePluginApi["registerSessionCatalog"]>[0] | undefined;
     const page = {
       payloadJSON: JSON.stringify({
         sessions: [
@@ -754,7 +754,7 @@ describe("Pi session catalog", () => {
       },
       registerNodeHostCommand: vi.fn(),
       registerNodeInvokePolicy: vi.fn(),
-    } as unknown as OpenClawPluginApi);
+    } as unknown as SteelEnginePluginApi);
 
     await expect(provider!.list({ hostIds: ["node:node-1"], search: "remote" })).resolves.toEqual([
       expect.objectContaining({
@@ -792,13 +792,13 @@ describe("Pi session catalog", () => {
     const api = {
       pluginConfig: { piSessionCatalog: { enabled: false } },
       registerSessionCatalog,
-    } as unknown as OpenClawPluginApi;
+    } as unknown as SteelEnginePluginApi;
     registerPiSessionCatalog(api);
     expect(registerSessionCatalog).not.toHaveBeenCalled();
   });
 
   it("bridges paired-node list and read requests without undefined transport fields", async () => {
-    let provider: Parameters<OpenClawPluginApi["registerSessionCatalog"]>[0] | undefined;
+    let provider: Parameters<SteelEnginePluginApi["registerSessionCatalog"]>[0] | undefined;
     const invoke = vi
       .fn()
       .mockResolvedValueOnce({
@@ -843,7 +843,7 @@ describe("Pi session catalog", () => {
       },
       registerNodeHostCommand: vi.fn(),
       registerNodeInvokePolicy: vi.fn(),
-    } as unknown as OpenClawPluginApi;
+    } as unknown as SteelEnginePluginApi;
 
     registerPiSessionCatalog(api);
     const catalog = provider;

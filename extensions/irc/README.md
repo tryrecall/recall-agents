@@ -1,13 +1,13 @@
-# IRC OpenClaw channel
+# IRC SteelEngine channel
 
-Official OpenClaw channel plugin for IRC.
+Official SteelEngine channel plugin for IRC.
 
 ## Install
 
 ```sh
-openclaw plugins install @openclaw/irc
+steelengine plugins install @steelengine/irc
 ```
 
 ## Docs
 
-See `docs/channels/irc.md` in the OpenClaw repository, or the published docs at `https://docs.openclaw.ai/channels/irc`.
+See `docs/channels/irc.md` in the SteelEngine repository, or the published docs at `https://docs.steelengine.ai/channels/irc`.

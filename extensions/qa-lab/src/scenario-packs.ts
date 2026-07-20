@@ -1,5 +1,5 @@
 // Qa Lab plugin module implements scenario packs behavior.
-import { uniqueStrings } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { uniqueStrings } from "steelengine/plugin-sdk/string-coerce-runtime";
 
 type QaScenarioPackDefinition = {
   id: string;

@@ -1,21 +1,21 @@
 // Legacy config migration tests cover generic doctor repair of old config layouts.
 
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { describe, expect, it } from "vitest";
 import { findLegacyConfigIssues } from "../../../config/legacy.js";
-import type { OpenClawConfig } from "../../../config/types.js";
+import type { SteelEngineConfig } from "../../../config/types.js";
 import { legacyCodexProviderIdentityKey } from "./codex-route-model-ref.js";
 import { pruneBindingsForMissingAgents } from "./legacy-config-binding-repair.js";
 import { LEGACY_CONFIG_MIGRATIONS } from "./legacy-config-migrations.js";
 import { collectBlockedLegacyOpenAICodexProviderPlan } from "./legacy-config-migrations.runtime.models.js";
 
-function repairBindingsForTest(config: OpenClawConfig) {
+function repairBindingsForTest(config: SteelEngineConfig) {
   const changes: string[] = [];
   return { config: pruneBindingsForMissingAgents(config, changes), changes };
 }
 
 function migrateLegacyConfigForTest(raw: unknown): {
-  config: OpenClawConfig | null;
+  config: SteelEngineConfig | null;
   changes: string[];
 } {
   if (!raw || typeof raw !== "object") {
@@ -28,7 +28,7 @@ function migrateLegacyConfigForTest(raw: unknown): {
   }
   return changes.length === 0
     ? { config: null, changes }
-    : { config: next as OpenClawConfig, changes };
+    : { config: next as SteelEngineConfig, changes };
 }
 
 function expectMigrationChangesToIncludeFragments(changes: string[], fragments: string[]): void {
@@ -48,7 +48,7 @@ describe("compatibility binding repair migrate", () => {
         { agentId: "alpha", match: { channel: "discord" } },
         { agentId: "ghost", match: { channel: "discord" } },
       ],
-    } as OpenClawConfig);
+    } as SteelEngineConfig);
 
     expect(res.config.bindings).toEqual([{ agentId: "alpha", match: { channel: "discord" } }]);
     expect(res.changes).toContain("Removed 1 binding that referenced missing agents.list ids.");
@@ -63,7 +63,7 @@ describe("compatibility binding repair migrate", () => {
         { agentId: "ghost", match: { channel: "discord" } },
         { agentId: "alpha", match: { channel: "discord" } },
       ],
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
 
     const res = repairBindingsForTest(cfg);
 
@@ -140,7 +140,7 @@ describe("legacy memory search config migrate", () => {
       memorySearch: {
         provider: "openai",
         store: {
-          path: "/tmp/openclaw-memory-{agentId}.sqlite",
+          path: "/tmp/steelengine-memory-{agentId}.sqlite",
           vector: { enabled: false },
         },
       },
@@ -260,7 +260,7 @@ describe("legacy memory search config migrate", () => {
             models: [
               { id: "gpt-missing" },
               { id: "gpt-auto", agentRuntime: { id: "auto" } },
-              { id: "gpt-openclaw", agentRuntime: { id: "openclaw" } },
+              { id: "gpt-steelengine", agentRuntime: { id: "steelengine" } },
             ],
           },
         },
@@ -270,7 +270,7 @@ describe("legacy memory search config migrate", () => {
     expect(res.config?.models?.providers?.openai?.models).toEqual([
       { id: "gpt-missing", agentRuntime: { id: "codex" } },
       { id: "gpt-auto", agentRuntime: { id: "codex" } },
-      { id: "gpt-openclaw", agentRuntime: { id: "openclaw" } },
+      { id: "gpt-steelengine", agentRuntime: { id: "steelengine" } },
     ]);
     expect(res.config?.models?.providers).not.toHaveProperty("codex");
   });
@@ -283,7 +283,7 @@ describe("legacy memory search config migrate", () => {
           codex: {
             models: [
               { id: "gpt-auto", agentRuntime: { id: "auto" } },
-              { id: "gpt-openclaw", agentRuntime: { id: "openclaw" } },
+              { id: "gpt-steelengine", agentRuntime: { id: "steelengine" } },
             ],
           },
         },
@@ -293,7 +293,7 @@ describe("legacy memory search config migrate", () => {
     expect(res.config?.models?.providers?.openai?.models).toEqual([
       { id: "text-embedding-3-small" },
       { id: "gpt-auto", agentRuntime: { id: "codex" } },
-      { id: "gpt-openclaw", agentRuntime: { id: "openclaw" } },
+      { id: "gpt-steelengine", agentRuntime: { id: "steelengine" } },
     ]);
     expect(res.config?.models?.providers).not.toHaveProperty("codex");
   });
@@ -1862,7 +1862,7 @@ describe("legacy migrate mention routing", () => {
         groupChat: {
           requireMention: false,
           historyLimit: 12,
-          mentionPatterns: ["@openclaw"],
+          mentionPatterns: ["@steelengine"],
         },
       },
       channels: {
@@ -1890,7 +1890,7 @@ describe("legacy migrate mention routing", () => {
     });
     expect(res.config?.messages?.groupChat).toEqual({
       historyLimit: 12,
-      mentionPatterns: ["@openclaw"],
+      mentionPatterns: ["@steelengine"],
     });
     expect(res.changes).toStrictEqual([
       "Moved routing.allowFrom → channels.whatsapp.allowFrom.",
@@ -1971,7 +1971,7 @@ describe("legacy migrate sandbox scope aliases", () => {
         list: [
           {
             id: "reviewer",
-            agentRuntime: { fallback: "openclaw" },
+            agentRuntime: { fallback: "steelengine" },
             embeddedHarness: {
               runtime: "codex",
               fallback: "none",
@@ -2054,7 +2054,7 @@ describe("legacy migrate sandbox scope aliases", () => {
           agentRuntime: { id: "claude-cli" },
           model: "anthropic/claude-opus-4-7",
           models: {
-            "anthropic/claude-opus-4-7": { agentRuntime: { id: "openclaw" } },
+            "anthropic/claude-opus-4-7": { agentRuntime: { id: "steelengine" } },
           },
         },
       },
@@ -2066,7 +2066,7 @@ describe("legacy migrate sandbox scope aliases", () => {
     expect(res.config?.agents?.defaults).toEqual({
       model: "anthropic/claude-opus-4-7",
       models: {
-        "anthropic/claude-opus-4-7": { agentRuntime: { id: "openclaw" } },
+        "anthropic/claude-opus-4-7": { agentRuntime: { id: "steelengine" } },
       },
     });
   });
@@ -2159,7 +2159,7 @@ describe("legacy migrate sandbox scope aliases", () => {
       agents: {
         list: [
           {
-            id: "openclaw",
+            id: "steelengine",
             sandbox: {
               perSession: false,
             },
@@ -2215,7 +2215,7 @@ describe("legacy migrate sandbox scope aliases", () => {
 });
 
 describe("legacy migrate MCP server type aliases", () => {
-  it("moves CLI-native http type to OpenClaw streamable HTTP transport", () => {
+  it("moves CLI-native http type to SteelEngine streamable HTTP transport", () => {
     const res = migrateLegacyConfigForTest({
       mcp: {
         servers: {

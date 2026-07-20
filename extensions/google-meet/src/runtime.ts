@@ -1,15 +1,15 @@
 // Google Meet composes platform strategies with the shared meeting session runtime.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 import {
   MeetingSessionRuntime,
   type MeetingSessionLeaveResult,
   type MeetingSessionRuntimeHandles,
   type MeetingSessionRuntimeJoinContext,
-} from "openclaw/plugin-sdk/meeting-runtime";
-import type { PluginRuntime, RuntimeLogger } from "openclaw/plugin-sdk/plugin-runtime";
-import { normalizeAgentId } from "openclaw/plugin-sdk/routing";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/meeting-runtime";
+import type { PluginRuntime, RuntimeLogger } from "steelengine/plugin-sdk/plugin-runtime";
+import { normalizeAgentId } from "steelengine/plugin-sdk/routing";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
 import type {
   GoogleMeetConfig,
   GoogleMeetMode,
@@ -124,7 +124,7 @@ export class GoogleMeetRuntime {
   constructor(
     private readonly params: {
       config: GoogleMeetConfig;
-      fullConfig: OpenClawConfig;
+      fullConfig: SteelEngineConfig;
       runtime: PluginRuntime;
       logger: RuntimeLogger;
     },
@@ -155,9 +155,9 @@ export class GoogleMeetRuntime {
           audioBridgeUnavailable: "Realtime speech requires an active Chrome audio bridge.",
           browserUnverified: "Google Meet browser state has not been verified yet.",
           manualActionFallback:
-            "Resolve the Google Meet browser prompt before asking OpenClaw to speak.",
+            "Resolve the Google Meet browser prompt before asking SteelEngine to speak.",
           microphoneMuted:
-            "Turn on the OpenClaw Google Meet microphone before asking OpenClaw to speak.",
+            "Turn on the SteelEngine Google Meet microphone before asking SteelEngine to speak.",
           microphoneMutedReason: "meet-microphone-muted",
           notInCall: "Google Meet has not reported that the browser participant is in the call.",
           notInCallReason: "not-in-call",

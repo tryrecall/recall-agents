@@ -6,7 +6,7 @@ import { saveAuthProfileStore } from "../agents/auth-profiles/store.js";
 import { resolveMemorySearchConfig } from "../agents/memory-search.js";
 import { resolveApiKeyForProvider } from "../agents/model-auth.js";
 import { resolveSandboxContext } from "../agents/sandbox/context.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import { resolveAuthProfileSecretOwnerId } from "../secrets/runtime-auth-profile-owner.js";
 import { getActiveSecretsRuntimeSnapshot } from "../secrets/runtime.js";
 import { withEnvAsync } from "../test-utils/env.js";
@@ -19,12 +19,12 @@ import {
 
 installGatewayTestHooks({ scope: "suite" });
 
-async function writeConfig(config: OpenClawConfig): Promise<void> {
+async function writeConfig(config: SteelEngineConfig): Promise<void> {
   const { writeConfigFile } = await import("../config/config.js");
   await writeConfigFile(config);
 }
 
-function baseConfig(): OpenClawConfig {
+function baseConfig(): SteelEngineConfig {
   return {
     gateway: {
       mode: "local",
@@ -294,7 +294,7 @@ describe("Gateway startup SecretRef owner isolation", () => {
       },
       async () => {
         const profileId = "openai:cold";
-        const config: OpenClawConfig = {
+        const config: SteelEngineConfig = {
           ...baseConfig(),
           agents: {
             defaults: {

@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import { normalizeChatType } from "../../channels/chat-type.js";
 import { normalizeAnyChannelId } from "../../channels/registry.js";
 import { applyMergePatch } from "../../config/merge-patch.js";
@@ -12,7 +12,7 @@ import { loadSessionEntry, listSessionEntries } from "../../config/sessions/sess
 import { resolveSessionKey } from "../../config/sessions/session-key.js";
 import { formatSqliteSessionFileMarker } from "../../config/sessions/sqlite-marker.js";
 import type { SessionEntry, SessionScope } from "../../config/sessions/types.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import {
   isModelSelectionLocked,
   MODEL_SELECTION_LOCKED_RESET_MESSAGE,
@@ -35,7 +35,7 @@ import type { SessionInitResult } from "./session.js";
 
 function isSlowReplyTestAllowed(env: NodeJS.ProcessEnv = process.env): boolean {
   return (
-    env.OPENCLAW_ALLOW_SLOW_REPLY_TESTS === "1" || env.OPENCLAW_STRICT_FAST_REPLY_CONFIG === "0"
+    env.STEELENGINE_ALLOW_SLOW_REPLY_TESTS === "1" || env.STEELENGINE_STRICT_FAST_REPLY_CONFIG === "0"
   );
 }
 
@@ -52,22 +52,22 @@ function resolveFastSessionKey(params: {
   return resolveSessionKey(params.sessionScope, ctx, params.mainKey);
 }
 
-export function withFullRuntimeReplyConfig<T extends OpenClawConfig>(config: T): T {
+export function withFullRuntimeReplyConfig<T extends SteelEngineConfig>(config: T): T {
   return markReplyConfigRuntimeMode(config, "full");
 }
 
 export function resolveGetReplyConfig(params: {
-  getRuntimeConfig: () => OpenClawConfig;
+  getRuntimeConfig: () => SteelEngineConfig;
   isFastTestEnv: boolean;
-  configOverride?: OpenClawConfig;
-}): OpenClawConfig {
+  configOverride?: SteelEngineConfig;
+}): SteelEngineConfig {
   const { configOverride } = params;
   if (configOverride == null) {
     return params.getRuntimeConfig();
   }
   if (params.isFastTestEnv && !isCompleteReplyConfig(configOverride) && !isSlowReplyTestAllowed()) {
     throw new Error(
-      "Fast reply tests must pass with withFastReplyConfig()/markCompleteReplyConfig(); set OPENCLAW_ALLOW_SLOW_REPLY_TESTS=1 to opt out.",
+      "Fast reply tests must pass with withFastReplyConfig()/markCompleteReplyConfig(); set STEELENGINE_ALLOW_SLOW_REPLY_TESTS=1 to opt out.",
     );
   }
   if (params.isFastTestEnv && isCompleteReplyConfig(configOverride)) {
@@ -76,12 +76,12 @@ export function resolveGetReplyConfig(params: {
   if (isCompleteReplyConfig(configOverride)) {
     return configOverride;
   }
-  return applyMergePatch(params.getRuntimeConfig(), configOverride) as OpenClawConfig;
+  return applyMergePatch(params.getRuntimeConfig(), configOverride) as SteelEngineConfig;
 }
 
 export function shouldUseReplyFastTestBootstrap(params: {
   isFastTestEnv: boolean;
-  configOverride?: OpenClawConfig;
+  configOverride?: SteelEngineConfig;
 }): boolean {
   return (
     params.isFastTestEnv &&
@@ -91,7 +91,7 @@ export function shouldUseReplyFastTestBootstrap(params: {
 }
 
 export function shouldUseReplyFastTestRuntime(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   isFastTestEnv: boolean;
 }): boolean {
   return (
@@ -119,7 +119,7 @@ export function shouldUseReplyFastDirectiveExecution(params: {
 
 export function buildFastReplyCommandContext(params: {
   ctx: MsgContext;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId?: string;
   sessionKey?: string;
   isGroup: boolean;
@@ -155,7 +155,7 @@ export function buildFastReplyCommandContext(params: {
 }
 
 export function shouldHandleFastReplyTextCommands(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   commandSource?: string;
 }): boolean {
   return params.commandSource === "native" || params.cfg.commands?.text !== false;
@@ -163,7 +163,7 @@ export function shouldHandleFastReplyTextCommands(params: {
 
 export function initFastReplySessionState(params: {
   ctx: MsgContext;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId: string;
   commandAuthorized: boolean;
   workspaceDir: string;

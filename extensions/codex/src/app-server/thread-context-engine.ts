@@ -1,7 +1,7 @@
 import {
   isActiveHarnessContextEngine,
   type EmbeddedRunAttemptParams,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
+} from "steelengine/plugin-sdk/agent-harness-runtime";
 import {
   resolveCodexContextEngineProjectionMaxChars,
   resolveCodexContextEngineProjectionReserveTokens,

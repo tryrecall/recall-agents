@@ -3,8 +3,8 @@
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
-import { resolveSendableOutboundReplyParts } from "openclaw/plugin-sdk/reply-payload";
+} from "@steelengine/normalization-core/string-coerce";
+import { resolveSendableOutboundReplyParts } from "steelengine/plugin-sdk/reply-payload";
 import { ErrorCodes } from "../../../packages/gateway-protocol/src/schema/error-codes.js";
 import { stripPlainTextToolCallBlocks } from "../../../packages/tool-call-repair/src/index.js";
 import { resolveSessionAgentId } from "../../agents/agent-scope.js";
@@ -34,7 +34,7 @@ import type {
   ChannelThreadingToolContext,
 } from "../../channels/plugins/types.public.js";
 import type { InternalChannelThreadingToolContext } from "../../channels/threading-tool-context-internal.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import {
   hasLegacyInteractiveReplyBlocks,
   hasMessagePresentationBlocks,
@@ -141,7 +141,7 @@ const loadMessageActionGatewayRuntime = createLazyRuntimeModule(
 );
 
 export type RunMessageActionParams = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   action: ChannelMessageActionName;
   params: Record<string, unknown>;
   defaultAccountId?: string;
@@ -267,7 +267,7 @@ function asResultRecord(value: unknown): Record<string, unknown> | undefined {
 function markDeliveredCurrentSourceReply<T extends MessageActionRunResult>(
   result: T,
   params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     actionParams: Record<string, unknown>;
     channel: ChannelId;
     accountId?: string | null;
@@ -448,7 +448,7 @@ function applyCrossContextMessageDecoration({
 }
 
 async function maybeApplyCrossContextMarker(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   channel: ChannelId;
   action: ChannelMessageActionName;
   target: string;
@@ -482,7 +482,7 @@ async function maybeApplyCrossContextMarker(params: {
 }
 
 async function resolveChannel(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   params: Record<string, unknown>,
   toolContext?: { currentChannelProvider?: string },
   action?: ChannelMessageActionName,
@@ -542,7 +542,7 @@ function inferPeerKindForAccountBinding(channel: ChannelId, target: string): Cha
 }
 
 function resolveTargetBoundAccountId(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   channel: ChannelId;
   args: Record<string, unknown>;
   agentId?: string;
@@ -578,7 +578,7 @@ function resolveTargetBoundAccountId(params: {
 }
 
 async function resolveActionTarget(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   channel: ChannelId;
   action: ChannelMessageActionName;
   args: Record<string, unknown>;
@@ -619,7 +619,7 @@ function sanitizeGroupTargetId(target: string): string {
 }
 
 async function resolveResolvedTargetOrThrow(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   channel: ChannelId;
   input: string;
   accountId?: string;
@@ -644,7 +644,7 @@ async function resolveResolvedTargetOrThrow(params: {
 }
 
 type ResolvedActionContext = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   params: Record<string, unknown>;
   channel: ChannelId;
   mediaAccess: OutboundMediaAccess;
@@ -841,7 +841,7 @@ function applyImplicitSourceReplySendPolicy(
 }
 
 async function runGatewayPluginMessageActionOrNull(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   params: Record<string, unknown>;
   channel: ChannelId;
   action: ChannelMessageActionName;
@@ -1152,7 +1152,7 @@ function buildInternalSourceReplyToolResult(payload: {
 }
 
 async function buildSendPayloadParts(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   actionParams: Record<string, unknown>;
   input: RunMessageActionParams;
   channel?: ChannelId;

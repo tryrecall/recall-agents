@@ -1,4 +1,4 @@
-// `openclaw plugins update` command implementation for tracked npm plugins and hook packs.
+// `steelengine plugins update` command implementation for tracked npm plugins and hook packs.
 import { isDeepStrictEqual } from "node:util";
 import { theme } from "../../packages/terminal-core/src/theme.js";
 import {
@@ -16,7 +16,7 @@ import { createMergePatch } from "../config/io.write-prepare.js";
 import { applyMergePatch } from "../config/merge-patch.js";
 import { ConfigMutationConflictError } from "../config/mutate.js";
 import { extractShippedPluginInstallConfigRecords } from "../config/plugin-install-config-migration.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 import { updateNpmInstalledHookPacks } from "../hooks/update.js";
 import { normalizeUpdateChannel } from "../infra/update-channels.js";
@@ -103,12 +103,12 @@ function shouldPreserveEmptyPlugins(params: {
 }
 
 function projectUpdaterResultOntoSourceConfig(params: {
-  runtimeBase: OpenClawConfig;
-  sourceBase: OpenClawConfig;
-  updatedConfig: OpenClawConfig;
-}): OpenClawConfig {
+  runtimeBase: SteelEngineConfig;
+  sourceBase: SteelEngineConfig;
+  updatedConfig: SteelEngineConfig;
+}): SteelEngineConfig {
   const updatePatch = createMergePatch(params.runtimeBase, params.updatedConfig);
-  return applyMergePatch(params.sourceBase, updatePatch) as OpenClawConfig;
+  return applyMergePatch(params.sourceBase, updatePatch) as SteelEngineConfig;
 }
 
 function assertWriteOptionRecordFresh(params: {

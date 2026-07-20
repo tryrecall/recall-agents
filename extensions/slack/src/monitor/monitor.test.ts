@@ -1,7 +1,7 @@
 // Slack tests cover monitor plugin behavior.
 import type { App } from "@slack/bolt";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
 import { describe, expect, it, vi } from "vitest";
 import { resolveSlackChannelConfig } from "./channel-config.js";
 import { createSlackMonitorContext, normalizeSlackChannelType } from "./context.js";
@@ -190,7 +190,7 @@ describe("resolveSlackChannelConfig", () => {
 });
 
 const baseParams = () => ({
-  cfg: {} as OpenClawConfig,
+  cfg: {} as SteelEngineConfig,
   accountId: "default",
   botToken: "token",
   app: { client: {} } as App,
@@ -216,7 +216,7 @@ const baseParams = () => ({
   replyToMode: "off" as const,
   slashCommand: {
     enabled: false,
-    name: "openclaw",
+    name: "steelengine",
     sessionPrefix: "slack:slash",
     ephemeral: true,
   },

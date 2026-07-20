@@ -1,0 +1,4 @@
+interface:
+  display_name: "SteelEngine CI Limits"
+  short_description: "Tune SteelEngine CI fanout and runner budgets"
+  default_prompt: "Use $steelengine-ci-limits to inspect SteelEngine CI pressure, tune runner-registration fanout safely, and document the exact validation before landing."

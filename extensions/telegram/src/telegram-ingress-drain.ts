@@ -7,9 +7,9 @@ import {
   DEFAULT_INGRESS_RETRY_MAX_ATTEMPTS,
   type ChannelIngressDrain,
   type ChannelIngressQueue,
-} from "openclaw/plugin-sdk/channel-outbound";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { clampPositiveTimerTimeoutMs } from "openclaw/plugin-sdk/number-runtime";
+} from "steelengine/plugin-sdk/channel-outbound";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { clampPositiveTimerTimeoutMs } from "steelengine/plugin-sdk/number-runtime";
 import type { TelegramBotInfo } from "./bot-info.js";
 import {
   runWithTelegramSpooledReplayUpdate,
@@ -20,7 +20,7 @@ import { resolveTelegramIngressNonRetryableFailure } from "./telegram-ingress-no
 import type { TelegramSpooledUpdatePayload } from "./telegram-ingress-spool.payload.js";
 import { createShouldSupersedeTelegramSpooledPending } from "./telegram-ingress-supersede.js";
 
-const TELEGRAM_SPOOLED_HANDLER_TIMEOUT_ENV = "OPENCLAW_TELEGRAM_SPOOLED_HANDLER_TIMEOUT_MS";
+const TELEGRAM_SPOOLED_HANDLER_TIMEOUT_ENV = "STEELENGINE_TELEGRAM_SPOOLED_HANDLER_TIMEOUT_MS";
 const TELEGRAM_SPOOLED_DRAIN_START_LIMIT = 100;
 const TELEGRAM_SPOOLED_DRAIN_SCAN_LIMIT = TELEGRAM_SPOOLED_DRAIN_START_LIMIT * 10;
 
@@ -64,7 +64,7 @@ type TelegramIngressDrainDispatch = (
 type CreateTelegramIngressDrainParams = {
   queue: ChannelIngressQueue<TelegramSpooledUpdatePayload>;
   /** Required for authorization-gated supersede (numeric allowlist). */
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId: string;
   botInfo?: TelegramBotInfo;
   adoptionStallTimeoutMs?: number;

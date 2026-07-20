@@ -51,13 +51,13 @@ function assertMaintenancePathsOwnedByStateDir(
       }
       resolvedPath = resolveRootPathSync({
         absolutePath,
-        boundaryLabel: "OpenClaw state directory",
+        boundaryLabel: "SteelEngine state directory",
         rootCanonicalPath: stateCanonicalDir,
         rootPath: stateDir,
       });
     } catch (error) {
       throw new Error(
-        `Cannot run ${operation} for a path outside the active OpenClaw state directory: ${protectedPath}. Set OPENCLAW_STATE_DIR to the owning state directory and retry.`,
+        `Cannot run ${operation} for a path outside the active SteelEngine state directory: ${protectedPath}. Set STEELENGINE_STATE_DIR to the owning state directory and retry.`,
         { cause: error },
       );
     }
@@ -103,14 +103,14 @@ export async function withDoctorSqliteMaintenanceLock<T>(
   } catch (error) {
     if (error instanceof GatewayLockError) {
       throw new Error(
-        `Cannot run ${params.operation} while the Gateway or another SQLite maintenance command owns this OpenClaw state directory. Stop the Gateway and retry.`,
+        `Cannot run ${params.operation} while the Gateway or another SQLite maintenance command owns this SteelEngine state directory. Stop the Gateway and retry.`,
         { cause: error },
       );
     }
     throw error;
   }
   if (!lock) {
-    throw new Error(`Cannot run ${params.operation} without exclusive OpenClaw state ownership.`);
+    throw new Error(`Cannot run ${params.operation} without exclusive SteelEngine state ownership.`);
   }
 
   try {

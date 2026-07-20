@@ -1,5 +1,5 @@
 // Normalizes installed plugin config and install records.
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 import { buildNpmResolutionFields, type NpmSpecResolution } from "../infra/install-source-utils.js";
 import { parseRegistryNpmSpec } from "../infra/npm-registry-spec.js";
@@ -36,9 +36,9 @@ export function resolveNpmInstallRecordSpec(params: {
 
 /** Replaces a plugin install record with the authoritative completed install. */
 export function recordPluginInstall(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   update: PluginInstallUpdate,
-): OpenClawConfig {
+): SteelEngineConfig {
   const { pluginId, ...record } = update;
   const nextRecord = {
     ...record,

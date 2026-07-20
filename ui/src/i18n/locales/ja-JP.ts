@@ -279,14 +279,14 @@ export const ja_JP: TranslationMap = {
     genericSubtitle: "このパネルの読み込み中に問題が発生しました。",
     staleTitle: "新しいバージョンが利用可能です",
     staleSubtitle:
-      "OpenClaw がバックグラウンドで更新されました。最新のパネルを表示するには再読み込みしてください。",
+      "SteelEngine がバックグラウンドで更新されました。最新のパネルを表示するには再読み込みしてください。",
     retry: "再試行",
   },
   nodes: {
     pairing: {
       button: "モバイルデバイスをペアリング",
       adminRequired: "セットアップコードを作成するには管理者アクセスが必要です。",
-      title: "OpenClaw mobile",
+      title: "SteelEngine mobile",
       subtitle:
         "新しいスマートフォンを接続するには、モバイルアプリでこのQRコードをスキャンしてください。",
       generating: "安全なセットアップコードを作成しています…",
@@ -300,14 +300,14 @@ export const ja_JP: TranslationMap = {
       transportLimitedHint:
         "このGateway URLは平文のws://を使用しています。wss://またはTailscale Serveを使用してから、フルアクセス用の新しいコードを作成してください。",
       failed: "セットアップコードを作成できませんでした。",
-      qrAlt: "OpenClaw mobile ペアリングQRコード",
+      qrAlt: "SteelEngine mobile ペアリングQRコード",
       qrUnavailable: "QRを利用できません。代わりにセットアップコードをコピーしてください。",
       copySetupCode: "セットアップコードをコピー",
       newCode: "新しいコード",
       showSetupCode: "セットアップコードを表示",
       pending: "レビュー待ちのデバイスリクエスト: {count}",
       review: "レビュー",
-      waiting: "公式の OpenClaw mobile アプリはスキャン後に自動的に接続します。",
+      waiting: "公式の SteelEngine mobile アプリはスキャン後に自動的に接続します。",
       help: "ペアリングのヘルプ",
       manageDevices: "デバイスを管理",
     },
@@ -455,11 +455,11 @@ export const ja_JP: TranslationMap = {
     ownerSession: "セッション",
     ownerWorkboard: "Workboard",
     title: "管理対象ワークツリー",
-    subtitle: "OpenClaw が所有する分離されたリポジトリのチェックアウト。",
+    subtitle: "SteelEngine が所有する分離されたリポジトリのチェックアウト。",
     cleanNow: "今すぐクリーンアップ",
     cleanupTitle: "クリーンアップ",
     cleanupSubtitle:
-      "OpenClaw は、ディスク容量を確保するために古い worktree を定期的に削除します。クリーンアップの実行基準を調整できます。",
+      "SteelEngine は、ディスク容量を確保するために古い worktree を定期的に削除します。クリーンアップの実行基準を調整できます。",
     cleanupMaxCount: "worktree の最大数",
     cleanupMaxCountHelp:
       "すべてのリポジトリで保持する管理対象 worktree の最大数です。古い worktree から順にスナップショットが作成され、削除されます。件数制限を無効にするには 0 に設定します。",
@@ -510,8 +510,8 @@ export const ja_JP: TranslationMap = {
     cloudWorker: "クラウド · {profile}",
     cloudWorkerProvider: "クラウドワーカーのプロバイダー: {provider}",
     cloudRequiresWorktree: "クラウドワーカーには管理対象のワークツリーが必要です",
-    cloudRequiresOpenClawRuntime:
-      "クラウドワーカーにはOpenClawランタイムが必要です。{runtime}が選択されています。",
+    cloudRequiresSteelEngineRuntime:
+      "クラウドワーカーにはSteelEngineランタイムが必要です。{runtime}が選択されています。",
     cloudSecureContextRequired:
       "復旧時にタスクを保護できるようにするには、クラウドワーカーにセキュアなブラウザーコンテキストが必要です。",
     cloudStartFailed:
@@ -1312,7 +1312,7 @@ export const ja_JP: TranslationMap = {
     autoSaveFailed: "保存に失敗しました",
     autoSaveConflict: "設定が別の場所で変更されました",
     retry: "再試行",
-    applyBannerText: "openclaw.json に保存しました — Gateway を再起動して適用してください。",
+    applyBannerText: "steelengine.json に保存しました — Gateway を再起動して適用してください。",
     applyBannerAction: "再起動して適用",
     rawDiscard: "破棄",
     rawDraftBlocksApply:
@@ -1367,7 +1367,7 @@ export const ja_JP: TranslationMap = {
     },
   },
   approvalPage: {
-    brandName: "OpenClaw",
+    brandName: "SteelEngine",
     eyebrow: "Operator approval",
     loadingTitle: "Loading approval",
     loadingDescription: "Checking the current approval state with the Gateway.",
@@ -1376,7 +1376,7 @@ export const ja_JP: TranslationMap = {
       "This approval could not be found or this device is not authorized to review it.",
     connectionErrorTitle: "Connection interrupted",
     connectionErrorDescription:
-      "OpenClaw cannot confirm or record a decision while disconnected. Reconnect to check the current status.",
+      "SteelEngine cannot confirm or record a decision while disconnected. Reconnect to check the current status.",
     retry: "Retry",
     execTitle: "Command approval",
     pending: "Waiting for your decision",
@@ -1554,7 +1554,7 @@ export const ja_JP: TranslationMap = {
     chat: "チャット",
     settings: "設定",
     settingsGeneral: "一般",
-    askOpenClaw: "OpenClawに質問",
+    askSteelEngine: "SteelEngineに質問",
     settingsGroupConnections: "接続",
     settingsGroupAgents: "エージェントとツール",
     settingsGroupSecurity: "プライバシーとセキュリティ",
@@ -1676,7 +1676,7 @@ export const ja_JP: TranslationMap = {
     skillWorkshop: "Skill Workshop",
     nodes: "ノード",
     chat: "チャット",
-    custodian: "OpenClaw",
+    custodian: "SteelEngine",
     config: "設定",
     profile: "プロフィール",
     communications: "通信",
@@ -1715,7 +1715,7 @@ export const ja_JP: TranslationMap = {
     nodes: "ペアリング済みデバイスとコマンド。",
     chat: "すばやく介入するための Gateway チャット。",
     custodian: "システムのセットアップとメンテナンス。",
-    config: "openclaw.json を編集。",
+    config: "steelengine.json を編集。",
     profile: "エージェントの統計、連続記録、リーフでの活動。",
     communications: "チャンネル、メッセージ、音声設定。",
     appearance: "テーマ、UI、セットアップウィザードの設定。",
@@ -1737,7 +1737,7 @@ export const ja_JP: TranslationMap = {
   modelSetup: {
     heading: "AIに接続",
     intro:
-      "OpenClawは、CLIログイン、APIキー、プロバイダーへのサインインなど、既にお持ちのAIアクセスを再利用します。",
+      "SteelEngineは、CLIログイン、APIキー、プロバイダーへのサインインなど、既にお持ちのAIアクセスを再利用します。",
     loading: "このGatewayで利用可能なAIアクセスを確認しています…",
     retry: "再試行",
     checkAgain: "再確認",
@@ -1750,7 +1750,7 @@ export const ja_JP: TranslationMap = {
     },
     access: {
       adminRequired: "モデルの設定にはoperator.adminアクセスが必要です。",
-      gatewayTooOld: "Gatewayで実行中のOpenClawのバージョンが古いです",
+      gatewayTooOld: "Gatewayで実行中のSteelEngineのバージョンが古いです",
     },
     candidates: {
       title: "このGatewayで検出",
@@ -1852,12 +1852,12 @@ export const ja_JP: TranslationMap = {
     confirmReplace:
       "既存のコピー先ファイルは、置き換える前に移行レポート内にバックアップされます。",
     confirmBackup:
-      "OpenClaw は、メモリをコピーする前に検証済みのインポート前バックアップを作成します。",
+      "SteelEngine は、メモリをコピーする前に検証済みのインポート前バックアップを作成します。",
     confirmImport: "メモリをインポート",
     disconnected: "メモリをインポートするには Gateway に接続してください。",
     title: "アシスタントのメモリをインポート",
     subtitle:
-      "Codex の統合メモリと Claude Code の自動メモリを確認してから、OpenClaw にコピーします。",
+      "Codex の統合メモリと Claude Code の自動メモリを確認してから、SteelEngine にコピーします。",
     agent: "コピー先エージェント",
     replaceExisting: "既存のインポートを置き換える",
     replaceHint: "競合を再度プレビューし、置き換える前に各項目のバックアップを保持します。",
@@ -1865,7 +1865,7 @@ export const ja_JP: TranslationMap = {
   onboarding: {
     memoryImport: {
       title: "アシスタントのメモリを引き継ぐ",
-      body: "OpenClaw が他のコーディングアシスタントのメモリを検出しました。エージェントのワークスペースにインポートしますか？",
+      body: "SteelEngine が他のコーディングアシスタントのメモリを検出しました。エージェントのワークスペースにインポートしますか？",
       plannedCount: "{count} 件をインポートできます",
       alreadyImported: "インポート済み: {count} 件",
       sourceUnavailable: "ソースパスを利用できません",
@@ -1881,23 +1881,23 @@ export const ja_JP: TranslationMap = {
       unknownError: "リクエストに失敗しました",
       doneTitle: "メモリのインポートが完了しました",
       doneBody:
-        "{migrated} 件を移行し、{skipped} 件をスキップしました。OpenClaw のセットアップを続行できます。",
+        "{migrated} 件を移行し、{skipped} 件をスキップしました。SteelEngine のセットアップを続行できます。",
     },
   },
   custodian: {
-    title: "OpenClaw",
+    title: "SteelEngine",
     subtitle: "システムセットアップガイド",
     exitSetup: "セットアップを終了",
     hatchDraft: "目を覚まして、友よ！",
-    placeholder: "OpenClawにメッセージ…",
+    placeholder: "SteelEngineにメッセージ…",
     sensitivePlaceholder: "機密値を入力…",
     sensitiveReply: "機密情報を含む返信を送信しました",
     send: "送信",
-    thinking: "OpenClawが考えています",
-    requestFailed: "OpenClawは返信できませんでした。もう一度お試しください。",
+    thinking: "SteelEngineが考えています",
+    requestFailed: "SteelEngineは返信できませんでした。もう一度お試しください。",
     connectionChanged:
       "Gatewayの接続が変更されました。このセットアップを続行するには、再試行してください。",
-    unsupportedGateway: "OpenClawでセットアップを続行するには、Gatewayを更新してください。",
+    unsupportedGateway: "SteelEngineでセットアップを続行するには、Gatewayを更新してください。",
   },
   mcpPage: {
     manageServersLink: "プラグインページでサーバーを管理します。",
@@ -1989,7 +1989,7 @@ export const ja_JP: TranslationMap = {
       notes: "Markdown、Obsidian、Notion、Bear にメモを取り込みます。",
     },
     noInstalledTitle: "オプションのプラグインはインストールされていません",
-    noInstalledBody: "注目のプラグインを見つけるか、ClawHub を検索して OpenClaw を拡張しましょう。",
+    noInstalledBody: "注目のプラグインを見つけるか、ClawHub を検索して SteelEngine を拡張しましょう。",
     noInstalledMatchTitle: "一致するインストール済みプラグインはありません",
     noMatchBody: "別の検索を試してください。",
     filterAll: "すべて",
@@ -2035,7 +2035,7 @@ export const ja_JP: TranslationMap = {
     detailPluginId: "プラグイン ID",
     offlineTitle: "Gatewayがオフラインです",
     offlineBody: "接続して、インストール済みおよびおすすめのプラグインを閲覧してください。",
-    optionalCapability: "任意のOpenClaw機能です。",
+    optionalCapability: "任意のSteelEngine機能です。",
     enabled: "有効",
     disabled: "無効",
     available: "利用可能",
@@ -2068,7 +2068,7 @@ export const ja_JP: TranslationMap = {
     disabledRestart: "{name} を無効化しました。変更を適用するには Gateway の再起動が必要です。",
   },
   aboutPage: {
-    productName: "OpenClaw",
+    productName: "SteelEngine",
     tagline: "あなた自身のデバイスで動作する、パーソナルAIアシスタント。",
     waveHello: "Clawdに手を振って挨拶",
     linksLabel: "コミュニティとリソース",
@@ -2078,7 +2078,7 @@ export const ja_JP: TranslationMap = {
     linkDiscord: "Discord",
     linkX: "X（Twitter）",
     linkChangelog: "変更履歴",
-    license: "© 2026 OpenClaw Foundation — MIT License.",
+    license: "© 2026 SteelEngine Foundation — MIT License.",
     artifactTitle: "Control UI",
     artifactSubtitle: "このブラウザーアーティファクトのビルド時に埋め込まれた ID。",
     artifactDetails: "Control UI のビルド詳細",
@@ -2096,7 +2096,7 @@ export const ja_JP: TranslationMap = {
       "アクティブな Gateway 接続によって報告されます。この Control UI ビルドとは別です。",
   },
   appsPage: {
-    heroTitle: "OpenClawをどこへでも",
+    heroTitle: "SteelEngineをどこへでも",
     heroTagline:
       "スマートフォン、腕時計、デスクトップ、ブラウザ向けのコンパニオンアプリに加え、エージェントの機能を拡張するプラグインも利用できます。",
     sectionMobile: "スマートフォンで",
@@ -2118,11 +2118,11 @@ export const ja_JP: TranslationMap = {
     cards: {
       ios: {
         title: "iPhone",
-        desc: "iOSからOpenClawでチャットや音声会話、アクションの承認、共有ができます。",
+        desc: "iOSからSteelEngineでチャットや音声会話、アクションの承認、共有ができます。",
       },
       android: {
         title: "Android",
-        desc: "Androidスマートフォンを、チャット、カメラ、Canvasに対応した完全なOpenClawノードとして使用できます。",
+        desc: "Androidスマートフォンを、チャット、カメラ、Canvasに対応した完全なSteelEngineノードとして使用できます。",
       },
       appleWatch: {
         title: "Apple Watch",
@@ -2130,7 +2130,7 @@ export const ja_JP: TranslationMap = {
       },
       wearOs: {
         title: "Wear OS",
-        desc: "Androidコンパニオンにより、OpenClawをスマートウォッチでも利用できます。",
+        desc: "Androidコンパニオンにより、SteelEngineをスマートウォッチでも利用できます。",
       },
       macos: {
         title: "macOS",
@@ -2138,7 +2138,7 @@ export const ja_JP: TranslationMap = {
       },
       windows: {
         title: "Windows",
-        desc: "Windowsコンパニオンは、PCをOpenClawノードとして接続します。",
+        desc: "Windowsコンパニオンは、PCをSteelEngineノードとして接続します。",
       },
       linux: {
         title: "Linux",
@@ -2146,11 +2146,11 @@ export const ja_JP: TranslationMap = {
       },
       chrome: {
         title: "Chrome拡張機能",
-        desc: "OpenClawで既存のChromeを操作 — タブ、ページ、フォームに対応。",
+        desc: "SteelEngineで既存のChromeを操作 — タブ、ページ、フォームに対応。",
       },
       plugins: {
         title: "プラグイン＆ClawHub",
-        desc: "コミュニティが提供するチャンネル、ツール、SkillsでOpenClawを拡張できます。",
+        desc: "コミュニティが提供するチャンネル、ツール、SkillsでSteelEngineを拡張できます。",
       },
     },
   },
@@ -2317,7 +2317,7 @@ export const ja_JP: TranslationMap = {
     selfLearning: {
       pitchTitle: "自己学習を有効にする",
       pitchBody:
-        "OpenClaw は修正内容や完了した重要な実行をレビューし、このボード向けのスキル提案の下書きを作成します。追加のバックグラウンドトークンを消費し、下書きは保留中の提案として追加されます。",
+        "SteelEngine は修正内容や完了した重要な実行をレビューし、このボード向けのスキル提案の下書きを作成します。追加のバックグラウンドトークンを消費し、下書きは保留中の提案として追加されます。",
       enable: "自己学習を有効にする",
       enabling: "有効化中…",
       updateError: "自己学習の設定を更新できませんでした。",
@@ -3403,9 +3403,9 @@ export const ja_JP: TranslationMap = {
         summary:
           "Gateway には到達できますが、このブラウザーが接続する前に一致するトークンまたはパスワードが必要です。",
         stepPaste:
-          "openclaw dashboard --no-open のトークンを貼り付けるか、構成済みのパスワードを入力します。",
+          "steelengine dashboard --no-open のトークンを貼り付けるか、構成済みのパスワードを入力します。",
         stepGenerate:
-          "トークンが構成されていない場合は、Gateway ホストで openclaw doctor --generate-gateway-token を実行します。",
+          "トークンが構成されていない場合は、Gateway ホストで steelengine doctor --generate-gateway-token を実行します。",
         stepConnect: "認証情報を更新したら、もう一度 Connect をクリックします。",
       },
       authFailed: {
@@ -3413,7 +3413,7 @@ export const ja_JP: TranslationMap = {
         summary:
           "指定された認証情報は拒否されました。最も一般的な原因は、古いトークン、または別の Gateway URL からコピーしたトークンです。",
         stepDashboard:
-          "openclaw dashboard --no-open を実行し、新しい URL を開くか、そのトークンを貼り付けます。",
+          "steelengine dashboard --no-open を実行し、新しい URL を開くか、そのトークンを貼り付けます。",
         stepReplace:
           "古いトークン/パスワード値を置き換えてください。別の Gateway URL のトークンは再利用しないでください。",
         stepMode:
@@ -3436,8 +3436,8 @@ export const ja_JP: TranslationMap = {
           "このブラウザーで Control UI を使用するには、Gateway ホストからの一度限りの承認が必要です。",
         upgradeSummary:
           "このブラウザーは既に認識されていますが、要求されたアクセスが変わったため、新しい承認が必要です。",
-        stepList: "Gateway ホストで openclaw devices list を実行します。",
-        stepApproveId: "このリクエストを承認します: openclaw devices approve {requestId}.",
+        stepList: "Gateway ホストで steelengine devices list を実行します。",
+        stepApproveId: "このリクエストを承認します: steelengine devices approve {requestId}.",
         stepApprove: "その一覧から保留中のブラウザー/デバイスリクエストを承認します。",
         stepReconnect: "承認が完了したら再接続します。",
       },
@@ -3466,21 +3466,21 @@ export const ja_JP: TranslationMap = {
         summary:
           "提供された Control UI と実行中の Gateway で、サポートされる接続プロトコルが一致していません。",
         stepDashboard:
-          "openclaw dashboard で提供元の dashboard を開き直し、UI と Gateway が同じインストールから来るようにします。",
+          "steelengine dashboard で提供元の dashboard を開き直し、UI と Gateway が同じインストールから来るようにします。",
         stepDevUi:
           "pnpm ui:dev を使用している場合は、現在の checkout に対して開発 UI を再ビルドまたは再起動します。",
-        stepRestart: "OpenClaw 更新後に Gateway を再起動し、現在のプロトコルを提供させます。",
+        stepRestart: "SteelEngine 更新後に Gateway を再起動し、現在のプロトコルを提供させます。",
       },
       network: {
         title: "接続できません",
         summary:
           "ブラウザーは Gateway 接続を完了できませんでした。認証情報を再試行する前に、ターゲットとトランスポートを確認してください。",
         stepGateway:
-          "openclaw status または openclaw gateway run で Gateway が実行中であることを確認します。",
+          "steelengine status または steelengine gateway run で Gateway が実行中であることを確認します。",
         stepUrl:
           "WebSocket URL を確認し、Gateway が HTTPS/Tailscale Serve の背後にある場合は wss:// を使用します。",
         stepDashboard:
-          "openclaw dashboard --no-open で dashboard を開き直し、現在の URL と認証詳細を再コピーします。",
+          "steelengine dashboard --no-open で dashboard を開き直し、現在の URL と認証詳細を再コピーします。",
       },
     },
   },
@@ -3505,7 +3505,7 @@ export const ja_JP: TranslationMap = {
       remoteViewOnly: "このセッションはペアリング済みノード上にあり、表示専用です。",
       unsupportedViewOnly: "この外部セッションソースは表示専用です。",
       sessionMenu: "External session actions",
-      openInOpenClaw: "Open in OpenClaw",
+      openInSteelEngine: "Open in SteelEngine",
       openInTerminal: "Open in terminal",
       terminalUnavailable: "Terminal opening is unavailable for this session.",
     },
@@ -3560,7 +3560,7 @@ export const ja_JP: TranslationMap = {
     followUpModeOverriding: "サーバーのデフォルトを上書き中 ({mode})",
     followUpModeReset: "サーバーの既定値にリセット",
     catalogOpenTarget: "Open Codex/Claude sessions in",
-    catalogOpenTargetViewer: "OpenClaw viewer",
+    catalogOpenTargetViewer: "SteelEngine viewer",
     catalogOpenTargetTerminal: "Terminal",
     onboardingDisabled: "セットアップ中は無効",
     gatewayStatus: "Gateway ステータス: {status}",
@@ -4023,7 +4023,7 @@ export const ja_JP: TranslationMap = {
       filters: "フィルター",
       shownOf: "{total} 件中 {shown} 件",
       emptyTitle: "スケジュールされたタスクはまだありません",
-      emptyHint: "OpenClaw に何をいつ実行させるかを記述すると、スケジュールに従って実行されます。",
+      emptyHint: "SteelEngine に何をいつ実行させるかを記述すると、スケジュールに従って実行されます。",
       noMatching: "現在のフィルターに一致するタスクはありません。",
       loadMore: "さらに読み込む",
       loading: "読み込み中...",
@@ -4090,7 +4090,7 @@ export const ja_JP: TranslationMap = {
     detail: {
       tabsLabel: "自動化の詳細",
       newTitle: "新規スケジュールタスク",
-      newSubtitle: "OpenClaw に何をさせるかを記述し、実行するタイミングを選択します。",
+      newSubtitle: "SteelEngine に何をさせるかを記述し、実行するタイミングを選択します。",
       back: "すべての自動化",
       settingsTab: "設定",
       historyTitle: "実行履歴",
@@ -4163,7 +4163,7 @@ export const ja_JP: TranslationMap = {
       descriptionPlaceholder: "このジョブの任意のコンテキスト",
       agentPlaceholder: "main または ops",
       agentHelp: "入力を始めると既知のエージェントを選択でき、カスタム値を入力することもできます。",
-      promptPlaceholder: "OpenClaw に実行させたいことを記述...",
+      promptPlaceholder: "SteelEngine に実行させたいことを記述...",
       repeat: "繰り返し",
       repeatInterval: "間隔",
       repeatOnce: "1回",

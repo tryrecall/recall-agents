@@ -1,5 +1,5 @@
 import { consume } from "@lit/context";
-import { asNullableRecord as catalogRawRecord } from "@openclaw/normalization-core/record-coerce";
+import { asNullableRecord as catalogRawRecord } from "@steelengine/normalization-core/record-coerce";
 import { html, nothing } from "lit";
 import { property, state as litState } from "lit/decorators.js";
 import type {
@@ -77,7 +77,7 @@ import {
   uiSessionEventMatches,
 } from "../../lib/sessions/session-key.ts";
 import { SessionUnreadPatchGuard } from "../../lib/sessions/unread.ts";
-import { OpenClawLightDomElement } from "../../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../../lit/steelengine-element.ts";
 import { PollController } from "../../lit/poll-controller.ts";
 import { catalogMessageId } from "./catalog-message-id.ts";
 import { refreshChatAvatar } from "./chat-avatar.ts";
@@ -213,7 +213,7 @@ function catalogRawResult(raw: unknown): string | null {
 }
 function nativeHistoryMessageIdentity(message: unknown): string | null {
   const record = catalogRawRecord(message);
-  const metadata = catalogRawRecord(record?.["__openclaw"]);
+  const metadata = catalogRawRecord(record?.["__steelengine"]);
   const seq = metadata?.seq;
   const id = metadata?.id ?? record?.messageId;
   const sourceIdentity =
@@ -278,7 +278,7 @@ function keyboardEventPathMatches(event: KeyboardEvent, selector: string): boole
     .some((target) => target instanceof Element && target.matches(selector));
 }
 
-class ChatPane extends OpenClawLightDomElement {
+class ChatPane extends SteelEngineLightDomElement {
   // One lifecycle-owned minute tick refreshes both relative labels and external PR state.
   readonly minutePoll = new PollController(this, 60_000, () => {
     this.requestUpdate();
@@ -2561,13 +2561,13 @@ class ChatPane extends OpenClawLightDomElement {
   }
 }
 
-if (!customElements.get("openclaw-chat-pane")) {
-  customElements.define("openclaw-chat-pane", ChatPane);
+if (!customElements.get("steelengine-chat-pane")) {
+  customElements.define("steelengine-chat-pane", ChatPane);
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    "openclaw-chat-pane": ChatPane;
+    "steelengine-chat-pane": ChatPane;
   }
 }
 /* oxlint-disable max-lines -- TODO: split this grandfathered oversized file. */

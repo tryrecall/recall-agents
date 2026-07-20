@@ -1,7 +1,7 @@
 /** Builds web-tool secret metadata from config, plugins, and provider contracts. */
-import { normalizeLowercaseStringOrEmpty } from "@openclaw/normalization-core/string-coerce";
-import { sortUniqueStrings } from "@openclaw/normalization-core/string-normalization";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import { normalizeLowercaseStringOrEmpty } from "@steelengine/normalization-core/string-coerce";
+import { sortUniqueStrings } from "@steelengine/normalization-core/string-normalization";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { resolveSecretInputRef } from "../config/types.secrets.js";
 import { loadInstalledPluginIndexInstallRecordsSync } from "../plugins/installed-plugin-index-records.js";
 import type {
@@ -54,7 +54,7 @@ const loadRuntimeWebToolsManifest = createLazyRuntimeSurface(
   (mod) => mod,
 );
 
-type FetchConfig = NonNullable<OpenClawConfig["tools"]>["web"] extends infer Web
+type FetchConfig = NonNullable<SteelEngineConfig["tools"]>["web"] extends infer Web
   ? Web extends { fetch?: infer Fetch }
     ? Fetch
     : undefined
@@ -115,7 +115,7 @@ function needsRuntimeWebFetchProviderDiscovery(params: {
 }
 
 function hasPluginScopedWebToolConfig(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   key: "webSearch" | "webFetch",
 ): boolean {
   const entries = config.plugins?.entries;
@@ -132,7 +132,7 @@ function hasPluginScopedWebToolConfig(
 }
 
 function inferSingleBundledPluginScopedWebToolConfigOwner(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   key: "webSearch" | "webFetch",
 ): string | undefined {
   const entries = config.plugins?.entries;
@@ -157,7 +157,7 @@ function inferSingleBundledPluginScopedWebToolConfigOwner(
 }
 
 function inferExactBundledPluginScopedWebToolConfigOwner(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   key: "webSearch" | "webFetch";
   pluginId: string;
 }): string | undefined {
@@ -173,7 +173,7 @@ type WebProviderContract = "webSearchProviders" | "webFetchProviders";
 
 async function hasCustomWebProviderPluginRisk(params: {
   contract: WebProviderContract;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
 }): Promise<boolean> {
   const installRecords = loadInstalledPluginIndexInstallRecordsSync({ env: params.env });
@@ -241,7 +241,7 @@ function buildUnresolvedReason(params: {
 }
 
 async function resolveSecretInputWithEnvFallback(params: {
-  sourceConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
   context: ResolverContext;
   defaults: SecretDefaults | undefined;
   value: unknown;
@@ -340,7 +340,7 @@ async function resolveSecretInputWithEnvFallback(params: {
 }
 
 function setResolvedWebSearchApiKey(params: {
-  resolvedConfig: OpenClawConfig;
+  resolvedConfig: SteelEngineConfig;
   provider: PluginWebSearchProviderEntry;
   value: string;
 }): void {
@@ -355,7 +355,7 @@ function setResolvedWebSearchApiKey(params: {
 }
 
 async function resolveBundledWebSearchProviders(params: {
-  sourceConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
   context: ResolverContext;
   configuredBundledPluginId?: string;
   onlyPluginIds?: readonly string[];
@@ -408,7 +408,7 @@ async function resolveBundledWebSearchProviders(params: {
 }
 
 async function resolveBundledWebFetchProviders(params: {
-  sourceConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
   context: ResolverContext;
   configuredBundledPluginId?: string;
   hasCustomWebFetchPluginRisk: boolean;
@@ -460,7 +460,7 @@ async function resolveBundledWebFetchProviders(params: {
 
 function readConfiguredProviderCredential(params: {
   provider: PluginWebSearchProviderEntry;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   search: Record<string, unknown> | undefined;
 }): unknown {
   return (
@@ -471,7 +471,7 @@ function readConfiguredProviderCredential(params: {
 
 function readConfiguredProviderCredentialFallback(params: {
   provider: PluginWebSearchProviderEntry;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   search: Record<string, unknown> | undefined;
 }): { path: string; value: unknown } | undefined {
   return params.provider.getConfiguredCredentialFallback?.(params.config);
@@ -487,7 +487,7 @@ function inactivePathsForProvider(provider: PluginWebSearchProviderEntry): strin
 }
 
 function setResolvedWebFetchApiKey(params: {
-  resolvedConfig: OpenClawConfig;
+  resolvedConfig: SteelEngineConfig;
   provider: PluginWebFetchProviderEntry;
   value: string;
 }): void {
@@ -503,7 +503,7 @@ function setResolvedWebFetchApiKey(params: {
 
 function readConfiguredFetchProviderCredential(params: {
   provider: PluginWebFetchProviderEntry;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   fetch: Record<string, unknown> | undefined;
 }): unknown {
   const configuredValue = params.provider.getConfiguredCredentialValue?.(params.config);
@@ -512,7 +512,7 @@ function readConfiguredFetchProviderCredential(params: {
 
 function readConfiguredFetchProviderCredentialFallback(params: {
   provider: PluginWebFetchProviderEntry;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   fetch: Record<string, unknown> | undefined;
 }): { path: string; value: unknown } | undefined {
   return params.provider.getConfiguredCredentialFallback?.(params.config);
@@ -532,8 +532,8 @@ function inactivePathsForFetchProvider(provider: PluginWebFetchProviderEntry): s
  */
 /** Resolves web search/fetch secret metadata from config, plugins, and fallback runtime providers. */
 export async function resolveRuntimeWebTools(params: {
-  sourceConfig: OpenClawConfig;
-  resolvedConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
+  resolvedConfig: SteelEngineConfig;
   context: ResolverContext;
   allowUnavailableSecretOwners?: boolean;
 }): Promise<ResolvedRuntimeWebTools> {

@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
 import {
   resolveAgentConfig,
   resolveAgentDir,
@@ -8,7 +8,7 @@ import {
 } from "../agents/agent-scope.js";
 import type { HookContext } from "../agents/agent-tools.before-tool-call.js";
 import {
-  createOpenClawCodingTools,
+  createSteelEngineCodingTools,
   resolveToolLoopDetectionConfig,
 } from "../agents/agent-tools.js";
 import type { CodeModeNamespaceDescriptor } from "../agents/code-mode-namespaces.js";
@@ -32,7 +32,7 @@ import {
 } from "../agents/tool-search.js";
 import type { AnyAgentTool } from "../agents/tools/common.js";
 import { ensureAgentWorkspace } from "../agents/workspace.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { getPluginToolMeta } from "../plugins/tools.js";
 import { normalizeAgentId } from "../routing/session-key.js";
 import {
@@ -67,7 +67,7 @@ type PreparedTriggerRuntime = {
 };
 
 type PrepareTriggerRuntime = (params: {
-  runtimeConfig: OpenClawConfig;
+  runtimeConfig: SteelEngineConfig;
   jobId: string;
   agentId?: string;
   toolsAllow?: string[];
@@ -75,24 +75,24 @@ type PrepareTriggerRuntime = (params: {
 }) => Promise<PreparedTriggerRuntime>;
 
 type CronTriggerEvaluatorDeps = {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   runHeadless?: typeof runCodeModeScriptHeadless;
   prepareRuntime?: PrepareTriggerRuntime;
 };
 
 type TriggerRuntimeCacheEntry = {
   promise: Promise<PreparedTriggerRuntime>;
-  configEpoch: OpenClawConfig;
+  configEpoch: SteelEngineConfig;
   agentId: string;
   toolsAllowKey: string;
 };
 
-function resolveTriggerAgentId(config: OpenClawConfig, agentId?: string): string {
+function resolveTriggerAgentId(config: SteelEngineConfig, agentId?: string): string {
   return agentId?.trim() ? normalizeAgentId(agentId) : resolveDefaultAgentId(config);
 }
 
 async function prepareTriggerRuntime(params: {
-  runtimeConfig: OpenClawConfig;
+  runtimeConfig: SteelEngineConfig;
   jobId: string;
   agentId?: string;
   toolsAllow?: string[];
@@ -106,7 +106,7 @@ async function prepareTriggerRuntime(params: {
     defaults: params.runtimeConfig.agents?.defaults,
     agentConfigOverride,
   });
-  const config: OpenClawConfig = {
+  const config: SteelEngineConfig = {
     ...params.runtimeConfig,
     agents: Object.assign({}, params.runtimeConfig.agents, { defaults: agentDefaults }),
   };
@@ -147,7 +147,7 @@ async function prepareTriggerRuntime(params: {
   // Bundle MCP tools are source:"mcp", which the headless bridge excludes.
   // LSP runtimes are session-scoped and intentionally outside trigger v1.
   const allTools = toolPlan.constructTools
-    ? createOpenClawCodingTools({
+    ? createSteelEngineCodingTools({
         agentId,
         exec: { config },
         sandbox,
@@ -323,7 +323,7 @@ export function createCronTriggerEvaluator(deps: CronTriggerEvaluatorDeps) {
     }
   };
   const resolveCachedRuntime = async (request: {
-    runtimeConfig: OpenClawConfig;
+    runtimeConfig: SteelEngineConfig;
     jobId: string;
     requestedAgentId?: string;
     agentId: string;

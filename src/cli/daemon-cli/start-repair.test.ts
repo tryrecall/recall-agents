@@ -14,8 +14,8 @@ const buildGatewayInstallPlanMock = vi.hoisted(() =>
       const preservedFileValue =
         params.existingEnvironmentValueSources?.TELEGRAM_DEFAULT_BOTTOKEN === "file";
       return {
-        programArguments: ["/usr/bin/openclaw", "gateway", "run"],
-        workingDirectory: "/tmp/openclaw",
+        programArguments: ["/usr/bin/steelengine", "gateway", "run"],
+        workingDirectory: "/tmp/steelengine",
         environment: {
           TELEGRAM_DEFAULT_BOTTOKEN: preservedFileValue
             ? params.existingEnvironment?.TELEGRAM_DEFAULT_BOTTOKEN
@@ -31,7 +31,7 @@ const buildGatewayInstallPlanMock = vi.hoisted(() =>
 const resolveGatewayInstallTokenMock = vi.hoisted(() => vi.fn());
 const readConfigFileSnapshotForWriteMock = vi.hoisted(() => vi.fn());
 const resolveGatewayPortMock = vi.hoisted(() => vi.fn(() => 18789));
-const resolveOpenClawWrapperPathMock = vi.hoisted(() => vi.fn());
+const resolveSteelEngineWrapperPathMock = vi.hoisted(() => vi.fn());
 const formatGatewayServiceStartRepairIssuesMock = vi.hoisted(() => vi.fn());
 const defaultRuntimeLogMock = vi.hoisted(() => vi.fn());
 
@@ -56,8 +56,8 @@ vi.mock("../../config/paths.js", () => ({
 }));
 
 vi.mock("../../daemon/program-args.js", () => ({
-  OPENCLAW_WRAPPER_ENV_KEY: "OPENCLAW_WRAPPER",
-  resolveOpenClawWrapperPath: resolveOpenClawWrapperPathMock,
+  STEELENGINE_WRAPPER_ENV_KEY: "STEELENGINE_WRAPPER",
+  resolveSteelEngineWrapperPath: resolveSteelEngineWrapperPathMock,
 }));
 
 vi.mock("../../daemon/service.js", () => ({
@@ -84,7 +84,7 @@ describe("repairLoadedGatewayServiceForStart", () => {
     resolveGatewayInstallTokenMock.mockReset();
     readConfigFileSnapshotForWriteMock.mockReset();
     resolveGatewayPortMock.mockClear();
-    resolveOpenClawWrapperPathMock.mockReset();
+    resolveSteelEngineWrapperPathMock.mockReset();
     formatGatewayServiceStartRepairIssuesMock.mockReset();
     defaultRuntimeLogMock.mockClear();
 
@@ -94,9 +94,9 @@ describe("repairLoadedGatewayServiceForStart", () => {
     });
     readConfigFileSnapshotForWriteMock.mockResolvedValue({
       snapshot: { exists: true, valid: true, sourceConfig: {}, config: {} },
-      writeOptions: { expectedConfigPath: "/tmp/openclaw.json" },
+      writeOptions: { expectedConfigPath: "/tmp/steelengine.json" },
     });
-    resolveOpenClawWrapperPathMock.mockResolvedValue("/usr/bin/openclaw");
+    resolveSteelEngineWrapperPathMock.mockResolvedValue("/usr/bin/steelengine");
     formatGatewayServiceStartRepairIssuesMock.mockReturnValue(
       "service was installed by an older version",
     );
@@ -110,11 +110,11 @@ describe("repairLoadedGatewayServiceForStart", () => {
       isLoaded: isLoadedMock,
     } as unknown as GatewayService;
     const existingEnvironment = {
-      OPENCLAW_SERVICE_VERSION: "2026.4.24",
+      STEELENGINE_SERVICE_VERSION: "2026.4.24",
       TELEGRAM_DEFAULT_BOTTOKEN: "existing-env-file-token",
     };
     const existingEnvironmentValueSources = {
-      OPENCLAW_SERVICE_VERSION: "inline" as const,
+      STEELENGINE_SERVICE_VERSION: "inline" as const,
       TELEGRAM_DEFAULT_BOTTOKEN: "file" as const,
     };
     const state: GatewayServiceState = {
@@ -123,7 +123,7 @@ describe("repairLoadedGatewayServiceForStart", () => {
       running: false,
       env: {},
       command: {
-        programArguments: ["/usr/bin/openclaw", "gateway", "run"],
+        programArguments: ["/usr/bin/steelengine", "gateway", "run"],
         environment: existingEnvironment,
         environmentValueSources: existingEnvironmentValueSources,
       },

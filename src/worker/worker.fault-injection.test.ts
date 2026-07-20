@@ -18,7 +18,7 @@ import {
   resolveSessionTranscriptRuntimeTarget,
   upsertSessionEntry,
 } from "../config/sessions/session-accessor.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   attachWorkerWsMessageHandler,
   type WorkerConnectionService,
@@ -51,10 +51,10 @@ import {
 import { rawDataToString } from "../infra/ws.js";
 import type { WorkerProvider, WorkerSshEndpoint } from "../plugins/types.js";
 import {
-  closeOpenClawStateDatabaseForTest,
-  openOpenClawStateDatabase,
-  type OpenClawStateDatabase,
-} from "../state/openclaw-state-db.js";
+  closeSteelEngineStateDatabaseForTest,
+  openSteelEngineStateDatabase,
+  type SteelEngineStateDatabase,
+} from "../state/steelengine-state-db.js";
 import { buildWorkerConnectParams, type WorkerLaunchDescriptor } from "./launch-descriptor.js";
 import {
   createWorkerConnection,
@@ -80,20 +80,20 @@ const HOST_KEY = [["ssh", "ed25519"].join("-"), "AAAA"].join(" ");
 const SSH_ENDPOINT: WorkerSshEndpoint = {
   host: "worker.example.test",
   port: 22,
-  user: "openclaw",
+  user: "steelengine",
   hostKey: HOST_KEY,
   keyRef: { source: "file", provider: "worker-fixtures", id: "/development-key" },
 };
 const HANDSHAKE = {
   bundleHash: BUNDLE_HASH,
-  openclawVersion: "fault-test",
+  steelengineVersion: "fault-test",
   protocolFeatures: [...WORKER_PROTOCOL_FEATURES],
 };
 type WorkerEnvironmentServiceOptions = Parameters<typeof createWorkerEnvironmentService>[0];
 const BUNDLE_ARTIFACT = {
   install: "bundle" as const,
   bundleHash: BUNDLE_HASH,
-  openclawVersion: HANDSHAKE.openclawVersion,
+  steelengineVersion: HANDSHAKE.steelengineVersion,
   protocolFeatures: [...WORKER_PROTOCOL_FEATURES],
   tarballSha256: Array.from({ length: 64 }, () => "b").join(""),
   tarballPath: "/gateway/cache/worker-bundle.tgz",
@@ -205,8 +205,8 @@ class ComposedGatewayHarness {
   readonly storePath: string;
   readonly sessionFile: string;
   readonly socketPath: string;
-  readonly cfg: OpenClawConfig;
-  readonly database: OpenClawStateDatabase;
+  readonly cfg: SteelEngineConfig;
+  readonly database: SteelEngineStateDatabase;
   readonly store: WorkerEnvironmentStore;
   readonly requests: Array<{ method: string; params: unknown }> = [];
   readonly admissions: WorkerConnectionIdentity[] = [];
@@ -231,7 +231,7 @@ class ComposedGatewayHarness {
 
   static async create(): Promise<ComposedGatewayHarness> {
     const root = await fs.mkdtemp(
-      path.join(await fs.realpath(os.tmpdir()), "openclaw-worker-fault-"),
+      path.join(await fs.realpath(os.tmpdir()), "steelengine-worker-fault-"),
     );
     const sessionsDir = path.join(root, "agents", "main", "sessions");
     const storePath = path.join(sessionsDir, "sessions.json");
@@ -272,7 +272,7 @@ class ComposedGatewayHarness {
         profiles: { development: { provider: "fake", settings: { region: "test" } } },
       },
     };
-    this.database = openOpenClawStateDatabase({ env: { OPENCLAW_STATE_DIR: this.stateDir } });
+    this.database = openSteelEngineStateDatabase({ env: { STEELENGINE_STATE_DIR: this.stateDir } });
     this.store = createWorkerEnvironmentStore({ database: this.database });
     this.seedAttachedEnvironment();
     this.liveEventsValue = this.createLiveEvents(true);
@@ -470,7 +470,7 @@ class ComposedGatewayHarness {
     await new Promise<void>((resolve) => {
       this.httpServer.close(() => resolve());
     });
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     await fs.rm(this.root, { recursive: true, force: true });
   }
 

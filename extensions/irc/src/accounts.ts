@@ -1,15 +1,15 @@
 // Irc plugin module implements accounts behavior.
-import { createAccountListHelpers } from "openclaw/plugin-sdk/account-helpers";
-import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "openclaw/plugin-sdk/account-id";
-import { resolveMergedAccountConfig } from "openclaw/plugin-sdk/account-resolution";
-import { parseOptionalDelimitedEntries } from "openclaw/plugin-sdk/channel-core";
-import { parseStrictPositiveInteger } from "openclaw/plugin-sdk/number-runtime";
-import { tryReadSecretFileSync } from "openclaw/plugin-sdk/secret-file-runtime";
-import { normalizeResolvedSecretInputString } from "openclaw/plugin-sdk/secret-input";
+import { createAccountListHelpers } from "steelengine/plugin-sdk/account-helpers";
+import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "steelengine/plugin-sdk/account-id";
+import { resolveMergedAccountConfig } from "steelengine/plugin-sdk/account-resolution";
+import { parseOptionalDelimitedEntries } from "steelengine/plugin-sdk/channel-core";
+import { parseStrictPositiveInteger } from "steelengine/plugin-sdk/number-runtime";
+import { tryReadSecretFileSync } from "steelengine/plugin-sdk/secret-file-runtime";
+import { normalizeResolvedSecretInputString } from "steelengine/plugin-sdk/secret-input";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 import type { CoreConfig, IrcAccountConfig, IrcNickServConfig } from "./types.js";
 
 type CredentialUnavailableDiagnostic = Extract<
@@ -199,12 +199,12 @@ export function resolveIrcAccount(params: {
       merged.username?.trim() ||
       (accountId === DEFAULT_ACCOUNT_ID ? process.env.IRC_USERNAME?.trim() : "") ||
       nick ||
-      "openclaw"
+      "steelengine"
     ).trim();
     const realname = (
       merged.realname?.trim() ||
       (accountId === DEFAULT_ACCOUNT_ID ? process.env.IRC_REALNAME?.trim() : "") ||
-      "OpenClaw"
+      "SteelEngine"
     ).trim();
 
     const passwordResolution = resolvePassword(accountId, merged);

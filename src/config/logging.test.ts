@@ -6,7 +6,7 @@ import { withTempDirSync } from "../test-helpers/temp-dir.js";
 
 const mocks = vi.hoisted(() => ({
   createConfigIO: vi.fn().mockReturnValue({
-    configPath: "/tmp/openclaw-dev/openclaw.json",
+    configPath: "/tmp/steelengine-dev/steelengine.json",
   }),
 }));
 
@@ -29,18 +29,18 @@ beforeEach(() => {
 
 describe("config logging", () => {
   it("formats the live config path when no explicit path is provided", () => {
-    expect(formatConfigPath()).toBe("/tmp/openclaw-dev/openclaw.json");
+    expect(formatConfigPath()).toBe("/tmp/steelengine-dev/steelengine.json");
   });
 
   it("logs the live config path when no explicit path is provided", () => {
     const runtime = { log: vi.fn() };
     logConfigUpdated(runtime as never);
-    expect(runtime.log).toHaveBeenCalledWith("Updated config: /tmp/openclaw-dev/openclaw.json");
+    expect(runtime.log).toHaveBeenCalledWith("Updated config: /tmp/steelengine-dev/steelengine.json");
   });
 
   it("formats backup as an indented detail when present", () => {
-    withTempDirSync({ prefix: "openclaw-config-log-" }, (dir) => {
-      const configPath = path.join(dir, "openclaw.json");
+    withTempDirSync({ prefix: "steelengine-config-log-" }, (dir) => {
+      const configPath = path.join(dir, "steelengine.json");
       const backupPath = `${configPath}.bak`;
       fs.writeFileSync(backupPath, "{}", "utf8");
 

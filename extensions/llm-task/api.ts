@@ -1,7 +1,7 @@
 // Llm Task API module exposes the plugin public contract.
-export { resolvePreferredOpenClawTmpDir, withTempWorkspace } from "./src/runtime-api.js";
+export { resolvePreferredSteelEngineTmpDir, withTempWorkspace } from "./src/runtime-api.js";
 export {
   definePluginEntry,
   type AnyAgentTool,
-  type OpenClawPluginApi,
-} from "openclaw/plugin-sdk/plugin-entry";
+  type SteelEnginePluginApi,
+} from "steelengine/plugin-sdk/plugin-entry";

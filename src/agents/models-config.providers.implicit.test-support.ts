@@ -1,9 +1,9 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { PluginMetadataSnapshot } from "../plugins/plugin-metadata-snapshot.js";
 import "./models-config.providers.implicit.js";
 
 type ResolveProviderDiscoveryFilterParams = {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
   resolveOwners?: (provider: string) => readonly string[] | undefined;
@@ -22,7 +22,7 @@ type ModelsConfigImplicitProvidersTestApi = {
 
 function getTestApi(): ModelsConfigImplicitProvidersTestApi {
   return (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.modelsConfigImplicitProvidersTestApi")
+    Symbol.for("steelengine.modelsConfigImplicitProvidersTestApi")
   ] as ModelsConfigImplicitProvidersTestApi;
 }
 

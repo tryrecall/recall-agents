@@ -12,5 +12,5 @@ type CliBackendsTestApi = {
 };
 
 export const testing = (globalThis as Record<PropertyKey, unknown>)[
-  Symbol.for("openclaw.cliBackendsTestApi")
+  Symbol.for("steelengine.cliBackendsTestApi")
 ] as CliBackendsTestApi;

@@ -3,7 +3,7 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   GATEWAY_CLIENT_MODES,
@@ -46,7 +46,7 @@ const mocks = vi.hoisted(() => ({
     }>
   >(async () => ({ messageId: "poll-1" })),
   getChannelPlugin: vi.fn(),
-  loadOpenClawPlugins: vi.fn(),
+  loadSteelEnginePlugins: vi.fn(),
   applyPluginAutoEnable: vi.fn(),
   getRuntimeConfigSnapshot: vi.fn(),
   getRuntimeConfigSourceSnapshot: vi.fn(),
@@ -77,7 +77,7 @@ vi.mock("../../channels/plugins/message-action-dispatch.js", () => ({
   dispatchChannelMessageAction: mocks.dispatchChannelMessageAction,
 }));
 
-const TEST_AGENT_WORKSPACE = "/tmp/openclaw-test-workspace";
+const TEST_AGENT_WORKSPACE = "/tmp/steelengine-test-workspace";
 let sendHandlers: typeof import("./send.js").sendHandlers;
 
 function resolveAgentIdFromSessionKeyForTests(params: { sessionKey?: string }): string {
@@ -150,7 +150,7 @@ vi.mock("../../config/runtime-snapshot.js", async () => {
 });
 
 vi.mock("../../plugins/loader.js", () => ({
-  loadOpenClawPlugins: mocks.loadOpenClawPlugins,
+  loadSteelEnginePlugins: mocks.loadSteelEnginePlugins,
   resolveRuntimePluginRegistry: vi.fn(),
 }));
 
@@ -363,10 +363,10 @@ function agentRuntimeClient(sessionKey: string, agentId = "main") {
   } as never;
 }
 
-async function withTempOpenClawStateDir<T>(test: (stateDir: string) => Promise<T>): Promise<T> {
-  const envSnapshot = captureEnv(["OPENCLAW_STATE_DIR"]);
+async function withTempSteelEngineStateDir<T>(test: (stateDir: string) => Promise<T>): Promise<T> {
+  const envSnapshot = captureEnv(["STEELENGINE_STATE_DIR"]);
   const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "gateway-send-state-"));
-  setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
+  setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
   try {
     return await test(stateDir);
   } finally {
@@ -1083,7 +1083,7 @@ describe("gateway send mirroring", () => {
   it("materializes buffer-only gateway sends before outbound delivery", async () => {
     mockDeliverySuccess("m-buffer-media");
 
-    await withTempOpenClawStateDir(async () => {
+    await withTempSteelEngineStateDir(async () => {
       const { respond } = await runSend({
         to: "+15551234567",
         mediaUrl: "buffer://message-send/attachment",
@@ -1114,14 +1114,14 @@ describe("gateway send mirroring", () => {
     const { respond } = await runSend({
       to: "channel:C1",
       message: "voice note",
-      mediaUrl: "file:///tmp/openclaw-voice.ogg",
+      mediaUrl: "file:///tmp/steelengine-voice.ogg",
       asVoice: true,
       channel: "slack",
       idempotencyKey: "idem-voice",
     });
 
     expect(deliveryCall()?.payloads?.[0]?.text).toBe("voice note");
-    expect(deliveryCall()?.payloads?.[0]?.mediaUrl).toBe("file:///tmp/openclaw-voice.ogg");
+    expect(deliveryCall()?.payloads?.[0]?.mediaUrl).toBe("file:///tmp/steelengine-voice.ogg");
     expect(deliveryCall()?.payloads?.[0]?.audioAsVoice).toBe(true);
     const response = firstRespondCall(respond);
     expect(response?.[0]).toBe(true);
@@ -3518,7 +3518,7 @@ describe("gateway send mirroring", () => {
       "send-test-message-action-buffer-materialize",
     );
 
-    await withTempOpenClawStateDir(async () => {
+    await withTempSteelEngineStateDir(async () => {
       const { respond } = await runMessageActionRequest(
         {
           channel: "telegram",

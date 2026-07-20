@@ -13,7 +13,7 @@ import {
 } from "../config/io.js";
 import { formatConfigIssueLines } from "../config/issue-format.js";
 import type { ConfigFileSnapshot, LegacyConfigIssue } from "../config/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import type { StartupMigrationLease } from "../infra/startup-migration-checkpoint.js";
 import { normalizePluginsConfig, resolveEffectiveEnableState } from "../plugins/config-state.js";
@@ -41,7 +41,7 @@ const loadLegacyCronRepair = createLazyRuntimeModule(
 const startupPreflightTraceStartedAt = performance.now();
 
 async function measureStartupPreflightStep<T>(name: string, run: () => T | Promise<T>): Promise<T> {
-  if (!isTruthyEnvValue(process.env.OPENCLAW_GATEWAY_STARTUP_TRACE)) {
+  if (!isTruthyEnvValue(process.env.STEELENGINE_GATEWAY_STARTUP_TRACE)) {
     return await run();
   }
   const startedAt = performance.now();
@@ -63,8 +63,8 @@ async function maybeMigrateLegacyConfig(): Promise<string[]> {
     return changes;
   }
 
-  const targetDir = path.join(home, ".openclaw");
-  const targetPath = path.join(targetDir, "openclaw.json");
+  const targetDir = path.join(home, ".steelengine");
+  const targetPath = path.join(targetDir, "steelengine.json");
   try {
     await fs.access(targetPath);
     return changes;
@@ -72,7 +72,11 @@ async function maybeMigrateLegacyConfig(): Promise<string[]> {
     // missing config
   }
 
-  const legacyCandidates = [path.join(home, ".clawdbot", "clawdbot.json")];
+  const legacyCandidates = [
+    path.join(targetDir, "recall.json"),
+    path.join(home, ".recall", "recall.json"),
+    path.join(home, ".clawdbot", "clawdbot.json"),
+  ];
 
   let legacyPath: string | null = null;
   for (const candidate of legacyCandidates) {
@@ -101,7 +105,7 @@ async function maybeMigrateLegacyConfig(): Promise<string[]> {
 
 export type DoctorConfigPreflightResult = {
   snapshot: Awaited<ReturnType<typeof readConfigFileSnapshot>>;
-  baseConfig: OpenClawConfig;
+  baseConfig: SteelEngineConfig;
   cronCodexRuntimePolicyTargets?: CronCodexRuntimePolicyTarget[];
 };
 
@@ -130,7 +134,7 @@ function addDoctorLegacyIssues(
 export function shouldSkipPluginValidationForDoctorConfigPreflight(
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {
-  return isTruthyEnvValue(env.OPENCLAW_UPDATE_IN_PROGRESS);
+  return isTruthyEnvValue(env.STEELENGINE_UPDATE_IN_PROGRESS);
 }
 
 function noteStateMigrationResult(result: {
@@ -161,7 +165,7 @@ type StartupPluginConvergenceResult = {
 };
 
 async function planStartupPluginVerification(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
 }) {
   const { planStartupPluginConvergence } = await measureStartupPreflightStep(
@@ -177,7 +181,7 @@ async function planStartupPluginVerification(params: {
 }
 
 function buildStartupPluginQuarantine(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   failures: readonly PluginPayloadSmokeFailure[];
 }): DegradedPlugin[] {
   return buildDegradedPluginsFromVerificationFailures(
@@ -190,7 +194,7 @@ function buildStartupPluginQuarantine(params: {
 }
 
 function isStartupPluginVerificationFailureActive(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   failure: PluginPayloadSmokeFailure;
 }): boolean {
   return resolveEffectiveEnableState({
@@ -207,11 +211,11 @@ function formatStartupPluginSmokeFailure(failure: PluginPayloadSmokeFailure): st
     reason: failure.reason,
     detail: failure.detail,
     ...(failure.installPath ? { installPath: failure.installPath } : {}),
-  })}. Run \`openclaw update repair\` to retry plugin repair.`;
+  })}. Run \`steelengine update repair\` to retry plugin repair.`;
 }
 
 async function runStartupUpgradeConvergence(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
 }): Promise<StartupPluginConvergenceResult> {
   const plan = await planStartupPluginVerification(params);
@@ -275,7 +279,7 @@ async function runStartupUpgradeConvergence(params: {
 }
 
 async function refreshStartupPluginQuarantine(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
 }): Promise<StartupPluginConvergenceResult> {
   const plan = await planStartupPluginVerification(params);
@@ -338,9 +342,9 @@ function formatStartupMigrationFailure(params: { warnings: string[]; blockers: s
     ...params.blockers.map((blocker) => `- ${blocker}`),
   ];
   return [
-    "OpenClaw startup migrations did not complete cleanly; refusing to report the gateway ready.",
+    "SteelEngine startup migrations did not complete cleanly; refusing to report the gateway ready.",
     ...details,
-    'Run "openclaw doctor --fix" against the mounted state/config, then restart the container.',
+    'Run "steelengine doctor --fix" against the mounted state/config, then restart the container.',
   ].join("\n");
 }
 
@@ -348,7 +352,7 @@ function formatStartupPluginVerificationFailure(
   diagnostic: StartupPluginVerificationDiagnostic,
 ): string {
   return [
-    "OpenClaw plugin verification failed; refusing to report the gateway ready.",
+    "SteelEngine plugin verification failed; refusing to report the gateway ready.",
     ...diagnostic.messages.map((message) => `- ${message}`),
     "Resolve the plugin verification errors above, then restart the container.",
   ].join("\n");
@@ -362,7 +366,7 @@ function throwStartupMigrationRefusal(message: string): never {
 
 function throwStartupMigrationGuardRejected(): never {
   throw new Error(
-    "OpenClaw startup migrations were skipped because the selected config changed during startup; refusing to report the gateway ready. Retry startup so the new config can be validated.",
+    "SteelEngine startup migrations were skipped because the selected config changed during startup; refusing to report the gateway ready. Retry startup so the new config can be validated.",
   );
 }
 
@@ -490,7 +494,7 @@ export async function runDoctorConfigPreflight(
     if (options.repairPrefixedConfig === true && snapshot.exists && !snapshot.valid) {
       if (await recoverConfigFromJsonRootSuffix(snapshot)) {
         note(
-          "Removed non-JSON prefix from openclaw.json; original saved as .clobbered.*.",
+          "Removed non-JSON prefix from steelengine.json; original saved as .clobbered.*.",
           "Config",
         );
         snapshot = addDoctorLegacyIssues(await readConfigFileSnapshot(readOptions));
@@ -498,7 +502,7 @@ export async function runDoctorConfigPreflight(
         await recoverConfigFromLastKnownGood({ snapshot, reason: "doctor-invalid-config" })
       ) {
         note(
-          "Restored openclaw.json from last-known-good; original saved as .clobbered.*.",
+          "Restored steelengine.json from last-known-good; original saved as .clobbered.*.",
           "Config",
         );
         snapshot = addDoctorLegacyIssues(await readConfigFileSnapshot(readOptions));
@@ -619,7 +623,7 @@ export async function runDoctorConfigPreflight(
         if (startupMigrationHeartbeatError) {
           throw startupMigrationHeartbeatError instanceof Error
             ? startupMigrationHeartbeatError
-            : new Error("OpenClaw startup migration lease heartbeat failed.");
+            : new Error("SteelEngine startup migration lease heartbeat failed.");
         }
         if (startupMigrationWarnings.length > 0) {
           throwStartupMigrationRefusal(
@@ -633,7 +637,9 @@ export async function runDoctorConfigPreflight(
           throwStartupMigrationRefusal(
             formatStartupMigrationFailure({
               warnings: [],
-              blockers: ['OpenClaw config is invalid; run "openclaw doctor --fix" before startup.'],
+              blockers: [
+                'SteelEngine config is invalid; run "steelengine doctor --fix" before startup.',
+              ],
             }),
           );
         }

@@ -1,15 +1,15 @@
 // Memory Core plugin module implements cli behavior.
 import type { Command } from "commander";
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
 import {
   formatDocsLink,
   formatHelpExamples,
   theme,
-} from "openclaw/plugin-sdk/memory-core-host-runtime-cli";
+} from "steelengine/plugin-sdk/memory-core-host-runtime-cli";
 import {
   parseStrictNonNegativeInteger,
   parseStrictPositiveInteger,
-} from "openclaw/plugin-sdk/number-runtime";
+} from "steelengine/plugin-sdk/number-runtime";
 import type {
   MemoryCommandOptions,
   MemoryPromoteCommandOptions,
@@ -123,44 +123,44 @@ export function registerMemoryCli(program: Command, hostOptions?: MemoryCoreRunt
       "after",
       () =>
         `\n${theme.heading("Examples:")}\n${formatHelpExamples([
-          ["openclaw memory status", "Show index and provider status."],
+          ["steelengine memory status", "Show index and provider status."],
           [
-            "openclaw memory status --fix",
+            "steelengine memory status --fix",
             "Repair stale recall locks and normalize promotion metadata.",
           ],
-          ["openclaw memory status --deep", "Probe embedding provider readiness."],
-          ["openclaw memory index --force", "Force a full reindex."],
-          ['openclaw memory search "meeting notes"', "Quick search using positional query."],
+          ["steelengine memory status --deep", "Probe embedding provider readiness."],
+          ["steelengine memory index --force", "Force a full reindex."],
+          ['steelengine memory search "meeting notes"', "Quick search using positional query."],
           [
-            'openclaw memory search --query "deployment" --max-results 20',
+            'steelengine memory search --query "deployment" --max-results 20',
             "Limit results for focused troubleshooting.",
           ],
           [
-            `openclaw memory promote --limit 10 --min-score ${DEFAULT_PROMOTION_MIN_SCORE}`,
+            `steelengine memory promote --limit 10 --min-score ${DEFAULT_PROMOTION_MIN_SCORE}`,
             "Review weighted short-term candidates for long-term memory.",
           ],
           [
-            "openclaw memory promote --apply",
+            "steelengine memory promote --apply",
             "Append top-ranked short-term candidates into MEMORY.md.",
           ],
           [
-            'openclaw memory promote-explain "router vlan"',
+            'steelengine memory promote-explain "router vlan"',
             "Explain why a specific candidate would or would not promote.",
           ],
           [
-            "openclaw memory rem-harness --json",
+            "steelengine memory rem-harness --json",
             "Preview REM reflections, candidate truths, and deep promotion output.",
           ],
           [
-            "openclaw memory rem-backfill --path ./memory",
+            "steelengine memory rem-backfill --path ./memory",
             "Write grounded historical REM entries into DREAMS.md for UI review.",
           ],
           [
-            "openclaw memory rem-backfill --path ./memory --stage-short-term",
+            "steelengine memory rem-backfill --path ./memory --stage-short-term",
             "Also seed durable grounded candidates into the live short-term promotion store.",
           ],
-          ["openclaw memory status --json", "Output machine-readable JSON (good for scripts)."],
-        ])}\n\n${theme.muted("Docs:")} ${formatDocsLink("/cli/memory", "docs.openclaw.ai/cli/memory")}\n`,
+          ["steelengine memory status --json", "Output machine-readable JSON (good for scripts)."],
+        ])}\n\n${theme.muted("Docs:")} ${formatDocsLink("/cli/memory", "docs.steelengine.ai/cli/memory")}\n`,
     );
 
   memory

@@ -11,17 +11,17 @@ Cloud worker provider backed by the Crabbox CLI.
 
 ## Distribution
 
-- Package: `@openclaw/crabbox-provider`
-- Install route: included in OpenClaw
+- Package: `@steelengine/crabbox-provider`
+- Install route: included in SteelEngine
 
 ## Surface
 
 contracts: `workerProviders`
 
-<!-- openclaw-plugin-reference:manual-start -->
+<!-- steelengine-plugin-reference:manual-start -->
 
 ## Configure
 
 See [Cloud worker environments](/gateway/configuration-reference#crabbox-profile) for the profile schema and lifecycle notes.
 
-<!-- openclaw-plugin-reference:manual-end -->
+<!-- steelengine-plugin-reference:manual-end -->

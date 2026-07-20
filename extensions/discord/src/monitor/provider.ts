@@ -1,20 +1,20 @@
-import { loadModelCatalog } from "openclaw/plugin-sdk/agent-runtime";
+import { loadModelCatalog } from "steelengine/plugin-sdk/agent-runtime";
 // Discord provider module implements model/runtime integration.
-import type { ChannelRuntimeSurface } from "openclaw/plugin-sdk/channel-contract";
-import type { OpenClawConfig, ReplyToMode } from "openclaw/plugin-sdk/config-contracts";
-import { createConnectedChannelStatusPatch } from "openclaw/plugin-sdk/gateway-runtime";
-import { resolveTextChunkLimit } from "openclaw/plugin-sdk/reply-chunking";
-import { getRuntimeConfig } from "openclaw/plugin-sdk/runtime-config-snapshot";
-import { logVerbose, warn } from "openclaw/plugin-sdk/runtime-env";
-import { createSubsystemLogger } from "openclaw/plugin-sdk/runtime-env";
-import { createNonExitingRuntime, type RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+import type { ChannelRuntimeSurface } from "steelengine/plugin-sdk/channel-contract";
+import type { SteelEngineConfig, ReplyToMode } from "steelengine/plugin-sdk/config-contracts";
+import { createConnectedChannelStatusPatch } from "steelengine/plugin-sdk/gateway-runtime";
+import { resolveTextChunkLimit } from "steelengine/plugin-sdk/reply-chunking";
+import { getRuntimeConfig } from "steelengine/plugin-sdk/runtime-config-snapshot";
+import { logVerbose, warn } from "steelengine/plugin-sdk/runtime-env";
+import { createSubsystemLogger } from "steelengine/plugin-sdk/runtime-env";
+import { createNonExitingRuntime, type RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
 import {
   GROUP_POLICY_BLOCKED_LABEL,
   resolveOpenProviderRuntimeGroupPolicy,
   resolveDefaultGroupPolicy,
   warnMissingProviderGroupPolicyFallbackOnce,
-} from "openclaw/plugin-sdk/runtime-group-policy";
-import { formatErrorMessage } from "openclaw/plugin-sdk/ssrf-runtime";
+} from "steelengine/plugin-sdk/runtime-group-policy";
+import { formatErrorMessage } from "steelengine/plugin-sdk/ssrf-runtime";
 import { resolveDiscordAccountAllowFrom, resolveDiscordAccountDmPolicy } from "../accounts.js";
 import type { DiscordCommandDeployHashStore } from "../command-deploy-store.js";
 import { GatewayCloseCodes } from "../internal/gateway.js";
@@ -48,7 +48,7 @@ import type { DiscordMonitorStatusSink } from "./status.js";
 export type MonitorDiscordOpts = {
   token?: string;
   accountId?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   runtime?: RuntimeEnv;
   channelRuntime?: ChannelRuntimeSurface;
   abortSignal?: AbortSignal;
@@ -381,7 +381,7 @@ export async function monitorDiscordProvider(opts: MonitorDiscordOpts = {}) {
     const logger = createSubsystemLogger("discord/monitor");
     const guildHistories = new Map<
       string,
-      import("openclaw/plugin-sdk/reply-history").HistoryEntry[]
+      import("steelengine/plugin-sdk/reply-history").HistoryEntry[]
     >();
     const { botUserId, botUserName } = await fetchDiscordBotIdentity({
       client,

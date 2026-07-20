@@ -2,12 +2,12 @@
 import fs from "node:fs";
 import fsPromises from "node:fs/promises";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { upsertAcpSessionMeta } from "../../acp/runtime/session-meta.js";
 import * as jsonFiles from "../../infra/json-files.js";
 import { createSuiteTempRootTracker, withTempDirSync } from "../../test-helpers/temp-dir.js";
-import type { OpenClawConfig } from "../config.js";
+import type { SteelEngineConfig } from "../config.js";
 import type { SessionConfig } from "../types.base.js";
 import { resolveSessionLifecycleTimestamps, resolveSessionWorkStartError } from "./lifecycle.js";
 import {
@@ -69,18 +69,18 @@ describe("session path safety", () => {
   });
 
   it("resolves transcript path inside an explicit sessions dir", () => {
-    const sessionsDir = "/tmp/openclaw/agents/main/sessions";
+    const sessionsDir = "/tmp/steelengine/agents/main/sessions";
     const resolved = resolveSessionTranscriptPathInDir("sess-1", sessionsDir, "topic/a+b");
 
     expect(resolved).toBe(path.resolve(sessionsDir, "sess-1-topic-topic%2Fa%2Bb.jsonl"));
   });
 
   it("falls back to derived path when sessionFile is outside known agent sessions dirs", () => {
-    const sessionsDir = "/tmp/openclaw/agents/main/sessions";
+    const sessionsDir = "/tmp/steelengine/agents/main/sessions";
 
     const resolved = resolveSessionFilePath(
       "sess-1",
-      { sessionFile: "/tmp/openclaw/agents/work/not-sessions/abc-123.jsonl" },
+      { sessionFile: "/tmp/steelengine/agents/work/not-sessions/abc-123.jsonl" },
       { sessionsDir },
     );
     expect(resolved).toBe(path.resolve(sessionsDir, "sess-1.jsonl"));
@@ -97,7 +97,7 @@ describe("session path safety", () => {
     if (process.platform === "win32") {
       return;
     }
-    withTempDirSync({ prefix: "openclaw-symlink-session-" }, (tmpDir) => {
+    withTempDirSync({ prefix: "steelengine-symlink-session-" }, (tmpDir) => {
       const realRoot = path.join(tmpDir, "real-state");
       const aliasRoot = path.join(tmpDir, "alias-state");
       const sessionsDir = path.join(realRoot, "agents", "main", "sessions");
@@ -116,7 +116,7 @@ describe("session path safety", () => {
     if (process.platform === "win32") {
       return;
     }
-    withTempDirSync({ prefix: "openclaw-symlink-escape-" }, (tmpDir) => {
+    withTempDirSync({ prefix: "steelengine-symlink-escape-" }, (tmpDir) => {
       const sessionsDir = path.join(tmpDir, "agents", "main", "sessions");
       const outsideDir = path.join(tmpDir, "outside");
       fs.mkdirSync(sessionsDir, { recursive: true });
@@ -285,7 +285,7 @@ describe("resolveSessionResetPolicy", () => {
 
 describe("session lifecycle timestamps", () => {
   it("falls back to the JSONL session header for legacy session start time", async () => {
-    const dir = await fsPromises.mkdtemp("/tmp/openclaw-lifecycle-test-");
+    const dir = await fsPromises.mkdtemp("/tmp/steelengine-lifecycle-test-");
     try {
       const storePath = path.join(dir, "sessions.json");
       const sessionFile = path.join(dir, "legacy-session.jsonl");
@@ -336,7 +336,7 @@ describe("session lifecycle timestamps", () => {
   });
 
   it("ignores out-of-range lifecycle timestamps before header fallback", async () => {
-    const dir = await fsPromises.mkdtemp("/tmp/openclaw-lifecycle-test-");
+    const dir = await fsPromises.mkdtemp("/tmp/steelengine-lifecycle-test-");
     try {
       const storePath = path.join(dir, "sessions.json");
       const sessionFile = path.join(dir, "legacy-session.jsonl");
@@ -389,7 +389,7 @@ describe("session work admission", () => {
 });
 
 describe("session store writer queue", () => {
-  const writerFixtureRootTracker = createSuiteTempRootTracker({ prefix: "openclaw-writer-test-" });
+  const writerFixtureRootTracker = createSuiteTempRootTracker({ prefix: "steelengine-writer-test-" });
 
   async function makeTmpStore(
     initial: Record<string, unknown> = {},
@@ -878,7 +878,7 @@ describe("session store writer queue", () => {
 
   it("clones session store cache hits from cached serialized JSON", () => {
     const key = "agent:main:serialized-cache";
-    const storePath = "/tmp/openclaw-serialized-cache-test.json";
+    const storePath = "/tmp/steelengine-serialized-cache-test.json";
     const store = {
       [key]: {
         sessionId: "s-serialized-cache",
@@ -915,7 +915,7 @@ describe("session store writer queue", () => {
 
   it("invalidates session store cache when ctime nanoseconds change inside the same millisecond", () => {
     const key = "agent:main:ctime-ns-cache";
-    const storePath = "/tmp/openclaw-ctime-ns-cache-test.json";
+    const storePath = "/tmp/steelengine-ctime-ns-cache-test.json";
     const store = {
       [key]: {
         sessionId: "s-ctime-ns-cache",
@@ -1091,7 +1091,7 @@ describe("session store writer queue", () => {
       {
         sessionId: previousSessionId,
         updatedAt: 100,
-        sessionFile: `/tmp/openclaw/sessions/${previousSessionId}.jsonl`,
+        sessionFile: `/tmp/steelengine/sessions/${previousSessionId}.jsonl`,
       },
       {
         sessionId: nextSessionId,
@@ -1099,13 +1099,13 @@ describe("session store writer queue", () => {
       },
     );
 
-    expect(merged.sessionFile).toBe(`/tmp/openclaw/sessions/${nextSessionId}.jsonl`);
+    expect(merged.sessionFile).toBe(`/tmp/steelengine/sessions/${nextSessionId}.jsonl`);
   });
 
   it("rewrites stale generated sessionFile patches during session rollover", () => {
     const previousSessionId = "11111111-1111-4111-8111-111111111111";
     const nextSessionId = "22222222-2222-4222-8222-222222222222";
-    const previousSessionFile = `/tmp/openclaw/sessions/${previousSessionId}-topic-456.jsonl`;
+    const previousSessionFile = `/tmp/steelengine/sessions/${previousSessionId}-topic-456.jsonl`;
     const merged = mergeSessionEntry(
       {
         sessionId: previousSessionId,
@@ -1119,7 +1119,7 @@ describe("session store writer queue", () => {
       },
     );
 
-    expect(merged.sessionFile).toBe(`/tmp/openclaw/sessions/${nextSessionId}-topic-456.jsonl`);
+    expect(merged.sessionFile).toBe(`/tmp/steelengine/sessions/${nextSessionId}-topic-456.jsonl`);
   });
 
   it("preserves custom sessionFile paths when session id changes", () => {
@@ -1127,7 +1127,7 @@ describe("session store writer queue", () => {
       {
         sessionId: "previous-session",
         updatedAt: 100,
-        sessionFile: "/tmp/openclaw/sessions/custom-transcript.jsonl",
+        sessionFile: "/tmp/steelengine/sessions/custom-transcript.jsonl",
       },
       {
         sessionId: "next-session",
@@ -1135,7 +1135,7 @@ describe("session store writer queue", () => {
       },
     );
 
-    expect(merged.sessionFile).toBe("/tmp/openclaw/sessions/custom-transcript.jsonl");
+    expect(merged.sessionFile).toBe("/tmp/steelengine/sessions/custom-transcript.jsonl");
   });
 
   it("normalizes orphan modelProvider fields at store write boundary", async () => {
@@ -1211,7 +1211,7 @@ describe("session store writer queue", () => {
       session: {
         store: storePath,
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     const result = await upsertAcpSessionMeta({
       cfg,

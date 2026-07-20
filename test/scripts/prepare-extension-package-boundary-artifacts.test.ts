@@ -7,7 +7,7 @@ import os from "node:os";
 import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { pathToFileURL } from "node:url";
-import { MAX_TIMER_TIMEOUT_MS } from "@openclaw/normalization-core/number-coercion";
+import { MAX_TIMER_TIMEOUT_MS } from "@steelengine/normalization-core/number-coercion";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { resolveWindowsTaskkillPath } from "../../scripts/lib/windows-taskkill.mjs";
 import {
@@ -210,7 +210,7 @@ describe("prepare-extension-package-boundary-artifacts", () => {
   it.runIf(process.platform !== "win32")(
     "force-kills aborted sibling step process groups",
     async () => {
-      const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-boundary-abort-group-"));
+      const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-boundary-abort-group-"));
       tempRoots.add(rootDir);
       const descendantPidPath = path.join(rootDir, "descendant.pid");
       let descendantPid = 0;
@@ -268,7 +268,7 @@ describe("prepare-extension-package-boundary-artifacts", () => {
   it.runIf(process.platform !== "win32")(
     "lets aborted sibling descendants drain during kill grace",
     async () => {
-      const rootDir = makeTempDir(tempRoots, "openclaw-boundary-abort-drain-");
+      const rootDir = makeTempDir(tempRoots, "steelengine-boundary-abort-drain-");
       const readyPath = path.join(rootDir, "descendant.ready");
       const drainedPath = path.join(rootDir, "descendant.drained");
       const descendantScript = [
@@ -355,7 +355,7 @@ describe("prepare-extension-package-boundary-artifacts", () => {
   });
 
   it.runIf(process.platform !== "win32")("kills timed-out prep step process groups", async () => {
-    const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-boundary-timeout-group-"));
+    const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-boundary-timeout-group-"));
     tempRoots.add(rootDir);
     const descendantPidPath = path.join(rootDir, "descendant.pid");
     let descendantPid = 0;
@@ -406,7 +406,7 @@ describe("prepare-extension-package-boundary-artifacts", () => {
   it.runIf(process.platform !== "win32")(
     "forwards wrapper termination to detached prep step groups",
     async () => {
-      const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-boundary-signal-group-"));
+      const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-boundary-signal-group-"));
       tempRoots.add(rootDir);
       const descendantPidPath = path.join(rootDir, "descendant.pid");
       let descendantPid = 0;
@@ -454,7 +454,7 @@ describe("prepare-extension-package-boundary-artifacts", () => {
   );
 
   it("runs boundary prep steps serially for local checks", async () => {
-    const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-boundary-serial-"));
+    const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-boundary-serial-"));
     tempRoots.add(rootDir);
     const logPath = path.join(rootDir, "steps.log");
     const appendScript = (label: string) =>
@@ -468,7 +468,7 @@ describe("prepare-extension-package-boundary-artifacts", () => {
         { label: "first", args: ["--eval", appendScript("first")], timeoutMs: 5_000 },
         { label: "second", args: ["--eval", appendScript("second")], timeoutMs: 5_000 },
       ],
-      { OPENCLAW_LOCAL_CHECK: "1" },
+      { STEELENGINE_LOCAL_CHECK: "1" },
     );
 
     expect(fs.readFileSync(logPath, "utf8").trim().split("\n")).toEqual([
@@ -480,18 +480,18 @@ describe("prepare-extension-package-boundary-artifacts", () => {
   });
 
   it("passes step-specific environment overrides to child steps", async () => {
-    const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-boundary-env-"));
+    const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-boundary-env-"));
     tempRoots.add(rootDir);
     const outputPath = path.join(rootDir, "env.txt");
     const writeEnvScript =
       `const fs=require("node:fs");` +
-      `fs.writeFileSync(${JSON.stringify(outputPath)}, process.env.OPENCLAW_TEST_ENV || "", "utf8");`;
+      `fs.writeFileSync(${JSON.stringify(outputPath)}, process.env.STEELENGINE_TEST_ENV || "", "utf8");`;
 
     await runNodeStepsInParallel([
       {
         label: "env-step",
         args: ["--eval", writeEnvScript],
-        env: { OPENCLAW_TEST_ENV: "passed" },
+        env: { STEELENGINE_TEST_ENV: "passed" },
         timeoutMs: 5_000,
       },
     ]);
@@ -500,7 +500,7 @@ describe("prepare-extension-package-boundary-artifacts", () => {
   });
 
   it("treats artifacts as fresh only when outputs are newer than inputs", () => {
-    const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-boundary-prep-"));
+    const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-boundary-prep-"));
     tempRoots.add(rootDir);
     const inputPath = path.join(rootDir, "src", "demo.ts");
     const outputPath = path.join(rootDir, "dist", "demo.tsbuildinfo");
@@ -532,7 +532,7 @@ describe("prepare-extension-package-boundary-artifacts", () => {
   });
 
   it("requires generated entry-shim outputs in addition to the freshness stamp", () => {
-    const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-boundary-entry-shims-"));
+    const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-boundary-entry-shims-"));
     tempRoots.add(rootDir);
     const inputPath = path.join(rootDir, "scripts", "write-plugin-sdk-entry-dts.ts");
     const stampPath = path.join(rootDir, "dist", "plugin-sdk", ".boundary-entry-shims.stamp");
@@ -602,18 +602,18 @@ describe("prepare-extension-package-boundary-artifacts", () => {
     expect(resolveBoundaryRootShimsTimeoutMs({})).toBe(300_000);
     expect(
       resolveBoundaryRootShimsTimeoutMs({
-        OPENCLAW_PLUGIN_SDK_BOUNDARY_ROOT_SHIMS_TIMEOUT_MS: "450000",
+        STEELENGINE_PLUGIN_SDK_BOUNDARY_ROOT_SHIMS_TIMEOUT_MS: "450000",
       }),
     ).toBe(450_000);
     expect(() =>
       resolveBoundaryRootShimsTimeoutMs({
-        OPENCLAW_PLUGIN_SDK_BOUNDARY_ROOT_SHIMS_TIMEOUT_MS: "120s",
+        STEELENGINE_PLUGIN_SDK_BOUNDARY_ROOT_SHIMS_TIMEOUT_MS: "120s",
       }),
-    ).toThrow("OPENCLAW_PLUGIN_SDK_BOUNDARY_ROOT_SHIMS_TIMEOUT_MS must be a positive integer");
+    ).toThrow("STEELENGINE_PLUGIN_SDK_BOUNDARY_ROOT_SHIMS_TIMEOUT_MS must be a positive integer");
     expect(() =>
       resolveBoundaryRootShimsTimeoutMs({
-        OPENCLAW_PLUGIN_SDK_BOUNDARY_ROOT_SHIMS_TIMEOUT_MS: "0",
+        STEELENGINE_PLUGIN_SDK_BOUNDARY_ROOT_SHIMS_TIMEOUT_MS: "0",
       }),
-    ).toThrow("OPENCLAW_PLUGIN_SDK_BOUNDARY_ROOT_SHIMS_TIMEOUT_MS must be a positive integer");
+    ).toThrow("STEELENGINE_PLUGIN_SDK_BOUNDARY_ROOT_SHIMS_TIMEOUT_MS must be a positive integer");
   });
 });

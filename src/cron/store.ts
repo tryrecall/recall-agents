@@ -2,16 +2,16 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import { expandHomePrefix } from "../infra/home-dir.js";
 import { requireNodeSqlite } from "../infra/node-sqlite.js";
 import { replaceFileAtomic } from "../infra/replace-file.js";
 import {
-  openOpenClawStateDatabase,
-  runOpenClawStateWriteTransaction,
-} from "../state/openclaw-state-db.js";
-import { resolveOpenClawStateSqlitePath } from "../state/openclaw-state-db.paths.js";
+  openSteelEngineStateDatabase,
+  runSteelEngineStateWriteTransaction,
+} from "../state/steelengine-state-db.js";
+import { resolveSteelEngineStateSqlitePath } from "../state/steelengine-state-db.paths.js";
 import { resolveConfigDir } from "../utils.js";
 import { parseJsonWithJson5Fallback } from "../utils/parse-json-compat.js";
 import { cronStoreKey } from "./store/key.js";
@@ -66,7 +66,7 @@ export function resolveCronJobsStorePath(storePath?: string, env: NodeJS.Process
 export async function loadCronJobsStoreWithConfigJobs(storePath: string): Promise<LoadedCronStore> {
   const resolvedStorePath = path.resolve(storePath);
   const storeKey = cronStoreKey(resolvedStorePath);
-  const database = openOpenClawStateDatabase().db;
+  const database = openSteelEngineStateDatabase().db;
   const rows = loadCronRows(database, storeKey);
   if (rows.length > 0) {
     return loadedCronStoreFromRows(rows);
@@ -102,7 +102,7 @@ function tableExists(db: DatabaseSync, tableName: string): boolean {
 export async function loadCronJobsStoreWithConfigJobsReadOnly(
   storePath: string,
 ): Promise<LoadedCronStore> {
-  const statePath = resolveOpenClawStateSqlitePath(process.env);
+  const statePath = resolveSteelEngineStateSqlitePath(process.env);
   if (!fs.existsSync(statePath)) {
     return emptyLoadedCronStore();
   }
@@ -133,7 +133,7 @@ export async function loadCronJobsStore(storePath: string): Promise<CronStoreFil
 export function loadCronJobsStoreSync(storePath: string): CronStoreFile {
   const resolvedStorePath = path.resolve(storePath);
   const storeKey = cronStoreKey(resolvedStorePath);
-  const database = openOpenClawStateDatabase().db;
+  const database = openSteelEngineStateDatabase().db;
   const rows = loadCronRows(database, storeKey);
   if (rows.length > 0) {
     return loadedCronStoreFromRows(rows).store;
@@ -151,7 +151,7 @@ async function atomicWrite(filePath: string, content: string, dirMode = 0o700): 
     content,
     dirMode,
     mode: 0o600,
-    tempPrefix: ".openclaw-cron",
+    tempPrefix: ".steelengine-cron",
     renameMaxRetries: 3,
     copyFallbackOnPermissionError: true,
   });
@@ -168,13 +168,13 @@ export async function saveCronJobsStore(
   if (opts?.stateOnly) {
     // Hot-path timer updates only mutate runtime columns; full config JSON stays
     // untouched so user-authored cron definitions do not churn.
-    runOpenClawStateWriteTransaction(({ db }) => {
+    runSteelEngineStateWriteTransaction(({ db }) => {
       updateCronRuntimeRows(db, storeKey, store);
     });
     return;
   }
   assertCronStoreCanPersist(store);
-  runOpenClawStateWriteTransaction(({ db }) => {
+  runSteelEngineStateWriteTransaction(({ db }) => {
     replaceCronRows(db, storeKey, store);
   });
 }
@@ -188,7 +188,7 @@ export async function saveCronJobsStoreWithMetadata(
   const resolvedStorePath = path.resolve(storePath);
   const storeKey = cronStoreKey(resolvedStorePath);
   assertCronStoreCanPersist(store);
-  return runOpenClawStateWriteTransaction(({ db }) => {
+  return runSteelEngineStateWriteTransaction(({ db }) => {
     if (!acquireMetadata(db)) {
       return false;
     }

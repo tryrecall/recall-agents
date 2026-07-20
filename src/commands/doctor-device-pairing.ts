@@ -1,12 +1,12 @@
 /** Doctor diagnostics for pending, paired, and locally cached device auth state. */
 import path from "node:path";
-import { normalizeUniqueSingleOrTrimmedStringList } from "@openclaw/normalization-core/string-normalization";
+import { normalizeUniqueSingleOrTrimmedStringList } from "@steelengine/normalization-core/string-normalization";
 import { note } from "../../packages/terminal-core/src/note.js";
 import { sanitizeTerminalText } from "../../packages/terminal-core/src/safe-text.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { quoteCliArg } from "../cli/quote-cli-arg.js";
 import { resolveStateDir } from "../config/paths.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { HealthFinding } from "../flows/health-checks.js";
 import { callGateway } from "../gateway/call.js";
 import {
@@ -145,7 +145,7 @@ function normalizeLocalPairedDevice(device: PairedDevice): DoctorPairedDevice {
 }
 
 async function loadDoctorPairingSnapshot(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   healthOk: boolean;
 }): Promise<DoctorPairingSnapshot | null> {
   if (params.healthOk) {
@@ -249,8 +249,8 @@ function resolvePendingPairingIssue(
     displayName: pending.displayName,
     clientId: pending.clientId,
   });
-  const approveCommand = formatCliArgs(["openclaw", "devices", "approve", pending.requestId]);
-  const inspectCommand = formatCliArgs(["openclaw", "devices", "list"]);
+  const approveCommand = formatCliArgs(["steelengine", "devices", "approve", pending.requestId]);
+  const inspectCommand = formatCliArgs(["steelengine", "devices", "list"]);
   if (!paired) {
     return {
       kind: "first-time",
@@ -267,7 +267,7 @@ function resolvePendingPairingIssue(
       deviceLabel,
       approveCommand,
       inspectCommand,
-      removeCommand: formatCliArgs(["openclaw", "devices", "remove", pending.deviceId]),
+      removeCommand: formatCliArgs(["steelengine", "devices", "remove", pending.deviceId]),
     };
   }
   const requestedRoles = normalizeUniqueSingleOrTrimmedStringList(
@@ -358,7 +358,7 @@ function collectPairedRecordIssues(snapshot: DoctorPairingSnapshot): PairedRecor
     for (const role of approvedRoles) {
       const token = findTokenSummary(device, role);
       const rotateCommand = formatCliArgs([
-        "openclaw",
+        "steelengine",
         "devices",
         "rotate",
         "--device",
@@ -496,7 +496,7 @@ function collectLocalDeviceAuthIssues(snapshot: DoctorPairingSnapshot): LocalDev
       continue;
     }
     const rotateCommand = formatCliArgs([
-      "openclaw",
+      "steelengine",
       "devices",
       "rotate",
       "--device",
@@ -538,11 +538,11 @@ function formatLocalDeviceAuthIssue(issue: LocalDeviceAuthIssue): string {
 }
 
 function formatLegacyPairingStoreIssue(filePath: string): string {
-  return `- Legacy device pairing store ${filePath} has not been imported into the SQLite state store yet. The gateway imports and archives it at startup, so restart the gateway. If the file persists across restarts it is likely unreadable; OpenClaw refused to treat it as empty to avoid dropping approved pairings, so fix or move it aside, then restart.`;
+  return `- Legacy device pairing store ${filePath} has not been imported into the SQLite state store yet. The gateway imports and archives it at startup, so restart the gateway. If the file persists across restarts it is likely unreadable; SteelEngine refused to treat it as empty to avoid dropping approved pairings, so fix or move it aside, then restart.`;
 }
 
 /** Warn about legacy devices/*.json files the startup SQLite import has not archived. */
-async function collectLegacyPairingStoreIssues(cfg: OpenClawConfig): Promise<string[]> {
+async function collectLegacyPairingStoreIssues(cfg: SteelEngineConfig): Promise<string[]> {
   if (cfg.gateway?.mode === "remote") {
     return [];
   }
@@ -609,7 +609,7 @@ function legacyPairingStoreIssueToHealthFinding(message: string): HealthFinding 
 }
 
 export async function collectDevicePairingHealthFindings(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   healthOk?: boolean;
 }): Promise<HealthFinding[]> {
   const legacyStoreFindings = (await collectLegacyPairingStoreIssues(params.cfg)).map(
@@ -637,7 +637,7 @@ export async function collectDevicePairingHealthFindings(params: {
  * local SQLite pairing state when the gateway is down.
  */
 export async function noteDevicePairingHealth(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   healthOk: boolean;
 }): Promise<void> {
   const legacyStoreLines = await collectLegacyPairingStoreIssues(params.cfg);

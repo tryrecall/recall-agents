@@ -29,9 +29,9 @@ const {
   mockResolveStorePath: vi.fn(() => "/tmp/feishu-session-store.json"),
 }));
 
-vi.mock("openclaw/plugin-sdk/channel-inbound", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/channel-inbound")>(
-    "openclaw/plugin-sdk/channel-inbound",
+vi.mock("steelengine/plugin-sdk/channel-inbound", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/channel-inbound")>(
+    "steelengine/plugin-sdk/channel-inbound",
   );
   return {
     ...actual,
@@ -48,9 +48,9 @@ vi.mock("openclaw/plugin-sdk/channel-inbound", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/session-store-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/session-store-runtime")>(
-    "openclaw/plugin-sdk/session-store-runtime",
+vi.mock("steelengine/plugin-sdk/session-store-runtime", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/session-store-runtime")>(
+    "steelengine/plugin-sdk/session-store-runtime",
   );
   return { ...actual, resolveStorePath: mockResolveStorePath };
 });

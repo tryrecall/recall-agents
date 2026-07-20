@@ -34,10 +34,10 @@ const noneAuth = { mode: "none" as const };
 beforeEach(() => sessionEntries.clear());
 
 describe("resolveGatewayRequestContext", () => {
-  it("uses normalized x-openclaw-message-channel when enabled", () => {
+  it("uses normalized x-steelengine-message-channel when enabled", () => {
     const result = resolveGatewayRequestContext({
-      req: createReq({ "x-openclaw-message-channel": " Custom-Channel " }),
-      model: "openclaw",
+      req: createReq({ "x-steelengine-message-channel": " Custom-Channel " }),
+      model: "steelengine",
       sessionPrefix: "openai",
       defaultMessageChannel: "webchat",
       useMessageChannelHeader: true,
@@ -48,8 +48,8 @@ describe("resolveGatewayRequestContext", () => {
 
   it("uses default messageChannel when header support is disabled", () => {
     const result = resolveGatewayRequestContext({
-      req: createReq({ "x-openclaw-message-channel": "custom-channel" }),
-      model: "openclaw",
+      req: createReq({ "x-steelengine-message-channel": "custom-channel" }),
+      model: "steelengine",
       sessionPrefix: "openresponses",
       defaultMessageChannel: "webchat",
       useMessageChannelHeader: false,
@@ -61,7 +61,7 @@ describe("resolveGatewayRequestContext", () => {
   it("includes session prefix and user in generated session key", () => {
     const result = resolveGatewayRequestContext({
       req: createReq(),
-      model: "openclaw",
+      model: "steelengine",
       user: "alice",
       sessionPrefix: "openresponses",
       defaultMessageChannel: "webchat",
@@ -72,13 +72,24 @@ describe("resolveGatewayRequestContext", () => {
 
   it("preserves normal explicit session-key overrides", () => {
     const result = resolveGatewayRequestContext({
-      req: createReq({ "x-openclaw-session-key": "customer-case-42" }),
-      model: "openclaw",
+      req: createReq({ "x-steelengine-session-key": "customer-case-42" }),
+      model: "steelengine",
       sessionPrefix: "openai",
       defaultMessageChannel: "webchat",
     });
 
     expect(result.sessionKey).toBe("customer-case-42");
+  });
+
+  it("preserves legacy Recall model and session header aliases", () => {
+    const result = resolveGatewayRequestContext({
+      req: createReq({ "x-recall-session-key": "ops-chat:orchestrator:user-42" }),
+      model: "recall",
+      sessionPrefix: "openai",
+      defaultMessageChannel: "webchat",
+    });
+
+    expect(result.sessionKey).toBe("ops-chat:orchestrator:user-42");
   });
 
   it.each([
@@ -93,8 +104,8 @@ describe("resolveGatewayRequestContext", () => {
   ])("rejects reserved internal session-key override %s", (sessionKey) => {
     expect(() =>
       resolveGatewayRequestContext({
-        req: createReq({ "x-openclaw-session-key": sessionKey }),
-        model: "openclaw",
+        req: createReq({ "x-steelengine-session-key": sessionKey }),
+        model: "steelengine",
         sessionPrefix: "openai",
         defaultMessageChannel: "webchat",
       }),
@@ -106,8 +117,8 @@ describe("resolveGatewayRequestContext", () => {
     sessionEntries.set(sessionKey, { sessionId: "legacy-session", modelSelectionLocked: false });
 
     const result = resolveGatewayRequestContext({
-      req: createReq({ "x-openclaw-session-key": sessionKey }),
-      model: "openclaw",
+      req: createReq({ "x-steelengine-session-key": sessionKey }),
+      model: "steelengine",
       sessionPrefix: "openai",
       defaultMessageChannel: "webchat",
     });
@@ -125,8 +136,8 @@ describe("resolveGatewayRequestContext", () => {
 
     expect(() =>
       resolveGatewayRequestContext({
-        req: createReq({ "x-openclaw-session-key": sessionKey }),
-        model: "openclaw",
+        req: createReq({ "x-steelengine-session-key": sessionKey }),
+        model: "steelengine",
         sessionPrefix: "openai",
         defaultMessageChannel: "webchat",
       }),
@@ -136,8 +147,8 @@ describe("resolveGatewayRequestContext", () => {
   it("does not build session state for explicit unknown agent ids", () => {
     expect(() =>
       resolveGatewayRequestContext({
-        req: createReq({ "x-openclaw-agent-id": "missing-agent" }),
-        model: "openclaw",
+        req: createReq({ "x-steelengine-agent-id": "missing-agent" }),
+        model: "steelengine",
         sessionPrefix: "openai",
         defaultMessageChannel: "webchat",
       }),
@@ -146,7 +157,7 @@ describe("resolveGatewayRequestContext", () => {
     expect(() =>
       resolveGatewayRequestContext({
         req: createReq(),
-        model: "openclaw/missing-agent",
+        model: "steelengine/missing-agent",
         sessionPrefix: "openai",
         defaultMessageChannel: "webchat",
       }),
@@ -154,8 +165,8 @@ describe("resolveGatewayRequestContext", () => {
 
     expect(() =>
       resolveGatewayRequestContext({
-        req: createReq({ "x-openclaw-agent-id": "!!!" }),
-        model: "openclaw",
+        req: createReq({ "x-steelengine-agent-id": "!!!" }),
+        model: "steelengine",
         sessionPrefix: "openai",
         defaultMessageChannel: "webchat",
       }),
@@ -168,7 +179,7 @@ describe("resolveTrustedHttpOperatorScopes", () => {
     const scopes = resolveTrustedHttpOperatorScopes(
       createReq({
         authorization: "Bearer secret",
-        "x-openclaw-scopes": "operator.admin, operator.write",
+        "x-steelengine-scopes": "operator.admin, operator.write",
       }),
       tokenAuth,
     );
@@ -179,7 +190,7 @@ describe("resolveTrustedHttpOperatorScopes", () => {
   it("keeps declared scopes for non-bearer HTTP requests", () => {
     const scopes = resolveTrustedHttpOperatorScopes(
       createReq({
-        "x-openclaw-scopes": "operator.admin, operator.write",
+        "x-steelengine-scopes": "operator.admin, operator.write",
       }),
       noneAuth,
     );
@@ -191,7 +202,7 @@ describe("resolveTrustedHttpOperatorScopes", () => {
     const scopes = resolveTrustedHttpOperatorScopes(
       createReq({
         authorization: "Bearer upstream-idp-token",
-        "x-openclaw-scopes": "operator.admin, operator.write",
+        "x-steelengine-scopes": "operator.admin, operator.write",
       }),
       noneAuth,
     );
@@ -203,7 +214,7 @@ describe("resolveTrustedHttpOperatorScopes", () => {
     const scopes = resolveTrustedHttpOperatorScopes(
       createReq({
         authorization: "Bearer upstream-idp-token",
-        "x-openclaw-scopes": "operator.admin, operator.write",
+        "x-steelengine-scopes": "operator.admin, operator.write",
       }),
       { trustDeclaredOperatorScopes: false },
     );
@@ -215,10 +226,10 @@ describe("resolveTrustedHttpOperatorScopes", () => {
 describe("resolveHttpSenderIsOwner", () => {
   it("requires operator.admin on a trusted HTTP scope-bearing request", () => {
     expect(
-      resolveHttpSenderIsOwner(createReq({ "x-openclaw-scopes": "operator.admin" }), noneAuth),
+      resolveHttpSenderIsOwner(createReq({ "x-steelengine-scopes": "operator.admin" }), noneAuth),
     ).toBe(true);
     expect(
-      resolveHttpSenderIsOwner(createReq({ "x-openclaw-scopes": "operator.write" }), noneAuth),
+      resolveHttpSenderIsOwner(createReq({ "x-steelengine-scopes": "operator.write" }), noneAuth),
     ).toBe(false);
   });
 
@@ -227,7 +238,7 @@ describe("resolveHttpSenderIsOwner", () => {
       resolveHttpSenderIsOwner(
         createReq({
           authorization: "Bearer secret",
-          "x-openclaw-scopes": "operator.admin",
+          "x-steelengine-scopes": "operator.admin",
         }),
         tokenAuth,
       ),
@@ -240,7 +251,7 @@ describe("resolveOpenAiCompatibleHttpOperatorScopes", () => {
     const scopes = resolveOpenAiCompatibleHttpOperatorScopes(
       createReq({
         authorization: "Bearer secret",
-        "x-openclaw-scopes": "operator.approvals",
+        "x-steelengine-scopes": "operator.approvals",
       }),
       { authMethod: "token", trustDeclaredOperatorScopes: false },
     );
@@ -259,7 +270,7 @@ describe("resolveOpenAiCompatibleHttpOperatorScopes", () => {
   it("keeps declared scopes for trusted HTTP identity-bearing requests", () => {
     const scopes = resolveOpenAiCompatibleHttpOperatorScopes(
       createReq({
-        "x-openclaw-scopes": "operator.write",
+        "x-steelengine-scopes": "operator.write",
       }),
       { authMethod: "trusted-proxy", trustDeclaredOperatorScopes: true },
     );
@@ -274,7 +285,7 @@ describe("resolveOpenAiCompatibleHttpSenderIsOwner", () => {
       resolveOpenAiCompatibleHttpSenderIsOwner(
         createReq({
           authorization: "Bearer secret",
-          "x-openclaw-scopes": "operator.approvals",
+          "x-steelengine-scopes": "operator.approvals",
         }),
         { authMethod: "token", trustDeclaredOperatorScopes: false },
       ),
@@ -284,13 +295,13 @@ describe("resolveOpenAiCompatibleHttpSenderIsOwner", () => {
   it("still requires operator.admin for trusted scope-bearing requests", () => {
     expect(
       resolveOpenAiCompatibleHttpSenderIsOwner(
-        createReq({ "x-openclaw-scopes": "operator.write" }),
+        createReq({ "x-steelengine-scopes": "operator.write" }),
         { authMethod: "trusted-proxy", trustDeclaredOperatorScopes: true },
       ),
     ).toBe(false);
     expect(
       resolveOpenAiCompatibleHttpSenderIsOwner(
-        createReq({ "x-openclaw-scopes": "operator.admin" }),
+        createReq({ "x-steelengine-scopes": "operator.admin" }),
         { authMethod: "trusted-proxy", trustDeclaredOperatorScopes: true },
       ),
     ).toBe(true);
@@ -298,33 +309,33 @@ describe("resolveOpenAiCompatibleHttpSenderIsOwner", () => {
 });
 
 describe("authorizeOpenAiCompatibleHttpModelOverride", () => {
-  it("allows shared-secret bearer callers to use x-openclaw-model", () => {
+  it("allows shared-secret bearer callers to use x-steelengine-model", () => {
     expect(
       authorizeOpenAiCompatibleHttpModelOverride(
-        createReq({ authorization: "Bearer secret", "x-openclaw-model": "openai/gpt-5.4" }),
+        createReq({ authorization: "Bearer secret", "x-steelengine-model": "openai/gpt-5.4" }),
         { authMethod: "token", trustDeclaredOperatorScopes: false },
       ),
     ).toEqual({ allowed: true });
   });
 
-  it("allows trusted admin callers to use x-openclaw-model", () => {
+  it("allows trusted admin callers to use x-steelengine-model", () => {
     expect(
       authorizeOpenAiCompatibleHttpModelOverride(
         createReq({
-          "x-openclaw-scopes": "operator.admin, operator.write",
-          "x-openclaw-model": "openai/gpt-5.4",
+          "x-steelengine-scopes": "operator.admin, operator.write",
+          "x-steelengine-model": "openai/gpt-5.4",
         }),
         { authMethod: "trusted-proxy", trustDeclaredOperatorScopes: true },
       ),
     ).toEqual({ allowed: true });
   });
 
-  it("rejects trusted write-only callers that try to use x-openclaw-model", () => {
+  it("rejects trusted write-only callers that try to use x-steelengine-model", () => {
     expect(
       authorizeOpenAiCompatibleHttpModelOverride(
         createReq({
-          "x-openclaw-scopes": "operator.write",
-          "x-openclaw-model": "openai/gpt-5.4",
+          "x-steelengine-scopes": "operator.write",
+          "x-steelengine-model": "openai/gpt-5.4",
         }),
         { authMethod: "trusted-proxy", trustDeclaredOperatorScopes: true },
       ),

@@ -1,17 +1,17 @@
 // Memory Core plugin module implements dreaming command behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { resolveMemoryDreamingConfig } from "openclaw/plugin-sdk/memory-core-host-status";
-import type { OpenClawPluginApi, PluginCommandContext } from "openclaw/plugin-sdk/plugin-entry";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { resolveMemoryDreamingConfig } from "steelengine/plugin-sdk/memory-core-host-status";
+import type { SteelEnginePluginApi, PluginCommandContext } from "steelengine/plugin-sdk/plugin-entry";
+import { normalizeLowercaseStringOrEmpty } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { asRecord } from "./dreaming-shared.js";
 import { resolveShortTermPromotionDreamingConfig } from "./dreaming.js";
 
-function resolveDreamingPluginConfig(cfg: OpenClawConfig): Record<string, unknown> {
+function resolveDreamingPluginConfig(cfg: SteelEngineConfig): Record<string, unknown> {
   const entry = asRecord(cfg.plugins?.entries?.["memory-core"]);
   return asRecord(entry?.config) ?? {};
 }
 
-function updateDreamingEnabledInConfig(cfg: OpenClawConfig, enabled: boolean): OpenClawConfig {
+function updateDreamingEnabledInConfig(cfg: SteelEngineConfig, enabled: boolean): SteelEngineConfig {
   const entries = { ...cfg.plugins?.entries };
   const existingEntry = asRecord(entries["memory-core"]) ?? {};
   const existingConfig = asRecord(existingEntry.config) ?? {};
@@ -48,7 +48,7 @@ function formatPhaseGuide(): string {
   ].join("\n");
 }
 
-function formatStatus(cfg: OpenClawConfig): string {
+function formatStatus(cfg: SteelEngineConfig): string {
   const pluginConfig = resolveDreamingPluginConfig(cfg);
   const dreaming = resolveMemoryDreamingConfig({
     pluginConfig,
@@ -87,13 +87,13 @@ function lacksAdminOrOwnerForDreamingMutation(params: {
   return params.senderIsOwner !== true;
 }
 
-export async function handleDreamingCommand(api: OpenClawPluginApi, ctx: PluginCommandContext) {
+export async function handleDreamingCommand(api: SteelEnginePluginApi, ctx: PluginCommandContext) {
   const args = ctx.args?.trim() ?? "";
   const [firstToken = ""] = args
     .split(/\s+/)
     .filter(Boolean)
     .map((token) => normalizeLowercaseStringOrEmpty(token));
-  const currentConfig = api.runtime.config.current() as OpenClawConfig;
+  const currentConfig = api.runtime.config.current() as SteelEngineConfig;
 
   if (!firstToken || firstToken === "help" || firstToken === "options" || firstToken === "phases") {
     return { text: formatUsage(formatStatus(currentConfig)) };

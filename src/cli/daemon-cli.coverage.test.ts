@@ -60,9 +60,9 @@ const buildGatewayInstallPlan = vi.fn(
     programArguments: ["/bin/node", "cli", "gateway", "--port", String(params.port)],
     workingDirectory: process.cwd(),
     environment: {
-      OPENCLAW_GATEWAY_PORT: String(params.port),
-      ...(params.wrapperPath ? { OPENCLAW_WRAPPER: params.wrapperPath } : {}),
-      ...(params.token ? { OPENCLAW_GATEWAY_TOKEN: params.token } : {}),
+      STEELENGINE_GATEWAY_PORT: String(params.port),
+      ...(params.wrapperPath ? { STEELENGINE_WRAPPER: params.wrapperPath } : {}),
+      ...(params.token ? { STEELENGINE_GATEWAY_TOKEN: params.token } : {}),
     },
   }),
 );
@@ -84,9 +84,9 @@ vi.mock("../gateway/probe-auth.js", () => ({
 }));
 
 vi.mock("../daemon/program-args.js", () => ({
-  OPENCLAW_WRAPPER_ENV_KEY: "OPENCLAW_WRAPPER",
+  STEELENGINE_WRAPPER_ENV_KEY: "STEELENGINE_WRAPPER",
   resolveGatewayProgramArguments: (opts: unknown) => resolveGatewayProgramArguments(opts),
-  resolveOpenClawWrapperPath: async (value: string | undefined) => value?.trim() || undefined,
+  resolveSteelEngineWrapperPath: async (value: string | undefined) => value?.trim() || undefined,
 }));
 
 vi.mock("../daemon/service.js", async () => {
@@ -186,17 +186,17 @@ describe("daemon-cli coverage", () => {
 
   beforeEach(() => {
     daemonProgram = createDaemonProgram();
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-daemon-cli-"));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-daemon-cli-"));
     envSnapshot = captureEnv([
-      "OPENCLAW_STATE_DIR",
-      "OPENCLAW_CONFIG_PATH",
-      "OPENCLAW_GATEWAY_PORT",
-      "OPENCLAW_PROFILE",
+      "STEELENGINE_STATE_DIR",
+      "STEELENGINE_CONFIG_PATH",
+      "STEELENGINE_GATEWAY_PORT",
+      "STEELENGINE_PROFILE",
     ]);
-    setTestEnvValue("OPENCLAW_STATE_DIR", tmpDir);
-    setTestEnvValue("OPENCLAW_CONFIG_PATH", path.join(tmpDir, "openclaw.json"));
-    deleteTestEnvValue("OPENCLAW_GATEWAY_PORT");
-    deleteTestEnvValue("OPENCLAW_PROFILE");
+    setTestEnvValue("STEELENGINE_STATE_DIR", tmpDir);
+    setTestEnvValue("STEELENGINE_CONFIG_PATH", path.join(tmpDir, "steelengine.json"));
+    deleteTestEnvValue("STEELENGINE_GATEWAY_PORT");
+    deleteTestEnvValue("STEELENGINE_PROFILE");
     serviceReadCommand.mockResolvedValue(null);
     resolveGatewayProbeAuthSafeWithSecretInputs.mockClear();
     findExtraGatewayServices.mockClear();
@@ -231,12 +231,12 @@ describe("daemon-cli coverage", () => {
     serviceReadCommand.mockResolvedValueOnce({
       programArguments: ["/bin/node", "cli", "gateway", "--port", "19001"],
       environment: {
-        OPENCLAW_PROFILE: "dev",
-        OPENCLAW_STATE_DIR: "/tmp/openclaw-daemon-state",
-        OPENCLAW_CONFIG_PATH: "/tmp/openclaw-daemon-state/openclaw.json",
-        OPENCLAW_GATEWAY_PORT: "19001",
+        STEELENGINE_PROFILE: "dev",
+        STEELENGINE_STATE_DIR: "/tmp/steelengine-daemon-state",
+        STEELENGINE_CONFIG_PATH: "/tmp/steelengine-daemon-state/steelengine.json",
+        STEELENGINE_GATEWAY_PORT: "19001",
       },
-      sourcePath: "/tmp/ai.openclaw.gateway.plist",
+      sourcePath: "/tmp/ai.steelengine.gateway.plist",
     });
 
     await runDaemonCommand(["daemon", "status", "--json"]);
@@ -305,12 +305,12 @@ describe("daemon-cli coverage", () => {
     serviceReadCommand.mockResolvedValueOnce({
       programArguments: ["/bin/node", "cli", "gateway", "--port", "18789"],
       environment: {
-        OPENCLAW_WRAPPER: "/usr/local/bin/openclaw-doppler",
+        STEELENGINE_WRAPPER: "/usr/local/bin/steelengine-doppler",
         PATH: "/custom/go/bin:/usr/bin",
         GOPATH: "/Users/test/.local/gopath",
         GOBIN: "/Users/test/.local/gopath/bin",
       },
-      sourcePath: "/tmp/ai.openclaw.gateway.plist",
+      sourcePath: "/tmp/ai.steelengine.gateway.plist",
     });
 
     await runDaemonCommand(["daemon", "install", "--force", "--json"]);
@@ -321,12 +321,12 @@ describe("daemon-cli coverage", () => {
     );
     expect(installPlanParams.existingEnvironment).toEqual({
       PATH: "/custom/go/bin:/usr/bin",
-      OPENCLAW_WRAPPER: "/usr/local/bin/openclaw-doppler",
+      STEELENGINE_WRAPPER: "/usr/local/bin/steelengine-doppler",
       GOPATH: "/Users/test/.local/gopath",
       GOBIN: "/Users/test/.local/gopath/bin",
     });
-    expect((installPlanParams.env as NodeJS.ProcessEnv).OPENCLAW_WRAPPER).toBe(
-      "/usr/local/bin/openclaw-doppler",
+    expect((installPlanParams.env as NodeJS.ProcessEnv).STEELENGINE_WRAPPER).toBe(
+      "/usr/local/bin/steelengine-doppler",
     );
   });
 
@@ -338,12 +338,12 @@ describe("daemon-cli coverage", () => {
       "daemon",
       "install",
       "--wrapper",
-      "/usr/local/bin/openclaw-doppler",
+      "/usr/local/bin/steelengine-doppler",
       "--json",
     ]);
 
     expect(requireMockCallArg(buildGatewayInstallPlan, "buildGatewayInstallPlan").wrapperPath).toBe(
-      "/usr/local/bin/openclaw-doppler",
+      "/usr/local/bin/steelengine-doppler",
     );
   });
 

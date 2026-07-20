@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { logError } from "openclaw/plugin-sdk/logging-core";
-import { resolveRequestClientIp } from "openclaw/plugin-sdk/webhook-ingress";
+import { logError } from "steelengine/plugin-sdk/logging-core";
+import { resolveRequestClientIp } from "steelengine/plugin-sdk/webhook-ingress";
 import { parseDiscordActivityCustomId } from "../component-custom-id.js";
 import {
   DISCORD_TOKEN_URL,

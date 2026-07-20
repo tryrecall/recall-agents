@@ -15,10 +15,10 @@ import {
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
-const collapsedSessionSectionsStorageKey = "openclaw:sidebar:sessions:collapsed-sections";
-const captureUiProofEnabled = process.env.OPENCLAW_CAPTURE_UI_PROOF === "1";
+const collapsedSessionSectionsStorageKey = "steelengine:sidebar:sessions:collapsed-sections";
+const captureUiProofEnabled = process.env.STEELENGINE_CAPTURE_UI_PROOF === "1";
 const uiProofArtifactDir = path.join(
   process.cwd(),
   ".artifacts",
@@ -147,7 +147,7 @@ describeControlUiE2e("Control UI session management mocked Gateway E2E", () => {
   beforeAll(async () => {
     if (!chromiumAvailable) {
       throw new Error(
-        `Playwright Chromium is not installed or cannot start at ${chromiumExecutablePath}. Run \`pnpm --dir ui exec playwright install --with-deps chromium\`, or set OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM=1 only when intentionally skipping this lane.`,
+        `Playwright Chromium is not installed or cannot start at ${chromiumExecutablePath}. Run \`pnpm --dir ui exec playwright install --with-deps chromium\`, or set STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM=1 only when intentionally skipping this lane.`,
       );
     }
     server = await startControlUiE2eServer();
@@ -577,7 +577,7 @@ describeControlUiE2e("Control UI session management mocked Gateway E2E", () => {
 
     try {
       await page.goto(`${server.baseUrl}chat`);
-      const sidebar = page.locator("openclaw-app-sidebar");
+      const sidebar = page.locator("steelengine-app-sidebar");
       const row = sidebar.locator(
         '.sidebar-recent-session[data-session-key="agent:main:research"]',
       );
@@ -711,7 +711,7 @@ describeControlUiE2e("Control UI session management mocked Gateway E2E", () => {
       await row.waitFor({ state: "visible", timeout: 10_000 });
 
       await row.click({ button: "right" });
-      const menuHost = page.locator("openclaw-session-menu");
+      const menuHost = page.locator("steelengine-session-menu");
       await menuHost
         .getByRole("menuitem", { name: "Archive session" })
         .waitFor({ state: "visible" });
@@ -759,7 +759,7 @@ describeControlUiE2e("Control UI session management mocked Gateway E2E", () => {
 
       await row.getByRole("button", { name: "Open session menu" }).click();
       await activateMenuItem(
-        page.locator("openclaw-session-menu").getByRole("menuitem", { name: "Delete…" }),
+        page.locator("steelengine-session-menu").getByRole("menuitem", { name: "Delete…" }),
       );
 
       const request = await gateway.waitForRequest("sessions.delete");
@@ -1422,7 +1422,7 @@ describeControlUiE2e("Control UI session management mocked Gateway E2E", () => {
           withWork
             ? {
                 execNode: nodeHash,
-                worktree: { branch: "openclaw/wt-1", repoRoot: "/Users/dev/Projects/clawdbot" },
+                worktree: { branch: "steelengine/wt-1", repoRoot: "/Users/dev/Projects/clawdbot" },
               }
             : {},
         ),
@@ -1522,7 +1522,7 @@ describeControlUiE2e("Control UI session management mocked Gateway E2E", () => {
     const rows = [
       ...Array.from({ length: 8 }, (_, index) =>
         sessionRow(`agent:main:work-${index}`, `Work session ${index}`, baseTime - index * 60_000, {
-          worktree: { branch: `openclaw/wt-${index}`, repoRoot: "/Users/dev/Projects/clawdbot" },
+          worktree: { branch: `steelengine/wt-${index}`, repoRoot: "/Users/dev/Projects/clawdbot" },
         }),
       ),
       ...Array.from({ length: 30 }, (_, index) =>

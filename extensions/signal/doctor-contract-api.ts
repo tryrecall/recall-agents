@@ -2,9 +2,9 @@
 import type {
   ChannelDoctorConfigMutation,
   ChannelDoctorLegacyConfigRule,
-} from "openclaw/plugin-sdk/channel-contract";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { defineChannelAliasMigration } from "openclaw/plugin-sdk/runtime-doctor";
+} from "steelengine/plugin-sdk/channel-contract";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { defineChannelAliasMigration } from "steelengine/plugin-sdk/runtime-doctor";
 
 // Signal's nested streaming schema is delivery-only ({chunkMode, block}); it
 // has no preview mode, so only the delivery flat aliases are legal legacy
@@ -23,7 +23,7 @@ export const legacyConfigRules: ChannelDoctorLegacyConfigRule[] =
 export function normalizeCompatibilityConfig({
   cfg,
 }: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
 }): ChannelDoctorConfigMutation {
   return streamingAliasMigration.normalizeChannelConfig({ cfg });
 }

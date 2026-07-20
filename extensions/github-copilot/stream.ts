@@ -1,12 +1,12 @@
 // Github Copilot plugin module implements stream behavior.
-import type { StreamFn } from "openclaw/plugin-sdk/agent-core";
-import type { Context } from "openclaw/plugin-sdk/llm";
-import type { ProviderWrapStreamFnContext } from "openclaw/plugin-sdk/plugin-entry";
-import { buildCopilotIdeHeaders, COPILOT_INTEGRATION_ID } from "openclaw/plugin-sdk/provider-auth";
+import type { StreamFn } from "steelengine/plugin-sdk/agent-core";
+import type { Context } from "steelengine/plugin-sdk/llm";
+import type { ProviderWrapStreamFnContext } from "steelengine/plugin-sdk/plugin-entry";
+import { buildCopilotIdeHeaders, COPILOT_INTEGRATION_ID } from "steelengine/plugin-sdk/provider-auth";
 import {
   applyAnthropicEphemeralCacheControlMarkers,
   streamWithPayloadPatch,
-} from "openclaw/plugin-sdk/provider-stream-shared";
+} from "steelengine/plugin-sdk/provider-stream-shared";
 import { rewriteCopilotResponsePayloadConnectionBoundIds } from "./connection-bound-ids.js";
 import { stripCopilotAssistantThinkingMessages } from "./replay-policy.js";
 

@@ -26,12 +26,12 @@ export function makeEnv(): {
   env: {
     HOME: string;
     USERPROFILE: string;
-    OPENCLAW_HOME: string;
-    OPENCLAW_STATE_DIR: string;
-    OPENCLAW_CONFIG_PATH: string;
-    OPENCLAW_NO_ONBOARD: string;
-    OPENCLAW_SKIP_PROVIDERS: string;
-    OPENCLAW_KITCHEN_SINK_PERSONALITY: string;
+    STEELENGINE_HOME: string;
+    STEELENGINE_STATE_DIR: string;
+    STEELENGINE_CONFIG_PATH: string;
+    STEELENGINE_NO_ONBOARD: string;
+    STEELENGINE_SKIP_PROVIDERS: string;
+    STEELENGINE_KITCHEN_SINK_PERSONALITY: string;
   };
 };
 export function cleanupKitchenSinkEnv(
@@ -96,7 +96,7 @@ export function createRpcCliRunOptions(
   options?: { env?: NodeJS.ProcessEnv; commandResourceOptions?: Record<string, unknown> },
 ): Record<string, unknown> & { resourceLabel: string; timeoutMs: number };
 export function findDistCallGatewayModuleFiles(cwd?: string): string[];
-export function usesBuiltOpenClawEntry(
+export function usesBuiltSteelEngineEntry(
   runner: unknown,
   cwd?: string,
   env?: NodeJS.ProcessEnv,

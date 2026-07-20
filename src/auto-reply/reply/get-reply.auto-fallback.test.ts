@@ -2,7 +2,7 @@
 import path from "node:path";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAutoCleanupTempDirTracker } from "../../../test/helpers/temp-dir.js";
-import type { ModelDefinitionConfig, OpenClawConfig } from "../../config/config.js";
+import type { ModelDefinitionConfig, SteelEngineConfig } from "../../config/config.js";
 import type { SessionEntry } from "../../config/sessions.js";
 import { replaceSessionEntrySync } from "../../config/sessions/session-accessor.js";
 import type { ThinkLevel } from "../thinking.js";
@@ -51,7 +51,7 @@ function makeTestModel(id: string, name: string, reasoning: boolean): ModelDefin
   };
 }
 
-function makeReasoningModelConfig(): OpenClawConfig {
+function makeReasoningModelConfig(): SteelEngineConfig {
   return withFastReplyConfig({
     agents: {
       defaults: {
@@ -71,10 +71,10 @@ function makeReasoningModelConfig(): OpenClawConfig {
         },
       },
     },
-  } satisfies OpenClawConfig);
+  } satisfies SteelEngineConfig);
 }
 
-function makePerAgentThinkingOffConfig(): OpenClawConfig {
+function makePerAgentThinkingOffConfig(): SteelEngineConfig {
   return withFastReplyConfig({
     agents: {
       defaults: {
@@ -100,12 +100,12 @@ function makePerAgentThinkingOffConfig(): OpenClawConfig {
         },
       },
     },
-  } satisfies OpenClawConfig);
+  } satisfies SteelEngineConfig);
 }
 
 function makePerModelThinkingConfig(
   thinking: false | "disabled" | "none" | "high",
-): OpenClawConfig {
+): SteelEngineConfig {
   return withFastReplyConfig({
     agents: {
       defaults: {
@@ -130,7 +130,7 @@ function makePerModelThinkingConfig(
         },
       },
     },
-  } satisfies OpenClawConfig);
+  } satisfies SteelEngineConfig);
 }
 
 const tempDirs = useAutoCleanupTempDirTracker(afterEach);
@@ -195,7 +195,7 @@ describe("getReplyFromConfig auto-fallback primary probes", () => {
 
   beforeEach(() => {
     vi.unstubAllEnvs();
-    delete process.env.OPENCLAW_TEST_FAST;
+    delete process.env.STEELENGINE_TEST_FAST;
     mocks.resolveReplyDirectives.mockReset();
     mocks.handleInlineActions.mockReset();
     mocks.initSessionState.mockReset();

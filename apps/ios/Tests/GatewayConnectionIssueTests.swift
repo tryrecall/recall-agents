@@ -1,6 +1,6 @@
-import OpenClawKit
+import SteelEngineKit
 import Testing
-@testable import OpenClaw
+@testable import SteelEngine
 
 @Suite(.serialized) struct GatewayConnectionIssueTests {
     @Test func `detects token missing`() {

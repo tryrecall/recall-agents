@@ -1,4 +1,4 @@
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 // Normalizes MCP server config for runtime launch and validation.
 import { isRecord } from "../utils.js";
 import { readSourceConfigSnapshot } from "./io.js";
@@ -10,7 +10,7 @@ import { replaceConfigFile } from "./mutate.js";
 import { redactSensitiveArgv } from "./redact-argv.js";
 import { REDACTED_SENTINEL, restoreRedactedValues } from "./redact-snapshot.js";
 import { buildConfigSchema } from "./schema.js";
-import type { OpenClawConfig } from "./types.openclaw.js";
+import type { SteelEngineConfig } from "./types.steelengine.js";
 import { validateConfigObjectWithPlugins } from "./validation.js";
 
 type ConfigMcpServers = ReturnType<typeof normalizeConfiguredMcpServers>;
@@ -23,7 +23,7 @@ type ConfigMcpReadResult =
   | {
       ok: true;
       path: string;
-      config: OpenClawConfig;
+      config: SteelEngineConfig;
       mcpServers: ConfigMcpServers;
       baseHash?: string;
     }
@@ -33,7 +33,7 @@ type ConfigMcpWriteResult =
   | {
       ok: true;
       path: string;
-      config: OpenClawConfig;
+      config: SteelEngineConfig;
       mcpServers: ConfigMcpServers;
       removed?: boolean;
       updated?: boolean;

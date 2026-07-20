@@ -26,7 +26,7 @@ const invocationCwd = process.cwd();
 // delete; only the child keeps the caller's original cwd.
 process.chdir(repoRoot);
 const lockScript = fileURLToPath(new URL("./operation-lock.sh", import.meta.url));
-const lockSnapshotDir = mkdtempSync(join(tmpdir(), "openclaw-pr-lock-release-"));
+const lockSnapshotDir = mkdtempSync(join(tmpdir(), "steelengine-pr-lock-release-"));
 const lockScriptSnapshot = join(lockSnapshotDir, "operation-lock.sh");
 // merge-run can delete this revision's script directory before lock release.
 writeFileSync(lockScriptSnapshot, readFileSync(lockScript));
@@ -158,9 +158,9 @@ const child = spawn(script, args, {
   detached: true,
   env: {
     ...process.env,
-    OPENCLAW_PR_DEDICATED_PROCESS_GROUP: "1",
-    OPENCLAW_PR_LOCK_NOTIFY_FD: "3",
-    OPENCLAW_PR_LOCK_SUPERVISOR_PID: String(process.pid),
+    STEELENGINE_PR_DEDICATED_PROCESS_GROUP: "1",
+    STEELENGINE_PR_LOCK_NOTIFY_FD: "3",
+    STEELENGINE_PR_LOCK_SUPERVISOR_PID: String(process.pid),
   },
   stdio: ["inherit", "inherit", "inherit", "pipe"],
 });
@@ -175,7 +175,7 @@ function consumeNotificationLine(line) {
   const [lockRef, ownerOid, extra] = line.split("\t");
   if (
     extra !== undefined ||
-    !/^refs\/openclaw\/pr-operation-locks\/[1-9][0-9]*$/u.test(lockRef ?? "") ||
+    !/^refs\/steelengine\/pr-operation-locks\/[1-9][0-9]*$/u.test(lockRef ?? "") ||
     !/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/u.test(ownerOid ?? "")
   ) {
     notificationFailure ??= new Error("scripts/pr emitted malformed operation-lock metadata");
@@ -321,7 +321,7 @@ async function waitForOperationDrain() {
 
 function releaseLock({ lockRef, ownerOid }) {
   const env = { ...process.env };
-  delete env.OPENCLAW_PR_LOCK_NOTIFY_FD;
+  delete env.STEELENGINE_PR_LOCK_NOTIFY_FD;
   const result = spawnSync(
     "bash",
     [

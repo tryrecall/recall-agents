@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { describe, expect, it } from "vitest";
 import {
   artifactDownloadArgs,
@@ -268,10 +268,10 @@ function trustedMainPackageFixture({
     event: "workflow_dispatch",
     head_branch: workflowRef,
     head_sha: workflowSha,
-    html_url: `https://github.com/openclaw/openclaw/actions/runs/${runId}`,
+    html_url: `https://github.com/steelengineai/recall-agents/actions/runs/${runId}`,
     id: Number(runId),
     path: parentPath,
-    repository: { full_name: "openclaw/openclaw" },
+    repository: { full_name: "steelengine/steelengine" },
     run_attempt: 1,
     status: "completed",
   };
@@ -307,10 +307,10 @@ function trustedMainPackageFixture({
     event: "workflow_dispatch",
     head_branch: workflowRef,
     head_sha: workflowSha,
-    html_url: `https://github.com/openclaw/openclaw/actions/runs/${childRunId}`,
+    html_url: `https://github.com/steelengineai/recall-agents/actions/runs/${childRunId}`,
     id: Number(childRunId),
-    path: ".github/workflows/openclaw-release-checks.yml",
-    repository: { full_name: "openclaw/openclaw" },
+    path: ".github/workflows/steelengine-release-checks.yml",
+    repository: { full_name: "steelengine/steelengine" },
     run_attempt: 1,
     status: "completed",
     triggering_actor: { login: "github-actions[bot]" },
@@ -339,7 +339,7 @@ function trustedMainPackageFixture({
       expect(jobId).toBe(parentJob.id);
       return [
         `TARGET_SHA: ${targetSha}`,
-        `Dispatched openclaw-release-checks.yml: ${childRun.html_url}`,
+        `Dispatched steelengine-release-checks.yml: ${childRun.html_url}`,
       ].join("\n");
     },
     getParentJobs(requestedRunId: string) {
@@ -376,7 +376,7 @@ describe("release CI summary child correlation", () => {
         "--validate-run",
         "29071366025",
         "--repo",
-        "openclaw/openclaw",
+        "steelengine/steelengine",
         "--manifest",
         "/tmp/manifest.json",
         "--json",
@@ -385,7 +385,7 @@ describe("release CI summary child correlation", () => {
       json: true,
       intervalMs: 30_000,
       manifestPath: "/tmp/manifest.json",
-      repository: "openclaw/openclaw",
+      repository: "steelengine/steelengine",
       runId: "29071366025",
       trustedWorkflowRef: "main",
       validate: true,
@@ -394,7 +394,7 @@ describe("release CI summary child correlation", () => {
       watch: false,
     });
     expect(parseReleaseCiSummaryArgs(["29071366025"])).toMatchObject({
-      repository: "openclaw/openclaw",
+      repository: "steelengine/steelengine",
       runId: "29071366025",
       trustedWorkflowRef: "main",
       validate: false,
@@ -614,7 +614,7 @@ describe("release CI summary child correlation", () => {
     expect(
       validateReleaseRunEvidence(
         {
-          repository: "openclaw/openclaw",
+          repository: "steelengine/steelengine",
           runId: legacyV2.runId,
           verifierSourceContent: readFileSync(SCRIPT),
           verifierSourceSha: "c".repeat(40),
@@ -631,7 +631,7 @@ describe("release CI summary child correlation", () => {
     expect(() =>
       validateReleaseRunEvidence(
         {
-          repository: "openclaw/openclaw",
+          repository: "steelengine/steelengine",
           runId: legacyV3.runId,
           verifierSourceContent: readFileSync(SCRIPT),
           verifierSourceSha: "c".repeat(40),
@@ -649,7 +649,7 @@ describe("release CI summary child correlation", () => {
     const verifierSourceSha = "c".repeat(40);
     const evidence = validateReleaseRunEvidence(
       {
-        repository: "openclaw/openclaw",
+        repository: "steelengine/steelengine",
         runId: fixture.runId,
         verifierSourceContent: readFileSync(SCRIPT),
         verifierSourceSha,
@@ -661,10 +661,10 @@ describe("release CI summary child correlation", () => {
       directRoot: true,
       evidenceReuse: null,
       releaseProfile: "full",
-      repository: "openclaw/openclaw",
+      repository: "steelengine/steelengine",
       rerunGroup: "package",
       runReleaseSoak: true,
-      schema: "openclaw.release-validation-evidence/v3",
+      schema: "steelengine.release-validation-evidence/v3",
       producerOnTrustedMainLineage: true,
       trustedWorkflowFullRef: "refs/heads/main",
       trustedWorkflowRef: "main",
@@ -720,7 +720,7 @@ describe("release CI summary child correlation", () => {
     expect(
       validateReleaseRunEvidence(
         {
-          repository: "openclaw/openclaw",
+          repository: "steelengine/steelengine",
           runId: fixture.runId,
           verifierSourceContent: readFileSync(SCRIPT),
           verifierSourceSha: "c".repeat(40),
@@ -741,7 +741,7 @@ describe("release CI summary child correlation", () => {
     });
     const evidence = validateReleaseRunEvidence(
       {
-        repository: "openclaw/openclaw",
+        repository: "steelengine/steelengine",
         runId: fixture.runId,
         verifierSourceContent: readFileSync(SCRIPT),
         verifierSourceSha: "c".repeat(40),
@@ -767,7 +767,7 @@ describe("release CI summary child correlation", () => {
     });
     const evidence = validateReleaseRunEvidence(
       {
-        repository: "openclaw/openclaw",
+        repository: "steelengine/steelengine",
         runId: fixture.runId,
         trustedWorkflowRef: workflowRef,
         verifierSourceContent: readFileSync(SCRIPT),
@@ -792,7 +792,7 @@ describe("release CI summary child correlation", () => {
     expect(() =>
       validateReleaseRunEvidence(
         {
-          repository: "openclaw/openclaw",
+          repository: "steelengine/steelengine",
           runId: fixture.runId,
           verifierSourceContent: readFileSync(SCRIPT),
           verifierSourceSha: "c".repeat(40),
@@ -811,7 +811,7 @@ describe("release CI summary child correlation", () => {
     expect(() =>
       validateReleaseRunEvidence(
         {
-          repository: "openclaw/openclaw",
+          repository: "steelengine/steelengine",
           runId: fixture.runId,
           verifierSourceContent: readFileSync(SCRIPT),
           verifierSourceSha: "c".repeat(40),
@@ -830,7 +830,7 @@ describe("release CI summary child correlation", () => {
     expect(() =>
       validateReleaseRunEvidence(
         {
-          repository: "openclaw/openclaw",
+          repository: "steelengine/steelengine",
           runId: fixture.runId,
           trustedWorkflowRef: "main",
           verifierSourceContent: readFileSync(SCRIPT),
@@ -856,7 +856,7 @@ describe("release CI summary child correlation", () => {
     expect(
       validateReleaseRunEvidence(
         {
-          repository: "openclaw/openclaw",
+          repository: "steelengine/steelengine",
           runId: fixture.runId,
           verifierSourceContent: readFileSync(SCRIPT),
           verifierSourceSha: "c".repeat(40),
@@ -883,7 +883,7 @@ describe("release CI summary child correlation", () => {
       expect(
         validateReleaseRunEvidence(
           {
-            repository: "openclaw/openclaw",
+            repository: "steelengine/steelengine",
             runId: fixture.runId,
             verifierSourceContent: readFileSync(SCRIPT),
             verifierSourceSha: "c".repeat(40),
@@ -943,7 +943,7 @@ describe("release CI summary child correlation", () => {
     expect(() =>
       validateReleaseRunEvidence(
         {
-          repository: "openclaw/openclaw",
+          repository: "steelengine/steelengine",
           runId: fixture.runId,
           verifierSourceContent: readFileSync(SCRIPT),
           verifierSourceSha: "c".repeat(40),
@@ -958,7 +958,7 @@ describe("release CI summary child correlation", () => {
     expect(() =>
       validateReleaseRunEvidence(
         {
-          repository: "openclaw/openclaw",
+          repository: "steelengine/steelengine",
           runId: fixture.runId,
           verifierSourceContent: "different verifier bytes",
           verifierSourceSha: "c".repeat(40),
@@ -969,7 +969,7 @@ describe("release CI summary child correlation", () => {
     expect(() =>
       validateReleaseRunEvidence(
         {
-          repository: "openclaw/openclaw",
+          repository: "steelengine/steelengine",
           runId: fixture.runId,
           verifierSourceSha: "f".repeat(40),
         },
@@ -1059,7 +1059,7 @@ describe("release CI summary child correlation", () => {
     expect(() =>
       validateParentRunBinding(
         parentView,
-        { ...parentRest, path: ".github/workflows/openclaw-release-checks.yml" },
+        { ...parentRest, path: ".github/workflows/steelengine-release-checks.yml" },
         "29090000000",
       ),
     ).toThrow("full release parent run binding mismatch");
@@ -1079,14 +1079,14 @@ describe("release CI summary child correlation", () => {
       },
       {
         displayTitle:
-          "OpenClaw Release Checks full-release-validation-29090000000-3-release-checks",
+          "SteelEngine Release Checks full-release-validation-29090000000-3-release-checks",
         headBranch: "release/2026.7.1",
         manifestKey: "releaseChecks",
-        name: "OpenClaw Release Checks",
+        name: "SteelEngine Release Checks",
         parentJobName: "Run release/live/Docker/QA validation",
         suffix: "-release-checks",
         trustedRef: "parent",
-        workflow: "openclaw-release-checks.yml",
+        workflow: "steelengine-release-checks.yml",
       },
       {
         displayTitle: "Plugin Prerelease full-release-validation-29090000000-3-plugin-prerelease",
@@ -1109,20 +1109,20 @@ describe("release CI summary child correlation", () => {
         workflow: "npm-telegram-beta-e2e.yml",
       },
       {
-        displayTitle: "OpenClaw Performance full-release-validation-29090000000-3",
+        displayTitle: "SteelEngine Performance full-release-validation-29090000000-3",
         headBranch: "release/2026.7.1",
         manifestKey: "productPerformance",
-        name: "OpenClaw Performance",
+        name: "SteelEngine Performance",
         parentJobName: "Run product performance evidence",
         suffix: "",
         trustedRef: "parent",
-        workflow: "openclaw-performance.yml",
+        workflow: "steelengine-performance.yml",
       },
     ]);
   });
 
   it("ignores same-SHA and nearby-name runs without the exact parent dispatch binding", () => {
-    const expected = "OpenClaw Performance full-release-validation-29090000000-3";
+    const expected = "SteelEngine Performance full-release-validation-29090000000-3";
     const exact = {
       display_title: expected,
       event: "workflow_dispatch",
@@ -1134,7 +1134,7 @@ describe("release CI summary child correlation", () => {
       selectExactChildRun(
         [
           {
-            display_title: "OpenClaw Performance",
+            display_title: "SteelEngine Performance",
             event: "workflow_dispatch",
             head_branch: "main",
             head_sha: exact.head_sha,
@@ -1179,7 +1179,7 @@ describe("release CI summary child correlation", () => {
   });
 
   it("returns one exact child after a full bounded pagination scan", () => {
-    const expected = "OpenClaw Performance full-release-validation-29090000000-3";
+    const expected = "SteelEngine Performance full-release-validation-29090000000-3";
     const exact = {
       display_title: expected,
       event: "workflow_dispatch",
@@ -1578,7 +1578,7 @@ describe("release CI summary child correlation", () => {
     ];
     const parentLog = [
       `TARGET_SHA: ${parentManifest.targetSha}`,
-      "Dispatched ci.yml: https://github.com/openclaw/openclaw/actions/runs/101",
+      "Dispatched ci.yml: https://github.com/steelengineai/recall-agents/actions/runs/101",
     ].join("\n");
     const run = {
       actor: { login: "github-actions[bot]" },
@@ -1629,10 +1629,10 @@ describe("release CI summary child correlation", () => {
         {
           originAttempt: 1,
           runId: 28717802171,
-          title: "OpenClaw Performance full-release-validation-28717729503-1",
+          title: "SteelEngine Performance full-release-validation-28717729503-1",
         },
       ],
-      ["releaseChecks", { originAttempt: 1, runId: 28717802397, title: "OpenClaw Release Checks" }],
+      ["releaseChecks", { originAttempt: 1, runId: 28717802397, title: "SteelEngine Release Checks" }],
     ]);
     const fingerprint = {
       completed_at: "2026-07-04T20:29:21Z",
@@ -1689,7 +1689,7 @@ describe("release CI summary child correlation", () => {
       const parentLog = [
         `TARGET_SHA: ${parentManifest.targetSha}`,
         ...(child.manifestKey === "productPerformance" ? ["-f publish_reports=false"] : []),
-        `Dispatched ${child.workflow}: https://github.com/openclaw/openclaw/actions/runs/${runId}`,
+        `Dispatched ${child.workflow}: https://github.com/steelengineai/recall-agents/actions/runs/${runId}`,
       ].join("\n");
       expect(resolveManifestChildOriginAttempt(run, child, parentManifest, parentJobs)).toBe(
         originAttempt,
@@ -1732,7 +1732,7 @@ describe("release CI summary child correlation", () => {
     ];
     const ciLog = [
       `TARGET_SHA: ${parentManifest.targetSha}`,
-      "Dispatched ci.yml: https://github.com/openclaw/openclaw/actions/runs/101",
+      "Dispatched ci.yml: https://github.com/steelengineai/recall-agents/actions/runs/101",
     ].join("\n");
     expect(() =>
       validateManifestChildRun(wrongParent, ci, "101", parentManifest, ciJobs, ciLog),

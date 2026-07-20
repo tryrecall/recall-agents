@@ -1,7 +1,7 @@
 {
-  "name": "@openclaw/ai",
+  "name": "@steelengine/ai",
   "version": "2026.7.2-beta.3",
-  "description": "Reusable model provider adapters and streaming runtime from OpenClaw",
+  "description": "Reusable model provider adapters and streaming runtime from SteelEngine",
   "keywords": [
     "ai",
     "anthropic",
@@ -11,14 +11,14 @@
     "openai",
     "streaming"
   ],
-  "homepage": "https://github.com/openclaw/openclaw#readme",
+  "homepage": "https://github.com/steelengineai/recall-agents#readme",
   "bugs": {
-    "url": "https://github.com/openclaw/openclaw/issues"
+    "url": "https://github.com/steelengineai/recall-agents/issues"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openclaw/openclaw.git",
+    "url": "git+https://github.com/steelengineai/recall-agents.git",
     "directory": "packages/ai"
   },
   "files": [
@@ -81,7 +81,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "openclaw": {
+  "steelengine": {
     "release": {
       "publishToNpm": true
     }

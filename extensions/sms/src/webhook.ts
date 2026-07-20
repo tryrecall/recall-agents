@@ -1,11 +1,11 @@
 // Sms plugin module implements webhook behavior.
 import type { IncomingMessage, ServerResponse } from "node:http";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   createFixedWindowRateLimiter,
   resolveRequestClientIp,
-} from "openclaw/plugin-sdk/webhook-ingress";
-import { runDetachedWebhookWork } from "openclaw/plugin-sdk/webhook-request-guards";
+} from "steelengine/plugin-sdk/webhook-ingress";
+import { runDetachedWebhookWork } from "steelengine/plugin-sdk/webhook-request-guards";
 import {
   readTwilioWebhookForm,
   respondTwiml,
@@ -39,7 +39,7 @@ type SmsWebhookLog = {
 };
 
 export type SmsWebhookHandlerParams = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   account: ResolvedSmsAccount;
   ingress: {
     enqueue: (form: Record<string, string>) => Promise<{ duplicate: boolean }>;
@@ -55,7 +55,7 @@ function headerValue(value: string | string[] | undefined): string | undefined {
   return value;
 }
 
-function resolvedClientAddress(params: { cfg: OpenClawConfig; req: IncomingMessage }): string {
+function resolvedClientAddress(params: { cfg: SteelEngineConfig; req: IncomingMessage }): string {
   return (
     resolveRequestClientIp(
       params.req,

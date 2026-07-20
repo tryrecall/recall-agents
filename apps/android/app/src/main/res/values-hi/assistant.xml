@@ -1,7 +1,7 @@
 <resources>
-    <string-array name="ask_openclaw_query_patterns">
-        <item>"OpenClaw से %1$s पूछें"</item>
-        <item>"OpenClaw को %1$s बताने के लिए कहें"</item>
-        <item>"OpenClaw खोलें और %1$s पूछें"</item>
+    <string-array name="ask_steelengine_query_patterns">
+        <item>"SteelEngine से %1$s पूछें"</item>
+        <item>"SteelEngine को %1$s बताने के लिए कहें"</item>
+        <item>"SteelEngine खोलें और %1$s पूछें"</item>
     </string-array>
 </resources>

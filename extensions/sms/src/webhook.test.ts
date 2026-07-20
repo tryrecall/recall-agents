@@ -12,9 +12,9 @@ const enqueueSmsIngress = vi.hoisted(() =>
 const drainSmsIngress = vi.hoisted(() => vi.fn(async () => undefined));
 const runDetachedWebhookWork = vi.hoisted(() => vi.fn((run: () => Promise<void>) => run()));
 
-vi.mock("openclaw/plugin-sdk/webhook-request-guards", async (importOriginal) => {
+vi.mock("steelengine/plugin-sdk/webhook-request-guards", async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import("openclaw/plugin-sdk/webhook-request-guards")>();
+    await importOriginal<typeof import("steelengine/plugin-sdk/webhook-request-guards")>();
   return { ...actual, runDetachedWebhookWork };
 });
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "SteelEngine Testing"
+  short_description: "Choose cheap, targeted SteelEngine validation"
+  default_prompt: "Use $steelengine-testing to choose the cheapest safe test or CI verification path, inspect failures, and rerun only the relevant SteelEngine lane."

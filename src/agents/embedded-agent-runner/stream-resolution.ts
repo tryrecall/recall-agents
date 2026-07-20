@@ -1,8 +1,8 @@
 /**
  * Resolves provider stream functions and API keys for embedded agents.
  */
-import { getApiProvider } from "@openclaw/ai/internal/runtime";
-import { stripSystemPromptCacheBoundary } from "@openclaw/ai/internal/shared";
+import { getApiProvider } from "@steelengine/ai/internal/runtime";
+import { stripSystemPromptCacheBoundary } from "@steelengine/ai/internal/shared";
 import { streamSimple } from "../../llm/stream.js";
 import { createAnthropicVertexStreamFnForModel } from "../anthropic-vertex-stream.js";
 import { createBoundaryAwareStreamFnForModel } from "../provider-transport-stream.js";
@@ -28,7 +28,7 @@ export function resolveEmbeddedAgentBaseStreamFn(params: {
   return baseStreamFn;
 }
 
-function isDefaultOpenClawStreamFnForModel(
+function isDefaultSteelEngineStreamFnForModel(
   model: EmbeddedRunAttemptParams["model"],
   streamFn: StreamFn | undefined,
 ): boolean {
@@ -51,14 +51,14 @@ function isOpenAICodexResponsesModel(model: EmbeddedRunAttemptParams["model"]): 
   return model.provider === "openai" && model.api === "openai-chatgpt-responses";
 }
 
-function resolveOpenClawNativeCodexResponsesStreamFn(params: {
+function resolveSteelEngineNativeCodexResponsesStreamFn(params: {
   model: EmbeddedRunAttemptParams["model"];
   currentStreamFn: StreamFn | undefined;
 }): StreamFn | undefined {
   if (!isOpenAICodexResponsesModel(params.model)) {
     return undefined;
   }
-  if (!isDefaultOpenClawStreamFnForModel(params.model, params.currentStreamFn)) {
+  if (!isDefaultSteelEngineStreamFnForModel(params.model, params.currentStreamFn)) {
     return undefined;
   }
   return params.currentStreamFn ?? streamSimple;
@@ -77,14 +77,14 @@ export function describeEmbeddedAgentStreamStrategy(params: {
     return "anthropic-vertex";
   }
   if (
-    resolveOpenClawNativeCodexResponsesStreamFn({
+    resolveSteelEngineNativeCodexResponsesStreamFn({
       model: params.model,
       currentStreamFn: params.currentStreamFn,
     })
   ) {
-    return "openclaw-native-codex-responses";
+    return "steelengine-native-codex-responses";
   }
-  if (isDefaultOpenClawStreamFnForModel(params.model, params.currentStreamFn)) {
+  if (isDefaultSteelEngineStreamFnForModel(params.model, params.currentStreamFn)) {
     return createBoundaryAwareStreamFnForModel(params.model)
       ? `boundary-aware:${params.model.api}`
       : "stream-simple";
@@ -145,12 +145,12 @@ export function resolveEmbeddedAgentStreamFn(params: {
     return createAnthropicVertexStreamFnForModel(params.model);
   }
 
-  const openClawNativeCodexResponsesStreamFn = resolveOpenClawNativeCodexResponsesStreamFn({
+  const steelEngineNativeCodexResponsesStreamFn = resolveSteelEngineNativeCodexResponsesStreamFn({
     model: params.model,
     currentStreamFn: params.currentStreamFn,
   });
-  if (openClawNativeCodexResponsesStreamFn) {
-    return wrapEmbeddedAgentStreamFn(openClawNativeCodexResponsesStreamFn, {
+  if (steelEngineNativeCodexResponsesStreamFn) {
+    return wrapEmbeddedAgentStreamFn(steelEngineNativeCodexResponsesStreamFn, {
       runSignal: params.signal,
       resolvedApiKey: params.resolvedApiKey,
       authProfileId: params.authProfileId,
@@ -169,7 +169,7 @@ export function resolveEmbeddedAgentStreamFn(params: {
   }
 
   if (
-    isDefaultOpenClawStreamFnForModel(params.model, params.currentStreamFn) ||
+    isDefaultSteelEngineStreamFnForModel(params.model, params.currentStreamFn) ||
     hasResolvedRuntimeApiKey(params.resolvedApiKey) ||
     params.transportAuthAvailable ||
     // Proxied anthropic-messages providers (provider !== "anthropic", e.g. pioneer)
@@ -184,9 +184,9 @@ export function resolveEmbeddedAgentStreamFn(params: {
   ) {
     const boundaryAwareStreamFn = createBoundaryAwareStreamFnForModel(params.model);
     if (boundaryAwareStreamFn) {
-      // Some OpenClaw session factories return a provider-specific stream wrapper
+      // Some SteelEngine session factories return a provider-specific stream wrapper
       // once runtime auth is resolved. Keep transport-supported APIs on
-      // OpenClaw's HTTP transport so provider-specific auth/header semantics
+      // SteelEngine's HTTP transport so provider-specific auth/header semantics
       // are not lost behind that wrapper.
       // Boundary-aware transports read credentials from options.apiKey just
       // like provider-owned streams, but the embedded run layer never gets to

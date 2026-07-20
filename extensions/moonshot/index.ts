@@ -1,7 +1,7 @@
-// Moonshot plugin entrypoint registers its OpenClaw integration.
-import { defineSingleProviderPluginEntry } from "openclaw/plugin-sdk/provider-entry";
-import { buildOpenAICompatibleReplayPolicy } from "openclaw/plugin-sdk/provider-model-shared";
-import { buildProviderStreamFamilyHooks } from "openclaw/plugin-sdk/provider-stream-family";
+// Moonshot plugin entrypoint registers its SteelEngine integration.
+import { defineSingleProviderPluginEntry } from "steelengine/plugin-sdk/provider-entry";
+import { buildOpenAICompatibleReplayPolicy } from "steelengine/plugin-sdk/provider-model-shared";
+import { buildProviderStreamFamilyHooks } from "steelengine/plugin-sdk/provider-stream-family";
 import { applyMoonshotNativeStreamingUsageCompat } from "./api.js";
 import { moonshotMediaUnderstandingProvider } from "./media-understanding-provider.js";
 import {

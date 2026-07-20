@@ -1,22 +1,22 @@
 {
-  "name": "@openclaw/cerebras-provider",
+  "name": "@steelengine/cerebras-provider",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw Cerebras provider plugin.",
+  "description": "SteelEngine Cerebras provider plugin.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/steelengineai/recall-agents"
   },
   "type": "module",
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "clawhubSpec": "clawhub:@openclaw/cerebras-provider",
-      "npmSpec": "@openclaw/cerebras-provider",
+      "clawhubSpec": "clawhub:@steelengine/cerebras-provider",
+      "npmSpec": "@steelengine/cerebras-provider",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.6.8"
     },
@@ -24,7 +24,7 @@
       "pluginApi": ">=2026.7.2-beta.3"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3",
+      "steelengineVersion": "2026.7.2-beta.3",
       "bundledDist": false
     },
     "release": {

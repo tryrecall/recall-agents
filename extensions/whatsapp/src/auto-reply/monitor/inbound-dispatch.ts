@@ -2,22 +2,22 @@
 import {
   DEFAULT_TIMING,
   type StatusReactionController,
-} from "openclaw/plugin-sdk/channel-feedback";
+} from "steelengine/plugin-sdk/channel-feedback";
 import {
   buildChannelInboundEventContext,
   type CommandFacts,
   type ChannelInboundTurnPlan,
   toInboundMediaFacts,
-} from "openclaw/plugin-sdk/channel-inbound";
-import { hasVisibleInboundReplyDispatch } from "openclaw/plugin-sdk/channel-inbound";
+} from "steelengine/plugin-sdk/channel-inbound";
+import { hasVisibleInboundReplyDispatch } from "steelengine/plugin-sdk/channel-inbound";
 import {
   bindIngressLifecycleToReplyOptions,
   deliverInboundReplyWithMessageSendContext,
   resolveChannelStreamingBlockEnabled,
-} from "openclaw/plugin-sdk/channel-outbound";
-import { buildInboundHistoryFromEntries } from "openclaw/plugin-sdk/reply-history";
-import type { FinalizedMsgContext } from "openclaw/plugin-sdk/reply-runtime";
-import { normalizeStringEntries } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/channel-outbound";
+import { buildInboundHistoryFromEntries } from "steelengine/plugin-sdk/reply-history";
+import type { FinalizedMsgContext } from "steelengine/plugin-sdk/reply-runtime";
+import { normalizeStringEntries } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { requireWhatsAppInboundAdmission } from "../../inbound/admission.js";
 import { resolveWhatsAppIngressLifecycle } from "../../inbound/ingress-lifecycle.js";
 import type { AdmittedWebInboundMessage } from "../../inbound/types.js";

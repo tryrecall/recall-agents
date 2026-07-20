@@ -1,12 +1,12 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 import {
   MeetingSessionRuntime,
   type MeetingSessionRuntimeHandles,
   type MeetingSessionRuntimeJoinContext,
-} from "openclaw/plugin-sdk/meeting-runtime";
-import type { PluginRuntime, RuntimeLogger } from "openclaw/plugin-sdk/plugin-runtime";
-import { normalizeAgentId } from "openclaw/plugin-sdk/routing";
+} from "steelengine/plugin-sdk/meeting-runtime";
+import type { PluginRuntime, RuntimeLogger } from "steelengine/plugin-sdk/plugin-runtime";
+import { normalizeAgentId } from "steelengine/plugin-sdk/routing";
 import type { TeamsMeetingsConfig, TeamsMeetingsMode, TeamsMeetingsTransport } from "./config.js";
 import {
   testTeamsMeetingListening,
@@ -87,7 +87,7 @@ export class TeamsMeetingsRuntime {
   constructor(
     private readonly params: {
       config: TeamsMeetingsConfig;
-      fullConfig: OpenClawConfig;
+      fullConfig: SteelEngineConfig;
       runtime: PluginRuntime;
       logger: RuntimeLogger;
     },
@@ -118,8 +118,8 @@ export class TeamsMeetingsRuntime {
           audioBridgeUnavailable: "Realtime speech requires an active Chrome audio bridge.",
           browserUnverified: "Microsoft Teams browser state has not been verified yet.",
           manualActionFallback:
-            "Resolve the Microsoft Teams browser prompt before asking OpenClaw to speak.",
-          microphoneMuted: "Turn on the OpenClaw Teams microphone before asking OpenClaw to speak.",
+            "Resolve the Microsoft Teams browser prompt before asking SteelEngine to speak.",
+          microphoneMuted: "Turn on the SteelEngine Teams microphone before asking SteelEngine to speak.",
           microphoneMutedReason: "teams-microphone-muted",
           notInCall: "Microsoft Teams has not reported that the browser guest is in the call.",
           notInCallReason: "not-in-call",

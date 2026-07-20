@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/tlon",
+  "name": "@steelengine/tlon",
   "version": "2026.7.2-beta.3",
-  "description": "OpenClaw Tlon/Urbit channel plugin for chat workflows.",
+  "description": "SteelEngine Tlon/Urbit channel plugin for chat workflows.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw"
+    "url": "https://github.com/steelengineai/recall-agents"
   },
   "type": "module",
   "dependencies": {
@@ -15,18 +15,18 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*",
+    "steelengine": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.7.2-beta.3"
+    "steelengine": ">=2026.7.2-beta.3"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "steelengine": {
       "optional": true
     }
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
@@ -68,7 +68,7 @@
       ]
     },
     "install": {
-      "npmSpec": "@openclaw/tlon",
+      "npmSpec": "@steelengine/tlon",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.10"
     },
@@ -76,7 +76,7 @@
       "pluginApi": ">=2026.7.2-beta.3"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3"
+      "steelengineVersion": "2026.7.2-beta.3"
     },
     "release": {
       "bundleRuntimeDependencies": false,

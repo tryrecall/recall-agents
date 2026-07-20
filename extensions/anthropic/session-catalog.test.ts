@@ -1,10 +1,10 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
-import type { PluginRuntime } from "openclaw/plugin-sdk/plugin-runtime";
-import type { SessionCatalogProvider } from "openclaw/plugin-sdk/session-catalog";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-entry";
+import type { PluginRuntime } from "steelengine/plugin-sdk/plugin-runtime";
+import type { SessionCatalogProvider } from "steelengine/plugin-sdk/session-catalog";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { adoptedSourceKey } from "./session-catalog-adoption.js";
 import {
@@ -35,7 +35,7 @@ function captureCatalogProvider(runtime: PluginRuntime): SessionCatalogProvider 
     registerSessionCatalog: (candidate: SessionCatalogProvider) => {
       provider = candidate;
     },
-  } as unknown as OpenClawPluginApi);
+  } as unknown as SteelEnginePluginApi);
   if (!provider) {
     throw new Error("expected Anthropic session catalog registration");
   }
@@ -50,8 +50,8 @@ const nodeHostMocks = vi.hoisted(() => ({
   userShellPaths: new Map<string, string>(),
 }));
 
-vi.mock("openclaw/plugin-sdk/node-host", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/node-host")>();
+vi.mock("steelengine/plugin-sdk/node-host", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("steelengine/plugin-sdk/node-host")>();
   return {
     ...actual,
     runNodePtyCommand: nodeHostMocks.runNodePtyCommand,
@@ -93,7 +93,7 @@ vi.mock("openclaw/plugin-sdk/node-host", async (importOriginal) => {
 });
 
 async function createHome(): Promise<string> {
-  const home = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-claude-catalog-"));
+  const home = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-claude-catalog-"));
   homes.push(home);
   return home;
 }
@@ -250,7 +250,7 @@ describe("Claude session catalog", () => {
           },
         },
       },
-    } as unknown as OpenClawPluginApi;
+    } as unknown as SteelEnginePluginApi;
 
     expect(listBoundClaudeSessions(api)).toEqual(
       new Map([
@@ -279,8 +279,8 @@ describe("Claude session catalog", () => {
     const createSessionEntry = vi.fn(async (params: Record<string, unknown>) => ({
       key: `agent:main:${String(params.key)}`,
       agentId: "main",
-      sessionId: "openclaw-adopted",
-      entry: { sessionId: "openclaw-adopted", updatedAt: Date.now() },
+      sessionId: "steelengine-adopted",
+      entry: { sessionId: "steelengine-adopted", updatedAt: Date.now() },
     }));
     let provider: SessionCatalogProvider | undefined;
     const api = {
@@ -308,7 +308,7 @@ describe("Claude session catalog", () => {
       registerSessionCatalog: (candidate: SessionCatalogProvider) => {
         provider = candidate;
       },
-    } as unknown as OpenClawPluginApi;
+    } as unknown as SteelEnginePluginApi;
     registerClaudeSessionCatalog(api);
 
     expect(provider?.resolveCreateSession?.({})).toEqual({
@@ -349,7 +349,7 @@ describe("Claude session catalog", () => {
   });
 
   it("does not advertise creation without a configured Claude CLI route", () => {
-    let config: OpenClawConfig = {};
+    let config: SteelEngineConfig = {};
     let provider: SessionCatalogProvider | undefined;
     const api = {
       id: "anthropic",
@@ -360,7 +360,7 @@ describe("Claude session catalog", () => {
       registerSessionCatalog: (candidate: SessionCatalogProvider) => {
         provider = candidate;
       },
-    } as unknown as OpenClawPluginApi;
+    } as unknown as SteelEnginePluginApi;
 
     registerClaudeSessionCatalog(api);
 
@@ -397,12 +397,12 @@ describe("Claude session catalog", () => {
           {
             id: "research",
             models: {
-              "anthropic/claude-opus-4-8": { agentRuntime: { id: "openclaw" } },
+              "anthropic/claude-opus-4-8": { agentRuntime: { id: "steelengine" } },
             },
           },
         ],
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     let provider: SessionCatalogProvider | undefined;
     const api = {
       id: "anthropic",
@@ -411,7 +411,7 @@ describe("Claude session catalog", () => {
       registerSessionCatalog: (candidate: SessionCatalogProvider) => {
         provider = candidate;
       },
-    } as unknown as OpenClawPluginApi;
+    } as unknown as SteelEnginePluginApi;
 
     registerClaudeSessionCatalog(api);
 
@@ -439,7 +439,7 @@ describe("Claude session catalog", () => {
           },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     let provider: SessionCatalogProvider | undefined;
     const api = {
       id: "anthropic",
@@ -448,7 +448,7 @@ describe("Claude session catalog", () => {
       registerSessionCatalog: (candidate: SessionCatalogProvider) => {
         provider = candidate;
       },
-    } as unknown as OpenClawPluginApi;
+    } as unknown as SteelEnginePluginApi;
 
     registerClaudeSessionCatalog(api);
 
@@ -471,7 +471,7 @@ describe("Claude session catalog", () => {
         pluginExtensions: { anthropic: { sessionCatalog: { sourceThreadId: sessionId } } },
       }),
     },
-  ])("links a catalog row to an existing OpenClaw session via $label", async ({ entry }) => {
+  ])("links a catalog row to an existing SteelEngine session via $label", async ({ entry }) => {
     const home = await createHome();
     process.env.HOME = home;
     const sessionId = "claude-bound-session";
@@ -507,11 +507,11 @@ describe("Claude session catalog", () => {
       registerSessionCatalog: (candidate: SessionCatalogProvider) => {
         provider = candidate;
       },
-    } as unknown as OpenClawPluginApi;
+    } as unknown as SteelEnginePluginApi;
     registerClaudeSessionCatalog(api);
 
     const hosts = await provider?.list({});
-    expect(hosts?.[0]?.sessions[0]?.openClawSessionKey).toBe("agent:main:claude-bound");
+    expect(hosts?.[0]?.sessions[0]?.steelEngineSessionKey).toBe("agent:main:claude-bound");
   });
 
   it("continues a local Desktop-app row and lists it as continuable", async () => {
@@ -539,8 +539,8 @@ describe("Claude session catalog", () => {
     const createSessionEntry = vi.fn(async (params: Record<string, unknown>) => ({
       key: `agent:main:${String(params.key)}`,
       agentId: "main",
-      sessionId: "openclaw-adopted",
-      entry: { sessionId: "openclaw-adopted", updatedAt: Date.now() },
+      sessionId: "steelengine-adopted",
+      entry: { sessionId: "steelengine-adopted", updatedAt: Date.now() },
     }));
     let provider: SessionCatalogProvider | undefined;
     const api = {
@@ -559,7 +559,7 @@ describe("Claude session catalog", () => {
       registerSessionCatalog: (candidate: SessionCatalogProvider) => {
         provider = candidate;
       },
-    } as unknown as OpenClawPluginApi;
+    } as unknown as SteelEnginePluginApi;
     registerClaudeSessionCatalog(api);
 
     const hosts = await provider?.list({});
@@ -657,7 +657,7 @@ describe("Claude session catalog", () => {
       registerSessionCatalog: (candidate: SessionCatalogProvider) => {
         provider = candidate;
       },
-    } as unknown as OpenClawPluginApi;
+    } as unknown as SteelEnginePluginApi;
     registerClaudeSessionCatalog(api);
 
     const hosts = await provider?.list({ hostIds: ["node:node-a"] });
@@ -770,7 +770,7 @@ describe("Claude session catalog", () => {
       registerSessionCatalog: (candidate: SessionCatalogProvider) => {
         provider = candidate;
       },
-    } as unknown as OpenClawPluginApi;
+    } as unknown as SteelEnginePluginApi;
     registerClaudeSessionCatalog(api);
 
     const hosts = await provider?.list({ hostIds: ["node:node-view"] });
@@ -1277,7 +1277,7 @@ describe("Claude session catalog", () => {
     const api = {
       runtime: {},
       registerSessionCatalog,
-    } as unknown as OpenClawPluginApi;
+    } as unknown as SteelEnginePluginApi;
     registerClaudeSessionCatalog(api);
     expect(registerSessionCatalog).toHaveBeenCalledWith(
       expect.objectContaining({ id: "claude", label: "Claude Code" }),
@@ -1403,7 +1403,7 @@ describe("Claude session catalog", () => {
       registerSessionCatalog: (candidate: SessionCatalogProvider) => {
         provider = candidate;
       },
-    } as unknown as OpenClawPluginApi);
+    } as unknown as SteelEnginePluginApi);
 
     await writeBrokenClaudeNpmShim(shellBinDir);
     nodeHostMocks.userShellPaths.set("claude", shellBinDir);

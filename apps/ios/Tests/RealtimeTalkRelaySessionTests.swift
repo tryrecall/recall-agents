@@ -1,8 +1,8 @@
 import Foundation
-import OpenClawKit
-import OpenClawProtocol
+import SteelEngineKit
+import SteelEngineProtocol
 import Testing
-@testable import OpenClaw
+@testable import SteelEngine
 
 @MainActor
 private final class UnusedPCMStreamingAudioPlayer: PCMStreamingAudioPlaying {

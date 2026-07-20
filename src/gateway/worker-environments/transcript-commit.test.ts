@@ -14,12 +14,12 @@ import {
   resolveSessionTranscriptRuntimeTarget,
   upsertSessionEntry,
 } from "../../config/sessions/session-accessor.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { onSessionTranscriptUpdate } from "../../sessions/transcript-events.js";
 import {
-  closeOpenClawStateDatabaseForTest,
-  openOpenClawStateDatabase,
-} from "../../state/openclaw-state-db.js";
+  closeSteelEngineStateDatabaseForTest,
+  openSteelEngineStateDatabase,
+} from "../../state/steelengine-state-db.js";
 import type { WorkerConnectionIdentity } from "./connection-identity.js";
 import {
   createWorkerTranscriptCommitStore,
@@ -144,13 +144,13 @@ describe("worker transcript commit application", () => {
   let sessionsDir: string;
   let storePath: string;
   let sessionFile: string;
-  let cfg: OpenClawConfig;
+  let cfg: SteelEngineConfig;
   let committer: WorkerTranscriptCommitter;
   let ledgerStore: WorkerTranscriptCommitStore;
   let unsubscribe: (() => void) | undefined;
 
   beforeEach(async () => {
-    root = await fs.mkdtemp(path.join(await fs.realpath(os.tmpdir()), "openclaw-worker-turn-"));
+    root = await fs.mkdtemp(path.join(await fs.realpath(os.tmpdir()), "steelengine-worker-turn-"));
     sessionsDir = path.join(root, "agents", "main", "sessions");
     storePath = path.join(sessionsDir, "sessions.json");
     cfg = {
@@ -175,8 +175,8 @@ describe("worker transcript commit application", () => {
         storePath,
       })
     ).sessionFile;
-    const database = openOpenClawStateDatabase({
-      env: { OPENCLAW_STATE_DIR: path.join(root, "state") },
+    const database = openSteelEngineStateDatabase({
+      env: { STEELENGINE_STATE_DIR: path.join(root, "state") },
     });
     ledgerStore = createWorkerTranscriptCommitStore({ database });
     committer = createWorkerTranscriptCommitter({
@@ -187,7 +187,7 @@ describe("worker transcript commit application", () => {
 
   afterEach(async () => {
     unsubscribe?.();
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     await fs.rm(root, { recursive: true, force: true });
   });
 

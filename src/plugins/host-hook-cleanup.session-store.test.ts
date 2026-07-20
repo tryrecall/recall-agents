@@ -5,20 +5,20 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadSessionEntry, replaceSessionEntry } from "../config/sessions/session-accessor.js";
 import type { SessionEntry } from "../config/sessions/types.js";
 import * as jsonFiles from "../infra/json-files.js";
-import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
-import { closeOpenClawAgentDatabasesForTest } from "../state/openclaw-agent-db.js";
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+import { resolvePreferredSteelEngineTmpDir } from "../infra/tmp-steelengine-dir.js";
+import { closeSteelEngineAgentDatabasesForTest } from "../state/steelengine-agent-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import { captureEnv, setTestEnvValue } from "../test-utils/env.js";
 import { runPluginHostCleanup } from "./host-hook-cleanup.js";
 import { createEmptyPluginRegistry } from "./registry-empty.js";
 
 describe("plugin host cleanup session stores", () => {
   let stateDir: string | undefined;
-  const envSnapshot = captureEnv(["OPENCLAW_STATE_DIR"]);
+  const envSnapshot = captureEnv(["STEELENGINE_STATE_DIR"]);
 
   afterEach(async () => {
-    closeOpenClawAgentDatabasesForTest();
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineAgentDatabasesForTest();
+    closeSteelEngineStateDatabaseForTest();
     envSnapshot.restore();
     if (stateDir) {
       await fs.rm(stateDir, { recursive: true, force: true });
@@ -28,9 +28,9 @@ describe("plugin host cleanup session stores", () => {
 
   it("does not rewrite session stores when cleanup scans find no plugin-owned state", async () => {
     stateDir = await fs.mkdtemp(
-      path.join(resolvePreferredOpenClawTmpDir(), "openclaw-host-cleanup-noop-"),
+      path.join(resolvePreferredSteelEngineTmpDir(), "steelengine-host-cleanup-noop-"),
     );
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
     const storePath = path.join(stateDir, "sessions.json");
     await replaceSessionEntry({ sessionKey: "agent:main:main", storePath }, {
       sessionId: "session-id",
@@ -51,9 +51,9 @@ describe("plugin host cleanup session stores", () => {
 
   it("can defer persistent session-state cleanup to an atomic owner", async () => {
     stateDir = await fs.mkdtemp(
-      path.join(resolvePreferredOpenClawTmpDir(), "openclaw-host-cleanup-deferred-"),
+      path.join(resolvePreferredSteelEngineTmpDir(), "steelengine-host-cleanup-deferred-"),
     );
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
     const storePath = path.join(stateDir, "sessions.json");
     await replaceSessionEntry({ sessionKey: "agent:main:main", storePath }, {
       sessionId: "session-id",
@@ -85,9 +85,9 @@ describe("plugin host cleanup session stores", () => {
 
   it("clears plugin-owned session state across resolved stores without touching unrelated rows", async () => {
     stateDir = await fs.mkdtemp(
-      path.join(resolvePreferredOpenClawTmpDir(), "openclaw-host-cleanup-multistore-"),
+      path.join(resolvePreferredSteelEngineTmpDir(), "steelengine-host-cleanup-multistore-"),
     );
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
     const firstStorePath = path.join(stateDir, "agents", "a", "sessions", "sessions.json");
     const secondStorePath = path.join(stateDir, "agents", "b", "sessions", "sessions.json");
     const beforeUpdatedAt = 100;
@@ -172,9 +172,9 @@ describe("plugin host cleanup session stores", () => {
 
   it("clears shared custom SQLite stores for each resolved agent", async () => {
     stateDir = await fs.mkdtemp(
-      path.join(resolvePreferredOpenClawTmpDir(), "openclaw-host-cleanup-shared-custom-"),
+      path.join(resolvePreferredSteelEngineTmpDir(), "steelengine-host-cleanup-shared-custom-"),
     );
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
     const sharedStorePath = path.join(stateDir, "custom", "sessions.json");
     const beforeUpdatedAt = 100;
     const entry: SessionEntry = {
@@ -222,9 +222,9 @@ describe("plugin host cleanup session stores", () => {
 
   it("preserves locked sessions for every harness owned by a disabled plugin", async () => {
     stateDir = await fs.mkdtemp(
-      path.join(resolvePreferredOpenClawTmpDir(), "openclaw-host-cleanup-locked-harness-"),
+      path.join(resolvePreferredSteelEngineTmpDir(), "steelengine-host-cleanup-locked-harness-"),
     );
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
     const storePath = path.join(stateDir, "sessions.json");
     const updatedAt = 100;
     const registry = createEmptyPluginRegistry();

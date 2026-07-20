@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import path from "node:path";
-import { collectManifestModelIdNormalizationPolicies } from "@openclaw/model-catalog-core/provider-model-id-normalization";
+import { collectManifestModelIdNormalizationPolicies } from "@steelengine/model-catalog-core/provider-model-id-normalization";
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope-config.js";
 import { ensureOwnerDisplaySecret } from "../agents/owner-display.js";
 import { formatErrorMessage } from "../infra/errors.js";
@@ -46,11 +46,11 @@ import {
 } from "./plugin-install-config-migration.js";
 import { applyConfigOverrides } from "./runtime-overrides.js";
 import { resolveShellEnvExpectedKeys } from "./shell-env-expected-keys.js";
-import type { ConfigFileSnapshot, OpenClawConfig } from "./types.js";
+import type { ConfigFileSnapshot, SteelEngineConfig } from "./types.js";
 import { validateConfigObjectWithPlugins } from "./validation.js";
 
 type ValidationPluginMetadataSnapshotLoader = {
-  load: (config: OpenClawConfig) => PluginMetadataSnapshot;
+  load: (config: SteelEngineConfig) => PluginMetadataSnapshot;
   getSnapshot: () => PluginMetadataSnapshot | undefined;
 };
 
@@ -59,27 +59,27 @@ export type ConfigIoContext = {
   configPath: string;
   options: ConfigIoFactoryOptions;
   observeLoadConfigSnapshot: (snapshot: ConfigFileSnapshot) => ConfigFileSnapshot;
-  finalizeLoadedRuntimeConfig: (config: OpenClawConfig) => OpenClawConfig;
+  finalizeLoadedRuntimeConfig: (config: SteelEngineConfig) => SteelEngineConfig;
   migrateAndStripShippedPluginInstallConfigRecords: (
     configRaw: unknown,
     options?: { persist?: boolean; rootConfigRaw?: unknown },
   ) => ShippedPluginInstallConfigReadMigration;
   retainRuntimeOnlyShippedPluginInstallConfigRecords: (
-    config: OpenClawConfig,
+    config: SteelEngineConfig,
     sourceRaw: unknown,
-  ) => OpenClawConfig;
+  ) => SteelEngineConfig;
   createValidationPluginMetadataSnapshotLoader: (params: {
     effectiveConfigRaw: unknown;
     env: NodeJS.ProcessEnv;
   }) => ValidationPluginMetadataSnapshotLoader;
-  resolveRuntimePreflightSourceConfig: (candidate: OpenClawConfig) => OpenClawConfig;
+  resolveRuntimePreflightSourceConfig: (candidate: SteelEngineConfig) => SteelEngineConfig;
   ensureShippedPluginInstallConfigRecordsMigratedForWrite: (
     snapshot: ConfigFileSnapshot,
   ) => ShippedPluginInstallConfigWriteMigration;
   rollbackShippedPluginInstallConfigWriteMigration: (
     migration: ShippedPluginInstallConfigWriteMigration,
   ) => boolean;
-  resolveSuspiciousRecoveryBackupCandidate: (parsed: unknown) => OpenClawConfig | null;
+  resolveSuspiciousRecoveryBackupCandidate: (parsed: unknown) => SteelEngineConfig | null;
 };
 
 export function createConfigIoContext(options: ConfigIoFactoryOptions = {}): ConfigIoContext {
@@ -93,7 +93,7 @@ export function createConfigIoContext(options: ConfigIoFactoryOptions = {}): Con
     return snapshot;
   }
 
-  function finalizeLoadedRuntimeConfig(cfg: OpenClawConfig): OpenClawConfig {
+  function finalizeLoadedRuntimeConfig(cfg: SteelEngineConfig): SteelEngineConfig {
     const duplicates = findDuplicateAgentDirs(cfg, { env: deps.env, homedir: deps.homedir });
     if (duplicates.length > 0) {
       throw new DuplicateAgentDirError(duplicates);
@@ -184,9 +184,9 @@ export function createConfigIoContext(options: ConfigIoFactoryOptions = {}): Con
   }
 
   function retainRuntimeOnlyShippedPluginInstallConfigRecords(
-    config: OpenClawConfig,
+    config: SteelEngineConfig,
     sourceRaw: unknown,
-  ): OpenClawConfig {
+  ): SteelEngineConfig {
     const installRecords = extractShippedPluginInstallConfigRecords(sourceRaw);
     if (Object.keys(installRecords).length === 0) {
       return config;
@@ -225,7 +225,7 @@ export function createConfigIoContext(options: ConfigIoFactoryOptions = {}): Con
     };
   }
 
-  function resolveRuntimePreflightSourceConfig(candidate: OpenClawConfig): OpenClawConfig {
+  function resolveRuntimePreflightSourceConfig(candidate: SteelEngineConfig): SteelEngineConfig {
     const env = { ...deps.env } as NodeJS.ProcessEnv;
     const resolvedIncludes = resolveConfigIncludesForRead(candidate, configPath, { ...deps, env });
     const resolution = resolveConfigForRead(resolvedIncludes, env, deps.lowerPrecedenceEnv);
@@ -264,7 +264,7 @@ export function createConfigIoContext(options: ConfigIoFactoryOptions = {}): Con
       return { migrated: true };
     } catch (error) {
       throw new Error(
-        `Config write blocked: shipped plugins.installs records in ${configPath} could not be migrated into the plugin index. Fix state directory permissions or run openclaw plugins registry --refresh, then retry. ${formatErrorMessage(error)}`,
+        `Config write blocked: shipped plugins.installs records in ${configPath} could not be migrated into the plugin index. Fix state directory permissions or run steelengine plugins registry --refresh, then retry. ${formatErrorMessage(error)}`,
         { cause: error },
       );
     }
@@ -279,7 +279,7 @@ export function createConfigIoContext(options: ConfigIoFactoryOptions = {}): Con
     return false;
   }
 
-  function resolveSuspiciousRecoveryBackupCandidate(parsed: unknown): OpenClawConfig | null {
+  function resolveSuspiciousRecoveryBackupCandidate(parsed: unknown): SteelEngineConfig | null {
     try {
       const candidateEnv = cloneEnvWithPlatformSemantics(deps.env);
       const resolved = resolveConfigIncludesForRead(parsed, configPath, {
@@ -332,10 +332,10 @@ export function resolveModelIdNormalizationPolicies(snapshot: PluginMetadataSnap
 
 export function materializeConfigForLoad(
   context: ConfigIoContext,
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   effectiveConfigRaw: unknown,
   pluginMetadata: PluginMetadataSnapshot | undefined,
-): OpenClawConfig {
+): SteelEngineConfig {
   return context.retainRuntimeOnlyShippedPluginInstallConfigRecords(
     materializeRuntimeConfig(config, "load", {
       manifestRegistry: pluginMetadata?.manifestRegistry,

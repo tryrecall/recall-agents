@@ -1,27 +1,27 @@
 import crypto from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { Readable } from "node:stream";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { BOOTSTRAP_HANDOFF_OPERATOR_SCOPES } from "openclaw/plugin-sdk/device-bootstrap";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
-import { createTestPluginApi } from "openclaw/plugin-sdk/plugin-test-api";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { BOOTSTRAP_HANDOFF_OPERATOR_SCOPES } from "steelengine/plugin-sdk/device-bootstrap";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-entry";
+import { createTestPluginApi } from "steelengine/plugin-sdk/plugin-test-api";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-type OpenClawPluginHttpRouteParams = Parameters<OpenClawPluginApi["registerHttpRoute"]>[0];
+type SteelEnginePluginHttpRouteParams = Parameters<SteelEnginePluginApi["registerHttpRoute"]>[0];
 
 const issueDeviceBootstrapToken = vi.hoisted(() =>
   vi.fn(async () => ({ token: "issued", expiresAtMs: Date.now() + 600_000 })),
 );
 const resolveTelegramMiniAppUrls = vi.hoisted(() =>
   vi.fn(async () => ({
-    pageUrl: "https://host.tailnet.ts.net/__openclaw_tg_miniapp/",
-    controlUiUrl: "https://host.tailnet.ts.net/openclaw",
+    pageUrl: "https://host.tailnet.ts.net/__steelengine_tg_miniapp/",
+    controlUiUrl: "https://host.tailnet.ts.net/steelengine",
     gatewayUrl: "wss://host.tailnet.ts.net",
   })),
 );
 
-vi.mock("openclaw/plugin-sdk/device-bootstrap", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("openclaw/plugin-sdk/device-bootstrap")>()),
+vi.mock("steelengine/plugin-sdk/device-bootstrap", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("steelengine/plugin-sdk/device-bootstrap")>()),
   issueDeviceBootstrapToken,
 }));
 
@@ -51,8 +51,8 @@ class MockResponse {
   }
 }
 
-function createRoute(cfg: OpenClawConfig): OpenClawPluginHttpRouteParams {
-  let route: OpenClawPluginHttpRouteParams | null = null;
+function createRoute(cfg: SteelEngineConfig): SteelEnginePluginHttpRouteParams {
+  let route: SteelEnginePluginHttpRouteParams | null = null;
   const api = createTestPluginApi({
     config: cfg,
     registerHttpRoute(params) {
@@ -67,7 +67,7 @@ function createRoute(cfg: OpenClawConfig): OpenClawPluginHttpRouteParams {
 }
 
 async function callRoute(params: {
-  route: OpenClawPluginHttpRouteParams;
+  route: SteelEnginePluginHttpRouteParams;
   method: string;
   url: string;
   body?: string;
@@ -86,7 +86,7 @@ async function callRoute(params: {
   return res;
 }
 
-function config(allowFrom: string[] = ["123456"]): OpenClawConfig {
+function config(allowFrom: string[] = ["123456"]): SteelEngineConfig {
   return {
     channels: {
       telegram: {
@@ -121,7 +121,7 @@ describe("registerTelegramMiniAppRoutes", () => {
     const res = await callRoute({
       route,
       method: "GET",
-      url: "/__openclaw_tg_miniapp/?accountId=ops",
+      url: "/__steelengine_tg_miniapp/?accountId=ops",
     });
 
     expect(res.statusCode).toBe(200);
@@ -135,7 +135,7 @@ describe("registerTelegramMiniAppRoutes", () => {
     const res = await callRoute({
       route,
       method: "POST",
-      url: "/__openclaw_tg_miniapp/auth",
+      url: "/__steelengine_tg_miniapp/auth",
       contentType: "application/json; charset=utf-8",
       body: JSON.stringify({
         initData: signedInitData("123456", "success"),
@@ -146,7 +146,7 @@ describe("registerTelegramMiniAppRoutes", () => {
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.body)).toEqual({
       bootstrapToken: "issued",
-      controlUiUrl: "https://host.tailnet.ts.net/openclaw",
+      controlUiUrl: "https://host.tailnet.ts.net/steelengine",
       gatewayUrl: "wss://host.tailnet.ts.net",
     });
     expect(issueDeviceBootstrapToken).toHaveBeenCalledWith({
@@ -164,7 +164,7 @@ describe("registerTelegramMiniAppRoutes", () => {
     await callRoute({
       route,
       method: "POST",
-      url: "/__openclaw_tg_miniapp/auth",
+      url: "/__steelengine_tg_miniapp/auth",
       contentType: "application/json",
       body: JSON.stringify({ initData }),
       ip: "203.0.113.20",
@@ -172,7 +172,7 @@ describe("registerTelegramMiniAppRoutes", () => {
     const replay = await callRoute({
       route,
       method: "POST",
-      url: "/__openclaw_tg_miniapp/auth",
+      url: "/__steelengine_tg_miniapp/auth",
       contentType: "application/json",
       body: JSON.stringify({ initData }),
       ip: "203.0.113.20",
@@ -191,7 +191,7 @@ describe("registerTelegramMiniAppRoutes", () => {
       callRoute({
         route,
         method: "POST",
-        url: "/__openclaw_tg_miniapp/auth",
+        url: "/__steelengine_tg_miniapp/auth",
         contentType: "application/json",
         body: JSON.stringify({ initData }),
         ip: "203.0.113.21",
@@ -199,7 +199,7 @@ describe("registerTelegramMiniAppRoutes", () => {
       callRoute({
         route,
         method: "POST",
-        url: "/__openclaw_tg_miniapp/auth",
+        url: "/__steelengine_tg_miniapp/auth",
         contentType: "application/json",
         body: JSON.stringify({ initData }),
         ip: "203.0.113.22",
@@ -215,7 +215,7 @@ describe("registerTelegramMiniAppRoutes", () => {
     const res = await callRoute({
       route,
       method: "POST",
-      url: "/__openclaw_tg_miniapp/auth",
+      url: "/__steelengine_tg_miniapp/auth",
       contentType: "application/json",
       body: JSON.stringify({ initData: signedInitData("123456", "non-owner") }),
       ip: "203.0.113.30",
@@ -232,7 +232,7 @@ describe("registerTelegramMiniAppRoutes", () => {
       last = await callRoute({
         route,
         method: "POST",
-        url: "/__openclaw_tg_miniapp/auth",
+        url: "/__steelengine_tg_miniapp/auth",
         contentType: "application/json",
         body: JSON.stringify({ initData: signedInitData("123456", `rate-${i}`) }),
         ip: "203.0.113.40",

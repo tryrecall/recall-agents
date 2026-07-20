@@ -236,8 +236,8 @@ function formatPressureNextStep(
   pressure: Omit<DiagnosticMemoryPressureEvent, "seq" | "ts" | "type">,
 ): string {
   return pressure.level === "critical"
-    ? "nextStep=inspect latest stability bundle or run openclaw gateway diagnostics export; restart gateway if process is unstable"
-    : "nextStep=run openclaw gateway status --deep and openclaw gateway diagnostics export; restart gateway if pressure persists";
+    ? "nextStep=inspect latest stability bundle or run steelengine gateway diagnostics export; restart gateway if process is unstable"
+    : "nextStep=run steelengine gateway status --deep and steelengine gateway diagnostics export; restart gateway if pressure persists";
 }
 
 function logMemoryPressure(params: {

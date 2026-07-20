@@ -6,14 +6,14 @@ import type {
   AgentHarnessCompactParams,
   AgentHarnessCompactResult,
   ContextEngineHostCapability,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+} from "steelengine/plugin-sdk/agent-harness-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import type { CodexAppServerBindingStore } from "./src/app-server/session-binding.js";
 
 // `codex` is legacy input only until Part 2 doctor migration rewrites stored refs.
 // New runtime identity uses the `openai` provider.
 const DEFAULT_CODEX_HARNESS_PROVIDER_IDS = new Set(["codex", "openai"]);
-const SHARED_CODEX_APP_SERVER_CLIENT_DISPOSER = Symbol.for("openclaw.codexAppServerClientDisposer");
+const SHARED_CODEX_APP_SERVER_CLIENT_DISPOSER = Symbol.for("steelengine.codexAppServerClientDisposer");
 const CODEX_APP_SERVER_CONTEXT_ENGINE_HOST_CAPABILITIES = [
   "bootstrap",
   "assemble-before-prompt",
@@ -49,7 +49,7 @@ export function createCodexAppServerAgentHarness(options: {
   providerIds?: Iterable<string>;
   pluginConfig?: unknown;
   resolvePluginConfig?: () => unknown;
-  resolveConfig?: () => OpenClawConfig | undefined;
+  resolveConfig?: () => SteelEngineConfig | undefined;
   bindingStore: CodexAppServerBindingStore;
 }): AgentHarness {
   const harnessRuntimeId = options?.id ?? "codex";

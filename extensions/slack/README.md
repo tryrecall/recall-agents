@@ -1,11 +1,11 @@
-# OpenClaw Slack
+# SteelEngine Slack
 
-Official OpenClaw channel plugin for Slack channels, DMs, commands, and app events.
+Official SteelEngine channel plugin for Slack channels, DMs, commands, and app events.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugin add @openclaw/slack
+steelengine plugin add @steelengine/slack
 ```
 
-Configure the Slack app credentials and allowed workspaces/channels in OpenClaw. The plugin lets agents receive Slack events and reply through the configured Slack app.
+Configure the Slack app credentials and allowed workspaces/channels in SteelEngine. The plugin lets agents receive Slack events and reply through the configured Slack app.

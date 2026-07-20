@@ -1,13 +1,13 @@
 /**
  * Normalizes and sanitizes Codex dynamic-tool progress payloads before they are
- * emitted into OpenClaw events or logs.
+ * emitted into SteelEngine events or logs.
  */
 import {
   inferToolMetaFromArgs,
   type EmbeddedRunAttemptParams,
   type ToolProgressDetailMode,
-} from "openclaw/plugin-sdk/agent-harness-runtime";
-import { redactSensitiveFieldValue, redactToolPayloadText } from "openclaw/plugin-sdk/logging-core";
+} from "steelengine/plugin-sdk/agent-harness-runtime";
+import { redactSensitiveFieldValue, redactToolPayloadText } from "steelengine/plugin-sdk/logging-core";
 import {
   isJsonObject,
   type CodexDynamicToolCallParams,
@@ -15,7 +15,7 @@ import {
   type JsonValue,
 } from "./protocol.js";
 
-/** Maps OpenClaw tool-progress config to the mode used by Codex progress metadata. */
+/** Maps SteelEngine tool-progress config to the mode used by Codex progress metadata. */
 export function resolveCodexToolProgressDetailMode(
   value: EmbeddedRunAttemptParams["toolProgressDetail"],
 ): ToolProgressDetailMode {

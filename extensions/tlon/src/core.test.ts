@@ -4,10 +4,10 @@ import {
   createPluginSetupWizardStatus,
   createTestWizardPrompter,
   runSetupWizardConfigure,
-} from "openclaw/plugin-sdk/plugin-test-runtime";
-import type { WizardPrompter } from "openclaw/plugin-sdk/plugin-test-runtime";
+} from "steelengine/plugin-sdk/plugin-test-runtime";
+import type { WizardPrompter } from "steelengine/plugin-sdk/plugin-test-runtime";
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../api.js";
+import type { SteelEngineConfig } from "../api.js";
 import { tlonChannelConfigSchema } from "./config-schema.js";
 import { tlonSetupWizard } from "./setup-surface.js";
 import { normalizeShip, resolveTlonOutboundTarget } from "./targets.js";
@@ -20,12 +20,12 @@ const tlonTestPlugin = {
   config: {
     listAccountIds: listTlonAccountIds,
     defaultAccountId: () => "default",
-    resolveAllowFrom: ({ cfg, accountId }: { cfg: OpenClawConfig; accountId?: string | null }) =>
+    resolveAllowFrom: ({ cfg, accountId }: { cfg: SteelEngineConfig; accountId?: string | null }) =>
       resolveTlonAccount(cfg, accountId).dmAllowlist,
     formatAllowFrom: ({
       allowFrom,
     }: {
-      cfg: OpenClawConfig;
+      cfg: SteelEngineConfig;
       allowFrom: Array<string | number> | undefined | null;
     }) => {
       const entries: string[] = [];
@@ -39,7 +39,7 @@ const tlonTestPlugin = {
     },
   },
   setup: {
-    resolveAccountId: ({ accountId }: { cfg: OpenClawConfig; accountId?: string | null }) =>
+    resolveAccountId: ({ accountId }: { cfg: SteelEngineConfig; accountId?: string | null }) =>
       accountId ?? "default",
   },
 };
@@ -59,7 +59,7 @@ describe("tlon core", () => {
   it("formats dm allowlist entries through the shared hybrid adapter", () => {
     expect(
       tlonTestPlugin.config.formatAllowFrom?.({
-        cfg: {} as OpenClawConfig,
+        cfg: {} as SteelEngineConfig,
         allowFrom: ["zod", " ~nec "],
       }),
     ).toEqual(["~zod", "~nec"]);
@@ -68,7 +68,7 @@ describe("tlon core", () => {
   it("returns an empty dm allowlist when the default account is unconfigured", () => {
     expect(
       tlonTestPlugin.config.resolveAllowFrom?.({
-        cfg: {} as OpenClawConfig,
+        cfg: {} as SteelEngineConfig,
         accountId: "default",
       }),
     ).toStrictEqual([]);
@@ -86,7 +86,7 @@ describe("tlon core", () => {
               dmAllowlist: ["~zod"],
             },
           },
-        } as OpenClawConfig,
+        } as SteelEngineConfig,
         accountId: "default",
       }),
     ).toEqual(["~zod"]);
@@ -186,7 +186,7 @@ describe("tlon core", () => {
 
     const result = await runSetupWizardConfigure({
       configure: tlonConfigure,
-      cfg: {} as OpenClawConfig,
+      cfg: {} as SteelEngineConfig,
       prompter,
       options: {},
     });
@@ -239,7 +239,7 @@ describe("tlon core", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     expect(listTlonAccountIds(cfg)).toEqual(["alerts", "default", "work"]);
   });
@@ -265,7 +265,7 @@ describe("tlon core", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       "work",
     );
 
@@ -296,7 +296,7 @@ describe("tlon core", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       "default",
     );
 
@@ -317,7 +317,7 @@ describe("tlon core", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
       accountOverrides: { tlon: "work" },
     });
 

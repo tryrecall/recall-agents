@@ -1,7 +1,7 @@
 // Discord API module exposes the plugin public contract.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import { inspectDiscordAccount } from "./src/account-inspect.js";
 
-export function inspectDiscordReadOnlyAccount(cfg: OpenClawConfig, accountId?: string | null) {
+export function inspectDiscordReadOnlyAccount(cfg: SteelEngineConfig, accountId?: string | null) {
   return inspectDiscordAccount({ cfg, accountId });
 }

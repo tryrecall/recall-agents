@@ -47,7 +47,7 @@ function createTempCommandDir(
   files: Array<{ name: string; executable?: boolean }>,
 ): string {
   // Temporary PATH entries model available shell binaries and permissions.
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-shell-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-shell-"));
   tempDirs.push(dir);
   for (const file of files) {
     const filePath = path.join(dir, file.name);
@@ -150,7 +150,7 @@ describe("getShellConfig", () => {
   });
 
   it("rejects a missing explicit custom shell path", () => {
-    expect(() => getShellConfig(path.join(os.tmpdir(), "missing-openclaw-shell"))).toThrow(
+    expect(() => getShellConfig(path.join(os.tmpdir(), "missing-steelengine-shell"))).toThrow(
       "Custom shell path not found",
     );
   });
@@ -209,7 +209,7 @@ describe("getBashShellConfig", () => {
   });
 
   it("finds Git Bash under ProgramFiles", () => {
-    const programFiles = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-git-bash-"));
+    const programFiles = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-git-bash-"));
     tempDirs.push(programFiles);
     const bashDir = path.join(programFiles, "Git", "bin");
     fs.mkdirSync(bashDir, { recursive: true });
@@ -227,7 +227,7 @@ describe("getBashShellConfig", () => {
   });
 
   it("prepends coreutils for a standard Git for Windows install", () => {
-    const programFiles = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-git-bash-env-"));
+    const programFiles = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-git-bash-env-"));
     tempDirs.push(programFiles);
     const gitRoot = path.join(programFiles, "Git");
     const bashPath = path.join(gitRoot, "bin", "bash.exe");
@@ -247,7 +247,7 @@ describe("getBashShellConfig", () => {
   });
 
   it("recognizes portable Git for Windows installs", () => {
-    const gitRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-portable-git-"));
+    const gitRoot = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-portable-git-"));
     tempDirs.push(gitRoot);
     const bashPath = path.join(gitRoot, "usr", "bin", "bash.exe");
     const usrBin = path.dirname(bashPath);
@@ -260,7 +260,7 @@ describe("getBashShellConfig", () => {
   });
 
   it("leaves unrelated MSYS2 installs unchanged", () => {
-    const msysRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-msys2-"));
+    const msysRoot = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-msys2-"));
     tempDirs.push(msysRoot);
     const bashPath = path.join(msysRoot, "usr", "bin", "bash.exe");
     fs.mkdirSync(path.dirname(bashPath), { recursive: true });
@@ -327,12 +327,12 @@ describe("getBashShellEnv", () => {
     envSnapshot.restore();
   });
 
-  it("returns an env object with the OpenClaw bin dir on PATH", () => {
+  it("returns an env object with the SteelEngine bin dir on PATH", () => {
     process.env.PATH = "/usr/bin";
     const env = getBashShellEnv();
 
     expect(env.PATH).toContain("/usr/bin");
-    expect(env.PATH).toContain(".openclaw");
+    expect(env.PATH).toContain(".steelengine");
   });
 
   it("collapses case-insensitive PATH duplicates before Windows spawn", () => {
@@ -365,7 +365,7 @@ describe("detectRuntimeShell", () => {
 
   beforeEach(() => {
     envSnapshot = captureEnv([
-      "OPENCLAW_SHELL",
+      "STEELENGINE_SHELL",
       "SHELL",
       "POWERSHELL_DISTRIBUTION_CHANNEL",
       "BASH_VERSION",
@@ -375,7 +375,7 @@ describe("detectRuntimeShell", () => {
       "NU_VERSION",
       "NUSHELL_VERSION",
     ]);
-    delete process.env.OPENCLAW_SHELL;
+    delete process.env.STEELENGINE_SHELL;
     delete process.env.POWERSHELL_DISTRIBUTION_CHANNEL;
     delete process.env.BASH_VERSION;
     delete process.env.ZSH_VERSION;
@@ -424,7 +424,7 @@ describe("getShellConfig on Windows", () => {
   });
 
   it("prefers PowerShell 7 in ProgramFiles", () => {
-    const base = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-pfiles-"));
+    const base = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-pfiles-"));
     tempDirs.push(base);
     const pwsh7Dir = path.join(base, "PowerShell", "7");
     fs.mkdirSync(pwsh7Dir, { recursive: true });
@@ -441,8 +441,8 @@ describe("getShellConfig on Windows", () => {
   });
 
   it("prefers ProgramW6432 PowerShell 7 when ProgramFiles lacks pwsh", () => {
-    const programFiles = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-pfiles-"));
-    const programW6432 = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-pw6432-"));
+    const programFiles = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-pfiles-"));
+    const programW6432 = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-pw6432-"));
     tempDirs.push(programFiles, programW6432);
     const pwsh7Dir = path.join(programW6432, "PowerShell", "7");
     fs.mkdirSync(pwsh7Dir, { recursive: true });
@@ -459,8 +459,8 @@ describe("getShellConfig on Windows", () => {
   });
 
   it("finds pwsh on PATH when not in standard install locations", () => {
-    const programFiles = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-pfiles-"));
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-bin-"));
+    const programFiles = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-pfiles-"));
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-bin-"));
     tempDirs.push(programFiles, binDir);
     const pwshPath = path.join(binDir, "pwsh");
     fs.writeFileSync(pwshPath, "");
@@ -476,8 +476,8 @@ describe("getShellConfig on Windows", () => {
   });
 
   it("falls back to Windows PowerShell 5.1 path when pwsh is unavailable", () => {
-    const programFiles = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-pfiles-"));
-    const sysRoot = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-sysroot-"));
+    const programFiles = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-pfiles-"));
+    const sysRoot = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-sysroot-"));
     tempDirs.push(programFiles, sysRoot);
     const ps51Dir = path.join(sysRoot, "System32", "WindowsPowerShell", "v1.0");
     fs.mkdirSync(ps51Dir, { recursive: true });

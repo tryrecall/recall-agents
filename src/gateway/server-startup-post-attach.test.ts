@@ -15,7 +15,7 @@ import {
   getActiveGatewayRootWorkCount,
   resetGatewayWorkAdmission,
 } from "../process/gateway-work-admission.js";
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import { withEnvAsync } from "../test-utils/env.js";
 
 const hoisted = vi.hoisted(() => {
@@ -61,7 +61,7 @@ const hoisted = vi.hoisted(() => {
     allowed: true,
     inCatalog: true,
   }));
-  const ensureOpenClawModelsJson = vi.fn(async () => {});
+  const ensureSteelEngineModelsJson = vi.fn(async () => {});
   const ensureRuntimePluginsLoaded = vi.fn();
   const ensureContextWindowCacheLoaded = vi.fn(async () => {});
   const clearCurrentProviderAuthState = vi.fn();
@@ -100,7 +100,7 @@ const hoisted = vi.hoisted(() => {
     resolveHooksGmailModel,
     loadModelCatalog,
     getModelRefStatus,
-    ensureOpenClawModelsJson,
+    ensureSteelEngineModelsJson,
     ensureRuntimePluginsLoaded,
     ensureContextWindowCacheLoaded,
     clearCurrentProviderAuthState,
@@ -133,11 +133,11 @@ vi.mock("../config/paths.js", async () => {
   const actual = await vi.importActual<typeof import("../config/paths.js")>("../config/paths.js");
   return {
     ...actual,
-    STATE_DIR: "/tmp/openclaw-state",
-    resolveConfigPath: vi.fn(() => "/tmp/openclaw-state/openclaw.json"),
+    STATE_DIR: "/tmp/steelengine-state",
+    resolveConfigPath: vi.fn(() => "/tmp/steelengine-state/steelengine.json"),
     resolveGatewayPort: vi.fn(() => 18789),
     resolveStateDir: vi.fn((env: NodeJS.ProcessEnv = process.env) =>
-      env.OPENCLAW_STATE_DIR?.trim() ? actual.resolveStateDir(env) : "/tmp/openclaw-state",
+      env.STEELENGINE_STATE_DIR?.trim() ? actual.resolveStateDir(env) : "/tmp/steelengine-state",
     ),
   };
 });
@@ -204,7 +204,7 @@ vi.mock("../agents/model-selection.js", () => ({
 }));
 
 vi.mock("../agents/models-config.js", () => ({
-  ensureOpenClawModelsJson: hoisted.ensureOpenClawModelsJson,
+  ensureSteelEngineModelsJson: hoisted.ensureSteelEngineModelsJson,
 }));
 
 vi.mock("../agents/runtime-plugins.js", () => ({
@@ -313,9 +313,9 @@ function firstGatewayStartCall(
 describe("startGatewayPostAttachRuntime", () => {
   beforeEach(() => {
     resetGatewayWorkAdmission();
-    closeOpenClawStateDatabaseForTest();
-    vi.stubEnv("OPENCLAW_SKIP_CHANNELS", "0");
-    vi.stubEnv("OPENCLAW_SKIP_PROVIDERS", "0");
+    closeSteelEngineStateDatabaseForTest();
+    vi.stubEnv("STEELENGINE_SKIP_CHANNELS", "0");
+    vi.stubEnv("STEELENGINE_SKIP_PROVIDERS", "0");
     hoisted.startPluginServices.mockClear();
     hoisted.startGmailWatcherWithLogs.mockClear();
     hoisted.loadInternalHooks.mockClear();
@@ -355,8 +355,8 @@ describe("startGatewayPostAttachRuntime", () => {
       allowed: true,
       inCatalog: true,
     });
-    hoisted.ensureOpenClawModelsJson.mockReset();
-    hoisted.ensureOpenClawModelsJson.mockResolvedValue(undefined);
+    hoisted.ensureSteelEngineModelsJson.mockReset();
+    hoisted.ensureSteelEngineModelsJson.mockResolvedValue(undefined);
     hoisted.ensureRuntimePluginsLoaded.mockReset();
     hoisted.ensureContextWindowCacheLoaded.mockReset();
     hoisted.ensureContextWindowCacheLoaded.mockResolvedValue(undefined);
@@ -372,7 +372,7 @@ describe("startGatewayPostAttachRuntime", () => {
 
   afterEach(() => {
     resetGatewayWorkAdmission();
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     vi.useRealTimers();
     vi.unstubAllEnvs();
   });
@@ -674,9 +674,9 @@ describe("startGatewayPostAttachRuntime", () => {
   });
 
   it("skips heavy restart sentinel refresh when no sentinel file exists", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-no-sentinel-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-no-sentinel-"));
     try {
-      await withEnvAsync({ OPENCLAW_STATE_DIR: stateDir }, async () => {
+      await withEnvAsync({ STEELENGINE_STATE_DIR: stateDir }, async () => {
         hoisted.refreshLatestUpdateRestartSentinel.mockClear();
 
         const result = await testing.refreshLatestUpdateRestartSentinelIfPresent();
@@ -685,13 +685,13 @@ describe("startGatewayPostAttachRuntime", () => {
         expect(hoisted.refreshLatestUpdateRestartSentinel).not.toHaveBeenCalled();
       });
     } finally {
-      closeOpenClawStateDatabaseForTest();
+      closeSteelEngineStateDatabaseForTest();
       fs.rmSync(stateDir, { recursive: true, force: true });
     }
   });
 
   it("refreshes the restart sentinel when the sentinel row exists", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-sentinel-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-sentinel-"));
     try {
       await writeRestartSentinel(
         {
@@ -699,9 +699,9 @@ describe("startGatewayPostAttachRuntime", () => {
           status: "ok",
           ts: 1,
         },
-        { OPENCLAW_STATE_DIR: stateDir } as NodeJS.ProcessEnv,
+        { STEELENGINE_STATE_DIR: stateDir } as NodeJS.ProcessEnv,
       );
-      await withEnvAsync({ OPENCLAW_STATE_DIR: stateDir }, async () => {
+      await withEnvAsync({ STEELENGINE_STATE_DIR: stateDir }, async () => {
         const sentinel = { kind: "update", status: "ok", ts: 1 } as const;
         hoisted.refreshLatestUpdateRestartSentinel.mockClear();
         hoisted.refreshLatestUpdateRestartSentinel.mockResolvedValue(sentinel);
@@ -712,13 +712,13 @@ describe("startGatewayPostAttachRuntime", () => {
         expect(hoisted.refreshLatestUpdateRestartSentinel).toHaveBeenCalledOnce();
       });
     } finally {
-      closeOpenClawStateDatabaseForTest();
+      closeSteelEngineStateDatabaseForTest();
       fs.rmSync(stateDir, { recursive: true, force: true });
     }
   });
 
   it("detects restart sentinel rows in explicit state directories", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-sentinel-state-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-sentinel-state-"));
     try {
       await writeRestartSentinel(
         {
@@ -726,22 +726,22 @@ describe("startGatewayPostAttachRuntime", () => {
           status: "ok",
           ts: 1,
         },
-        { OPENCLAW_STATE_DIR: stateDir } as NodeJS.ProcessEnv,
+        { STEELENGINE_STATE_DIR: stateDir } as NodeJS.ProcessEnv,
       );
 
       expect(
         await testing.hasRestartSentinelFast({
-          OPENCLAW_STATE_DIR: stateDir,
+          STEELENGINE_STATE_DIR: stateDir,
         } as NodeJS.ProcessEnv),
       ).toBe(true);
     } finally {
-      closeOpenClawStateDatabaseForTest();
+      closeSteelEngineStateDatabaseForTest();
       fs.rmSync(stateDir, { recursive: true, force: true });
     }
   });
 
   it("avoids sync filesystem probes while checking restart sentinel presence", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-async-sentinel-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-async-sentinel-"));
     try {
       await writeRestartSentinel(
         {
@@ -749,7 +749,7 @@ describe("startGatewayPostAttachRuntime", () => {
           status: "ok",
           ts: 1,
         },
-        { OPENCLAW_STATE_DIR: stateDir } as NodeJS.ProcessEnv,
+        { STEELENGINE_STATE_DIR: stateDir } as NodeJS.ProcessEnv,
       );
       const actualExistsSync = fs.existsSync;
       const existsSync = vi.spyOn(fs, "existsSync").mockImplementation((candidate) => {
@@ -761,7 +761,7 @@ describe("startGatewayPostAttachRuntime", () => {
       try {
         await expect(
           testing.hasRestartSentinelFast({
-            OPENCLAW_STATE_DIR: stateDir,
+            STEELENGINE_STATE_DIR: stateDir,
           } as NodeJS.ProcessEnv),
         ).resolves.toBe(true);
         expect(
@@ -771,7 +771,7 @@ describe("startGatewayPostAttachRuntime", () => {
         existsSync.mockRestore();
       }
     } finally {
-      closeOpenClawStateDatabaseForTest();
+      closeSteelEngineStateDatabaseForTest();
       fs.rmSync(stateDir, { recursive: true, force: true });
     }
   });
@@ -957,7 +957,7 @@ describe("startGatewayPostAttachRuntime", () => {
           memory: { backend: "qmd", qmd: { update: { startup: "idle", startupDelayMs: 25 } } },
         } as never,
         pluginRegistry: createPostAttachParams().pluginRegistry,
-        defaultWorkspaceDir: "/tmp/openclaw-workspace",
+        defaultWorkspaceDir: "/tmp/steelengine-workspace",
         deps: {} as never,
         startChannels: vi.fn(async () => {}),
         log: { warn: vi.fn() },
@@ -989,7 +989,7 @@ describe("startGatewayPostAttachRuntime", () => {
     let active = 0;
     let maxActive = 0;
     const cleanedLock = {
-      lockPath: "/tmp/openclaw-state/agents/main/sessions/a.jsonl.lock",
+      lockPath: "/tmp/steelengine-state/agents/main/sessions/a.jsonl.lock",
       pid: null,
       pidAlive: false,
       createdAt: null,
@@ -1049,7 +1049,7 @@ describe("startGatewayPostAttachRuntime", () => {
   it("marks cleaned startup session locks even when cleanup is stopped after removal", async () => {
     let stopped = false;
     const cleanedLock = {
-      lockPath: "/tmp/openclaw-state/agents/main/sessions/a.jsonl.lock",
+      lockPath: "/tmp/steelengine-state/agents/main/sessions/a.jsonl.lock",
       pid: null,
       pidAlive: false,
       createdAt: null,
@@ -1210,7 +1210,7 @@ describe("startGatewayPostAttachRuntime", () => {
     await waitForGatewayTestState(() => {
       expect(hoisted.ensureRuntimePluginsLoaded).toHaveBeenCalledWith({
         config: currentConfig,
-        workspaceDir: "/tmp/openclaw-workspace",
+        workspaceDir: "/tmp/steelengine-workspace",
         allowGatewaySubagentBinding: true,
       });
     });
@@ -1464,8 +1464,8 @@ describe("startGatewayPostAttachRuntime", () => {
   it("starts channels when channel startup is enabled", async () => {
     await withEnvAsync(
       {
-        OPENCLAW_SKIP_CHANNELS: undefined,
-        OPENCLAW_SKIP_PROVIDERS: undefined,
+        STEELENGINE_SKIP_CHANNELS: undefined,
+        STEELENGINE_SKIP_PROVIDERS: undefined,
       },
       async () => {
         const startChannels = vi.fn(async () => {});
@@ -1476,7 +1476,7 @@ describe("startGatewayPostAttachRuntime", () => {
             agents: { defaults: { model: "openai/gpt-5.4" } },
           } as never,
           pluginRegistry: createPostAttachParams().pluginRegistry,
-          defaultWorkspaceDir: "/tmp/openclaw-workspace",
+          defaultWorkspaceDir: "/tmp/steelengine-workspace",
           deps: {} as never,
           startChannels,
           log: { warn: vi.fn() },
@@ -1498,7 +1498,7 @@ describe("startGatewayPostAttachRuntime", () => {
 
   it("starts and reports plugin services after channel startup completes", async () => {
     await withEnvAsync(
-      { OPENCLAW_SKIP_CHANNELS: undefined, OPENCLAW_SKIP_PROVIDERS: undefined },
+      { STEELENGINE_SKIP_CHANNELS: undefined, STEELENGINE_SKIP_PROVIDERS: undefined },
       async () => {
         let releaseChannels: (() => void) | undefined;
         const events: string[] = [];
@@ -1561,7 +1561,7 @@ describe("startGatewayPostAttachRuntime", () => {
 
   it("does not start plugin services after deferred close starts during channel startup", async () => {
     await withEnvAsync(
-      { OPENCLAW_SKIP_CHANNELS: undefined, OPENCLAW_SKIP_PROVIDERS: undefined },
+      { STEELENGINE_SKIP_CHANNELS: undefined, STEELENGINE_SKIP_PROVIDERS: undefined },
       async () => {
         let closing = false;
         let releaseChannels: (() => void) | undefined;
@@ -1605,7 +1605,7 @@ describe("startGatewayPostAttachRuntime", () => {
 
   it("stops plugin services that finish starting after deferred close begins", async () => {
     await withEnvAsync(
-      { OPENCLAW_SKIP_CHANNELS: undefined, OPENCLAW_SKIP_PROVIDERS: undefined },
+      { STEELENGINE_SKIP_CHANNELS: undefined, STEELENGINE_SKIP_PROVIDERS: undefined },
       async () => {
         let shouldStartPluginServices = true;
         let releasePluginServices: (() => void) | undefined;
@@ -1621,7 +1621,7 @@ describe("startGatewayPostAttachRuntime", () => {
         const sidecarsPromise = startGatewaySidecars({
           cfg: { hooks: { internal: { enabled: false } } } as never,
           pluginRegistry: createPostAttachParams().pluginRegistry,
-          defaultWorkspaceDir: "/tmp/openclaw-workspace",
+          defaultWorkspaceDir: "/tmp/steelengine-workspace",
           deps: {} as never,
           startChannels: vi.fn(async () => {}),
           shouldStartPluginServices: () => shouldStartPluginServices,
@@ -1657,7 +1657,7 @@ describe("startGatewayPostAttachRuntime", () => {
 
   it("returns plugin services already reported by deferred sidecars", async () => {
     await withEnvAsync(
-      { OPENCLAW_SKIP_CHANNELS: undefined, OPENCLAW_SKIP_PROVIDERS: undefined },
+      { STEELENGINE_SKIP_CHANNELS: undefined, STEELENGINE_SKIP_PROVIDERS: undefined },
       async () => {
         let releaseStartupLog: (() => void) | undefined;
         let releaseChannels: (() => void) | undefined;
@@ -1723,7 +1723,7 @@ describe("startGatewayPostAttachRuntime", () => {
     const prewarmPrimaryModel = vi.fn(async () => {});
 
     await withEnvAsync(
-      { OPENCLAW_SKIP_CHANNELS: "1", OPENCLAW_SKIP_PROVIDERS: undefined },
+      { STEELENGINE_SKIP_CHANNELS: "1", STEELENGINE_SKIP_PROVIDERS: undefined },
       async () => {
         await startGatewaySidecars({
           cfg: {
@@ -1731,7 +1731,7 @@ describe("startGatewayPostAttachRuntime", () => {
             agents: { defaults: { model: "openai/gpt-5.6" } },
           } as never,
           pluginRegistry: createPostAttachParams().pluginRegistry,
-          defaultWorkspaceDir: "/tmp/openclaw-workspace",
+          defaultWorkspaceDir: "/tmp/steelengine-workspace",
           deps: {} as never,
           startChannels: vi.fn(async () => {}),
           log: { warn: vi.fn() },
@@ -1753,7 +1753,7 @@ describe("startGatewayPostAttachRuntime", () => {
     expect(trace.measures).toContain("sidecars.channels");
     expect(trace.measures).toContain("sidecars.channel-skip");
     expect(logChannels.info).toHaveBeenCalledWith(
-      "skipping channel start (OPENCLAW_SKIP_CHANNELS=1 or OPENCLAW_SKIP_PROVIDERS=1)",
+      "skipping channel start (STEELENGINE_SKIP_CHANNELS=1 or STEELENGINE_SKIP_PROVIDERS=1)",
     );
   });
 
@@ -1777,7 +1777,7 @@ describe("startGatewayPostAttachRuntime", () => {
     const sidecars = startGatewaySidecars({
       cfg: { hooks: { internal: { enabled: false } } } as never,
       pluginRegistry: createPostAttachParams().pluginRegistry,
-      defaultWorkspaceDir: "/tmp/openclaw-workspace",
+      defaultWorkspaceDir: "/tmp/steelengine-workspace",
       deps: {} as never,
       startChannels,
       log: { warn: vi.fn() },
@@ -1818,7 +1818,7 @@ describe("startGatewayPostAttachRuntime", () => {
     await startGatewaySidecars({
       cfg: { hooks: { internal: { enabled: false } } } as never,
       pluginRegistry: createPostAttachParams().pluginRegistry,
-      defaultWorkspaceDir: "/tmp/openclaw-workspace",
+      defaultWorkspaceDir: "/tmp/steelengine-workspace",
       deps: {} as never,
       startChannels,
       log,
@@ -1900,7 +1900,7 @@ describe("startGatewayPostAttachRuntime", () => {
         hooks: { enabled: true, internal: { enabled: false }, gmail: { account: "me" } },
       } as never,
       pluginRegistry: createPostAttachParams().pluginRegistry,
-      defaultWorkspaceDir: "/tmp/openclaw-workspace",
+      defaultWorkspaceDir: "/tmp/steelengine-workspace",
       deps: {} as never,
       startChannels: vi.fn(async () => {}),
       log,
@@ -1943,7 +1943,7 @@ describe("startGatewayPostAttachRuntime", () => {
         hooks: { enabled: true, internal: { enabled: false }, gmail: { account: "me" } },
       } as never,
       pluginRegistry: createPostAttachParams().pluginRegistry,
-      defaultWorkspaceDir: "/tmp/openclaw-workspace",
+      defaultWorkspaceDir: "/tmp/steelengine-workspace",
       deps: {} as never,
       startChannels: vi.fn(async () => {}),
       log,
@@ -1972,7 +1972,7 @@ describe("startGatewayPostAttachRuntime", () => {
         hooks: { enabled: true, internal: { enabled: false }, gmail: { account: "me" } },
       } as never,
       pluginRegistry: createPostAttachParams().pluginRegistry,
-      defaultWorkspaceDir: "/tmp/openclaw-workspace",
+      defaultWorkspaceDir: "/tmp/steelengine-workspace",
       deps: {} as never,
       startChannels: vi.fn(async () => {}),
       log: { warn: vi.fn() },
@@ -2016,7 +2016,7 @@ describe("startGatewayPostAttachRuntime", () => {
           hooks: { enabled: true, internal: { enabled: false }, gmail: { account: "me" } },
         } as never,
         pluginRegistry: createPostAttachParams().pluginRegistry,
-        defaultWorkspaceDir: "/tmp/openclaw-workspace",
+        defaultWorkspaceDir: "/tmp/steelengine-workspace",
         deps: {} as never,
         startChannels: vi.fn(async () => {}),
         log: { warn: vi.fn() },
@@ -2099,7 +2099,7 @@ describe("startGatewayPostAttachRuntime", () => {
         hooks: { internal: { enabled: false }, gmail: { model: "openai/gpt-5.4" } },
       } as never,
       pluginRegistry: createPostAttachParams().pluginRegistry,
-      defaultWorkspaceDir: "/tmp/openclaw-workspace",
+      defaultWorkspaceDir: "/tmp/steelengine-workspace",
       deps: {} as never,
       startChannels: vi.fn(async () => {}),
       log: { warn: vi.fn() },
@@ -2311,7 +2311,7 @@ describe("startGatewayPostAttachRuntime", () => {
       await startGatewaySidecars({
         cfg,
         pluginRegistry: createPostAttachParams().pluginRegistry,
-        defaultWorkspaceDir: "/tmp/openclaw-workspace",
+        defaultWorkspaceDir: "/tmp/steelengine-workspace",
         deps,
         startChannels: vi.fn(async () => {}),
         log: { warn: vi.fn() },
@@ -2338,7 +2338,7 @@ describe("startGatewayPostAttachRuntime", () => {
         {
           cfg,
           deps,
-          workspaceDir: "/tmp/openclaw-workspace",
+          workspaceDir: "/tmp/steelengine-workspace",
         },
       );
       expect(hoisted.triggerInternalHook).toHaveBeenCalledWith(hoisted.startupHookEvent);
@@ -2366,7 +2366,7 @@ describe("startGatewayPostAttachRuntime", () => {
         acp: { enabled: true, backend: "acpx" },
       } as never,
       pluginRegistry: createPostAttachParams().pluginRegistry,
-      defaultWorkspaceDir: "/tmp/openclaw-workspace",
+      defaultWorkspaceDir: "/tmp/steelengine-workspace",
       deps: {} as never,
       startChannels: vi.fn(async () => {}),
       log: { warn: vi.fn() },
@@ -2438,7 +2438,7 @@ describe("startGatewayPostAttachRuntime", () => {
     expect(event).toEqual({ port: 18789 });
     expect(ctx.port).toBe(18789);
     expect(ctx.config).toBe(params.gatewayPluginConfigAtStart);
-    expect(ctx.workspaceDir).toBe("/tmp/openclaw-workspace");
+    expect(ctx.workspaceDir).toBe("/tmp/steelengine-workspace");
     const getCron = ctx.getCron;
     if (!getCron) {
       throw new Error("gateway_start context did not expose getCron");
@@ -2552,7 +2552,7 @@ function createPostAttachParams(overrides: Partial<PostAttachParams> = {}): Post
       ],
       typedHooks: [],
     } as never,
-    defaultWorkspaceDir: "/tmp/openclaw-workspace",
+    defaultWorkspaceDir: "/tmp/steelengine-workspace",
     deps: {} as never,
     startChannels: vi.fn(async () => {}),
     recoveryRuntime: {

@@ -3,15 +3,15 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import {
   asDateTimestampMs,
   resolveExpiresAtMsFromDurationMs,
-} from "openclaw/plugin-sdk/number-runtime";
+} from "steelengine/plugin-sdk/number-runtime";
 import {
   createHostedOutboundMediaStore,
   type HostedOutboundMediaChunkRecord,
   type HostedOutboundMediaMetaRecord,
   type HostedOutboundMediaStore,
-} from "openclaw/plugin-sdk/outbound-media";
-import { safeEqualSecret } from "openclaw/plugin-sdk/security-runtime";
-import { resolveWebhookPath } from "openclaw/plugin-sdk/webhook-ingress";
+} from "steelengine/plugin-sdk/outbound-media";
+import { safeEqualSecret } from "steelengine/plugin-sdk/security-runtime";
+import { resolveWebhookPath } from "steelengine/plugin-sdk/webhook-ingress";
 import { getZaloRuntime } from "./runtime.js";
 
 const ZALO_OUTBOUND_MEDIA_TTL_MS = 2 * 60_000;

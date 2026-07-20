@@ -1,6 +1,6 @@
 // User turn transcript helpers extract user-turn text from session transcripts.
 import path from "node:path";
-import { mimeTypeFromFilePath } from "@openclaw/media-core/mime";
+import { mimeTypeFromFilePath } from "@steelengine/media-core/mime";
 import type { AgentMessage } from "../../packages/agent-core/src/types.js";
 import {
   persistSessionTranscriptTurn,
@@ -207,8 +207,8 @@ function buildUserTurnSenderMeta(
   };
 }
 
-function readOpenClawMessageMeta(message: AgentMessage): Record<string, unknown> | undefined {
-  const meta = (message as unknown as Record<string, unknown>)["__openclaw"];
+function readSteelEngineMessageMeta(message: AgentMessage): Record<string, unknown> | undefined {
+  const meta = (message as unknown as Record<string, unknown>)["__steelengine"];
   return meta && typeof meta === "object" && !Array.isArray(meta)
     ? (meta as Record<string, unknown>)
     : undefined;
@@ -223,10 +223,10 @@ export function buildPersistedUserTurnMessage(params: UserTurnInput): PersistedU
   // derived from each message's own `timestamp` field, so the current turn and
   // every historical turn serialize identically on the wire. Persisting a stamp
   // here would NOT match the bare-current arrival (the gateway no longer stamps
-  // the live turn) — see https://github.com/openclaw/openclaw/issues/3658.
+  // the live turn) — see https://github.com/steelengineai/recall-agents/issues/3658.
   const content = text || (hasMedia ? (params.mediaOnlyText ?? "") : "");
   const senderMeta = buildUserTurnSenderMeta(params.sender);
-  const openClawMeta = {
+  const steelEngineMeta = {
     ...(params.senderIsOwner === undefined ? {} : { senderIsOwner: params.senderIsOwner }),
     ...senderMeta,
     ...(params.transport ? { transport: params.transport } : {}),
@@ -237,7 +237,7 @@ export function buildPersistedUserTurnMessage(params: UserTurnInput): PersistedU
     timestamp: params.timestamp ?? Date.now(),
     ...(params.idempotencyKey ? { idempotencyKey: params.idempotencyKey } : {}),
     ...mediaFields,
-    ...(Object.keys(openClawMeta).length > 0 ? { __openclaw: openClawMeta } : {}),
+    ...(Object.keys(steelEngineMeta).length > 0 ? { __steelengine: steelEngineMeta } : {}),
   } as PersistedUserTurnMessage;
   return applyInputProvenanceToUserMessage(message, params.provenance) as PersistedUserTurnMessage;
 }
@@ -307,7 +307,7 @@ function buildLateResolvedMediaMessage(params: {
 }
 
 function isBeforeAgentRunBlockedMessage(message: AgentMessage): boolean {
-  const marker = (message as { __openclaw?: { beforeAgentRunBlocked?: unknown } })["__openclaw"]
+  const marker = (message as { __steelengine?: { beforeAgentRunBlocked?: unknown } })["__steelengine"]
     ?.beforeAgentRunBlocked;
   return marker !== undefined;
 }
@@ -340,12 +340,12 @@ export function mergePreparedUserTurnMessageForRuntime(params: {
   }
   const runtimeMessage = params.runtimeMessage as unknown as Record<string, unknown>;
   const preparedMessage = params.preparedMessage as unknown as Record<string, unknown>;
-  const runtimeMeta = readOpenClawMessageMeta(params.runtimeMessage);
-  const preparedMeta = readOpenClawMessageMeta(params.preparedMessage);
+  const runtimeMeta = readSteelEngineMessageMeta(params.runtimeMessage);
+  const preparedMeta = readSteelEngineMessageMeta(params.preparedMessage);
   return {
     ...runtimeMessage,
     ...preparedMessage,
-    ...(preparedMeta ? { __openclaw: { ...runtimeMeta, ...preparedMeta } } : {}),
+    ...(preparedMeta ? { __steelengine: { ...runtimeMeta, ...preparedMeta } } : {}),
     ...(userMessageHasImageContent(params.runtimeMessage)
       ? { content: params.runtimeMessage.content }
       : {}),
@@ -360,14 +360,14 @@ export function restorePreparedUserTurnOperationalMetaForRuntime(params: {
   if (!params.preparedMessage || !isUserMessage(params.runtimeMessage)) {
     return params.runtimeMessage;
   }
-  const preparedMeta = readOpenClawMessageMeta(params.preparedMessage);
+  const preparedMeta = readSteelEngineMessageMeta(params.preparedMessage);
   const senderIsOwner = preparedMeta?.senderIsOwner;
   if (typeof senderIsOwner !== "boolean") {
     return params.runtimeMessage;
   }
   return {
     ...(params.runtimeMessage as unknown as Record<string, unknown>),
-    __openclaw: { ...readOpenClawMessageMeta(params.runtimeMessage), senderIsOwner },
+    __steelengine: { ...readSteelEngineMessageMeta(params.runtimeMessage), senderIsOwner },
   } as unknown as AgentMessage;
 }
 
@@ -385,8 +385,8 @@ export function preparePersistedUserTurnMessageForTranscriptWrite(
   const provenance = normalizeInputProvenance(
     (message as unknown as { provenance?: unknown }).provenance,
   );
-  const senderIsOwner = readOpenClawMessageMeta(message)?.senderIsOwner;
-  const originalTransport = readOpenClawMessageMeta(message)?.transport;
+  const senderIsOwner = readSteelEngineMessageMeta(message)?.senderIsOwner;
+  const originalTransport = readSteelEngineMessageMeta(message)?.transport;
   // Hooks receive the original message object and may mutate nested metadata in
   // place. Snapshot transport correlation before handing them that reference.
   const transport =
@@ -408,14 +408,14 @@ export function preparePersistedUserTurnMessageForTranscriptWrite(
     return nextUserMessage;
   }
   const protectedMeta = {
-    ...readOpenClawMessageMeta(nextUserMessage),
+    ...readSteelEngineMessageMeta(nextUserMessage),
     ...(typeof senderIsOwner === "boolean" ? { senderIsOwner } : {}),
     ...(transport ? { transport } : {}),
   };
   return {
     ...(nextUserMessage as unknown as Record<string, unknown>),
     ...(idempotencyKey ? { idempotencyKey } : {}),
-    ...(Object.keys(protectedMeta).length > 0 ? { __openclaw: protectedMeta } : {}),
+    ...(Object.keys(protectedMeta).length > 0 ? { __steelengine: protectedMeta } : {}),
   } as unknown as PersistedUserTurnMessage;
 }
 
@@ -734,7 +734,7 @@ export function createUserTurnTranscriptRecorder(
 }
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
-  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("openclaw.userTurnTranscriptTestApi")] = {
+  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("steelengine.userTurnTranscriptTestApi")] = {
     persistUserTurnTranscript,
   };
 }

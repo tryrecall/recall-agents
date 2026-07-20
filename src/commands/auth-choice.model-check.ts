@@ -1,5 +1,5 @@
 // Post-selection model/auth sanity checks shown during onboarding and agent setup.
-import { normalizeProviderIdForAuth } from "@openclaw/model-catalog-core/provider-id";
+import { normalizeProviderIdForAuth } from "@steelengine/model-catalog-core/provider-id";
 import { ensureAuthProfileStore } from "../agents/auth-profiles.js";
 import { createModelAuthAvailabilityResolver } from "../agents/model-auth-availability.js";
 import { loadModelCatalogSnapshot, type ModelCatalogEntry } from "../agents/model-catalog.js";
@@ -7,7 +7,7 @@ import { resolveDefaultModelForAgent } from "../agents/model-selection.js";
 import { buildProviderAuthRecoveryHint } from "../agents/provider-auth-recovery-hint.js";
 import { canonicalizeProviderModelId } from "../agents/provider-model-route.js";
 import type { ModelApi } from "../config/types.models.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { ProviderModelRouteAuthRequirement } from "../plugin-sdk/provider-model-types.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
 
@@ -37,7 +37,7 @@ type DefaultModelAuthStatus = {
  * onboarding model check and the finalize hatch gating.
  */
 export function resolveDefaultModelAuthStatus(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   options?: {
     agentId?: string;
     agentDir?: string;
@@ -119,7 +119,7 @@ type DefaultModelCatalogFacts = {
 
 /** Resolve logical model identity and every physical route represented by a catalog. */
 export function resolveDefaultModelCatalogFacts(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   catalog: readonly ModelCatalogEntry[],
   options?: { agentId?: string; routeVariants?: readonly ModelCatalogEntry[] },
 ): DefaultModelCatalogFacts {
@@ -142,7 +142,7 @@ export function resolveDefaultModelCatalogFacts(
 
 /** Warn when the selected default model is unknown or has no usable credentials. */
 export async function warnIfModelConfigLooksOff(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   prompter: WizardPrompter,
   options?: {
     agentId?: string;

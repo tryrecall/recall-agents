@@ -1,6 +1,6 @@
 // Doctor scanner and repair for subagent allowlists that reference missing agents.
 import { listAgentIds } from "../../../agents/agent-scope-config.js";
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../../config/types.steelengine.js";
 import { normalizeAgentId, normalizeOptionalAgentId } from "../../../routing/session-key.js";
 
 type StaleSubagentAllowlistHit = {
@@ -12,7 +12,7 @@ type StaleSubagentAllowlistHit = {
   normalizedAgentId: string;
 };
 
-function collectConfiguredSubagentTargetIds(cfg: OpenClawConfig): Set<string> {
+function collectConfiguredSubagentTargetIds(cfg: SteelEngineConfig): Set<string> {
   const ids = new Set<string>(listAgentIds(cfg));
   for (const agent of cfg.agents?.list ?? []) {
     if (agent.runtime?.type !== "acp") {
@@ -77,7 +77,7 @@ function collectStaleAllowlistEntries(params: {
 
 /** Find subagent allowlist entries not backed by configured agent or ACP targets. */
 export function scanStaleSubagentAllowlistReferences(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
 ): StaleSubagentAllowlistHit[] {
   const configuredTargetIds = collectConfiguredSubagentTargetIds(cfg);
   const hits: StaleSubagentAllowlistHit[] = [];
@@ -129,8 +129,8 @@ function filterAllowAgents(params: {
 }
 
 /** Remove stale subagent allowlist entries while preserving valid targets and wildcards. */
-export function maybeRepairStaleSubagentAllowlists(cfg: OpenClawConfig): {
-  config: OpenClawConfig;
+export function maybeRepairStaleSubagentAllowlists(cfg: SteelEngineConfig): {
+  config: SteelEngineConfig;
   changes: string[];
 } {
   const hits = scanStaleSubagentAllowlistReferences(cfg);

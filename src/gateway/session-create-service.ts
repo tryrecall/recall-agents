@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import {
   ErrorCodes,
   type ErrorShape,
@@ -28,7 +28,7 @@ import {
   createSessionEntryWithTranscript,
   resolveSessionEntryAccessTarget,
 } from "../config/sessions/session-accessor.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   createInternalHookEvent,
   hasInternalHookListeners,
@@ -71,7 +71,7 @@ type RequestedSessionAgentIdResolution =
   | { ok: false; error: ErrorShape };
 
 export function resolveRequestedSessionAgentId(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   key: string,
   explicitAgentId?: string,
 ): RequestedSessionAgentIdResolution {
@@ -183,7 +183,7 @@ type CreateGatewaySessionResult =
   | { ok: false; error: ErrorShape };
 
 export async function createGatewaySession(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   key?: string;
   agentId?: string;
   label?: string;

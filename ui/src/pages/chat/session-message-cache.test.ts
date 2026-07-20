@@ -126,7 +126,7 @@ describe("session message cache", () => {
     const cache: ChatMessageCache = new Map();
     const retained = Array.from({ length: 140 }, (_, index) => ({
       content: `retained-${index + 1}`,
-      __openclaw: { seq: index + 1 },
+      __steelengine: { seq: index + 1 },
     }));
     cacheChatSessionSnapshot(
       cache,
@@ -140,7 +140,7 @@ describe("session message cache", () => {
     );
     const refreshedTail = Array.from({ length: 40 }, (_, index) => ({
       content: `fresh-${index + 101}`,
-      __openclaw: { seq: index + 101 },
+      __steelengine: { seq: index + 101 },
     }));
 
     cacheChatSessionSnapshot(
@@ -166,7 +166,7 @@ describe("session message cache", () => {
     const cache: ChatMessageCache = new Map();
     const current = [1, 2, 3].map((seq) => ({
       content: `current-${seq}`,
-      __openclaw: { seq },
+      __steelengine: { seq },
     }));
     cacheChatSessionSnapshot(
       cache,
@@ -205,12 +205,12 @@ describe("session message cache", () => {
       host,
       { sessionKey: "home" },
       {
-        messages: [{ content: "old", __openclaw: { seq: 1 } }],
+        messages: [{ content: "old", __steelengine: { seq: 1 } }],
         pagination: { hasMore: false, totalMessages: 1 },
         sessionId: "session-1",
       },
     );
-    const replacement = [{ content: "new", __openclaw: { seq: 1 } }];
+    const replacement = [{ content: "new", __steelengine: { seq: 1 } }];
 
     cacheChatSessionSnapshot(
       cache,
@@ -287,9 +287,9 @@ describe("session message cache", () => {
       { sessionKey: "home" },
       {
         messages: [
-          { content, __openclaw: { seq: 1 } },
-          { content, projection: "sibling", __openclaw: { seq: 1 } },
-          { content, __openclaw: { seq: 2 } },
+          { content, __steelengine: { seq: 1 } },
+          { content, projection: "sibling", __steelengine: { seq: 1 } },
+          { content, __steelengine: { seq: 2 } },
         ],
         pagination: { hasMore: false, totalMessages: 2 },
         sessionId: "session-1",
@@ -315,7 +315,7 @@ describe("session message cache", () => {
         host,
         { sessionKey },
         {
-          messages: [{ content, __openclaw: { seq: 1 } }],
+          messages: [{ content, __steelengine: { seq: 1 } }],
           pagination: { hasMore: false, totalMessages: 1 },
           sessionId: sessionKey,
         },

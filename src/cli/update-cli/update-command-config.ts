@@ -1,7 +1,7 @@
 // Config snapshots and pre/post-update config restoration.
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
 import { theme } from "../../../packages/terminal-core/src/theme.js";
 import { createPreUpdateConfigSnapshot } from "../../config/backup-rotation.js";
 import {
@@ -13,7 +13,7 @@ import { resolveConfigEnvVars } from "../../config/env-substitution.js";
 import { resolveConfigIncludes } from "../../config/includes.js";
 import { asResolvedSourceConfig, asRuntimeConfig } from "../../config/materialize.js";
 import { CONFIG_PATH, resolveIncludeRoots } from "../../config/paths.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type { PluginInstallRecord } from "../../config/types.plugins.js";
 import { normalizeUpdateChannel, type UpdateChannel } from "../../infra/update-channels.js";
 import type { PreUpdateConfigRestoreInput } from "../../infra/update-post-core-context.js";
@@ -148,7 +148,7 @@ export function restoreDroppedPreUpdateChannels(
   const authoredChannels = resolveRestoredAuthoredChannels({
     currentChannels: snapshot.sourceConfig.channels,
     currentAuthoredChannels: isRecord(snapshot.parsed)
-      ? (snapshot.parsed as OpenClawConfig).channels
+      ? (snapshot.parsed as SteelEngineConfig).channels
       : snapshot.sourceConfig.channels,
     preUpdateAuthoredChannels: preUpdateConfig.authoredConfig.channels,
     restoredChannelIds,
@@ -156,7 +156,7 @@ export function restoreDroppedPreUpdateChannels(
   const nextConfig = {
     ...snapshot.sourceConfig,
     channels: restoredChannels,
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
   return {
     snapshot: {
       ...createUpdatedConfigSnapshot(snapshot, nextConfig),
@@ -270,7 +270,7 @@ export async function persistRequestedUpdateChannel(params: {
 
 function createUpdatedConfigSnapshot(
   snapshot: Awaited<ReturnType<typeof readConfigFileSnapshot>>,
-  next: OpenClawConfig,
+  next: SteelEngineConfig,
 ): Awaited<ReturnType<typeof readConfigFileSnapshot>> {
   if (!snapshot.valid) {
     return snapshot;
@@ -339,11 +339,11 @@ function normalizePreUpdateConfigRestoreInput(
   const authoredConfig = parsed.authoredConfig;
   if (isRecord(sourceConfig) && isRecord(authoredConfig)) {
     return {
-      sourceConfig: sourceConfig as OpenClawConfig,
-      authoredConfig: authoredConfig as OpenClawConfig,
+      sourceConfig: sourceConfig as SteelEngineConfig,
+      authoredConfig: authoredConfig as SteelEngineConfig,
     };
   }
-  const authored = parsed as OpenClawConfig;
+  const authored = parsed as SteelEngineConfig;
   return {
     sourceConfig: options?.configPath
       ? resolvePreUpdateSourceConfigFromAuthored(authored, options.configPath)
@@ -353,9 +353,9 @@ function normalizePreUpdateConfigRestoreInput(
 }
 
 function resolvePreUpdateSourceConfigFromAuthored(
-  authoredConfig: OpenClawConfig,
+  authoredConfig: SteelEngineConfig,
   configPath: string,
-): OpenClawConfig {
+): SteelEngineConfig {
   try {
     const withIncludes = resolveConfigIncludes(authoredConfig, configPath, undefined, {
       allowedRoots: resolveIncludeRoots(process.env),
@@ -363,7 +363,7 @@ function resolvePreUpdateSourceConfigFromAuthored(
     const resolved = resolveConfigEnvVars(withIncludes, process.env, {
       onMissing: () => undefined,
     });
-    return isRecord(resolved) ? (resolved as OpenClawConfig) : authoredConfig;
+    return isRecord(resolved) ? (resolved as SteelEngineConfig) : authoredConfig;
   } catch {
     return authoredConfig;
   }

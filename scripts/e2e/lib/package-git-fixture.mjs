@@ -22,26 +22,26 @@ function withoutAiRuntimeDependency(value) {
   if (!Array.isArray(value)) {
     return value;
   }
-  const next = value.filter((entry) => entry !== "@openclaw/ai");
+  const next = value.filter((entry) => entry !== "@steelengine/ai");
   return next.length > 0 ? next : undefined;
 }
 
 function prepare(root) {
   const packageJsonPath = path.join(root, "package.json");
   const packageJson = readJson(packageJsonPath);
-  const aiRuntimeSource = path.join(root, "node_modules", "@openclaw", "ai");
+  const aiRuntimeSource = path.join(root, "node_modules", "@steelengine", "ai");
   const aiRuntimePackageJson = path.join(aiRuntimeSource, "package.json");
   if (!fs.existsSync(aiRuntimePackageJson)) {
     return;
   }
 
-  const aiRuntimeTarget = path.join(root, ".openclaw-fixture", "packages", "ai");
+  const aiRuntimeTarget = path.join(root, ".steelengine-fixture", "packages", "ai");
   fs.rmSync(aiRuntimeTarget, { force: true, recursive: true });
   fs.mkdirSync(path.dirname(aiRuntimeTarget), { recursive: true });
   fs.renameSync(aiRuntimeSource, aiRuntimeTarget);
 
   packageJson.dependencies ??= {};
-  packageJson.dependencies["@openclaw/ai"] = "file:.openclaw-fixture/packages/ai";
+  packageJson.dependencies["@steelengine/ai"] = "file:.steelengine-fixture/packages/ai";
   packageJson.bundleDependencies = withoutAiRuntimeDependency(packageJson.bundleDependencies);
   packageJson.bundledDependencies = withoutAiRuntimeDependency(packageJson.bundledDependencies);
   if (packageJson.bundleDependencies === undefined) {

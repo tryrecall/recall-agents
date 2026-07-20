@@ -1,14 +1,14 @@
 /** Read-only diagnostic readers used by the session SQLite doctor mode. */
 import fs from "node:fs";
 import { TextDecoder } from "node:util";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
 import { normalizeLoadedFileEntry, type FileEntry } from "../agents/sessions/session-manager.js";
 import type { TranscriptEvent } from "../config/sessions/session-accessor.js";
 import { resolveSqliteTargetFromSessionStorePath } from "../config/sessions/session-sqlite-target.js";
 import type { SessionStoreTarget } from "../config/sessions/targets.js";
 import type { SessionEntry } from "../config/sessions/types.js";
 import { requireNodeSqlite } from "../infra/node-sqlite.js";
-import { resolveOpenClawAgentSqlitePath } from "../state/openclaw-agent-db.js";
+import { resolveSteelEngineAgentSqlitePath } from "../state/steelengine-agent-db.js";
 
 type ReadOnlySqliteSessionSummary = {
   entry: SessionEntry;
@@ -284,7 +284,7 @@ export function resolveTargetSqlitePath(target: SessionStoreTarget): string {
   const sqliteTarget = resolveSqliteTargetFromSessionStorePath(target.storePath, {
     agentId: target.agentId,
   });
-  return resolveOpenClawAgentSqlitePath({
+  return resolveSteelEngineAgentSqlitePath({
     agentId: sqliteTarget.agentId ?? target.agentId,
     ...(sqliteTarget.path ? { path: sqliteTarget.path } : {}),
   });

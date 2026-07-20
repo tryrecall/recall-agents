@@ -40,7 +40,7 @@ let saveExecApprovals: ExecApprovalsModule["saveExecApprovals"];
 let updateExecApprovals: ExecApprovalsModule["updateExecApprovals"];
 
 const tempDirs: string[] = [];
-const testEnvSnapshot = captureEnv(["OPENCLAW_HOME", "OPENCLAW_PROFILE", "OPENCLAW_STATE_DIR"]);
+const testEnvSnapshot = captureEnv(["STEELENGINE_HOME", "STEELENGINE_PROFILE", "STEELENGINE_STATE_DIR"]);
 
 beforeAll(async () => {
   const module = await import("./exec-approvals.js");
@@ -82,14 +82,14 @@ afterEach(() => {
 function createHomeDir(): string {
   const dir = makeTempDir();
   tempDirs.push(dir);
-  setTestEnvValue("OPENCLAW_HOME", dir);
-  deleteTestEnvValue("OPENCLAW_PROFILE");
-  deleteTestEnvValue("OPENCLAW_STATE_DIR");
+  setTestEnvValue("STEELENGINE_HOME", dir);
+  deleteTestEnvValue("STEELENGINE_PROFILE");
+  deleteTestEnvValue("STEELENGINE_STATE_DIR");
   return dir;
 }
 
 function approvalsFilePath(homeDir: string): string {
-  return path.join(homeDir, ".openclaw", "exec-approvals.json");
+  return path.join(homeDir, ".steelengine", "exec-approvals.json");
 }
 
 function stateApprovalsFilePath(stateDir: string): string {
@@ -134,18 +134,18 @@ describe("exec approvals store helpers", () => {
     const dir = createHomeDir();
 
     expect(path.normalize(resolveExecApprovalsPath())).toBe(
-      path.normalize(path.join(dir, ".openclaw", "exec-approvals.json")),
+      path.normalize(path.join(dir, ".steelengine", "exec-approvals.json")),
     );
     expect(path.normalize(resolveExecApprovalsSocketPath())).toBe(
-      path.normalize(path.join(dir, ".openclaw", "exec-approvals.sock")),
+      path.normalize(path.join(dir, ".steelengine", "exec-approvals.sock")),
     );
-    expect(resolveExecApprovalsDisplayPath()).toBe("~/.openclaw/exec-approvals.json");
+    expect(resolveExecApprovalsDisplayPath()).toBe("~/.steelengine/exec-approvals.json");
   });
 
-  it("uses OPENCLAW_STATE_DIR for default file and socket paths", () => {
+  it("uses STEELENGINE_STATE_DIR for default file and socket paths", () => {
     const dir = createHomeDir();
     const stateDir = path.join(dir, "custom-state");
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
 
     expect(path.normalize(resolveExecApprovalsPath())).toBe(
       path.normalize(stateApprovalsFilePath(stateDir)),
@@ -154,7 +154,7 @@ describe("exec approvals store helpers", () => {
       path.normalize(path.join(stateDir, "exec-approvals.sock")),
     );
     expect(resolveExecApprovalsDisplayPath()).toBe(stateApprovalsFilePath(stateDir));
-    expect(resolveExecApprovalsTranscriptPath()).toBe("$OPENCLAW_STATE_DIR/exec-approvals.json");
+    expect(resolveExecApprovalsTranscriptPath()).toBe("$STEELENGINE_STATE_DIR/exec-approvals.json");
 
     const ensured = ensureExecApprovals();
 
@@ -301,7 +301,7 @@ describe("exec approvals store helpers", () => {
       `${JSON.stringify({
         version: 1,
         socket: {
-          path: path.join(dir, ".openclaw", "exec-approvals.sock"),
+          path: path.join(dir, ".steelengine", "exec-approvals.sock"),
           token: "legacy-token",
         },
         defaults: {
@@ -313,7 +313,7 @@ describe("exec approvals store helpers", () => {
       "utf8",
     );
     const defaultBefore = fs.readFileSync(approvalsFilePath(dir), "utf8");
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
 
     const resolved = await resolveExecApprovals("main", {
       security: "full",
@@ -343,7 +343,7 @@ describe("exec approvals store helpers", () => {
 
   it("keeps named-profile approvals isolated from the default profile", () => {
     const dir = createHomeDir();
-    const stateDir = path.join(dir, ".openclaw-work");
+    const stateDir = path.join(dir, ".steelengine-work");
     const defaultPath = approvalsFilePath(dir);
     fs.mkdirSync(path.dirname(defaultPath), { recursive: true });
     fs.writeFileSync(
@@ -357,8 +357,8 @@ describe("exec approvals store helpers", () => {
       "utf8",
     );
     const defaultBefore = fs.readFileSync(defaultPath, "utf8");
-    setTestEnvValue("OPENCLAW_PROFILE", "work");
-    setTestEnvValue("OPENCLAW_STATE_DIR", stateDir);
+    setTestEnvValue("STEELENGINE_PROFILE", "work");
+    setTestEnvValue("STEELENGINE_STATE_DIR", stateDir);
 
     const ensured = ensureExecApprovals();
 
@@ -1179,17 +1179,17 @@ describe("exec approvals store helpers", () => {
     expect(fs.readFileSync(targetPath, "utf8")).toBe('{"sentinel":true}\n');
   });
 
-  it("accepts a symlinked OPENCLAW_HOME as the trusted approvals root", () => {
+  it("accepts a symlinked STEELENGINE_HOME as the trusted approvals root", () => {
     const realHome = makeTempDir();
     const linkedHome = `${realHome}-link`;
     tempDirs.push(realHome, linkedHome);
     fs.symlinkSync(realHome, linkedHome, "dir");
-    setTestEnvValue("OPENCLAW_HOME", linkedHome);
+    setTestEnvValue("STEELENGINE_HOME", linkedHome);
 
     saveExecApprovals({ version: 1, defaults: { security: "full" }, agents: {} });
 
     expect(
-      fs.readFileSync(path.join(realHome, ".openclaw", "exec-approvals.json"), "utf8"),
+      fs.readFileSync(path.join(realHome, ".steelengine", "exec-approvals.json"), "utf8"),
     ).toContain('"security": "full"');
   });
 
@@ -1200,8 +1200,8 @@ describe("exec approvals store helpers", () => {
     tempDirs.push(realHome, linkedHome);
     fs.mkdirSync(linkedStateTarget, { recursive: true });
     fs.symlinkSync(realHome, linkedHome, "dir");
-    fs.symlinkSync(linkedStateTarget, path.join(realHome, ".openclaw"), "dir");
-    setTestEnvValue("OPENCLAW_HOME", linkedHome);
+    fs.symlinkSync(linkedStateTarget, path.join(realHome, ".steelengine"), "dir");
+    setTestEnvValue("STEELENGINE_HOME", linkedHome);
 
     expect(() =>
       saveExecApprovals({ version: 1, defaults: { security: "full" }, agents: {} }),
@@ -1219,8 +1219,8 @@ describe("exec approvals store helpers", () => {
       tempDirs.push(realHome, linkedHome);
       fs.mkdirSync(linkedStateTarget, { recursive: true });
       fs.symlinkSync(realHome, linkedHome, "dir");
-      fs.symlinkSync(linkedStateTarget, path.join(realHome, ".openclaw"), "dir");
-      setTestEnvValue("OPENCLAW_HOME", linkedHome);
+      fs.symlinkSync(linkedStateTarget, path.join(realHome, ".steelengine"), "dir");
+      setTestEnvValue("STEELENGINE_HOME", linkedHome);
 
       await expect(
         updateExecApprovals({

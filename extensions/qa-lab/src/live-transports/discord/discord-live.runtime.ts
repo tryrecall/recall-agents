@@ -7,13 +7,13 @@ import {
   DiscordApiError,
   handleDiscordMessageAction,
   requestDiscord,
-} from "@openclaw/discord/api.js";
-import { DEFAULT_EMOJIS } from "openclaw/plugin-sdk/channel-feedback";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { writeExternalFileWithinRoot } from "openclaw/plugin-sdk/security-runtime";
-import { uniqueStrings } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { escapeHtml } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "@steelengine/discord/api.js";
+import { DEFAULT_EMOJIS } from "steelengine/plugin-sdk/channel-feedback";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { writeExternalFileWithinRoot } from "steelengine/plugin-sdk/security-runtime";
+import { uniqueStrings } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { escapeHtml } from "steelengine/plugin-sdk/text-utility-runtime";
 import { chromium } from "playwright-core";
 import { z } from "zod";
 import { startQaGatewayChild } from "../../gateway-child.js";
@@ -224,14 +224,14 @@ type DiscordThreadReplyAttachmentEvidence = {
   threadName: string;
 };
 
-const DISCORD_QA_CAPTURE_UI_METADATA_ENV = "OPENCLAW_QA_DISCORD_CAPTURE_UI_METADATA";
-const DISCORD_QA_KEEP_THREADS_ENV = "OPENCLAW_QA_DISCORD_KEEP_THREADS";
+const DISCORD_QA_CAPTURE_UI_METADATA_ENV = "STEELENGINE_QA_DISCORD_CAPTURE_UI_METADATA";
+const DISCORD_QA_KEEP_THREADS_ENV = "STEELENGINE_QA_DISCORD_KEEP_THREADS";
 const DISCORD_QA_ENV_KEYS = [
-  "OPENCLAW_QA_DISCORD_GUILD_ID",
-  "OPENCLAW_QA_DISCORD_CHANNEL_ID",
-  "OPENCLAW_QA_DISCORD_DRIVER_BOT_TOKEN",
-  "OPENCLAW_QA_DISCORD_SUT_BOT_TOKEN",
-  "OPENCLAW_QA_DISCORD_SUT_APPLICATION_ID",
+  "STEELENGINE_QA_DISCORD_GUILD_ID",
+  "STEELENGINE_QA_DISCORD_CHANNEL_ID",
+  "STEELENGINE_QA_DISCORD_DRIVER_BOT_TOKEN",
+  "STEELENGINE_QA_DISCORD_SUT_BOT_TOKEN",
+  "STEELENGINE_QA_DISCORD_SUT_APPLICATION_ID",
 ] as const;
 
 const DISCORD_QA_SCENARIOS: DiscordQaScenarioDefinition[] = [
@@ -342,16 +342,16 @@ function resolveEnvValue(env: NodeJS.ProcessEnv, key: (typeof DISCORD_QA_ENV_KEY
 }
 
 function resolveDiscordQaRuntimeEnv(env: NodeJS.ProcessEnv = process.env): DiscordQaRuntimeEnv {
-  const voiceChannelId = env.OPENCLAW_QA_DISCORD_VOICE_CHANNEL_ID?.trim();
+  const voiceChannelId = env.STEELENGINE_QA_DISCORD_VOICE_CHANNEL_ID?.trim();
   const runtimeEnv = {
-    guildId: resolveEnvValue(env, "OPENCLAW_QA_DISCORD_GUILD_ID"),
-    channelId: resolveEnvValue(env, "OPENCLAW_QA_DISCORD_CHANNEL_ID"),
-    driverBotToken: resolveEnvValue(env, "OPENCLAW_QA_DISCORD_DRIVER_BOT_TOKEN"),
-    sutBotToken: resolveEnvValue(env, "OPENCLAW_QA_DISCORD_SUT_BOT_TOKEN"),
-    sutApplicationId: resolveEnvValue(env, "OPENCLAW_QA_DISCORD_SUT_APPLICATION_ID"),
+    guildId: resolveEnvValue(env, "STEELENGINE_QA_DISCORD_GUILD_ID"),
+    channelId: resolveEnvValue(env, "STEELENGINE_QA_DISCORD_CHANNEL_ID"),
+    driverBotToken: resolveEnvValue(env, "STEELENGINE_QA_DISCORD_DRIVER_BOT_TOKEN"),
+    sutBotToken: resolveEnvValue(env, "STEELENGINE_QA_DISCORD_SUT_BOT_TOKEN"),
+    sutApplicationId: resolveEnvValue(env, "STEELENGINE_QA_DISCORD_SUT_APPLICATION_ID"),
     ...(voiceChannelId ? { voiceChannelId } : {}),
   };
-  validateDiscordQaRuntimeEnv(runtimeEnv, "OPENCLAW_QA_DISCORD");
+  validateDiscordQaRuntimeEnv(runtimeEnv, "STEELENGINE_QA_DISCORD");
   return runtimeEnv;
 }
 
@@ -379,7 +379,7 @@ function parseDiscordQaCredentialPayload(payload: unknown): DiscordQaRuntimeEnv 
 }
 
 function buildDiscordQaConfig(
-  baseCfg: OpenClawConfig,
+  baseCfg: SteelEngineConfig,
   params: {
     guildId: string;
     channelId: string;
@@ -394,7 +394,7 @@ function buildDiscordQaConfig(
       guildId: string;
     };
   } = {},
-): OpenClawConfig {
+): SteelEngineConfig {
   const pluginAllow = uniqueStrings([...(baseCfg.plugins?.allow ?? []), "discord"]);
   const pluginEntries = {
     ...baseCfg.plugins?.entries,
@@ -532,7 +532,7 @@ async function resolveDiscordQaVoiceChannel(params: {
   const first = voiceChannels[0];
   if (!first) {
     throw new Error(
-      "Discord voice auto-join scenario could not find a visible voice/stage channel for the SUT bot. Add voiceChannelId to the Convex discord credential payload or set OPENCLAW_QA_DISCORD_VOICE_CHANNEL_ID.",
+      "Discord voice auto-join scenario could not find a visible voice/stage channel for the SUT bot. Add voiceChannelId to the Convex discord credential payload or set STEELENGINE_QA_DISCORD_VOICE_CHANNEL_ID.",
     );
   }
   return first;
@@ -890,7 +890,7 @@ function renderDiscordThreadReplyAttachmentHtml(params: {
     <h1>${escapeHtml(params.scenarioTitle)}</h1>
     <div class="sub">Thread: ${escapeHtml(params.threadName)}</div>
     <section class="message">
-      <div class="author">OpenClaw Discord SUT</div>
+      <div class="author">SteelEngine Discord SUT</div>
       <div class="badge">${params.status === "pass" ? "Attachment found" : "Attachment missing"}</div>
       <div class="content">${escapeHtml(params.messageContent ?? "No SUT reply content captured")}</div>
       <div class="attachments">${attachmentRows}</div>
@@ -1117,7 +1117,7 @@ async function pollThreadReplyMessage(params: {
 }
 
 async function runDiscordThreadReplyFilePathAttachmentScenario(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   driverBotId: string;
   outputDir: string;
   runtimeEnv: DiscordQaRuntimeEnv;

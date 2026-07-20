@@ -32,7 +32,7 @@ function writeStartupMetadataSourceSignatureFixture(rootDir: string): void {
     ["extensions/canvas/src/a2ui-jsonl.ts", "export const a2uiJsonl = 'canvas';\n"],
     ["extensions/canvas/src/cli-helpers.ts", "export const canvasHelpers = 'canvas';\n"],
     ["extensions/canvas/src/cli.ts", "export const canvasCliHelp = 'canvas';\n"],
-    ["src/cli/banner.ts", "export const banner = 'openclaw';\n"],
+    ["src/cli/banner.ts", "export const banner = 'steelengine';\n"],
     [
       "src/cli/daemon-cli/register-service-commands.ts",
       "export const gatewayServiceCommands = 'gateway';\n",
@@ -123,16 +123,16 @@ describe("write-cli-startup-metadata", () => {
     const spawnSyncMock = vi.mocked(spawnSync);
     const successfulRender = {
       error: undefined,
-      output: [null, "Usage: openclaw\n", ""],
+      output: [null, "Usage: steelengine\n", ""],
       pid: 123,
       signal: null,
       status: 0,
       stderr: "",
-      stdout: "Usage: openclaw\n",
+      stdout: "Usage: steelengine\n",
     };
     spawnSyncMock.mockReturnValueOnce(successfulRender);
 
-    expect(__testing.renderSourceRootHelpText()).toBe("Usage: openclaw\n");
+    expect(__testing.renderSourceRootHelpText()).toBe("Usage: steelengine\n");
 
     expect(spawnSyncMock).toHaveBeenCalledOnce();
     expect(spawnSyncMock.mock.calls[0]?.[2]).toMatchObject({
@@ -258,7 +258,7 @@ describe("write-cli-startup-metadata", () => {
   it.runIf(process.platform !== "win32")(
     "kills descendant processes when command help rendering times out",
     async () => {
-      const tempRoot = createTempDir("openclaw-startup-metadata-timeout-");
+      const tempRoot = createTempDir("steelengine-startup-metadata-timeout-");
       const markerPath = path.join(tempRoot, "grandchild.pid");
       const grandchildScript = [
         "process.on('SIGTERM', () => {});",
@@ -292,7 +292,7 @@ describe("write-cli-startup-metadata", () => {
   it.runIf(process.platform !== "win32")(
     "waits for all command help descendants before re-raising parent signals",
     async () => {
-      const tempRoot = createTempDir("openclaw-startup-metadata-signal-");
+      const tempRoot = createTempDir("steelengine-startup-metadata-signal-");
       const fastCommandPath = path.join(tempRoot, "fast-command.mjs");
       const fastReadyPath = path.join(tempRoot, "fast-ready");
       const commandPath = path.join(tempRoot, "command.mjs");
@@ -404,7 +404,7 @@ describe("write-cli-startup-metadata", () => {
   );
 
   it("writes startup metadata with populated root help text when dist falls back to source rendering", async () => {
-    const tempRoot = createTempDir("openclaw-startup-metadata-");
+    const tempRoot = createTempDir("steelengine-startup-metadata-");
     const distDir = path.join(tempRoot, "dist");
     const extensionsDir = path.join(tempRoot, "extensions");
     const outputPath = path.join(distDir, "cli-startup-metadata.json");
@@ -414,7 +414,7 @@ describe("write-cli-startup-metadata", () => {
     writeFileSync(
       path.join(extensionsDir, "matrix", "package.json"),
       JSON.stringify({
-        openclaw: {
+        steelengine: {
           channel: {
             id: "matrix",
             order: 120,
@@ -432,17 +432,17 @@ describe("write-cli-startup-metadata", () => {
       renderBundledRootHelpText: async () => {
         throw new Error("dist root help unavailable");
       },
-      renderSourceRootHelpText: () => "Usage: openclaw\n",
-      renderSourceBrowserHelpText: () => "Usage: openclaw browser\n",
-      renderSourceSecretsHelpText: () => "Usage: openclaw secrets\n",
-      renderSourceNodesHelpText: () => "Usage: openclaw nodes\n",
+      renderSourceRootHelpText: () => "Usage: steelengine\n",
+      renderSourceBrowserHelpText: () => "Usage: steelengine browser\n",
+      renderSourceSecretsHelpText: () => "Usage: steelengine secrets\n",
+      renderSourceNodesHelpText: () => "Usage: steelengine nodes\n",
       renderSourceSubcommandHelpTextRecord: () => ({
-        doctor: "Usage: openclaw doctor\n",
-        gateway: "Usage: openclaw gateway\n",
-        models: "Usage: openclaw models\n",
-        plugins: "Usage: openclaw plugins\n",
-        sessions: "Usage: openclaw sessions\n",
-        tasks: "Usage: openclaw tasks\n",
+        doctor: "Usage: steelengine doctor\n",
+        gateway: "Usage: steelengine gateway\n",
+        models: "Usage: steelengine models\n",
+        plugins: "Usage: steelengine plugins\n",
+        sessions: "Usage: steelengine sessions\n",
+        tasks: "Usage: steelengine tasks\n",
       }),
     });
 
@@ -465,23 +465,23 @@ describe("write-cli-startup-metadata", () => {
     expect(written.channelOptions).toContain("matrix");
     expect(written.generatorSignature).toMatch(/^[a-f0-9]{40}$/u);
     expect(written.browserHelpText).toContain("Usage:");
-    expect(written.browserHelpText).toContain("openclaw browser");
+    expect(written.browserHelpText).toContain("steelengine browser");
     expect(written.secretsHelpText).toContain("Usage:");
-    expect(written.secretsHelpText).toContain("openclaw secrets");
+    expect(written.secretsHelpText).toContain("steelengine secrets");
     expect(written.nodesHelpText).toContain("Usage:");
-    expect(written.nodesHelpText).toContain("openclaw nodes");
+    expect(written.nodesHelpText).toContain("steelengine nodes");
     expect(written.rootHelpText).toContain("Usage:");
-    expect(written.rootHelpText).toContain("openclaw");
-    expect(written.subcommandHelpText.doctor).toContain("openclaw doctor");
-    expect(written.subcommandHelpText.gateway).toContain("openclaw gateway");
-    expect(written.subcommandHelpText.models).toContain("openclaw models");
-    expect(written.subcommandHelpText.plugins).toContain("openclaw plugins");
-    expect(written.subcommandHelpText.sessions).toContain("openclaw sessions");
-    expect(written.subcommandHelpText.tasks).toContain("openclaw tasks");
+    expect(written.rootHelpText).toContain("steelengine");
+    expect(written.subcommandHelpText.doctor).toContain("steelengine doctor");
+    expect(written.subcommandHelpText.gateway).toContain("steelengine gateway");
+    expect(written.subcommandHelpText.models).toContain("steelengine models");
+    expect(written.subcommandHelpText.plugins).toContain("steelengine plugins");
+    expect(written.subcommandHelpText.sessions).toContain("steelengine sessions");
+    expect(written.subcommandHelpText.tasks).toContain("steelengine tasks");
   });
 
   it("renders independent startup help snapshots concurrently", async () => {
-    const tempRoot = createTempDir("openclaw-startup-metadata-concurrency-");
+    const tempRoot = createTempDir("steelengine-startup-metadata-concurrency-");
     const distDir = path.join(tempRoot, "dist");
     const extensionsDir = path.join(tempRoot, "extensions");
     const outputPath = path.join(distDir, "cli-startup-metadata.json");
@@ -521,22 +521,22 @@ describe("write-cli-startup-metadata", () => {
       outputPath,
       extensionsDir,
       sourceRootDir: tempRoot,
-      renderBundledRootHelpText: async () => "Usage: openclaw\n",
-      renderSourceBrowserHelpText: renderAfterUnblock("browser", "Usage: openclaw browser\n"),
-      renderSourceSecretsHelpText: renderAfterUnblock("secrets", "Usage: openclaw secrets\n"),
-      renderSourceNodesHelpText: renderAfterUnblock("nodes", "Usage: openclaw nodes\n"),
+      renderBundledRootHelpText: async () => "Usage: steelengine\n",
+      renderSourceBrowserHelpText: renderAfterUnblock("browser", "Usage: steelengine browser\n"),
+      renderSourceSecretsHelpText: renderAfterUnblock("secrets", "Usage: steelengine secrets\n"),
+      renderSourceNodesHelpText: renderAfterUnblock("nodes", "Usage: steelengine nodes\n"),
       renderSourceSubcommandHelpTextRecord: async () => {
         started.push("subcommands");
         await new Promise<void>((resolve) => {
           unblockers.set("subcommands", resolve);
         });
         return {
-          doctor: "Usage: openclaw doctor\n",
-          gateway: "Usage: openclaw gateway\n",
-          models: "Usage: openclaw models\n",
-          plugins: "Usage: openclaw plugins\n",
-          sessions: "Usage: openclaw sessions\n",
-          tasks: "Usage: openclaw tasks\n",
+          doctor: "Usage: steelengine doctor\n",
+          gateway: "Usage: steelengine gateway\n",
+          models: "Usage: steelengine models\n",
+          plugins: "Usage: steelengine plugins\n",
+          sessions: "Usage: steelengine sessions\n",
+          tasks: "Usage: steelengine tasks\n",
         };
       },
     });
@@ -552,13 +552,13 @@ describe("write-cli-startup-metadata", () => {
       nodesHelpText: string;
       secretsHelpText: string;
     };
-    expect(written.browserHelpText).toContain("openclaw browser");
-    expect(written.secretsHelpText).toContain("openclaw secrets");
-    expect(written.nodesHelpText).toContain("openclaw nodes");
+    expect(written.browserHelpText).toContain("steelengine browser");
+    expect(written.secretsHelpText).toContain("steelengine secrets");
+    expect(written.nodesHelpText).toContain("steelengine nodes");
   });
 
   it("regenerates nodes help when bundled canvas CLI help sources change", async () => {
-    const tempRoot = createTempDir("openclaw-startup-metadata-signature-");
+    const tempRoot = createTempDir("steelengine-startup-metadata-signature-");
     const distDir = path.join(tempRoot, "dist");
     const extensionsDir = path.join(tempRoot, "extensions");
     const outputPath = path.join(distDir, "cli-startup-metadata.json");
@@ -573,20 +573,20 @@ describe("write-cli-startup-metadata", () => {
         outputPath,
         extensionsDir,
         sourceRootDir: tempRoot,
-        renderBundledRootHelpText: async () => "Usage: openclaw\n",
-        renderSourceBrowserHelpText: () => "Usage: openclaw browser\n",
-        renderSourceSecretsHelpText: () => "Usage: openclaw secrets\n",
+        renderBundledRootHelpText: async () => "Usage: steelengine\n",
+        renderSourceBrowserHelpText: () => "Usage: steelengine browser\n",
+        renderSourceSecretsHelpText: () => "Usage: steelengine secrets\n",
         renderSourceNodesHelpText: () => {
           nodesRenderCount += 1;
-          return `Usage: openclaw nodes ${nodesRenderCount}\n`;
+          return `Usage: steelengine nodes ${nodesRenderCount}\n`;
         },
         renderSourceSubcommandHelpTextRecord: () => ({
-          doctor: "Usage: openclaw doctor\n",
-          gateway: "Usage: openclaw gateway\n",
-          models: "Usage: openclaw models\n",
-          plugins: "Usage: openclaw plugins\n",
-          sessions: "Usage: openclaw sessions\n",
-          tasks: "Usage: openclaw tasks\n",
+          doctor: "Usage: steelengine doctor\n",
+          gateway: "Usage: steelengine gateway\n",
+          models: "Usage: steelengine models\n",
+          plugins: "Usage: steelengine plugins\n",
+          sessions: "Usage: steelengine sessions\n",
+          tasks: "Usage: steelengine tasks\n",
         }),
       });
     };
@@ -617,11 +617,11 @@ describe("write-cli-startup-metadata", () => {
       nodesHelpText: string;
     };
     expect(nodesRenderCount).toBe(3);
-    expect(written.nodesHelpText).toContain("openclaw nodes 3");
+    expect(written.nodesHelpText).toContain("steelengine nodes 3");
   });
 
   it("regenerates help when build version or commit changes", async () => {
-    const tempRoot = createTempDir("openclaw-startup-metadata-build-identity-");
+    const tempRoot = createTempDir("steelengine-startup-metadata-build-identity-");
     const distDir = path.join(tempRoot, "dist");
     const extensionsDir = path.join(tempRoot, "extensions");
     const outputPath = path.join(distDir, "cli-startup-metadata.json");
@@ -639,29 +639,29 @@ describe("write-cli-startup-metadata", () => {
         sourceRootDir: tempRoot,
         renderBundledRootHelpText: async () => {
           renderCount += 1;
-          return `Usage: openclaw ${renderCount}\n`;
+          return `Usage: steelengine ${renderCount}\n`;
         },
         renderSourceBrowserHelpText: () => {
           commandRenderCount += 1;
-          return "Usage: openclaw browser\n";
+          return "Usage: steelengine browser\n";
         },
         renderSourceSecretsHelpText: () => {
           commandRenderCount += 1;
-          return "Usage: openclaw secrets\n";
+          return "Usage: steelengine secrets\n";
         },
         renderSourceNodesHelpText: () => {
           commandRenderCount += 1;
-          return "Usage: openclaw nodes\n";
+          return "Usage: steelengine nodes\n";
         },
         renderSourceSubcommandHelpTextRecord: () => {
           commandRenderCount += 1;
           return {
-            doctor: "Usage: openclaw doctor\n",
-            gateway: "Usage: openclaw gateway\n",
-            models: "Usage: openclaw models\n",
-            plugins: "Usage: openclaw plugins\n",
-            sessions: "Usage: openclaw sessions\n",
-            tasks: "Usage: openclaw tasks\n",
+            doctor: "Usage: steelengine doctor\n",
+            gateway: "Usage: steelengine gateway\n",
+            models: "Usage: steelengine models\n",
+            plugins: "Usage: steelengine plugins\n",
+            sessions: "Usage: steelengine sessions\n",
+            tasks: "Usage: steelengine tasks\n",
           };
         },
       });

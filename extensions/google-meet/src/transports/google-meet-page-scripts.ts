@@ -146,15 +146,15 @@ export function meetStatusScript(params: {
   const captionState = (() => {
     if (!captureCaptions) return undefined;
     const w = window;
-    if (!inCall && !w.__openclawMeetCaptions) return undefined;
-    // A reused tab starts a fresh logical transcript for each OpenClaw session.
+    if (!inCall && !w.__steelengineMeetCaptions) return undefined;
+    // A reused tab starts a fresh logical transcript for each SteelEngine session.
     // Status refreshes omit the id, so they preserve the active page-owned buffer.
-    if (!w.__openclawMeetCaptions || (captionSessionId && w.__openclawMeetCaptions.sessionId !== captionSessionId)) {
-      if (w.__openclawMeetCaptions?.settleTimer !== undefined) {
-        clearTimeout(w.__openclawMeetCaptions.settleTimer);
+    if (!w.__steelengineMeetCaptions || (captionSessionId && w.__steelengineMeetCaptions.sessionId !== captionSessionId)) {
+      if (w.__steelengineMeetCaptions?.settleTimer !== undefined) {
+        clearTimeout(w.__steelengineMeetCaptions.settleTimer);
       }
-      w.__openclawMeetCaptions?.observer?.disconnect?.();
-      w.__openclawMeetCaptions = {
+      w.__steelengineMeetCaptions?.observer?.disconnect?.();
+      w.__steelengineMeetCaptions = {
         sessionId: captionSessionId,
         // Epochs cross document lifetimes in the runtime transcript cursor.
         // Strong UUIDs keep a reloaded page distinct from its prior buffer.
@@ -168,7 +168,7 @@ export function meetStatusScript(params: {
         visible: []
       };
     }
-    return w.__openclawMeetCaptions;
+    return w.__steelengineMeetCaptions;
   })();
   const normalizeCaption = (speaker, captionText) => {
     if (!captionState) return;
@@ -209,7 +209,7 @@ export function meetStatusScript(params: {
       if (captionState.visible.length > 0 && captionState.settleTimer === undefined) {
         const pendingState = captionState;
         pendingState.settleTimer = setTimeout(() => {
-          if (window.__openclawMeetCaptions !== pendingState) return;
+          if (window.__steelengineMeetCaptions !== pendingState) return;
           commitLines(pendingState, pendingState.visible);
           pendingState.visible = [];
           pendingState.settleTimer = undefined;
@@ -316,23 +316,23 @@ export function meetStatusScript(params: {
   let manualActionMessage;
   if (!inCall && (host === "accounts.google.com" || /use your google account|to continue to google meet|choose an account|sign in to (join|continue)/i.test(pageText))) {
     manualActionReason = "google-login-required";
-    manualActionMessage = "Sign in to Google in the OpenClaw browser profile, then retry the Meet join.";
+    manualActionMessage = "Sign in to Google in the SteelEngine browser profile, then retry the Meet join.";
   } else if (!inCall && joinElsewhere) {
     manualActionReason = "meet-session-conflict";
     manualActionMessage = "Meet is already active in another tab or device. Leave that session or reuse an English-pinned tab before retrying.";
   } else if (!inCall && /asking to be let in|you.?ll join when someone lets you in|waiting to be let in|ask to join/i.test(pageText)) {
     manualActionReason = "meet-admission-required";
-    manualActionMessage = "Admit the OpenClaw browser participant in Google Meet, then retry speech.";
+    manualActionMessage = "Admit the SteelEngine browser participant in Google Meet, then retry speech.";
   } else if (permissionNeeded) {
     manualActionReason = "meet-permission-required";
     manualActionMessage = allowMicrophone
-      ? "Allow microphone/camera/speaker permissions for Meet in the OpenClaw browser profile, then retry."
-      : "Join without microphone/camera permissions in the OpenClaw browser profile, then retry.";
+      ? "Allow microphone/camera/speaker permissions for Meet in the SteelEngine browser profile, then retry."
+      : "Join without microphone/camera permissions in the SteelEngine browser profile, then retry.";
   } else if (!inCall && (allowMicrophone ? !microphoneChoice : !noMicrophoneChoice) && /do you want people to hear you in the meeting/i.test(pageText)) {
     manualActionReason = "meet-audio-choice-required";
     manualActionMessage = allowMicrophone
-      ? "Meet is showing the microphone choice. Click Use microphone in the OpenClaw browser profile, then retry."
-      : "Meet is showing the microphone choice. Choose the no-microphone option in the OpenClaw browser profile, then retry.";
+      ? "Meet is showing the microphone choice. Click Use microphone in the SteelEngine browser profile, then retry."
+      : "Meet is showing the microphone choice. Choose the no-microphone option in the SteelEngine browser profile, then retry.";
   }
   return JSON.stringify({
     clickedJoin: Boolean(join),
@@ -380,7 +380,7 @@ export function meetTranscriptScript(
   if (!expectedMeetingUrl || currentMeetingUrl !== expectedMeetingUrl) {
     return JSON.stringify({ urlMatched: false });
   }
-  const state = window.__openclawMeetCaptions;
+  const state = window.__steelengineMeetCaptions;
   if (state?.sessionId && state.sessionId !== expectedSessionId) {
     return JSON.stringify({ urlMatched: true, sessionMatched: false });
   }

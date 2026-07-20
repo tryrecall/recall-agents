@@ -16,7 +16,7 @@ if (typeof process.getuid !== "function") throw new Error("workspace quiescence 
 const uid = process.getuid();
 if (uid === 0) throw new Error("workspace quiescence refuses root-owned worker sessions");
 const sleeper = new Int32Array(new SharedArrayBuffer(4));
-const leaseDirectory = path.join(os.homedir(), ".openclaw-worker", "quiescence");
+const leaseDirectory = path.join(os.homedir(), ".steelengine-worker", "quiescence");
 fs.mkdirSync(leaseDirectory, { recursive: true, mode: 0o700 });
 fs.chmodSync(leaseDirectory, 0o700);
 const workspaceKey = crypto.createHash("sha256").update(root).digest("hex");
@@ -271,7 +271,7 @@ const uid = process.getuid();
 if (!/^[a-f0-9]{32}$/.test(nonce || "")) throw new Error("invalid workspace quiescence nonce");
 if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 10 * 1000) throw new Error("invalid watchdog timeout");
 if (validationMode !== "heartbeat" && validationMode !== "final") throw new Error("invalid workspace quiescence validation mode");
-const leasePath = path.join(os.homedir(), ".openclaw-worker", "quiescence", crypto.createHash("sha256").update(root).digest("hex") + "." + nonce + ".json");
+const leasePath = path.join(os.homedir(), ".steelengine-worker", "quiescence", crypto.createHash("sha256").update(root).digest("hex") + "." + nonce + ".json");
 const input = JSON.parse(fs.readFileSync(leasePath, "utf8"));
 if (
   !input ||
@@ -380,7 +380,7 @@ if (typeof process.getuid !== "function") throw new Error("workspace quiescence 
 const root = fs.realpathSync(process.argv[1]);
 const nonce = process.argv[2];
 if (!/^[a-f0-9]{32}$/.test(nonce || "")) throw new Error("invalid workspace quiescence nonce");
-const leasePath = path.join(os.homedir(), ".openclaw-worker", "quiescence", crypto.createHash("sha256").update(root).digest("hex") + "." + nonce + ".json");
+const leasePath = path.join(os.homedir(), ".steelengine-worker", "quiescence", crypto.createHash("sha256").update(root).digest("hex") + "." + nonce + ".json");
 let raw;
 try { raw = fs.readFileSync(leasePath, "utf8"); } catch (error) {
   if (error && error.code === "ENOENT") process.exit(0);
@@ -441,8 +441,8 @@ if [ "$actual" != "$base" ]; then
   printf '%s\n' 'worker git base does not match the synced pack' >&2
   exit 2
 fi
-git update-ref refs/heads/openclaw-worker "$base"
-git symbolic-ref HEAD refs/heads/openclaw-worker
+git update-ref refs/heads/steelengine-worker "$base"
+git symbolic-ref HEAD refs/heads/steelengine-worker
 git read-tree "$base"
 git ls-files --stage -z | node -e '
 const childProcess = require("node:child_process");
@@ -575,7 +575,7 @@ function nulPaths(args) {
 }
 function eligiblePaths() {
   const selected = new Set(nulPaths(["--full-name", "--cached", "--others", "--exclude-standard"]));
-  selected.delete(".openclaw-base.pack");
+  selected.delete(".steelengine-base.pack");
   const includePath = path.join(root, ".worktreeinclude");
   if (fs.existsSync(includePath) && fs.lstatSync(includePath).isFile()) {
     const ignored = new Set(nulPaths(["--full-name", "--others", "--ignored", "--exclude-standard"]));
@@ -592,7 +592,7 @@ function eligiblePaths() {
   }
   for (const priorManifestDigest of priorManifestDigests) {
     if (!/^[a-f0-9]{64}$/.test(priorManifestDigest)) fail("invalid prior workspace manifest digest");
-    const priorPath = path.join(process.env.HOME, ".openclaw-worker", "manifests", priorManifestDigest + ".json");
+    const priorPath = path.join(process.env.HOME, ".steelengine-worker", "manifests", priorManifestDigest + ".json");
     const priorRaw = fs.readFileSync(priorPath, "utf8");
     if (crypto.createHash("sha256").update(priorRaw).digest("hex") !== priorManifestDigest) {
       fail("prior workspace manifest digest mismatch");
@@ -603,7 +603,7 @@ function eligiblePaths() {
     }
     for (const entry of prior.entries) {
       if (!entry || typeof entry.path !== "string") fail("invalid prior workspace manifest entry");
-      if (entry.path !== ".openclaw-base.pack" && !isDerivedWorkspacePath(entry.path)) {
+      if (entry.path !== ".steelengine-base.pack" && !isDerivedWorkspacePath(entry.path)) {
         selected.add(entry.path);
       }
     }
@@ -652,7 +652,7 @@ async function main() {
   const baseCommit = requestedBaseCommit;
   const manifest = JSON.stringify({ version: 1, baseCommit, entries });
   const digest = crypto.createHash("sha256").update(manifest).digest("hex");
-  const workerRoot = path.join(process.env.HOME, ".openclaw-worker");
+  const workerRoot = path.join(process.env.HOME, ".steelengine-worker");
   const manifestRoot = path.join(workerRoot, "manifests");
   ensurePrivateDirectory(workerRoot);
   ensurePrivateDirectory(manifestRoot);

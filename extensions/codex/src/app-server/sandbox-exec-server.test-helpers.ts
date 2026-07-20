@@ -2,7 +2,7 @@
  * Test helpers for standing up fake sandbox contexts and driving the Codex
  * sandbox exec-server JSON-RPC/WebSocket protocol.
  */
-import type { SandboxContext } from "openclaw/plugin-sdk/sandbox";
+import type { SandboxContext } from "steelengine/plugin-sdk/sandbox";
 import { vi } from "vitest";
 import WebSocket from "ws";
 
@@ -30,17 +30,17 @@ export function createSandboxContext(overrides: {
     workspaceDir: "/host/workspace",
     agentWorkspaceDir: "/host/workspace",
     workspaceAccess: "rw",
-    runtimeId: "openclaw-test-runtime",
-    runtimeLabel: "openclaw-test-runtime",
-    containerName: "openclaw-test-runtime",
+    runtimeId: "steelengine-test-runtime",
+    runtimeLabel: "steelengine-test-runtime",
+    containerName: "steelengine-test-runtime",
     containerWorkdir: "/workspace",
     docker: { binds: [], image: "test", workdir: "/workspace", env: {}, network: "none" },
     tools: {},
     browserAllowHostControl: false,
     backend: {
       id: "docker",
-      runtimeId: "openclaw-test-runtime",
-      runtimeLabel: "openclaw-test-runtime",
+      runtimeId: "steelengine-test-runtime",
+      runtimeLabel: "steelengine-test-runtime",
       workdir: "/workspace",
       buildExecSpec:
         overrides.buildExecSpec ??

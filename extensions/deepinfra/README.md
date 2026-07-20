@@ -1,12 +1,12 @@
-# OpenClaw DeepInfra Provider
+# SteelEngine DeepInfra Provider
 
-Official OpenClaw provider plugin for DeepInfra.
+Official SteelEngine provider plugin for DeepInfra.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/deepinfra-provider
-openclaw gateway restart
+steelengine plugins install @steelengine/deepinfra-provider
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/providers/deepinfra> for setup and configuration.
+See <https://docs.steelengine.ai/providers/deepinfra> for setup and configuration.

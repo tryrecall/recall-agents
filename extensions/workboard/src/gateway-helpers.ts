@@ -1,8 +1,8 @@
-import { WORKBOARD_STATUSES, type WorkboardCard } from "@openclaw/workboard-contract";
+import { WORKBOARD_STATUSES, type WorkboardCard } from "@steelengine/workboard-contract";
 // Workboard plugin module implements shared gateway request helpers.
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { parseStrictPositiveInteger } from "openclaw/plugin-sdk/number-runtime";
-import type { OpenClawPluginApi } from "../api.js";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { parseStrictPositiveInteger } from "steelengine/plugin-sdk/number-runtime";
+import type { SteelEnginePluginApi } from "../api.js";
 import { dispatchAndStartWorkboardCards } from "./dispatcher.js";
 import type { WorkboardStore } from "./store.js";
 import {
@@ -13,7 +13,7 @@ import {
 } from "./workspace-access.js";
 
 export type GatewayMethodContext = Parameters<
-  Parameters<OpenClawPluginApi["registerGatewayMethod"]>[1]
+  Parameters<SteelEnginePluginApi["registerGatewayMethod"]>[1]
 >[0];
 type GatewayRespond = GatewayMethodContext["respond"];
 
@@ -86,7 +86,7 @@ export function resolveGatewayWorkboardWorkspaceAccess(params: {
 }
 
 export function createWorkboardDispatchHandler(params: {
-  api: OpenClawPluginApi;
+  api: SteelEnginePluginApi;
   store: WorkboardStore;
   redactCard: (card: WorkboardCard) => WorkboardCard;
 }) {

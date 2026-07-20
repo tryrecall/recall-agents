@@ -1,12 +1,12 @@
 ---
-summary: "Use OpenCode Zen and Go catalogs with OpenClaw"
+summary: "Use OpenCode Zen and Go catalogs with SteelEngine"
 read_when:
   - You want OpenCode-hosted model access
   - You want to pick between the Zen and Go catalogs
 title: "OpenCode"
 ---
 
-OpenCode exposes two hosted catalogs in OpenClaw:
+OpenCode exposes two hosted catalogs in SteelEngine:
 
 | Catalog | Prefix            | Runtime provider |
 | ------- | ----------------- | ---------------- |
@@ -14,7 +14,7 @@ OpenCode exposes two hosted catalogs in OpenClaw:
 | **Go**  | `opencode-go/...` | `opencode-go`    |
 
 Both catalogs share one OpenCode API key (`OPENCODE_API_KEY`, alias
-`OPENCODE_ZEN_API_KEY`). OpenClaw keeps the runtime provider ids split so
+`OPENCODE_ZEN_API_KEY`). SteelEngine keeps the runtime provider ids split so
 upstream per-model routing stays correct, but onboarding and docs treat them as
 one OpenCode setup.
 
@@ -28,23 +28,23 @@ one OpenCode setup.
     <Steps>
       <Step title="Run onboarding">
         ```bash
-        openclaw onboard --auth-choice opencode-zen
+        steelengine onboard --auth-choice opencode-zen
         ```
 
         Or pass the key directly:
 
         ```bash
-        openclaw onboard --opencode-zen-api-key "$OPENCODE_API_KEY"
+        steelengine onboard --opencode-zen-api-key "$OPENCODE_API_KEY"
         ```
       </Step>
       <Step title="Set a Zen model as the default">
         ```bash
-        openclaw config set agents.defaults.model.primary "opencode/claude-opus-4-6"
+        steelengine config set agents.defaults.model.primary "opencode/claude-opus-4-6"
         ```
       </Step>
       <Step title="Verify models are available">
         ```bash
-        openclaw models list --provider opencode
+        steelengine models list --provider opencode
         ```
       </Step>
     </Steps>
@@ -57,23 +57,23 @@ one OpenCode setup.
     <Steps>
       <Step title="Run onboarding">
         ```bash
-        openclaw onboard --auth-choice opencode-go
+        steelengine onboard --auth-choice opencode-go
         ```
 
         Or pass the key directly:
 
         ```bash
-        openclaw onboard --opencode-go-api-key "$OPENCODE_API_KEY"
+        steelengine onboard --opencode-go-api-key "$OPENCODE_API_KEY"
         ```
       </Step>
       <Step title="Set a Go model as the default">
         ```bash
-        openclaw config set agents.defaults.model.primary "opencode-go/kimi-k2.6"
+        steelengine config set agents.defaults.model.primary "opencode-go/kimi-k2.6"
         ```
       </Step>
       <Step title="Verify models are available">
         ```bash
-        openclaw models list --provider opencode-go
+        steelengine models list --provider opencode-go
         ```
       </Step>
     </Steps>
@@ -99,7 +99,7 @@ one OpenCode setup.
 | Runtime provider | `opencode`                                                                                    |
 | Example models   | `opencode/claude-opus-4-6`, `opencode/gpt-5.5`, `opencode/gemini-3.1-pro`, `opencode/glm-5.2` |
 
-Run `openclaw models list --provider opencode` for the full current list, which
+Run `steelengine models list --provider opencode` for the full current list, which
 also includes free-tier rows such as `opencode/big-pickle` and
 `opencode/deepseek-v4-flash-free`.
 
@@ -131,7 +131,7 @@ See [OpenCode Go](/providers/opencode-go) for the full Go model table.
   </Accordion>
 
   <Accordion title="Gemini replay behavior">
-    Gemini-backed OpenCode refs stay on the proxy-Gemini path, so OpenClaw keeps
+    Gemini-backed OpenCode refs stay on the proxy-Gemini path, so SteelEngine keeps
     Gemini thought-signature sanitation there without enabling native Gemini
     replay validation or bootstrap rewrites.
   </Accordion>

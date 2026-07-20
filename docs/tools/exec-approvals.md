@@ -31,7 +31,7 @@ prompting even if session or config defaults request `ask: "on-miss"`.
 
 Exec approvals are enforced locally on the execution host:
 
-- **Gateway host** -> `openclaw` process on the gateway machine.
+- **Gateway host** -> `steelengine` process on the gateway machine.
 - **Node host** -> node runner (macOS companion app or headless node host).
 
 ### Trust model
@@ -41,8 +41,8 @@ Exec approvals are enforced locally on the execution host:
 - Approvals reduce accidental execution risk, but are **not** a per-user auth boundary or filesystem read-only policy.
 - Once approved, a command can mutate files according to the selected host or sandbox filesystem permissions.
 - Approved node-host runs bind canonical execution context: cwd, exact argv, env binding when present, and pinned executable path when applicable.
-- For shell scripts and direct interpreter/runtime file invocations, OpenClaw also tries to bind one concrete local file operand. If that file changes after approval but before execution, the run is denied instead of executing drifted content.
-- File binding is best-effort, not a complete model of every interpreter/runtime loader path. If exactly one concrete local file cannot be identified, OpenClaw refuses to mint an approval-backed run rather than pretend full coverage.
+- For shell scripts and direct interpreter/runtime file invocations, SteelEngine also tries to bind one concrete local file operand. If that file changes after approval but before execution, the run is denied instead of executing drifted content.
+- File binding is best-effort, not a complete model of every interpreter/runtime loader path. If exactly one concrete local file cannot be identified, SteelEngine refuses to mint an approval-backed run rather than pretend full coverage.
 
 ### macOS split
 
@@ -53,9 +53,9 @@ Exec approvals are enforced locally on the execution host:
 
 | Command                                                          | What it shows                                                                          |
 | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `openclaw approvals get` / `--gateway` / `--node <id\|name\|ip>` | Requested policy, host policy sources, and the effective result.                       |
-| `openclaw exec-policy show`                                      | Local-machine merged view.                                                             |
-| `openclaw exec-policy set` / `preset`                            | Synchronize the local requested policy with the local host approvals file in one step. |
+| `steelengine approvals get` / `--gateway` / `--node <id\|name\|ip>` | Requested policy, host policy sources, and the effective result.                       |
+| `steelengine exec-policy show`                                      | Local-machine merged view.                                                             |
+| `steelengine exec-policy set` / `preset`                            | Synchronize the local requested policy with the local host approvals file in one step. |
 
 <Note>
 Per-session `/exec` overrides are not included. Run `/exec` in the relevant session to inspect its current defaults. See [session overrides](/tools/exec#session-overrides-exec).
@@ -80,22 +80,22 @@ message as a fallback.
 ## Settings and storage
 
 Approvals live in a local JSON file on the execution host. When
-`OPENCLAW_STATE_DIR` is set, the file follows that state directory;
-otherwise it uses the default OpenClaw state directory:
+`STEELENGINE_STATE_DIR` is set, the file follows that state directory;
+otherwise it uses the default SteelEngine state directory:
 
 ```text
-$OPENCLAW_STATE_DIR/exec-approvals.json
+$STEELENGINE_STATE_DIR/exec-approvals.json
 # otherwise
-~/.openclaw/exec-approvals.json
+~/.steelengine/exec-approvals.json
 ```
 
 The default approval socket follows the same root:
-`$OPENCLAW_STATE_DIR/exec-approvals.sock`, or
-`~/.openclaw/exec-approvals.sock` when the variable is unset.
+`$STEELENGINE_STATE_DIR/exec-approvals.sock`, or
+`~/.steelengine/exec-approvals.sock` when the variable is unset.
 
-State directories are independent trust scopes. When `OPENCLAW_STATE_DIR`
-points somewhere else, OpenClaw never imports or archives
-`~/.openclaw/exec-approvals.json`; configure approvals separately for the
+State directories are independent trust scopes. When `STEELENGINE_STATE_DIR`
+points somewhere else, SteelEngine never imports or archives
+`~/.steelengine/exec-approvals.json`; configure approvals separately for the
 custom state directory. Doctor also imports legacy
 `plugin-binding-approvals.json` only when it belongs to the active state
 directory.
@@ -106,7 +106,7 @@ Example schema:
 {
   "version": 1,
   "socket": {
-    "path": "~/.openclaw/exec-approvals.sock",
+    "path": "~/.steelengine/exec-approvals.sock",
     "token": "base64url-token"
   },
   "defaults": {
@@ -147,7 +147,7 @@ Example schema:
 | `deny`      | Block host exec.                                                                                                                                                          |
 | `allowlist` | Run only allowlisted commands without asking.                                                                                                                             |
 | `ask`       | Use allowlist policy and ask on misses.                                                                                                                                   |
-| `auto`      | Use allowlist policy, run deterministic matches directly, and send approval misses through OpenClaw's native auto reviewer before falling back to a human approval route. |
+| `auto`      | Use allowlist policy, run deterministic matches directly, and send approval misses through SteelEngine's native auto reviewer before falling back to a human approval route. |
 | `full`      | Run host exec without approval prompts.                                                                                                                                   |
 
 Legacy `tools.exec.security` / `tools.exec.ask` remain supported and still
@@ -205,7 +205,7 @@ Examples that strict mode catches: `python -c`, `node -e`/`--eval`/`-p`,
 
 In strict mode these commands need reviewer or explicit approval. With
 `tools.exec.mode: "auto"`, the reviewer may grant one low-risk execution when
-the command has an enforceable plan; otherwise OpenClaw asks a human.
+the command has an enforceable plan; otherwise SteelEngine asks a human.
 `Codex app-server` command approvals that reach the reviewer fallback ask a
 human because their approval requests do not expose an enforceable resolved
 executable.
@@ -214,7 +214,7 @@ executable.
 ### `tools.exec.commandHighlighting`
 
 <ParamField path="commandHighlighting" type="boolean" default="false">
-  Presentation only: when enabled, OpenClaw may attach parser-derived
+  Presentation only: when enabled, SteelEngine may attach parser-derived
   command spans so Web approval prompts can highlight command tokens. Does
   **not** change `security`, `ask`, allowlist matching, strict inline-eval
   behavior, approval forwarding, or command execution.
@@ -226,7 +226,7 @@ Set globally under `tools.exec.commandHighlighting` or per agent under
 ## YOLO mode (no-approval)
 
 To run host exec without approval prompts, open **both** policy layers:
-requested exec policy in OpenClaw config (`tools.exec.*`) **and**
+requested exec policy in SteelEngine config (`tools.exec.*`) **and**
 host-local approvals policy in the execution host approvals file.
 
 Omitted `askFallback` defaults to `deny`. Set host `askFallback` to `full`
@@ -250,15 +250,15 @@ explicitly when a no-UI approval prompt should fall back to allow.
 
 CLI-backed providers that expose their own noninteractive permission mode
 can follow this policy. Claude CLI adds
-`--permission-mode bypassPermissions` when OpenClaw's effective exec
-policy is YOLO. For OpenClaw-managed Claude live sessions, OpenClaw's
+`--permission-mode bypassPermissions` when SteelEngine's effective exec
+policy is YOLO. For SteelEngine-managed Claude live sessions, SteelEngine's
 effective exec policy is authoritative over Claude's native permission mode:
 YOLO normalizes live launches to `--permission-mode bypassPermissions`, and
 restrictive effective exec policy normalizes live launches to
 `--permission-mode default`, even if raw Claude backend args specify another
 mode.
 
-If you want a more conservative setup, tighten OpenClaw exec policy back to
+If you want a more conservative setup, tighten SteelEngine exec policy back to
 `allowlist` / `on-miss` or `deny`.
 
 ### Persistent gateway-host "never prompt" setup
@@ -266,15 +266,15 @@ If you want a more conservative setup, tighten OpenClaw exec policy back to
 <Steps>
   <Step title="Set the requested config policy">
     ```bash
-    openclaw config set tools.exec.host gateway
-    openclaw config set tools.exec.security full
-    openclaw config set tools.exec.ask off
-    openclaw gateway restart
+    steelengine config set tools.exec.host gateway
+    steelengine config set tools.exec.security full
+    steelengine config set tools.exec.ask off
+    steelengine gateway restart
     ```
   </Step>
   <Step title="Match the host approvals file">
     ```bash
-    openclaw approvals set --stdin <<'EOF'
+    steelengine approvals set --stdin <<'EOF'
     {
       version: 1,
       defaults: {
@@ -291,22 +291,22 @@ If you want a more conservative setup, tighten OpenClaw exec policy back to
 ### Local shortcut
 
 ```bash
-openclaw exec-policy preset yolo
+steelengine exec-policy preset yolo
 ```
 
 Updates both local `tools.exec.host/security/ask` and the local approvals
 file defaults (including `askFallback: "full"`). It is intentionally
 local-only. To change gateway-host or node-host approvals remotely, use
-`openclaw approvals set --gateway` or `openclaw approvals set --node
+`steelengine approvals set --gateway` or `steelengine approvals set --node
 <id|name|ip>`.
 
 Other built-in presets: `cautious` (`host=gateway`, `security=allowlist`,
 `ask=on-miss`, `askFallback=deny`) and `deny-all` (`host=gateway`,
 `security=deny`, `ask=off`, `askFallback=deny`). Apply the same way:
-`openclaw exec-policy preset cautious`.
+`steelengine exec-policy preset cautious`.
 
 To set individual fields instead of a full preset, use
-`openclaw exec-policy set --host <auto|sandbox|gateway|node> --security
+`steelengine exec-policy set --host <auto|sandbox|gateway|node> --security
 <deny|allowlist|full> --ask <off|on-miss|always> --ask-fallback
 <deny|allowlist|full>` with any subset of those flags.
 
@@ -315,7 +315,7 @@ To set individual fields instead of a full preset, use
 Apply the same approvals file on the node instead:
 
 ```bash
-openclaw approvals set --node <id|name|ip> --stdin <<'EOF'
+steelengine approvals set --node <id|name|ip> --stdin <<'EOF'
 {
   version: 1,
   defaults: {
@@ -330,9 +330,9 @@ EOF
 <Note>
 **Local-only limitations:**
 
-- `openclaw exec-policy` does not synchronize node approvals.
-- `openclaw exec-policy set --host node` is rejected.
-- Node exec approvals are fetched from the node at runtime, so node-targeted updates must use `openclaw approvals --node ...`.
+- `steelengine exec-policy` does not synchronize node approvals.
+- `steelengine exec-policy set --host node` is rejected.
+- Node exec approvals are fetched from the node at runtime, so node-targeted updates must use `steelengine approvals --node ...`.
 
 </Note>
 
@@ -371,7 +371,7 @@ Examples:
 ### Restricting arguments with argPattern
 
 Add `argPattern` when an allowlist entry should match a binary and a
-specific argument shape. OpenClaw uses ECMAScript (JavaScript) regular
+specific argument shape. SteelEngine uses ECMAScript (JavaScript) regular
 expression semantics on every host and evaluates the expression against
 the parsed command arguments, excluding the executable token (`argv[0]`).
 For hand-authored entries, arguments are joined with a single space, so
@@ -400,7 +400,7 @@ entry when the goal is to restrict the binary to the declared arguments.
 
 Entries saved by approval flows use an internal separator format for exact
 argv matching. Prefer the UI or approval flow to regenerate those entries
-instead of hand-editing the encoded value. If OpenClaw cannot parse argv
+instead of hand-editing the encoded value. If SteelEngine cannot parse argv
 for a command segment, entries with `argPattern` do not match.
 
 Each allowlist entry supports:
@@ -452,10 +452,10 @@ local approvals file directly.
 
 Some node hosts, including the Windows companion, own a different approval
 policy format. Control UI shows these host-native policies read-only. Use the
-companion app or `openclaw approvals set --node <id|name|ip>` with the native
+companion app or `steelengine approvals set --node <id|name|ip>` with the native
 policy shape to edit them; see [Approvals CLI](/cli/approvals).
 
-CLI: `openclaw approvals` supports gateway or node editing - see
+CLI: `steelengine approvals` supports gateway or node editing - see
 [Approvals CLI](/cli/approvals).
 
 ## Approval flow
@@ -477,17 +477,17 @@ context when forwarding approved `system.run` requests:
 ## System events and denials
 
 Exec lifecycle posts an `Exec finished` system message to the agent's
-session after the node reports completion. OpenClaw can also emit an
+session after the node reports completion. SteelEngine can also emit an
 in-progress notice once an approval is granted, after
 `tools.exec.approvalRunningNoticeMs` elapses (default `10000`, `0` disables
 it). Denied exec approvals are terminal for the host command: the command
 does not run.
 
-- For main-agent async approvals with an originating session, OpenClaw
+- For main-agent async approvals with an originating session, SteelEngine
   posts the denial back into that session as an internal followup so the
   agent can stop waiting on the async command and avoid a missing-result
   repair.
-- If there is no session or the session cannot be resumed, OpenClaw can
+- If there is no session or the session cannot be resumed, SteelEngine can
   still report a concise denial to the operator or direct chat route.
 - Denials for subagent and cron sessions are not posted back into that
   session.

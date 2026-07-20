@@ -182,15 +182,15 @@ export abstract class AppSidebarSessionListElement extends AppSidebarMenusElemen
           <span class="session-row-trail" id=${metaId ?? nothing}
             >${session.isChild && session.runtimeMs != null
               ? session.hasActiveRun || session.status === "running"
-                ? html`<openclaw-elapsed-time
+                ? html`<steelengine-elapsed-time
                     .startMs=${session.runtimeSampledAt! - session.runtimeMs}
-                  ></openclaw-elapsed-time>`
+                  ></steelengine-elapsed-time>`
                 : (formatDurationCompact(session.runtimeMs, { spaced: true }) ?? "0ms")
               : session.isChild && session.startedAt != null
-                ? html`<openclaw-elapsed-time
+                ? html`<steelengine-elapsed-time
                     .startMs=${session.startedAt}
                     .endMs=${session.endedAt ?? null}
-                  ></openclaw-elapsed-time>`
+                  ></steelengine-elapsed-time>`
                 : nothing}</span
           >
           ${session.isChild
@@ -541,7 +541,7 @@ export abstract class AppSidebarSessionListElement extends AppSidebarMenusElemen
                 data-sidebar-session-error
               >
                 <span class="callout__content">${this.sessionMutationError}</span>
-                <openclaw-tooltip .content=${t("chat.actions.dismissError")}>
+                <steelengine-tooltip .content=${t("chat.actions.dismissError")}>
                   <button
                     class="callout__dismiss"
                     type="button"
@@ -552,7 +552,7 @@ export abstract class AppSidebarSessionListElement extends AppSidebarMenusElemen
                   >
                     ${icons.x}
                   </button>
-                </openclaw-tooltip>
+                </steelengine-tooltip>
               </div>
             `
           : nothing}

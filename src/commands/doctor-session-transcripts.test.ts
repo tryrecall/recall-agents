@@ -2,7 +2,7 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SessionManager } from "../agents/sessions/session-manager.js";
 
@@ -92,7 +92,7 @@ describe("doctor session transcript repair", () => {
     withDoctorSqliteMaintenanceLock
       .mockReset()
       .mockImplementation(async (params: { run: () => unknown }) => await params.run());
-    root = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-doctor-transcripts-"));
+    root = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-doctor-transcripts-"));
   });
 
   afterEach(async () => {
@@ -125,9 +125,9 @@ describe("doctor session transcript repair", () => {
           content: [
             "visible ask",
             "",
-            "<<<BEGIN_OPENCLAW_INTERNAL_CONTEXT>>>",
+            "<<<BEGIN_STEELENGINE_INTERNAL_CONTEXT>>>",
             "secret",
-            "<<<END_OPENCLAW_INTERNAL_CONTEXT>>>",
+            "<<<END_STEELENGINE_INTERNAL_CONTEXT>>>",
           ].join("\n"),
         },
       },
@@ -181,7 +181,7 @@ describe("doctor session transcript repair", () => {
         message: {
           role: "user",
           content:
-            "visible ask\n\n<<<BEGIN_OPENCLAW_INTERNAL_CONTEXT>>>\nsecret\n<<<END_OPENCLAW_INTERNAL_CONTEXT>>>",
+            "visible ask\n\n<<<BEGIN_STEELENGINE_INTERNAL_CONTEXT>>>\nsecret\n<<<END_STEELENGINE_INTERNAL_CONTEXT>>>",
         },
       },
       {
@@ -199,7 +199,7 @@ describe("doctor session transcript repair", () => {
     const [message, title] = requireFirstMockCall(note, "doctor note") as [string, string];
     expect(title).toBe("Session transcripts");
     expect(message).toContain("legacy state");
-    expect(message).toContain('Run "openclaw doctor --fix"');
+    expect(message).toContain('Run "steelengine doctor --fix"');
     expect(countNonEmptyLines(await fs.readFile(filePath, "utf-8"))).toBe(3);
   });
 
@@ -230,7 +230,7 @@ describe("doctor session transcript repair", () => {
       checkId: "core/doctor/session-transcripts",
       severity: "info",
       path: filePath,
-      fixHint: expect.stringContaining("openclaw doctor --fix"),
+      fixHint: expect.stringContaining("steelengine doctor --fix"),
     });
     expect(sessionTranscriptIssueToRepairEffect(issue)).toEqual({
       kind: "file",
@@ -256,7 +256,7 @@ describe("doctor session transcript repair", () => {
         validatedTranscriptEvents: 0,
       },
     });
-    const env = { ...process.env, OPENCLAW_STATE_DIR: root };
+    const env = { ...process.env, STEELENGINE_STATE_DIR: root };
     const cfg = {};
 
     await noteSessionTranscriptHealth({
@@ -303,7 +303,7 @@ describe("doctor session transcript repair", () => {
         validatedTranscriptEvents: 0,
       },
     });
-    const env = { ...process.env, OPENCLAW_STATE_DIR: root };
+    const env = { ...process.env, STEELENGINE_STATE_DIR: root };
     const cfg = {};
 
     await noteSessionTranscriptHealth({
@@ -333,7 +333,7 @@ describe("doctor session transcript repair", () => {
         message: {
           role: "user",
           content:
-            "visible ask\n\n<<<BEGIN_OPENCLAW_INTERNAL_CONTEXT>>>\nsecret\n<<<END_OPENCLAW_INTERNAL_CONTEXT>>>",
+            "visible ask\n\n<<<BEGIN_STEELENGINE_INTERNAL_CONTEXT>>>\nsecret\n<<<END_STEELENGINE_INTERNAL_CONTEXT>>>",
         },
       },
       {
@@ -370,7 +370,7 @@ describe("doctor session transcript repair", () => {
         message: {
           role: "user",
           content:
-            "visible ask\n\n<<<BEGIN_OPENCLAW_INTERNAL_CONTEXT>>>\nsecret\n<<<END_OPENCLAW_INTERNAL_CONTEXT>>>",
+            "visible ask\n\n<<<BEGIN_STEELENGINE_INTERNAL_CONTEXT>>>\nsecret\n<<<END_STEELENGINE_INTERNAL_CONTEXT>>>",
         },
       },
       {
@@ -468,7 +468,7 @@ describe("doctor session transcript repair", () => {
         message: {
           role: "user",
           content:
-            "visible ask\n\n<<<BEGIN_OPENCLAW_INTERNAL_CONTEXT>>>\nsecret\n<<<END_OPENCLAW_INTERNAL_CONTEXT>>>",
+            "visible ask\n\n<<<BEGIN_STEELENGINE_INTERNAL_CONTEXT>>>\nsecret\n<<<END_STEELENGINE_INTERNAL_CONTEXT>>>",
         },
       },
       {
@@ -526,7 +526,7 @@ describe("doctor session transcript repair", () => {
         message: {
           role: "user",
           content:
-            "visible ask\n\n<<<BEGIN_OPENCLAW_INTERNAL_CONTEXT>>>\nsecret\n<<<END_OPENCLAW_INTERNAL_CONTEXT>>>",
+            "visible ask\n\n<<<BEGIN_STEELENGINE_INTERNAL_CONTEXT>>>\nsecret\n<<<END_STEELENGINE_INTERNAL_CONTEXT>>>",
         },
       },
       {

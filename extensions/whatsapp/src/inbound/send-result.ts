@@ -6,8 +6,8 @@ import {
   type MessageReceipt,
   type MessageReceiptPartKind,
   type MessageReceiptSourceResult,
-} from "openclaw/plugin-sdk/channel-outbound";
-import { normalizeStringEntries, uniqueStrings } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/channel-outbound";
+import { normalizeStringEntries, uniqueStrings } from "steelengine/plugin-sdk/string-coerce-runtime";
 
 export type WhatsAppSendKind =
   | "contact"

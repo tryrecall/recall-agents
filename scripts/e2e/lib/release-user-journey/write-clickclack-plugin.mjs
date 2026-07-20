@@ -17,14 +17,14 @@ fs.writeFileSync(
       name: "clickclack",
       version: "0.0.1",
       type: "module",
-      openclaw: { extensions: ["./index.mjs"] },
+      steelengine: { extensions: ["./index.mjs"] },
     },
     null,
     2,
   )}\n`,
 );
 fs.writeFileSync(
-  path.join(pluginDir, "openclaw.plugin.json"),
+  path.join(pluginDir, "steelengine.plugin.json"),
   `${JSON.stringify(
     {
       id: "clickclack",

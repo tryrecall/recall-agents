@@ -1,9 +1,9 @@
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import type {
-  OpenClawPluginCommandDefinition,
+  SteelEnginePluginCommandDefinition,
   PluginCommandContext,
-} from "openclaw/plugin-sdk/plugin-entry";
-import { createTestPluginApi } from "openclaw/plugin-sdk/plugin-test-api";
+} from "steelengine/plugin-sdk/plugin-entry";
+import { createTestPluginApi } from "steelengine/plugin-sdk/plugin-test-api";
 import { describe, expect, it, vi } from "vitest";
 
 const resolveTelegramMiniAppUrls = vi.hoisted(() => vi.fn());
@@ -17,8 +17,8 @@ const { registerTelegramMiniAppCommand } = await import("./command.js");
 
 function registerDashboardCommand(
   api: Parameters<typeof registerTelegramMiniAppCommand>[0],
-): OpenClawPluginCommandDefinition {
-  const commands: OpenClawPluginCommandDefinition[] = [];
+): SteelEnginePluginCommandDefinition {
+  const commands: SteelEnginePluginCommandDefinition[] = [];
   registerTelegramMiniAppCommand({
     ...api,
     registerCommand: (command) => commands.push(command),
@@ -69,8 +69,8 @@ describe("registerTelegramMiniAppCommand", () => {
 
   it("returns a web app button for owner DM invocations", async () => {
     resolveTelegramMiniAppUrls.mockResolvedValue({
-      pageUrl: "https://host.tailnet.ts.net/__openclaw_tg_miniapp/",
-      controlUiUrl: "https://host.tailnet.ts.net/openclaw",
+      pageUrl: "https://host.tailnet.ts.net/__steelengine_tg_miniapp/",
+      controlUiUrl: "https://host.tailnet.ts.net/steelengine",
       gatewayUrl: "wss://host.tailnet.ts.net",
     });
     const command = registerDashboardCommand(
@@ -96,7 +96,7 @@ describe("registerTelegramMiniAppCommand", () => {
       }),
     );
 
-    expect(result.text).toBe("Open OpenClaw dashboard.");
+    expect(result.text).toBe("Open SteelEngine dashboard.");
     expect(result.presentation?.blocks).toEqual([
       {
         type: "buttons",
@@ -104,7 +104,7 @@ describe("registerTelegramMiniAppCommand", () => {
           {
             label: "Open dashboard",
             webApp: {
-              url: "https://host.tailnet.ts.net/__openclaw_tg_miniapp/?accountId=ops",
+              url: "https://host.tailnet.ts.net/__steelengine_tg_miniapp/?accountId=ops",
             },
           },
         ],

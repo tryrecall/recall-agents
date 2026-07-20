@@ -4,15 +4,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { Readable, Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { readProviderJsonResponse } from "openclaw/plugin-sdk/provider-http";
-import { runPluginCommandWithTimeout } from "openclaw/plugin-sdk/run-command";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
-import { CONFIG_DIR, extractArchive, resolveBrewExecutable } from "openclaw/plugin-sdk/setup-tools";
-import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { withTempDownloadPath } from "openclaw/plugin-sdk/temp-path";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { readProviderJsonResponse } from "steelengine/plugin-sdk/provider-http";
+import { runPluginCommandWithTimeout } from "steelengine/plugin-sdk/run-command";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
+import { CONFIG_DIR, extractArchive, resolveBrewExecutable } from "steelengine/plugin-sdk/setup-tools";
+import { fetchWithSsrFGuard } from "steelengine/plugin-sdk/ssrf-runtime";
+import { normalizeLowercaseStringOrEmpty } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { withTempDownloadPath } from "steelengine/plugin-sdk/temp-path";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 
 export type ReleaseAsset = {
   name?: string;
@@ -309,7 +309,7 @@ export async function installSignalCliFromRelease(
     auditContext: "signal-cli-release-info",
     init: {
       headers: {
-        "User-Agent": "openclaw",
+        "User-Agent": "steelengine",
         Accept: "application/vnd.github+json",
       },
     },
@@ -349,7 +349,7 @@ export async function installSignalCliFromRelease(
   // Keep the large release archive in an owned workspace so every callback exit
   // cleans it without touching the installed tree under CONFIG_DIR.
   return await withTempDownloadPath(
-    { prefix: "openclaw-signal", fileName: asset.name },
+    { prefix: "steelengine-signal", fileName: asset.name },
     async (archivePath) => {
       runtime.log(`Downloading signal-cli ${version} (${asset.name})…`);
       await downloadToFile(asset.browser_download_url, archivePath);

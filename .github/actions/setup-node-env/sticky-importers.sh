@@ -5,7 +5,7 @@ mode="${1:?mode is required}"
 sticky_root="${2:?sticky root is required}"
 workspace="${3:?workspace is required}"
 archive="$sticky_root/importer-node-modules.tar"
-marker="$sticky_root/.openclaw-deps-fingerprint"
+marker="$sticky_root/.steelengine-deps-fingerprint"
 
 case "$mode" in
   capture)

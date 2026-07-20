@@ -311,11 +311,11 @@ function createPlanningEvidenceFixture(
       },
     };
   }
-  if (scenario.execution.runtime === "openclaw" && artifactFile) {
+  if (scenario.execution.runtime === "steelengine" && artifactFile) {
     return {
       scenario,
       outboundText: `Built ${artifactFile}`,
-      failureMessage: "missing OpenClaw update_plan signal",
+      failureMessage: "missing SteelEngine update_plan signal",
       currentSummary: {
         eventCursor: 9,
         successfulToolCallCounts: { update_plan: 1 },

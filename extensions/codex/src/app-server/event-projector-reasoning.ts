@@ -1,5 +1,5 @@
-import type { EmbeddedRunAttemptParams } from "openclaw/plugin-sdk/agent-harness-runtime";
-import type { AgentPlanStep, AgentPlanStepStatus } from "openclaw/plugin-sdk/channel-outbound";
+import type { EmbeddedRunAttemptParams } from "steelengine/plugin-sdk/agent-harness-runtime";
+import type { AgentPlanStep, AgentPlanStepStatus } from "steelengine/plugin-sdk/channel-outbound";
 import {
   readNonNegativeInteger,
   readNullableString,

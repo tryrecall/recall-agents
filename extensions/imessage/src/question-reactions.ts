@@ -1,8 +1,8 @@
 // iMessage transport binding for numbered ask_user reactions.
-import type { OutboundDeliveryResult } from "openclaw/plugin-sdk/channel-send-result";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { questionGatewayRuntime } from "openclaw/plugin-sdk/question-gateway-runtime";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-runtime";
+import type { OutboundDeliveryResult } from "steelengine/plugin-sdk/channel-send-result";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { questionGatewayRuntime } from "steelengine/plugin-sdk/question-gateway-runtime";
+import type { ReplyPayload } from "steelengine/plugin-sdk/reply-runtime";
 import { resolveIMessageReactionContext } from "./monitor/reaction-context.js";
 import type { IMessagePayload } from "./monitor/types.js";
 
@@ -125,7 +125,7 @@ export function hasIMessageQuestionReactionTarget(params: {
 }
 
 export async function maybeResolveIMessageQuestionReaction(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId: string;
   message: IMessagePayload;
   bodyText: string;

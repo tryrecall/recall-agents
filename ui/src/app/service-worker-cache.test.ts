@@ -20,7 +20,7 @@ describe("Control UI service worker cache versioning", () => {
     expect(mainSource).toContain('navigator.serviceWorker.addEventListener("message"');
     expect(mainSource).toContain("event.data.version !== currentControlUiBuildId");
     expect(serviceWorkerSource).toContain(
-      'const EMBEDDED_CACHE_VERSION = "__OPENCLAW_CONTROL_UI_BUILD_ID__"',
+      'const EMBEDDED_CACHE_VERSION = "__STEELENGINE_CONTROL_UI_BUILD_ID__"',
     );
     expect(serviceWorkerSource).toContain("URL_CACHE_VERSION");
     expect(serviceWorkerSource).toContain("CONTROL_CACHE_LIMIT = 3");
@@ -32,12 +32,12 @@ describe("Control UI service worker cache versioning", () => {
     );
     expect(viteConfigSource).toContain("source.replace(placeholder, JSON.stringify(buildId))");
     expect(viteConfigSource).toContain(
-      '"globalThis.OPENCLAW_CONTROL_UI_BUILD_INFO": JSON.stringify(buildInfo)',
+      '"globalThis.STEELENGINE_CONTROL_UI_BUILD_INFO": JSON.stringify(buildInfo)',
     );
     expect(viteConfigSource).not.toContain(
-      "OPENCLAW_CONTROL_UI_BUILD_ID: JSON.stringify(controlUiBuildId)",
+      "STEELENGINE_CONTROL_UI_BUILD_ID: JSON.stringify(controlUiBuildId)",
     );
-    expect(serviceWorkerSource).not.toContain('const CACHE_NAME = "openclaw-control-v1"');
+    expect(serviceWorkerSource).not.toContain('const CACHE_NAME = "steelengine-control-v1"');
   });
 
   it("broadcasts updated versions to uncontrolled window clients during activation", async () => {
@@ -53,10 +53,10 @@ describe("Control UI service worker cache versioning", () => {
     const caches = {
       delete: cacheDelete,
       keys: vi.fn(async () => [
-        "openclaw-control-oldest",
-        "openclaw-control-older",
-        "openclaw-control-previous",
-        "openclaw-control-new-build",
+        "steelengine-control-oldest",
+        "steelengine-control-older",
+        "steelengine-control-previous",
+        "steelengine-control-new-build",
         "other-cache",
       ]),
       open: vi.fn(),
@@ -102,7 +102,7 @@ describe("Control UI service worker cache versioning", () => {
 
     expect(clients.matchAll).toHaveBeenCalledWith({ type: "window", includeUncontrolled: true });
     expect(clients.claim).toHaveBeenCalled();
-    expect(cacheDelete).toHaveBeenCalledWith("openclaw-control-oldest");
+    expect(cacheDelete).toHaveBeenCalledWith("steelengine-control-oldest");
     expect(windowClient.postMessage).toHaveBeenCalledWith({
       type: "sw-updated",
       version: "new-build",

@@ -1,51 +1,51 @@
 ---
 summary: "ClickClack bot-token channel setup and target syntax"
 read_when:
-  - Connecting OpenClaw to a ClickClack workspace
+  - Connecting SteelEngine to a ClickClack workspace
   - Testing ClickClack bot identities
 title: "ClickClack"
 ---
 
-ClickClack connects OpenClaw to a self-hosted ClickClack workspace through first-class ClickClack bot tokens.
+ClickClack connects SteelEngine to a self-hosted ClickClack workspace through first-class ClickClack bot tokens.
 
-Use this when you want an OpenClaw agent to appear as a ClickClack bot user. ClickClack supports independent service bots and user-owned bots; user-owned bots keep an `owner_user_id` and receive only the token scopes you grant.
+Use this when you want an SteelEngine agent to appear as a ClickClack bot user. ClickClack supports independent service bots and user-owned bots; user-owned bots keep an `owner_user_id` and receive only the token scopes you grant.
 
 ## Quick setup
 
-In ClickClack, open **Workspace settings → Integrations → OpenClaw**, create a
+In ClickClack, open **Workspace settings → Integrations → SteelEngine**, create a
 bot using **Setup code (recommended)**, and copy the generated command:
 
 ```bash
-openclaw channels add clickclack --code 'https://clickclack.example.com/#XXXX-XXXX-XXXX'
+steelengine channels add clickclack --code 'https://clickclack.example.com/#XXXX-XXXX-XXXX'
 ```
 
-The setup code is single-use and expires after 10 minutes. OpenClaw claims it,
+The setup code is single-use and expires after 10 minutes. SteelEngine claims it,
 receives the newly minted bot token and workspace settings, saves the account,
 verifies the connection, and reports whether the running gateway picked it up.
-The setup code itself is not stored in OpenClaw config.
+The setup code itself is not stored in SteelEngine config.
 
 Setup-code claims use HTTPS for public servers. Plain HTTP is also supported for
 local installations on loopback or private networks, including `localhost`,
 private IP addresses, and internal hostnames that resolve only to private
 addresses.
 
-If OpenClaw is already running, ClickClack connects automatically and no second
+If SteelEngine is already running, ClickClack connects automatically and no second
 command is needed. Otherwise, start it with:
 
 ```bash
-openclaw gateway
+steelengine gateway
 ```
 
 You can also pass the code separately from the server URL:
 
 ```bash
-openclaw channels add clickclack --code XXXX-XXXX-XXXX --base-url https://clickclack.example.com
+steelengine channels add clickclack --code XXXX-XXXX-XXXX --base-url https://clickclack.example.com
 ```
 
 For guided setup, run:
 
 ```bash
-openclaw onboard
+steelengine onboard
 ```
 
 Select ClickClack, then enter the server URL, bot token, and workspace when
@@ -54,11 +54,11 @@ failed check does not discard the configuration.
 
 ### Alternative: manual token
 
-Choose **Manual token** in ClickClack when configuring a non-OpenClaw client or
+Choose **Manual token** in ClickClack when configuring a non-SteelEngine client or
 when you explicitly need to manage the token yourself:
 
 ```bash
-openclaw channels add clickclack --base-url https://clickclack.example.com --token ccb_... --workspace default
+steelengine channels add clickclack --base-url https://clickclack.example.com --token ccb_... --workspace default
 ```
 
 `workspace` accepts a workspace id (`wsp_...`), slug, or display name.
@@ -71,8 +71,8 @@ in config:
 
 ```bash
 export CLICKCLACK_BOT_TOKEN="ccb_..."
-openclaw channels add clickclack --base-url https://clickclack.example.com --workspace default --use-env
-openclaw gateway
+steelengine channels add clickclack --base-url https://clickclack.example.com --workspace default --use-env
+steelengine gateway
 ```
 
 Named accounts must use a configured token or token file; the shared env
@@ -120,11 +120,11 @@ id (`wsp_...`), slug, or name; the gateway resolves it to the id at startup.
 | `reconnectMs`           | `1500`              | Realtime reconnect delay (100 to 60000).                                                |
 
 If `plugins.allow` is a non-empty restrictive list, explicitly selecting
-ClickClack in channel setup or running `openclaw plugins enable clickclack`
+ClickClack in channel setup or running `steelengine plugins enable clickclack`
 appends `clickclack` to that list. Onboarding installation uses the same
 explicit-selection behavior. These paths do not override `plugins.deny` or a
 global `plugins.enabled: false` setting. Direct
-`openclaw plugins install @openclaw/clickclack` follows the normal
+`steelengine plugins install @steelengine/clickclack` follows the normal
 plugin-install policy and also records ClickClack in an existing allowlist.
 
 ## Multiple bots
@@ -185,7 +185,7 @@ not needed there.
 
 ## Command menu
 
-At gateway startup, each configured account publishes OpenClaw's native
+At gateway startup, each configured account publishes SteelEngine's native
 commands to ClickClack. They appear in composer autocomplete labeled with the
 bot's handle. The published set is replaced wholesale on each startup,
 including clearing a stale menu when the native command catalog is empty.
@@ -225,7 +225,7 @@ delivery.
 
 Use `agent` mode for cross-service correlation evidence. For an authoritative
 ClickClack message id in its canonical `msg_<ulid>` shape, the channel derives
-the deterministic OpenClaw run id `clickclack:<message-id>`. Each model call is
+the deterministic SteelEngine run id `clickclack:<message-id>`. Each model call is
 then visible in diagnostics as `clickclack:<message-id>:model:<n>`; when that
 turn uses ClawRouter, the same model-call id is sent as `X-Request-ID`.
 `model` mode bypasses the normal agent run/session diagnostics and is therefore
@@ -240,11 +240,11 @@ prompts, completions, credentials, or tool output.
 
 ## Durable media delivery
 
-Agent replies containing media use required durable delivery. OpenClaw assigns
+Agent replies containing media use required durable delivery. SteelEngine assigns
 stable per-part message and upload nonces before the first ClickClack write, so
 a retry reuses the same upload and message instead of consuming storage quota
 or publishing duplicates. If an upload already exists after a restart,
-OpenClaw does not reread the original local path or remote media URL.
+SteelEngine does not reread the original local path or remote media URL.
 
 This recovery contract requires a ClickClack server that supports:
 
@@ -256,7 +256,7 @@ This recovery contract requires a ClickClack server that supports:
   owner-scoped nonce and upload.
 
 An older server's generic 404 is not treated as proof that a send is absent.
-OpenClaw leaves the delivery unresolved rather than risking a duplicate; update
+SteelEngine leaves the delivery unresolved rather than risking a duplicate; update
 ClickClack before enabling media-producing agent replies.
 
 ## Agent activity rows
@@ -294,7 +294,7 @@ Explicit outbound targets may also carry the `clickclack:` or `cc:` provider pre
 
 Outbound media uses ClickClack's upload API and then attaches the durable upload
 to the created channel message, thread reply, or DM. Local files and supported
-remote media URLs follow OpenClaw's normal media-access policy, with a 64 MiB
+remote media URLs follow SteelEngine's normal media-access policy, with a 64 MiB
 per-file limit. Durable queued sends use separate owner-scoped nonces for each
 upload and message part, then retry attachment association with those same
 objects. See [Durable media delivery](#durable-media-delivery) for the server
@@ -303,9 +303,9 @@ contract and recovery behavior.
 Examples:
 
 ```bash
-openclaw message send --channel clickclack --target channel:general --message "hello"
-openclaw message send --channel clickclack --target dm:usr_123 --message "hello"
-openclaw message send --channel clickclack --target thread:msg_123 --message "following up"
+steelengine message send --channel clickclack --target channel:general --message "hello"
+steelengine message send --channel clickclack --target dm:usr_123 --message "hello"
+steelengine message send --channel clickclack --target thread:msg_123 --message "following up"
 ```
 
 ## Permissions
@@ -318,7 +318,7 @@ ClickClack token scopes are enforced by the ClickClack API.
 - `commands:write`: publish the bot's command menu. Included in current `bot:write` and `bot:admin` bundles and grantable individually.
 - `agent_activity:write`: durable agent activity rows (`agent_commentary` / `agent_tool`). Not inherited by `bot:write` or `bot:admin`; required only when `agentActivity: true` is set.
 
-OpenClaw only needs current `bot:write` for normal agent chat and command-menu sync. Add `agent_activity:write` when enabling [agent activity rows](#agent-activity-rows).
+SteelEngine only needs current `bot:write` for normal agent chat and command-menu sync. Add `agent_activity:write` when enabling [agent activity rows](#agent-activity-rows).
 
 ## Troubleshooting
 

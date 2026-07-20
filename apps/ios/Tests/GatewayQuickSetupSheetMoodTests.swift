@@ -1,6 +1,6 @@
-import OpenClawChatUI
+import SteelEngineChatUI
 import Testing
-@testable import OpenClaw
+@testable import SteelEngine
 
 @MainActor
 struct GatewayQuickSetupSheetMoodTests {

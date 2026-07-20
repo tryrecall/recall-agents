@@ -50,7 +50,7 @@ async function executeReloadHandoff(launchctlStub: string): Promise<{
   try {
     const home = path.join(stubDir, "home");
     const callsPath = path.join(stubDir, "launchctl.calls");
-    fs.mkdirSync(path.join(home, ".openclaw", "logs"), { recursive: true });
+    fs.mkdirSync(path.join(home, ".steelengine", "logs"), { recursive: true });
     fs.writeFileSync(
       path.join(stubDir, "launchctl"),
       `#!/bin/sh\nprintf '%s\\n' "$*" >> "$LAUNCHCTL_CALLS_PATH"\n${launchctlStub}\n`,
@@ -61,7 +61,7 @@ async function executeReloadHandoff(launchctlStub: string): Promise<{
 
     spawnMock.mockReturnValue({ pid: 4242, unref: unrefMock });
     scheduleDetachedLaunchdRestartHandoff({
-      env: { HOME: home, OPENCLAW_PROFILE: "default" },
+      env: { HOME: home, STEELENGINE_PROFILE: "default" },
       mode: "reload",
       waitForPid: noWaitPid,
     });
@@ -103,7 +103,7 @@ async function executeReloadHandoff(launchctlStub: string): Promise<{
 
     const calls = fs.readFileSync(callsPath, "utf8").trim().split("\n");
     const log = fs.readFileSync(
-      path.join(home, ".openclaw", "logs", "gateway-restart.log"),
+      path.join(home, ".steelengine", "logs", "gateway-restart.log"),
       "utf8",
     );
     return { calls, exitCode, log };
@@ -122,7 +122,7 @@ describe("scheduleDetachedLaunchdRestartHandoff", () => {
   it("waits for the caller pid before kickstarting launchd", () => {
     const env = {
       HOME: "/Users/test",
-      OPENCLAW_PROFILE: "default",
+      STEELENGINE_PROFILE: "default",
     };
     spawnMock.mockReturnValue({ pid: 4242, unref: unrefMock });
 
@@ -136,11 +136,11 @@ describe("scheduleDetachedLaunchdRestartHandoff", () => {
     expect(spawnMock).toHaveBeenCalledTimes(1);
     const [, args] = requireSpawnCall();
     expect(args[0]).toBe("-c");
-    expect(args[2]).toBe("openclaw-launchd-restart-handoff");
+    expect(args[2]).toBe("steelengine-launchd-restart-handoff");
     expect(args[6]).toBe("9876");
     expect(args[1]).toContain('while kill -0 "$wait_pid" >/dev/null 2>&1; do');
-    expect(args[1]).toContain("exec >>'/Users/test/.openclaw/logs/gateway-restart.log' 2>&1");
-    expect(args[1]).toContain("openclaw restart attempt source=handoff mode=kickstart");
+    expect(args[1]).toContain("exec >>'/Users/test/.steelengine/logs/gateway-restart.log' 2>&1");
+    expect(args[1]).toContain("steelengine restart attempt source=handoff mode=kickstart");
     expect(args[1]).toContain("pid=%s interactive=0");
     expect(args[1]).toContain('launchctl enable "$service_target"');
     expect(args[1]).toContain('if launchctl kickstart -k "$service_target"; then');
@@ -158,7 +158,7 @@ describe("scheduleDetachedLaunchdRestartHandoff", () => {
     scheduleDetachedLaunchdRestartHandoff({
       env: {
         HOME: "/Users/test",
-        OPENCLAW_PROFILE: "default",
+        STEELENGINE_PROFILE: "default",
       },
       mode: "start-after-exit",
     });
@@ -179,14 +179,14 @@ describe("scheduleDetachedLaunchdRestartHandoff", () => {
     scheduleDetachedLaunchdRestartHandoff({
       env: {
         HOME: "/Users/test",
-        OPENCLAW_PROFILE: "default",
+        STEELENGINE_PROFILE: "default",
       },
       mode: "reload",
       waitForPid: 9876,
     });
 
     const [, args] = requireSpawnCall();
-    expect(args[1]).toContain("openclaw restart attempt source=handoff mode=reload");
+    expect(args[1]).toContain("steelengine restart attempt source=handoff mode=reload");
     expect(args[1]).toContain('launchctl enable "$service_target"');
     expect(args[1]).toContain('launchctl bootout "$service_target"');
     // The unload poll must outlast launchd's ExitTimeOut SIGKILL ceiling plus
@@ -280,7 +280,7 @@ esac`);
     scheduleDetachedLaunchdRestartHandoff({
       env: {
         HOME: "/Users/test",
-        OPENCLAW_PROFILE: "default",
+        STEELENGINE_PROFILE: "default",
         PATH: "/tmp/evil-bin",
         DYLD_INSERT_LIBRARIES: "/tmp/evil.dylib",
         NPM_CONFIG_GLOBALCONFIG: "/tmp/evil-npmrc",
@@ -289,11 +289,11 @@ esac`);
     });
 
     const [, args, options] = requireSpawnCall();
-    expect(args[1]).toContain("exec >>'/Users/test/.openclaw/logs/gateway-restart.log' 2>&1");
+    expect(args[1]).toContain("exec >>'/Users/test/.steelengine/logs/gateway-restart.log' 2>&1");
     expect(args[1]).not.toContain("/tmp/evil-bin");
     expect(args[1]).not.toContain("/tmp/evil.dylib");
     expect(args[1]).not.toContain("/tmp/evil-npmrc");
-    expect(options.env.OPENCLAW_PROFILE).toBe("default");
+    expect(options.env.STEELENGINE_PROFILE).toBe("default");
     expect(options.env.PATH).not.toBe("/tmp/evil-bin");
     expect(options.env.DYLD_INSERT_LIBRARIES).toBeUndefined();
     expect(options.env.NPM_CONFIG_GLOBALCONFIG).toBeUndefined();
@@ -304,7 +304,7 @@ esac`);
       scheduleDetachedLaunchdRestartHandoff({
         env: {
           HOME: "/Users/test",
-          OPENCLAW_LAUNCHD_LABEL: "../evil/\n\u001b[31mlabel\u001b[0m",
+          STEELENGINE_LAUNCHD_LABEL: "../evil/\n\u001b[31mlabel\u001b[0m",
         },
         mode: "kickstart",
       });

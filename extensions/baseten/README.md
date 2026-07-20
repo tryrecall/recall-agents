@@ -1,12 +1,12 @@
-# OpenClaw Baseten Provider
+# SteelEngine Baseten Provider
 
-Official OpenClaw provider plugin for Baseten Model APIs, including Thinking Machines Lab's Inkling.
+Official SteelEngine provider plugin for Baseten Model APIs, including Thinking Machines Lab's Inkling.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/baseten-provider
-openclaw gateway restart
+steelengine plugins install @steelengine/baseten-provider
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/providers/baseten> for setup and configuration.
+See <https://docs.steelengine.ai/providers/baseten> for setup and configuration.

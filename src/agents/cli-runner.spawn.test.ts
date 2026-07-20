@@ -2,7 +2,7 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createReplyOperation, replyRunRegistry } from "../auto-reply/reply/reply-run-registry.js";
 import { testing as replyRunTesting } from "../auto-reply/reply/reply-run-registry.test-support.js";
@@ -356,10 +356,10 @@ async function withTempExecApprovalsFile(
   file: Record<string, unknown>,
   run: () => Promise<void>,
 ): Promise<void> {
-  const home = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-cli-exec-approvals-"));
-  await fs.mkdir(path.join(home, ".openclaw"), { recursive: true });
+  const home = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-cli-exec-approvals-"));
+  await fs.mkdir(path.join(home, ".steelengine"), { recursive: true });
   await fs.writeFile(
-    path.join(home, ".openclaw", "exec-approvals.json"),
+    path.join(home, ".steelengine", "exec-approvals.json"),
     `${JSON.stringify(file)}\n`,
     "utf-8",
   );
@@ -370,10 +370,10 @@ async function withTempExecApprovalsFile(
   }
 }
 
-async function withTempOpenClawHome(run: (home: string) => Promise<void>): Promise<void> {
-  const home = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-cli-home-"));
+async function withTempSteelEngineHome(run: (home: string) => Promise<void>): Promise<void> {
+  const home = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-cli-home-"));
   try {
-    await withEnvAsync({ OPENCLAW_HOME: home }, async () => run(home));
+    await withEnvAsync({ STEELENGINE_HOME: home }, async () => run(home));
   } finally {
     await fs.rm(home, { recursive: true, force: true });
   }
@@ -482,7 +482,7 @@ describe("runCliAgent spawn path", () => {
       runId: "run-node-claude",
       prompt: "current turn",
       sessionEntry: {
-        sessionId: "openclaw-session",
+        sessionId: "steelengine-session",
         updatedAt: 1,
         execHost: "node",
         execNode: "node-a",
@@ -499,7 +499,7 @@ describe("runCliAgent spawn path", () => {
           "--mcp-config",
           "/tmp/gateway-mcp.json",
           "--allowedTools",
-          "mcp__openclaw__*",
+          "mcp__steelengine__*",
         ],
         resumeArgs: [
           "-p",
@@ -511,7 +511,7 @@ describe("runCliAgent spawn path", () => {
           "--mcp-config",
           "/tmp/gateway-mcp.json",
           "--allowedTools",
-          "mcp__openclaw__*",
+          "mcp__steelengine__*",
           "--resume",
           "{sessionId}",
         ],
@@ -523,9 +523,9 @@ describe("runCliAgent spawn path", () => {
         toolAvailability = execution.toolAvailability;
         return [...execution.baseArgs];
       },
-      cliToolAvailability: { native: [], mcp: ["mcp__openclaw__message"] },
+      cliToolAvailability: { native: [], mcp: ["mcp__steelengine__message"] },
     });
-    context.openClawHistoryPrompt = "gateway transcript reseed";
+    context.steelEngineHistoryPrompt = "gateway transcript reseed";
     context.claudeSkillsPluginArgs = ["--plugin-dir", "/tmp/gateway-skills"];
     context.params.forkCliSessionOnResume = true;
     context.params.claimCliSessionFork = vi.fn(async () => true);
@@ -581,7 +581,7 @@ describe("runCliAgent spawn path", () => {
       runId: "run-node-claude-truncated",
       prompt: "current turn",
       sessionEntry: {
-        sessionId: "openclaw-session",
+        sessionId: "steelengine-session",
         updatedAt: 1,
         execHost: "node",
         execNode: "node-a",
@@ -622,7 +622,7 @@ describe("runCliAgent spawn path", () => {
       model: "claude-opus-4-8",
       runId: "run-node-abort",
       sessionEntry: {
-        sessionId: "openclaw-session",
+        sessionId: "steelengine-session",
         updatedAt: 1,
         execHost: "node",
         execNode: "node-a",
@@ -703,7 +703,7 @@ describe("runCliAgent spawn path", () => {
       sessionKey: plan.sessionKey,
       agentId: "main",
       sessionEntry: {
-        sessionId: "openclaw-session",
+        sessionId: "steelengine-session",
         updatedAt: 1,
         execHost: "node",
         execNode: "node-a",
@@ -768,7 +768,7 @@ describe("runCliAgent spawn path", () => {
       runId: "run-node-approval-timeout",
       timeoutMs: 25,
       sessionEntry: {
-        sessionId: "openclaw-session",
+        sessionId: "steelengine-session",
         updatedAt: 1,
         execHost: "node",
         execNode: "node-a",
@@ -808,7 +808,7 @@ describe("runCliAgent spawn path", () => {
       runId: "run-node-approval-registration-timeout",
       timeoutMs: 25,
       sessionEntry: {
-        sessionId: "openclaw-session",
+        sessionId: "steelengine-session",
         updatedAt: 1,
         execHost: "node",
         execNode: "node-a",
@@ -830,7 +830,7 @@ describe("runCliAgent spawn path", () => {
       model: "claude-opus-4-8",
       runId: "run-node-image",
       sessionEntry: {
-        sessionId: "openclaw-session",
+        sessionId: "steelengine-session",
         updatedAt: 1,
         execHost: "node",
         execNode: "node-a",
@@ -916,7 +916,7 @@ describe("runCliAgent spawn path", () => {
     expect(allArgs).toContain("You are a helpful assistant.");
   });
 
-  it("includes the OpenClaw skills prompt in CLI system prompts", () => {
+  it("includes the SteelEngine skills prompt in CLI system prompts", () => {
     const systemPrompt = buildCliAgentSystemPrompt({
       workspaceDir: "/tmp",
       modelDisplay: "claude-cli/sonnet",
@@ -1277,7 +1277,7 @@ describe("runCliAgent spawn path", () => {
     supervisorSpawnMock.mockImplementationOnce(async (...args: unknown[]) => {
       const input = (args[0] ?? {}) as { argv?: string[] };
       systemPromptPath = requireArgAfter(input.argv, "--append-system-prompt-file");
-      expect(systemPromptPath).toContain("openclaw-cli-system-prompt-");
+      expect(systemPromptPath).toContain("steelengine-cli-system-prompt-");
       await expect(fs.readFile(systemPromptPath, "utf-8")).resolves.toBe(
         "You are a helpful assistant.",
       );
@@ -1307,7 +1307,7 @@ describe("runCliAgent spawn path", () => {
 
   it("resends system prompts through a file for soft-resumed prompt-tool drift", async () => {
     const writeSoftResumeSystemPromptFile = vi.fn(async () => ({
-      filePath: "/tmp/openclaw-soft-resume-system-prompt.md",
+      filePath: "/tmp/steelengine-soft-resume-system-prompt.md",
       cleanup: async () => {},
     }));
     setCliRunnerExecuteTestDeps({
@@ -1317,7 +1317,7 @@ describe("runCliAgent spawn path", () => {
       const input = (args[0] ?? {}) as { argv?: string[] };
       expect(input.argv).toContain("resume");
       expect(input.argv).toContain("soft-cli-session");
-      expect(input.argv?.join(" ")).toContain("/tmp/openclaw-soft-resume-system-prompt.md");
+      expect(input.argv?.join(" ")).toContain("/tmp/steelengine-soft-resume-system-prompt.md");
       return createManagedRun({
         reason: "exit",
         exitCode: 0,
@@ -1423,7 +1423,7 @@ describe("runCliAgent spawn path", () => {
     mockSuccessfulClaudeJsonlRun();
     const toolAvailability: NonNullable<PreparedCliRunContext["params"]["cliToolAvailability"]> = {
       native: [],
-      mcp: ["mcp__openclaw__openclaw"],
+      mcp: ["mcp__steelengine__steelengine"],
     };
     const resolveExecutionArgs = vi.fn(({ baseArgs }) => baseArgs);
 
@@ -1453,7 +1453,7 @@ describe("runCliAgent spawn path", () => {
           runId: "run-claude-tool-policy-refused",
           cliToolAvailability: {
             native: [],
-            mcp: ["mcp__openclaw__openclaw"],
+            mcp: ["mcp__steelengine__steelengine"],
           },
           resolveExecutionArgs,
         }),
@@ -1495,22 +1495,22 @@ describe("runCliAgent spawn path", () => {
           },
         },
         preparedEnv: {
-          GEMINI_CLI_HOME: "/tmp/openclaw-gemini-profile-home",
-          GEMINI_CLI_SYSTEM_SETTINGS_PATH: "/tmp/openclaw-gemini-system-settings.json",
+          GEMINI_CLI_HOME: "/tmp/steelengine-gemini-profile-home",
+          GEMINI_CLI_SYSTEM_SETTINGS_PATH: "/tmp/steelengine-gemini-system-settings.json",
         },
       }),
     );
 
     const input = mockCallArg(supervisorSpawnMock) as { env?: Record<string, string> };
     expect(input.env?.STATIC_BACKEND_FLAG).toBe("set");
-    expect(input.env?.GEMINI_CLI_HOME).toBe("/tmp/openclaw-gemini-profile-home");
+    expect(input.env?.GEMINI_CLI_HOME).toBe("/tmp/steelengine-gemini-profile-home");
     expect(input.env?.GEMINI_CLI_SYSTEM_SETTINGS_PATH).toBe(
-      "/tmp/openclaw-gemini-system-settings.json",
+      "/tmp/steelengine-gemini-system-settings.json",
     );
   });
 
   it("captures a runtime artifact for a strict CLI credential", async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-cli-strict-artifact-"));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-cli-strict-artifact-"));
     const executable = path.join(dir, "claude-fixture");
     try {
       await fs.copyFile(process.execPath, executable);
@@ -1542,8 +1542,8 @@ describe("runCliAgent spawn path", () => {
     }
   });
 
-  it("passes OpenClaw skills to Claude as a session plugin", async () => {
-    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-cli-skills-"));
+  it("passes SteelEngine skills to Claude as a session plugin", async () => {
+    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-cli-skills-"));
     const skillDir = path.join(workspaceDir, "skills", "weather");
     await fs.mkdir(skillDir, { recursive: true });
     await fs.writeFile(
@@ -1566,7 +1566,7 @@ describe("runCliAgent spawn path", () => {
       const manifest = JSON.parse(
         await fs.readFile(path.join(pluginDir, ".claude-plugin", "plugin.json"), "utf-8"),
       ) as { name?: string; skills?: string };
-      expect(manifest.name).toBe("openclaw-skills");
+      expect(manifest.name).toBe("steelengine-skills");
       expect(manifest.skills).toBe("./skills");
       await expect(
         fs.readFile(path.join(pluginDir, "skills", "weather", "SKILL.md"), "utf-8"),
@@ -2460,12 +2460,12 @@ describe("runCliAgent spawn path", () => {
       reason: "session_expired",
       code: "cli_live_session_changed",
     });
-    missingContext.openClawHistoryPrompt = "bounded OpenClaw history\n\nsecond";
+    missingContext.steelEngineHistoryPrompt = "bounded SteelEngine history\n\nsecond";
     expect((await executePreparedCliRun(missingContext)).text).toBe("one");
     expect(supervisorSpawnMock).toHaveBeenCalledTimes(3);
     expect(
       (JSON.parse(writes.at(-1) ?? "") as { message: { content: string } }).message.content,
-    ).toBe("bounded OpenClaw history\n\nsecond");
+    ).toBe("bounded SteelEngine history\n\nsecond");
   });
 
   it("keeps pre-tool commentary out of an empty-result Claude live reply", async () => {
@@ -2695,7 +2695,7 @@ describe("runCliAgent spawn path", () => {
 
   it("keeps captured live prepared backend cleanup with the whole-run owner", async () => {
     const mcpConfigDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "openclaw-cli-captured-mcp-config-"),
+      path.join(os.tmpdir(), "steelengine-cli-captured-mcp-config-"),
     );
     const mcpConfigPath = path.join(mcpConfigDir, "mcp.json");
     await fs.writeFile(
@@ -2703,7 +2703,7 @@ describe("runCliAgent spawn path", () => {
       `${JSON.stringify(
         {
           mcpServers: {
-            openclaw: {
+            steelengine: {
               type: "http",
               url: "http://127.0.0.1:23119/mcp",
               headers: {},
@@ -2805,7 +2805,7 @@ describe("runCliAgent spawn path", () => {
     supervisorSpawnMock.mockImplementationOnce(async (...args: unknown[]) => {
       const input = args[0] as Parameters<ReturnType<typeof getProcessSupervisor>["spawn"]>[0];
       const captureHandle = markMcpLoopbackToolCallStarted({
-        captureKey: input.env?.OPENCLAW_MCP_CLI_CAPTURE_KEY ?? "",
+        captureKey: input.env?.STEELENGINE_MCP_CLI_CAPTURE_KEY ?? "",
         toolName: "message",
         args: { action: "send", target: "chat123", message: "done" },
       });
@@ -3457,7 +3457,7 @@ describe("runCliAgent spawn path", () => {
         "--resume",
         "claude-session",
         "--session-id",
-        "openclaw-session",
+        "steelengine-session",
         "--append-system-prompt",
         "old prompt",
         "--append-system-prompt-file",
@@ -3471,7 +3471,7 @@ describe("runCliAgent spawn path", () => {
     expect(args).toContain("--resume");
     expect(args).toContain("claude-session");
     expect(args).not.toContain("--session-id");
-    expect(args).not.toContain("openclaw-session");
+    expect(args).not.toContain("steelengine-session");
     expect(args).not.toContain("--append-system-prompt-file");
     expect(args).not.toContain("/tmp/system-prompt.md");
     expect(args).not.toContain("--append-system-prompt");
@@ -3796,7 +3796,7 @@ ${JSON.stringify({
                   {
                     type: "mcp_tool_use",
                     id: "tool-live-blocked",
-                    name: "mcp__openclaw__message",
+                    name: "mcp__steelengine__message",
                     input: { action: "react" },
                   },
                 ],
@@ -3831,7 +3831,7 @@ ${JSON.stringify({
         onStdout?: (chunk: string) => void;
       };
       stdoutListener = input.onStdout;
-      captureKey = input.env?.OPENCLAW_MCP_CLI_CAPTURE_KEY ?? "";
+      captureKey = input.env?.STEELENGINE_MCP_CLI_CAPTURE_KEY ?? "";
       return {
         runId: "live-run-blocked",
         pid: 3061,
@@ -3898,13 +3898,13 @@ ${JSON.stringify({
                   {
                     type: "mcp_tool_use",
                     id: "tool-live-identical-a",
-                    name: "mcp__openclaw__message",
+                    name: "mcp__steelengine__message",
                     input: toolArgs,
                   },
                   {
                     type: "mcp_tool_use",
                     id: "tool-live-identical-b",
-                    name: "mcp__openclaw__message",
+                    name: "mcp__steelengine__message",
                     input: toolArgs,
                   },
                 ],
@@ -3954,7 +3954,7 @@ ${JSON.stringify({
         onStdout?: (chunk: string) => void;
       };
       stdoutListener = input.onStdout;
-      captureKey = input.env?.OPENCLAW_MCP_CLI_CAPTURE_KEY ?? "";
+      captureKey = input.env?.STEELENGINE_MCP_CLI_CAPTURE_KEY ?? "";
       return {
         runId: "live-run-identical",
         pid: 3062,
@@ -4274,8 +4274,8 @@ ${JSON.stringify({
   });
 
   it("does not create exec approvals file while resolving Claude live policy", async () => {
-    await withTempOpenClawHome(async (home) => {
-      const approvalsPath = path.join(home, ".openclaw", "exec-approvals.json");
+    await withTempSteelEngineHome(async (home) => {
+      const approvalsPath = path.join(home, ".steelengine", "exec-approvals.json");
       let stdoutListener: ((chunk: string) => void) | undefined;
       const stdin = {
         write: vi.fn((_data: string, cb?: (err?: Error | null) => void) => {
@@ -4760,7 +4760,7 @@ ${JSON.stringify({
     );
   });
 
-  it("answers Claude live control_request can_use_tool with allow when OpenClaw exec is YOLO despite raw --permission-mode default", async () => {
+  it("answers Claude live control_request can_use_tool with allow when SteelEngine exec is YOLO despite raw --permission-mode default", async () => {
     let stdoutListener: ((chunk: string) => void) | undefined;
     const writes: string[] = [];
     const stdin = {
@@ -4809,7 +4809,7 @@ ${JSON.stringify({
     });
 
     // tools.exec resolves to full/off (would normally allow native Bash), and
-    // OpenClaw policy is authoritative over raw Claude permission-mode args.
+    // SteelEngine policy is authoritative over raw Claude permission-mode args.
     const result = await executePreparedCliRun(
       buildPreparedCliRunContext({
         provider: "claude-cli",
@@ -5157,7 +5157,7 @@ ${JSON.stringify({
         name: "FailoverError",
         message:
           "Claude CLI stopped after reaching the maximum number of turns (limit: 1). " +
-          "OpenClaw run: run-live-max-turns. OpenClaw session: s1. " +
+          "SteelEngine run: run-live-max-turns. SteelEngine session: s1. " +
           "Claude session: live-max-turns. Tool actions may already have run; verify their effects before retrying. " +
           "Retry with a higher --max-turns value or a narrower task.",
         sessionId: "s1",
@@ -5532,7 +5532,7 @@ ${JSON.stringify({
   });
 
   it("restarts Claude live sessions when selected skills change", async () => {
-    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-live-skills-"));
+    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-live-skills-"));
     const weatherDir = path.join(workspaceDir, "skills", "weather");
     const gitDir = path.join(workspaceDir, "skills", "git");
     await fs.mkdir(weatherDir, { recursive: true });
@@ -5914,7 +5914,7 @@ ${JSON.stringify({
 
   it("can preserve selected clearEnv keys for live CLI backend probes", async () => {
     try {
-      process.env.OPENCLAW_LIVE_CLI_BACKEND_PRESERVE_ENV = '["SAFE_CLEAR"]';
+      process.env.STEELENGINE_LIVE_CLI_BACKEND_PRESERVE_ENV = '["SAFE_CLEAR"]';
       process.env.SAFE_CLEAR = "from-base";
       mockSuccessfulCliRun();
       await executePreparedCliRun(
@@ -5935,7 +5935,7 @@ ${JSON.stringify({
       expect(input.env?.SAFE_CLEAR).toBe("from-base");
       expect(input.env?.SAFE_DROP).toBeUndefined();
     } finally {
-      delete process.env.OPENCLAW_LIVE_CLI_BACKEND_PRESERVE_ENV;
+      delete process.env.STEELENGINE_LIVE_CLI_BACKEND_PRESERVE_ENV;
       delete process.env.SAFE_CLEAR;
     }
   });
@@ -6109,7 +6109,7 @@ ${JSON.stringify({
 
   it("loads workspace bootstrap files into the Claude CLI system prompt", async () => {
     const workspaceDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "openclaw-cli-bootstrap-context-"),
+      path.join(os.tmpdir(), "steelengine-cli-bootstrap-context-"),
     );
 
     await fs.writeFile(

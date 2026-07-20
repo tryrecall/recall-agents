@@ -4,11 +4,11 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import type {
   WhatsAppQaDriverObservedMessage,
   WhatsAppQaDriverSession,
-} from "@openclaw/whatsapp/api.js";
+} from "@steelengine/whatsapp/api.js";
 import { describe, expect, it, vi } from "vitest";
 import { fingerprintQaCredentialId } from "../../qa-credentials-fingerprint.runtime.js";
 import { resolveWhatsAppQaScenarioIds } from "./scenario-selection.js";
@@ -27,11 +27,11 @@ import { getWhatsAppQaScenarioDefinition } from "./whatsapp-live.scenarios.js";
 import { unpackWhatsAppAuthArchive } from "./whatsapp-live.setup.js";
 
 const runExecSpy = vi.hoisted(() =>
-  vi.fn<typeof import("openclaw/plugin-sdk/process-runtime").runExec>(),
+  vi.fn<typeof import("steelengine/plugin-sdk/process-runtime").runExec>(),
 );
 
-vi.mock("openclaw/plugin-sdk/process-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/process-runtime")>();
+vi.mock("steelengine/plugin-sdk/process-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("steelengine/plugin-sdk/process-runtime")>();
   runExecSpy.mockImplementation(actual.runExec);
   return { ...actual, runExec: runExecSpy };
 });
@@ -114,7 +114,7 @@ type WhatsAppQaConfigParams = Parameters<typeof testing.buildWhatsAppQaConfig>[1
 function createWhatsAppScenarioContext(
   overrides: Partial<WhatsAppScenarioContext> = {},
 ): WhatsAppScenarioContext {
-  const workspaceDir = overrides.gatewayWorkspaceDir ?? "/tmp/openclaw-whatsapp-qa";
+  const workspaceDir = overrides.gatewayWorkspaceDir ?? "/tmp/steelengine-whatsapp-qa";
   return {
     driver: createWhatsAppQaDriverMock(),
     driverPhoneE164: "+15550000001",
@@ -147,7 +147,7 @@ function buildWhatsAppQaConfigFixture(
 ) {
   return testing.buildWhatsAppQaConfig(base, {
     allowFrom: ["+15550000001"],
-    authDir: "/tmp/openclaw-whatsapp-qa-auth",
+    authDir: "/tmp/steelengine-whatsapp-qa-auth",
     dmPolicy: "allowlist",
     sutAccountId: "sut",
     ...options,
@@ -241,7 +241,7 @@ describe("WhatsApp QA live runtime", () => {
   });
 
   it("unpacks auth archives into a caller-provided temp directory", async () => {
-    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-wa-qa-test-"));
+    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-wa-qa-test-"));
     try {
       runExecSpy.mockClear();
       const archiveBase64 = await createTgz({
@@ -275,7 +275,7 @@ describe("WhatsApp QA live runtime", () => {
   });
 
   it("can remove copied Signal sessions while preserving other auth archive state", async () => {
-    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-wa-qa-test-"));
+    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-wa-qa-test-"));
     try {
       const archiveBase64 = await createTgz({
         root: tempRoot,
@@ -381,7 +381,7 @@ describe("WhatsApp QA live runtime", () => {
     });
     const context = createWhatsAppScenarioContext({
       driver,
-      gatewayWorkspaceDir: "/tmp/openclaw-whatsapp-qa-gateway",
+      gatewayWorkspaceDir: "/tmp/steelengine-whatsapp-qa-gateway",
       recordObservedMessage: (message: unknown) => {
         recordedMessages.push(message);
       },
@@ -613,10 +613,10 @@ describe("WhatsApp QA live runtime", () => {
           return {};
         },
         restart: async () => {},
-        workspaceDir: "/tmp/openclaw-whatsapp-qa-gateway",
+        workspaceDir: "/tmp/steelengine-whatsapp-qa-gateway",
       },
       gatewayTarget: groupJid,
-      gatewayWorkspaceDir: "/tmp/openclaw-whatsapp-qa-gateway",
+      gatewayWorkspaceDir: "/tmp/steelengine-whatsapp-qa-gateway",
       scenarioId: "whatsapp-group-outbound-media",
       scenarioTitle: mediaScenario.title,
       target: groupJid,
@@ -705,9 +705,9 @@ describe("WhatsApp QA live runtime", () => {
           return {};
         },
         restart: async () => {},
-        workspaceDir: "/tmp/openclaw-whatsapp-qa-gateway",
+        workspaceDir: "/tmp/steelengine-whatsapp-qa-gateway",
       },
-      gatewayWorkspaceDir: "/tmp/openclaw-whatsapp-qa-gateway",
+      gatewayWorkspaceDir: "/tmp/steelengine-whatsapp-qa-gateway",
       scenarioId: scenario.id,
       scenarioTitle: scenario.title,
       sent: { messageId: "driver-message-1" },
@@ -749,7 +749,7 @@ describe("WhatsApp QA live runtime", () => {
       gateway: {
         call: async () => ({}),
         restart: async () => {},
-        workspaceDir: "/tmp/openclaw-whatsapp-qa",
+        workspaceDir: "/tmp/steelengine-whatsapp-qa",
       },
       scenarioId: "whatsapp-reply-to-mode-batched",
       scenarioTitle: scenario.title,
@@ -805,7 +805,7 @@ describe("WhatsApp QA live runtime", () => {
       gateway: {
         call: async () => ({}),
         restart: async () => {},
-        workspaceDir: "/tmp/openclaw-whatsapp-qa",
+        workspaceDir: "/tmp/steelengine-whatsapp-qa",
       },
       recordObservedMessage: (message) => {
         observed.push(message);
@@ -854,7 +854,7 @@ describe("WhatsApp QA live runtime", () => {
       gateway: {
         call: async () => ({}),
         restart: async () => {},
-        workspaceDir: "/tmp/openclaw-whatsapp-qa",
+        workspaceDir: "/tmp/steelengine-whatsapp-qa",
       },
       recordObservedMessage: (message) => {
         recorded.push(message);
@@ -912,7 +912,7 @@ describe("WhatsApp QA live runtime", () => {
       gateway: {
         call: async () => ({}),
         restart: async () => {},
-        workspaceDir: "/tmp/openclaw-whatsapp-qa",
+        workspaceDir: "/tmp/steelengine-whatsapp-qa",
       },
       recordObservedMessage: (message) => {
         recorded.push(message);
@@ -1079,7 +1079,7 @@ describe("WhatsApp QA live runtime", () => {
       expect(scenario.requiresGroupJid).toBe(true);
       expect(run.target).toBe("group");
       expect(run.configMode).toBe("open");
-      expect(run.input).toContain("openclawqa");
+      expect(run.input).toContain("steelengineqa");
     }
   });
 
@@ -1143,7 +1143,7 @@ describe("WhatsApp QA live runtime", () => {
         const latestProbe = sentTextCalls.findLast(
           ({ text }) =>
             /\bWHATSAPP_QA_ACTIVATION_ALWAYS_[A-Z0-9]+\b/u.test(text) &&
-            !/\bopenclawqa\b/iu.test(text),
+            !/\bsteelengineqa\b/iu.test(text),
         );
         if (latestProbe) {
           expect(
@@ -1190,7 +1190,7 @@ describe("WhatsApp QA live runtime", () => {
     const context = createWhatsAppScenarioContext({
       driver,
       gatewayTarget: groupJid,
-      gatewayWorkspaceDir: "/tmp/openclaw-whatsapp-qa-workspace",
+      gatewayWorkspaceDir: "/tmp/steelengine-whatsapp-qa-workspace",
       scenarioId: scenario.id,
       scenarioTitle: scenario.title,
       sent: { messageId: "activation-command-message" },
@@ -1223,7 +1223,7 @@ describe("WhatsApp QA live runtime", () => {
       /\bWHATSAPP_QA_ACTIVATION_ALWAYS_[A-Z0-9]+\b/u.test(text),
     );
     expect(alwaysProbe?.to).toBe(groupJid);
-    expect(alwaysProbe?.text).not.toMatch(/\bopenclawqa\b/i);
+    expect(alwaysProbe?.text).not.toMatch(/\bsteelengineqa\b/i);
     expect(alwaysModeReplyMatched).toBe(true);
     const restoreIndex = sentTextCalls.findIndex(
       ({ text, to }) => to === groupJid && text.trim() === "/activation mention",
@@ -1233,7 +1233,7 @@ describe("WhatsApp QA live runtime", () => {
       .slice(restoreIndex + 1)
       .find(({ text }) => /\bWHATSAPP_QA_ACTIVATION_QUIET_[A-Z0-9]+\b/u.test(text));
     expect(restoredQuietProbe?.to).toBe(groupJid);
-    expect(restoredQuietProbe?.text).not.toMatch(/\bopenclawqa\b/i);
+    expect(restoredQuietProbe?.text).not.toMatch(/\bsteelengineqa\b/i);
     expect(restoredQuietObservationReads).toBeGreaterThan(0);
   });
 
@@ -1287,7 +1287,7 @@ describe("WhatsApp QA live runtime", () => {
         createWhatsAppScenarioContext({
           driver,
           gatewayTarget: groupJid,
-          gatewayWorkspaceDir: "/tmp/openclaw-whatsapp-qa-workspace",
+          gatewayWorkspaceDir: "/tmp/steelengine-whatsapp-qa-workspace",
           scenarioId: scenario.id,
           scenarioTitle: scenario.title,
           sent: { messageId: "activation-command-message" },
@@ -1307,7 +1307,7 @@ describe("WhatsApp QA live runtime", () => {
     }
 
     expect(run.target).toBe("group");
-    expect(run.input).toMatch(/\bopenclawqa\b/iu);
+    expect(run.input).toMatch(/\bsteelengineqa\b/iu);
     expect(run.input).toMatch(/\bWHATSAPP_QA_REPLY_TO_BOT_SEED_[A-Z0-9]+\b/u);
     expect(run.afterReply).toEqual(expect.any(Function));
 
@@ -1379,7 +1379,7 @@ describe("WhatsApp QA live runtime", () => {
       createWhatsAppScenarioContext({
         driver,
         gatewayTarget: groupJid,
-        gatewayWorkspaceDir: "/tmp/openclaw-whatsapp-qa-workspace",
+        gatewayWorkspaceDir: "/tmp/steelengine-whatsapp-qa-workspace",
         scenarioId: scenario.id,
         scenarioTitle: scenario.title,
         sent: { messageId: "driver-seed-message" },
@@ -1390,7 +1390,7 @@ describe("WhatsApp QA live runtime", () => {
     const quotedSend = sendTextCalls.find((call) => call.options?.quotedMessageKey);
     expect(quotedSend?.to).toBe(groupJid);
     expect(quotedSend?.text).toMatch(/\bWHATSAPP_QA_REPLY_TO_BOT_TRIGGER_[A-Z0-9]+\b/u);
-    expect(quotedSend?.text).not.toMatch(/\bopenclawqa\b/i);
+    expect(quotedSend?.text).not.toMatch(/\bsteelengineqa\b/i);
     expect(quotedSend?.text).not.toMatch(/@\d/u);
     expect(quotedSend?.options?.quotedMessageKey).toMatchObject({
       fromMe: false,
@@ -1435,8 +1435,8 @@ describe("WhatsApp QA live runtime", () => {
         target: "group",
       },
     ]);
-    expect(runs[0]?.run.input).not.toContain("openclawqa");
-    expect(runs[1]?.run.input).toMatch(/^openclawqa\b/u);
+    expect(runs[0]?.run.input).not.toContain("steelengineqa");
+    expect(runs[1]?.run.input).toMatch(/^steelengineqa\b/u);
 
     for (const { run } of runs) {
       expect(() =>
@@ -1550,9 +1550,9 @@ describe("WhatsApp QA live runtime", () => {
       gateway: {
         call: async () => ({}),
         restart: async () => {},
-        workspaceDir: "/tmp/openclaw-whatsapp-qa-gateway",
+        workspaceDir: "/tmp/steelengine-whatsapp-qa-gateway",
       },
-      gatewayWorkspaceDir: "/tmp/openclaw-whatsapp-qa-gateway",
+      gatewayWorkspaceDir: "/tmp/steelengine-whatsapp-qa-gateway",
       recordObservedMessage: (message: unknown) => {
         recorded.push(message);
       },
@@ -1591,10 +1591,10 @@ describe("WhatsApp QA live runtime", () => {
       gateway: {
         call: async () => ({}),
         restart: async () => {},
-        workspaceDir: "/tmp/openclaw-whatsapp-qa-gateway",
+        workspaceDir: "/tmp/steelengine-whatsapp-qa-gateway",
       },
       gatewayTarget: "120363000000000000@g.us",
-      gatewayWorkspaceDir: "/tmp/openclaw-whatsapp-qa-gateway",
+      gatewayWorkspaceDir: "/tmp/steelengine-whatsapp-qa-gateway",
       recordObservedMessage: (message: unknown) => {
         recorded.push(message);
       },
@@ -1688,9 +1688,9 @@ describe("WhatsApp QA live runtime", () => {
       gateway: {
         call: async () => ({}),
         restart: async () => {},
-        workspaceDir: "/tmp/openclaw-whatsapp-qa-gateway",
+        workspaceDir: "/tmp/steelengine-whatsapp-qa-gateway",
       },
-      gatewayWorkspaceDir: "/tmp/openclaw-whatsapp-qa-gateway",
+      gatewayWorkspaceDir: "/tmp/steelengine-whatsapp-qa-gateway",
       requestStartedAt: new Date("2026-06-05T01:00:00.000Z"),
       scenarioId: "whatsapp-reply-delivery-shape",
       scenarioTitle: "WhatsApp gateway send chunks long replies",
@@ -1966,7 +1966,7 @@ describe("WhatsApp QA live runtime", () => {
     if (scenarioRun.kind === "approval") {
       throw new Error("whatsapp-group-audio-gating unexpectedly built an approval scenario run");
     }
-    const triggerSentinel = Buffer.from("OPENCLAW_QA_GROUP_AUDIO_TRIGGER", "utf8");
+    const triggerSentinel = Buffer.from("STEELENGINE_QA_GROUP_AUDIO_TRIGGER", "utf8");
 
     expect(scenarioRun.input).toBe("");
     expect(scenarioRun.matchText).toBe("WHATSAPP_QA_GROUP_AUDIO_TRANSCRIPT_OK");
@@ -2149,14 +2149,14 @@ describe("WhatsApp QA live runtime", () => {
     if (scenarioRun.kind === "approval") {
       throw new Error("whatsapp-mention-gating unexpectedly built an approval scenario run");
     }
-    expect(scenarioRun.input).toContain("openclawqa reply with only this exact marker");
+    expect(scenarioRun.input).toContain("steelengineqa reply with only this exact marker");
     expect(scenarioRun.input).not.toContain("visible reply tool check");
 
     const cfg = buildWhatsAppQaConfigFixture({
       groupJid: "120363000000000000@g.us",
     });
     expect(cfg.messages?.groupChat?.visibleReplies).toBe("automatic");
-    expect(cfg.messages?.groupChat?.mentionPatterns).toContain("\\bopenclawqa\\b");
+    expect(cfg.messages?.groupChat?.mentionPatterns).toContain("\\bsteelengineqa\\b");
   });
   it("classifies WhatsApp driver connection closures as retryable", () => {
     expect(testing.isTransientWhatsAppQaDriverError(new Error("Connection Closed"))).toBe(true);

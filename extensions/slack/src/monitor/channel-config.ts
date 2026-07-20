@@ -3,14 +3,14 @@ import {
   applyChannelMatchMeta,
   buildChannelKeyCandidates,
   type ChannelMatchSource,
-} from "openclaw/plugin-sdk/channel-targets";
+} from "steelengine/plugin-sdk/channel-targets";
 import type {
   ChannelBotLoopProtectionConfig,
   ReplyToMode,
   SlackChannelConfig,
-} from "openclaw/plugin-sdk/config-contracts";
-import { mergePairLoopGuardConfig } from "openclaw/plugin-sdk/pair-loop-guard-runtime";
-import { normalizeLowercaseStringOrEmpty } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/config-contracts";
+import { mergePairLoopGuardConfig } from "steelengine/plugin-sdk/pair-loop-guard-runtime";
+import { normalizeLowercaseStringOrEmpty } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { buildSlackChannelPolicyScope } from "../group-policy.js";
 import { normalizeSlackSlug } from "./allow-list.js";
 

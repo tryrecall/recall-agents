@@ -276,14 +276,14 @@ export const ru: TranslationMap = {
     genericSubtitle: "При загрузке этой панели произошла ошибка.",
     staleTitle: "Доступна новая версия",
     staleSubtitle:
-      "OpenClaw был обновлён в фоновом режиме. Перезагрузите страницу, чтобы получить последнюю версию панели.",
+      "SteelEngine был обновлён в фоновом режиме. Перезагрузите страницу, чтобы получить последнюю версию панели.",
     retry: "Повторить",
   },
   nodes: {
     pairing: {
       button: "Сопрячь мобильное устройство",
       adminRequired: "Для создания кодов настройки требуется доступ администратора.",
-      title: "OpenClaw для мобильных устройств",
+      title: "SteelEngine для мобильных устройств",
       subtitle: "Отсканируйте этот QR-код в мобильном приложении, чтобы подключить новый телефон.",
       generating: "Создаём безопасный код настройки…",
       accessTitle: "Мобильный доступ",
@@ -297,7 +297,7 @@ export const ru: TranslationMap = {
       transportLimitedHint:
         "Этот URL-адрес Gateway использует незашифрованный протокол ws://. Используйте wss:// или Tailscale Serve, затем создайте новый код для полного доступа.",
       failed: "Не удалось создать код настройки.",
-      qrAlt: "QR-код сопряжения OpenClaw для мобильных устройств",
+      qrAlt: "QR-код сопряжения SteelEngine для мобильных устройств",
       qrUnavailable: "QR-код недоступен. Скопируйте код настройки.",
       copySetupCode: "Скопировать код настройки",
       newCode: "Новый код",
@@ -305,7 +305,7 @@ export const ru: TranslationMap = {
       pending: "Запросы устройств, ожидающие проверки: {count}",
       review: "Обзор",
       waiting:
-        "Официальные мобильные приложения OpenClaw подключаются автоматически после сканирования.",
+        "Официальные мобильные приложения SteelEngine подключаются автоматически после сканирования.",
       help: "Справка по сопряжению",
       manageDevices: "Управление устройствами",
     },
@@ -452,11 +452,11 @@ export const ru: TranslationMap = {
     ownerSession: "Сеанс",
     ownerWorkboard: "Рабочая доска",
     title: "Управляемые рабочие деревья",
-    subtitle: "Изолированные копии репозиториев, принадлежащие OpenClaw.",
+    subtitle: "Изолированные копии репозиториев, принадлежащие SteelEngine.",
     cleanNow: "Очистить сейчас",
     cleanupTitle: "Очистка",
     cleanupSubtitle:
-      "OpenClaw периодически удаляет старые рабочие деревья, чтобы освободить место на диске. Настройте интенсивность очистки.",
+      "SteelEngine периодически удаляет старые рабочие деревья, чтобы освободить место на диске. Настройте интенсивность очистки.",
     cleanupMaxCount: "Максимальное количество рабочих деревьев",
     cleanupMaxCountHelp:
       "Максимальное количество управляемых рабочих деревьев, сохраняемых во всех репозиториях. Более старые рабочие деревья сначала сохраняются в виде снимков, а затем удаляются. Установите значение 0, чтобы отключить ограничение по количеству.",
@@ -506,8 +506,8 @@ export const ru: TranslationMap = {
     cloudWorker: "Облако · {profile}",
     cloudWorkerProvider: "Провайдер облачного исполнителя: {provider}",
     cloudRequiresWorktree: "Для облачных исполнителей требуется управляемое рабочее дерево",
-    cloudRequiresOpenClawRuntime:
-      "Для облачных воркеров требуется среда выполнения OpenClaw; выбрана {runtime}.",
+    cloudRequiresSteelEngineRuntime:
+      "Для облачных воркеров требуется среда выполнения SteelEngine; выбрана {runtime}.",
     cloudSecureContextRequired:
       "Облачным исполнителям требуется безопасный контекст браузера, чтобы функция восстановления могла защитить вашу задачу.",
     cloudStartFailed: "Сеанс был создан локально, но не удалось запустить его в облаке: {error}",
@@ -1313,7 +1313,7 @@ export const ru: TranslationMap = {
     autoSaveFailed: "Не удалось сохранить",
     autoSaveConflict: "Настройки были изменены в другом месте",
     retry: "Повторить",
-    applyBannerText: "Сохранено в openclaw.json — перезапустите gateway для применения.",
+    applyBannerText: "Сохранено в steelengine.json — перезапустите gateway для применения.",
     applyBannerAction: "Перезапустить и применить",
     rawDiscard: "Отменить",
     rawDraftBlocksApply:
@@ -1369,7 +1369,7 @@ export const ru: TranslationMap = {
     },
   },
   approvalPage: {
-    brandName: "OpenClaw",
+    brandName: "SteelEngine",
     eyebrow: "Operator approval",
     loadingTitle: "Loading approval",
     loadingDescription: "Checking the current approval state with the Gateway.",
@@ -1378,7 +1378,7 @@ export const ru: TranslationMap = {
       "This approval could not be found or this device is not authorized to review it.",
     connectionErrorTitle: "Connection interrupted",
     connectionErrorDescription:
-      "OpenClaw cannot confirm or record a decision while disconnected. Reconnect to check the current status.",
+      "SteelEngine cannot confirm or record a decision while disconnected. Reconnect to check the current status.",
     retry: "Повторить",
     execTitle: "Command approval",
     pending: "Waiting for your decision",
@@ -1557,7 +1557,7 @@ export const ru: TranslationMap = {
     chat: "Чат",
     settings: "Настройки",
     settingsGeneral: "Общие",
-    askOpenClaw: "Спросить OpenClaw",
+    askSteelEngine: "Спросить SteelEngine",
     settingsGroupConnections: "Подключения",
     settingsGroupAgents: "Агенты и инструменты",
     settingsGroupSecurity: "Конфиденциальность и безопасность",
@@ -1678,7 +1678,7 @@ export const ru: TranslationMap = {
     skillWorkshop: "Мастерская навыков",
     nodes: "Узлы",
     chat: "Чат",
-    custodian: "OpenClaw",
+    custodian: "SteelEngine",
     config: "Конфигурация",
     profile: "Профиль",
     communications: "Коммуникации",
@@ -1718,7 +1718,7 @@ export const ru: TranslationMap = {
     nodes: "Сопряженные устройства и команды.",
     chat: "Чат шлюза для быстрых вмешательств.",
     custodian: "Настройка и обслуживание системы.",
-    config: "Редактировать openclaw.json.",
+    config: "Редактировать steelengine.json.",
     profile: "Статистика вашего агента, серии активности и жизнь на рифе.",
     communications: "Каналы, сообщения и настройки аудио.",
     appearance: "Тема, интерфейс и настройки мастера настройки.",
@@ -1741,7 +1741,7 @@ export const ru: TranslationMap = {
   modelSetup: {
     heading: "Подключите свой ИИ",
     intro:
-      "OpenClaw использует уже имеющийся у вас доступ к ИИ — вход через CLI, ключ API или авторизацию у провайдера.",
+      "SteelEngine использует уже имеющийся у вас доступ к ИИ — вход через CLI, ключ API или авторизацию у провайдера.",
     loading: "Проверяем доступные способы доступа к ИИ на этом Gateway…",
     retry: "Повторить",
     checkAgain: "Проверить снова",
@@ -1754,7 +1754,7 @@ export const ru: TranslationMap = {
     },
     access: {
       adminRequired: "Для настройки модели требуется доступ operator.admin.",
-      gatewayTooOld: "На Gateway установлена устаревшая версия OpenClaw",
+      gatewayTooOld: "На Gateway установлена устаревшая версия SteelEngine",
     },
     candidates: {
       title: "Найдено на этом Gateway",
@@ -1855,12 +1855,12 @@ export const ru: TranslationMap = {
       "Скопировать выбранные файлы памяти ({count}) в рабочее пространство этого агента.",
     confirmReplace:
       "Перед заменой существующие файлы назначения будут сохранены в резервной копии в отчёте о миграции.",
-    confirmBackup: "Перед копированием памяти OpenClaw создаёт проверенную резервную копию.",
+    confirmBackup: "Перед копированием памяти SteelEngine создаёт проверенную резервную копию.",
     confirmImport: "Импортировать память",
     disconnected: "Подключитесь к Gateway, чтобы импортировать память.",
     title: "Импорт памяти ассистента",
     subtitle:
-      "Проверьте консолидированную память Codex и автоматическую память Claude Code перед копированием в OpenClaw.",
+      "Проверьте консолидированную память Codex и автоматическую память Claude Code перед копированием в SteelEngine.",
     agent: "Целевой агент",
     replaceExisting: "Заменять существующие импорты",
     replaceHint:
@@ -1869,7 +1869,7 @@ export const ru: TranslationMap = {
   onboarding: {
     memoryImport: {
       title: "Перенесите память своего ассистента",
-      body: "OpenClaw обнаружил память других ассистентов для программирования. Импортировать её в рабочее пространство вашего агента?",
+      body: "SteelEngine обнаружил память других ассистентов для программирования. Импортировать её в рабочее пространство вашего агента?",
       plannedCount: "Готово к импорту: {count}",
       alreadyImported: "Уже импортировано: {count}",
       sourceUnavailable: "Путь к источнику недоступен",
@@ -1885,23 +1885,23 @@ export const ru: TranslationMap = {
       unknownError: "Не удалось выполнить запрос",
       doneTitle: "Импорт памяти завершён",
       doneBody:
-        "Перенесено: {migrated}, пропущено: {skipped}. Можно продолжить настройку OpenClaw.",
+        "Перенесено: {migrated}, пропущено: {skipped}. Можно продолжить настройку SteelEngine.",
     },
   },
   custodian: {
-    title: "OpenClaw",
+    title: "SteelEngine",
     subtitle: "Руководство по настройке системы",
     exitSetup: "Выйти из настройки",
     hatchDraft: "Просыпайся, мой друг!",
-    placeholder: "Напишите OpenClaw…",
+    placeholder: "Напишите SteelEngine…",
     sensitivePlaceholder: "Введите конфиденциальное значение…",
     sensitiveReply: "Конфиденциальный ответ отправлен",
     send: "Отправить",
-    thinking: "OpenClaw думает",
-    requestFailed: "OpenClaw не смог ответить. Повторите попытку.",
+    thinking: "SteelEngine думает",
+    requestFailed: "SteelEngine не смог ответить. Повторите попытку.",
     connectionChanged:
       "Подключение к Gateway изменилось. Повторите попытку, чтобы продолжить настройку.",
-    unsupportedGateway: "Обновите Gateway, чтобы продолжить настройку с OpenClaw.",
+    unsupportedGateway: "Обновите Gateway, чтобы продолжить настройку с SteelEngine.",
   },
   mcpPage: {
     manageServersLink: "Управляйте серверами на странице плагинов.",
@@ -1998,7 +1998,7 @@ export const ru: TranslationMap = {
     },
     noInstalledTitle: "Не установлены дополнительные плагины",
     noInstalledBody:
-      "Откройте для себя рекомендуемый плагин или выполните поиск в ClawHub, чтобы расширить OpenClaw.",
+      "Откройте для себя рекомендуемый плагин или выполните поиск в ClawHub, чтобы расширить SteelEngine.",
     noInstalledMatchTitle: "Нет подходящих установленных плагинов",
     noMatchBody: "Попробуйте другой поисковый запрос.",
     filterAll: "Все",
@@ -2044,7 +2044,7 @@ export const ru: TranslationMap = {
     detailPluginId: "ID плагина",
     offlineTitle: "Gateway не в сети",
     offlineBody: "Подключитесь, чтобы просмотреть установленные и рекомендуемые плагины.",
-    optionalCapability: "Необязательная возможность OpenClaw.",
+    optionalCapability: "Необязательная возможность SteelEngine.",
     enabled: "Включено",
     disabled: "Отключено",
     available: "Доступно",
@@ -2076,7 +2076,7 @@ export const ru: TranslationMap = {
     disabledRestart: "Отключен {name}. Для применения изменения требуется перезапуск Gateway.",
   },
   aboutPage: {
-    productName: "OpenClaw",
+    productName: "SteelEngine",
     tagline: "Ваш персональный ИИ-ассистент, работающий на ваших устройствах.",
     waveHello: "Помашите Клоуду",
     linksLabel: "Сообщество и ресурсы",
@@ -2086,7 +2086,7 @@ export const ru: TranslationMap = {
     linkDiscord: "Discord",
     linkX: "X (Twitter)",
     linkChangelog: "История изменений",
-    license: "© 2026 OpenClaw Foundation — лицензия MIT.",
+    license: "© 2026 SteelEngine Foundation — лицензия MIT.",
     artifactTitle: "Control UI",
     artifactSubtitle: "Идентичность, встроенная при сборке этого браузерного артефакта.",
     artifactDetails: "Сведения о сборке Control UI",
@@ -2104,7 +2104,7 @@ export const ru: TranslationMap = {
       "Сообщается активным подключением Gateway; отдельно от этой сборки Control UI.",
   },
   appsPage: {
-    heroTitle: "Берите OpenClaw с собой повсюду",
+    heroTitle: "Берите SteelEngine с собой повсюду",
     heroTagline:
       "Приложения-компаньоны для телефона, часов, компьютера и браузера, а также плагины, расширяющие возможности вашего агента.",
     sectionMobile: "На телефоне",
@@ -2126,11 +2126,11 @@ export const ru: TranslationMap = {
     cards: {
       ios: {
         title: "iPhone",
-        desc: "Общайтесь в чате и голосом, подтверждайте действия и делитесь контентом в OpenClaw из iOS.",
+        desc: "Общайтесь в чате и голосом, подтверждайте действия и делитесь контентом в SteelEngine из iOS.",
       },
       android: {
         title: "Android",
-        desc: "Ваш телефон Android как полноценный узел OpenClaw — чат, камера и Canvas.",
+        desc: "Ваш телефон Android как полноценный узел SteelEngine — чат, камера и Canvas.",
       },
       appleWatch: {
         title: "Apple Watch",
@@ -2138,7 +2138,7 @@ export const ru: TranslationMap = {
       },
       wearOs: {
         title: "Wear OS",
-        desc: "Приложение-компаньон для Android расширяет возможности OpenClaw на ваших часах.",
+        desc: "Приложение-компаньон для Android расширяет возможности SteelEngine на ваших часах.",
       },
       macos: {
         title: "macOS",
@@ -2146,7 +2146,7 @@ export const ru: TranslationMap = {
       },
       windows: {
         title: "Windows",
-        desc: "Приложение-компаньон для Windows подключает ваш ПК как узел OpenClaw.",
+        desc: "Приложение-компаньон для Windows подключает ваш ПК как узел SteelEngine.",
       },
       linux: {
         title: "Linux",
@@ -2154,11 +2154,11 @@ export const ru: TranslationMap = {
       },
       chrome: {
         title: "Расширение Chrome",
-        desc: "Позвольте OpenClaw управлять вашим Chrome — вкладками, страницами и формами.",
+        desc: "Позвольте SteelEngine управлять вашим Chrome — вкладками, страницами и формами.",
       },
       plugins: {
         title: "Плагины и ClawHub",
-        desc: "Расширяйте возможности OpenClaw с помощью каналов, инструментов и навыков от сообщества.",
+        desc: "Расширяйте возможности SteelEngine с помощью каналов, инструментов и навыков от сообщества.",
       },
     },
   },
@@ -2325,7 +2325,7 @@ export const ru: TranslationMap = {
     selfLearning: {
       pitchTitle: "Включить самообучение",
       pitchBody:
-        "OpenClaw анализирует исправления и значимые завершённые запуски, а затем создаёт для этой доски черновики предложений по навыкам. При этом используются дополнительные токены в фоновом режиме, а черновики поступают как ожидающие рассмотрения предложения.",
+        "SteelEngine анализирует исправления и значимые завершённые запуски, а затем создаёт для этой доски черновики предложений по навыкам. При этом используются дополнительные токены в фоновом режиме, а черновики поступают как ожидающие рассмотрения предложения.",
       enable: "Включить самообучение",
       enabling: "Включение…",
       updateError: "Не удалось обновить настройку самообучения.",
@@ -3416,9 +3416,9 @@ export const ru: TranslationMap = {
         title: "Требуется аутентификация",
         summary:
           "Gateway доступен, но для подключения этого браузера требуется соответствующий токен или пароль.",
-        stepPaste: "Вставьте токен из openclaw dashboard --no-open или введите настроенный пароль.",
+        stepPaste: "Вставьте токен из steelengine dashboard --no-open или введите настроенный пароль.",
         stepGenerate:
-          "Если токен не настроен, выполните openclaw doctor --generate-gateway-token на хосте шлюза.",
+          "Если токен не настроен, выполните steelengine doctor --generate-gateway-token на хосте шлюза.",
         stepConnect: "Нажмите «Подключиться» еще раз после обновления учетных данных.",
       },
       authFailed: {
@@ -3426,7 +3426,7 @@ export const ru: TranslationMap = {
         summary:
           "Предоставленные учетные данные были отклонены. Чаще всего причина — устаревший токен или токен, скопированный с другого URL Gateway.",
         stepDashboard:
-          "Запустите openclaw dashboard --no-open и откройте новый URL или вставьте его токен.",
+          "Запустите steelengine dashboard --no-open и откройте новый URL или вставьте его токен.",
         stepReplace:
           "Замените устаревшие значения токена/пароля; не используйте повторно токен с другого URL Gateway.",
         stepMode:
@@ -3450,8 +3450,8 @@ export const ru: TranslationMap = {
           "Этому браузеру требуется одноразовое подтверждение с хоста Gateway, прежде чем он сможет использовать Control UI.",
         upgradeSummary:
           "Этот браузер уже известен, но запрошенный доступ изменился и требует нового подтверждения.",
-        stepList: "Выполните openclaw devices list на хосте Gateway.",
-        stepApproveId: "Подтвердите этот запрос: openclaw devices approve {requestId}.",
+        stepList: "Выполните steelengine devices list на хосте Gateway.",
+        stepApproveId: "Подтвердите этот запрос: steelengine devices approve {requestId}.",
         stepApprove: "Подтвердите ожидающий запрос браузера/устройства из этого списка.",
         stepReconnect: "Подключитесь повторно после завершения подтверждения.",
       },
@@ -3479,22 +3479,22 @@ export const ru: TranslationMap = {
         summary:
           "Обслуживаемый Control UI и запущенный Gateway не согласованы по поддерживаемому протоколу подключения.",
         stepDashboard:
-          "Повторно откройте обслуживаемую панель командой openclaw dashboard, чтобы UI и Gateway были из одной установки.",
+          "Повторно откройте обслуживаемую панель командой steelengine dashboard, чтобы UI и Gateway были из одной установки.",
         stepDevUi:
           "Если используется pnpm ui:dev, пересоберите или перезапустите dev UI для текущей рабочей копии.",
         stepRestart:
-          "Перезапустите Gateway после обновления OpenClaw, чтобы он обслуживал текущий протокол.",
+          "Перезапустите Gateway после обновления SteelEngine, чтобы он обслуживал текущий протокол.",
       },
       network: {
         title: "Не удалось подключиться",
         summary:
           "Браузер не смог завершить подключение к Gateway. Проверьте цель и транспорт перед повторной попыткой ввода учетных данных.",
         stepGateway:
-          "Убедитесь, что Gateway запущен, с помощью openclaw status или openclaw gateway run.",
+          "Убедитесь, что Gateway запущен, с помощью steelengine status или steelengine gateway run.",
         stepUrl:
           "Проверьте URL WebSocket и используйте wss://, когда Gateway находится за HTTPS/Tailscale Serve.",
         stepDashboard:
-          "Снова откройте панель управления с помощью openclaw dashboard --no-open, чтобы повторно скопировать текущий URL и данные аутентификации.",
+          "Снова откройте панель управления с помощью steelengine dashboard --no-open, чтобы повторно скопировать текущий URL и данные аутентификации.",
       },
     },
   },
@@ -3519,7 +3519,7 @@ export const ru: TranslationMap = {
       remoteViewOnly: "Этот сеанс находится на сопряжённом узле и доступен только для просмотра.",
       unsupportedViewOnly: "Этот внешний источник сеансов доступен только для просмотра.",
       sessionMenu: "External session actions",
-      openInOpenClaw: "Open in OpenClaw",
+      openInSteelEngine: "Open in SteelEngine",
       openInTerminal: "Open in terminal",
       terminalUnavailable: "Terminal opening is unavailable for this session.",
     },
@@ -3575,7 +3575,7 @@ export const ru: TranslationMap = {
     followUpModeOverriding: "Переопределение значения по умолчанию на сервере ({mode})",
     followUpModeReset: "Сбросить к серверному значению по умолчанию",
     catalogOpenTarget: "Open Codex/Claude sessions in",
-    catalogOpenTargetViewer: "OpenClaw viewer",
+    catalogOpenTargetViewer: "SteelEngine viewer",
     catalogOpenTargetTerminal: "Терминал",
     onboardingDisabled: "Отключено во время настройки",
     gatewayStatus: "Статус Gateway: {status}",
@@ -4038,7 +4038,7 @@ export const ru: TranslationMap = {
       shownOf: "{shown} из {total}",
       emptyTitle: "Пока нет запланированных задач",
       emptyHint:
-        "Опишите, что и когда должен делать OpenClaw — задача будет выполняться по расписанию.",
+        "Опишите, что и когда должен делать SteelEngine — задача будет выполняться по расписанию.",
       noMatching: "Нет задач, соответствующих текущим фильтрам.",
       loadMore: "Загрузить ещё",
       loading: "Загрузка...",
@@ -4105,7 +4105,7 @@ export const ru: TranslationMap = {
     detail: {
       tabsLabel: "Сведения об автоматизации",
       newTitle: "Новая запланированная задача",
-      newSubtitle: "Опишите, что должен делать OpenClaw, затем выберите время запуска.",
+      newSubtitle: "Опишите, что должен делать SteelEngine, затем выберите время запуска.",
       back: "Все автоматизации",
       settingsTab: "Настройки",
       historyTitle: "История запусков",
@@ -4178,7 +4178,7 @@ export const ru: TranslationMap = {
       descriptionPlaceholder: "Необязательный контекст для этого задания",
       agentPlaceholder: "main или ops",
       agentHelp: "Начните вводить, чтобы выбрать известного агента, или введите свой вариант.",
-      promptPlaceholder: "Опишите, что должен делать OpenClaw...",
+      promptPlaceholder: "Опишите, что должен делать SteelEngine...",
       repeat: "Повтор",
       repeatInterval: "Интервал",
       repeatOnce: "Один раз",

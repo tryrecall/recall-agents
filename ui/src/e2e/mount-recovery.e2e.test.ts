@@ -11,7 +11,7 @@ import {
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
 
 let browser: Browser;
@@ -50,8 +50,8 @@ describeControlUiE2e("Control UI mount recovery E2E", () => {
         documentRequests += 1;
         const response = await route.fetch();
         const body = (await response.text()).replace(
-          'data-openclaw-mount-timeout-ms="12000"',
-          'data-openclaw-mount-timeout-ms="50"',
+          'data-steelengine-mount-timeout-ms="12000"',
+          'data-steelengine-mount-timeout-ms="50"',
         );
         await route.fulfill({ response, body });
         return;
@@ -69,12 +69,12 @@ describeControlUiE2e("Control UI mount recovery E2E", () => {
       expect(
         (await page.goto(`${server.baseUrl}chat`, { waitUntil: "domcontentloaded" }))?.status(),
       ).toBe(200);
-      await page.locator("openclaw-app-shell").waitFor();
+      await page.locator("steelengine-app-shell").waitFor();
       await page.locator(".agent-chat__welcome").waitFor();
 
       expect(documentRequests).toBe(2);
       expect(failedModuleRequests).toBe(1);
-      await expect.poll(() => page.url()).not.toContain("openclaw_mount_recovery");
+      await expect.poll(() => page.url()).not.toContain("steelengine_mount_recovery");
       await page.screenshot({ path: path.join(artifactDir, "recovered-control-ui.png") });
     } finally {
       await context.close();

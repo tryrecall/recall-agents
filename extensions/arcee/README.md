@@ -1,12 +1,12 @@
-# OpenClaw Arcee AI Provider
+# SteelEngine Arcee AI Provider
 
-Official OpenClaw provider plugin for Arcee AI.
+Official SteelEngine provider plugin for Arcee AI.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/arcee-provider
-openclaw gateway restart
+steelengine plugins install @steelengine/arcee-provider
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/providers/arcee> for setup and configuration.
+See <https://docs.steelengine.ai/providers/arcee> for setup and configuration.

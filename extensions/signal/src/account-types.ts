@@ -1,7 +1,7 @@
 // Signal plugin module implements account types behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 
 export type SignalAccountConfig = Omit<
-  Exclude<NonNullable<OpenClawConfig["channels"]>["signal"], undefined>,
+  Exclude<NonNullable<SteelEngineConfig["channels"]>["signal"], undefined>,
   "accounts"
 >;

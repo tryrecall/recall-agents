@@ -1,5 +1,5 @@
-// Fal plugin entrypoint registers its OpenClaw integration.
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+// Fal plugin entrypoint registers its SteelEngine integration.
+import { definePluginEntry } from "steelengine/plugin-sdk/plugin-entry";
 import { buildFalImageGenerationProvider } from "./image-generation-provider.js";
 import { buildFalMusicGenerationProvider } from "./music-generation-provider.js";
 import { createFalProvider } from "./provider-registration.js";

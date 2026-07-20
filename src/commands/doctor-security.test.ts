@@ -2,7 +2,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import { withTempDir } from "../test-helpers/temp-dir.js";
 
 const note = vi.hoisted(() => vi.fn());
@@ -44,25 +44,25 @@ describe("noteSecurityWarnings gateway exposure", () => {
     listReadOnlyChannelPluginsForConfigMock.mockReset();
     listReadOnlyChannelPluginsForConfigMock.mockImplementation(() => pluginRegistry.list);
     pluginRegistry.list = [];
-    prevToken = process.env.OPENCLAW_GATEWAY_TOKEN;
-    prevPassword = process.env.OPENCLAW_GATEWAY_PASSWORD;
+    prevToken = process.env.STEELENGINE_GATEWAY_TOKEN;
+    prevPassword = process.env.STEELENGINE_GATEWAY_PASSWORD;
     prevHome = process.env.HOME;
-    prevServiceKind = process.env.OPENCLAW_SERVICE_KIND;
-    delete process.env.OPENCLAW_GATEWAY_TOKEN;
-    delete process.env.OPENCLAW_GATEWAY_PASSWORD;
-    delete process.env.OPENCLAW_SERVICE_KIND;
+    prevServiceKind = process.env.STEELENGINE_SERVICE_KIND;
+    delete process.env.STEELENGINE_GATEWAY_TOKEN;
+    delete process.env.STEELENGINE_GATEWAY_PASSWORD;
+    delete process.env.STEELENGINE_SERVICE_KIND;
   });
 
   afterEach(() => {
     if (prevToken === undefined) {
-      delete process.env.OPENCLAW_GATEWAY_TOKEN;
+      delete process.env.STEELENGINE_GATEWAY_TOKEN;
     } else {
-      process.env.OPENCLAW_GATEWAY_TOKEN = prevToken;
+      process.env.STEELENGINE_GATEWAY_TOKEN = prevToken;
     }
     if (prevPassword === undefined) {
-      delete process.env.OPENCLAW_GATEWAY_PASSWORD;
+      delete process.env.STEELENGINE_GATEWAY_PASSWORD;
     } else {
-      process.env.OPENCLAW_GATEWAY_PASSWORD = prevPassword;
+      process.env.STEELENGINE_GATEWAY_PASSWORD = prevPassword;
     }
     if (prevHome === undefined) {
       delete process.env.HOME;
@@ -70,9 +70,9 @@ describe("noteSecurityWarnings gateway exposure", () => {
       process.env.HOME = prevHome;
     }
     if (prevServiceKind === undefined) {
-      delete process.env.OPENCLAW_SERVICE_KIND;
+      delete process.env.STEELENGINE_SERVICE_KIND;
     } else {
-      process.env.OPENCLAW_SERVICE_KIND = prevServiceKind;
+      process.env.STEELENGINE_SERVICE_KIND = prevServiceKind;
     }
   });
 
@@ -82,11 +82,11 @@ describe("noteSecurityWarnings gateway exposure", () => {
     file: Record<string, unknown>,
     run: () => Promise<void>,
   ): Promise<void> {
-    await withTempDir({ prefix: "openclaw-doctor-security-" }, async (home) => {
+    await withTempDir({ prefix: "steelengine-doctor-security-" }, async (home) => {
       process.env.HOME = home;
-      await fs.mkdir(path.join(home, ".openclaw"), { recursive: true });
+      await fs.mkdir(path.join(home, ".steelengine"), { recursive: true });
       await fs.writeFile(
-        path.join(home, ".openclaw", "exec-approvals.json"),
+        path.join(home, ".steelengine", "exec-approvals.json"),
         JSON.stringify(file, null, 2),
       );
       await run();
@@ -126,7 +126,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
               },
             ],
           },
-        } as OpenClawConfig);
+        } as SteelEngineConfig);
       },
     );
 
@@ -137,19 +137,19 @@ describe("noteSecurityWarnings gateway exposure", () => {
   }
 
   it("warns when exposed without auth", async () => {
-    const cfg = { gateway: { bind: "lan" } } as OpenClawConfig;
+    const cfg = { gateway: { bind: "lan" } } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     const message = lastMessage();
     expect(message).toContain("CRITICAL");
     expect(message).toContain("without authentication");
     expect(message).toContain("Safer remote access");
     expect(message).toContain("ssh -N -L 18789:127.0.0.1:18789");
-    expect(message).toContain("openclaw security audit --deep");
+    expect(message).toContain("steelengine security audit --deep");
   });
 
   it("uses env token to avoid critical warning", async () => {
-    process.env.OPENCLAW_GATEWAY_TOKEN = "token-123";
-    const cfg = { gateway: { bind: "lan" } } as OpenClawConfig;
+    process.env.STEELENGINE_GATEWAY_TOKEN = "token-123";
+    const cfg = { gateway: { bind: "lan" } } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     const message = lastMessage();
     expect(message).toContain("WARNING");
@@ -162,97 +162,97 @@ describe("noteSecurityWarnings gateway exposure", () => {
         bind: "lan",
         auth: {
           mode: "token",
-          token: { source: "env", provider: "default", id: "OPENCLAW_GATEWAY_TOKEN" },
+          token: { source: "env", provider: "default", id: "STEELENGINE_GATEWAY_TOKEN" },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     const message = lastMessage();
     expect(message).toContain("WARNING");
     expect(message).not.toContain("CRITICAL");
   });
 
-  it("warns when OPENCLAW_GATEWAY_TOKEN env conflicts with gateway.auth.token config (#74271)", async () => {
-    process.env.OPENCLAW_GATEWAY_TOKEN = "env-token-123";
+  it("warns when STEELENGINE_GATEWAY_TOKEN env conflicts with gateway.auth.token config (#74271)", async () => {
+    process.env.STEELENGINE_GATEWAY_TOKEN = "env-token-123";
     const cfg = {
       gateway: {
         auth: {
           token: "config-token-456",
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     const message = lastMessage();
-    expect(message).toContain("OPENCLAW_GATEWAY_TOKEN conflicts with gateway.auth.token");
+    expect(message).toContain("STEELENGINE_GATEWAY_TOKEN conflicts with gateway.auth.token");
     expect(message).toContain("Direct local Gateway clients commonly prefer the env token");
-    expect(message).toContain("~/.openclaw/.env");
+    expect(message).toContain("~/.steelengine/.env");
   });
 
   it("does not warn when only env token is set without config token", async () => {
-    process.env.OPENCLAW_GATEWAY_TOKEN = "env-token-only";
-    const cfg = { gateway: { bind: "lan" } } as OpenClawConfig;
+    process.env.STEELENGINE_GATEWAY_TOKEN = "env-token-only";
+    const cfg = { gateway: { bind: "lan" } } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     const message = lastMessage();
-    expect(message).not.toContain("OPENCLAW_GATEWAY_TOKEN overrides");
+    expect(message).not.toContain("STEELENGINE_GATEWAY_TOKEN overrides");
   });
 
   it("does not warn inside the managed gateway service credential context", async () => {
-    process.env.OPENCLAW_GATEWAY_TOKEN = "env-token-123";
-    process.env.OPENCLAW_SERVICE_KIND = "gateway";
+    process.env.STEELENGINE_GATEWAY_TOKEN = "env-token-123";
+    process.env.STEELENGINE_SERVICE_KIND = "gateway";
     const cfg = {
       gateway: {
         auth: {
           token: "config-token-456",
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     const message = lastMessage();
-    expect(message).not.toContain("OPENCLAW_GATEWAY_TOKEN conflicts");
+    expect(message).not.toContain("STEELENGINE_GATEWAY_TOKEN conflicts");
   });
 
-  it("does not warn when config token uses OPENCLAW_GATEWAY_TOKEN SecretRef", async () => {
-    process.env.OPENCLAW_GATEWAY_TOKEN = "env-token-123";
+  it("does not warn when config token uses STEELENGINE_GATEWAY_TOKEN SecretRef", async () => {
+    process.env.STEELENGINE_GATEWAY_TOKEN = "env-token-123";
     const cfg = {
-      gateway: { auth: { token: "${OPENCLAW_GATEWAY_TOKEN}" } },
+      gateway: { auth: { token: "${STEELENGINE_GATEWAY_TOKEN}" } },
       secrets: { providers: { default: { source: "env" } } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     const message = lastMessage();
-    expect(message).not.toContain("OPENCLAW_GATEWAY_TOKEN overrides");
+    expect(message).not.toContain("STEELENGINE_GATEWAY_TOKEN overrides");
   });
 
   it("does not warn about local gateway auth token precedence in remote mode", async () => {
-    process.env.OPENCLAW_GATEWAY_TOKEN = "env-token-123";
+    process.env.STEELENGINE_GATEWAY_TOKEN = "env-token-123";
     const cfg = {
       gateway: {
         mode: "remote",
         remote: { token: "remote-token" },
         auth: { token: "local-token" },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     const message = lastMessage();
-    expect(message).not.toContain("OPENCLAW_GATEWAY_TOKEN overrides");
+    expect(message).not.toContain("STEELENGINE_GATEWAY_TOKEN overrides");
   });
 
   it("treats whitespace token as missing", async () => {
     const cfg = {
       gateway: { bind: "lan", auth: { mode: "token", token: "   " } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     const message = lastMessage();
     expect(message).toContain("CRITICAL");
   });
 
   it("skips warning for loopback bind", async () => {
-    const cfg = { gateway: { bind: "loopback" } } as OpenClawConfig;
+    const cfg = { gateway: { bind: "loopback" } } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     expect(note).not.toHaveBeenCalled();
   });
 
   it("treats unset bind as loopback for host-side doctor checks", async () => {
-    const cfg = { gateway: {} } as OpenClawConfig;
+    const cfg = { gateway: {} } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     expect(note).not.toHaveBeenCalled();
   });
@@ -279,7 +279,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
         },
       },
     ];
-    const cfg = { session: { dmScope: "main" } } as OpenClawConfig;
+    const cfg = { session: { dmScope: "main" } } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     expect(listReadOnlyChannelPluginsForConfigMock).toHaveBeenCalledWith(cfg, {
       includePersistedAuthState: true,
@@ -296,12 +296,12 @@ describe("noteSecurityWarnings gateway exposure", () => {
           enabled: false,
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     const message = lastMessage();
     expect(message).toContain("disables approval forwarding only");
     expect(message).toContain("exec-approvals.json");
-    expect(message).toContain("openclaw approvals get --gateway");
+    expect(message).toContain("steelengine approvals get --gateway");
   });
 
   it("warns when filesystem tools are disabled but exec remains available", async () => {
@@ -310,7 +310,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
         allow: ["read", "exec", "process"],
         deny: ["write", "edit", "apply_patch"],
       },
-    } as OpenClawConfig);
+    } as SteelEngineConfig);
 
     const message = lastMessage();
     expect(message).toContain("filesystem write tools are disabled, but exec is still available");
@@ -333,7 +333,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
         allow: ["read", "exec", "process"],
         deny: ["write", "edit", "apply_patch"],
       },
-    } as OpenClawConfig);
+    } as SteelEngineConfig);
 
     const message = lastMessage();
     expect(message).not.toContain(
@@ -350,12 +350,12 @@ describe("noteSecurityWarnings gateway exposure", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig);
+    } as unknown as SteelEngineConfig);
 
     const message = lastMessage();
     expect(message).toContain("plaintext secret-bearing config fields");
     expect(message).toContain("models.providers.openai.apiKey");
-    expect(message).toContain("openclaw secrets audit --check");
+    expect(message).toContain("steelengine secrets audit --check");
   });
 
   it("warns when sensitive model provider headers are stored as plaintext in config", async () => {
@@ -369,7 +369,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig);
+    } as unknown as SteelEngineConfig);
 
     const message = lastMessage();
     expect(message).toContain("plaintext secret-bearing config fields");
@@ -387,7 +387,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig);
+    } as unknown as SteelEngineConfig);
 
     const message = lastMessage();
     expect(message).not.toContain("plaintext secret-bearing config fields");
@@ -407,7 +407,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig);
+    } as unknown as SteelEngineConfig);
 
     const message = lastMessage();
     expect(message).toContain("plaintext secret-bearing config fields");
@@ -428,7 +428,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig);
+    } as unknown as SteelEngineConfig);
 
     const message = lastMessage();
     expect(message).not.toContain("plaintext secret-bearing config fields");
@@ -451,7 +451,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
               ask: "off",
             },
           },
-        } as OpenClawConfig);
+        } as SteelEngineConfig);
       },
     );
 
@@ -478,7 +478,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
               mode: "full",
             },
           },
-        } as OpenClawConfig);
+        } as SteelEngineConfig);
       },
     );
 
@@ -486,7 +486,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
     expect(message).toContain("tools.exec is broader than the host exec policy");
     expect(message).toContain('tools.exec.mode="full"');
     expect(message).toContain('defaults.security="allowlist"');
-    expect(message).not.toContain("OpenClaw default");
+    expect(message).not.toContain("SteelEngine default");
   });
 
   it("attributes broader host policy warnings to wildcard agent entries", async () => {
@@ -507,7 +507,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
               ask: "on-miss",
             },
           },
-        } as OpenClawConfig);
+        } as SteelEngineConfig);
       },
     );
 
@@ -527,7 +527,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
               ask: "always",
             },
           },
-        } as OpenClawConfig);
+        } as SteelEngineConfig);
       },
     );
 
@@ -560,7 +560,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
           agents: {
             list: [{ id: "runner" }],
           },
-        } as OpenClawConfig);
+        } as SteelEngineConfig);
       },
     );
 
@@ -596,7 +596,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
           agents: {
             list: [{ id: "runner" }],
           },
-        } as OpenClawConfig);
+        } as SteelEngineConfig);
       },
     );
 
@@ -632,7 +632,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
               ask: "always",
             },
           },
-        } as OpenClawConfig);
+        } as SteelEngineConfig);
       },
     );
 
@@ -649,7 +649,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     const message = lastMessage();
     expect(message).toContain("Heartbeat defaults");
@@ -669,7 +669,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
           },
         ],
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     const message = lastMessage();
     expect(message).toContain('Heartbeat agent "ops"');
@@ -696,7 +696,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
       },
     ];
 
-    await noteSecurityWarnings({} as OpenClawConfig);
+    await noteSecurityWarnings({} as SteelEngineConfig);
     expect(listReadOnlyChannelPluginsForConfigMock).toHaveBeenCalledWith(
       {},
       {
@@ -707,7 +707,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
     const message = lastMessage();
     expect(message).toContain("[secrets]");
     expect(message).toContain("failed to resolve account");
-    expect(message).toContain("Run: openclaw security audit --deep");
+    expect(message).toContain("Run: steelengine security audit --deep");
   });
 
   it("skips heartbeat directPolicy warning when delivery is internal-only or explicit", async () => {
@@ -728,7 +728,7 @@ describe("noteSecurityWarnings gateway exposure", () => {
           },
         ],
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await noteSecurityWarnings(cfg);
     const message = lastMessage();
     expect(message).not.toContain("Heartbeat defaults");

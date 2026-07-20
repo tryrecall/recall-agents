@@ -1,6 +1,6 @@
-// Qqbot plugin entrypoint registers its OpenClaw integration.
-import type { ApprovalResolveResult } from "openclaw/plugin-sdk/approval-gateway-runtime";
-import type { ResolvedChannelMessageIngress } from "openclaw/plugin-sdk/channel-ingress-runtime";
+// Qqbot plugin entrypoint registers its SteelEngine integration.
+import type { ApprovalResolveResult } from "steelengine/plugin-sdk/approval-gateway-runtime";
+import type { ResolvedChannelMessageIngress } from "steelengine/plugin-sdk/channel-ingress-runtime";
 import type { EffectivePolicyInput } from "../access/resolve-policy.js";
 import type { FetchMediaOptions, FetchMediaResult, SecretInputRef } from "./types.js";
 

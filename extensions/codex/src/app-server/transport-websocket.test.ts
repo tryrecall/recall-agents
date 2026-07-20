@@ -47,7 +47,7 @@ describe("Codex app-server websocket transport", () => {
         const message = JSON.parse(rawDataToText(data)) as { id?: number; method?: string };
         if (message.method === "initialize") {
           socket.send(
-            JSON.stringify({ id: message.id, result: { userAgent: "openclaw/0.143.0" } }),
+            JSON.stringify({ id: message.id, result: { userAgent: "steelengine/0.143.0" } }),
           );
           return;
         }
@@ -76,7 +76,7 @@ describe("Codex app-server websocket transport", () => {
   });
 
   it("can speak JSON-RPC over the canonical unix control socket", async () => {
-    const tempDir = await mkdtemp(path.join(os.tmpdir(), "openclaw-codex-unix-"));
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "steelengine-codex-unix-"));
     tempDirs.push(tempDir);
     const socketPath = path.join(tempDir, "app-server.sock");
     const httpServer = http.createServer();
@@ -90,7 +90,7 @@ describe("Codex app-server websocket transport", () => {
         const message = JSON.parse(rawDataToText(data)) as { id?: number; method?: string };
         if (message.method === "initialize") {
           socket.send(
-            JSON.stringify({ id: message.id, result: { userAgent: "openclaw/0.144.1" } }),
+            JSON.stringify({ id: message.id, result: { userAgent: "steelengine/0.144.1" } }),
           );
           return;
         }

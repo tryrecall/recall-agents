@@ -335,17 +335,17 @@ export type AgentDefaultsConfig = {
   compaction?: AgentCompactionConfig;
   /** Outer run loop retry iteration boundaries. */
   runRetries?: AgentRunRetriesConfig;
-  /** Embedded OpenClaw runner hardening and compatibility controls. */
+  /** Embedded SteelEngine runner hardening and compatibility controls. */
   embeddedAgent?: {
     /**
-     * How embedded OpenClaw should trust workspace-local `.openclaw/settings.json`.
+     * How embedded SteelEngine should trust workspace-local `.steelengine/settings.json`.
      * - sanitize (default): apply project settings except shellPath/shellCommandPrefix
      * - ignore: ignore project settings entirely
      * - trusted: trust project settings as-is
      */
     projectSettingsPolicy?: "trusted" | "sanitize" | "ignore";
     /**
-     * Embedded OpenClaw execution contract:
+     * Embedded SteelEngine execution contract:
      * - default: keep the standard runner behavior
      * - strict-agentic: enable structured plan tracking and non-visible turn recovery on supported GPT-5 runs
      */
@@ -521,11 +521,11 @@ export type AgentCompactionMidTurnPrecheckConfig = {
 export type AgentCompactionConfig = {
   /** Compaction summarization mode. */
   mode?: AgentCompactionMode;
-  /** Embedded OpenClaw reserve target before floor and context-window caps. */
+  /** Embedded SteelEngine reserve target before floor and context-window caps. */
   reserveTokens?: number;
-  /** Embedded OpenClaw keepRecentTokens budget used for cut-point selection. */
+  /** Embedded SteelEngine keepRecentTokens budget used for cut-point selection. */
   keepRecentTokens?: number;
-  /** Minimum reserve tokens enforced for embedded OpenClaw compaction (0 disables the floor). */
+  /** Minimum reserve tokens enforced for embedded SteelEngine compaction (0 disables the floor). */
   reserveTokensFloor?: number;
   /** Max share of context window for history during safeguard pruning (0.1–0.9, default 0.5). */
   maxHistoryShare?: number;

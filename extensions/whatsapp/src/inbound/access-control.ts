@@ -1,9 +1,9 @@
 // Whatsapp plugin module implements access control behavior.
-import { createChannelPairingChallengeIssuer } from "openclaw/plugin-sdk/channel-pairing";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { upsertChannelPairingRequest } from "openclaw/plugin-sdk/conversation-runtime";
-import { defaultRuntime } from "openclaw/plugin-sdk/runtime-env";
-import { warnMissingProviderGroupPolicyFallbackOnce } from "openclaw/plugin-sdk/runtime-group-policy";
+import { createChannelPairingChallengeIssuer } from "steelengine/plugin-sdk/channel-pairing";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { upsertChannelPairingRequest } from "steelengine/plugin-sdk/conversation-runtime";
+import { defaultRuntime } from "steelengine/plugin-sdk/runtime-env";
+import { warnMissingProviderGroupPolicyFallbackOnce } from "steelengine/plugin-sdk/runtime-group-policy";
 import { resolveWhatsAppInboundPolicy, resolveWhatsAppIngressAccess } from "../inbound-policy.js";
 import { buildWhatsAppInboundAdmission, type WhatsAppInboundAdmission } from "./admission.js";
 
@@ -48,7 +48,7 @@ function blockedInboundAccess(
 }
 
 export async function checkInboundAccessControl(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId: string;
   from: string;
   selfE164: string | null;

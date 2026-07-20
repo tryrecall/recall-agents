@@ -236,13 +236,13 @@ describe("pairing setup code", () => {
 
   beforeEach(() => {
     gatewayEnvSnapshot = captureEnv([
-      "OPENCLAW_GATEWAY_TOKEN",
-      "OPENCLAW_GATEWAY_PASSWORD",
-      "OPENCLAW_GATEWAY_PORT",
+      "STEELENGINE_GATEWAY_TOKEN",
+      "STEELENGINE_GATEWAY_PASSWORD",
+      "STEELENGINE_GATEWAY_PORT",
     ]);
-    process.env.OPENCLAW_GATEWAY_TOKEN = "";
-    process.env.OPENCLAW_GATEWAY_PASSWORD = "";
-    process.env.OPENCLAW_GATEWAY_PORT = "";
+    process.env.STEELENGINE_GATEWAY_TOKEN = "";
+    process.env.STEELENGINE_GATEWAY_PASSWORD = "";
+    process.env.STEELENGINE_GATEWAY_PORT = "";
   });
 
   beforeEach(() => {
@@ -366,13 +366,13 @@ describe("pairing setup code", () => {
       expectedAuthLabel: "password",
     },
     {
-      name: "uses OPENCLAW_GATEWAY_PASSWORD without resolving configured password SecretRef",
+      name: "uses STEELENGINE_GATEWAY_PASSWORD without resolving configured password SecretRef",
       auth: {
         mode: "password",
         password: { source: "env", provider: "default", id: "MISSING_GW_PASSWORD" },
       } as const,
       env: {
-        OPENCLAW_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
+        STEELENGINE_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
       },
       expectedAuthLabel: "password",
     },
@@ -435,7 +435,7 @@ describe("pairing setup code", () => {
       },
       {
         env: {
-          OPENCLAW_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
+          STEELENGINE_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
         },
       },
     );
@@ -522,7 +522,7 @@ describe("pairing setup code", () => {
       } satisfies ResolveSetupConfig,
       options: {
         env: {
-          OPENCLAW_GATEWAY_TOKEN: "new-token",
+          STEELENGINE_GATEWAY_TOKEN: "new-token",
         },
       } satisfies ResolveSetupOptions,
       expected: {
@@ -853,13 +853,13 @@ describe("pairing setup code", () => {
       },
       config: {
         gateway: {
-          tailscale: { mode: "serve", serviceName: "svc:openclaw" },
+          tailscale: { mode: "serve", serviceName: "svc:steelengine" },
           auth: { mode: "password", password: "secret" },
         },
       } satisfies ResolveSetupConfig,
       expected: {
         authLabel: "password",
-        url: "wss://openclaw.tailnet.ts.net",
+        url: "wss://steelengine.tailnet.ts.net",
         urlSource: "gateway.tailscale.mode=serve",
       },
     },
@@ -904,7 +904,7 @@ describe("pairing setup code", () => {
     await expectResolvedSetupFailureCase({
       config: {
         gateway: {
-          tailscale: { mode: "serve", serviceName: "svc:openclaw" },
+          tailscale: { mode: "serve", serviceName: "svc:steelengine" },
           auth: { mode: "password", password: "secret" },
         },
       } satisfies ResolveSetupConfig,

@@ -1,7 +1,7 @@
 // Verifies plugin readonly-scope audit findings.
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 
 const applyPluginAutoEnableMock = vi.hoisted(() => vi.fn());
 const getActivePluginRegistryMock = vi.hoisted(() => vi.fn());
@@ -33,7 +33,7 @@ vi.mock("../plugins/runtime/metadata-registry-loader.js", () => ({
 const { runSecurityAudit } = await import("./audit.js");
 
 function createAuditOptions(params: {
-  sourceConfig: OpenClawConfig;
+  sourceConfig: SteelEngineConfig;
   plugins: Parameters<typeof runSecurityAudit>[0]["plugins"];
 }): Parameters<typeof runSecurityAudit>[0] {
   return {
@@ -45,8 +45,8 @@ function createAuditOptions(params: {
     includeChannelSecurity: true,
     deep: false,
     deepTimeoutMs: 5000,
-    stateDir: "/tmp/openclaw-test-state",
-    configPath: "/tmp/openclaw-test-config.json",
+    stateDir: "/tmp/steelengine-test-state",
+    configPath: "/tmp/steelengine-test-config.json",
     plugins: params.plugins,
     loadPluginSecurityCollectors: true,
     configSnapshot: null,
@@ -193,8 +193,8 @@ describe("security audit read-only plugin scope", () => {
       env: {},
       includeFilesystem: false,
       includeChannelSecurity: false,
-      stateDir: "/tmp/openclaw-test-state",
-      configPath: "/tmp/openclaw-test-config.json",
+      stateDir: "/tmp/steelengine-test-state",
+      configPath: "/tmp/steelengine-test-config.json",
     });
 
     expect(getActivePluginRegistryMock).not.toHaveBeenCalled();

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 
 vi.mock("../model-fallback.js", () => ({
   resolveModelCandidateChain: (params: { provider: string; model: string }) => [
@@ -28,7 +28,7 @@ const baseParams = {
   workspaceDir: "/tmp",
 };
 
-function configWithFallbacks(fallbacks: string[]): OpenClawConfig {
+function configWithFallbacks(fallbacks: string[]): SteelEngineConfig {
   return {
     agents: {
       defaults: {
@@ -38,7 +38,7 @@ function configWithFallbacks(fallbacks: string[]): OpenClawConfig {
         },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 describe("compactEmbeddedAgentSessionDirect abortSignal threading", () => {

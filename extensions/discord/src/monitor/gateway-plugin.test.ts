@@ -63,14 +63,14 @@ vi.mock("../internal/gateway.js", () => ({
   GatewayPlugin,
 }));
 
-vi.mock("openclaw/plugin-sdk/proxy-capture", () => ({
+vi.mock("steelengine/plugin-sdk/proxy-capture", () => ({
   captureHttpExchange: vi.fn(),
   captureWsEvent: vi.fn(),
   resolveEffectiveDebugProxyUrl: () => undefined,
   resolveDebugProxySettings: () => ({ enabled: false }),
 }));
 
-vi.mock("openclaw/plugin-sdk/runtime-env", () => ({
+vi.mock("steelengine/plugin-sdk/runtime-env", () => ({
   danger: (value: string) => value,
   warn: (value: string) => value,
 }));
@@ -143,7 +143,7 @@ describe("createDiscordGatewayPlugin", () => {
     expect(resolveDiscordGatewayInfoTimeoutMs({ configuredTimeoutMs: 45_000 })).toBe(45_000);
     expect(
       resolveDiscordGatewayInfoTimeoutMs({
-        env: { OPENCLAW_DISCORD_GATEWAY_INFO_TIMEOUT_MS: "25000" },
+        env: { STEELENGINE_DISCORD_GATEWAY_INFO_TIMEOUT_MS: "25000" },
       }),
     ).toBe(25_000);
     expect(resolveDiscordGatewayInfoTimeoutMs({ env: {} })).toBe(30_000);
@@ -223,7 +223,7 @@ describe("createDiscordGatewayPlugin", () => {
     );
   });
 
-  it("leaves autoInteractions disabled so OpenClaw owns interaction handoff", () => {
+  it("leaves autoInteractions disabled so SteelEngine owns interaction handoff", () => {
     const plugin = createPlugin();
 
     expect(
@@ -249,7 +249,7 @@ describe("createDiscordGatewayPlugin", () => {
     });
   });
 
-  it("keeps OpenClaw metadata timeout out of gateway options", () => {
+  it("keeps SteelEngine metadata timeout out of gateway options", () => {
     const plugin = createDiscordGatewayPlugin({
       discordConfig: { gatewayInfoTimeoutMs: 5_000 },
       runtime: {

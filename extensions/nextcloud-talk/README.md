@@ -1,11 +1,11 @@
-# OpenClaw Nextcloud Talk
+# SteelEngine Nextcloud Talk
 
-Official OpenClaw channel plugin for Nextcloud Talk conversations.
+Official SteelEngine channel plugin for Nextcloud Talk conversations.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugin add @openclaw/nextcloud-talk
+steelengine plugin add @steelengine/nextcloud-talk
 ```
 
-Configure the Nextcloud server and Talk credentials in OpenClaw, then enable the conversations where agents should receive and send messages.
+Configure the Nextcloud server and Talk credentials in SteelEngine, then enable the conversations where agents should receive and send messages.

@@ -26,24 +26,24 @@ function createExecRequest(overrides: Partial<ExecApprovalRequest> = {}): ExecAp
 
 async function renderApproval(request: ExecApprovalRequest) {
   render(
-    html`<openclaw-exec-approval
+    html`<steelengine-exec-approval
       .props=${{
         queue: [request],
         busy: false,
         error: null,
         onDecision: vi.fn(),
       }}
-    ></openclaw-exec-approval>`,
+    ></steelengine-exec-approval>`,
     container,
   );
-  const approval = container.querySelector<LitElement>("openclaw-exec-approval");
+  const approval = container.querySelector<LitElement>("steelengine-exec-approval");
   if (!approval) {
     throw new Error("Expected exec approval");
   }
   await approval.updateComplete;
 }
 
-describe("openclaw-exec-approval", () => {
+describe("steelengine-exec-approval", () => {
   beforeEach(async () => {
     restoreDialogPolyfill = installDialogPolyfill();
     await i18n.setLocale("en");

@@ -1,4 +1,4 @@
-import { expectDefined, parseStrictInteger } from "@openclaw/normalization-core";
+import { expectDefined, parseStrictInteger } from "@steelengine/normalization-core";
 export type UsageBarTemplate = Record<string, unknown>;
 export type UsageContract = Record<string, unknown>;
 type Vocab = Record<string, unknown>;

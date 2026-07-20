@@ -1,14 +1,14 @@
-import type { OpenClawConfig, TelegramAccountConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig, TelegramAccountConfig } from "steelengine/plugin-sdk/config-contracts";
 // Telegram plugin module owns buffered reply payload delivery decisions.
-import { normalizeMessagePresentation } from "openclaw/plugin-sdk/interactive-runtime";
+import { normalizeMessagePresentation } from "steelengine/plugin-sdk/interactive-runtime";
 import {
   isFastModeAutoProgressPayload,
   isReplyPayloadNonTerminalToolErrorWarning,
   resolveSendableOutboundReplyParts,
-} from "openclaw/plugin-sdk/reply-payload";
-import type { ReplyPayload } from "openclaw/plugin-sdk/reply-payload";
-import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
-import { danger } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/reply-payload";
+import type { ReplyPayload } from "steelengine/plugin-sdk/reply-payload";
+import type { RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
+import { danger } from "steelengine/plugin-sdk/runtime-env";
 import type { TelegramBotDeps } from "./bot-deps.js";
 import type { TelegramMessageContext } from "./bot-message-context.js";
 import type { TelegramDeliveryController } from "./bot-message-dispatch-delivery.js";
@@ -54,7 +54,7 @@ function hasExecApprovalPayload(payload: ReplyPayload): boolean {
 }
 
 export function createTelegramReplyDelivery(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   context: TelegramMessageContext;
   delivery: TelegramDeliveryController;
   draft: TelegramDraftController;

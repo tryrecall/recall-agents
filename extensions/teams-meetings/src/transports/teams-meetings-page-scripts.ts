@@ -114,9 +114,9 @@ export function teamsMeetingStatusScript(params: {
   });
   const notes = [];
   const currentIdentity = meetingIdentity(location.href);
-  const priorMeeting = window.__openclawTeamsMeeting;
+  const priorMeeting = window.__steelengineTeamsMeeting;
   if (expectedIdentity && currentIdentity && currentIdentity !== expectedIdentity) {
-    delete window.__openclawTeamsMeeting;
+    delete window.__steelengineTeamsMeeting;
     return JSON.stringify({
       inCall: false,
       manualActionRequired: true,
@@ -198,7 +198,7 @@ export function teamsMeetingStatusScript(params: {
   const identityVerified = identityMatchedUrl || identityPreservedInCall;
   const inCall = Boolean(identityVerified && leave);
   if (identityMatchedUrl || identityPreservedInCall) {
-    window.__openclawTeamsMeeting = {
+    window.__steelengineTeamsMeeting = {
       ...(priorMeeting?.identity === expectedIdentity ? priorMeeting : {}),
       identity: expectedIdentity,
       sessionId: sessionId || priorMeeting?.sessionId,
@@ -211,7 +211,7 @@ export function teamsMeetingStatusScript(params: {
     !identityAwaitingRerender &&
     (priorMeeting.inCallControl || markerAgeMs >= 30_000)
   ) {
-    delete window.__openclawTeamsMeeting;
+    delete window.__steelengineTeamsMeeting;
   }
   const microphone = first(selectors.microphone) || findTextButton(/mute|unmute|microphone/i);
   let microphoneState = identityVerified ? toggleState(microphone, "microphone") : undefined;
@@ -310,8 +310,8 @@ export function teamsMeetingStatusScript(params: {
         }
         selected = Boolean(selectedMicrophoneLabel());
       }
-      if (selected && window.__openclawTeamsMeeting?.identity === expectedIdentity) {
-        window.__openclawTeamsMeeting.audioInputDeviceId = input.deviceId;
+      if (selected && window.__steelengineTeamsMeeting?.identity === expectedIdentity) {
+        window.__steelengineTeamsMeeting.audioInputDeviceId = input.deviceId;
       }
       return selected;
     } catch (error) {
@@ -411,15 +411,15 @@ export function teamsMeetingStatusScript(params: {
   if (!inCall && loginRequired) {
     manualActionReason = "teams-login-required";
     manualActionMessage = tenantLoginRequired
-      ? "This Teams tenant requires sign-in or email verification. Complete it in the OpenClaw browser profile, then retry."
-      : "Sign in to Microsoft Teams in the OpenClaw browser profile, then retry the meeting join.";
+      ? "This Teams tenant requires sign-in or email verification. Complete it in the SteelEngine browser profile, then retry."
+      : "Sign in to Microsoft Teams in the SteelEngine browser profile, then retry the meeting join.";
   } else if (!inCall && lobbyWaiting) {
     manualActionReason = "teams-admission-required";
-    manualActionMessage = "Admit the OpenClaw guest from the Microsoft Teams lobby, then retry speech.";
+    manualActionMessage = "Admit the SteelEngine guest from the Microsoft Teams lobby, then retry speech.";
   } else if (!inCall && permissionRequired) {
     manualActionReason = "teams-permission-required";
     manualActionMessage = allowMicrophone
-      ? "Allow microphone and camera permissions for Teams in the OpenClaw browser profile, then retry."
+      ? "Allow microphone and camera permissions for Teams in the SteelEngine browser profile, then retry."
       : "Dismiss the Teams device-permission prompt or continue without devices, then retry.";
   } else if (!inCall && controlManualActionReason) {
     manualActionReason = controlManualActionReason;
@@ -500,7 +500,7 @@ export function teamsMeetingTranscriptScript(meetingUrl: string, meetingSessionI
   const expectedIdentity = ${JSON.stringify(expectedIdentity)};
   const expectedSessionId = ${JSON.stringify(meetingSessionId)};
   const currentIdentity = meetingIdentity(location.href);
-  const state = window.__openclawTeamsMeeting;
+  const state = window.__steelengineTeamsMeeting;
   const effectiveIdentity = currentIdentity || state?.identity;
   if (!expectedIdentity || effectiveIdentity !== expectedIdentity) {
     return JSON.stringify({ urlMatched: false, droppedLines: 0, lines: [] });
@@ -520,7 +520,7 @@ export function teamsMeetingLeaveScript(meetingUrl: string) {
   const selectors = ${selectors};
   const expectedIdentity = ${JSON.stringify(expectedIdentity)};
   const currentIdentity = meetingIdentity(location.href);
-  const state = window.__openclawTeamsMeeting;
+  const state = window.__steelengineTeamsMeeting;
   const first = (list) => {
     for (const selector of list) {
       const node = document.querySelector(selector);
@@ -567,7 +567,7 @@ export function teamsMeetingLeaveScript(meetingUrl: string) {
     return JSON.stringify({ departed: false, urlMatched: false });
   }
   if (postCall) {
-    delete window.__openclawTeamsMeeting;
+    delete window.__steelengineTeamsMeeting;
     return JSON.stringify({ departed: true, urlMatched: true });
   }
   if (confirmation) {
@@ -575,7 +575,7 @@ export function teamsMeetingLeaveScript(meetingUrl: string) {
     return JSON.stringify({ departed: false, leaveAction: "confirm", urlMatched: true });
   }
   if (leave) {
-    window.__openclawTeamsMeeting = {
+    window.__steelengineTeamsMeeting = {
       ...state,
       identity: expectedIdentity,
       inCallControl: leave,

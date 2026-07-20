@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/core";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/core";
 import { fingerprint } from "../protocol/index.js";
 import {
   parseReefRelayUrl,
@@ -42,7 +42,7 @@ export const reefSetupAdapter = {
     cfg,
     input,
   }: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     accountId: string;
     input: Record<string, unknown>;
   }) =>
@@ -52,12 +52,12 @@ export const reefSetupAdapter = {
         ...cfg.channels,
         reef: { ...(cfg.channels?.reef as object), ...input },
       },
-    }) as OpenClawConfig,
+    }) as SteelEngineConfig,
 };
 
 export const reefSetupWizard = {
   channel: "reef",
-  getStatus: async ({ cfg }: { cfg: OpenClawConfig }) => {
+  getStatus: async ({ cfg }: { cfg: SteelEngineConfig }) => {
     const raw = cfg.channels?.reef as unknown;
     const parsed = ReefChannelConfigSchema.safeParse(raw ?? {});
     const configured =
@@ -68,8 +68,8 @@ export const reefSetupWizard = {
       statusLines: [configured ? `Reef @${parsed.data.handle}` : "Reef not configured"],
     };
   },
-  configure: async ({ cfg }: { cfg: OpenClawConfig }) => ({ cfg }),
-  configureInteractive: async ({ cfg, prompter }: { cfg: OpenClawConfig; prompter: Prompt }) => {
+  configure: async ({ cfg }: { cfg: SteelEngineConfig }) => ({ cfg }),
+  configureInteractive: async ({ cfg, prompter }: { cfg: SteelEngineConfig; prompter: Prompt }) => {
     const rawRelayUrl = await prompter.text({
       message: "Reef relay origin URL",
       initialValue: "https://reefwire.ai",
@@ -121,7 +121,7 @@ export const reefSetupWizard = {
     const identity = loadReefIdentityBinding(runtime);
     if (identity && (identity.handle !== handle || identity.relayUrl !== relayUrl)) {
       throw new Error(
-        `This OpenClaw state already holds the Reef identity @${identity.handle} on ${identity.relayUrl}. Re-register the same handle and relay.`,
+        `This SteelEngine state already holds the Reef identity @${identity.handle} on ${identity.relayUrl}. Re-register the same handle and relay.`,
       );
     }
     const configuredStateDir = (cfg.channels?.reef as { stateDir?: unknown } | undefined)?.stateDir;
@@ -222,7 +222,7 @@ export const reefSetupWizard = {
       "Reef safety fingerprint — share out of band",
     );
     return {
-      cfg: { ...cfg, channels: { ...cfg.channels, reef } } as OpenClawConfig,
+      cfg: { ...cfg, channels: { ...cfg.channels, reef } } as SteelEngineConfig,
       accountId: "default",
     };
   },

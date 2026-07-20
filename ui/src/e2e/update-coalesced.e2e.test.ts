@@ -9,11 +9,11 @@ import {
   type ControlUiE2eServer,
 } from "../test-helpers/control-ui-e2e.ts";
 
-const NATIVE_UPDATE_AVAILABILITY_CHANGED_EVENT = "openclaw:native-update-availability-changed";
+const NATIVE_UPDATE_AVAILABILITY_CHANGED_EVENT = "steelengine:native-update-availability-changed";
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
 
 let browser: Browser;
@@ -90,16 +90,16 @@ describeControlUiE2e("Control UI coalesced update E2E", () => {
     });
     await context.addInitScript(() => {
       const nativeWindow = window as unknown as {
-        openClawUpdateMessages: unknown[];
+        steelEngineUpdateMessages: unknown[];
         webkit: {
-          messageHandlers: { openclawUpdate: { postMessage: (message: unknown) => void } };
+          messageHandlers: { steelengineUpdate: { postMessage: (message: unknown) => void } };
         };
       };
-      nativeWindow.openClawUpdateMessages = [];
+      nativeWindow.steelEngineUpdateMessages = [];
       nativeWindow.webkit = {
         messageHandlers: {
-          openclawUpdate: {
-            postMessage: (message) => nativeWindow.openClawUpdateMessages.push(message),
+          steelengineUpdate: {
+            postMessage: (message) => nativeWindow.steelEngineUpdateMessages.push(message),
           },
         },
       };
@@ -130,7 +130,7 @@ describeControlUiE2e("Control UI coalesced update E2E", () => {
       await page.getByRole("button", { name: /Update Mac app \+ Gateway/ }).click();
       expect(
         await page.evaluate(
-          () => (window as unknown as { openClawUpdateMessages: unknown[] }).openClawUpdateMessages,
+          () => (window as unknown as { steelEngineUpdateMessages: unknown[] }).steelEngineUpdateMessages,
         ),
       ).toEqual([{ type: "start-update" }]);
       expect(await gateway.getRequests("update.run")).toHaveLength(0);

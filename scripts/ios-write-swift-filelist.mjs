@@ -14,14 +14,14 @@ const iosSourceRoots = [
 ];
 
 const sharedSourceRoots = [
-  path.join("..", "shared", "OpenClawKit", "Sources", "OpenClawChatUI"),
-  path.join("..", "shared", "OpenClawKit", "Sources", "OpenClawKit"),
-  path.join("..", "shared", "OpenClawKit", "Sources", "OpenClawProtocol"),
+  path.join("..", "shared", "SteelEngineKit", "Sources", "SteelEngineChatUI"),
+  path.join("..", "shared", "SteelEngineKit", "Sources", "SteelEngineKit"),
+  path.join("..", "shared", "SteelEngineKit", "Sources", "SteelEngineProtocol"),
   path.join("..", "swabble", "Sources", "SwabbleKit"),
 ];
 
 const excludedSwiftFiles = new Set([
-  "../shared/OpenClawKit/Sources/OpenClawProtocol/GatewayModels.swift",
+  "../shared/SteelEngineKit/Sources/SteelEngineProtocol/GatewayModels.swift",
 ]);
 
 function normalizeFileListPath(filePath) {

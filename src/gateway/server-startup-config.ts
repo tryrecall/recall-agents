@@ -16,7 +16,7 @@ import { applyPluginAutoEnable } from "../config/plugin-auto-enable.js";
 import { isPluginPackagingRuntimeOutputInvalidConfigSnapshot } from "../config/recovery-policy.js";
 import { applyConfigOverrides } from "../config/runtime-overrides.js";
 import type { GatewayAuthConfig, GatewayTailscaleConfig } from "../config/types.gateway.js";
-import type { ConfigFileSnapshot, OpenClawConfig } from "../config/types.openclaw.js";
+import type { ConfigFileSnapshot, SteelEngineConfig } from "../config/types.steelengine.js";
 import { measureDiagnosticsTimelineSpan } from "../infra/diagnostics-timeline.js";
 import type { PluginManifestRegistry } from "../plugins/manifest-registry.js";
 import type { PluginMetadataSnapshot } from "../plugins/plugin-metadata-snapshot.js";
@@ -69,7 +69,7 @@ type RuntimeSecretsActivationParams = {
 
 /** Gateway startup hook that prepares secrets and optionally activates the prepared snapshot. */
 export type ActivateRuntimeSecrets = ((
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   params: RuntimeSecretsActivationParams,
 ) => Promise<PreparedRuntimeSecretsSnapshot>) & {
   activatePreparedSnapshot?: (
@@ -162,7 +162,7 @@ export async function loadGatewayStartupConfigSnapshot(params: {
 
 function withRuntimeConfig(
   snapshot: ConfigFileSnapshot,
-  runtimeConfig: OpenClawConfig,
+  runtimeConfig: SteelEngineConfig,
 ): ConfigFileSnapshot {
   return {
     ...snapshot,
@@ -177,7 +177,7 @@ export function createRuntimeSecretsActivator(params: {
   emitStateEvent: (
     code: GatewaySecretsStateEventCode,
     message: string,
-    cfg: OpenClawConfig,
+    cfg: SteelEngineConfig,
   ) => void;
   prepareRuntimeSecretsSnapshot?: PrepareRuntimeSecretsSnapshot;
   activateRuntimeSecretsSnapshot?: ActivateRuntimeSecretsSnapshot;
@@ -247,7 +247,7 @@ export function createRuntimeSecretsActivator(params: {
   const handleSecretsActivationError = (
     err: unknown,
     activationParams: RuntimeSecretsActivationParams,
-    eventConfig: OpenClawConfig,
+    eventConfig: SteelEngineConfig,
   ): never => {
     const details = String(err);
     if (!secretsDegraded) {
@@ -486,7 +486,7 @@ export async function prepareGatewayStartupConfig(params: {
     },
     { omitErrorMessage: true },
   );
-  const canReusePreflightPreparedSnapshot = (config: OpenClawConfig): boolean =>
+  const canReusePreflightPreparedSnapshot = (config: SteelEngineConfig): boolean =>
     Boolean(
       preflightPrepared &&
       params.activateRuntimeSecrets.activatePreparedSnapshot &&
@@ -495,7 +495,7 @@ export async function prepareGatewayStartupConfig(params: {
         preflightPrepared.sourceConfig,
       ),
     );
-  const activateStartupSecrets = async (config: OpenClawConfig) => {
+  const activateStartupSecrets = async (config: SteelEngineConfig) => {
     // Reuse the preflight snapshot only if generated startup auth did not
     // change the secret-relevant source config.
     if (preflightPrepared && canReusePreflightPreparedSnapshot(config)) {
@@ -554,7 +554,7 @@ export async function prepareGatewayStartupConfig(params: {
   };
 }
 
-function hasActiveGatewayAuthSecretRef(config: OpenClawConfig): boolean {
+function hasActiveGatewayAuthSecretRef(config: SteelEngineConfig): boolean {
   const states = evaluateGatewayAuthSurfaceStates({
     config,
     defaults: config.secrets?.defaults,
@@ -566,7 +566,7 @@ function hasActiveGatewayAuthSecretRef(config: OpenClawConfig): boolean {
   });
 }
 
-function assertRuntimeGatewayAuthNotKnownWeak(config: OpenClawConfig): void {
+function assertRuntimeGatewayAuthNotKnownWeak(config: SteelEngineConfig): void {
   assertGatewayAuthNotKnownWeak(
     resolveGatewayAuth({
       authConfig: config.gateway?.auth,
@@ -578,7 +578,7 @@ function assertRuntimeGatewayAuthNotKnownWeak(config: OpenClawConfig): void {
 
 function logGatewayAuthSurfaceDiagnostics(
   prepared: {
-    sourceConfig: OpenClawConfig;
+    sourceConfig: SteelEngineConfig;
     warnings: Array<{ code: string; path: string; message: string }>;
   },
   logSecrets: GatewayStartupLog,
@@ -609,9 +609,9 @@ function logGatewayAuthSurfaceDiagnostics(
 }
 
 function applyGatewayAuthOverridesForStartupPreflight(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   overrides: GatewayStartupConfigOverrides,
-): OpenClawConfig {
+): SteelEngineConfig {
   if (!overrides.auth && !overrides.tailscale) {
     return config;
   }

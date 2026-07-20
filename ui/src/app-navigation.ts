@@ -331,7 +331,7 @@ export function settingsNavigationLabelForRoute(routeId: NavigationRouteId): str
     return t("nav.settingsGeneral");
   }
   if (routeId === "custodian") {
-    return t("nav.askOpenClaw");
+    return t("nav.askSteelEngine");
   }
   return titleForRoute(routeId);
 }

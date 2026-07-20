@@ -3,8 +3,8 @@ import crypto from "node:crypto";
 import {
   hasNonEmptyString,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
-import { hasOutboundReplyContent } from "openclaw/plugin-sdk/reply-payload";
+} from "@steelengine/normalization-core/string-coerce";
+import { hasOutboundReplyContent } from "steelengine/plugin-sdk/reply-payload";
 import { resolveBootstrapWarningSignaturesSeen } from "../../agents/bootstrap-budget.js";
 import {
   formatRateLimitOrOverloadedErrorCopy,

@@ -75,7 +75,7 @@ describe("sanitizeRedactedFormForSubmit", () => {
       gateway: {
         mode: "remote",
         remote: {
-          token: "__OPENCLAW_REDACTED__",
+          token: "__STEELENGINE_REDACTED__",
         },
       },
     };
@@ -83,7 +83,7 @@ describe("sanitizeRedactedFormForSubmit", () => {
       gateway: {
         mode: "remote",
         remote: {
-          token: "__OPENCLAW_REDACTED__",
+          token: "__STEELENGINE_REDACTED__",
         },
       },
     };
@@ -106,7 +106,7 @@ describe("sanitizeRedactedFormForSubmit", () => {
       gateway: {
         mode: "remote",
         remote: {
-          token: "__OPENCLAW_REDACTED__",
+          token: "__STEELENGINE_REDACTED__",
         },
       },
     };
@@ -116,7 +116,7 @@ describe("sanitizeRedactedFormForSubmit", () => {
       sanitizeRedactedFormForSubmit(
         form,
         originalForm,
-        '{\n  gateway: {\n    mode: "remote",\n    remote: {\n      token: "__OPENCLAW_REDACTED__"\n    }\n  }\n}\n',
+        '{\n  gateway: {\n    mode: "remote",\n    remote: {\n      token: "__STEELENGINE_REDACTED__"\n    }\n  }\n}\n',
       ),
     ).toEqual(form);
   });
@@ -125,7 +125,7 @@ describe("sanitizeRedactedFormForSubmit", () => {
     const form = {
       gateway: {
         remote: {
-          token: "__OPENCLAW_REDACTED__",
+          token: "__STEELENGINE_REDACTED__",
         },
       },
     };
@@ -149,7 +149,7 @@ describe("sanitizeRedactedFormForSubmit", () => {
       gateway: {
         remote: {
           nested: {
-            token: "__OPENCLAW_REDACTED__",
+            token: "__STEELENGINE_REDACTED__",
           },
         },
       },
@@ -168,7 +168,7 @@ describe("sanitizeRedactedFormForSubmit", () => {
     const form = {
       channels: {
         slack: {
-          tokens: ["__OPENCLAW_REDACTED__", "second-token"],
+          tokens: ["__STEELENGINE_REDACTED__", "second-token"],
         },
       },
     };
@@ -187,7 +187,7 @@ describe("sanitizeRedactedFormForSubmit", () => {
     const form = {
       gateway: {
         remote: {
-          token: "__OPENCLAW_REDACTED__",
+          token: "__STEELENGINE_REDACTED__",
         },
       },
     };

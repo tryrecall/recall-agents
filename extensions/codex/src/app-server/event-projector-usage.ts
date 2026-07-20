@@ -1,4 +1,4 @@
-import { normalizeUsage } from "openclaw/plugin-sdk/agent-harness-runtime";
+import { normalizeUsage } from "steelengine/plugin-sdk/agent-harness-runtime";
 import { readNonNegativeInteger, readNumber } from "./event-projector-values.js";
 import { isJsonObject, type JsonObject } from "./protocol.js";
 
@@ -36,7 +36,7 @@ export function normalizeCodexThreadTokenUsage(
 export function normalizeCodexResponseTokenUsage(
   record: JsonObject,
 ): ReturnType<typeof normalizeUsage> {
-  // v2 TokenUsageBreakdown. inputTokens includes cached input; OpenClaw usage
+  // v2 TokenUsageBreakdown. inputTokens includes cached input; SteelEngine usage
   // tracks uncached input and cache reads separately.
   const totalTokens = readTokenCount(record, "totalTokens");
   const inputTokens = readTokenCount(record, "inputTokens");

@@ -3,12 +3,12 @@ import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { resolveTimerTimeoutMs } from "@openclaw/normalization-core/number-coercion";
+import { resolveTimerTimeoutMs } from "@steelengine/normalization-core/number-coercion";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
-import { normalizeStringEntries } from "@openclaw/normalization-core/string-normalization";
+} from "@steelengine/normalization-core/string-coerce";
+import { normalizeStringEntries } from "@steelengine/normalization-core/string-normalization";
 import { prerelease as parseSemverPrerelease, satisfies as satisfiesSemver } from "semver";
 import { hasValidIsoCalendarComponents } from "../shared/iso-time.js";
 import { retryClawHubRead } from "./clawhub-retry.js";
@@ -37,10 +37,10 @@ const CLAWHUB_ERROR_BODY_MAX_CHARS = 400;
 
 export type ClawHubPackageFamily = "skill" | "code-plugin" | "bundle-plugin";
 export type ClawHubPackageChannel = "official" | "community" | "private";
-// Keep aligned with @openclaw/plugin-package-contract ExternalPluginCompatibility.
+// Keep aligned with @steelengine/plugin-package-contract ExternalPluginCompatibility.
 export type ClawHubPackageCompatibility = {
   pluginApiRange?: string;
-  builtWithOpenClawVersion?: string;
+  builtWithSteelEngineVersion?: string;
   pluginSdkVersion?: string;
   minGatewayVersion?: string;
 };
@@ -460,7 +460,7 @@ export class ClawHubRequestError extends Error {
 
 function normalizeBaseUrl(baseUrl?: string): string {
   const envValue =
-    normalizeOptionalString(process.env.OPENCLAW_CLAWHUB_URL) ||
+    normalizeOptionalString(process.env.STEELENGINE_CLAWHUB_URL) ||
     normalizeOptionalString(process.env.CLAWHUB_URL) ||
     DEFAULT_CLAWHUB_URL;
   const value = (normalizeOptionalString(baseUrl) || envValue).replace(/\/+$/, "");
@@ -551,13 +551,13 @@ function shouldPreservePluginApiPrereleaseFloor(target: string): boolean {
 }
 
 function normalizePluginApiVersionForComparator(version: string, target: string): string {
-  const normalizedCorrection = normalizeOpenClawNumericCorrectionForPluginApi(version);
+  const normalizedCorrection = normalizeSteelEngineNumericCorrectionForPluginApi(version);
   if (normalizedCorrection) {
     return normalizedCorrection;
   }
   return shouldPreservePluginApiPrereleaseFloor(target)
     ? version
-    : normalizeOpenClawReleaseSuffixForPluginApi(version);
+    : normalizeSteelEngineReleaseSuffixForPluginApi(version);
 }
 
 function satisfiesComparator(version: string, token: string): boolean {
@@ -594,18 +594,18 @@ function satisfiesSemverRange(version: string, range: string): boolean {
   return tokens.every((token) => satisfiesComparator(version, token));
 }
 
-const OPENCLAW_RELEASE_SUFFIX_PATTERN =
+const STEELENGINE_RELEASE_SUFFIX_PATTERN =
   /^[vV]?(\d{4}\.[1-9]\d?\.[1-9]\d*)(?:-\d+|-(?:alpha|beta|rc)\.\d+)$/i;
-const OPENCLAW_NUMERIC_CORRECTION_PATTERN = /^[vV]?(\d{4}\.[1-9]\d?\.[1-9]\d*)-\d+$/;
+const STEELENGINE_NUMERIC_CORRECTION_PATTERN = /^[vV]?(\d{4}\.[1-9]\d?\.[1-9]\d*)-\d+$/;
 
-function normalizeOpenClawNumericCorrectionForPluginApi(
+function normalizeSteelEngineNumericCorrectionForPluginApi(
   pluginApiVersion: string,
 ): string | undefined {
-  return OPENCLAW_NUMERIC_CORRECTION_PATTERN.exec(pluginApiVersion.trim())?.[1];
+  return STEELENGINE_NUMERIC_CORRECTION_PATTERN.exec(pluginApiVersion.trim())?.[1];
 }
 
-function normalizeOpenClawReleaseSuffixForPluginApi(pluginApiVersion: string): string {
-  const match = OPENCLAW_RELEASE_SUFFIX_PATTERN.exec(pluginApiVersion.trim());
+function normalizeSteelEngineReleaseSuffixForPluginApi(pluginApiVersion: string): string {
+  const match = STEELENGINE_RELEASE_SUFFIX_PATTERN.exec(pluginApiVersion.trim());
   return match?.[1] ?? pluginApiVersion;
 }
 
@@ -1407,7 +1407,7 @@ export async function downloadClawHubPackageArchive(params: {
     const rawSpecVersion = response.headers.get("X-ClawHub-ClawPack-Spec-Version");
     const specVersion = parseStrictPositiveInteger(rawSpecVersion);
     const target = await createTempDownloadTarget({
-      prefix: "openclaw-clawhub-clawpack",
+      prefix: "steelengine-clawhub-clawpack",
       fileName: npmTarballName,
     });
     await fs.writeFile(target.path, bytes);
@@ -1449,7 +1449,7 @@ export async function downloadClawHubPackageArchive(params: {
   });
   const sha256Hex = formatSha256Hex(bytes);
   const target = await createTempDownloadTarget({
-    prefix: "openclaw-clawhub-package",
+    prefix: "steelengine-clawhub-package",
     fileName: `${params.name}.zip`,
   });
   await fs.writeFile(target.path, bytes);
@@ -1495,7 +1495,7 @@ export async function downloadClawHubSkillArchive(params: {
   });
   const sha256Hex = formatSha256Hex(bytes);
   const target = await createTempDownloadTarget({
-    prefix: "openclaw-clawhub-skill",
+    prefix: "steelengine-clawhub-skill",
     fileName: `${params.slug}.zip`,
   });
   await fs.writeFile(target.path, bytes);
@@ -1537,7 +1537,7 @@ export async function downloadClawHubSkillArchiveUrl(params: {
   });
   const sha256Hex = formatSha256Hex(bytes);
   const target = await createTempDownloadTarget({
-    prefix: "openclaw-clawhub-skill",
+    prefix: "steelengine-clawhub-skill",
     fileName: "skill.zip",
   });
   await fs.writeFile(target.path, bytes);
@@ -1573,7 +1573,7 @@ export async function downloadClawHubGitHubSkillArchive(params: {
   });
   const sha256Hex = formatSha256Hex(bytes);
   const target = await createTempDownloadTarget({
-    prefix: "openclaw-clawhub-github-skill",
+    prefix: "steelengine-clawhub-github-skill",
     fileName: `${params.commit}.zip`,
   });
   await fs.writeFile(target.path, bytes);

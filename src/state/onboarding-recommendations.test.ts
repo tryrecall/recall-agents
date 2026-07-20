@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { withOpenClawTestState } from "../test-utils/openclaw-test-state.js";
+import { withSteelEngineTestState } from "../test-utils/steelengine-test-state.js";
 import {
   acknowledgeOnboardingRecommendations,
   clearOnboardingRecommendations,
@@ -7,7 +7,7 @@ import {
   writeOnboardingRecommendationsOffer,
   type OnboardingRecommendationMatch,
 } from "./onboarding-recommendations.js";
-import { closeOpenClawStateDatabaseForTest } from "./openclaw-state-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "./steelengine-state-db.js";
 
 const matches: OnboardingRecommendationMatch[] = [
   {
@@ -25,12 +25,12 @@ const matches: OnboardingRecommendationMatch[] = [
 ];
 
 afterEach(() => {
-  closeOpenClawStateDatabaseForTest();
+  closeSteelEngineStateDatabaseForTest();
 });
 
 describe("onboarding recommendations store", () => {
   it("round-trips the singleton offer and answer timestamps", async () => {
-    await withOpenClawTestState({ label: "onboarding-recommendations" }, async (state) => {
+    await withSteelEngineTestState({ label: "onboarding-recommendations" }, async (state) => {
       const database = { env: state.env };
       const inventory = [{ label: "Chat", bundleId: "com.example.chat" }];
 
@@ -64,7 +64,7 @@ describe("onboarding recommendations store", () => {
   });
 
   it("keeps acceptedAt null when the offer was shown without an answer", async () => {
-    await withOpenClawTestState({ label: "onboarding-recommendations-open" }, async (state) => {
+    await withSteelEngineTestState({ label: "onboarding-recommendations-open" }, async (state) => {
       const record = writeOnboardingRecommendationsOffer({
         inventory: [{ label: "Chat" }],
         matches,
@@ -85,7 +85,7 @@ describe("onboarding recommendations store", () => {
   });
 
   it("deletes the stored offer so recommendations can be scanned again", async () => {
-    await withOpenClawTestState({ label: "onboarding-recommendations-clear" }, async (state) => {
+    await withSteelEngineTestState({ label: "onboarding-recommendations-clear" }, async (state) => {
       const database = { env: state.env };
       writeOnboardingRecommendationsOffer({
         inventory: [{ label: "Chat" }],

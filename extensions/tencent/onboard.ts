@@ -2,8 +2,8 @@
 import {
   applyAgentDefaultModelPrimary,
   applyProviderConfigWithModelCatalog,
-  type OpenClawConfig,
-} from "openclaw/plugin-sdk/provider-onboard";
+  type SteelEngineConfig,
+} from "steelengine/plugin-sdk/provider-onboard";
 import {
   buildTokenHubModelDefinition,
   buildTokenPlanModelDefinition,
@@ -20,7 +20,7 @@ import {
 export const TOKENHUB_DEFAULT_MODEL_REF = `${TOKENHUB_PROVIDER_ID}/hy3`;
 const TOKENHUB_PREVIEW_MODEL_REF = `${TOKENHUB_PROVIDER_ID}/hy3-preview`;
 
-function applyTokenHubProviderConfig(cfg: OpenClawConfig): OpenClawConfig {
+function applyTokenHubProviderConfig(cfg: SteelEngineConfig): SteelEngineConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[TOKENHUB_DEFAULT_MODEL_REF] = {
     ...models[TOKENHUB_DEFAULT_MODEL_REF],
@@ -40,7 +40,7 @@ function applyTokenHubProviderConfig(cfg: OpenClawConfig): OpenClawConfig {
   });
 }
 
-export function applyTokenHubConfig(cfg: OpenClawConfig): OpenClawConfig {
+export function applyTokenHubConfig(cfg: SteelEngineConfig): SteelEngineConfig {
   return applyAgentDefaultModelPrimary(
     applyTokenHubProviderConfig(cfg),
     TOKENHUB_DEFAULT_MODEL_REF,
@@ -51,7 +51,7 @@ export function applyTokenHubConfig(cfg: OpenClawConfig): OpenClawConfig {
 
 export const TOKENPLAN_DEFAULT_MODEL_REF = `${TOKENPLAN_PROVIDER_ID}/hy3`;
 
-function applyTokenPlanProviderConfig(cfg: OpenClawConfig): OpenClawConfig {
+function applyTokenPlanProviderConfig(cfg: SteelEngineConfig): SteelEngineConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[TOKENPLAN_DEFAULT_MODEL_REF] = {
     ...models[TOKENPLAN_DEFAULT_MODEL_REF],
@@ -67,7 +67,7 @@ function applyTokenPlanProviderConfig(cfg: OpenClawConfig): OpenClawConfig {
   });
 }
 
-export function applyTokenPlanConfig(cfg: OpenClawConfig): OpenClawConfig {
+export function applyTokenPlanConfig(cfg: SteelEngineConfig): SteelEngineConfig {
   return applyAgentDefaultModelPrimary(
     applyTokenPlanProviderConfig(cfg),
     TOKENPLAN_DEFAULT_MODEL_REF,

@@ -1,21 +1,21 @@
 ---
-summary: "OpenClaw browser control API, CLI reference, and scripting actions"
+summary: "SteelEngine browser control API, CLI reference, and scripting actions"
 read_when:
   - Scripting or debugging the agent browser via the local control API
-  - Looking for the `openclaw browser` CLI reference
+  - Looking for the `steelengine browser` CLI reference
   - Adding custom browser automation with snapshots and refs
 title: "Browser control API"
 ---
 
 For setup, configuration, and troubleshooting, see [Browser](/tools/browser).
-This page is the reference for the local control HTTP API, the `openclaw browser`
+This page is the reference for the local control HTTP API, the `steelengine browser`
 CLI, and scripting patterns (snapshots, refs, waits, debug flows).
 
 ## Control API (optional)
 
 For local integrations only, the Gateway exposes a small loopback HTTP API.
 This standalone server is opt-in — set the environment variable
-`OPENCLAW_EAGER_BROWSER_CONTROL_SERVER=1` in the gateway service environment
+`STEELENGINE_EAGER_BROWSER_CONTROL_SERVER=1` in the gateway service environment
 and restart the gateway before the HTTP endpoints become available. Without
 this variable the browser control runtime still works through the CLI and
 agent tools, but nothing listens on the loopback control port.
@@ -42,7 +42,7 @@ prefer the single-purpose tab routes above when scripting directly.
 All endpoints accept `?profile=<name>`. `POST /start?headless=true` requests a
 one-shot headless launch for local managed profiles without changing persisted
 browser config; attach-only, remote CDP, and existing-session profiles reject
-that override because OpenClaw does not launch those browser processes.
+that override because SteelEngine does not launch those browser processes.
 
 For tab endpoints, `targetId` is the compatibility field name. Prefer passing
 `suggestedTargetId` from `GET /tabs` or `POST /tabs/open`; labels and `tabId`
@@ -52,7 +52,7 @@ target-id prefixes still work, but they are volatile diagnostic handles.
 If shared-secret gateway auth is configured, browser HTTP routes require auth too:
 
 - `Authorization: Bearer <gateway token>`
-- `x-openclaw-password: <gateway password>` or HTTP Basic auth with that password
+- `x-steelengine-password: <gateway password>` or HTTP Basic auth with that password
 
 Notes:
 
@@ -95,7 +95,7 @@ What still works without Playwright:
   `--depth`, `--efficient`) when a per-tab CDP WebSocket is available. This is
   a fallback for inspection and ref discovery; Playwright remains the primary
   action engine.
-- Page screenshots for the managed `openclaw` browser when a per-tab CDP
+- Page screenshots for the managed `steelengine` browser when a per-tab CDP
   WebSocket is available
 - Page screenshots for `existing-session` / Chrome MCP profiles
 - `existing-session` ref-based screenshots (`--ref`) from snapshot output
@@ -113,7 +113,7 @@ not supported for element screenshots`.
 
 If you see `Playwright is not available in this gateway build`, the packaged
 Gateway is missing the core browser runtime dependency. Reinstall or update
-OpenClaw, then restart the gateway. For Docker, also install the Chromium
+SteelEngine, then restart the gateway. For Docker, also install the Chromium
 browser binaries as shown below.
 
 #### Docker Playwright install
@@ -122,19 +122,19 @@ If your Gateway runs in Docker, avoid `npx playwright` (npm override conflicts).
 For custom images, bake Chromium into the image:
 
 ```bash
-OPENCLAW_INSTALL_BROWSER=1 ./scripts/docker/setup.sh
+STEELENGINE_INSTALL_BROWSER=1 ./scripts/docker/setup.sh
 ```
 
 For an existing image, install through the bundled CLI instead:
 
 ```bash
-docker compose run --rm openclaw-cli \
+docker compose run --rm steelengine-cli \
   node /app/node_modules/playwright-core/cli.js install chromium
 ```
 
 To persist browser downloads, set `PLAYWRIGHT_BROWSERS_PATH` (for example,
 `/home/node/.cache/ms-playwright`) and make sure `/home/node` is persisted via
-`OPENCLAW_HOME_VOLUME` or a bind mount. OpenClaw auto-detects the persisted
+`STEELENGINE_HOME_VOLUME` or a bind mount. SteelEngine auto-detects the persisted
 Chromium on Linux. See [Docker](/install/docker).
 
 ## How it works (internal)
@@ -150,23 +150,23 @@ All commands accept `--browser-profile <name>` to target a specific profile, and
 <Accordion title="Basics: status, tabs, open/focus/close">
 
 ```bash
-openclaw browser status
-openclaw browser doctor
-openclaw browser doctor --deep    # add a live snapshot probe
-openclaw browser start
-openclaw browser start --headless # one-shot local managed headless launch
-openclaw browser stop            # also clears emulation on attach-only/remote CDP
-openclaw browser reset-profile   # moves the profile's browser data to Trash
-openclaw browser tabs
-openclaw browser tab             # shortcut for current tab
-openclaw browser tab new
-openclaw browser tab new --label research
-openclaw browser tab label abcd1234 research
-openclaw browser tab select 2
-openclaw browser tab close 2
-openclaw browser open https://example.com
-openclaw browser focus abcd1234
-openclaw browser close abcd1234
+steelengine browser status
+steelengine browser doctor
+steelengine browser doctor --deep    # add a live snapshot probe
+steelengine browser start
+steelengine browser start --headless # one-shot local managed headless launch
+steelengine browser stop            # also clears emulation on attach-only/remote CDP
+steelengine browser reset-profile   # moves the profile's browser data to Trash
+steelengine browser tabs
+steelengine browser tab             # shortcut for current tab
+steelengine browser tab new
+steelengine browser tab new --label research
+steelengine browser tab label abcd1234 research
+steelengine browser tab select 2
+steelengine browser tab close 2
+steelengine browser open https://example.com
+steelengine browser focus abcd1234
+steelengine browser close abcd1234
 ```
 
 </Accordion>
@@ -174,10 +174,10 @@ openclaw browser close abcd1234
 <Accordion title="Profiles: list, create, delete">
 
 ```bash
-openclaw browser profiles
-openclaw browser create-profile --name research --color "#0066CC"
-openclaw browser create-profile --name attach --driver existing-session --cdp-url http://127.0.0.1:9222
-openclaw browser delete-profile --name research
+steelengine browser profiles
+steelengine browser create-profile --name research --color "#0066CC"
+steelengine browser create-profile --name attach --driver existing-session --cdp-url http://127.0.0.1:9222
+steelengine browser delete-profile --name research
 ```
 
 </Accordion>
@@ -185,24 +185,24 @@ openclaw browser delete-profile --name research
 <Accordion title="Inspection: screenshot, snapshot, console, errors, requests">
 
 ```bash
-openclaw browser screenshot
-openclaw browser screenshot --full-page
-openclaw browser screenshot --ref 12        # or --ref e12
-openclaw browser screenshot --labels
-openclaw browser snapshot
-openclaw browser snapshot --format aria --limit 200
-openclaw browser snapshot --interactive --compact --depth 6
-openclaw browser snapshot --efficient
-openclaw browser snapshot --labels
-openclaw browser snapshot --urls
-openclaw browser snapshot --selector "#main" --interactive
-openclaw browser snapshot --frame "iframe#main" --interactive
-openclaw browser snapshot --out snapshot.txt
-openclaw browser console --level error
-openclaw browser errors --clear
-openclaw browser requests --filter api --clear
-openclaw browser pdf
-openclaw browser responsebody "**/api" --max-chars 5000
+steelengine browser screenshot
+steelengine browser screenshot --full-page
+steelengine browser screenshot --ref 12        # or --ref e12
+steelengine browser screenshot --labels
+steelengine browser snapshot
+steelengine browser snapshot --format aria --limit 200
+steelengine browser snapshot --interactive --compact --depth 6
+steelengine browser snapshot --efficient
+steelengine browser snapshot --labels
+steelengine browser snapshot --urls
+steelengine browser snapshot --selector "#main" --interactive
+steelengine browser snapshot --frame "iframe#main" --interactive
+steelengine browser snapshot --out snapshot.txt
+steelengine browser console --level error
+steelengine browser errors --clear
+steelengine browser requests --filter api --clear
+steelengine browser pdf
+steelengine browser responsebody "**/api" --max-chars 5000
 ```
 
 </Accordion>
@@ -210,32 +210,32 @@ openclaw browser responsebody "**/api" --max-chars 5000
 <Accordion title="Actions: navigate, click, type, drag, wait, evaluate">
 
 ```bash
-openclaw browser navigate https://example.com
-openclaw browser resize 1280 720
-openclaw browser click 12 --double           # or e12 for role refs
-openclaw browser click-coords 120 340        # viewport coordinates
-openclaw browser type 23 "hello" --submit
-openclaw browser press Enter
-openclaw browser hover 44
-openclaw browser scrollintoview e12
-openclaw browser drag 10 11
-openclaw browser select 9 OptionA OptionB
-openclaw browser download e12 report.pdf
-openclaw browser waitfordownload report.pdf
-openclaw browser upload /tmp/openclaw/uploads/file.pdf
-openclaw browser upload /tmp/openclaw/uploads/file.pdf --ref e12
-openclaw browser upload media://inbound/file.pdf
-openclaw browser fill --fields '[{"ref":"1","type":"text","value":"Ada"}]'
-openclaw browser dialog --accept
-openclaw browser dialog --dismiss --dialog-id d1
-openclaw browser wait --text "Done"
-openclaw browser wait "#main" --url "**/dash" --load networkidle --fn "window.ready===true"
-openclaw browser evaluate --fn '(el) => el.textContent' --ref 7
-openclaw browser evaluate --fn 'const title = document.title; return title;'
-openclaw browser evaluate --timeout-ms 30000 --fn 'async () => { await window.ready; return true; }'
-openclaw browser highlight e12
-openclaw browser trace start
-openclaw browser trace stop
+steelengine browser navigate https://example.com
+steelengine browser resize 1280 720
+steelengine browser click 12 --double           # or e12 for role refs
+steelengine browser click-coords 120 340        # viewport coordinates
+steelengine browser type 23 "hello" --submit
+steelengine browser press Enter
+steelengine browser hover 44
+steelengine browser scrollintoview e12
+steelengine browser drag 10 11
+steelengine browser select 9 OptionA OptionB
+steelengine browser download e12 report.pdf
+steelengine browser waitfordownload report.pdf
+steelengine browser upload /tmp/steelengine/uploads/file.pdf
+steelengine browser upload /tmp/steelengine/uploads/file.pdf --ref e12
+steelengine browser upload media://inbound/file.pdf
+steelengine browser fill --fields '[{"ref":"1","type":"text","value":"Ada"}]'
+steelengine browser dialog --accept
+steelengine browser dialog --dismiss --dialog-id d1
+steelengine browser wait --text "Done"
+steelengine browser wait "#main" --url "**/dash" --load networkidle --fn "window.ready===true"
+steelengine browser evaluate --fn '(el) => el.textContent' --ref 7
+steelengine browser evaluate --fn 'const title = document.title; return title;'
+steelengine browser evaluate --timeout-ms 30000 --fn 'async () => { await window.ready; return true; }'
+steelengine browser highlight e12
+steelengine browser trace start
+steelengine browser trace stop
 ```
 
 </Accordion>
@@ -243,20 +243,20 @@ openclaw browser trace stop
 <Accordion title="State: cookies, storage, offline, headers, geo, device">
 
 ```bash
-openclaw browser cookies
-openclaw browser cookies set session abc123 --url "https://example.com"
-openclaw browser cookies clear
-openclaw browser storage local get
-openclaw browser storage local set theme dark
-openclaw browser storage session clear
-openclaw browser set offline on
-openclaw browser set headers --headers-json '{"X-Debug":"1"}'
-openclaw browser set credentials user pass            # --clear to remove
-openclaw browser set geo 37.7749 -122.4194 --origin "https://example.com"
-openclaw browser set media dark
-openclaw browser set timezone America/New_York
-openclaw browser set locale en-US
-openclaw browser set device "iPhone 14"
+steelengine browser cookies
+steelengine browser cookies set session abc123 --url "https://example.com"
+steelengine browser cookies clear
+steelengine browser storage local get
+steelengine browser storage local set theme dark
+steelengine browser storage session clear
+steelengine browser set offline on
+steelengine browser set headers --headers-json '{"X-Debug":"1"}'
+steelengine browser set credentials user pass            # --clear to remove
+steelengine browser set geo 37.7749 -122.4194 --origin "https://example.com"
+steelengine browser set media dark
+steelengine browser set timezone America/New_York
+steelengine browser set locale en-US
+steelengine browser set device "iPhone 14"
 ```
 
 </Accordion>
@@ -270,17 +270,17 @@ Notes:
   download URL, suggested filename, and guarded local path. Explicit download
   interception is available for managed Playwright profiles; existing-session
   profiles return an unsupported-operation error.
-- Prefer atomic chooser uploads: pass the trigger `--ref` with the upload so OpenClaw arms and clicks in one request. Paths-only `upload` remains supported when a later trigger is intentional. Use `--input-ref` or `--element` to set a file input directly. `dialog` is an arming call; run it before the click/press that triggers the dialog. If an action opens a modal, the action response includes `blockedByDialog` and `browserState.dialogs.pending`; pass that `dialogId` to respond directly. Dialogs handled outside OpenClaw appear under `browserState.dialogs.recent`.
+- Prefer atomic chooser uploads: pass the trigger `--ref` with the upload so SteelEngine arms and clicks in one request. Paths-only `upload` remains supported when a later trigger is intentional. Use `--input-ref` or `--element` to set a file input directly. `dialog` is an arming call; run it before the click/press that triggers the dialog. If an action opens a modal, the action response includes `blockedByDialog` and `browserState.dialogs.pending`; pass that `dialogId` to respond directly. Dialogs handled outside SteelEngine appear under `browserState.dialogs.recent`.
 - `click`/`type`/etc require a `ref` from `snapshot` (numeric `12`, role ref `e12`, or actionable ARIA ref `ax12`). CSS selectors are intentionally not supported for actions. Use `click-coords` when the visible viewport position is the only reliable target.
-- Download and trace paths are constrained to OpenClaw temp roots: `/tmp/openclaw{,/downloads}` (fallback: `${os.tmpdir()}/openclaw/...`).
-- `upload` accepts files from the OpenClaw temp uploads root and
-  OpenClaw-managed inbound media. Managed inbound media can be referenced as
+- Download and trace paths are constrained to SteelEngine temp roots: `/tmp/steelengine{,/downloads}` (fallback: `${os.tmpdir()}/steelengine/...`).
+- `upload` accepts files from the SteelEngine temp uploads root and
+  SteelEngine-managed inbound media. Managed inbound media can be referenced as
   `media://inbound/<id>`, sandbox-relative `media/inbound/<id>`, or a resolved
   path inside the managed inbound media directory. Nested media refs,
   traversal, symlinks, hardlinks, and arbitrary local paths are still rejected.
 - `upload` can also set file inputs directly via `--input-ref` or `--element`.
 
-Stable tab ids and labels survive Chromium raw-target replacement when OpenClaw
+Stable tab ids and labels survive Chromium raw-target replacement when SteelEngine
 can prove the replacement tab, such as a unique old/new pair for the same URL or
 a single old tab becoming a single new tab after form submission. Ambiguous
 duplicate-URL replacements receive fresh handles. Raw target ids are still
@@ -289,7 +289,7 @@ volatile; prefer `suggestedTargetId` from `tabs` in scripts.
 Snapshot flags at a glance:
 
 - `--format ai` (default with Playwright): AI snapshot with numeric refs (`aria-ref="<n>"`).
-- `--format aria`: accessibility tree with `axN` refs. When Playwright is available, OpenClaw binds refs with backend DOM ids to the live page so follow-up actions can use them; otherwise treat the output as inspection-only.
+- `--format aria`: accessibility tree with `axN` refs. When Playwright is available, SteelEngine binds refs with backend DOM ids to the live page so follow-up actions can use them; otherwise treat the output as inspection-only.
 - `--efficient` (or `--mode efficient`): compact role snapshot preset. Set `browser.snapshotDefaults.mode: "efficient"` to make this the default (see [Gateway configuration](/gateway/configuration-reference#browser)).
 - `--interactive`, `--compact`, `--depth`, `--selector` force a role snapshot with `ref=e12` refs. `--frame "<iframe>"` scopes role snapshots to an iframe.
 - With Playwright, `--labels` adds a screenshot with overlayed ref labels
@@ -304,16 +304,16 @@ Snapshot flags at a glance:
 
 ## Snapshots and refs
 
-OpenClaw supports two "snapshot" styles:
+SteelEngine supports two "snapshot" styles:
 
-- **AI snapshot (numeric refs)**: `openclaw browser snapshot` (default; `--format ai`)
+- **AI snapshot (numeric refs)**: `steelengine browser snapshot` (default; `--format ai`)
   - Output: a text snapshot that includes numeric refs.
-  - Actions: `openclaw browser click 12`, `openclaw browser type 23 "hello"`.
+  - Actions: `steelengine browser click 12`, `steelengine browser type 23 "hello"`.
   - Internally, the ref is resolved via Playwright's `aria-ref`.
 
-- **Role snapshot (role refs like `e12`)**: `openclaw browser snapshot --interactive` (or `--compact`, `--depth`, `--selector`, `--frame`)
+- **Role snapshot (role refs like `e12`)**: `steelengine browser snapshot --interactive` (or `--compact`, `--depth`, `--selector`, `--frame`)
   - Output: a role-based list/tree with `[ref=e12]` (and optional `[nth=1]`).
-  - Actions: `openclaw browser click e12`, `openclaw browser highlight e12`.
+  - Actions: `steelengine browser click e12`, `steelengine browser highlight e12`.
   - Internally, the ref is resolved via `getByRole(...)` (plus `nth()` for duplicates).
   - Add `--labels` to include a screenshot with overlayed `e12` labels. On
     Playwright-backed profiles this also returns per-ref bounding-box metadata
@@ -321,9 +321,9 @@ OpenClaw supports two "snapshot" styles:
   - Add `--urls` when link text is ambiguous and the agent needs concrete
     navigation targets.
 
-- **ARIA snapshot (ARIA refs like `ax12`)**: `openclaw browser snapshot --format aria`
+- **ARIA snapshot (ARIA refs like `ax12`)**: `steelengine browser snapshot --format aria`
   - Output: the accessibility tree as structured nodes.
-  - Actions: `openclaw browser click ax12` works when the snapshot path can bind
+  - Actions: `steelengine browser click ax12` works when the snapshot path can bind
     the ref through Playwright and Chrome backend DOM ids.
 - If Playwright is unavailable, ARIA snapshots can still be useful for
   inspection, but refs may not be actionable. Re-snapshot with `--format ai`
@@ -348,19 +348,19 @@ Ref behavior:
 You can wait on more than just time/text:
 
 - Wait for URL (globs supported by Playwright):
-  - `openclaw browser wait --url "**/dash"`
+  - `steelengine browser wait --url "**/dash"`
 - Wait for load state:
-  - `openclaw browser wait --load networkidle`
-  - Supported on managed `openclaw` and raw/remote CDP profiles. Profiles using the `existing-session` driver (including the default `user` profile) reject `networkidle`; use `--url`, `--text`, a selector, or `--fn` waits there.
+  - `steelengine browser wait --load networkidle`
+  - Supported on managed `steelengine` and raw/remote CDP profiles. Profiles using the `existing-session` driver (including the default `user` profile) reject `networkidle`; use `--url`, `--text`, a selector, or `--fn` waits there.
 - Wait for a JS predicate:
-  - `openclaw browser wait --fn "window.ready===true"`
+  - `steelengine browser wait --fn "window.ready===true"`
 - Wait for a selector to become visible:
-  - `openclaw browser wait "#main"`
+  - `steelengine browser wait "#main"`
 
 These can be combined:
 
 ```bash
-openclaw browser wait "#main" \
+steelengine browser wait "#main" \
   --url "**/dash" \
   --load networkidle \
   --fn "window.ready===true" \
@@ -371,16 +371,16 @@ openclaw browser wait "#main" \
 
 When an action fails (e.g. "not visible", "strict mode violation", "covered"):
 
-1. `openclaw browser snapshot --interactive`
+1. `steelengine browser snapshot --interactive`
 2. Use `click <ref>` / `type <ref>` (prefer role refs in interactive mode)
-3. If it still fails: `openclaw browser highlight <ref>` to see what Playwright is targeting
+3. If it still fails: `steelengine browser highlight <ref>` to see what Playwright is targeting
 4. If the page behaves oddly:
-   - `openclaw browser errors --clear`
-   - `openclaw browser requests --filter api --clear`
+   - `steelengine browser errors --clear`
+   - `steelengine browser requests --filter api --clear`
 5. For deep debugging: record a trace:
-   - `openclaw browser trace start`
+   - `steelengine browser trace start`
    - reproduce the issue
-   - `openclaw browser trace stop` (prints `TRACE:<path>`)
+   - `steelengine browser trace stop` (prints `TRACE:<path>`)
 
 ## JSON output
 
@@ -389,10 +389,10 @@ When an action fails (e.g. "not visible", "strict mode violation", "covered"):
 Examples:
 
 ```bash
-openclaw browser --json status
-openclaw browser --json snapshot --interactive
-openclaw browser --json requests --filter api
-openclaw browser --json cookies
+steelengine browser --json status
+steelengine browser --json snapshot --interactive
+steelengine browser --json requests --filter api
+steelengine browser --json cookies
 ```
 
 Role snapshots in JSON include `refs` plus a small `stats` block (lines/chars/refs/interactive) so tools can reason about payload size and density.
@@ -415,11 +415,11 @@ These are useful for "make the site behave like X" workflows:
 
 ## Security and privacy
 
-- The openclaw browser profile may contain logged-in sessions; treat it as sensitive.
-- `browser act kind=evaluate` / `openclaw browser evaluate` and `wait --fn`
+- The steelengine browser profile may contain logged-in sessions; treat it as sensitive.
+- `browser act kind=evaluate` / `steelengine browser evaluate` and `wait --fn`
   execute arbitrary JavaScript in the page context. Prompt injection can steer
   this. Disable it with `browser.evaluateEnabled=false` if you do not need it.
-- `openclaw browser evaluate --fn` accepts a function source, an expression, or
+- `steelengine browser evaluate --fn` accepts a function source, an expression, or
   a statement body. Statement bodies are wrapped as async functions, so use
   `return` for the value you want back. Use `--timeout-ms <ms>` when the
   page-side function may need longer than the default evaluate timeout.

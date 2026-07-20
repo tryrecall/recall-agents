@@ -1,13 +1,13 @@
-# OpenClaw Cohere Provider
+# SteelEngine Cohere Provider
 
-Official OpenClaw provider plugin for Cohere's OpenAI-compatible Compatibility
+Official SteelEngine provider plugin for Cohere's OpenAI-compatible Compatibility
 API.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/cohere-provider
-openclaw gateway restart
+steelengine plugins install @steelengine/cohere-provider
+steelengine gateway restart
 ```
 
 Configure a Cohere API key, then select `cohere/command-a-plus-05-2026`,

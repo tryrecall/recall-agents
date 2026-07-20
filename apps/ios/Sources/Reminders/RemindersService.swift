@@ -1,6 +1,6 @@
 import EventKit
 import Foundation
-import OpenClawKit
+import SteelEngineKit
 
 final class RemindersService: RemindersServicing {
     private let reminderAuthorizationStatus: @Sendable () -> EKAuthorizationStatus
@@ -13,7 +13,7 @@ final class RemindersService: RemindersServicing {
         self.reminderAuthorizationStatus = reminderAuthorizationStatus
     }
 
-    func list(params: OpenClawRemindersListParams) async throws -> OpenClawRemindersListPayload {
+    func list(params: SteelEngineRemindersListParams) async throws -> SteelEngineRemindersListPayload {
         let status = self.reminderAuthorizationStatus()
         guard EventKitAuthorization.allowsRead(status: status) else {
             throw NSError(domain: "Reminders", code: 1, userInfo: [
@@ -26,7 +26,7 @@ final class RemindersService: RemindersServicing {
         let statusFilter = params.status ?? .incomplete
 
         let predicate = store.predicateForReminders(in: nil)
-        let payload: [OpenClawReminderPayload] = try await withCheckedThrowingContinuation { cont in
+        let payload: [SteelEngineReminderPayload] = try await withCheckedThrowingContinuation { cont in
             store.fetchReminders(matching: predicate) { items in
                 let formatter = ISO8601DateFormatter()
                 let filtered = (items ?? []).filter { reminder in
@@ -42,7 +42,7 @@ final class RemindersService: RemindersServicing {
                 let selected = Array(filtered.prefix(limit))
                 let payload = selected.map { reminder in
                     let due = Self.date(fromDueComponents: reminder.dueDateComponents)
-                    return OpenClawReminderPayload(
+                    return SteelEngineReminderPayload(
                         identifier: reminder.calendarItemIdentifier,
                         title: reminder.title,
                         dueISO: due.map { formatter.string(from: $0) },
@@ -53,10 +53,10 @@ final class RemindersService: RemindersServicing {
             }
         }
 
-        return OpenClawRemindersListPayload(reminders: payload)
+        return SteelEngineRemindersListPayload(reminders: payload)
     }
 
-    func add(params: OpenClawRemindersAddParams) async throws -> OpenClawRemindersAddPayload {
+    func add(params: SteelEngineRemindersAddParams) async throws -> SteelEngineRemindersAddPayload {
         let status = self.reminderAuthorizationStatus()
         guard EventKitAuthorization.allowsWrite(status: status) else {
             throw NSError(domain: "Reminders", code: 2, userInfo: [
@@ -88,14 +88,14 @@ final class RemindersService: RemindersServicing {
 
         let formatter = ISO8601DateFormatter()
         let due = Self.date(fromDueComponents: reminder.dueDateComponents)
-        let payload = OpenClawReminderPayload(
+        let payload = SteelEngineReminderPayload(
             identifier: reminder.calendarItemIdentifier,
             title: reminder.title,
             dueISO: due.map { formatter.string(from: $0) },
             completed: reminder.isCompleted,
             listName: reminder.calendar.title)
 
-        return OpenClawRemindersAddPayload(reminder: payload)
+        return SteelEngineRemindersAddPayload(reminder: payload)
     }
 
     static func applyDueISO(

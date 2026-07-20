@@ -1,12 +1,12 @@
 import crypto from "node:crypto";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   normalizePluginsConfig,
   resolvePluginConfigObject,
-} from "openclaw/plugin-sdk/plugin-config-runtime";
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
-import { parseAgentSessionKey, parseThreadSessionSuffix } from "openclaw/plugin-sdk/routing";
-import { asOptionalRecord as asRecord } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/plugin-config-runtime";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-entry";
+import { parseAgentSessionKey, parseThreadSessionSuffix } from "steelengine/plugin-sdk/routing";
+import { asOptionalRecord as asRecord } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { resolveCanonicalSessionKeyFromSessionId } from "./session.js";
 import {
   DEFAULT_AGENT_ID,
@@ -19,7 +19,7 @@ function activeMemoryToggleKey(sessionKey: string): string {
   return crypto.createHash("sha256").update(sessionKey, "utf8").digest("hex");
 }
 
-function openActiveMemoryToggleStore(api: OpenClawPluginApi) {
+function openActiveMemoryToggleStore(api: SteelEnginePluginApi) {
   return api.runtime.state.openKeyedStore<ActiveMemoryToggleEntry>({
     namespace: "session-toggles",
     maxEntries: 10_000,
@@ -27,7 +27,7 @@ function openActiveMemoryToggleStore(api: OpenClawPluginApi) {
 }
 
 async function isSessionActiveMemoryDisabled(params: {
-  api: OpenClawPluginApi;
+  api: SteelEnginePluginApi;
   sessionKey?: string;
 }): Promise<boolean> {
   const sessionKey = params.sessionKey?.trim();
@@ -51,7 +51,7 @@ async function isSessionActiveMemoryDisabled(params: {
 }
 
 async function setSessionActiveMemoryDisabled(params: {
-  api: OpenClawPluginApi;
+  api: SteelEnginePluginApi;
   sessionKey: string;
   disabled: boolean;
 }): Promise<void> {
@@ -68,7 +68,7 @@ async function setSessionActiveMemoryDisabled(params: {
 }
 
 function resolveCommandSessionKey(params: {
-  api: OpenClawPluginApi;
+  api: SteelEnginePluginApi;
   config: ResolvedActiveRecallPluginConfig;
   sessionKey?: string;
   sessionId?: string;
@@ -106,7 +106,7 @@ function formatActiveMemoryCommandHelp(): string {
   ].join("\n");
 }
 
-function isActiveMemoryGloballyEnabled(cfg: OpenClawConfig): boolean {
+function isActiveMemoryGloballyEnabled(cfg: SteelEngineConfig): boolean {
   const entry = asRecord(cfg.plugins?.entries?.["active-memory"]);
   if (entry?.enabled === false) {
     return false;
@@ -115,7 +115,7 @@ function isActiveMemoryGloballyEnabled(cfg: OpenClawConfig): boolean {
   return pluginConfig?.enabled !== false;
 }
 
-function isActiveMemoryPluginEnabled(cfg: OpenClawConfig): boolean {
+function isActiveMemoryPluginEnabled(cfg: SteelEngineConfig): boolean {
   const plugins = normalizePluginsConfig(cfg.plugins);
   if (!plugins.enabled || plugins.deny.includes("active-memory")) {
     return false;
@@ -126,7 +126,7 @@ function isActiveMemoryPluginEnabled(cfg: OpenClawConfig): boolean {
   return plugins.entries["active-memory"]?.enabled !== false;
 }
 
-function hasRememberAcrossConversationsAgent(cfg: OpenClawConfig): boolean {
+function hasRememberAcrossConversationsAgent(cfg: SteelEngineConfig): boolean {
   return (
     cfg.agents?.defaults?.memorySearch?.rememberAcrossConversations === true ||
     cfg.agents?.list?.some((agent) => agent.memorySearch?.rememberAcrossConversations === true) ===
@@ -134,7 +134,7 @@ function hasRememberAcrossConversationsAgent(cfg: OpenClawConfig): boolean {
   );
 }
 
-function shouldRememberAcrossConversations(cfg: OpenClawConfig, agentId: string): boolean {
+function shouldRememberAcrossConversations(cfg: SteelEngineConfig, agentId: string): boolean {
   const normalizedAgentId = agentId.trim().toLowerCase();
   const agent = cfg.agents?.list?.find(
     (candidate) => candidate.id?.trim().toLowerCase() === normalizedAgentId,
@@ -147,9 +147,9 @@ function shouldRememberAcrossConversations(cfg: OpenClawConfig, agentId: string)
 }
 
 function updateActiveMemoryGlobalEnabledInConfig(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   enabled: boolean,
-): OpenClawConfig {
+): SteelEngineConfig {
   const entries = { ...cfg.plugins?.entries };
   const existingEntry = asRecord(entries["active-memory"]) ?? {};
   const existingConfig = asRecord(existingEntry.config) ?? {};
@@ -204,7 +204,7 @@ function isAgentHarnessSessionKey(sessionKey: string): boolean {
 }
 
 function shouldSkipActiveMemoryForHarnessSession(params: {
-  api: OpenClawPluginApi;
+  api: SteelEnginePluginApi;
   agentId?: string;
   sessionKey?: string;
 }): boolean {

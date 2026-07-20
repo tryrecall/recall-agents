@@ -37,7 +37,7 @@ export {
   resolveLocalPathFromRootsSync,
   resolvePinnedHostnameWithPolicy,
   resolvePinnedMainDmOwnerFromAllowlist,
-  resolvePreferredOpenClawTmpDir,
+  resolvePreferredSteelEngineTmpDir,
   resolveStrictExistingPathsWithinRoot,
   root,
   safeEqualSecret,

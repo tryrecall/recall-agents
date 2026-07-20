@@ -2,13 +2,13 @@
 import crypto from "node:crypto";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { mimeTypeFromFilePath } from "openclaw/plugin-sdk/media-mime";
-import { formatByteSize } from "openclaw/plugin-sdk/number-runtime";
+import { mimeTypeFromFilePath } from "steelengine/plugin-sdk/media-mime";
+import { formatByteSize } from "steelengine/plugin-sdk/number-runtime";
 import {
   openLocalFileSafely,
   readRegularFile,
   statRegularFileSync,
-} from "openclaw/plugin-sdk/security-runtime";
+} from "steelengine/plugin-sdk/security-runtime";
 import { getPlatformAdapter } from "../adapter/index.js";
 import type { SsrfPolicyConfig } from "../adapter/types.js";
 import { MediaFileType } from "../types.js";

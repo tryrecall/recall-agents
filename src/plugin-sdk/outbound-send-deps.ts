@@ -1,4 +1,4 @@
-/** @deprecated Compatibility subpath. Use `openclaw/plugin-sdk/channel-outbound`. */
+/** @deprecated Compatibility subpath. Use `steelengine/plugin-sdk/channel-outbound`. */
 export {
   resolveLegacyOutboundSendDepKeys,
   resolveOutboundSendDep,

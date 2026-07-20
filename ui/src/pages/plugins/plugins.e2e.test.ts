@@ -22,9 +22,9 @@ import {
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
-const updateScreenshots = process.env.OPENCLAW_UPDATE_E2E_SCREENSHOTS === "1";
+const updateScreenshots = process.env.STEELENGINE_UPDATE_E2E_SCREENSHOTS === "1";
 const artifactDir = path.resolve(process.cwd(), ".artifacts/control-ui-e2e/plugins");
 const desktopViewport = { height: 1000, width: 1440 };
 const mobileViewport = { height: 852, width: 393 };
@@ -69,7 +69,7 @@ const lobsterPlugin = {
   state: "not-installed",
   featured: true,
   order: 50,
-  install: { source: "clawhub", packageName: "@openclaw/lobster" },
+  install: { source: "clawhub", packageName: "@steelengine/lobster" },
 } satisfies PluginCatalogItem;
 
 const remoteIconPlugin = {
@@ -84,7 +84,7 @@ const remoteIconPlugin = {
   featured: true,
   order: 60,
   hasIcon: true,
-  install: { source: "clawhub", packageName: "@openclaw/firecrawl" },
+  install: { source: "clawhub", packageName: "@steelengine/firecrawl" },
 } satisfies PluginCatalogItem;
 
 const calendarPlugin = {
@@ -174,7 +174,7 @@ function configSnapshot(isWorkboardEnabled: boolean) {
     config,
     hash: isWorkboardEnabled ? "plugins-config-enabled" : "plugins-config-disabled",
     issues: [],
-    path: "/tmp/openclaw-e2e/openclaw.json",
+    path: "/tmp/steelengine-e2e/steelengine.json",
     raw: JSON.stringify(config, null, 2),
     resolved: config,
     sourceConfig: config,
@@ -309,7 +309,7 @@ describeControlUiE2e("Control UI Plugins mocked Gateway E2E", () => {
   beforeAll(async () => {
     if (!chromiumAvailable) {
       throw new Error(
-        `Playwright Chromium is not installed at ${chromiumExecutablePath}. Run \`pnpm --dir ui exec playwright install chromium\`, or set OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM=1 only when intentionally skipping this lane.`,
+        `Playwright Chromium is not installed at ${chromiumExecutablePath}. Run \`pnpm --dir ui exec playwright install chromium\`, or set STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM=1 only when intentionally skipping this lane.`,
       );
     }
     if (updateScreenshots) {
@@ -330,7 +330,7 @@ describeControlUiE2e("Control UI Plugins mocked Gateway E2E", () => {
     const page = await context.newPage();
     await page.addInitScript(
       ({ gatewayUrl }) => {
-        window["__OPENCLAW_NATIVE_CONTROL_AUTH__"] = { gatewayUrl };
+        window["__STEELENGINE_NATIVE_CONTROL_AUTH__"] = { gatewayUrl };
       },
       { gatewayUrl: server.baseUrl.replace(/^http/u, "ws") },
     );
@@ -339,7 +339,7 @@ describeControlUiE2e("Control UI Plugins mocked Gateway E2E", () => {
       methodResponses: pluginMethodResponses(),
     });
     let pluginIconAuth = "";
-    await page.route("**/__openclaw__/plugin-icon/remote-icon", async (route) => {
+    await page.route("**/__steelengine__/plugin-icon/remote-icon", async (route) => {
       pluginIconAuth = route.request().headers().authorization ?? "";
       await route.fulfill({
         body: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#f97316" d="M4 3h16v18H4z"/></svg>`,
@@ -564,7 +564,7 @@ describeControlUiE2e("Control UI Plugins mocked Gateway E2E", () => {
       if (await settingsSidebar.isVisible()) {
         await settingsSidebar.getByRole("button", { name: "Back to app" }).click();
       }
-      const sidebar = page.locator("openclaw-app-sidebar");
+      const sidebar = page.locator("steelengine-app-sidebar");
       await sidebar.waitFor({ state: "visible" });
       const moreButton = sidebar.getByRole("button", { name: "More" });
       if ((await moreButton.getAttribute("aria-expanded")) !== "true") {

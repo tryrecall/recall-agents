@@ -7,20 +7,20 @@ import type { AgentCoreRuntimeDeps } from "../../packages/agent-core/src/runtime
 import type { CompleteSimpleFn, StreamFn } from "../../packages/llm-core/src/index.js";
 import { completeSimple, streamSimple } from "./llm.js";
 
-/** Runtime adapter that lets the package agent-core use OpenClaw LLM helpers. */
-export const openClawAgentCoreRuntime = {
+/** Runtime adapter that lets the package agent-core use SteelEngine LLM helpers. */
+export const steelEngineAgentCoreRuntime = {
   completeSimple: completeSimple as unknown as CompleteSimpleFn,
   streamSimple: streamSimple as unknown as StreamFn,
 } satisfies AgentCoreRuntimeDeps;
 
-/** Agent-core class preconfigured with OpenClaw runtime dependencies. */
+/** Agent-core class preconfigured with SteelEngine runtime dependencies. */
 export class Agent extends CoreAgent {
   constructor(options: CoreAgentOptions = {}) {
-    super({ runtime: openClawAgentCoreRuntime, ...options });
+    super({ runtime: steelEngineAgentCoreRuntime, ...options });
   }
 }
 
-// OpenClaw-owned reusable agent core
+// SteelEngine-owned reusable agent core
 export { runAgentLoop } from "../../packages/agent-core/src/index.js";
 // Documented proxy stream API stays until this entrypoint's announced
 // public demotion window (registry: plugin-sdk-agent-core-public-demotion).

@@ -1,4 +1,4 @@
-import { truncateUtf16Safe } from "@openclaw/normalization-core/utf16-slice";
+import { truncateUtf16Safe } from "@steelengine/normalization-core/utf16-slice";
 // Control UI chat domain owns pure tool-card extraction rules.
 import {
   extractCanvasFromDetails,
@@ -20,10 +20,10 @@ function resolveTranscriptMessageId(message: Record<string, unknown>): string | 
   if (typeof message.messageId === "string" && message.messageId.trim()) {
     return message.messageId;
   }
-  const openClawMeta = message["__openclaw"];
+  const steelEngineMeta = message["__steelengine"];
   const transcriptMeta =
-    openClawMeta && typeof openClawMeta === "object" && !Array.isArray(openClawMeta)
-      ? (openClawMeta as Record<string, unknown>)
+    steelEngineMeta && typeof steelEngineMeta === "object" && !Array.isArray(steelEngineMeta)
+      ? (steelEngineMeta as Record<string, unknown>)
       : null;
   return typeof transcriptMeta?.id === "string" && transcriptMeta.id.trim()
     ? transcriptMeta.id
@@ -320,7 +320,7 @@ function extractToolCards(message: unknown, prefix = "tool"): ToolCard[] {
   const m = message as Record<string, unknown>;
   const content = normalizeContent(m.content);
   const messageIsError = readToolErrorFlag(m);
-  const isLiveToolStream = m["__openclawToolStreamLive"] === true;
+  const isLiveToolStream = m["__steelengineToolStreamLive"] === true;
   const cards: ToolCard[] = [];
   const fallbackMatchedCards = new WeakSet<ToolCard>();
   const transcriptMessageId = resolveTranscriptMessageId(m);
@@ -341,7 +341,7 @@ function extractToolCards(message: unknown, prefix = "tool"): ToolCard[] {
         args,
         inputText: serializeToolInput(args),
         ...(isLiveToolStream
-          ? { live: true, completed: m["__openclawToolStreamResultReceived"] === true }
+          ? { live: true, completed: m["__steelengineToolStreamResultReceived"] === true }
           : {}),
         messageId: transcriptMessageId,
       });

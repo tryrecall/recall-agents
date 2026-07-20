@@ -3,7 +3,7 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import type { AssistantMessage } from "openclaw/plugin-sdk/llm";
+import type { AssistantMessage } from "steelengine/plugin-sdk/llm";
 import { afterEach, describe, expect, test } from "vitest";
 import { replaceTranscriptEvents } from "../config/sessions/session-accessor.js";
 import { resolveSqliteTargetFromSessionStorePath } from "../config/sessions/session-sqlite-target.js";
@@ -13,9 +13,9 @@ import {
 } from "../config/sessions/transcript.js";
 import { executeSqliteQuerySync, getNodeSqliteKysely } from "../infra/kysely-sync.js";
 import { emitSessionTranscriptUpdate } from "../sessions/transcript-events.js";
-import { OPENCLAW_TRANSCRIPT_ARTIFACT_API } from "../shared/transcript-only-openclaw-assistant.js";
-import type { DB as OpenClawAgentKyselyDatabase } from "../state/openclaw-agent-db.generated.js";
-import { runOpenClawAgentWriteTransaction } from "../state/openclaw-agent-db.js";
+import { STEELENGINE_TRANSCRIPT_ARTIFACT_API } from "../shared/transcript-only-steelengine-assistant.js";
+import type { DB as SteelEngineAgentKyselyDatabase } from "../state/steelengine-agent-db.generated.js";
+import { runSteelEngineAgentWriteTransaction } from "../state/steelengine-agent-db.js";
 import { testState } from "./test-helpers.runtime-state.js";
 import {
   connectReq,
@@ -29,7 +29,7 @@ import {
 installGatewayTestHooks();
 
 const AUTH_HEADER = { Authorization: "Bearer test-gateway-token-1234567890" };
-const READ_SCOPE_HEADER = { "x-openclaw-scopes": "operator.read" };
+const READ_SCOPE_HEADER = { "x-steelengine-scopes": "operator.read" };
 const cleanupDirs: string[] = [];
 
 afterEach(async () => {
@@ -42,12 +42,12 @@ afterEach(async () => {
 
 const AGENT_ID = "main";
 type SessionHistoryTestDatabase = Pick<
-  OpenClawAgentKyselyDatabase,
+  SteelEngineAgentKyselyDatabase,
   "session_entries" | "session_routes" | "sessions"
 >;
 
 async function createSessionStoreFile(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-session-history-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-session-history-"));
   cleanupDirs.push(dir);
   const storePath = path.join(dir, "sessions.json");
   testState.sessionStorePath = storePath;
@@ -110,7 +110,7 @@ function seedRawSessionRows(params: {
   if (!databasePath) {
     throw new Error("expected SQLite session store path");
   }
-  runOpenClawAgentWriteTransaction(
+  runSteelEngineAgentWriteTransaction(
     (database) => {
       const db = getNodeSqliteKysely<SessionHistoryTestDatabase>(database.db);
       for (const row of params.rows) {
@@ -211,10 +211,10 @@ function makeDeliveryMirrorAssistantMessage(
   return {
     ...makeTranscriptAssistantMessage({
       ...params,
-      provider: "openclaw",
+      provider: "steelengine",
       model: "delivery-mirror",
     }),
-    api: OPENCLAW_TRANSCRIPT_ARTIFACT_API,
+    api: STEELENGINE_TRANSCRIPT_ARTIFACT_API,
   };
 }
 
@@ -294,7 +294,7 @@ async function withGatewayHarness<T>(
 
 type SessionHistoryMessage = {
   content?: Array<{ text?: string }>;
-  __openclaw?: { id?: string; seq?: number };
+  __steelengine?: { id?: string; seq?: number };
 };
 
 type SessionHistoryBody = {
@@ -361,7 +361,7 @@ type SessionHistorySseStream = {
   streamState: { buffer: string };
 };
 
-function expectOpenClawMetadata(
+function expectSteelEngineMetadata(
   metadata: { id?: string; seq?: number } | undefined,
   expected: { id?: string; seq: number },
 ) {
@@ -435,9 +435,9 @@ async function expectMessageEventMatch(
   ).toBe(params.text);
   expect((event.data as { messageSeq?: number }).messageSeq).toBe(params.seq);
   if (params.id !== undefined) {
-    expectOpenClawMetadata(
-      (event.data as { message?: { __openclaw?: { id?: string; seq?: number } } }).message?.[
-        "__openclaw"
+    expectSteelEngineMetadata(
+      (event.data as { message?: { __steelengine?: { id?: string; seq?: number } } }).message?.[
+        "__steelengine"
       ],
       {
         id: params.id,
@@ -473,7 +473,7 @@ describe("session history HTTP endpoints", () => {
       expect(body.sessionKey).toBe("agent:main:main");
       expect(body.messages).toHaveLength(1);
       expect(body.messages?.[0]?.content?.[0]?.text).toBe("hello from history");
-      expectOpenClawMetadata(body.messages?.[0]?.["__openclaw"], {
+      expectSteelEngineMetadata(body.messages?.[0]?.["__steelengine"], {
         seq: 2,
       });
     });
@@ -515,7 +515,7 @@ describe("session history HTTP endpoints", () => {
       ]);
       expect(body.hasMore).toBe(true);
       expect(body.nextCursor).toBe("2");
-      expectOpenClawMetadata(body.messages?.[0]?.["__openclaw"], {
+      expectSteelEngineMetadata(body.messages?.[0]?.["__steelengine"], {
         seq: 2,
       });
     });
@@ -691,7 +691,7 @@ describe("session history HTTP endpoints", () => {
         "second message",
         "third message",
       ]);
-      expect(firstBody.messages?.map((message) => message["__openclaw"]?.seq)).toEqual([3, 4]);
+      expect(firstBody.messages?.map((message) => message["__steelengine"]?.seq)).toEqual([3, 4]);
       expect(firstBody.hasMore).toBe(true);
       expect(firstBody.nextCursor).toBe("3");
 
@@ -703,7 +703,7 @@ describe("session history HTTP endpoints", () => {
       expect(secondBody.items?.map((message) => message.content?.[0]?.text)).toEqual([
         "first message",
       ]);
-      expect(secondBody.messages?.map((message) => message["__openclaw"]?.seq)).toEqual([2]);
+      expect(secondBody.messages?.map((message) => message["__steelengine"]?.seq)).toEqual([2]);
       expect(secondBody.hasMore).toBe(false);
       expect(secondBody.nextCursor).toBeUndefined();
     });
@@ -793,11 +793,11 @@ describe("session history HTTP endpoints", () => {
       const nextData = nextEvent.data as {
         messages?: Array<{
           content?: Array<{ text?: string }>;
-          __openclaw?: { id?: string; seq?: number };
+          __steelengine?: { id?: string; seq?: number };
         }>;
       };
       expect(nextData.messages?.[0]?.content?.[0]?.text).toBe("third message");
-      expectOpenClawMetadata(nextData.messages?.[0]?.["__openclaw"], {
+      expectSteelEngineMetadata(nextData.messages?.[0]?.["__steelengine"], {
         id: thirdMessageId,
         seq: 4,
       });
@@ -822,10 +822,10 @@ describe("session history HTTP endpoints", () => {
       const refreshEvent = await readSseEvent(stream.reader, stream.streamState);
       expect(refreshEvent.event).toBe("history");
       const refreshData = refreshEvent.data as {
-        messages?: Array<{ content?: Array<{ text?: string }>; __openclaw?: { seq?: number } }>;
+        messages?: Array<{ content?: Array<{ text?: string }>; __steelengine?: { seq?: number } }>;
       };
       expect(refreshData.messages?.[0]?.content?.[0]?.text).toBe("second message");
-      expect(refreshData.messages?.[0]?.["__openclaw"]?.seq).toBe(3);
+      expect(refreshData.messages?.[0]?.["__steelengine"]?.seq).toBe(3);
 
       await stream.reader.cancel();
     });
@@ -881,13 +881,13 @@ describe("session history HTTP endpoints", () => {
         sessionKey?: string;
         messages?: Array<{
           content?: Array<{ text?: string }>;
-          __openclaw?: { id?: string; seq?: number };
+          __steelengine?: { id?: string; seq?: number };
         }>;
       };
       expect(body.sessionKey).toBe("agent:main:main");
       expect(body.messages).toHaveLength(1);
       expect(body.messages?.[0]?.content?.[0]?.text).toBe("Done.");
-      expectOpenClawMetadata(body.messages?.[0]?.["__openclaw"], {
+      expectSteelEngineMetadata(body.messages?.[0]?.["__steelengine"], {
         id: visibleMessageId,
         seq: 3,
       });
@@ -1112,6 +1112,44 @@ describe("session history HTTP endpoints", () => {
       const body = await httpHistory.json();
       expect(body.sessionKey).toBe("agent:main:main");
       expect(body.messages?.[0]?.content?.[0]?.text).toBe("bearer allowed history");
+    } finally {
+      ws.close();
+      await server.close();
+      envSnapshot.restore();
+    }
+  });
+
+  test("injects proactive messages idempotently with shared-secret bearer auth", async () => {
+    await seedSession({ text: "existing message" });
+
+    const started = await startServerWithClient("test-gateway-token-1234567890");
+    const { server, ws, port, envSnapshot } = started;
+    try {
+      const injectUrl = `http://127.0.0.1:${port}/sessions/${encodeURIComponent(
+        "agent:main:main",
+      )}/messages`;
+      const request = () =>
+        fetch(injectUrl, {
+          method: "POST",
+          headers: { ...AUTH_HEADER, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: "proactive update",
+            label: "flight-sync",
+            idempotencyKey: "flight-sync-42",
+          }),
+        });
+
+      expect((await request()).status).toBe(200);
+      expect((await request()).status).toBe(200);
+
+      const history = await fetchSessionHistory(port, "agent:main:main", {
+        query: "?limit=10",
+        headers: AUTH_HEADER,
+      });
+      expect(history.status).toBe(200);
+      const body = (await history.json()) as SessionHistoryBody;
+      const texts = (body.messages ?? []).map((message) => message.content?.[0]?.text);
+      expect(texts.filter((text) => text === "[flight-sync]\n\nproactive update")).toHaveLength(1);
     } finally {
       ws.close();
       await server.close();

@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
 import { resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { getRuntimeConfig } from "../config/config.js";
 import { resolveSessionFilePath } from "../config/sessions/paths.js";
@@ -20,10 +20,10 @@ import {
   type SessionStoreTarget,
 } from "../config/sessions/targets.js";
 import type { SessionEntry } from "../config/sessions/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { resolveStoredSessionOwnerAgentId } from "../gateway/session-store-key.js";
 import { normalizeAgentId } from "../routing/session-key.js";
-import { closeOpenClawAgentDatabaseByPath } from "../state/openclaw-agent-db.js";
+import { closeSteelEngineAgentDatabaseByPath } from "../state/steelengine-agent-db.js";
 import { compactDoctorSessionSqliteTarget } from "./doctor-session-sqlite-compact.js";
 import {
   assertSafeSessionSqliteMigrationDirectory,
@@ -155,7 +155,7 @@ export async function runDoctorSessionSqlite(
 }
 
 // Direct store migrations are scoped by path; broader agent discovery needs runtime config.
-function resolveDoctorSessionSqliteConfig(options: DoctorSessionSqliteOptions): OpenClawConfig {
+function resolveDoctorSessionSqliteConfig(options: DoctorSessionSqliteOptions): SteelEngineConfig {
   if (options.cfg) {
     return options.cfg;
   }
@@ -165,7 +165,7 @@ function resolveDoctorSessionSqliteConfig(options: DoctorSessionSqliteOptions): 
 function resolveDoctorSessionSqliteTargets(params: {
   allAgents?: boolean;
   agent?: string;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   mode: DoctorSessionSqliteMode;
   store?: string;
@@ -216,7 +216,7 @@ function filterLegacySessionStoreTargets(
 async function inspectOrMigrateTarget(params: {
   activeRun?: ActiveSessionSqliteMigrationRun;
   archiveImportedArtifacts?: boolean;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   mode: Exclude<DoctorSessionSqliteMode, "restore" | "recover">;
   target: SessionStoreTarget;
@@ -318,7 +318,7 @@ async function inspectOrMigrateTarget(params: {
 }
 
 function resolveFullyCoveredLegacyStorePaths(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   targets: readonly SessionStoreTarget[],
 ): Set<string> {
   const covered = new Set<string>();
@@ -398,7 +398,7 @@ function readLegacySessionRecords(
 }
 
 function isLegacySessionRecordOwnedByTarget(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   target: SessionStoreTarget,
   sessionKey: string,
 ): boolean {
@@ -997,7 +997,7 @@ function compactSqliteDatabase(
 ): void {
   try {
     if (options.closeImportedHandle) {
-      closeOpenClawAgentDatabaseByPath(resolveTargetSqlitePath(target));
+      closeSteelEngineAgentDatabaseByPath(resolveTargetSqlitePath(target));
     }
     report.compact = options.migrateOlderSchema
       ? compactDoctorSessionSqliteTarget(target, {

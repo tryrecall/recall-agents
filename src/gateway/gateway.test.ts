@@ -14,7 +14,7 @@ import {
 import { resetConfigOverrides, setConfigOverride } from "../config/runtime-overrides.js";
 import { clearSessionStoreCacheForTest } from "../config/sessions/store.js";
 import type { GatewayAuthConfig, GatewayTailscaleConfig } from "../config/types.gateway.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { resetAgentEventsForTest } from "../infra/agent-events.js";
 import { clearGatewaySubagentRuntime } from "../plugins/runtime/gateway-bindings.test-fixtures.js";
 import { captureEnv, deleteTestEnvValue, setTestEnvValue } from "../test-utils/env.js";
@@ -34,19 +34,19 @@ const GATEWAY_E2E_TIMEOUT_MS = 90_000;
 let gatewayTestSeq = 0;
 const GATEWAY_TEST_ENV_KEYS = [
   "HOME",
-  "OPENCLAW_STATE_DIR",
-  "OPENCLAW_CONFIG_PATH",
-  "OPENCLAW_GATEWAY_TOKEN",
-  "OPENCLAW_TEST_GATEWAY_OVERRIDE_TOKEN",
-  "OPENCLAW_TEST_RUNTIME_OVERRIDE_TOKEN",
-  "OPENCLAW_SKIP_CHANNELS",
-  "OPENCLAW_SKIP_GMAIL_WATCHER",
-  "OPENCLAW_SKIP_CRON",
-  "OPENCLAW_SKIP_CANVAS_HOST",
-  "OPENCLAW_SKIP_BROWSER_CONTROL_SERVER",
-  "OPENCLAW_SKIP_PROVIDERS",
-  "OPENCLAW_BUNDLED_PLUGINS_DIR",
-  "OPENCLAW_DISABLE_BUNDLED_PLUGINS",
+  "STEELENGINE_STATE_DIR",
+  "STEELENGINE_CONFIG_PATH",
+  "STEELENGINE_GATEWAY_TOKEN",
+  "STEELENGINE_TEST_GATEWAY_OVERRIDE_TOKEN",
+  "STEELENGINE_TEST_RUNTIME_OVERRIDE_TOKEN",
+  "STEELENGINE_SKIP_CHANNELS",
+  "STEELENGINE_SKIP_GMAIL_WATCHER",
+  "STEELENGINE_SKIP_CRON",
+  "STEELENGINE_SKIP_CANVAS_HOST",
+  "STEELENGINE_SKIP_BROWSER_CONTROL_SERVER",
+  "STEELENGINE_SKIP_PROVIDERS",
+  "STEELENGINE_BUNDLED_PLUGINS_DIR",
+  "STEELENGINE_DISABLE_BUNDLED_PLUGINS",
 ] as const;
 
 function nextGatewayId(prefix: string): string {
@@ -54,13 +54,13 @@ function nextGatewayId(prefix: string): string {
 }
 
 async function createEmptyBundledPluginsDir(tempHome: string): Promise<string> {
-  const bundledPluginsDir = path.join(tempHome, "openclaw-test-empty-bundled-plugins");
+  const bundledPluginsDir = path.join(tempHome, "steelengine-test-empty-bundled-plugins");
   await fs.mkdir(bundledPluginsDir, { recursive: true });
   return bundledPluginsDir;
 }
 
 async function createGatewayConfigPath(tempHome: string): Promise<string> {
-  const configPath = path.join(tempHome, ".openclaw", "openclaw.json");
+  const configPath = path.join(tempHome, ".steelengine", "steelengine.json");
   await fs.mkdir(path.dirname(configPath), { recursive: true });
   return configPath;
 }
@@ -91,10 +91,10 @@ async function writeWorkspacePlugin(params: {
   body: string;
   activation?: { onStartup?: boolean };
 }): Promise<void> {
-  const pluginDir = path.join(params.workspaceDir, ".openclaw", "extensions", params.id);
+  const pluginDir = path.join(params.workspaceDir, ".steelengine", "extensions", params.id);
   await fs.mkdir(pluginDir, { recursive: true });
   await fs.writeFile(
-    path.join(pluginDir, "openclaw.plugin.json"),
+    path.join(pluginDir, "steelengine.plugin.json"),
     `${JSON.stringify(
       {
         id: params.id,
@@ -142,29 +142,29 @@ async function readCounterWithRetry(filePath: string): Promise<number> {
 async function setupGatewayTempHome(params: { prefix: string; minimalGateway?: boolean }) {
   const envSnapshot = captureEnv([
     ...GATEWAY_TEST_ENV_KEYS,
-    ...(params.minimalGateway ? (["OPENCLAW_TEST_MINIMAL_GATEWAY"] as const) : []),
+    ...(params.minimalGateway ? (["STEELENGINE_TEST_MINIMAL_GATEWAY"] as const) : []),
   ]);
 
   const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), params.prefix));
   setTestEnvValue("HOME", tempHome);
-  setTestEnvValue("OPENCLAW_STATE_DIR", path.join(tempHome, ".openclaw"));
-  deleteTestEnvValue("OPENCLAW_CONFIG_PATH");
-  setTestEnvValue("OPENCLAW_SKIP_CHANNELS", "1");
-  setTestEnvValue("OPENCLAW_SKIP_GMAIL_WATCHER", "1");
-  setTestEnvValue("OPENCLAW_SKIP_CRON", "1");
-  setTestEnvValue("OPENCLAW_SKIP_CANVAS_HOST", "1");
-  setTestEnvValue("OPENCLAW_SKIP_BROWSER_CONTROL_SERVER", "1");
-  setTestEnvValue("OPENCLAW_SKIP_PROVIDERS", "1");
+  setTestEnvValue("STEELENGINE_STATE_DIR", path.join(tempHome, ".steelengine"));
+  deleteTestEnvValue("STEELENGINE_CONFIG_PATH");
+  setTestEnvValue("STEELENGINE_SKIP_CHANNELS", "1");
+  setTestEnvValue("STEELENGINE_SKIP_GMAIL_WATCHER", "1");
+  setTestEnvValue("STEELENGINE_SKIP_CRON", "1");
+  setTestEnvValue("STEELENGINE_SKIP_CANVAS_HOST", "1");
+  setTestEnvValue("STEELENGINE_SKIP_BROWSER_CONTROL_SERVER", "1");
+  setTestEnvValue("STEELENGINE_SKIP_PROVIDERS", "1");
   if (params.minimalGateway) {
-    setTestEnvValue("OPENCLAW_TEST_MINIMAL_GATEWAY", "1");
+    setTestEnvValue("STEELENGINE_TEST_MINIMAL_GATEWAY", "1");
   } else {
-    deleteTestEnvValue("OPENCLAW_TEST_MINIMAL_GATEWAY");
+    deleteTestEnvValue("STEELENGINE_TEST_MINIMAL_GATEWAY");
   }
 
-  const workspaceDir = path.join(tempHome, "openclaw");
+  const workspaceDir = path.join(tempHome, "steelengine");
   await fs.mkdir(workspaceDir, { recursive: true });
-  setTestEnvValue("OPENCLAW_BUNDLED_PLUGINS_DIR", await createEmptyBundledPluginsDir(tempHome));
-  setTestEnvValue("OPENCLAW_DISABLE_BUNDLED_PLUGINS", "1");
+  setTestEnvValue("STEELENGINE_BUNDLED_PLUGINS_DIR", await createEmptyBundledPluginsDir(tempHome));
+  setTestEnvValue("STEELENGINE_DISABLE_BUNDLED_PLUGINS", "1");
   return { envSnapshot, tempHome, workspaceDir };
 }
 
@@ -190,15 +190,15 @@ describe("gateway e2e", () => {
     "preserves %s auth across a safe direct gateway reload",
     async (authSource) => {
       const { envSnapshot, tempHome } = await setupGatewayTempHome({
-        prefix: "openclaw-gw-direct-reload-",
+        prefix: "steelengine-gw-direct-reload-",
       });
       let server: Awaited<ReturnType<typeof startGatewayServer>> | undefined;
       let client: Awaited<ReturnType<typeof connectGatewayClient>> | undefined;
       try {
-        deleteTestEnvValue("OPENCLAW_GATEWAY_TOKEN");
+        deleteTestEnvValue("STEELENGINE_GATEWAY_TOKEN");
         const fileToken = nextGatewayId("direct-file-token");
         const overrideToken = nextGatewayId("direct-override-token");
-        const initialConfig: OpenClawConfig = {
+        const initialConfig: SteelEngineConfig = {
           ...(authSource !== "generated"
             ? {
                 gateway: {
@@ -209,7 +209,7 @@ describe("gateway e2e", () => {
                         ? {
                             source: "env" as const,
                             provider: "default",
-                            id: "OPENCLAW_TEST_MISSING_DISK_TOKEN",
+                            id: "STEELENGINE_TEST_MISSING_DISK_TOKEN",
                           }
                         : fileToken,
                   },
@@ -222,21 +222,21 @@ describe("gateway e2e", () => {
           logging: { level: "info" },
         };
         const configPath = await createGatewayConfigPath(tempHome);
-        setTestEnvValue("OPENCLAW_CONFIG_PATH", configPath);
+        setTestEnvValue("STEELENGINE_CONFIG_PATH", configPath);
         const configIO = createConfigIO({ configPath });
         await configIO.writeConfigFile(initialConfig);
         if (authSource === "secret-ref-override") {
-          setTestEnvValue("OPENCLAW_TEST_GATEWAY_OVERRIDE_TOKEN", overrideToken);
+          setTestEnvValue("STEELENGINE_TEST_GATEWAY_OVERRIDE_TOKEN", overrideToken);
         }
         if (authSource === "runtime-overrides") {
-          deleteTestEnvValue("OPENCLAW_SKIP_CHANNELS");
-          deleteTestEnvValue("OPENCLAW_SKIP_PROVIDERS");
-          setTestEnvValue("OPENCLAW_TEST_RUNTIME_OVERRIDE_TOKEN", overrideToken);
+          deleteTestEnvValue("STEELENGINE_SKIP_CHANNELS");
+          deleteTestEnvValue("STEELENGINE_SKIP_PROVIDERS");
+          setTestEnvValue("STEELENGINE_TEST_RUNTIME_OVERRIDE_TOKEN", overrideToken);
           expect(
             setConfigOverride("gateway.auth.token", {
               source: "env",
               provider: "default",
-              id: "OPENCLAW_TEST_RUNTIME_OVERRIDE_TOKEN",
+              id: "STEELENGINE_TEST_RUNTIME_OVERRIDE_TOKEN",
             }).ok,
           ).toBe(true);
           expect(
@@ -256,7 +256,7 @@ describe("gateway e2e", () => {
                   token: {
                     source: "env",
                     provider: "default",
-                    id: "OPENCLAW_TEST_GATEWAY_OVERRIDE_TOKEN",
+                    id: "STEELENGINE_TEST_GATEWAY_OVERRIDE_TOKEN",
                   },
                 }
               : undefined;
@@ -328,7 +328,7 @@ describe("gateway e2e", () => {
             .toBeGreaterThan(revisionBeforePolicyEdit);
           const persistedPolicyEdit = JSON.parse(
             await fs.readFile(configPath, "utf-8"),
-          ) as OpenClawConfig;
+          ) as SteelEngineConfig;
           expect(persistedPolicyEdit.channels?.whatsapp?.dmPolicy).toBe("disabled");
           expect(getRuntimeConfig().channels?.whatsapp?.dmPolicy).toBe("open");
 
@@ -346,7 +346,7 @@ describe("gateway e2e", () => {
             .toBeGreaterThan(revisionBeforeUnrelatedWrite);
           const persistedAfterUnrelatedWrite = JSON.parse(
             await fs.readFile(configPath, "utf-8"),
-          ) as OpenClawConfig;
+          ) as SteelEngineConfig;
           expect(persistedAfterUnrelatedWrite.channels?.whatsapp?.dmPolicy).toBe("disabled");
         }
 
@@ -374,13 +374,13 @@ describe("gateway e2e", () => {
     { timeout: GATEWAY_E2E_TIMEOUT_MS },
     async () => {
       const { envSnapshot, tempHome } = await setupGatewayTempHome({
-        prefix: "openclaw-gw-startup-auth-ref-",
+        prefix: "steelengine-gw-startup-auth-ref-",
       });
       let server: Awaited<ReturnType<typeof startGatewayServer>> | undefined;
       let oldClient: Awaited<ReturnType<typeof connectGatewayClient>> | undefined;
       try {
         const configPath = await createGatewayConfigPath(tempHome);
-        setTestEnvValue("OPENCLAW_CONFIG_PATH", configPath);
+        setTestEnvValue("STEELENGINE_CONFIG_PATH", configPath);
         const configIO = createConfigIO({ configPath });
         const fileToken = nextGatewayId("startup-auth-file-token");
         const oldToken = nextGatewayId("startup-auth-ref-old");
@@ -389,7 +389,7 @@ describe("gateway e2e", () => {
           gateway: { auth: { mode: "token", token: fileToken } },
           logging: { level: "info" },
         });
-        setTestEnvValue("OPENCLAW_TEST_GATEWAY_OVERRIDE_TOKEN", oldToken);
+        setTestEnvValue("STEELENGINE_TEST_GATEWAY_OVERRIDE_TOKEN", oldToken);
         const port = await getFreeGatewayPort();
         server = await startGatewayServer(port, {
           bind: "loopback",
@@ -398,7 +398,7 @@ describe("gateway e2e", () => {
             token: {
               source: "env",
               provider: "default",
-              id: "OPENCLAW_TEST_GATEWAY_OVERRIDE_TOKEN",
+              id: "STEELENGINE_TEST_GATEWAY_OVERRIDE_TOKEN",
             },
           },
           controlUiEnabled: false,
@@ -409,7 +409,7 @@ describe("gateway e2e", () => {
           clientDisplayName: "vitest-startup-auth-ref-old",
         });
 
-        setTestEnvValue("OPENCLAW_TEST_GATEWAY_OVERRIDE_TOKEN", newToken);
+        setTestEnvValue("STEELENGINE_TEST_GATEWAY_OVERRIDE_TOKEN", newToken);
         const reload = await oldClient
           .request<{ ok?: boolean }>("secrets.reload", {})
           .catch((error: unknown) => (error instanceof Error ? error : new Error(String(error))));
@@ -446,13 +446,13 @@ describe("gateway e2e", () => {
 
   it("preserves runtime-seeded Control UI origins across a safe direct reload", async () => {
     const { envSnapshot, tempHome } = await setupGatewayTempHome({
-      prefix: "openclaw-gw-direct-origins-",
+      prefix: "steelengine-gw-direct-origins-",
     });
     const token = nextGatewayId("direct-origins-token");
     const configPath = await createGatewayConfigPath(tempHome);
-    setTestEnvValue("OPENCLAW_CONFIG_PATH", configPath);
+    setTestEnvValue("STEELENGINE_CONFIG_PATH", configPath);
     const configIO = createConfigIO({ configPath });
-    const initialConfig: OpenClawConfig = {
+    const initialConfig: SteelEngineConfig = {
       gateway: { auth: { mode: "token", token } },
       logging: { level: "info" },
     };
@@ -509,12 +509,12 @@ describe("gateway e2e", () => {
     async () => {
       const { baseUrl: openaiBaseUrl, restore } = installOpenAiResponsesMock();
       const { envSnapshot, tempHome, workspaceDir } = await setupGatewayTempHome({
-        prefix: "openclaw-gw-mock-home-",
+        prefix: "steelengine-gw-mock-home-",
         minimalGateway: true,
       });
 
       const token = nextGatewayId("test-token");
-      setTestEnvValue("OPENCLAW_GATEWAY_TOKEN", token);
+      setTestEnvValue("STEELENGINE_GATEWAY_TOKEN", token);
 
       const configPath = await createGatewayConfigPath(tempHome);
       const mockProvider = buildMockOpenAiResponsesProvider(openaiBaseUrl);
@@ -592,11 +592,11 @@ describe("gateway e2e", () => {
     { timeout: GATEWAY_E2E_TIMEOUT_MS },
     async () => {
       const { envSnapshot, tempHome, workspaceDir } = await setupGatewayTempHome({
-        prefix: "openclaw-gw-http-tools-home-",
+        prefix: "steelengine-gw-http-tools-home-",
       });
 
       const token = nextGatewayId("http-tools-token");
-      setTestEnvValue("OPENCLAW_GATEWAY_TOKEN", token);
+      setTestEnvValue("STEELENGINE_GATEWAY_TOKEN", token);
       const registerCountPath = path.join(tempHome, "workspace-plugin-register-count.txt");
       await writeWorkspacePlugin({
         workspaceDir,
@@ -629,7 +629,7 @@ module.exports = {
         gateway: { auth: { token } },
       };
       await fs.writeFile(configPath, `${JSON.stringify(cfg, null, 2)}\n`);
-      setTestEnvValue("OPENCLAW_CONFIG_PATH", configPath);
+      setTestEnvValue("STEELENGINE_CONFIG_PATH", configPath);
 
       const { port, server } = await startLoopbackTokenGateway(token);
 
@@ -671,13 +671,13 @@ module.exports = {
     { timeout: GATEWAY_E2E_TIMEOUT_MS },
     async () => {
       const { envSnapshot, tempHome } = await setupGatewayTempHome({
-        prefix: "openclaw-wizard-home-",
+        prefix: "steelengine-wizard-home-",
         minimalGateway: true,
       });
-      deleteTestEnvValue("OPENCLAW_GATEWAY_TOKEN");
+      deleteTestEnvValue("STEELENGINE_GATEWAY_TOKEN");
 
       const configPath = await createGatewayConfigPath(tempHome);
-      setTestEnvValue("OPENCLAW_CONFIG_PATH", configPath);
+      setTestEnvValue("STEELENGINE_CONFIG_PATH", configPath);
       clearRuntimeConfigSnapshot();
       clearConfigCache();
 
@@ -793,7 +793,7 @@ module.exports = {
     { timeout: GATEWAY_E2E_TIMEOUT_MS },
     async () => {
       const { envSnapshot, tempHome } = await setupGatewayTempHome({
-        prefix: "openclaw-wizard-channels-home-",
+        prefix: "steelengine-wizard-channels-home-",
         minimalGateway: true,
       });
       const wizAuth = nextGatewayId("wiz-chan");
@@ -874,38 +874,38 @@ module.exports = {
     async () => {
       const envSnapshot = captureEnv([
         "HOME",
-        "OPENCLAW_STATE_DIR",
-        "OPENCLAW_CONFIG_PATH",
-        "OPENCLAW_GATEWAY_TOKEN",
-        "OPENCLAW_SKIP_CHANNELS",
-        "OPENCLAW_SKIP_GMAIL_WATCHER",
-        "OPENCLAW_SKIP_CRON",
-        "OPENCLAW_SKIP_CANVAS_HOST",
-        "OPENCLAW_SKIP_BROWSER_CONTROL_SERVER",
-        "OPENCLAW_SKIP_PROVIDERS",
-        "OPENCLAW_BUNDLED_PLUGINS_DIR",
-        "OPENCLAW_TEST_MINIMAL_GATEWAY",
+        "STEELENGINE_STATE_DIR",
+        "STEELENGINE_CONFIG_PATH",
+        "STEELENGINE_GATEWAY_TOKEN",
+        "STEELENGINE_SKIP_CHANNELS",
+        "STEELENGINE_SKIP_GMAIL_WATCHER",
+        "STEELENGINE_SKIP_CRON",
+        "STEELENGINE_SKIP_CANVAS_HOST",
+        "STEELENGINE_SKIP_BROWSER_CONTROL_SERVER",
+        "STEELENGINE_SKIP_PROVIDERS",
+        "STEELENGINE_BUNDLED_PLUGINS_DIR",
+        "STEELENGINE_TEST_MINIMAL_GATEWAY",
         "DISCORD_BOT_TOKEN",
       ]);
 
-      const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-minimal-gateway-home-"));
+      const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-minimal-gateway-home-"));
       const configPath = await createGatewayConfigPath(tempHome);
-      const bundledPluginsDir = path.join(tempHome, "openclaw-test-no-bundled-extensions");
+      const bundledPluginsDir = path.join(tempHome, "steelengine-test-no-bundled-extensions");
       setTestEnvValue("HOME", tempHome);
-      setTestEnvValue("OPENCLAW_STATE_DIR", path.join(tempHome, ".openclaw"));
-      setTestEnvValue("OPENCLAW_CONFIG_PATH", configPath);
-      setTestEnvValue("OPENCLAW_SKIP_CHANNELS", "1");
-      setTestEnvValue("OPENCLAW_SKIP_GMAIL_WATCHER", "1");
-      setTestEnvValue("OPENCLAW_SKIP_CRON", "1");
-      setTestEnvValue("OPENCLAW_SKIP_CANVAS_HOST", "1");
-      setTestEnvValue("OPENCLAW_SKIP_BROWSER_CONTROL_SERVER", "1");
-      setTestEnvValue("OPENCLAW_SKIP_PROVIDERS", "1");
-      setTestEnvValue("OPENCLAW_BUNDLED_PLUGINS_DIR", bundledPluginsDir);
-      setTestEnvValue("OPENCLAW_TEST_MINIMAL_GATEWAY", "1");
+      setTestEnvValue("STEELENGINE_STATE_DIR", path.join(tempHome, ".steelengine"));
+      setTestEnvValue("STEELENGINE_CONFIG_PATH", configPath);
+      setTestEnvValue("STEELENGINE_SKIP_CHANNELS", "1");
+      setTestEnvValue("STEELENGINE_SKIP_GMAIL_WATCHER", "1");
+      setTestEnvValue("STEELENGINE_SKIP_CRON", "1");
+      setTestEnvValue("STEELENGINE_SKIP_CANVAS_HOST", "1");
+      setTestEnvValue("STEELENGINE_SKIP_BROWSER_CONTROL_SERVER", "1");
+      setTestEnvValue("STEELENGINE_SKIP_PROVIDERS", "1");
+      setTestEnvValue("STEELENGINE_BUNDLED_PLUGINS_DIR", bundledPluginsDir);
+      setTestEnvValue("STEELENGINE_TEST_MINIMAL_GATEWAY", "1");
       setTestEnvValue("DISCORD_BOT_TOKEN", "discord-test-token");
 
       const token = nextGatewayId("minimal-token");
-      setTestEnvValue("OPENCLAW_GATEWAY_TOKEN", token);
+      setTestEnvValue("STEELENGINE_GATEWAY_TOKEN", token);
       await fs.mkdir(bundledPluginsDir, { recursive: true });
       await fs.writeFile(
         configPath,

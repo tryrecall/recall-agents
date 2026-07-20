@@ -3,24 +3,24 @@ import path from "node:path";
 
 export type FleetContainerRuntimeName = "docker" | "podman";
 
-export const DEFAULT_FLEET_IMAGE = "ghcr.io/openclaw/openclaw:latest";
+export const DEFAULT_FLEET_IMAGE = "ghcr.io/steelengine/steelengine:latest";
 const FLEET_BASE_PORT = 19_100;
 export const FLEET_GATEWAY_PORT = 18_789;
 const FLEET_CONTAINER_HOME = "/home/node";
-const FLEET_CONTAINER_STATE_DIR = "/home/node/.openclaw";
-const FLEET_CONTAINER_AUTH_SECRET_DIR = "/home/node/.config/openclaw";
-export const FLEET_TENANT_LABEL = "openclaw.fleet.tenant";
-export const FLEET_OWNER_LABEL = "openclaw.fleet.owner";
-export const FLEET_ATTEMPT_LABEL = "openclaw.fleet.attempt";
-export const FLEET_ENV_KEYS_LABEL = "openclaw.fleet.env-keys";
-export const FLEET_DISK_LIMIT_LABEL = "openclaw.fleet.disk-limit";
+const FLEET_CONTAINER_STATE_DIR = "/home/node/.steelengine";
+const FLEET_CONTAINER_AUTH_SECRET_DIR = "/home/node/.config/steelengine";
+export const FLEET_TENANT_LABEL = "steelengine.fleet.tenant";
+export const FLEET_OWNER_LABEL = "steelengine.fleet.owner";
+export const FLEET_ATTEMPT_LABEL = "steelengine.fleet.attempt";
+export const FLEET_ENV_KEYS_LABEL = "steelengine.fleet.env-keys";
+export const FLEET_DISK_LIMIT_LABEL = "steelengine.fleet.disk-limit";
 const FLEET_MANAGED_ENV_KEYS = [
   "HOME",
-  "OPENCLAW_HOME",
-  "OPENCLAW_STATE_DIR",
-  "OPENCLAW_CONFIG_PATH",
-  "OPENCLAW_WORKSPACE_DIR",
-  "OPENCLAW_GATEWAY_TOKEN",
+  "STEELENGINE_HOME",
+  "STEELENGINE_STATE_DIR",
+  "STEELENGINE_CONFIG_PATH",
+  "STEELENGINE_WORKSPACE_DIR",
+  "STEELENGINE_GATEWAY_TOKEN",
 ] as const;
 
 const FLEET_TENANT_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?$/;
@@ -155,17 +155,17 @@ export function buildCellEnvironment(
   }
   return {
     HOME: FLEET_CONTAINER_HOME,
-    OPENCLAW_HOME: FLEET_CONTAINER_HOME,
-    OPENCLAW_STATE_DIR: FLEET_CONTAINER_STATE_DIR,
-    OPENCLAW_CONFIG_PATH: `${FLEET_CONTAINER_STATE_DIR}/openclaw.json`,
-    OPENCLAW_WORKSPACE_DIR: `${FLEET_CONTAINER_STATE_DIR}/workspace`,
-    OPENCLAW_GATEWAY_TOKEN: token,
+    STEELENGINE_HOME: FLEET_CONTAINER_HOME,
+    STEELENGINE_STATE_DIR: FLEET_CONTAINER_STATE_DIR,
+    STEELENGINE_CONFIG_PATH: `${FLEET_CONTAINER_STATE_DIR}/steelengine.json`,
+    STEELENGINE_WORKSPACE_DIR: `${FLEET_CONTAINER_STATE_DIR}/workspace`,
+    STEELENGINE_GATEWAY_TOKEN: token,
     ...userEnv,
   };
 }
 
 export function cellContainerName(tenantId: string): string {
-  return `openclaw-cell-${validateTenantId(tenantId)}`;
+  return `steelengine-cell-${validateTenantId(tenantId)}`;
 }
 
 export function cellNetworkName(tenantId: string): string {

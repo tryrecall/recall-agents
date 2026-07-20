@@ -259,9 +259,9 @@ describe("package manager build policy", () => {
       const packageJson = readJson(packageJsonPath) as {
         name?: string;
         version?: string;
-        openclaw?: { release?: { publishToNpm?: boolean } };
+        steelengine?: { release?: { publishToNpm?: boolean } };
       };
-      if (packageJson.openclaw?.release?.publishToNpm !== true) {
+      if (packageJson.steelengine?.release?.publishToNpm !== true) {
         continue;
       }
 

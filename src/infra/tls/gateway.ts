@@ -59,7 +59,7 @@ async function generateSelfSignedCert(params: {
       "-out",
       params.certPath,
       "-subj",
-      "/CN=openclaw-gateway",
+      "/CN=steelengine-gateway",
     ],
     { logOutput: false },
   );

@@ -1,6 +1,6 @@
 /**
- * @deprecated Use `openclaw/plugin-sdk/channel-inbound` for inbound runners and
- * dispatch predicates. Use `openclaw/plugin-sdk/channel-outbound` for message
+ * @deprecated Use `steelengine/plugin-sdk/channel-inbound` for inbound runners and
+ * dispatch predicates. Use `steelengine/plugin-sdk/channel-outbound` for message
  * delivery helpers.
  */
 

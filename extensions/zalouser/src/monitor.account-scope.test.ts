@@ -1,7 +1,7 @@
-import { KeyedAsyncQueue } from "openclaw/plugin-sdk/core";
+import { KeyedAsyncQueue } from "steelengine/plugin-sdk/core";
 // Zalouser tests cover monitor.account scope plugin behavior.
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig, PluginRuntime } from "../runtime-api.js";
+import type { SteelEngineConfig, PluginRuntime } from "../runtime-api.js";
 import "./monitor.send.test-mocks.js";
 import "./zalo-js.test-mocks.js";
 import { monitorZalouserProvider } from "./monitor.js";
@@ -77,7 +77,7 @@ describe("zalouser monitor pairing account scoping", () => {
       },
     };
 
-    const config: OpenClawConfig = {
+    const config: SteelEngineConfig = {
       channels: {
         zalouser: {
           accounts: {

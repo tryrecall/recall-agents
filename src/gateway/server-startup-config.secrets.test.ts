@@ -11,7 +11,7 @@ import {
   getRuntimeAuthProfileStoreSnapshot,
   setRuntimeAuthProfileStoreSnapshot,
 } from "../agents/auth-profiles/runtime-snapshots.js";
-import type { ConfigFileSnapshot, OpenClawConfig } from "../config/types.js";
+import type { ConfigFileSnapshot, SteelEngineConfig } from "../config/types.js";
 import { measureDiagnosticsTimelineSpan } from "../infra/diagnostics-timeline.js";
 import {
   activateSecretsRuntimeSnapshotState,
@@ -49,7 +49,7 @@ type GatewayStartupLogMock = {
 };
 
 type GatewayStartupStateEmitterMock = ReturnType<
-  typeof vi.fn<(code: string, message: string, cfg: OpenClawConfig) => void>
+  typeof vi.fn<(code: string, message: string, cfg: SteelEngineConfig) => void>
 >;
 
 const RESOLVED_GATEWAY_TOKEN = "resolved-gateway-token";
@@ -63,7 +63,7 @@ function activateSecretsRuntimeSnapshotForTest(snapshot: PreparedSecretsRuntimeS
   });
 }
 
-function gatewayTokenConfig(config: OpenClawConfig): OpenClawConfig {
+function gatewayTokenConfig(config: SteelEngineConfig): SteelEngineConfig {
   return {
     ...config,
     gateway: {
@@ -77,14 +77,14 @@ function gatewayTokenConfig(config: OpenClawConfig): OpenClawConfig {
   };
 }
 
-function asConfig(value: unknown): OpenClawConfig {
-  return value as OpenClawConfig;
+function asConfig(value: unknown): SteelEngineConfig {
+  return value as SteelEngineConfig;
 }
 
-function buildSnapshot(config: OpenClawConfig): ConfigFileSnapshot {
+function buildSnapshot(config: SteelEngineConfig): ConfigFileSnapshot {
   const raw = `${JSON.stringify(config, null, 2)}\n`;
   return buildTestConfigSnapshot({
-    path: "/tmp/openclaw-startup-secrets-test.json",
+    path: "/tmp/steelengine-startup-secrets-test.json",
     exists: true,
     raw,
     parsed: config,
@@ -95,7 +95,7 @@ function buildSnapshot(config: OpenClawConfig): ConfigFileSnapshot {
   });
 }
 
-function preparedSnapshot(config: OpenClawConfig): PreparedSecretsRuntimeSnapshot {
+function preparedSnapshot(config: SteelEngineConfig): PreparedSecretsRuntimeSnapshot {
   return {
     sourceConfig: config,
     config,
@@ -117,7 +117,7 @@ function preparedSnapshot(config: OpenClawConfig): PreparedSecretsRuntimeSnapsho
 }
 
 function preparedSnapshotWithGatewayToken(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   token = RESOLVED_GATEWAY_TOKEN,
 ): PreparedSecretsRuntimeSnapshot {
   return {
@@ -177,7 +177,7 @@ function runtimeSecretsActivatorForTest(params: {
 function runtimeSecretsActivatorOptionsForTest() {
   return {
     logSecrets: mockLogSecretsForTest(),
-    emitStateEvent: vi.fn<(code: string, message: string, cfg: OpenClawConfig) => void>(),
+    emitStateEvent: vi.fn<(code: string, message: string, cfg: SteelEngineConfig) => void>(),
   };
 }
 
@@ -198,25 +198,25 @@ function readTimelineEvents(filePath: string): Array<Record<string, unknown>> {
 }
 
 function installDiagnosticsTimelineEnv() {
-  const root = mkdtempSync(path.join(tmpdir(), "openclaw-startup-secrets-timeline-"));
+  const root = mkdtempSync(path.join(tmpdir(), "steelengine-startup-secrets-timeline-"));
   const timelinePath = path.join(root, "timeline.jsonl");
-  const previousDiagnostics = process.env.OPENCLAW_DIAGNOSTICS;
-  const previousTimelinePath = process.env.OPENCLAW_DIAGNOSTICS_TIMELINE_PATH;
-  process.env.OPENCLAW_DIAGNOSTICS = "timeline";
-  process.env.OPENCLAW_DIAGNOSTICS_TIMELINE_PATH = timelinePath;
+  const previousDiagnostics = process.env.STEELENGINE_DIAGNOSTICS;
+  const previousTimelinePath = process.env.STEELENGINE_DIAGNOSTICS_TIMELINE_PATH;
+  process.env.STEELENGINE_DIAGNOSTICS = "timeline";
+  process.env.STEELENGINE_DIAGNOSTICS_TIMELINE_PATH = timelinePath;
 
   return {
     timelinePath,
     cleanup: () => {
       if (previousDiagnostics === undefined) {
-        delete process.env.OPENCLAW_DIAGNOSTICS;
+        delete process.env.STEELENGINE_DIAGNOSTICS;
       } else {
-        process.env.OPENCLAW_DIAGNOSTICS = previousDiagnostics;
+        process.env.STEELENGINE_DIAGNOSTICS = previousDiagnostics;
       }
       if (previousTimelinePath === undefined) {
-        delete process.env.OPENCLAW_DIAGNOSTICS_TIMELINE_PATH;
+        delete process.env.STEELENGINE_DIAGNOSTICS_TIMELINE_PATH;
       } else {
-        process.env.OPENCLAW_DIAGNOSTICS_TIMELINE_PATH = previousTimelinePath;
+        process.env.STEELENGINE_DIAGNOSTICS_TIMELINE_PATH = previousTimelinePath;
       }
       rmSync(root, { force: true, recursive: true });
     },
@@ -225,21 +225,21 @@ function installDiagnosticsTimelineEnv() {
 
 /** Isolate path-based auth store discovery so prior full-suite env cannot force slow path. */
 function installIsolatedStartupFastPathEnv() {
-  const root = mkdtempSync(path.join(tmpdir(), "openclaw-startup-fast-path-env-"));
+  const root = mkdtempSync(path.join(tmpdir(), "steelengine-startup-fast-path-env-"));
   const keys = [
-    "OPENCLAW_HOME",
-    "OPENCLAW_STATE_DIR",
-    "OPENCLAW_CONFIG_PATH",
-    "OPENCLAW_OAUTH_DIR",
+    "STEELENGINE_HOME",
+    "STEELENGINE_STATE_DIR",
+    "STEELENGINE_CONFIG_PATH",
+    "STEELENGINE_OAUTH_DIR",
   ] as const;
   const previous = new Map<(typeof keys)[number], string | undefined>();
   for (const key of keys) {
     previous.set(key, process.env[key]);
   }
-  process.env.OPENCLAW_HOME = path.join(root, "home");
-  process.env.OPENCLAW_STATE_DIR = path.join(root, "state");
-  process.env.OPENCLAW_CONFIG_PATH = path.join(root, "state", "openclaw.json");
-  process.env.OPENCLAW_OAUTH_DIR = path.join(root, "credentials");
+  process.env.STEELENGINE_HOME = path.join(root, "home");
+  process.env.STEELENGINE_STATE_DIR = path.join(root, "state");
+  process.env.STEELENGINE_CONFIG_PATH = path.join(root, "state", "steelengine.json");
+  process.env.STEELENGINE_OAUTH_DIR = path.join(root, "credentials");
 
   return {
     cleanup: () => {
@@ -284,13 +284,13 @@ function installGatewayStartupSecretsRuntimeMock(state: GatewayStartupSecretsRun
       preflightActiveSecretsRuntimeSnapshotRefresh: async ({
         sourceConfig,
       }: {
-        sourceConfig: OpenClawConfig;
+        sourceConfig: SteelEngineConfig;
       }) => await runtimeState.prepareRuntimeSecretsSnapshot({ config: sourceConfig }),
       refreshActiveSecretsRuntimeSnapshotForConfig: async ({
         sourceConfig,
         preflightResult,
       }: {
-        sourceConfig: OpenClawConfig;
+        sourceConfig: SteelEngineConfig;
         preflightResult?: unknown;
       }) => {
         const snapshot =
@@ -340,7 +340,7 @@ function createGatewayStartupSecretsRuntimeHarness(prefix: string) {
   };
 }
 
-async function activateImportedStartupConfig(config: OpenClawConfig) {
+async function activateImportedStartupConfig(config: SteelEngineConfig) {
   const { createRuntimeSecretsActivator: createActivator } =
     await import("./server-startup-config.js");
   return await createActivator(runtimeSecretsActivatorOptionsForTest())(
@@ -373,7 +373,7 @@ function expectBootstrapAuthResolvedGatewayToken(
 
 async function expectImportedStartupConfigUsesFullSecretsRuntime(
   harness: ReturnType<typeof createGatewayStartupSecretsRuntimeHarness>,
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
 ): Promise<void> {
   harness.install();
 
@@ -389,20 +389,20 @@ async function expectImportedStartupConfigUsesFullSecretsRuntime(
 }
 
 describe("gateway startup config secret preflight", () => {
-  const previousSkipChannels = process.env.OPENCLAW_SKIP_CHANNELS;
-  const previousSkipProviders = process.env.OPENCLAW_SKIP_PROVIDERS;
+  const previousSkipChannels = process.env.STEELENGINE_SKIP_CHANNELS;
+  const previousSkipProviders = process.env.STEELENGINE_SKIP_PROVIDERS;
 
   afterEach(() => {
     clearSecretsRuntimeSnapshot();
     if (previousSkipChannels === undefined) {
-      delete process.env.OPENCLAW_SKIP_CHANNELS;
+      delete process.env.STEELENGINE_SKIP_CHANNELS;
     } else {
-      process.env.OPENCLAW_SKIP_CHANNELS = previousSkipChannels;
+      process.env.STEELENGINE_SKIP_CHANNELS = previousSkipChannels;
     }
     if (previousSkipProviders === undefined) {
-      delete process.env.OPENCLAW_SKIP_PROVIDERS;
+      delete process.env.STEELENGINE_SKIP_PROVIDERS;
     } else {
-      process.env.OPENCLAW_SKIP_PROVIDERS = previousSkipProviders;
+      process.env.STEELENGINE_SKIP_PROVIDERS = previousSkipProviders;
     }
   });
 
@@ -438,7 +438,7 @@ describe("gateway startup config secret preflight", () => {
   });
 
   it("rejects a managed reload prepared before an OAuth credential mutation", async () => {
-    const agentDir = "/tmp/openclaw-managed-auth-store-cas";
+    const agentDir = "/tmp/steelengine-managed-auth-store-cas";
     const initial = preparedSnapshot(gatewayTokenConfig({}));
     const candidate: PreparedSecretsRuntimeSnapshot = {
       ...preparedSnapshotWithGatewayToken(initial.sourceConfig, "candidate-token"),
@@ -947,7 +947,7 @@ describe("gateway startup config secret preflight", () => {
   );
 
   it("prunes channel refs from startup secret preflight when channels are skipped", async () => {
-    process.env.OPENCLAW_SKIP_CHANNELS = "1";
+    process.env.STEELENGINE_SKIP_CHANNELS = "1";
     const prepareRuntimeSecretsSnapshot = vi.fn(async ({ config }) => preparedSnapshot(config));
     const activateRuntimeSecrets = runtimeSecretsActivatorForTest({
       prepareRuntimeSecretsSnapshot,
@@ -968,7 +968,7 @@ describe("gateway startup config secret preflight", () => {
     });
     expect(typeof result.config.gateway).toBe("object");
     const preflightInput = callArg<{
-      config?: OpenClawConfig;
+      config?: SteelEngineConfig;
       loadAuthStore?: unknown;
     }>(prepareRuntimeSecretsSnapshot);
     expect(preflightInput.config?.channels).toBeUndefined();
@@ -1005,7 +1005,7 @@ describe("gateway startup config secret preflight", () => {
     expect(result.auth.mode).toBe("password");
     expect(result.auth.password).toBe("override-password");
     const preflightInput = callArg<{
-      config?: OpenClawConfig;
+      config?: SteelEngineConfig;
       loadAuthStore?: unknown;
     }>(prepareRuntimeSecretsSnapshot);
     expect(preflightInput.config?.gateway?.auth?.mode).toBe("password");
@@ -1027,7 +1027,7 @@ describe("gateway startup config secret preflight", () => {
     expect(result.auth.token).toBe("startup-test-token");
     expect(prepareRuntimeSecretsSnapshot).toHaveBeenCalledTimes(1);
     const preflightInput = callArg<{
-      config?: OpenClawConfig;
+      config?: SteelEngineConfig;
       loadAuthStore?: unknown;
     }>(prepareRuntimeSecretsSnapshot);
     expect(preflightInput.config?.gateway?.auth?.token).toBe("startup-test-token");
@@ -1090,7 +1090,7 @@ describe("gateway startup config secret preflight", () => {
 
   it("activates no-SecretRef startup config without importing the full secrets runtime", async () => {
     vi.resetModules();
-    const agentDir = mkdtempSync(path.join(tmpdir(), "openclaw-startup-fast-path-"));
+    const agentDir = mkdtempSync(path.join(tmpdir(), "steelengine-startup-fast-path-"));
     const isolatedEnv = installIsolatedStartupFastPathEnv();
     const runtimeImport = vi.fn();
     const prepareRuntimeSecretsSnapshot = vi.fn(async ({ config }) => preparedSnapshot(config));
@@ -1135,13 +1135,13 @@ describe("gateway startup config secret preflight", () => {
         preflightActiveSecretsRuntimeSnapshotRefresh: async ({
           sourceConfig,
         }: {
-          sourceConfig: OpenClawConfig;
+          sourceConfig: SteelEngineConfig;
         }) => await state.prepareRuntimeSecretsSnapshot({ config: sourceConfig }),
         refreshActiveSecretsRuntimeSnapshotForConfig: async ({
           sourceConfig,
           preflightResult,
         }: {
-          sourceConfig: OpenClawConfig;
+          sourceConfig: SteelEngineConfig;
           preflightResult?: unknown;
         }) => {
           const snapshot =
@@ -1210,7 +1210,7 @@ describe("gateway startup config secret preflight", () => {
   });
 
   it("retries a stale startup fast-path preflight against the newer runtime context", async () => {
-    const agentDir = autoCleanupTempDirs.make("openclaw-startup-fast-path-cas-");
+    const agentDir = autoCleanupTempDirs.make("steelengine-startup-fast-path-cas-");
     let clearImportedSecretsRuntimeSnapshot: (() => void) | undefined;
     const config = (port: number) =>
       gatewayTokenConfig(
@@ -1275,7 +1275,7 @@ describe("gateway startup config secret preflight", () => {
   });
 
   it("grafts live auth stores onto one-shot config-write snapshots", async () => {
-    const agentDir = "/tmp/openclaw-managed-write-auth-store";
+    const agentDir = "/tmp/steelengine-managed-write-auth-store";
     const credential = {
       type: "api_key" as const,
       provider: "openai",
@@ -1303,7 +1303,7 @@ describe("gateway startup config secret preflight", () => {
       },
       refreshHandler: null,
     });
-    const prepareRuntimeSecretsSnapshot = vi.fn(async (params: { config: OpenClawConfig }) =>
+    const prepareRuntimeSecretsSnapshot = vi.fn(async (params: { config: SteelEngineConfig }) =>
       preparedSnapshot(params.config),
     );
     const activateRuntimeSecrets = runtimeSecretsActivatorForTest({
@@ -1331,7 +1331,7 @@ describe("gateway startup config secret preflight", () => {
   });
 
   it("keeps the full secrets runtime path when startup config has a SecretRef", async () => {
-    const harness = createGatewayStartupSecretsRuntimeHarness("openclaw-startup-secret-ref-");
+    const harness = createGatewayStartupSecretsRuntimeHarness("steelengine-startup-secret-ref-");
     await expectImportedStartupConfigUsesFullSecretsRuntime(
       harness,
       asConfig({
@@ -1351,7 +1351,7 @@ describe("gateway startup config secret preflight", () => {
   });
 
   it("keeps the full secrets runtime path when auth profile files are present", async () => {
-    const harness = createGatewayStartupSecretsRuntimeHarness("openclaw-startup-auth-store-");
+    const harness = createGatewayStartupSecretsRuntimeHarness("steelengine-startup-auth-store-");
     writeFileSync(
       path.join(harness.agentDir, "auth-profiles.json"),
       `${JSON.stringify({

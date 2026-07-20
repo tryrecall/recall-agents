@@ -1,7 +1,7 @@
-type OpenClawCodingToolsFactory =
-  (typeof import("openclaw/plugin-sdk/agent-harness"))["createOpenClawCodingTools"];
+type SteelEngineCodingToolsFactory =
+  (typeof import("steelengine/plugin-sdk/agent-harness"))["createSteelEngineCodingTools"];
 
 /** Mutable dependency seam shared by dynamic-tool construction and its behavioral tests. */
 export const dynamicToolBuildState: {
-  openClawCodingToolsFactory?: OpenClawCodingToolsFactory;
+  steelEngineCodingToolsFactory?: SteelEngineCodingToolsFactory;
 } = {};

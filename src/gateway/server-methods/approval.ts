@@ -1,5 +1,5 @@
 // Unified operator approval lookup and first-answer resolution handlers.
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import {
   ErrorCodes,
   errorShape,
@@ -20,7 +20,7 @@ import type {
 } from "../../infra/exec-approvals.js";
 import type { PluginApprovalRequestPayload } from "../../infra/plugin-approvals.js";
 import type { SystemAgentApprovalRequestPayload } from "../../infra/system-agent-approvals.js";
-import type { OpenClawStateDatabaseOptions } from "../../state/openclaw-state-db.js";
+import type { SteelEngineStateDatabaseOptions } from "../../state/steelengine-state-db.js";
 import { normalizeControlUiBasePath } from "../control-ui-shared.js";
 import type { ExecApprovalManager, ExecApprovalRecord } from "../exec-approval-manager.js";
 import {
@@ -55,7 +55,7 @@ type CreateApprovalHandlersParams = {
   forwarder?: ExecApprovalForwarder;
   iosPushDelivery?: ExecApprovalIosPushDelivery;
   pluginIosPushDelivery?: PluginApprovalIosPushDelivery;
-  databaseOptions?: OpenClawStateDatabaseOptions;
+  databaseOptions?: SteelEngineStateDatabaseOptions;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -168,7 +168,7 @@ function loadVisibleApproval(params: {
   execApprovalManager: ExecApprovalManager;
   pluginApprovalManager: ExecApprovalManager<PluginApprovalRequestPayload>;
   systemAgentApprovalManager?: ExecApprovalManager<SystemAgentApprovalRequestPayload>;
-  databaseOptions?: OpenClawStateDatabaseOptions;
+  databaseOptions?: SteelEngineStateDatabaseOptions;
 }): OperatorApprovalRecord | null {
   // Reconciliation can settle a live waiter, so authorization must precede
   // every durable read and no unauthorized lookup may reach the bridge.

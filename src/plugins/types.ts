@@ -80,16 +80,16 @@ export type {
   ProviderThinkingProfile,
 } from "./provider-thinking.types.js";
 export type {
-  OpenClawPluginActiveModelContext,
-  OpenClawPluginHookOptions,
-  OpenClawPluginToolContext,
-  OpenClawPluginToolFactory,
-  OpenClawPluginToolOptions,
+  SteelEnginePluginActiveModelContext,
+  SteelEnginePluginHookOptions,
+  SteelEnginePluginToolContext,
+  SteelEnginePluginToolFactory,
+  SteelEnginePluginToolOptions,
 } from "./tool-types.js";
 export type {
-  OpenClawPluginNodeHostCommand,
-  OpenClawPluginNodeHostCommandAvailabilityContext,
-  OpenClawPluginNodeHostCommandIo,
+  SteelEnginePluginNodeHostCommand,
+  SteelEnginePluginNodeHostCommandAvailabilityContext,
+  SteelEnginePluginNodeHostCommandIo,
 } from "./types.node-host.js";
 export type {
   PluginWebFetchProviderEntry,
@@ -145,26 +145,26 @@ export type {
   MigrationProviderPlugin,
   MigrationSummary,
 } from "./migration-provider.types.js";
-export type { OpenClawPluginApi } from "./plugin-api.types.js";
+export type { SteelEnginePluginApi } from "./plugin-api.types.js";
 export type {
   AgentPromptGuidance,
   AgentPromptGuidanceEntry,
   AgentPromptSurfaceKind,
-  OpenClawPluginCommandDefinition,
+  SteelEnginePluginCommandDefinition,
   PluginCommandContext,
   PluginCommandResult,
 } from "./plugin-command.types.js";
-export type { OpenClawPluginConfigSchema } from "./plugin-config-schema.types.js";
-export type { OpenClawPluginDefinition } from "./plugin-definition.types.js";
+export type { SteelEnginePluginConfigSchema } from "./plugin-config-schema.types.js";
+export type { SteelEnginePluginDefinition } from "./plugin-definition.types.js";
 export type {
-  OpenClawGatewayDiscoveryService,
-  OpenClawPluginNodeInvokePolicy,
-  OpenClawPluginNodeInvokePolicyContext,
-  OpenClawPluginNodeInvokePolicyResult,
-  OpenClawPluginReloadRegistration,
-  OpenClawPluginSecurityAuditCollector,
-  OpenClawPluginService,
-  OpenClawPluginServiceContext,
+  SteelEngineGatewayDiscoveryService,
+  SteelEnginePluginNodeInvokePolicy,
+  SteelEnginePluginNodeInvokePolicyContext,
+  SteelEnginePluginNodeInvokePolicyResult,
+  SteelEnginePluginReloadRegistration,
+  SteelEnginePluginSecurityAuditCollector,
+  SteelEnginePluginService,
+  SteelEnginePluginServiceContext,
 } from "./plugin-registration.types.js";
 export type {
   ProviderAuthContext,
@@ -222,9 +222,9 @@ export type {
   ProviderWrapStreamFnContext,
 } from "./provider-transport.types.js";
 export type {
-  OpenClawGatewayDiscoveryAdvertiseContext,
-  OpenClawPluginHttpRouteHandler,
-  OpenClawPluginSecurityAuditContext,
+  SteelEngineGatewayDiscoveryAdvertiseContext,
+  SteelEnginePluginHttpRouteHandler,
+  SteelEnginePluginSecurityAuditContext,
 } from "./plugin-registration.types.js";
 export type { ProviderUsageAuthToken } from "./provider-runtime.types.js";
 export type { WorkerSshIdentityRequest } from "./capability-provider.types.js";
@@ -235,13 +235,13 @@ export type {
   VideoGenerationProviderPlugin,
 } from "./capability-provider.types.js";
 export type {
-  OpenClawPluginCliCommandDescriptor,
-  OpenClawPluginCliRegistrar,
-  OpenClawPluginGatewayRuntimeScopeSurface,
-  OpenClawPluginHostedMediaResolver,
-  OpenClawPluginHttpRouteAuth,
-  OpenClawPluginHttpRouteMatch,
-  OpenClawPluginHttpRouteUpgradeHandler,
+  SteelEnginePluginCliCommandDescriptor,
+  SteelEnginePluginCliRegistrar,
+  SteelEnginePluginGatewayRuntimeScopeSurface,
+  SteelEnginePluginHostedMediaResolver,
+  SteelEnginePluginHttpRouteAuth,
+  SteelEnginePluginHttpRouteMatch,
+  SteelEnginePluginHttpRouteUpgradeHandler,
   PluginInteractiveHandlerRegistration,
   PluginRegistrationMode,
 } from "./plugin-registration.types.js";

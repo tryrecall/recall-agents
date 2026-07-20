@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import {
   buildTuiLastSessionScopeKey,
   clearTuiLastSessionPointers,
@@ -15,13 +15,13 @@ import {
 const tempDirs: string[] = [];
 
 async function makeTempStateDir() {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-tui-last-session-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-tui-last-session-"));
   tempDirs.push(dir);
   return dir;
 }
 
 afterEach(async () => {
-  closeOpenClawStateDatabaseForTest();
+  closeSteelEngineStateDatabaseForTest();
   await Promise.all(tempDirs.splice(0).map((dir) => fs.rm(dir, { recursive: true, force: true })));
 });
 
@@ -45,7 +45,7 @@ describe("tui last session state", () => {
       code: "ENOENT",
     });
 
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     await expect(readTuiLastSessionKey({ scopeKey, stateDir })).resolves.toBe("agent:main:tui-123");
   });
 

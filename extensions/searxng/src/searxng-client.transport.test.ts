@@ -41,9 +41,9 @@ describe("searxng real transport", () => {
         JSON.stringify({
           results: [
             {
-              title: "OpenClaw",
-              url: "https://docs.openclaw.ai/",
-              content: "OpenClaw documentation",
+              title: "SteelEngine",
+              url: "https://docs.steelengine.ai/",
+              content: "SteelEngine documentation",
             },
           ],
         }),
@@ -54,13 +54,13 @@ describe("searxng real transport", () => {
     await expect(
       runSearxngSearch({
         baseUrl,
-        query: "openclaw",
+        query: "steelengine",
         categories: "general",
       }),
     ).resolves.toMatchObject({
       provider: "searxng",
       count: 1,
-      results: [{ url: "https://docs.openclaw.ai/" }],
+      results: [{ url: "https://docs.steelengine.ai/" }],
     });
   });
 

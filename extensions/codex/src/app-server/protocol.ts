@@ -98,7 +98,7 @@ export type CodexDynamicToolFunctionSpec = JsonObject & {
 type CodexDynamicToolNamespaceTool = CodexDynamicToolFunctionSpec;
 
 /** Namespace Codex keeps directly model-visible without exposing it to Code Mode guests. */
-export const CODEX_OPENCLAW_DIRECT_DYNAMIC_TOOL_NAMESPACE = "openclaw_direct";
+export const CODEX_STEELENGINE_DIRECT_DYNAMIC_TOOL_NAMESPACE = "steelengine_direct";
 
 type CodexDynamicToolNamespaceSpec = JsonObject & {
   type: "namespace";

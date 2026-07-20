@@ -1,15 +1,15 @@
 import { setTimeout as sleep } from "node:timers/promises";
 // Qa Lab plugin module owns Telegram live adapter API and credential behavior.
-import type { TelegramBotMessage, TelegramBotUpdate } from "@openclaw/telegram/api.js";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import type { TelegramBotMessage, TelegramBotUpdate } from "@steelengine/telegram/api.js";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 import {
   parseStrictPositiveInteger,
   resolveTimerTimeoutMs,
-} from "openclaw/plugin-sdk/number-runtime";
-import { readProviderJsonResponse } from "openclaw/plugin-sdk/provider-http";
-import { fetchWithSsrFGuard } from "openclaw/plugin-sdk/ssrf-runtime";
-import { isRecord, uniqueStrings } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/number-runtime";
+import { readProviderJsonResponse } from "steelengine/plugin-sdk/provider-http";
+import { fetchWithSsrFGuard } from "steelengine/plugin-sdk/ssrf-runtime";
+import { isRecord, uniqueStrings } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { z } from "zod";
 
 export type TelegramQaRuntimeEnv = {
@@ -92,9 +92,9 @@ type TelegramGatewayClient = {
 
 const TELEGRAM_QA_DEFAULT_READY_TIMEOUT_MS = 45_000;
 const TELEGRAM_QA_ENV_FIELDS = [
-  { field: "groupId", envKey: "OPENCLAW_QA_TELEGRAM_GROUP_ID" },
-  { field: "driverToken", envKey: "OPENCLAW_QA_TELEGRAM_DRIVER_BOT_TOKEN" },
-  { field: "sutToken", envKey: "OPENCLAW_QA_TELEGRAM_SUT_BOT_TOKEN" },
+  { field: "groupId", envKey: "STEELENGINE_QA_TELEGRAM_GROUP_ID" },
+  { field: "driverToken", envKey: "STEELENGINE_QA_TELEGRAM_DRIVER_BOT_TOKEN" },
+  { field: "sutToken", envKey: "STEELENGINE_QA_TELEGRAM_SUT_BOT_TOKEN" },
 ] as const;
 
 const telegramQaCredentialPayloadSchema = z.object({
@@ -251,14 +251,14 @@ export function normalizeTelegramObservedMessage(
 }
 
 export function buildTelegramQaConfig(
-  baseCfg: OpenClawConfig,
+  baseCfg: SteelEngineConfig,
   params: {
     groupId: string;
     sutToken: string;
     driverBotId: number;
     sutAccountId: string;
   },
-): OpenClawConfig {
+): SteelEngineConfig {
   return {
     ...baseCfg,
     agents: {
@@ -269,7 +269,7 @@ export function buildTelegramQaConfig(
           ...baseCfg.agents?.defaults?.models,
           "openai/gpt-5.6-luna": {
             ...baseCfg.agents?.defaults?.models?.["openai/gpt-5.6-luna"],
-            agentRuntime: { id: "openclaw" },
+            agentRuntime: { id: "steelengine" },
           },
         },
         skipBootstrap: true,
@@ -388,7 +388,7 @@ export async function flushTelegramUpdates(token: string) {
 }
 
 function resolveTelegramQaReadyTimeoutMs(env: NodeJS.ProcessEnv = process.env) {
-  const raw = env.OPENCLAW_QA_TRANSPORT_READY_TIMEOUT_MS;
+  const raw = env.STEELENGINE_QA_TRANSPORT_READY_TIMEOUT_MS;
   return raw
     ? (parseStrictPositiveInteger(raw) ?? TELEGRAM_QA_DEFAULT_READY_TIMEOUT_MS)
     : TELEGRAM_QA_DEFAULT_READY_TIMEOUT_MS;

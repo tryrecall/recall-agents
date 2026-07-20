@@ -6,13 +6,13 @@ import {
   listMissingRequiredPlatformPackages,
   readManagedNpmRootInstalledDependency,
   readManagedNpmRootPeerDependencySnapshot,
-  readOpenClawManagedNpmRootOverrides,
-  repairManagedNpmRootOpenClawPeer,
+  readSteelEngineManagedNpmRootOverrides,
+  repairManagedNpmRootSteelEnginePeer,
   syncManagedNpmRootPeerDependencies,
   upsertManagedNpmRootDependency,
   type ManagedNpmRootInstalledDependency,
 } from "../infra/npm-managed-root.js";
-import { installedPackageNeedsOpenClawPeerLinkRepair } from "../infra/package-update-utils.js";
+import { installedPackageNeedsSteelEnginePeerLinkRepair } from "../infra/package-update-utils.js";
 import {
   createSafeNpmInstallArgs,
   createSafeNpmInstallEnv,
@@ -52,7 +52,7 @@ import {
 import {
   defaultLogger,
   ensureInstallTargetAvailableForMode,
-  formatUnresolvedOpenClawPeerLinkError,
+  formatUnresolvedSteelEnginePeerLinkError,
   loadPluginInstallRuntime,
   readOptionalPackageManifest,
   resolveEffectiveInstallMode,
@@ -65,7 +65,7 @@ import type {
   PluginInstallPolicyRequest,
 } from "./install-types.js";
 import { hasRetainedManagedNpmInstallMarker } from "./managed-npm-retention.js";
-import { relinkOpenClawPeerDependenciesInManagedNpmRoot } from "./plugin-peer-link.js";
+import { relinkSteelEnginePeerDependenciesInManagedNpmRoot } from "./plugin-peer-link.js";
 
 export async function installPluginFromManagedNpmRoot(
   params: InstallSafetyOverrides & {
@@ -191,17 +191,17 @@ export async function installPluginFromManagedNpmRoot(
     prepared: ManagedNpmRootPreparedDependency,
   ): Promise<InstallPluginResult> => {
     logger.info?.(`Installing ${params.displaySpec} into ${npmRoot}…`);
-    if (params.packageName !== "openclaw") {
-      const repairedOpenClawPeer = await repairManagedNpmRootOpenClawPeer({
+    if (params.packageName !== "steelengine") {
+      const repairedSteelEnginePeer = await repairManagedNpmRootSteelEnginePeer({
         npmRoot,
         timeoutMs,
         logger,
       });
-      if (repairedOpenClawPeer) {
-        logger.info?.(`Repaired stale openclaw peer dependency in ${npmRoot}`);
+      if (repairedSteelEnginePeer) {
+        logger.info?.(`Repaired stale steelengine peer dependency in ${npmRoot}`);
       }
     }
-    const managedOverrides = await readOpenClawManagedNpmRootOverrides();
+    const managedOverrides = await readSteelEngineManagedNpmRootOverrides();
     rollbackPeerDependencySnapshot ??= await readManagedNpmRootPeerDependencySnapshot({ npmRoot });
     const rollbackFailedManagedNpmInstall = async (
       failure: Extract<InstallPluginResult, { ok: false }>,
@@ -233,7 +233,7 @@ export async function installPluginFromManagedNpmRoot(
       } catch (error) {
         return await rollbackFailedManagedNpmInstall({
           ok: false,
-          error: `${cause.error}, but OpenClaw could not quarantine ${npmRoot} for rebuild: ${String(error)}`,
+          error: `${cause.error}, but SteelEngine could not quarantine ${npmRoot} for rebuild: ${String(error)}`,
         });
       }
       logger.warn?.(
@@ -415,7 +415,7 @@ export async function installPluginFromManagedNpmRoot(
       );
       let freshCacheDir: string | undefined;
       try {
-        freshCacheDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-npm-cache-"));
+        freshCacheDir = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-npm-cache-"));
         install = await runCommandWithTimeout(npmInstallArgs, {
           ...npmInstallOptions,
           env: {
@@ -465,31 +465,31 @@ export async function installPluginFromManagedNpmRoot(
         });
       }
     }
-    if (params.packageName !== "openclaw") {
-      const repairedOpenClawPeer = await repairManagedNpmRootOpenClawPeer({
+    if (params.packageName !== "steelengine") {
+      const repairedSteelEnginePeer = await repairManagedNpmRootSteelEnginePeer({
         npmRoot,
         timeoutMs,
         logger,
       });
-      if (repairedOpenClawPeer) {
-        logger.info?.(`Repaired stale openclaw peer dependency in ${npmRoot} after npm install`);
+      if (repairedSteelEnginePeer) {
+        logger.info?.(`Repaired stale steelengine peer dependency in ${npmRoot} after npm install`);
       }
     }
     try {
-      await relinkOpenClawPeerDependenciesInManagedNpmRoot({
+      await relinkSteelEnginePeerDependenciesInManagedNpmRoot({
         npmRoot,
         logger,
       });
     } catch (error) {
       return await rollbackFailedManagedNpmInstall({
         ok: false,
-        error: `Failed to repair openclaw peer links after npm install: ${String(error)}`,
+        error: `Failed to repair steelengine peer links after npm install: ${String(error)}`,
       });
     }
-    if (installedPackageNeedsOpenClawPeerLinkRepair(installRoot)) {
+    if (installedPackageNeedsSteelEnginePeerLinkRepair(installRoot)) {
       return await rollbackFailedManagedNpmInstall({
         ok: false,
-        error: formatUnresolvedOpenClawPeerLinkError(params.packageName),
+        error: formatUnresolvedSteelEnginePeerLinkError(params.packageName),
       });
     }
 

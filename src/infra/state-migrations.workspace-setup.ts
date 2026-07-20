@@ -16,7 +16,7 @@ import {
 } from "../agents/workspace-legacy-state.js";
 import { resolveWorkspaceStateIdentity } from "../agents/workspace-state-store.js";
 import { resolveLegacyStateDirs } from "../config/paths.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { formatErrorMessage } from "./errors.js";
 import { acquireGatewayLock, GatewayLockError } from "./gateway-lock.js";
 import type { MigrationMessages } from "./state-migrations.types.js";
@@ -235,7 +235,7 @@ function listOrphanAttestationSources(params: {
 
 /** Detect retired workspace files only when an explicit Doctor flow opts in. */
 export function detectLegacyWorkspaceState(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   stateDir: string;
   env?: NodeJS.ProcessEnv;
   homedir?: () => string;
@@ -244,7 +244,7 @@ export function detectLegacyWorkspaceState(params: {
   if (params.doctorOnlyStateMigrations !== true) {
     return { sources: [], hasLegacy: false };
   }
-  const env = { ...(params.env ?? process.env), OPENCLAW_STATE_DIR: params.stateDir };
+  const env = { ...(params.env ?? process.env), STEELENGINE_STATE_DIR: params.stateDir };
   const homedir = params.homedir ?? os.homedir;
   const byPath = new Map<string, LegacyWorkspaceStateSource>();
   const add = (source: LegacyWorkspaceStateSource) => {
@@ -651,7 +651,7 @@ export async function migrateLegacyWorkspaceState(params: {
   if (!params.detected?.hasLegacy) {
     return { changes: [], warnings: [] };
   }
-  const env = { ...(params.env ?? process.env), OPENCLAW_STATE_DIR: params.stateDir };
+  const env = { ...(params.env ?? process.env), STEELENGINE_STATE_DIR: params.stateDir };
   let lock: Awaited<ReturnType<typeof acquireGatewayLock>>;
   try {
     lock = await acquireGatewayLock({
@@ -669,7 +669,7 @@ export async function migrateLegacyWorkspaceState(params: {
     return {
       changes: [],
       warnings: [
-        `Failed migrating legacy workspace state: ${detail}. Stop the Gateway and run \`openclaw doctor --fix\` again.`,
+        `Failed migrating legacy workspace state: ${detail}. Stop the Gateway and run \`steelengine doctor --fix\` again.`,
       ],
     };
   }

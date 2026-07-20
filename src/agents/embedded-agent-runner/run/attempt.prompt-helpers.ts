@@ -1,8 +1,8 @@
-import { prependSystemPromptAdditionAfterCacheBoundary } from "@openclaw/ai/internal/shared";
+import { prependSystemPromptAdditionAfterCacheBoundary } from "@steelengine/ai/internal/shared";
 /**
  * Builds and repairs prompt inputs for embedded-agent attempts.
  */
-import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../../config/types.steelengine.js";
 import type {
   ContextEnginePromptCacheInfo,
   ContextEngineRuntimeContext,
@@ -105,7 +105,7 @@ export function forgetPromptBuildDrainCacheForRun(runId: string | undefined): vo
  * session-store reads do not lose plugin context after a failed first attempt.
  */
 export async function resolvePromptBuildHookResult(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   prompt: string;
   messages: unknown[];
   hookCtx: PluginHookAgentContext;
@@ -244,7 +244,7 @@ export function resolvePromptModeForSession(sessionKey?: string): "minimal" | "f
  * keep their normal prompt shape.
  */
 export function shouldInjectHeartbeatPrompt(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   agentId?: string;
   defaultAgentId?: string;
   isDefaultAgent: boolean;
@@ -498,7 +498,7 @@ export function mergeOrphanedTrailingUserPrompt(params: {
 }
 
 export function resolveAttemptFsWorkspaceOnly(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   sessionAgentId: string;
 }): boolean {
   return resolveEffectiveToolFsWorkspaceOnly({

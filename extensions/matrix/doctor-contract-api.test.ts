@@ -3,16 +3,16 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import type {
   OpenKeyedStoreOptions,
   PluginStateKeyedStore,
-} from "openclaw/plugin-sdk/plugin-state-runtime";
+} from "steelengine/plugin-sdk/plugin-state-runtime";
 import {
   createPluginStateKeyedStoreForTests,
   resetPluginStateStoreForTests,
-} from "openclaw/plugin-sdk/plugin-state-test-runtime";
-import type { PluginDoctorStateMigrationContext } from "openclaw/plugin-sdk/runtime-doctor";
+} from "steelengine/plugin-sdk/plugin-state-test-runtime";
+import type { PluginDoctorStateMigrationContext } from "steelengine/plugin-sdk/runtime-doctor";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { stateMigrations } from "./doctor-contract-api.js";
 import { SqliteBackedMatrixSyncStore } from "./src/matrix/client/file-sync-store.js";
@@ -47,8 +47,8 @@ function createContext(): PluginDoctorStateMigrationContext {
 
 function createMigrationParams(stateDir: string) {
   return {
-    config: {} as OpenClawConfig,
-    env: { OPENCLAW_STATE_DIR: stateDir },
+    config: {} as SteelEngineConfig,
+    env: { STEELENGINE_STATE_DIR: stateDir },
     stateDir,
     oauthDir: path.join(stateDir, "oauth"),
     context: createContext(),
@@ -79,7 +79,7 @@ describe("matrix doctor contract state migrations", () => {
   });
 
   it("imports account credentials into SQLite before archiving the JSON", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-matrix-doctor-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-matrix-doctor-"));
     tempDirs.push(stateDir);
     const credentialsDir = path.join(stateDir, "credentials", "matrix");
     const filePath = path.join(credentialsDir, "credentials-ops.json");
@@ -119,7 +119,7 @@ describe("matrix doctor contract state migrations", () => {
   });
 
   it("archives legacy credentials without restoring an explicitly cleared account", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-matrix-doctor-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-matrix-doctor-"));
     tempDirs.push(stateDir);
     const credentialsDir = path.join(stateDir, "credentials", "matrix");
     const filePath = path.join(credentialsDir, "credentials-ops.json");
@@ -158,7 +158,7 @@ describe("matrix doctor contract state migrations", () => {
   });
 
   it("migrates legacy sync cache JSON to SQLite plugin state", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-matrix-doctor-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-matrix-doctor-"));
     tempDirs.push(stateDir);
     const storageRootDir = path.join(
       stateDir,
@@ -252,7 +252,7 @@ describe("matrix doctor contract state migrations", () => {
   });
 
   it("migrates Matrix storage metadata JSON to SQLite plugin state", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-matrix-doctor-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-matrix-doctor-"));
     tempDirs.push(stateDir);
     const storageRootDir = path.join(
       stateDir,
@@ -300,7 +300,7 @@ describe("matrix doctor contract state migrations", () => {
   });
 
   it("does not archive the legacy flat sync cache into an unread SQLite root", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-matrix-doctor-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-matrix-doctor-"));
     tempDirs.push(stateDir);
     const flatRoot = path.join(stateDir, "matrix");
     fs.mkdirSync(flatRoot, { recursive: true });
@@ -323,7 +323,7 @@ describe("matrix doctor contract state migrations", () => {
   });
 
   it("migrates Matrix recovery-key JSON to SQLite plugin state", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-matrix-doctor-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-matrix-doctor-"));
     tempDirs.push(stateDir);
     const storageRootDir = path.join(
       stateDir,
@@ -365,7 +365,7 @@ describe("matrix doctor contract state migrations", () => {
   });
 
   it("migrates Matrix IndexedDB snapshot JSON to SQLite plugin state", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-matrix-doctor-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-matrix-doctor-"));
     tempDirs.push(stateDir);
     const storageRootDir = path.join(
       stateDir,
@@ -378,7 +378,7 @@ describe("matrix doctor contract state migrations", () => {
     fs.mkdirSync(storageRootDir, { recursive: true });
     const snapshot = [
       {
-        name: "openclaw-matrix::matrix-sdk-crypto",
+        name: "steelengine-matrix::matrix-sdk-crypto",
         version: 1,
         stores: [
           {
@@ -414,7 +414,7 @@ describe("matrix doctor contract state migrations", () => {
   });
 
   it("migrates Matrix legacy crypto migration JSON to SQLite plugin state", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-matrix-doctor-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-matrix-doctor-"));
     tempDirs.push(stateDir);
     const storageRootDir = path.join(
       stateDir,
@@ -459,7 +459,7 @@ describe("matrix doctor contract state migrations", () => {
   });
 
   it("migrates legacy inbound dedupe markers into the claimable dedupe store", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-matrix-doctor-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-matrix-doctor-"));
     tempDirs.push(stateDir);
     const sqliteRoot = path.join(
       stateDir,
@@ -498,7 +498,7 @@ describe("matrix doctor contract state migrations", () => {
     }>("matrix", {
       namespace: "inbound-dedupe",
       maxEntries: 20_000,
-      env: { OPENCLAW_STATE_DIR: sqliteRoot },
+      env: { STEELENGINE_STATE_DIR: sqliteRoot },
     });
     await legacyStore.register(legacyKey("ops", "$committed"), {
       roomId,
@@ -515,7 +515,7 @@ describe("matrix doctor contract state migrations", () => {
       {
         namespace: "inbound-dedupe-migrations",
         maxEntries: 1_000,
-        env: { OPENCLAW_STATE_DIR: sqliteRoot },
+        env: { STEELENGINE_STATE_DIR: sqliteRoot },
       },
     );
     await legacyMarkersStore.register("ops:legacy-json-marker", { importedAt: now });
@@ -551,7 +551,7 @@ describe("matrix doctor contract state migrations", () => {
     });
 
     // Pre-upgrade markers must keep deduping through the new runtime guard.
-    const dedupeEnv = { ...process.env, OPENCLAW_STATE_DIR: stateDir };
+    const dedupeEnv = { ...process.env, STEELENGINE_STATE_DIR: stateDir };
     const opsDeduper = createMatrixInboundEventDeduper({
       auth: { accountId: "ops" },
       env: dedupeEnv,
@@ -581,7 +581,7 @@ describe("matrix doctor contract state migrations", () => {
   });
 
   it("archives malformed inbound dedupe JSON without importing it", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-matrix-doctor-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-matrix-doctor-"));
     tempDirs.push(stateDir);
     const jsonRoot = path.join(
       stateDir,
@@ -610,9 +610,9 @@ describe("matrix doctor contract state migrations", () => {
   });
 
   it("keeps newer runtime dedupe rows when legacy imports hit capacity", async () => {
-    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-matrix-doctor-"));
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-matrix-doctor-"));
     tempDirs.push(stateDir);
-    const io = { context: createContext(), env: { OPENCLAW_STATE_DIR: stateDir } };
+    const io = { context: createContext(), env: { STEELENGINE_STATE_DIR: stateDir } };
     const roomId = "!room:example.org";
     const now = Date.now();
     // Simulate the row the upgraded runtime already committed post-upgrade.

@@ -3,13 +3,13 @@
  * follow plugin ownership aliases so scoped live runs include equivalent
  * provider IDs.
  */
-import { normalizeProviderId } from "@openclaw/model-catalog-core/provider-id";
-import { normalizeGooglePreviewModelId } from "@openclaw/model-catalog-core/provider-model-id-normalize";
+import { normalizeProviderId } from "@steelengine/model-catalog-core/provider-id";
+import { normalizeGooglePreviewModelId } from "@steelengine/model-catalog-core/provider-model-id-normalize";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
-} from "@openclaw/normalization-core/string-coerce";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+} from "@steelengine/normalization-core/string-coerce";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { liveProvidersShareOwningPlugin } from "./live-provider-owner.js";
 
 type ModelTarget = {
@@ -72,7 +72,7 @@ function parseModelTarget(raw: string): ModelTarget | null {
 export function createLiveTargetMatcher(params: {
   providerFilter: Set<string> | null;
   modelFilter: Set<string> | null;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }) {

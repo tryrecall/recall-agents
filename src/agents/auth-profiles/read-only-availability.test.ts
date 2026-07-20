@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import { resolveStoredCredentialReadOnlyAvailability } from "./read-only-availability.js";
 
 const cfg = {
@@ -8,7 +8,7 @@ const cfg = {
       vault: { source: "env" },
     },
   },
-} satisfies OpenClawConfig;
+} satisfies SteelEngineConfig;
 
 describe("resolveStoredCredentialReadOnlyAvailability", () => {
   it("prefers explicit secret refs over retained inline values", () => {

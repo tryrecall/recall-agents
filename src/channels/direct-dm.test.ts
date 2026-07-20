@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { dispatchInboundDirectDm } from "./direct-dm.js";
 
 const mocks = vi.hoisted(() => ({
@@ -37,7 +37,7 @@ vi.mock("./turn/kernel.js", () => ({
 describe("dispatchInboundDirectDm", () => {
   it("forwards the canonical model-selection reply pipeline", async () => {
     await dispatchInboundDirectDm({
-      cfg: {} as OpenClawConfig,
+      cfg: {} as SteelEngineConfig,
       channel: "nostr",
       channelLabel: "Nostr",
       accountId: "account-1",

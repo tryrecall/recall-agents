@@ -1,5 +1,5 @@
 // Msteams tests cover channel.actions plugin behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { msteamsPlugin } from "./channel.js";
 
@@ -582,7 +582,7 @@ describe("msteamsPlugin message actions", () => {
               tenantId: "tenant-id",
             },
           },
-        } as OpenClawConfig,
+        } as SteelEngineConfig,
       })?.actions,
     ).toContain("upload-file");
   });
@@ -976,7 +976,7 @@ describe("msteamsPlugin message actions", () => {
             tenantId: "tenant-id",
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
     const schema = discovery?.schema;
     if (!schema) {
@@ -1360,7 +1360,7 @@ describe("msteamsPlugin.threading.buildToolContext", () => {
       throw new Error("msteams threading.buildToolContext unavailable");
     }
     return build({
-      cfg: {} as OpenClawConfig,
+      cfg: {} as SteelEngineConfig,
       accountId: undefined,
       context,
     });

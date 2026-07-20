@@ -3,12 +3,12 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { root, type Root } from "@openclaw/fs-safe";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
-import type { DB as OpenClawStateKyselyDatabase } from "../state/openclaw-state-db.generated.js";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
+import type { DB as SteelEngineStateKyselyDatabase } from "../state/steelengine-state-db.generated.js";
 import {
-  openOpenClawStateDatabase,
-  runOpenClawStateWriteTransaction,
-} from "../state/openclaw-state-db.js";
+  openSteelEngineStateDatabase,
+  runSteelEngineStateWriteTransaction,
+} from "../state/steelengine-state-db.js";
 import { formatErrorMessage } from "./errors.js";
 import { acquireGatewayLock, GatewayLockError } from "./gateway-lock.js";
 import {
@@ -59,7 +59,7 @@ const RELAY_REGISTRATION_KEYS = new Set([
 ]);
 
 type ApnsMigrationDatabase = Pick<
-  OpenClawStateKyselyDatabase,
+  SteelEngineStateKyselyDatabase,
   "apns_registrations" | "apns_registration_tombstones" | "migration_runs" | "migration_sources"
 >;
 
@@ -221,7 +221,7 @@ function receiptSourceKey(sourcePath: string): string {
 
 function readMigrationReceipt(sourcePath: string, env: NodeJS.ProcessEnv): MigrationReceipt | null {
   const sourceKey = receiptSourceKey(sourcePath);
-  const { db } = openOpenClawStateDatabase({ env });
+  const { db } = openSteelEngineStateDatabase({ env });
   const row = executeSqliteQueryTakeFirstSync(
     db,
     getNodeSqliteKysely<ApnsMigrationDatabase>(db)
@@ -247,7 +247,7 @@ function importAndRecordReceipt(params: {
   const sourceKey = receiptSourceKey(params.sourcePath);
   const runId = `${sourceKey}:${params.snapshot.sha256.slice(0, 16)}`;
   const now = Date.now();
-  return runOpenClawStateWriteTransaction(
+  return runSteelEngineStateWriteTransaction(
     ({ db }) => {
       const stateDb = getNodeSqliteKysely<ApnsMigrationDatabase>(db);
       const existingReceipt = executeSqliteQueryTakeFirstSync(
@@ -358,7 +358,7 @@ function importAndRecordReceipt(params: {
 }
 
 function markSourceRemoved(sourceKey: string, env: NodeJS.ProcessEnv): void {
-  runOpenClawStateWriteTransaction(
+  runSteelEngineStateWriteTransaction(
     ({ db }) => {
       executeSqliteQuerySync(
         db,
@@ -588,7 +588,7 @@ export async function migrateLegacyApnsRegistrations(params: {
     return { changes: [], warnings: [] };
   }
 
-  const env = { ...(params.env ?? process.env), OPENCLAW_STATE_DIR: params.stateDir };
+  const env = { ...(params.env ?? process.env), STEELENGINE_STATE_DIR: params.stateDir };
   let lock: Awaited<ReturnType<typeof acquireGatewayLock>>;
   try {
     lock = await acquireGatewayLock({
@@ -606,7 +606,7 @@ export async function migrateLegacyApnsRegistrations(params: {
     return {
       changes: [],
       warnings: [
-        `Failed migrating legacy APNs state: ${detail}. Stop the Gateway and run \`openclaw doctor --fix\` again.`,
+        `Failed migrating legacy APNs state: ${detail}. Stop the Gateway and run \`steelengine doctor --fix\` again.`,
       ],
     };
   }

@@ -17,16 +17,16 @@ export type { ChannelPlugin } from "../channels/plugins/types.plugin.js";
 export type { ChannelSetupWizard } from "../channels/plugins/setup-wizard-types.js";
 export type {
   AnyAgentTool,
-  OpenClawPluginApi,
-  OpenClawPluginConfigSchema,
+  SteelEnginePluginApi,
+  SteelEnginePluginConfigSchema,
   PluginLogger,
 } from "../plugins/types.js";
 
 export type { PluginRuntime } from "../plugins/runtime/types.js";
 
-export type { OpenClawConfig } from "../config/config.js";
-/** @deprecated Use OpenClawConfig instead */
-export type { OpenClawConfig as ClawdbotConfig } from "../config/config.js";
+export type { SteelEngineConfig } from "../config/config.js";
+/** @deprecated Use SteelEngineConfig instead */
+export type { SteelEngineConfig as ClawdbotConfig } from "../config/config.js";
 
 export type { SecretInput } from "../config/types.secrets.js";
 export type { RuntimeEnv } from "../runtime.js";
@@ -47,5 +47,5 @@ export {
   ContextEngineRuntimeSettingsUnsupportedError,
 } from "../context-engine/types.js";
 export { onDiagnosticEvent } from "../infra/diagnostic-events.js";
-/** @deprecated Use OpenClawConfig instead */
-export type { OpenClawConfig as OpenClawSchemaType } from "../config/config.js";
+/** @deprecated Use SteelEngineConfig instead */
+export type { SteelEngineConfig as SteelEngineSchemaType } from "../config/config.js";

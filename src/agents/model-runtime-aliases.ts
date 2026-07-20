@@ -1,10 +1,10 @@
 /**
  * Resolves CLI runtime aliases to provider/model auth labels and execution ids.
  */
-import { parseModelCatalogRef } from "@openclaw/model-catalog-core/model-catalog-refs";
-import { normalizeProviderId } from "@openclaw/model-catalog-core/provider-id";
-import { normalizeOptionalLowercaseString } from "@openclaw/normalization-core/string-coerce";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import { parseModelCatalogRef } from "@steelengine/model-catalog-core/model-catalog-refs";
+import { normalizeProviderId } from "@steelengine/model-catalog-core/provider-id";
+import { normalizeOptionalLowercaseString } from "@steelengine/normalization-core/string-coerce";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   isCliRuntimeModelBackendForProvider,
   listCliRuntimeModelBackendBindings,
@@ -18,7 +18,7 @@ import { resolveProviderIdForAuth } from "./provider-auth-aliases.js";
 /** True for CLI runtime provider ids such as `claude-cli` and `google-gemini-cli`. */
 export function isCliRuntimeProvider(
   provider: string,
-  params: { config?: OpenClawConfig; env?: NodeJS.ProcessEnv; includeSetupRegistry?: boolean } = {},
+  params: { config?: SteelEngineConfig; env?: NodeJS.ProcessEnv; includeSetupRegistry?: boolean } = {},
 ): boolean {
   const normalized = normalizeProviderId(provider);
   return listCliRuntimeProviderIds({
@@ -39,7 +39,7 @@ export function isCliRuntimeAlias(runtime: string | undefined): boolean {
 export function isCliRuntimeAliasForProvider(params: {
   runtime: string | undefined;
   provider: string | undefined;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
 }): boolean {
   return isCliRuntimeModelBackendForProvider({
     provider: params.provider,
@@ -49,7 +49,7 @@ export function isCliRuntimeAliasForProvider(params: {
 }
 
 type RuntimeAliasComparisonOptions = {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   includeSetupRegistry?: boolean;
 };
@@ -128,7 +128,7 @@ export function shouldPreferActiveRuntimeAliasAuthLabel(params: {
 }
 
 function resolveConfiguredRuntime(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   provider: string;
   agentId?: string;
   modelId?: string;
@@ -146,7 +146,7 @@ function resolveConfiguredRuntime(params: {
 }
 
 function resolveProfileRuntimeAlias(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   provider: string;
   profileId: string;
 }): string | undefined {
@@ -175,7 +175,7 @@ function resolveProfileRuntimeAlias(params: {
 }
 
 function resolveCliRuntimeFromAuthProfile(params: {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   provider: string;
   authProfileId?: string;
 }): string | undefined {
@@ -227,14 +227,14 @@ function resolveCliRuntimeFromAuthProfile(params: {
 
 export function resolveCliRuntimeExecutionProvider(params: {
   provider: string;
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   agentId?: string;
   modelId?: string;
   authProfileId?: string;
 }): string | undefined {
   const provider = normalizeProviderId(params.provider);
   const { runtime, matchedProvider } = resolveConfiguredRuntime({ ...params, provider });
-  if (runtime === "openclaw") {
+  if (runtime === "steelengine") {
     return undefined;
   }
   if (!runtime || runtime === "auto") {

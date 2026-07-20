@@ -3,7 +3,7 @@
  * this module to merge implicit provider discovery, explicit config, and
  * preserved secrets before touching models.json.
  */
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { PluginMetadataSnapshot } from "../plugins/plugin-metadata-snapshot.js";
 import { isRecord } from "../utils.js";
 import {
@@ -25,12 +25,12 @@ import {
   resolvePluginModelCatalogOwnerPluginId,
 } from "./plugin-model-catalog.js";
 
-type ModelsConfig = NonNullable<OpenClawConfig["models"]>;
+type ModelsConfig = NonNullable<SteelEngineConfig["models"]>;
 
 /** Dependency hook for resolving implicit model providers while planning models.json. */
 type ResolveImplicitProvidersForModelsJson = (params: {
   agentDir: string;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env: NodeJS.ProcessEnv;
   workspaceDir?: string;
   explicitProviders: Record<string, ProviderConfig>;
@@ -94,7 +94,7 @@ function buildPluginCatalogWrites(
 /** Resolves providers for models.json with injectable implicit-provider discovery. */
 async function resolveProvidersForModelsJsonWithDeps(
   params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     agentDir: string;
     env: NodeJS.ProcessEnv;
     workspaceDir?: string;
@@ -114,7 +114,7 @@ async function resolveProvidersForModelsJsonWithDeps(
     : params.cfg;
   // When models.mode is "replace" the user opts out of provider discovery, so
   // skip the (potentially slow) implicit-provider resolver entirely and return
-  // only the explicit providers. See openclaw#66957.
+  // only the explicit providers. See steelengine#66957.
   if (cfg.models?.mode === "replace") {
     return mergeProviders({ implicit: {}, explicit: explicitProviders });
   }
@@ -200,10 +200,10 @@ function filterWritableProviders(
 }
 
 /** Plans root and plugin-owned model catalog writes with injectable provider discovery. */
-async function planOpenClawModelsJsonWithDeps(
+async function planSteelEngineModelsJsonWithDeps(
   params: {
-    cfg: OpenClawConfig;
-    sourceConfigForSecrets?: OpenClawConfig;
+    cfg: SteelEngineConfig;
+    sourceConfigForSecrets?: SteelEngineConfig;
     agentDir: string;
     env: NodeJS.ProcessEnv;
     workspaceDir?: string;
@@ -311,15 +311,15 @@ async function planOpenClawModelsJsonWithDeps(
 }
 
 /** Plans root and plugin-owned model catalog writes for the current runtime. */
-export async function planOpenClawModelsJson(
-  params: Parameters<typeof planOpenClawModelsJsonWithDeps>[0],
+export async function planSteelEngineModelsJson(
+  params: Parameters<typeof planSteelEngineModelsJsonWithDeps>[0],
 ): Promise<ModelsJsonPlan> {
-  return planOpenClawModelsJsonWithDeps(params);
+  return planSteelEngineModelsJsonWithDeps(params);
 }
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
-  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("openclaw.modelsConfigPlanTestApi")] = {
-    planOpenClawModelsJsonWithDeps,
+  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("steelengine.modelsConfigPlanTestApi")] = {
+    planSteelEngineModelsJsonWithDeps,
     resolveProvidersForModelsJsonWithDeps,
   };
 }

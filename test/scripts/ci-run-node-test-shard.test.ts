@@ -24,7 +24,7 @@ import {
 const scratchDirs: string[] = [];
 
 function makeScratchDir(): string {
-  const dir = mkdtempSync(path.join(tmpdir(), "openclaw-shard-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "steelengine-shard-test-"));
   scratchDirs.push(dir);
   return dir;
 }
@@ -45,8 +45,8 @@ describe("scripts/ci-run-node-test-shard.mjs", () => {
 
   it("prefers explicit targets and keeps one target per child", () => {
     const plans = resolveShardPlans({
-      OPENCLAW_NODE_TEST_TARGETS_JSON: JSON.stringify(["a.test.ts", "b.test.ts"]),
-      OPENCLAW_NODE_TEST_GROUPS_JSON: JSON.stringify([{ configs: ["c.config.ts"] }]),
+      STEELENGINE_NODE_TEST_TARGETS_JSON: JSON.stringify(["a.test.ts", "b.test.ts"]),
+      STEELENGINE_NODE_TEST_GROUPS_JSON: JSON.stringify([{ configs: ["c.config.ts"] }]),
     });
     expect(plans).toEqual([
       { kind: "target", name: "a.test.ts", target: "a.test.ts" },
@@ -56,7 +56,7 @@ describe("scripts/ci-run-node-test-shard.mjs", () => {
 
   it("falls back from groups to the single-shard matrix envelope", () => {
     const groupPlans = resolveShardPlans({
-      OPENCLAW_NODE_TEST_GROUPS_JSON: JSON.stringify([
+      STEELENGINE_NODE_TEST_GROUPS_JSON: JSON.stringify([
         { configs: ["one.config.ts"], shard_name: "one" },
         { configs: ["two.config.ts"], shard_name: "two" },
       ]),
@@ -64,8 +64,8 @@ describe("scripts/ci-run-node-test-shard.mjs", () => {
     expect(groupPlans.map((plan) => plan.name)).toEqual(["one", "two"]);
 
     const singlePlans = resolveShardPlans({
-      OPENCLAW_NODE_TEST_CONFIGS_JSON: JSON.stringify(["solo.config.ts"]),
-      OPENCLAW_VITEST_SHARD_NAME: "solo",
+      STEELENGINE_NODE_TEST_CONFIGS_JSON: JSON.stringify(["solo.config.ts"]),
+      STEELENGINE_VITEST_SHARD_NAME: "solo",
     });
     expect(singlePlans).toHaveLength(1);
     expect(singlePlans[0]).toMatchObject({ kind: "group", name: "solo" });
@@ -85,33 +85,33 @@ describe("scripts/ci-run-node-test-shard.mjs", () => {
     };
     const childEnv = buildChildEnv(
       entry,
-      { BASE: "1", OPENCLAW_VITEST_INCLUDE_FILE: "stale.json" },
+      { BASE: "1", STEELENGINE_VITEST_INCLUDE_FILE: "stale.json" },
       scratchDir,
       3,
     );
     expect(childEnv.BASE).toBe("1");
     expect(childEnv.EXTRA).toBe("yes");
     expect(childEnv.IGNORED).toBeUndefined();
-    expect(childEnv.OPENCLAW_VITEST_SHARD_NAME).toBe("g");
-    expect(childEnv.OPENCLAW_TEST_PROJECTS_PARALLEL).toBe("1");
-    expect(childEnv.OPENCLAW_TEST_HEAVY_CHECK_LOCK_HELD).toBe("1");
-    expect(childEnv.OPENCLAW_VITEST_FS_MODULE_CACHE_PATH).toBe(
+    expect(childEnv.STEELENGINE_VITEST_SHARD_NAME).toBe("g");
+    expect(childEnv.STEELENGINE_TEST_PROJECTS_PARALLEL).toBe("1");
+    expect(childEnv.STEELENGINE_TEST_HEAVY_CHECK_LOCK_HELD).toBe("1");
+    expect(childEnv.STEELENGINE_VITEST_FS_MODULE_CACHE_PATH).toBe(
       path.join(scratchDir, "vitest-cache-3"),
     );
-    expect(childEnv.OPENCLAW_VITEST_INCLUDE_FILE).toBe(
+    expect(childEnv.STEELENGINE_VITEST_INCLUDE_FILE).toBe(
       path.join(scratchDir, "node-test-include-3.json"),
     );
-    expect(JSON.parse(readFileSync(childEnv.OPENCLAW_VITEST_INCLUDE_FILE ?? "", "utf8"))).toEqual([
+    expect(JSON.parse(readFileSync(childEnv.STEELENGINE_VITEST_INCLUDE_FILE ?? "", "utf8"))).toEqual([
       "src/a.test.ts",
     ]);
 
     const bare = buildChildEnv(
       { kind: "group" as const, name: "bare", plan: { configs: ["cfg.ts"] } },
-      { OPENCLAW_VITEST_INCLUDE_FILE: "stale.json" },
+      { STEELENGINE_VITEST_INCLUDE_FILE: "stale.json" },
       scratchDir,
       0,
     );
-    expect(bare.OPENCLAW_VITEST_INCLUDE_FILE).toBeUndefined();
+    expect(bare.STEELENGINE_VITEST_INCLUDE_FILE).toBeUndefined();
   });
 
   it("runs plans with bounded concurrency and distinct cache paths", async () => {
@@ -121,7 +121,7 @@ describe("scripts/ci-run-node-test-shard.mjs", () => {
     let peakActive = 0;
     const exitCode = await runShardPlans(
       resolveShardPlans({
-        OPENCLAW_NODE_TEST_GROUPS_JSON: JSON.stringify([
+        STEELENGINE_NODE_TEST_GROUPS_JSON: JSON.stringify([
           { configs: ["a.config.ts"], shard_name: "a" },
           { configs: ["b.config.ts"], shard_name: "b" },
           { configs: ["c.config.ts"], shard_name: "c" },
@@ -140,7 +140,7 @@ describe("scripts/ci-run-node-test-shard.mjs", () => {
           await new Promise((resolve) => {
             setTimeout(resolve, 10);
           });
-          seen.push({ args, cache: childEnv.OPENCLAW_VITEST_FS_MODULE_CACHE_PATH, label });
+          seen.push({ args, cache: childEnv.STEELENGINE_VITEST_FS_MODULE_CACHE_PATH, label });
           active -= 1;
           return 0;
         },
@@ -158,12 +158,12 @@ describe("scripts/ci-run-node-test-shard.mjs", () => {
     const seen: string[][] = [];
     const exitCode = await runShardPlans(
       resolveShardPlans({
-        OPENCLAW_NODE_TEST_CONFIGS_JSON: JSON.stringify(["test/vitest/vitest.unit.config.ts"]),
+        STEELENGINE_NODE_TEST_CONFIGS_JSON: JSON.stringify(["test/vitest/vitest.unit.config.ts"]),
       }),
       {
         concurrency: 1,
         env: {
-          OPENCLAW_NODE_TEST_VITEST_ARGS_JSON: JSON.stringify(["--hookTimeout=300000"]),
+          STEELENGINE_NODE_TEST_VITEST_ARGS_JSON: JSON.stringify(["--hookTimeout=300000"]),
         },
         runChild: async (args: string[]) => {
           seen.push(args);
@@ -186,7 +186,7 @@ describe("scripts/ci-run-node-test-shard.mjs", () => {
     let sharedWriter = false;
     const exitCode = await runShardPlans(
       resolveShardPlans({
-        OPENCLAW_NODE_TEST_GROUPS_JSON: JSON.stringify(
+        STEELENGINE_NODE_TEST_GROUPS_JSON: JSON.stringify(
           ["a", "b", "c", "d"].map((name) => ({
             configs: [`${name}.config.ts`],
             shard_name: name,
@@ -195,9 +195,9 @@ describe("scripts/ci-run-node-test-shard.mjs", () => {
       }),
       {
         concurrency: 2,
-        env: { OPENCLAW_VITEST_FS_MODULE_CACHE_PATH: persistentRoot },
+        env: { STEELENGINE_VITEST_FS_MODULE_CACHE_PATH: persistentRoot },
         runChild: async (_args: string[], childEnv: Record<string, string | undefined>) => {
-          const cache = childEnv.OPENCLAW_VITEST_FS_MODULE_CACHE_PATH ?? "";
+          const cache = childEnv.STEELENGINE_VITEST_FS_MODULE_CACHE_PATH ?? "";
           if (activeCaches.has(cache)) {
             sharedWriter = true;
           }
@@ -242,7 +242,7 @@ describe("scripts/ci-run-node-test-shard.mjs", () => {
     const slot = path.join(persistentRoot, "vitest-cache-0");
     mkdirSync(slot, { recursive: true });
     const metadata = path.join(slot, "_metadata.json");
-    const generation = path.join(persistentRoot, ".openclaw-transform-generation");
+    const generation = path.join(persistentRoot, ".steelengine-transform-generation");
     const oldest = path.join(slot, "oldest");
     const newest = path.join(slot, "newest");
     writeFileSync(metadata, "{}", "utf8");
@@ -269,14 +269,14 @@ describe("scripts/ci-run-node-test-shard.mjs", () => {
     mkdirSync(path.dirname(transform), { recursive: true });
     writeFileSync(transform, "cached", "utf8");
     const plans = resolveShardPlans({
-      OPENCLAW_NODE_TEST_CONFIGS_JSON: JSON.stringify(["test/vitest/vitest.unit.config.ts"]),
+      STEELENGINE_NODE_TEST_CONFIGS_JSON: JSON.stringify(["test/vitest/vitest.unit.config.ts"]),
     });
     const run = (writer: string) =>
       runShardPlans(plans, {
         concurrency: 1,
         env: {
-          OPENCLAW_VITEST_FS_MODULE_CACHE_PATH: persistentRoot,
-          OPENCLAW_VITEST_FS_MODULE_CACHE_WRITER: writer,
+          STEELENGINE_VITEST_FS_MODULE_CACHE_PATH: persistentRoot,
+          STEELENGINE_VITEST_FS_MODULE_CACHE_WRITER: writer,
         },
         fsModuleCacheMaxBytes: 0,
         runChild: async () => 0,
@@ -294,7 +294,7 @@ describe("scripts/ci-run-node-test-shard.mjs", () => {
     const started: string[] = [];
     const exitCode = await runShardPlans(
       resolveShardPlans({
-        OPENCLAW_NODE_TEST_GROUPS_JSON: JSON.stringify([
+        STEELENGINE_NODE_TEST_GROUPS_JSON: JSON.stringify([
           { configs: ["a.config.ts"], shard_name: "a" },
           { configs: ["b.config.ts"], shard_name: "b" },
           { configs: ["c.config.ts"], shard_name: "c" },

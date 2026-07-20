@@ -3,14 +3,14 @@
 import {
   applyProviderConfigWithDefaultModelPreset,
   type ModelDefinitionConfig,
-  type OpenClawConfig,
+  type SteelEngineConfig,
 } from "../../dist/plugin-sdk/provider-onboard.js";
 
-export type { OpenClawConfig };
+export type { SteelEngineConfig };
 
 const DOCKER_OPENAI_MODEL_REF = "openai/gpt-5.6-luna";
 const DOCKER_OPENAI_BASE_URL =
-  process.env.OPENCLAW_DOCKER_OPENAI_BASE_URL?.trim() || "http://127.0.0.1:9/v1";
+  process.env.STEELENGINE_DOCKER_OPENAI_BASE_URL?.trim() || "http://127.0.0.1:9/v1";
 const DOCKER_OPENAI_MODEL: ModelDefinitionConfig = {
   id: "gpt-5.6-luna",
   name: "gpt-5.6-luna",
@@ -28,9 +28,9 @@ const DOCKER_OPENAI_MODEL: ModelDefinitionConfig = {
 };
 
 export function applyDockerOpenAiProviderConfig(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   apiKey: string,
-): OpenClawConfig {
+): SteelEngineConfig {
   const seededConfig = applyProviderConfigWithDefaultModelPreset(config, {
     providerId: "openai",
     api: "openai-responses",

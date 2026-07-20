@@ -1,6 +1,6 @@
-name: OpenClaw
+name: SteelEngine
 options:
-  bundleIdPrefix: ai.openclawfoundation
+  bundleIdPrefix: ai.steelenginefoundation
   deploymentTarget:
     iOS: "18.0"
   xcodeVersion: "26.0"
@@ -11,8 +11,8 @@ settings:
     ENABLE_APP_INTENTS_METADATA_GENERATION: NO
 
 packages:
-  OpenClawKit:
-    path: ../shared/OpenClawKit
+  SteelEngineKit:
+    path: ../shared/SteelEngineKit
   Swabble:
     path: ../swabble
   WebRTC:
@@ -20,39 +20,39 @@ packages:
     exactVersion: 147.0.0
 
 schemes:
-  OpenClaw:
+  SteelEngine:
     shared: true
     build:
       targets:
-        OpenClaw: all
+        SteelEngine: all
     test:
       targets:
-        - OpenClawTests
-        - OpenClawLogicTests
-  OpenClawLogicTests:
+        - SteelEngineTests
+        - SteelEngineLogicTests
+  SteelEngineLogicTests:
     shared: true
     build:
       targets:
-        OpenClawLogicTests: all
+        SteelEngineLogicTests: all
     test:
       targets:
-        - OpenClawLogicTests
-  OpenClawUITests:
+        - SteelEngineLogicTests
+  SteelEngineUITests:
     shared: true
     build:
       targets:
-        OpenClawUITests: all
+        SteelEngineUITests: all
     test:
       targets:
-        - OpenClawUITests
-  OpenClawWatchApp:
+        - SteelEngineUITests
+  SteelEngineWatchApp:
     shared: true
     build:
       targets:
-        OpenClawWatchApp: all
+        SteelEngineWatchApp: all
 
 targets:
-  OpenClaw:
+  SteelEngine:
     type: application
     platform: iOS
     configFiles:
@@ -68,18 +68,18 @@ targets:
       - path: Resources/Localizable.xcstrings
         buildPhase: resources
     dependencies:
-      - target: OpenClawShareExtension
+      - target: SteelEngineShareExtension
         embed: true
-      - target: OpenClawActivityWidget
+      - target: SteelEngineActivityWidget
         embed: true
       # A companion watch application belongs in the standard Watch bundle location.
       # PlugIns is for extension products and breaks paired watch installation.
-      - target: OpenClawWatchApp
-      - package: OpenClawKit
-      - package: OpenClawKit
-        product: OpenClawChatUI
-      - package: OpenClawKit
-        product: OpenClawProtocol
+      - target: SteelEngineWatchApp
+      - package: SteelEngineKit
+      - package: SteelEngineKit
+        product: SteelEngineChatUI
+      - package: SteelEngineKit
+        product: SteelEngineProtocol
       - package: Swabble
         product: SwabbleKit
       - package: WebRTC
@@ -95,7 +95,7 @@ targets:
           export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin"
           "$SRCROOT/../../scripts/check-swift-tools.sh" swiftformat
           swiftformat --lint --config "$SRCROOT/../../config/swiftformat" \
-            --unexclude "$SRCROOT/Sources,$SRCROOT/ShareExtension,$SRCROOT/ActivityWidget,$SRCROOT/WatchApp,$SRCROOT/../shared/OpenClawKit/Sources/OpenClawChatUI,$SRCROOT/../shared/OpenClawKit/Sources/OpenClawKit,$SRCROOT/../shared/OpenClawKit/Sources/OpenClawProtocol,$SRCROOT/../swabble/Sources/SwabbleKit" \
+            --unexclude "$SRCROOT/Sources,$SRCROOT/ShareExtension,$SRCROOT/ActivityWidget,$SRCROOT/WatchApp,$SRCROOT/../shared/SteelEngineKit/Sources/SteelEngineChatUI,$SRCROOT/../shared/SteelEngineKit/Sources/SteelEngineKit,$SRCROOT/../shared/SteelEngineKit/Sources/SteelEngineProtocol,$SRCROOT/../swabble/Sources/SwabbleKit" \
             --filelist "$SRCROOT/SwiftSources.input.xcfilelist"
       - name: SwiftLint
         basedOnDependencyAnalysis: false
@@ -109,15 +109,15 @@ targets:
     settings:
       base:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        CODE_SIGN_IDENTITY: "$(OPENCLAW_CODE_SIGN_IDENTITY)"
-        CODE_SIGN_ENTITLEMENTS: "$(OPENCLAW_CODE_SIGN_ENTITLEMENTS)"
-        CODE_SIGN_STYLE: "$(OPENCLAW_CODE_SIGN_STYLE)"
-        DEVELOPMENT_TEAM: "$(OPENCLAW_DEVELOPMENT_TEAM)"
-        OPENCLAW_ACTIVE_APP_GROUP_ID: "$(OPENCLAW_APP_GROUP_ID)"
-        OPENCLAW_APP_DISPLAY_NAME: OpenClaw
-        OPENCLAW_URL_SCHEME: openclaw
-        PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_APP_BUNDLE_ID)"
-        PROVISIONING_PROFILE_SPECIFIER: "$(OPENCLAW_APP_PROFILE)"
+        CODE_SIGN_IDENTITY: "$(STEELENGINE_CODE_SIGN_IDENTITY)"
+        CODE_SIGN_ENTITLEMENTS: "$(STEELENGINE_CODE_SIGN_ENTITLEMENTS)"
+        CODE_SIGN_STYLE: "$(STEELENGINE_CODE_SIGN_STYLE)"
+        DEVELOPMENT_TEAM: "$(STEELENGINE_DEVELOPMENT_TEAM)"
+        STEELENGINE_ACTIVE_APP_GROUP_ID: "$(STEELENGINE_APP_GROUP_ID)"
+        STEELENGINE_APP_DISPLAY_NAME: SteelEngine
+        STEELENGINE_URL_SCHEME: steelengine
+        PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_APP_BUNDLE_ID)"
+        PROVISIONING_PROFILE_SPECIFIER: "$(STEELENGINE_APP_PROFILE)"
         TARGETED_DEVICE_FAMILY: "1,2"
         SWIFT_VERSION: "6.0"
         SWIFT_STRICT_CONCURRENCY: complete
@@ -128,35 +128,35 @@ targets:
         Debug:
           ASSETCATALOG_COMPILER_APPICON_NAME: AppIconDebug
           CODE_SIGN_STYLE: Automatic
-          OPENCLAW_ACTIVE_APP_GROUP_ID: "$(OPENCLAW_DEBUG_APP_GROUP_ID)"
-          OPENCLAW_APP_DISPLAY_NAME: OpenClaw
-          OPENCLAW_CODE_SIGN_ENTITLEMENTS: Sources/OpenClaw.entitlements
-          OPENCLAW_APNS_ENTITLEMENT_ENVIRONMENT: development
-          OPENCLAW_URL_SCHEME: openclaw-debug
-          PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_DEBUG_APP_BUNDLE_ID)"
+          STEELENGINE_ACTIVE_APP_GROUP_ID: "$(STEELENGINE_DEBUG_APP_GROUP_ID)"
+          STEELENGINE_APP_DISPLAY_NAME: SteelEngine
+          STEELENGINE_CODE_SIGN_ENTITLEMENTS: Sources/SteelEngine.entitlements
+          STEELENGINE_APNS_ENTITLEMENT_ENVIRONMENT: development
+          STEELENGINE_URL_SCHEME: steelengine-debug
+          PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_DEBUG_APP_BUNDLE_ID)"
           PROVISIONING_PROFILE_SPECIFIER: ""
-          OPENCLAW_PUSH_MODE: localSandbox
-          OPENCLAW_PUSH_RELAY_BASE_URL: ""
+          STEELENGINE_PUSH_MODE: localSandbox
+          STEELENGINE_PUSH_RELAY_BASE_URL: ""
         Release:
-          OPENCLAW_CODE_SIGN_ENTITLEMENTS: Sources/OpenClaw.entitlements
-          OPENCLAW_APNS_ENTITLEMENT_ENVIRONMENT: production
-          OPENCLAW_PUSH_MODE: localProduction
-          OPENCLAW_PUSH_RELAY_BASE_URL: ""
+          STEELENGINE_CODE_SIGN_ENTITLEMENTS: Sources/SteelEngine.entitlements
+          STEELENGINE_APNS_ENTITLEMENT_ENVIRONMENT: production
+          STEELENGINE_PUSH_MODE: localProduction
+          STEELENGINE_PUSH_RELAY_BASE_URL: ""
     info:
       path: Sources/Info.plist
       properties:
-        CFBundleDisplayName: "$(OPENCLAW_APP_DISPLAY_NAME)"
+        CFBundleDisplayName: "$(STEELENGINE_APP_DISPLAY_NAME)"
         CFBundleIconName: "$(ASSETCATALOG_COMPILER_APPICON_NAME)"
         CFBundleURLTypes:
-          - CFBundleURLName: ai.openclawfoundation.app
+          - CFBundleURLName: ai.steelenginefoundation.app
             CFBundleURLSchemes:
-              - "$(OPENCLAW_URL_SCHEME)"
-        CFBundleShortVersionString: "$(OPENCLAW_MARKETING_VERSION)"
-        OpenClawCanonicalVersion: "$(OPENCLAW_IOS_VERSION)"
-        OpenClawGitCommit: "$(OPENCLAW_GIT_COMMIT)"
-        OpenClawBuildTimestamp: "$(OPENCLAW_BUILD_TIMESTAMP)"
-        OpenClawAppGroupIdentifier: "$(OPENCLAW_ACTIVE_APP_GROUP_ID)"
-        CFBundleVersion: "$(OPENCLAW_BUILD_VERSION)"
+              - "$(STEELENGINE_URL_SCHEME)"
+        CFBundleShortVersionString: "$(STEELENGINE_MARKETING_VERSION)"
+        SteelEngineCanonicalVersion: "$(STEELENGINE_IOS_VERSION)"
+        SteelEngineGitCommit: "$(STEELENGINE_GIT_COMMIT)"
+        SteelEngineBuildTimestamp: "$(STEELENGINE_BUILD_TIMESTAMP)"
+        SteelEngineAppGroupIdentifier: "$(STEELENGINE_ACTIVE_APP_GROUP_ID)"
+        CFBundleVersion: "$(STEELENGINE_BUILD_VERSION)"
         UILaunchScreen: {}
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
@@ -166,27 +166,27 @@ targets:
           - remote-notification
         BGTaskSchedulerPermittedIdentifiers:
           - "$(PRODUCT_BUNDLE_IDENTIFIER).bgrefresh"
-        NSLocalNetworkUsageDescription: OpenClaw discovers and connects to your OpenClaw gateway on the local network.
+        NSLocalNetworkUsageDescription: SteelEngine discovers and connects to your SteelEngine gateway on the local network.
         NSAppTransportSecurity:
           NSAllowsArbitraryLoadsInWebContent: true
           NSAllowsLocalNetworking: true
         NSBonjourServices:
-          - _openclaw-gw._tcp
-        NSCameraUsageDescription: OpenClaw uses the camera when you scan a Gateway setup QR code or ask your paired Gateway or assistant to capture a photo or short video from this iPhone, for example to connect to your Gateway or show your assistant a document, device screen, or workspace.
-        NSCalendarsUsageDescription: OpenClaw uses your calendars to show events and scheduling context when you enable calendar access.
-        NSCalendarsFullAccessUsageDescription: OpenClaw uses your calendars to show events and scheduling context when you enable calendar access.
-        NSCalendarsWriteOnlyAccessUsageDescription: OpenClaw uses your calendars to add events when you enable calendar access.
-        NSContactsUsageDescription: OpenClaw uses your contacts so you can search and reference people while using the assistant.
-        NSLocationWhenInUseUsageDescription: OpenClaw uses your location when you allow location sharing.
-        NSLocationAlwaysAndWhenInUseUsageDescription: OpenClaw can share your location in the background when you enable Always.
-        NSMicrophoneUsageDescription: OpenClaw uses the microphone for realtime chat, voice wake, push-to-talk, and voice notes.
-        NSMotionUsageDescription: OpenClaw may use motion data to support device-aware interactions and automations.
-        NSHealthShareUsageDescription: OpenClaw reads your steps, sleep, resting heart rate, and workouts from the Apple Health app to create summaries you request and send them through your Gateway to your configured AI provider.
-        NSHealthUpdateUsageDescription: OpenClaw does not write to the Apple Health app. It uses read-only data to create summaries you request and send them through your Gateway to your configured AI provider.
-        NSPhotoLibraryUsageDescription: OpenClaw lets your assistant read photos you allow and lets you choose photos to share.
+          - _steelengine-gw._tcp
+        NSCameraUsageDescription: SteelEngine uses the camera when you scan a Gateway setup QR code or ask your paired Gateway or assistant to capture a photo or short video from this iPhone, for example to connect to your Gateway or show your assistant a document, device screen, or workspace.
+        NSCalendarsUsageDescription: SteelEngine uses your calendars to show events and scheduling context when you enable calendar access.
+        NSCalendarsFullAccessUsageDescription: SteelEngine uses your calendars to show events and scheduling context when you enable calendar access.
+        NSCalendarsWriteOnlyAccessUsageDescription: SteelEngine uses your calendars to add events when you enable calendar access.
+        NSContactsUsageDescription: SteelEngine uses your contacts so you can search and reference people while using the assistant.
+        NSLocationWhenInUseUsageDescription: SteelEngine uses your location when you allow location sharing.
+        NSLocationAlwaysAndWhenInUseUsageDescription: SteelEngine can share your location in the background when you enable Always.
+        NSMicrophoneUsageDescription: SteelEngine uses the microphone for realtime chat, voice wake, push-to-talk, and voice notes.
+        NSMotionUsageDescription: SteelEngine may use motion data to support device-aware interactions and automations.
+        NSHealthShareUsageDescription: SteelEngine reads your steps, sleep, resting heart rate, and workouts from the Apple Health app to create summaries you request and send them through your Gateway to your configured AI provider.
+        NSHealthUpdateUsageDescription: SteelEngine does not write to the Apple Health app. It uses read-only data to create summaries you request and send them through your Gateway to your configured AI provider.
+        NSPhotoLibraryUsageDescription: SteelEngine lets your assistant read photos you allow and lets you choose photos to share.
         PHPhotoLibraryPreventAutomaticLimitedAccessAlert: true
-        NSRemindersFullAccessUsageDescription: OpenClaw uses your reminders to list, add, and complete tasks when you enable reminders access.
-        NSSpeechRecognitionUsageDescription: OpenClaw uses on-device speech recognition for talk mode and voice wake.
+        NSRemindersFullAccessUsageDescription: SteelEngine uses your reminders to list, add, and complete tasks when you enable reminders access.
+        NSSpeechRecognitionUsageDescription: SteelEngine uses on-device speech recognition for talk mode and voice wake.
         NSSupportsLiveActivities: true
         ITSAppUsesNonExemptEncryption: false
         UIAppFonts:
@@ -196,14 +196,14 @@ targets:
           - JetBrainsMono-Regular.ttf
           - JetBrainsMono-Medium.ttf
           - JetBrainsMono-SemiBold.ttf
-        OpenClawPushMode: "$(OPENCLAW_PUSH_MODE)"
-        OpenClawPushRelayBaseURL: "$(OPENCLAW_PUSH_RELAY_BASE_URL)"
+        SteelEnginePushMode: "$(STEELENGINE_PUSH_MODE)"
+        SteelEnginePushRelayBaseURL: "$(STEELENGINE_PUSH_RELAY_BASE_URL)"
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-  OpenClawShareExtension:
+  SteelEngineShareExtension:
     type: app-extension
     platform: iOS
     configFiles:
@@ -214,35 +214,35 @@ targets:
       - path: Resources/Localizable.xcstrings
         buildPhase: resources
     dependencies:
-      - package: OpenClawKit
+      - package: SteelEngineKit
       - sdk: AppIntents.framework
     settings:
       base:
-        CODE_SIGN_IDENTITY: "$(OPENCLAW_CODE_SIGN_IDENTITY)"
-        CODE_SIGN_ENTITLEMENTS: ShareExtension/OpenClawShareExtension.entitlements
-        CODE_SIGN_STYLE: "$(OPENCLAW_CODE_SIGN_STYLE)"
-        DEVELOPMENT_TEAM: "$(OPENCLAW_DEVELOPMENT_TEAM)"
+        CODE_SIGN_IDENTITY: "$(STEELENGINE_CODE_SIGN_IDENTITY)"
+        CODE_SIGN_ENTITLEMENTS: ShareExtension/SteelEngineShareExtension.entitlements
+        CODE_SIGN_STYLE: "$(STEELENGINE_CODE_SIGN_STYLE)"
+        DEVELOPMENT_TEAM: "$(STEELENGINE_DEVELOPMENT_TEAM)"
         ENABLE_APPINTENTS_METADATA: NO
         ENABLE_APP_INTENTS_METADATA_GENERATION: NO
-        OPENCLAW_ACTIVE_APP_GROUP_ID: "$(OPENCLAW_APP_GROUP_ID)"
-        PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_SHARE_BUNDLE_ID)"
-        PROVISIONING_PROFILE_SPECIFIER: "$(OPENCLAW_SHARE_PROFILE)"
+        STEELENGINE_ACTIVE_APP_GROUP_ID: "$(STEELENGINE_APP_GROUP_ID)"
+        PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_SHARE_BUNDLE_ID)"
+        PROVISIONING_PROFILE_SPECIFIER: "$(STEELENGINE_SHARE_PROFILE)"
         TARGETED_DEVICE_FAMILY: "1,2"
         SWIFT_VERSION: "6.0"
         SWIFT_STRICT_CONCURRENCY: complete
       configs:
         Debug:
           CODE_SIGN_STYLE: Automatic
-          OPENCLAW_ACTIVE_APP_GROUP_ID: "$(OPENCLAW_DEBUG_APP_GROUP_ID)"
-          PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_DEBUG_SHARE_BUNDLE_ID)"
+          STEELENGINE_ACTIVE_APP_GROUP_ID: "$(STEELENGINE_DEBUG_APP_GROUP_ID)"
+          PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_DEBUG_SHARE_BUNDLE_ID)"
           PROVISIONING_PROFILE_SPECIFIER: ""
     info:
       path: ShareExtension/Info.plist
       properties:
-        CFBundleDisplayName: OpenClaw Share
-        CFBundleShortVersionString: "$(OPENCLAW_MARKETING_VERSION)"
-        OpenClawAppGroupIdentifier: "$(OPENCLAW_ACTIVE_APP_GROUP_ID)"
-        CFBundleVersion: "$(OPENCLAW_BUILD_VERSION)"
+        CFBundleDisplayName: SteelEngine Share
+        CFBundleShortVersionString: "$(STEELENGINE_MARKETING_VERSION)"
+        SteelEngineAppGroupIdentifier: "$(STEELENGINE_ACTIVE_APP_GROUP_ID)"
+        CFBundleVersion: "$(STEELENGINE_BUILD_VERSION)"
         NSExtension:
           NSExtensionPointIdentifier: com.apple.share-services
           NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).ShareViewController"
@@ -253,7 +253,7 @@ targets:
               NSExtensionActivationSupportsImageWithMaxCount: 10
               NSExtensionActivationSupportsMovieWithMaxCount: 1
 
-  OpenClawActivityWidget:
+  SteelEngineActivityWidget:
     type: app-extension
     platform: iOS
     configFiles:
@@ -261,7 +261,7 @@ targets:
       Release: Signing.xcconfig
     sources:
       - path: ActivityWidget
-      - path: Sources/LiveActivity/OpenClawActivityAttributes.swift
+      - path: Sources/LiveActivity/SteelEngineActivityAttributes.swift
       - path: Sources/Fonts
         buildPhase: resources
       - path: Resources/Localizable.xcstrings
@@ -271,11 +271,11 @@ targets:
       - sdk: ActivityKit.framework
     settings:
       base:
-        CODE_SIGN_IDENTITY: "$(OPENCLAW_CODE_SIGN_IDENTITY)"
-        CODE_SIGN_STYLE: "$(OPENCLAW_CODE_SIGN_STYLE)"
-        DEVELOPMENT_TEAM: "$(OPENCLAW_DEVELOPMENT_TEAM)"
-        PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_ACTIVITY_WIDGET_BUNDLE_ID)"
-        PROVISIONING_PROFILE_SPECIFIER: "$(OPENCLAW_ACTIVITY_WIDGET_PROFILE)"
+        CODE_SIGN_IDENTITY: "$(STEELENGINE_CODE_SIGN_IDENTITY)"
+        CODE_SIGN_STYLE: "$(STEELENGINE_CODE_SIGN_STYLE)"
+        DEVELOPMENT_TEAM: "$(STEELENGINE_DEVELOPMENT_TEAM)"
+        PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_ACTIVITY_WIDGET_BUNDLE_ID)"
+        PROVISIONING_PROFILE_SPECIFIER: "$(STEELENGINE_ACTIVITY_WIDGET_PROFILE)"
         TARGETED_DEVICE_FAMILY: "1,2"
         SWIFT_VERSION: "6.0"
         SWIFT_STRICT_CONCURRENCY: complete
@@ -283,14 +283,14 @@ targets:
       configs:
         Debug:
           CODE_SIGN_STYLE: Automatic
-          PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_DEBUG_ACTIVITY_WIDGET_BUNDLE_ID)"
+          PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_DEBUG_ACTIVITY_WIDGET_BUNDLE_ID)"
           PROVISIONING_PROFILE_SPECIFIER: ""
     info:
       path: ActivityWidget/Info.plist
       properties:
-        CFBundleDisplayName: OpenClaw Activity
-        CFBundleShortVersionString: "$(OPENCLAW_MARKETING_VERSION)"
-        CFBundleVersion: "$(OPENCLAW_BUILD_VERSION)"
+        CFBundleDisplayName: SteelEngine Activity
+        CFBundleShortVersionString: "$(STEELENGINE_MARKETING_VERSION)"
+        CFBundleVersion: "$(STEELENGINE_BUILD_VERSION)"
         NSSupportsLiveActivities: true
         UIAppFonts:
           - RedHatDisplay[wght].ttf
@@ -302,7 +302,7 @@ targets:
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
 
-  OpenClawWatchApp:
+  SteelEngineWatchApp:
     type: application
     platform: watchOS
     deploymentTarget: "11.0"
@@ -315,24 +315,24 @@ targets:
       - path: Sources/Services/ExactOpaqueIdentifier.swift
         group: Sources/Services
       # Universal talk waveform, compiled directly to keep the watch styling local.
-      - path: ../shared/OpenClawKit/Sources/OpenClawChatUI/TalkWaveformView.swift
+      - path: ../shared/SteelEngineKit/Sources/SteelEngineChatUI/TalkWaveformView.swift
         group: Shared
       # Universal mascot, compiled directly to keep the watch styling local.
-      - path: ../shared/OpenClawKit/Sources/OpenClawChatUI/OpenClawMascotView.swift
+      - path: ../shared/SteelEngineKit/Sources/SteelEngineChatUI/SteelEngineMascotView.swift
         group: Shared
-      - path: ../shared/OpenClawKit/Sources/OpenClawChatUI/OpenClawMascotAnimator.swift
+      - path: ../shared/SteelEngineKit/Sources/SteelEngineChatUI/SteelEngineMascotAnimator.swift
         group: Shared
-      - path: ../shared/OpenClawKit/Sources/OpenClawChatUI/OpenClawMascotCanvas+Accessories.swift
+      - path: ../shared/SteelEngineKit/Sources/SteelEngineChatUI/SteelEngineMascotCanvas+Accessories.swift
         group: Shared
-      - path: ../shared/OpenClawKit/Sources/OpenClawChatUI/ChatTypography.swift
+      - path: ../shared/SteelEngineKit/Sources/SteelEngineChatUI/ChatTypography.swift
         group: Shared
       - path: Sources/Fonts
         buildPhase: resources
       - path: Resources/Localizable.xcstrings
         buildPhase: resources
     dependencies:
-      - package: OpenClawKit
-        product: OpenClawKit
+      - package: SteelEngineKit
+        product: SteelEngineKit
       - sdk: AppIntents.framework
       - sdk: AVFAudio.framework
       - sdk: WatchConnectivity.framework
@@ -341,38 +341,38 @@ targets:
       Debug: Config/Signing.xcconfig
       Release: Config/Signing.xcconfig
     attributes:
-      DevelopmentTeam: "$(OPENCLAW_DEVELOPMENT_TEAM)"
-      ProvisioningStyle: "$(OPENCLAW_CODE_SIGN_STYLE)"
+      DevelopmentTeam: "$(STEELENGINE_DEVELOPMENT_TEAM)"
+      ProvisioningStyle: "$(STEELENGINE_CODE_SIGN_STYLE)"
     settings:
       base:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        CODE_SIGN_IDENTITY: "$(OPENCLAW_CODE_SIGN_IDENTITY)"
-        CODE_SIGN_STYLE: "$(OPENCLAW_CODE_SIGN_STYLE)"
-        DEVELOPMENT_TEAM: "$(OPENCLAW_DEVELOPMENT_TEAM)"
+        CODE_SIGN_IDENTITY: "$(STEELENGINE_CODE_SIGN_IDENTITY)"
+        CODE_SIGN_STYLE: "$(STEELENGINE_CODE_SIGN_STYLE)"
+        DEVELOPMENT_TEAM: "$(STEELENGINE_DEVELOPMENT_TEAM)"
         ENABLE_APPINTENTS_METADATA: NO
         ENABLE_APP_INTENTS_METADATA_GENERATION: NO
-        OPENCLAW_COMPANION_APP_BUNDLE_ID: "$(OPENCLAW_APP_BUNDLE_ID)"
-        PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_WATCH_APP_BUNDLE_ID)"
-        PROVISIONING_PROFILE_SPECIFIER: "$(OPENCLAW_WATCH_APP_PROFILE)"
+        STEELENGINE_COMPANION_APP_BUNDLE_ID: "$(STEELENGINE_APP_BUNDLE_ID)"
+        PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_WATCH_APP_BUNDLE_ID)"
+        PROVISIONING_PROFILE_SPECIFIER: "$(STEELENGINE_WATCH_APP_PROFILE)"
         SWIFT_STRICT_CONCURRENCY: complete
         SWIFT_VERSION: "6.0"
       configs:
         Debug:
           ASSETCATALOG_COMPILER_APPICON_NAME: AppIconDebug
           CODE_SIGN_STYLE: Automatic
-          OPENCLAW_COMPANION_APP_BUNDLE_ID: "$(OPENCLAW_DEBUG_APP_BUNDLE_ID)"
-          PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_DEBUG_WATCH_APP_BUNDLE_ID)"
+          STEELENGINE_COMPANION_APP_BUNDLE_ID: "$(STEELENGINE_DEBUG_APP_BUNDLE_ID)"
+          PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_DEBUG_WATCH_APP_BUNDLE_ID)"
           PROVISIONING_PROFILE_SPECIFIER: ""
     info:
       path: WatchApp/Info.plist
       properties:
-        CFBundleDisplayName: OpenClaw
-        CFBundleShortVersionString: "$(OPENCLAW_MARKETING_VERSION)"
-        CFBundleVersion: "$(OPENCLAW_BUILD_VERSION)"
-        WKCompanionAppBundleIdentifier: "$(OPENCLAW_COMPANION_APP_BUNDLE_ID)"
+        CFBundleDisplayName: SteelEngine
+        CFBundleShortVersionString: "$(STEELENGINE_MARKETING_VERSION)"
+        CFBundleVersion: "$(STEELENGINE_BUILD_VERSION)"
+        WKCompanionAppBundleIdentifier: "$(STEELENGINE_COMPANION_APP_BUNDLE_ID)"
         WKApplication: true
         WKPrefersNetworkUponForeground: true
-        NSLocalNetworkUsageDescription: OpenClaw connects this Apple Watch directly to your Gateway on trusted local networks.
+        NSLocalNetworkUsageDescription: SteelEngine connects this Apple Watch directly to your Gateway on trusted local networks.
         UIAppFonts:
           - RedHatDisplay[wght].ttf
           - Inter[opsz,wght].ttf
@@ -381,7 +381,7 @@ targets:
           - JetBrainsMono-Medium.ttf
           - JetBrainsMono-SemiBold.ttf
 
-  OpenClawTests:
+  SteelEngineTests:
     type: bundle.unit-test
     platform: iOS
     configFiles:
@@ -394,32 +394,32 @@ targets:
       - path: WatchApp/Sources/WatchDeferredPayloadOrdering.swift
         group: WatchApp/Sources
     dependencies:
-      - target: OpenClaw
+      - target: SteelEngine
       - package: Swabble
         product: SwabbleKit
       - sdk: AppIntents.framework
     settings:
       base:
-        CODE_SIGN_IDENTITY: "$(OPENCLAW_CODE_SIGN_IDENTITY)"
-        CODE_SIGN_STYLE: "$(OPENCLAW_CODE_SIGN_STYLE)"
-        DEVELOPMENT_TEAM: "$(OPENCLAW_DEVELOPMENT_TEAM)"
-        PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_APP_BUNDLE_ID).tests"
+        CODE_SIGN_IDENTITY: "$(STEELENGINE_CODE_SIGN_IDENTITY)"
+        CODE_SIGN_STYLE: "$(STEELENGINE_CODE_SIGN_STYLE)"
+        DEVELOPMENT_TEAM: "$(STEELENGINE_DEVELOPMENT_TEAM)"
+        PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_APP_BUNDLE_ID).tests"
         ENABLE_APP_INTENTS_METADATA_GENERATION: NO
         SWIFT_VERSION: "6.0"
         SWIFT_STRICT_CONCURRENCY: complete
-        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/OpenClaw.app/OpenClaw"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/SteelEngine.app/SteelEngine"
         BUNDLE_LOADER: "$(TEST_HOST)"
       configs:
         Debug:
-          PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_DEBUG_APP_BUNDLE_ID).tests"
+          PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_DEBUG_APP_BUNDLE_ID).tests"
     info:
       path: Tests/Info.plist
       properties:
-        CFBundleDisplayName: OpenClawTests
-        CFBundleShortVersionString: "$(OPENCLAW_MARKETING_VERSION)"
-        CFBundleVersion: "$(OPENCLAW_BUILD_VERSION)"
+        CFBundleDisplayName: SteelEngineTests
+        CFBundleShortVersionString: "$(STEELENGINE_MARKETING_VERSION)"
+        CFBundleVersion: "$(STEELENGINE_BUILD_VERSION)"
 
-  OpenClawLogicTests:
+  SteelEngineLogicTests:
     type: bundle.unit-test
     platform: iOS
     configFiles:
@@ -439,39 +439,39 @@ targets:
         group: WatchApp/Sources
       - path: WatchApp/Sources/WatchMascot.swift
         group: WatchApp/Sources
-      - path: ../shared/OpenClawKit/Sources/OpenClawChatUI/OpenClawMascotView.swift
+      - path: ../shared/SteelEngineKit/Sources/SteelEngineChatUI/SteelEngineMascotView.swift
         group: Shared
-      - path: ../shared/OpenClawKit/Sources/OpenClawChatUI/OpenClawMascotAnimator.swift
+      - path: ../shared/SteelEngineKit/Sources/SteelEngineChatUI/SteelEngineMascotAnimator.swift
         group: Shared
-      - path: ../shared/OpenClawKit/Sources/OpenClawChatUI/OpenClawMascotCanvas+Accessories.swift
+      - path: ../shared/SteelEngineKit/Sources/SteelEngineChatUI/SteelEngineMascotCanvas+Accessories.swift
         group: Shared
-      - path: ../shared/OpenClawKit/Sources/OpenClawChatUI/ChatTypography.swift
+      - path: ../shared/SteelEngineKit/Sources/SteelEngineChatUI/ChatTypography.swift
         group: Shared
       - path: Sources/Services/ExactOpaqueIdentifier.swift
         group: Sources/Services
     dependencies:
-      - package: OpenClawKit
+      - package: SteelEngineKit
     settings:
       base:
-        CODE_SIGN_IDENTITY: "$(OPENCLAW_CODE_SIGN_IDENTITY)"
-        CODE_SIGN_STYLE: "$(OPENCLAW_CODE_SIGN_STYLE)"
-        DEVELOPMENT_TEAM: "$(OPENCLAW_DEVELOPMENT_TEAM)"
-        PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_APP_BUNDLE_ID).logic-tests"
+        CODE_SIGN_IDENTITY: "$(STEELENGINE_CODE_SIGN_IDENTITY)"
+        CODE_SIGN_STYLE: "$(STEELENGINE_CODE_SIGN_STYLE)"
+        DEVELOPMENT_TEAM: "$(STEELENGINE_DEVELOPMENT_TEAM)"
+        PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_APP_BUNDLE_ID).logic-tests"
         ENABLE_APP_INTENTS_METADATA_GENERATION: NO
         SWIFT_EMIT_CONST_VALUE_PROTOCOLS: ""
         SWIFT_VERSION: "6.0"
         SWIFT_STRICT_CONCURRENCY: complete
       configs:
         Debug:
-          PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_DEBUG_APP_BUNDLE_ID).logic-tests"
+          PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_DEBUG_APP_BUNDLE_ID).logic-tests"
     info:
       path: Tests/Info.plist
       properties:
-        CFBundleDisplayName: OpenClawLogicTests
-        CFBundleShortVersionString: "$(OPENCLAW_MARKETING_VERSION)"
-        CFBundleVersion: "$(OPENCLAW_BUILD_VERSION)"
+        CFBundleDisplayName: SteelEngineLogicTests
+        CFBundleShortVersionString: "$(STEELENGINE_MARKETING_VERSION)"
+        CFBundleVersion: "$(STEELENGINE_BUILD_VERSION)"
 
-  OpenClawUITests:
+  SteelEngineUITests:
     type: bundle.ui-testing
     platform: iOS
     configFiles:
@@ -480,25 +480,25 @@ targets:
     sources:
       - path: UITests
     dependencies:
-      - target: OpenClaw
+      - target: SteelEngine
     settings:
       base:
-        CODE_SIGN_IDENTITY: "$(OPENCLAW_CODE_SIGN_IDENTITY)"
-        CODE_SIGN_STYLE: "$(OPENCLAW_CODE_SIGN_STYLE)"
-        DEVELOPMENT_TEAM: "$(OPENCLAW_DEVELOPMENT_TEAM)"
-        PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_APP_BUNDLE_ID).ui-tests"
+        CODE_SIGN_IDENTITY: "$(STEELENGINE_CODE_SIGN_IDENTITY)"
+        CODE_SIGN_STYLE: "$(STEELENGINE_CODE_SIGN_STYLE)"
+        DEVELOPMENT_TEAM: "$(STEELENGINE_DEVELOPMENT_TEAM)"
+        PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_APP_BUNDLE_ID).ui-tests"
         SDKROOT: iphoneos
         SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
         SUPPORTS_MACCATALYST: NO
         SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
-        TEST_TARGET_NAME: OpenClaw
+        TEST_TARGET_NAME: SteelEngine
         SWIFT_VERSION: "5.0"
       configs:
         Debug:
-          PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_DEBUG_APP_BUNDLE_ID).ui-tests"
+          PRODUCT_BUNDLE_IDENTIFIER: "$(STEELENGINE_DEBUG_APP_BUNDLE_ID).ui-tests"
     info:
       path: UITests/Info.plist
       properties:
-        CFBundleDisplayName: OpenClawUITests
-        CFBundleShortVersionString: "$(OPENCLAW_MARKETING_VERSION)"
-        CFBundleVersion: "$(OPENCLAW_BUILD_VERSION)"
+        CFBundleDisplayName: SteelEngineUITests
+        CFBundleShortVersionString: "$(STEELENGINE_MARKETING_VERSION)"
+        CFBundleVersion: "$(STEELENGINE_BUILD_VERSION)"

@@ -31,18 +31,18 @@ const readConfigFileSnapshot = vi.hoisted(() =>
   vi.fn(async () => ({
     exists: false,
     valid: true,
-    path: "/tmp/openclaw.json",
+    path: "/tmp/steelengine.json",
     issues: [] as Array<{ path?: string; message: string }>,
     config: {},
   })),
 );
 
-const logPathTracker = createSuiteLogPathTracker("openclaw-guided-onboard-log-");
+const logPathTracker = createSuiteLogPathTracker("steelengine-guided-onboard-log-");
 
 vi.mock("../config/config.js", () => ({ readConfigFileSnapshot }));
 
 vi.mock("./onboard-helpers.js", () => ({
-  DEFAULT_WORKSPACE: "/tmp/openclaw-workspace",
+  DEFAULT_WORKSPACE: "/tmp/steelengine-workspace",
   printWizardHeader: vi.fn(),
 }));
 
@@ -85,7 +85,7 @@ function detection(
     manualProviders: [],
     authOptions: [],
     recommendedInstalls: [],
-    workspace: "/tmp/openclaw-workspace",
+    workspace: "/tmp/steelengine-workspace",
     setupComplete: false,
     ...overrides,
   };
@@ -111,7 +111,7 @@ function setupDeps(params: {
     applySetup:
       params.applySetup ??
       vi.fn(async () => ({
-        configPath: "/tmp/openclaw.json",
+        configPath: "/tmp/steelengine.json",
         configHashBefore: null,
         configHashAfter: null,
         bootstrapPending: false,
@@ -121,7 +121,7 @@ function setupDeps(params: {
     listManualOptions: vi.fn(async () => ({
       manualProviders: [],
       authOptions: [],
-      workspace: "/tmp/openclaw-workspace",
+      workspace: "/tmp/steelengine-workspace",
       setupComplete: false,
     })),
     detect: params.detect ?? vi.fn(async () => detection()),
@@ -154,7 +154,7 @@ describe("runGuidedOnboarding custodian flow", () => {
     readConfigFileSnapshot.mockResolvedValue({
       exists: false,
       valid: true,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       issues: [],
       config: {},
     });
@@ -177,7 +177,7 @@ describe("runGuidedOnboarding custodian flow", () => {
       listManualOptions: vi.fn(async () => ({
         manualProviders: [{ id: "openai-api-key", label: "OpenAI" }],
         authOptions: [],
-        workspace: "/tmp/openclaw-workspace",
+        workspace: "/tmp/steelengine-workspace",
         setupComplete: false,
       })),
     };
@@ -202,7 +202,7 @@ describe("runGuidedOnboarding custodian flow", () => {
       listManualOptions: vi.fn(async () => ({
         manualProviders: [{ id: "openai-api-key", label: "OpenAI" }],
         authOptions: [],
-        workspace: "/tmp/openclaw-workspace",
+        workspace: "/tmp/steelengine-workspace",
         setupComplete: false,
       })),
     };
@@ -262,7 +262,7 @@ describe("runGuidedOnboarding custodian flow", () => {
     readConfigFileSnapshot.mockResolvedValue({
       exists: true,
       valid: true,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       issues: [],
       config: {
         wizard: { accessMode: "full", securityAcknowledgedAt: "2026-01-01T00:00:00.000Z" },
@@ -314,7 +314,7 @@ describe("runGuidedOnboarding custodian flow", () => {
     readConfigFileSnapshot.mockResolvedValue({
       exists: true,
       valid: true,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       issues: [],
       config: {
         gateway: { mode: "local" },
@@ -328,7 +328,7 @@ describe("runGuidedOnboarding custodian flow", () => {
 
     expect(deps.applySetup).not.toHaveBeenCalled();
     // Configured reruns hatch the persisted default workspace, not the probe context.
-    expect(deps.launchHatchTui).toHaveBeenCalledWith("/tmp/openclaw-workspace");
+    expect(deps.launchHatchTui).toHaveBeenCalledWith("/tmp/steelengine-workspace");
     expect(prompter.note).toHaveBeenCalledWith(
       expect.stringContaining("already set up"),
       expect.anything(),
@@ -339,7 +339,7 @@ describe("runGuidedOnboarding custodian flow", () => {
     readConfigFileSnapshot.mockResolvedValue({
       exists: true,
       valid: true,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       issues: [],
       config: {
         agents: { defaults: { workspace: "/tmp/authored" } },
@@ -364,7 +364,7 @@ describe("runGuidedOnboarding custodian flow", () => {
     expect(deps.launchHatchTui).toHaveBeenCalledWith("/tmp/authored");
   });
 
-  it("falls back to the OpenClaw chat when applying setup fails", async () => {
+  it("falls back to the SteelEngine chat when applying setup fails", async () => {
     const prompter = createWizardPrompter();
     const applySetup = vi.fn(async () => {
       throw new Error("config write raced");

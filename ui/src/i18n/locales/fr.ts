@@ -281,14 +281,14 @@ export const fr: TranslationMap = {
     genericSubtitle: "Une erreur s’est produite lors du chargement de ce panneau.",
     staleTitle: "Une nouvelle version est disponible",
     staleSubtitle:
-      "OpenClaw a été mis à jour en arrière-plan. Rechargez la page pour obtenir le panneau le plus récent.",
+      "SteelEngine a été mis à jour en arrière-plan. Rechargez la page pour obtenir le panneau le plus récent.",
     retry: "Réessayer",
   },
   nodes: {
     pairing: {
       button: "Associer un appareil mobile",
       adminRequired: "Un accès administrateur est requis pour créer des codes de configuration.",
-      title: "OpenClaw mobile",
+      title: "SteelEngine mobile",
       subtitle: "Scannez ce code QR dans l’application mobile pour connecter un nouveau téléphone.",
       generating: "Création d’un code de configuration sécurisé…",
       accessTitle: "Accès mobile",
@@ -302,7 +302,7 @@ export const fr: TranslationMap = {
       transportLimitedHint:
         "Cette URL du Gateway utilise le protocole ws:// en texte clair. Utilisez wss:// ou Tailscale Serve, puis créez un nouveau code pour bénéficier d’un accès complet.",
       failed: "Impossible de créer un code de configuration.",
-      qrAlt: "Code QR d’association OpenClaw mobile",
+      qrAlt: "Code QR d’association SteelEngine mobile",
       qrUnavailable: "Code QR indisponible. Copiez plutôt le code de configuration.",
       copySetupCode: "Copier le code de configuration",
       newCode: "Nouveau code",
@@ -310,7 +310,7 @@ export const fr: TranslationMap = {
       pending: "Demandes d’appareils en attente d’examen : {count}",
       review: "Révision",
       waiting:
-        "Les applications mobiles officielles OpenClaw se connectent automatiquement après la numérisation.",
+        "Les applications mobiles officielles SteelEngine se connectent automatiquement après la numérisation.",
       help: "Aide à l’association",
       manageDevices: "Gérer les appareils",
     },
@@ -457,11 +457,11 @@ export const fr: TranslationMap = {
     ownerSession: "Session",
     ownerWorkboard: "Workboard",
     title: "Worktrees gérés",
-    subtitle: "Checkouts de dépôt isolés appartenant à OpenClaw.",
+    subtitle: "Checkouts de dépôt isolés appartenant à SteelEngine.",
     cleanNow: "Nettoyer maintenant",
     cleanupTitle: "Nettoyage",
     cleanupSubtitle:
-      "OpenClaw supprime périodiquement les anciens worktrees afin de libérer de l’espace disque. Ajustez le niveau d’agressivité du nettoyage.",
+      "SteelEngine supprime périodiquement les anciens worktrees afin de libérer de l’espace disque. Ajustez le niveau d’agressivité du nettoyage.",
     cleanupMaxCount: "Nombre maximal de worktrees",
     cleanupMaxCountHelp:
       "Nombre maximal de worktrees gérés à conserver dans l’ensemble des dépôts. Les worktrees les plus anciens sont d’abord enregistrés sous forme d’instantanés, puis supprimés. Définissez cette valeur sur 0 pour désactiver la limite du nombre.",
@@ -512,8 +512,8 @@ export const fr: TranslationMap = {
     cloudWorker: "Cloud · {profile}",
     cloudWorkerProvider: "Fournisseur de worker cloud : {provider}",
     cloudRequiresWorktree: "Les workers cloud nécessitent un worktree géré",
-    cloudRequiresOpenClawRuntime:
-      "Les workers cloud nécessitent le runtime OpenClaw ; {runtime} est sélectionné.",
+    cloudRequiresSteelEngineRuntime:
+      "Les workers cloud nécessitent le runtime SteelEngine ; {runtime} est sélectionné.",
     cloudSecureContextRequired:
       "Les workers cloud nécessitent un contexte de navigateur sécurisé afin que la récupération puisse protéger votre tâche.",
     cloudStartFailed:
@@ -1320,7 +1320,7 @@ export const fr: TranslationMap = {
     autoSaveFailed: "Échec de l'enregistrement",
     autoSaveConflict: "Paramètres modifiés ailleurs",
     retry: "Réessayer",
-    applyBannerText: "Enregistré dans openclaw.json — redémarrez le gateway pour appliquer.",
+    applyBannerText: "Enregistré dans steelengine.json — redémarrez le gateway pour appliquer.",
     applyBannerAction: "Redémarrer et appliquer",
     rawDiscard: "Abandonner",
     rawDraftBlocksApply:
@@ -1376,7 +1376,7 @@ export const fr: TranslationMap = {
     },
   },
   approvalPage: {
-    brandName: "OpenClaw",
+    brandName: "SteelEngine",
     eyebrow: "Operator approval",
     loadingTitle: "Loading approval",
     loadingDescription: "Checking the current approval state with the Gateway.",
@@ -1385,7 +1385,7 @@ export const fr: TranslationMap = {
       "This approval could not be found or this device is not authorized to review it.",
     connectionErrorTitle: "Connection interrupted",
     connectionErrorDescription:
-      "OpenClaw cannot confirm or record a decision while disconnected. Reconnect to check the current status.",
+      "SteelEngine cannot confirm or record a decision while disconnected. Reconnect to check the current status.",
     retry: "Retry",
     execTitle: "Command approval",
     pending: "Waiting for your decision",
@@ -1565,7 +1565,7 @@ export const fr: TranslationMap = {
     chat: "Chat",
     settings: "Paramètres",
     settingsGeneral: "Général",
-    askOpenClaw: "Demander à OpenClaw",
+    askSteelEngine: "Demander à SteelEngine",
     settingsGroupConnections: "Connexions",
     settingsGroupAgents: "Agents et outils",
     settingsGroupSecurity: "Confidentialité et sécurité",
@@ -1687,7 +1687,7 @@ export const fr: TranslationMap = {
     skillWorkshop: "Atelier Skills",
     nodes: "Nœuds",
     chat: "Chat",
-    custodian: "OpenClaw",
+    custodian: "SteelEngine",
     config: "Configuration",
     profile: "Profil",
     communications: "Communications",
@@ -1727,7 +1727,7 @@ export const fr: TranslationMap = {
     nodes: "Appareils appairés et commandes.",
     chat: "Chat Gateway pour les interventions rapides.",
     custodian: "Configuration et maintenance du système.",
-    config: "Modifier openclaw.json.",
+    config: "Modifier steelengine.json.",
     profile: "Les statistiques, les séries et la vie dans le récif de votre agent.",
     communications: "Canaux, messages et paramètres audio.",
     appearance: "Thème, UI et paramètres de l’assistant de configuration.",
@@ -1752,7 +1752,7 @@ export const fr: TranslationMap = {
   modelSetup: {
     heading: "Connectez votre IA",
     intro:
-      "OpenClaw réutilise l’accès à l’IA dont vous disposez déjà — une connexion CLI, une clé API ou une connexion à un fournisseur.",
+      "SteelEngine réutilise l’accès à l’IA dont vous disposez déjà — une connexion CLI, une clé API ou une connexion à un fournisseur.",
     loading: "Recherche des accès à l’IA disponibles sur ce Gateway…",
     retry: "Réessayer",
     checkAgain: "Vérifier à nouveau",
@@ -1765,7 +1765,7 @@ export const fr: TranslationMap = {
     },
     access: {
       adminRequired: "La configuration du modèle nécessite l’accès operator.admin.",
-      gatewayTooOld: "Le Gateway utilise une ancienne version d’OpenClaw",
+      gatewayTooOld: "Le Gateway utilise une ancienne version d’SteelEngine",
     },
     candidates: {
       title: "Trouvés sur ce Gateway",
@@ -1868,12 +1868,12 @@ export const fr: TranslationMap = {
     confirmReplace:
       "Les fichiers de destination existants seront sauvegardés dans le rapport de migration avant leur remplacement.",
     confirmBackup:
-      "OpenClaw crée une sauvegarde vérifiée avant l’importation, puis copie la mémoire.",
+      "SteelEngine crée une sauvegarde vérifiée avant l’importation, puis copie la mémoire.",
     confirmImport: "Importer la mémoire",
     disconnected: "Connectez-vous au Gateway pour importer la mémoire.",
     title: "Importer la mémoire de l’assistant",
     subtitle:
-      "Examinez la mémoire consolidée de Codex et la mémoire automatique de Claude Code avant de les copier dans OpenClaw.",
+      "Examinez la mémoire consolidée de Codex et la mémoire automatique de Claude Code avant de les copier dans SteelEngine.",
     agent: "Agent de destination",
     replaceExisting: "Remplacer les importations existantes",
     replaceHint:
@@ -1882,7 +1882,7 @@ export const fr: TranslationMap = {
   onboarding: {
     memoryImport: {
       title: "Emportez la mémoire de votre assistant avec vous",
-      body: "OpenClaw a trouvé des données de mémoire provenant d’autres assistants de programmation. Voulez-vous les importer dans l’espace de travail de votre agent ?",
+      body: "SteelEngine a trouvé des données de mémoire provenant d’autres assistants de programmation. Voulez-vous les importer dans l’espace de travail de votre agent ?",
       plannedCount: "{count} prêts à être importés",
       alreadyImported: "Déjà importés : {count}",
       sourceUnavailable: "Chemin source indisponible",
@@ -1898,23 +1898,23 @@ export const fr: TranslationMap = {
       unknownError: "Échec de la requête",
       doneTitle: "Importation de la mémoire terminée",
       doneBody:
-        "{migrated} migrés, {skipped} ignorés. Vous pouvez poursuivre la configuration d’OpenClaw.",
+        "{migrated} migrés, {skipped} ignorés. Vous pouvez poursuivre la configuration d’SteelEngine.",
     },
   },
   custodian: {
-    title: "OpenClaw",
+    title: "SteelEngine",
     subtitle: "Votre guide de configuration du système",
     exitSetup: "Quitter la configuration",
     hatchDraft: "Réveille-toi, mon ami !",
-    placeholder: "Envoyer un message à OpenClaw…",
+    placeholder: "Envoyer un message à SteelEngine…",
     sensitivePlaceholder: "Saisissez une valeur sensible…",
     sensitiveReply: "Réponse sensible envoyée",
     send: "Envoyer",
-    thinking: "OpenClaw réfléchit",
-    requestFailed: "OpenClaw n’a pas pu répondre. Réessayez.",
+    thinking: "SteelEngine réfléchit",
+    requestFailed: "SteelEngine n’a pas pu répondre. Réessayez.",
     connectionChanged:
       "La connexion au Gateway a changé. Réessayez pour poursuivre cette configuration.",
-    unsupportedGateway: "Mettez à jour le Gateway pour poursuivre la configuration avec OpenClaw.",
+    unsupportedGateway: "Mettez à jour le Gateway pour poursuivre la configuration avec SteelEngine.",
   },
   mcpPage: {
     manageServersLink: "Gérez les serveurs sur la page Plugins.",
@@ -2017,7 +2017,7 @@ export const fr: TranslationMap = {
     },
     noInstalledTitle: "Aucun plugin facultatif installé",
     noInstalledBody:
-      "Découvrez un plugin mis en avant ou recherchez dans ClawHub pour étendre OpenClaw.",
+      "Découvrez un plugin mis en avant ou recherchez dans ClawHub pour étendre SteelEngine.",
     noInstalledMatchTitle: "Aucun plugin installé ne correspond",
     noMatchBody: "Essayez une autre recherche.",
     filterAll: "Tous",
@@ -2065,7 +2065,7 @@ export const fr: TranslationMap = {
     detailPluginId: "ID du plugin",
     offlineTitle: "Gateway hors ligne",
     offlineBody: "Connectez-vous pour parcourir les plugins installés et recommandés.",
-    optionalCapability: "Fonctionnalité OpenClaw facultative.",
+    optionalCapability: "Fonctionnalité SteelEngine facultative.",
     enabled: "Activé",
     disabled: "Désactivé",
     available: "Disponible",
@@ -2102,7 +2102,7 @@ export const fr: TranslationMap = {
       "{name} désactivé. Un redémarrage de Gateway est nécessaire pour appliquer la modification.",
   },
   aboutPage: {
-    productName: "OpenClaw",
+    productName: "SteelEngine",
     tagline: "Votre assistant IA personnel, exécuté sur vos propres appareils.",
     waveHello: "Faites un signe à Clawd",
     linksLabel: "Communauté et ressources",
@@ -2112,7 +2112,7 @@ export const fr: TranslationMap = {
     linkDiscord: "Discord",
     linkX: "X (Twitter)",
     linkChangelog: "Journal des modifications",
-    license: "© 2026 OpenClaw Foundation — Licence MIT.",
+    license: "© 2026 SteelEngine Foundation — Licence MIT.",
     artifactTitle: "Control UI",
     artifactSubtitle: "Identité intégrée lors de la création de cet artefact de navigateur.",
     artifactDetails: "Détails de build du Control UI",
@@ -2130,7 +2130,7 @@ export const fr: TranslationMap = {
       "Signalée par la connexion Gateway active ; distincte de ce build du Control UI.",
   },
   appsPage: {
-    heroTitle: "Emportez OpenClaw partout",
+    heroTitle: "Emportez SteelEngine partout",
     heroTagline:
       "Des applications compagnons pour votre téléphone, votre montre, votre ordinateur et votre navigateur — ainsi que des plugins pour étendre les capacités de votre agent.",
     sectionMobile: "Sur votre téléphone",
@@ -2152,11 +2152,11 @@ export const fr: TranslationMap = {
     cards: {
       ios: {
         title: "iPhone",
-        desc: "Discutez, parlez, approuvez des actions et partagez du contenu dans OpenClaw depuis iOS.",
+        desc: "Discutez, parlez, approuvez des actions et partagez du contenu dans SteelEngine depuis iOS.",
       },
       android: {
         title: "Android",
-        desc: "Votre téléphone Android comme nœud OpenClaw complet — chat, appareil photo et Canvas.",
+        desc: "Votre téléphone Android comme nœud SteelEngine complet — chat, appareil photo et Canvas.",
       },
       appleWatch: {
         title: "Apple Watch",
@@ -2164,7 +2164,7 @@ export const fr: TranslationMap = {
       },
       wearOs: {
         title: "Wear OS",
-        desc: "L’app compagnon Android étend OpenClaw à votre montre.",
+        desc: "L’app compagnon Android étend SteelEngine à votre montre.",
       },
       macos: {
         title: "macOS",
@@ -2172,7 +2172,7 @@ export const fr: TranslationMap = {
       },
       windows: {
         title: "Windows",
-        desc: "Le compagnon Windows connecte votre PC en tant que nœud OpenClaw.",
+        desc: "Le compagnon Windows connecte votre PC en tant que nœud SteelEngine.",
       },
       linux: {
         title: "Linux",
@@ -2180,11 +2180,11 @@ export const fr: TranslationMap = {
       },
       chrome: {
         title: "Extension Chrome",
-        desc: "Permettez à OpenClaw de piloter votre navigateur Chrome existant — onglets, pages et formulaires.",
+        desc: "Permettez à SteelEngine de piloter votre navigateur Chrome existant — onglets, pages et formulaires.",
       },
       plugins: {
         title: "Plugins et ClawHub",
-        desc: "Étendez OpenClaw avec des canaux, des outils et des compétences créés par la communauté.",
+        desc: "Étendez SteelEngine avec des canaux, des outils et des compétences créés par la communauté.",
       },
     },
   },
@@ -2356,7 +2356,7 @@ export const fr: TranslationMap = {
     selfLearning: {
       pitchTitle: "Activer l’auto-apprentissage",
       pitchBody:
-        "OpenClaw analyse les corrections et les exécutions substantielles terminées, puis rédige des propositions de Skills pour ce tableau. Il utilise des jetons supplémentaires en arrière-plan, et les brouillons apparaissent comme propositions en attente.",
+        "SteelEngine analyse les corrections et les exécutions substantielles terminées, puis rédige des propositions de Skills pour ce tableau. Il utilise des jetons supplémentaires en arrière-plan, et les brouillons apparaissent comme propositions en attente.",
       enable: "Activer l’auto-apprentissage",
       enabling: "Activation…",
       updateError: "Impossible de mettre à jour le paramètre d’auto-apprentissage.",
@@ -3452,9 +3452,9 @@ export const fr: TranslationMap = {
         summary:
           "Le Gateway est joignable, mais il lui faut un jeton ou un mot de passe correspondant avant que ce navigateur puisse se connecter.",
         stepPaste:
-          "Collez le jeton de openclaw dashboard --no-open ou saisissez le mot de passe configuré.",
+          "Collez le jeton de steelengine dashboard --no-open ou saisissez le mot de passe configuré.",
         stepGenerate:
-          "Si aucun jeton n’est configuré, exécutez openclaw doctor --generate-gateway-token sur l’hôte Gateway.",
+          "Si aucun jeton n’est configuré, exécutez steelengine doctor --generate-gateway-token sur l’hôte Gateway.",
         stepConnect: "Cliquez de nouveau sur Connect après avoir mis à jour l’identifiant.",
       },
       authFailed: {
@@ -3462,7 +3462,7 @@ export const fr: TranslationMap = {
         summary:
           "L’identifiant fourni a été refusé. La cause la plus courante est un jeton obsolète ou copié depuis une autre URL Gateway.",
         stepDashboard:
-          "Exécutez openclaw dashboard --no-open et ouvrez la nouvelle URL ou collez son jeton.",
+          "Exécutez steelengine dashboard --no-open et ouvrez la nouvelle URL ou collez son jeton.",
         stepReplace:
           "Remplacez les valeurs de jeton/mot de passe obsolètes ; ne réutilisez pas un jeton provenant d’une autre URL Gateway.",
         stepMode:
@@ -3487,8 +3487,8 @@ export const fr: TranslationMap = {
           "Ce navigateur nécessite une approbation unique de l’hôte Gateway avant de pouvoir utiliser Control UI.",
         upgradeSummary:
           "Ce navigateur est déjà connu, mais l’accès demandé a changé et nécessite une nouvelle approbation.",
-        stepList: "Exécutez openclaw devices list sur l’hôte Gateway.",
-        stepApproveId: "Approuvez cette demande : openclaw devices approve {requestId}.",
+        stepList: "Exécutez steelengine devices list sur l’hôte Gateway.",
+        stepApproveId: "Approuvez cette demande : steelengine devices approve {requestId}.",
         stepApprove: "Approuvez la demande navigateur/appareil en attente depuis cette liste.",
         stepReconnect: "Reconnectez-vous après la fin de l’approbation.",
       },
@@ -3519,22 +3519,22 @@ export const fr: TranslationMap = {
         summary:
           "La Control UI servie et le Gateway en cours d’exécution ne sont pas d’accord sur le protocole de connexion pris en charge.",
         stepDashboard:
-          "Rouvrez le dashboard servi avec openclaw dashboard afin que l’UI et le Gateway viennent de la même installation.",
+          "Rouvrez le dashboard servi avec steelengine dashboard afin que l’UI et le Gateway viennent de la même installation.",
         stepDevUi:
           "Si vous utilisez pnpm ui:dev, reconstruisez ou redémarrez l’UI de développement avec le checkout actuel.",
         stepRestart:
-          "Redémarrez le Gateway après la mise à jour d’OpenClaw afin qu’il serve le protocole actuel.",
+          "Redémarrez le Gateway après la mise à jour d’SteelEngine afin qu’il serve le protocole actuel.",
       },
       network: {
         title: "Connexion impossible",
         summary:
           "Le navigateur n’a pas pu terminer la connexion au Gateway. Vérifiez la cible et le transport avant de réessayer les identifiants.",
         stepGateway:
-          "Confirmez que le Gateway fonctionne avec openclaw status ou openclaw gateway run.",
+          "Confirmez que le Gateway fonctionne avec steelengine status ou steelengine gateway run.",
         stepUrl:
           "Vérifiez l’URL WebSocket et utilisez wss:// lorsque le Gateway est derrière HTTPS/Tailscale Serve.",
         stepDashboard:
-          "Rouvrez le dashboard avec openclaw dashboard --no-open pour recopier l’URL actuelle et les détails d’authentification.",
+          "Rouvrez le dashboard avec steelengine dashboard --no-open pour recopier l’URL actuelle et les détails d’authentification.",
       },
     },
   },
@@ -3559,7 +3559,7 @@ export const fr: TranslationMap = {
       remoteViewOnly: "Cette session se trouve sur un nœud associé et est en lecture seule.",
       unsupportedViewOnly: "Cette source de session externe est en lecture seule.",
       sessionMenu: "External session actions",
-      openInOpenClaw: "Open in OpenClaw",
+      openInSteelEngine: "Open in SteelEngine",
       openInTerminal: "Open in terminal",
       terminalUnavailable: "Terminal opening is unavailable for this session.",
     },
@@ -3615,7 +3615,7 @@ export const fr: TranslationMap = {
     followUpModeOverriding: "Remplacement de la valeur par défaut du serveur ({mode})",
     followUpModeReset: "Réinitialiser à la valeur par défaut du serveur",
     catalogOpenTarget: "Open Codex/Claude sessions in",
-    catalogOpenTargetViewer: "OpenClaw viewer",
+    catalogOpenTargetViewer: "SteelEngine viewer",
     catalogOpenTargetTerminal: "Terminal",
     onboardingDisabled: "Désactivé pendant la configuration",
     gatewayStatus: "État du Gateway : {status}",
@@ -4079,7 +4079,7 @@ export const fr: TranslationMap = {
       filters: "Filtres",
       shownOf: "{shown} sur {total}",
       emptyTitle: "Aucune tâche planifiée pour le moment",
-      emptyHint: "Décrivez ce qu'OpenClaw doit faire et quand — l'exécution suit la planification.",
+      emptyHint: "Décrivez ce qu'SteelEngine doit faire et quand — l'exécution suit la planification.",
       noMatching: "Aucune tâche ne correspond aux filtres actuels.",
       loadMore: "Charger davantage",
       loading: "Chargement...",
@@ -4146,7 +4146,7 @@ export const fr: TranslationMap = {
     detail: {
       tabsLabel: "Détails de l’automatisation",
       newTitle: "Nouvelle tâche planifiée",
-      newSubtitle: "Décrivez ce qu'OpenClaw doit faire, puis choisissez quand l'exécuter.",
+      newSubtitle: "Décrivez ce qu'SteelEngine doit faire, puis choisissez quand l'exécuter.",
       back: "Toutes les automatisations",
       settingsTab: "Paramètres",
       historyTitle: "Historique des exécutions",
@@ -4220,7 +4220,7 @@ export const fr: TranslationMap = {
       descriptionPlaceholder: "Contexte facultatif pour cette tâche",
       agentPlaceholder: "main ou ops",
       agentHelp: "Commencez à taper pour choisir un agent connu, ou saisissez-en un personnalisé.",
-      promptPlaceholder: "Décrivez ce qu'OpenClaw doit faire...",
+      promptPlaceholder: "Décrivez ce qu'SteelEngine doit faire...",
       repeat: "Répéter",
       repeatInterval: "Intervalle",
       repeatOnce: "Une fois",

@@ -1,27 +1,27 @@
 // Mattermost plugin module implements monitor behavior.
-import { resolveHumanDelayConfig } from "openclaw/plugin-sdk/agent-runtime";
+import { resolveHumanDelayConfig } from "steelengine/plugin-sdk/agent-runtime";
 import {
   formatInboundEnvelope,
   implicitMentionKindWhen,
   type ChannelInboundTurnPlan,
-} from "openclaw/plugin-sdk/channel-inbound";
+} from "steelengine/plugin-sdk/channel-inbound";
 import {
   bindIngressLifecycleToReplyOptions,
   buildChannelProgressDraftLineForEntry,
   createChannelProgressDraftCompositor,
-} from "openclaw/plugin-sdk/channel-outbound";
-import { isLoopbackHost } from "openclaw/plugin-sdk/gateway-runtime";
-import { finalizeInboundContext } from "openclaw/plugin-sdk/reply-runtime";
-import { resolveInboundLastRouteSessionKey } from "openclaw/plugin-sdk/routing";
-import { resolvePinnedMainDmOwnerFromAllowlist } from "openclaw/plugin-sdk/security-runtime";
-import { isPrivateNetworkOptInEnabled } from "openclaw/plugin-sdk/ssrf-runtime";
+} from "steelengine/plugin-sdk/channel-outbound";
+import { isLoopbackHost } from "steelengine/plugin-sdk/gateway-runtime";
+import { finalizeInboundContext } from "steelengine/plugin-sdk/reply-runtime";
+import { resolveInboundLastRouteSessionKey } from "steelengine/plugin-sdk/routing";
+import { resolvePinnedMainDmOwnerFromAllowlist } from "steelengine/plugin-sdk/security-runtime";
+import { isPrivateNetworkOptInEnabled } from "steelengine/plugin-sdk/ssrf-runtime";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
   normalizeTrimmedStringList,
   uniqueStrings,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import { getMattermostRuntime } from "../runtime.js";
 import { resolveMattermostAccount, resolveMattermostReplyToMode } from "./accounts.js";
 import {
@@ -103,7 +103,7 @@ import {
 import type {
   ChannelAccountSnapshot,
   ChatType,
-  OpenClawConfig,
+  SteelEngineConfig,
   ReplyPayload,
   RuntimeEnv,
 } from "./runtime-api.js";
@@ -135,7 +135,7 @@ type MonitorMattermostOpts = {
   botToken?: string;
   baseUrl?: string;
   accountId?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   runtime?: RuntimeEnv;
   abortSignal?: AbortSignal;
   statusSink?: (patch: Partial<ChannelAccountSnapshot>) => void;
@@ -228,7 +228,7 @@ function buildMattermostWsUrl(baseUrl: string): string {
 export async function monitorMattermostProvider(opts: MonitorMattermostOpts = {}): Promise<void> {
   const core = getMattermostRuntime();
   const runtime = resolveRuntime(opts);
-  const cfg = (opts.config ?? core.config.current()) as OpenClawConfig;
+  const cfg = (opts.config ?? core.config.current()) as SteelEngineConfig;
   const account = resolveMattermostAccount({
     cfg,
     accountId: opts.accountId,
@@ -374,7 +374,7 @@ export async function monitorMattermostProvider(opts: MonitorMattermostOpts = {}
               message: post.message ?? "",
               props: post.props ?? undefined,
             },
-            ephemeral_text: `OpenClaw ignored this action for ${decision.roomLabel}.`,
+            ephemeral_text: `SteelEngine ignored this action for ${decision.roomLabel}.`,
           },
         };
       },

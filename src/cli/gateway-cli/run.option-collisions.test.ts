@@ -61,7 +61,7 @@ const loadShellEnvFallback = vi.fn((_opts?: unknown) => {
   callOrder.push("shell-env");
 });
 const clearShellEnvAppliedKeys = vi.fn((_keys: readonly string[]) => undefined);
-const resolveShellEnvExpectedKeys = vi.fn((_env?: NodeJS.ProcessEnv) => ["OPENCLAW_GATEWAY_TOKEN"]);
+const resolveShellEnvExpectedKeys = vi.fn((_env?: NodeJS.ProcessEnv) => ["STEELENGINE_GATEWAY_TOKEN"]);
 const resolveShellEnvFallbackTimeoutMs = vi.fn((_env?: NodeJS.ProcessEnv) => 15_000);
 const shouldDeferShellEnvFallback = vi.fn((_env?: NodeJS.ProcessEnv) => false);
 const shouldEnableShellEnvFallback = vi.fn((_env?: NodeJS.ProcessEnv) => false);
@@ -91,8 +91,8 @@ const readConfigFileSnapshotWithPluginMetadata = vi.fn(
 );
 const writeDiagnosticStabilityBundleForFailureSync = vi.fn((_reason: string, _error: unknown) => ({
   status: "written" as const,
-  message: "wrote stability bundle: /tmp/openclaw-stability.json",
-  path: "/tmp/openclaw-stability.json",
+  message: "wrote stability bundle: /tmp/steelengine-stability.json",
+  path: "/tmp/steelengine-stability.json",
 }));
 const bootLifecycle = vi.hoisted(() => ({
   decisions: [] as Array<{
@@ -123,8 +123,8 @@ const withoutSupervisorEnv = Object.fromEntries(
   SUPERVISOR_HINT_ENV_VARS.map((key) => [key, undefined]),
 ) as Record<string, string | undefined>;
 const withoutGatewayAuthEnv = {
-  OPENCLAW_GATEWAY_TOKEN: undefined,
-  OPENCLAW_GATEWAY_PASSWORD: undefined,
+  STEELENGINE_GATEWAY_TOKEN: undefined,
+  STEELENGINE_GATEWAY_PASSWORD: undefined,
 };
 
 const { runtimeErrors, defaultRuntime, resetRuntimeCapture } = createCliRuntimeCapture();
@@ -132,15 +132,15 @@ const { runtimeErrors, defaultRuntime, resetRuntimeCapture } = createCliRuntimeC
 // (see runGatewayCli auth wiring); snapshot and clear them so shared vitest
 // workers do not leak credentials into later files' gateway connects.
 const serviceEnvSnapshot = captureEnv([
-  "OPENCLAW_SERVICE_MARKER",
-  "OPENCLAW_SERVICE_KIND",
+  "STEELENGINE_SERVICE_MARKER",
+  "STEELENGINE_SERVICE_KIND",
   GATEWAY_SERVICE_RUNTIME_PID_ENV,
-  "OPENCLAW_GATEWAY_TOKEN",
-  "OPENCLAW_GATEWAY_PASSWORD",
+  "STEELENGINE_GATEWAY_TOKEN",
+  "STEELENGINE_GATEWAY_PASSWORD",
 ]);
 
 vi.mock("../../config/config.js", () => ({
-  getConfigPath: () => "/tmp/openclaw-test-missing-config.json",
+  getConfigPath: () => "/tmp/steelengine-test-missing-config.json",
   readBestEffortConfig: () => readBestEffortConfig(),
   readConfigFileSnapshot: async () => configState.snapshot,
   readConfigFileSnapshotWithPluginMetadata: (options?: ConfigSnapshotReadOptionsStub) =>
@@ -155,10 +155,10 @@ vi.mock("../../commands/doctor/shared/pristine-startup-state.js", () => ({
 }));
 
 vi.mock("../../config/paths.js", () => ({
-  CONFIG_PATH: "/tmp/openclaw-test-missing-config.json",
+  CONFIG_PATH: "/tmp/steelengine-test-missing-config.json",
   normalizeStateDirEnv: (env?: NodeJS.ProcessEnv) => normalizeStateDirEnv(env),
   pinRuntimePaths: (env?: NodeJS.ProcessEnv) => pinRuntimePaths(env),
-  resolveConfigPath: () => "/tmp/openclaw-test-missing-config.json",
+  resolveConfigPath: () => "/tmp/steelengine-test-missing-config.json",
   resolveStateDir: () => "/tmp",
   resolveGatewayPort: (cfg?: { gateway?: { port?: number } }) => cfg?.gateway?.port ?? 18789,
 }));
@@ -199,13 +199,13 @@ vi.mock("../../gateway/auth.js", () => ({
     const token =
       (typeof params.authOverride?.token === "string" ? params.authOverride.token : undefined) ??
       (typeof params.authConfig?.token === "string" ? params.authConfig.token : undefined) ??
-      params.env?.OPENCLAW_GATEWAY_TOKEN;
+      params.env?.STEELENGINE_GATEWAY_TOKEN;
     const password =
       (typeof params.authOverride?.password === "string"
         ? params.authOverride.password
         : undefined) ??
       (typeof params.authConfig?.password === "string" ? params.authConfig.password : undefined) ??
-      params.env?.OPENCLAW_GATEWAY_PASSWORD;
+      params.env?.STEELENGINE_GATEWAY_PASSWORD;
     return {
       mode,
       token,
@@ -329,7 +329,7 @@ vi.mock("../command-format.js", () => ({
 vi.mock("../terminal-interactivity.js", () => ({
   isTerminalInteractive: () => isTerminalInteractive(),
   NON_INTERACTIVE_GATEWAY_RUN_FORCE_MESSAGE:
-    "Refusing to kill the operator's running gateway service from a non-interactive shell. Use an isolated dev gateway (openclaw gateway run --dev, or --profile <name> with a free port) for testing.",
+    "Refusing to kill the operator's running gateway service from a non-interactive shell. Use an isolated dev gateway (steelengine gateway run --dev, or --profile <name> with a free port) for testing.",
 }));
 
 vi.mock("../invalid-config-recovery.js", () => ({
@@ -366,10 +366,10 @@ describe("gateway run option collisions", () => {
   });
 
   beforeEach(() => {
-    delete process.env.OPENCLAW_SERVICE_MARKER;
-    delete process.env.OPENCLAW_SERVICE_KIND;
-    delete process.env.OPENCLAW_GATEWAY_TOKEN;
-    delete process.env.OPENCLAW_GATEWAY_PASSWORD;
+    delete process.env.STEELENGINE_SERVICE_MARKER;
+    delete process.env.STEELENGINE_SERVICE_KIND;
+    delete process.env.STEELENGINE_GATEWAY_TOKEN;
+    delete process.env.STEELENGINE_GATEWAY_PASSWORD;
     deleteTestEnvValue(GATEWAY_SERVICE_RUNTIME_PID_ENV);
     resetRuntimeCapture();
     configState.cfg = {};
@@ -483,7 +483,7 @@ describe("gateway run option collisions", () => {
       exists: true,
       hash: "initial",
       parsed: initialConfig,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       sourceConfig: initialConfig,
       valid: true,
     };
@@ -507,7 +507,7 @@ describe("gateway run option collisions", () => {
       exists: true,
       hash: "recovered",
       parsed: recoveredConfig,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       sourceConfig: recoveredConfig,
       valid: true,
     };
@@ -525,7 +525,7 @@ describe("gateway run option collisions", () => {
     configState.snapshot = {
       exists: true,
       valid: true,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       config: finalConfig,
       parsed: finalConfig,
       sourceConfig: finalConfig,
@@ -544,14 +544,14 @@ describe("gateway run option collisions", () => {
   });
 
   it("loads configured shell env fallback before final proxy refresh and gateway startup", async () => {
-    await withEnvAsync({ OPENCLAW_GATEWAY_TOKEN: undefined }, async () => {
+    await withEnvAsync({ STEELENGINE_GATEWAY_TOKEN: undefined }, async () => {
       const finalConfig = {
         env: {
           shellEnv: { enabled: true, timeoutMs: 1234 },
-          vars: { OPENCLAW_GATEWAY_TOKEN: "config-token" },
+          vars: { STEELENGINE_GATEWAY_TOKEN: "config-token" },
         },
         gateway: {
-          auth: { mode: "token", token: "${OPENCLAW_GATEWAY_TOKEN}" },
+          auth: { mode: "token", token: "${STEELENGINE_GATEWAY_TOKEN}" },
           mode: "local",
         },
         proxy: { enabled: true, proxyUrl: "http://127.0.0.1:29876" },
@@ -559,7 +559,7 @@ describe("gateway run option collisions", () => {
       configState.snapshot = {
         exists: true,
         valid: true,
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         config: finalConfig,
         parsed: finalConfig,
         sourceConfig: finalConfig,
@@ -567,14 +567,14 @@ describe("gateway run option collisions", () => {
       readConfigFileSnapshotWithPluginMetadata
         .mockImplementationOnce(async (options) => {
           expect(options?.lowerPrecedenceEnv).toBeUndefined();
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBeUndefined();
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBeUndefined();
           return { snapshot: configState.snapshot };
         })
         .mockImplementationOnce(async (options) => {
           expect(options?.lowerPrecedenceEnv).toEqual({
-            OPENCLAW_GATEWAY_TOKEN: "shell-token",
+            STEELENGINE_GATEWAY_TOKEN: "shell-token",
           });
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("shell-token");
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("shell-token");
           return {
             snapshot: {
               ...configState.snapshot,
@@ -590,7 +590,7 @@ describe("gateway run option collisions", () => {
         });
       loadShellEnvFallback.mockImplementationOnce((opts?: unknown) => {
         callOrder.push("shell-env");
-        (opts as { env: NodeJS.ProcessEnv }).env.OPENCLAW_GATEWAY_TOKEN = "shell-token";
+        (opts as { env: NodeJS.ProcessEnv }).env.STEELENGINE_GATEWAY_TOKEN = "shell-token";
       });
       const uninstall = installGatewayRunRuntimeHooks({ refreshManagedProxy });
       try {
@@ -602,18 +602,18 @@ describe("gateway run option collisions", () => {
       expect(loadShellEnvFallback).toHaveBeenCalledWith({
         enabled: true,
         env: process.env,
-        expectedKeys: ["OPENCLAW_GATEWAY_TOKEN"],
+        expectedKeys: ["STEELENGINE_GATEWAY_TOKEN"],
         logger: expect.any(Object),
         timeoutMs: 1234,
       });
       expect(readConfigFileSnapshotWithPluginMetadata).toHaveBeenCalledWith(
         expect.objectContaining({
-          lowerPrecedenceEnv: { OPENCLAW_GATEWAY_TOKEN: "shell-token" },
+          lowerPrecedenceEnv: { STEELENGINE_GATEWAY_TOKEN: "shell-token" },
         }),
       );
       expect(readConfigFileSnapshotWithPluginMetadata).toHaveBeenCalledTimes(2);
-      expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("config-token");
-      expect(clearShellEnvAppliedKeys).toHaveBeenCalledWith(["OPENCLAW_GATEWAY_TOKEN"]);
+      expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("config-token");
+      expect(clearShellEnvAppliedKeys).toHaveBeenCalledWith(["STEELENGINE_GATEWAY_TOKEN"]);
       const shellEnvOrder = loadShellEnvFallback.mock.invocationCallOrder[0] ?? 0;
       const initialConfigReadOrder =
         readConfigFileSnapshotWithPluginMetadata.mock.invocationCallOrder[0] ?? 0;
@@ -641,7 +641,7 @@ describe("gateway run option collisions", () => {
         config: finalConfig,
         exists: true,
         parsed: finalConfig,
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         sourceConfig: finalConfig,
         valid: true,
       };
@@ -661,7 +661,7 @@ describe("gateway run option collisions", () => {
   });
 
   it("removes shell fallback values when the final accepted config disables fallback", async () => {
-    await withEnvAsync({ OPENCLAW_GATEWAY_TOKEN: undefined }, async () => {
+    await withEnvAsync({ STEELENGINE_GATEWAY_TOKEN: undefined }, async () => {
       const enabledConfig = {
         env: { shellEnv: { enabled: true } },
         gateway: { auth: { mode: "none" }, mode: "local" },
@@ -673,7 +673,7 @@ describe("gateway run option collisions", () => {
         config,
         exists: true,
         parsed: config,
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         sourceConfig: config,
         valid: true,
       });
@@ -681,26 +681,26 @@ describe("gateway run option collisions", () => {
         .mockResolvedValueOnce({ snapshot: snapshot(enabledConfig) })
         .mockImplementationOnce(async (options) => {
           expect(options?.lowerPrecedenceEnv).toEqual({
-            OPENCLAW_GATEWAY_TOKEN: "shell-token",
+            STEELENGINE_GATEWAY_TOKEN: "shell-token",
           });
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("shell-token");
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("shell-token");
           return { snapshot: snapshot(disabledConfig) };
         })
         .mockImplementationOnce(async (options) => {
           expect(options?.lowerPrecedenceEnv).toBeUndefined();
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBeUndefined();
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBeUndefined();
           return { snapshot: snapshot(disabledConfig) };
         });
       loadShellEnvFallback.mockImplementationOnce((opts?: unknown) => {
-        (opts as { env: NodeJS.ProcessEnv }).env.OPENCLAW_GATEWAY_TOKEN = "shell-token";
+        (opts as { env: NodeJS.ProcessEnv }).env.STEELENGINE_GATEWAY_TOKEN = "shell-token";
       });
 
       await runGatewayCli(["gateway"]);
 
       expect(readConfigFileSnapshotWithPluginMetadata).toHaveBeenCalledTimes(3);
       expect(loadShellEnvFallback).toHaveBeenCalledOnce();
-      expect(clearShellEnvAppliedKeys).toHaveBeenCalledWith(["OPENCLAW_GATEWAY_TOKEN"]);
-      expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBeUndefined();
+      expect(clearShellEnvAppliedKeys).toHaveBeenCalledWith(["STEELENGINE_GATEWAY_TOKEN"]);
+      expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBeUndefined();
       expect(startGatewayServer).toHaveBeenCalledOnce();
     });
   });
@@ -708,16 +708,16 @@ describe("gateway run option collisions", () => {
   it("uses config env shell fallback controls without mutating the live env during planning", async () => {
     await withEnvAsync(
       {
-        OPENCLAW_GATEWAY_TOKEN: undefined,
-        OPENCLAW_LOAD_SHELL_ENV: undefined,
-        OPENCLAW_SHELL_ENV_TIMEOUT_MS: undefined,
+        STEELENGINE_GATEWAY_TOKEN: undefined,
+        STEELENGINE_LOAD_SHELL_ENV: undefined,
+        STEELENGINE_SHELL_ENV_TIMEOUT_MS: undefined,
       },
       async () => {
         const finalConfig = {
           env: {
             vars: {
-              OPENCLAW_LOAD_SHELL_ENV: "1",
-              OPENCLAW_SHELL_ENV_TIMEOUT_MS: "4321",
+              STEELENGINE_LOAD_SHELL_ENV: "1",
+              STEELENGINE_SHELL_ENV_TIMEOUT_MS: "4321",
             },
           },
           gateway: { auth: { mode: "none" }, mode: "local" },
@@ -726,15 +726,15 @@ describe("gateway run option collisions", () => {
           config: finalConfig,
           exists: true,
           parsed: finalConfig,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           sourceConfig: finalConfig,
           valid: true,
         };
         shouldEnableShellEnvFallback.mockImplementationOnce(
-          (env?: NodeJS.ProcessEnv) => env?.OPENCLAW_LOAD_SHELL_ENV === "1",
+          (env?: NodeJS.ProcessEnv) => env?.STEELENGINE_LOAD_SHELL_ENV === "1",
         );
         resolveShellEnvFallbackTimeoutMs.mockImplementationOnce((env?: NodeJS.ProcessEnv) =>
-          Number(env?.OPENCLAW_SHELL_ENV_TIMEOUT_MS),
+          Number(env?.STEELENGINE_SHELL_ENV_TIMEOUT_MS),
         );
 
         await runGatewayCli(["gateway"]);
@@ -742,8 +742,8 @@ describe("gateway run option collisions", () => {
         expect(loadShellEnvFallback).toHaveBeenCalledWith(
           expect.objectContaining({ enabled: true, timeoutMs: 4321 }),
         );
-        expect(process.env.OPENCLAW_LOAD_SHELL_ENV).toBe("1");
-        expect(process.env.OPENCLAW_SHELL_ENV_TIMEOUT_MS).toBe("4321");
+        expect(process.env.STEELENGINE_LOAD_SHELL_ENV).toBe("1");
+        expect(process.env.STEELENGINE_SHELL_ENV_TIMEOUT_MS).toBe("4321");
       },
     );
   });
@@ -751,15 +751,15 @@ describe("gateway run option collisions", () => {
   it("honors config env shell fallback deferral", async () => {
     await withEnvAsync(
       {
-        OPENCLAW_DEFER_SHELL_ENV_FALLBACK: undefined,
-        OPENCLAW_LOAD_SHELL_ENV: undefined,
+        STEELENGINE_DEFER_SHELL_ENV_FALLBACK: undefined,
+        STEELENGINE_LOAD_SHELL_ENV: undefined,
       },
       async () => {
         const finalConfig = {
           env: {
             vars: {
-              OPENCLAW_DEFER_SHELL_ENV_FALLBACK: "1",
-              OPENCLAW_LOAD_SHELL_ENV: "1",
+              STEELENGINE_DEFER_SHELL_ENV_FALLBACK: "1",
+              STEELENGINE_LOAD_SHELL_ENV: "1",
             },
           },
           gateway: { auth: { mode: "none" }, mode: "local" },
@@ -768,15 +768,15 @@ describe("gateway run option collisions", () => {
           config: finalConfig,
           exists: true,
           parsed: finalConfig,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           sourceConfig: finalConfig,
           valid: true,
         };
         shouldEnableShellEnvFallback.mockImplementationOnce(
-          (env?: NodeJS.ProcessEnv) => env?.OPENCLAW_LOAD_SHELL_ENV === "1",
+          (env?: NodeJS.ProcessEnv) => env?.STEELENGINE_LOAD_SHELL_ENV === "1",
         );
         shouldDeferShellEnvFallback.mockImplementationOnce(
-          (env?: NodeJS.ProcessEnv) => env?.OPENCLAW_DEFER_SHELL_ENV_FALLBACK === "1",
+          (env?: NodeJS.ProcessEnv) => env?.STEELENGINE_DEFER_SHELL_ENV_FALLBACK === "1",
         );
 
         await runGatewayCli(["gateway"]);
@@ -792,12 +792,12 @@ describe("gateway run option collisions", () => {
     clearGatewayRunConfigEnvironment();
     await withEnvAsync(
       {
-        OPENCLAW_DEFER_SHELL_ENV_FALLBACK: undefined,
-        OPENCLAW_LOAD_SHELL_ENV: "1",
+        STEELENGINE_DEFER_SHELL_ENV_FALLBACK: undefined,
+        STEELENGINE_LOAD_SHELL_ENV: "1",
       },
       async () => {
         const invalidConfig = {
-          env: { vars: { OPENCLAW_DEFER_SHELL_ENV_FALLBACK: "1" } },
+          env: { vars: { STEELENGINE_DEFER_SHELL_ENV_FALLBACK: "1" } },
           gateway: { mode: "local" },
         };
         configState.snapshot = {
@@ -805,15 +805,15 @@ describe("gateway run option collisions", () => {
           exists: true,
           issues: [{ path: "gateway", message: "invalid" }],
           parsed: invalidConfig,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           sourceConfig: invalidConfig,
           valid: false,
         };
         shouldEnableShellEnvFallback.mockImplementation(
-          (env?: NodeJS.ProcessEnv) => env?.OPENCLAW_LOAD_SHELL_ENV === "1",
+          (env?: NodeJS.ProcessEnv) => env?.STEELENGINE_LOAD_SHELL_ENV === "1",
         );
         shouldDeferShellEnvFallback.mockImplementation(
-          (env?: NodeJS.ProcessEnv) => env?.OPENCLAW_DEFER_SHELL_ENV_FALLBACK === "1",
+          (env?: NodeJS.ProcessEnv) => env?.STEELENGINE_DEFER_SHELL_ENV_FALLBACK === "1",
         );
 
         await runGatewayCli(["gateway", "--allow-unconfigured"]);
@@ -825,17 +825,17 @@ describe("gateway run option collisions", () => {
   });
 
   it("rejects an invalid final config after a prepared config selected runtime paths", async () => {
-    const selectedStateDir = "/tmp/openclaw-prepared-selected-state";
-    await withEnvAsync({ OPENCLAW_STATE_DIR: undefined }, async () => {
+    const selectedStateDir = "/tmp/steelengine-prepared-selected-state";
+    await withEnvAsync({ STEELENGINE_STATE_DIR: undefined }, async () => {
       const selectedConfig = {
-        env: { vars: { OPENCLAW_STATE_DIR: selectedStateDir } },
+        env: { vars: { STEELENGINE_STATE_DIR: selectedStateDir } },
         gateway: { mode: "local" },
       };
       configState.snapshot = {
         config: selectedConfig,
         exists: true,
         parsed: selectedConfig,
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         sourceConfig: selectedConfig,
         valid: true,
       };
@@ -847,7 +847,7 @@ describe("gateway run option collisions", () => {
 
       expect(await selectGatewayRunEnvironment({ opts: {}, runtime: defaultRuntime })).toBe(true);
       expect(await prepareGatewayRunBootstrap({ opts: {}, runtime: defaultRuntime })).toBe(true);
-      expect(process.env.OPENCLAW_STATE_DIR).toBe(selectedStateDir);
+      expect(process.env.STEELENGINE_STATE_DIR).toBe(selectedStateDir);
 
       const invalidSnapshot = {
         ...configState.snapshot,
@@ -869,30 +869,30 @@ describe("gateway run option collisions", () => {
   it("replaces config-derived env when the final startup snapshot changes in place", async () => {
     await withEnvAsync(
       {
-        OPENCLAW_GATEWAY_TOKEN: undefined,
-        OPENCLAW_PROXY_URL: undefined,
-        OPENCLAW_RAW_STREAM: undefined,
+        STEELENGINE_GATEWAY_TOKEN: undefined,
+        STEELENGINE_PROXY_URL: undefined,
+        STEELENGINE_RAW_STREAM: undefined,
       },
       async () => {
         const oldConfig = {
           env: {
             vars: {
-              OPENCLAW_GATEWAY_TOKEN: "old-token",
-              OPENCLAW_PROXY_URL: "http://127.0.0.1:19876",
-              OPENCLAW_RAW_STREAM: "1",
+              STEELENGINE_GATEWAY_TOKEN: "old-token",
+              STEELENGINE_PROXY_URL: "http://127.0.0.1:19876",
+              STEELENGINE_RAW_STREAM: "1",
             },
           },
           gateway: { mode: "local" },
         };
         const newConfig = {
-          env: { vars: { OPENCLAW_GATEWAY_TOKEN: "new-token" } },
+          env: { vars: { STEELENGINE_GATEWAY_TOKEN: "new-token" } },
           gateway: { mode: "local" },
         };
         configState.snapshot = {
           config: oldConfig,
           exists: true,
           hash: "old",
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           sourceConfig: oldConfig,
           valid: true,
         };
@@ -902,27 +902,27 @@ describe("gateway run option collisions", () => {
         await prepareGatewayRunBootstrap({ opts: {}, runtime: defaultRuntime });
         expect(pinRuntimePaths).toHaveBeenCalledWith(process.env);
         expect(pinConfigDir).toHaveBeenCalledWith(process.env);
-        expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("old-token");
-        expect(process.env.OPENCLAW_PROXY_URL).toBe("http://127.0.0.1:19876");
+        expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("old-token");
+        expect(process.env.STEELENGINE_PROXY_URL).toBe("http://127.0.0.1:19876");
 
         configState.snapshot = {
           config: newConfig,
           exists: true,
           hash: "new",
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           sourceConfig: newConfig,
           valid: true,
         };
         readConfigFileSnapshotWithPluginMetadata.mockImplementationOnce(async () => {
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBeUndefined();
-          expect(process.env.OPENCLAW_PROXY_URL).toBeUndefined();
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBeUndefined();
+          expect(process.env.STEELENGINE_PROXY_URL).toBeUndefined();
           return { snapshot: configState.snapshot };
         });
         await runGatewayCli(["gateway", "--raw-stream"]);
 
-        expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("new-token");
-        expect(process.env.OPENCLAW_PROXY_URL).toBeUndefined();
-        expect(process.env.OPENCLAW_RAW_STREAM).toBe("1");
+        expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("new-token");
+        expect(process.env.STEELENGINE_PROXY_URL).toBeUndefined();
+        expect(process.env.STEELENGINE_RAW_STREAM).toBe("1");
       },
     );
   });
@@ -973,14 +973,14 @@ describe("gateway run option collisions", () => {
     expect(findVerifiedGatewayListenerPidsOnPortSync).toHaveBeenCalledWith(18789);
     expect(forceFreePortAndWait).toHaveBeenCalledTimes(1);
     expect(startGatewayServer).not.toHaveBeenCalled();
-    expect(runtimeErrors.join("\n")).toContain("openclaw gateway run --dev");
+    expect(runtimeErrors.join("\n")).toContain("steelengine gateway run --dev");
     expect(runtimeErrors.join("\n")).toContain("--profile <name> with a free port");
   });
 
   it("marks service-mode gateway descendants with the live gateway pid", async () => {
     await withEnvAsync(
       {
-        OPENCLAW_SERVICE_MARKER: "openclaw",
+        STEELENGINE_SERVICE_MARKER: "steelengine",
         [GATEWAY_SERVICE_RUNTIME_PID_ENV]: undefined,
       },
       async () => {
@@ -995,7 +995,7 @@ describe("gateway run option collisions", () => {
   it("protects the inherited service pid before replacing it", async () => {
     await withEnvAsync(
       {
-        OPENCLAW_SERVICE_MARKER: "openclaw",
+        STEELENGINE_SERVICE_MARKER: "steelengine",
         [GATEWAY_SERVICE_RUNTIME_PID_ENV]: "4242",
       },
       async () => {
@@ -1012,25 +1012,25 @@ describe("gateway run option collisions", () => {
   it("marks descendants when the final config supplies the service marker", async () => {
     await withEnvAsync(
       {
-        OPENCLAW_SERVICE_MARKER: undefined,
+        STEELENGINE_SERVICE_MARKER: undefined,
         [GATEWAY_SERVICE_RUNTIME_PID_ENV]: undefined,
       },
       async () => {
         const finalConfig = {
-          env: { vars: { OPENCLAW_SERVICE_MARKER: "openclaw" } },
+          env: { vars: { STEELENGINE_SERVICE_MARKER: "steelengine" } },
           gateway: { mode: "local" },
         };
         configState.snapshot = {
           config: finalConfig,
           exists: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           sourceConfig: finalConfig,
           valid: true,
         };
 
         await runGatewayCli(["gateway"]);
 
-        expect(process.env.OPENCLAW_SERVICE_MARKER).toBe("openclaw");
+        expect(process.env.STEELENGINE_SERVICE_MARKER).toBe("steelengine");
         expect(process.env[GATEWAY_SERVICE_RUNTIME_PID_ENV]).toBe(String(process.pid));
       },
     );
@@ -1039,12 +1039,12 @@ describe("gateway run option collisions", () => {
   it("rechecks future config after the final config enters service mode", async () => {
     await withEnvAsync(
       {
-        OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: "1",
-        OPENCLAW_SERVICE_MARKER: undefined,
+        STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: "1",
+        STEELENGINE_SERVICE_MARKER: undefined,
       },
       async () => {
         const finalConfig = {
-          env: { vars: { OPENCLAW_SERVICE_MARKER: "openclaw" } },
+          env: { vars: { STEELENGINE_SERVICE_MARKER: "steelengine" } },
           gateway: { mode: "local" },
           meta: { lastTouchedVersion: "9999.1.1" },
         };
@@ -1052,15 +1052,15 @@ describe("gateway run option collisions", () => {
         configState.snapshot = {
           config: finalConfig,
           exists: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           sourceConfig: finalConfig,
           valid: true,
         };
 
         await expect(runGatewayCli(["gateway"])).rejects.toThrow("__exit__:78");
 
-        expect(process.env.OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
-        expect(process.env.OPENCLAW_SERVICE_MARKER).toBeUndefined();
+        expect(process.env.STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS).toBeUndefined();
+        expect(process.env.STEELENGINE_SERVICE_MARKER).toBeUndefined();
         expect(startGatewayServer).not.toHaveBeenCalled();
         expect(runtimeErrors.join("\n")).toContain("start the gateway service");
       },
@@ -1091,17 +1091,17 @@ describe("gateway run option collisions", () => {
       config: { meta: { lastTouchedVersion: "9999.1.1" } },
       sourceConfig: { meta: { lastTouchedVersion: "9999.1.1" } },
     };
-    const previousMarker = process.env.OPENCLAW_SERVICE_MARKER;
-    process.env.OPENCLAW_SERVICE_MARKER = "gateway";
+    const previousMarker = process.env.STEELENGINE_SERVICE_MARKER;
+    process.env.STEELENGINE_SERVICE_MARKER = "gateway";
     try {
       await expect(runGatewayCli(["gateway", "run", "--allow-unconfigured"])).rejects.toThrow(
         "__exit__:78",
       );
     } finally {
       if (previousMarker === undefined) {
-        delete process.env.OPENCLAW_SERVICE_MARKER;
+        delete process.env.STEELENGINE_SERVICE_MARKER;
       } else {
-        process.env.OPENCLAW_SERVICE_MARKER = previousMarker;
+        process.env.STEELENGINE_SERVICE_MARKER = previousMarker;
       }
     }
 
@@ -1148,12 +1148,12 @@ describe("gateway run option collisions", () => {
   it("does not retain targets or credentials from the config deleted by dev reset", async () => {
     await withEnvAsync(
       {
-        OPENCLAW_CONFIG_PATH: undefined,
-        OPENCLAW_GATEWAY_TOKEN: undefined,
-        OPENCLAW_HOME: undefined,
-        OPENCLAW_PROFILE: undefined,
-        OPENCLAW_STATE_DIR: undefined,
-        OPENCLAW_WORKSPACE_DIR: undefined,
+        STEELENGINE_CONFIG_PATH: undefined,
+        STEELENGINE_GATEWAY_TOKEN: undefined,
+        STEELENGINE_HOME: undefined,
+        STEELENGINE_PROFILE: undefined,
+        STEELENGINE_STATE_DIR: undefined,
+        STEELENGINE_WORKSPACE_DIR: undefined,
       },
       async () => {
         configState.snapshot = {
@@ -1163,22 +1163,22 @@ describe("gateway run option collisions", () => {
           sourceConfig: {
             env: {
               vars: {
-                OPENCLAW_CONFIG_PATH: "/tmp/openclaw-reset/openclaw.json",
-                OPENCLAW_GATEWAY_TOKEN: "old-token",
-                OPENCLAW_HOME: "/tmp/openclaw-reset-home",
-                OPENCLAW_STATE_DIR: "/tmp/openclaw-reset",
+                STEELENGINE_CONFIG_PATH: "/tmp/steelengine-reset/steelengine.json",
+                STEELENGINE_GATEWAY_TOKEN: "old-token",
+                STEELENGINE_HOME: "/tmp/steelengine-reset-home",
+                STEELENGINE_STATE_DIR: "/tmp/steelengine-reset",
               },
             },
             gateway: { mode: "local" },
           },
         };
         ensureDevGatewayConfig.mockImplementationOnce(async () => {
-          expect(process.env.OPENCLAW_CONFIG_PATH).toBeUndefined();
-          expect(process.env.OPENCLAW_HOME).toBeUndefined();
-          expect(process.env.OPENCLAW_PROFILE).toBe("dev");
-          expect(process.env.OPENCLAW_STATE_DIR).toBeUndefined();
-          expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBeUndefined();
-          expect(process.env.OPENCLAW_WORKSPACE_DIR).toBe("/tmp/openclaw-reset-workspace");
+          expect(process.env.STEELENGINE_CONFIG_PATH).toBeUndefined();
+          expect(process.env.STEELENGINE_HOME).toBeUndefined();
+          expect(process.env.STEELENGINE_PROFILE).toBe("dev");
+          expect(process.env.STEELENGINE_STATE_DIR).toBeUndefined();
+          expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBeUndefined();
+          expect(process.env.STEELENGINE_WORKSPACE_DIR).toBe("/tmp/steelengine-reset-workspace");
           configState.snapshot = {
             exists: true,
             valid: true,
@@ -1187,10 +1187,10 @@ describe("gateway run option collisions", () => {
           };
         });
         loadGlobalRuntimeDotEnvFiles.mockImplementation(() => {
-          process.env.OPENCLAW_GATEWAY_TOKEN ??= "trusted-token";
-          process.env.OPENCLAW_PROFILE ??= "dev";
-          if (process.env.OPENCLAW_WORKSPACE_DIR === undefined) {
-            setTestEnvValue("OPENCLAW_WORKSPACE_DIR", "/tmp/openclaw-reset-workspace");
+          process.env.STEELENGINE_GATEWAY_TOKEN ??= "trusted-token";
+          process.env.STEELENGINE_PROFILE ??= "dev";
+          if (process.env.STEELENGINE_WORKSPACE_DIR === undefined) {
+            setTestEnvValue("STEELENGINE_WORKSPACE_DIR", "/tmp/steelengine-reset-workspace");
           }
         });
 
@@ -1198,27 +1198,27 @@ describe("gateway run option collisions", () => {
         await runGatewayCli(["gateway", "run", "--allow-unconfigured", "--dev", "--reset"]);
 
         expect(ensureDevGatewayConfig).toHaveBeenCalledWith({ reset: true });
-        expect(process.env.OPENCLAW_GATEWAY_TOKEN).toBe("trusted-token");
+        expect(process.env.STEELENGINE_GATEWAY_TOKEN).toBe("trusted-token");
         expect(loadGlobalRuntimeDotEnvFiles).toHaveBeenCalled();
       },
     );
   });
 
   it("refuses dev reset if trusted dotenv retargets after pre-bootstrap", async () => {
-    await withEnvAsync({ OPENCLAW_STATE_DIR: "/tmp/openclaw-reset-original" }, async () => {
+    await withEnvAsync({ STEELENGINE_STATE_DIR: "/tmp/steelengine-reset-original" }, async () => {
       configState.snapshot = {
         config: { gateway: { mode: "local" } },
         exists: true,
-        path: "/tmp/openclaw-reset-original/openclaw.json",
+        path: "/tmp/steelengine-reset-original/steelengine.json",
         sourceConfig: { gateway: { mode: "local" } },
         valid: true,
       };
       await prepareGatewayReset();
       loadGlobalRuntimeDotEnvFiles.mockImplementation(() => {
-        setTestEnvValue("OPENCLAW_STATE_DIR", "/tmp/openclaw-reset-retargeted");
+        setTestEnvValue("STEELENGINE_STATE_DIR", "/tmp/steelengine-reset-retargeted");
         return {
           gatewayEnvAppliedKeys: [],
-          stateEnvAppliedKeys: ["OPENCLAW_STATE_DIR"],
+          stateEnvAppliedKeys: ["STEELENGINE_STATE_DIR"],
         };
       });
 
@@ -1227,7 +1227,7 @@ describe("gateway run option collisions", () => {
       ).rejects.toThrow("__exit__:1");
 
       expect(ensureDevGatewayConfig).not.toHaveBeenCalled();
-      expect(process.env.OPENCLAW_STATE_DIR).toBe("/tmp/openclaw-reset-original");
+      expect(process.env.STEELENGINE_STATE_DIR).toBe("/tmp/steelengine-reset-original");
       expect(runtimeErrors.join("\n")).toContain(
         "selected config or state target changed during startup",
       );
@@ -1235,19 +1235,19 @@ describe("gateway run option collisions", () => {
   });
 
   it.each([
-    "OPENCLAW_AGENT_DIR",
-    "OPENCLAW_INCLUDE_ROOTS",
-    "OPENCLAW_NIX_MODE",
-    "OPENCLAW_OAUTH_DIR",
-    "OPENCLAW_PACKAGE_DIR",
-    "OPENCLAW_PROFILE",
-    "OPENCLAW_STATE_DIR",
-    "OPENCLAW_WORKSPACE_DIR",
+    "STEELENGINE_AGENT_DIR",
+    "STEELENGINE_INCLUDE_ROOTS",
+    "STEELENGINE_NIX_MODE",
+    "STEELENGINE_OAUTH_DIR",
+    "STEELENGINE_PACKAGE_DIR",
+    "STEELENGINE_PROFILE",
+    "STEELENGINE_STATE_DIR",
+    "STEELENGINE_WORKSPACE_DIR",
     "PI_CODING_AGENT_DIR",
   ])("blocks trusted dotenv selector drift for %s after startup mutations", async (selector) => {
-    await withEnvAsync({ [selector]: "/tmp/openclaw-reset-value" }, async () => {
+    await withEnvAsync({ [selector]: "/tmp/steelengine-reset-value" }, async () => {
       loadGlobalRuntimeDotEnvFiles.mockImplementation(() => {
-        setTestEnvValue(selector, "/tmp/openclaw-reset-retargeted");
+        setTestEnvValue(selector, "/tmp/steelengine-reset-retargeted");
       });
       const { reloadTrustedGatewayRunEnvironment } = await import("./pre-bootstrap.js");
 
@@ -1255,7 +1255,7 @@ describe("gateway run option collisions", () => {
         "__exit__:1",
       );
 
-      expect(process.env[selector]).toBe("/tmp/openclaw-reset-value");
+      expect(process.env[selector]).toBe("/tmp/steelengine-reset-value");
       expect(runtimeErrors.join("\n")).toContain(
         "trusted dotenv reload after startup mutations changed config or state selection",
       );
@@ -1286,14 +1286,14 @@ describe("gateway run option collisions", () => {
     let recoveryAllowed: boolean | undefined;
     await withEnvAsync(
       {
-        OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: "1",
-        OPENCLAW_SERVICE_MARKER: undefined,
+        STEELENGINE_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS: "1",
+        STEELENGINE_SERVICE_MARKER: undefined,
       },
       async () => {
         readConfigFileSnapshotWithPluginMetadata.mockImplementationOnce(async (options) => {
           recoveryAllowed = await options?.allowSuspiciousRecovery?.(
             {
-              env: { vars: { OPENCLAW_SERVICE_MARKER: "gateway" } },
+              env: { vars: { STEELENGINE_SERVICE_MARKER: "gateway" } },
               gateway: { mode: "local" },
               meta: { lastTouchedVersion: "9999.1.1" },
             },
@@ -1336,20 +1336,20 @@ describe("gateway run option collisions", () => {
   });
 
   it("blocks a final startup snapshot that changes guarded config selection", async () => {
-    await withEnvAsync({ OPENCLAW_STATE_DIR: undefined }, async () => {
+    await withEnvAsync({ STEELENGINE_STATE_DIR: undefined }, async () => {
       configState.snapshot = {
         exists: true,
         valid: true,
         config: { gateway: { mode: "local" } },
         sourceConfig: {
-          env: { vars: { OPENCLAW_STATE_DIR: "/tmp/openclaw-late-selection" } },
+          env: { vars: { STEELENGINE_STATE_DIR: "/tmp/steelengine-late-selection" } },
           gateway: { mode: "local" },
         },
       };
 
       await expect(runGatewayCli(["gateway", "run"])).rejects.toThrow("__exit__:1");
 
-      expect(process.env.OPENCLAW_STATE_DIR).toBeUndefined();
+      expect(process.env.STEELENGINE_STATE_DIR).toBeUndefined();
       expect(startGatewayServer).not.toHaveBeenCalled();
       expect(runtimeErrors.join("\n")).toContain(
         "final config read changed config or state selection",
@@ -1358,16 +1358,16 @@ describe("gateway run option collisions", () => {
   });
 
   it("blocks a final startup snapshot that changes an already-selected config selector", async () => {
-    await withEnvAsync({ OPENCLAW_STATE_DIR: undefined }, async () => {
+    await withEnvAsync({ STEELENGINE_STATE_DIR: undefined }, async () => {
       const guardedConfig = {
-        env: { vars: { OPENCLAW_STATE_DIR: "/tmp/openclaw-guarded-state" } },
+        env: { vars: { STEELENGINE_STATE_DIR: "/tmp/steelengine-guarded-state" } },
         gateway: { mode: "local" },
       };
       configState.snapshot = {
         config: guardedConfig,
         exists: true,
         hash: "guarded",
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         sourceConfig: guardedConfig,
         valid: true,
       };
@@ -1375,24 +1375,24 @@ describe("gateway run option collisions", () => {
         await import("./pre-bootstrap.js");
       await selectGatewayRunEnvironment({ opts: {}, runtime: defaultRuntime });
       await prepareGatewayRunBootstrap({ opts: {}, runtime: defaultRuntime });
-      expect(process.env.OPENCLAW_STATE_DIR).toBe("/tmp/openclaw-guarded-state");
+      expect(process.env.STEELENGINE_STATE_DIR).toBe("/tmp/steelengine-guarded-state");
 
       const finalConfig = {
-        env: { vars: { OPENCLAW_STATE_DIR: "/tmp/openclaw-final-state" } },
+        env: { vars: { STEELENGINE_STATE_DIR: "/tmp/steelengine-final-state" } },
         gateway: { mode: "local" },
       };
       configState.snapshot = {
         config: finalConfig,
         exists: true,
         hash: "final",
-        path: "/tmp/openclaw.json",
+        path: "/tmp/steelengine.json",
         sourceConfig: finalConfig,
         valid: true,
       };
 
       await expect(runGatewayCli(["gateway", "run"])).rejects.toThrow("__exit__:1");
 
-      expect(process.env.OPENCLAW_STATE_DIR).toBe("/tmp/openclaw-guarded-state");
+      expect(process.env.STEELENGINE_STATE_DIR).toBe("/tmp/steelengine-guarded-state");
       expect(startGatewayServer).not.toHaveBeenCalled();
       expect(runtimeErrors.join("\n")).toContain(
         "final config read changed config or state selection",
@@ -1404,12 +1404,12 @@ describe("gateway run option collisions", () => {
     ["--cli-backend-logs", "generic flag"],
     ["--claude-cli-logs", "deprecated alias"],
   ])("enables CLI backend log filtering via %s (%s)", async (flag) => {
-    delete process.env.OPENCLAW_CLI_BACKEND_LOG_OUTPUT;
+    delete process.env.STEELENGINE_CLI_BACKEND_LOG_OUTPUT;
 
     await runGatewayCli(["gateway", "run", flag, "--allow-unconfigured"]);
 
     expect(setConsoleSubsystemFilter).toHaveBeenCalledWith(["agent/cli-backend"]);
-    expect(process.env.OPENCLAW_CLI_BACKEND_LOG_OUTPUT).toBe("1");
+    expect(process.env.STEELENGINE_CLI_BACKEND_LOG_OUTPUT).toBe("1");
   });
 
   it("starts gateway when token mode has no configured token (startup bootstrap path)", async () => {
@@ -1587,7 +1587,7 @@ describe("gateway run option collisions", () => {
     await expect(runGatewayCli(["gateway", "run"])).rejects.toThrow("__exit__:78");
 
     expect(runtimeErrors).toContain(
-      "Gateway start blocked: existing config is missing gateway.mode. Treat this as suspicious or clobbered config. Re-run `openclaw onboard --mode local` or `openclaw setup`, set gateway.mode=local manually, or pass --allow-unconfigured.",
+      "Gateway start blocked: existing config is missing gateway.mode. Treat this as suspicious or clobbered config. Re-run `steelengine onboard --mode local` or `steelengine setup`, set gateway.mode=local manually, or pass --allow-unconfigured.",
     );
     expect(runtimeErrors).toContain(
       `Config write audit: ${path.join("/tmp", "logs", "config-audit.jsonl")}`,
@@ -1601,7 +1601,7 @@ describe("gateway run option collisions", () => {
     configState.snapshot = {
       exists: true,
       valid: false,
-      path: "/tmp/openclaw-test-missing-config.json",
+      path: "/tmp/steelengine-test-missing-config.json",
       config: {},
       parsed: null,
       issues: [{ path: "<root>", message: "JSON5 parse failed" }],
@@ -1611,7 +1611,7 @@ describe("gateway run option collisions", () => {
     await expect(runGatewayCli(["gateway", "run"])).rejects.toThrow("__exit__:78");
 
     expect(runtimeErrors).toContain(
-      "Gateway start blocked: existing config is missing gateway.mode. Treat this as suspicious or clobbered config. Re-run `openclaw onboard --mode local` or `openclaw setup`, set gateway.mode=local manually, or pass --allow-unconfigured.",
+      "Gateway start blocked: existing config is missing gateway.mode. Treat this as suspicious or clobbered config. Re-run `steelengine onboard --mode local` or `steelengine setup`, set gateway.mode=local manually, or pass --allow-unconfigured.",
     );
     expect(runtimeErrors).toContain(
       `Config write audit: ${path.join("/tmp", "logs", "config-audit.jsonl")}`,
@@ -1624,7 +1624,7 @@ describe("gateway run option collisions", () => {
     configState.snapshot = {
       exists: true,
       valid: false,
-      path: "/tmp/openclaw-test-missing-config.json",
+      path: "/tmp/steelengine-test-missing-config.json",
       config: {},
       parsed: null,
       issues: [{ path: "<root>", message: "JSON5 parse failed" }],
@@ -1642,7 +1642,7 @@ describe("gateway run option collisions", () => {
     configState.snapshot = {
       exists: true,
       valid: false,
-      path: "/tmp/openclaw-test-missing-config.json",
+      path: "/tmp/steelengine-test-missing-config.json",
       config: {},
       parsed: null,
       issues: [{ path: "<root>", message: "JSON5 parse failed" }],
@@ -1659,7 +1659,7 @@ describe("gateway run option collisions", () => {
   it("does not offer doctor repair after --allow-unconfigured reaches startup", async () => {
     const { createInvalidConfigError } = await import("../../config/io.invalid-config.js");
     startGatewayServer.mockRejectedValueOnce(
-      createInvalidConfigError("/tmp/openclaw.json", "gateway.mode: invalid"),
+      createInvalidConfigError("/tmp/steelengine.json", "gateway.mode: invalid"),
     );
 
     await expect(runGatewayCli(["gateway", "run", "--allow-unconfigured"])).rejects.toThrow(
@@ -1691,7 +1691,7 @@ describe("gateway run option collisions", () => {
       gateway: {
         auth: {
           mode: "password",
-          password: { source: "env", provider: "default", id: "OPENCLAW_GATEWAY_PASSWORD" },
+          password: { source: "env", provider: "default", id: "STEELENGINE_GATEWAY_PASSWORD" },
         },
       },
       secrets: {
@@ -1714,7 +1714,7 @@ describe("gateway run option collisions", () => {
 
   it("reads gateway password from --password-file", async () => {
     await withTempSecretFiles(
-      "openclaw-gateway-run-",
+      "steelengine-gateway-run-",
       { password: "pw_from_file\n" },
       async ({ passwordFile }) => {
         await runGatewayCli([
@@ -1733,7 +1733,7 @@ describe("gateway run option collisions", () => {
     expect(options.auth?.mode).toBe("password");
     expect(options.auth?.password).toBe("pw_from_file"); // pragma: allowlist secret
     expect(runtimeErrors).not.toContain(
-      "Warning: --password can be exposed via process listings. Prefer --password-file or OPENCLAW_GATEWAY_PASSWORD.",
+      "Warning: --password can be exposed via process listings. Prefer --password-file or STEELENGINE_GATEWAY_PASSWORD.",
     );
   });
 
@@ -1749,13 +1749,13 @@ describe("gateway run option collisions", () => {
     ]);
 
     expect(runtimeErrors).toContain(
-      "Warning: --password can be exposed via process listings. Prefer --password-file or OPENCLAW_GATEWAY_PASSWORD.",
+      "Warning: --password can be exposed via process listings. Prefer --password-file or STEELENGINE_GATEWAY_PASSWORD.",
     );
   });
 
   it("rejects using both --password and --password-file", async () => {
     await withTempSecretFiles(
-      "openclaw-gateway-run-",
+      "steelengine-gateway-run-",
       { password: "pw_from_file\n" },
       async ({ passwordFile }) => {
         await expect(

@@ -1,12 +1,12 @@
-# OpenClaw Qianfan Provider
+# SteelEngine Qianfan Provider
 
-Official OpenClaw provider plugin for Qianfan.
+Official SteelEngine provider plugin for Qianfan.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/qianfan-provider
-openclaw gateway restart
+steelengine plugins install @steelengine/qianfan-provider
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/providers/qianfan> for setup and configuration.
+See <https://docs.steelengine.ai/providers/qianfan> for setup and configuration.

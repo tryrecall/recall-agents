@@ -1,8 +1,8 @@
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import { isWellFormedApprovalId } from "../../packages/gateway-protocol/src/schema/approval-id.js";
 import type { ReplyPayload } from "../auto-reply/types.js";
 import type {
@@ -102,13 +102,13 @@ function buildGenericNativeExecApprovalFallbackText(params?: {
     excludeChannel: params?.excludeChannel,
   });
   let manualRecovery =
-    "Print the Control UI URL with `openclaw dashboard --no-open`, open it in a browser, then use the approval inbox.";
+    "Print the Control UI URL with `steelengine dashboard --no-open`, open it in a browser, then use the approval inbox.";
   if (params?.host === "node") {
     const nodeId = normalizeOptionalString(params.nodeId) ?? "<id|name|ip>";
-    manualRecovery += ` Inspect the node's effective exec policy with \`openclaw approvals get --node ${nodeId}\`.`;
+    manualRecovery += ` Inspect the node's effective exec policy with \`steelengine approvals get --node ${nodeId}\`.`;
   }
   return clients
-    ? `Approve it from the Web UI or terminal UI, or enable a native chat approval client such as ${clients}. ${manualRecovery} If those accounts already know your owner ID via allowFrom or owner config, OpenClaw can often infer approvers automatically.`
+    ? `Approve it from the Web UI or terminal UI, or enable a native chat approval client such as ${clients}. ${manualRecovery} If those accounts already know your owner ID via allowFrom or owner config, SteelEngine can often infer approvers automatically.`
     : `Approve it from the Web UI or terminal UI. ${manualRecovery}`;
 }
 

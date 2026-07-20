@@ -3,6 +3,6 @@ import type { CustodianRouteData } from "./route.ts";
 
 export function renderCustodianRoute(data: CustodianRouteData | undefined) {
   return html`
-    <openclaw-custodian-page .onboarding=${data?.onboarding === true}></openclaw-custodian-page>
+    <steelengine-custodian-page .onboarding=${data?.onboarding === true}></steelengine-custodian-page>
   `;
 }

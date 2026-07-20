@@ -1,17 +1,17 @@
 {
-  "name": "@openclaw/pixverse-provider",
+  "name": "@steelengine/pixverse-provider",
   "version": "2026.7.2-beta.3",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
-      "name": "@openclaw/pixverse-provider",
+      "name": "@steelengine/pixverse-provider",
       "version": "2026.7.2-beta.3",
       "peerDependencies": {
-        "openclaw": ">=2026.7.2-beta.3"
+        "steelengine": ">=2026.7.2-beta.3"
       },
       "peerDependenciesMeta": {
-        "openclaw": {
+        "steelengine": {
           "optional": true
         }
       }

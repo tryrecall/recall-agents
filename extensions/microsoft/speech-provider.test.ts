@@ -2,19 +2,19 @@
 import { mkdtempSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   finalizeDebugProxyCapture,
   getDebugProxyCaptureStore,
   initializeDebugProxyCapture,
-} from "openclaw/plugin-sdk/proxy-capture";
+} from "steelengine/plugin-sdk/proxy-capture";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { installDebugProxyTestResetHooks } from "../test-support/debug-proxy-env-test-helpers.js";
 
 const fetchWithSsrFGuardMock = vi.hoisted(() => vi.fn());
 
-vi.mock("openclaw/plugin-sdk/ssrf-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/ssrf-runtime")>();
+vi.mock("steelengine/plugin-sdk/ssrf-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("steelengine/plugin-sdk/ssrf-runtime")>();
   return {
     ...actual,
     fetchWithSsrFGuard: (...args: Parameters<typeof actual.fetchWithSsrFGuard>) => {
@@ -33,7 +33,7 @@ vi.mock("node-edge-tts", () => ({
 import { buildMicrosoftSpeechProvider } from "./speech-provider.js";
 import * as ttsModule from "./tts.js";
 
-const TEST_CFG = {} as OpenClawConfig;
+const TEST_CFG = {} as SteelEngineConfig;
 
 async function listVoicesThroughProvider() {
   const listVoices = buildMicrosoftSpeechProvider().listVoices;
@@ -134,9 +134,9 @@ describe("listMicrosoftVoices", () => {
   it("records voice discovery exchanges in debug proxy capture mode", async () => {
     const tempDir = mkdtempSync(path.join(os.tmpdir(), "microsoft-voices-capture-"));
     proxyReset.captureProxyEnv();
-    process.env.OPENCLAW_DEBUG_PROXY_ENABLED = "1";
-    process.env.OPENCLAW_STATE_DIR = tempDir;
-    process.env.OPENCLAW_DEBUG_PROXY_SESSION_ID = "ms-voices-session";
+    process.env.STEELENGINE_DEBUG_PROXY_ENABLED = "1";
+    process.env.STEELENGINE_STATE_DIR = tempDir;
+    process.env.STEELENGINE_DEBUG_PROXY_SESSION_ID = "ms-voices-session";
 
     globalThis.fetch = vi
       .fn()
@@ -149,8 +149,8 @@ describe("listMicrosoftVoices", () => {
       id: "ms-voices-session",
       startedAt: Date.now(),
       mode: "test",
-      sourceScope: "openclaw",
-      sourceProcess: "openclaw",
+      sourceScope: "steelengine",
+      sourceProcess: "steelengine",
     });
 
     await listVoicesThroughProvider();
@@ -173,9 +173,9 @@ describe("listMicrosoftVoices", () => {
   it("does not double-capture voice discovery when the global fetch patch is installed", async () => {
     const tempDir = mkdtempSync(path.join(os.tmpdir(), "microsoft-voices-global-"));
     proxyReset.captureProxyEnv();
-    process.env.OPENCLAW_DEBUG_PROXY_ENABLED = "1";
-    process.env.OPENCLAW_STATE_DIR = tempDir;
-    process.env.OPENCLAW_DEBUG_PROXY_SESSION_ID = "ms-voices-global-session";
+    process.env.STEELENGINE_DEBUG_PROXY_ENABLED = "1";
+    process.env.STEELENGINE_STATE_DIR = tempDir;
+    process.env.STEELENGINE_DEBUG_PROXY_SESSION_ID = "ms-voices-global-session";
 
     globalThis.fetch = vi.fn(
       async () => new Response(JSON.stringify([{ ShortName: "en-US-AvaNeural" }]), { status: 200 }),
@@ -186,8 +186,8 @@ describe("listMicrosoftVoices", () => {
       id: "ms-voices-global-session",
       startedAt: Date.now(),
       mode: "test",
-      sourceScope: "openclaw",
-      sourceProcess: "openclaw",
+      sourceScope: "steelengine",
+      sourceProcess: "steelengine",
     });
     initializeDebugProxyCapture("test");
 

@@ -19,7 +19,7 @@ import {
 } from "../../../lib/chat/tool-display.ts";
 import { copyToClipboard } from "../../../lib/clipboard.ts";
 import { type EditorId, openEditor } from "../../../lib/editor-links.ts";
-import { OpenClawLightDomElement } from "../../../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../../../lit/steelengine-element.ts";
 import "./session-diff-panel.ts";
 import { renderChatSidebarEditorMenu } from "./chat-sidebar-editor-menu.ts";
 import type { FileEditorViewHandle } from "./file-editor-view.ts";
@@ -281,7 +281,7 @@ function renderFileSidebarContent(
       <div class="sidebar-file-view__path-bar">
         <div class="sidebar-file-view__path-field">
           <span class="sidebar-file-view__path" title=${content.path}>${content.path}</span>
-          <openclaw-tooltip .content=${t("chat.detailPanel.copyPath")}>
+          <steelengine-tooltip .content=${t("chat.detailPanel.copyPath")}>
             <button
               class="btn btn--sm sidebar-file-view__action"
               type="button"
@@ -290,7 +290,7 @@ function renderFileSidebarContent(
             >
               ${icons.copy}
             </button>
-          </openclaw-tooltip>
+          </steelengine-tooltip>
         </div>
         ${controls
           ? html`
@@ -317,7 +317,7 @@ function renderFileSidebarContent(
                   : html`
                       ${content.edit
                         ? html`
-                            <openclaw-tooltip .content=${t("chat.detailPanel.editFile")}>
+                            <steelengine-tooltip .content=${t("chat.detailPanel.editFile")}>
                               <button
                                 class="btn btn--sm sidebar-file-view__action"
                                 type="button"
@@ -327,10 +327,10 @@ function renderFileSidebarContent(
                               >
                                 ${icons.edit}
                               </button>
-                            </openclaw-tooltip>
+                            </steelengine-tooltip>
                           `
                         : nothing}
-                      <openclaw-tooltip .content=${t("chat.detailPanel.searchInFile")}>
+                      <steelengine-tooltip .content=${t("chat.detailPanel.searchInFile")}>
                         <button
                           class="btn btn--sm sidebar-file-view__action"
                           type="button"
@@ -340,10 +340,10 @@ function renderFileSidebarContent(
                         >
                           ${icons.search}
                         </button>
-                      </openclaw-tooltip>
+                      </steelengine-tooltip>
                       ${controls.onReveal
                         ? html`
-                            <openclaw-tooltip .content=${t("chat.detailPanel.showInFiles")}>
+                            <steelengine-tooltip .content=${t("chat.detailPanel.showInFiles")}>
                               <button
                                 class="btn btn--sm sidebar-file-view__action"
                                 type="button"
@@ -352,7 +352,7 @@ function renderFileSidebarContent(
                               >
                                 ${icons.folder}
                               </button>
-                            </openclaw-tooltip>
+                            </steelengine-tooltip>
                           `
                         : nothing}
                       ${renderChatSidebarEditorMenu({
@@ -361,7 +361,7 @@ function renderFileSidebarContent(
                         onOpenChange: controls.onEditorMenuOpenChange,
                         onOpenEditor: controls.onOpenEditor,
                       })}
-                      <openclaw-tooltip content="Copy file contents">
+                      <steelengine-tooltip content="Copy file contents">
                         <button
                           class="btn btn--sm sidebar-file-view__action ${controls.copied
                             ? "copied"
@@ -372,7 +372,7 @@ function renderFileSidebarContent(
                         >
                           ${controls.copied ? icons.check : icons.copy}
                         </button>
-                      </openclaw-tooltip>
+                      </steelengine-tooltip>
                     `}
               </div>
             `
@@ -520,7 +520,7 @@ function renderMarkdownSidebar(props: MarkdownSidebarProps) {
     <div class="sidebar-panel">
       <div class="sidebar-header">
         <div class="sidebar-title">${title}</div>
-        <openclaw-tooltip .content=${t("chat.detailPanel.close")}>
+        <steelengine-tooltip .content=${t("chat.detailPanel.close")}>
           <button
             @click=${props.onClose}
             class="btn"
@@ -529,7 +529,7 @@ function renderMarkdownSidebar(props: MarkdownSidebarProps) {
           >
             ${icons.x}
           </button>
-        </openclaw-tooltip>
+        </steelengine-tooltip>
       </div>
       <div class="sidebar-content">
         ${props.error
@@ -552,7 +552,7 @@ function renderMarkdownSidebar(props: MarkdownSidebarProps) {
             ? content.kind === "file"
               ? renderFileSidebarContent(content, props.onViewRawText, props.fileView)
               : content.kind === "session-diff"
-                ? html`<openclaw-session-diff .loader=${content.load}></openclaw-session-diff>`
+                ? html`<steelengine-session-diff .loader=${content.load}></steelengine-session-diff>`
                 : content.kind === "canvas"
                   ? html`
                       <div class="chat-tool-card__preview" data-kind="canvas">
@@ -640,7 +640,7 @@ function renderMarkdownSidebar(props: MarkdownSidebarProps) {
   `;
 }
 
-class ChatDetailPanel extends OpenClawLightDomElement {
+class ChatDetailPanel extends SteelEngineLightDomElement {
   @property({ attribute: false }) content: SidebarContent | null = null;
   @property({ attribute: false }) loadFullMessage?:
     | ((request: SidebarFullMessageRequest) => Promise<DetailFullMessageResult | null | undefined>)
@@ -1280,7 +1280,7 @@ class ChatDetailPanel extends OpenClawLightDomElement {
   }
 }
 
-if (!customElements.get("openclaw-chat-detail-panel")) {
-  customElements.define("openclaw-chat-detail-panel", ChatDetailPanel);
+if (!customElements.get("steelengine-chat-detail-panel")) {
+  customElements.define("steelengine-chat-detail-panel", ChatDetailPanel);
 }
 /* oxlint-disable max-lines -- TODO: split this grandfathered oversized file. */

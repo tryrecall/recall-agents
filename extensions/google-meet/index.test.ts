@@ -8,7 +8,7 @@ import { createContext, Script } from "node:vm";
 import {
   validateJsonSchemaValue,
   type JsonSchemaObject,
-} from "openclaw/plugin-sdk/json-schema-runtime";
+} from "steelengine/plugin-sdk/json-schema-runtime";
 import {
   convertMeetingTtsAudioForBridge,
   createLocalMeetingRealtimeAudioTransport,
@@ -19,13 +19,13 @@ import {
   type MeetingRealtimeAudioEngineHealth,
   type MeetingRealtimeAudioTransport,
   type MeetingRealtimeToolCallParams,
-} from "openclaw/plugin-sdk/meeting-runtime";
-import type { RealtimeTranscriptionProviderPlugin } from "openclaw/plugin-sdk/realtime-transcription";
-import type { RealtimeVoiceProviderPlugin } from "openclaw/plugin-sdk/realtime-voice";
+} from "steelengine/plugin-sdk/meeting-runtime";
+import type { RealtimeTranscriptionProviderPlugin } from "steelengine/plugin-sdk/realtime-transcription";
+import type { RealtimeVoiceProviderPlugin } from "steelengine/plugin-sdk/realtime-voice";
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import plugin, { testing as googleMeetPluginTesting } from "./index.js";
 import {
-  consultOpenClawAgentForGoogleMeet,
+  consultSteelEngineAgentForGoogleMeet,
   handleGoogleMeetRealtimeConsultToolCall,
   resolveGoogleMeetRealtimeTools,
 } from "./src/agent-consult.js";
@@ -116,9 +116,9 @@ function createEmptyMeetingRealtimeAudioEngineHealth(): MeetingRealtimeAudioEngi
 
 function createGoogleMeetTestEngineBindings(params: {
   config: GoogleMeetConfig;
-  fullConfig: Parameters<typeof consultOpenClawAgentForGoogleMeet>[0]["fullConfig"];
-  runtime: Parameters<typeof consultOpenClawAgentForGoogleMeet>[0]["runtime"];
-  logger: Parameters<typeof consultOpenClawAgentForGoogleMeet>[0]["logger"];
+  fullConfig: Parameters<typeof consultSteelEngineAgentForGoogleMeet>[0]["fullConfig"];
+  runtime: Parameters<typeof consultSteelEngineAgentForGoogleMeet>[0]["runtime"];
+  logger: Parameters<typeof consultSteelEngineAgentForGoogleMeet>[0]["logger"];
 }) {
   return {
     platform: {
@@ -127,7 +127,7 @@ function createGoogleMeetTestEngineBindings(params: {
       sessionIdPrefix: "google-meet",
     },
     consultAgent: (consult: MeetingAgentConsultParams) =>
-      consultOpenClawAgentForGoogleMeet({ ...params, ...consult }),
+      consultSteelEngineAgentForGoogleMeet({ ...params, ...consult }),
     tools: resolveGoogleMeetRealtimeTools(params.config.realtime.toolPolicy),
     handleToolCall: (call: MeetingRealtimeToolCallParams) =>
       handleGoogleMeetRealtimeConsultToolCall({ ...params, ...call }),
@@ -264,8 +264,8 @@ const fetchGuardMocks = vi.hoisted(() => ({
   ),
 }));
 
-vi.mock("openclaw/plugin-sdk/ssrf-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("openclaw/plugin-sdk/ssrf-runtime")>();
+vi.mock("steelengine/plugin-sdk/ssrf-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("steelengine/plugin-sdk/ssrf-runtime")>();
   return {
     ...actual,
     fetchWithSsrFGuard: fetchGuardMocks.fetchWithSsrFGuard,
@@ -310,19 +310,19 @@ function setup(
 }
 
 const GOOGLE_MEET_ENV_KEYS = [
-  "OPENCLAW_GOOGLE_MEET_CLIENT_ID",
+  "STEELENGINE_GOOGLE_MEET_CLIENT_ID",
   "GOOGLE_MEET_CLIENT_ID",
-  "OPENCLAW_GOOGLE_MEET_CLIENT_SECRET",
+  "STEELENGINE_GOOGLE_MEET_CLIENT_SECRET",
   "GOOGLE_MEET_CLIENT_SECRET",
-  "OPENCLAW_GOOGLE_MEET_REFRESH_TOKEN",
+  "STEELENGINE_GOOGLE_MEET_REFRESH_TOKEN",
   "GOOGLE_MEET_REFRESH_TOKEN",
-  "OPENCLAW_GOOGLE_MEET_ACCESS_TOKEN",
+  "STEELENGINE_GOOGLE_MEET_ACCESS_TOKEN",
   "GOOGLE_MEET_ACCESS_TOKEN",
-  "OPENCLAW_GOOGLE_MEET_ACCESS_TOKEN_EXPIRES_AT",
+  "STEELENGINE_GOOGLE_MEET_ACCESS_TOKEN_EXPIRES_AT",
   "GOOGLE_MEET_ACCESS_TOKEN_EXPIRES_AT",
-  "OPENCLAW_GOOGLE_MEET_DEFAULT_MEETING",
+  "STEELENGINE_GOOGLE_MEET_DEFAULT_MEETING",
   "GOOGLE_MEET_DEFAULT_MEETING",
-  "OPENCLAW_GOOGLE_MEET_PREVIEW_ACK",
+  "STEELENGINE_GOOGLE_MEET_PREVIEW_ACK",
   "GOOGLE_MEET_PREVIEW_ACK",
 ] as const;
 
@@ -374,7 +374,7 @@ type MockSessionEntry = {
 };
 
 function createMockSessionRuntime(sessionStore: Record<string, unknown>) {
-  const sessionRoot = createIsolatedTestDir("openclaw-google-meet-session-");
+  const sessionRoot = createIsolatedTestDir("steelengine-google-meet-session-");
   return {
     resolveStorePath: vi.fn(() => path.join(sessionRoot, "sessions.json")),
     loadSessionStore: vi.fn(() => sessionStore),
@@ -896,7 +896,7 @@ describe("google-meet plugin", () => {
   });
 
   afterAll(() => {
-    vi.doUnmock("openclaw/plugin-sdk/ssrf-runtime");
+    vi.doUnmock("steelengine/plugin-sdk/ssrf-runtime");
     vi.doUnmock("./src/voice-call-gateway.js");
     vi.resetModules();
   });
@@ -912,7 +912,7 @@ describe("google-meet plugin", () => {
     expect(config.chrome).toEqual({
       audioBackend: "blackhole-2ch",
       launch: true,
-      guestName: "OpenClaw Agent",
+      guestName: "SteelEngine Agent",
       reuseExistingTab: true,
       autoJoin: true,
       joinTimeoutMs: 30000,
@@ -979,7 +979,7 @@ describe("google-meet plugin", () => {
     expect(config.realtime.introMessage).toBe("Say exactly: I'm here and listening.");
     expect(config.realtime.toolPolicy).toBe("safe-read-only");
     expect(config.realtime.providers).toEqual({});
-    expect(config.realtime.instructions).toContain("openclaw_agent_consult");
+    expect(config.realtime.instructions).toContain("steelengine_agent_consult");
     expect(config.oauth).toEqual({});
     expect(config.auth).toEqual({ provider: "google-oauth" });
 
@@ -1129,7 +1129,7 @@ describe("google-meet plugin", () => {
 
   it("declares advanced config metadata in the plugin entry and manifest", () => {
     const manifest = JSON.parse(
-      readFileSync(new URL("./openclaw.plugin.json", import.meta.url), "utf8"),
+      readFileSync(new URL("./steelengine.plugin.json", import.meta.url), "utf8"),
     ) as {
       uiHints?: Record<string, unknown>;
       configSchema?: GoogleMeetManifestConfigSchema;
@@ -1278,13 +1278,13 @@ describe("google-meet plugin", () => {
 
   it("uses env fallbacks for OAuth, preview, and default meeting values", () => {
     const config = resolveGoogleMeetConfigFromTestEnv({
-      OPENCLAW_GOOGLE_MEET_CLIENT_ID: "client-id",
+      STEELENGINE_GOOGLE_MEET_CLIENT_ID: "client-id",
       GOOGLE_MEET_CLIENT_SECRET: "client-secret",
-      OPENCLAW_GOOGLE_MEET_REFRESH_TOKEN: "refresh-token",
+      STEELENGINE_GOOGLE_MEET_REFRESH_TOKEN: "refresh-token",
       GOOGLE_MEET_ACCESS_TOKEN: "access-token",
-      OPENCLAW_GOOGLE_MEET_ACCESS_TOKEN_EXPIRES_AT: "123456",
+      STEELENGINE_GOOGLE_MEET_ACCESS_TOKEN_EXPIRES_AT: "123456",
       GOOGLE_MEET_DEFAULT_MEETING: "https://meet.google.com/abc-defg-hij",
-      OPENCLAW_GOOGLE_MEET_PREVIEW_ACK: "true",
+      STEELENGINE_GOOGLE_MEET_PREVIEW_ACK: "true",
     });
     expect(config.defaults).toEqual({ meeting: "https://meet.google.com/abc-defg-hij" });
     expect(config.preview).toEqual({ enrollmentAcknowledged: true });
@@ -1299,8 +1299,8 @@ describe("google-meet plugin", () => {
 
   it.each(["0x10", "1e3"])("ignores non-decimal env numeric fallbacks: %s", (expiresAt) => {
     const config = resolveGoogleMeetConfigFromTestEnv({
-      OPENCLAW_GOOGLE_MEET_ACCESS_TOKEN: "access-token",
-      OPENCLAW_GOOGLE_MEET_ACCESS_TOKEN_EXPIRES_AT: expiresAt,
+      STEELENGINE_GOOGLE_MEET_ACCESS_TOKEN: "access-token",
+      STEELENGINE_GOOGLE_MEET_ACCESS_TOKEN_EXPIRES_AT: expiresAt,
     });
 
     expect(config.oauth).toEqual({ accessToken: "access-token" });
@@ -1461,7 +1461,7 @@ describe("google-meet plugin", () => {
       type: "string",
       enum: ["agent", "bidi", "transcribe"],
       description:
-        "Join mode. agent uses realtime transcription, the configured OpenClaw agent, and regular TTS. bidi uses the realtime voice model directly. transcribe joins observe-only.",
+        "Join mode. agent uses realtime transcription, the configured SteelEngine agent, and regular TTS. bidi uses the realtime voice model directly. transcribe joins observe-only.",
     });
   });
 
@@ -2114,7 +2114,7 @@ describe("google-meet plugin", () => {
         details: {
           manualActionRequired: true,
           reason: "not-authenticated",
-          browser: { profile: "openclaw" },
+          browser: { profile: "steelengine" },
         },
       });
     });
@@ -2130,7 +2130,7 @@ describe("google-meet plugin", () => {
     expect(result.details).toEqual({
       manualActionRequired: true,
       reason: "not-authenticated",
-      browser: { profile: "openclaw" },
+      browser: { profile: "steelengine" },
     });
   });
 
@@ -2319,8 +2319,8 @@ describe("google-meet plugin", () => {
     try {
       const { tools } = setup({
         chrome: {
-          audioInputCommand: ["openclaw-audio-bridge", "capture"],
-          audioOutputCommand: ["openclaw-audio-bridge", "play"],
+          audioInputCommand: ["steelengine-audio-bridge", "capture"],
+          audioOutputCommand: ["steelengine-audio-bridge", "play"],
         },
       });
       const tool = tools[0] as {
@@ -2423,7 +2423,7 @@ describe("google-meet plugin", () => {
 
   it("writes export bundles through the tool", async () => {
     stubMeetArtifactsApi();
-    const tempDir = mkdtempSync(path.join(tmpdir(), "openclaw-google-meet-tool-export-"));
+    const tempDir = mkdtempSync(path.join(tmpdir(), "steelengine-google-meet-tool-export-"));
     const { tools } = setup();
     const tool = tools[0] as {
       execute: (
@@ -2482,7 +2482,7 @@ describe("google-meet plugin", () => {
 
   it("dry-runs export bundles through the tool", async () => {
     stubMeetArtifactsApi();
-    const parentDir = mkdtempSync(path.join(tmpdir(), "openclaw-google-meet-tool-dry-run-"));
+    const parentDir = mkdtempSync(path.join(tmpdir(), "steelengine-google-meet-tool-dry-run-"));
     const outputDir = path.join(parentDir, "bundle");
     const { tools } = setup();
     const tool = tools[0] as {
@@ -3269,7 +3269,7 @@ describe("google-meet plugin", () => {
           return { ok: true };
         }
         if (request.path === "/act") {
-          if (String(request.body?.fn).includes("state = window.__openclawMeetCaptions")) {
+          if (String(request.body?.fn).includes("state = window.__steelengineMeetCaptions")) {
             const finalizing = String(request.body?.fn).includes("if (true &&");
             if (!finalizing) {
               options?.onNonFinalTranscriptRead?.();
@@ -3514,7 +3514,7 @@ describe("google-meet plugin", () => {
         const request = call[2] as { body?: { fn?: string } };
         const script = String(request.body?.fn);
         return (
-          script.includes("state = window.__openclawMeetCaptions") && script.includes("if (true &&")
+          script.includes("state = window.__steelengineMeetCaptions") && script.includes("if (true &&")
         );
       });
       expect(finalCaptures).toHaveLength(1);
@@ -3969,7 +3969,7 @@ describe("google-meet plugin", () => {
                 lobbyWaiting: true,
                 manualActionRequired: true,
                 manualActionReason: "meet-admission-required",
-                manualActionMessage: "Admit the OpenClaw browser participant in Google Meet.",
+                manualActionMessage: "Admit the SteelEngine browser participant in Google Meet.",
                 title: "Meet",
                 url: "https://meet.google.com/abc-defg-hij",
               }),
@@ -4312,7 +4312,7 @@ describe("google-meet plugin", () => {
     ).runInContext(context) as () => string | Promise<string>;
 
     const first = JSON.parse(await inspect()) as { captionsEnabledAttempted?: boolean };
-    const captionsStateKey = "__openclawMeetCaptions";
+    const captionsStateKey = "__steelengineMeetCaptions";
     const stateAfterFirst = windowState[captionsStateKey] as {
       enabledAttempted?: boolean;
     };
@@ -4407,7 +4407,7 @@ describe("google-meet plugin", () => {
     expect(first.leaveReason).toBeUndefined();
     page.caption = "Alice\nmeeting ended after the recap";
     await inspect();
-    const state = windowState["__openclawMeetCaptions"] as {
+    const state = windowState["__steelengineMeetCaptions"] as {
       epoch: string;
       lines: Array<{ text: string }>;
       visible: Array<{ text: string }>;
@@ -4445,9 +4445,9 @@ describe("google-meet plugin", () => {
     };
     expect(afterFinalize.lines).toHaveLength(2);
 
-    delete windowState["__openclawMeetCaptions"];
+    delete windowState["__steelengineMeetCaptions"];
     await inspect();
-    const reloadedState = windowState["__openclawMeetCaptions"] as { epoch: string };
+    const reloadedState = windowState["__steelengineMeetCaptions"] as { epoch: string };
     expect(reloadedState.epoch).not.toBe(state.epoch);
 
     const inspectNextSession = new Script(
@@ -4458,7 +4458,7 @@ describe("google-meet plugin", () => {
       })})`,
     ).runInContext(context) as () => string | Promise<string>;
     await inspectNextSession();
-    const nextState = windowState["__openclawMeetCaptions"] as {
+    const nextState = windowState["__steelengineMeetCaptions"] as {
       droppedLines: number;
       epoch: string;
       sessionId?: string;
@@ -5357,7 +5357,7 @@ describe("google-meet plugin", () => {
                     inCall: false,
                     manualActionRequired: true,
                     manualActionReason: "meet-admission-required",
-                    manualActionMessage: "Admit the OpenClaw browser participant in Google Meet.",
+                    manualActionMessage: "Admit the SteelEngine browser participant in Google Meet.",
                     title: "Meet",
                     url: "https://meet.google.com/abc-defg-hij?authuser=me%40example.com&hl=en",
                   }),
@@ -5589,7 +5589,7 @@ describe("google-meet plugin", () => {
               inCall: false,
               manualActionRequired: true,
               manualActionReason: "meet-admission-required",
-              manualActionMessage: "Admit the OpenClaw browser participant in Google Meet.",
+              manualActionMessage: "Admit the SteelEngine browser participant in Google Meet.",
               title: "Meet",
               url: "https://meet.google.com/abc-defg-hij?authuser=me%40example.com&hl=en",
             }),
@@ -6944,7 +6944,7 @@ describe("google-meet plugin", () => {
           manualActionRequired: true,
           manualActionReason: "google-login-required",
           manualActionMessage:
-            "Sign in to Google in the OpenClaw browser profile, then retry the Meet join.",
+            "Sign in to Google in the SteelEngine browser profile, then retry the Meet join.",
           title: "Sign in - Google Accounts",
           url: "https://accounts.google.com/signin",
         },
@@ -7161,7 +7161,7 @@ describe("google-meet plugin", () => {
     });
 
     expect(result.details.error).toContain("No connected Google Meet-capable node");
-    expect(result.details.error).toContain("openclaw node run");
+    expect(result.details.error).toContain("steelengine node run");
   });
 
   it("requires chromeNode.node when multiple capable nodes are connected", async () => {
@@ -7729,7 +7729,7 @@ describe("google-meet plugin", () => {
     callbacks?.onToolCall?.({
       itemId: "item-1",
       callId: "tool-call-1",
-      name: "openclaw_agent_consult",
+      name: "steelengine_agent_consult",
       args: { question: "What should I say about launch timing?" },
     });
     expect(bridge.submitToolResult).toHaveBeenCalled();
@@ -7738,7 +7738,7 @@ describe("google-meet plugin", () => {
     expect(firstToolResultCall[2]).toStrictEqual({ willContinue: true });
     const progressPayload = requireRecord(firstToolResultCall[1], "tool progress payload");
     expect(progressPayload.status).toBe("working");
-    expect(progressPayload.tool).toBe("openclaw_agent_consult");
+    expect(progressPayload.tool).toBe("steelengine_agent_consult");
 
     expect(spawnMock).toHaveBeenNthCalledWith(1, "play-meet", [], {
       stdio: ["pipe", "ignore", "pipe"],
@@ -7791,7 +7791,7 @@ describe("google-meet plugin", () => {
       channels: 1,
     });
     expect(callbacks.autoRespondToAudio).toBe(true);
-    expect(callbacks.tools?.map((tool) => tool.name)).toContain("openclaw_agent_consult");
+    expect(callbacks.tools?.map((tool) => tool.name)).toContain("steelengine_agent_consult");
     await vi.waitFor(() => {
       expect(bridge.submitToolResult).toHaveBeenLastCalledWith(
         "tool-call-1",
@@ -8246,7 +8246,7 @@ describe("google-meet plugin", () => {
     let releaseIdlePull: (() => void) | undefined;
     const fullConfig = { models: { providers: {} } } as never;
     const sessionStore: Record<string, unknown> = {};
-    const testRoot = createIsolatedTestDir("openclaw-google-meet-node-agent-");
+    const testRoot = createIsolatedTestDir("steelengine-google-meet-node-agent-");
     const runtime = {
       nodes: {
         invoke: vi.fn(async ({ params }: { params?: { action?: string; base64?: string } }) => {
@@ -8308,7 +8308,7 @@ describe("google-meet plugin", () => {
     callbacks?.onToolCall?.({
       itemId: "item-1",
       callId: "tool-call-1",
-      name: "openclaw_agent_consult",
+      name: "steelengine_agent_consult",
       args: { question: "What should I say?" },
     });
     expect(bridge.submitToolResult).toHaveBeenCalled();
@@ -8317,7 +8317,7 @@ describe("google-meet plugin", () => {
     expect(firstToolResultCall[2]).toStrictEqual({ willContinue: true });
     const progressPayload = requireRecord(firstToolResultCall[1], "node tool progress payload");
     expect(progressPayload.status).toBe("working");
-    expect(progressPayload.tool).toBe("openclaw_agent_consult");
+    expect(progressPayload.tool).toBe("steelengine_agent_consult");
 
     await vi.waitFor(() => {
       expect(sendAudio).toHaveBeenCalledWith(Buffer.from([9, 8, 7]));
@@ -8364,7 +8364,7 @@ describe("google-meet plugin", () => {
       channels: 1,
     });
     expect(callbacks.autoRespondToAudio).toBe(true);
-    expect(callbacks.tools?.map((tool) => tool.name)).toContain("openclaw_agent_consult");
+    expect(callbacks.tools?.map((tool) => tool.name)).toContain("steelengine_agent_consult");
     expect(handle.type).toBe("node-command-pair");
     expect(handle.providerId).toBe("openai");
     expect(handle.nodeId).toBe("node-1");

@@ -3,9 +3,9 @@ import { request as httpRequest } from "node:http";
 import {
   createPluginRuntimeMediaMock,
   createPluginRuntimeMock,
-} from "openclaw/plugin-sdk/channel-test-helpers";
+} from "steelengine/plugin-sdk/channel-test-helpers";
 import { expect, vi } from "vitest";
-import type { OpenClawConfig, PluginRuntime } from "../runtime-api.js";
+import type { SteelEngineConfig, PluginRuntime } from "../runtime-api.js";
 import type { ResolvedZaloAccount } from "../types.js";
 
 function resolveLifecycleAllowFrom(params: {
@@ -21,7 +21,7 @@ function createLifecycleConfig(params: {
   allowFrom?: string[];
   webhookUrl?: string;
   webhookSecret?: string;
-}): OpenClawConfig {
+}): SteelEngineConfig {
   const webhookUrl = params.webhookUrl ?? "https://example.com/hooks/zalo";
   const webhookSecret = params.webhookSecret ?? "supersecret";
   const allowFrom = resolveLifecycleAllowFrom(params);
@@ -40,7 +40,7 @@ function createLifecycleConfig(params: {
         },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 function createLifecycleAccount(params: {

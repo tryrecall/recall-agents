@@ -1,9 +1,9 @@
 /**
- * Claude CLI argument helpers for OpenClaw-managed bundle MCP config.
+ * Claude CLI argument helpers for SteelEngine-managed bundle MCP config.
  */
 import fs from "node:fs/promises";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 
 /** Find existing Claude `--mcp-config` argument values. */
 export function findClaudeMcpConfigPaths(args?: string[]): string[] {
@@ -16,7 +16,7 @@ export function findClaudeMcpConfigPaths(args?: string[]): string[] {
     if (arg === "--mcp-config") {
       // Claude treats --mcp-config as variadic. Keep this scan aligned with
       // extensions/anthropic/cli-shared.ts so user config files are not leaked
-      // as positional prompts after OpenClaw injects its strict overlay.
+      // as positional prompts after SteelEngine injects its strict overlay.
       while (typeof args[i + 1] === "string" && !args[i + 1]?.startsWith("-")) {
         i += 1;
         const path = normalizeOptionalString(args[i]);
@@ -41,7 +41,7 @@ export function findClaudeMcpConfigPath(args?: string[]): string | undefined {
   return findClaudeMcpConfigPaths(args)[0];
 }
 
-/** Return Claude args with OpenClaw's strict MCP config path injected. */
+/** Return Claude args with SteelEngine's strict MCP config path injected. */
 export function injectClaudeMcpConfigArgs(
   args: string[] | undefined,
   mcpConfigPath: string,
@@ -67,7 +67,7 @@ export function injectClaudeMcpConfigArgs(
   return next;
 }
 
-/** Writes the active per-attempt capture token into OpenClaw's generated Claude MCP config. */
+/** Writes the active per-attempt capture token into SteelEngine's generated Claude MCP config. */
 export async function writeClaudeMcpCaptureConfig(params: {
   mcpConfigPath: string;
   captureKey: string;
@@ -77,11 +77,11 @@ export async function writeClaudeMcpCaptureConfig(params: {
     throw new Error("Claude MCP capture requires an object config");
   }
   const mcpServers = isRecord(raw.mcpServers) ? raw.mcpServers : {};
-  const openclaw = isRecord(mcpServers.openclaw) ? mcpServers.openclaw : undefined;
-  if (!openclaw) {
-    throw new Error("Claude MCP capture requires an openclaw server config");
+  const steelengine = isRecord(mcpServers.steelengine) ? mcpServers.steelengine : undefined;
+  if (!steelengine) {
+    throw new Error("Claude MCP capture requires an steelengine server config");
   }
-  const headers = isRecord(openclaw.headers) ? openclaw.headers : {};
+  const headers = isRecord(steelengine.headers) ? steelengine.headers : {};
   await fs.writeFile(
     params.mcpConfigPath,
     `${JSON.stringify(
@@ -89,11 +89,11 @@ export async function writeClaudeMcpCaptureConfig(params: {
         ...raw,
         mcpServers: {
           ...mcpServers,
-          openclaw: {
-            ...openclaw,
+          steelengine: {
+            ...steelengine,
             headers: {
               ...headers,
-              "x-openclaw-cli-capture-key": params.captureKey,
+              "x-steelengine-cli-capture-key": params.captureKey,
             },
           },
         },

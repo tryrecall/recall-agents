@@ -1,16 +1,16 @@
 {
-  "name": "@openclaw/imessage",
+  "name": "@steelengine/imessage",
   "version": "2026.7.2-beta.3",
   "private": true,
-  "description": "OpenClaw iMessage channel plugin using imsg on a signed-in Mac",
+  "description": "SteelEngine iMessage channel plugin using imsg on a signed-in Mac",
   "type": "module",
   "dependencies": {
     "typebox": "1.3.3"
   },
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ],
@@ -49,7 +49,7 @@
       "pluginApi": ">=2026.7.2-beta.3"
     },
     "build": {
-      "openclawVersion": "2026.7.2-beta.3"
+      "steelengineVersion": "2026.7.2-beta.3"
     }
   },
   "pluginInspector": {

@@ -1,5 +1,5 @@
 // Chat-owned composer, queue, status, context, and run controls.
-import { truncateUtf16Safe } from "@openclaw/normalization-core/utf16-slice";
+import { truncateUtf16Safe } from "@steelengine/normalization-core/utf16-slice";
 import { html, nothing, type TemplateResult } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { ref } from "lit/directives/ref.js";
@@ -441,7 +441,7 @@ function renderChatGoalActionButton(options: {
   onClick: () => void;
 }): TemplateResult {
   return html`
-    <openclaw-tooltip content=${options.label}>
+    <steelengine-tooltip content=${options.label}>
       <button
         class="agent-chat__goal-action ${options.className}"
         type="button"
@@ -450,7 +450,7 @@ function renderChatGoalActionButton(options: {
       >
         ${options.icon}
       </button>
-    </openclaw-tooltip>
+    </steelengine-tooltip>
   `;
 }
 
@@ -1083,7 +1083,7 @@ function renderChatQueueItem(item: ChatQueueItem, props: ChatQueueProps) {
         ${busy
           ? nothing
           : html`
-              <openclaw-tooltip .content=${t("chat.queue.removeQueuedMessage")}>
+              <steelengine-tooltip .content=${t("chat.queue.removeQueuedMessage")}>
                 <button
                   class="chat-queue__remove"
                   type="button"
@@ -1092,7 +1092,7 @@ function renderChatQueueItem(item: ChatQueueItem, props: ChatQueueProps) {
                 >
                   ${icons.x}
                 </button>
-              </openclaw-tooltip>
+              </steelengine-tooltip>
             `}
       </span>
       ${item.sendError ? html`<span class="chat-queue__error">${item.sendError}</span>` : nothing}
@@ -1191,11 +1191,11 @@ function renderFallbackIndicator(status: FallbackStatus | null | undefined) {
       : "compaction-indicator compaction-indicator--fallback";
   const icon = phase === "cleared" ? icons.check : icons.brain;
   return html`
-    <openclaw-tooltip .content=${details}>
+    <steelengine-tooltip .content=${details}>
       <div class=${className} role="status" aria-live="polite" aria-label=${details}>
         ${icon} ${message}
       </div>
-    </openclaw-tooltip>
+    </steelengine-tooltip>
   `;
 }
 
@@ -1760,7 +1760,7 @@ function renderChatPrimaryActions(props: ChatRunControlsProps) {
   };
   const abortAction = props.canAbort
     ? html`
-        <openclaw-tooltip .content=${t("chat.runControls.stop")}>
+        <steelengine-tooltip .content=${t("chat.runControls.stop")}>
           <button
             class="chat-send-btn chat-send-btn--stop"
             @click=${props.onAbort}
@@ -1769,7 +1769,7 @@ function renderChatPrimaryActions(props: ChatRunControlsProps) {
             ${icons.stop}
             <span class="agent-chat__control-label">${t("chat.runControls.stop")}</span>
           </button>
-        </openclaw-tooltip>
+        </steelengine-tooltip>
       `
     : nothing;
 
@@ -1781,7 +1781,7 @@ function renderChatPrimaryActions(props: ChatRunControlsProps) {
   return html`
     ${props.voiceActive && props.onToggleVoice
       ? html`
-          <openclaw-tooltip .content=${t("chat.composer.stopVoiceInput")}>
+          <steelengine-tooltip .content=${t("chat.composer.stopVoiceInput")}>
             <button
               class="chat-send-btn chat-send-btn--voice-live${voiceErrored
                 ? " chat-send-btn--voice-error"
@@ -1797,7 +1797,7 @@ function renderChatPrimaryActions(props: ChatRunControlsProps) {
                   })}
               <span class="chat-send-btn__voice-stop-glyph">${icons.stop}</span>
             </button>
-          </openclaw-tooltip>
+          </steelengine-tooltip>
           ${voiceErrored
             ? nothing
             : html`
@@ -1815,7 +1815,7 @@ function renderChatPrimaryActions(props: ChatRunControlsProps) {
         ? html`
             ${hasComposedContent
               ? html`
-                  <openclaw-tooltip .content=${activeRunActionLabel}>
+                  <steelengine-tooltip .content=${activeRunActionLabel}>
                     <button
                       class="chat-send-btn"
                       @click=${storeDraftAndSend}
@@ -1825,10 +1825,10 @@ function renderChatPrimaryActions(props: ChatRunControlsProps) {
                       ${icons.arrowUp}
                       <span class="agent-chat__control-label">${activeRunActionLabel}</span>
                     </button>
-                  </openclaw-tooltip>
+                  </steelengine-tooltip>
                 `
               : nothing}
-            <openclaw-tooltip .content=${t("chat.runControls.stop")}>
+            <steelengine-tooltip .content=${t("chat.runControls.stop")}>
               <button
                 class="chat-send-btn chat-send-btn--stop"
                 @click=${props.onAbort}
@@ -1837,11 +1837,11 @@ function renderChatPrimaryActions(props: ChatRunControlsProps) {
                 ${icons.stop}
                 <span class="agent-chat__control-label">${t("chat.runControls.stop")}</span>
               </button>
-            </openclaw-tooltip>
+            </steelengine-tooltip>
           `
         : hasComposedContent || !props.onToggleVoice
           ? html`
-              <openclaw-tooltip
+              <steelengine-tooltip
                 .content=${props.isBusy ? t("chat.runControls.queue") : t("chat.runControls.send")}
               >
                 <button
@@ -1859,10 +1859,10 @@ function renderChatPrimaryActions(props: ChatRunControlsProps) {
                       : t("chat.runControls.send")}</span
                   >
                 </button>
-              </openclaw-tooltip>
+              </steelengine-tooltip>
             `
           : html`
-              <openclaw-tooltip .content=${t("chat.composer.startVoiceInput")}>
+              <steelengine-tooltip .content=${t("chat.composer.startVoiceInput")}>
                 <button
                   class="chat-send-btn chat-send-btn--voice"
                   @click=${props.onToggleVoice}
@@ -1874,10 +1874,10 @@ function renderChatPrimaryActions(props: ChatRunControlsProps) {
                     >${t("chat.composer.startVoiceInput")}</span
                   >
                 </button>
-              </openclaw-tooltip>
+              </steelengine-tooltip>
               ${props.onToggleVideo
                 ? html`
-                    <openclaw-tooltip .content=${t("chat.composer.startVideoTalk")}>
+                    <steelengine-tooltip .content=${t("chat.composer.startVideoTalk")}>
                       <button
                         class="chat-send-btn chat-send-btn--voice"
                         @click=${props.onToggleVideo}
@@ -1889,7 +1889,7 @@ function renderChatPrimaryActions(props: ChatRunControlsProps) {
                           >${t("chat.composer.startVideoTalk")}</span
                         >
                       </button>
-                    </openclaw-tooltip>
+                    </steelengine-tooltip>
                   `
                 : nothing}
             `}
@@ -1952,7 +1952,7 @@ export function renderChatComposer(props: ChatComposerProps) {
     },
   );
   const composerControls = props.composerControls ?? nothing;
-  const assistantName = props.assistantName || "OpenClaw";
+  const assistantName = props.assistantName || "SteelEngine";
   const inProgressLabel =
     submittedProgress?.sendState === "waiting-model"
       ? t("chat.composer.preparingModel")
@@ -2309,9 +2309,9 @@ export function renderChatComposer(props: ChatComposerProps) {
                 }
               })}
             >
-              <openclaw-chat-question-panel
+              <steelengine-chat-question-panel
                 .props=${questionPanelProps}
-              ></openclaw-chat-question-panel>
+              ></steelengine-chat-question-panel>
             </div>
           `
         : nothing}

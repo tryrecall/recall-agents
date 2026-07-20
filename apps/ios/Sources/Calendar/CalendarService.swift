@@ -1,6 +1,6 @@
 import EventKit
 import Foundation
-import OpenClawKit
+import SteelEngineKit
 
 final class CalendarService: CalendarServicing {
     private let eventAuthorizationStatus: @Sendable () -> EKAuthorizationStatus
@@ -13,7 +13,7 @@ final class CalendarService: CalendarServicing {
         self.eventAuthorizationStatus = eventAuthorizationStatus
     }
 
-    func events(params: OpenClawCalendarEventsParams) async throws -> OpenClawCalendarEventsPayload {
+    func events(params: SteelEngineCalendarEventsParams) async throws -> SteelEngineCalendarEventsPayload {
         let status = self.eventAuthorizationStatus()
         guard EventKitAuthorization.allowsRead(status: status) else {
             throw NSError(domain: "Calendar", code: 1, userInfo: [
@@ -32,7 +32,7 @@ final class CalendarService: CalendarServicing {
 
         let formatter = ISO8601DateFormatter()
         let payload = selected.map { event in
-            OpenClawCalendarEventPayload(
+            SteelEngineCalendarEventPayload(
                 identifier: event.eventIdentifier ?? UUID().uuidString,
                 title: event.title ?? "(untitled)",
                 startISO: formatter.string(from: event.startDate),
@@ -42,10 +42,10 @@ final class CalendarService: CalendarServicing {
                 calendarTitle: event.calendar.title)
         }
 
-        return OpenClawCalendarEventsPayload(events: payload)
+        return SteelEngineCalendarEventsPayload(events: payload)
     }
 
-    func add(params: OpenClawCalendarAddParams) async throws -> OpenClawCalendarAddPayload {
+    func add(params: SteelEngineCalendarAddParams) async throws -> SteelEngineCalendarAddPayload {
         let status = self.eventAuthorizationStatus()
         guard EventKitAuthorization.allowsWrite(status: status) else {
             throw NSError(domain: "Calendar", code: 2, userInfo: [
@@ -91,7 +91,7 @@ final class CalendarService: CalendarServicing {
 
         try store.save(event, span: .thisEvent)
 
-        let payload = OpenClawCalendarEventPayload(
+        let payload = SteelEngineCalendarEventPayload(
             identifier: event.eventIdentifier ?? UUID().uuidString,
             title: event.title ?? title,
             startISO: formatter.string(from: event.startDate),
@@ -100,7 +100,7 @@ final class CalendarService: CalendarServicing {
             location: event.location,
             calendarTitle: event.calendar.title)
 
-        return OpenClawCalendarAddPayload(event: payload)
+        return SteelEngineCalendarAddPayload(event: payload)
     }
 
     private static func resolveCalendar(

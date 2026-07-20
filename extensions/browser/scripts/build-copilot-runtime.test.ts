@@ -8,7 +8,7 @@ const tempDirs = useAutoCleanupTempDirTracker(afterEach);
 
 describe("scripts/build-copilot-runtime.mjs", () => {
   it("creates a missing bundle without rewriting it when unchanged", async () => {
-    const rootDir = tempDirs.make("openclaw-browser-copilot-runtime-");
+    const rootDir = tempDirs.make("steelengine-browser-copilot-runtime-");
     const outputPath = path.join(rootDir, "copilot-runtime.js");
     const build = vi.fn(async () => ({
       outputFiles: [{ text: "export const copilotRuntime = true;\n" }],

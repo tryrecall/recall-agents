@@ -1,4 +1,4 @@
-import { QUEUED_USER_MESSAGE_MARKER } from "openclaw/plugin-sdk/agent-runtime-test-contracts";
+import { QUEUED_USER_MESSAGE_MARKER } from "steelengine/plugin-sdk/agent-runtime-test-contracts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { SessionSystemPromptReport } from "../../../config/sessions/types.js";
 import type { AgentMessage } from "../../runtime/index.js";
@@ -164,7 +164,7 @@ describe("prepareEmbeddedAttemptPromptContext", () => {
         role: "user",
         content: "Visible request",
         timestamp: 123,
-        __openclaw: { senderId: "alice-id", senderName: "Alice" },
+        __steelengine: { senderId: "alice-id", senderName: "Alice" },
       } as AgentMessage,
     });
 
@@ -257,7 +257,7 @@ describe("prepareEmbeddedAttemptPromptContext", () => {
 
   it("keeps a pure heartbeat task active while persisting only the poll marker", () => {
     const taskPrompt = "Check the deployment and report any failures.";
-    const transcriptPrompt = "[OpenClaw heartbeat poll]";
+    const transcriptPrompt = "[SteelEngine heartbeat poll]";
     const fixture = createInput({
       attempt: createAttempt({ currentInboundContext: undefined }),
       prompt: createPrompt({
@@ -281,7 +281,7 @@ describe("prepareEmbeddedAttemptPromptContext", () => {
 
   it("keeps the live orphan-repair heartbeat task active without parsing its marker", () => {
     const taskPrompt = "Check the deployment and report any failures.";
-    const transcriptPrompt = "[OpenClaw heartbeat poll]";
+    const transcriptPrompt = "[SteelEngine heartbeat poll]";
     const mergedModelPrompt = [QUEUED_USER_MESSAGE_MARKER, transcriptPrompt, "", taskPrompt].join(
       "\n",
     );

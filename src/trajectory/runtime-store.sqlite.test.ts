@@ -5,26 +5,26 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { replaceSessionEntry } from "../config/sessions/session-accessor.js";
 import { executeSqliteQuerySync, getNodeSqliteKysely } from "../infra/kysely-sync.js";
-import type { DB as OpenClawAgentKyselyDatabase } from "../state/openclaw-agent-db.generated.js";
+import type { DB as SteelEngineAgentKyselyDatabase } from "../state/steelengine-agent-db.generated.js";
 import {
-  closeOpenClawAgentDatabasesForTest,
-  openOpenClawAgentDatabase,
-} from "../state/openclaw-agent-db.js";
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+  closeSteelEngineAgentDatabasesForTest,
+  openSteelEngineAgentDatabase,
+} from "../state/steelengine-agent-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import {
   appendSqliteTrajectoryRuntimeEvents,
   loadSqliteTrajectoryRuntimeEvents,
 } from "./runtime-store.sqlite.js";
 import type { TrajectoryEvent } from "./types.js";
 
-type TrajectoryRuntimeTestDatabase = Pick<OpenClawAgentKyselyDatabase, "trajectory_runtime_events">;
+type TrajectoryRuntimeTestDatabase = Pick<SteelEngineAgentKyselyDatabase, "trajectory_runtime_events">;
 
 describe("SQLite trajectory runtime store", () => {
   let tempDir: string;
   let storePath: string;
 
   beforeEach(async () => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-trajectory-sqlite-"));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-trajectory-sqlite-"));
     storePath = path.join(tempDir, "agents", "main", "sessions", "sessions.json");
     await replaceSessionEntry(
       { sessionKey: "agent:main:main", storePath },
@@ -33,8 +33,8 @@ describe("SQLite trajectory runtime store", () => {
   });
 
   afterEach(() => {
-    closeOpenClawAgentDatabasesForTest();
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineAgentDatabasesForTest();
+    closeSteelEngineStateDatabaseForTest();
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
@@ -51,7 +51,7 @@ describe("SQLite trajectory runtime store", () => {
       expect.objectContaining({ seq: 1, type: "model.completed" }),
     ]);
 
-    const database = openOpenClawAgentDatabase({ agentId: "main", path: sqlitePath() });
+    const database = openSteelEngineAgentDatabase({ agentId: "main", path: sqlitePath() });
     const db = getNodeSqliteKysely<TrajectoryRuntimeTestDatabase>(database.db);
     const rows = executeSqliteQuerySync(
       database.db,
@@ -91,7 +91,7 @@ describe("SQLite trajectory runtime store", () => {
       createTrajectoryEvent({ type: "model.started" }),
     ]);
 
-    const database = openOpenClawAgentDatabase({ agentId: "main", path: sqlitePath() });
+    const database = openSteelEngineAgentDatabase({ agentId: "main", path: sqlitePath() });
     database.db.prepare("DELETE FROM sessions WHERE session_id = ?").run("session-1");
 
     await expect(
@@ -100,13 +100,13 @@ describe("SQLite trajectory runtime store", () => {
   });
 
   function sqlitePath(): string {
-    return path.join(tempDir, "agents", "main", "agent", "openclaw-agent.sqlite");
+    return path.join(tempDir, "agents", "main", "agent", "steelengine-agent.sqlite");
   }
 });
 
 function createTrajectoryEvent(options: { seq?: number; type: string }): TrajectoryEvent {
   return {
-    traceSchema: "openclaw-trajectory",
+    traceSchema: "steelengine-trajectory",
     schemaVersion: 1,
     traceId: "session-1",
     source: "runtime",

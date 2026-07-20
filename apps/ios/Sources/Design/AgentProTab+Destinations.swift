@@ -1,5 +1,5 @@
-import OpenClawKit
-import OpenClawProtocol
+import SteelEngineKit
+import SteelEngineProtocol
 import SwiftUI
 
 extension AgentProTab {
@@ -48,11 +48,11 @@ extension AgentProTab {
         .refreshable {
             await self.refreshOverview(force: true)
         }
-        .font(OpenClawType.body)
+        .font(SteelEngineType.body)
         .toolbar {
             if let headerLeadingAction {
                 ToolbarItem(placement: .topBarLeading) {
-                    OpenClawSidebarHeaderLeadingSlot(action: headerLeadingAction)
+                    SteelEngineSidebarHeaderLeadingSlot(action: headerLeadingAction)
                 }
             }
             ToolbarItemGroup(placement: .topBarTrailing) {
@@ -64,7 +64,7 @@ extension AgentProTab {
 
     var skillsDestination: some View {
         ZStack {
-            OpenClawProBackground()
+            SteelEngineProBackground()
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     self.detailSummaryCard(
@@ -72,19 +72,19 @@ extension AgentProTab {
                         title: "Skills",
                         value: self.skillsValue,
                         detail: self.skillsDetail,
-                        color: self.gatewayConnected ? OpenClawBrand.accent : .secondary)
+                        color: self.gatewayConnected ? SteelEngineBrand.accent : .secondary)
                     self.skillsPolicyControls
                     self.skillsFilterField
                     self.clawHubSearchCard
                     self.skillsList
                 }
                 .padding(.vertical, 18)
-                .font(OpenClawType.body)
+                .font(SteelEngineType.body)
             }
             .refreshable {
                 await self.refreshOverview(force: true)
             }
-            .safeAreaPadding(.bottom, OpenClawProMetric.bottomScrollInset)
+            .safeAreaPadding(.bottom, SteelEngineProMetric.bottomScrollInset)
         }
         .navigationTitle("Skills")
         .navigationBarTitleDisplayMode(.inline)
@@ -106,7 +106,7 @@ extension AgentProTab {
 
     var cronDestination: some View {
         ZStack {
-            OpenClawProBackground()
+            SteelEngineProBackground()
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     self.directHeader(
@@ -123,12 +123,12 @@ extension AgentProTab {
                     self.cronJobsList(limit: nil)
                 }
                 .padding(.vertical, 18)
-                .font(OpenClawType.body)
+                .font(SteelEngineType.body)
             }
             .refreshable {
                 await self.refreshOverview(force: true)
             }
-            .safeAreaPadding(.bottom, OpenClawProMetric.bottomScrollInset)
+            .safeAreaPadding(.bottom, SteelEngineProMetric.bottomScrollInset)
         }
         .navigationTitle("Automations")
         .navigationBarTitleDisplayMode(.inline)
@@ -136,7 +136,7 @@ extension AgentProTab {
 
     var usageDestination: some View {
         ZStack {
-            OpenClawProBackground()
+            SteelEngineProBackground()
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     self.directHeader(
@@ -148,17 +148,17 @@ extension AgentProTab {
                         title: "Usage",
                         value: self.usageValue,
                         detail: self.usageDetail,
-                        color: self.gatewayConnected ? OpenClawBrand.accent : .secondary)
+                        color: self.gatewayConnected ? SteelEngineBrand.accent : .secondary)
                     self.usageTotalsCard
                     self.usageDailyList
                 }
                 .padding(.vertical, 18)
-                .font(OpenClawType.body)
+                .font(SteelEngineType.body)
             }
             .refreshable {
                 await self.refreshOverview(force: true)
             }
-            .safeAreaPadding(.bottom, OpenClawProMetric.bottomScrollInset)
+            .safeAreaPadding(.bottom, SteelEngineProMetric.bottomScrollInset)
         }
         .navigationTitle("Usage")
         .navigationBarTitleDisplayMode(.inline)
@@ -181,21 +181,21 @@ extension AgentProTab {
     @ViewBuilder
     func directHeader(for route: AgentRoute, title: String, subtitle: String) -> some View {
         if let headerLeadingAction = self.directHeaderLeadingAction(for: route) {
-            OpenClawAdaptiveHeaderRow(
+            SteelEngineAdaptiveHeaderRow(
                 title: .localized(title),
                 subtitle: .localized(subtitle),
-                titleFont: OpenClawType.title3SemiBold,
-                subtitleFont: OpenClawType.subheadMedium)
+                titleFont: SteelEngineType.title3SemiBold,
+                subtitleFont: SteelEngineType.subheadMedium)
             {
-                OpenClawSidebarHeaderLeadingSlot(action: headerLeadingAction)
+                SteelEngineSidebarHeaderLeadingSlot(action: headerLeadingAction)
             } accessory: {
                 EmptyView()
             }
-            .padding(.horizontal, OpenClawProMetric.pagePadding)
+            .padding(.horizontal, SteelEngineProMetric.pagePadding)
         }
     }
 
-    func directHeaderLeadingAction(for route: AgentRoute) -> OpenClawSidebarHeaderAction? {
+    func directHeaderLeadingAction(for route: AgentRoute) -> SteelEngineSidebarHeaderAction? {
         self.directRoute == route ? self.headerLeadingAction : nil
     }
 
@@ -211,15 +211,15 @@ extension AgentProTab {
                 ProIconBadge(systemName: icon, color: color)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(title)
-                        .font(OpenClawType.headline)
+                        .font(SteelEngineType.headline)
                     Text(detail)
-                        .font(OpenClawType.caption)
+                        .font(SteelEngineType.caption)
                         .foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 8)
                 ProValuePill(value: value, color: color)
             }
         }
-        .padding(.horizontal, OpenClawProMetric.pagePadding)
+        .padding(.horizontal, SteelEngineProMetric.pagePadding)
     }
 }

@@ -1,5 +1,5 @@
-// Mistral plugin entrypoint registers its OpenClaw integration.
-import { defineSingleProviderPluginEntry } from "openclaw/plugin-sdk/provider-entry";
+// Mistral plugin entrypoint registers its SteelEngine integration.
+import { defineSingleProviderPluginEntry } from "steelengine/plugin-sdk/provider-entry";
 import {
   applyMistralModelCompat,
   MISTRAL_MEDIUM_3_5_ID,

@@ -1,5 +1,5 @@
 // Control UI chat module owns Chat thread item derivation and thread-local caches.
-import { asNullableRecord as asRecord } from "@openclaw/normalization-core/record-coerce";
+import { asNullableRecord as asRecord } from "@steelengine/normalization-core/record-coerce";
 import {
   isToolCallContentType,
   isToolResultContentType,
@@ -401,7 +401,7 @@ function groupMessages(items: ChatItem[]): Array<ChatItem | MessageGroup> {
     const timestamp = normalized.timestamp || Date.now();
     const shouldSplitBySender = role.toLowerCase() === "user" || role.toLowerCase() === "assistant";
     const startsProjectedTurn =
-      asRecord(asRecord(item.message)?.["__openclaw"])?.turnBoundary === true;
+      asRecord(asRecord(item.message)?.["__steelengine"])?.turnBoundary === true;
 
     if (
       !currentGroup ||
@@ -780,7 +780,7 @@ function assistantGroupIsForwardedBoundary(group: MessageGroup): boolean {
 }
 
 function groupStartsProjectedTurnBoundary(group: MessageGroup): boolean {
-  return asRecord(asRecord(group.messages[0]?.message)?.["__openclaw"])?.turnBoundary === true;
+  return asRecord(asRecord(group.messages[0]?.message)?.["__steelengine"])?.turnBoundary === true;
 }
 
 function annotateToolTurnOutcome(
@@ -818,7 +818,7 @@ function annotateToolTurnOutcome(
 }
 
 function isPendingSendMessage(message: unknown): boolean {
-  return asRecord(asRecord(message)?.["__openclaw"])?.kind === "pending-send";
+  return asRecord(asRecord(message)?.["__steelengine"])?.kind === "pending-send";
 }
 
 function sourceMessageId(message: unknown): string | null {
@@ -826,9 +826,9 @@ function sourceMessageId(message: unknown): string | null {
   if (!record) {
     return null;
   }
-  const openclawId = asRecord(record["__openclaw"])?.id;
-  if (typeof openclawId === "string" && openclawId.trim()) {
-    return openclawId.trim();
+  const steelengineId = asRecord(record["__steelengine"])?.id;
+  if (typeof steelengineId === "string" && steelengineId.trim()) {
+    return steelengineId.trim();
   }
   const messageId = typeof record.messageId === "string" ? record.messageId.trim() : "";
   if (messageId) {
@@ -847,7 +847,7 @@ function transcriptMessageSourceKey(message: unknown): string | null {
   if (id) {
     return `id:${id}`;
   }
-  const seq = asRecord(record["__openclaw"])?.seq;
+  const seq = asRecord(record["__steelengine"])?.seq;
   const normalizedSeq =
     typeof seq === "number" && Number.isSafeInteger(seq) && seq > 0 ? seq : null;
   return normalizedSeq == null ? null : `seq:${normalizedSeq}`;
@@ -1085,7 +1085,7 @@ function queuedSendThreadMessage(item: ChatQueueItem): Record<string, unknown> |
     role: "user",
     content,
     timestamp: item.createdAt,
-    __openclaw: {
+    __steelengine: {
       kind: "pending-send",
       id: item.id,
       state: item.sendState,
@@ -1212,7 +1212,7 @@ function buildChatItems(props: BuildChatItemsProps): Array<ChatItem | MessageGro
       continue;
     }
     const raw = asRecord(msg) ?? {};
-    const marker = raw["__openclaw"] as Record<string, unknown> | undefined;
+    const marker = raw["__steelengine"] as Record<string, unknown> | undefined;
     if (marker && marker.kind === "compaction") {
       items.push(buildCompactionDividerItem(marker, normalized.timestamp ?? Date.now(), i));
       continue;
@@ -1436,8 +1436,8 @@ function buildChatItems(props: BuildChatItemsProps): Array<ChatItem | MessageGro
     tools.some((message) => {
       const record = asRecord(message);
       return (
-        record?.["__openclawToolStreamLive"] === true &&
-        record["__openclawToolStreamResultReceived"] !== true
+        record?.["__steelengineToolStreamLive"] === true &&
+        record["__steelengineToolStreamResultReceived"] !== true
       );
     });
   // The initial-load skeleton owns the empty thread; a background reload with

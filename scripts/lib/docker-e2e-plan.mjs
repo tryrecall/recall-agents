@@ -18,8 +18,8 @@ import {
 export { DEFAULT_LIVE_RETRIES };
 export { normalizeReleaseProfile };
 
-export const DEFAULT_E2E_BARE_IMAGE = "openclaw-docker-e2e-bare:local";
-export const DEFAULT_E2E_FUNCTIONAL_IMAGE = "openclaw-docker-e2e-functional:local";
+export const DEFAULT_E2E_BARE_IMAGE = "steelengine-docker-e2e-bare:local";
+export const DEFAULT_E2E_FUNCTIONAL_IMAGE = "steelengine-docker-e2e-functional:local";
 export const DEFAULT_PARALLELISM = 10;
 export const DEFAULT_PROFILE = "all";
 export const DEFAULT_RESOURCE_LIMITS = {
@@ -70,7 +70,7 @@ function shellQuote(value) {
 function sanitizeLaneNameSuffix(value) {
   return (
     String(value)
-      .replace(/^openclaw@/u, "")
+      .replace(/^steelengine@/u, "")
       .replace(/[^A-Za-z0-9._-]+/g, "-")
       .replace(/^-+|-+$/g, "") || "baseline"
   );
@@ -78,7 +78,7 @@ function sanitizeLaneNameSuffix(value) {
 
 const UPGRADE_SURVIVOR_SCENARIOS = [
   "base",
-  "acpx-openclaw-tools-bridge",
+  "acpx-steelengine-tools-bridge",
   "feishu-channel",
   "bootstrap-persona",
   "channel-post-core-restore",
@@ -115,11 +115,11 @@ const LEGACY_UPGRADE_SURVIVOR_SCENARIO_CATALOGS = new Map([
   ],
   [
     "f226c05636dfb4e759558b5127d1c684d28a609292f4e110ff656c0e4f95ad06",
-    "base acpx-openclaw-tools-bridge feishu-channel bootstrap-persona channel-post-core-restore plugin-deps-cleanup configured-plugin-installs stale-source-plugin-shadow tilde-log-path versioned-runtime-deps",
+    "base acpx-steelengine-tools-bridge feishu-channel bootstrap-persona channel-post-core-restore plugin-deps-cleanup configured-plugin-installs stale-source-plugin-shadow tilde-log-path versioned-runtime-deps",
   ],
   [
     "d9c9edcb27aca88a0b11c72e85592001cba732cf0f96bb8a73c1c0243c8f3678",
-    "base acpx-openclaw-tools-bridge feishu-channel bootstrap-persona channel-post-core-restore codex-allowlist-survival plugin-deps-cleanup configured-plugin-installs stale-source-plugin-shadow tilde-log-path versioned-runtime-deps",
+    "base acpx-steelengine-tools-bridge feishu-channel bootstrap-persona channel-post-core-restore codex-allowlist-survival plugin-deps-cleanup configured-plugin-installs stale-source-plugin-shadow tilde-log-path versioned-runtime-deps",
   ],
   [
     "8ac0113158bfe1ebde77272fb1ffb740c281378a170fbc1e9e281d4e44677f02",
@@ -220,16 +220,16 @@ export function normalizeUpgradeSurvivorBaselineSpec(raw) {
   if (!value) {
     return undefined;
   }
-  const spec = value.startsWith("openclaw@") ? value : `openclaw@${value}`;
+  const spec = value.startsWith("steelengine@") ? value : `steelengine@${value}`;
   if (
-    !/^openclaw@(?:alpha|beta|latest|[0-9]{4}\.[0-9]+\.[0-9]+(?:-(?:[0-9]+|alpha\.[0-9]+|beta\.[0-9]+))?)$/u.test(
+    !/^steelengine@(?:alpha|beta|latest|[0-9]{4}\.[0-9]+\.[0-9]+(?:-(?:[0-9]+|alpha\.[0-9]+|beta\.[0-9]+))?)$/u.test(
       spec,
     )
   ) {
     throw new Error(
       `invalid published upgrade survivor baseline: ${JSON.stringify(
         value,
-      )}. Expected openclaw@latest, openclaw@beta, openclaw@alpha, or openclaw@YYYY.M.PATCH.`,
+      )}. Expected steelengine@latest, steelengine@beta, steelengine@alpha, or steelengine@YYYY.M.PATCH.`,
     );
   }
   return spec;
@@ -282,7 +282,7 @@ function parseUpgradeSurvivorScenarios(raw) {
 }
 
 function parsePublishedReleaseVersion(spec) {
-  const match = /^openclaw@([0-9]{4})\.([0-9]+)\.([0-9]+)/u.exec(String(spec ?? ""));
+  const match = /^steelengine@([0-9]{4})\.([0-9]+)\.([0-9]+)/u.exec(String(spec ?? ""));
   if (!match) {
     return null;
   }
@@ -323,7 +323,7 @@ function supportsUpgradeSurvivorScenarioAtBaseline(scenario, baselineSpec) {
   return (
     (scenario !== "plugin-deps-cleanup" ||
       supportsUpgradeSurvivorPluginDependencyCleanup(baselineSpec)) &&
-    (scenario !== "acpx-openclaw-tools-bridge" ||
+    (scenario !== "acpx-steelengine-tools-bridge" ||
       supportsUpgradeSurvivorAcpToolsBridge(baselineSpec))
   );
 }
@@ -404,11 +404,11 @@ function expandUpgradeSurvivorBaselineLanes(
             const name = expandedUpgradeSurvivorLaneName(poolLane.name, baselineSpec, scenario);
             const suffix = name.slice(poolLane.name.length + 1);
             const commandPrefix = [
-              `OPENCLAW_UPGRADE_SURVIVOR_ARTIFACT_DIR="$PWD/.artifacts/upgrade-survivor/${name}"`,
+              `STEELENGINE_UPGRADE_SURVIVOR_ARTIFACT_DIR="$PWD/.artifacts/upgrade-survivor/${name}"`,
               baselineSpec
-                ? `OPENCLAW_UPGRADE_SURVIVOR_BASELINE_SPEC=${shellQuote(baselineSpec)}`
+                ? `STEELENGINE_UPGRADE_SURVIVOR_BASELINE_SPEC=${shellQuote(baselineSpec)}`
                 : "",
-              scenario ? `OPENCLAW_UPGRADE_SURVIVOR_SCENARIO=${shellQuote(scenario)}` : "",
+              scenario ? `STEELENGINE_UPGRADE_SURVIVOR_SCENARIO=${shellQuote(scenario)}` : "",
             ]
               .filter(Boolean)
               .join(" ");
@@ -457,7 +457,7 @@ export function parseLiveMode(raw) {
     return mode;
   }
   throw new Error(
-    `OPENCLAW_DOCKER_ALL_LIVE_MODE must be one of: all, skip, only. Got: ${JSON.stringify(raw)}`,
+    `STEELENGINE_DOCKER_ALL_LIVE_MODE must be one of: all, skip, only. Got: ${JSON.stringify(raw)}`,
   );
 }
 
@@ -467,7 +467,7 @@ export function parseProfile(raw) {
     return profile;
   }
   throw new Error(
-    `OPENCLAW_DOCKER_ALL_PROFILE must be one of: ${DEFAULT_PROFILE}, ${RELEASE_PATH_PROFILE}. Got: ${JSON.stringify(raw)}`,
+    `STEELENGINE_DOCKER_ALL_PROFILE must be one of: ${DEFAULT_PROFILE}, ${RELEASE_PATH_PROFILE}. Got: ${JSON.stringify(raw)}`,
   );
 }
 
@@ -507,7 +507,7 @@ export function lanesNeedE2eImageKind(poolLanes, kind) {
   return poolLanes.some((poolLane) => poolLane.e2eImageKind === kind);
 }
 
-export function lanesNeedOpenClawPackage(poolLanes) {
+export function lanesNeedSteelEnginePackage(poolLanes) {
   return poolLanes.some((poolLane) => poolLane.e2eImageKind);
 }
 
@@ -515,9 +515,9 @@ export function findLaneByName(name) {
   return dedupeLanes(
     expandUpgradeSurvivorBaselineLanes(
       [...allReleasePathLanes({ includeOpenWebUI: true }), ...mainLanes, ...tailLanes],
-      process.env.OPENCLAW_UPGRADE_SURVIVOR_BASELINE_SPECS,
+      process.env.STEELENGINE_UPGRADE_SURVIVOR_BASELINE_SPECS,
       undefined,
-      process.env.OPENCLAW_UPGRADE_SURVIVOR_SCENARIOS,
+      process.env.STEELENGINE_UPGRADE_SURVIVOR_SCENARIOS,
     ).lanes,
   ).find((poolLane) => poolLane.name === name);
 }
@@ -589,7 +589,7 @@ function buildPlanJson(params) {
       e2eImage: imageKinds.length > 0,
       functionalImage: imageKinds.includes("functional"),
       liveImage: scheduledLanes.some((poolLane) => poolLane.needsLiveImage),
-      package: lanesNeedOpenClawPackage(scheduledLanes),
+      package: lanesNeedSteelEnginePackage(scheduledLanes),
     },
     profile: params.profile,
     releaseProfile: params.releaseProfile,
@@ -688,7 +688,7 @@ export function resolveDockerE2ePlan(options) {
             omittedUnsupportedLaneNames.add(selectedName);
             return [];
           }
-          selectNamedLanes(unfilteredSelectableLanes, [selectedName], "OPENCLAW_DOCKER_ALL_LANES");
+          selectNamedLanes(unfilteredSelectableLanes, [selectedName], "STEELENGINE_DOCKER_ALL_LANES");
           return [];
         })
       : undefined;

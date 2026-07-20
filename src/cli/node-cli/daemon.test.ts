@@ -56,7 +56,7 @@ vi.mock("../../daemon/runtime-hints.js", () => ({
     "Logs: node service log",
     "Restart attempts: node restart log",
   ],
-  buildPlatformServiceStartHints: () => ["openclaw node install", "openclaw node start"],
+  buildPlatformServiceStartHints: () => ["steelengine node install", "steelengine node start"],
 }));
 
 vi.mock("../../../packages/terminal-core/src/theme.js", async () => {
@@ -203,9 +203,9 @@ describe("runNodeDaemonStatus", () => {
     mocks.service.readCommand.mockResolvedValue({
       programArguments: ["node", "node-host"],
       environment: {
-        OPENCLAW_PROFILE: "work",
-        OPENCLAW_GATEWAY_TOKEN: "gateway-token",
-        OPENCLAW_GATEWAY_PASSWORD: "gateway-password",
+        STEELENGINE_PROFILE: "work",
+        STEELENGINE_GATEWAY_TOKEN: "gateway-token",
+        STEELENGINE_GATEWAY_PASSWORD: "gateway-password",
       },
     });
 
@@ -214,7 +214,7 @@ describe("runNodeDaemonStatus", () => {
     expect(mocks.runtime.writeJson).toHaveBeenCalledWith({
       service: expect.objectContaining({
         command: expect.objectContaining({
-          environment: { OPENCLAW_PROFILE: "work" },
+          environment: { STEELENGINE_PROFILE: "work" },
         }),
       }),
     });

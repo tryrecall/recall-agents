@@ -1,5 +1,5 @@
 ---
-summary: "Twilio SMS channel plugin for OpenClaw text messages."
+summary: "Twilio SMS channel plugin for SteelEngine text messages."
 read_when:
   - You are installing, configuring, or auditing the sms plugin
 title: "Sms plugin"
@@ -7,12 +7,12 @@ title: "Sms plugin"
 
 # Sms plugin
 
-Twilio SMS channel plugin for OpenClaw text messages.
+Twilio SMS channel plugin for SteelEngine text messages.
 
 ## Distribution
 
-- Package: `@openclaw/sms`
-- Install route: npm; ClawHub: `clawhub:@openclaw/sms`
+- Package: `@steelengine/sms`
+- Install route: npm; ClawHub: `clawhub:@steelengine/sms`
 
 ## Surface
 

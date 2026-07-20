@@ -19,10 +19,10 @@ export function renderFloatingUpdateCard(params: {
   if (!params.navigationSurfaceHidden || params.onboarding) {
     return nothing;
   }
-  return html`<openclaw-sidebar-update-card
+  return html`<steelengine-sidebar-update-card
     class="sidebar-update-card--floating"
     .updateAvailable=${params.updateAvailable}
     .updateRunning=${params.updateRunning}
     .onUpdate=${params.onUpdate}
-  ></openclaw-sidebar-update-card>`;
+  ></steelengine-sidebar-update-card>`;
 }

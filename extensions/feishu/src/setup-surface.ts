@@ -1,4 +1,4 @@
-import { createLazyRuntimeModule } from "openclaw/plugin-sdk/lazy-runtime";
+import { createLazyRuntimeModule } from "steelengine/plugin-sdk/lazy-runtime";
 // Feishu plugin module implements setup surface behavior.
 import {
   DEFAULT_ACCOUNT_ID,
@@ -13,10 +13,10 @@ import {
   type ChannelSetupDmPolicy,
   type ChannelSetupWizard,
   type DmPolicy,
-  type OpenClawConfig,
+  type SteelEngineConfig,
   type SecretInput,
-} from "openclaw/plugin-sdk/setup";
-import { normalizeOptionalString as normalizeString } from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/setup";
+import { normalizeOptionalString as normalizeString } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { resolveDefaultFeishuAccountId, resolveFeishuAccount } from "./accounts.js";
 import type { AppRegistrationResult } from "./app-registration.js";
 import type { FeishuConfig, FeishuDomain } from "./types.js";
@@ -31,7 +31,7 @@ const FEISHU_SETUP_FLOW_KEY = "_flow";
 // Helpers
 // ---------------------------------------------------------------------------
 
-function isFeishuConfigured(cfg: OpenClawConfig): boolean {
+function isFeishuConfigured(cfg: SteelEngineConfig): boolean {
   const feishuCfg = cfg.channels?.feishu as FeishuConfig | undefined;
 
   const isAppIdConfigured = (value: unknown): boolean => {
@@ -85,10 +85,10 @@ function formatFeishuStatusLine(status: "configured-unverified" | "needs-credent
  * - named account → writes to channels.feishu.accounts[accountId]
  */
 function patchFeishuConfig(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   accountId: string,
   patch: Record<string, unknown>,
-): OpenClawConfig {
+): SteelEngineConfig {
   const feishuCfg = cfg.channels?.feishu as FeishuConfig | undefined;
   if (accountId === DEFAULT_ACCOUNT_ID) {
     return patchTopLevelChannelConfigSection({
@@ -117,10 +117,10 @@ function patchFeishuConfig(
 }
 
 async function promptFeishuAllowFrom(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   accountId?: string;
   prompter: Parameters<NonNullable<ChannelSetupDmPolicy["promptAllowFrom"]>>[0]["prompter"];
-}): Promise<OpenClawConfig> {
+}): Promise<SteelEngineConfig> {
   const feishuCfg = params.cfg.channels?.feishu as FeishuConfig | undefined;
   const resolvedAccountId = params.accountId ?? resolveDefaultFeishuAccountId(params.cfg);
   const account =
@@ -228,11 +228,11 @@ type FeishuSetupMethod = "manual" | "scan";
 // ---------------------------------------------------------------------------
 
 function applyNewAppSecurityPolicy(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   accountId: string,
   openId: string | undefined,
   groupPolicy: "allowlist" | "open" | "disabled",
-): OpenClawConfig {
+): SteelEngineConfig {
   let next = cfg;
 
   if (openId) {
@@ -332,10 +332,10 @@ async function runScanToCreate(
 // ---------------------------------------------------------------------------
 
 async function runNewAppFlow(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   prompter: WizardPrompter;
   options: Parameters<NonNullable<ChannelSetupWizard["finalize"]>>[0]["options"];
-}): Promise<{ cfg: OpenClawConfig }> {
+}): Promise<{ cfg: SteelEngineConfig }> {
   const { prompter, options } = params;
   let next = params.cfg;
 
@@ -445,10 +445,10 @@ async function runNewAppFlow(params: {
 // ---------------------------------------------------------------------------
 
 async function runEditFlow(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   prompter: WizardPrompter;
   options: Parameters<NonNullable<ChannelSetupWizard["finalize"]>>[0]["options"];
-}): Promise<{ cfg: OpenClawConfig } | null> {
+}): Promise<{ cfg: SteelEngineConfig } | null> {
   const { prompter, options } = params;
   const next = params.cfg;
   const feishuCfg = next.channels?.feishu as FeishuConfig | undefined;
@@ -508,9 +508,9 @@ async function runEditFlow(params: {
 // ---------------------------------------------------------------------------
 
 export async function runFeishuLogin(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   prompter: WizardPrompter;
-}): Promise<OpenClawConfig> {
+}): Promise<SteelEngineConfig> {
   const { cfg, prompter } = params;
   const options = {};
   const alreadyConfigured = isFeishuConfigured(cfg);

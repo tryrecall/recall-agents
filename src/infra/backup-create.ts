@@ -4,7 +4,7 @@ import { constants as fsConstants } from "node:fs";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { resolveDateTimestampMs } from "@openclaw/normalization-core/number-coercion";
+import { resolveDateTimestampMs } from "@steelengine/normalization-core/number-coercion";
 import {
   buildBackupArchiveBasename,
   buildBackupArchivePath,
@@ -14,11 +14,11 @@ import {
 } from "../commands/backup-shared.js";
 import { isPathWithin } from "../commands/cleanup-utils.js";
 import { createLazyRuntimeModule } from "../shared/lazy-runtime.js";
-import { resolveOpenClawStateSqlitePath } from "../state/openclaw-state-db.paths.js";
+import { resolveSteelEngineStateSqlitePath } from "../state/steelengine-state-db.paths.js";
 import {
-  sanitizeOpenClawGlobalStateSnapshot,
-  sanitizeOpenClawStateLeaseRows,
-} from "../state/openclaw-state-snapshot-sanitizer.js";
+  sanitizeSteelEngineGlobalStateSnapshot,
+  sanitizeSteelEngineStateLeaseRows,
+} from "../state/steelengine-state-snapshot-sanitizer.js";
 import { resolveHomeDir, resolveUserPath } from "../utils.js";
 import { resolveRuntimeServiceVersion } from "../version.js";
 import { writeArchiveStreamToFile } from "./backup-create-stream.js";
@@ -434,7 +434,7 @@ function isCanonicalAgentSqlitePathOrAncestor(sourcePath: string, stateDir: stri
     return false;
   }
   return SQLITE_BACKUP_SOURCE_SUFFIXES.some(
-    (suffix) => segments[3] === `openclaw-agent.sqlite${suffix}`,
+    (suffix) => segments[3] === `steelengine-agent.sqlite${suffix}`,
   );
 }
 
@@ -446,7 +446,7 @@ function isCanonicalAgentSqliteDatabasePath(sourcePath: string, stateDir: string
     segments[0] === "agents" &&
     Boolean(segments[1]) &&
     segments[2] === "agent" &&
-    segments[3] === "openclaw-agent.sqlite"
+    segments[3] === "steelengine-agent.sqlite"
   );
 }
 
@@ -623,9 +623,9 @@ async function createStateSqliteBackupPlan(params: {
   // tempDir outside stateDir, and this ordering prevents future overlap from
   // making backup discover one of its own staged SQLite files.
   const globalStateSqlitePath = path.resolve(
-    resolveOpenClawStateSqlitePath({
+    resolveSteelEngineStateSqlitePath({
       ...process.env,
-      OPENCLAW_STATE_DIR: params.stateDir,
+      STEELENGINE_STATE_DIR: params.stateDir,
     }),
   );
   const discovery = await listStateSqlitePaths({
@@ -668,7 +668,7 @@ async function createStateSqliteBackupPlan(params: {
     const sourceDatabasePath = isGlobalStateDatabase
       ? canonicalGlobalSourcePath
       : (canonicalAgentSource?.sourcePath ?? archiveSourcePath);
-    const sourcePath = path.join(params.tempDir, `openclaw-state-db-${snapshots.length}.sqlite`);
+    const sourcePath = path.join(params.tempDir, `steelengine-state-db-${snapshots.length}.sqlite`);
     try {
       await createVerifiedSqliteSnapshot({
         sourcePath: sourceDatabasePath,
@@ -676,9 +676,9 @@ async function createStateSqliteBackupPlan(params: {
         // Agent coordination is transient, while unrelated plugin databases
         // remain owner-defined. Queue and TTL-blob policy is global-only.
         transform: isGlobalStateDatabase
-          ? sanitizeOpenClawGlobalStateSnapshot
+          ? sanitizeSteelEngineGlobalStateSnapshot
           : canonicalAgentSource
-            ? sanitizeOpenClawStateLeaseRows
+            ? sanitizeSteelEngineStateLeaseRows
             : undefined,
       });
     } catch (err) {
@@ -718,8 +718,8 @@ export async function createBackupArchive(
   if (plan.included.length === 0) {
     throw new Error(
       onlyConfig
-        ? "No OpenClaw config file was found to back up."
-        : "No local OpenClaw state was found to back up.",
+        ? "No SteelEngine config file was found to back up."
+        : "No local SteelEngine state was found to back up.",
     );
   }
 
@@ -758,7 +758,7 @@ export async function createBackupArchive(
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
   const tempRoot = await chooseBackupTempRoot({ assets: result.assets, outputPath });
   await fs.mkdir(tempRoot, { recursive: true });
-  const tempDir = await fs.mkdtemp(path.join(tempRoot, "openclaw-backup-"));
+  const tempDir = await fs.mkdtemp(path.join(tempRoot, "steelengine-backup-"));
   const manifestPath = path.join(tempDir, "manifest.json");
   const tempArchivePath = buildTempArchivePath(outputPath);
   const tempArchiveCleanupPaths = resolveBackupTarAttemptTempPaths(tempArchivePath);

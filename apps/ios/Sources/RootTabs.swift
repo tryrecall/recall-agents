@@ -1,5 +1,5 @@
-import OpenClawKit
-import OpenClawProtocol
+import SteelEngineKit
+import SteelEngineProtocol
 import SwiftUI
 import UIKit
 
@@ -55,7 +55,7 @@ struct RootTabs: View {
     }
 
     static func initialTab(arguments: [String]) -> AppTab {
-        guard let flagIndex = arguments.firstIndex(of: "--openclaw-initial-tab") else {
+        guard let flagIndex = arguments.firstIndex(of: "--steelengine-initial-tab") else {
             return self.fallbackInitialTab(arguments: arguments)
         }
         let valueIndex = arguments.index(after: flagIndex)
@@ -95,7 +95,7 @@ struct RootTabs: View {
     }
 
     static func requestedInitialSidebarDestination(arguments: [String]) -> SidebarDestination? {
-        guard let flagIndex = arguments.firstIndex(of: "--openclaw-initial-destination") else {
+        guard let flagIndex = arguments.firstIndex(of: "--steelengine-initial-destination") else {
             return nil
         }
         let valueIndex = arguments.index(after: flagIndex)
@@ -110,7 +110,7 @@ struct RootTabs: View {
 
     private static var initialChatSessionKey: String? {
         let arguments = ProcessInfo.processInfo.arguments
-        guard let flagIndex = arguments.firstIndex(of: "--openclaw-chat-session") else {
+        guard let flagIndex = arguments.firstIndex(of: "--steelengine-chat-session") else {
             return nil
         }
         let valueIndex = arguments.index(after: flagIndex)
@@ -141,7 +141,7 @@ struct RootTabs: View {
             self.rootLifecycle(
                 self.rootOverlays(
                     self.tabContent
-                        .tint(OpenClawBrand.accent))))
+                        .tint(SteelEngineBrand.accent))))
     }
 
     @ViewBuilder
@@ -174,7 +174,7 @@ struct RootTabs: View {
                 Label(
                     "Talk",
                     systemImage: self.appModel.talkMode.isEnabled ? "waveform.circle.fill" : "waveform.circle")
-                    .font(OpenClawType.captionSemiBold)
+                    .font(SteelEngineType.captionSemiBold)
             }
             .tag(AppTab.talk)
 
@@ -209,7 +209,7 @@ struct RootTabs: View {
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
                 .tag(AppTab.settings)
         }
-        .openClawTabBarBehavior()
+        .steelEngineTabBarBehavior()
     }
 
     private var sidebarSplitContent: some View {
@@ -248,7 +248,7 @@ struct RootTabs: View {
             self.sidebarDetailNavigationShell
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
-        .background(OpenClawProBackground())
+        .background(SteelEngineProBackground())
     }
 
     private func sidebarDrawerContent(sidebarWidth: CGFloat) -> some View {
@@ -301,12 +301,12 @@ struct RootTabs: View {
 
     private var sidebarIdentityHeader: some View {
         HStack(spacing: 10) {
-            OpenClawProMark(size: 30, shadowRadius: 3)
+            SteelEngineProMark(size: 30, shadowRadius: 3)
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("OpenClaw")
-                    .font(OpenClawType.headline)
+                Text("SteelEngine")
+                    .font(SteelEngineType.headline)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
@@ -315,10 +315,10 @@ struct RootTabs: View {
                         .font(.system(size: 7, weight: .bold))
                         .foregroundStyle(self.sidebarGatewayStatusColor)
                     Text(self.sidebarGatewayStatusTitle)
-                        .font(OpenClawType.captionMedium)
+                        .font(SteelEngineType.captionMedium)
                         .lineLimit(1)
                 }
-                .font(OpenClawType.captionMedium)
+                .font(SteelEngineType.captionMedium)
                 .foregroundStyle(.secondary)
             }
 
@@ -337,7 +337,7 @@ struct RootTabs: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel(
             String(
-                format: String(localized: "OpenClaw %@"),
+                format: String(localized: "SteelEngine %@"),
                 self.sidebarGatewayStatusTitle))
     }
 
@@ -366,7 +366,7 @@ struct RootTabs: View {
             }
         }
         .listStyle(.sidebar)
-        .tint(OpenClawBrand.accent)
+        .tint(SteelEngineBrand.accent)
         .scrollContentBackground(.hidden)
         .background(Color(uiColor: .systemBackground))
     }
@@ -386,11 +386,11 @@ struct RootTabs: View {
     private var sidebarGatewayStatusColor: Color {
         switch self.gatewayStatus {
         case .connected:
-            OpenClawBrand.ok
+            SteelEngineBrand.ok
         case .connecting:
-            OpenClawBrand.accent
+            SteelEngineBrand.accent
         case .error:
-            OpenClawBrand.warn
+            SteelEngineBrand.warn
         case .disconnected:
             .secondary
         }
@@ -404,7 +404,7 @@ struct RootTabs: View {
             self.selectSidebarDestination(destination)
         } label: {
             Label(title ?? destination.sidebarTitle, systemImage: destination.systemImage)
-                .font(OpenClawType.subheadSemiBold)
+                .font(SteelEngineType.subheadSemiBold)
                 .lineLimit(1)
                 .minimumScaleFactor(0.82)
                 .truncationMode(.tail)
@@ -413,12 +413,12 @@ struct RootTabs: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
         }
-        .font(OpenClawType.subheadSemiBold)
+        .font(SteelEngineType.subheadSemiBold)
         .buttonStyle(.plain)
-        .foregroundStyle(destination == self.selectedSidebarDestination ? OpenClawBrand.accent : .primary)
+        .foregroundStyle(destination == self.selectedSidebarDestination ? SteelEngineBrand.accent : .primary)
         .listRowBackground(
             destination == self.selectedSidebarDestination
-                ? OpenClawBrand.accent.opacity(0.12)
+                ? SteelEngineBrand.accent.opacity(0.12)
                 : Color.clear)
         .listRowSeparator(.hidden, edges: .all)
     }
@@ -512,7 +512,7 @@ struct RootTabs: View {
             TerminalHubScreen(
                 gatewayAction: { self.selectSidebarDestination(.gateway) })
         case .docs:
-            OpenClawDocsScreen(
+            SteelEngineDocsScreen(
                 headerLeadingAction: self.sidebarHeaderLeadingAction,
                 gatewayAction: { self.selectSidebarDestination(.gateway) })
         case .settings:
@@ -601,7 +601,7 @@ struct RootTabs: View {
             layoutMode: self.isSidebarDrawerLayout ? .drawer : .split)
     }
 
-    private var sidebarHeaderLeadingAction: OpenClawSidebarHeaderAction? {
+    private var sidebarHeaderLeadingAction: SteelEngineSidebarHeaderAction? {
         guard Self.shouldShowSidebarRevealInDestinationHeader(
             isSidebarVisible: self.isSidebarVisible,
             layoutMode: self.isSidebarDrawerLayout ? .drawer : .split)
@@ -609,28 +609,28 @@ struct RootTabs: View {
             return nil
         }
         if self.isSidebarVisible {
-            return OpenClawSidebarHeaderAction(
+            return SteelEngineSidebarHeaderAction(
                 systemName: "sidebar.left",
                 accessibilityLabel: .localized("Hide Sidebar"),
                 accessibilityIdentifier: Self.sidebarHideButtonAccessibilityIdentifier,
                 action: { self.hideSidebar() })
         }
-        return OpenClawSidebarHeaderAction(
+        return SteelEngineSidebarHeaderAction(
             systemName: "sidebar.left",
             accessibilityLabel: .localized("Show Sidebar"),
             accessibilityIdentifier: Self.sidebarShowButtonAccessibilityIdentifier,
             action: { self.showSidebar() })
     }
 
-    private var phoneChatReturnAction: OpenClawSidebarHeaderAction? {
+    private var phoneChatReturnAction: SteelEngineSidebarHeaderAction? {
         guard !self.usesSidebarTabs, let phoneChatReturn else { return nil }
-        return OpenClawSidebarHeaderAction(
+        return SteelEngineSidebarHeaderAction(
             systemName: "chevron.left",
             accessibilityLabel: .verbatim(
                 String(
                     format: String(localized: "Back to %@"),
                     phoneChatReturn.destination.title)),
-            accessibilityIdentifier: "OpenClawChatBackToControlDetailButton",
+            accessibilityIdentifier: "SteelEngineChatBackToControlDetailButton",
             action: { self.openPhoneControlDetail(phoneChatReturn.destination) })
     }
 
@@ -647,12 +647,12 @@ struct RootTabs: View {
             self.hideSidebar()
         } label: {
             Image(systemName: self.isSidebarDrawerLayout ? "xmark" : "sidebar.left")
-                .font(OpenClawType.subheadSemiBold)
+                .font(SteelEngineType.subheadSemiBold)
         }
         .frame(width: 44, height: 44)
         .contentShape(Rectangle())
         .buttonStyle(.plain)
-        .foregroundStyle(OpenClawBrand.accent)
+        .foregroundStyle(SteelEngineBrand.accent)
         .accessibilityLabel("Hide Sidebar")
         .accessibilityIdentifier(Self.sidebarHideButtonAccessibilityIdentifier)
     }
@@ -919,7 +919,7 @@ struct RootTabs: View {
                     })
                     .environment(self.appModel)
                     .environment(self.gatewayController)
-                    .openClawSheetChrome()
+                    .steelEngineSheetChrome()
                 }
             }
             .fullScreenCover(isPresented: self.$showOnboarding) {
@@ -1005,7 +1005,7 @@ extension RootTabs {
                 activeAgentCaption: "Routes chat and talk",
                 agentCount: agents.count,
                 agents: Array(agents.prefix(6)),
-                footer: "OpenClaw only runs phone-side capabilities while the app is connected and permitted.")
+                footer: "SteelEngine only runs phone-side capabilities while the app is connected and permitted.")
         case .connecting:
             return RootTabsHomeCanvasPayload(
                 gatewayState: "connecting",
@@ -1023,7 +1023,7 @@ extension RootTabs {
         case .error, .disconnected:
             return RootTabsHomeCanvasPayload(
                 gatewayState: self.gatewayStatus == .error ? "error" : "offline",
-                eyebrow: self.gatewayStatus == .error ? "Gateway needs attention" : "OpenClaw iOS",
+                eyebrow: self.gatewayStatus == .error ? "Gateway needs attention" : "SteelEngine iOS",
                 title: "Pair a gateway",
                 subtitle:
                 "Connect this phone as a local node for chat, realtime voice, share intake, and approved device tools.",
@@ -1034,7 +1034,7 @@ extension RootTabs {
                 agentCount: agents.count,
                 agents: Array(agents.prefix(4)),
                 footer:
-                "Use Settings to scan a pairing QR code or paste a setup code from your OpenClaw gateway.")
+                "Use Settings to scan a pairing QR code or paste a setup code from your SteelEngine gateway.")
         }
     }
 

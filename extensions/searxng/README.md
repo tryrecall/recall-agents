@@ -1,13 +1,13 @@
-# SearXNG OpenClaw plugin
+# SearXNG SteelEngine plugin
 
-Official OpenClaw plugin for SearXNG.
+Official SteelEngine plugin for SearXNG.
 
 ## Install
 
 ```sh
-openclaw plugins install @openclaw/searxng-plugin
+steelengine plugins install @steelengine/searxng-plugin
 ```
 
 ## Docs
 
-See `docs/tools/searxng-search.md` in the OpenClaw repository, or the published docs at `https://docs.openclaw.ai/tools/searxng-search`.
+See `docs/tools/searxng-search.md` in the SteelEngine repository, or the published docs at `https://docs.steelengine.ai/tools/searxng-search`.

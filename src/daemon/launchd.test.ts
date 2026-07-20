@@ -1,6 +1,6 @@
 // Launchd tests cover macOS service plist generation and command handling.
 import { PassThrough } from "node:stream";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { deleteTestEnvValue, setTestEnvValue } from "../test-utils/env.js";
 import { GATEWAY_SERVICE_KIND, GATEWAY_SERVICE_MARKER } from "./constants.js";
@@ -10,11 +10,11 @@ import {
 } from "./launchd-plist.js";
 import {
   installLaunchAgent,
-  disableCurrentOpenClawUpdateLaunchdJob,
-  disableOpenClawUpdateLaunchdJob,
-  findStaleOpenClawUpdateLaunchdJobs,
+  disableCurrentSteelEngineUpdateLaunchdJob,
+  disableSteelEngineUpdateLaunchdJob,
+  findStaleSteelEngineUpdateLaunchdJobs,
   parseLaunchctlPrint,
-  parseLaunchctlListOpenClawUpdateJobs,
+  parseLaunchctlListSteelEngineUpdateJobs,
   readLaunchAgentProgramArguments,
   readLaunchAgentRuntime,
   repairLaunchAgentBootstrap,
@@ -90,7 +90,7 @@ function readPlistProgramArgumentStrings(plist: string): string[] {
 function createDefaultLaunchdEnv(): Record<string, string | undefined> {
   return {
     HOME: "/Users/test",
-    OPENCLAW_PROFILE: "default",
+    STEELENGINE_PROFILE: "default",
   };
 }
 
@@ -185,7 +185,7 @@ async function runStopLaunchAgentWithFakeTimers(args: Parameters<typeof stopLaun
 
 function expectLaunchctlEnableBootstrapOrder(env: Record<string, string | undefined>) {
   const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-  const label = "ai.openclaw.gateway";
+  const label = "ai.steelengine.gateway";
   const plistPath = resolveLaunchAgentPlistPath(env);
   const serviceId = `${domain}/${label}`;
   const enableIndex = state.launchctlCalls.findIndex(
@@ -515,30 +515,30 @@ describe("launchd runtime state", () => {
 });
 
 describe("launchctl list detection", () => {
-  it("parses stale OpenClaw updater jobs from launchctl list", () => {
-    const jobs = parseLaunchctlListOpenClawUpdateJobs(
+  it("parses stale SteelEngine updater jobs from launchctl list", () => {
+    const jobs = parseLaunchctlListSteelEngineUpdateJobs(
       [
-        "123 0 ai.openclaw.gateway",
-        "- 127 ai.openclaw.update.2026.5.12",
-        "- 0 ai.openclaw.manual-update.1717168800",
-        "8142 0 ai.openclaw.update.2026.5.13-beta.1",
-        "915 0 ai.openclaw.tayoun.update.20260625T201026-0400",
-        "- 0 ai.openclaw.manual-updater.1717168800",
+        "123 0 ai.steelengine.gateway",
+        "- 127 ai.steelengine.update.2026.5.12",
+        "- 0 ai.steelengine.manual-update.1717168800",
+        "8142 0 ai.steelengine.update.2026.5.13-beta.1",
+        "915 0 ai.steelengine.tayoun.update.20260625T201026-0400",
+        "- 0 ai.steelengine.manual-updater.1717168800",
         "- 0 com.example.other",
       ].join("\n"),
     );
 
     expect(jobs).toEqual([
       {
-        label: "ai.openclaw.manual-update.1717168800",
+        label: "ai.steelengine.manual-update.1717168800",
         lastExitStatus: 0,
       },
       {
-        label: "ai.openclaw.update.2026.5.12",
+        label: "ai.steelengine.update.2026.5.12",
         lastExitStatus: 127,
       },
       {
-        label: "ai.openclaw.update.2026.5.13-beta.1",
+        label: "ai.steelengine.update.2026.5.13-beta.1",
         pid: 8142,
         lastExitStatus: 0,
       },
@@ -546,15 +546,15 @@ describe("launchctl list detection", () => {
   });
 
   it.runIf(process.platform === "darwin")(
-    "finds stale OpenClaw updater jobs via launchctl list",
+    "finds stale SteelEngine updater jobs via launchctl list",
     async () => {
-      state.listOutput = "- 127 ai.openclaw.update.2026.5.12\n";
+      state.listOutput = "- 127 ai.steelengine.update.2026.5.12\n";
 
-      const jobs = await findStaleOpenClawUpdateLaunchdJobs();
+      const jobs = await findStaleSteelEngineUpdateLaunchdJobs();
 
       expect(jobs).toEqual([
         {
-          label: "ai.openclaw.update.2026.5.12",
+          label: "ai.steelengine.update.2026.5.12",
           lastExitStatus: 127,
         },
       ]);
@@ -565,38 +565,38 @@ describe("launchctl list detection", () => {
     "reports profile-scoped updater jobs only when launchd metadata confirms an update command",
     async () => {
       const env = createDefaultLaunchdEnv();
-      const updaterLabel = "ai.openclaw.tayoun.update.20260625T201026-0400";
-      const gatewayLikeLabel = "ai.openclaw.dev.team.update.20260625T201026-0400";
-      const nonOpenClawLabel = "ai.openclaw.fake.update.20260625T201026-0400";
-      const prefixedCliLabel = "ai.openclaw.helper.update.20260625T201026-0400";
+      const updaterLabel = "ai.steelengine.tayoun.update.20260625T201026-0400";
+      const gatewayLikeLabel = "ai.steelengine.dev.team.update.20260625T201026-0400";
+      const nonSteelEngineLabel = "ai.steelengine.fake.update.20260625T201026-0400";
+      const prefixedCliLabel = "ai.steelengine.helper.update.20260625T201026-0400";
       state.listOutput = [
         `4321 0 ${updaterLabel}`,
         `9876 0 ${gatewayLikeLabel}`,
-        `2468 0 ${nonOpenClawLabel}`,
+        `2468 0 ${nonSteelEngineLabel}`,
         `1357 0 ${prefixedCliLabel}`,
       ].join("\n");
       setLaunchAgentPlist({
         env,
         label: updaterLabel,
-        programArguments: ["/opt/homebrew/bin/openclaw", "update", "--yes", "--json"],
+        programArguments: ["/opt/homebrew/bin/steelengine", "update", "--yes", "--json"],
       });
       setLaunchAgentPlist({
         env,
         label: gatewayLikeLabel,
-        programArguments: ["/opt/homebrew/bin/openclaw", "gateway", "run"],
+        programArguments: ["/opt/homebrew/bin/steelengine", "gateway", "run"],
       });
       setLaunchAgentPlist({
         env,
-        label: nonOpenClawLabel,
+        label: nonSteelEngineLabel,
         programArguments: ["/bin/echo", "update", "--yes"],
       });
       setLaunchAgentPlist({
         env,
         label: prefixedCliLabel,
-        programArguments: ["/usr/local/bin/openclaw-helper", "update", "--yes"],
+        programArguments: ["/usr/local/bin/steelengine-helper", "update", "--yes"],
       });
 
-      const jobs = await findStaleOpenClawUpdateLaunchdJobs(env as NodeJS.ProcessEnv);
+      const jobs = await findStaleSteelEngineUpdateLaunchdJobs(env as NodeJS.ProcessEnv);
 
       expect(jobs).toEqual([
         {
@@ -612,16 +612,16 @@ describe("launchctl list detection", () => {
     "accepts an explicit updater marker when confirming profile-scoped updater jobs",
     async () => {
       const env = createDefaultLaunchdEnv();
-      const updaterLabel = "ai.openclaw.tayoun.update.20260625T201026-0400";
+      const updaterLabel = "ai.steelengine.tayoun.update.20260625T201026-0400";
       state.listOutput = `4321 0 ${updaterLabel}`;
       setLaunchAgentPlist({
         env,
         label: updaterLabel,
-        programArguments: ["/opt/homebrew/bin/openclaw", "gateway", "run"],
-        environment: { OPENCLAW_UPDATE_RUN_HANDOFF: "1" },
+        programArguments: ["/opt/homebrew/bin/steelengine", "gateway", "run"],
+        environment: { STEELENGINE_UPDATE_RUN_HANDOFF: "1" },
       });
 
-      const jobs = await findStaleOpenClawUpdateLaunchdJobs(env as NodeJS.ProcessEnv);
+      const jobs = await findStaleSteelEngineUpdateLaunchdJobs(env as NodeJS.ProcessEnv);
 
       expect(jobs).toEqual([
         {
@@ -637,8 +637,8 @@ describe("launchctl list detection", () => {
     "unwraps generated environment-wrapper metadata for profile-scoped updater jobs",
     async () => {
       const env = createDefaultLaunchdEnv();
-      const label = "ai.openclaw.tayoun.update.20260625T201026-0400";
-      const envDir = "/Users/test/.openclaw-tayoun/service-env";
+      const label = "ai.steelengine.tayoun.update.20260625T201026-0400";
+      const envDir = "/Users/test/.steelengine-tayoun/service-env";
       const wrapperPath = `${envDir}/${label}-env-wrapper.sh`;
       const envFilePath = `${envDir}/${label}.env`;
       state.listOutput = `4321 0 ${label}`;
@@ -650,13 +650,13 @@ describe("launchctl list detection", () => {
           LAUNCH_AGENT_ENV_WRAPPER_SHELL,
           wrapperPath,
           envFilePath,
-          "/opt/homebrew/bin/openclaw",
+          "/opt/homebrew/bin/steelengine",
           "update",
           "--yes",
         ],
       });
 
-      const jobs = await findStaleOpenClawUpdateLaunchdJobs(env as NodeJS.ProcessEnv);
+      const jobs = await findStaleSteelEngineUpdateLaunchdJobs(env as NodeJS.ProcessEnv);
 
       expect(jobs).toEqual([
         {
@@ -672,12 +672,12 @@ describe("launchctl list detection", () => {
     "reads the updater marker from a generated environment file",
     async () => {
       const env = createDefaultLaunchdEnv();
-      const label = "ai.openclaw.tayoun.update.20260625T201026-0400";
-      const envDir = "/Users/test/.openclaw-tayoun/service-env";
+      const label = "ai.steelengine.tayoun.update.20260625T201026-0400";
+      const envDir = "/Users/test/.steelengine-tayoun/service-env";
       const wrapperPath = `${envDir}/${label}-env-wrapper.sh`;
       const envFilePath = `${envDir}/${label}.env`;
       state.listOutput = `4321 0 ${label}`;
-      state.files.set(envFilePath, "export OPENCLAW_UPDATE_RUN_HANDOFF='1'\n");
+      state.files.set(envFilePath, "export STEELENGINE_UPDATE_RUN_HANDOFF='1'\n");
       setLaunchAgentPlist({
         env,
         label,
@@ -685,13 +685,13 @@ describe("launchctl list detection", () => {
           LAUNCH_AGENT_ENV_WRAPPER_SHELL,
           wrapperPath,
           envFilePath,
-          "/opt/homebrew/bin/openclaw",
+          "/opt/homebrew/bin/steelengine",
           "gateway",
           "run",
         ],
       });
 
-      const jobs = await findStaleOpenClawUpdateLaunchdJobs(env as NodeJS.ProcessEnv);
+      const jobs = await findStaleSteelEngineUpdateLaunchdJobs(env as NodeJS.ProcessEnv);
 
       expect(jobs).toEqual([
         {
@@ -708,17 +708,17 @@ describe("launchctl list detection", () => {
     async () => {
       const env = {
         ...createDefaultLaunchdEnv(),
-        OPENCLAW_UPDATE_RUN_HANDOFF: "1",
+        STEELENGINE_UPDATE_RUN_HANDOFF: "1",
       };
-      const gatewayLikeLabel = "ai.openclaw.dev.team.update.20260625T201026-0400";
+      const gatewayLikeLabel = "ai.steelengine.dev.team.update.20260625T201026-0400";
       state.listOutput = `9876 0 ${gatewayLikeLabel}`;
       setLaunchAgentPlist({
         env,
         label: gatewayLikeLabel,
-        programArguments: ["/opt/homebrew/bin/openclaw", "gateway", "run"],
+        programArguments: ["/opt/homebrew/bin/steelengine", "gateway", "run"],
       });
 
-      const jobs = await findStaleOpenClawUpdateLaunchdJobs(env as NodeJS.ProcessEnv);
+      const jobs = await findStaleSteelEngineUpdateLaunchdJobs(env as NodeJS.ProcessEnv);
 
       expect(jobs).toEqual([]);
     },
@@ -728,21 +728,21 @@ describe("launchctl list detection", () => {
     "does not report current gateway labels that collide with manual update labels",
     async () => {
       state.listOutput = [
-        "- 0 ai.openclaw.manual-update.1717168800",
-        "812 0 ai.openclaw.manual-update.profile",
-        "913 0 ai.openclaw.manual-update.custom-label",
+        "- 0 ai.steelengine.manual-update.1717168800",
+        "812 0 ai.steelengine.manual-update.profile",
+        "913 0 ai.steelengine.manual-update.custom-label",
       ].join("\n");
 
-      const jobs = await findStaleOpenClawUpdateLaunchdJobs({
-        OPENCLAW_PROFILE: "manual-update.profile",
-        OPENCLAW_LAUNCHD_LABEL: "ai.openclaw.manual-update.custom-label",
-        OPENCLAW_SERVICE_MARKER: GATEWAY_SERVICE_MARKER,
-        OPENCLAW_SERVICE_KIND: GATEWAY_SERVICE_KIND,
+      const jobs = await findStaleSteelEngineUpdateLaunchdJobs({
+        STEELENGINE_PROFILE: "manual-update.profile",
+        STEELENGINE_LAUNCHD_LABEL: "ai.steelengine.manual-update.custom-label",
+        STEELENGINE_SERVICE_MARKER: GATEWAY_SERVICE_MARKER,
+        STEELENGINE_SERVICE_KIND: GATEWAY_SERVICE_KIND,
       } as NodeJS.ProcessEnv);
 
       expect(jobs).toEqual([
         {
-          label: "ai.openclaw.manual-update.1717168800",
+          label: "ai.steelengine.manual-update.1717168800",
           lastExitStatus: 0,
         },
       ]);
@@ -753,15 +753,15 @@ describe("launchctl list detection", () => {
     "disables the current legacy updater launchd job",
     async () => {
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
-          LAUNCH_JOB_LABEL: "ai.openclaw.update.2026.5.12",
+        disableCurrentSteelEngineUpdateLaunchdJob({
+          LAUNCH_JOB_LABEL: "ai.steelengine.update.2026.5.12",
         }),
       ).resolves.toBe(true);
 
       const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
       expect(state.launchctlCalls).toContainEqual([
         "disable",
-        `${domain}/ai.openclaw.update.2026.5.12`,
+        `${domain}/ai.steelengine.update.2026.5.12`,
       ]);
       expect(launchctlCommandNames()).not.toContain("remove");
     },
@@ -771,51 +771,51 @@ describe("launchctl list detection", () => {
     "disables the current manual updater launchd job",
     async () => {
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
-          LAUNCH_JOB_LABEL: "ai.openclaw.manual-update.1717168800",
+        disableCurrentSteelEngineUpdateLaunchdJob({
+          LAUNCH_JOB_LABEL: "ai.steelengine.manual-update.1717168800",
         }),
       ).resolves.toBe(true);
 
       const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
       expect(state.launchctlCalls).toContainEqual([
         "disable",
-        `${domain}/ai.openclaw.manual-update.1717168800`,
+        `${domain}/ai.steelengine.manual-update.1717168800`,
       ]);
       expect(launchctlCommandNames()).not.toContain("remove");
     },
   );
 
   it.runIf(process.platform === "darwin")(
-    "disables the current legacy updater launchd job from OpenClaw label env",
+    "disables the current legacy updater launchd job from SteelEngine label env",
     async () => {
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
-          OPENCLAW_LAUNCHD_LABEL: "ai.openclaw.update.2026.5.12",
+        disableCurrentSteelEngineUpdateLaunchdJob({
+          STEELENGINE_LAUNCHD_LABEL: "ai.steelengine.update.2026.5.12",
         }),
       ).resolves.toBe(true);
 
       const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
       expect(state.launchctlCalls).toContainEqual([
         "disable",
-        `${domain}/ai.openclaw.update.2026.5.12`,
+        `${domain}/ai.steelengine.update.2026.5.12`,
       ]);
     },
   );
 
   it.runIf(process.platform === "darwin")(
-    "does not let non-update launchd markers mask the OpenClaw update label",
+    "does not let non-update launchd markers mask the SteelEngine update label",
     async () => {
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
+        disableCurrentSteelEngineUpdateLaunchdJob({
           XPC_SERVICE_NAME: "0",
-          OPENCLAW_LAUNCHD_LABEL: "ai.openclaw.update.2026.5.12",
+          STEELENGINE_LAUNCHD_LABEL: "ai.steelengine.update.2026.5.12",
         }),
       ).resolves.toBe(true);
 
       const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
       expect(state.launchctlCalls).toContainEqual([
         "disable",
-        `${domain}/ai.openclaw.update.2026.5.12`,
+        `${domain}/ai.steelengine.update.2026.5.12`,
       ]);
     },
   );
@@ -824,8 +824,8 @@ describe("launchctl list detection", () => {
     "does not disable the current gateway launchd job",
     async () => {
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
-          LAUNCH_JOB_LABEL: "ai.openclaw.gateway",
+        disableCurrentSteelEngineUpdateLaunchdJob({
+          LAUNCH_JOB_LABEL: "ai.steelengine.gateway",
         }),
       ).resolves.toBe(false);
 
@@ -837,9 +837,9 @@ describe("launchctl list detection", () => {
     "does not disable profile-specific gateway launchd jobs that look like updater labels",
     async () => {
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
-          LAUNCH_JOB_LABEL: "ai.openclaw.update.2026.5.12",
-          OPENCLAW_PROFILE: "update.2026.5.12",
+        disableCurrentSteelEngineUpdateLaunchdJob({
+          LAUNCH_JOB_LABEL: "ai.steelengine.update.2026.5.12",
+          STEELENGINE_PROFILE: "update.2026.5.12",
         }),
       ).resolves.toBe(false);
 
@@ -851,9 +851,9 @@ describe("launchctl list detection", () => {
     "does not disable profile-specific gateway launchd jobs that look like manual updater labels",
     async () => {
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
-          LAUNCH_JOB_LABEL: "ai.openclaw.manual-update.1717168800",
-          OPENCLAW_PROFILE: "manual-update.1717168800",
+        disableCurrentSteelEngineUpdateLaunchdJob({
+          LAUNCH_JOB_LABEL: "ai.steelengine.manual-update.1717168800",
+          STEELENGINE_PROFILE: "manual-update.1717168800",
         }),
       ).resolves.toBe(false);
 
@@ -865,15 +865,15 @@ describe("launchctl list detection", () => {
     "disables current profile-scoped updater launchd jobs only after metadata confirmation",
     async () => {
       const env = createDefaultLaunchdEnv();
-      const label = "ai.openclaw.tayoun.update.20260625T201026-0400";
+      const label = "ai.steelengine.tayoun.update.20260625T201026-0400";
       setLaunchAgentPlist({
         env,
         label,
-        programArguments: ["/usr/local/bin/node", "/opt/openclaw/openclaw.mjs", "update", "--yes"],
+        programArguments: ["/usr/local/bin/node", "/opt/steelengine/steelengine.mjs", "update", "--yes"],
       });
 
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
+        disableCurrentSteelEngineUpdateLaunchdJob({
           ...env,
           LAUNCH_JOB_LABEL: label,
         }),
@@ -888,13 +888,13 @@ describe("launchctl list detection", () => {
     "lets a profile-scoped updater self-disarm from launchd runtime metadata",
     async () => {
       const env = createDefaultLaunchdEnv();
-      const label = "ai.openclaw.tayoun.update.20260625T201026-0400";
+      const label = "ai.steelengine.tayoun.update.20260625T201026-0400";
 
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
+        disableCurrentSteelEngineUpdateLaunchdJob({
           ...env,
           LAUNCH_JOB_LABEL: label,
-          OPENCLAW_UPDATE_RUN_HANDOFF: "1",
+          STEELENGINE_UPDATE_RUN_HANDOFF: "1",
         }),
       ).resolves.toBe(true);
 
@@ -907,18 +907,18 @@ describe("launchctl list detection", () => {
     "requires plist proof for a configured label preserved by an update handoff",
     async () => {
       const env = createDefaultLaunchdEnv();
-      const label = "ai.openclaw.dev.team.update.20260625T201026-0400";
+      const label = "ai.steelengine.dev.team.update.20260625T201026-0400";
       setLaunchAgentPlist({
         env,
         label,
-        programArguments: ["/opt/homebrew/bin/openclaw", "gateway", "run"],
+        programArguments: ["/opt/homebrew/bin/steelengine", "gateway", "run"],
       });
 
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
+        disableCurrentSteelEngineUpdateLaunchdJob({
           ...env,
-          OPENCLAW_LAUNCHD_LABEL: label,
-          OPENCLAW_UPDATE_RUN_HANDOFF: "1",
+          STEELENGINE_LAUNCHD_LABEL: label,
+          STEELENGINE_UPDATE_RUN_HANDOFF: "1",
         }),
       ).resolves.toBe(false);
 
@@ -930,18 +930,18 @@ describe("launchctl list detection", () => {
     "disables a configured profile-scoped updater only with confirming plist metadata",
     async () => {
       const env = createDefaultLaunchdEnv();
-      const label = "ai.openclaw.tayoun.update.20260625T201026-0400";
+      const label = "ai.steelengine.tayoun.update.20260625T201026-0400";
       setLaunchAgentPlist({
         env,
         label,
-        programArguments: ["/opt/homebrew/bin/openclaw", "update", "--yes"],
+        programArguments: ["/opt/homebrew/bin/steelengine", "update", "--yes"],
       });
 
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
+        disableCurrentSteelEngineUpdateLaunchdJob({
           ...env,
-          OPENCLAW_LAUNCHD_LABEL: label,
-          OPENCLAW_UPDATE_RUN_HANDOFF: "1",
+          STEELENGINE_LAUNCHD_LABEL: label,
+          STEELENGINE_UPDATE_RUN_HANDOFF: "1",
         }),
       ).resolves.toBe(true);
 
@@ -954,15 +954,15 @@ describe("launchctl list detection", () => {
     "does not disable profile-scoped gateway labels without updater metadata",
     async () => {
       const env = createDefaultLaunchdEnv();
-      const label = "ai.openclaw.tayoun.update.20260625T201026-0400";
+      const label = "ai.steelengine.tayoun.update.20260625T201026-0400";
       setLaunchAgentPlist({
         env,
         label,
-        programArguments: ["/opt/homebrew/bin/openclaw", "gateway", "run"],
+        programArguments: ["/opt/homebrew/bin/steelengine", "gateway", "run"],
       });
 
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
+        disableCurrentSteelEngineUpdateLaunchdJob({
           ...env,
           LAUNCH_JOB_LABEL: label,
         }),
@@ -976,8 +976,8 @@ describe("launchctl list detection", () => {
     "does not disable custom gateway launchd labels under the manual-update prefix",
     async () => {
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
-          LAUNCH_JOB_LABEL: "ai.openclaw.manual-update.gateway",
+        disableCurrentSteelEngineUpdateLaunchdJob({
+          LAUNCH_JOB_LABEL: "ai.steelengine.manual-update.gateway",
         }),
       ).resolves.toBe(false);
 
@@ -989,11 +989,11 @@ describe("launchctl list detection", () => {
     "does not disable custom gateway launchd labels that look like updater labels",
     async () => {
       await expect(
-        disableCurrentOpenClawUpdateLaunchdJob({
-          LAUNCH_JOB_LABEL: "ai.openclaw.update.2026.5.12",
-          OPENCLAW_LAUNCHD_LABEL: "ai.openclaw.update.2026.5.12",
-          OPENCLAW_SERVICE_MARKER: "openclaw",
-          OPENCLAW_SERVICE_KIND: "gateway",
+        disableCurrentSteelEngineUpdateLaunchdJob({
+          LAUNCH_JOB_LABEL: "ai.steelengine.update.2026.5.12",
+          STEELENGINE_LAUNCHD_LABEL: "ai.steelengine.update.2026.5.12",
+          STEELENGINE_SERVICE_MARKER: "steelengine",
+          STEELENGINE_SERVICE_KIND: "gateway",
         }),
       ).resolves.toBe(false);
 
@@ -1002,26 +1002,26 @@ describe("launchctl list detection", () => {
   );
 
   it.runIf(process.platform === "darwin")("disables explicit legacy updater jobs", async () => {
-    await expect(disableOpenClawUpdateLaunchdJob("ai.openclaw.update.2026.5.12")).resolves.toBe(
+    await expect(disableSteelEngineUpdateLaunchdJob("ai.steelengine.update.2026.5.12")).resolves.toBe(
       true,
     );
 
     const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
     expect(state.launchctlCalls).toContainEqual([
       "disable",
-      `${domain}/ai.openclaw.update.2026.5.12`,
+      `${domain}/ai.steelengine.update.2026.5.12`,
     ]);
   });
 
   it.runIf(process.platform === "darwin")("disables explicit manual updater jobs", async () => {
     await expect(
-      disableOpenClawUpdateLaunchdJob("ai.openclaw.manual-update.1717168800"),
+      disableSteelEngineUpdateLaunchdJob("ai.steelengine.manual-update.1717168800"),
     ).resolves.toBe(true);
 
     const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
     expect(state.launchctlCalls).toContainEqual([
       "disable",
-      `${domain}/ai.openclaw.manual-update.1717168800`,
+      `${domain}/ai.steelengine.manual-update.1717168800`,
     ]);
   });
 
@@ -1029,12 +1029,12 @@ describe("launchctl list detection", () => {
     "does not let the process marker bypass metadata for an explicit profile job",
     async () => {
       const env = createDefaultLaunchdEnv();
-      const label = "ai.openclaw.tayoun.update.20260625T201026-0400";
+      const label = "ai.steelengine.tayoun.update.20260625T201026-0400";
 
       await expect(
-        disableOpenClawUpdateLaunchdJob(label, {
+        disableSteelEngineUpdateLaunchdJob(label, {
           ...env,
-          OPENCLAW_UPDATE_RUN_HANDOFF: "1",
+          STEELENGINE_UPDATE_RUN_HANDOFF: "1",
         }),
       ).resolves.toBe(false);
 
@@ -1047,14 +1047,14 @@ describe("launchd bootstrap repair", () => {
   it("migrates inline secrets before making an existing plist readable", async () => {
     const env = createDefaultLaunchdEnv();
     const plistPath = resolveLaunchAgentPlistPath(env);
-    const wrapperPath = "/Users/test/.openclaw/service-env/ai.openclaw.gateway-env-wrapper.sh";
+    const wrapperPath = "/Users/test/.steelengine/service-env/ai.steelengine.gateway-env-wrapper.sh";
     const warn = vi.fn();
     const secret = "legacy-secret";
     state.files.set(wrapperPath, "custom wrapper");
     state.files.set(
       plistPath,
       createTestLaunchAgentPlist({
-        label: "ai.openclaw.gateway",
+        label: "ai.steelengine.gateway",
         programArguments: defaultProgramArguments,
         environment: { OPENAI_API_KEY: secret },
       }),
@@ -1066,7 +1066,7 @@ describe("launchd bootstrap repair", () => {
     expect(warn).toHaveBeenCalledWith(expect.stringContaining("custom behavior"));
     expect(state.files.get(plistPath)).not.toContain(secret);
     expect(state.fileModes.get(plistPath)).toBe(0o644);
-    expect(state.files.get("/Users/test/.openclaw/service-env/ai.openclaw.gateway.env")).toContain(
+    expect(state.files.get("/Users/test/.steelengine/service-env/ai.steelengine.gateway.env")).toContain(
       secret,
     );
   });
@@ -1194,7 +1194,7 @@ describe("launchd install", () => {
 
   it("writes LaunchAgent environment to an owner-only env file when provided", async () => {
     const env = createDefaultLaunchdEnv();
-    const tmpDir = "/Users/test/.openclaw/tmp";
+    const tmpDir = "/Users/test/.steelengine/tmp";
     const apiKey = "secret-api-key";
     await installLaunchAgent({
       env,
@@ -1204,8 +1204,8 @@ describe("launchd install", () => {
     });
 
     const plistPath = resolveLaunchAgentPlistPath(env);
-    const envFilePath = "/Users/test/.openclaw/service-env/ai.openclaw.gateway.env";
-    const wrapperPath = "/Users/test/.openclaw/service-env/ai.openclaw.gateway-env-wrapper.sh";
+    const envFilePath = "/Users/test/.steelengine/service-env/ai.steelengine.gateway.env";
+    const wrapperPath = "/Users/test/.steelengine/service-env/ai.steelengine.gateway-env-wrapper.sh";
     const plist = state.files.get(plistPath) ?? "";
     expect(plist).not.toContain("<key>EnvironmentVariables</key>");
     expect(plist).not.toContain(apiKey);
@@ -1220,7 +1220,7 @@ describe("launchd install", () => {
     expect(envFile).toContain(`export OPENAI_API_KEY='${apiKey}'`);
     expect(state.fileModes.get(envFilePath)).toBe(0o600);
     expect(state.fileModes.get(wrapperPath)).toBe(0o700);
-    expect(state.dirModes.get("/Users/test/.openclaw/service-env")).toBe(0o700);
+    expect(state.dirModes.get("/Users/test/.steelengine/service-env")).toBe(0o700);
 
     const command = await readLaunchAgentProgramArguments(env);
     expect(command?.programArguments).toEqual(defaultProgramArguments);
@@ -1232,12 +1232,12 @@ describe("launchd install", () => {
 
   it("warns before overwriting a customized generated LaunchAgent env wrapper", async () => {
     const env = createDefaultLaunchdEnv();
-    const wrapperPath = "/Users/test/.openclaw/service-env/ai.openclaw.gateway-env-wrapper.sh";
+    const wrapperPath = "/Users/test/.steelengine/service-env/ai.steelengine.gateway-env-wrapper.sh";
     await installLaunchAgent({
       env,
       stdout: new PassThrough(),
       programArguments: defaultProgramArguments,
-      environment: { OPENCLAW_GATEWAY_PORT: "18789" },
+      environment: { STEELENGINE_GATEWAY_PORT: "18789" },
     });
     const generatedWrapper = state.files.get(wrapperPath);
     if (!generatedWrapper) {
@@ -1258,24 +1258,24 @@ describe("launchd install", () => {
       env,
       stdout,
       programArguments: defaultProgramArguments,
-      environment: { OPENCLAW_GATEWAY_PORT: "18789" },
+      environment: { STEELENGINE_GATEWAY_PORT: "18789" },
     });
 
     expect(output).toContain("Warning:");
     expect(output).toContain("contains custom behavior and will be overwritten");
-    expect(output).toContain("openclaw gateway install --wrapper <path>");
-    expect(output).toContain("OPENCLAW_WRAPPER");
+    expect(output).toContain("steelengine gateway install --wrapper <path>");
+    expect(output).toContain("STEELENGINE_WRAPPER");
     expect(state.files.get(wrapperPath)).toBe(generatedWrapper);
   });
 
   it("warns before overwriting a customized generated LaunchAgent env wrapper during restart rewrite", async () => {
     const env = createDefaultLaunchdEnv();
-    const wrapperPath = "/Users/test/.openclaw/service-env/ai.openclaw.gateway-env-wrapper.sh";
+    const wrapperPath = "/Users/test/.steelengine/service-env/ai.steelengine.gateway-env-wrapper.sh";
     await installLaunchAgent({
       env,
       stdout: new PassThrough(),
       programArguments: defaultProgramArguments,
-      environment: { OPENCLAW_GATEWAY_PORT: "18789" },
+      environment: { STEELENGINE_GATEWAY_PORT: "18789" },
     });
     const generatedWrapper = state.files.get(wrapperPath);
     if (!generatedWrapper) {
@@ -1300,20 +1300,20 @@ describe("launchd install", () => {
 
     expect(output).toContain("Warning:");
     expect(output).toContain("contains custom behavior and will be overwritten");
-    expect(output).toContain("openclaw gateway install --wrapper <path>");
-    expect(output).toContain("OPENCLAW_WRAPPER");
+    expect(output).toContain("steelengine gateway install --wrapper <path>");
+    expect(output).toContain("STEELENGINE_WRAPPER");
     expect(state.files.get(wrapperPath)).toBe(generatedWrapper);
   });
 
   it("rewrites legacy LaunchAgent environment wrappers to a system shell executable", async () => {
     const env = createDefaultLaunchdEnv();
-    const envFilePath = "/Users/test/.openclaw/service-env/ai.openclaw.gateway.env";
-    const wrapperPath = "/Users/test/.openclaw/service-env/ai.openclaw.gateway-env-wrapper.sh";
+    const envFilePath = "/Users/test/.steelengine/service-env/ai.steelengine.gateway.env";
+    const wrapperPath = "/Users/test/.steelengine/service-env/ai.steelengine.gateway-env-wrapper.sh";
     await installLaunchAgent({
       env,
       stdout: new PassThrough(),
       programArguments: defaultProgramArguments,
-      environment: { OPENCLAW_GATEWAY_PORT: "19007" },
+      environment: { STEELENGINE_GATEWAY_PORT: "19007" },
     });
 
     const plistPath = resolveLaunchAgentPlistPath(env);
@@ -1352,29 +1352,29 @@ describe("launchd install", () => {
     const callerEnv = createDefaultLaunchdEnv();
     const serviceEnv = {
       ...callerEnv,
-      OPENCLAW_STATE_DIR: "/Users/test/service-env/custom-state",
+      STEELENGINE_STATE_DIR: "/Users/test/service-env/custom-state",
     };
     await installLaunchAgent({
       env: serviceEnv,
       stdout: new PassThrough(),
       programArguments: defaultProgramArguments,
       environment: {
-        OPENCLAW_GATEWAY_PORT: "18789",
-        OPENCLAW_STATE_DIR: serviceEnv.OPENCLAW_STATE_DIR,
+        STEELENGINE_GATEWAY_PORT: "18789",
+        STEELENGINE_STATE_DIR: serviceEnv.STEELENGINE_STATE_DIR,
       },
     });
 
     const plistPath = resolveLaunchAgentPlistPath(callerEnv);
-    const envFilePath = "/Users/test/service-env/custom-state/service-env/ai.openclaw.gateway.env";
+    const envFilePath = "/Users/test/service-env/custom-state/service-env/ai.steelengine.gateway.env";
     const wrapperPath =
-      "/Users/test/service-env/custom-state/service-env/ai.openclaw.gateway-env-wrapper.sh";
-    const callerEnvFilePath = "/Users/test/.openclaw/service-env/ai.openclaw.gateway.env";
+      "/Users/test/service-env/custom-state/service-env/ai.steelengine.gateway-env-wrapper.sh";
+    const callerEnvFilePath = "/Users/test/.steelengine/service-env/ai.steelengine.gateway.env";
     const callerWrapperPath =
-      "/Users/test/.openclaw/service-env/ai.openclaw.gateway-env-wrapper.sh";
+      "/Users/test/.steelengine/service-env/ai.steelengine.gateway-env-wrapper.sh";
     const mangledEnvFilePath =
-      "/Users/test/service-env/custom-state/service-env/[ai.openclaw.gateway.env](http:/ai.openclaw.gateway.env)";
+      "/Users/test/service-env/custom-state/service-env/[ai.steelengine.gateway.env](http:/ai.steelengine.gateway.env)";
     const mangledWrapperPath =
-      "/Users/test/service-env/custom-state/service-env/[ai.openclaw.gateway-env-wrapper.sh](http:/ai.openclaw.gateway-env-wrapper.sh)";
+      "/Users/test/service-env/custom-state/service-env/[ai.steelengine.gateway-env-wrapper.sh](http:/ai.steelengine.gateway-env-wrapper.sh)";
     state.files.set(
       plistPath,
       (state.files.get(plistPath) ?? "")
@@ -1384,9 +1384,9 @@ describe("launchd install", () => {
 
     const command = await readLaunchAgentProgramArguments(callerEnv);
     expect(command?.programArguments).toEqual(defaultProgramArguments);
-    expect(command?.environment?.OPENCLAW_GATEWAY_PORT).toBe("18789");
-    expect(command?.environment?.OPENCLAW_STATE_DIR).toBe(serviceEnv.OPENCLAW_STATE_DIR);
-    expect(command?.environmentValueSources?.OPENCLAW_GATEWAY_PORT).toBe("file");
+    expect(command?.environment?.STEELENGINE_GATEWAY_PORT).toBe("18789");
+    expect(command?.environment?.STEELENGINE_STATE_DIR).toBe(serviceEnv.STEELENGINE_STATE_DIR);
+    expect(command?.environmentValueSources?.STEELENGINE_GATEWAY_PORT).toBe("file");
 
     await restartLaunchAgent({
       env: callerEnv,
@@ -1403,15 +1403,15 @@ describe("launchd install", () => {
     expect(rewritten).not.toContain(mangledEnvFilePath);
     expect(rewritten).not.toContain(mangledWrapperPath);
     const rewrittenEnv = state.files.get(callerEnvFilePath) ?? "";
-    expect(rewrittenEnv).toContain("export OPENCLAW_GATEWAY_PORT='18789'");
+    expect(rewrittenEnv).toContain("export STEELENGINE_GATEWAY_PORT='18789'");
     expect(rewrittenEnv).toContain(
-      "export OPENCLAW_STATE_DIR='/Users/test/service-env/custom-state'",
+      "export STEELENGINE_STATE_DIR='/Users/test/service-env/custom-state'",
     );
   });
 
   it("creates the LaunchAgent TMPDIR before bootstrap", async () => {
     const env = createDefaultLaunchdEnv();
-    const tmpDir = "/Users/test/.openclaw/tmp";
+    const tmpDir = "/Users/test/.steelengine/tmp";
     await installLaunchAgent({
       env,
       stdout: new PassThrough(),
@@ -1438,7 +1438,7 @@ describe("launchd install", () => {
     expect(plist).toContain("<key>StandardInPath</key>");
     expect(plist).toContain("<string>/dev/null</string>");
     expect(plist).toContain("<key>StandardOutPath</key>");
-    expect(plist).toContain("<string>/Users/test/Library/Logs/openclaw/gateway.log</string>");
+    expect(plist).toContain("<string>/Users/test/Library/Logs/steelengine/gateway.log</string>");
     expect(plist).not.toContain("<key>SuccessfulExit</key>");
     expect(plist).toContain("<key>ExitTimeOut</key>");
     expect(plist).toContain(`<integer>${LAUNCH_AGENT_EXIT_TIMEOUT_SECONDS}</integer>`);
@@ -1463,7 +1463,7 @@ describe("launchd install", () => {
         '<plist version="1.0">',
         "  <dict>",
         "    <key>Label</key>",
-        "    <string>ai.openclaw.gateway</string>",
+        "    <string>ai.steelengine.gateway</string>",
         "    <key>ProgramArguments</key>",
         "    <array>",
         "      <string>node</string>",
@@ -1482,7 +1482,7 @@ describe("launchd install", () => {
     const plist = state.files.get(plistPath) ?? "";
     expect(plist).toContain("<key>StandardInPath</key>");
     expect(plist).toContain("<key>StandardOutPath</key>");
-    expect(plist).toContain("<string>/Users/test/Library/Logs/openclaw/gateway.log</string>");
+    expect(plist).toContain("<string>/Users/test/Library/Logs/steelengine/gateway.log</string>");
     expect(plist).toContain("<key>StandardErrorPath</key>");
     expect(plist).toContain("<string>/dev/null</string>");
     expect(plist).toContain("<key>KeepAlive</key>");
@@ -1525,7 +1525,7 @@ describe("launchd install", () => {
     await stopLaunchAgent({ env, stdout });
 
     const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-    const serviceId = `${domain}/ai.openclaw.gateway`;
+    const serviceId = `${domain}/ai.steelengine.gateway`;
     expect(state.launchctlCalls).toEqual([["bootout", serviceId]]);
     expect(output).toContain("Stopped LaunchAgent");
   });
@@ -1535,11 +1535,11 @@ describe("launchd install", () => {
 
     await withProcessEnv(
       {
-        LAUNCH_JOB_LABEL: "ai.openclaw.gateway",
+        LAUNCH_JOB_LABEL: "ai.steelengine.gateway",
       },
       async () => {
         await expect(stopLaunchAgent({ env, stdout: new PassThrough() })).rejects.toThrow(
-          "Refusing to stop LaunchAgent ai.openclaw.gateway from inside the same launchd service",
+          "Refusing to stop LaunchAgent ai.steelengine.gateway from inside the same launchd service",
         );
       },
     );
@@ -1555,13 +1555,13 @@ describe("launchd install", () => {
         LAUNCH_JOB_LABEL: undefined,
         LAUNCH_JOB_NAME: undefined,
         XPC_SERVICE_NAME: "0",
-        OPENCLAW_SERVICE_MARKER: "openclaw",
-        OPENCLAW_SERVICE_KIND: "gateway",
-        OPENCLAW_LAUNCHD_LABEL: "ai.openclaw.gateway",
+        STEELENGINE_SERVICE_MARKER: "steelengine",
+        STEELENGINE_SERVICE_KIND: "gateway",
+        STEELENGINE_LAUNCHD_LABEL: "ai.steelengine.gateway",
       },
       async () => {
         await expect(stopLaunchAgent({ env, stdout: new PassThrough() })).rejects.toThrow(
-          "Refusing to stop LaunchAgent ai.openclaw.gateway from inside the same launchd service",
+          "Refusing to stop LaunchAgent ai.steelengine.gateway from inside the same launchd service",
         );
       },
     );
@@ -1572,7 +1572,7 @@ describe("launchd install", () => {
   it("allows external LaunchAgent label overrides to stop the selected target", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_LAUNCHD_LABEL: "com.example.openclaw.gateway",
+      STEELENGINE_LAUNCHD_LABEL: "com.example.steelengine.gateway",
     };
     const stdout = new PassThrough();
     let output = "";
@@ -1585,9 +1585,9 @@ describe("launchd install", () => {
         LAUNCH_JOB_LABEL: undefined,
         LAUNCH_JOB_NAME: undefined,
         XPC_SERVICE_NAME: undefined,
-        OPENCLAW_LAUNCHD_LABEL: undefined,
-        OPENCLAW_SERVICE_MARKER: undefined,
-        OPENCLAW_SERVICE_KIND: undefined,
+        STEELENGINE_LAUNCHD_LABEL: undefined,
+        STEELENGINE_SERVICE_MARKER: undefined,
+        STEELENGINE_SERVICE_KIND: undefined,
       },
       async () => {
         await stopLaunchAgent({ env, stdout });
@@ -1595,7 +1595,7 @@ describe("launchd install", () => {
     );
 
     const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-    const serviceId = `${domain}/com.example.openclaw.gateway`;
+    const serviceId = `${domain}/com.example.steelengine.gateway`;
     expect(state.launchctlCalls).toEqual([["bootout", serviceId]]);
     expect(output).toContain("Stopped LaunchAgent");
   });
@@ -1603,7 +1603,7 @@ describe("launchd install", () => {
   it("verifies the configured gateway port is released before reporting stop success", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "19003",
+      STEELENGINE_GATEWAY_PORT: "19003",
     };
     const stdout = new PassThrough();
     let output = "";
@@ -1621,7 +1621,7 @@ describe("launchd install", () => {
   it("waits for the configured gateway port to finish releasing after bootout", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "19009",
+      STEELENGINE_GATEWAY_PORT: "19009",
     };
     inspectPortUsage.mockResolvedValueOnce({
       port: 19009,
@@ -1639,7 +1639,7 @@ describe("launchd install", () => {
   it("keeps waiting until a bind probe explicitly confirms port release", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "19010",
+      STEELENGINE_GATEWAY_PORT: "19010",
     };
     inspectPortUsage.mockResolvedValueOnce({
       port: 19010,
@@ -1660,7 +1660,7 @@ describe("launchd install", () => {
       env,
       stdout: new PassThrough(),
       programArguments: defaultProgramArguments,
-      environment: { OPENCLAW_GATEWAY_PORT: "19006" },
+      environment: { STEELENGINE_GATEWAY_PORT: "19006" },
     });
     state.launchctlCalls.length = 0;
 
@@ -1673,7 +1673,7 @@ describe("launchd install", () => {
   it("fails stop when the verified gateway port remains busy after cleanup", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "19004",
+      STEELENGINE_GATEWAY_PORT: "19004",
     };
     const stdout = new PassThrough();
     const onMutation = vi.fn();
@@ -1711,10 +1711,10 @@ describe("launchd install", () => {
     await stopLaunchAgent({ env, stdout, disable: true });
 
     const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-    const serviceId = `${domain}/ai.openclaw.gateway`;
+    const serviceId = `${domain}/ai.steelengine.gateway`;
     expect(state.launchctlCalls).toEqual([
       ["disable", serviceId],
-      ["stop", "ai.openclaw.gateway"],
+      ["stop", "ai.steelengine.gateway"],
       ["print", serviceId],
     ]);
     expect(output).toContain("Stopped LaunchAgent");
@@ -1723,7 +1723,7 @@ describe("launchd install", () => {
   it("verifies the configured gateway port is released before reporting disable stop success", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "19005",
+      STEELENGINE_GATEWAY_PORT: "19005",
     };
     const stdout = new PassThrough();
     let output = "";
@@ -1743,13 +1743,13 @@ describe("launchd install", () => {
 
     await withProcessEnv(
       {
-        LAUNCH_JOB_LABEL: "ai.openclaw.gateway",
+        LAUNCH_JOB_LABEL: "ai.steelengine.gateway",
       },
       async () => {
         await expect(
           stopLaunchAgent({ env, stdout: new PassThrough(), disable: true }),
         ).rejects.toThrow(
-          "Refusing to stop LaunchAgent ai.openclaw.gateway from inside the same launchd service",
+          "Refusing to stop LaunchAgent ai.steelengine.gateway from inside the same launchd service",
         );
       },
     );
@@ -1772,10 +1772,10 @@ describe("launchd install", () => {
     await stopLaunchAgent({ env, stdout, disable: true });
 
     const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-    const serviceId = `${domain}/ai.openclaw.gateway`;
+    const serviceId = `${domain}/ai.steelengine.gateway`;
     expect(state.launchctlCalls).toEqual([
       ["disable", serviceId],
-      ["stop", "ai.openclaw.gateway"],
+      ["stop", "ai.steelengine.gateway"],
       ["print", serviceId],
     ]);
     expect(launchctlCommandNames()).not.toContain("bootout");
@@ -1820,7 +1820,7 @@ describe("launchd install", () => {
   it("does not report degraded stop success when fallback cleanup leaves the port busy", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "19008",
+      STEELENGINE_GATEWAY_PORT: "19008",
     };
     const stdout = new PassThrough();
     const onMutation = vi.fn();
@@ -1976,7 +1976,7 @@ describe("launchd install", () => {
   it("restarts LaunchAgent with kickstart and no bootout", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "18789",
+      STEELENGINE_GATEWAY_PORT: "18789",
     };
     const onMutation = vi.fn();
     const result = await restartLaunchAgent({
@@ -1986,7 +1986,7 @@ describe("launchd install", () => {
     });
 
     const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-    const label = "ai.openclaw.gateway";
+    const label = "ai.steelengine.gateway";
     const serviceId = `${domain}/${label}`;
     expect(result).toEqual({ outcome: "completed" });
     expect(cleanStaleGatewayProcessesSync).toHaveBeenCalledWith(18789);
@@ -2017,7 +2017,7 @@ describe("launchd install", () => {
     ).resolves.toBeUndefined();
 
     const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-    const serviceId = `${domain}/ai.openclaw.gateway`;
+    const serviceId = `${domain}/ai.steelengine.gateway`;
     expect(state.launchctlCalls).toEqual([
       ["enable", serviceId],
       ["kickstart", serviceId],
@@ -2037,7 +2037,7 @@ describe("launchd install", () => {
     await startLaunchAgent({ env, stdout: new PassThrough(), onMutation });
 
     const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-    const serviceId = `${domain}/ai.openclaw.gateway`;
+    const serviceId = `${domain}/ai.steelengine.gateway`;
     expect(state.launchctlCalls).toEqual([
       ["enable", serviceId],
       ["kickstart", serviceId],
@@ -2062,7 +2062,7 @@ describe("launchd install", () => {
   it("audits kickstart before a later output failure", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "18789",
+      STEELENGINE_GATEWAY_PORT: "18789",
     };
     const onMutation = vi.fn();
     const stdout = {
@@ -2079,7 +2079,7 @@ describe("launchd install", () => {
   it("reloads launchd after rewriting an existing plist", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "18789",
+      STEELENGINE_GATEWAY_PORT: "18789",
     };
     const plistPath = resolveLaunchAgentPlistPath(env);
     state.files.set(
@@ -2089,14 +2089,14 @@ describe("launchd install", () => {
         '<plist version="1.0">',
         "  <dict>",
         "    <key>Label</key>",
-        "    <string>ai.openclaw.gateway</string>",
+        "    <string>ai.steelengine.gateway</string>",
         "    <key>ProgramArguments</key>",
         "    <array>",
         "      <string>node</string>",
         "      <string>gateway.js</string>",
         "    </array>",
         "    <key>StandardOutPath</key>",
-        "    <string>/Users/test/.openclaw-default/logs/gateway.log</string>",
+        "    <string>/Users/test/.steelengine-default/logs/gateway.log</string>",
         "  </dict>",
         "</plist>",
       ].join("\n"),
@@ -2112,7 +2112,7 @@ describe("launchd install", () => {
     const plist = state.files.get(plistPath) ?? "";
     expect(plist).toContain("<key>StandardInPath</key>");
     expect(plist).toContain("<string>/dev/null</string>");
-    expect(plist).toContain("<string>/Users/test/Library/Logs/openclaw/gateway.log</string>");
+    expect(plist).toContain("<string>/Users/test/Library/Logs/steelengine/gateway.log</string>");
     expect(launchctlCommandNames()).toEqual(["enable", "bootout", "enable", "bootstrap"]);
     expect(launchctlCommandNames()).not.toContain("kickstart");
     expect(onMutation.mock.calls).toEqual([
@@ -2126,11 +2126,11 @@ describe("launchd install", () => {
   it("audits reload bootout before a later bootstrap failure", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "18789",
+      STEELENGINE_GATEWAY_PORT: "18789",
     };
     setLaunchAgentPlist({
       env,
-      label: "ai.openclaw.gateway",
+      label: "ai.steelengine.gateway",
       programArguments: ["node", "gateway.js"],
     });
     state.bootstrapError = "Operation not permitted";
@@ -2152,11 +2152,11 @@ describe("launchd install", () => {
   it("completes reload when the mutation observer fails after bootout", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "18789",
+      STEELENGINE_GATEWAY_PORT: "18789",
     };
     setLaunchAgentPlist({
       env,
-      label: "ai.openclaw.gateway",
+      label: "ai.steelengine.gateway",
       programArguments: ["node", "gateway.js"],
     });
     const onMutation = vi.fn(({ mode }: { mode: string }) => {
@@ -2177,7 +2177,7 @@ describe("launchd install", () => {
   it("treats a concurrent launchd bootstrap as success when the service is loaded", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "18789",
+      STEELENGINE_GATEWAY_PORT: "18789",
     };
     const plistPath = resolveLaunchAgentPlistPath(env);
     state.files.set(
@@ -2187,14 +2187,14 @@ describe("launchd install", () => {
         '<plist version="1.0">',
         "  <dict>",
         "    <key>Label</key>",
-        "    <string>ai.openclaw.gateway</string>",
+        "    <string>ai.steelengine.gateway</string>",
         "    <key>ProgramArguments</key>",
         "    <array>",
         "      <string>node</string>",
         "      <string>gateway.js</string>",
         "    </array>",
         "    <key>StandardOutPath</key>",
-        "    <string>/Users/test/.openclaw-default/logs/gateway.log</string>",
+        "    <string>/Users/test/.steelengine-default/logs/gateway.log</string>",
         "  </dict>",
         "</plist>",
       ].join("\n"),
@@ -2215,7 +2215,7 @@ describe("launchd install", () => {
   it("uses the configured gateway port for stale cleanup", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "19001",
+      STEELENGINE_GATEWAY_PORT: "19001",
     };
 
     await restartLaunchAgent({
@@ -2229,7 +2229,7 @@ describe("launchd install", () => {
   it("ignores invalid configured gateway ports for stale cleanup", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "65536",
+      STEELENGINE_GATEWAY_PORT: "65536",
     };
     state.files.clear();
 
@@ -2248,7 +2248,7 @@ describe("launchd install", () => {
       env,
       stdout: new PassThrough(),
       programArguments: defaultProgramArguments,
-      environment: { OPENCLAW_GATEWAY_PORT: "19007" },
+      environment: { STEELENGINE_GATEWAY_PORT: "19007" },
     });
     state.launchctlCalls.length = 0;
 
@@ -2286,7 +2286,7 @@ describe("launchd install", () => {
       env,
       stdout: new PassThrough(),
       programArguments: defaultProgramArguments,
-      environment: { OPENCLAW_GATEWAY_PORT: "65536" },
+      environment: { STEELENGINE_GATEWAY_PORT: "65536" },
     });
     state.launchctlCalls.length = 0;
 
@@ -2302,7 +2302,7 @@ describe("launchd install", () => {
   it("fails restart before kickstart when the configured gateway port remains busy", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      OPENCLAW_GATEWAY_PORT: "19002",
+      STEELENGINE_GATEWAY_PORT: "19002",
     };
     const plistPath = resolveLaunchAgentPlistPath(env);
     const originalPlist = [
@@ -2310,14 +2310,14 @@ describe("launchd install", () => {
       '<plist version="1.0">',
       "  <dict>",
       "    <key>Label</key>",
-      "    <string>ai.openclaw.gateway</string>",
+      "    <string>ai.steelengine.gateway</string>",
       "    <key>ProgramArguments</key>",
       "    <array>",
       "      <string>node</string>",
       "      <string>gateway.js</string>",
       "    </array>",
       "    <key>StandardOutPath</key>",
-      "    <string>/Users/test/.openclaw-default/logs/gateway.log</string>",
+      "    <string>/Users/test/.steelengine-default/logs/gateway.log</string>",
       "  </dict>",
       "</plist>",
     ].join("\n");
@@ -2369,7 +2369,7 @@ describe("launchd install", () => {
     });
 
     const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-    const serviceId = `${domain}/ai.openclaw.gateway`;
+    const serviceId = `${domain}/ai.steelengine.gateway`;
     const kickstartCalls = state.launchctlCalls.filter(
       (c) => c[0] === "kickstart" && c[1] === "-k" && c[2] === serviceId,
     );
@@ -2418,7 +2418,7 @@ describe("launchd install", () => {
   it("hands restart off to a detached helper when invoked from the current LaunchAgent", async () => {
     const env = createDefaultLaunchdEnv();
 
-    const result = await withProcessEnv({ LAUNCH_JOB_LABEL: "ai.openclaw.gateway" }, async () =>
+    const result = await withProcessEnv({ LAUNCH_JOB_LABEL: "ai.steelengine.gateway" }, async () =>
       restartLaunchAgent({
         env,
         stdout: new PassThrough(),
@@ -2444,20 +2444,20 @@ describe("launchd install", () => {
         '<plist version="1.0">',
         "  <dict>",
         "    <key>Label</key>",
-        "    <string>ai.openclaw.gateway</string>",
+        "    <string>ai.steelengine.gateway</string>",
         "    <key>ProgramArguments</key>",
         "    <array>",
         "      <string>node</string>",
         "      <string>gateway.js</string>",
         "    </array>",
         "    <key>StandardOutPath</key>",
-        "    <string>/Users/test/.openclaw-default/logs/gateway.log</string>",
+        "    <string>/Users/test/.steelengine-default/logs/gateway.log</string>",
         "  </dict>",
         "</plist>",
       ].join("\n"),
     );
 
-    const result = await withProcessEnv({ LAUNCH_JOB_LABEL: "ai.openclaw.gateway" }, async () =>
+    const result = await withProcessEnv({ LAUNCH_JOB_LABEL: "ai.steelengine.gateway" }, async () =>
       restartLaunchAgent({
         env,
         stdout: new PassThrough(),
@@ -2470,7 +2470,7 @@ describe("launchd install", () => {
       mode: "reload",
       waitForPid: process.pid,
     });
-    expect(state.files.get(plistPath)).toContain("/Users/test/Library/Logs/openclaw/gateway.log");
+    expect(state.files.get(plistPath)).toContain("/Users/test/Library/Logs/steelengine/gateway.log");
     expect(state.launchctlCalls).toStrictEqual([]);
   });
 
@@ -2482,7 +2482,7 @@ describe("launchd install", () => {
     });
 
     await expect(
-      withProcessEnv({ LAUNCH_JOB_LABEL: "ai.openclaw.gateway" }, async () =>
+      withProcessEnv({ LAUNCH_JOB_LABEL: "ai.steelengine.gateway" }, async () =>
         restartLaunchAgent({
           env,
           stdout: new PassThrough(),
@@ -2499,9 +2499,9 @@ describe("launchd install", () => {
         LAUNCH_JOB_LABEL: undefined,
         LAUNCH_JOB_NAME: undefined,
         XPC_SERVICE_NAME: "0",
-        OPENCLAW_SERVICE_MARKER: "openclaw",
-        OPENCLAW_SERVICE_KIND: "gateway",
-        OPENCLAW_LAUNCHD_LABEL: "ai.openclaw.gateway",
+        STEELENGINE_SERVICE_MARKER: "steelengine",
+        STEELENGINE_SERVICE_KIND: "gateway",
+        STEELENGINE_LAUNCHD_LABEL: "ai.steelengine.gateway",
       },
       async () =>
         restartLaunchAgent({
@@ -2527,9 +2527,9 @@ describe("launchd install", () => {
         LAUNCH_JOB_LABEL: undefined,
         LAUNCH_JOB_NAME: undefined,
         XPC_SERVICE_NAME: "0",
-        OPENCLAW_SERVICE_MARKER: undefined,
-        OPENCLAW_SERVICE_KIND: undefined,
-        OPENCLAW_LAUNCHD_LABEL: undefined,
+        STEELENGINE_SERVICE_MARKER: undefined,
+        STEELENGINE_SERVICE_KIND: undefined,
+        STEELENGINE_LAUNCHD_LABEL: undefined,
       },
       async () =>
         restartLaunchAgent({
@@ -2557,7 +2557,7 @@ describe("launchd install", () => {
     }
     expect(message).toContain("logged-in macOS GUI session");
     expect(message).toContain("wrong user (including sudo)");
-    expect(message).toContain("https://docs.openclaw.ai/gateway");
+    expect(message).toContain("https://docs.steelengine.ai/gateway");
   });
 
   it("surfaces generic bootstrap failures without GUI-specific guidance", async () => {
@@ -2577,40 +2577,40 @@ describe("launchd install", () => {
 describe("resolveLaunchAgentPlistPath", () => {
   it.each([
     {
-      name: "uses default label when OPENCLAW_PROFILE is unset",
+      name: "uses default label when STEELENGINE_PROFILE is unset",
       env: { HOME: "/Users/test" },
-      expected: "/Users/test/Library/LaunchAgents/ai.openclaw.gateway.plist",
+      expected: "/Users/test/Library/LaunchAgents/ai.steelengine.gateway.plist",
     },
     {
-      name: "uses profile-specific label when OPENCLAW_PROFILE is set to a custom value",
-      env: { HOME: "/Users/test", OPENCLAW_PROFILE: "jbphoenix" },
-      expected: "/Users/test/Library/LaunchAgents/ai.openclaw.jbphoenix.plist",
+      name: "uses profile-specific label when STEELENGINE_PROFILE is set to a custom value",
+      env: { HOME: "/Users/test", STEELENGINE_PROFILE: "jbphoenix" },
+      expected: "/Users/test/Library/LaunchAgents/ai.steelengine.jbphoenix.plist",
     },
     {
-      name: "prefers OPENCLAW_LAUNCHD_LABEL over OPENCLAW_PROFILE",
+      name: "prefers STEELENGINE_LAUNCHD_LABEL over STEELENGINE_PROFILE",
       env: {
         HOME: "/Users/test",
-        OPENCLAW_PROFILE: "jbphoenix",
-        OPENCLAW_LAUNCHD_LABEL: "com.custom.label",
+        STEELENGINE_PROFILE: "jbphoenix",
+        STEELENGINE_LAUNCHD_LABEL: "com.custom.label",
       },
       expected: "/Users/test/Library/LaunchAgents/com.custom.label.plist",
     },
     {
-      name: "trims whitespace from OPENCLAW_LAUNCHD_LABEL",
+      name: "trims whitespace from STEELENGINE_LAUNCHD_LABEL",
       env: {
         HOME: "/Users/test",
-        OPENCLAW_LAUNCHD_LABEL: "  com.custom.label  ",
+        STEELENGINE_LAUNCHD_LABEL: "  com.custom.label  ",
       },
       expected: "/Users/test/Library/LaunchAgents/com.custom.label.plist",
     },
     {
-      name: "ignores empty OPENCLAW_LAUNCHD_LABEL and falls back to profile",
+      name: "ignores empty STEELENGINE_LAUNCHD_LABEL and falls back to profile",
       env: {
         HOME: "/Users/test",
-        OPENCLAW_PROFILE: "myprofile",
-        OPENCLAW_LAUNCHD_LABEL: "   ",
+        STEELENGINE_PROFILE: "myprofile",
+        STEELENGINE_LAUNCHD_LABEL: "   ",
       },
-      expected: "/Users/test/Library/LaunchAgents/ai.openclaw.myprofile.plist",
+      expected: "/Users/test/Library/LaunchAgents/ai.steelengine.myprofile.plist",
     },
   ])("$name", ({ env, expected }) => {
     expect(resolveLaunchAgentPlistPath(env)).toBe(expected);
@@ -2620,7 +2620,7 @@ describe("resolveLaunchAgentPlistPath", () => {
     expect(() =>
       resolveLaunchAgentPlistPath({
         HOME: "/Users/test",
-        OPENCLAW_LAUNCHD_LABEL: "../evil/label",
+        STEELENGINE_LAUNCHD_LABEL: "../evil/label",
       }),
     ).toThrow("Invalid launchd label");
   });

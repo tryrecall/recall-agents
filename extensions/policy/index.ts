@@ -1,5 +1,5 @@
-// Policy plugin entrypoint registers its OpenClaw integration.
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+// Policy plugin entrypoint registers its SteelEngine integration.
+import { definePluginEntry } from "steelengine/plugin-sdk/plugin-entry";
 import { registerPolicyCli } from "./src/cli.js";
 import { registerPolicyDoctorChecks } from "./src/doctor/register.js";
 

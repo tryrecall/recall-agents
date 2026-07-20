@@ -46,12 +46,12 @@ export async function runWorkerDescriptor(
   options: { signal?: AbortSignal } = {},
 ): Promise<WorkerRuntimeResult> {
   const workspaceDir = await assertWorkspaceDirectory(descriptor.assignment.workspaceDir);
-  const stateDir = await mkdtemp(path.join(tmpdir(), "openclaw-worker-"));
+  const stateDir = await mkdtemp(path.join(tmpdir(), "steelengine-worker-"));
   await chmod(stateDir, 0o700);
-  const previousStateDir = process.env.OPENCLAW_STATE_DIR;
-  const previousConfigPath = process.env.OPENCLAW_CONFIG_PATH;
-  process.env.OPENCLAW_STATE_DIR = stateDir;
-  process.env.OPENCLAW_CONFIG_PATH = path.join(stateDir, "openclaw.json");
+  const previousStateDir = process.env.STEELENGINE_STATE_DIR;
+  const previousConfigPath = process.env.STEELENGINE_CONFIG_PATH;
+  process.env.STEELENGINE_STATE_DIR = stateDir;
+  process.env.STEELENGINE_CONFIG_PATH = path.join(stateDir, "steelengine.json");
 
   const abortController = new AbortController();
   let turnStarted = false;
@@ -189,14 +189,14 @@ export async function runWorkerDescriptor(
     live.dispose();
     await connection.stop();
     if (previousStateDir === undefined) {
-      delete process.env.OPENCLAW_STATE_DIR;
+      delete process.env.STEELENGINE_STATE_DIR;
     } else {
-      process.env.OPENCLAW_STATE_DIR = previousStateDir;
+      process.env.STEELENGINE_STATE_DIR = previousStateDir;
     }
     if (previousConfigPath === undefined) {
-      delete process.env.OPENCLAW_CONFIG_PATH;
+      delete process.env.STEELENGINE_CONFIG_PATH;
     } else {
-      process.env.OPENCLAW_CONFIG_PATH = previousConfigPath;
+      process.env.STEELENGINE_CONFIG_PATH = previousConfigPath;
     }
     await rm(stateDir, { recursive: true, force: true });
   }

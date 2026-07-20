@@ -5,7 +5,7 @@ import path from "node:path";
 import {
   createPluginStateSyncKeyedStoreForTests,
   resetPluginStateStoreForTests,
-} from "openclaw/plugin-sdk/plugin-state-test-runtime";
+} from "steelengine/plugin-sdk/plugin-state-test-runtime";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveMatrixAccountStorageRoot } from "../../storage-paths.js";
 import { installMatrixTestRuntime } from "../../test-runtime.js";
@@ -58,8 +58,8 @@ describe("matrix client storage paths", () => {
     },
     logger = createTestLogger(),
   ): string {
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-matrix-storage-"));
-    const stateDir = path.join(homeDir, ".openclaw");
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "steelengine-matrix-storage-"));
+    const stateDir = path.join(homeDir, ".steelengine");
     fs.mkdirSync(stateDir, { recursive: true });
     tempDirs.push(homeDir);
     installMatrixTestRuntime({
@@ -75,9 +75,9 @@ describe("matrix client storage paths", () => {
   function createMigrationEnv(stateDir: string): NodeJS.ProcessEnv {
     return {
       HOME: path.dirname(stateDir),
-      OPENCLAW_HOME: path.dirname(stateDir),
-      OPENCLAW_STATE_DIR: stateDir,
-      OPENCLAW_TEST_FAST: "1",
+      STEELENGINE_HOME: path.dirname(stateDir),
+      STEELENGINE_STATE_DIR: stateDir,
+      STEELENGINE_TEST_FAST: "1",
     } as NodeJS.ProcessEnv;
   }
 
@@ -240,7 +240,7 @@ describe("matrix client storage paths", () => {
     const stateDir = setupStateDir();
     const storagePaths = resolveMatrixStoragePaths({
       ...defaultStorageAuth,
-      env: { ...process.env, OPENCLAW_STATE_DIR: stateDir },
+      env: { ...process.env, STEELENGINE_STATE_DIR: stateDir },
     });
     expect(
       writeStorageMeta({
@@ -534,7 +534,7 @@ describe("matrix client storage paths", () => {
     });
 
     expect(rotatedStoragePaths.rootDir).toBe(oldStoragePaths.rootDir);
-    expect(fs.existsSync(path.join(oldStoragePaths.rootDir, "state", "openclaw.sqlite"))).toBe(
+    expect(fs.existsSync(path.join(oldStoragePaths.rootDir, "state", "steelengine.sqlite"))).toBe(
       false,
     );
   });

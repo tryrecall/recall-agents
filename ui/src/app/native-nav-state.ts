@@ -10,14 +10,14 @@ type WebKitMessageHandler = {
 type WebKitBridgeWindow = Window & {
   webkit?: {
     messageHandlers?: {
-      openclawNav?: WebKitMessageHandler;
+      steelengineNav?: WebKitMessageHandler;
     };
   };
 };
 
 export function postNativeNavState(state: NativeNavState): void {
   try {
-    (window as WebKitBridgeWindow).webkit?.messageHandlers?.openclawNav?.postMessage({
+    (window as WebKitBridgeWindow).webkit?.messageHandlers?.steelengineNav?.postMessage({
       type: "nav-state",
       ...state,
     });

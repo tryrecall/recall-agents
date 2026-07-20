@@ -1,22 +1,22 @@
 {
-  "name": "@openclaw/logbook",
+  "name": "@steelengine/logbook",
   "version": "2026.7.2-beta.3",
   "private": true,
-  "description": "OpenClaw automatic work journal plugin",
+  "description": "SteelEngine automatic work journal plugin",
   "type": "module",
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*",
-    "openclaw": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*",
+    "steelengine": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.7.2-beta.3"
+    "steelengine": ">=2026.7.2-beta.3"
   },
   "peerDependenciesMeta": {
-    "openclaw": {
+    "steelengine": {
       "optional": true
     }
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ]

@@ -1,13 +1,13 @@
-# Tavily OpenClaw plugin
+# Tavily SteelEngine plugin
 
-Official OpenClaw plugin for Tavily.
+Official SteelEngine plugin for Tavily.
 
 ## Install
 
 ```sh
-openclaw plugins install @openclaw/tavily-plugin
+steelengine plugins install @steelengine/tavily-plugin
 ```
 
 ## Docs
 
-See `docs/tools/tavily.md` in the OpenClaw repository, or the published docs at `https://docs.openclaw.ai/tools/tavily`.
+See `docs/tools/tavily.md` in the SteelEngine repository, or the published docs at `https://docs.steelengine.ai/tools/tavily`.

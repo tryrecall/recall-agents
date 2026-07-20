@@ -1,7 +1,7 @@
 <resources>
-    <string-array name="ask_openclaw_query_patterns">
-        <item>"از OpenClaw بپرس %1$s"</item>
-        <item>"به OpenClaw بگو %1$s"</item>
-        <item>"OpenClaw را باز کن و بپرس %1$s"</item>
+    <string-array name="ask_steelengine_query_patterns">
+        <item>"از SteelEngine بپرس %1$s"</item>
+        <item>"به SteelEngine بگو %1$s"</item>
+        <item>"SteelEngine را باز کن و بپرس %1$s"</item>
     </string-array>
 </resources>

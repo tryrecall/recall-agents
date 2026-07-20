@@ -1,9 +1,9 @@
 // Discord tests cover provider plugin behavior.
 import { EventEmitter } from "node:events";
-import type { ChannelRuntimeSurface } from "openclaw/plugin-sdk/channel-contract";
-import { createPluginRuntimeMock } from "openclaw/plugin-sdk/channel-test-helpers";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { logVerbose } from "openclaw/plugin-sdk/runtime-env";
+import type { ChannelRuntimeSurface } from "steelengine/plugin-sdk/channel-contract";
+import { createPluginRuntimeMock } from "steelengine/plugin-sdk/channel-test-helpers";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { logVerbose } from "steelengine/plugin-sdk/runtime-env";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { RateLimitError } from "../internal/discord.js";
 import {
@@ -18,7 +18,7 @@ import {
   formatDiscordDeployErrorMessage,
 } from "./provider.deploy-errors.js";
 
-vi.mock("openclaw/plugin-sdk/runtime-env", { spy: true });
+vi.mock("steelengine/plugin-sdk/runtime-env", { spy: true });
 
 const {
   clientConstructorOptionsMock,
@@ -100,7 +100,7 @@ function createRateLimitError(
   return new RateLimitErrorCtor(response, body, fallbackRequest);
 }
 
-function createConfigWithDiscordAccount(overrides: Record<string, unknown> = {}): OpenClawConfig {
+function createConfigWithDiscordAccount(overrides: Record<string, unknown> = {}): SteelEngineConfig {
   return {
     channels: {
       discord: {
@@ -112,7 +112,7 @@ function createConfigWithDiscordAccount(overrides: Record<string, unknown> = {})
         },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 type MockCallReader = { mock: { calls: unknown[][] } };
@@ -161,7 +161,7 @@ vi.mock("../voice/manager.runtime.js", () => {
 });
 describe("monitorDiscordProvider", () => {
   type ReconcileHealthProbeParams = {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     accountId: string;
     sessionKey: string;
     binding: unknown;
@@ -169,7 +169,7 @@ describe("monitorDiscordProvider", () => {
   };
 
   type ReconcileStartupParams = {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     healthProbe?: (
       params: ReconcileHealthProbeParams,
     ) => Promise<{ status: string; reason?: string }>;
@@ -225,7 +225,7 @@ describe("monitorDiscordProvider", () => {
   };
 
   beforeAll(async () => {
-    vi.doMock("openclaw/plugin-sdk/plugin-runtime", () => ({
+    vi.doMock("steelengine/plugin-sdk/plugin-runtime", () => ({
       getPluginCommandSpecs: getPluginCommandSpecsMock,
     }));
     vi.doMock("../accounts.js", () => ({
@@ -836,7 +836,7 @@ describe("monitorDiscordProvider", () => {
     expect(drained[0]?.message).toContain("4014");
   });
 
-  it("passes OpenClaw event queue defaults to the Discord client", async () => {
+  it("passes SteelEngine event queue defaults to the Discord client", async () => {
     await monitorDiscordProvider({
       config: baseConfig(),
       runtime: baseRuntime(),

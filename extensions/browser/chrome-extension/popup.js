@@ -12,9 +12,9 @@ const statusLine = document.getElementById("statusLine");
 const errorLine = document.getElementById("error");
 
 const STATE_LABEL = {
-  on: "Connected to OpenClaw",
+  on: "Connected to SteelEngine",
   connecting: "Connecting…",
-  error: "Relay unreachable — is the OpenClaw gateway running?",
+  error: "Relay unreachable — is the SteelEngine gateway running?",
   off: "Not connected",
 };
 
@@ -45,7 +45,7 @@ async function refresh() {
   copilotButton.dataset.path = panel?.path ?? "";
   const { shared } = await chrome.runtime.sendMessage({ type: "isTabShared", tabId: tab.id });
   shareButton.classList.remove("hidden");
-  shareButton.textContent = shared ? "Stop sharing this tab" : "Share this tab with OpenClaw";
+  shareButton.textContent = shared ? "Stop sharing this tab" : "Share this tab with SteelEngine";
   shareButton.dataset.tabId = String(tab.id);
 }
 

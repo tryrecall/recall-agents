@@ -41,12 +41,12 @@ export function beginSecretsRuntimeIsolationForTest(): SecretsRuntimeEnvSnapshot
   secretsRuntimePluginMocks.resolvePluginWebSearchProvidersMock.mockReset();
   secretsRuntimePluginMocks.resolvePluginWebSearchProvidersMock.mockReturnValue([]);
   const envSnapshot = captureEnv([
-    "OPENCLAW_BUNDLED_PLUGINS_DIR",
-    "OPENCLAW_DISABLE_BUNDLED_PLUGINS",
-    "OPENCLAW_VERSION",
+    "STEELENGINE_BUNDLED_PLUGINS_DIR",
+    "STEELENGINE_DISABLE_BUNDLED_PLUGINS",
+    "STEELENGINE_VERSION",
   ]);
-  delete process.env.OPENCLAW_BUNDLED_PLUGINS_DIR;
-  delete process.env.OPENCLAW_VERSION;
+  delete process.env.STEELENGINE_BUNDLED_PLUGINS_DIR;
+  delete process.env.STEELENGINE_VERSION;
   return envSnapshot;
 }
 

@@ -2,53 +2,53 @@
 set -euo pipefail
 
 SCRIPT_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-ROOT_DIR="${OPENCLAW_LIVE_DOCKER_REPO_ROOT:-$SCRIPT_ROOT_DIR}"
+ROOT_DIR="${STEELENGINE_LIVE_DOCKER_REPO_ROOT:-$SCRIPT_ROOT_DIR}"
 ROOT_DIR="$(cd "$ROOT_DIR" && pwd)"
-TRUSTED_HARNESS_DIR="${OPENCLAW_LIVE_DOCKER_TRUSTED_HARNESS_DIR:-${OPENCLAW_LIVE_CODEX_TRUSTED_HARNESS_DIR:-$SCRIPT_ROOT_DIR}}"
+TRUSTED_HARNESS_DIR="${STEELENGINE_LIVE_DOCKER_TRUSTED_HARNESS_DIR:-${STEELENGINE_LIVE_CODEX_TRUSTED_HARNESS_DIR:-$SCRIPT_ROOT_DIR}}"
 if [[ -z "$TRUSTED_HARNESS_DIR" || ! -d "$TRUSTED_HARNESS_DIR" ]]; then
   echo "ERROR: trusted Codex harness directory not found: ${TRUSTED_HARNESS_DIR:-<empty>}." >&2
   exit 1
 fi
 TRUSTED_HARNESS_DIR="$(cd "$TRUSTED_HARNESS_DIR" && pwd)"
 source "$TRUSTED_HARNESS_DIR/scripts/lib/live-docker-auth.sh"
-IMAGE_NAME="${OPENCLAW_IMAGE:-openclaw:local}"
-LIVE_IMAGE_NAME="${OPENCLAW_LIVE_IMAGE:-${IMAGE_NAME}-live}"
-CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$HOME/.openclaw}"
-WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$HOME/.openclaw/workspace}"
-PROFILE_FILE="$(openclaw_live_default_profile_file)"
-CODEX_HARNESS_AUTH_MODE="${OPENCLAW_LIVE_CODEX_HARNESS_AUTH:-codex-auth}"
-CODEX_CLI_PACKAGE_SPEC="${OPENCLAW_LIVE_CODEX_CLI_PACKAGE_SPEC:-}"
-CODEX_HARNESS_SETUP_TIMEOUT_SECONDS="$(openclaw_live_read_positive_int_env OPENCLAW_LIVE_CODEX_HARNESS_SETUP_TIMEOUT_SECONDS 180)"
+IMAGE_NAME="${STEELENGINE_IMAGE:-steelengine:local}"
+LIVE_IMAGE_NAME="${STEELENGINE_LIVE_IMAGE:-${IMAGE_NAME}-live}"
+CONFIG_DIR="${STEELENGINE_CONFIG_DIR:-$HOME/.steelengine}"
+WORKSPACE_DIR="${STEELENGINE_WORKSPACE_DIR:-$HOME/.steelengine/workspace}"
+PROFILE_FILE="$(steelengine_live_default_profile_file)"
+CODEX_HARNESS_AUTH_MODE="${STEELENGINE_LIVE_CODEX_HARNESS_AUTH:-codex-auth}"
+CODEX_CLI_PACKAGE_SPEC="${STEELENGINE_LIVE_CODEX_CLI_PACKAGE_SPEC:-}"
+CODEX_HARNESS_SETUP_TIMEOUT_SECONDS="$(steelengine_live_read_positive_int_env STEELENGINE_LIVE_CODEX_HARNESS_SETUP_TIMEOUT_SECONDS 180)"
 CODEX_HARNESS_TARGET_COUNT=1
-if [[ -n "${OPENCLAW_LIVE_CODEX_HARNESS_TARGETS:-}" ]]; then
-  IFS=',' read -r -a CODEX_HARNESS_TARGET_ITEMS <<<"$OPENCLAW_LIVE_CODEX_HARNESS_TARGETS"
+if [[ -n "${STEELENGINE_LIVE_CODEX_HARNESS_TARGETS:-}" ]]; then
+  IFS=',' read -r -a CODEX_HARNESS_TARGET_ITEMS <<<"$STEELENGINE_LIVE_CODEX_HARNESS_TARGETS"
   CODEX_HARNESS_TARGET_COUNT="${#CODEX_HARNESS_TARGET_ITEMS[@]}"
 fi
 # Each target starts an isolated 15-minute Vitest suite. Preserve the old
 # 35-minute single-target budget while scaling matrix runs linearly.
-CODEX_HARNESS_DOCKER_RUN_TIMEOUT="${OPENCLAW_LIVE_CODEX_HARNESS_DOCKER_RUN_TIMEOUT:-$((2100 * CODEX_HARNESS_TARGET_COUNT))s}"
+CODEX_HARNESS_DOCKER_RUN_TIMEOUT="${STEELENGINE_LIVE_CODEX_HARNESS_DOCKER_RUN_TIMEOUT:-$((2100 * CODEX_HARNESS_TARGET_COUNT))s}"
 TEMP_DIRS=()
-DOCKER_USER="${OPENCLAW_DOCKER_USER:-node}"
+DOCKER_USER="${STEELENGINE_DOCKER_USER:-node}"
 DOCKER_HOME_MOUNT=()
 DOCKER_TRUSTED_HARNESS_MOUNT=()
 DOCKER_TRUSTED_HARNESS_CONTAINER_DIR=""
-DOCKER_CACHE_CONTAINER_DIR="/tmp/openclaw-cache"
-DOCKER_CLI_TOOLS_CONTAINER_DIR="/tmp/openclaw-npm-global"
+DOCKER_CACHE_CONTAINER_DIR="/tmp/steelengine-cache"
+DOCKER_CLI_TOOLS_CONTAINER_DIR="/tmp/steelengine-npm-global"
 DOCKER_EXTRA_ENV_FILES=()
 DOCKER_AUTH_PRESTAGED=0
 
-openclaw_live_codex_harness_is_ci() {
-  openclaw_live_is_ci
+steelengine_live_codex_harness_is_ci() {
+  steelengine_live_is_ci
 }
 
-openclaw_live_codex_harness_append_build_extension() {
+steelengine_live_codex_harness_append_build_extension() {
   local extension="${1:?extension required}"
-  local current="${OPENCLAW_DOCKER_BUILD_EXTENSIONS:-${OPENCLAW_EXTENSIONS:-}}"
+  local current="${STEELENGINE_DOCKER_BUILD_EXTENSIONS:-${STEELENGINE_EXTENSIONS:-}}"
   case " $current " in
     *" $extension "*)
       ;;
     *)
-      export OPENCLAW_DOCKER_BUILD_EXTENSIONS="${current:+$current }$extension"
+      export STEELENGINE_DOCKER_BUILD_EXTENSIONS="${current:+$current }$extension"
       ;;
   esac
 }
@@ -57,7 +57,7 @@ case "$CODEX_HARNESS_AUTH_MODE" in
   codex-auth | api-key)
     ;;
   *)
-    echo "ERROR: OPENCLAW_LIVE_CODEX_HARNESS_AUTH must be one of: codex-auth, api-key." >&2
+    echo "ERROR: STEELENGINE_LIVE_CODEX_HARNESS_AUTH must be one of: codex-auth, api-key." >&2
     exit 1
     ;;
 esac
@@ -70,13 +70,13 @@ if [[ -f "$PROFILE_FILE" && -r "$PROFILE_FILE" ]]; then
 fi
 
 if [[ "$CODEX_HARNESS_AUTH_MODE" == "api-key" && -z "${OPENAI_API_KEY:-}" ]]; then
-  echo "ERROR: OPENCLAW_LIVE_CODEX_HARNESS_AUTH=api-key requires OPENAI_API_KEY." >&2
+  echo "ERROR: STEELENGINE_LIVE_CODEX_HARNESS_AUTH=api-key requires OPENAI_API_KEY." >&2
   exit 1
 fi
 if [[ "$CODEX_HARNESS_AUTH_MODE" != "api-key" && ! -s "$HOME/.codex/auth.json" ]]; then
-  echo "ERROR: OPENCLAW_LIVE_CODEX_HARNESS_AUTH=codex-auth requires ~/.codex/auth.json before building the live Docker image." >&2
+  echo "ERROR: STEELENGINE_LIVE_CODEX_HARNESS_AUTH=codex-auth requires ~/.codex/auth.json before building the live Docker image." >&2
   if [[ -n "${OPENAI_API_KEY:-}" ]]; then
-    echo "If this is a Testbox/API-key run, set OPENCLAW_LIVE_CODEX_HARNESS_AUTH=api-key and run through openclaw-testbox-env." >&2
+    echo "If this is a Testbox/API-key run, set STEELENGINE_LIVE_CODEX_HARNESS_AUTH=api-key and run through steelengine-testbox-env." >&2
   fi
   exit 1
 fi
@@ -98,41 +98,41 @@ cleanup_temp_dirs() {
 }
 trap cleanup_temp_dirs EXIT
 
-if [[ -n "${OPENCLAW_DOCKER_CLI_TOOLS_DIR:-}" ]]; then
-  CLI_TOOLS_DIR="${OPENCLAW_DOCKER_CLI_TOOLS_DIR}"
-elif openclaw_live_codex_harness_is_ci; then
-  CLI_TOOLS_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/openclaw-docker-cli-tools.XXXXXX")"
+if [[ -n "${STEELENGINE_DOCKER_CLI_TOOLS_DIR:-}" ]]; then
+  CLI_TOOLS_DIR="${STEELENGINE_DOCKER_CLI_TOOLS_DIR}"
+elif steelengine_live_codex_harness_is_ci; then
+  CLI_TOOLS_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/steelengine-docker-cli-tools.XXXXXX")"
   TEMP_DIRS+=("$CLI_TOOLS_DIR")
 else
-  CLI_TOOLS_DIR="$HOME/.cache/openclaw/docker-cli-tools"
+  CLI_TOOLS_DIR="$HOME/.cache/steelengine/docker-cli-tools"
 fi
-if [[ -n "${OPENCLAW_DOCKER_CACHE_HOME_DIR:-}" ]]; then
-  CACHE_HOME_DIR="${OPENCLAW_DOCKER_CACHE_HOME_DIR}"
-elif openclaw_live_codex_harness_is_ci; then
-  CACHE_HOME_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/openclaw-docker-cache.XXXXXX")"
+if [[ -n "${STEELENGINE_DOCKER_CACHE_HOME_DIR:-}" ]]; then
+  CACHE_HOME_DIR="${STEELENGINE_DOCKER_CACHE_HOME_DIR}"
+elif steelengine_live_codex_harness_is_ci; then
+  CACHE_HOME_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/steelengine-docker-cache.XXXXXX")"
   TEMP_DIRS+=("$CACHE_HOME_DIR")
 else
-  CACHE_HOME_DIR="$HOME/.cache/openclaw/docker-cache"
+  CACHE_HOME_DIR="$HOME/.cache/steelengine/docker-cache"
 fi
 
-openclaw_live_prepare_bind_dir_for_container_user "$CLI_TOOLS_DIR"
-openclaw_live_prepare_bind_dir_for_container_user "$CACHE_HOME_DIR"
-if openclaw_live_uses_managed_bind_dirs; then
+steelengine_live_prepare_bind_dir_for_container_user "$CLI_TOOLS_DIR"
+steelengine_live_prepare_bind_dir_for_container_user "$CACHE_HOME_DIR"
+if steelengine_live_uses_managed_bind_dirs; then
   DOCKER_USER="$(id -u):$(id -g)"
-  DOCKER_HOME_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/openclaw-docker-home.XXXXXX")"
+  DOCKER_HOME_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/steelengine-docker-home.XXXXXX")"
   TEMP_DIRS+=("$DOCKER_HOME_DIR")
-  openclaw_live_prepare_bind_dir_for_container_user "$DOCKER_HOME_DIR"
+  steelengine_live_prepare_bind_dir_for_container_user "$DOCKER_HOME_DIR"
   DOCKER_HOME_MOUNT=(-v "$DOCKER_HOME_DIR":/home/node)
 fi
 if [[ "$CODEX_HARNESS_AUTH_MODE" == "api-key" ]]; then
   if [[ -z "${DOCKER_HOME_DIR:-}" ]]; then
-    DOCKER_HOME_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/openclaw-docker-home.XXXXXX")"
+    DOCKER_HOME_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/steelengine-docker-home.XXXXXX")"
     TEMP_DIRS+=("$DOCKER_HOME_DIR")
-    openclaw_live_prepare_bind_dir_for_container_user "$DOCKER_HOME_DIR"
+    steelengine_live_prepare_bind_dir_for_container_user "$DOCKER_HOME_DIR"
     DOCKER_HOME_MOUNT=(-v "$DOCKER_HOME_DIR":/home/node)
   fi
-  CONFIG_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/openclaw-docker-config.XXXXXX")"
-  WORKSPACE_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/openclaw-docker-workspace.XXXXXX")"
+  CONFIG_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/steelengine-docker-config.XXXXXX")"
+  WORKSPACE_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/steelengine-docker-workspace.XXXXXX")"
   TEMP_DIRS+=("$CONFIG_DIR" "$WORKSPACE_DIR")
   chmod 0777 "$DOCKER_HOME_DIR" "$CONFIG_DIR" "$WORKSPACE_DIR" || true
   DOCKER_CACHE_CONTAINER_DIR="/home/node/.cache"
@@ -143,7 +143,7 @@ PROFILE_MOUNT=()
 PROFILE_STATUS="none"
 if [[ "$CODEX_HARNESS_AUTH_MODE" != "api-key" && -f "$PROFILE_FILE" && -r "$PROFILE_FILE" ]]; then
   if [[ -n "${DOCKER_HOME_DIR:-}" ]]; then
-    openclaw_live_stage_profile_into_home "$DOCKER_HOME_DIR" "$PROFILE_FILE"
+    steelengine_live_stage_profile_into_home "$DOCKER_HOME_DIR" "$PROFILE_FILE"
   else
     PROFILE_MOUNT=(-v "$PROFILE_FILE":/home/node/.profile:ro)
   fi
@@ -160,23 +160,23 @@ if [[ "$CODEX_HARNESS_AUTH_MODE" != "api-key" ]]; then
   while IFS= read -r auth_file; do
     [[ -n "$auth_file" ]] || continue
     AUTH_FILES+=("$auth_file")
-  done < <(openclaw_live_collect_auth_files_from_csv "openai")
+  done < <(steelengine_live_collect_auth_files_from_csv "openai")
 fi
 
 AUTH_FILES_CSV=""
 if ((${#AUTH_FILES[@]} > 0)); then
-  AUTH_FILES_CSV="$(openclaw_live_join_csv "${AUTH_FILES[@]}")"
+  AUTH_FILES_CSV="$(steelengine_live_join_csv "${AUTH_FILES[@]}")"
 fi
 
 if [[ -n "${DOCKER_HOME_DIR:-}" ]]; then
-  openclaw_live_stage_auth_into_home "$DOCKER_HOME_DIR" --files "${AUTH_FILES[@]}"
+  steelengine_live_stage_auth_into_home "$DOCKER_HOME_DIR" --files "${AUTH_FILES[@]}"
   DOCKER_AUTH_PRESTAGED=1
 fi
 
 EXTERNAL_AUTH_MOUNTS=()
 if ((${#AUTH_FILES[@]} > 0)); then
   for auth_file in "${AUTH_FILES[@]}"; do
-    auth_file="$(openclaw_live_validate_relative_home_path "$auth_file")"
+    auth_file="$(steelengine_live_validate_relative_home_path "$auth_file")"
     host_path="$HOME/$auth_file"
     if [[ -f "$host_path" ]]; then
       EXTERNAL_AUTH_MOUNTS+=(-v "$host_path":/host-auth-files/"$auth_file":ro)
@@ -186,7 +186,7 @@ fi
 
 DOCKER_AUTH_ENV=()
 if [[ "$CODEX_HARNESS_AUTH_MODE" == "api-key" ]]; then
-  docker_env_dir="$(mktemp -d "${RUNNER_TEMP:-/tmp}/openclaw-codex-harness-env.XXXXXX")"
+  docker_env_dir="$(mktemp -d "${RUNNER_TEMP:-/tmp}/steelengine-codex-harness-env.XXXXXX")"
   TEMP_DIRS+=("$docker_env_dir")
   docker_env_file="$docker_env_dir/openai.env"
   {
@@ -212,22 +212,22 @@ cleanup_codex_live_mounts() {
   chmod -R a+rwX "$HOME" "$NPM_CONFIG_PREFIX" "$XDG_CACHE_HOME" 2>/dev/null || true
 }
 trap cleanup_codex_live_mounts EXIT
-if [ "${OPENCLAW_LIVE_CODEX_HARNESS_DEBUG:-}" = "1" ]; then
+if [ "${STEELENGINE_LIVE_CODEX_HARNESS_DEBUG:-}" = "1" ]; then
   id
-  mount | grep -E 'openclaw-cache|openclaw-npm|/home/node' || true
+  mount | grep -E 'steelengine-cache|steelengine-npm|/home/node' || true
   ls -ld "$HOME" "$XDG_CACHE_HOME" "$NPM_CONFIG_PREFIX" 2>/dev/null || true
 fi
 # Force the Codex harness to use the staged `~/.codex` auth files. This lane
 # is not meant to exercise raw OpenAI API-key routing unless the lane
 # explicitly opts into API-key auth for CI.
-if [ "${OPENCLAW_LIVE_CODEX_HARNESS_AUTH:-codex-auth}" != "api-key" ]; then
+if [ "${STEELENGINE_LIVE_CODEX_HARNESS_AUTH:-codex-auth}" != "api-key" ]; then
   unset OPENAI_API_KEY OPENAI_BASE_URL
 fi
 mkdir -p "$NPM_CONFIG_PREFIX" "$XDG_CACHE_HOME" "$COREPACK_HOME" "$NPM_CONFIG_CACHE"
 chmod 700 "$XDG_CACHE_HOME" "$COREPACK_HOME" "$NPM_CONFIG_CACHE" || true
 export PATH="$NPM_CONFIG_PREFIX/bin:$PATH"
 run_setup_command() {
-  local timeout_value="${OPENCLAW_LIVE_CODEX_HARNESS_SETUP_TIMEOUT_SECONDS:?missing live Codex harness setup timeout seconds}s"
+  local timeout_value="${STEELENGINE_LIVE_CODEX_HARNESS_SETUP_TIMEOUT_SECONDS:?missing live Codex harness setup timeout seconds}s"
   local timeout_bin=""
   if command -v timeout >/dev/null 2>&1; then
     timeout_bin="timeout"
@@ -243,8 +243,8 @@ run_setup_command() {
     "$timeout_bin" "$timeout_value" "$@"
   fi
 }
-if [ "${OPENCLAW_DOCKER_AUTH_PRESTAGED:-0}" != "1" ]; then
-  IFS=',' read -r -a auth_files <<<"${OPENCLAW_DOCKER_AUTH_FILES_RESOLVED:-}"
+if [ "${STEELENGINE_DOCKER_AUTH_PRESTAGED:-0}" != "1" ]; then
+  IFS=',' read -r -a auth_files <<<"${STEELENGINE_DOCKER_AUTH_FILES_RESOLVED:-}"
   if ((${#auth_files[@]} > 0)); then
     for auth_file in "${auth_files[@]}"; do
       [ -n "$auth_file" ] || continue
@@ -256,46 +256,46 @@ if [ "${OPENCLAW_DOCKER_AUTH_PRESTAGED:-0}" != "1" ]; then
     done
   fi
 fi
-if [ "${OPENCLAW_LIVE_CODEX_HARNESS_AUTH:-codex-auth}" != "api-key" ] && [ ! -s "$HOME/.codex/auth.json" ]; then
+if [ "${STEELENGINE_LIVE_CODEX_HARNESS_AUTH:-codex-auth}" != "api-key" ] && [ ! -s "$HOME/.codex/auth.json" ]; then
   echo "ERROR: missing ~/.codex/auth.json for Codex harness live test." >&2
   exit 1
 fi
-trusted_scripts_dir="${OPENCLAW_LIVE_DOCKER_SCRIPTS_DIR:-/src/scripts}"
-if [ "${OPENCLAW_LIVE_CODEX_HARNESS_AUTH:-codex-auth}" != "api-key" ]; then
+trusted_scripts_dir="${STEELENGINE_LIVE_DOCKER_SCRIPTS_DIR:-/src/scripts}"
+if [ "${STEELENGINE_LIVE_CODEX_HARNESS_AUTH:-codex-auth}" != "api-key" ]; then
   node --import tsx "$trusted_scripts_dir/prepare-codex-ci-auth.ts" "$HOME/.codex/auth.json"
 fi
-run_setup_command npm install -g "$OPENCLAW_LIVE_CODEX_CLI_PACKAGE_SPEC"
+run_setup_command npm install -g "$STEELENGINE_LIVE_CODEX_CLI_PACKAGE_SPEC"
 "$NPM_CONFIG_PREFIX/bin/codex" --version
-if [ "${OPENCLAW_LIVE_CODEX_HARNESS_AUTH:-codex-auth}" = "api-key" ]; then
+if [ "${STEELENGINE_LIVE_CODEX_HARNESS_AUTH:-codex-auth}" = "api-key" ]; then
   printf '%s\n' "$OPENAI_API_KEY" | "$NPM_CONFIG_PREFIX/bin/codex" login --with-api-key >/dev/null
 fi
 tmp_dir="$(mktemp -d)"
 source "$trusted_scripts_dir/lib/live-docker-stage.sh"
-openclaw_live_stage_source_tree "$tmp_dir"
-openclaw_live_stage_node_modules "$tmp_dir"
-openclaw_live_link_runtime_tree "$tmp_dir"
+steelengine_live_stage_source_tree "$tmp_dir"
+steelengine_live_stage_node_modules "$tmp_dir"
+steelengine_live_link_runtime_tree "$tmp_dir"
 if [ -d /app/dist-runtime/extensions/codex ]; then
-  export OPENCLAW_BUNDLED_PLUGINS_DIR=/app/dist-runtime/extensions
+  export STEELENGINE_BUNDLED_PLUGINS_DIR=/app/dist-runtime/extensions
 elif [ -d /app/dist/extensions/codex ]; then
-  export OPENCLAW_BUNDLED_PLUGINS_DIR=/app/dist/extensions
-elif [ -f "$tmp_dir/extensions/codex/openclaw.plugin.json" ]; then
-  export OPENCLAW_BUNDLED_PLUGINS_DIR="$tmp_dir/extensions"
+  export STEELENGINE_BUNDLED_PLUGINS_DIR=/app/dist/extensions
+elif [ -f "$tmp_dir/extensions/codex/steelengine.plugin.json" ]; then
+  export STEELENGINE_BUNDLED_PLUGINS_DIR="$tmp_dir/extensions"
 else
   echo "ERROR: staged Codex plugin not found for live harness." >&2
   exit 1
 fi
-openclaw_live_stage_state_dir "$tmp_dir/.openclaw-state"
-if [ -n "${OPENCLAW_LIVE_CODEX_TRUSTED_HARNESS_DIR:-}" ] && [ -d "$OPENCLAW_LIVE_CODEX_TRUSTED_HARNESS_DIR" ]; then
+steelengine_live_stage_state_dir "$tmp_dir/.steelengine-state"
+if [ -n "${STEELENGINE_LIVE_CODEX_TRUSTED_HARNESS_DIR:-}" ] && [ -d "$STEELENGINE_LIVE_CODEX_TRUSTED_HARNESS_DIR" ]; then
   for harness_file in src/gateway/gateway-codex-harness.live-helpers.ts; do
-    if [ -f "$OPENCLAW_LIVE_CODEX_TRUSTED_HARNESS_DIR/$harness_file" ]; then
+    if [ -f "$STEELENGINE_LIVE_CODEX_TRUSTED_HARNESS_DIR/$harness_file" ]; then
       mkdir -p "$(dirname "$tmp_dir/$harness_file")"
-      cp "$OPENCLAW_LIVE_CODEX_TRUSTED_HARNESS_DIR/$harness_file" "$tmp_dir/$harness_file"
+      cp "$STEELENGINE_LIVE_CODEX_TRUSTED_HARNESS_DIR/$harness_file" "$tmp_dir/$harness_file"
     fi
   done
 fi
-openclaw_live_prepare_staged_config
+steelengine_live_prepare_staged_config
 cd "$tmp_dir"
-if [ "${OPENCLAW_LIVE_CODEX_HARNESS_USE_CI_SAFE_CODEX_CONFIG:-1}" = "1" ]; then
+if [ "${STEELENGINE_LIVE_CODEX_HARNESS_USE_CI_SAFE_CODEX_CONFIG:-1}" = "1" ]; then
   node --import tsx "$trusted_scripts_dir/prepare-codex-ci-config.ts" "$HOME/.codex/config.toml" "$tmp_dir"
 fi
 codex_preflight_log="$tmp_dir/codex-preflight.log"
@@ -306,7 +306,7 @@ if ! "$NPM_CONFIG_PREFIX/bin/codex" exec \
   --skip-git-repo-check \
   "Reply exactly: $codex_preflight_token" >"$codex_preflight_log" 2>&1; then
   if grep -q "Failed to extract accountId from token" "$codex_preflight_log"; then
-    echo "ERROR: Codex auth cannot extract accountId from the available token; refresh OPENCLAW_CODEX_AUTH_JSON or use OPENCLAW_LIVE_CODEX_HARNESS_AUTH=api-key." >&2
+    echo "ERROR: Codex auth cannot extract accountId from the available token; refresh STEELENGINE_CODEX_AUTH_JSON or use STEELENGINE_LIVE_CODEX_HARNESS_AUTH=api-key." >&2
     exit 1
   fi
   tail -c 262144 "$codex_preflight_log" >&2 || true
@@ -315,13 +315,13 @@ fi
 run_codex_harness_target() {
   local model="${1:?model required}"
   local thinking="${2:?thinking required}"
-  export OPENCLAW_LIVE_CODEX_HARNESS_MODEL="$model"
-  export OPENCLAW_LIVE_CODEX_HARNESS_THINKING="$thinking"
+  export STEELENGINE_LIVE_CODEX_HARNESS_MODEL="$model"
+  export STEELENGINE_LIVE_CODEX_HARNESS_THINKING="$thinking"
   echo "==> Codex harness target: model=$model thinking=$thinking"
-  node scripts/test-live.mjs -- ${OPENCLAW_LIVE_CODEX_TEST_FILES:-src/gateway/gateway-codex-harness.live.test.ts}
+  node scripts/test-live.mjs -- ${STEELENGINE_LIVE_CODEX_TEST_FILES:-src/gateway/gateway-codex-harness.live.test.ts}
 }
-if [ -n "${OPENCLAW_LIVE_CODEX_HARNESS_TARGETS:-}" ]; then
-  IFS=',' read -r -a harness_targets <<<"$OPENCLAW_LIVE_CODEX_HARNESS_TARGETS"
+if [ -n "${STEELENGINE_LIVE_CODEX_HARNESS_TARGETS:-}" ]; then
+  IFS=',' read -r -a harness_targets <<<"$STEELENGINE_LIVE_CODEX_HARNESS_TARGETS"
   for harness_target in "${harness_targets[@]}"; do
     model="${harness_target%%=*}"
     thinking="${harness_target##*=}"
@@ -333,20 +333,20 @@ if [ -n "${OPENCLAW_LIVE_CODEX_HARNESS_TARGETS:-}" ]; then
   done
 else
   run_codex_harness_target \
-    "${OPENCLAW_LIVE_CODEX_HARNESS_MODEL:-openai/gpt-5.6-luna}" \
-    "${OPENCLAW_LIVE_CODEX_HARNESS_THINKING:-low}"
+    "${STEELENGINE_LIVE_CODEX_HARNESS_MODEL:-openai/gpt-5.6-luna}" \
+    "${STEELENGINE_LIVE_CODEX_HARNESS_THINKING:-low}"
 fi
 EOF
 
-openclaw_live_codex_harness_append_build_extension codex
+steelengine_live_codex_harness_append_build_extension codex
 # The release package image intentionally excludes externalized plugins such as
 # Codex. This lane must rebuild the live image so the plugin-owned harness is
 # present under the bundled plugin runtime directory.
-OPENCLAW_SKIP_DOCKER_BUILD=0
-export OPENCLAW_SKIP_DOCKER_BUILD
-OPENCLAW_LIVE_DOCKER_REPO_ROOT="$ROOT_DIR" "$TRUSTED_HARNESS_DIR/scripts/test-live-build-docker.sh"
-if openclaw_live_uses_managed_bind_dirs; then
-  openclaw_live_chown_bind_dirs_for_container_user \
+STEELENGINE_SKIP_DOCKER_BUILD=0
+export STEELENGINE_SKIP_DOCKER_BUILD
+STEELENGINE_LIVE_DOCKER_REPO_ROOT="$ROOT_DIR" "$TRUSTED_HARNESS_DIR/scripts/test-live-build-docker.sh"
+if steelengine_live_uses_managed_bind_dirs; then
+  steelengine_live_chown_bind_dirs_for_container_user \
     "$LIVE_IMAGE_NAME" \
     "$DOCKER_USER" \
     "$CLI_TOOLS_DIR" \
@@ -357,36 +357,36 @@ if openclaw_live_uses_managed_bind_dirs; then
 fi
 
 echo "==> Run Codex harness live test in Docker"
-echo "==> Model: ${OPENCLAW_LIVE_CODEX_HARNESS_MODEL:-openai/gpt-5.6-luna}"
-echo "==> Thinking: ${OPENCLAW_LIVE_CODEX_HARNESS_THINKING:-low}"
-echo "==> Expected native effort: ${OPENCLAW_LIVE_CODEX_HARNESS_EXPECTED_EFFORT:-auto}"
-echo "==> Targets: ${OPENCLAW_LIVE_CODEX_HARNESS_TARGETS:-single model}"
+echo "==> Model: ${STEELENGINE_LIVE_CODEX_HARNESS_MODEL:-openai/gpt-5.6-luna}"
+echo "==> Thinking: ${STEELENGINE_LIVE_CODEX_HARNESS_THINKING:-low}"
+echo "==> Expected native effort: ${STEELENGINE_LIVE_CODEX_HARNESS_EXPECTED_EFFORT:-auto}"
+echo "==> Targets: ${STEELENGINE_LIVE_CODEX_HARNESS_TARGETS:-single model}"
 echo "==> Target count: $CODEX_HARNESS_TARGET_COUNT"
 echo "==> Docker run timeout: $CODEX_HARNESS_DOCKER_RUN_TIMEOUT"
-echo "==> Chat image probe: ${OPENCLAW_LIVE_CODEX_HARNESS_CHAT_IMAGE_PROBE:-0}"
-echo "==> Image probe: ${OPENCLAW_LIVE_CODEX_HARNESS_IMAGE_PROBE:-1}"
-echo "==> MCP probe: ${OPENCLAW_LIVE_CODEX_HARNESS_MCP_PROBE:-1}"
-echo "==> Subagent probe: ${OPENCLAW_LIVE_CODEX_HARNESS_SUBAGENT_PROBE:-1}"
-echo "==> Subagent count: ${OPENCLAW_LIVE_CODEX_HARNESS_SUBAGENT_COUNT:-1}"
-echo "==> Subagent-only fast path: ${OPENCLAW_LIVE_CODEX_HARNESS_SUBAGENT_ONLY:-auto}"
-echo "==> Guardian probe: ${OPENCLAW_LIVE_CODEX_HARNESS_GUARDIAN_PROBE:-1}"
-echo "==> Code-mode-only probe: ${OPENCLAW_LIVE_CODEX_HARNESS_CODE_MODE_ONLY:-0}"
-echo "==> Loop relay disabled: ${OPENCLAW_LIVE_CODEX_HARNESS_DISABLE_LOOP_RELAY:-0}"
-echo "==> Resume stress: ${OPENCLAW_LIVE_CODEX_HARNESS_RESUME_STRESS:-0}"
-echo "==> Resume stress history turns: ${OPENCLAW_LIVE_CODEX_HARNESS_RESUME_STRESS_HISTORY_TURNS:-4}"
-echo "==> Resume stress restarts: ${OPENCLAW_LIVE_CODEX_HARNESS_RESUME_STRESS_RESTARTS:-3}"
-echo "==> Compaction stress: ${OPENCLAW_LIVE_CODEX_HARNESS_COMPACTION_STRESS:-0}"
-echo "==> Compaction stress turns: ${OPENCLAW_LIVE_CODEX_HARNESS_COMPACTION_STRESS_TURNS:-4}"
-echo "==> Large output bytes: ${OPENCLAW_LIVE_CODEX_HARNESS_LARGE_OUTPUT_BYTES:-300000}"
+echo "==> Chat image probe: ${STEELENGINE_LIVE_CODEX_HARNESS_CHAT_IMAGE_PROBE:-0}"
+echo "==> Image probe: ${STEELENGINE_LIVE_CODEX_HARNESS_IMAGE_PROBE:-1}"
+echo "==> MCP probe: ${STEELENGINE_LIVE_CODEX_HARNESS_MCP_PROBE:-1}"
+echo "==> Subagent probe: ${STEELENGINE_LIVE_CODEX_HARNESS_SUBAGENT_PROBE:-1}"
+echo "==> Subagent count: ${STEELENGINE_LIVE_CODEX_HARNESS_SUBAGENT_COUNT:-1}"
+echo "==> Subagent-only fast path: ${STEELENGINE_LIVE_CODEX_HARNESS_SUBAGENT_ONLY:-auto}"
+echo "==> Guardian probe: ${STEELENGINE_LIVE_CODEX_HARNESS_GUARDIAN_PROBE:-1}"
+echo "==> Code-mode-only probe: ${STEELENGINE_LIVE_CODEX_HARNESS_CODE_MODE_ONLY:-0}"
+echo "==> Loop relay disabled: ${STEELENGINE_LIVE_CODEX_HARNESS_DISABLE_LOOP_RELAY:-0}"
+echo "==> Resume stress: ${STEELENGINE_LIVE_CODEX_HARNESS_RESUME_STRESS:-0}"
+echo "==> Resume stress history turns: ${STEELENGINE_LIVE_CODEX_HARNESS_RESUME_STRESS_HISTORY_TURNS:-4}"
+echo "==> Resume stress restarts: ${STEELENGINE_LIVE_CODEX_HARNESS_RESUME_STRESS_RESTARTS:-3}"
+echo "==> Compaction stress: ${STEELENGINE_LIVE_CODEX_HARNESS_COMPACTION_STRESS:-0}"
+echo "==> Compaction stress turns: ${STEELENGINE_LIVE_CODEX_HARNESS_COMPACTION_STRESS_TURNS:-4}"
+echo "==> Large output bytes: ${STEELENGINE_LIVE_CODEX_HARNESS_LARGE_OUTPUT_BYTES:-300000}"
 echo "==> Auth mode: $CODEX_HARNESS_AUTH_MODE"
 echo "==> Profile file: $PROFILE_STATUS"
-echo "==> CI-safe Codex config: ${OPENCLAW_LIVE_CODEX_HARNESS_USE_CI_SAFE_CODEX_CONFIG:-1}"
-echo "==> Test files: ${OPENCLAW_LIVE_CODEX_TEST_FILES:-src/gateway/gateway-codex-harness.live.test.ts}"
+echo "==> CI-safe Codex config: ${STEELENGINE_LIVE_CODEX_HARNESS_USE_CI_SAFE_CODEX_CONFIG:-1}"
+echo "==> Test files: ${STEELENGINE_LIVE_CODEX_TEST_FILES:-src/gateway/gateway-codex-harness.live.test.ts}"
 echo "==> Codex CLI package: $CODEX_CLI_PACKAGE_SPEC"
 echo "==> Harness fallback: none"
 echo "==> Auth files: ${AUTH_FILES_CSV:-none}"
 DOCKER_RUN_ARGS=()
-openclaw_live_init_docker_run_args DOCKER_RUN_ARGS "$CODEX_HARNESS_DOCKER_RUN_TIMEOUT"
+steelengine_live_init_docker_run_args DOCKER_RUN_ARGS "$CODEX_HARNESS_DOCKER_RUN_TIMEOUT"
 DOCKER_RUN_ARGS+=(--rm -t \
   -u "$DOCKER_USER" \
   --entrypoint bash \
@@ -398,69 +398,69 @@ DOCKER_RUN_ARGS+=(--rm -t \
   -e COREPACK_HOME="$DOCKER_CACHE_CONTAINER_DIR/node/corepack" \
   -e NPM_CONFIG_CACHE="$DOCKER_CACHE_CONTAINER_DIR/npm" \
   -e npm_config_cache="$DOCKER_CACHE_CONTAINER_DIR/npm" \
-  -e NODE_OPTIONS="$(openclaw_live_container_node_options)" \
-  -e OPENCLAW_AGENT_HARNESS_FALLBACK=none \
-  -e OPENCLAW_DOCKER_AUTH_PRESTAGED="$DOCKER_AUTH_PRESTAGED" \
-  -e OPENCLAW_CODEX_APP_SERVER_BIN="${OPENCLAW_CODEX_APP_SERVER_BIN:-codex}" \
-  -e OPENCLAW_DOCKER_AUTH_FILES_RESOLVED="$AUTH_FILES_CSV" \
-  -e OPENCLAW_LIVE_DOCKER_SOURCE_STAGE_MODE="${OPENCLAW_LIVE_DOCKER_SOURCE_STAGE_MODE:-copy}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_AUTH="$CODEX_HARNESS_AUTH_MODE" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS=1 \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_CHAT_IMAGE_PROBE="${OPENCLAW_LIVE_CODEX_HARNESS_CHAT_IMAGE_PROBE:-0}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_CODE_MODE_ONLY="${OPENCLAW_LIVE_CODEX_HARNESS_CODE_MODE_ONLY:-0}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_COMPACTION_STRESS="${OPENCLAW_LIVE_CODEX_HARNESS_COMPACTION_STRESS:-0}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_COMPACTION_STRESS_TURNS="${OPENCLAW_LIVE_CODEX_HARNESS_COMPACTION_STRESS_TURNS:-4}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_DEBUG="${OPENCLAW_LIVE_CODEX_HARNESS_DEBUG:-}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_DISABLE_LOOP_RELAY="${OPENCLAW_LIVE_CODEX_HARNESS_DISABLE_LOOP_RELAY:-0}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_GUARDIAN_PROBE="${OPENCLAW_LIVE_CODEX_HARNESS_GUARDIAN_PROBE:-1}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_IMAGE_PROBE="${OPENCLAW_LIVE_CODEX_HARNESS_IMAGE_PROBE:-1}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_LARGE_OUTPUT_BYTES="${OPENCLAW_LIVE_CODEX_HARNESS_LARGE_OUTPUT_BYTES:-300000}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_MCP_PROBE="${OPENCLAW_LIVE_CODEX_HARNESS_MCP_PROBE:-1}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_MODEL="${OPENCLAW_LIVE_CODEX_HARNESS_MODEL:-openai/gpt-5.6-luna}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_TARGETS="${OPENCLAW_LIVE_CODEX_HARNESS_TARGETS:-}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_THINKING="${OPENCLAW_LIVE_CODEX_HARNESS_THINKING:-low}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_EXPECTED_EFFORT="${OPENCLAW_LIVE_CODEX_HARNESS_EXPECTED_EFFORT:-}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_REQUIRE_GUARDIAN_EVENTS="${OPENCLAW_LIVE_CODEX_HARNESS_REQUIRE_GUARDIAN_EVENTS:-1}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_REQUEST_TIMEOUT_MS="${OPENCLAW_LIVE_CODEX_HARNESS_REQUEST_TIMEOUT_MS:-}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_RESUME_STRESS="${OPENCLAW_LIVE_CODEX_HARNESS_RESUME_STRESS:-0}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_RESUME_STRESS_HISTORY_TURNS="${OPENCLAW_LIVE_CODEX_HARNESS_RESUME_STRESS_HISTORY_TURNS:-4}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_RESUME_STRESS_RESTARTS="${OPENCLAW_LIVE_CODEX_HARNESS_RESUME_STRESS_RESTARTS:-3}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_SETUP_TIMEOUT_SECONDS="$CODEX_HARNESS_SETUP_TIMEOUT_SECONDS" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_SUBAGENT_ONLY="${OPENCLAW_LIVE_CODEX_HARNESS_SUBAGENT_ONLY:-}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_SUBAGENT_COUNT="${OPENCLAW_LIVE_CODEX_HARNESS_SUBAGENT_COUNT:-1}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_SUBAGENT_PROBE="${OPENCLAW_LIVE_CODEX_HARNESS_SUBAGENT_PROBE:-1}" \
-  -e OPENCLAW_LIVE_CODEX_HARNESS_USE_CI_SAFE_CODEX_CONFIG="${OPENCLAW_LIVE_CODEX_HARNESS_USE_CI_SAFE_CODEX_CONFIG:-1}" \
-  -e OPENCLAW_LIVE_CODEX_CLI_PACKAGE_SPEC="$CODEX_CLI_PACKAGE_SPEC" \
-  -e OPENCLAW_CLI_BACKEND_LOG_OUTPUT="${OPENCLAW_CLI_BACKEND_LOG_OUTPUT:-}" \
-  -e OPENCLAW_TEST_CONSOLE="${OPENCLAW_TEST_CONSOLE:-}" \
-  -e OPENCLAW_LIVE_DOCKER_SCRIPTS_DIR="${DOCKER_TRUSTED_HARNESS_CONTAINER_DIR}/scripts" \
-  -e OPENCLAW_LIVE_DOCKER_TRUSTED_HARNESS_DIR="$DOCKER_TRUSTED_HARNESS_CONTAINER_DIR" \
-  -e OPENCLAW_LIVE_CODEX_TRUSTED_HARNESS_DIR="$DOCKER_TRUSTED_HARNESS_CONTAINER_DIR" \
-  -e OPENCLAW_LIVE_CODEX_BIND="${OPENCLAW_LIVE_CODEX_BIND:-}" \
-  -e OPENCLAW_LIVE_CODEX_BIND_MODEL="${OPENCLAW_LIVE_CODEX_BIND_MODEL:-}" \
-  -e OPENCLAW_LIVE_CODEX_BIND_PROVIDER="${OPENCLAW_LIVE_CODEX_BIND_PROVIDER:-}" \
-  -e OPENCLAW_LIVE_CODEX_TEST_FILES="${OPENCLAW_LIVE_CODEX_TEST_FILES:-}" \
-  -e OPENCLAW_LIVE_TEST=1 \
-  -e OPENCLAW_VITEST_FS_MODULE_CACHE=0)
-openclaw_live_append_array DOCKER_RUN_ARGS DOCKER_AUTH_ENV
-openclaw_live_append_array DOCKER_RUN_ARGS DOCKER_EXTRA_ENV_FILES
-openclaw_live_append_array DOCKER_RUN_ARGS DOCKER_HOME_MOUNT
-openclaw_live_append_array DOCKER_RUN_ARGS DOCKER_TRUSTED_HARNESS_MOUNT
+  -e NODE_OPTIONS="$(steelengine_live_container_node_options)" \
+  -e STEELENGINE_AGENT_HARNESS_FALLBACK=none \
+  -e STEELENGINE_DOCKER_AUTH_PRESTAGED="$DOCKER_AUTH_PRESTAGED" \
+  -e STEELENGINE_CODEX_APP_SERVER_BIN="${STEELENGINE_CODEX_APP_SERVER_BIN:-codex}" \
+  -e STEELENGINE_DOCKER_AUTH_FILES_RESOLVED="$AUTH_FILES_CSV" \
+  -e STEELENGINE_LIVE_DOCKER_SOURCE_STAGE_MODE="${STEELENGINE_LIVE_DOCKER_SOURCE_STAGE_MODE:-copy}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_AUTH="$CODEX_HARNESS_AUTH_MODE" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS=1 \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_CHAT_IMAGE_PROBE="${STEELENGINE_LIVE_CODEX_HARNESS_CHAT_IMAGE_PROBE:-0}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_CODE_MODE_ONLY="${STEELENGINE_LIVE_CODEX_HARNESS_CODE_MODE_ONLY:-0}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_COMPACTION_STRESS="${STEELENGINE_LIVE_CODEX_HARNESS_COMPACTION_STRESS:-0}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_COMPACTION_STRESS_TURNS="${STEELENGINE_LIVE_CODEX_HARNESS_COMPACTION_STRESS_TURNS:-4}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_DEBUG="${STEELENGINE_LIVE_CODEX_HARNESS_DEBUG:-}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_DISABLE_LOOP_RELAY="${STEELENGINE_LIVE_CODEX_HARNESS_DISABLE_LOOP_RELAY:-0}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_GUARDIAN_PROBE="${STEELENGINE_LIVE_CODEX_HARNESS_GUARDIAN_PROBE:-1}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_IMAGE_PROBE="${STEELENGINE_LIVE_CODEX_HARNESS_IMAGE_PROBE:-1}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_LARGE_OUTPUT_BYTES="${STEELENGINE_LIVE_CODEX_HARNESS_LARGE_OUTPUT_BYTES:-300000}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_MCP_PROBE="${STEELENGINE_LIVE_CODEX_HARNESS_MCP_PROBE:-1}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_MODEL="${STEELENGINE_LIVE_CODEX_HARNESS_MODEL:-openai/gpt-5.6-luna}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_TARGETS="${STEELENGINE_LIVE_CODEX_HARNESS_TARGETS:-}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_THINKING="${STEELENGINE_LIVE_CODEX_HARNESS_THINKING:-low}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_EXPECTED_EFFORT="${STEELENGINE_LIVE_CODEX_HARNESS_EXPECTED_EFFORT:-}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_REQUIRE_GUARDIAN_EVENTS="${STEELENGINE_LIVE_CODEX_HARNESS_REQUIRE_GUARDIAN_EVENTS:-1}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_REQUEST_TIMEOUT_MS="${STEELENGINE_LIVE_CODEX_HARNESS_REQUEST_TIMEOUT_MS:-}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_RESUME_STRESS="${STEELENGINE_LIVE_CODEX_HARNESS_RESUME_STRESS:-0}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_RESUME_STRESS_HISTORY_TURNS="${STEELENGINE_LIVE_CODEX_HARNESS_RESUME_STRESS_HISTORY_TURNS:-4}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_RESUME_STRESS_RESTARTS="${STEELENGINE_LIVE_CODEX_HARNESS_RESUME_STRESS_RESTARTS:-3}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_SETUP_TIMEOUT_SECONDS="$CODEX_HARNESS_SETUP_TIMEOUT_SECONDS" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_SUBAGENT_ONLY="${STEELENGINE_LIVE_CODEX_HARNESS_SUBAGENT_ONLY:-}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_SUBAGENT_COUNT="${STEELENGINE_LIVE_CODEX_HARNESS_SUBAGENT_COUNT:-1}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_SUBAGENT_PROBE="${STEELENGINE_LIVE_CODEX_HARNESS_SUBAGENT_PROBE:-1}" \
+  -e STEELENGINE_LIVE_CODEX_HARNESS_USE_CI_SAFE_CODEX_CONFIG="${STEELENGINE_LIVE_CODEX_HARNESS_USE_CI_SAFE_CODEX_CONFIG:-1}" \
+  -e STEELENGINE_LIVE_CODEX_CLI_PACKAGE_SPEC="$CODEX_CLI_PACKAGE_SPEC" \
+  -e STEELENGINE_CLI_BACKEND_LOG_OUTPUT="${STEELENGINE_CLI_BACKEND_LOG_OUTPUT:-}" \
+  -e STEELENGINE_TEST_CONSOLE="${STEELENGINE_TEST_CONSOLE:-}" \
+  -e STEELENGINE_LIVE_DOCKER_SCRIPTS_DIR="${DOCKER_TRUSTED_HARNESS_CONTAINER_DIR}/scripts" \
+  -e STEELENGINE_LIVE_DOCKER_TRUSTED_HARNESS_DIR="$DOCKER_TRUSTED_HARNESS_CONTAINER_DIR" \
+  -e STEELENGINE_LIVE_CODEX_TRUSTED_HARNESS_DIR="$DOCKER_TRUSTED_HARNESS_CONTAINER_DIR" \
+  -e STEELENGINE_LIVE_CODEX_BIND="${STEELENGINE_LIVE_CODEX_BIND:-}" \
+  -e STEELENGINE_LIVE_CODEX_BIND_MODEL="${STEELENGINE_LIVE_CODEX_BIND_MODEL:-}" \
+  -e STEELENGINE_LIVE_CODEX_BIND_PROVIDER="${STEELENGINE_LIVE_CODEX_BIND_PROVIDER:-}" \
+  -e STEELENGINE_LIVE_CODEX_TEST_FILES="${STEELENGINE_LIVE_CODEX_TEST_FILES:-}" \
+  -e STEELENGINE_LIVE_TEST=1 \
+  -e STEELENGINE_VITEST_FS_MODULE_CACHE=0)
+steelengine_live_append_array DOCKER_RUN_ARGS DOCKER_AUTH_ENV
+steelengine_live_append_array DOCKER_RUN_ARGS DOCKER_EXTRA_ENV_FILES
+steelengine_live_append_array DOCKER_RUN_ARGS DOCKER_HOME_MOUNT
+steelengine_live_append_array DOCKER_RUN_ARGS DOCKER_TRUSTED_HARNESS_MOUNT
 DOCKER_RUN_ARGS+=(\
   -v "$ROOT_DIR":/src:ro \
-  -v "$CONFIG_DIR":/home/node/.openclaw \
-  -v "$WORKSPACE_DIR":/home/node/.openclaw/workspace)
+  -v "$CONFIG_DIR":/home/node/.steelengine \
+  -v "$WORKSPACE_DIR":/home/node/.steelengine/workspace)
 if [[ "$CODEX_HARNESS_AUTH_MODE" != "api-key" ]]; then
   DOCKER_RUN_ARGS+=(\
     -v "$CACHE_HOME_DIR":"$DOCKER_CACHE_CONTAINER_DIR" \
     -v "$CLI_TOOLS_DIR":"$DOCKER_CLI_TOOLS_CONTAINER_DIR")
 fi
-openclaw_live_append_array DOCKER_RUN_ARGS EXTERNAL_AUTH_MOUNTS
-openclaw_live_append_array DOCKER_RUN_ARGS PROFILE_MOUNT
+steelengine_live_append_array DOCKER_RUN_ARGS EXTERNAL_AUTH_MOUNTS
+steelengine_live_append_array DOCKER_RUN_ARGS PROFILE_MOUNT
 DOCKER_RUN_ARGS+=(\
   "$LIVE_IMAGE_NAME" \
   -lc "$LIVE_TEST_CMD")
-if [[ "${OPENCLAW_LIVE_CODEX_HARNESS_DEBUG:-}" == "1" ]]; then
+if [[ "${STEELENGINE_LIVE_CODEX_HARNESS_DEBUG:-}" == "1" ]]; then
   echo "==> Docker debug: host ids and mounted dirs"
   id
   ls -ld "$CACHE_HOME_DIR" "$CLI_TOOLS_DIR" "${DOCKER_HOME_DIR:-$HOME}" 2>/dev/null || true

@@ -1,20 +1,20 @@
 {
-  "name": "@openclaw/tokenjuice",
+  "name": "@steelengine/tokenjuice",
   "version": "2026.7.2-beta.3",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
-      "name": "@openclaw/tokenjuice",
+      "name": "@steelengine/tokenjuice",
       "version": "2026.7.2-beta.3",
       "dependencies": {
         "tokenjuice": "0.8.1"
       },
       "peerDependencies": {
-        "openclaw": ">=2026.7.2-beta.3"
+        "steelengine": ">=2026.7.2-beta.3"
       },
       "peerDependenciesMeta": {
-        "openclaw": {
+        "steelengine": {
           "optional": true
         }
       }

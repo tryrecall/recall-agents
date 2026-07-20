@@ -7,8 +7,8 @@ import { resolveAuthProfileOrder } from "../agents/auth-profiles/order.js";
 import { loadPersistedAuthProfileStore } from "../agents/auth-profiles/persisted.js";
 import { saveAuthProfileStore } from "../agents/auth-profiles/store.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import { closeOpenClawAgentDatabasesForTest } from "../state/openclaw-agent-db.js";
-import { closeOpenClawStateDatabaseForTest } from "../state/openclaw-state-db.js";
+import { closeSteelEngineAgentDatabasesForTest } from "../state/steelengine-agent-db.js";
+import { closeSteelEngineStateDatabaseForTest } from "../state/steelengine-state-db.js";
 import { createSuiteTempRootTracker } from "../test-helpers/temp-dir.js";
 import { withEnvAsync } from "../test-utils/env.js";
 import { baseConfigSnapshot, createTestRuntime } from "./test-runtime-config-helpers.js";
@@ -51,7 +51,7 @@ const transformConfigWithPendingPluginInstallsMock = vi.hoisted(() =>
       });
       await writeConfigFileMock(transformed.nextConfig);
       return {
-        path: snapshot.path ?? "/tmp/openclaw.json",
+        path: snapshot.path ?? "/tmp/steelengine.json",
         previousHash: snapshot.hash ?? null,
         persistedHash: "persisted-hash",
         snapshot,
@@ -115,18 +115,18 @@ import { WizardCancelledError } from "../wizard/prompts.js";
 import { agentsAddCommand, testing } from "./agents.commands.add.js";
 
 const runtime = createTestRuntime();
-const RESERVED_SYSTEM_AGENT_IDS_FOR_TEST = ["openclaw", "crestodian"] as const; // reserved ids
+const RESERVED_SYSTEM_AGENT_IDS_FOR_TEST = ["steelengine", "crestodian"] as const; // reserved ids
 
 describe("agents add command", () => {
-  const suiteTempDirs = createSuiteTempRootTracker({ prefix: "openclaw-agents-add-" });
+  const suiteTempDirs = createSuiteTempRootTracker({ prefix: "steelengine-agents-add-" });
 
   beforeAll(async () => {
     await suiteTempDirs.setup();
   });
 
   afterAll(async () => {
-    closeOpenClawAgentDatabasesForTest();
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineAgentDatabasesForTest();
+    closeSteelEngineStateDatabaseForTest();
     await suiteTempDirs.cleanup();
   });
 
@@ -151,7 +151,7 @@ describe("agents add command", () => {
     run: (root: string) => Promise<void>,
   ): Promise<void> {
     const root = await suiteTempDirs.make(prefix);
-    await withEnvAsync({ OPENCLAW_STATE_DIR: root }, async () => await run(root));
+    await withEnvAsync({ STEELENGINE_STATE_DIR: root }, async () => await run(root));
   }
 
   it("requires --workspace when flags are present", async () => {
@@ -161,7 +161,7 @@ describe("agents add command", () => {
 
     expect(runtime.error).toHaveBeenCalledOnce();
     expect(runtime.error).toHaveBeenCalledWith(
-      `Non-interactive agent creation requires --workspace. Re-run ${formatCliCommand("openclaw agents add <id> --workspace <path>")} or omit flags to use the wizard.`,
+      `Non-interactive agent creation requires --workspace. Re-run ${formatCliCommand("steelengine agents add <id> --workspace <path>")} or omit flags to use the wizard.`,
     );
     expect(runtime.exit).toHaveBeenCalledWith(1);
     expect(writeConfigFileMock).not.toHaveBeenCalled();
@@ -176,7 +176,7 @@ describe("agents add command", () => {
 
     expect(runtime.error).toHaveBeenCalledOnce();
     expect(runtime.error).toHaveBeenCalledWith(
-      `Non-interactive agent creation requires --workspace. Re-run ${formatCliCommand("openclaw agents add <id> --workspace <path>")} or omit flags to use the wizard.`,
+      `Non-interactive agent creation requires --workspace. Re-run ${formatCliCommand("steelengine agents add <id> --workspace <path>")} or omit flags to use the wizard.`,
     );
     expect(runtime.exit).toHaveBeenCalledWith(1);
     expect(writeConfigFileMock).not.toHaveBeenCalled();
@@ -190,7 +190,7 @@ describe("agents add command", () => {
       await agentsAddCommand({ name, workspace: "/tmp/reserved" }, runtime, { hasFlags: true });
 
       expect(runtime.error).toHaveBeenCalledWith(
-        `"${name}" is reserved. Choose another name, or run ${formatCliCommand("openclaw agents list")} to inspect configured agents.`,
+        `"${name}" is reserved. Choose another name, or run ${formatCliCommand("steelengine agents list")} to inspect configured agents.`,
       );
       expect(runtime.exit).toHaveBeenCalledWith(1);
       expect(writeConfigFileMock).not.toHaveBeenCalled();
@@ -242,7 +242,7 @@ describe("agents add command", () => {
     });
     wizardMocks.createClackPrompter.mockReturnValue({
       intro: vi.fn(),
-      text: vi.fn().mockResolvedValueOnce("Jon").mockResolvedValueOnce("/tmp/openclaw-jon"),
+      text: vi.fn().mockResolvedValueOnce("Jon").mockResolvedValueOnce("/tmp/steelengine-jon"),
       confirm: vi.fn().mockResolvedValue(false),
       note: vi.fn(),
       outro: vi.fn(),
@@ -262,7 +262,7 @@ describe("agents add command", () => {
   });
 
   it("copies only portable auth profiles when seeding a new agent store", async () => {
-    await withAgentsAddStateRoot("openclaw-agents-add-auth-copy-", async (root) => {
+    await withAgentsAddStateRoot("steelengine-agents-add-auth-copy-", async (root) => {
       const sourceAgentDir = path.join(root, "main", "agent");
       const destAgentDir = path.join(root, "work", "agent");
       await fs.mkdir(sourceAgentDir, { recursive: true });
@@ -329,7 +329,7 @@ describe("agents add command", () => {
   });
 
   it("copies portable Codex OAuth profiles inline", async () => {
-    await withAgentsAddStateRoot("openclaw-agents-add-oauth-copy-", async (root) => {
+    await withAgentsAddStateRoot("steelengine-agents-add-oauth-copy-", async (root) => {
       const sourceAgentDir = path.join(root, "main", "agent");
       const destAgentDir = path.join(root, "work", "agent");
       const expires = Date.now() + 60_000;
@@ -371,12 +371,12 @@ describe("agents add command", () => {
   });
 
   it("skips unresolved OAuth profiles when seeding a new agent store", async () => {
-    await withAgentsAddStateRoot("openclaw-agents-add-oauth-ref-skip-", async (root) => {
+    await withAgentsAddStateRoot("steelengine-agents-add-oauth-ref-skip-", async (root) => {
       const sourceAgentDir = path.join(root, "main", "agent");
       const destAgentDir = path.join(root, "work", "agent");
       const profileId = "openai:oauth";
       const ref = {
-        source: "openclaw-credentials" as const,
+        source: "steelengine-credentials" as const,
         provider: "openai" as const,
         id: "0123456789abcdef0123456789abcdef",
       };

@@ -35,13 +35,13 @@ type PluginStateStoreTestApi = {
 
 function getSqliteTestApi(): PluginStateSqliteTestApi {
   return (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.pluginStateSqliteTestApi")
+    Symbol.for("steelengine.pluginStateSqliteTestApi")
   ] as PluginStateSqliteTestApi;
 }
 
 function getStoreTestApi(): PluginStateStoreTestApi {
   return (globalThis as Record<PropertyKey, unknown>)[
-    Symbol.for("openclaw.pluginStateStoreTestApi")
+    Symbol.for("steelengine.pluginStateStoreTestApi")
   ] as PluginStateStoreTestApi;
 }
 

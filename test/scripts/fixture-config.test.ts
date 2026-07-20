@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 const fixturePath = path.resolve("scripts/e2e/lib/fixture.mjs");
 
 function makeTempRoot(): string {
-  return mkdtempSync(path.join(tmpdir(), "openclaw-fixture-config-"));
+  return mkdtempSync(path.join(tmpdir(), "steelengine-fixture-config-"));
 }
 
 function runFixture(
@@ -21,11 +21,11 @@ function runFixture(
     encoding: "utf8",
     env: {
       ...process.env,
-      OPENCLAW_CONFIG_BATCH_PATH: path.join(root, "batch.json"),
-      OPENCLAW_CONFIG_PATH: path.join(root, "openclaw.json"),
-      OPENCLAW_GATEWAY_TOKEN: "test-token",
-      OPENCLAW_OPENWEBUI_MODEL: "openai/gpt-5.4-mini",
-      OPENCLAW_STATE_DIR: root,
+      STEELENGINE_CONFIG_BATCH_PATH: path.join(root, "batch.json"),
+      STEELENGINE_CONFIG_PATH: path.join(root, "steelengine.json"),
+      STEELENGINE_GATEWAY_TOKEN: "test-token",
+      STEELENGINE_OPENWEBUI_MODEL: "openai/gpt-5.4-mini",
+      STEELENGINE_STATE_DIR: root,
       ...env,
     },
   });
@@ -62,7 +62,7 @@ describe("scripts/e2e/lib/fixture.mjs config commands", () => {
       const result = runFixture(root, "browser-cdp", [], { CDP_PORT: "19223", PORT: "19000" });
 
       expect(result.status).toBe(0);
-      const config = JSON.parse(readFileSync(path.join(root, "openclaw.json"), "utf8"));
+      const config = JSON.parse(readFileSync(path.join(root, "steelengine.json"), "utf8"));
       expect(config.gateway.port).toBe(19000);
       expect(config.browser.noSandbox).toBe(true);
       expect(config.browser.extraArgs).toEqual([
@@ -103,11 +103,11 @@ describe("scripts/e2e/lib/fixture.mjs config commands", () => {
     const root = makeTempRoot();
     try {
       const result = runFixture(root, "openwebui-config", ["test-key"], {
-        OPENCLAW_OPENWEBUI_PROVIDER_TIMEOUT_SECONDS: "300s",
+        STEELENGINE_OPENWEBUI_PROVIDER_TIMEOUT_SECONDS: "300s",
       });
 
       expect(result.status).not.toBe(0);
-      expect(result.stderr).toContain("invalid OPENCLAW_OPENWEBUI_PROVIDER_TIMEOUT_SECONDS: 300s");
+      expect(result.stderr).toContain("invalid STEELENGINE_OPENWEBUI_PROVIDER_TIMEOUT_SECONDS: 300s");
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
@@ -117,7 +117,7 @@ describe("scripts/e2e/lib/fixture.mjs config commands", () => {
     const root = makeTempRoot();
     try {
       const result = runFixture(root, "openwebui-config", ["test-key"], {
-        OPENCLAW_OPENWEBUI_PROVIDER_TIMEOUT_SECONDS: "300",
+        STEELENGINE_OPENWEBUI_PROVIDER_TIMEOUT_SECONDS: "300",
       });
 
       expect(result.status).toBe(0);
@@ -138,7 +138,7 @@ describe("scripts/e2e/lib/fixture.mjs config commands", () => {
       const result = runFixture(root, "openai-web-search-minimal-config");
 
       expect(result.status).toBe(0);
-      const config = JSON.parse(readFileSync(path.join(root, "openclaw.json"), "utf8"));
+      const config = JSON.parse(readFileSync(path.join(root, "steelengine.json"), "utf8"));
       expect(config.agents.defaults.model.primary).toBe("openai/gpt-5");
       expect(config.models.providers.openai).toMatchObject({
         api: "openai-responses",

@@ -4,8 +4,8 @@ import type {
   AcpSessionRuntimeOptions,
   SessionAcpIdentity,
   SessionAcpMeta,
-} from "@openclaw/acp-core/types";
-import { normalizeOptionalString, type FastMode } from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/acp-core/types";
+import { normalizeOptionalString, type FastMode } from "@steelengine/normalization-core/string-coerce";
 import type { ChatType } from "../../channels/chat-type.js";
 import type { ChannelId } from "../../channels/plugins/channel-id.types.js";
 import type { ChannelRouteRef } from "../../plugin-sdk/channel-route.js";
@@ -434,7 +434,7 @@ export type SessionEntry = SessionRestartRecoveryState &
     modelProvider?: string;
     model?: string;
     /**
-     * Prevents OpenClaw model changes and automatic maintenance eviction until
+     * Prevents SteelEngine model changes and automatic maintenance eviction until
      * the owning harness explicitly retires the session.
      */
     modelSelectionLocked?: boolean;

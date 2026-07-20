@@ -1,6 +1,6 @@
 import type { RunEmbeddedAgentParams } from "../../agents/embedded-agent-runner/run/params.js";
 import type { SessionEntry } from "../../config/sessions.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type { AgentLifecycleTerminalBackstop } from "./agent-lifecycle-terminal.js";
 import type {
   AgentRunLoopResult,
@@ -47,7 +47,7 @@ type AgentFallbackModelPatch = {
 export type AgentFallbackCycleParams = {
   turn: AgentTurnParams;
   effectiveRun: FollowupRun["run"];
-  runtimeConfig: OpenClawConfig;
+  runtimeConfig: SteelEngineConfig;
   liveModelSwitchRuntimeEntry?: Pick<
     SessionEntry,
     "agentHarnessId" | "agentRuntimeOverride" | "modelSelectionLocked"

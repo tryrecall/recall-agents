@@ -1,5 +1,5 @@
 import { consume } from "@lit/context";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
 import { html, nothing, type PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
 import {
@@ -20,7 +20,7 @@ import {
 } from "../../app/context.ts";
 import { controlUiPublicAssetPath } from "../../app/public-assets.ts";
 import { i18n, t } from "../../i18n/index.ts";
-import { OpenClawLightDomElement } from "../../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../../lit/steelengine-element.ts";
 const APPROVAL_POLL_INTERVAL_MS = 2_000;
 const APPROVAL_MIN_POLL_DELAY_MS = 250;
 
@@ -170,7 +170,7 @@ function terminalDescription(approval: ApprovalSnapshot, origin: ResolutionOrigi
   return unreachable;
 }
 
-export class ApprovalPage extends OpenClawLightDomElement {
+export class ApprovalPage extends SteelEngineLightDomElement {
   @consume({ context: applicationContext, subscribe: false })
   context!: ApplicationContext<RouteId>;
 

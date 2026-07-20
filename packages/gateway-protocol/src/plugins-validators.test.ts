@@ -17,7 +17,7 @@ import {
 const installedPlugin = {
   id: "workboard",
   name: "Workboard",
-  packageName: "@openclaw/workboard",
+  packageName: "@steelengine/workboard",
   description: "Coordinate work across agents",
   version: "1.0.0",
   kind: ["tool"],

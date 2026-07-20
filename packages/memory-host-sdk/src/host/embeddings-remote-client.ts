@@ -1,7 +1,7 @@
 // Memory Host SDK module implements embeddings remote client behavior.
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import type { EmbeddingProviderOptions } from "./embeddings.types.js";
-import { requireApiKey, resolveApiKeyForProvider } from "./openclaw-runtime-auth.js";
+import { requireApiKey, resolveApiKeyForProvider } from "./steelengine-runtime-auth.js";
 import { buildRemoteBaseUrlPolicy } from "./remote-http.js";
 import { resolveMemorySecretInputString } from "./secret-input.js";
 import type { SsrFPolicy } from "./ssrf-policy.js";
@@ -12,12 +12,12 @@ import type { SsrFPolicy } from "./ssrf-policy.js";
 export type RemoteEmbeddingProviderId = string;
 
 /** Attribution headers for native OpenAI embedding calls. */
-function resolveOpenClawAttributionHeaders(): Record<string, string> {
-  const version = typeof process !== "undefined" ? process.env.OPENCLAW_VERSION?.trim() : undefined;
+function resolveSteelEngineAttributionHeaders(): Record<string, string> {
+  const version = typeof process !== "undefined" ? process.env.STEELENGINE_VERSION?.trim() : undefined;
   return {
-    originator: "openclaw",
+    originator: "steelengine",
     ...(version ? { version } : {}),
-    "User-Agent": version ? `openclaw/${version}` : "openclaw",
+    "User-Agent": version ? `steelengine/${version}` : "steelengine",
   };
 }
 
@@ -65,7 +65,7 @@ export async function resolveRemoteEmbeddingBearerClient(params: {
     ...headerOverrides,
   };
   if (isNativeOpenAIEmbeddingRoute(params.provider, baseUrl)) {
-    Object.assign(headers, resolveOpenClawAttributionHeaders());
+    Object.assign(headers, resolveSteelEngineAttributionHeaders());
   }
   return { baseUrl, headers, ssrfPolicy: buildRemoteBaseUrlPolicy(baseUrl) };
 }

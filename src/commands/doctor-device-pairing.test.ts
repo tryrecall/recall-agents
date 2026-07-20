@@ -1,7 +1,7 @@
 // Doctor device pairing tests cover device-pairing checks, repair prompts, and diagnostics.
 import fs from "node:fs/promises";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { storeDeviceAuthToken } from "../infra/device-auth-store.js";
 import {
@@ -72,11 +72,11 @@ describe("noteDevicePairingHealth", () => {
       initial: Awaited<ReturnType<typeof requestDevicePairing>>;
     }) => Promise<void>,
   ): Promise<void> {
-    await withTempDir("openclaw-doctor-device-pairing-", async (stateDir) => {
+    await withTempDir("steelengine-doctor-device-pairing-", async (stateDir) => {
       await withEnvAsync(
         {
-          OPENCLAW_STATE_DIR: stateDir,
-          OPENCLAW_TEST_FAST: "1",
+          STEELENGINE_STATE_DIR: stateDir,
+          STEELENGINE_TEST_FAST: "1",
         },
         async () => {
           const identity = loadOrCreateDeviceIdentity();
@@ -135,7 +135,7 @@ describe("noteDevicePairingHealth", () => {
       expect(requireNoteTitle()).toBe("Device pairing");
       expect(message).toContain("Pending scope upgrade");
       expect(message).toContain("operator.admin");
-      expect(message).toContain("openclaw devices approve");
+      expect(message).toContain("steelengine devices approve");
       expect(callGatewayMock).not.toHaveBeenCalled();
 
       const findings = await collectDevicePairingHealthFindings({
@@ -149,7 +149,7 @@ describe("noteDevicePairingHealth", () => {
           target: identity.deviceId + ":" + pending.request.requestId,
           requirement: "scope-upgrade",
           message: expect.stringContaining("Pending scope upgrade"),
-          fixHint: expect.stringContaining("openclaw devices approve"),
+          fixHint: expect.stringContaining("steelengine devices approve"),
         }),
       ]);
       expect(callGatewayMock).not.toHaveBeenCalled();
@@ -157,11 +157,11 @@ describe("noteDevicePairingHealth", () => {
   });
 
   it("warns when a legacy pairing store file has not been imported into SQLite", async () => {
-    await withTempDir("openclaw-doctor-device-pairing-", async (stateDir) => {
+    await withTempDir("steelengine-doctor-device-pairing-", async (stateDir) => {
       await withEnvAsync(
         {
-          OPENCLAW_STATE_DIR: stateDir,
-          OPENCLAW_TEST_FAST: "1",
+          STEELENGINE_STATE_DIR: stateDir,
+          STEELENGINE_TEST_FAST: "1",
         },
         async () => {
           const pairedPath = path.join(stateDir, "devices", "paired.json");
@@ -232,7 +232,7 @@ describe("noteDevicePairingHealth", () => {
       expect(noteMock).toHaveBeenCalledTimes(1);
       const message = requireNoteMessage();
       expect(message).toContain("stale device-token pattern");
-      expect(message).toContain("openclaw devices rotate");
+      expect(message).toContain("steelengine devices rotate");
     });
   });
 
@@ -364,9 +364,9 @@ describe("noteDevicePairingHealth", () => {
     });
 
     const message = requireNoteMessage();
-    expect(message).toContain("openclaw devices remove 'device; echo pwn'");
+    expect(message).toContain("steelengine devices remove 'device; echo pwn'");
     expect(message).toContain(
-      "openclaw devices rotate --device 'device; echo pwn' --role 'operator; touch /tmp/pwn'",
+      "steelengine devices rotate --device 'device; echo pwn' --role 'operator; touch /tmp/pwn'",
     );
   });
 

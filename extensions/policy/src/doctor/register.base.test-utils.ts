@@ -4,9 +4,9 @@ import { join } from "node:path";
 import {
   listHealthChecks,
   type HealthCheck,
-  type OpenClawConfig,
-} from "openclaw/plugin-sdk/health";
-import { clearHealthChecksForTest } from "openclaw/plugin-sdk/plugin-test-runtime";
+  type SteelEngineConfig,
+} from "steelengine/plugin-sdk/health";
+import { clearHealthChecksForTest } from "steelengine/plugin-sdk/plugin-test-runtime";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   collectPolicyEvidence,
@@ -32,7 +32,7 @@ describe("registerPolicyDoctorChecks", () => {
   afterEach(describe0AfterEach1);
 
   it("allows scoped overrides that are stricter than top-level policy", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -56,7 +56,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("allows scoped allowlists when an empty top-level allowlist is disabled", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -80,7 +80,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("allows scoped denyTools groups that cover top-level required denies", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -104,7 +104,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("allows scoped sandbox container requirements that match top-level policy", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -128,7 +128,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("rejects scoped sandbox container policies weaker than top-level requirements", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -157,7 +157,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("rejects scoped overrides that are weaker than top-level policy", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -186,7 +186,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("allows overlapping scoped fields when later scopes are stricter", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -213,7 +213,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("rejects overlapping scoped fields when later scopes are weaker", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -331,7 +331,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("reports a missing policy file when the Policy plugin is enabled", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
 
     const result = await runPolicyChecks(ctx(configPath, cfgWithPolicy()));
@@ -346,7 +346,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("does not report a missing policy file when policy is disabled", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
 
     const result = await runPolicyChecks(ctx(configPath, cfgWithPolicy({ enabled: false })));
@@ -355,7 +355,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("reports invalid policy files as errors", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(join(workspaceDir, "policy.jsonc"), "{ channels: ", "utf-8");
 
@@ -371,7 +371,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("reports malformed channel deny rules as policy errors", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -392,7 +392,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("reports malformed channel deny rules against a configured policy path", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "workspace.policy.jsonc"),
@@ -746,7 +746,7 @@ describe("registerPolicyDoctorChecks", () => {
     ["auth array", { auth: [] }, "oc://policy.jsonc/auth"],
     ["auth profiles array", { auth: { profiles: [] } }, "oc://policy.jsonc/auth/profiles"],
   ])("reports malformed policy shape for %s", async (_label, policy, target) => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(join(workspaceDir, "policy.jsonc"), JSON.stringify(policy), "utf-8");
 
@@ -938,7 +938,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("reports a policy hash mismatch when expectedHash is configured", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -960,11 +960,11 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("does not emit repairable channel findings when the policy hash is not accepted", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ expectedHash: "sha256:not-the-policy", workspaceRepairs: true }),
       channels: { telegram: { enabled: true } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -984,7 +984,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("accepts a policy file that matches the configured expectedHash", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const policy = { channels: { denyRules: [] } };
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(join(workspaceDir, "policy.jsonc"), JSON.stringify(policy), "utf-8");
@@ -997,7 +997,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("reports an attestation mismatch when expectedAttestationHash is configured", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1019,7 +1019,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("reports policy validation errors before attestation drift", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1040,11 +1040,11 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("does not emit repairable channel findings when the accepted attestation changed", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ expectedAttestationHash: "sha256:not-current", workspaceRepairs: true }),
       channels: { telegram: { enabled: true } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1064,7 +1064,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("accepts a policy check that matches the configured expectedAttestationHash", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const policy = { channels: { denyRules: [] } };
     const policyHash = policyDocumentHash(policy);
     const acceptedAttestationHash = createPolicyAttestation({
@@ -1098,7 +1098,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("does not include unrelated TOOLS.md evidence in channel-only attestations", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const policy = { channels: { denyRules: [] } };
     const policyHash = policyDocumentHash(policy);
     const acceptedAttestationHash = createPolicyAttestation({
@@ -1133,7 +1133,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("does not include unrelated secret or auth evidence in channel-only attestations", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const policy = { channels: { denyRules: [] } };
     const policyHash = policyDocumentHash(policy);
     const acceptedAttestationHash = createPolicyAttestation({
@@ -1179,7 +1179,7 @@ describe("registerPolicyDoctorChecks", () => {
           changed: { provider: "github", mode: "oauth" },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(join(workspaceDir, "policy.jsonc"), JSON.stringify(policy), "utf-8");
 
@@ -1206,7 +1206,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("includes global and per-agent alsoAllow in tool posture attestations", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const policy = { tools: { profiles: { allow: ["messaging"] } } };
     const baselineConfig = {
       tools: { profile: "messaging" },
@@ -1238,7 +1238,7 @@ describe("registerPolicyDoctorChecks", () => {
           },
         ],
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(join(workspaceDir, "policy.jsonc"), JSON.stringify(policy), "utf-8");
 
@@ -1251,13 +1251,13 @@ describe("registerPolicyDoctorChecks", () => {
           id: "tools-alsoAllow",
           kind: "alsoAllow",
           entries: ["exec"],
-          source: "oc://openclaw.config/tools/alsoAllow",
+          source: "oc://steelengine.config/tools/alsoAllow",
         }),
         expect.objectContaining({
           id: "reviewer-alsoAllow",
           kind: "alsoAllow",
           entries: ["write"],
-          source: "oc://openclaw.config/agents/list/#0/tools/alsoAllow",
+          source: "oc://steelengine.config/agents/list/#0/tools/alsoAllow",
         }),
       ]),
     );
@@ -1271,11 +1271,11 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("reports configured channels denied by policy", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy(),
       channels: { telegram: { enabled: true } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1303,9 +1303,9 @@ describe("registerPolicyDoctorChecks", () => {
       expect.objectContaining({
         checkId: "policy/channels-denied-provider",
         severity: "error",
-        path: "openclaw config",
-        ocPath: "oc://openclaw.config/channels/telegram",
-        target: "oc://openclaw.config/channels/telegram",
+        path: "steelengine config",
+        ocPath: "oc://steelengine.config/channels/telegram",
+        target: "oc://steelengine.config/channels/telegram",
         requirement: "oc://policy.jsonc/channels/denyRules/#0",
         fixHint: "Telegram is not approved for this workspace.",
       }),
@@ -1317,11 +1317,11 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("repairs denied enabled channels by disabling them when workspace repairs are enabled", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: true }),
       channels: { telegram: { enabled: true } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1345,11 +1345,11 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("does not repair denied channels without workspace repair opt-in", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: false }),
       channels: { telegram: { enabled: true } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1375,11 +1375,11 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("does not let policy.jsonc enable workspace repairs", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy(),
       channels: { telegram: { enabled: true } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1406,11 +1406,11 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("dry-runs automatic policy narrowing repairs without mutating config", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: true }),
       tools: { elevated: { enabled: true } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1430,11 +1430,11 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("does not repair automatic policy narrowing config without workspace repair opt-in", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy(),
       tools: { elevated: { enabled: true } },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1457,7 +1457,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("does not over-apply scoped elevated policy findings globally", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: true }),
       agents: {
@@ -1468,7 +1468,7 @@ describe("registerPolicyDoctorChecks", () => {
           },
         ],
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1498,14 +1498,14 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("skips scoped elevated repairs that inherit shared global tools config", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: true }),
       tools: { elevated: { enabled: true } },
       agents: {
         list: [{ id: "reviewer" }],
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1535,7 +1535,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("repairs automatic policy narrowing config findings", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: true }),
       tools: { elevated: { enabled: true } },
@@ -1550,7 +1550,7 @@ describe("registerPolicyDoctorChecks", () => {
       },
       logging: { redactSensitive: "off" },
       diagnostics: { otel: { enabled: true, captureContent: { enabled: true, toolInputs: true } } },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1622,7 +1622,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("repairs denied gateway HTTP endpoint findings", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: true }),
       gateway: {
@@ -1640,7 +1640,7 @@ describe("registerPolicyDoctorChecks", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1680,11 +1680,11 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("previews review-required gateway bind repair without mutating config", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: true }),
       gateway: { bind: "lan" },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1718,11 +1718,11 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("previews review-required custom gateway bind repair without mutating config", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: true }),
       gateway: { bind: "custom", customBindHost: "10.0.0.4" },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1737,7 +1737,7 @@ describe("registerPolicyDoctorChecks", () => {
 
     expect(result.findings).toEqual([
       expect.objectContaining({
-        ocPath: "oc://openclaw.config/gateway/customBindHost",
+        ocPath: "oc://steelengine.config/gateway/customBindHost",
       }),
     ]);
     expect(result.status).toBe("skipped");
@@ -1763,11 +1763,11 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("previews review-required gateway node command repairs without mutating config", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: true }),
       gateway: { nodes: { denyCommands: ["mcp.help"] } },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1801,7 +1801,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("repairs automatic channel ingress narrowing findings", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: true }),
       channels: {
@@ -1817,7 +1817,7 @@ describe("registerPolicyDoctorChecks", () => {
           },
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1865,7 +1865,7 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("repairs quoted channel ingress paths without splitting slash segments", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: true }),
       channels: {
@@ -1873,7 +1873,7 @@ describe("registerPolicyDoctorChecks", () => {
           requireMention: false,
         },
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1895,7 +1895,7 @@ describe("registerPolicyDoctorChecks", () => {
     expect(result.status).toBe("repaired");
     expect(result.findings).toEqual([
       expect.objectContaining({
-        ocPath: 'oc://openclaw.config/channels/"team/sebby"/requireMention',
+        ocPath: 'oc://steelengine.config/channels/"team/sebby"/requireMention',
       }),
     ]);
     expect(result.changes).toEqual([
@@ -1907,14 +1907,14 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("skips scoped channel ingress repairs that would mutate inherited defaults", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: true }),
       channels: {
         defaults: { groupPolicy: "open" },
         telegram: {},
       },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1949,18 +1949,18 @@ describe("registerPolicyDoctorChecks", () => {
     expect(result.remainingFindings).toEqual([
       expect.objectContaining({
         checkId: "policy/ingress-open-groups-denied",
-        ocPath: "oc://openclaw.config/channels/defaults/groupPolicy",
+        ocPath: "oc://steelengine.config/channels/defaults/groupPolicy",
         requirement: "oc://policy.jsonc/scopes/telegram/ingress/channels/denyOpenGroups",
       }),
     ]);
   });
 
   it("does not repair channel ingress config without workspace repair opt-in", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy(),
       channels: { telegram: { groupPolicy: "open" } },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -1989,11 +1989,11 @@ describe("registerPolicyDoctorChecks", () => {
   });
 
   it("dry-runs required tool deny repairs without mutating config", async () => {
-    const configPath = join(workspaceDir, "openclaw.jsonc");
+    const configPath = join(workspaceDir, "steelengine.jsonc");
     const cfg = {
       ...cfgWithPolicy({ workspaceRepairs: true }),
       tools: { deny: ["read"] },
-    } as unknown as OpenClawConfig;
+    } as unknown as SteelEngineConfig;
     await fs.writeFile(configPath, "{}", "utf-8");
     await fs.writeFile(
       join(workspaceDir, "policy.jsonc"),
@@ -2011,12 +2011,12 @@ describe("registerPolicyDoctorChecks", () => {
         expect.objectContaining({
           checkId: "policy/tools-required-deny-missing",
           message: "global tools config does not deny required tool 'exec'.",
-          ocPath: "oc://openclaw.config/tools/deny",
+          ocPath: "oc://steelengine.config/tools/deny",
         }),
         expect.objectContaining({
           checkId: "policy/tools-required-deny-missing",
           message: "global tools config does not deny required tool 'write'.",
-          ocPath: "oc://openclaw.config/tools/deny",
+          ocPath: "oc://steelengine.config/tools/deny",
         }),
       ]),
     );

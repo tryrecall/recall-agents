@@ -7,11 +7,11 @@ import {
   WORKSPACE_SETUP_STATE_VERSION,
   registerWorkspaceStateAliasesInTransaction,
 } from "../agents/workspace-state-store.js";
-import type { DB as OpenClawStateKyselyDatabase } from "../state/openclaw-state-db.generated.js";
+import type { DB as SteelEngineStateKyselyDatabase } from "../state/steelengine-state-db.generated.js";
 import {
-  openOpenClawStateDatabase,
-  runOpenClawStateWriteTransaction,
-} from "../state/openclaw-state-db.js";
+  openSteelEngineStateDatabase,
+  runSteelEngineStateWriteTransaction,
+} from "../state/steelengine-state-db.js";
 import {
   executeSqliteQuerySync,
   executeSqliteQueryTakeFirstSync,
@@ -24,7 +24,7 @@ import type { LegacyWorkspaceStateSource } from "./state-migrations.workspace-se
 const MIGRATION_KIND = WORKSPACE_LEGACY_STATE_MIGRATION_KIND;
 
 type WorkspaceMigrationDatabase = Pick<
-  OpenClawStateKyselyDatabase,
+  SteelEngineStateKyselyDatabase,
   | "workspace_setup_state"
   | "workspace_path_aliases"
   | "workspace_attestations"
@@ -199,7 +199,7 @@ function attestationFingerprint(params: {
 }
 
 function findMigrationAuthority(params: {
-  db: ReturnType<typeof openOpenClawStateDatabase>["db"];
+  db: ReturnType<typeof openSteelEngineStateDatabase>["db"];
   kysely: ReturnType<typeof getNodeSqliteKysely<WorkspaceMigrationDatabase>>;
   source: LegacyWorkspaceStateSource;
   fingerprint: string;
@@ -250,7 +250,7 @@ export function canonicalCoversParsedSource(params: {
   parsed: ParsedSource;
   env: NodeJS.ProcessEnv;
 }): boolean {
-  const { db } = openOpenClawStateDatabase({ env: params.env });
+  const { db } = openSteelEngineStateDatabase({ env: params.env });
   return runSqliteDeferredTransactionSync(db, () => {
     const kysely = getNodeSqliteKysely<WorkspaceMigrationDatabase>(db);
     if (params.source.kind === "setup" && params.parsed.kind === "setup") {
@@ -333,7 +333,7 @@ export function importAndRecordReceipt(params: {
   const key = resolveWorkspaceMigrationSourceKey(params.source);
   const runId = `${key}:${params.snapshot.sha256.slice(0, 16)}`;
   const now = Date.now();
-  return runOpenClawStateWriteTransaction(
+  return runSteelEngineStateWriteTransaction(
     (database) => {
       const { db } = database;
       const kysely = getNodeSqliteKysely<WorkspaceMigrationDatabase>(db);

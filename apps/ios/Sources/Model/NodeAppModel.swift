@@ -1,9 +1,9 @@
 import CoreLocation
 import CryptoKit
 import Observation
-import OpenClawChatUI
-import OpenClawKit
-import OpenClawProtocol
+import SteelEngineChatUI
+import SteelEngineKit
+import SteelEngineProtocol
 import os
 import Security
 import SwiftUI
@@ -21,8 +21,8 @@ private struct GatewayRelayIdentityResponse: Decodable {
 }
 
 private struct WatchChatPreview {
-    var items: [OpenClawWatchChatItem]
-    var status: OpenClawWatchAppStatus?
+    var items: [SteelEngineWatchChatItem]
+    var status: SteelEngineWatchAppStatus?
     var statusText: String?
 }
 
@@ -35,13 +35,13 @@ private struct WatchChatMetadataEnvelope: Decodable {
     var messageToolMirror: [String: String]?
 
     enum CodingKeys: String, CodingKey {
-        case metadata = "__openclaw"
-        case messageToolMirror = "openclawMessageToolMirror"
+        case metadata = "__steelengine"
+        case messageToolMirror = "steelengineMessageToolMirror"
     }
 }
 
 private struct WatchChatMessageEntry {
-    var message: OpenClawChatMessage
+    var message: SteelEngineChatMessage
     var text: String
     var serverId: String?
     var isMessageToolMirror: Bool
@@ -373,17 +373,17 @@ final class NodeAppModel {
         var pendingResolutions: [WatchExecApprovalResolveEvent]?
     }
 
-    private let deepLinkLogger = Logger(subsystem: "ai.openclawfoundation.app", category: "DeepLink")
+    private let deepLinkLogger = Logger(subsystem: "ai.steelenginefoundation.app", category: "DeepLink")
     private nonisolated static let agentRequestNodeEventTimeoutSeconds = 8
     private nonisolated static let execApprovalNotificationGuidanceSuppressedKey =
         "notifications.execApprovalGuidance.suppressed"
-    private let pushWakeLogger = Logger(subsystem: "ai.openclawfoundation.app", category: "PushWake")
-    private let pendingActionLogger = Logger(subsystem: "ai.openclawfoundation.app", category: "PendingAction")
-    private let locationWakeLogger = Logger(subsystem: "ai.openclawfoundation.app", category: "LocationWake")
-    private let watchReplyLogger = Logger(subsystem: "ai.openclawfoundation.app", category: "WatchReply")
-    private let watchExecApprovalLogger = Logger(subsystem: "ai.openclawfoundation.app", category: "WatchExecApproval")
+    private let pushWakeLogger = Logger(subsystem: "ai.steelenginefoundation.app", category: "PushWake")
+    private let pendingActionLogger = Logger(subsystem: "ai.steelenginefoundation.app", category: "PendingAction")
+    private let locationWakeLogger = Logger(subsystem: "ai.steelenginefoundation.app", category: "LocationWake")
+    private let watchReplyLogger = Logger(subsystem: "ai.steelenginefoundation.app", category: "WatchReply")
+    private let watchExecApprovalLogger = Logger(subsystem: "ai.steelenginefoundation.app", category: "WatchExecApproval")
     private let execApprovalNotificationLogger = Logger(
-        subsystem: "ai.openclawfoundation.app",
+        subsystem: "ai.steelenginefoundation.app",
         category: "ExecApprovalNotification")
     enum CameraHUDKind {
         case photo
@@ -401,7 +401,7 @@ final class NodeAppModel {
     let screen: ScreenController
     private let camera: any CameraServicing
     private let screenRecorder: any ScreenRecordingServicing
-    private var watchGatewayConnectionStatus: OpenClawWatchAppStatusCode?
+    private var watchGatewayConnectionStatus: SteelEngineWatchAppStatusCode?
     var gatewayStatusText: String = "Offline" {
         didSet {
             self.watchGatewayConnectionStatus = nil
@@ -526,7 +526,7 @@ final class NodeAppModel {
     private var gatewayHealthMonitorDisabled = false
     private let notificationCenter: NotificationCentering
     let voiceWake = VoiceWakeManager()
-    let voiceNoteRecorder: OpenClawVoiceNoteRecorder
+    let voiceNoteRecorder: SteelEngineVoiceNoteRecorder
     let talkMode: TalkModeManager
     private let locationService: any LocationServicing
     private let deviceStatusService: any DeviceStatusServicing
@@ -568,7 +568,7 @@ final class NodeAppModel {
     @ObservationIgnored private var watchMessageRetryAttempts: [String: Int] = [:]
     @ObservationIgnored private var watchMessageRetryTask: Task<Void, Never>?
     @ObservationIgnored private let appleReviewDemoChatTransport = AppleReviewDemoChatTransport()
-    @ObservationIgnored private var chatTranscriptCachesByGatewayID: [String: OpenClawChatSQLiteTranscriptCache] = [:]
+    @ObservationIgnored private var chatTranscriptCachesByGatewayID: [String: SteelEngineChatSQLiteTranscriptCache] = [:]
     @ObservationIgnored private var chatSessionRoutingRestoreTask: Task<Void, Never>?
     private var watchExecApprovalPromptsByID: [ExecApprovalIdentifier.Key: ExecApprovalPrompt] = [:]
     private var execApprovalInboxPromptsByKey: [ExecApprovalInboxKey: ExecApprovalPrompt] = [:]
@@ -632,7 +632,7 @@ final class NodeAppModel {
         return self.isOperatorGatewayConnected ? "operator" : "offline"
     }
 
-    func makeChatTransport(outboxGatewayID: String? = nil) -> any OpenClawChatTransport {
+    func makeChatTransport(outboxGatewayID: String? = nil) -> any SteelEngineChatTransport {
         if self.isScreenshotFixtureModeEnabled {
             return LocalFixtureChatTransport(fixture: .appScreenshots)
         }
@@ -682,13 +682,13 @@ final class NodeAppModel {
     /// the paired gateway identity (one SQLite file per gateway, memoized so
     /// retire/purge can close every open handle). Nil for fixture/unpaired
     /// transports: no cache and no outbox.
-    func makeChatOfflineStore() -> OpenClawChatSQLiteTranscriptCache? {
+    func makeChatOfflineStore() -> SteelEngineChatSQLiteTranscriptCache? {
         guard let gatewayID = self.chatTranscriptCacheGatewayID else { return nil }
         if let cache = self.chatTranscriptCachesByGatewayID[gatewayID] {
             return cache
         }
         guard let databaseURL = Self.chatTranscriptCacheDatabaseURL(gatewayID: gatewayID) else { return nil }
-        let cache = OpenClawChatSQLiteTranscriptCache(databaseURL: databaseURL, gatewayID: gatewayID)
+        let cache = SteelEngineChatSQLiteTranscriptCache(databaseURL: databaseURL, gatewayID: gatewayID)
         self.chatTranscriptCachesByGatewayID[gatewayID] = cache
         return cache
     }
@@ -723,12 +723,12 @@ final class NodeAppModel {
         self.homeCanvasRevision &+= 1
     }
 
-    func loadCachedChatSessions() async -> [OpenClawChatSessionEntry] {
+    func loadCachedChatSessions() async -> [SteelEngineChatSessionEntry] {
         guard let cache = self.makeChatOfflineStore() else { return [] }
         return await cache.loadSessions()
     }
 
-    func storeCachedChatSessions(_ sessions: [OpenClawChatSessionEntry]) async {
+    func storeCachedChatSessions(_ sessions: [SteelEngineChatSessionEntry]) async {
         guard let cache = self.makeChatOfflineStore() else { return }
         await cache.storeSessions(sessions)
     }
@@ -743,7 +743,7 @@ final class NodeAppModel {
             if let cache = self.chatTranscriptCachesByGatewayID[gatewayID] {
                 await cache.retire()
             }
-            OpenClawChatSQLiteTranscriptCache.removeDatabaseFiles(at: databaseURL)
+            SteelEngineChatSQLiteTranscriptCache.removeDatabaseFiles(at: databaseURL)
             self.chatTranscriptCachesByGatewayID.removeValue(forKey: gatewayID)
             self.chatTranscriptCacheGeneration &+= 1
             return
@@ -771,7 +771,7 @@ final class NodeAppModel {
     }
 
     private static func chatTranscriptCacheDirectoryURL() -> URL? {
-        try? OpenClawNodeStorage.appSupportDir()
+        try? SteelEngineNodeStorage.appSupportDir()
             .appendingPathComponent("chat-cache", isDirectory: true)
     }
 
@@ -818,7 +818,7 @@ final class NodeAppModel {
         healthSummaryService: any HealthSummaryServicing = HealthSummaryService(),
         watchMessagingService: any WatchMessagingServicing = WatchMessagingService(),
         talkMode: TalkModeManager = TalkModeManager(),
-        voiceNoteRecorder: OpenClawVoiceNoteRecorder = OpenClawVoiceNoteRecorder(),
+        voiceNoteRecorder: SteelEngineVoiceNoteRecorder = SteelEngineVoiceNoteRecorder(),
         audioAdmissionInitiallyAllowed: Bool = true)
     {
         self.screen = screen
@@ -960,7 +960,7 @@ final class NodeAppModel {
         }()
         guard !userAction.isEmpty else { return }
 
-        guard let name = OpenClawCanvasA2UIAction.extractActionName(userAction) else { return }
+        guard let name = SteelEngineCanvasA2UIAction.extractActionName(userAction) else { return }
         let actionId: String = {
             let id = (userAction["id"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             return id.isEmpty ? UUID().uuidString : id
@@ -982,15 +982,15 @@ final class NodeAppModel {
             deviceName: UIDevice.current.name,
             interfaceIdiom: UIDevice.current.userInterfaceIdiom)
         let instanceId = (UserDefaults.standard.string(forKey: "node.instanceId") ?? "ios-node").lowercased()
-        let contextJSON = OpenClawCanvasA2UIAction.compactJSON(userAction["context"])
+        let contextJSON = SteelEngineCanvasA2UIAction.compactJSON(userAction["context"])
         let sessionKey = mainSessionKey
 
-        let messageContext = OpenClawCanvasA2UIAction.AgentMessageContext(
+        let messageContext = SteelEngineCanvasA2UIAction.AgentMessageContext(
             actionName: name,
             session: .init(key: sessionKey, surfaceId: surfaceId),
             component: .init(id: sourceComponentId, host: host, instanceId: instanceId),
             contextJSON: contextJSON)
-        let message = OpenClawCanvasA2UIAction.formatAgentMessage(messageContext)
+        let message = SteelEngineCanvasA2UIAction.formatAgentMessage(messageContext)
 
         let ok: Bool
         var errorText: String?
@@ -1015,7 +1015,7 @@ final class NodeAppModel {
             }
         }
 
-        let js = OpenClawCanvasA2UIAction.jsDispatchA2UIActionStatus(actionId: actionId, ok: ok, error: errorText)
+        let js = SteelEngineCanvasA2UIAction.jsDispatchA2UIActionStatus(actionId: actionId, ok: ok, error: errorText)
         do {
             _ = try await self.screen.eval(javaScript: js)
         } catch {
@@ -1348,7 +1348,7 @@ final class NodeAppModel {
         self.talkMode.applyAudioRoutePreferenceChanged()
     }
 
-    func requestLocationPermissions(mode: OpenClawLocationMode) async -> Bool {
+    func requestLocationPermissions(mode: SteelEngineLocationMode) async -> Bool {
         guard mode != .off else {
             self.reconcileSignificantLocationMonitoring(
                 mode: mode,
@@ -1370,7 +1370,7 @@ final class NodeAppModel {
     }
 
     private func reconcileSignificantLocationMonitoring(
-        mode: OpenClawLocationMode,
+        mode: SteelEngineLocationMode,
         authorizationStatus: CLAuthorizationStatus)
     {
         guard mode == .always, authorizationStatus == .authorizedAlways else {
@@ -1431,12 +1431,12 @@ final class NodeAppModel {
                   sourceStore.gatewayID == sourceGatewayID,
                   let sourceRoute = await operatorGateway.currentRoute(ifGatewayID: sourceGatewayID)
             else { return }
-            let request = OpenClawChatGatewayRequests.agentsList(timeoutMs: 8000)
+            let request = SteelEngineChatGatewayRequests.agentsList(timeoutMs: 8000)
             let res = try await operatorGateway.request(
                 request,
                 ifCurrentRoute: sourceRoute)
             let decoded = try JSONDecoder().decode(AgentsListResult.self, from: res)
-            let routingIdentity = OpenClawChatSessionRoutingIdentity(
+            let routingIdentity = SteelEngineChatSessionRoutingIdentity(
                 scope: decoded.scope.value as? String,
                 mainSessionKey: decoded.mainkey,
                 defaultAgentID: decoded.defaultid)
@@ -1952,7 +1952,7 @@ final class NodeAppModel {
                         method: "health",
                         paramsJSON: nil,
                         timeoutSeconds: 6)
-                    guard let decoded = try? JSONDecoder().decode(OpenClawGatewayHealthOK.self, from: data) else {
+                    guard let decoded = try? JSONDecoder().decode(SteelEngineGatewayHealthOK.self, from: data) else {
                         return false
                     }
                     return decoded.ok ?? false
@@ -1995,7 +1995,7 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(
+                error: SteelEngineNodeError(
                     code: .backgroundUnavailable,
                     message: "NODE_BACKGROUND_UNAVAILABLE: canvas/camera/screen/talk commands require foreground"))
         }
@@ -2004,7 +2004,7 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(
+                error: SteelEngineNodeError(
                     code: .unavailable,
                     message: "CAMERA_DISABLED: enable Camera in iOS Settings → Camera → Allow Camera"))
         }
@@ -2018,12 +2018,12 @@ final class NodeAppModel {
                 return BridgeInvokeResponse(
                     id: req.id,
                     ok: false,
-                    error: OpenClawNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
+                    error: SteelEngineNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
             case .handlerUnavailable:
                 return BridgeInvokeResponse(
                     id: req.id,
                     ok: false,
-                    error: OpenClawNodeError(code: .unavailable, message: "node handler unavailable"))
+                    error: SteelEngineNodeError(code: .unavailable, message: "node handler unavailable"))
             }
         } catch is CancellationError {
             if command.hasPrefix("camera.") {
@@ -2032,7 +2032,7 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .unavailable, message: "node invoke cancelled"))
+                error: SteelEngineNodeError(code: .unavailable, message: "node invoke cancelled"))
         } catch {
             if command.hasPrefix("camera.") {
                 let text = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
@@ -2041,7 +2041,7 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .unavailable, message: error.localizedDescription))
+                error: SteelEngineNodeError(code: .unavailable, message: error.localizedDescription))
         }
     }
 
@@ -2049,8 +2049,8 @@ final class NodeAppModel {
         _ req: BridgeInvokeRequest,
         gatewayStableID: String?) -> BridgeInvokeRequest
     {
-        guard req.command == OpenClawWatchCommand.notify.rawValue,
-              var params = try? decodeParams(OpenClawWatchNotifyParams.self, from: req.paramsJSON)
+        guard req.command == SteelEngineWatchCommand.notify.rawValue,
+              var params = try? decodeParams(SteelEngineWatchNotifyParams.self, from: req.paramsJSON)
         else { return req }
         // Gateway identity comes from the installed node route, never the request payload.
         params.gatewayStableID = trimmedOrNil(gatewayStableID)
@@ -2074,7 +2074,7 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(
+                error: SteelEngineNodeError(
                     code: .unavailable,
                     message: "LOCATION_DISABLED: enable Location in Settings"))
         }
@@ -2082,12 +2082,12 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(
+                error: SteelEngineNodeError(
                     code: .backgroundUnavailable,
                     message: "LOCATION_BACKGROUND_UNAVAILABLE: background location requires Always"))
         }
-        let params = (try? Self.decodeParams(OpenClawLocationGetParams.self, from: req.paramsJSON)) ??
-            OpenClawLocationGetParams()
+        let params = (try? Self.decodeParams(SteelEngineLocationGetParams.self, from: req.paramsJSON)) ??
+            SteelEngineLocationGetParams()
         let desired = params.desiredAccuracy ??
             (isLocationPreciseEnabled() ? .precise : .balanced)
         let status = self.locationService.authorizationStatus()
@@ -2095,7 +2095,7 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(
+                error: SteelEngineNodeError(
                     code: .unavailable,
                     message: "LOCATION_PERMISSION_REQUIRED: grant Location permission"))
         }
@@ -2103,7 +2103,7 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(
+                error: SteelEngineNodeError(
                     code: .unavailable,
                     message: "LOCATION_PERMISSION_REQUIRED: enable Always for background access"))
         }
@@ -2113,7 +2113,7 @@ final class NodeAppModel {
             maxAgeMs: params.maxAgeMs,
             timeoutMs: params.timeoutMs)
         let isPrecise = self.locationService.accuracyAuthorization() == .fullAccuracy
-        let payload = OpenClawLocationPayload(
+        let payload = SteelEngineLocationPayload(
             lat: location.coordinate.latitude,
             lon: location.coordinate.longitude,
             accuracyMeters: location.horizontalAccuracy,
@@ -2129,10 +2129,10 @@ final class NodeAppModel {
 
     private func handleCanvasInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
         switch req.command {
-        case OpenClawCanvasCommand.present.rawValue:
+        case SteelEngineCanvasCommand.present.rawValue:
             // iOS ignores placement hints; canvas always fills the screen.
-            let params = (try? Self.decodeParams(OpenClawCanvasPresentParams.self, from: req.paramsJSON)) ??
-                OpenClawCanvasPresentParams()
+            let params = (try? Self.decodeParams(SteelEngineCanvasPresentParams.self, from: req.paramsJSON)) ??
+                SteelEngineCanvasPresentParams()
             let url = params.url?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             if url.isEmpty {
                 self.screen.presentDefaultCanvas()
@@ -2140,21 +2140,21 @@ final class NodeAppModel {
                 self.screen.present(urlString: url)
             }
             return BridgeInvokeResponse(id: req.id, ok: true)
-        case OpenClawCanvasCommand.hide.rawValue:
+        case SteelEngineCanvasCommand.hide.rawValue:
             self.screen.hideCanvas()
             return BridgeInvokeResponse(id: req.id, ok: true)
-        case OpenClawCanvasCommand.navigate.rawValue:
-            let params = try Self.decodeParams(OpenClawCanvasNavigateParams.self, from: req.paramsJSON)
+        case SteelEngineCanvasCommand.navigate.rawValue:
+            let params = try Self.decodeParams(SteelEngineCanvasNavigateParams.self, from: req.paramsJSON)
             let trimmedURL = params.url.trimmingCharacters(in: .whitespacesAndNewlines)
             self.screen.present(urlString: trimmedURL)
             return BridgeInvokeResponse(id: req.id, ok: true)
-        case OpenClawCanvasCommand.evalJS.rawValue:
-            let params = try Self.decodeParams(OpenClawCanvasEvalParams.self, from: req.paramsJSON)
+        case SteelEngineCanvasCommand.evalJS.rawValue:
+            let params = try Self.decodeParams(SteelEngineCanvasEvalParams.self, from: req.paramsJSON)
             let result = try await screen.eval(javaScript: params.javaScript)
             let payload = try Self.encodePayload(["result": result])
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: payload)
-        case OpenClawCanvasCommand.snapshot.rawValue:
-            let params = try? Self.decodeParams(OpenClawCanvasSnapshotParams.self, from: req.paramsJSON)
+        case SteelEngineCanvasCommand.snapshot.rawValue:
+            let params = try? Self.decodeParams(SteelEngineCanvasSnapshotParams.self, from: req.paramsJSON)
             let format = params?.format ?? .jpeg
             let maxWidth: CGFloat? = {
                 if let raw = params?.maxWidth, raw > 0 { return CGFloat(raw) }
@@ -2178,14 +2178,14 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
+                error: SteelEngineNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
         }
     }
 
     private func handleCanvasA2UIInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
         let command = req.command
         switch command {
-        case OpenClawCanvasA2UICommand.reset.rawValue:
+        case SteelEngineCanvasA2UICommand.reset.rawValue:
             switch await ensureA2UIReadyWithCapabilityRefresh(timeoutMs: 5000) {
             case .ready:
                 break
@@ -2193,32 +2193,32 @@ final class NodeAppModel {
                 return BridgeInvokeResponse(
                     id: req.id,
                     ok: false,
-                    error: OpenClawNodeError(
+                    error: SteelEngineNodeError(
                         code: .unavailable,
                         message: "A2UI_HOST_UNAVAILABLE: bundled A2UI host not reachable"))
             }
             let json = try await screen.eval(javaScript: """
             (() => {
-              const host = globalThis.openclawA2UI;
-              if (!host) return JSON.stringify({ ok: false, error: "missing openclawA2UI" });
+              const host = globalThis.steelengineA2UI;
+              if (!host) return JSON.stringify({ ok: false, error: "missing steelengineA2UI" });
               return JSON.stringify(host.reset());
             })()
             """)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
 
-        case OpenClawCanvasA2UICommand.push.rawValue, OpenClawCanvasA2UICommand.pushJSONL.rawValue:
-            let messages: [OpenClawKit.AnyCodable]
-            if command == OpenClawCanvasA2UICommand.pushJSONL.rawValue {
-                let params = try Self.decodeParams(OpenClawCanvasA2UIPushJSONLParams.self, from: req.paramsJSON)
-                messages = try OpenClawCanvasA2UIJSONL.decodeMessagesFromJSONL(params.jsonl)
+        case SteelEngineCanvasA2UICommand.push.rawValue, SteelEngineCanvasA2UICommand.pushJSONL.rawValue:
+            let messages: [SteelEngineKit.AnyCodable]
+            if command == SteelEngineCanvasA2UICommand.pushJSONL.rawValue {
+                let params = try Self.decodeParams(SteelEngineCanvasA2UIPushJSONLParams.self, from: req.paramsJSON)
+                messages = try SteelEngineCanvasA2UIJSONL.decodeMessagesFromJSONL(params.jsonl)
             } else {
                 do {
-                    let params = try Self.decodeParams(OpenClawCanvasA2UIPushParams.self, from: req.paramsJSON)
+                    let params = try Self.decodeParams(SteelEngineCanvasA2UIPushParams.self, from: req.paramsJSON)
                     messages = params.messages
                 } catch {
                     // Be forgiving: some clients still send JSONL payloads to `canvas.a2ui.push`.
-                    let params = try Self.decodeParams(OpenClawCanvasA2UIPushJSONLParams.self, from: req.paramsJSON)
-                    messages = try OpenClawCanvasA2UIJSONL.decodeMessagesFromJSONL(params.jsonl)
+                    let params = try Self.decodeParams(SteelEngineCanvasA2UIPushJSONLParams.self, from: req.paramsJSON)
+                    messages = try SteelEngineCanvasA2UIJSONL.decodeMessagesFromJSONL(params.jsonl)
                 }
             }
 
@@ -2229,17 +2229,17 @@ final class NodeAppModel {
                 return BridgeInvokeResponse(
                     id: req.id,
                     ok: false,
-                    error: OpenClawNodeError(
+                    error: SteelEngineNodeError(
                         code: .unavailable,
                         message: "A2UI_HOST_UNAVAILABLE: bundled A2UI host not reachable"))
             }
 
-            let messagesJSON = try OpenClawCanvasA2UIJSONL.encodeMessagesJSONArray(messages)
+            let messagesJSON = try SteelEngineCanvasA2UIJSONL.encodeMessagesJSONArray(messages)
             let js = """
             (() => {
               try {
-                const host = globalThis.openclawA2UI;
-                if (!host) return JSON.stringify({ ok: false, error: "missing openclawA2UI" });
+                const host = globalThis.steelengineA2UI;
+                if (!host) return JSON.stringify({ ok: false, error: "missing steelengineA2UI" });
                 const messages = \(messagesJSON);
                 return JSON.stringify(host.applyMessages(messages));
               } catch (e) {
@@ -2254,24 +2254,24 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
+                error: SteelEngineNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
         }
     }
 
     private func handleCameraInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
         switch req.command {
-        case OpenClawCameraCommand.list.rawValue:
+        case SteelEngineCameraCommand.list.rawValue:
             let devices = await camera.listDevices()
             struct Payload: Codable {
                 var devices: [CameraController.CameraDeviceInfo]
             }
             let payload = try Self.encodePayload(Payload(devices: devices))
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: payload)
-        case OpenClawCameraCommand.snap.rawValue:
+        case SteelEngineCameraCommand.snap.rawValue:
             showCameraHUD(ownerID: req.id, text: "Taking photo…", kind: .photo)
             triggerCameraFlash()
-            let params = (try? Self.decodeParams(OpenClawCameraSnapParams.self, from: req.paramsJSON)) ??
-                OpenClawCameraSnapParams()
+            let params = (try? Self.decodeParams(SteelEngineCameraSnapParams.self, from: req.paramsJSON)) ??
+                SteelEngineCameraSnapParams()
             let res = try await self.withForegroundCapture {
                 try await self.camera.snap(params: params)
             }
@@ -2291,9 +2291,9 @@ final class NodeAppModel {
             try Task.checkCancellation()
             updateCameraHUD(ownerID: req.id, text: "Photo captured", kind: .success, autoHideSeconds: 1.6)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: payload)
-        case OpenClawCameraCommand.clip.rawValue:
-            let params = (try? Self.decodeParams(OpenClawCameraClipParams.self, from: req.paramsJSON)) ??
-                OpenClawCameraClipParams()
+        case SteelEngineCameraCommand.clip.rawValue:
+            let params = (try? Self.decodeParams(SteelEngineCameraClipParams.self, from: req.paramsJSON)) ??
+                SteelEngineCameraClipParams()
 
             let includeAudio = params.includeAudio ?? true
             showCameraHUD(ownerID: req.id, text: "Recording…", kind: .recording)
@@ -2322,13 +2322,13 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
+                error: SteelEngineNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
         }
     }
 
     private func handleScreenRecordInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
-        let params = (try? Self.decodeParams(OpenClawScreenRecordParams.self, from: req.paramsJSON)) ??
-            OpenClawScreenRecordParams()
+        let params = (try? Self.decodeParams(SteelEngineScreenRecordParams.self, from: req.paramsJSON)) ??
+            SteelEngineScreenRecordParams()
         if let format = params.format, format.lowercased() != "mp4" {
             throw NSError(domain: "Screen", code: 30, userInfo: [
                 NSLocalizedDescriptionKey: "INVALID_REQUEST: screen format must be mp4",
@@ -2374,14 +2374,14 @@ final class NodeAppModel {
     }
 
     private func handleSystemNotify(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
-        let params = try Self.decodeParams(OpenClawSystemNotifyParams.self, from: req.paramsJSON)
+        let params = try Self.decodeParams(SteelEngineSystemNotifyParams.self, from: req.paramsJSON)
         let title = params.title.trimmingCharacters(in: .whitespacesAndNewlines)
         let body = params.body.trimmingCharacters(in: .whitespacesAndNewlines)
         if title.isEmpty, body.isEmpty {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .invalidRequest, message: "INVALID_REQUEST: empty notification"))
+                error: SteelEngineNodeError(code: .invalidRequest, message: "INVALID_REQUEST: empty notification"))
         }
 
         let status = await notificationAuthorizationStatus()
@@ -2389,7 +2389,7 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .unavailable, message: "NOT_AUTHORIZED: notifications"))
+                error: SteelEngineNodeError(code: .unavailable, message: "NOT_AUTHORIZED: notifications"))
         }
 
         let addResult = await runNotificationCall(timeoutSeconds: 2.0) { [notificationCenter] in
@@ -2422,19 +2422,19 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .unavailable, message: "NOTIFICATION_FAILED: \(error.message)"))
+                error: SteelEngineNodeError(code: .unavailable, message: "NOTIFICATION_FAILED: \(error.message)"))
         }
         return BridgeInvokeResponse(id: req.id, ok: true)
     }
 
     private func handleChatPushInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
-        let params = try Self.decodeParams(OpenClawChatPushParams.self, from: req.paramsJSON)
+        let params = try Self.decodeParams(SteelEngineChatPushParams.self, from: req.paramsJSON)
         let text = params.text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .invalidRequest, message: "INVALID_REQUEST: empty chat.push text"))
+                error: SteelEngineNodeError(code: .invalidRequest, message: "INVALID_REQUEST: empty chat.push text"))
         }
 
         let shouldSpeak = params.speak ?? true
@@ -2444,14 +2444,14 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .unavailable, message: "NOT_AUTHORIZED: notifications"))
+                error: SteelEngineNodeError(code: .unavailable, message: "NOT_AUTHORIZED: notifications"))
         }
 
         let messageId = UUID().uuidString
         if notificationsAllowed {
             let addResult = await runNotificationCall(timeoutSeconds: 2.0) { [notificationCenter] in
                 let content = UNMutableNotificationContent()
-                content.title = "OpenClaw"
+                content.title = "SteelEngine"
                 content.body = text
                 content.sound = .default
                 content.userInfo = ["messageId": messageId]
@@ -2465,7 +2465,7 @@ final class NodeAppModel {
                 return BridgeInvokeResponse(
                     id: req.id,
                     ok: false,
-                    error: OpenClawNodeError(code: .unavailable, message: "NOTIFICATION_FAILED: \(error.message)"))
+                    error: SteelEngineNodeError(code: .unavailable, message: "NOTIFICATION_FAILED: \(error.message)"))
             }
         }
 
@@ -2476,7 +2476,7 @@ final class NodeAppModel {
             }
         }
 
-        let payload = OpenClawChatPushPayload(messageId: messageId)
+        let payload = SteelEngineChatPushPayload(messageId: messageId)
         let json = try Self.encodePayload(payload)
         return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
     }
@@ -2569,11 +2569,11 @@ final class NodeAppModel {
 
     private func handleDeviceInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
         switch req.command {
-        case OpenClawDeviceCommand.status.rawValue:
+        case SteelEngineDeviceCommand.status.rawValue:
             let payload = try await deviceStatusService.status()
             let json = try Self.encodePayload(payload)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
-        case OpenClawDeviceCommand.info.rawValue:
+        case SteelEngineDeviceCommand.info.rawValue:
             let payload = self.deviceStatusService.info()
             let json = try Self.encodePayload(payload)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
@@ -2581,13 +2581,13 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
+                error: SteelEngineNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
         }
     }
 
     private func handlePhotosInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
-        let params = (try? Self.decodeParams(OpenClawPhotosLatestParams.self, from: req.paramsJSON)) ??
-            OpenClawPhotosLatestParams()
+        let params = (try? Self.decodeParams(SteelEnginePhotosLatestParams.self, from: req.paramsJSON)) ??
+            SteelEnginePhotosLatestParams()
         let payload = try await photosService.latest(params: params)
         let json = try Self.encodePayload(payload)
         return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
@@ -2595,14 +2595,14 @@ final class NodeAppModel {
 
     private func handleContactsInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
         switch req.command {
-        case OpenClawContactsCommand.search.rawValue:
-            let params = (try? Self.decodeParams(OpenClawContactsSearchParams.self, from: req.paramsJSON)) ??
-                OpenClawContactsSearchParams()
+        case SteelEngineContactsCommand.search.rawValue:
+            let params = (try? Self.decodeParams(SteelEngineContactsSearchParams.self, from: req.paramsJSON)) ??
+                SteelEngineContactsSearchParams()
             let payload = try await contactsService.search(params: params)
             let json = try Self.encodePayload(payload)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
-        case OpenClawContactsCommand.add.rawValue:
-            let params = try Self.decodeParams(OpenClawContactsAddParams.self, from: req.paramsJSON)
+        case SteelEngineContactsCommand.add.rawValue:
+            let params = try Self.decodeParams(SteelEngineContactsAddParams.self, from: req.paramsJSON)
             let payload = try await contactsService.add(params: params)
             let json = try Self.encodePayload(payload)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
@@ -2610,20 +2610,20 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
+                error: SteelEngineNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
         }
     }
 
     private func handleCalendarInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
         switch req.command {
-        case OpenClawCalendarCommand.events.rawValue:
-            let params = (try? Self.decodeParams(OpenClawCalendarEventsParams.self, from: req.paramsJSON)) ??
-                OpenClawCalendarEventsParams()
+        case SteelEngineCalendarCommand.events.rawValue:
+            let params = (try? Self.decodeParams(SteelEngineCalendarEventsParams.self, from: req.paramsJSON)) ??
+                SteelEngineCalendarEventsParams()
             let payload = try await calendarService.events(params: params)
             let json = try Self.encodePayload(payload)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
-        case OpenClawCalendarCommand.add.rawValue:
-            let params = try Self.decodeParams(OpenClawCalendarAddParams.self, from: req.paramsJSON)
+        case SteelEngineCalendarCommand.add.rawValue:
+            let params = try Self.decodeParams(SteelEngineCalendarAddParams.self, from: req.paramsJSON)
             let payload = try await calendarService.add(params: params)
             let json = try Self.encodePayload(payload)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
@@ -2631,20 +2631,20 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
+                error: SteelEngineNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
         }
     }
 
     private func handleRemindersInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
         switch req.command {
-        case OpenClawRemindersCommand.list.rawValue:
-            let params = (try? Self.decodeParams(OpenClawRemindersListParams.self, from: req.paramsJSON)) ??
-                OpenClawRemindersListParams()
+        case SteelEngineRemindersCommand.list.rawValue:
+            let params = (try? Self.decodeParams(SteelEngineRemindersListParams.self, from: req.paramsJSON)) ??
+                SteelEngineRemindersListParams()
             let payload = try await remindersService.list(params: params)
             let json = try Self.encodePayload(payload)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
-        case OpenClawRemindersCommand.add.rawValue:
-            let params = try Self.decodeParams(OpenClawRemindersAddParams.self, from: req.paramsJSON)
+        case SteelEngineRemindersCommand.add.rawValue:
+            let params = try Self.decodeParams(SteelEngineRemindersAddParams.self, from: req.paramsJSON)
             let payload = try await remindersService.add(params: params)
             let json = try Self.encodePayload(payload)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
@@ -2652,21 +2652,21 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
+                error: SteelEngineNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
         }
     }
 
     private func handleMotionInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
         switch req.command {
-        case OpenClawMotionCommand.activity.rawValue:
-            let params = (try? Self.decodeParams(OpenClawMotionActivityParams.self, from: req.paramsJSON)) ??
-                OpenClawMotionActivityParams()
+        case SteelEngineMotionCommand.activity.rawValue:
+            let params = (try? Self.decodeParams(SteelEngineMotionActivityParams.self, from: req.paramsJSON)) ??
+                SteelEngineMotionActivityParams()
             let payload = try await motionService.activities(params: params)
             let json = try Self.encodePayload(payload)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
-        case OpenClawMotionCommand.pedometer.rawValue:
-            let params = (try? Self.decodeParams(OpenClawPedometerParams.self, from: req.paramsJSON)) ??
-                OpenClawPedometerParams()
+        case SteelEngineMotionCommand.pedometer.rawValue:
+            let params = (try? Self.decodeParams(SteelEnginePedometerParams.self, from: req.paramsJSON)) ??
+                SteelEnginePedometerParams()
             let payload = try await motionService.pedometer(params: params)
             let json = try Self.encodePayload(payload)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
@@ -2674,16 +2674,16 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
+                error: SteelEngineNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
         }
     }
 
     private func handleHealthInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
-        guard let params = try? Self.decodeParams(OpenClawHealthSummaryParams.self, from: req.paramsJSON) else {
+        guard let params = try? Self.decodeParams(SteelEngineHealthSummaryParams.self, from: req.paramsJSON) else {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(
+                error: SteelEngineNodeError(
                     code: .invalidRequest,
                     message: "INVALID_REQUEST: period must be today"))
         }
@@ -2695,7 +2695,7 @@ final class NodeAppModel {
     private func handleTalkInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
         try Task.checkCancellation()
         switch req.command {
-        case OpenClawTalkCommand.pttStart.rawValue:
+        case SteelEngineTalkCommand.pttStart.rawValue:
             let commandEpoch = self.talkPttCommandEpoch
             var reservedCaptureId: String?
             do {
@@ -2725,7 +2725,7 @@ final class NodeAppModel {
                 }
                 throw error
             }
-        case OpenClawTalkCommand.pttOnce.rawValue:
+        case SteelEngineTalkCommand.pttOnce.rawValue:
             let commandEpoch = self.talkPttCommandEpoch
             var reservedCaptureId: String?
             let start: TalkPushToTalkOnceStart
@@ -2747,7 +2747,7 @@ final class NodeAppModel {
                 }
                 throw error
             }
-            let payload: OpenClawTalkPTTStopPayload = switch start {
+            let payload: SteelEngineTalkPTTStopPayload = switch start {
             case let .busy(busyPayload):
                 busyPayload
             case .started:
@@ -2755,14 +2755,14 @@ final class NodeAppModel {
             }
             let json = try Self.encodePayload(payload)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
-        case OpenClawTalkCommand.pttStop.rawValue:
+        case SteelEngineTalkCommand.pttStop.rawValue:
             // Interrupt commands invalidate suspended preparation before touching
             // capture state, then bypass the preparation queue entirely.
             self.talkPttCommandEpoch &+= 1
             let payload = self.talkMode.endPushToTalk()
             let json = try Self.encodePayload(payload)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
-        case OpenClawTalkCommand.pttCancel.rawValue:
+        case SteelEngineTalkCommand.pttCancel.rawValue:
             self.talkPttCommandEpoch &+= 1
             let payload = self.talkMode.cancelPushToTalk()
             let json = try Self.encodePayload(payload)
@@ -2771,7 +2771,7 @@ final class NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
+                error: SteelEngineNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
         }
     }
 
@@ -2956,118 +2956,118 @@ extension NodeAppModel {
             }
         }
 
-        register([OpenClawLocationCommand.get.rawValue]) { [weak self] req in
+        register([SteelEngineLocationCommand.get.rawValue]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleLocationInvoke(req)
         }
 
         register([
-            OpenClawCanvasCommand.present.rawValue,
-            OpenClawCanvasCommand.hide.rawValue,
-            OpenClawCanvasCommand.navigate.rawValue,
-            OpenClawCanvasCommand.evalJS.rawValue,
-            OpenClawCanvasCommand.snapshot.rawValue,
+            SteelEngineCanvasCommand.present.rawValue,
+            SteelEngineCanvasCommand.hide.rawValue,
+            SteelEngineCanvasCommand.navigate.rawValue,
+            SteelEngineCanvasCommand.evalJS.rawValue,
+            SteelEngineCanvasCommand.snapshot.rawValue,
         ]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleCanvasInvoke(req)
         }
 
         register([
-            OpenClawCanvasA2UICommand.reset.rawValue,
-            OpenClawCanvasA2UICommand.push.rawValue,
-            OpenClawCanvasA2UICommand.pushJSONL.rawValue,
+            SteelEngineCanvasA2UICommand.reset.rawValue,
+            SteelEngineCanvasA2UICommand.push.rawValue,
+            SteelEngineCanvasA2UICommand.pushJSONL.rawValue,
         ]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleCanvasA2UIInvoke(req)
         }
 
         register([
-            OpenClawCameraCommand.list.rawValue,
-            OpenClawCameraCommand.snap.rawValue,
-            OpenClawCameraCommand.clip.rawValue,
+            SteelEngineCameraCommand.list.rawValue,
+            SteelEngineCameraCommand.snap.rawValue,
+            SteelEngineCameraCommand.clip.rawValue,
         ]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleCameraInvoke(req)
         }
 
-        register([OpenClawScreenCommand.record.rawValue]) { [weak self] req in
+        register([SteelEngineScreenCommand.record.rawValue]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleScreenRecordInvoke(req)
         }
 
-        register([OpenClawSystemCommand.notify.rawValue]) { [weak self] req in
+        register([SteelEngineSystemCommand.notify.rawValue]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleSystemNotify(req)
         }
 
-        register([OpenClawChatCommand.push.rawValue]) { [weak self] req in
+        register([SteelEngineChatCommand.push.rawValue]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleChatPushInvoke(req)
         }
 
         register([
-            OpenClawDeviceCommand.status.rawValue,
-            OpenClawDeviceCommand.info.rawValue,
+            SteelEngineDeviceCommand.status.rawValue,
+            SteelEngineDeviceCommand.info.rawValue,
         ]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleDeviceInvoke(req)
         }
 
         register([
-            OpenClawWatchCommand.status.rawValue,
-            OpenClawWatchCommand.notify.rawValue,
+            SteelEngineWatchCommand.status.rawValue,
+            SteelEngineWatchCommand.notify.rawValue,
         ]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleWatchInvoke(req)
         }
 
-        register([OpenClawPhotosCommand.latest.rawValue]) { [weak self] req in
+        register([SteelEnginePhotosCommand.latest.rawValue]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handlePhotosInvoke(req)
         }
 
         register([
-            OpenClawContactsCommand.search.rawValue,
-            OpenClawContactsCommand.add.rawValue,
+            SteelEngineContactsCommand.search.rawValue,
+            SteelEngineContactsCommand.add.rawValue,
         ]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleContactsInvoke(req)
         }
 
         register([
-            OpenClawCalendarCommand.events.rawValue,
-            OpenClawCalendarCommand.add.rawValue,
+            SteelEngineCalendarCommand.events.rawValue,
+            SteelEngineCalendarCommand.add.rawValue,
         ]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleCalendarInvoke(req)
         }
 
         register([
-            OpenClawRemindersCommand.list.rawValue,
-            OpenClawRemindersCommand.add.rawValue,
+            SteelEngineRemindersCommand.list.rawValue,
+            SteelEngineRemindersCommand.add.rawValue,
         ]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleRemindersInvoke(req)
         }
 
         register([
-            OpenClawMotionCommand.activity.rawValue,
-            OpenClawMotionCommand.pedometer.rawValue,
+            SteelEngineMotionCommand.activity.rawValue,
+            SteelEngineMotionCommand.pedometer.rawValue,
         ]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleMotionInvoke(req)
         }
 
-        register([OpenClawHealthCommand.summary.rawValue]) { [weak self] req in
+        register([SteelEngineHealthCommand.summary.rawValue]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleHealthInvoke(req)
         }
 
         register([
-            OpenClawTalkCommand.pttStart.rawValue,
-            OpenClawTalkCommand.pttStop.rawValue,
-            OpenClawTalkCommand.pttCancel.rawValue,
-            OpenClawTalkCommand.pttOnce.rawValue,
+            SteelEngineTalkCommand.pttStart.rawValue,
+            SteelEngineTalkCommand.pttStop.rawValue,
+            SteelEngineTalkCommand.pttCancel.rawValue,
+            SteelEngineTalkCommand.pttOnce.rawValue,
         ]) { [weak self] req in
             guard let self else { throw NodeCapabilityRouter.RouterError.handlerUnavailable }
             return try await self.handleTalkInvoke(req)
@@ -3078,9 +3078,9 @@ extension NodeAppModel {
 
     private func handleWatchInvoke(_ req: BridgeInvokeRequest) async throws -> BridgeInvokeResponse {
         switch req.command {
-        case OpenClawWatchCommand.status.rawValue:
+        case SteelEngineWatchCommand.status.rawValue:
             let status = await watchMessagingService.status()
-            let payload = OpenClawWatchStatusPayload(
+            let payload = SteelEngineWatchStatusPayload(
                 supported: status.supported,
                 paired: status.paired,
                 appInstalled: status.appInstalled,
@@ -3088,8 +3088,8 @@ extension NodeAppModel {
                 activationState: status.activationState)
             let json = try Self.encodePayload(payload)
             return BridgeInvokeResponse(id: req.id, ok: true, payloadJSON: json)
-        case OpenClawWatchCommand.notify.rawValue:
-            let params = try Self.decodeParams(OpenClawWatchNotifyParams.self, from: req.paramsJSON)
+        case SteelEngineWatchCommand.notify.rawValue:
+            let params = try Self.decodeParams(SteelEngineWatchNotifyParams.self, from: req.paramsJSON)
             let normalizedParams = Self.normalizeWatchNotifyParams(params)
             let title = normalizedParams.title
             let body = normalizedParams.body
@@ -3097,7 +3097,7 @@ extension NodeAppModel {
                 return BridgeInvokeResponse(
                     id: req.id,
                     ok: false,
-                    error: OpenClawNodeError(
+                    error: SteelEngineNodeError(
                         code: .invalidRequest,
                         message: "INVALID_REQUEST: empty watch notification"))
             }
@@ -3120,7 +3120,7 @@ extension NodeAppModel {
                             sendResult: result)
                     }
                 }
-                let payload = OpenClawWatchNotifyPayload(
+                let payload = SteelEngineWatchNotifyPayload(
                     deliveredImmediately: result.deliveredImmediately,
                     queuedForDelivery: result.queuedForDelivery,
                     transport: result.transport)
@@ -3130,7 +3130,7 @@ extension NodeAppModel {
                 return BridgeInvokeResponse(
                     id: req.id,
                     ok: false,
-                    error: OpenClawNodeError(
+                    error: SteelEngineNodeError(
                         code: .unavailable,
                         message: error.localizedDescription))
             }
@@ -3138,7 +3138,7 @@ extension NodeAppModel {
             return BridgeInvokeResponse(
                 id: req.id,
                 ok: false,
-                error: OpenClawNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
+                error: SteelEngineNodeError(code: .invalidRequest, message: "INVALID_REQUEST: unknown command"))
         }
     }
 
@@ -3160,7 +3160,7 @@ extension NodeAppModel {
         let status = await watchMessagingService.status()
         guard status.supported, status.paired, status.appInstalled else {
             throw NSError(domain: "WatchDirectSetup", code: 3, userInfo: [
-                NSLocalizedDescriptionKey: "Pair an Apple Watch and install the OpenClaw watch app first.",
+                NSLocalizedDescriptionKey: "Pair an Apple Watch and install the SteelEngine watch app first.",
             ])
         }
 
@@ -3183,9 +3183,9 @@ extension NodeAppModel {
         self.watchMessagingStatus = await self.watchMessagingService.status()
     }
 
-    private func locationMode() -> OpenClawLocationMode {
+    private func locationMode() -> SteelEngineLocationMode {
         let raw = UserDefaults.standard.string(forKey: "location.enabledMode") ?? "off"
-        return OpenClawLocationMode(rawValue: raw) ?? .off
+        return SteelEngineLocationMode(rawValue: raw) ?? .off
     }
 
     private func isLocationPreciseEnabled() -> Bool {
@@ -3311,7 +3311,7 @@ extension NodeAppModel {
     /// snapshot confirms the read (unread != true), so a run finishing while the
     /// session stays open re-acknowledges without patch loops (the gateway stamps
     /// lastReadAt server-side, which makes the exchange convergent).
-    func reconcileChatSessionReadState(_ entries: [OpenClawChatSessionEntry]) {
+    func reconcileChatSessionReadState(_ entries: [SteelEngineChatSessionEntry]) {
         guard let openedKey = self.openedChatSessionKey,
               let entry = entries.first(where: { $0.key == openedKey })
         else { return }
@@ -3384,7 +3384,7 @@ extension NodeAppModel {
     }
 
     var chatSessionRoutingContract: String? {
-        OpenClawChatSessionRoutingContract.make(
+        SteelEngineChatSessionRoutingContract.make(
             scope: self.gatewaySessionScope,
             mainKey: self.mainSessionBaseKey,
             defaultAgentID: self.gatewayDefaultAgentId)
@@ -4102,7 +4102,7 @@ extension NodeAppModel {
             kind: .unknown,
             owner: .iphone,
             title: "Credential save failed",
-            message: "OpenClaw disconnected because it could not securely save the new gateway credential.",
+            message: "SteelEngine disconnected because it could not securely save the new gateway credential.",
             retryable: true,
             pauseReconnect: true,
             technicalDetails: technicalDetails))
@@ -4400,7 +4400,7 @@ extension NodeAppModel {
                             BridgeInvokeResponse(
                                 id: req.id,
                                 ok: false,
-                                error: OpenClawNodeError(
+                                error: SteelEngineNodeError(
                                     code: .invalidRequest,
                                     message: "INVALID_REQUEST: operator session cannot invoke node commands"))
                         },
@@ -4624,7 +4624,7 @@ extension NodeAppModel {
                         return BridgeInvokeResponse(
                             id: req.id,
                             ok: false,
-                            error: OpenClawNodeError(
+                            error: SteelEngineNodeError(
                                 code: .unavailable,
                                 message: "UNAVAILABLE: node not ready"))
                     }
@@ -4878,7 +4878,7 @@ extension NodeAppModel {
             role: "operator",
             scopes: scopes,
             scopesAreExplicit: forceExplicitScopes,
-            caps: [OpenClawGatewayClientCapability.inlineWidgets],
+            caps: [SteelEngineGatewayClientCapability.inlineWidgets],
             commands: [],
             permissions: [:],
             clientId: clientId,
@@ -4891,7 +4891,7 @@ extension NodeAppModel {
 
     private func legacyClientIdFallback(currentClientId: String, error: Error) -> String? {
         let normalizedClientId = currentClientId.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        guard normalizedClientId == "openclaw-ios" else { return nil }
+        guard normalizedClientId == "steelengine-ios" else { return nil }
         let message = error.localizedDescription.lowercased()
         guard message.contains("invalid connect params"), message.contains("/client/id") else {
             return nil
@@ -5079,7 +5079,7 @@ extension NodeAppModel {
         }
 
         do {
-            let request = OpenClawChatGatewayRequests.sessionsList(
+            let request = SteelEngineChatGatewayRequests.sessionsList(
                 limit: 80,
                 search: nil,
                 archived: false,
@@ -5120,8 +5120,8 @@ extension NodeAppModel {
         self.recordShareEvent("Share self-test running…")
 
         let payload = SharedContentPayload(
-            title: "OpenClaw Share Self-Test",
-            url: URL(string: "https://openclaw.ai/share-self-test"),
+            title: "SteelEngine Share Self-Test",
+            url: URL(string: "https://steelengine.ai/share-self-test"),
             text: "Validate iOS share->deep-link->gateway forwarding.")
         guard let deepLink = ShareToAgentDeepLink.buildURL(
             from: payload,
@@ -5793,10 +5793,10 @@ extension NodeAppModel {
         self.persistWatchExecApprovalBridgeState()
     }
 
-    private static func makeWatchExecApprovalItem(from prompt: ExecApprovalPrompt) -> OpenClawWatchExecApprovalItem {
-        let decisions = prompt.allowedDecisions.compactMap(OpenClawWatchExecApprovalDecision.init(rawValue:))
+    private static func makeWatchExecApprovalItem(from prompt: ExecApprovalPrompt) -> SteelEngineWatchExecApprovalItem {
+        let decisions = prompt.allowedDecisions.compactMap(SteelEngineWatchExecApprovalDecision.init(rawValue:))
         let preview = Self.trimmedOrNil(prompt.commandPreview) ?? Self.trimmedOrNil(prompt.commandText)
-        return OpenClawWatchExecApprovalItem(
+        return SteelEngineWatchExecApprovalItem(
             id: prompt.id,
             gatewayStableID: prompt.gatewayStableID,
             commandText: prompt.commandText,
@@ -5823,7 +5823,7 @@ extension NodeAppModel {
               !self.terminalExecApprovalKeys.contains(inboxKey)
         else { return }
         let deliveryGeneration = self.gatewayConnectGeneration
-        let message = OpenClawWatchExecApprovalPromptMessage(
+        let message = SteelEngineWatchExecApprovalPromptMessage(
             approval: Self.makeWatchExecApprovalItem(from: prompt),
             sentAtMs: Int64(Date().timeIntervalSince1970 * 1000),
             resetResolutionAttemptId: resetResolutionAttemptId)
@@ -5853,8 +5853,8 @@ extension NodeAppModel {
     private func publishWatchExecApprovalResolved(
         approvalId: String,
         gatewayStableID: String,
-        decision: OpenClawWatchExecApprovalDecision?,
-        outcome: OpenClawWatchExecApprovalOutcome,
+        decision: SteelEngineWatchExecApprovalDecision?,
+        outcome: SteelEngineWatchExecApprovalOutcome,
         outcomeText: String,
         resolvedAtMs: Int64? = nil,
         source: String,
@@ -5866,7 +5866,7 @@ extension NodeAppModel {
         self.markExecApprovalOwnerTerminal(
             approvalId: approvalID,
             gatewayStableID: gatewayStableID)
-        let message = OpenClawWatchExecApprovalResolvedMessage(
+        let message = SteelEngineWatchExecApprovalResolvedMessage(
             approvalId: approvalID,
             gatewayStableID: gatewayStableID,
             decision: decision,
@@ -5905,7 +5905,7 @@ extension NodeAppModel {
             await self.publishWatchExecApprovalResolved(
                 approvalId: terminal.id,
                 gatewayStableID: gatewayStableID,
-                decision: terminal.decision.flatMap(OpenClawWatchExecApprovalDecision.init(rawValue:)),
+                decision: terminal.decision.flatMap(SteelEngineWatchExecApprovalDecision.init(rawValue:)),
                 outcome: outcome,
                 outcomeText: Self.execApprovalTerminalText(
                     terminal,
@@ -5940,7 +5940,7 @@ extension NodeAppModel {
     }
 
     private static func watchExecApprovalOutcome(
-        for verdict: ExecApprovalTerminalVerdict) -> OpenClawWatchExecApprovalOutcome?
+        for verdict: ExecApprovalTerminalVerdict) -> SteelEngineWatchExecApprovalOutcome?
     {
         switch verdict {
         case .allowOnce:
@@ -5957,7 +5957,7 @@ extension NodeAppModel {
     private func publishWatchExecApprovalExpired(
         approvalId: String,
         gatewayStableID: String,
-        reason: OpenClawWatchExecApprovalCloseReason,
+        reason: SteelEngineWatchExecApprovalCloseReason,
         approvalKind: ApprovalKind = .exec,
         syncSnapshots: Bool = true) async
     {
@@ -5968,7 +5968,7 @@ extension NodeAppModel {
             approvalId: approvalID,
             gatewayStableID: gatewayStableID)
         guard approvalKind == .exec else { return }
-        let message = OpenClawWatchExecApprovalExpiredMessage(
+        let message = SteelEngineWatchExecApprovalExpiredMessage(
             approvalId: approvalID,
             gatewayStableID: gatewayStableID,
             reason: reason,
@@ -6020,7 +6020,7 @@ extension NodeAppModel {
             false
         }
         let canAcknowledgeRequest = requestId?.isEmpty == false && requestOwnerMatches
-        let message = OpenClawWatchExecApprovalSnapshotMessage(
+        let message = SteelEngineWatchExecApprovalSnapshotMessage(
             approvals: approvals,
             gatewayStableID: gatewayStableID,
             sentAtMs: Int64(Date().timeIntervalSince1970 * 1000),
@@ -6052,14 +6052,14 @@ extension NodeAppModel {
 
     private func makeWatchChatPreview() async -> WatchChatPreview {
         do {
-            let payload: OpenClawChatHistoryPayload
+            let payload: SteelEngineChatHistoryPayload
             if self.isAppleReviewDemoModeEnabled {
                 payload = try await self.appleReviewDemoChatTransport.requestHistory(sessionKey: self.chatSessionKey)
             } else {
                 guard self.isOperatorGatewayConnected else {
                     return WatchChatPreview(
                         items: [],
-                        status: OpenClawWatchAppStatus(code: .chatConnectIPhone),
+                        status: SteelEngineWatchAppStatus(code: .chatConnectIPhone),
                         statusText: "Connect iPhone chat to read messages")
                 }
                 payload = try await IOSGatewayChatTransport(gateway: self.operatorSession)
@@ -6070,20 +6070,20 @@ extension NodeAppModel {
             return WatchChatPreview(
                 items: items,
                 status: items.isEmpty
-                    ? OpenClawWatchAppStatus(code: .chatNoMessages)
+                    ? SteelEngineWatchAppStatus(code: .chatNoMessages)
                     : nil,
                 statusText: items.isEmpty ? "No chat messages yet" : nil)
         } catch {
             GatewayDiagnostics.log("watch app snapshot: chat preview failed error=\(error.localizedDescription)")
             return WatchChatPreview(
                 items: [],
-                status: OpenClawWatchAppStatus(code: .chatUnavailable),
+                status: SteelEngineWatchAppStatus(code: .chatUnavailable),
                 statusText: "Chat unavailable")
         }
     }
 
     private nonisolated static func watchChatReplyText(
-        from raw: [OpenClawKit.AnyCodable],
+        from raw: [SteelEngineKit.AnyCodable],
         runId: String,
         submittedText: String,
         submittedAtMs: Int64) -> String?
@@ -6126,10 +6126,10 @@ extension NodeAppModel {
     }
 
     private nonisolated static func decodeWatchChatMessage(
-        _ raw: OpenClawKit.AnyCodable) -> WatchChatMessageEntry?
+        _ raw: SteelEngineKit.AnyCodable) -> WatchChatMessageEntry?
     {
         guard let data = try? JSONEncoder().encode(raw),
-              let message = try? JSONDecoder().decode(OpenClawChatMessage.self, from: data),
+              let message = try? JSONDecoder().decode(SteelEngineChatMessage.self, from: data),
               let text = nonEmptyWatchChatText(watchChatText(from: message))
         else {
             return nil
@@ -6143,7 +6143,7 @@ extension NodeAppModel {
     }
 
     private nonisolated static func makeWatchChatItems(
-        from raw: [OpenClawKit.AnyCodable]) -> [OpenClawWatchChatItem]
+        from raw: [SteelEngineKit.AnyCodable]) -> [SteelEngineWatchChatItem]
     {
         let readableMessages = raw.compactMap(self.decodeWatchChatMessage)
         var idOccurrences: [String: Int] = [:]
@@ -6156,7 +6156,7 @@ extension NodeAppModel {
         }
         return identified.suffix(self.watchChatPreviewItemLimit).map { entry, stableId in
             let timestampMs = self.watchTimestampMs(entry.message.timestamp)
-            return OpenClawWatchChatItem(
+            return SteelEngineWatchChatItem(
                 id: stableId,
                 role: entry.message.role,
                 text: self.truncatedWatchChatText(entry.text),
@@ -6171,7 +6171,7 @@ extension NodeAppModel {
         return "\(entry.message.role)-\(digest)"
     }
 
-    private nonisolated static func watchChatText(from message: OpenClawChatMessage) -> String {
+    private nonisolated static func watchChatText(from message: SteelEngineChatMessage) -> String {
         let parts = message.content.compactMap { content -> String? in
             let kind = (content.type ?? "text").lowercased()
             guard kind.isEmpty || kind == "text" || kind == "output_text" else { return nil }
@@ -6181,7 +6181,7 @@ extension NodeAppModel {
             if let text = self.nonEmptyWatchChatText(content.content?.value as? String) {
                 return text
             }
-            if let dict = content.content?.value as? [String: OpenClawKit.AnyCodable],
+            if let dict = content.content?.value as? [String: SteelEngineKit.AnyCodable],
                let text = self.nonEmptyWatchChatText(dict["text"]?.value as? String)
             {
                 return text
@@ -6220,7 +6220,7 @@ extension NodeAppModel {
     }
 
     private func makeWatchAppSnapshot(
-        chatPreview: WatchChatPreview? = nil) -> OpenClawWatchAppSnapshotMessage
+        chatPreview: WatchChatPreview? = nil) -> SteelEngineWatchAppSnapshotMessage
     {
         self.pruneExpiredWatchExecApprovalPrompts()
         let watchGatewayConnected = self.isAppleReviewDemoModeEnabled
@@ -6229,7 +6229,7 @@ extension NodeAppModel {
         let watchGatewayStatusText = watchGatewayConnected || displayStatusText != "Connected"
             ? displayStatusText
             : self.operatorStatusText
-        return OpenClawWatchAppSnapshotMessage(
+        return SteelEngineWatchAppSnapshotMessage(
             gatewayStatus: self.makeWatchGatewayStatus(connected: watchGatewayConnected),
             gatewayStatusText: watchGatewayStatusText,
             gatewayConnected: watchGatewayConnected,
@@ -6251,23 +6251,23 @@ extension NodeAppModel {
             snapshotId: UUID().uuidString)
     }
 
-    private func makeWatchGatewayStatus(connected: Bool) -> OpenClawWatchAppStatus {
+    private func makeWatchGatewayStatus(connected: Bool) -> SteelEngineWatchAppStatus {
         if connected {
-            return OpenClawWatchAppStatus(code: .gatewayConnected)
+            return SteelEngineWatchAppStatus(code: .gatewayConnected)
         }
         if let problem = self.lastGatewayProblem {
             return Self.makeWatchGatewayProblemStatus(problem)
         }
         if let watchGatewayConnectionStatus {
-            return OpenClawWatchAppStatus(code: watchGatewayConnectionStatus)
+            return SteelEngineWatchAppStatus(code: watchGatewayConnectionStatus)
         }
         let statusText = self.gatewayStatusText == "Connected"
             ? self.operatorStatusText
             : self.gatewayStatusText
         if statusText == "Offline" {
-            return OpenClawWatchAppStatus(code: .gatewayOffline)
+            return SteelEngineWatchAppStatus(code: .gatewayOffline)
         }
-        return OpenClawWatchAppStatus(code: .legacy, verbatim: statusText)
+        return SteelEngineWatchAppStatus(code: .legacy, verbatim: statusText)
     }
 
     func setGatewayConnectionProgress(reconnecting: Bool) {
@@ -6278,7 +6278,7 @@ extension NodeAppModel {
     }
 
     private static func makeWatchGatewayProblemStatus(
-        _ problem: GatewayConnectionProblem) -> OpenClawWatchAppStatus
+        _ problem: GatewayConnectionProblem) -> SteelEngineWatchAppStatus
     {
         let requestID: String? = switch problem.kind {
         case .pairingRequired, .pairingRoleUpgradeRequired, .pairingScopeUpgradeRequired,
@@ -6287,35 +6287,35 @@ extension NodeAppModel {
         default:
             nil
         }
-        let code: OpenClawWatchAppStatusCode = requestID != nil
+        let code: SteelEngineWatchAppStatusCode = requestID != nil
             ? .gatewayProblemWithRequestID
             : .gatewayProblem
         let requestArguments = requestID.map { [$0] } ?? []
         return switch problem.titlePresentation {
         case let .localized(key):
-            OpenClawWatchAppStatus(
+            SteelEngineWatchAppStatus(
                 code: code,
                 localizationKey: key,
                 arguments: requestArguments)
         case let .localizedFormat(key, arguments):
-            OpenClawWatchAppStatus(
+            SteelEngineWatchAppStatus(
                 code: code,
                 localizationKey: key,
                 arguments: arguments + requestArguments)
         case let .verbatim(value):
-            OpenClawWatchAppStatus(
+            SteelEngineWatchAppStatus(
                 code: code,
                 arguments: requestArguments,
                 verbatim: value)
         }
     }
 
-    private func makeWatchTalkStatus() -> OpenClawWatchAppStatus {
+    private func makeWatchTalkStatus() -> SteelEngineWatchAppStatus {
         if self.talkMode.isSpeaking {
-            return OpenClawWatchAppStatus(code: .talkSpeaking)
+            return SteelEngineWatchAppStatus(code: .talkSpeaking)
         }
         if self.talkMode.isListening {
-            return OpenClawWatchAppStatus(code: .talkListening)
+            return SteelEngineWatchAppStatus(code: .talkListening)
         }
         if self.talkMode.hasActivePushToTalkSession {
             return self.makeWatchTalkPresentationStatus()
@@ -6327,48 +6327,48 @@ extension NodeAppModel {
             break
         }
         if !self.talkMode.isEnabled {
-            return OpenClawWatchAppStatus(code: .talkOff)
+            return SteelEngineWatchAppStatus(code: .talkOff)
         }
         if !self.talkMode.isGatewayConnected {
-            return OpenClawWatchAppStatus(code: .talkOffline)
+            return SteelEngineWatchAppStatus(code: .talkOffline)
         }
         switch self.talkMode.gatewayTalkPermissionState {
         case .unknown, .ready:
             break
         case let .missingScope(scope):
-            return OpenClawWatchAppStatus(code: .talkPermissionRequired, arguments: [scope])
+            return SteelEngineWatchAppStatus(code: .talkPermissionRequired, arguments: [scope])
         case .requestingUpgrade:
-            return OpenClawWatchAppStatus(code: .talkRequestingApproval)
+            return SteelEngineWatchAppStatus(code: .talkRequestingApproval)
         case .upgradeRequested:
-            return OpenClawWatchAppStatus(code: .talkApprovalRequested)
+            return SteelEngineWatchAppStatus(code: .talkApprovalRequested)
         case let .requestFailed(message), let .loadFailed(message):
-            return OpenClawWatchAppStatus(code: .talkFailure, verbatim: message)
+            return SteelEngineWatchAppStatus(code: .talkFailure, verbatim: message)
         case .apiKeyMissing:
-            return OpenClawWatchAppStatus(code: .talkAPIKeyMissing)
+            return SteelEngineWatchAppStatus(code: .talkAPIKeyMissing)
         }
         return self.makeWatchTalkPresentationStatus()
     }
 
-    private func makeWatchTalkPresentationStatus() -> OpenClawWatchAppStatus {
+    private func makeWatchTalkPresentationStatus() -> SteelEngineWatchAppStatus {
         switch self.talkMode.watchPresentation {
         case let .localized(key):
-            return OpenClawWatchAppStatus(code: .talkFailure, localizationKey: key)
+            return SteelEngineWatchAppStatus(code: .talkFailure, localizationKey: key)
         case .phase:
             break
         case let .verbatim(value):
-            return OpenClawWatchAppStatus(code: .talkFailure, verbatim: value)
+            return SteelEngineWatchAppStatus(code: .talkFailure, verbatim: value)
         }
         return switch self.talkMode.phase {
         case .connecting:
-            OpenClawWatchAppStatus(code: .talkConnecting)
+            SteelEngineWatchAppStatus(code: .talkConnecting)
         case .thinking:
-            OpenClawWatchAppStatus(code: .talkThinking)
+            SteelEngineWatchAppStatus(code: .talkThinking)
         case .listening:
-            OpenClawWatchAppStatus(code: .talkListening)
+            SteelEngineWatchAppStatus(code: .talkListening)
         case .speaking:
-            OpenClawWatchAppStatus(code: .talkSpeaking)
+            SteelEngineWatchAppStatus(code: .talkSpeaking)
         case .idle:
-            OpenClawWatchAppStatus(code: .talkReady)
+            SteelEngineWatchAppStatus(code: .talkReady)
         }
     }
 
@@ -6699,7 +6699,7 @@ extension NodeAppModel {
     private func sendWatchChatCompletion(commandId: String, replyText: String) async {
         do {
             _ = try await self.watchMessagingService.sendChatCompletion(
-                OpenClawWatchChatCompletionMessage(
+                SteelEngineWatchChatCompletionMessage(
                     commandId: commandId,
                     replyText: replyText,
                     sentAtMs: Int64(Date().timeIntervalSince1970 * 1000)))
@@ -7803,7 +7803,7 @@ extension NodeAppModel {
             self.pushWakeLogger.info("Ignored APNs payload wakeId=\(wakeId, privacy: .public): not silent push")
             return false
         }
-        let pushKind = Self.openclawPushKind(userInfo)
+        let pushKind = Self.steelenginePushKind(userInfo)
         let receivedMessage =
             "Silent push received wakeId=\(wakeId) "
                 + "kind=\(pushKind) "
@@ -8107,14 +8107,14 @@ extension NodeAppModel {
         return String(raw.prefix(8))
     }
 
-    private static func openclawPushKind(_ userInfo: [AnyHashable: Any]) -> String {
-        if let payload = userInfo["openclaw"] as? [String: Any],
+    private static func steelenginePushKind(_ userInfo: [AnyHashable: Any]) -> String {
+        if let payload = userInfo["steelengine"] as? [String: Any],
            let kind = payload["kind"] as? String
         {
             let trimmed = kind.trimmingCharacters(in: .whitespacesAndNewlines)
             if !trimmed.isEmpty { return trimmed }
         }
-        if let payload = userInfo["openclaw"] as? [AnyHashable: Any],
+        if let payload = userInfo["steelengine"] as? [AnyHashable: Any],
            let kind = payload["kind"] as? String
         {
             let trimmed = kind.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -9116,7 +9116,7 @@ extension NodeAppModel {
         else {
             self.execApprovalNotificationLogger.error(
                 "Exec approval action failed id=\(approvalID, privacy: .public): operator not connected")
-            return .failed(message: "OpenClaw couldn't connect to the gateway operator session.")
+            return .failed(message: "SteelEngine couldn't connect to the gateway operator session.")
         }
 
         let rpcFamily = await self.execApprovalRPCFamily(route: context.route)
@@ -9435,9 +9435,9 @@ extension NodeAppModel {
             // Legacy get removes committed rows, so not-found cannot distinguish success from
             // expiry. Keep every surface frozen until an explicit terminal event/reconnect.
             return .uncertain(
-                message: "Decision status is unknown. Actions remain locked until OpenClaw reconnects.")
+                message: "Decision status is unknown. Actions remain locked until SteelEngine reconnects.")
         case .failed:
-            return .uncertain(message: "Decision status is unknown. Actions remain locked until OpenClaw reconnects.")
+            return .uncertain(message: "Decision status is unknown. Actions remain locked until SteelEngine reconnects.")
         }
     }
 
@@ -10378,12 +10378,12 @@ extension NodeAppModel {
         await self.canPublishAPNsRegistration(usesRelayTransport: usesRelayTransport)
     }
 
-    nonisolated static func _test_makeWatchChatItems(from raw: [OpenClawKit.AnyCodable]) -> [OpenClawWatchChatItem] {
+    nonisolated static func _test_makeWatchChatItems(from raw: [SteelEngineKit.AnyCodable]) -> [SteelEngineWatchChatItem] {
         self.makeWatchChatItems(from: raw)
     }
 
     nonisolated static func _test_watchChatReplyText(
-        from raw: [OpenClawKit.AnyCodable],
+        from raw: [SteelEngineKit.AnyCodable],
         runId: String,
         submittedText: String,
         submittedAtMs: Int64) -> String?

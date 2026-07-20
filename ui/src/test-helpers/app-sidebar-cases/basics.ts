@@ -12,12 +12,12 @@ import {
 import "../../components/app-sidebar.ts";
 
 describe("AppSidebar update card wiring", () => {
-  it("shows OpenClaw in the default pinned routes", async () => {
+  it("shows SteelEngine in the default pinned routes", async () => {
     const gateway = createGateway({} as GatewayBrowserClient);
     const { sidebar } = await mountSidebar(gateway, createSessions("main", ["agent:main:main"]));
 
     const link = sidebar.querySelector<HTMLAnchorElement>('.nav-item[href="/custodian"]');
-    expect(link?.textContent?.trim()).toBe("OpenClaw");
+    expect(link?.textContent?.trim()).toBe("SteelEngine");
   });
 
   it("renders the update card in the footer after the attention slot and forwards its action", async () => {
@@ -34,8 +34,8 @@ describe("AppSidebar update card wiring", () => {
 
     const footer = sidebar.querySelector(".sidebar-shell__footer");
     // Attention chips (when present) stack above the update card.
-    expect(footer?.firstElementChild?.localName).toBe("openclaw-sidebar-attention");
-    const card = footer?.querySelector("openclaw-sidebar-update-card");
+    expect(footer?.firstElementChild?.localName).toBe("steelengine-sidebar-attention");
+    const card = footer?.querySelector("steelengine-sidebar-update-card");
     expect(card).not.toBeNull();
     card?.querySelector<HTMLButtonElement>(".sidebar-update-card__action")?.click();
     expect(onUpdate).toHaveBeenCalledOnce();

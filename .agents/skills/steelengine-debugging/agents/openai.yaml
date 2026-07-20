@@ -1,0 +1,4 @@
+interface:
+  display_name: "SteelEngine Debugging"
+  short_description: "Debug model, tool, stream, and live behavior"
+  default_prompt: "Use $steelengine-debugging to identify the right SteelEngine debug boundary, turn on targeted logs, and choose the narrowest local or Crabbox proof."

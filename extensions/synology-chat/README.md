@@ -1,11 +1,11 @@
-# OpenClaw Synology Chat
+# SteelEngine Synology Chat
 
-Official OpenClaw channel plugin for Synology Chat conversations and direct messages.
+Official SteelEngine channel plugin for Synology Chat conversations and direct messages.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugin add @openclaw/synology-chat
+steelengine plugin add @steelengine/synology-chat
 ```
 
-Configure Synology Chat credentials and allowed conversations in OpenClaw, then use the plugin to route messages between Synology Chat and OpenClaw agents.
+Configure Synology Chat credentials and allowed conversations in SteelEngine, then use the plugin to route messages between Synology Chat and SteelEngine agents.

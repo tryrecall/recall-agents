@@ -1,5 +1,5 @@
 import { consume } from "@lit/context";
-import type { SystemAgentChatParams, SystemAgentChatResult } from "@openclaw/gateway-protocol";
+import type { SystemAgentChatParams, SystemAgentChatResult } from "@steelengine/gateway-protocol";
 import { html, nothing, type PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
@@ -10,7 +10,7 @@ import { toSanitizedMarkdownHtml } from "../../components/markdown.ts";
 import { t } from "../../i18n/index.ts";
 import { isGatewayMethodAdvertised } from "../../lib/gateway-methods.ts";
 import { searchForSession } from "../../lib/sessions/navigation.ts";
-import { OpenClawLightDomElement } from "../../lit/openclaw-element.ts";
+import { SteelEngineLightDomElement } from "../../lit/steelengine-element.ts";
 import { SubscriptionsController } from "../../lit/subscriptions-controller.ts";
 import "../../styles/custodian.css";
 import { parseCustodianQuestion, type CustodianStructuredQuestion } from "./structured-question.ts";
@@ -40,7 +40,7 @@ function errorMessage(error: unknown): string {
     : t("custodian.requestFailed");
 }
 
-export class CustodianPage extends OpenClawLightDomElement {
+export class CustodianPage extends SteelEngineLightDomElement {
   @consume({ context: applicationContext, subscribe: true })
   private context!: ApplicationContext;
 
@@ -135,7 +135,7 @@ export class CustodianPage extends OpenClawLightDomElement {
     if (!client) {
       return;
     }
-    if (isGatewayMethodAdvertised(snapshot, "openclaw.chat") !== true) {
+    if (isGatewayMethodAdvertised(snapshot, "steelengine.chat") !== true) {
       this.error = t("custodian.unsupportedGateway");
       return;
     }
@@ -189,7 +189,7 @@ export class CustodianPage extends OpenClawLightDomElement {
     this.error = null;
     this.retryParams = params;
     try {
-      const result = await client.request<SystemAgentChatResult>("openclaw.chat", params, {
+      const result = await client.request<SystemAgentChatResult>("steelengine.chat", params, {
         timeoutMs: SYSTEM_AGENT_CHAT_TIMEOUT_MS,
       });
       if (epoch !== this.requestEpoch || client !== this.activeClient) {
@@ -341,7 +341,7 @@ export class CustodianPage extends OpenClawLightDomElement {
                     </div>`
                   : nothing}
                 ${showQuestion
-                  ? html`<openclaw-option-card
+                  ? html`<steelengine-option-card
                       .props=${{
                         header: message.question!.header,
                         question: message.question!.question,
@@ -358,7 +358,7 @@ export class CustodianPage extends OpenClawLightDomElement {
                         onSelect: (label: string) => this.answerQuestion(message, label),
                         onSkip: () => this.dismissQuestion(message),
                       }}
-                    ></openclaw-option-card>`
+                    ></steelengine-option-card>`
                   : nothing}
               </article>
             `;
@@ -421,12 +421,12 @@ export class CustodianPage extends OpenClawLightDomElement {
   }
 }
 
-if (!customElements.get("openclaw-custodian-page")) {
-  customElements.define("openclaw-custodian-page", CustodianPage);
+if (!customElements.get("steelengine-custodian-page")) {
+  customElements.define("steelengine-custodian-page", CustodianPage);
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    "openclaw-custodian-page": CustodianPage;
+    "steelengine-custodian-page": CustodianPage;
   }
 }

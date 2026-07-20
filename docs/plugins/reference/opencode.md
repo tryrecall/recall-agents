@@ -1,5 +1,5 @@
 ---
-summary: "Adds OpenCode model provider support to OpenClaw."
+summary: "Adds OpenCode model provider support to SteelEngine."
 read_when:
   - You are installing, configuring, or auditing the opencode plugin
 title: "OpenCode plugin"
@@ -7,22 +7,22 @@ title: "OpenCode plugin"
 
 # OpenCode plugin
 
-Adds OpenCode model provider support to OpenClaw.
+Adds OpenCode model provider support to SteelEngine.
 
 ## Distribution
 
-- Package: `@openclaw/opencode-provider`
-- Install route: included in OpenClaw
+- Package: `@steelengine/opencode-provider`
+- Install route: included in SteelEngine
 
 ## Surface
 
 providers: `opencode`; contracts: `mediaUnderstandingProviders`
 
-<!-- openclaw-plugin-reference:manual-start -->
+<!-- steelengine-plugin-reference:manual-start -->
 
 ## Native sessions
 
-OpenClaw auto-detects the `opencode` CLI on the Gateway and paired nodes. Stored
+SteelEngine auto-detects the `opencode` CLI on the Gateway and paired nodes. Stored
 sessions then appear in the **OpenCode** sessions-sidebar group, with read-only
 transcript browsing through the official `opencode --pure db ... --format json`
 and `opencode --pure export` commands. The restricted environment and `--pure`
@@ -32,7 +32,7 @@ Gateway credentials.
 Turn **OpenCode Session Catalog** off under **Config > Plugins > OpenCode** to
 disable discovery. It is enabled by default.
 
-<!-- openclaw-plugin-reference:manual-end -->
+<!-- steelengine-plugin-reference:manual-end -->
 
 ## Related docs
 

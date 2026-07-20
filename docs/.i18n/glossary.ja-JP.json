@@ -56,8 +56,8 @@
     "target": "オンボーディング"
   },
   {
-    "source": "OpenClaw",
-    "target": "OpenClaw"
+    "source": "SteelEngine",
+    "target": "SteelEngine"
   },
   {
     "source": "Pi",

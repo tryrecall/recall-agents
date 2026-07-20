@@ -22,26 +22,26 @@ function makeTempDir(prefix: string): string {
 }
 
 function makeLockRepoDir(): string {
-  const dir = makeTempDir("openclaw-pr-gates-lock-");
+  const dir = makeTempDir("steelengine-pr-gates-lock-");
   mkdirSync(join(dir, ".git"), { recursive: true });
   return dir;
 }
 
 function heavyCheckLockDir(repoDir: string): string {
-  return join(repoDir, ".git", "openclaw-local-checks", "heavy-check.lock");
+  return join(repoDir, ".git", "steelengine-local-checks", "heavy-check.lock");
 }
 
 function sanitizedEnv(overrides: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
   // check:changed and gate runs export these to children; drop ambient copies
   // so lock and mode behavior under test only sees explicit overrides.
   const env: NodeJS.ProcessEnv = { ...process.env };
-  delete env.OPENCLAW_PR_GATES_REMOTE;
-  delete env.OPENCLAW_TESTBOX;
-  delete env.OPENCLAW_TEST_HEAVY_CHECK_LOCK_HELD;
-  delete env.OPENCLAW_TSGO_HEAVY_CHECK_LOCK_HELD;
-  delete env.OPENCLAW_OXLINT_SKIP_LOCK;
-  delete env.OPENCLAW_HEAVY_CHECK_LOCK_TIMEOUT_MS;
-  delete env.OPENCLAW_HEAVY_CHECK_LOCK_POLL_MS;
+  delete env.STEELENGINE_PR_GATES_REMOTE;
+  delete env.STEELENGINE_TESTBOX;
+  delete env.STEELENGINE_TEST_HEAVY_CHECK_LOCK_HELD;
+  delete env.STEELENGINE_TSGO_HEAVY_CHECK_LOCK_HELD;
+  delete env.STEELENGINE_OXLINT_SKIP_LOCK;
+  delete env.STEELENGINE_HEAVY_CHECK_LOCK_TIMEOUT_MS;
+  delete env.STEELENGINE_HEAVY_CHECK_LOCK_POLL_MS;
   return { ...env, ...overrides };
 }
 
@@ -89,7 +89,7 @@ function spawnGateLockHolder(repoDir: string, statusFile: string, env: NodeJS.Pr
 }
 
 function makeRetryRepo(): { repoDir: string; stubBin: string; headSha: string } {
-  const dir = makeTempDir("openclaw-pr-gates-retry-");
+  const dir = makeTempDir("steelengine-pr-gates-retry-");
   const repoDir = join(dir, "repo");
   mkdirSync(repoDir);
   for (const args of [
@@ -129,7 +129,7 @@ function makeRetryRepo(): { repoDir: string; stubBin: string; headSha: string } 
 }
 
 function makeSyncRepo(options: { needsRebase: boolean }): string {
-  const repoDir = join(makeTempDir("openclaw-pr-sync-"), "repo");
+  const repoDir = join(makeTempDir("steelengine-pr-sync-"), "repo");
   mkdirSync(repoDir);
 
   const git = (...args: string[]) => {
@@ -259,10 +259,10 @@ describe("resolve_pr_gates_remote_mode", () => {
     { value: undefined, expected: "local" },
     { value: "", expected: "local" },
     { value: "testbox", expected: "testbox" },
-  ])("resolves OPENCLAW_PR_GATES_REMOTE=$value to $expected", ({ value, expected }) => {
+  ])("resolves STEELENGINE_PR_GATES_REMOTE=$value to $expected", ({ value, expected }) => {
     const env: NodeJS.ProcessEnv = {};
     if (value !== undefined) {
-      env.OPENCLAW_PR_GATES_REMOTE = value;
+      env.STEELENGINE_PR_GATES_REMOTE = value;
     }
     const result = runGatesBash("resolve_pr_gates_remote_mode", { env });
     expect(result.status).toBe(0);
@@ -271,18 +271,18 @@ describe("resolve_pr_gates_remote_mode", () => {
 
   it("rejects unsupported values", () => {
     const result = runGatesBash("resolve_pr_gates_remote_mode", {
-      env: { OPENCLAW_PR_GATES_REMOTE: "azure" },
+      env: { STEELENGINE_PR_GATES_REMOTE: "azure" },
     });
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("Unsupported OPENCLAW_PR_GATES_REMOTE=azure");
+    expect(result.stderr).toContain("Unsupported STEELENGINE_PR_GATES_REMOTE=azure");
   });
 
   it("rejects the hosted-gates conflict before touching the worktree", () => {
     const result = runGatesBash("prepare_gates 424242", {
-      env: { OPENCLAW_PR_GATES_REMOTE: "testbox", OPENCLAW_TESTBOX: "1" },
+      env: { STEELENGINE_PR_GATES_REMOTE: "testbox", STEELENGINE_TESTBOX: "1" },
     });
     expect(result.status).toBe(2);
-    expect(result.stdout).toContain("conflicts with OPENCLAW_TESTBOX=1");
+    expect(result.stdout).toContain("conflicts with STEELENGINE_TESTBOX=1");
   });
 });
 
@@ -332,7 +332,7 @@ describe("prepare gate changed-file plan", () => {
 
 describe("remote testbox gate delegation", () => {
   it("runs the full pnpm test through the worktree crabbox wrapper", () => {
-    const dir = makeTempDir("openclaw-pr-gates-remote-");
+    const dir = makeTempDir("steelengine-pr-gates-remote-");
     const stubBin = join(dir, "bin");
     mkdirSync(stubBin);
     writeFileSync(
@@ -364,7 +364,7 @@ describe("remote testbox gate delegation", () => {
     expect(argLine).toBe(
       "scripts/crabbox-wrapper.mjs run " +
         "--provider blacksmith-testbox " +
-        "--blacksmith-org openclaw " +
+        "--blacksmith-org steelengine " +
         "--blacksmith-workflow .github/workflows/ci-check-testbox.yml " +
         "--blacksmith-job check " +
         "--blacksmith-ref main " +
@@ -375,18 +375,18 @@ describe("remote testbox gate delegation", () => {
   });
 
   it("extracts the last successful blacksmith-testbox timing stamp", () => {
-    const dir = makeTempDir("openclaw-pr-gates-stamp-");
+    const dir = makeTempDir("steelengine-pr-gates-stamp-");
     const log = join(dir, "gates-test.log");
     writeFileSync(
       log,
       [
         "provider=blacksmith-testbox id=tbx_first sync=delegated auth=blacksmith",
-        "GitHub Actions run: https://github.com/openclaw/openclaw/actions/runs/1234",
+        "GitHub Actions run: https://github.com/steelengineai/recall-agents/actions/runs/1234",
         '{"not":"a stamp"}',
         "not json at all",
         '{"provider":"blacksmith-testbox","leaseId":"tbx_first","exitCode":1,"runStatus":"failed"}',
         '{"provider":"blacksmith-testbox","leaseId":"tbx_final","exitCode":0,"runStatus":"passed"}',
-        "GitHub Actions run: https://github.com/openclaw/openclaw/actions/runs/9999",
+        "GitHub Actions run: https://github.com/steelengineai/recall-agents/actions/runs/9999",
         "GitHub Actions run: https://github.com/example/other/actions/runs/8888",
         "",
       ].join("\n"),
@@ -397,12 +397,12 @@ describe("remote testbox gate delegation", () => {
     );
     expect(result.status).toBe(0);
     expect(result.stdout.trim()).toBe(
-      "tbx_final\thttps://github.com/openclaw/openclaw/actions/runs/1234",
+      "tbx_final\thttps://github.com/steelengineai/recall-agents/actions/runs/1234",
     );
   });
 
   it("fails when the gate log has no successful stamp", () => {
-    const dir = makeTempDir("openclaw-pr-gates-stamp-");
+    const dir = makeTempDir("steelengine-pr-gates-stamp-");
     const log = join(dir, "gates-test.log");
     writeFileSync(
       log,
@@ -433,7 +433,7 @@ describe("lease-retry gate stamp refresh", () => {
         cwd: repoDir,
         env: {
           PATH: `${stubBin}:${process.env.PATH ?? ""}`,
-          OPENCLAW_PR_GATES_REMOTE: "testbox",
+          STEELENGINE_PR_GATES_REMOTE: "testbox",
         },
       },
     );
@@ -498,7 +498,7 @@ describe("prepare sync-head transitions", () => {
         "test -e .local/published",
         "grep -F 'Preserved hosted PR ancestry' .local/prep.md",
       ].join("\n"),
-      { cwd: repoDir, env: { OPENCLAW_TESTBOX: "1" }, sourcePrepareCore: true },
+      { cwd: repoDir, env: { STEELENGINE_TESTBOX: "1" }, sourcePrepareCore: true },
     );
 
     expect(result.status, result.stderr).toBe(0);
@@ -696,7 +696,7 @@ describe("prepare gate stamp transitions", () => {
     }).stdout.trim();
     const result = runGatesBash(
       [
-        `gh() { if [ "$1" = pr ]; then printf '${currentHead}\\n'; else printf 'openclaw/openclaw\\n'; fi; }`,
+        `gh() { if [ "$1" = pr ]; then printf '${currentHead}\\n'; else printf 'steelengine/steelengine\\n'; fi; }`,
         "run_quiet_logged() { printf 'ARG:%s\\n' \"$@\"; }",
         `run_hosted_prepare_gates 100606 ${currentHead} false`,
       ].join("\n"),
@@ -790,7 +790,7 @@ describe("prepare gate stamp transitions", () => {
         "prepare_gates 4242",
         "cat .local/gates.env",
       ].join("\n"),
-      { cwd: repoDir, env: { OPENCLAW_TESTBOX: "1" } },
+      { cwd: repoDir, env: { STEELENGINE_TESTBOX: "1" } },
     );
 
     expect(result.status).toBe(0);
@@ -824,7 +824,7 @@ describe("pr-gates-lock helper", () => {
     expect(await waitFor(() => existsSync(firstStatus), 5_000)).toBe(true);
 
     const second = spawnGateLockHolder(repoDir, secondStatus, {
-      OPENCLAW_HEAVY_CHECK_LOCK_POLL_MS: "50",
+      STEELENGINE_HEAVY_CHECK_LOCK_POLL_MS: "50",
     });
     await waitForStderr(second, "queued behind the local heavy-check lock", 5_000);
     expect(existsSync(secondStatus)).toBe(false);
@@ -850,8 +850,8 @@ describe("pr-gates-lock helper", () => {
 
     const statusFile = join(repoDir, "status");
     const holder = spawnGateLockHolder(repoDir, statusFile, {
-      OPENCLAW_HEAVY_CHECK_LOCK_TIMEOUT_MS: "200",
-      OPENCLAW_HEAVY_CHECK_LOCK_POLL_MS: "50",
+      STEELENGINE_HEAVY_CHECK_LOCK_TIMEOUT_MS: "200",
+      STEELENGINE_HEAVY_CHECK_LOCK_POLL_MS: "50",
     });
     await waitForExit(holder);
 
@@ -901,11 +901,11 @@ describe("gates.sh gate lock plumbing", () => {
     const result = runGatesBash(
       [
         "acquire_pr_gates_lock",
-        'echo "held=${OPENCLAW_TEST_HEAVY_CHECK_LOCK_HELD:-unset},${OPENCLAW_TSGO_HEAVY_CHECK_LOCK_HELD:-unset},${OPENCLAW_OXLINT_SKIP_LOCK:-unset}"',
-        "jq -r .tool .git/openclaw-local-checks/heavy-check.lock/owner.json",
+        'echo "held=${STEELENGINE_TEST_HEAVY_CHECK_LOCK_HELD:-unset},${STEELENGINE_TSGO_HEAVY_CHECK_LOCK_HELD:-unset},${STEELENGINE_OXLINT_SKIP_LOCK:-unset}"',
+        "jq -r .tool .git/steelengine-local-checks/heavy-check.lock/owner.json",
         "release_pr_gates_lock",
-        'echo "released=${OPENCLAW_TEST_HEAVY_CHECK_LOCK_HELD:-unset}"',
-        '[ -d .git/openclaw-local-checks/heavy-check.lock ] && echo "lock=held" || echo "lock=free"',
+        'echo "released=${STEELENGINE_TEST_HEAVY_CHECK_LOCK_HELD:-unset}"',
+        '[ -d .git/steelengine-local-checks/heavy-check.lock ] && echo "lock=held" || echo "lock=free"',
       ].join("\n"),
       { cwd: repoDir },
     );
@@ -922,10 +922,10 @@ describe("gates.sh gate lock plumbing", () => {
     const result = runGatesBash(
       [
         "acquire_pr_gates_lock",
-        '[ -d .git/openclaw-local-checks/heavy-check.lock ] && echo "lock=held" || echo "lock=free"',
+        '[ -d .git/steelengine-local-checks/heavy-check.lock ] && echo "lock=held" || echo "lock=free"',
         'echo "helper_pid=${PR_GATES_LOCK_PID:-none}"',
       ].join("\n"),
-      { cwd: repoDir, env: { OPENCLAW_TEST_HEAVY_CHECK_LOCK_HELD: "1" } },
+      { cwd: repoDir, env: { STEELENGINE_TEST_HEAVY_CHECK_LOCK_HELD: "1" } },
     );
 
     expect(result.status).toBe(0);
@@ -945,8 +945,8 @@ describe("gates.sh gate lock plumbing", () => {
     const result = runGatesBash("acquire_pr_gates_lock", {
       cwd: repoDir,
       env: {
-        OPENCLAW_HEAVY_CHECK_LOCK_TIMEOUT_MS: "200",
-        OPENCLAW_HEAVY_CHECK_LOCK_POLL_MS: "50",
+        STEELENGINE_HEAVY_CHECK_LOCK_TIMEOUT_MS: "200",
+        STEELENGINE_HEAVY_CHECK_LOCK_POLL_MS: "50",
       },
     });
 

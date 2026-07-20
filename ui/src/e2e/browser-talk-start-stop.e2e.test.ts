@@ -13,7 +13,7 @@ import {
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
 
 let server: ControlUiE2eServer;
@@ -93,7 +93,7 @@ async function installTalkBrowserFixtures(page: Page) {
       configurable: true,
       value: MockAudioContext,
     });
-    Object.defineProperty(window, "openclawTalkE2eState", {
+    Object.defineProperty(window, "steelengineTalkE2eState", {
       configurable: true,
       value: state,
     });
@@ -223,9 +223,9 @@ describeControlUiE2e("Control UI browser Talk", () => {
             () =>
               (
                 window as Window & {
-                  openclawTalkE2eState?: { constraints: unknown[] };
+                  steelengineTalkE2eState?: { constraints: unknown[] };
                 }
-              ).openclawTalkE2eState?.constraints,
+              ).steelengineTalkE2eState?.constraints,
           ),
         )
         .toEqual([
@@ -292,7 +292,7 @@ describeControlUiE2e("Control UI browser Talk", () => {
       await page.evaluate(() => {
         const state = (
           window as Window & {
-            openclawTalkE2eState?: {
+            steelengineTalkE2eState?: {
               inputProcessor?: {
                 onaudioprocess?: (event: {
                   inputBuffer: { getChannelData: () => Float32Array };
@@ -301,7 +301,7 @@ describeControlUiE2e("Control UI browser Talk", () => {
               meterLevel?: number;
             };
           }
-        ).openclawTalkE2eState;
+        ).steelengineTalkE2eState;
         if (state) {
           state.meterLevel = 0.25;
         }
@@ -333,9 +333,9 @@ describeControlUiE2e("Control UI browser Talk", () => {
           page.evaluate(() => {
             const state = (
               window as Window & {
-                openclawTalkE2eState?: { audioContextsClosed: number; tracksStopped: number };
+                steelengineTalkE2eState?: { audioContextsClosed: number; tracksStopped: number };
               }
-            ).openclawTalkE2eState;
+            ).steelengineTalkE2eState;
             return state
               ? {
                   audioContextsClosed: state.audioContextsClosed,
@@ -393,7 +393,7 @@ describeControlUiE2e("Control UI browser Talk", () => {
       await page.evaluate(() => {
         const state = (
           window as Window & {
-            openclawTalkE2eState?: {
+            steelengineTalkE2eState?: {
               inputProcessor?: {
                 onaudioprocess?: (event: {
                   inputBuffer: { getChannelData: () => Float32Array };
@@ -402,7 +402,7 @@ describeControlUiE2e("Control UI browser Talk", () => {
               meterLevel?: number;
             };
           }
-        ).openclawTalkE2eState;
+        ).steelengineTalkE2eState;
         if (state) {
           state.meterLevel = 0.25;
         }
@@ -495,11 +495,11 @@ describeControlUiE2e("Control UI browser Talk", () => {
           const stream = await getUserMedia(constraints);
           (
             window as Window & {
-              openclawVideoTalkTracks?: MediaStreamTrack[];
+              steelengineVideoTalkTracks?: MediaStreamTrack[];
             }
-          ).openclawVideoTalkTracks = [
-            ...((window as Window & { openclawVideoTalkTracks?: MediaStreamTrack[] })
-              .openclawVideoTalkTracks ?? []),
+          ).steelengineVideoTalkTracks = [
+            ...((window as Window & { steelengineVideoTalkTracks?: MediaStreamTrack[] })
+              .steelengineVideoTalkTracks ?? []),
             ...stream.getTracks(),
           ];
           return stream;
@@ -528,9 +528,9 @@ describeControlUiE2e("Control UI browser Talk", () => {
           super();
           (
             window as Window & {
-              openclawVideoTalkE2e?: { peer: FakePeerConnection };
+              steelengineVideoTalkE2e?: { peer: FakePeerConnection };
             }
-          ).openclawVideoTalkE2e = { peer: this };
+          ).steelengineVideoTalkE2e = { peer: this };
         }
 
         addTrack() {}
@@ -594,9 +594,9 @@ describeControlUiE2e("Control UI browser Talk", () => {
       await page.evaluate(() => {
         const channel = (
           window as Window & {
-            openclawVideoTalkE2e?: { peer: { channel: EventTarget } };
+            steelengineVideoTalkE2e?: { peer: { channel: EventTarget } };
           }
-        ).openclawVideoTalkE2e?.peer.channel;
+        ).steelengineVideoTalkE2e?.peer.channel;
         channel?.dispatchEvent(new Event("open"));
       });
       await captureVideoTalkProof(page, "02-live-camera-preview.png");
@@ -604,9 +604,9 @@ describeControlUiE2e("Control UI browser Talk", () => {
       await page.evaluate(() => {
         const channel = (
           window as Window & {
-            openclawVideoTalkE2e?: { peer: { channel: EventTarget } };
+            steelengineVideoTalkE2e?: { peer: { channel: EventTarget } };
           }
-        ).openclawVideoTalkE2e?.peer.channel;
+        ).steelengineVideoTalkE2e?.peer.channel;
         channel?.dispatchEvent(
           new MessageEvent("message", {
             data: JSON.stringify({
@@ -624,9 +624,9 @@ describeControlUiE2e("Control UI browser Talk", () => {
           page.evaluate(() => {
             const sent = (
               window as Window & {
-                openclawVideoTalkE2e?: { peer: { channel: { sent: unknown[] } } };
+                steelengineVideoTalkE2e?: { peer: { channel: { sent: unknown[] } } };
               }
-            ).openclawVideoTalkE2e?.peer.channel.sent;
+            ).steelengineVideoTalkE2e?.peer.channel.sent;
             return {
               image: sent?.some(
                 (event) =>
@@ -657,9 +657,9 @@ describeControlUiE2e("Control UI browser Talk", () => {
       const trackStates = await page.evaluate(() =>
         (
           window as Window & {
-            openclawVideoTalkTracks?: MediaStreamTrack[];
+            steelengineVideoTalkTracks?: MediaStreamTrack[];
           }
-        ).openclawVideoTalkTracks?.map((track) => track.readyState),
+        ).steelengineVideoTalkTracks?.map((track) => track.readyState),
       );
       expect(trackStates).toHaveLength(2);
       expect(trackStates?.every((state) => state === "ended")).toBe(true);
@@ -725,11 +725,11 @@ describeControlUiE2e("Control UI browser Talk", () => {
           const stream = await getUserMedia(constraints);
           (
             window as Window & {
-              openclawGeminiVideoTalkTracks?: MediaStreamTrack[];
+              steelengineGeminiVideoTalkTracks?: MediaStreamTrack[];
             }
-          ).openclawGeminiVideoTalkTracks = [
-            ...((window as Window & { openclawGeminiVideoTalkTracks?: MediaStreamTrack[] })
-              .openclawGeminiVideoTalkTracks ?? []),
+          ).steelengineGeminiVideoTalkTracks = [
+            ...((window as Window & { steelengineGeminiVideoTalkTracks?: MediaStreamTrack[] })
+              .steelengineGeminiVideoTalkTracks ?? []),
             ...stream.getTracks(),
           ];
           return stream;
@@ -797,9 +797,9 @@ describeControlUiE2e("Control UI browser Talk", () => {
       const trackStates = await page.evaluate(() =>
         (
           window as Window & {
-            openclawGeminiVideoTalkTracks?: MediaStreamTrack[];
+            steelengineGeminiVideoTalkTracks?: MediaStreamTrack[];
           }
-        ).openclawGeminiVideoTalkTracks?.map((track) => track.readyState),
+        ).steelengineGeminiVideoTalkTracks?.map((track) => track.readyState),
       );
       expect(trackStates).toHaveLength(2);
       expect(trackStates?.every((state) => state === "ended")).toBe(true);
@@ -888,9 +888,9 @@ describeControlUiE2e("Control UI browser Talk", () => {
             () =>
               (
                 window as Window & {
-                  openclawTalkE2eState?: { constraints: unknown[] };
+                  steelengineTalkE2eState?: { constraints: unknown[] };
                 }
-              ).openclawTalkE2eState?.constraints.length,
+              ).steelengineTalkE2eState?.constraints.length,
           ),
         )
         .toBe(1);

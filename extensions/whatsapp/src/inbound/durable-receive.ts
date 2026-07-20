@@ -7,7 +7,7 @@ import {
   DEFAULT_INGRESS_RETRY_MAX_ATTEMPTS,
   type ChannelIngressDrain,
   type ChannelIngressQueue,
-} from "openclaw/plugin-sdk/channel-outbound";
+} from "steelengine/plugin-sdk/channel-outbound";
 import { getWhatsAppRuntime } from "../runtime.js";
 import {
   deserializeWhatsAppDurableInboundMessage,

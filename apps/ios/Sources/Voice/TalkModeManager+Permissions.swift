@@ -1,6 +1,6 @@
 import AVFAudio
 import Foundation
-import OpenClawKit
+import SteelEngineKit
 import Speech
 
 extension TalkModeManager {

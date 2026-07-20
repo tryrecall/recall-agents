@@ -1,15 +1,15 @@
 import {
   isDefaultAgentRuntimeId,
-  OPENCLAW_AGENT_RUNTIME_ID,
+  STEELENGINE_AGENT_RUNTIME_ID,
 } from "../../agents/agent-runtime-id.js";
 import { resolveSessionModelRef } from "../../agents/session-model-ref.js";
 import { resolvePersistedSessionRuntimeId } from "../../agents/session-runtime-compat.js";
 import { resolveEffectiveAgentRuntime } from "../../agents/thinking-runtime.js";
 import type { SessionEntry } from "../../config/sessions.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 
 export function resolveWorkerPlacementSessionRuntime(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   entry: SessionEntry;
   agentId: string;
   sessionKey: string;
@@ -29,5 +29,5 @@ export function resolveWorkerPlacementSessionRuntime(params: {
 }
 
 export function isWorkerPlacementSessionRuntimeSupported(runtime: string): boolean {
-  return runtime === OPENCLAW_AGENT_RUNTIME_ID;
+  return runtime === STEELENGINE_AGENT_RUNTIME_ID;
 }

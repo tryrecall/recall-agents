@@ -1,18 +1,18 @@
 /**
  * Canvas plugin config parsing, enablement, and schema metadata.
  */
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   normalizePluginsConfig,
   resolveEffectiveEnableState,
   resolvePluginConfigObject,
-} from "openclaw/plugin-sdk/plugin-config-runtime";
-import { isTruthyEnvValue } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/plugin-config-runtime";
+import { isTruthyEnvValue } from "steelengine/plugin-sdk/runtime-env";
 import {
   asBoolean as readBoolean,
   isRecord,
   readStringValue as readString,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 
 /** Host-server configuration for Canvas and A2UI assets. */
 export type CanvasHostConfig = {
@@ -62,7 +62,7 @@ export function parseCanvasPluginConfig(value: unknown): CanvasPluginConfig {
 }
 
 /** Returns whether the bundled Canvas plugin is effectively enabled. */
-export function isCanvasPluginEnabled(config?: OpenClawConfig): boolean {
+export function isCanvasPluginEnabled(config?: SteelEngineConfig): boolean {
   if (!config) {
     return true;
   }
@@ -77,7 +77,7 @@ export function isCanvasPluginEnabled(config?: OpenClawConfig): boolean {
 
 /** Resolves Canvas host config from plugin config or root config. */
 export function resolveCanvasHostConfig(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   pluginConfig?: Record<string, unknown>;
 }): CanvasHostConfig {
   const pluginConfig =
@@ -87,8 +87,8 @@ export function resolveCanvasHostConfig(params: {
 }
 
 /** Returns whether the Canvas hosted route/server surface should be active. */
-export function isCanvasHostEnabled(config?: OpenClawConfig): boolean {
-  if (isTruthyEnvValue(process.env.OPENCLAW_SKIP_CANVAS_HOST)) {
+export function isCanvasHostEnabled(config?: SteelEngineConfig): boolean {
+  if (isTruthyEnvValue(process.env.STEELENGINE_SKIP_CANVAS_HOST)) {
     return false;
   }
   if (!isCanvasPluginEnabled(config)) {
@@ -112,7 +112,7 @@ export const canvasConfigSchema: CanvasPluginConfigSchema = {
     },
     "host.root": {
       label: "Canvas Host Root Directory",
-      help: "Directory to serve. Defaults to the OpenClaw state canvas directory.",
+      help: "Directory to serve. Defaults to the SteelEngine state canvas directory.",
       advanced: true,
     },
     "host.port": {

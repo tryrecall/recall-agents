@@ -2,13 +2,13 @@
 export type {
   DiagnosticEventMetadata,
   DiagnosticEventPayload,
-} from "openclaw/plugin-sdk/diagnostic-runtime";
-export { isInternalDiagnosticEventMetadata } from "openclaw/plugin-sdk/diagnostic-runtime";
+} from "steelengine/plugin-sdk/diagnostic-runtime";
+export { isInternalDiagnosticEventMetadata } from "steelengine/plugin-sdk/diagnostic-runtime";
 export {
   emptyPluginConfigSchema,
-  type OpenClawPluginApi,
-  type OpenClawPluginHttpRouteHandler,
-  type OpenClawPluginService,
-  type OpenClawPluginServiceContext,
-} from "openclaw/plugin-sdk/plugin-entry";
-export { redactSensitiveText } from "openclaw/plugin-sdk/security-runtime";
+  type SteelEnginePluginApi,
+  type SteelEnginePluginHttpRouteHandler,
+  type SteelEnginePluginService,
+  type SteelEnginePluginServiceContext,
+} from "steelengine/plugin-sdk/plugin-entry";
+export { redactSensitiveText } from "steelengine/plugin-sdk/security-runtime";

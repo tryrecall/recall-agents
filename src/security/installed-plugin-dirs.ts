@@ -1,9 +1,9 @@
 // Resolves installed plugin directories for security trust audits.
 import fs from "node:fs/promises";
 import path from "node:path";
-import { normalizeOptionalLowercaseString } from "@openclaw/normalization-core/string-coerce";
+import { normalizeOptionalLowercaseString } from "@steelengine/normalization-core/string-coerce";
 
-const IGNORED_INSTALLED_PLUGIN_DIR_NAMES = new Set(["node_modules", ".openclaw-install-backups"]);
+const IGNORED_INSTALLED_PLUGIN_DIR_NAMES = new Set(["node_modules", ".steelengine-install-backups"]);
 
 /**
  * Decide whether an installed-plugin directory should be skipped by security audits.

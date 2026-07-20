@@ -1,4 +1,4 @@
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -117,7 +117,7 @@ describe("MCP App gateway bridge", () => {
     mocks.restoreMcpAppView.mockReset().mockResolvedValue(undefined);
     mocks.createMcpAppStandaloneTicket.mockReset().mockReturnValue({
       ticket: "ticket",
-      url: "/__openclaw__/mcp-app#ticket",
+      url: "/__steelengine__/mcp-app#ticket",
       expiresAtMs: 1_800_000_120_000,
     });
   });
@@ -135,7 +135,7 @@ describe("MCP App gateway bridge", () => {
         sandboxOrigin: "https://apps.example.com",
         html: "<html>demo</html>",
         toolInput: { city: "Paris" },
-        standaloneUrl: "/__openclaw__/mcp-app#ticket",
+        standaloneUrl: "/__steelengine__/mcp-app#ticket",
         standaloneExpiresAtMs: 1_800_000_120_000,
         messageSupported: true,
       }),

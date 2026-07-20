@@ -1,6 +1,6 @@
 {
-  "name": "OpenClaw Control",
-  "short_name": "OpenClaw",
+  "name": "SteelEngine Control",
+  "short_name": "SteelEngine",
   "description": "Multi-channel AI gateway control panel",
   "start_url": "./",
   "display": "standalone",

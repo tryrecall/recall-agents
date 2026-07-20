@@ -1,24 +1,24 @@
 ---
-summary: "CLI reference for `openclaw daemon` (legacy alias for gateway service management)"
+summary: "CLI reference for `steelengine daemon` (legacy alias for gateway service management)"
 read_when:
-  - You still use `openclaw daemon ...` in scripts
+  - You still use `steelengine daemon ...` in scripts
   - You need service lifecycle commands (install/start/stop/restart/status)
 title: "Daemon"
 ---
 
-# `openclaw daemon`
+# `steelengine daemon`
 
-Legacy alias for Gateway service management. `openclaw daemon ...` maps to the same service-control commands as `openclaw gateway ...`. Prefer [`openclaw gateway`](/cli/gateway) for current docs and examples.
+Legacy alias for Gateway service management. `steelengine daemon ...` maps to the same service-control commands as `steelengine gateway ...`. Prefer [`steelengine gateway`](/cli/gateway) for current docs and examples.
 
 ## Usage
 
 ```bash
-openclaw daemon status
-openclaw daemon install
-openclaw daemon start
-openclaw daemon stop
-openclaw daemon restart
-openclaw daemon uninstall
+steelengine daemon status
+steelengine daemon install
+steelengine daemon start
+steelengine daemon stop
+steelengine daemon restart
+steelengine daemon uninstall
 ```
 
 ## Subcommands and options

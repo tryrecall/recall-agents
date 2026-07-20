@@ -4,10 +4,10 @@
  * Manages live capture, manual import, summarization, and process-local transcript sessions.
  */
 import path from "node:path";
-import { uniqueStrings } from "@openclaw/normalization-core/string-normalization";
+import { uniqueStrings } from "@steelengine/normalization-core/string-normalization";
 import { Type } from "typebox";
 import { resolveStateDir } from "../../config/paths.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import {
   type ResolvedTranscriptsAutoStartConfig,
   resolveTranscriptsConfig,
@@ -296,7 +296,7 @@ async function statusTranscripts(ctx: TranscriptsRuntimeContext) {
 
 /** Create the agent-facing transcripts tool. */
 export function createTranscriptsTool(options?: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   stateDir?: string;
   logger?: TranscriptsLogger;
 }): AnyAgentTool {

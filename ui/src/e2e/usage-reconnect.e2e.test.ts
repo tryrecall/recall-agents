@@ -15,9 +15,9 @@ import {
 
 const chromiumExecutablePath = resolvePlaywrightChromiumExecutablePath(chromium.executablePath());
 const chromiumAvailable = canRunPlaywrightChromium(chromiumExecutablePath);
-const allowMissingChromium = process.env.OPENCLAW_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
+const allowMissingChromium = process.env.STEELENGINE_UI_E2E_ALLOW_MISSING_CHROMIUM === "1";
 const describeControlUiE2e = chromiumAvailable || !allowMissingChromium ? describe : describe.skip;
-const proofDir = process.env.OPENCLAW_UI_E2E_ARTIFACT_DIR?.trim();
+const proofDir = process.env.STEELENGINE_UI_E2E_ARTIFACT_DIR?.trim();
 
 let browser: Browser;
 let server: ControlUiE2eServer;
@@ -136,9 +136,9 @@ async function proxyReconnect(
   expectedSocketCount: number,
 ): Promise<void> {
   await gateway.closeLatest(1001, "proxy idle timeout");
-  await page.locator("openclaw-connection-banner").waitFor({ state: "visible" });
+  await page.locator("steelengine-connection-banner").waitFor({ state: "visible" });
   await expect.poll(() => gateway.getSocketCount(), { timeout: 10_000 }).toBe(expectedSocketCount);
-  await page.locator("openclaw-connection-banner").waitFor({ state: "hidden" });
+  await page.locator("steelengine-connection-banner").waitFor({ state: "hidden" });
 }
 
 async function captureProof(page: Page, name: string): Promise<void> {

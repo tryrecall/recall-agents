@@ -1,5 +1,5 @@
 // Google Meet plugin module implements chrome behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
 import {
   createLocalMeetingRealtimeAudioTransport,
   createNodeMeetingRealtimeAudioTransport,
@@ -14,12 +14,12 @@ import {
   type MeetingRealtimeAudioEngineHandle,
   type MeetingRealtimeToolCallParams,
   type MeetingRuntimePlatform,
-} from "openclaw/plugin-sdk/meeting-runtime";
-import { addTimerTimeoutGraceMs } from "openclaw/plugin-sdk/number-runtime";
-import type { PluginRuntime } from "openclaw/plugin-sdk/plugin-runtime";
-import type { RuntimeLogger } from "openclaw/plugin-sdk/plugin-runtime";
+} from "steelengine/plugin-sdk/meeting-runtime";
+import { addTimerTimeoutGraceMs } from "steelengine/plugin-sdk/number-runtime";
+import type { PluginRuntime } from "steelengine/plugin-sdk/plugin-runtime";
+import type { RuntimeLogger } from "steelengine/plugin-sdk/plugin-runtime";
 import {
-  consultOpenClawAgentForGoogleMeet,
+  consultSteelEngineAgentForGoogleMeet,
   handleGoogleMeetRealtimeConsultToolCall,
   resolveGoogleMeetRealtimeTools,
 } from "../agent-consult.js";
@@ -63,14 +63,14 @@ type ChromeNodeRealtimeAudioBridgeHandle = MeetingRealtimeAudioEngineHandle & {
 
 function createGoogleMeetRealtimeEngineBindings(params: {
   config: GoogleMeetConfig;
-  fullConfig: OpenClawConfig;
+  fullConfig: SteelEngineConfig;
   runtime: PluginRuntime;
   logger: RuntimeLogger;
 }) {
   return {
     platform: GOOGLE_MEET_RUNTIME_PLATFORM,
     consultAgent: (consult: MeetingAgentConsultParams) =>
-      consultOpenClawAgentForGoogleMeet({
+      consultSteelEngineAgentForGoogleMeet({
         config: params.config,
         fullConfig: params.fullConfig,
         runtime: params.runtime,
@@ -111,7 +111,7 @@ export async function assertBlackHole2chAvailable(params: {
     throw new Error(
       [
         "BlackHole 2ch audio device not found.",
-        "Install BlackHole 2ch and route Chrome input/output through the OpenClaw audio bridge.",
+        "Install BlackHole 2ch and route Chrome input/output through the SteelEngine audio bridge.",
         hint,
       ]
         .filter(Boolean)
@@ -123,7 +123,7 @@ export async function assertBlackHole2chAvailable(params: {
 export async function launchChromeMeet(params: {
   runtime: PluginRuntime;
   config: GoogleMeetConfig;
-  fullConfig: OpenClawConfig;
+  fullConfig: SteelEngineConfig;
   meetingSessionId: string;
   requesterSessionKey?: string;
   mode: GoogleMeetMode;
@@ -170,7 +170,7 @@ export async function launchChromeMeet(params: {
     if (params.config.chrome.audioBridgeCommand) {
       if (params.mode === "agent") {
         throw new Error(
-          "Chrome agent mode requires chrome.audioInputCommand and chrome.audioOutputCommand so OpenClaw can run STT and regular TTS directly.",
+          "Chrome agent mode requires chrome.audioInputCommand and chrome.audioOutputCommand so SteelEngine can run STT and regular TTS directly.",
         );
       }
       const bridge = await params.runtime.system.runCommandWithTimeout(
@@ -493,7 +493,7 @@ export async function recoverCurrentMeetTabOnNode(params: {
 export async function launchChromeMeetOnNode(params: {
   runtime: PluginRuntime;
   config: GoogleMeetConfig;
-  fullConfig: OpenClawConfig;
+  fullConfig: SteelEngineConfig;
   meetingSessionId: string;
   requesterSessionKey?: string;
   mode: GoogleMeetMode;

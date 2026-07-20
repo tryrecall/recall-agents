@@ -1,9 +1,9 @@
 /** Tests node-host MCP startup, descriptors, calls, and failure isolation. */
 
 import { ErrorCode, type CallToolResult, type Tool } from "@modelcontextprotocol/sdk/types.js";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { describe, expect, it, vi } from "vitest";
-import { OpenClawSchema } from "../config/zod-schema.js";
+import { SteelEngineSchema } from "../config/zod-schema.js";
 import { startNodeHostMcpManager } from "./mcp.js";
 
 function tool(name: string, description?: string): Tool {
@@ -99,7 +99,7 @@ describe("node host MCP manager", () => {
   });
 
   it("parses nodeHost.mcp config, isolates failures, filters tools, and shuts down", async () => {
-    const parsed = OpenClawSchema.parse({
+    const parsed = SteelEngineSchema.parse({
       nodeHost: {
         mcp: {
           servers: {

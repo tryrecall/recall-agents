@@ -1,8 +1,8 @@
 // Memory Wiki plugin module implements gateway behavior.
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
-import { resolveDefaultAgentId } from "openclaw/plugin-sdk/memory-host-core";
-import { readPositiveIntegerParam } from "openclaw/plugin-sdk/param-readers";
-import type { OpenClawConfig, OpenClawPluginApi } from "../api.js";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
+import { resolveDefaultAgentId } from "steelengine/plugin-sdk/memory-host-core";
+import { readPositiveIntegerParam } from "steelengine/plugin-sdk/param-readers";
+import type { SteelEngineConfig, SteelEnginePluginApi } from "../api.js";
 import { applyMemoryWikiMutation, normalizeMemoryWikiMutationInput } from "./apply.js";
 import { compileMemoryWikiVault } from "./compile.js";
 import {
@@ -33,7 +33,7 @@ const WRITE_SCOPE = "operator.write" as const;
 const ADMIN_SCOPE = "operator.admin" as const;
 const LOCAL_FILE_INGEST_SCOPE = ADMIN_SCOPE;
 type GatewayMethodContext = Parameters<
-  Parameters<OpenClawPluginApi["registerGatewayMethod"]>[1]
+  Parameters<SteelEnginePluginApi["registerGatewayMethod"]>[1]
 >[0];
 type GatewayRespond = GatewayMethodContext["respond"];
 
@@ -80,17 +80,17 @@ function respondError(respond: GatewayRespond, error: unknown) {
 
 async function syncImportedSourcesIfNeeded(
   config: ResolvedMemoryWikiConfig,
-  appConfig?: OpenClawConfig,
+  appConfig?: SteelEngineConfig,
 ) {
   await syncMemoryWikiImportedSources({ config, appConfig });
 }
 
 export function registerMemoryWikiGatewayMethods(params: {
-  api: OpenClawPluginApi;
+  api: SteelEnginePluginApi;
   config: ResolvedMemoryWikiConfig;
-  appConfig?: OpenClawConfig;
-  getAppConfig?: () => OpenClawConfig | undefined;
-  resolveConfig?: (agentId?: string, appConfig?: OpenClawConfig) => ResolvedMemoryWikiConfig;
+  appConfig?: SteelEngineConfig;
+  getAppConfig?: () => SteelEngineConfig | undefined;
+  resolveConfig?: (agentId?: string, appConfig?: SteelEngineConfig) => ResolvedMemoryWikiConfig;
 }) {
   const { api, config: baseConfig } = params;
 
@@ -99,7 +99,7 @@ export function registerMemoryWikiGatewayMethods(params: {
       return params.getAppConfig();
     }
     if (typeof api.runtime.config?.current === "function") {
-      return api.runtime.config.current() as OpenClawConfig;
+      return api.runtime.config.current() as SteelEngineConfig;
     }
     return params.appConfig;
   };

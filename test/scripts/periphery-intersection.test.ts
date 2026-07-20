@@ -10,7 +10,7 @@ import {
   validateFindings,
 } from "../../scripts/periphery-intersection.mjs";
 
-const WORKFLOW_PATH = ".github/workflows/shared-openclawkit-periphery.yml";
+const WORKFLOW_PATH = ".github/workflows/shared-steelenginekit-periphery.yml";
 
 type WorkflowStep = {
   id?: string;
@@ -33,9 +33,9 @@ type Workflow = {
 
 function finding(overrides: Record<string, unknown> = {}) {
   return {
-    ids: ["s:11OpenClawKit7ExampleV"],
+    ids: ["s:11SteelEngineKit7ExampleV"],
     kind: "struct",
-    location: "../shared/OpenClawKit/Sources/OpenClawKit/Example.swift:12:8",
+    location: "../shared/SteelEngineKit/Sources/SteelEngineKit/Example.swift:12:8",
     name: "Example",
     ...overrides,
   };
@@ -43,20 +43,20 @@ function finding(overrides: Record<string, unknown> = {}) {
 
 describe("Periphery intersection", () => {
   it("matches exact Swift USRs instead of declaration names", () => {
-    const sameNameDifferentUsr = finding({ ids: ["s:11OpenClawKit7ExampleV_other"] });
+    const sameNameDifferentUsr = finding({ ids: ["s:11SteelEngineKit7ExampleV_other"] });
     expect(intersectFindings([finding()], [sameNameDifferentUsr])).toEqual([]);
     expect(intersectFindings([finding()], [finding()])).toEqual([finding()]);
   });
 
   it("matches any USR emitted for a declaration compiled into multiple iOS modules", () => {
-    const ios = finding({ ids: ["s:16OpenClawWatchApp7ExampleV", "s:11OpenClawKit7ExampleV"] });
+    const ios = finding({ ids: ["s:16SteelEngineWatchApp7ExampleV", "s:11SteelEngineKit7ExampleV"] });
     expect(intersectFindings([ios], [finding()])).toEqual([ios]);
   });
 
   it("sorts findings deterministically", () => {
     const later = finding({
-      ids: ["s:11OpenClawKit5LaterV"],
-      location: "../shared/OpenClawKit/Sources/OpenClawKit/Later.swift:2:1",
+      ids: ["s:11SteelEngineKit5LaterV"],
+      location: "../shared/SteelEngineKit/Sources/SteelEngineKit/Later.swift:2:1",
       name: "Later",
     });
     expect(intersectFindings([later, finding()], [finding(), later])).toEqual([finding(), later]);
@@ -68,20 +68,20 @@ describe("Periphery intersection", () => {
     );
   });
 
-  it("rejects findings outside shared OpenClawKit", () => {
+  it("rejects findings outside shared SteelEngineKit", () => {
     expect(() =>
       validateFindings([finding({ location: "Sources/App.swift:1:1" })], "macOS"),
-    ).toThrow("macOS finding 0 is outside shared OpenClawKit sources");
+    ).toThrow("macOS finding 0 is outside shared SteelEngineKit sources");
   });
 
   it("maps relative scan locations to repository annotations", () => {
     expect(parseRepoLocation(finding().location)).toEqual({
       column: "8",
-      file: "apps/shared/OpenClawKit/Sources/OpenClawKit/Example.swift",
+      file: "apps/shared/SteelEngineKit/Sources/SteelEngineKit/Example.swift",
       line: "12",
     });
     expect(formatAnnotation(finding())).toBe(
-      "::error file=apps/shared/OpenClawKit/Sources/OpenClawKit/Example.swift,line=12,col=8,title=Dead shared Swift code::struct Example",
+      "::error file=apps/shared/SteelEngineKit/Sources/SteelEngineKit/Example.swift,line=12,col=8,title=Dead shared Swift code::struct Example",
     );
   });
 
@@ -91,7 +91,7 @@ describe("Periphery intersection", () => {
   });
 });
 
-describe("shared OpenClawKit Periphery workflow", () => {
+describe("shared SteelEngineKit Periphery workflow", () => {
   const workflow = parse(readFileSync(WORKFLOW_PATH, "utf8")) as Workflow;
 
   it("runs two consumer scans and a same-run intersection", () => {
@@ -114,9 +114,9 @@ describe("shared OpenClawKit Periphery workflow", () => {
   it("retains the generated protocol contract and leaves findings for the intersection", () => {
     for (const jobName of ["scan-ios", "scan-macos"]) {
       const scan = workflow.jobs?.[jobName]?.steps?.find((step) => step.name === "Scan shared kit");
-      expect(scan?.run).toContain("--report-include '../shared/OpenClawKit/Sources/**'");
+      expect(scan?.run).toContain("--report-include '../shared/SteelEngineKit/Sources/**'");
       expect(scan?.run).toContain(
-        "--retain-files '../shared/OpenClawKit/Sources/OpenClawProtocol/GatewayModels.swift'",
+        "--retain-files '../shared/SteelEngineKit/Sources/SteelEngineProtocol/GatewayModels.swift'",
       );
       expect(scan?.run).not.toContain("--strict");
     }
@@ -137,8 +137,8 @@ describe("shared OpenClawKit Periphery workflow", () => {
 
     for (const filename of [
       "apps/ios/Sources/App.swift",
-      "apps/macos/Sources/OpenClaw/App.swift",
-      "apps/shared/OpenClawKit/Sources/OpenClawKit/Example.swift",
+      "apps/macos/Sources/SteelEngine/App.swift",
+      "apps/shared/SteelEngineKit/Sources/SteelEngineKit/Example.swift",
       WORKFLOW_PATH,
     ]) {
       const outputs = new Map<string, string>();

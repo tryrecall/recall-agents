@@ -3,12 +3,12 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import JSZip from "jszip";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { createSolidPngBuffer } from "../../test/helpers/image-fixtures.js";
 import { resolveStateDir } from "../config/paths.js";
-import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
+import { resolvePreferredSteelEngineTmpDir } from "../infra/tmp-steelengine-dir.js";
 import { createEmptyPluginRegistry } from "../plugins/registry-empty.js";
 import { resetPluginRuntimeStateForTest, setActivePluginRegistry } from "../plugins/runtime.js";
 import { withEnvAsync } from "../test-utils/env.js";
@@ -24,7 +24,7 @@ let resolveImageCompressionGrid: typeof import("./web-media.js").resolveImageCom
 
 const TINY_PNG_BUFFER = createSolidPngBuffer(1, 1, { r: 255, g: 255, b: 255 });
 const TINY_PNG_BASE64 = TINY_PNG_BUFFER.toString("base64");
-const CANVAS_HOST_PATH = "/__openclaw__/canvas";
+const CANVAS_HOST_PATH = "/__steelengine__/canvas";
 
 let fixtureRoot = "";
 let tinyPngFile = "";
@@ -57,7 +57,7 @@ beforeAll(async () => {
     optimizeImageToJpeg,
     resolveImageCompressionGrid,
   } = await import("./web-media.js"));
-  fixtureRoot = await fs.mkdtemp(path.join(resolvePreferredOpenClawTmpDir(), "web-media-core-"));
+  fixtureRoot = await fs.mkdtemp(path.join(resolvePreferredSteelEngineTmpDir(), "web-media-core-"));
   tinyPngFile = path.join(fixtureRoot, "tiny.png");
   await fs.writeFile(tinyPngFile, Buffer.from(TINY_PNG_BASE64, "base64"));
   workspaceDir = path.join(fixtureRoot, "workspace");
@@ -612,7 +612,7 @@ describe("loadWebMedia", () => {
   });
 
   it("resolves home-relative local media paths through allowed local roots", async () => {
-    await withEnvAsync({ OPENCLAW_HOME: fixtureRoot }, async () => {
+    await withEnvAsync({ STEELENGINE_HOME: fixtureRoot }, async () => {
       const result = await loadWebMedia("~/workspace/chart.png", {
         maxBytes: 1024 * 1024,
         localRoots: [workspaceDir],
@@ -690,7 +690,7 @@ describe("loadWebMedia", () => {
     expect(result.contentType).toBe("text/markdown");
   });
 
-  it("allows trusted generated host-read HTML reports under OpenClaw temp root", async () => {
+  it("allows trusted generated host-read HTML reports under SteelEngine temp root", async () => {
     const htmlFile = path.join(fixtureRoot, "report.html");
     await fs.writeFile(htmlFile, "<!doctype html><title>Report</title><h1>Report</h1>\n", "utf8");
     const result = await loadWebMedia(htmlFile, {
@@ -703,7 +703,7 @@ describe("loadWebMedia", () => {
     expect(result.contentType).toBe("text/html");
   });
 
-  it("rejects host-read HTML files outside the trusted OpenClaw temp root", async () => {
+  it("rejects host-read HTML files outside the trusted SteelEngine temp root", async () => {
     const outsideRoot = await fs.mkdtemp(path.join(os.tmpdir(), "web-media-host-html-"));
     const htmlFile = path.join(outsideRoot, "report.html");
     await fs.writeFile(htmlFile, "<!doctype html><title>Report</title><h1>Report</h1>\n", "utf8");
@@ -722,7 +722,7 @@ describe("loadWebMedia", () => {
     }
   });
 
-  it("rejects trusted host-read HTML symlinks that resolve outside OpenClaw temp root", async () => {
+  it("rejects trusted host-read HTML symlinks that resolve outside SteelEngine temp root", async () => {
     const outsideRoot = await fs.mkdtemp(path.join(os.tmpdir(), "web-media-host-html-"));
     const outsideHtml = path.join(outsideRoot, "report.html");
     const htmlLink = path.join(fixtureRoot, "linked-report.html");
@@ -756,9 +756,9 @@ describe("loadWebMedia", () => {
     }
   });
 
-  it("rejects trusted host-read HTML hardlinks to files outside OpenClaw temp root", async () => {
+  it("rejects trusted host-read HTML hardlinks to files outside SteelEngine temp root", async () => {
     const outsideRoot = await fs.mkdtemp(
-      path.join(path.dirname(resolvePreferredOpenClawTmpDir()), "web-media-host-html-"),
+      path.join(path.dirname(resolvePreferredSteelEngineTmpDir()), "web-media-host-html-"),
     );
     const outsideHtml = path.join(outsideRoot, "report.html");
     const htmlLink = path.join(fixtureRoot, "hardlinked-report.html");

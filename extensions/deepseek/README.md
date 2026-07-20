@@ -1,12 +1,12 @@
-# OpenClaw DeepSeek Provider
+# SteelEngine DeepSeek Provider
 
-Official OpenClaw provider plugin for DeepSeek.
+Official SteelEngine provider plugin for DeepSeek.
 
-Install from OpenClaw:
+Install from SteelEngine:
 
 ```bash
-openclaw plugins install @openclaw/deepseek-provider
-openclaw gateway restart
+steelengine plugins install @steelengine/deepseek-provider
+steelengine gateway restart
 ```
 
-See <https://docs.openclaw.ai/providers/deepseek> for setup and configuration.
+See <https://docs.steelengine.ai/providers/deepseek> for setup and configuration.

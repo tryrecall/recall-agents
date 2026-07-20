@@ -11,7 +11,7 @@ import type { TlsOptions } from "node:tls";
 import type { WebSocketServer } from "ws";
 import { resolveBundledChannelGatewayAuthBypassPaths } from "../channels/plugins/gateway-auth-bypass.js";
 import { getRuntimeConfig } from "../config/io.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   createDiagnosticTraceContext,
   runWithDiagnosticTraceContext,
@@ -114,6 +114,8 @@ const getSessionHistoryHttpModule = createLazyRuntimeModule(
   () => import("./sessions-history-http.js"),
 );
 
+const getSessionSendHttpModule = createLazyRuntimeModule(() => import("./sessions-send-http.js"));
+
 const getSessionKillHttpModule = createLazyRuntimeModule(() => import("./session-kill-http.js"));
 
 const getToolsInvokeHttpModule = createLazyRuntimeModule(() => import("./tools-invoke-http.js"));
@@ -143,12 +145,12 @@ function isControlUiCatalogIconRequest(pathname: string, basePath: string): bool
   );
 }
 const pluginGatewayAuthBypassPathsCache = new WeakMap<
-  OpenClawConfig,
+  SteelEngineConfig,
   Promise<ReadonlySet<string>>
 >();
 
 async function resolvePluginGatewayAuthBypassPaths(
-  configSnapshot: OpenClawConfig,
+  configSnapshot: SteelEngineConfig,
 ): Promise<Set<string>> {
   const paths = new Set<string>();
   const configuredChannels = configSnapshot.channels;
@@ -167,7 +169,7 @@ async function resolvePluginGatewayAuthBypassPaths(
 }
 
 function getCachedPluginGatewayAuthBypassPaths(
-  configSnapshot: OpenClawConfig,
+  configSnapshot: SteelEngineConfig,
 ): Promise<ReadonlySet<string>> {
   const cached = pluginGatewayAuthBypassPathsCache.get(configSnapshot);
   if (cached) {
@@ -186,7 +188,7 @@ function isOpenAiModelsPath(pathname: string): boolean {
 }
 
 function isMcpAppStandalonePath(pathname: string): boolean {
-  return pathname === "/__openclaw__/mcp-app" || pathname === "/__openclaw__/mcp-app/view";
+  return pathname === "/__steelengine__/mcp-app" || pathname === "/__steelengine__/mcp-app/view";
 }
 
 function isEmbeddingsPath(pathname: string): boolean {
@@ -215,6 +217,10 @@ function isSessionKillPath(pathname: string): boolean {
 
 function isSessionHistoryPath(pathname: string): boolean {
   return /^\/sessions\/[^/]+\/history$/.test(pathname);
+}
+
+function isSessionSendPath(pathname: string): boolean {
+  return /^\/sessions\/[^/]+\/messages$/.test(pathname);
 }
 
 function shouldEnforceDefaultPluginGatewayAuth(pathContext: PluginRoutePathContext): boolean {
@@ -480,7 +486,7 @@ export function createGatewayHttpServer(opts: {
   /** Optional rate limiter for auth brute-force protection. */
   rateLimiter?: AuthRateLimiter;
   getReadiness?: ReadinessChecker;
-  getRuntimeConfig?: () => OpenClawConfig;
+  getRuntimeConfig?: () => SteelEngineConfig;
   isTerminalEnabled?: () => boolean;
   tlsOptions?: TlsOptions;
 }): HttpServer {
@@ -672,6 +678,20 @@ export function createGatewayHttpServer(opts: {
               (await getSessionHistoryHttpModule()).handleSessionHistoryHttpRequest(req, res, {
                 auth: resolvedAuthValue,
                 getResolvedAuth,
+                trustedProxies,
+                allowRealIpFallback,
+                rateLimiter,
+              }),
+            ),
+        });
+      }
+      if (isSessionSendPath(scopedRequestPath)) {
+        requestStages.push({
+          name: "sessions-send",
+          run: async () =>
+            await runWithGatewayHttpWorkAdmission(res, async () =>
+              (await getSessionSendHttpModule()).handleSessionSendHttpRequest(req, res, {
+                auth: resolvedAuthValue,
                 trustedProxies,
                 allowRealIpFallback,
                 rateLimiter,
@@ -1055,17 +1075,17 @@ export function attachGatewayUpgradeHandler(opts: {
         wss.handleUpgrade(req, socket, head, (ws) => {
           (
             ws as unknown as import("ws").WebSocket & {
-              __openclawPreauthBudgetClaimed?: boolean;
-              __openclawPreauthBudgetKey?: string;
+              __steelenginePreauthBudgetClaimed?: boolean;
+              __steelenginePreauthBudgetKey?: string;
             }
-          )["__openclawPreauthBudgetKey"] = preauthBudgetKey;
+          )["__steelenginePreauthBudgetKey"] = preauthBudgetKey;
           wss.emit("connection", ws, req);
           const budgetClaimed = Boolean(
             (
               ws as unknown as import("ws").WebSocket & {
-                __openclawPreauthBudgetClaimed?: boolean;
+                __steelenginePreauthBudgetClaimed?: boolean;
               }
-            )["__openclawPreauthBudgetClaimed"],
+            )["__steelenginePreauthBudgetClaimed"],
           );
           if (budgetClaimed) {
             budgetTransferred = true;
@@ -1124,9 +1144,9 @@ export function attachWorkerGatewayUpgradeHandler(params: {
         const workerSocket = ws as GatewayIngressWebSocket;
         workerSocket[GATEWAY_WS_CONNECTION_KIND_PROPERTY] = "worker";
         workerSocket[GATEWAY_WS_PREAUTH_BUDGET_PROPERTY] = params.preauthConnectionBudget;
-        workerSocket["__openclawPreauthBudgetKey"] = preauthBudgetKey;
+        workerSocket["__steelenginePreauthBudgetKey"] = preauthBudgetKey;
         params.wss.emit("connection", ws, req);
-        if (workerSocket["__openclawPreauthBudgetClaimed"]) {
+        if (workerSocket["__steelenginePreauthBudgetClaimed"]) {
           budgetTransferred = true;
           socket.off("close", releaseUpgradeBudget);
         }

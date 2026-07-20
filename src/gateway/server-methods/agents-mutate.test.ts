@@ -1,7 +1,7 @@
 // Agent mutation tests cover create/update/delete handlers, safe workspace file
 // access, config preconditions, trash cleanup, and workspace-state handling.
 
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { FsSafeError } from "../../infra/fs-safe.js";
 /* ------------------------------------------------------------------ */
@@ -65,7 +65,7 @@ const mocks = vi.hoisted(() => ({
   rootWrite: vi.fn(async (_params?: unknown) => {}),
 }));
 
-const RESERVED_SYSTEM_AGENT_IDS_FOR_TEST = ["openclaw", "crestodian"] as const; // reserved ids
+const RESERVED_SYSTEM_AGENT_IDS_FOR_TEST = ["steelengine", "crestodian"] as const; // reserved ids
 
 vi.mock("../../config/config.js", async () => {
   const actual =
@@ -81,16 +81,16 @@ vi.mock("../../config/config.js", async () => {
     }) => {
       const draft = structuredClone(mocks.loadConfigReturn);
       const result = await params.mutate(draft, {
-        snapshot: { path: "/tmp/openclaw/config.json" },
+        snapshot: { path: "/tmp/steelengine/config.json" },
         previousHash: "test-hash",
         attempt: 0,
       });
       await mocks.writeConfigFile(draft);
       return {
-        path: "/tmp/openclaw/config.json",
+        path: "/tmp/steelengine/config.json",
         previousHash: "test-hash",
         persistedHash: "persisted-hash",
-        snapshot: { path: "/tmp/openclaw/config.json" },
+        snapshot: { path: "/tmp/steelengine/config.json" },
         nextConfig: draft,
         result,
         attempts: 1,

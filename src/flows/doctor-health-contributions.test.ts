@@ -4,7 +4,7 @@ import os from "node:os";
 import nodePath from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { DoctorPrompter } from "../commands/doctor-prompter.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { CORE_HEALTH_CHECKS } from "./doctor-core-checks.js";
 import "./doctor-tool-result-cap-advice.js";
 import { resolveDoctorContributionHealthChecks } from "./doctor-health-contributions.js";
@@ -47,7 +47,7 @@ const mocks = vi.hoisted(() => ({
   maybeScanExtraGatewayServices: vi.fn().mockResolvedValue(undefined),
   noteMacLaunchAgentOverrides: vi.fn(),
   noteMacLaunchctlGatewayEnvOverrides: vi.fn(),
-  noteMacStaleOpenClawUpdateLaunchdJobs: vi.fn(),
+  noteMacStaleSteelEngineUpdateLaunchdJobs: vi.fn(),
   gatewaySecretInputPathCanWin: vi.fn(),
   readGatewaySecretInputValue: vi.fn((..._args: unknown[]) => undefined as string | undefined),
   checkGatewayHealth: vi.fn(async () => ({
@@ -66,7 +66,7 @@ const mocks = vi.hoisted(() => ({
       checkId: "core/doctor/legacy-plugin-manifests",
       severity: "warning" as const,
       message: `Plugin manifest ${migration.pluginId} uses legacy top-level capability keys.`,
-      path: "/tmp/openclaw-plugin/openclaw.plugin.json",
+      path: "/tmp/steelengine-plugin/steelengine.plugin.json",
       target: migration.pluginId,
       requirement: "contracts-capability-keys",
     }),
@@ -74,7 +74,7 @@ const mocks = vi.hoisted(() => ({
   maybeRepairLegacyPluginManifestContracts: vi.fn().mockResolvedValue(undefined),
   detectLegacyClawdBrowserProfileResidue: vi.fn(),
   maybeArchiveLegacyClawdBrowserProfileResidue: vi.fn(),
-  resolveAgentWorkspaceDir: vi.fn(() => "/tmp/openclaw-workspace"),
+  resolveAgentWorkspaceDir: vi.fn(() => "/tmp/steelengine-workspace"),
   resolveDefaultAgentId: vi.fn(() => "default"),
   resolveAgentContextLimits: vi.fn(
     (cfg: { agents?: { defaults?: { contextLimits?: unknown } } }) =>
@@ -267,7 +267,7 @@ vi.mock("../gateway/call.js", () => ({
 vi.mock("../commands/doctor-platform-notes.js", () => ({
   noteMacLaunchAgentOverrides: mocks.noteMacLaunchAgentOverrides,
   noteMacLaunchctlGatewayEnvOverrides: mocks.noteMacLaunchctlGatewayEnvOverrides,
-  noteMacStaleOpenClawUpdateLaunchdJobs: mocks.noteMacStaleOpenClawUpdateLaunchdJobs,
+  noteMacStaleSteelEngineUpdateLaunchdJobs: mocks.noteMacStaleSteelEngineUpdateLaunchdJobs,
 }));
 
 vi.mock("../gateway/credentials-secret-inputs.js", async (importOriginal) => {
@@ -356,7 +356,7 @@ vi.mock("../version.js", async () => ({
 }));
 
 vi.mock("../config/config.js", () => ({
-  CONFIG_PATH: "/tmp/fake-openclaw.json",
+  CONFIG_PATH: "/tmp/fake-steelengine.json",
   replaceConfigFile: mocks.replaceConfigFile,
   readConfigFileSnapshot: mocks.readConfigFileSnapshot,
 }));
@@ -443,7 +443,7 @@ vi.mock("../utils.js", async (importOriginal) => {
   return {
     ...actual,
     isRecord: mocks.isRecord,
-    resolveConfigDir: vi.fn(() => "/tmp/openclaw-config"),
+    resolveConfigDir: vi.fn(() => "/tmp/steelengine-config"),
     resolveUserPath: vi.fn((value: string) => value),
     shortenHomePath: mocks.shortenHomePath,
   };
@@ -461,7 +461,7 @@ vi.mock("../commands/doctor-gateway-services.js", () => ({
 vi.mock("../commands/doctor-platform-notes.js", () => ({
   noteMacLaunchAgentOverrides: mocks.noteMacLaunchAgentOverrides,
   noteMacLaunchctlGatewayEnvOverrides: mocks.noteMacLaunchctlGatewayEnvOverrides,
-  noteMacStaleOpenClawUpdateLaunchdJobs: mocks.noteMacStaleOpenClawUpdateLaunchdJobs,
+  noteMacStaleSteelEngineUpdateLaunchdJobs: mocks.noteMacStaleSteelEngineUpdateLaunchdJobs,
 }));
 
 function requireDoctorContribution(id: string) {
@@ -559,7 +559,7 @@ describe("doctor health contributions", () => {
     mocks.maybeScanExtraGatewayServices.mockResolvedValue(undefined);
     mocks.noteMacLaunchAgentOverrides.mockClear();
     mocks.noteMacLaunchctlGatewayEnvOverrides.mockClear();
-    mocks.noteMacStaleOpenClawUpdateLaunchdJobs.mockClear();
+    mocks.noteMacStaleSteelEngineUpdateLaunchdJobs.mockClear();
     mocks.gatewaySecretInputPathCanWin.mockClear();
     mocks.gatewaySecretInputPathCanWin.mockReset();
     mocks.readGatewaySecretInputValue.mockClear();
@@ -609,7 +609,7 @@ describe("doctor health contributions", () => {
       warnings: [],
     });
     mocks.resolveAgentWorkspaceDir.mockReset();
-    mocks.resolveAgentWorkspaceDir.mockReturnValue("/tmp/openclaw-workspace");
+    mocks.resolveAgentWorkspaceDir.mockReturnValue("/tmp/steelengine-workspace");
     mocks.resolveDefaultAgentId.mockReset();
     mocks.resolveDefaultAgentId.mockReturnValue("default");
     mocks.resolveAgentContextLimits.mockReset();
@@ -702,8 +702,8 @@ describe("doctor health contributions", () => {
     mocks.noteMacLaunchAgentOverrides.mockResolvedValue(undefined);
     mocks.noteMacLaunchctlGatewayEnvOverrides.mockReset();
     mocks.noteMacLaunchctlGatewayEnvOverrides.mockResolvedValue(undefined);
-    mocks.noteMacStaleOpenClawUpdateLaunchdJobs.mockReset();
-    mocks.noteMacStaleOpenClawUpdateLaunchdJobs.mockResolvedValue(undefined);
+    mocks.noteMacStaleSteelEngineUpdateLaunchdJobs.mockReset();
+    mocks.noteMacStaleSteelEngineUpdateLaunchdJobs.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -718,14 +718,14 @@ describe("doctor health contributions", () => {
     expect(check.defaultEnabled).toBe(false);
 
     const migration = {
-      manifestPath: "/tmp/openclaw-plugin/openclaw.plugin.json",
+      manifestPath: "/tmp/steelengine-plugin/steelengine.plugin.json",
       pluginId: "legacy-plugin",
       nextRaw: {},
       changeLines: ["- moved tools to contracts.tools"],
     };
     mocks.collectLegacyPluginManifestContractMigrations.mockReturnValueOnce([migration]);
     const ctx = {
-      cfg: { plugins: { load: { paths: ["/tmp/openclaw-plugin"] } } },
+      cfg: { plugins: { load: { paths: ["/tmp/steelengine-plugin"] } } },
       mode: "lint" as const,
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
     };
@@ -789,7 +789,7 @@ describe("doctor health contributions", () => {
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
       options: {},
       cfgForPersistence: {},
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
       env: {},
     } as Parameters<(typeof contribution)["run"]>[0];
 
@@ -837,7 +837,7 @@ describe("doctor health contributions", () => {
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
       options: {},
       cfgForPersistence: cfg,
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
       env: {},
     } as Parameters<(typeof contribution)["run"]>[0];
 
@@ -882,7 +882,7 @@ describe("doctor health contributions", () => {
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
       options: {},
       cfgForPersistence: cfg,
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
       env: {},
     } as Parameters<(typeof contribution)["run"]>[0];
 
@@ -957,10 +957,10 @@ describe("doctor health contributions", () => {
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
       options: {},
       cfgForPersistence: {},
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
       env: {
-        OPENCLAW_UPDATE_IN_PROGRESS: "1",
-        OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
+        STEELENGINE_UPDATE_IN_PROGRESS: "1",
+        STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
       },
     } as unknown as Parameters<(typeof contribution)["run"]>[0];
 
@@ -1315,7 +1315,7 @@ describe("doctor health contributions", () => {
     expect(heartbeatTemplateCheck).toBeDefined();
 
     const ctx = {
-      cfg: { agents: { defaults: { workspace: "/tmp/openclaw-workspace" } } },
+      cfg: { agents: { defaults: { workspace: "/tmp/steelengine-workspace" } } },
       mode: "lint",
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
     } as const;
@@ -1332,7 +1332,7 @@ describe("doctor health contributions", () => {
         checkId: "core/doctor/heartbeat-template",
         severity: "warning",
         message: "HEARTBEAT.md contains an older heartbeat documentation template.",
-        path: "/tmp/openclaw-workspace/HEARTBEAT.md",
+        path: "/tmp/steelengine-workspace/HEARTBEAT.md",
         requirement: "legacy-template",
       },
     ]);
@@ -1375,7 +1375,7 @@ describe("doctor health contributions", () => {
           },
         },
         bindings: [{ agentId: "ops", match: { channel: "telegram" } }],
-      } as unknown as OpenClawConfig,
+      } as unknown as SteelEngineConfig,
       mode: "lint" as const,
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
     };
@@ -1410,7 +1410,7 @@ describe("doctor health contributions", () => {
       prompter: buildDoctorPrompter(false),
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
       options: { allowExec: true, nonInteractive: true },
-      env: { OPENCLAW_TEST_GATEWAY_TOKEN: "1" },
+      env: { STEELENGINE_TEST_GATEWAY_TOKEN: "1" },
     } as unknown as Parameters<(typeof contribution)["run"]>[0];
 
     await contribution.run(ctx);
@@ -1869,12 +1869,12 @@ describe("doctor health contributions", () => {
   });
 
   it("keeps legacy plugin dependency lint opt-in and read-only", async () => {
-    const previousStateDir = process.env.OPENCLAW_STATE_DIR;
-    const tempDir = fs.mkdtempSync(nodePath.join(os.tmpdir(), "openclaw-legacy-plugin-deps-lint-"));
+    const previousStateDir = process.env.STEELENGINE_STATE_DIR;
+    const tempDir = fs.mkdtempSync(nodePath.join(os.tmpdir(), "steelengine-legacy-plugin-deps-lint-"));
     const stateDir = nodePath.join(tempDir, "state");
     const legacyRuntimeRoot = nodePath.join(stateDir, "plugin-runtime-deps");
     fs.mkdirSync(legacyRuntimeRoot, { recursive: true });
-    process.env.OPENCLAW_STATE_DIR = stateDir;
+    process.env.STEELENGINE_STATE_DIR = stateDir;
     try {
       const contributionChecks = await resolveDoctorContributionHealthChecks();
       const check = contributionChecks.find(
@@ -1912,9 +1912,9 @@ describe("doctor health contributions", () => {
       expect(fs.existsSync(legacyRuntimeRoot)).toBe(true);
     } finally {
       if (previousStateDir === undefined) {
-        delete process.env.OPENCLAW_STATE_DIR;
+        delete process.env.STEELENGINE_STATE_DIR;
       } else {
-        process.env.OPENCLAW_STATE_DIR = previousStateDir;
+        process.env.STEELENGINE_STATE_DIR = previousStateDir;
       }
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -2055,7 +2055,7 @@ describe("doctor health contributions", () => {
         }),
       ],
     });
-    expect(mocks.collectWorkspaceBackupTip).toHaveBeenCalledWith("/tmp/openclaw-workspace");
+    expect(mocks.collectWorkspaceBackupTip).toHaveBeenCalledWith("/tmp/steelengine-workspace");
   });
 
   it("keeps disk space opt-in for default lint selection", async () => {
@@ -2083,8 +2083,8 @@ describe("doctor health contributions", () => {
       {
         checkId: "core/doctor/disk-space",
         severity: "warning",
-        message: "Low disk space: 300 MB free on the partition containing ~/.openclaw.",
-        path: "/home/test/.openclaw",
+        message: "Low disk space: 300 MB free on the partition containing ~/.steelengine.",
+        path: "/home/test/.steelengine",
         requirement: "low-free-space",
       },
     ]);
@@ -2265,7 +2265,7 @@ describe("doctor health contributions", () => {
     expect(cronStoreCheck).toBeDefined();
 
     const ctx = {
-      cfg: { cron: { store: "/tmp/openclaw-cron/jobs.json" } },
+      cfg: { cron: { store: "/tmp/steelengine-cron/jobs.json" } },
       mode: "lint",
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
     } as const;
@@ -2282,7 +2282,7 @@ describe("doctor health contributions", () => {
         checkId: "core/doctor/legacy-cron-store",
         severity: "warning",
         message: "Legacy JSON cron store was found.",
-        path: "/tmp/openclaw-cron/jobs.json",
+        path: "/tmp/steelengine-cron/jobs.json",
         requirement: "legacy-cron-store",
       },
     ]);
@@ -2468,7 +2468,7 @@ describe("doctor health contributions", () => {
       prompter: buildDoctorPrompter(true),
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
       options: {},
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
     } as unknown as Parameters<(typeof contribution)["run"]>[0];
 
     await contribution.run(ctx);
@@ -2515,15 +2515,15 @@ describe("doctor health contributions", () => {
       prompter: buildDoctorPrompter(true),
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
       options: {},
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
     } as unknown as Parameters<(typeof contribution)["run"]>[0];
 
     await contribution.run(ctx);
 
     expect(mocks.runDoctorHealthRepairs).toHaveBeenCalledWith(
       expect.objectContaining({
-        cwd: "/tmp/openclaw-workspace",
-        configPath: "/tmp/fake-openclaw.json",
+        cwd: "/tmp/steelengine-workspace",
+        configPath: "/tmp/fake-steelengine.json",
       }),
       {
         checks: contribution.healthChecks,
@@ -2548,9 +2548,9 @@ describe("doctor health contributions", () => {
           checkId: "core/doctor/test-structured-findings",
           severity: "warning",
           message: "structured finding needs attention",
-          path: "openclaw.json",
+          path: "steelengine.json",
           line: 12,
-          fixHint: "run openclaw doctor --fix",
+          fixHint: "run steelengine doctor --fix",
         },
       ],
       remainingFindings: [],
@@ -2575,15 +2575,15 @@ describe("doctor health contributions", () => {
       prompter: buildDoctorPrompter(false),
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
       options: {},
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
     } as unknown as Parameters<(typeof contribution)["run"]>[0];
 
     await contribution.run(ctx);
 
     expect(ctx.runtime.log).toHaveBeenCalledWith(
-      "[warning] core/doctor/test-structured-findings openclaw.json:12 - structured finding needs attention",
+      "[warning] core/doctor/test-structured-findings steelengine.json:12 - structured finding needs attention",
     );
-    expect(ctx.runtime.log).toHaveBeenCalledWith("  fix: run openclaw doctor --fix");
+    expect(ctx.runtime.log).toHaveBeenCalledWith("  fix: run steelengine doctor --fix");
   });
 
   it("runs structured-only contributions in dry-run mode when doctor is not repairing", async () => {
@@ -2604,13 +2604,13 @@ describe("doctor health contributions", () => {
       prompter: buildDoctorPrompter(false),
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
       options: {},
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
     } as unknown as Parameters<(typeof contribution)["run"]>[0];
 
     await contribution.run(ctx);
 
     expect(mocks.runDoctorHealthRepairs).toHaveBeenCalledWith(
-      expect.objectContaining({ cwd: "/tmp/openclaw-workspace" }),
+      expect.objectContaining({ cwd: "/tmp/steelengine-workspace" }),
       {
         checks: contribution.healthChecks,
         dryRun: true,
@@ -2666,7 +2666,7 @@ describe("doctor health contributions", () => {
       prompter: buildDoctorPrompter(true),
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
       options: {},
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
     } as unknown as Parameters<(typeof contribution)["run"]>[0];
 
     await contribution.run(ctx);
@@ -2696,7 +2696,7 @@ describe("doctor health contributions", () => {
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
       options: {},
       cfgForPersistence: {},
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
       env: {},
     } as unknown as Parameters<(typeof contribution)["run"]>[0];
 
@@ -2721,7 +2721,7 @@ describe("doctor health contributions", () => {
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
       options: {},
       cfgForPersistence: {},
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
       env: {},
     } as unknown as Parameters<(typeof contribution)["run"]>[0];
 
@@ -2745,7 +2745,7 @@ describe("doctor health contributions", () => {
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
       options: {},
       cfgForPersistence: {},
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
       env: {},
     } as unknown as Parameters<(typeof contribution)["run"]>[0];
 
@@ -2785,14 +2785,14 @@ describe("doctor health contributions", () => {
             },
           },
           bindings: [{ agentId: "ops", match: { channel: "telegram" } }],
-        } as unknown as OpenClawConfig,
+        } as unknown as SteelEngineConfig,
         configResult: { cfg: {} },
         sourceConfigValid: true,
         prompter: buildDoctorPrompter(shouldRepair),
         runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
         options: {},
         cfgForPersistence: {},
-        configPath: "/tmp/fake-openclaw.json",
+        configPath: "/tmp/fake-steelengine.json",
         env: {},
       } as unknown as Parameters<(typeof contribution)["run"]>[0];
 
@@ -2828,7 +2828,7 @@ describe("doctor health contributions", () => {
         cfg: {},
         mode: "lint" as const,
         runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
-        configPath: "/tmp/fake-openclaw.json",
+        configPath: "/tmp/fake-steelengine.json",
       };
 
       await expect(runDoctorLintChecks(ctx, { checks: [check] })).resolves.toMatchObject({
@@ -2839,7 +2839,7 @@ describe("doctor health contributions", () => {
     });
 
     it("reports Nix immutable config mode when selected", async () => {
-      vi.stubEnv("OPENCLAW_NIX_MODE", "1");
+      vi.stubEnv("STEELENGINE_NIX_MODE", "1");
 
       await expect(
         runDoctorLintChecks(
@@ -2847,7 +2847,7 @@ describe("doctor health contributions", () => {
             cfg: {},
             mode: "lint" as const,
             runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
-            configPath: "/tmp/fake-openclaw.json",
+            configPath: "/tmp/fake-steelengine.json",
           },
           { checks: [check], onlyIds: ["core/doctor/write-config"] },
         ),
@@ -2857,7 +2857,7 @@ describe("doctor health contributions", () => {
         findings: [
           expect.objectContaining({
             checkId: "core/doctor/write-config",
-            path: "/tmp/fake-openclaw.json",
+            path: "/tmp/fake-steelengine.json",
             requirement: "mutable-config-write-path",
           }),
         ],
@@ -2865,7 +2865,7 @@ describe("doctor health contributions", () => {
     });
 
     it("skips a read-only existing config when its directory is writable", async () => {
-      const configPath = "/tmp/openclaw-home/openclaw.json";
+      const configPath = "/tmp/steelengine-home/steelengine.json";
       vi.spyOn(fs, "existsSync").mockImplementation((path) => path === configPath);
       vi.spyOn(fs, "statSync").mockReturnValue({
         isDirectory: () => true,
@@ -2886,13 +2886,13 @@ describe("doctor health contributions", () => {
         findings: [],
       });
       expect(accessSpy).toHaveBeenCalledWith(
-        "/tmp/openclaw-home",
+        "/tmp/steelengine-home",
         fs.constants.W_OK | fs.constants.X_OK,
       );
     });
 
     it("reports an unwritable config directory for an existing config", async () => {
-      const configPath = "/tmp/openclaw-home/openclaw.json";
+      const configPath = "/tmp/steelengine-home/steelengine.json";
       vi.spyOn(fs, "existsSync").mockImplementation((path) => path === configPath);
       vi.spyOn(fs, "statSync").mockReturnValue({
         isDirectory: () => true,
@@ -2915,7 +2915,7 @@ describe("doctor health contributions", () => {
         findings: [
           expect.objectContaining({
             checkId: "core/doctor/write-config",
-            path: "/tmp/openclaw-home",
+            path: "/tmp/steelengine-home",
             target: configPath,
             requirement: "writable-config-directory",
           }),
@@ -2933,7 +2933,7 @@ describe("doctor health contributions", () => {
             cfg: {},
             mode: "lint" as const,
             runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
-            configPath: "/tmp/openclaw-home/openclaw.json",
+            configPath: "/tmp/steelengine-home/steelengine.json",
           },
           { checks: [check], onlyIds: ["core/doctor/write-config"] },
         ),
@@ -2955,7 +2955,7 @@ describe("doctor health contributions", () => {
             cfg: {},
             mode: "lint" as const,
             runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
-            configPath: "/tmp/openclaw-home/openclaw.json",
+            configPath: "/tmp/steelengine-home/steelengine.json",
           },
           { checks: [check], onlyIds: ["core/doctor/write-config"] },
         ),
@@ -2964,7 +2964,7 @@ describe("doctor health contributions", () => {
           expect.objectContaining({
             checkId: "core/doctor/write-config",
             path: "/tmp",
-            target: "/tmp/openclaw-home",
+            target: "/tmp/steelengine-home",
             requirement: "writable-config-directory",
           }),
         ],
@@ -2985,7 +2985,7 @@ describe("doctor health contributions", () => {
             cfg: {},
             mode: "lint" as const,
             runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
-            configPath: "/tmp/openclaw-home/openclaw.json",
+            configPath: "/tmp/steelengine-home/steelengine.json",
           },
           { checks: [check], onlyIds: ["core/doctor/write-config"] },
         ),
@@ -2994,7 +2994,7 @@ describe("doctor health contributions", () => {
           expect.objectContaining({
             checkId: "core/doctor/write-config",
             path: "/tmp",
-            target: "/tmp/openclaw-home",
+            target: "/tmp/steelengine-home",
             requirement: "writable-config-directory",
           }),
         ],
@@ -3002,7 +3002,7 @@ describe("doctor health contributions", () => {
     });
 
     it("reports an existing file that blocks the config directory path", async () => {
-      vi.spyOn(fs, "existsSync").mockImplementation((path) => path === "/tmp/openclaw-home");
+      vi.spyOn(fs, "existsSync").mockImplementation((path) => path === "/tmp/steelengine-home");
       vi.spyOn(fs, "statSync").mockReturnValue({
         isDirectory: () => false,
       } as fs.Stats);
@@ -3014,7 +3014,7 @@ describe("doctor health contributions", () => {
             cfg: {},
             mode: "lint" as const,
             runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
-            configPath: "/tmp/openclaw-home/openclaw.json",
+            configPath: "/tmp/steelengine-home/steelengine.json",
           },
           { checks: [check], onlyIds: ["core/doctor/write-config"] },
         ),
@@ -3022,8 +3022,8 @@ describe("doctor health contributions", () => {
         findings: [
           expect.objectContaining({
             checkId: "core/doctor/write-config",
-            path: "/tmp/openclaw-home",
-            target: "/tmp/openclaw-home",
+            path: "/tmp/steelengine-home",
+            target: "/tmp/steelengine-home",
             requirement: "config-directory-path",
           }),
         ],
@@ -3034,7 +3034,7 @@ describe("doctor health contributions", () => {
     it("reports a dangling symlink that blocks the config directory path", async () => {
       vi.spyOn(fs, "existsSync").mockImplementation((path) => path === "/tmp");
       vi.spyOn(fs, "lstatSync").mockImplementation((path) => {
-        if (path === "/tmp/openclaw-home") {
+        if (path === "/tmp/steelengine-home") {
           return { isDirectory: () => false } as fs.Stats;
         }
         throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
@@ -3050,7 +3050,7 @@ describe("doctor health contributions", () => {
             cfg: {},
             mode: "lint" as const,
             runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
-            configPath: "/tmp/openclaw-home/openclaw.json",
+            configPath: "/tmp/steelengine-home/steelengine.json",
           },
           { checks: [check], onlyIds: ["core/doctor/write-config"] },
         ),
@@ -3058,8 +3058,8 @@ describe("doctor health contributions", () => {
         findings: [
           expect.objectContaining({
             checkId: "core/doctor/write-config",
-            path: "/tmp/openclaw-home",
-            target: "/tmp/openclaw-home",
+            path: "/tmp/steelengine-home",
+            target: "/tmp/steelengine-home",
             requirement: "config-directory-path",
           }),
         ],
@@ -3091,7 +3091,7 @@ describe("doctor health contributions", () => {
         shouldWriteConfig: true,
         skipPluginValidationOnWrite: true,
       },
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
       sourceConfigValid: true,
       prompter: buildDoctorPrompter(true),
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
@@ -3129,7 +3129,7 @@ describe("doctor health contributions", () => {
       cfg,
       cfgForPersistence: cfg,
       configResult: { cfg, shouldWriteConfig: false },
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
       sourceConfigValid: true,
       prompter: buildDoctorPrompter(false),
       runtime,
@@ -3142,7 +3142,7 @@ describe("doctor health contributions", () => {
   });
 
   it("does not commit deferred cron migration when the config write fails", async () => {
-    const cfg = { agents: { defaults: { models: {} } } } as OpenClawConfig;
+    const cfg = { agents: { defaults: { models: {} } } } as SteelEngineConfig;
     mocks.replaceConfigFile.mockRejectedValueOnce(new Error("config write failed"));
     const ctx = {
       cfg,
@@ -3153,7 +3153,7 @@ describe("doctor health contributions", () => {
         shouldRepairCronCodexModelRefsAfterConfigWrite: true,
         blockedCodexModelIdentities: ["codex\u0000gpt-5.6-sol"],
       },
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
       sourceConfigValid: true,
       prompter: buildDoctorPrompter(true),
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
@@ -3168,7 +3168,7 @@ describe("doctor health contributions", () => {
   });
 
   it("commits deferred cron migration after the config write succeeds", async () => {
-    const cfg = { agents: { defaults: { models: {} } } } as OpenClawConfig;
+    const cfg = { agents: { defaults: { models: {} } } } as SteelEngineConfig;
     const ctx = {
       cfg,
       cfgForPersistence: cfg,
@@ -3178,7 +3178,7 @@ describe("doctor health contributions", () => {
         shouldRepairCronCodexModelRefsAfterConfigWrite: true,
         blockedCodexModelIdentities: ["codex\u0000gpt-5.6-sol"],
       },
-      configPath: "/tmp/fake-openclaw.json",
+      configPath: "/tmp/fake-steelengine.json",
       sourceConfigValid: true,
       prompter: buildDoctorPrompter(true),
       runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
@@ -3216,7 +3216,7 @@ describe("doctor health contributions", () => {
           shouldWriteConfig: true,
           skipPluginValidationOnWrite: false,
         },
-        configPath: "/tmp/fake-openclaw.json",
+        configPath: "/tmp/fake-steelengine.json",
         sourceConfigValid: true,
         prompter: buildDoctorPrompter(true),
         runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
@@ -3232,21 +3232,21 @@ describe("doctor health contributions", () => {
     it.each([
       {
         name: "legacy update parents",
-        env: { OPENCLAW_UPDATE_IN_PROGRESS: "1" },
+        env: { STEELENGINE_UPDATE_IN_PROGRESS: "1" },
         shouldWrite: false,
       },
       { name: "ordinary doctor runs", env: {}, shouldWrite: true },
       {
         name: "current update parents",
         env: {
-          OPENCLAW_UPDATE_IN_PROGRESS: "1",
-          OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
+          STEELENGINE_UPDATE_IN_PROGRESS: "1",
+          STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
         },
         shouldWrite: true,
       },
       {
         name: "falsey update env values",
-        env: { OPENCLAW_UPDATE_IN_PROGRESS: "0" },
+        env: { STEELENGINE_UPDATE_IN_PROGRESS: "0" },
         shouldWrite: true,
       },
     ])("handles config writes for $name", async ({ env, shouldWrite }) => {
@@ -3264,10 +3264,10 @@ describe("doctor health contributions", () => {
       }
     });
 
-    it("allows config size drops when OPENCLAW_UPDATE_IN_PROGRESS=1", async () => {
+    it("allows config size drops when STEELENGINE_UPDATE_IN_PROGRESS=1", async () => {
       const ctx = buildWriteConfigCtx({
-        OPENCLAW_UPDATE_IN_PROGRESS: "1",
-        OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
+        STEELENGINE_UPDATE_IN_PROGRESS: "1",
+        STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
       });
       await writeConfigContribution.run(ctx);
       expect(mocks.replaceConfigFile).toHaveBeenCalledWith(
@@ -3281,8 +3281,8 @@ describe("doctor health contributions", () => {
 
     it("skips plugin schema validation during update doctor writes", async () => {
       const ctx = buildWriteConfigCtx({
-        OPENCLAW_UPDATE_IN_PROGRESS: "1",
-        OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
+        STEELENGINE_UPDATE_IN_PROGRESS: "1",
+        STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
       });
       await writeConfigContribution.run(ctx);
       expect(mocks.replaceConfigFile).toHaveBeenCalledWith(
@@ -3296,8 +3296,8 @@ describe("doctor health contributions", () => {
 
     it("preserves source config version for legacy parent writable update doctor writes", async () => {
       const ctx = buildWriteConfigCtx({
-        OPENCLAW_UPDATE_IN_PROGRESS: "1",
-        OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
+        STEELENGINE_UPDATE_IN_PROGRESS: "1",
+        STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
       });
       ctx.configResult.sourceLastTouchedVersion = "2026.5.16-beta.4";
 
@@ -3314,9 +3314,9 @@ describe("doctor health contributions", () => {
 
     it("does not preserve source config version for explicit deferral update doctors", async () => {
       const ctx = buildWriteConfigCtx({
-        OPENCLAW_UPDATE_IN_PROGRESS: "1",
-        OPENCLAW_UPDATE_DEFER_CONFIGURED_PLUGIN_INSTALL_REPAIR: "1",
-        OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
+        STEELENGINE_UPDATE_IN_PROGRESS: "1",
+        STEELENGINE_UPDATE_DEFER_CONFIGURED_PLUGIN_INSTALL_REPAIR: "1",
+        STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
       });
       ctx.configResult.sourceLastTouchedVersion = "2026.5.16-beta.4";
 
@@ -3346,14 +3346,14 @@ describe("doctor health contributions", () => {
     it("points update-time config rewrites at the pre-update backup", async () => {
       vi.mocked(fs.existsSync).mockImplementation((value) => String(value).endsWith(".pre-update"));
       const ctx = buildWriteConfigCtx({
-        OPENCLAW_UPDATE_IN_PROGRESS: "1",
-        OPENCLAW_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
+        STEELENGINE_UPDATE_IN_PROGRESS: "1",
+        STEELENGINE_UPDATE_PARENT_SUPPORTS_DOCTOR_CONFIG_WRITE: "1",
       });
 
       await writeConfigContribution.run(ctx);
 
       expect(ctx.runtime.log).toHaveBeenCalledWith(
-        "Update changed config; pre-update backup: /tmp/fake-openclaw.json.pre-update",
+        "Update changed config; pre-update backup: /tmp/fake-steelengine.json.pre-update",
       );
     });
 
@@ -3364,13 +3364,13 @@ describe("doctor health contributions", () => {
         cfg: {},
         cfgForPersistence: {},
         configResult: { cfg: {} },
-        configPath: "/tmp/fake-openclaw.json",
+        configPath: "/tmp/fake-steelengine.json",
         sourceConfigValid: true,
         prompter: buildDoctorPrompter(true),
         runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },
         options: {},
         env: {
-          OPENCLAW_UPDATE_IN_PROGRESS: "1",
+          STEELENGINE_UPDATE_IN_PROGRESS: "1",
         },
       } as DoctorContributionRunContext);
 
@@ -3386,7 +3386,7 @@ describe("doctor health contributions", () => {
         cfg: {},
         cfgForPersistence: {},
         configResult: { cfg: {} },
-        configPath: "/tmp/fake-openclaw.json",
+        configPath: "/tmp/fake-steelengine.json",
         sourceConfigValid: true,
         prompter: buildDoctorPrompter(true),
         runtime: { log: vi.fn(), error: vi.fn(), exit: vi.fn() },

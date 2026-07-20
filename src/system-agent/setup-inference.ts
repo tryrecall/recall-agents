@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { isDeepStrictEqual } from "node:util";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { resolveAgentEffectiveModelPrimary, resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { normalizeAuthProfileCredential } from "../agents/auth-profiles/credential-normalize.js";
 import { loadPersistedAuthProfileStore } from "../agents/auth-profiles/persisted.js";
@@ -41,7 +41,7 @@ import {
   normalizeAgentModelRefForConfig,
   resolveAgentModelPrimaryValue,
 } from "../config/model-input.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
@@ -303,7 +303,7 @@ export type ActivateSetupInferenceDeps = {
   clearLoadInstalledPluginIndexInstallRecordsCache?: typeof import("../plugins/installed-plugin-index-records.js").clearLoadInstalledPluginIndexInstallRecordsCache;
   clearPluginMetadataLifecycleCaches?: typeof import("../plugins/plugin-metadata-lifecycle.js").clearPluginMetadataLifecycleCaches;
   invalidatePluginRuntimeDiscoveryAfterConfigMutation?: typeof import("../plugins/registry-refresh.js").invalidatePluginRuntimeDiscoveryAfterConfigMutation;
-  disposeOpenClawAgentDatabaseByPath?: typeof import("../state/openclaw-agent-db.js").disposeOpenClawAgentDatabaseByPath;
+  disposeSteelEngineAgentDatabaseByPath?: typeof import("../state/steelengine-agent-db.js").disposeSteelEngineAgentDatabaseByPath;
   createTempDir?: () => Promise<string>;
   removeTempDir?: (dir: string) => Promise<void>;
   timeoutMs?: number;
@@ -342,7 +342,7 @@ function invalidSetupConfigError(snapshot: {
 }): string {
   const issue = snapshot.issues?.[0];
   const detail = issue ? ` (${issue.path ? `${issue.path}: ` : ""}${issue.message})` : "";
-  return `OpenClaw config ${snapshot.path} is invalid${detail}. Fix it before running setup.`;
+  return `SteelEngine config ${snapshot.path} is invalid${detail}. Fix it before running setup.`;
 }
 
 function resolveCandidatePresentation(
@@ -589,8 +589,8 @@ type SetupInferenceTestPlan = {
   provider: string;
   model: string;
   modelRef: string;
-  config: OpenClawConfig;
-  /** Execution identity used by the real OpenClaw turn. */
+  config: SteelEngineConfig;
+  /** Execution identity used by the real SteelEngine turn. */
   agentId?: string;
   /** Default-agent owner whose model/runtime config is being selected. */
   routeAgentId?: string;
@@ -602,14 +602,14 @@ type SetupInferenceTestPlan = {
   persistModelRef?: string;
   manualAuth?: {
     profiles: ProviderAuthResult["profiles"];
-    runtimeConfigBase: OpenClawConfig;
-    sourceConfigBase: OpenClawConfig;
+    runtimeConfigBase: SteelEngineConfig;
+    sourceConfigBase: SteelEngineConfig;
     configPatch: unknown;
     pluginId?: string;
   };
 };
 
-function configureCodexCliPreparedAuth(cfg: OpenClawConfig): OpenClawConfig {
+function configureCodexCliPreparedAuth(cfg: SteelEngineConfig): SteelEngineConfig {
   const entry = cfg.plugins?.entries?.codex;
   const pluginConfig = entry?.config ?? {};
   const appServer =
@@ -774,7 +774,7 @@ function parseRef(modelRef: string): { provider: string; model: string } {
     : { provider: modelRef.slice(0, slash), model: modelRef.slice(slash + 1) };
 }
 
-function projectSetupTargetModelMetadata(config: OpenClawConfig, modelRef: string): unknown {
+function projectSetupTargetModelMetadata(config: SteelEngineConfig, modelRef: string): unknown {
   const target = parseRef(modelRef);
   const canonicalKey = modelKey(target.provider, target.model);
   const keys = new Set(
@@ -815,7 +815,7 @@ function resolveSetupAgentRuntimeId(
     kind === "provider-auth" ||
     parseProviderAutoSetupChoiceId(kind) !== undefined
   ) {
-    return "openclaw";
+    return "steelengine";
   }
   return undefined;
 }
@@ -840,15 +840,15 @@ function mapFailoverReasonToSetupStatus(reason?: string | null): SetupInferenceF
 }
 
 function prepareManualAuthForActivation(params: {
-  baseConfig: OpenClawConfig;
-  preparedConfig: OpenClawConfig;
+  baseConfig: SteelEngineConfig;
+  preparedConfig: SteelEngineConfig;
   profiles: ProviderAuthResult["profiles"];
   selectedProfileId: string;
   modelRef: string;
   providerId: string;
   pluginId?: string;
 }): {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   profiles: ProviderAuthResult["profiles"];
   selectedProfileId: string;
 } {
@@ -874,8 +874,8 @@ function prepareManualAuthForActivation(params: {
 }
 
 function copySelectedModelMetadata(params: {
-  target: OpenClawConfig;
-  prepared: OpenClawConfig;
+  target: SteelEngineConfig;
+  prepared: SteelEngineConfig;
   modelRef: string;
 }): void {
   const preparedDefaultModels = params.prepared.agents?.defaults?.models;
@@ -925,7 +925,7 @@ function copySelectedModelMetadata(params: {
 }
 
 function findSelectedProviderConfigKey(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   providerId: string,
 ): string | undefined {
   const providers = config.models?.providers;
@@ -943,18 +943,18 @@ function findSelectedProviderConfigKey(
 
 /**
  * Provider auth hooks are untrusted setup input. Carry only the selected
- * inference route's config into the probe; OpenClaw owns every other setup
+ * inference route's config into the probe; SteelEngine owns every other setup
  * surface after intelligence exists.
  */
 function projectManualInferenceConfig(params: {
-  baseConfig: OpenClawConfig;
-  preparedConfig: OpenClawConfig;
+  baseConfig: SteelEngineConfig;
+  preparedConfig: SteelEngineConfig;
   selectedProfile?: ProviderAuthResult["profiles"][number];
   selectedProfileId?: string;
   modelRef: string;
   providerId: string;
   pluginId?: string;
-}): OpenClawConfig {
+}): SteelEngineConfig {
   const config = structuredClone(params.baseConfig);
   if (params.selectedProfile && params.selectedProfileId) {
     const metadata = params.preparedConfig.auth?.profiles?.[params.selectedProfile.profileId] ?? {
@@ -1006,7 +1006,7 @@ function projectManualInferenceConfig(params: {
 }
 
 function canonicalizeSetupModelRef(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   raw: string;
   defaultProvider: string;
 }): string {
@@ -1028,8 +1028,8 @@ async function buildTestPlan(params: {
   modelRef?: string;
   authChoice?: string;
   apiKey?: string;
-  cfg: OpenClawConfig;
-  sourceCfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
+  sourceCfg: SteelEngineConfig;
   workspaceDir: string;
   pluginWorkspaceDir: string;
   agentDir: string;
@@ -1165,7 +1165,7 @@ async function buildTestPlan(params: {
         modelRef,
         agentDir: params.agentDir,
         config: prepared.config,
-        agentId: "openclaw",
+        agentId: "steelengine",
         routeAgentId: resolveDefaultAgentId(prepared.config),
         ...(prepared.selectedProfileId ? { authProfileId: prepared.selectedProfileId } : {}),
         persistModelRef: modelRef,
@@ -1208,7 +1208,7 @@ async function buildTestPlan(params: {
         model: route.model,
         modelRef: route.modelLabel,
         config: route.runConfig,
-        agentId: "openclaw",
+        agentId: "steelengine",
         routeAgentId: route.agentId,
         agentDir: route.agentDir,
         ...(route.runner === "embedded"
@@ -1228,7 +1228,7 @@ async function buildTestPlan(params: {
         ...ref,
         modelRef,
         config: cfg,
-        agentId: "openclaw",
+        agentId: "steelengine",
         routeAgentId: resolveDefaultAgentId(cfg),
         persistModelRef: modelRef,
       };
@@ -1244,7 +1244,7 @@ async function buildTestPlan(params: {
         ...ref,
         modelRef,
         config: cfg,
-        agentId: "openclaw",
+        agentId: "steelengine",
         routeAgentId: resolveDefaultAgentId(cfg),
         persistModelRef: modelRef,
       };
@@ -1261,7 +1261,7 @@ async function buildTestPlan(params: {
         modelRef,
         agentHarnessRuntimeOverride: "codex",
         config: cfg,
-        agentId: "openclaw",
+        agentId: "steelengine",
         routeAgentId: resolveDefaultAgentId(cfg),
         agentDir: params.agentDir,
         cleanupBundleMcpOnRunEnd: true,
@@ -1279,7 +1279,7 @@ async function buildTestPlan(params: {
         ...ref,
         modelRef,
         config: cfg,
-        agentId: "openclaw",
+        agentId: "steelengine",
         routeAgentId: resolveDefaultAgentId(cfg),
         persistModelRef: modelRef,
       };
@@ -1295,7 +1295,7 @@ async function buildTestPlan(params: {
         ...ref,
         modelRef,
         config: cfg,
-        agentId: "openclaw",
+        agentId: "steelengine",
         routeAgentId: resolveDefaultAgentId(cfg),
         persistModelRef: modelRef,
       };
@@ -1370,7 +1370,7 @@ async function buildTestPlan(params: {
         };
       }
       let result: ProviderAuthResult;
-      let preparedConfig: OpenClawConfig;
+      let preparedConfig: SteelEngineConfig;
       try {
         if (interactive) {
           if (!params.prompter) {
@@ -1471,7 +1471,7 @@ async function buildTestPlan(params: {
         modelRef,
         agentDir: params.agentDir,
         config: preparedAuth.config,
-        agentId: "openclaw",
+        agentId: "steelengine",
         routeAgentId: resolveDefaultAgentId(preparedAuth.config),
         authProfileId: preparedAuth.selectedProfileId,
         persistModelRef: modelRef,
@@ -1490,14 +1490,14 @@ async function buildTestPlan(params: {
 }
 
 async function runProviderManualSecretMethod(params: {
-  config: OpenClawConfig;
-  baseConfig: OpenClawConfig;
+  config: SteelEngineConfig;
+  baseConfig: SteelEngineConfig;
   choice: ProviderAuthChoiceMetadata;
   method: ProviderAuthMethod;
   apiKey: string;
   agentDir: string;
   workspaceDir: string;
-}): Promise<{ result: ProviderAuthResult; config: OpenClawConfig }> {
+}): Promise<{ result: ProviderAuthResult; config: SteelEngineConfig }> {
   const optionKey = params.choice.optionKey;
   const runNonInteractive = params.method.runNonInteractive;
   if (!optionKey || !params.choice.cliOption || !runNonInteractive) {
@@ -1616,8 +1616,8 @@ async function activateSetupInferenceUnredacted(
   if (snapshot.exists && !snapshot.valid) {
     throw new Error(invalidSetupConfigError(snapshot));
   }
-  const cfg: OpenClawConfig = snapshot.exists ? (snapshot.runtimeConfig ?? snapshot.config) : {};
-  const sourceCfg: OpenClawConfig = snapshot.exists
+  const cfg: SteelEngineConfig = snapshot.exists ? (snapshot.runtimeConfig ?? snapshot.config) : {};
+  const sourceCfg: SteelEngineConfig = snapshot.exists
     ? (snapshot.sourceConfig ?? snapshot.config)
     : {};
   const workspace = params.workspace?.trim()
@@ -1630,7 +1630,7 @@ async function activateSetupInferenceUnredacted(
       ).workspace;
 
   const tempDir = await (
-    deps.createTempDir ?? (() => fs.mkdtemp(path.join(os.tmpdir(), "openclaw-setup-inference-")))
+    deps.createTempDir ?? (() => fs.mkdtemp(path.join(os.tmpdir(), "steelengine-setup-inference-")))
   )();
   const testAgentDir = path.join(tempDir, "agent");
   let pendingCodexInstall: PluginInstallRecord | undefined;
@@ -1774,7 +1774,7 @@ async function activateSetupInferenceUnredacted(
         reason: "source-changed",
         workspaceDir: workspace,
         policyPluginIds: ["codex"],
-        traceCommand: "openclaw-setup-probe",
+        traceCommand: "steelengine-setup-probe",
         logger: { warn: (message) => (registryRefreshWarning = message) },
       });
       const ensureHarnessPlugin =
@@ -1826,7 +1826,7 @@ async function activateSetupInferenceUnredacted(
       sourceCfg,
       stagedRoute.modelLabel,
     );
-    // OpenClaw executes through the reserved agent id but reuses the default
+    // SteelEngine executes through the reserved agent id but reuses the default
     // route's agent directory. Only a submitted key stays in the isolated store.
     if (testPlan.runner === "embedded" && stagedRoute.runner === "embedded") {
       testPlan = {
@@ -1931,7 +1931,7 @@ async function activateSetupInferenceUnredacted(
         ok: false,
         status: "unknown",
         error:
-          "Inference succeeded, but its runtime did not report an owner that OpenClaw can safely reuse. No model or credential route was saved.",
+          "Inference succeeded, but its runtime did not report an owner that SteelEngine can safely reuse. No model or credential route was saved.",
       };
     }
     if (
@@ -1960,7 +1960,7 @@ async function activateSetupInferenceUnredacted(
         };
       }
       if (
-        successfulHarnessId !== "openclaw" &&
+        successfulHarnessId !== "steelengine" &&
         (test.auth.runtimeOwnerKind !== "plugin-harness" ||
           test.auth.runtimeOwnerId?.trim() !== successfulHarnessId ||
           !test.auth.runtimeArtifactFingerprint ||
@@ -1974,7 +1974,7 @@ async function activateSetupInferenceUnredacted(
         };
       }
     }
-    let committedConfig: OpenClawConfig | undefined;
+    let committedConfig: SteelEngineConfig | undefined;
     let autoLocalModelLeanApplied = false;
     if (!needsPersistence) {
       const latestSnapshot = await readSnapshot();
@@ -2034,9 +2034,9 @@ async function activateSetupInferenceUnredacted(
           })
         : undefined;
       const stageCandidate = (
-        current: OpenClawConfig,
+        current: SteelEngineConfig,
         configKind: "runtime" | "source",
-      ): OpenClawConfig => {
+      ): SteelEngineConfig => {
         let next =
           codexPluginPatch === undefined ? current : stripPendingPluginInstallRecords(current);
         if (plan.manualAuth) {
@@ -2048,7 +2048,7 @@ async function activateSetupInferenceUnredacted(
           );
         }
         if (codexPluginPatch !== undefined) {
-          const patched = applyMergePatch(next, codexPluginPatch) as OpenClawConfig;
+          const patched = applyMergePatch(next, codexPluginPatch) as SteelEngineConfig;
           const enabledCodex = enablePluginInConfig(
             normalizePluginTargetConfig(patched, "codex"),
             "codex",
@@ -2131,7 +2131,7 @@ async function activateSetupInferenceUnredacted(
             };
           }
           throw new SetupInferenceActivationIndeterminateError(
-            "Inference activation could not confirm whether its verified credential was saved or rolled back. No config commit was attempted; run openclaw doctor --fix before retrying.",
+            "Inference activation could not confirm whether its verified credential was saved or rolled back. No config commit was attempted; run steelengine doctor --fix before retrying.",
           );
         }
         if (persistedManualAuth.status === "not-persisted") {
@@ -2245,7 +2245,7 @@ async function activateSetupInferenceUnredacted(
             const rolledBack = await rollbackManualAuthProfiles(manualAuthReceipt, deps);
             if (!rolledBack) {
               throw new SetupInferenceActivationIndeterminateError(
-                "Inference activation stopped before its config commit, but could not confirm removal of its staged credential. Run openclaw doctor --fix before retrying.",
+                "Inference activation stopped before its config commit, but could not confirm removal of its staged credential. Run steelengine doctor --fix before retrying.",
               );
             }
           }
@@ -2277,13 +2277,13 @@ async function activateSetupInferenceUnredacted(
               configReferencesManualAuthProfiles(reconciledRuntime, manualAuthReceipt)
             ) {
               throw new SetupInferenceActivationIndeterminateError(
-                "Inference activation could not confirm its config commit state. The verified credential was retained because the current config may reference it. Run openclaw doctor --fix before retrying.",
+                "Inference activation could not confirm its config commit state. The verified credential was retained because the current config may reference it. Run steelengine doctor --fix before retrying.",
               );
             }
             const rolledBack = await rollbackManualAuthProfiles(manualAuthReceipt, deps);
             if (!rolledBack) {
               throw new SetupInferenceActivationIndeterminateError(
-                "Inference activation failed and its staged credential could not be rolled back. Run openclaw doctor --fix before retrying.",
+                "Inference activation failed and its staged credential could not be rolled back. Run steelengine doctor --fix before retrying.",
               );
             }
           }
@@ -2316,8 +2316,8 @@ async function activateSetupInferenceUnredacted(
       const after = await readSnapshot().catch(() => null);
       try {
         await appendSystemAgentAuditEntry({
-          operation: "openclaw.setup",
-          summary: "Verified and configured AI access through OpenClaw setup",
+          operation: "steelengine.setup",
+          summary: "Verified and configured AI access through SteelEngine setup",
           configPath: after?.path ?? snapshot.path,
           configHashBefore: snapshot.hash ?? null,
           configHashAfter: after?.hash ?? null,
@@ -2326,7 +2326,7 @@ async function activateSetupInferenceUnredacted(
       } catch (error) {
         // Inference is already verified and its route may already be durable.
         // Surface audit failure as a warning instead of misreporting setup failure.
-        const warning = `Inference setup completed, but OpenClaw could not record its audit entry: ${formatErrorMessage(error)}`;
+        const warning = `Inference setup completed, but SteelEngine could not record its audit entry: ${formatErrorMessage(error)}`;
         params.runtime.error?.(warning);
         lines = [...lines, warning];
       }
@@ -2426,7 +2426,7 @@ export async function verifySetupInference(
     return {
       ok: false,
       status: "unavailable",
-      error: "No OpenClaw config exists. Run `openclaw onboard` first.",
+      error: "No SteelEngine config exists. Run `steelengine onboard` first.",
     };
   }
   if (!snapshot.valid) {
@@ -2436,7 +2436,7 @@ export async function verifySetupInference(
       error: invalidSetupConfigError(snapshot),
     };
   }
-  const cfg: OpenClawConfig = snapshot.runtimeConfig ?? snapshot.config;
+  const cfg: SteelEngineConfig = snapshot.runtimeConfig ?? snapshot.config;
   const baselineRoute = await projectInferenceRoute(cfg, params.agentId);
   let verifiedBinding: SystemAgentVerifiedInferenceBinding | undefined;
   const verification = await verifySetupInferenceConfig({
@@ -2485,7 +2485,7 @@ export async function verifySetupInference(
       ok: false,
       status: "unknown",
       error:
-        "The successful inference run did not report an exact execution binding. Retry setup before starting OpenClaw.",
+        "The successful inference run did not report an exact execution binding. Retry setup before starting SteelEngine.",
     };
   }
   return { ...verification, binding: verifiedBinding };
@@ -2567,7 +2567,7 @@ export async function resolvePersistentApplyInference(params: {
 
 /** Live-test a staged default-agent route before any caller persists it. */
 export async function verifySetupInferenceConfig(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   agentId?: string;
   runtime: RuntimeEnv;
   timeoutMs?: number;
@@ -2590,11 +2590,11 @@ export async function verifySetupInferenceConfig(params: {
     return {
       ok: false,
       status: "unavailable",
-      error: "No agent model is configured. Run `openclaw onboard` first.",
+      error: "No agent model is configured. Run `steelengine onboard` first.",
     };
   }
   const tempDir = await (
-    deps.createTempDir ?? (() => fs.mkdtemp(path.join(os.tmpdir(), "openclaw-setup-inference-")))
+    deps.createTempDir ?? (() => fs.mkdtemp(path.join(os.tmpdir(), "steelengine-setup-inference-")))
   )();
   try {
     const plan = await buildTestPlan({
@@ -2731,7 +2731,7 @@ export async function completeSetupInference(params: {
     (await import("../config/config.js")).readConfigFileSnapshot;
   const snapshot = await readSnapshot();
   if (!snapshot.exists) {
-    return { ok: false, status: "unavailable", error: "No OpenClaw config exists." };
+    return { ok: false, status: "unavailable", error: "No SteelEngine config exists." };
   }
   if (!snapshot.valid) {
     return { ok: false, status: "format", error: invalidSetupConfigError(snapshot) };
@@ -2747,7 +2747,7 @@ export async function completeSetupInference(params: {
 
 /** Config-injected variant used by setup clients and live provider tests. */
 export async function completeSetupInferenceConfig(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   prompt: string;
   runtime: RuntimeEnv;
   timeoutMs?: number;
@@ -2762,7 +2762,7 @@ export async function completeSetupInferenceConfig(params: {
     return { ok: false, status: "unavailable", error: "No agent model is configured." };
   }
   const tempDir = await (
-    deps.createTempDir ?? (() => fs.mkdtemp(path.join(os.tmpdir(), "openclaw-setup-inference-")))
+    deps.createTempDir ?? (() => fs.mkdtemp(path.join(os.tmpdir(), "steelengine-setup-inference-")))
   )();
   try {
     const plan = await buildTestPlan({
@@ -2815,9 +2815,9 @@ async function cleanupSetupInferenceTempDir(params: {
 }): Promise<void> {
   try {
     const disposeDatabase =
-      params.deps.disposeOpenClawAgentDatabaseByPath ??
-      (await import("../state/openclaw-agent-db.js")).disposeOpenClawAgentDatabaseByPath;
-    disposeDatabase(path.join(params.tempDir, "agent", "openclaw-agent.sqlite"));
+      params.deps.disposeSteelEngineAgentDatabaseByPath ??
+      (await import("../state/steelengine-agent-db.js")).disposeSteelEngineAgentDatabaseByPath;
+    disposeDatabase(path.join(params.tempDir, "agent", "steelengine-agent.sqlite"));
   } catch {
     // Windows cannot remove an open SQLite file. Keep cleanup nonfatal, but
     // always try the directory removal so callers do not retain probe secrets.
@@ -2874,7 +2874,7 @@ async function retainUnownedCodexInstall(params: {
     const marked = await markRetained({
       packageDir: params.record.installPath,
       pluginId: "codex",
-      reason: "openclaw-inference-activation-not-committed",
+      reason: "steelengine-inference-activation-not-committed",
     });
     if (!marked) {
       log.warn("Could not retain the uncommitted Codex runtime package generation.");
@@ -2936,11 +2936,11 @@ async function reloadCodexRegistryAfterActivation(params: {
   const runtimeConfig =
     snapshot.exists && snapshot.valid
       ? (snapshot.runtimeConfig ?? snapshot.config)
-      : ({} satisfies OpenClawConfig);
+      : ({} satisfies SteelEngineConfig);
   const sourceConfig =
     snapshot.exists && snapshot.valid
       ? (snapshot.sourceConfig ?? snapshot.config)
-      : ({} satisfies OpenClawConfig);
+      : ({} satisfies SteelEngineConfig);
   try {
     const refreshPluginRegistry =
       params.deps.refreshPluginRegistryAfterConfigMutation ??
@@ -2995,11 +2995,11 @@ function mergePatchConflicts(base: unknown, current: unknown, patch: unknown): b
 }
 
 function applyManualAuthConfig(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   manualAuth: NonNullable<SetupInferenceTestPlan["manualAuth"]>,
   configKind: "runtime" | "source",
   enablePlugin: typeof enablePluginInConfig = enablePluginInConfig,
-): OpenClawConfig {
+): SteelEngineConfig {
   let enabledConfig = config;
   if (manualAuth.pluginId) {
     const enableResult = enablePlugin(config, manualAuth.pluginId);
@@ -3017,7 +3017,7 @@ function applyManualAuthConfig(
       "Provider configuration changed during the live inference test, so the verified credential was not saved. Review the current provider settings and retry.",
     );
   }
-  return applyMergePatch(enabledConfig, manualAuth.configPatch) as OpenClawConfig;
+  return applyMergePatch(enabledConfig, manualAuth.configPatch) as SteelEngineConfig;
 }
 
 type ManualAuthPersistenceReceipt = {
@@ -3055,7 +3055,7 @@ function modelSelectionReferencesProfile(value: unknown, profileIds: ReadonlySet
 }
 
 function configReferencesManualAuthProfiles(
-  config: OpenClawConfig,
+  config: SteelEngineConfig,
   receipt: ManualAuthPersistenceReceipt,
 ): boolean {
   const profileIds = new Set(receipt.profiles.map((profile) => profile.profileId));
@@ -3267,7 +3267,7 @@ async function runSetupInferenceTest(params: {
       result = (await runCli({
         sessionId,
         sessionKey: `temp:setup-inference:${runId}`,
-        agentId: plan.agentId ?? "openclaw",
+        agentId: plan.agentId ?? "steelengine",
         trigger: "manual",
         sessionFile,
         workspaceDir: tempDir,
@@ -3279,8 +3279,8 @@ async function runSetupInferenceTest(params: {
         ...(plan.authProfileId ? { authProfileId: plan.authProfileId } : {}),
         timeoutMs,
         runId,
-        messageChannel: "openclaw",
-        messageProvider: "openclaw",
+        messageChannel: "steelengine",
+        messageProvider: "steelengine",
         executionMode: "side-question",
         disableTools: true,
         cleanupCliLiveSessionOnRunEnd: true,
@@ -3295,7 +3295,7 @@ async function runSetupInferenceTest(params: {
       result = (await runEmbedded({
         sessionId,
         sessionKey: `temp:setup-inference:${runId}`,
-        agentId: plan.agentId ?? "openclaw",
+        agentId: plan.agentId ?? "steelengine",
         trigger: "manual",
         sessionFile,
         workspaceDir: tempDir,
@@ -3327,8 +3327,8 @@ async function runSetupInferenceTest(params: {
           : {}),
         disableTools: true,
         modelRun: true,
-        messageChannel: "openclaw",
-        messageProvider: "openclaw",
+        messageChannel: "steelengine",
+        messageProvider: "steelengine",
         onSuccessfulAuthBinding: (binding) => {
           successfulAuth = binding;
         },
@@ -3364,7 +3364,7 @@ async function runSetupInferenceTest(params: {
         ok: false,
         status: "unknown",
         error:
-          "Inference succeeded, but its runtime did not report an owner that OpenClaw can safely reuse.",
+          "Inference succeeded, but its runtime did not report an owner that SteelEngine can safely reuse.",
       };
     }
     return {

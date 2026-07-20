@@ -1,18 +1,18 @@
 import {
   buildChannelInboundEventContext,
   resolveChannelInboundRouteEnvelope,
-} from "openclaw/plugin-sdk/channel-inbound";
+} from "steelengine/plugin-sdk/channel-inbound";
 // Nextcloud Talk plugin module implements inbound behavior.
 import {
   channelIngressRoutes,
   resolveStableChannelMessageIngress,
-} from "openclaw/plugin-sdk/channel-ingress-runtime";
-import { resolveChannelStreamingBlockEnabled } from "openclaw/plugin-sdk/channel-outbound";
+} from "steelengine/plugin-sdk/channel-ingress-runtime";
+import { resolveChannelStreamingBlockEnabled } from "steelengine/plugin-sdk/channel-outbound";
 import {
   normalizeOptionalString,
   normalizeStringEntries,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
-import { sanitizeAssistantVisibleText } from "openclaw/plugin-sdk/text-chunking";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
+import { sanitizeAssistantVisibleText } from "steelengine/plugin-sdk/text-chunking";
 import {
   GROUP_POLICY_BLOCKED_LABEL,
   resolveAllowlistProviderRuntimeGroupPolicy,
@@ -22,7 +22,7 @@ import {
   resolveDefaultGroupPolicy,
   warnMissingProviderGroupPolicyFallbackOnce,
   type GroupPolicy,
-  type OpenClawConfig,
+  type SteelEngineConfig,
   type OutboundReplyPayload,
   type RuntimeEnv,
 } from "../runtime-api.js";
@@ -157,13 +157,13 @@ export async function handleNextcloudTalkInbound(params: {
   });
   const roomConfig = roomMatch.roomConfig;
   const allowTextCommands = core.channel.commands.shouldHandleTextCommands({
-    cfg: config as OpenClawConfig,
+    cfg: config as SteelEngineConfig,
     surface: CHANNEL_ID,
   });
-  const hasControlCommand = core.channel.text.hasControlCommand(rawBody, config as OpenClawConfig);
+  const hasControlCommand = core.channel.text.hasControlCommand(rawBody, config as SteelEngineConfig);
   const shouldRequireMention = isGroup
     ? resolveNextcloudTalkGroupRequireMention({
-        cfg: config as OpenClawConfig,
+        cfg: config as SteelEngineConfig,
         accountId: account.accountId,
         groupId: roomToken,
       })
@@ -174,7 +174,7 @@ export async function handleNextcloudTalkInbound(params: {
         ((config.channels as Record<string, unknown> | undefined)?.[CHANNEL_ID] ?? undefined) !==
         undefined,
       groupPolicy: account.config.groupPolicy,
-      defaultGroupPolicy: resolveDefaultGroupPolicy(config as OpenClawConfig),
+      defaultGroupPolicy: resolveDefaultGroupPolicy(config as SteelEngineConfig),
     });
   const allowFrom = normalizeStringEntries(account.config.allowFrom);
   const outerGroupAllowFrom = account.config.groupAllowFrom?.length
@@ -191,7 +191,7 @@ export async function handleNextcloudTalkInbound(params: {
         sensitivity: "pii",
         entryIdPrefix: "nextcloud-talk-entry",
       },
-      cfg: config as OpenClawConfig,
+      cfg: config as SteelEngineConfig,
       readStoreAllowFrom: async () =>
         await pairing.readStoreForDmPolicy(CHANNEL_ID, account.accountId),
       subject: { stableId: senderId },
@@ -295,7 +295,7 @@ export async function handleNextcloudTalkInbound(params: {
     return;
   }
 
-  const mentionRegexes = core.channel.mentions.buildMentionRegexes(config as OpenClawConfig);
+  const mentionRegexes = core.channel.mentions.buildMentionRegexes(config as SteelEngineConfig);
   const wasMentioned = mentionRegexes.length
     ? core.channel.mentions.matchesMentionPatterns(rawBody, mentionRegexes)
     : false;
@@ -308,7 +308,7 @@ export async function handleNextcloudTalkInbound(params: {
     return;
   }
   const { route, buildEnvelope } = resolveChannelInboundRouteEnvelope({
-    cfg: config as OpenClawConfig,
+    cfg: config as SteelEngineConfig,
     channel: CHANNEL_ID,
     accountId: account.accountId,
     peer: {
@@ -355,7 +355,7 @@ export async function handleNextcloudTalkInbound(params: {
   });
 
   await core.channel.inbound.dispatch({
-    cfg: config as OpenClawConfig,
+    cfg: config as SteelEngineConfig,
     channel: CHANNEL_ID,
     accountId: account.accountId,
     route: { agentId: route.agentId, sessionKey: route.sessionKey },

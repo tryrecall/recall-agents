@@ -1,7 +1,7 @@
 // Msteams plugin module implements feedback invoke behavior.
-import { recordChannelFeedbackEvent } from "openclaw/plugin-sdk/channel-inbound";
-import { resolveThreadSessionKeys } from "openclaw/plugin-sdk/routing";
-import { normalizeOptionalLowercaseString } from "openclaw/plugin-sdk/string-coerce-runtime";
+import { recordChannelFeedbackEvent } from "steelengine/plugin-sdk/channel-inbound";
+import { resolveThreadSessionKeys } from "steelengine/plugin-sdk/routing";
+import { normalizeOptionalLowercaseString } from "steelengine/plugin-sdk/string-coerce-runtime";
 import { formatUnknownError } from "./errors.js";
 import { buildFeedbackEvent, runFeedbackReflection } from "./feedback-reflection.js";
 import { extractMSTeamsConversationMessageId, normalizeMSTeamsConversationId } from "./inbound.js";

@@ -8,4 +8,4 @@ export {
   promptLegacyChannelAllowFromForAccount,
   resolveEntriesWithOptionalToken,
   setSetupChannelEnabled,
-} from "openclaw/plugin-sdk/setup-runtime";
+} from "steelengine/plugin-sdk/setup-runtime";

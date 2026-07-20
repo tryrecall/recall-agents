@@ -1,6 +1,6 @@
-import { normalizeOptionalLowercaseString } from "@openclaw/normalization-core/string-coerce";
+import { normalizeOptionalLowercaseString } from "@steelengine/normalization-core/string-coerce";
 import { executeSqliteQuerySync } from "../../infra/kysely-sync.js";
-import { openOpenClawAgentDatabase } from "../../state/openclaw-agent-db.js";
+import { openSteelEngineAgentDatabase } from "../../state/steelengine-agent-db.js";
 import type { ConversationIdentity, ConversationKind } from "./conversation-identity.js";
 import { upsertConversationIdentity } from "./session-accessor.sqlite-conversation.js";
 import {
@@ -104,7 +104,7 @@ function selectConversationRows(
     ...(scope.env ? { env: scope.env } : {}),
     ...(scope.storePath ? { storePath: scope.storePath } : {}),
   });
-  const database = openOpenClawAgentDatabase(toDatabaseOptions(resolved));
+  const database = openSteelEngineAgentDatabase(toDatabaseOptions(resolved));
   const db = getSessionKysely(database.db);
   let query = db
     .selectFrom("conversations as c")
@@ -190,7 +190,7 @@ export function registerConversationAddresses(
     ...(scope.env ? { env: scope.env } : {}),
     ...(scope.storePath ? { storePath: scope.storePath } : {}),
   });
-  const database = openOpenClawAgentDatabase(toDatabaseOptions(resolved));
+  const database = openSteelEngineAgentDatabase(toDatabaseOptions(resolved));
   for (const identity of identities) {
     upsertConversationIdentity(database, identity, discoveredAt);
   }

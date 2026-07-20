@@ -1,5 +1,5 @@
 ---
-summary: "OpenClaw ACP runtime backend with plugin-owned session and transport management."
+summary: "SteelEngine ACP runtime backend with plugin-owned session and transport management."
 read_when:
   - You are installing, configuring, or auditing the acpx plugin
 title: "ACPx plugin"
@@ -7,18 +7,18 @@ title: "ACPx plugin"
 
 # ACPx plugin
 
-OpenClaw ACP runtime backend with plugin-owned session and transport management.
+SteelEngine ACP runtime backend with plugin-owned session and transport management.
 
 ## Distribution
 
-- Package: `@openclaw/acpx`
+- Package: `@steelengine/acpx`
 - Install route: npm; ClawHub
 
 ## Surface
 
 skills
 
-<!-- openclaw-plugin-reference:manual-start -->
+<!-- steelengine-plugin-reference:manual-start -->
 
 ## Pi native sessions
 
@@ -32,7 +32,7 @@ from the directory containing their `settings.json` file.
 Turn **Pi Session Catalog** off under **Config > Plugins > ACPX Runtime** to
 disable discovery. It is enabled by default.
 
-<!-- openclaw-plugin-reference:manual-end -->
+<!-- steelengine-plugin-reference:manual-end -->
 
 ## Related docs
 

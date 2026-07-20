@@ -6,8 +6,8 @@
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+} from "@steelengine/normalization-core/string-coerce";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import {
   parseRawSessionConversationRef,
   parseThreadSessionSuffix,
@@ -37,7 +37,7 @@ type ChannelModelOverride = {
 type ChannelModelByChannelConfig = Record<string, Record<string, string>>;
 
 type ChannelModelOverrideParams = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   channel?: string | null;
   groupId?: string | null;
   groupChatType?: string | null;

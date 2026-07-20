@@ -9,12 +9,12 @@ import { Worker } from "node:worker_threads";
 import {
   isFutureDateTimestampMs,
   resolveExpiresAtMsFromDurationSeconds,
-} from "@openclaw/normalization-core/number-coercion";
-import { isRecord } from "@openclaw/normalization-core/record-coerce";
-import type { Result } from "@openclaw/normalization-core/result";
-import { uniqueValues } from "@openclaw/normalization-core/string-normalization";
+} from "@steelengine/normalization-core/number-coercion";
+import { isRecord } from "@steelengine/normalization-core/record-coerce";
+import type { Result } from "@steelengine/normalization-core/result";
+import { uniqueValues } from "@steelengine/normalization-core/string-normalization";
 import { Type } from "typebox";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { createLazyPromiseLoader } from "../shared/lazy-runtime.js";
 import { clampNumber } from "../utils.js";
 import { resolveAgentConfig } from "./agent-scope-config.js";
@@ -183,7 +183,7 @@ function normalizeCodeModeRawConfig(value: unknown): Record<string, unknown> | u
   return isRecord(codeMode) ? codeMode : undefined;
 }
 
-function readCodeModeRawConfig(config?: OpenClawConfig, agentId?: string): Record<string, unknown> {
+function readCodeModeRawConfig(config?: SteelEngineConfig, agentId?: string): Record<string, unknown> {
   const tools = isRecord(config?.tools) ? config.tools : undefined;
   const globalRaw = normalizeCodeModeRawConfig(tools?.codeMode) ?? {};
   const agentRaw =
@@ -212,7 +212,7 @@ function readLanguages(value: unknown): CodeModeLanguage[] {
 }
 
 /** Resolves Code Mode runtime limits and language support from config. */
-export function resolveCodeModeConfig(config?: OpenClawConfig, agentId?: string): CodeModeConfig {
+export function resolveCodeModeConfig(config?: SteelEngineConfig, agentId?: string): CodeModeConfig {
   const raw = readCodeModeRawConfig(config, agentId);
   const maxSearchLimit = clampNumber(
     readPositiveInteger(raw.maxSearchLimit, DEFAULT_MAX_SEARCH_LIMIT),
@@ -1275,10 +1275,10 @@ function renderCodeModeCatalogIndex(lines: readonly string[], total: number): st
   const omitted = total - lines.length;
   const footer =
     omitted > 0
-      ? `${omitted} additional OpenClaw/plugin tools omitted from this prompt index. Use ALL_TOOLS or tools.search inside exec to find them.`
+      ? `${omitted} additional SteelEngine/plugin tools omitted from this prompt index. Use ALL_TOOLS or tools.search inside exec to find them.`
       : "Use these exact ids with tools.callValue; use ALL_TOOLS or tools.search inside exec when lookup is ambiguous.";
   return [
-    "OpenClaw/plugin tool quick index (exact ids plus compact input and declared output hints; descriptions are intentionally deferred):",
+    "SteelEngine/plugin tool quick index (exact ids plus compact input and declared output hints; descriptions are intentionally deferred):",
     "Each line is `id input -> output`; `-> ?` means the output shape is unknown.",
     "OUTPUT DECLARED RULE: use the named fields in the first exec; keep dependent reads, checks, and follow-up calls in that exec instead of returning a raw value only to inspect an already-declared shape.",
     "OUTPUT UNKNOWN RULE: when the needed tool is `-> ?`, including a final dependent call after declared-output calls, return that tool's raw value unchanged. Do not wrap it in the requested answer shape or read guessed fields; filter or map only in a later exec after observing its shape.",
@@ -1290,7 +1290,7 @@ function renderCodeModeCatalogIndex(lines: readonly string[], total: number): st
 
 function formatCodeModeCatalogIndex(catalog: readonly ToolSearchCatalogEntry[]): string {
   const lines = catalog
-    .filter((entry) => entry.source === "openclaw")
+    .filter((entry) => entry.source === "steelengine")
     .map((entry) => compactToolSearchCatalogEntry(entry))
     // Declared-output entries sort first so byte truncation drops `-> ?`
     // lines, which stay fully discoverable through ALL_TOOLS, before it drops
@@ -1348,7 +1348,7 @@ function createCodeModeExecDescription(
       : "";
   const catalogIndex = catalog ? formatCodeModeCatalogIndex(catalog) : "";
   return (
-    "Run JavaScript or TypeScript in OpenClaw code mode. Use `return` to pass the final value back to the agent; awaited calls without a returned value complete as `null`. Quick-index arrows show trusted declared output hints; `-> ?` means never guess result field names. When the needed tool has an unknown output, including a final dependent call after declared-output calls, the first exec must return the raw tool value unchanged with `return await tools.callValue(id, args);`; do not wrap it in the requested answer shape or read guessed fields; filter or map it only in a later exec after observing its shape. When the arrow declares the fields you need, select, call, and process them in the first exec; do not spend another exec inspecting that declared shape. Within that exec, perform dependent reads, checks, and follow-up calls in order; nested calls still enforce normal tool policy and approvals. Parallelize only independent work. `ALL_TOOLS` is the complete compact catalog with exact ids, input hints, and declared output hints. Select from it directly when practical, use `tools.search(query: string, options?)` when lookup is ambiguous, and use `tools.describe(id: string)` only when the compact input hint is insufficient. Never invent or transform a tool id. `tools.callValue(id: string, args?)` executes a tool and returns its JSON value directly; `tools.call(id: string, args?)` preserves the raw `{ tool, result }` envelope. Example: `const hit = ALL_TOOLS.find((entry) => entry.description.includes('weather')) ?? (await tools.search('weather'))[0]; return await tools.callValue(hit.id, {});`. Node.js modules and `require`/`import` are NOT available; for any shell, file, network, or external action, use enabled catalog tools allowed by policy from inside your code." +
+    "Run JavaScript or TypeScript in SteelEngine code mode. Use `return` to pass the final value back to the agent; awaited calls without a returned value complete as `null`. Quick-index arrows show trusted declared output hints; `-> ?` means never guess result field names. When the needed tool has an unknown output, including a final dependent call after declared-output calls, the first exec must return the raw tool value unchanged with `return await tools.callValue(id, args);`; do not wrap it in the requested answer shape or read guessed fields; filter or map it only in a later exec after observing its shape. When the arrow declares the fields you need, select, call, and process them in the first exec; do not spend another exec inspecting that declared shape. Within that exec, perform dependent reads, checks, and follow-up calls in order; nested calls still enforce normal tool policy and approvals. Parallelize only independent work. `ALL_TOOLS` is the complete compact catalog with exact ids, input hints, and declared output hints. Select from it directly when practical, use `tools.search(query: string, options?)` when lookup is ambiguous, and use `tools.describe(id: string)` only when the compact input hint is insufficient. Never invent or transform a tool id. `tools.callValue(id: string, args?)` executes a tool and returns its JSON value directly; `tools.call(id: string, args?)` preserves the raw `{ tool, result }` envelope. Example: `const hit = ALL_TOOLS.find((entry) => entry.description.includes('weather')) ?? (await tools.search('weather'))[0]; return await tools.callValue(hit.id, {});`. Node.js modules and `require`/`import` are NOT available; for any shell, file, network, or external action, use enabled catalog tools allowed by policy from inside your code." +
     mcpGuidance +
     namespaceGuidance +
     ' The `language` field accepts only "javascript" or "typescript"; do not pass "bash", "shell", or other values.' +
@@ -1817,7 +1817,7 @@ export function createCodeModeTools(ctx: CodeModeToolContext): AnyAgentTool[] {
       restartSafe: Type.Optional(
         Type.Boolean({
           description:
-            "Set true only when every catalog call is explicitly replay-safe and OpenClaw may reconstruct the work after a gateway restart. Leave unset for ordinary calls; true rejects unmarked or side-effecting tools and plugin namespaces.",
+            "Set true only when every catalog call is explicitly replay-safe and SteelEngine may reconstruct the work after a gateway restart. Leave unset for ordinary calls; true rejects unmarked or side-effecting tools and plugin namespaces.",
         }),
       ),
     }),
@@ -1847,7 +1847,7 @@ export function createCodeModeTools(ctx: CodeModeToolContext): AnyAgentTool[] {
     name: CODE_MODE_WAIT_TOOL_NAME,
     label: "wait",
     hideFromChannelProgress: true,
-    description: "Resume a suspended OpenClaw code mode run returned by exec.",
+    description: "Resume a suspended SteelEngine code mode run returned by exec.",
     parameters: Type.Object({
       runId: Type.String({ description: "Code mode run id returned by exec." }),
     }),
@@ -1875,7 +1875,7 @@ export function createCodeModeTools(ctx: CodeModeToolContext): AnyAgentTool[] {
 /** Compact normal tools behind Code Mode exec/wait controls. */
 export function applyCodeModeCatalog(params: {
   tools: AnyAgentTool[];
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   sessionId?: string;
   sessionKey?: string;
   agentId?: string;
@@ -1933,7 +1933,7 @@ export function applyCodeModeCatalog(params: {
 /** Move client-side tool definitions into the active Code Mode catalog. */
 export function addClientToolsToCodeModeCatalog(params: {
   tools: ToolDefinition[];
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   sessionId?: string;
   sessionKey?: string;
   agentId?: string;
@@ -1963,6 +1963,6 @@ const testing = {
 };
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
-  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("openclaw.codeModeTestApi")] = testing;
+  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("steelengine.codeModeTestApi")] = testing;
 }
 /* oxlint-disable max-lines -- TODO: split this grandfathered oversized file. */

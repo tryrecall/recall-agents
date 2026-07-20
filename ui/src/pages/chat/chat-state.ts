@@ -1558,7 +1558,7 @@ function preserveDeliveredQueuedUserTurn(state: ChatPageHost, item: ChatQueueIte
       if (!message || typeof message !== "object" || Array.isArray(message)) {
         return false;
       }
-      const marker = (message as { __openclaw?: unknown })["__openclaw"];
+      const marker = (message as { __steelengine?: unknown })["__steelengine"];
       return (
         Boolean(marker && typeof marker === "object" && !Array.isArray(marker)) &&
         (marker as { idempotencyKey?: unknown }).idempotencyKey === idempotencyKey
@@ -1575,7 +1575,7 @@ function preserveDeliveredQueuedUserTurn(state: ChatPageHost, item: ChatQueueIte
     role: "user",
     content,
     timestamp: item.createdAt,
-    __openclaw: { idempotencyKey },
+    __steelengine: { idempotencyKey },
   };
   if (visibleSessionMatches(state, sessionKey, item.agentId)) {
     if (!containsUserTurn(state.chatMessages)) {

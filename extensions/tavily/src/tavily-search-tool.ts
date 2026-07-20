@@ -1,10 +1,10 @@
 // Tavily plugin module implements tavily search tool behavior.
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-runtime";
+import type { SteelEnginePluginApi } from "steelengine/plugin-sdk/plugin-runtime";
 import {
   jsonResult,
   readPositiveIntegerParam,
   readStringParam,
-} from "openclaw/plugin-sdk/provider-web-search";
+} from "steelengine/plugin-sdk/provider-web-search";
 import { Type } from "typebox";
 import { runTavilySearch } from "./tavily-client.js";
 import { resolveTavilyToolConfig, type TavilyToolConfigContext } from "./tavily-tool-config.js";
@@ -48,7 +48,7 @@ const TavilySearchToolSchema = Type.Object(
   { additionalProperties: false },
 );
 
-export function createTavilySearchTool(api: OpenClawPluginApi, ctx?: TavilyToolConfigContext) {
+export function createTavilySearchTool(api: SteelEnginePluginApi, ctx?: TavilyToolConfigContext) {
   return {
     name: "tavily_search",
     label: "Tavily Search",

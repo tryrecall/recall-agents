@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { normalizeOptionalString } from "@openclaw/normalization-core/string-coerce";
+import { normalizeOptionalString } from "@steelengine/normalization-core/string-coerce";
 import { resolveNodeStartupTlsEnvironment } from "../bootstrap/node-startup-env.js";
 import { VERSION } from "../version.js";
 import {
@@ -47,7 +47,7 @@ type SharedServiceEnvironmentFields = {
 };
 
 export const SERVICE_PROXY_ENV_KEYS = [
-  "OPENCLAW_PROXY_URL",
+  "STEELENGINE_PROXY_URL",
   "HTTP_PROXY",
   "HTTPS_PROXY",
   "NO_PROXY",
@@ -61,10 +61,10 @@ export const SERVICE_PROXY_ENV_KEYS = [
 function readServiceProxyEnvironment(
   env: Record<string, string | undefined>,
 ): Record<string, string | undefined> {
-  // Service env intentionally preserves only the canonical OpenClaw proxy knob;
+  // Service env intentionally preserves only the canonical SteelEngine proxy knob;
   // generic shell proxy vars are audited but not frozen into services.
-  const proxyUrl = normalizeOptionalString(env.OPENCLAW_PROXY_URL);
-  return proxyUrl ? { OPENCLAW_PROXY_URL: proxyUrl } : {};
+  const proxyUrl = normalizeOptionalString(env.STEELENGINE_PROXY_URL);
+  return proxyUrl ? { STEELENGINE_PROXY_URL: proxyUrl } : {};
 }
 
 function normalizeServicePathDir(dir: string | undefined): string | undefined {
@@ -398,11 +398,11 @@ function buildMinimalServicePath(options: BuildServicePathOptions = {}): string 
 }
 
 function resolveGatewaySystemdUnitEnv(env: Record<string, string | undefined>): string {
-  const override = normalizeOptionalString(env.OPENCLAW_SYSTEMD_UNIT);
+  const override = normalizeOptionalString(env.STEELENGINE_SYSTEMD_UNIT);
   if (override) {
     return override.endsWith(".service") ? override : `${override}.service`;
   }
-  return `${resolveGatewaySystemdServiceName(env.OPENCLAW_PROFILE)}.service`;
+  return `${resolveGatewaySystemdServiceName(env.STEELENGINE_PROFILE)}.service`;
 }
 
 export function buildServiceEnvironment(params: {
@@ -422,24 +422,24 @@ export function buildServiceEnvironment(params: {
     extraPathDirs,
     params.execPath,
   );
-  const profile = env.OPENCLAW_PROFILE;
-  const wrapperPath = normalizeOptionalString(env.OPENCLAW_WRAPPER);
+  const profile = env.STEELENGINE_PROFILE;
+  const wrapperPath = normalizeOptionalString(env.STEELENGINE_WRAPPER);
   const resolvedLaunchdLabel =
     launchdLabel || (platform === "darwin" ? resolveGatewayLaunchAgentLabel(profile) : undefined);
   const systemdUnit = resolveGatewaySystemdUnitEnv(env);
   return {
     ...buildCommonServiceEnvironment(env, sharedEnv),
     NODE_OPTIONS: resolveGatewayHeapNodeOptions(params.existingNodeOptions),
-    OPENCLAW_PROFILE: profile,
-    OPENCLAW_WRAPPER: wrapperPath,
-    OPENCLAW_GATEWAY_PORT: String(port),
-    OPENCLAW_LAUNCHD_LABEL: resolvedLaunchdLabel,
-    OPENCLAW_SYSTEMD_UNIT: systemdUnit,
-    OPENCLAW_WINDOWS_TASK_NAME: resolveGatewayWindowsTaskName(profile),
-    OPENCLAW_WINDOWS_TASK_HIDDEN_LAUNCHER: "1",
-    OPENCLAW_SERVICE_MARKER: GATEWAY_SERVICE_MARKER,
-    OPENCLAW_SERVICE_KIND: GATEWAY_SERVICE_KIND,
-    OPENCLAW_SERVICE_VERSION: VERSION,
+    STEELENGINE_PROFILE: profile,
+    STEELENGINE_WRAPPER: wrapperPath,
+    STEELENGINE_GATEWAY_PORT: String(port),
+    STEELENGINE_LAUNCHD_LABEL: resolvedLaunchdLabel,
+    STEELENGINE_SYSTEMD_UNIT: systemdUnit,
+    STEELENGINE_WINDOWS_TASK_NAME: resolveGatewayWindowsTaskName(profile),
+    STEELENGINE_WINDOWS_TASK_HIDDEN_LAUNCHER: "1",
+    STEELENGINE_SERVICE_MARKER: GATEWAY_SERVICE_MARKER,
+    STEELENGINE_SERVICE_KIND: GATEWAY_SERVICE_KIND,
+    STEELENGINE_SERVICE_VERSION: VERSION,
   };
 }
 
@@ -457,23 +457,23 @@ export function buildNodeServiceEnvironment(params: {
     extraPathDirs,
     params.execPath,
   );
-  const gatewayToken = normalizeOptionalString(env.OPENCLAW_GATEWAY_TOKEN);
-  const gatewayPassword = normalizeOptionalString(env.OPENCLAW_GATEWAY_PASSWORD);
-  const allowInsecurePrivateWs = normalizeOptionalString(env.OPENCLAW_ALLOW_INSECURE_PRIVATE_WS);
+  const gatewayToken = normalizeOptionalString(env.STEELENGINE_GATEWAY_TOKEN);
+  const gatewayPassword = normalizeOptionalString(env.STEELENGINE_GATEWAY_PASSWORD);
+  const allowInsecurePrivateWs = normalizeOptionalString(env.STEELENGINE_ALLOW_INSECURE_PRIVATE_WS);
   return {
     ...buildCommonServiceEnvironment(env, sharedEnv),
-    OPENCLAW_GATEWAY_TOKEN: gatewayToken,
-    OPENCLAW_GATEWAY_PASSWORD: gatewayPassword,
-    OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: allowInsecurePrivateWs,
-    OPENCLAW_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
-    OPENCLAW_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
-    OPENCLAW_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
-    OPENCLAW_WINDOWS_TASK_HIDDEN_LAUNCHER: "1",
-    OPENCLAW_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
-    OPENCLAW_LOG_PREFIX: "node",
-    OPENCLAW_SERVICE_MARKER: NODE_SERVICE_MARKER,
-    OPENCLAW_SERVICE_KIND: NODE_SERVICE_KIND,
-    OPENCLAW_SERVICE_VERSION: VERSION,
+    STEELENGINE_GATEWAY_TOKEN: gatewayToken,
+    STEELENGINE_GATEWAY_PASSWORD: gatewayPassword,
+    STEELENGINE_ALLOW_INSECURE_PRIVATE_WS: allowInsecurePrivateWs,
+    STEELENGINE_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
+    STEELENGINE_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
+    STEELENGINE_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
+    STEELENGINE_WINDOWS_TASK_HIDDEN_LAUNCHER: "1",
+    STEELENGINE_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
+    STEELENGINE_LOG_PREFIX: "node",
+    STEELENGINE_SERVICE_MARKER: NODE_SERVICE_MARKER,
+    STEELENGINE_SERVICE_KIND: NODE_SERVICE_KIND,
+    STEELENGINE_SERVICE_VERSION: VERSION,
   };
 }
 
@@ -486,8 +486,8 @@ function buildCommonServiceEnvironment(
     TMPDIR: sharedEnv.tmpDir,
     NODE_EXTRA_CA_CERTS: sharedEnv.nodeCaCerts,
     NODE_USE_SYSTEM_CA: sharedEnv.nodeUseSystemCa,
-    OPENCLAW_STATE_DIR: sharedEnv.stateDir,
-    OPENCLAW_CONFIG_PATH: sharedEnv.configPath,
+    STEELENGINE_STATE_DIR: sharedEnv.stateDir,
+    STEELENGINE_CONFIG_PATH: sharedEnv.configPath,
     ...sharedEnv.proxyEnv,
   };
   if (sharedEnv.minimalPath) {
@@ -516,8 +516,8 @@ function resolveSharedServiceEnvironmentFields(
   extraPathDirs: string[] | undefined,
   execPath?: string,
 ): SharedServiceEnvironmentFields {
-  const stateDir = env.OPENCLAW_STATE_DIR;
-  const configPath = env.OPENCLAW_CONFIG_PATH;
+  const stateDir = env.STEELENGINE_STATE_DIR;
+  const configPath = env.STEELENGINE_CONFIG_PATH;
   const tmpDir = resolveServiceTmpDir(env, platform);
   // On macOS, launchd services don't inherit the shell environment, so Node's undici/fetch
   // cannot locate the system CA bundle. Default to /etc/ssl/cert.pem so TLS verification

@@ -6,7 +6,7 @@ import fs from "node:fs/promises";
 import net from "node:net";
 import os from "node:os";
 import path from "node:path";
-import { asNullableRecord } from "@openclaw/normalization-core/record-coerce";
+import { asNullableRecord } from "@steelengine/normalization-core/record-coerce";
 import { describe, expect, it } from "vitest";
 import { getAcpSessionManager } from "../acp/control-plane/manager.js";
 import { getAcpRuntimeBackend } from "../acp/runtime/registry.js";
@@ -20,7 +20,7 @@ import {
 import { resolveStorePath } from "../config/sessions/paths.js";
 import { loadSessionStore } from "../config/sessions/store.js";
 import type { SessionEntry } from "../config/sessions/types.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import { clearPluginLoaderCache } from "../plugins/loader.test-fixtures.js";
 import { resetPluginRuntimeStateForTest } from "../plugins/runtime.js";
@@ -30,22 +30,22 @@ import { restoreLiveEnv, snapshotLiveEnv, type LiveEnvSnapshot } from "./live-en
 import { startGatewayServer } from "./server.js";
 
 const LIVE = isLiveTestEnabled();
-const ACP_SPAWN_DEFAULTS_LIVE = isTruthyEnvValue(process.env.OPENCLAW_LIVE_ACP_SPAWN_DEFAULTS);
+const ACP_SPAWN_DEFAULTS_LIVE = isTruthyEnvValue(process.env.STEELENGINE_LIVE_ACP_SPAWN_DEFAULTS);
 const ACP_THINKING_CONTROLS_LIVE = isTruthyEnvValue(
-  process.env.OPENCLAW_LIVE_ACP_THINKING_CONTROLS,
+  process.env.STEELENGINE_LIVE_ACP_THINKING_CONTROLS,
 );
 const describeLive = LIVE && ACP_SPAWN_DEFAULTS_LIVE ? describe : describe.skip;
 const CONNECT_TIMEOUT_MS = resolvePositiveInteger(
-  process.env.OPENCLAW_LIVE_ACP_SPAWN_DEFAULTS_CONNECT_TIMEOUT_MS,
+  process.env.STEELENGINE_LIVE_ACP_SPAWN_DEFAULTS_CONNECT_TIMEOUT_MS,
   90_000,
 );
 const LIVE_TIMEOUT_MS = resolvePositiveInteger(
-  process.env.OPENCLAW_LIVE_ACP_SPAWN_DEFAULTS_TIMEOUT_MS,
+  process.env.STEELENGINE_LIVE_ACP_SPAWN_DEFAULTS_TIMEOUT_MS,
   240_000,
 );
 
 function snapshotAcpSpawnDefaultsLiveEnv(): LiveEnvSnapshot {
-  return snapshotLiveEnv(["CODEX_HOME", "OPENCLAW_GATEWAY_PORT"]);
+  return snapshotLiveEnv(["CODEX_HOME", "STEELENGINE_GATEWAY_PORT"]);
 }
 
 function resolvePositiveInteger(raw: string | undefined, fallback: number): number {
@@ -54,11 +54,11 @@ function resolvePositiveInteger(raw: string | undefined, fallback: number): numb
 }
 
 function resolveSubagentModel(): string {
-  return process.env.OPENCLAW_LIVE_ACP_SPAWN_DEFAULTS_MODEL?.trim() || "openai/gpt-5.6-luna";
+  return process.env.STEELENGINE_LIVE_ACP_SPAWN_DEFAULTS_MODEL?.trim() || "openai/gpt-5.6-luna";
 }
 
 function resolveThinking(): string {
-  return process.env.OPENCLAW_LIVE_ACP_SPAWN_DEFAULTS_THINKING?.trim() || "high";
+  return process.env.STEELENGINE_LIVE_ACP_SPAWN_DEFAULTS_THINKING?.trim() || "high";
 }
 
 function resolveHarnessReasoningEffort(): string | undefined {
@@ -93,11 +93,11 @@ function findRuntimeConfigOption(status: unknown, id: string): Record<string, un
 }
 
 function resolveHarnessModel(): string {
-  return process.env.OPENCLAW_LIVE_ACP_BIND_CODEX_MODEL?.trim() || "gpt-5.6-luna";
+  return process.env.STEELENGINE_LIVE_ACP_BIND_CODEX_MODEL?.trim() || "gpt-5.6-luna";
 }
 
 function resolveAcpAgentId(): string {
-  return process.env.OPENCLAW_LIVE_ACP_SPAWN_DEFAULTS_AGENT?.trim() || "codex";
+  return process.env.STEELENGINE_LIVE_ACP_SPAWN_DEFAULTS_AGENT?.trim() || "codex";
 }
 
 function resolveAcpAgentCommand(agentId: string): { command: string; args?: string[] } {
@@ -211,7 +211,7 @@ async function waitForAcpBackendReady(timeoutMs = CONNECT_TIMEOUT_MS): Promise<v
 }
 
 async function waitForSessionEntry(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   sessionKey: string;
   timeoutMs?: number;
 }): Promise<SessionEntry> {
@@ -229,7 +229,7 @@ async function waitForSessionEntry(params: {
 }
 
 async function runOpenCodeThinkingControlProof(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   model: string;
   thinking: string;
   sessionKeys: string[];
@@ -279,7 +279,7 @@ async function runOpenCodeThinkingControlProof(params: {
 }
 
 async function runCodexThinkingControlProof(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   model: string;
   thinking: string;
   sessionKeys: string[];
@@ -352,7 +352,7 @@ function createConfig(params: {
   subagentModel?: string;
   thinking?: string;
   includePrimaryOnlyAcpAgent?: boolean;
-}): OpenClawConfig {
+}): SteelEngineConfig {
   const subagents = params.subagentModel
     ? {
         allowAgents: ["*"],
@@ -435,8 +435,8 @@ describeLive("gateway live (ACP spawn defaults)", () => {
     "applies existing subagent defaults to live ACP spawns without leaking primary agent model",
     async () => {
       const previousEnv = snapshotAcpSpawnDefaultsLiveEnv();
-      const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-live-acp-spawn-"));
-      const tempConfigPath = path.join(tempRoot, "openclaw.json");
+      const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-live-acp-spawn-"));
+      const tempConfigPath = path.join(tempRoot, "steelengine.json");
       const tempStateDir = path.join(tempRoot, "state");
       const port = await getFreeGatewayPort();
       const token = `test-${randomUUID()}`;
@@ -446,14 +446,14 @@ describeLive("gateway live (ACP spawn defaults)", () => {
       const sessionKeys: string[] = [];
       let server: Awaited<ReturnType<typeof startGatewayServer>> | undefined;
 
-      setTestEnvValue("OPENCLAW_CONFIG_PATH", tempConfigPath);
-      setTestEnvValue("OPENCLAW_STATE_DIR", tempStateDir);
-      process.env.OPENCLAW_SKIP_CHANNELS = "1";
-      process.env.OPENCLAW_SKIP_GMAIL_WATCHER = "1";
-      process.env.OPENCLAW_SKIP_CRON = "1";
-      process.env.OPENCLAW_SKIP_CANVAS_HOST = "1";
-      process.env.OPENCLAW_GATEWAY_TOKEN = token;
-      process.env.OPENCLAW_GATEWAY_PORT = String(port);
+      setTestEnvValue("STEELENGINE_CONFIG_PATH", tempConfigPath);
+      setTestEnvValue("STEELENGINE_STATE_DIR", tempStateDir);
+      process.env.STEELENGINE_SKIP_CHANNELS = "1";
+      process.env.STEELENGINE_SKIP_GMAIL_WATCHER = "1";
+      process.env.STEELENGINE_SKIP_CRON = "1";
+      process.env.STEELENGINE_SKIP_CANVAS_HOST = "1";
+      process.env.STEELENGINE_GATEWAY_TOKEN = token;
+      process.env.STEELENGINE_GATEWAY_PORT = String(port);
       if (acpAgentId === "codex") {
         await prepareCodexHomeForLiveSpawnDefaultsTest(tempRoot);
       }

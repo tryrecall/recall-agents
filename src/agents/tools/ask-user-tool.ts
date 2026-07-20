@@ -1,6 +1,6 @@
 /** Built-in blocking user-question tool and its active-session answer bridge. */
 import { createHash } from "node:crypto";
-import { truncateUtf16Safe } from "@openclaw/normalization-core/utf16-slice";
+import { truncateUtf16Safe } from "@steelengine/normalization-core/utf16-slice";
 import { Type } from "typebox";
 import type {
   QuestionAnswers,
@@ -390,7 +390,7 @@ function resetPendingAskUserQuestionsForTest(): void {
 }
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
-  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("openclaw.askUserToolTestApi")] = {
+  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("steelengine.askUserToolTestApi")] = {
     resetPendingAskUserQuestionsForTest,
   };
 }

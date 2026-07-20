@@ -1,7 +1,7 @@
-// Tencent plugin entrypoint registers its OpenClaw integration.
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
-import { createProviderApiKeyAuthMethod } from "openclaw/plugin-sdk/provider-auth-api-key";
-import { buildSingleProviderApiKeyCatalog } from "openclaw/plugin-sdk/provider-catalog-shared";
+// Tencent plugin entrypoint registers its SteelEngine integration.
+import { definePluginEntry } from "steelengine/plugin-sdk/plugin-entry";
+import { createProviderApiKeyAuthMethod } from "steelengine/plugin-sdk/provider-auth-api-key";
+import { buildSingleProviderApiKeyCatalog } from "steelengine/plugin-sdk/provider-catalog-shared";
 import {
   TOKENHUB_MODEL_CATALOG,
   TOKENHUB_PROVIDER_ID,

@@ -7,7 +7,7 @@ import type {
 } from "../auto-reply/reply/reply-dispatcher.types.js";
 import type { FinalizedMsgContext } from "../auto-reply/templating.js";
 import type { ChatType } from "../channels/chat-type.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { TtsAutoMode } from "../config/types.tts.js";
 import type { DiagnosticTraceContext } from "../infra/diagnostic-trace-context.js";
 import type {
@@ -189,7 +189,7 @@ type PluginHookChannelPairingRequestedEvent = {
   accountId?: string;
   /** Channel-scoped sender ID awaiting operator approval. */
   senderId: string;
-  /** Short-lived code accepted by `openclaw pairing approve`. */
+  /** Short-lived code accepted by `steelengine pairing approve`. */
   code: string;
   /** Sender-supplied channel metadata for operator notification/audit. Treat as untrusted. */
   metadata?: Record<string, string | undefined>;
@@ -516,7 +516,7 @@ export type PluginHookReplyDispatchEvent = {
 };
 
 export type PluginHookReplyDispatchContext = {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   dispatcher: ReplyDispatcher;
   abortSignal?: AbortSignal;
   onReplyStart?: () => Promise<void> | void;
@@ -787,7 +787,7 @@ export type PluginHookSubagentSpawningResult =
       /**
        * @deprecated Core now resolves thread-bound spawn routing from session
        * bindings and channel route projection. Keep returning this only for
-       * compatibility with older OpenClaw runtimes.
+       * compatibility with older SteelEngine runtimes.
        */
       threadBindingReady?: boolean;
       /**
@@ -873,7 +873,7 @@ export type PluginHookSubagentEndedEvent = {
 
 export type PluginHookGatewayContext = {
   port?: number;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   workspaceDir?: string;
   getCron?: () => PluginHookGatewayCronService | undefined;
 };

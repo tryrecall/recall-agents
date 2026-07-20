@@ -3,14 +3,14 @@
  */
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { resolveClaudeFable5ModelIdentity } from "@openclaw/llm-core";
-import { normalizeProviderId } from "@openclaw/model-catalog-core/provider-id";
+import { resolveClaudeFable5ModelIdentity } from "@steelengine/llm-core";
+import { normalizeProviderId } from "@steelengine/model-catalog-core/provider-id";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "@openclaw/normalization-core/string-coerce";
+} from "@steelengine/normalization-core/string-coerce";
 import { getRuntimeConfig } from "../config/config.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { isDiagnosticFlagEnabled } from "../infra/diagnostic-flags.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { planManifestModelCatalogRows } from "../model-catalog/manifest-planner.js";
@@ -48,7 +48,7 @@ import {
 } from "./model-selection-shared.js";
 import {
   buildModelsJsonSourceFingerprint,
-  prepareOpenClawModelsJsonSource,
+  prepareSteelEngineModelsJsonSource,
 } from "./models-config.js";
 import {
   filterGeneratedPluginModelCatalogProviders,
@@ -88,7 +88,7 @@ type AgentDiscoveryModule = typeof import("./agent-model-discovery.js");
 
 export type LoadModelCatalogParams = {
   agentDir?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   useCache?: boolean;
   cacheOnly?: boolean;
   readOnly?: boolean;
@@ -106,10 +106,10 @@ type ManifestModelCatalogCacheEntry = {
   snapshot: PluginMetadataSnapshot;
   rows: ModelCatalogEntry[];
 };
-let manifestModelCatalogCache = new WeakMap<OpenClawConfig, ManifestModelCatalogCacheEntry>();
+let manifestModelCatalogCache = new WeakMap<SteelEngineConfig, ManifestModelCatalogCacheEntry>();
 function buildLoadModelCatalogStateCacheKey(params: {
   agentDir: string;
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   metadataSnapshot?: PluginMetadataSnapshot;
   sourceFingerprint: string;
   workspaceDir?: string;
@@ -347,7 +347,7 @@ const EMPTY_DEGRADED_MODEL_CATALOG_SNAPSHOT: ModelCatalogSnapshot = {
 };
 
 export function loadManifestModelCatalog(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   fallbackToMetadataScan?: boolean;
@@ -538,7 +538,7 @@ async function loadReadOnlyPersistedProviderRows(
 }
 
 async function loadReadOnlyPersistedModelCatalog(params?: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   metadataSnapshot?: PluginMetadataSnapshot;
 }): Promise<ModelCatalogSnapshot> {
   const cfg = params?.config ?? getRuntimeConfig();
@@ -624,7 +624,7 @@ async function loadReadOnlyPersistedModelCatalog(params?: {
   return createModelCatalogSnapshot(models, routeVariants);
 }
 
-function hasConfiguredProviderRowsNeedingManifestLookup(cfg: OpenClawConfig): boolean {
+function hasConfiguredProviderRowsNeedingManifestLookup(cfg: SteelEngineConfig): boolean {
   const providers = cfg.models?.providers;
   if (!providers || typeof providers !== "object") {
     return false;
@@ -636,7 +636,7 @@ function hasConfiguredProviderRowsNeedingManifestLookup(cfg: OpenClawConfig): bo
 }
 
 function loadReadOnlyStaticModelCatalog(params?: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   metadataSnapshot?: PluginMetadataSnapshot;
 }): ModelCatalogSnapshot {
   const cfg = params?.config ?? getRuntimeConfig();
@@ -759,7 +759,7 @@ export async function loadModelCatalogSnapshot(
         }
       }
       if (!readOnly) {
-        const preparedSource = await prepareOpenClawModelsJsonSource(cfg, agentDir, {
+        const preparedSource = await prepareSteelEngineModelsJsonSource(cfg, agentDir, {
           pluginMetadataSnapshot: params?.metadataSnapshot,
           workspaceDir,
         });

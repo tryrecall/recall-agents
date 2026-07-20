@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { normalizeUniqueStringEntries } from "@openclaw/normalization-core/string-normalization";
+import { normalizeUniqueStringEntries } from "@steelengine/normalization-core/string-normalization";
 import pMap from "p-map";
 import {
   resolveAgentDir,
@@ -39,7 +39,7 @@ import {
   resolveSessionTranscriptPath,
   resolveSessionTranscriptsDirForAgent,
 } from "../../config/sessions/paths.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import {
   coerceSecretRef,
   hasConfiguredSecretInput,
@@ -47,7 +47,7 @@ import {
 } from "../../config/types.secrets.js";
 import { type SecretRefResolveCache, resolveSecretRefString } from "../../secrets/resolve.js";
 import { createLazyImportLoader } from "../../shared/lazy-promise.js";
-import { disposeOpenClawAgentDatabaseByPath } from "../../state/openclaw-agent-db.js";
+import { disposeSteelEngineAgentDatabaseByPath } from "../../state/steelengine-agent-db.js";
 import { redactSecrets } from "../status-all/format.js";
 import { buildProbeCandidateMap, selectProbeModel } from "./list.probe.models.js";
 import { formatMs } from "./shared.js";
@@ -202,7 +202,7 @@ function formatMissingCredentialProbeError(reasonCode: AuthProbeReasonCode): str
   return `${legacyLine}\n↳ Auth reason [ineligible_profile]: profile is incompatible with provider config.`;
 }
 
-function resolveProbeSecretRef(profile: ProfileEntry, cfg: OpenClawConfig) {
+function resolveProbeSecretRef(profile: ProfileEntry, cfg: SteelEngineConfig) {
   const defaults = cfg.secrets?.defaults;
   if (profile.type === "api_key") {
     if (normalizeSecretInputString(profile.key) !== undefined) {
@@ -225,11 +225,11 @@ function formatUnresolvedRefProbeError(refLabel: string): string {
 }
 
 function withDirectCredential(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   provider: string,
   value: string,
   mode: string | undefined,
-): OpenClawConfig {
+): SteelEngineConfig {
   const providers = cfg.models?.providers ?? {};
   const configKey =
     Object.keys(providers).find((key) => normalizeProviderId(key) === provider) ?? provider;
@@ -261,7 +261,7 @@ function withDirectCredential(
   };
 }
 
-function withoutProfileFallback(cfg: OpenClawConfig, provider: string): OpenClawConfig {
+function withoutProfileFallback(cfg: SteelEngineConfig, provider: string): SteelEngineConfig {
   return {
     ...cfg,
     auth: {
@@ -275,7 +275,7 @@ function withoutProfileFallback(cfg: OpenClawConfig, provider: string): OpenClaw
 }
 
 async function resolveConfiguredProbeCredential(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   input: unknown;
   cache: SecretRefResolveCache;
 }): Promise<string | null> {
@@ -299,7 +299,7 @@ async function resolveConfiguredProbeCredential(params: {
 }
 
 async function maybeResolveUnresolvedRefIssue(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   profile?: ProfileEntry;
   cache: SecretRefResolveCache;
 }): Promise<{ reasonCode: "unresolved_ref"; error: string } | null> {
@@ -327,7 +327,7 @@ async function maybeResolveUnresolvedRefIssue(params: {
 
 /** Builds probe targets plus preflight failures for missing/invalid credentials. */
 export async function buildProbeTargets(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentDir?: string;
   workspaceDir?: string;
   providers: string[];
@@ -708,7 +708,7 @@ export async function buildProbeTargets(params: {
 }
 
 async function probeTarget(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId: string;
   agentDir: string;
   workspaceDir: string;
@@ -768,10 +768,10 @@ async function probeTarget(params: {
     if (target.boundValue) {
       // Canonicalize so the isolated agent DB registers and unregisters under
       // one path. os.tmpdir() is a symlink on macOS (/var -> /private/var), and
-      // disposeOpenClawAgentDatabaseByPath's exact-path guard would otherwise
+      // disposeSteelEngineAgentDatabaseByPath's exact-path guard would otherwise
       // skip the registry row, leaking an agent_databases entry per probe.
       isolatedAgentDir = await fs.realpath(
-        await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-auth-probe-")),
+        await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-auth-probe-")),
       );
     }
     if (target.boundValue && !target.useRuntimeAuth && isolatedAgentDir) {
@@ -832,14 +832,14 @@ async function probeTarget(params: {
   } finally {
     if (isolatedAgentDir) {
       clearRuntimeAuthProfileStoreSnapshot(isolatedAgentDir);
-      disposeOpenClawAgentDatabaseByPath(resolveAuthProfileDatabasePath(isolatedAgentDir));
+      disposeSteelEngineAgentDatabaseByPath(resolveAuthProfileDatabasePath(isolatedAgentDir));
       await fs.rm(isolatedAgentDir, { recursive: true, force: true });
     }
   }
 }
 
 async function runTargetsWithConcurrency(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId?: string;
   agentDir?: string;
   workspaceDir?: string;
@@ -891,7 +891,7 @@ async function runTargetsWithConcurrency(params: {
 
 /** Runs all auth probes with bounded concurrency and returns a summary. */
 export async function runAuthProbes(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   agentId?: string;
   agentDir?: string;
   workspaceDir?: string;

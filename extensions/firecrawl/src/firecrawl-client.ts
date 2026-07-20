@@ -1,6 +1,6 @@
 // Firecrawl plugin module implements firecrawl client behavior.
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { readProviderJsonResponse } from "openclaw/plugin-sdk/provider-http";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { readProviderJsonResponse } from "steelengine/plugin-sdk/provider-http";
 import {
   DEFAULT_CACHE_TTL_MINUTES,
   markdownToText,
@@ -12,18 +12,18 @@ import {
   withSelfHostedWebToolsEndpoint,
   withStrictWebToolsEndpoint,
   writeCache,
-} from "openclaw/plugin-sdk/provider-web-fetch";
-import { normalizeSecretInput } from "openclaw/plugin-sdk/secret-input";
-import { wrapExternalContent, wrapWebContent } from "openclaw/plugin-sdk/security-runtime";
+} from "steelengine/plugin-sdk/provider-web-fetch";
+import { normalizeSecretInput } from "steelengine/plugin-sdk/secret-input";
+import { wrapExternalContent, wrapWebContent } from "steelengine/plugin-sdk/security-runtime";
 import {
   SsrFBlockedError,
   isBlockedHostnameOrIp,
   isPrivateIpAddress,
   resolvePinnedHostnameWithPolicy,
   type LookupFn,
-} from "openclaw/plugin-sdk/ssrf-runtime";
-import { normalizeOptionalString } from "openclaw/plugin-sdk/string-coerce-runtime";
-import { truncateUtf16Safe } from "openclaw/plugin-sdk/text-utility-runtime";
+} from "steelengine/plugin-sdk/ssrf-runtime";
+import { normalizeOptionalString } from "steelengine/plugin-sdk/string-coerce-runtime";
+import { truncateUtf16Safe } from "steelengine/plugin-sdk/text-utility-runtime";
 import {
   DEFAULT_FIRECRAWL_BASE_URL,
   resolveFirecrawlApiKey,
@@ -75,7 +75,7 @@ async function readFirecrawlJsonResponse(
 }
 
 type FirecrawlSearchParams = {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   query: string;
   count?: number;
   timeoutSeconds?: number;
@@ -91,7 +91,7 @@ type FirecrawlSearchParams = {
 };
 
 type FirecrawlScrapeParams = {
-  cfg?: OpenClawConfig;
+  cfg?: SteelEngineConfig;
   url: string;
   extractMode: "markdown" | "text";
   access?: "credential" | "keyless";

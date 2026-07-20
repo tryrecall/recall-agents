@@ -3,10 +3,10 @@ import crypto from "node:crypto";
 import fsSync from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { PlatformMessageNotDispatchedError } from "openclaw/plugin-sdk/error-runtime";
-import { redactIdentifier } from "openclaw/plugin-sdk/logging-core";
-import { MEDIA_FFMPEG_MAX_AUDIO_DURATION_SECS } from "openclaw/plugin-sdk/media-runtime";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { PlatformMessageNotDispatchedError } from "steelengine/plugin-sdk/error-runtime";
+import { redactIdentifier } from "steelengine/plugin-sdk/logging-core";
+import { MEDIA_FFMPEG_MAX_AUDIO_DURATION_SECS } from "steelengine/plugin-sdk/media-runtime";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createAcceptedWhatsAppSendResult } from "./inbound/send-result.test-helper.js";
 import type { ActiveWebListener } from "./inbound/types.js";
@@ -21,10 +21,10 @@ let sendMessageWhatsApp: typeof import("./send.js").sendMessageWhatsApp;
 let sendPollWhatsApp: typeof import("./send.js").sendPollWhatsApp;
 let sendReactionWhatsApp: typeof import("./send.js").sendReactionWhatsApp;
 let sendTypingWhatsApp: typeof import("./send.js").sendTypingWhatsApp;
-let resetLogger: typeof import("openclaw/plugin-sdk/runtime-env").resetLogger;
-let setLoggerOverride: typeof import("openclaw/plugin-sdk/runtime-env").setLoggerOverride;
+let resetLogger: typeof import("steelengine/plugin-sdk/runtime-env").resetLogger;
+let setLoggerOverride: typeof import("steelengine/plugin-sdk/runtime-env").setLoggerOverride;
 
-const WHATSAPP_TEST_CFG: OpenClawConfig = {
+const WHATSAPP_TEST_CFG: SteelEngineConfig = {
   channels: { whatsapp: {} },
 };
 
@@ -55,9 +55,9 @@ vi.mock("./outbound-media.runtime.js", async () => {
   };
 });
 
-vi.mock("openclaw/plugin-sdk/media-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/media-runtime")>(
-    "openclaw/plugin-sdk/media-runtime",
+vi.mock("steelengine/plugin-sdk/media-runtime", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/media-runtime")>(
+    "steelengine/plugin-sdk/media-runtime",
   );
   return {
     ...actual,
@@ -85,7 +85,7 @@ describe("web outbound", () => {
     ({ sendMessageWhatsApp, sendPollWhatsApp, sendReactionWhatsApp, sendTypingWhatsApp } =
       await import("./send.js"));
     const { resetLogger: loadedResetLogger, setLoggerOverride: loadedSetLoggerOverride } =
-      await import("openclaw/plugin-sdk/runtime-env");
+      await import("steelengine/plugin-sdk/runtime-env");
     resetLogger = loadedResetLogger;
     setLoggerOverride = loadedSetLoggerOverride;
   });
@@ -233,7 +233,7 @@ describe("web outbound", () => {
             },
           },
         },
-      } as OpenClawConfig,
+      } as SteelEngineConfig,
     });
 
     expect(result).toEqual({
@@ -338,7 +338,7 @@ describe("web outbound", () => {
 
     expect(error).toBeInstanceOf(PlatformMessageNotDispatchedError);
     expect(error).toMatchObject({
-      code: "OPENCLAW_PLATFORM_MESSAGE_NOT_DISPATCHED",
+      code: "STEELENGINE_PLATFORM_MESSAGE_NOT_DISPATCHED",
       message: expect.stringMatching(
         /No active WhatsApp Web listener.*channels login.*account work/,
       ),
@@ -748,7 +748,7 @@ describe("web outbound", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     await sendMessageWhatsApp("+1555", "pic", {
       verbose: false,
@@ -810,7 +810,7 @@ describe("web outbound", () => {
   });
 
   it("redacts recipients and poll text in outbound logs", async () => {
-    const logPath = path.join(os.tmpdir(), `openclaw-outbound-${crypto.randomUUID()}.log`);
+    const logPath = path.join(os.tmpdir(), `steelengine-outbound-${crypto.randomUUID()}.log`);
     setLoggerOverride({ level: "trace", file: logPath });
 
     await sendPollWhatsApp(

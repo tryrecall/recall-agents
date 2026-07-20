@@ -1,5 +1,5 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { resolveAgentModelPrimaryValue } from "openclaw/plugin-sdk/provider-onboard";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { resolveAgentModelPrimaryValue } from "steelengine/plugin-sdk/provider-onboard";
 import { describe, expect, it } from "vitest";
 import { buildCohereCatalogModels, COHERE_BASE_URL, COHERE_MODEL_CATALOG } from "./models.js";
 import { applyCohereConfig, COHERE_DEFAULT_MODEL_REF } from "./onboard.js";
@@ -29,7 +29,7 @@ describe("Cohere onboarding", () => {
   });
 
   it("sets Cohere only when there is no primary model", () => {
-    const existing: OpenClawConfig = {
+    const existing: SteelEngineConfig = {
       agents: {
         defaults: {
           model: { primary: "openai/gpt-5.5" },

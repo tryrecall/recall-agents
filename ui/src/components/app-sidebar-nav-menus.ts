@@ -201,7 +201,7 @@ export function renderSidebarMoreMenu(params: SidebarMoreMenuParams) {
     params.isRouteEnabled(routeId),
   );
   return html`
-    <openclaw-menu-surface>
+    <steelengine-menu-surface>
       <wa-dropdown
         class="sidebar-customize-menu sidebar-more-menu"
         .open=${true}
@@ -254,7 +254,7 @@ export function renderSidebarMoreMenu(params: SidebarMoreMenuParams) {
           <span class="sidebar-customize-menu__text">${t("nav.customize")}</span>
         </wa-dropdown-item>
       </wa-dropdown>
-    </openclaw-menu-surface>
+    </steelengine-menu-surface>
   `;
 }
 
@@ -274,7 +274,7 @@ export function renderSidebarCustomizeMenu(params: SidebarCustomizeMenuParams) {
     return nothing;
   }
   return html`
-    <openclaw-menu-surface>
+    <steelengine-menu-surface>
       <wa-dropdown
         class="sidebar-customize-menu"
         .open=${true}
@@ -325,7 +325,7 @@ export function renderSidebarCustomizeMenu(params: SidebarCustomizeMenuParams) {
           <span class="sidebar-customize-menu__text">${t("nav.customizeReset")}</span>
         </wa-dropdown-item>
       </wa-dropdown>
-    </openclaw-menu-surface>
+    </steelengine-menu-surface>
   `;
 }
 

@@ -38,7 +38,7 @@ export {
   normalizeAccountId,
   normalizeResolvedSecretInputString,
   normalizeSecretInputString,
-  type OpenClawConfig,
+  type SteelEngineConfig,
   type OutboundReplyPayload,
   PAIRING_APPROVED_MESSAGE,
   type PluginRuntime,

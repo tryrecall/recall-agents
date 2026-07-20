@@ -6,7 +6,7 @@ import {
   getNodeSqliteKysely,
 } from "../../infra/kysely-sync.js";
 import { runSqliteDeferredTransactionSync } from "../../infra/sqlite-transaction.js";
-import type { DB as OpenClawAgentKyselyDatabase } from "../../state/openclaw-agent-db.generated.js";
+import type { DB as SteelEngineAgentKyselyDatabase } from "../../state/steelengine-agent-db.generated.js";
 import {
   isCanonicalSessionTranscriptEntry,
   parseSessionTranscriptTreeEntry,
@@ -17,13 +17,13 @@ import {
 } from "./transcript-visible-events.js";
 
 type TranscriptProjectionDatabase = Pick<
-  OpenClawAgentKyselyDatabase,
+  SteelEngineAgentKyselyDatabase,
   "sessions" | "session_transcript_index_state" | "transcript_events"
 > & {
-  session_transcript_active_events: OpenClawAgentKyselyDatabase["session_transcript_active_events"] & {
+  session_transcript_active_events: SteelEngineAgentKyselyDatabase["session_transcript_active_events"] & {
     rowid: Generated<number>;
   };
-  session_transcript_fts: OpenClawAgentKyselyDatabase["session_transcript_fts"] & {
+  session_transcript_fts: SteelEngineAgentKyselyDatabase["session_transcript_fts"] & {
     rowid: Generated<number>;
   };
 };

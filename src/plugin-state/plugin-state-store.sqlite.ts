@@ -1,6 +1,6 @@
-// Plugin state SQLite helpers persist plugin state in the OpenClaw state database.
+// Plugin state SQLite helpers persist plugin state in the SteelEngine state database.
 import type { DatabaseSync } from "node:sqlite";
-import { resolveExpiresAtMsFromDurationMs } from "@openclaw/normalization-core/number-coercion";
+import { resolveExpiresAtMsFromDurationMs } from "@steelengine/normalization-core/number-coercion";
 import type { Insertable, Selectable } from "kysely";
 import {
   executeSqliteQuerySync,
@@ -9,15 +9,15 @@ import {
 } from "../infra/kysely-sync.js";
 import { requireNodeSqlite } from "../infra/node-sqlite.js";
 import { normalizeSqliteNumber } from "../infra/sqlite-number.js";
-import type { DB as OpenClawStateKyselyDatabase } from "../state/openclaw-state-db.generated.js";
+import type { DB as SteelEngineStateKyselyDatabase } from "../state/steelengine-state-db.generated.js";
 import {
-  closeOpenClawStateDatabase,
-  isOpenClawStateDatabaseOpen,
-  openOpenClawStateDatabase,
-  type OpenClawStateDatabaseOptions,
-  runOpenClawStateWriteTransaction,
-} from "../state/openclaw-state-db.js";
-import { resolveOpenClawStateSqlitePath } from "../state/openclaw-state-db.paths.js";
+  closeSteelEngineStateDatabase,
+  isSteelEngineStateDatabaseOpen,
+  openSteelEngineStateDatabase,
+  type SteelEngineStateDatabaseOptions,
+  runSteelEngineStateWriteTransaction,
+} from "../state/steelengine-state-db.js";
+import { resolveSteelEngineStateSqlitePath } from "../state/steelengine-state-db.paths.js";
 import {
   PluginStateStoreError,
   type PluginStateEntry,
@@ -33,8 +33,8 @@ export const MAX_PLUGIN_STATE_VALUE_BYTES = 65_536;
 export const MAX_PLUGIN_STATE_ENTRIES_PER_PLUGIN = 50_000;
 let maxPluginStateEntriesPerPluginForTests: number | undefined;
 
-type PluginStateEntriesTable = OpenClawStateKyselyDatabase["plugin_state_entries"];
-type PluginStateStoreDatabase = Pick<OpenClawStateKyselyDatabase, "plugin_state_entries">;
+type PluginStateEntriesTable = SteelEngineStateKyselyDatabase["plugin_state_entries"];
+type PluginStateStoreDatabase = Pick<SteelEngineStateKyselyDatabase, "plugin_state_entries">;
 
 type PluginStateRow = Selectable<PluginStateEntriesTable>;
 
@@ -99,7 +99,7 @@ function wrapPluginStateError(
   operation: PluginStateStoreOperation,
   fallbackCode: PluginStateStoreErrorCode,
   message: string,
-  pathname = resolveOpenClawStateSqlitePath(process.env),
+  pathname = resolveSteelEngineStateSqlitePath(process.env),
 ): PluginStateStoreError {
   if (error instanceof PluginStateStoreError) {
     return error;
@@ -121,7 +121,7 @@ function parseStoredJson(raw: string, operation: PluginStateStoreOperation): unk
       code: "PLUGIN_STATE_CORRUPT",
       operation,
       message: "Plugin state entry contains corrupt JSON.",
-      path: resolveOpenClawStateSqlitePath(process.env),
+      path: resolveSteelEngineStateSqlitePath(process.env),
       cause: error,
     });
   }
@@ -322,10 +322,10 @@ function sweepExpiredPluginStateEntriesFromDatabase(db: DatabaseSync, now: numbe
 
 function openPluginStateDatabase(
   operation: PluginStateStoreOperation = "open",
-  options: OpenClawStateDatabaseOptions = {},
+  options: SteelEngineStateDatabaseOptions = {},
 ): PluginStateDatabase {
   const env = options.env ?? process.env;
-  const pathname = resolveOpenClawStateSqlitePath(env);
+  const pathname = resolveSteelEngineStateSqlitePath(env);
   if (cachedDatabase && cachedDatabase.path === pathname && cachedDatabase.db.isOpen) {
     return cachedDatabase;
   }
@@ -334,7 +334,7 @@ function openPluginStateDatabase(
   }
 
   try {
-    const database = openOpenClawStateDatabase(options);
+    const database = openSteelEngineStateDatabase(options);
     cachedDatabase = {
       db: database.db,
       path: database.path,
@@ -356,17 +356,17 @@ function countRow(row: CountRow | undefined): number {
   return typeof raw === "bigint" ? Number(raw) : raw;
 }
 
-function envOptions(env?: NodeJS.ProcessEnv): OpenClawStateDatabaseOptions {
+function envOptions(env?: NodeJS.ProcessEnv): SteelEngineStateDatabaseOptions {
   return env ? { env } : {};
 }
 
 function runWriteTransaction<T>(
   operation: PluginStateStoreOperation,
   write: (store: PluginStateDatabase) => T,
-  options: OpenClawStateDatabaseOptions = {},
+  options: SteelEngineStateDatabaseOptions = {},
 ): T {
   const store = openPluginStateDatabase(operation, options);
-  return runOpenClawStateWriteTransaction(() => {
+  return runSteelEngineStateWriteTransaction(() => {
     const result = write(store);
     return result;
   }, options);
@@ -952,10 +952,10 @@ function seedPluginStateDatabaseEntriesForTests(
 }
 
 function probePluginStateStore(): PluginStateStoreProbeResult {
-  const databasePath = resolveOpenClawStateSqlitePath(process.env);
+  const databasePath = resolveSteelEngineStateSqlitePath(process.env);
   const steps: PluginStateStoreProbeStep[] = [];
   const wasOpen = cachedDatabase !== null;
-  const stateWasOpen = isOpenClawStateDatabaseOpen();
+  const stateWasOpen = isSteelEngineStateDatabaseOpen();
 
   const pushOk = (name: string) => steps.push({ name, ok: true });
   const pushFailure = (name: string, error: unknown) => {
@@ -1025,7 +1025,7 @@ function probePluginStateStore(): PluginStateStoreProbeResult {
       });
     });
     pushOk("write-read-delete");
-    openOpenClawStateDatabase().walMaintenance.checkpoint();
+    openSteelEngineStateDatabase().walMaintenance.checkpoint();
     pushOk("checkpoint");
   } catch (error) {
     pushFailure("probe", error);
@@ -1040,11 +1040,11 @@ function probePluginStateStore(): PluginStateStoreProbeResult {
 
 export function closePluginStateDatabase(): void {
   cachedDatabase = null;
-  closeOpenClawStateDatabase();
+  closeSteelEngineStateDatabase();
 }
 
 if (process.env.VITEST || process.env.NODE_ENV === "test") {
-  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("openclaw.pluginStateSqliteTestApi")] = {
+  (globalThis as Record<PropertyKey, unknown>)[Symbol.for("steelengine.pluginStateSqliteTestApi")] = {
     probePluginStateStore,
     seedPluginStateDatabaseEntriesForTests,
     setMaxPluginStateEntriesPerPluginForTests,

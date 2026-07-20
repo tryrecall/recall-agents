@@ -4,20 +4,20 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
-import { clearMemoryEmbeddingProviders as clearRegistry } from "openclaw/plugin-sdk/memory-core-host-engine-embeddings";
-import { hashText } from "openclaw/plugin-sdk/memory-core-host-engine-storage";
-import { resolveSessionTranscriptsDirForAgent } from "openclaw/plugin-sdk/memory-core-host-runtime-core";
+import { clearMemoryEmbeddingProviders as clearRegistry } from "steelengine/plugin-sdk/memory-core-host-engine-embeddings";
+import { hashText } from "steelengine/plugin-sdk/memory-core-host-engine-storage";
+import { resolveSessionTranscriptsDirForAgent } from "steelengine/plugin-sdk/memory-core-host-runtime-core";
 import {
   formatSqliteSessionFileMarker,
   upsertSessionEntry,
-} from "openclaw/plugin-sdk/session-store-runtime";
-import { appendSessionTranscriptMessageByIdentity } from "openclaw/plugin-sdk/session-transcript-runtime";
-import { resolveOpenClawAgentSqlitePath } from "openclaw/plugin-sdk/sqlite-runtime";
+} from "steelengine/plugin-sdk/session-store-runtime";
+import { appendSessionTranscriptMessageByIdentity } from "steelengine/plugin-sdk/session-transcript-runtime";
+import { resolveSteelEngineAgentSqlitePath } from "steelengine/plugin-sdk/sqlite-runtime";
 import {
-  closeOpenClawAgentDatabasesForTest,
-  closeOpenClawStateDatabaseForTest,
-  openOpenClawAgentDatabase,
-} from "openclaw/plugin-sdk/sqlite-runtime-testing";
+  closeSteelEngineAgentDatabasesForTest,
+  closeSteelEngineStateDatabaseForTest,
+  openSteelEngineAgentDatabase,
+} from "steelengine/plugin-sdk/sqlite-runtime-testing";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import "./test-runtime-mocks.js";
 import type { MemoryIndexManager } from "./index.js";
@@ -47,7 +47,7 @@ let providerCloseGate: Promise<void> | null = null;
 let providerInitGate: Promise<void> | null = null;
 let providerCalls: Array<{ provider?: string; model?: string; outputDimensionality?: number }> = [];
 let forceNoProvider = false;
-const originalMemoryIndexStateDir = process.env.OPENCLAW_STATE_DIR;
+const originalMemoryIndexStateDir = process.env.STEELENGINE_STATE_DIR;
 
 const identityAliasFixture = vi.hoisted(() => ({
   provider: "identity-alias-test",
@@ -64,14 +64,14 @@ function createLocalWorkerExitError(): Error {
 }
 
 function setMemoryIndexStateDir(stateDir: string): void {
-  Reflect.set(process.env, "OPENCLAW_STATE_DIR", stateDir);
+  Reflect.set(process.env, "STEELENGINE_STATE_DIR", stateDir);
 }
 
 function restoreMemoryIndexStateDir(): void {
   if (originalMemoryIndexStateDir === undefined) {
-    Reflect.deleteProperty(process.env, "OPENCLAW_STATE_DIR");
+    Reflect.deleteProperty(process.env, "STEELENGINE_STATE_DIR");
   } else {
-    Reflect.set(process.env, "OPENCLAW_STATE_DIR", originalMemoryIndexStateDir);
+    Reflect.set(process.env, "STEELENGINE_STATE_DIR", originalMemoryIndexStateDir);
   }
 }
 
@@ -278,7 +278,7 @@ describe("memory index", () => {
   const managersForCleanup = new Set<MemoryIndexManager>();
 
   beforeAll(async () => {
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-mem-fixtures-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-mem-fixtures-"));
     workspaceDir = path.join(fixtureRoot, "workspace");
     memoryDir = path.join(workspaceDir, "memory");
   });
@@ -292,8 +292,8 @@ describe("memory index", () => {
     vi.useRealTimers();
     await Promise.all(Array.from(managersForCleanup).map((manager) => manager.close()));
     await closeAllMemorySearchManagers();
-    closeOpenClawAgentDatabasesForTest();
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineAgentDatabasesForTest();
+    closeSteelEngineStateDatabaseForTest();
     clearRegistry();
     managersForCleanup.clear();
     restoreMemoryIndexStateDir();
@@ -647,12 +647,12 @@ describe("memory index", () => {
   it("reindexes memory tables in place without deleting unrelated agent rows", async () => {
     const stateDir = path.join(workspaceDir, "managed-memory-state");
     setMemoryIndexStateDir(stateDir);
-    const agentDbPath = resolveOpenClawAgentSqlitePath({ agentId: "main" });
-    const agentDb = openOpenClawAgentDatabase({ agentId: "main" });
+    const agentDbPath = resolveSteelEngineAgentSqlitePath({ agentId: "main" });
+    const agentDb = openSteelEngineAgentDatabase({ agentId: "main" });
     agentDb.db
       .prepare("INSERT INTO cache_entries (scope, key, value_json, updated_at) VALUES (?, ?, ?, ?)")
       .run("test", "keep-me", JSON.stringify({ value: "keep-me" }), 1);
-    closeOpenClawAgentDatabasesForTest();
+    closeSteelEngineAgentDatabasesForTest();
 
     const manager = await getFreshManager(
       createCfg({
@@ -666,7 +666,7 @@ describe("memory index", () => {
       await manager.close?.();
     }
 
-    const reopened = openOpenClawAgentDatabase({ agentId: "main" });
+    const reopened = openSteelEngineAgentDatabase({ agentId: "main" });
     expect(
       reopened.db
         .prepare("SELECT value_json FROM cache_entries WHERE scope = ? AND key = ?")
@@ -680,7 +680,7 @@ describe("memory index", () => {
     const manager = await getFreshManager(createCfg({}));
     await manager.close?.();
 
-    const agentDb = openOpenClawAgentDatabase({ agentId: "main" });
+    const agentDb = openSteelEngineAgentDatabase({ agentId: "main" });
     expect(
       agentDb.db.prepare("SELECT role, agent_id FROM schema_meta WHERE meta_key = 'primary'").get(),
     ).toEqual({
@@ -2246,7 +2246,7 @@ describe("memory index", () => {
         embedQuery: vi.fn(async () => [1, 0, 0, 0]),
         embedBatch: vi.fn(async (texts: string[]) => texts.map(() => [1, 0, 0, 0])),
       };
-      Object.defineProperty(provider, Symbol.for("openclaw.localEmbeddingRuntimeFacts"), {
+      Object.defineProperty(provider, Symbol.for("steelengine.localEmbeddingRuntimeFacts"), {
         value: getRuntimeFacts,
       });
       const fields = manager as unknown as {
@@ -3020,7 +3020,7 @@ describe("memory index", () => {
   });
 
   it("status-purpose manager detects unindexed session transcripts as dirty", async () => {
-    // Regression test for #97814: plain openclaw memory status (purpose: status)
+    // Regression test for #97814: plain steelengine memory status (purpose: status)
     // must report dirty=true when session files exist without index rows.
     const cfg = createCfg({ sources: ["sessions"], sessionMemory: true });
     const stateDirName = ".state-status-dirty-test";

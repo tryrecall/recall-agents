@@ -167,7 +167,7 @@ export function renderAgents(props: AgentsProps) {
       <section class="agents-toolbar">
         <div class="agents-toolbar-row">
           <div class="agents-control-select">
-            <openclaw-agent-select
+            <steelengine-agent-select
               .agents=${agents}
               .selectedId=${selectedId}
               .defaultId=${defaultId}
@@ -175,7 +175,7 @@ export function renderAgents(props: AgentsProps) {
               .authToken=${props.authToken}
               .disabled=${props.loading}
               .onSelect=${props.onSelectAgent}
-            ></openclaw-agent-select>
+            ></steelengine-agent-select>
           </div>
           <div class="agents-toolbar-actions">
             ${selectedAgent
@@ -368,9 +368,9 @@ export function renderAgents(props: AgentsProps) {
                         onClick: () => props.onOpenMemoryImport?.(),
                       })}
                     </div>
-                    <openclaw-agent-memory-panel
+                    <steelengine-agent-memory-panel
                       .agentId=${selectedAgent.id}
-                    ></openclaw-agent-memory-panel>
+                    ></steelengine-agent-memory-panel>
                   `
                 : nothing}
             `}

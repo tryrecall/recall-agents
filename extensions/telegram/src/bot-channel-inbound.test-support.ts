@@ -1,6 +1,6 @@
 import type { TelegramBotDeps } from "./bot-deps.js";
 
-type ChannelInboundRuntime = typeof import("openclaw/plugin-sdk/channel-inbound");
+type ChannelInboundRuntime = typeof import("steelengine/plugin-sdk/channel-inbound");
 type RunParams = Parameters<ChannelInboundRuntime["runChannelInboundEvent"]>[0];
 type Preflight = Parameters<RunParams["adapter"]["resolveTurn"]>[2];
 type TestTurn = {

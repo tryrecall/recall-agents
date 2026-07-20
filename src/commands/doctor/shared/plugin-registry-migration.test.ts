@@ -13,14 +13,14 @@ import {
   cleanupTrackedTempDirs,
   makeTrackedTempDir,
 } from "../../../plugins/test-helpers/fs-fixtures.js";
-import { runOpenClawStateWriteTransaction } from "../../../state/openclaw-state-db.js";
+import { runSteelEngineStateWriteTransaction } from "../../../state/steelengine-state-db.js";
 import {
   DISABLE_PLUGIN_REGISTRY_MIGRATION_ENV,
   migratePluginRegistryForInstall,
   preflightPluginRegistryInstallMigration,
 } from "./plugin-registry-migration.js";
 
-const FORCE_PLUGIN_REGISTRY_MIGRATION_ENV = "OPENCLAW_FORCE_PLUGIN_REGISTRY_MIGRATION";
+const FORCE_PLUGIN_REGISTRY_MIGRATION_ENV = "STEELENGINE_FORCE_PLUGIN_REGISTRY_MIGRATION";
 const tempDirs: string[] = [];
 
 afterEach(() => {
@@ -28,13 +28,13 @@ afterEach(() => {
 });
 
 function makeTempDir() {
-  return makeTrackedTempDir("openclaw-plugin-registry-migration", tempDirs);
+  return makeTrackedTempDir("steelengine-plugin-registry-migration", tempDirs);
 }
 
 function hermeticEnv(overrides: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
   return {
-    OPENCLAW_BUNDLED_PLUGINS_DIR: undefined,
-    OPENCLAW_VERSION: "2026.4.25",
+    STEELENGINE_BUNDLED_PLUGINS_DIR: undefined,
+    STEELENGINE_VERSION: "2026.4.25",
     VITEST: "true",
     ...overrides,
   };
@@ -52,7 +52,7 @@ function createCandidate(
     "utf8",
   );
   fs.writeFileSync(
-    path.join(rootDir, "openclaw.plugin.json"),
+    path.join(rootDir, "steelengine.plugin.json"),
     JSON.stringify({
       id,
       name: id,
@@ -124,7 +124,7 @@ function requirePlugin(index: InstalledPluginIndex | null | undefined, pluginId:
 }
 
 function insertStalePersistedIndexRow(stateDir: string) {
-  runOpenClawStateWriteTransaction(
+  runSteelEngineStateWriteTransaction(
     ({ db }) => {
       db.prepare(
         `
@@ -140,7 +140,7 @@ function insertStalePersistedIndexRow(stateDir: string) {
         `,
       ).run();
     },
-    { env: { ...process.env, OPENCLAW_STATE_DIR: stateDir } },
+    { env: { ...process.env, STEELENGINE_STATE_DIR: stateDir } },
   );
 }
 

@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import readline from "node:readline";
 import chokidar, { type FSWatcher } from "chokidar";
-import { formatErrorMessage } from "openclaw/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "steelengine/plugin-sdk/error-runtime";
 import {
   createSubsystemLogger,
   resolveAgentContextLimits,
@@ -14,14 +14,14 @@ import {
   resolveGlobalSingleton,
   resolveStateDir,
   truncateUtf16Safe,
-  type OpenClawConfig,
-} from "openclaw/plugin-sdk/memory-core-host-engine-foundation";
+  type SteelEngineConfig,
+} from "steelengine/plugin-sdk/memory-core-host-engine-foundation";
 import {
   deriveQmdScopeChannel,
   deriveQmdScopeChatType,
   isQmdScopeAllowed,
   type QmdQueryResult,
-} from "openclaw/plugin-sdk/memory-core-host-engine-qmd";
+} from "steelengine/plugin-sdk/memory-core-host-engine-qmd";
 import {
   buildMemoryReadResult,
   buildMemoryReadResultFromSlice,
@@ -39,21 +39,21 @@ import {
   type MemorySyncParams,
   type ResolvedMemoryBackendConfig,
   type ResolvedQmdConfig,
-} from "openclaw/plugin-sdk/memory-core-host-engine-storage";
+} from "steelengine/plugin-sdk/memory-core-host-engine-storage";
 import {
   isFutureDateTimestampMs,
   MAX_TIMER_TIMEOUT_MS,
   resolveExpiresAtMsFromDurationMs,
-} from "openclaw/plugin-sdk/number-runtime";
+} from "steelengine/plugin-sdk/number-runtime";
 import {
   PluginStateLeaseError,
   type PluginStateLeaseContext,
   type PluginStateLeaseRunner,
-} from "openclaw/plugin-sdk/plugin-state-runtime";
+} from "steelengine/plugin-sdk/plugin-state-runtime";
 import {
   normalizeLowercaseStringOrEmpty,
   uniqueValues,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 import {
   attachQmdSessionArtifactHit,
   copyQmdSessionArtifactHit,
@@ -115,8 +115,8 @@ const QMD_EMBED_BACKOFF_BASE_MS = 60_000;
 const QMD_EMBED_BACKOFF_MAX_MS = 60 * 60 * 1000;
 const QMD_EMBED_LEASE_MIN_WAIT_MS = 15 * 60 * 1000;
 const QMD_WRITE_LEASE_MIN_WAIT_MS = 5 * 60 * 1000;
-const QMD_EMBED_QUEUE_KEY = Symbol.for("openclaw.qmdEmbedQueueTail");
-const QMD_UPDATE_QUEUE_KEY = Symbol.for("openclaw.qmdUpdateQueueState");
+const QMD_EMBED_QUEUE_KEY = Symbol.for("steelengine.qmdEmbedQueueTail");
+const QMD_UPDATE_QUEUE_KEY = Symbol.for("steelengine.qmdUpdateQueueState");
 const IGNORED_MEMORY_WATCH_DIR_NAMES = new Set([
   ".git",
   ".cache",
@@ -172,7 +172,7 @@ function getQmdUpdateQueueState(): QmdUpdateQueueState {
 
 function normalizeHanBm25Query(query: string): string {
   const trimmed = query.trim();
-  // Keep Han/CJK BM25 queries intact so OpenClaw search semantics match direct qmd search.
+  // Keep Han/CJK BM25 queries intact so SteelEngine search semantics match direct qmd search.
   return trimmed;
 }
 
@@ -262,7 +262,7 @@ type QmdManagerRuntimeConfig = {
 };
 export class QmdMemoryManager implements MemorySearchManager {
   static async create(params: {
-    cfg: OpenClawConfig;
+    cfg: SteelEngineConfig;
     agentId: string;
     resolved: ResolvedMemoryBackendConfig;
     withLease: PluginStateLeaseRunner;
@@ -1307,7 +1307,7 @@ export class QmdMemoryManager implements MemorySearchManager {
       this.watchPressureWarning,
       count,
       "paths",
-      "Large QMD collections can make OpenClaw run out of file watchers or open files.",
+      "Large QMD collections can make SteelEngine run out of file watchers or open files.",
       "Remove large collections, or set memorySearch.sync.watch to false and refresh memory manually or with sync.intervalMinutes.",
       (message) => log.warn(message),
     );
@@ -2303,7 +2303,7 @@ export class QmdMemoryManager implements MemorySearchManager {
 }
 
 function resolveQmdManagerRuntimeConfig(
-  cfg: OpenClawConfig,
+  cfg: SteelEngineConfig,
   agentId: string,
 ): QmdManagerRuntimeConfig {
   return {

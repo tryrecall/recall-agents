@@ -11,8 +11,8 @@ Desktop notifications, camera capture, and location for Linux node hosts.
 
 ## Distribution
 
-- Package: `@openclaw/linux-node`
-- Install route: included in OpenClaw
+- Package: `@steelengine/linux-node`
+- Install route: included in SteelEngine
 
 ## Surface
 

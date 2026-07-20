@@ -114,7 +114,7 @@ export type {
   MSTeamsConfig,
   MSTeamsReplyStyle,
   MSTeamsTeamConfig,
-  OpenClawConfig,
+  SteelEngineConfig,
   ReplyToMode,
   SignalReactionNotificationMode,
   SlackAccountConfig,

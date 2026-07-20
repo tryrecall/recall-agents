@@ -47,11 +47,11 @@ vi.mock("../../plugins/official-external-plugin-repair-hints.js", () => ({
           pluginId: channelId,
           channelId,
           label: "Feishu",
-          installSpec: "@openclaw/feishu",
-          installCommand: "openclaw plugins install @openclaw/feishu",
-          doctorFixCommand: "openclaw doctor --fix",
+          installSpec: "@steelengine/feishu",
+          installCommand: "steelengine plugins install @steelengine/feishu",
+          doctorFixCommand: "steelengine doctor --fix",
           repairHint:
-            "Install the official external plugin with: openclaw plugins install @openclaw/feishu, or run: openclaw doctor --fix.",
+            "Install the official external plugin with: steelengine plugins install @steelengine/feishu, or run: steelengine doctor --fix.",
         }
       : null,
 }));
@@ -136,7 +136,7 @@ describe("buildChannelsTable", () => {
           enabled: true,
           state: "warn",
           detail:
-            "plugin not installed - run openclaw plugins install @openclaw/feishu or openclaw doctor --fix",
+            "plugin not installed - run steelengine plugins install @steelengine/feishu or steelengine doctor --fix",
         },
       ],
       details: [],
@@ -163,7 +163,7 @@ describe("buildChannelsTable", () => {
           label: "telegram",
           enabled: true,
           state: "warn",
-          detail: "plugin load failed: dependency tree corrupted; run openclaw doctor --fix",
+          detail: "plugin load failed: dependency tree corrupted; run steelengine doctor --fix",
         },
       ],
       details: [],

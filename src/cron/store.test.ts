@@ -2,13 +2,13 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   archiveLegacyCronStoreForMigration,
   loadLegacyCronStoreForMigration,
 } from "../commands/doctor/cron/legacy-store-migration.js";
-import { openOpenClawStateDatabase } from "../state/openclaw-state-db.js";
+import { openSteelEngineStateDatabase } from "../state/steelengine-state-db.js";
 import { captureEnv, setTestEnvValue } from "../test-utils/env.js";
 import {
   loadCronJobsStoreWithConfigJobs,
@@ -26,7 +26,7 @@ let fixtureRoot = "";
 let caseId = 0;
 
 beforeAll(async () => {
-  fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-cron-store-"));
+  fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "steelengine-cron-store-"));
 });
 
 afterAll(async () => {
@@ -82,18 +82,18 @@ function requireRecord(value: unknown, label: string): Record<string, unknown> {
 }
 
 describe("resolveCronStorePath", () => {
-  const envSnapshot = captureEnv(["OPENCLAW_HOME", "HOME"]);
+  const envSnapshot = captureEnv(["STEELENGINE_HOME", "HOME"]);
 
   afterEach(() => {
     envSnapshot.restore();
   });
 
-  it("uses OPENCLAW_HOME for tilde expansion", () => {
-    setTestEnvValue("OPENCLAW_HOME", "/srv/openclaw-home");
+  it("uses STEELENGINE_HOME for tilde expansion", () => {
+    setTestEnvValue("STEELENGINE_HOME", "/srv/steelengine-home");
     setTestEnvValue("HOME", "/home/other");
 
     const result = resolveCronStorePath("~/cron/jobs.json");
-    expect(result).toBe(path.resolve("/srv/openclaw-home", "cron", "jobs.json"));
+    expect(result).toBe(path.resolve("/srv/steelengine-home", "cron", "jobs.json"));
   });
 });
 
@@ -509,7 +509,7 @@ describe("cron store", () => {
 
     await saveCronStore(store.storePath, payload);
 
-    const queuedRow = openOpenClawStateDatabase()
+    const queuedRow = openSteelEngineStateDatabase()
       .db.prepare("SELECT running_at_ms, state_json FROM cron_jobs WHERE job_id = ?")
       .get(job.id) as { running_at_ms: number | null; state_json: string };
     expect(queuedRow.running_at_ms).toBeNull();
@@ -798,7 +798,7 @@ describe("cron store", () => {
     };
 
     await saveCronStore(storePath, { version: 1, jobs: [job] });
-    openOpenClawStateDatabase()
+    openSteelEngineStateDatabase()
       .db.prepare("UPDATE cron_jobs SET delivery_thread_id = NULL WHERE job_id = ?")
       .run(job.id);
 
@@ -820,7 +820,7 @@ describe("cron store", () => {
     };
 
     await saveCronStore(storePath, { version: 1, jobs: [job] });
-    openOpenClawStateDatabase()
+    openSteelEngineStateDatabase()
       .db.prepare("UPDATE cron_jobs SET delivery_thread_id = ? WHERE job_id = ?")
       .run("replacement", job.id);
 

@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import { modelKey } from "../shared/model-key.js";
 
 type ModelExtraParamSources = {
@@ -15,7 +15,7 @@ function legacyModelKey(provider: string, modelId: string): string | undefined {
 
 /** Resolves the config records merged into one model request. */
 export function resolveModelExtraParamSources(params: {
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
   provider: string;
   modelId?: string;
   agentId?: string;
@@ -34,7 +34,7 @@ export function resolveModelExtraParamSources(params: {
   return { defaultParams, modelParams, agentParams };
 }
 
-/** Returns whether embedded OpenClaw would apply authored request parameters. */
+/** Returns whether embedded SteelEngine would apply authored request parameters. */
 export function hasModelExtraParams(
   params: Parameters<typeof resolveModelExtraParamSources>[0],
 ): boolean {

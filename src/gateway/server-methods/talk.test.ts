@@ -2,17 +2,17 @@
  * Tests for talk gateway methods that coordinate speech and audio providers.
  */
 
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ErrorCodes } from "../../../packages/gateway-protocol/src/index.js";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { SteelEngineConfig } from "../../config/config.js";
 import { normalizeResolvedSecretInputString } from "../../config/types.secrets.js";
 import { REALTIME_VOICE_DESCRIBE_VIEW_TOOL_NAME } from "../../talk/describe-view-tool.js";
 import { buildTalkRealtimeConfig } from "./talk-shared.js";
 import { talkHandlers } from "./talk.js";
 
 const mocks = vi.hoisted(() => ({
-  getRuntimeConfig: vi.fn<() => OpenClawConfig>(),
+  getRuntimeConfig: vi.fn<() => SteelEngineConfig>(),
   readConfigFileSnapshot: vi.fn(),
   canonicalizeSpeechProviderId: vi.fn((providerId: string | undefined) => providerId),
   getSpeechProvider: vi.fn(),
@@ -118,7 +118,7 @@ vi.mock("../talk-transcription-relay.js", async (importOriginal) => {
   };
 });
 
-function createTalkConfig(apiKey: unknown): OpenClawConfig {
+function createTalkConfig(apiKey: unknown): SteelEngineConfig {
   return {
     talk: {
       provider: "acme",
@@ -129,7 +129,7 @@ function createTalkConfig(apiKey: unknown): OpenClawConfig {
         },
       },
     },
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 function expectRecordFields(record: unknown, expected: Record<string, unknown>) {
@@ -295,7 +295,7 @@ describe("talk.catalog handler", () => {
                 },
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -465,7 +465,7 @@ describe("talk.catalog handler", () => {
                 },
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -523,7 +523,7 @@ describe("talk.catalog handler", () => {
                 },
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -607,7 +607,7 @@ describe("talk.catalog handler", () => {
                 },
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -647,7 +647,7 @@ describe("talk.catalog handler", () => {
       client: { connect: { scopes: ["operator.read"] } } as never,
       isWebchatConnect: () => false,
       respond: respond as never,
-      context: { getRuntimeConfig: () => ({}) as OpenClawConfig } as never,
+      context: { getRuntimeConfig: () => ({}) as SteelEngineConfig } as never,
     });
 
     const catalog = mockCallArg(respond, 0, 1) as Record<string, Record<string, unknown>>;
@@ -696,7 +696,7 @@ describe("talk.catalog handler", () => {
                 "voice-call": { config: { streaming: { provider: "transcription" } } },
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -744,7 +744,7 @@ describe("talk.speak handler", () => {
 
     mocks.getRuntimeConfig.mockReturnValue(runtimeConfig);
     mocks.readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: "test-hash",
       valid: true,
       config: diskConfig,
@@ -777,7 +777,7 @@ describe("talk.speak handler", () => {
       },
     });
     mocks.synthesizeSpeech.mockImplementation(
-      async ({ cfg }: { cfg: OpenClawConfig; text: string; disableFallback: boolean }) => {
+      async ({ cfg }: { cfg: SteelEngineConfig; text: string; disableFallback: boolean }) => {
         expect(cfg.messages?.tts?.provider).toBe("acme");
         expect(cfg.messages?.tts?.providers?.acme?.apiKey).toBe("env-acme-key");
         return {
@@ -827,7 +827,7 @@ describe("talk.config handler", () => {
 
   it("projects the runtime realtime transport when source config is invalid", async () => {
     mocks.readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: "test-hash",
       valid: false,
       config: {},
@@ -849,7 +849,7 @@ describe("talk.config handler", () => {
             talk: {
               realtime: { transport: "provider-websocket" },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -912,7 +912,7 @@ describe("talk.config handler", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const runtimeConfig = {
       ...sourceConfig,
       plugins: {
@@ -932,9 +932,9 @@ describe("talk.config handler", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     mocks.readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: "test-hash",
       valid: true,
       config: sourceConfig,
@@ -963,9 +963,9 @@ describe("talk.config handler", () => {
     const providers = realtime.providers as Record<string, unknown> | undefined;
     expectRecordFields(providers?.openai, {
       apiKey: {
-        source: "__OPENCLAW_REDACTED__",
-        provider: "__OPENCLAW_REDACTED__",
-        id: "__OPENCLAW_REDACTED__",
+        source: "__STEELENGINE_REDACTED__",
+        provider: "__STEELENGINE_REDACTED__",
+        id: "__STEELENGINE_REDACTED__",
       },
       azureEndpoint: "https://example.openai.azure.com",
       azureDeployment: "realtime-prod",
@@ -999,7 +999,7 @@ describe("talk.config handler", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const runtimeConfig = {
       ...sourceConfig,
       messages: {
@@ -1013,10 +1013,10 @@ describe("talk.config handler", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     mocks.readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: "test-hash",
       valid: true,
       config: sourceConfig,
@@ -1073,7 +1073,7 @@ describe("talk.config handler", () => {
     expectRecordFields(talkConfig, { provider: "acme" });
     const resolved = talkConfig?.resolved as Record<string, unknown> | undefined;
     expectRecordFields(resolved, { provider: "acme" });
-    expectRecordFields(resolved?.config, { apiKey: "__OPENCLAW_REDACTED__" });
+    expectRecordFields(resolved?.config, { apiKey: "__STEELENGINE_REDACTED__" });
   });
 
   it("returns runtime-resolved Talk provider SecretRefs to authorized clients", async () => {
@@ -1086,7 +1086,7 @@ describe("talk.config handler", () => {
 
     mocks.getSpeechProvider.mockReturnValue(undefined);
     mocks.readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: "test-hash",
       valid: true,
       config: sourceConfig,
@@ -1144,7 +1144,7 @@ describe("talk.config handler", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const runtimeConfig = {
       talk: {
         provider: "acme",
@@ -1168,11 +1168,11 @@ describe("talk.config handler", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     mocks.getSpeechProvider.mockReturnValue(undefined);
     mocks.readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: "test-hash",
       valid: true,
       config: sourceConfig,
@@ -1244,7 +1244,7 @@ describe("talk.config handler", () => {
       }),
     });
     mocks.readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: "test-hash",
       valid: true,
       config: sourceConfig,
@@ -1268,8 +1268,8 @@ describe("talk.config handler", () => {
     expectRecordFields(resolved?.config, {
       apiKey: "runtime-resolved-talk-key",
       voiceId: "resolver-voice",
-      clientSecret: "__OPENCLAW_REDACTED__",
-      authToken: "__OPENCLAW_REDACTED__",
+      clientSecret: "__STEELENGINE_REDACTED__",
+      authToken: "__STEELENGINE_REDACTED__",
     });
     const serialized = JSON.stringify(response);
     expect(serialized).not.toContain("resolver-client-secret");
@@ -1301,7 +1301,7 @@ describe("talk.config handler", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
     const runtimeConfig = {
       talk: {
         provider: "acme",
@@ -1326,11 +1326,11 @@ describe("talk.config handler", () => {
           },
         },
       },
-    } as OpenClawConfig;
+    } as SteelEngineConfig;
 
     mocks.getSpeechProvider.mockReturnValue(undefined);
     mocks.readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: "test-hash",
       valid: true,
       config: sourceConfig,
@@ -1353,7 +1353,7 @@ describe("talk.config handler", () => {
     const resolved = response.config?.talk?.resolved as Record<string, unknown> | undefined;
     expectRecordFields(resolved?.config, {
       apiKey: "runtime-active-talk-key",
-      clientSecret: "__OPENCLAW_REDACTED__",
+      clientSecret: "__STEELENGINE_REDACTED__",
     });
     const serialized = JSON.stringify(response);
     expect(serialized).toContain("runtime-active-talk-key");
@@ -1378,7 +1378,7 @@ describe("talk.config handler", () => {
 
     mocks.getSpeechProvider.mockReturnValue(undefined);
     mocks.readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: "test-hash",
       valid: true,
       config: sourceConfig,
@@ -1402,9 +1402,9 @@ describe("talk.config handler", () => {
     expectRecordFields(resolved, { provider: "acme" });
     const resolvedConfig = expectRecordFields(resolved?.config, {});
     expectRecordFields(resolvedConfig.apiKey, {
-      source: "__OPENCLAW_REDACTED__",
-      provider: "__OPENCLAW_REDACTED__",
-      id: "__OPENCLAW_REDACTED__",
+      source: "__STEELENGINE_REDACTED__",
+      provider: "__STEELENGINE_REDACTED__",
+      id: "__STEELENGINE_REDACTED__",
     });
     const serialized = JSON.stringify(response);
     expect(serialized).not.toContain("runtime-resolved-talk-key");
@@ -1429,7 +1429,7 @@ describe("talk.session unified handlers", () => {
       sessionId: "session-active",
       active: true,
       queued: true,
-      message: "Steered the active OpenClaw run.",
+      message: "Steered the active SteelEngine run.",
       speak: false,
       show: true,
       suppress: true,
@@ -1441,7 +1441,7 @@ describe("talk.session unified handlers", () => {
       sessionId: "session-active",
       active: true,
       queued: true,
-      message: "Steered the active OpenClaw run.",
+      message: "Steered the active SteelEngine run.",
       speak: false,
       show: true,
       suppress: true,
@@ -1511,7 +1511,7 @@ describe("talk.session unified handlers", () => {
                 consultRouting: "force-agent-consult",
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -1748,7 +1748,7 @@ describe("talk.session unified handlers", () => {
                 providers: { openai: { apiKey: "bad-key" } },
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -1815,7 +1815,7 @@ describe("talk.session unified handlers", () => {
                 },
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -1919,7 +1919,7 @@ describe("talk.session unified handlers", () => {
                 },
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -1951,7 +1951,7 @@ describe("talk.session unified handlers", () => {
       isWebchatConnect: () => false,
       respond: createRespond as never,
       context: {
-        getRuntimeConfig: () => ({}) as OpenClawConfig,
+        getRuntimeConfig: () => ({}) as SteelEngineConfig,
       } as never,
     });
     const session = mockCallArg(createRespond, 0, 1) as { sessionId: string; token: string };
@@ -2010,7 +2010,7 @@ describe("talk.session unified handlers", () => {
       isWebchatConnect: () => false,
       respond: startRespond as never,
       context: {
-        getRuntimeConfig: () => ({}) as OpenClawConfig,
+        getRuntimeConfig: () => ({}) as SteelEngineConfig,
         broadcastToConnIds,
       } as never,
     });
@@ -2127,7 +2127,7 @@ describe("talk.session unified handlers", () => {
       isWebchatConnect: () => false,
       respond: createRespond as never,
       context: {
-        getRuntimeConfig: () => ({}) as OpenClawConfig,
+        getRuntimeConfig: () => ({}) as SteelEngineConfig,
       } as never,
     });
 
@@ -2162,7 +2162,7 @@ describe("talk.session unified handlers", () => {
       isWebchatConnect: () => false,
       respond: createRespond as never,
       context: {
-        getRuntimeConfig: () => ({}) as OpenClawConfig,
+        getRuntimeConfig: () => ({}) as SteelEngineConfig,
       } as never,
     });
 
@@ -2191,7 +2191,7 @@ describe("talk.session unified handlers", () => {
       isWebchatConnect: () => false,
       respond: createRespond as never,
       context: {
-        getRuntimeConfig: () => ({}) as OpenClawConfig,
+        getRuntimeConfig: () => ({}) as SteelEngineConfig,
       } as never,
     });
     const session = mockCallArg(createRespond, 0, 1) as { sessionId: string; token: string };
@@ -2335,7 +2335,7 @@ describe("talk.session unified handlers", () => {
       isWebchatConnect: () => false,
       respond: rejectedRespond as never,
       context: {
-        getRuntimeConfig: () => ({}) as OpenClawConfig,
+        getRuntimeConfig: () => ({}) as SteelEngineConfig,
       } as never,
     });
 
@@ -2361,7 +2361,7 @@ describe("talk.session unified handlers", () => {
       isWebchatConnect: () => false,
       respond: createRespond as never,
       context: {
-        getRuntimeConfig: () => ({}) as OpenClawConfig,
+        getRuntimeConfig: () => ({}) as SteelEngineConfig,
       } as never,
     });
 
@@ -2396,7 +2396,7 @@ describe("talk.session unified handlers", () => {
       client: { connId: "conn-1" } as never,
       isWebchatConnect: () => false,
       respond: respond as never,
-      context: { getRuntimeConfig: () => ({}) as OpenClawConfig } as never,
+      context: { getRuntimeConfig: () => ({}) as SteelEngineConfig } as never,
     });
 
     const error = expectRespondError(respond, { code: ErrorCodes.INVALID_REQUEST });
@@ -2429,14 +2429,14 @@ describe("talk.client.toolCall handler", () => {
       params: {
         sessionKey: "main",
         callId: "call-1",
-        name: "openclaw_agent_consult",
+        name: "steelengine_agent_consult",
         args: { question: "What is in this repo?", responseStyle: "one sentence" },
       },
       client: { connId: "conn-1" } as never,
       isWebchatConnect: () => false,
       respond: respond as never,
       context: {
-        getRuntimeConfig: () => ({}) as OpenClawConfig,
+        getRuntimeConfig: () => ({}) as SteelEngineConfig,
       } as never,
     });
 
@@ -2471,14 +2471,14 @@ describe("talk.client.toolCall handler", () => {
       params: {
         sessionKey: "main",
         callId: "call-active",
-        name: "openclaw_agent_consult",
+        name: "steelengine_agent_consult",
         args: { question: "What is running?" },
       },
       client: { connId: "conn-1" } as never,
       isWebchatConnect: () => false,
       respond: respond as never,
       context: {
-        getRuntimeConfig: () => ({}) as OpenClawConfig,
+        getRuntimeConfig: () => ({}) as SteelEngineConfig,
         logGateway: { warn: vi.fn() },
       } as never,
     });
@@ -2498,7 +2498,7 @@ describe("talk.client.toolCall handler", () => {
       params: {
         sessionKey: "main",
         callId: "call-1",
-        name: "openclaw_agent_consult",
+        name: "steelengine_agent_consult",
         args: { question: "Are the basement lights off?" },
       },
       client: { connId: "conn-1" } as never,
@@ -2511,7 +2511,7 @@ describe("talk.client.toolCall handler", () => {
               consultThinkingLevel: "low",
               consultFastMode: true,
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -2535,14 +2535,14 @@ describe("talk.client.toolCall handler", () => {
         sessionKey: "main",
         relaySessionId: "relay-1",
         callId: "call-1",
-        name: "openclaw_agent_consult",
+        name: "steelengine_agent_consult",
         args: { question: "What now?" },
       },
       client: { connId: "conn-1" } as never,
       isWebchatConnect: () => false,
       respond: respond as never,
       context: {
-        getRuntimeConfig: () => ({}) as OpenClawConfig,
+        getRuntimeConfig: () => ({}) as SteelEngineConfig,
       } as never,
     });
 
@@ -2583,14 +2583,14 @@ describe("talk.client.toolCall handler", () => {
           sessionKey: "main",
           relaySessionId: "relay-1",
           callId: "call-1",
-          name: "openclaw_agent_consult",
+          name: "steelengine_agent_consult",
           args: { question: "What now?" },
         },
         client: { connId: "conn-1" } as never,
         isWebchatConnect: () => false,
         respond: respond as never,
         context: {
-          getRuntimeConfig: () => ({}) as OpenClawConfig,
+          getRuntimeConfig: () => ({}) as SteelEngineConfig,
         } as never,
       });
 
@@ -2619,7 +2619,7 @@ describe("talk.client.toolCall handler", () => {
       isWebchatConnect: () => false,
       respond: respond as never,
       context: {
-        getRuntimeConfig: () => ({}) as OpenClawConfig,
+        getRuntimeConfig: () => ({}) as SteelEngineConfig,
       } as never,
     });
 
@@ -2659,7 +2659,7 @@ describe("talk.client.steer handler", () => {
       sessionId: "session-active",
       active: true,
       queued: true,
-      message: "Steered the active OpenClaw run.",
+      message: "Steered the active SteelEngine run.",
       speak: false,
       show: true,
       suppress: true,
@@ -2819,7 +2819,7 @@ describe("talk.client.create handler", () => {
                 instructions: "Speak warmly.",
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -2882,7 +2882,7 @@ describe("talk.client.create handler", () => {
       client: { connId: "conn-1" } as never,
       isWebchatConnect: () => false,
       respond: respond as never,
-      context: { getRuntimeConfig: () => ({}) as OpenClawConfig } as never,
+      context: { getRuntimeConfig: () => ({}) as SteelEngineConfig } as never,
     });
 
     const createInput = mockCallArg(createBrowserSession) as Record<string, unknown>;
@@ -2902,7 +2902,7 @@ describe("talk.client.create handler", () => {
       client: { connId: "conn-1" } as never,
       isWebchatConnect: () => false,
       respond: respond as never,
-      context: { getRuntimeConfig: () => ({}) as OpenClawConfig } as never,
+      context: { getRuntimeConfig: () => ({}) as SteelEngineConfig } as never,
     });
     expect((mockCallArg(createBrowserSession) as Record<string, unknown>).tools).not.toContainEqual(
       expect.objectContaining({ name: REALTIME_VOICE_DESCRIBE_VIEW_TOOL_NAME }),
@@ -2924,7 +2924,7 @@ describe("talk.client.create handler", () => {
       client: { connId: "conn-1" } as never,
       isWebchatConnect: () => false,
       respond: respond as never,
-      context: { getRuntimeConfig: () => ({}) as OpenClawConfig } as never,
+      context: { getRuntimeConfig: () => ({}) as SteelEngineConfig } as never,
     });
     expect((mockCallArg(createBrowserSession) as Record<string, unknown>).tools).toContainEqual(
       expect.objectContaining({ name: REALTIME_VOICE_DESCRIBE_VIEW_TOOL_NAME }),
@@ -2946,7 +2946,7 @@ describe("talk.client.create handler", () => {
       client: { connId: "conn-1" } as never,
       isWebchatConnect: () => false,
       respond: respond as never,
-      context: { getRuntimeConfig: () => ({}) as OpenClawConfig } as never,
+      context: { getRuntimeConfig: () => ({}) as SteelEngineConfig } as never,
     });
     expect(createBrowserSession).not.toHaveBeenCalled();
     expect(respond).toHaveBeenCalledWith(
@@ -3003,7 +3003,7 @@ describe("talk.client.create handler", () => {
                 speakerVoiceId: "voice-123",
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -3065,7 +3065,7 @@ describe("talk.client.create handler", () => {
                 providers: { openai: { apiKey: "openai-key" } },
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -3136,7 +3136,7 @@ describe("talk.client.create handler", () => {
                 providers: { openai: { apiKey: "openai-key" } },
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -3191,7 +3191,7 @@ describe("talk.client.create handler", () => {
                 },
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -3253,7 +3253,7 @@ describe("talk.client.create handler", () => {
                 },
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -3308,7 +3308,7 @@ describe("talk.client.create handler", () => {
                 providers: { custom: { apiKey: "custom-key" } },
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 
@@ -3331,7 +3331,7 @@ describe("talk.client.create handler", () => {
       client: { connId: "conn-1" } as never,
       isWebchatConnect: () => false,
       respond: respond as never,
-      context: { getRuntimeConfig: () => ({}) as OpenClawConfig } as never,
+      context: { getRuntimeConfig: () => ({}) as SteelEngineConfig } as never,
     });
 
     expectRespondError(respond, {
@@ -3354,7 +3354,7 @@ describe("talk.client.create handler", () => {
       client: { connId: "conn-1" } as never,
       isWebchatConnect: () => false,
       respond: respond as never,
-      context: { getRuntimeConfig: () => ({}) as OpenClawConfig } as never,
+      context: { getRuntimeConfig: () => ({}) as SteelEngineConfig } as never,
     });
 
     expectRespondError(respond, {
@@ -3403,7 +3403,7 @@ describe("talk.client.create handler", () => {
       client: { connId: "conn-1" } as never,
       isWebchatConnect: () => false,
       respond: respond as never,
-      context: { getRuntimeConfig: () => ({}) as OpenClawConfig } as never,
+      context: { getRuntimeConfig: () => ({}) as SteelEngineConfig } as never,
     });
 
     expect(createBrowserSession).toHaveBeenCalledOnce();
@@ -3431,7 +3431,7 @@ describe("talk.client.create handler", () => {
                 brain: "direct-tools",
               },
             },
-          }) as OpenClawConfig,
+          }) as SteelEngineConfig,
       } as never,
     });
 

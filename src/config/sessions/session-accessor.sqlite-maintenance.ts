@@ -1,4 +1,4 @@
-import { uniqueStrings } from "@openclaw/normalization-core/string-normalization";
+import { uniqueStrings } from "@steelengine/normalization-core/string-normalization";
 import { sql } from "kysely";
 import {
   executeSqliteQuerySync,
@@ -6,10 +6,10 @@ import {
 } from "../../infra/kysely-sync.js";
 import { getChildLogger } from "../../logging/logger.js";
 import {
-  openOpenClawAgentDatabase,
-  runOpenClawAgentWriteTransaction,
-  type OpenClawAgentDatabase,
-} from "../../state/openclaw-agent-db.js";
+  openSteelEngineAgentDatabase,
+  runSteelEngineAgentWriteTransaction,
+  type SteelEngineAgentDatabase,
+} from "../../state/steelengine-agent-db.js";
 import type { SessionDiskBudgetSweepResult } from "./disk-budget.js";
 import {
   materializeSqliteSessionStateDeletePlans,
@@ -85,7 +85,7 @@ function sumSessionEntryJsonBytes() {
   );
 }
 
-function readSqliteSessionRowBytes(database: OpenClawAgentDatabase): SqliteSessionRowBytes {
+function readSqliteSessionRowBytes(database: SteelEngineAgentDatabase): SqliteSessionRowBytes {
   const db = getSessionKysely(database.db);
   const entryRows = executeSqliteQuerySync(
     database.db,
@@ -125,7 +125,7 @@ function readSqliteSessionRowBytes(database: OpenClawAgentDatabase): SqliteSessi
 }
 
 function hasSqliteSessionDiskBudgetOverflow(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   maintenance: ResolvedSessionMaintenanceConfig,
 ): boolean {
   if (maintenance.maxDiskBytes == null || maintenance.highWaterBytes == null) {
@@ -151,7 +151,7 @@ function hasSqliteSessionDiskBudgetOverflow(
 }
 
 function applySqliteSessionDiskBudget(params: {
-  database: OpenClawAgentDatabase;
+  database: SteelEngineAgentDatabase;
   store: Record<string, SessionEntry>;
   maintenance: ResolvedSessionMaintenanceConfig;
   preserveKeys: ReadonlySet<string>;
@@ -167,7 +167,7 @@ function applySqliteSessionDiskBudget(params: {
 }
 
 function enforceSqliteSessionDiskBudgetInStore(params: {
-  database: OpenClawAgentDatabase;
+  database: SteelEngineAgentDatabase;
   store: Record<string, SessionEntry>;
   maintenance: Pick<ResolvedSessionMaintenanceConfig, "maxDiskBytes" | "highWaterBytes">;
   preserveKeys?: ReadonlySet<string>;
@@ -200,7 +200,7 @@ export function previewSqliteSessionDiskBudget(params: {
     sessionKey: "",
     storePath: params.storePath,
   });
-  const database = openOpenClawAgentDatabase(toDatabaseOptions(resolved));
+  const database = openSteelEngineAgentDatabase(toDatabaseOptions(resolved));
   const baseKeys = collectSqliteSessionMaintenanceBaseKeys(
     params.store,
     params.activeSessionKey ?? "",
@@ -222,7 +222,7 @@ export function previewSqliteSessionDiskBudget(params: {
 }
 
 function hasStaleSqliteSessionEntryCandidate(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   pruneAfterMs: number,
   preserveKeys: ReadonlySet<string> | undefined,
 ): boolean {
@@ -240,7 +240,7 @@ function hasStaleSqliteSessionEntryCandidate(
 }
 
 export function applySqliteSessionEntryMaintenance(
-  database: OpenClawAgentDatabase,
+  database: SteelEngineAgentDatabase,
   params: {
     activeSessionKey: string;
     archiveDirectory: string;
@@ -395,7 +395,7 @@ export function finalizeSqliteSessionEntryMaintenancePlansBestEffort(
   try {
     const materializedPlans = materializeSqliteSessionStateDeletePlans(stateDeletePlans);
     let archivedTranscripts: SessionLifecycleArchivedTranscript[] = [];
-    runOpenClawAgentWriteTransaction((database) => {
+    runSteelEngineAgentWriteTransaction((database) => {
       deletePlannedSqliteLifecycleArtifactEntries(database, entryRemovals);
       archivedTranscripts = deleteMaterializedSqliteSessionStatePlans(database, materializedPlans);
     }, toDatabaseOptions(scope));

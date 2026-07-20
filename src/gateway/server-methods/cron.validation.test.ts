@@ -1,10 +1,10 @@
 // Cron validation tests cover channel target validation against plugin
 // prefixes/aliases and runtime config for cron delivery destinations.
 
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChannelPlugin } from "../../channels/plugins/types.public.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import type { CronDelivery, CronJob } from "../../cron/types.js";
 import { resetPluginRuntimeStateForTest, setActivePluginRegistry } from "../../plugins/runtime.js";
 import {
@@ -15,7 +15,7 @@ import { getGatewayProcessInstanceId } from "../process-instance.js";
 import type { GatewayClient } from "./types.js";
 
 const getRuntimeConfig = vi.hoisted(() =>
-  vi.fn<() => OpenClawConfig>(() => ({}) as OpenClawConfig),
+  vi.fn<() => SteelEngineConfig>(() => ({}) as SteelEngineConfig),
 );
 const loadGatewaySessionEntry = vi.hoisted(() =>
   vi.fn(
@@ -290,17 +290,17 @@ function telegramDeliveryWithSlackFailure(overrides: Partial<CronDelivery> = {})
   };
 }
 
-function setRuntimeConfig(config: OpenClawConfig): void {
+function setRuntimeConfig(config: SteelEngineConfig): void {
   getRuntimeConfig.mockReturnValue(config);
 }
 
-function pluginEntries(...ids: string[]): OpenClawConfig["plugins"] {
+function pluginEntries(...ids: string[]): SteelEngineConfig["plugins"] {
   return {
     entries: Object.fromEntries(ids.map((id) => [id, { enabled: true }])),
   };
 }
 
-function telegramConfig(): OpenClawConfig {
+function telegramConfig(): SteelEngineConfig {
   return {
     channels: {
       telegram: {
@@ -308,10 +308,10 @@ function telegramConfig(): OpenClawConfig {
       },
     },
     plugins: pluginEntries("telegram"),
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
-function telegramSlackConfig(params: { includeMainSession?: boolean } = {}): OpenClawConfig {
+function telegramSlackConfig(params: { includeMainSession?: boolean } = {}): SteelEngineConfig {
   return {
     ...(params.includeMainSession ? { session: { mainKey: "main" } } : {}),
     channels: {
@@ -324,10 +324,10 @@ function telegramSlackConfig(params: { includeMainSession?: boolean } = {}): Ope
       },
     },
     plugins: pluginEntries("telegram", "slack"),
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
-function msteamsConfig(): OpenClawConfig {
+function msteamsConfig(): SteelEngineConfig {
   return {
     channels: {
       msteams: {
@@ -335,10 +335,10 @@ function msteamsConfig(): OpenClawConfig {
       },
     },
     plugins: pluginEntries("msteams"),
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
-function slackSynologyConfig(): OpenClawConfig {
+function slackSynologyConfig(): SteelEngineConfig {
   return {
     channels: {
       slack: {
@@ -350,10 +350,10 @@ function slackSynologyConfig(): OpenClawConfig {
       },
     },
     plugins: pluginEntries("slack", "synology-chat"),
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
-function slackConfig(params: { includeMainSession?: boolean } = {}): OpenClawConfig {
+function slackConfig(params: { includeMainSession?: boolean } = {}): SteelEngineConfig {
   return {
     ...(params.includeMainSession ? { session: { mainKey: "main" } } : {}),
     channels: {
@@ -363,7 +363,7 @@ function slackConfig(params: { includeMainSession?: boolean } = {}): OpenClawCon
       },
     },
     plugins: pluginEntries("slack"),
-  } as OpenClawConfig;
+  } as SteelEngineConfig;
 }
 
 function agentTurnCronParams(overrides: Record<string, unknown> = {}) {
@@ -456,7 +456,7 @@ function expectInvalidCronPatternError(respond: ReturnType<typeof vi.fn>): void 
 
 describe("cron method validation", () => {
   beforeEach(() => {
-    getRuntimeConfig.mockReset().mockReturnValue({} as OpenClawConfig);
+    getRuntimeConfig.mockReset().mockReturnValue({} as SteelEngineConfig);
     loadGatewaySessionEntry
       .mockReset()
       .mockImplementation((sessionKey: string) => ({ canonicalKey: sessionKey, entry: undefined }));
@@ -1565,7 +1565,7 @@ describe("cron method validation", () => {
         },
       },
       plugins: pluginEntries("slack"),
-    } as OpenClawConfig);
+    } as SteelEngineConfig);
 
     const { context, respond } = await invokeCronAdd(
       agentTurnCronParams({
@@ -1590,7 +1590,7 @@ describe("cron method validation", () => {
         },
       },
       plugins: pluginEntries("slack"),
-    } as OpenClawConfig);
+    } as SteelEngineConfig);
 
     const { context, respond } = await invokeCronAdd(
       agentTurnCronParams({
@@ -1611,7 +1611,7 @@ describe("cron method validation", () => {
         },
       },
       plugins: pluginEntries(),
-    } as OpenClawConfig);
+    } as SteelEngineConfig);
 
     const { context, respond } = await invokeCronAdd(
       agentTurnCronParams({
@@ -1996,7 +1996,7 @@ describe("cron method validation", () => {
           slack: { enabled: true },
         },
       },
-    } as OpenClawConfig);
+    } as SteelEngineConfig);
 
     const context = createCronContext(createCronJob());
     context.cron.getJob.mockReturnValue(undefined);

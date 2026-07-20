@@ -4,9 +4,9 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { requireNodeSqlite } from "../../infra/node-sqlite.js";
 import {
-  closeOpenClawStateDatabaseForTest,
-  openOpenClawStateDatabase,
-} from "../../state/openclaw-state-db.js";
+  closeSteelEngineStateDatabaseForTest,
+  openSteelEngineStateDatabase,
+} from "../../state/steelengine-state-db.js";
 import {
   deleteRegistryWorktree,
   getRegistryWorktreeProvisionedChunk,
@@ -29,12 +29,12 @@ describe("managed worktree registry", () => {
 
   beforeEach(async () => {
     const tempRoot = await fs.realpath(os.tmpdir());
-    root = await fs.mkdtemp(path.join(tempRoot, "openclaw-worktree-registry-"));
-    env = { ...process.env, OPENCLAW_STATE_DIR: path.join(root, "state") };
+    root = await fs.mkdtemp(path.join(tempRoot, "steelengine-worktree-registry-"));
+    env = { ...process.env, STEELENGINE_STATE_DIR: path.join(root, "state") };
   });
 
   afterEach(async () => {
-    closeOpenClawStateDatabaseForTest();
+    closeSteelEngineStateDatabaseForTest();
     await fs.rm(root, { recursive: true, force: true });
   });
 
@@ -45,7 +45,7 @@ describe("managed worktree registry", () => {
       repoFingerprint: "0123456789abcdef",
       repoRoot: path.join(root, "repo"),
       path: path.join(root, "worktrees", "task"),
-      branch: "openclaw/task",
+      branch: "steelengine/task",
       baseRef: "HEAD",
       ownerKind: "workboard",
       ownerId: "card-1",
@@ -75,13 +75,13 @@ describe("managed worktree registry", () => {
     updateRegistryWorktree(env, "first", {
       lastActiveAt: 30,
       removedAt: 40,
-      snapshotRef: "refs/openclaw/snapshots/first",
+      snapshotRef: "refs/steelengine/snapshots/first",
       provisionedState: [{ path: ".env.local", mode: 0o600, chunks: 1 }],
     });
     expect(getRegistryWorktree(env, "first")).toMatchObject({
       lastActiveAt: 30,
       removedAt: 40,
-      snapshotRef: "refs/openclaw/snapshots/first",
+      snapshotRef: "refs/steelengine/snapshots/first",
     });
     expect(findLiveRegistryWorktreeByPath(env, record.path)).toBeUndefined();
     expect(findRegistryWorktreeByPath(env, record.path)?.id).toBe("first");
@@ -119,22 +119,22 @@ describe("managed worktree registry", () => {
       }),
     ).toBeUndefined();
 
-    openOpenClawStateDatabase({ env })
+    openSteelEngineStateDatabase({ env })
       .db.prepare("UPDATE worktrees SET provisioned_paths_json = ? WHERE id = ?")
       .run("not-json", "second");
     expect(getRegistryWorktreeProvisionedLedger(env, "second")).toEqual({ status: "invalid" });
   });
 
   it("adds the provisioned-path ledger to an existing worktree registry", () => {
-    const databasePath = openOpenClawStateDatabase({ env }).path;
-    closeOpenClawStateDatabaseForTest();
+    const databasePath = openSteelEngineStateDatabase({ env }).path;
+    closeSteelEngineStateDatabaseForTest();
     const { DatabaseSync } = requireNodeSqlite();
     const legacy = new DatabaseSync(databasePath);
     legacy.exec("ALTER TABLE worktrees DROP COLUMN provisioned_paths_json");
     legacy.close();
 
     expect(getRegistryWorktreeProvisionedPaths(env, "missing")).toBeUndefined();
-    const database = openOpenClawStateDatabase({ env }).db;
+    const database = openSteelEngineStateDatabase({ env }).db;
     const columns = database.prepare("PRAGMA table_info(worktrees)").all() as Array<{
       name?: unknown;
     }>;

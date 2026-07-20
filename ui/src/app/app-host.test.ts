@@ -72,7 +72,7 @@ let lazyElementSequence = 0;
 
 function createLazyElementSpec(label: string): TestOptionalCustomElement {
   lazyElementSequence += 1;
-  const tagName = `openclaw-app-host-lazy-${lazyElementSequence}`;
+  const tagName = `steelengine-app-host-lazy-${lazyElementSequence}`;
   return {
     tagName,
     label,
@@ -115,7 +115,7 @@ type ShellSettingsSearchLoadState = {
 type TestWebKitWindow = Window & {
   webkit?: {
     messageHandlers: {
-      openclawNav: { postMessage: (message: unknown) => void };
+      steelengineNav: { postMessage: (message: unknown) => void };
     };
   };
 };
@@ -131,9 +131,9 @@ type MacosTitlebarControlsState = HTMLElement & {
 afterEach(() => {
   Reflect.deleteProperty(window, "webkit");
   document.documentElement.classList.remove(
-    "openclaw-native-macos",
-    "openclaw-native-nav",
-    "openclaw-native-web-chrome",
+    "steelengine-native-macos",
+    "steelengine-native-nav",
+    "steelengine-native-web-chrome",
   );
   vi.unstubAllGlobals();
 });
@@ -153,9 +153,9 @@ type ShellEpochState = {
   disconnectedCallback: () => void;
 };
 
-describe("OpenClaw app lifecycle", () => {
+describe("SteelEngine app lifecycle", () => {
   it("hides revealed login credentials when the app connection epoch ends", () => {
-    const app = document.createElement("openclaw-app") as unknown as AppLifecycleState;
+    const app = document.createElement("steelengine-app") as unknown as AppLifecycleState;
     app.loginShowGatewayToken = true;
     app.loginShowGatewayPassword = true;
 
@@ -166,7 +166,7 @@ describe("OpenClaw app lifecycle", () => {
   });
 
   it("hides revealed login credentials when the Gateway source changes", () => {
-    const app = document.createElement("openclaw-app") as unknown as AppLifecycleState;
+    const app = document.createElement("steelengine-app") as unknown as AppLifecycleState;
     const snapshot = {
       client: null,
       connected: false,
@@ -199,9 +199,9 @@ describe("OpenClaw app lifecycle", () => {
   });
 });
 
-describe("OpenClaw shell source initialization", () => {
+describe("SteelEngine shell source initialization", () => {
   it("clears retained presentation and source ownership when its context epoch ends", () => {
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellEpochState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellEpochState;
     const client = {} as GatewayBrowserClient;
     const agents = {} as ApplicationContext["agents"];
     const runtimeConfig = {} as ApplicationContext["runtimeConfig"];
@@ -238,7 +238,7 @@ describe("OpenClaw shell source initialization", () => {
 
   it("initializes replacement capabilities even when the Gateway client is unchanged", () => {
     const shell = document.createElement(
-      "openclaw-app-shell",
+      "steelengine-app-shell",
     ) as unknown as ShellInitializationState;
     shell.routeState = { routeId: "usage" };
     const client = {} as GatewayBrowserClient;
@@ -272,14 +272,14 @@ describe("OpenClaw shell source initialization", () => {
   });
 });
 
-describe("OpenClaw shell settings search", () => {
+describe("SteelEngine shell settings search", () => {
   it("loads config and schema for a non-empty query", async () => {
     const runtimeConfig = {
       ensureLoaded: vi.fn(() => Promise.resolve()),
       ensureSchemaLoaded: vi.fn(() => Promise.resolve()),
     } as unknown as ApplicationContext["runtimeConfig"];
     const shell = document.createElement(
-      "openclaw-app-shell",
+      "steelengine-app-shell",
     ) as unknown as ShellSettingsSearchLoadState;
     shell.runtime = {
       context: { runtimeConfig } as unknown as ApplicationContext,
@@ -307,7 +307,7 @@ describe("OpenClaw shell settings search", () => {
       ensureSchemaLoaded: vi.fn(() => Promise.resolve()),
     } as unknown as ApplicationContext["runtimeConfig"];
     const shell = document.createElement(
-      "openclaw-app-shell",
+      "steelengine-app-shell",
     ) as unknown as ShellSettingsSearchLoadState;
     shell.runtime = {
       context: { runtimeConfig: firstRuntimeConfig } as unknown as ApplicationContext,
@@ -341,7 +341,7 @@ describe("OpenClaw shell settings search", () => {
         ),
       } as unknown as ApplicationContext["runtimeConfig"];
       const shell = document.createElement(
-        "openclaw-app-shell",
+        "steelengine-app-shell",
       ) as unknown as ShellSettingsSearchLoadState;
       shell.runtime = {
         context: { runtimeConfig } as unknown as ApplicationContext,
@@ -357,7 +357,7 @@ describe("OpenClaw shell settings search", () => {
   );
 });
 
-describe("OpenClaw shell keyboard shortcuts", () => {
+describe("SteelEngine shell keyboard shortcuts", () => {
   it("resolves onboarding mode from the active route search", () => {
     expect(resolveOnboardingMode("?onboarding=1")).toBe(true);
     expect(resolveOnboardingMode("?onboarding=true")).toBe(true);
@@ -379,7 +379,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
       shouldMergeChatChrome({ mobileNavLayout: true, routeId: "chat", onboarding: true }),
     ).toBe(false);
 
-    document.documentElement.classList.add("openclaw-native-nav");
+    document.documentElement.classList.add("steelengine-native-nav");
     expect(
       shouldMergeChatChrome({ mobileNavLayout: true, routeId: "chat", onboarding: false }),
     ).toBe(false);
@@ -387,7 +387,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
 
   it("wires merged header window events for the shell lifecycle", () => {
     const addEventListener = vi.spyOn(window, "addEventListener");
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellChromeEventState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellChromeEventState;
 
     shell.connectedCallback();
 
@@ -407,7 +407,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
     );
     const openPalette = vi.fn();
     const trigger = document.createElement("button");
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellChromeEventState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellChromeEventState;
     shell.runtime = {
       context: {
         navigation: { snapshot: { navCollapsed: false }, update: vi.fn() },
@@ -430,7 +430,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
   it("loads and toggles the command palette on its first shortcut", async () => {
     const element = createLazyElementSpec("command palette");
     const togglePalette = vi.fn();
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellLazySurfaceState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellLazySurfaceState;
     shell.commandPaletteElement = element;
     Object.defineProperty(shell, "updateComplete", {
       configurable: true,
@@ -460,7 +460,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
     const browserElement = createLazyElementSpec("browser panel");
     const terminalToggle = vi.fn();
     const browserToggle = vi.fn();
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellLazySurfaceState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellLazySurfaceState;
     shell.terminalPanelElement = terminalElement;
     shell.browserPanelElement = browserElement;
     shell.runtime = {
@@ -515,7 +515,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
     const uiCommandEvent = vi.fn();
     window.addEventListener(TERMINAL_PANEL_TOGGLE_EVENT, panelEvent);
     window.addEventListener(UI_COMMAND_EVENT, uiCommandEvent);
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellUiCommandState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellUiCommandState;
     shell.runtime = {
       context: {
         navigation: { update },
@@ -576,7 +576,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
 
   it("opens Settings with Shift-Command-Comma", () => {
     const navigate = vi.fn();
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellKeyboardState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellKeyboardState;
     shell.runtime = {
       context: {
         navigate,
@@ -601,7 +601,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
     const update = vi.fn((next: { navCollapsed: boolean }) => {
       snapshot.navCollapsed = next.navCollapsed;
     });
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellNavigationState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellNavigationState;
     shell.runtime = {
       context: {
         navigation: { snapshot, update },
@@ -619,7 +619,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
     const navigate = vi.fn();
     const openPalette = vi.fn();
     const togglePalette = vi.fn();
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellNavigationState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellNavigationState;
     Object.defineProperty(shell, "commandPalette", {
       configurable: true,
       value: { openPalette, togglePalette },
@@ -631,7 +631,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
       } as unknown as ApplicationContext,
     };
     shell.handleNativeOpenSearch();
-    const toggleEvent = new CustomEvent("openclaw:native-toggle-search", { cancelable: true });
+    const toggleEvent = new CustomEvent("steelengine:native-toggle-search", { cancelable: true });
     shell.handleNativeToggleSearch(toggleEvent);
     shell.handleNativeNewSession();
 
@@ -646,7 +646,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
     const onOpenPalette = vi.fn();
     const onOpenNewSession = vi.fn();
     const controls = document.createElement(
-      "openclaw-macos-titlebar-controls",
+      "steelengine-macos-titlebar-controls",
     ) as unknown as MacosTitlebarControlsState;
     controls.navCollapsed = false;
     controls.historyOnly = false;
@@ -665,7 +665,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
 
   it("retains a native new-session request until a context exists", () => {
     const navigate = vi.fn();
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellNavigationState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellNavigationState;
 
     shell.handleNativeNewSession();
 
@@ -682,7 +682,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
 
   it("does not start a native session during onboarding", () => {
     const navigate = vi.fn();
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellNavigationState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellNavigationState;
     shell.runtime = {
       context: {
         navigate,
@@ -697,9 +697,9 @@ describe("OpenClaw shell keyboard shortcuts", () => {
   });
 
   it("updates native history state from the host event", () => {
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellNavigationState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellNavigationState;
     shell.handleNativeHistoryState(
-      new CustomEvent("openclaw:native-history-state", {
+      new CustomEvent("steelengine:native-history-state", {
         detail: { canGoBack: true, canGoForward: false },
       }),
     );
@@ -710,10 +710,10 @@ describe("OpenClaw shell keyboard shortcuts", () => {
   it("deduplicates native nav state reports", () => {
     const postMessage = vi.fn();
     (window as TestWebKitWindow).webkit = {
-      messageHandlers: { openclawNav: { postMessage } },
+      messageHandlers: { steelengineNav: { postMessage } },
     };
     const snapshot = { navCollapsed: false, navWidth: 280 };
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellNavigationState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellNavigationState;
     shell.runtime = {
       context: {
         navigation: { snapshot },
@@ -733,7 +733,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
 
   it("leaves plain Command-Comma to the browser", () => {
     const navigate = vi.fn();
-    const shell = document.createElement("openclaw-app-shell") as unknown as ShellKeyboardState;
+    const shell = document.createElement("steelengine-app-shell") as unknown as ShellKeyboardState;
     shell.runtime = {
       context: {
         navigate,
@@ -753,7 +753,7 @@ describe("OpenClaw shell keyboard shortcuts", () => {
   });
 });
 
-describe("OpenClaw shell update affordance", () => {
+describe("SteelEngine shell update affordance", () => {
   it("renders a floating card only while desktop navigation is collapsed", () => {
     const container = document.createElement("div");
     const shared = {
@@ -772,7 +772,7 @@ describe("OpenClaw shell update affordance", () => {
       mobileNavLayout: false,
     });
     render(renderFloatingUpdateCard({ ...shared, navigationSurfaceHidden: collapsed }), container);
-    expect(container.querySelector("openclaw-sidebar-update-card")).not.toBeNull();
+    expect(container.querySelector("steelengine-sidebar-update-card")).not.toBeNull();
 
     const visible = navigationSurfaceIsHidden({
       navCollapsed: false,
@@ -780,7 +780,7 @@ describe("OpenClaw shell update affordance", () => {
       mobileNavLayout: false,
     });
     render(renderFloatingUpdateCard({ ...shared, navigationSurfaceHidden: visible }), container);
-    expect(container.querySelector("openclaw-sidebar-update-card")).toBeNull();
+    expect(container.querySelector("steelengine-sidebar-update-card")).toBeNull();
   });
 
   it("treats a closed mobile drawer as hidden navigation", () => {

@@ -1,8 +1,8 @@
 // Builds plugin API objects from config, registries, and runtime helpers.
-import type { OpenClawConfig } from "../config/types.openclaw.js";
-import { attachPluginApiFacades, type OpenClawPluginApiWithoutFacades } from "./api-facades.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
+import { attachPluginApiFacades, type SteelEnginePluginApiWithoutFacades } from "./api-facades.js";
 import type { PluginRuntime } from "./runtime/types.js";
-import type { OpenClawPluginApi, PluginLogger } from "./types.js";
+import type { SteelEnginePluginApi, PluginLogger } from "./types.js";
 
 type BuildPluginApiParams = {
   id: string;
@@ -11,15 +11,15 @@ type BuildPluginApiParams = {
   description?: string;
   source: string;
   rootDir?: string;
-  registrationMode: OpenClawPluginApi["registrationMode"];
-  config: OpenClawConfig;
+  registrationMode: SteelEnginePluginApi["registrationMode"];
+  config: SteelEngineConfig;
   pluginConfig?: Record<string, unknown>;
   runtime: PluginRuntime;
   logger: PluginLogger;
   resolvePath: (input: string) => string;
   handlers?: Partial<
     Pick<
-      OpenClawPluginApi,
+      SteelEnginePluginApi,
       | "registerTool"
       | "registerHook"
       | "registerHttpRoute"
@@ -92,108 +92,108 @@ type BuildPluginApiParams = {
   >;
 };
 
-const noopRegisterTool: OpenClawPluginApi["registerTool"] = () => {};
-const noopRegisterHook: OpenClawPluginApi["registerHook"] = () => {};
-const noopRegisterHttpRoute: OpenClawPluginApi["registerHttpRoute"] = () => {};
-const noopRegisterHostedMediaResolver: OpenClawPluginApi["registerHostedMediaResolver"] = () => {};
-const noopRegisterMcpServerConnectionResolver: OpenClawPluginApi["registerMcpServerConnectionResolver"] =
+const noopRegisterTool: SteelEnginePluginApi["registerTool"] = () => {};
+const noopRegisterHook: SteelEnginePluginApi["registerHook"] = () => {};
+const noopRegisterHttpRoute: SteelEnginePluginApi["registerHttpRoute"] = () => {};
+const noopRegisterHostedMediaResolver: SteelEnginePluginApi["registerHostedMediaResolver"] = () => {};
+const noopRegisterMcpServerConnectionResolver: SteelEnginePluginApi["registerMcpServerConnectionResolver"] =
   () => {};
-const noopRegisterChannel: OpenClawPluginApi["registerChannel"] = () => {};
-const noopRegisterGatewayMethod: OpenClawPluginApi["registerGatewayMethod"] = () => {};
-const noopRegisterSessionCatalog: OpenClawPluginApi["registerSessionCatalog"] = () => {};
-const noopRegisterCli: OpenClawPluginApi["registerCli"] = () => {};
-const noopRegisterReload: OpenClawPluginApi["registerReload"] = () => {};
-const noopRegisterNodeHostCommand: OpenClawPluginApi["registerNodeHostCommand"] = () => {};
-const noopRegisterNodeInvokePolicy: OpenClawPluginApi["registerNodeInvokePolicy"] = () => {};
-const noopRegisterSecurityAuditCollector: OpenClawPluginApi["registerSecurityAuditCollector"] =
+const noopRegisterChannel: SteelEnginePluginApi["registerChannel"] = () => {};
+const noopRegisterGatewayMethod: SteelEnginePluginApi["registerGatewayMethod"] = () => {};
+const noopRegisterSessionCatalog: SteelEnginePluginApi["registerSessionCatalog"] = () => {};
+const noopRegisterCli: SteelEnginePluginApi["registerCli"] = () => {};
+const noopRegisterReload: SteelEnginePluginApi["registerReload"] = () => {};
+const noopRegisterNodeHostCommand: SteelEnginePluginApi["registerNodeHostCommand"] = () => {};
+const noopRegisterNodeInvokePolicy: SteelEnginePluginApi["registerNodeInvokePolicy"] = () => {};
+const noopRegisterSecurityAuditCollector: SteelEnginePluginApi["registerSecurityAuditCollector"] =
   () => {};
-const noopRegisterService: OpenClawPluginApi["registerService"] = () => {};
-const noopRegisterGatewayDiscoveryService: OpenClawPluginApi["registerGatewayDiscoveryService"] =
+const noopRegisterService: SteelEnginePluginApi["registerService"] = () => {};
+const noopRegisterGatewayDiscoveryService: SteelEnginePluginApi["registerGatewayDiscoveryService"] =
   () => {};
-const noopRegisterCliBackend: OpenClawPluginApi["registerCliBackend"] = () => {};
-const noopRegisterTextTransforms: OpenClawPluginApi["registerTextTransforms"] = () => {};
-const noopRegisterConfigMigration: OpenClawPluginApi["registerConfigMigration"] = () => {};
-const noopRegisterMigrationProvider: OpenClawPluginApi["registerMigrationProvider"] = () => {};
-const noopRegisterAutoEnableProbe: OpenClawPluginApi["registerAutoEnableProbe"] = () => {};
-const noopRegisterProvider: OpenClawPluginApi["registerProvider"] = () => {};
-const noopRegisterWorkerProvider: OpenClawPluginApi["registerWorkerProvider"] = () => {};
-const noopRegisterModelCatalogProvider: OpenClawPluginApi["registerModelCatalogProvider"] =
+const noopRegisterCliBackend: SteelEnginePluginApi["registerCliBackend"] = () => {};
+const noopRegisterTextTransforms: SteelEnginePluginApi["registerTextTransforms"] = () => {};
+const noopRegisterConfigMigration: SteelEnginePluginApi["registerConfigMigration"] = () => {};
+const noopRegisterMigrationProvider: SteelEnginePluginApi["registerMigrationProvider"] = () => {};
+const noopRegisterAutoEnableProbe: SteelEnginePluginApi["registerAutoEnableProbe"] = () => {};
+const noopRegisterProvider: SteelEnginePluginApi["registerProvider"] = () => {};
+const noopRegisterWorkerProvider: SteelEnginePluginApi["registerWorkerProvider"] = () => {};
+const noopRegisterModelCatalogProvider: SteelEnginePluginApi["registerModelCatalogProvider"] =
   () => {};
-const noopRegisterEmbeddingProvider: OpenClawPluginApi["registerEmbeddingProvider"] = () => {};
-const noopRegisterSpeechProvider: OpenClawPluginApi["registerSpeechProvider"] = () => {};
-const noopRegisterRealtimeTranscriptionProvider: OpenClawPluginApi["registerRealtimeTranscriptionProvider"] =
+const noopRegisterEmbeddingProvider: SteelEnginePluginApi["registerEmbeddingProvider"] = () => {};
+const noopRegisterSpeechProvider: SteelEnginePluginApi["registerSpeechProvider"] = () => {};
+const noopRegisterRealtimeTranscriptionProvider: SteelEnginePluginApi["registerRealtimeTranscriptionProvider"] =
   () => {};
-const noopRegisterRealtimeVoiceProvider: OpenClawPluginApi["registerRealtimeVoiceProvider"] =
+const noopRegisterRealtimeVoiceProvider: SteelEnginePluginApi["registerRealtimeVoiceProvider"] =
   () => {};
-const noopRegisterMediaUnderstandingProvider: OpenClawPluginApi["registerMediaUnderstandingProvider"] =
+const noopRegisterMediaUnderstandingProvider: SteelEnginePluginApi["registerMediaUnderstandingProvider"] =
   () => {};
-const noopRegisterTranscriptsSourceProvider: OpenClawPluginApi["registerTranscriptSourceProvider"] =
+const noopRegisterTranscriptsSourceProvider: SteelEnginePluginApi["registerTranscriptSourceProvider"] =
   () => {};
-const noopRegisterImageGenerationProvider: OpenClawPluginApi["registerImageGenerationProvider"] =
+const noopRegisterImageGenerationProvider: SteelEnginePluginApi["registerImageGenerationProvider"] =
   () => {};
-const noopRegisterVideoGenerationProvider: OpenClawPluginApi["registerVideoGenerationProvider"] =
+const noopRegisterVideoGenerationProvider: SteelEnginePluginApi["registerVideoGenerationProvider"] =
   () => {};
-const noopRegisterMusicGenerationProvider: OpenClawPluginApi["registerMusicGenerationProvider"] =
+const noopRegisterMusicGenerationProvider: SteelEnginePluginApi["registerMusicGenerationProvider"] =
   () => {};
-const noopRegisterWebFetchProvider: OpenClawPluginApi["registerWebFetchProvider"] = () => {};
-const noopRegisterWebSearchProvider: OpenClawPluginApi["registerWebSearchProvider"] = () => {};
-const noopRegisterInteractiveHandler: OpenClawPluginApi["registerInteractiveHandler"] = () => {};
-const noopOnConversationBindingResolved: OpenClawPluginApi["onConversationBindingResolved"] =
+const noopRegisterWebFetchProvider: SteelEnginePluginApi["registerWebFetchProvider"] = () => {};
+const noopRegisterWebSearchProvider: SteelEnginePluginApi["registerWebSearchProvider"] = () => {};
+const noopRegisterInteractiveHandler: SteelEnginePluginApi["registerInteractiveHandler"] = () => {};
+const noopOnConversationBindingResolved: SteelEnginePluginApi["onConversationBindingResolved"] =
   () => {};
-const noopRegisterCommand: OpenClawPluginApi["registerCommand"] = () => {};
-const noopRegisterContextEngine: OpenClawPluginApi["registerContextEngine"] = () => {};
-const noopRegisterCompactionProvider: OpenClawPluginApi["registerCompactionProvider"] = () => {};
-const noopRegisterAgentHarness: OpenClawPluginApi["registerAgentHarness"] = () => {};
-const noopRegisterCodexAppServerExtensionFactory: OpenClawPluginApi["registerCodexAppServerExtensionFactory"] =
+const noopRegisterCommand: SteelEnginePluginApi["registerCommand"] = () => {};
+const noopRegisterContextEngine: SteelEnginePluginApi["registerContextEngine"] = () => {};
+const noopRegisterCompactionProvider: SteelEnginePluginApi["registerCompactionProvider"] = () => {};
+const noopRegisterAgentHarness: SteelEnginePluginApi["registerAgentHarness"] = () => {};
+const noopRegisterCodexAppServerExtensionFactory: SteelEnginePluginApi["registerCodexAppServerExtensionFactory"] =
   () => {};
-const noopRegisterAgentToolResultMiddleware: OpenClawPluginApi["registerAgentToolResultMiddleware"] =
+const noopRegisterAgentToolResultMiddleware: SteelEnginePluginApi["registerAgentToolResultMiddleware"] =
   () => {};
-const noopRegisterSessionExtension: OpenClawPluginApi["registerSessionExtension"] = () => {};
-const noopEnqueueNextTurnInjection: OpenClawPluginApi["enqueueNextTurnInjection"] = async (
+const noopRegisterSessionExtension: SteelEnginePluginApi["registerSessionExtension"] = () => {};
+const noopEnqueueNextTurnInjection: SteelEnginePluginApi["enqueueNextTurnInjection"] = async (
   injection,
 ) => ({ enqueued: false, id: "", sessionKey: injection.sessionKey });
-const noopRegisterTrustedToolPolicy: OpenClawPluginApi["registerTrustedToolPolicy"] = () => {};
-const noopRegisterToolMetadata: OpenClawPluginApi["registerToolMetadata"] = () => {};
-const noopRegisterControlUiDescriptor: OpenClawPluginApi["registerControlUiDescriptor"] = () => {};
-const noopRegisterRuntimeLifecycle: OpenClawPluginApi["registerRuntimeLifecycle"] = () => {};
-const noopRegisterAgentEventSubscription: OpenClawPluginApi["registerAgentEventSubscription"] =
+const noopRegisterTrustedToolPolicy: SteelEnginePluginApi["registerTrustedToolPolicy"] = () => {};
+const noopRegisterToolMetadata: SteelEnginePluginApi["registerToolMetadata"] = () => {};
+const noopRegisterControlUiDescriptor: SteelEnginePluginApi["registerControlUiDescriptor"] = () => {};
+const noopRegisterRuntimeLifecycle: SteelEnginePluginApi["registerRuntimeLifecycle"] = () => {};
+const noopRegisterAgentEventSubscription: SteelEnginePluginApi["registerAgentEventSubscription"] =
   () => {};
-const noopEmitAgentEvent: OpenClawPluginApi["emitAgentEvent"] = () => ({
+const noopEmitAgentEvent: SteelEnginePluginApi["emitAgentEvent"] = () => ({
   emitted: false,
   reason: "not wired",
 });
-const noopSetRunContext: OpenClawPluginApi["setRunContext"] = () => false;
-const noopGetRunContext: OpenClawPluginApi["getRunContext"] = () => undefined;
-const noopClearRunContext: OpenClawPluginApi["clearRunContext"] = () => {};
-const noopRegisterSessionSchedulerJob: OpenClawPluginApi["registerSessionSchedulerJob"] = () =>
+const noopSetRunContext: SteelEnginePluginApi["setRunContext"] = () => false;
+const noopGetRunContext: SteelEnginePluginApi["getRunContext"] = () => undefined;
+const noopClearRunContext: SteelEnginePluginApi["clearRunContext"] = () => {};
+const noopRegisterSessionSchedulerJob: SteelEnginePluginApi["registerSessionSchedulerJob"] = () =>
   undefined;
-const noopRegisterSessionAction: OpenClawPluginApi["registerSessionAction"] = () => {};
-const noopSendSessionAttachment: OpenClawPluginApi["sendSessionAttachment"] = async () => ({
+const noopRegisterSessionAction: SteelEnginePluginApi["registerSessionAction"] = () => {};
+const noopSendSessionAttachment: SteelEnginePluginApi["sendSessionAttachment"] = async () => ({
   ok: false,
   error: "not wired",
 });
-const noopScheduleSessionTurn: OpenClawPluginApi["scheduleSessionTurn"] = async () => undefined;
-const noopUnscheduleSessionTurnsByTag: OpenClawPluginApi["unscheduleSessionTurnsByTag"] =
+const noopScheduleSessionTurn: SteelEnginePluginApi["scheduleSessionTurn"] = async () => undefined;
+const noopUnscheduleSessionTurnsByTag: SteelEnginePluginApi["unscheduleSessionTurnsByTag"] =
   async () => ({ removed: 0, failed: 0 });
-const noopRegisterDetachedTaskRuntime: OpenClawPluginApi["registerDetachedTaskRuntime"] = () => {};
-const noopRegisterMemoryCapability: OpenClawPluginApi["registerMemoryCapability"] = () => {};
-const noopRegisterMemoryPromptSection: OpenClawPluginApi["registerMemoryPromptSection"] = () => {};
-const noopRegisterMemoryPromptSupplement: OpenClawPluginApi["registerMemoryPromptSupplement"] =
+const noopRegisterDetachedTaskRuntime: SteelEnginePluginApi["registerDetachedTaskRuntime"] = () => {};
+const noopRegisterMemoryCapability: SteelEnginePluginApi["registerMemoryCapability"] = () => {};
+const noopRegisterMemoryPromptSection: SteelEnginePluginApi["registerMemoryPromptSection"] = () => {};
+const noopRegisterMemoryPromptSupplement: SteelEnginePluginApi["registerMemoryPromptSupplement"] =
   () => {};
-const noopRegisterMemoryPromptPreparation: OpenClawPluginApi["registerMemoryPromptPreparation"] =
+const noopRegisterMemoryPromptPreparation: SteelEnginePluginApi["registerMemoryPromptPreparation"] =
   () => {};
-const noopRegisterMemoryCorpusSupplement: OpenClawPluginApi["registerMemoryCorpusSupplement"] =
+const noopRegisterMemoryCorpusSupplement: SteelEnginePluginApi["registerMemoryCorpusSupplement"] =
   () => {};
-const noopRegisterMemoryFlushPlan: OpenClawPluginApi["registerMemoryFlushPlan"] = () => {};
-const noopRegisterMemoryRuntime: OpenClawPluginApi["registerMemoryRuntime"] = () => {};
-const noopRegisterMemoryEmbeddingProvider: OpenClawPluginApi["registerMemoryEmbeddingProvider"] =
+const noopRegisterMemoryFlushPlan: SteelEnginePluginApi["registerMemoryFlushPlan"] = () => {};
+const noopRegisterMemoryRuntime: SteelEnginePluginApi["registerMemoryRuntime"] = () => {};
+const noopRegisterMemoryEmbeddingProvider: SteelEnginePluginApi["registerMemoryEmbeddingProvider"] =
   () => {};
-const noopOn: OpenClawPluginApi["on"] = () => {};
+const noopOn: SteelEnginePluginApi["on"] = () => {};
 
-export function buildPluginApi(params: BuildPluginApiParams): OpenClawPluginApi {
+export function buildPluginApi(params: BuildPluginApiParams): SteelEnginePluginApi {
   const handlers = params.handlers ?? {};
   const registerCli = handlers.registerCli ?? noopRegisterCli;
-  const api: OpenClawPluginApiWithoutFacades = {
+  const api: SteelEnginePluginApiWithoutFacades = {
     id: params.id,
     name: params.name,
     version: params.version,

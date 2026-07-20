@@ -14,7 +14,7 @@ const { mockFetchWithSsrFGuard } = vi.hoisted(() => ({
   mockFetchWithSsrFGuard: vi.fn(),
 }));
 
-vi.mock("openclaw/plugin-sdk/ssrf-runtime", () => ({
+vi.mock("steelengine/plugin-sdk/ssrf-runtime", () => ({
   fetchWithSsrFGuard: mockFetchWithSsrFGuard,
 }));
 
@@ -59,7 +59,7 @@ function createStalledLookup() {
   return {
     lookupFn: lookupFn as unknown as NonNullable<
       Parameters<
-        typeof import("openclaw/plugin-sdk/ssrf-runtime").fetchWithSsrFGuard
+        typeof import("steelengine/plugin-sdk/ssrf-runtime").fetchWithSsrFGuard
       >[0]["lookupFn"]
     >,
     release: () => release?.(),
@@ -71,19 +71,19 @@ describe("Discord gateway metadata", () => {
     expect(resolveDiscordGatewayInfoTimeoutMs({ configuredTimeoutMs: 45_000 })).toBe(45_000);
     expect(
       resolveDiscordGatewayInfoTimeoutMs({
-        env: { OPENCLAW_DISCORD_GATEWAY_INFO_TIMEOUT_MS: "90000" },
+        env: { STEELENGINE_DISCORD_GATEWAY_INFO_TIMEOUT_MS: "90000" },
       }),
     ).toBe(90_000);
     expect(resolveDiscordGatewayInfoTimeoutMs({ configuredTimeoutMs: 150_000 })).toBe(120_000);
     expect(
       resolveDiscordGatewayInfoTimeoutMs({
         configuredTimeoutMs: 1.5,
-        env: { OPENCLAW_DISCORD_GATEWAY_INFO_TIMEOUT_MS: "0x1000" },
+        env: { STEELENGINE_DISCORD_GATEWAY_INFO_TIMEOUT_MS: "0x1000" },
       }),
     ).toBe(30_000);
     expect(
       resolveDiscordGatewayInfoTimeoutMs({
-        env: { OPENCLAW_DISCORD_GATEWAY_INFO_TIMEOUT_MS: "1e3" },
+        env: { STEELENGINE_DISCORD_GATEWAY_INFO_TIMEOUT_MS: "1e3" },
       }),
     ).toBe(30_000);
   });
@@ -146,8 +146,8 @@ describe("fetchDiscordGatewayMetadataGuarded bounded reads", () => {
   });
 
   it("aborts stalled DNS preflight through the gateway metadata deadline", async () => {
-    const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/ssrf-runtime")>(
-      "openclaw/plugin-sdk/ssrf-runtime",
+    const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/ssrf-runtime")>(
+      "steelengine/plugin-sdk/ssrf-runtime",
     );
     const stalledLookup = createStalledLookup();
     const fetchImpl = vi.fn(async () => new Response("{}", { status: 200 }));

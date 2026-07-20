@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveAgentDir } from "../agents/agent-scope-config.js";
 import {
@@ -15,7 +15,7 @@ import {
   type AgentExecutionAuthBinding,
 } from "../agents/execution-auth-binding.js";
 import { detectInferenceBackends } from "../commands/onboard-inference.js";
-import type { OpenClawConfig } from "../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../config/types.steelengine.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 import { withoutPluginInstallRecords } from "../plugins/installed-plugin-index-records.js";
 import { hasRetainedManagedNpmInstallMarker } from "../plugins/managed-npm-retention.js";
@@ -30,7 +30,7 @@ import {
 } from "../plugins/runtime.js";
 import { ensurePluginRegistryLoaded } from "../plugins/runtime/runtime-registry-loader.js";
 import type { ProviderPlugin } from "../plugins/types.js";
-import { disposeOpenClawAgentDatabaseByPath } from "../state/openclaw-agent-db.js";
+import { disposeSteelEngineAgentDatabaseByPath } from "../state/steelengine-agent-db.js";
 import { createSuiteTempRootTracker } from "../test-helpers/temp-dir.js";
 import { cleanupSystemAgentSession, createSystemAgentSession } from "./agent-turn.js";
 import { runSystemAgentTurnWithDeps } from "./agent-turn.test-support.js";
@@ -80,7 +80,7 @@ vi.mock("../config/config.js", async (importOriginal) => {
     readConfigFileSnapshot: vi.fn(async () => ({
       exists: false,
       valid: false,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       issues: [],
       config: {},
     })),
@@ -211,13 +211,13 @@ type SuccessfulRunParams = {
   onSuccessfulAuthBinding?: (binding: AgentExecutionAuthBinding) => void;
   authProfileId?: string;
   agentHarnessRuntimeOverride?: string;
-  config?: OpenClawConfig;
+  config?: SteelEngineConfig;
 };
 
 function successfulAgentHarnessBinding(params?: SuccessfulRunParams): AgentExecutionAuthBinding {
   const requestedHarnessId = params?.agentHarnessRuntimeOverride?.trim();
   const agentHarnessId =
-    !requestedHarnessId || requestedHarnessId === "auto" ? "openclaw" : requestedHarnessId;
+    !requestedHarnessId || requestedHarnessId === "auto" ? "steelengine" : requestedHarnessId;
   return {
     agentHarnessId,
     ...(agentHarnessId === "codex"
@@ -261,8 +261,8 @@ function successfulRunner(provider: string, model: string) {
 }
 
 function createConfigTransformHarness(
-  sourceConfig: OpenClawConfig = {},
-  runtimeConfig: OpenClawConfig = sourceConfig,
+  sourceConfig: SteelEngineConfig = {},
+  runtimeConfig: SteelEngineConfig = sourceConfig,
 ) {
   const state = {
     sourceConfig: structuredClone(sourceConfig),
@@ -271,26 +271,26 @@ function createConfigTransformHarness(
   const transform = vi.fn(
     async (params: {
       transform: (
-        config: OpenClawConfig,
+        config: SteelEngineConfig,
         context: {
           snapshot: {
             exists: true;
             valid: true;
             path: string;
-            config: OpenClawConfig;
-            sourceConfig: OpenClawConfig;
-            runtimeConfig: OpenClawConfig;
+            config: SteelEngineConfig;
+            sourceConfig: SteelEngineConfig;
+            runtimeConfig: SteelEngineConfig;
           };
           previousHash: string | null;
           attempt: number;
         },
-      ) => Promise<{ nextConfig: OpenClawConfig }> | { nextConfig: OpenClawConfig };
+      ) => Promise<{ nextConfig: SteelEngineConfig }> | { nextConfig: SteelEngineConfig };
     }) => {
       const transformed = await params.transform(state.sourceConfig, {
         snapshot: {
           exists: true,
           valid: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           config: state.runtimeConfig,
           sourceConfig: state.sourceConfig,
           runtimeConfig: state.runtimeConfig,
@@ -330,12 +330,12 @@ describe("applySystemAgentModelSelection", () => {
             id: "ops",
             default: true,
             models: {
-              "openai/gpt-5.5": { agentRuntime: { id: "openclaw" } },
+              "openai/gpt-5.5": { agentRuntime: { id: "steelengine" } },
             },
           },
         ],
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
 
     const result = await applySystemAgentModelSelection({
       config,
@@ -348,7 +348,7 @@ describe("applySystemAgentModelSelection", () => {
       id: "ops",
       models: { "openai/gpt-5.5": { agentRuntime: { id: "codex" } } },
     });
-    expect(config.agents.list[0]?.models["openai/gpt-5.5"]?.agentRuntime?.id).toBe("openclaw");
+    expect(config.agents.list[0]?.models["openai/gpt-5.5"]?.agentRuntime?.id).toBe("steelengine");
   });
 });
 
@@ -368,7 +368,7 @@ describe("detectSetupInference", () => {
     ]);
     const detection = await detectSetupInference({
       resolveManifestProviderAuthChoices,
-      enablePluginInConfig: ((config: OpenClawConfig) => ({ enabled: true, config })) as never,
+      enablePluginInConfig: ((config: SteelEngineConfig) => ({ enabled: true, config })) as never,
       probeLocalCommand: vi.fn(async (command) => ({ command, found: false })),
     });
     expect(detection.candidates).toHaveLength(2);
@@ -440,7 +440,7 @@ describe("detectSetupInference", () => {
           website: "https://local.example.com/download",
         },
       ],
-      enablePluginInConfig: ((config: OpenClawConfig) => ({ enabled: true, config })) as never,
+      enablePluginInConfig: ((config: SteelEngineConfig) => ({ enabled: true, config })) as never,
       resolvePluginProviders: () => [provider],
     });
 
@@ -472,13 +472,13 @@ describe("detectSetupInference", () => {
     vi.mocked(readConfigFileSnapshot).mockResolvedValueOnce({
       exists: true,
       valid: false,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       issues: [{ path: "agents.defaults.model", message: "Expected a model reference" }],
       config: {},
     } as never);
 
     await expect(detectSetupInference()).rejects.toThrow(
-      "OpenClaw config /tmp/openclaw.json is invalid (agents.defaults.model: Expected a model reference)",
+      "SteelEngine config /tmp/steelengine.json is invalid (agents.defaults.model: Expected a model reference)",
     );
   });
 
@@ -748,10 +748,10 @@ describe("detectSetupInference", () => {
 });
 
 async function runCodexSetupWithFinalConfig(params: {
-  initialConfig?: OpenClawConfig;
-  currentConfig: OpenClawConfig;
-  currentRuntimeConfig?: OpenClawConfig;
-  sourceConfig: OpenClawConfig;
+  initialConfig?: SteelEngineConfig;
+  currentConfig: SteelEngineConfig;
+  currentRuntimeConfig?: SteelEngineConfig;
+  sourceConfig: SteelEngineConfig;
 }) {
   const initialConfig = params.initialConfig ?? params.sourceConfig;
   let persistedConfig = structuredClone(params.currentConfig);
@@ -760,27 +760,27 @@ async function runCodexSetupWithFinalConfig(params: {
   const transformConfig = vi.fn(
     async (input: {
       transform: (
-        config: OpenClawConfig,
+        config: SteelEngineConfig,
         context: {
           snapshot: {
             exists: true;
             valid: true;
             path: string;
-            config: OpenClawConfig;
-            sourceConfig: OpenClawConfig;
-            runtimeConfig: OpenClawConfig;
+            config: SteelEngineConfig;
+            sourceConfig: SteelEngineConfig;
+            runtimeConfig: SteelEngineConfig;
           };
           previousHash: string | null;
           attempt: number;
         },
-      ) => Promise<{ nextConfig: OpenClawConfig }> | { nextConfig: OpenClawConfig };
+      ) => Promise<{ nextConfig: SteelEngineConfig }> | { nextConfig: SteelEngineConfig };
     }) => {
       const runtimeConfig = params.currentRuntimeConfig ?? params.sourceConfig;
       const transformed = await input.transform(persistedConfig, {
         snapshot: {
           exists: true,
           valid: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           config: runtimeConfig,
           sourceConfig: persistedConfig,
           runtimeConfig,
@@ -799,7 +799,7 @@ async function runCodexSetupWithFinalConfig(params: {
     return {
       exists: true,
       valid: true,
-      path: "/tmp/openclaw.json",
+      path: "/tmp/steelengine.json",
       hash: committed ? "after-setup" : "before-setup",
       issues: [],
       config: runtimeConfig,
@@ -809,13 +809,13 @@ async function runCodexSetupWithFinalConfig(params: {
   });
   const result = await activateSetupInference({
     kind: "codex-cli",
-    workspace: "/tmp/openclaw-workspace",
+    workspace: "/tmp/steelengine-workspace",
     surface: "gateway",
     runtime,
     deps: {
       readConfigFileSnapshot: readConfigFileSnapshot as never,
       runEmbeddedAgent: vi.fn(successfulRunner("openai", "gpt-5.6-sol")) as never,
-      ensureCodexRuntimePlugin: vi.fn(async ({ cfg }: { cfg: OpenClawConfig }) => ({
+      ensureCodexRuntimePlugin: vi.fn(async ({ cfg }: { cfg: SteelEngineConfig }) => ({
         cfg,
         required: true,
         installed: true,
@@ -832,7 +832,7 @@ async function runCodexSetupWithFinalConfig(params: {
 describe("activateSetupInference", () => {
   it("omits the token cap when harness selection is automatic", () => {
     expect(resolveSetupInferenceProbeStreamParams("auto")).toEqual({});
-    expect(resolveSetupInferenceProbeStreamParams("openclaw")).toEqual({
+    expect(resolveSetupInferenceProbeStreamParams("steelengine")).toEqual({
       streamParams: { maxTokens: 32 },
     });
   });
@@ -847,7 +847,7 @@ describe("activateSetupInference", () => {
     vi.restoreAllMocks();
   });
 
-  function createGroqSetupProvider(configPatch?: Partial<OpenClawConfig>): ProviderPlugin {
+  function createGroqSetupProvider(configPatch?: Partial<SteelEngineConfig>): ProviderPlugin {
     return {
       id: "groq",
       label: "Groq",
@@ -901,7 +901,7 @@ describe("activateSetupInference", () => {
           readConfigFileSnapshot: vi.fn(async () => ({
             exists: true,
             valid: false,
-            path: "/tmp/openclaw.json",
+            path: "/tmp/steelengine.json",
             issues: [{ path: "gateway.port", message: "Expected a number" }],
             config: {},
           })) as never,
@@ -910,7 +910,7 @@ describe("activateSetupInference", () => {
         },
       }),
     ).rejects.toThrow(
-      "OpenClaw config /tmp/openclaw.json is invalid (gateway.port: Expected a number). Fix it before running setup.",
+      "SteelEngine config /tmp/steelengine.json is invalid (gateway.port: Expected a number). Fix it before running setup.",
     );
     expect(runEmbeddedAgent).not.toHaveBeenCalled();
     expect(transformConfig).not.toHaveBeenCalled();
@@ -929,7 +929,7 @@ describe("activateSetupInference", () => {
         readConfigFileSnapshot: vi.fn(async () => ({
           exists: true,
           valid: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           hash: "setup-config-hash",
           config: {},
           sourceConfig: {},
@@ -945,11 +945,11 @@ describe("activateSetupInference", () => {
       ok: true,
       lines: [
         "Inference verified: claude-cli/claude-opus-4-8",
-        "Inference setup completed, but OpenClaw could not record its audit entry: audit directory is read-only",
+        "Inference setup completed, but SteelEngine could not record its audit entry: audit directory is read-only",
       ],
     });
     expect(error).toHaveBeenCalledWith(
-      "Inference setup completed, but OpenClaw could not record its audit entry: audit directory is read-only",
+      "Inference setup completed, but SteelEngine could not record its audit entry: audit directory is read-only",
     );
   });
 
@@ -982,18 +982,18 @@ describe("activateSetupInference", () => {
           {
             id: "ops",
             default: true,
-            agentDir: "/tmp/openclaw-ops-agent",
+            agentDir: "/tmp/steelengine-ops-agent",
             params: { temperature: 0.2 },
             tools: { allow: ["read"], deny: ["exec"] },
           },
           {
-            id: "openclaw",
+            id: "steelengine",
             params: { temperature: 1.7 },
             tools: { allow: ["exec"] },
           },
         ],
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const configHarness = createConfigTransformHarness(initialConfig);
     const runCliAgent = vi.fn(successfulRunner("claude-cli", "claude-opus-4-8"));
     const result = await activateSetupInference({
@@ -1021,21 +1021,21 @@ describe("activateSetupInference", () => {
     expect(runCliAgent).toHaveBeenCalledOnce();
     expect(runCliAgent).toHaveBeenCalledWith(
       expect.objectContaining({
-        agentId: "openclaw",
-        agentDir: "/tmp/openclaw-ops-agent",
+        agentId: "steelengine",
+        agentDir: "/tmp/steelengine-ops-agent",
         executionMode: "side-question",
         disableTools: true,
         cleanupCliLiveSessionOnRunEnd: true,
       }),
     );
     const probeConfig = runCliAgent.mock.calls[0]?.[0].config;
-    expect(probeConfig?.agents?.list?.find((agent) => agent.id === "openclaw")).toEqual({
-      id: "openclaw",
+    expect(probeConfig?.agents?.list?.find((agent) => agent.id === "steelengine")).toEqual({
+      id: "steelengine",
       params: { temperature: 0.2 },
       tools: { allow: ["read"], deny: ["exec"] },
     });
-    expect(configHarness.current().agents?.list?.find((agent) => agent.id === "openclaw")).toEqual({
-      id: "openclaw",
+    expect(configHarness.current().agents?.list?.find((agent) => agent.id === "steelengine")).toEqual({
+      id: "steelengine",
       params: { temperature: 1.7 },
       tools: { allow: ["exec"] },
     });
@@ -1064,10 +1064,10 @@ describe("activateSetupInference", () => {
     expect(configHarness.current()).toEqual({});
   });
 
-  it("rejects an unattested existing route before handing off to OpenClaw", async () => {
+  it("rejects an unattested existing route before handing off to SteelEngine", async () => {
     const config = {
       agents: { defaults: { model: "openai/gpt-5.5" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const configHarness = createConfigTransformHarness();
     const result = await activateSetupInference({
       kind: "existing-model",
@@ -1099,7 +1099,7 @@ describe("activateSetupInference", () => {
       deps: {
         runCliAgent: vi.fn(successfulRunner("claude-cli", "claude-opus-4-8")) as never,
         transformConfigWithPendingPluginInstalls: configHarness.transform as never,
-        createTempDir: async () => "/tmp/openclaw-setup-cleanup-fixture",
+        createTempDir: async () => "/tmp/steelengine-setup-cleanup-fixture",
         removeTempDir: async () => {
           throw new Error("simulated cleanup failure");
         },
@@ -1112,11 +1112,11 @@ describe("activateSetupInference", () => {
 
   it("disposes the temporary auth database before Windows-style removal", async () => {
     const tempDir = await makeTempDir();
-    const databasePath = path.join(tempDir, "agent", "openclaw-agent.sqlite");
+    const databasePath = path.join(tempDir, "agent", "steelengine-agent.sqlite");
     let disposed = false;
     const disposeDatabase = vi.fn((pathname: string) => {
       expect(pathname).toBe(databasePath);
-      disposed = disposeOpenClawAgentDatabaseByPath(pathname);
+      disposed = disposeSteelEngineAgentDatabaseByPath(pathname);
       return disposed;
     });
     const removeTempDir = vi.fn(async (dir: string) => {
@@ -1140,7 +1140,7 @@ describe("activateSetupInference", () => {
         runEmbeddedAgent: vi.fn(async () => {
           throw new Error("401 invalid_api_key");
         }) as never,
-        disposeOpenClawAgentDatabaseByPath: disposeDatabase,
+        disposeSteelEngineAgentDatabaseByPath: disposeDatabase,
         createTempDir: async () => tempDir,
         removeTempDir,
       },
@@ -1153,7 +1153,7 @@ describe("activateSetupInference", () => {
   });
 
   it("reconciles a config write that committed before its writer threw", async () => {
-    let committedConfig: OpenClawConfig | undefined;
+    let committedConfig: SteelEngineConfig | undefined;
     const readConfigFileSnapshot = vi.fn(async () => ({
       exists: true,
       valid: true,
@@ -1163,9 +1163,9 @@ describe("activateSetupInference", () => {
     const transformConfig = vi.fn(
       async (params: {
         transform: (
-          config: OpenClawConfig,
-          context: { snapshot: { config: OpenClawConfig; runtimeConfig: OpenClawConfig } },
-        ) => Promise<{ nextConfig: OpenClawConfig }>;
+          config: SteelEngineConfig,
+          context: { snapshot: { config: SteelEngineConfig; runtimeConfig: SteelEngineConfig } },
+        ) => Promise<{ nextConfig: SteelEngineConfig }>;
       }) => {
         committedConfig = (
           await params.transform({}, { snapshot: { config: {}, runtimeConfig: {} } })
@@ -1190,7 +1190,7 @@ describe("activateSetupInference", () => {
     expect(committedConfig?.agents?.defaults?.model).toBe("claude-cli/claude-opus-4-8");
   });
 
-  it("persists only the verified model before OpenClaw configures the rest", async () => {
+  it("persists only the verified model before SteelEngine configures the rest", async () => {
     const configHarness = createConfigTransformHarness();
 
     const result = await activateSetupInference({
@@ -1219,7 +1219,7 @@ describe("activateSetupInference", () => {
   it.each([
     {
       name: "auto-enables the lean surface for a verified local model",
-      initialConfig: {} satisfies OpenClawConfig,
+      initialConfig: {} satisfies SteelEngineConfig,
       expectedLean: true,
       expectedAnnouncement: true,
     },
@@ -1227,7 +1227,7 @@ describe("activateSetupInference", () => {
       name: "preserves an explicit localModelLean=false",
       initialConfig: {
         agents: { defaults: { experimental: { localModelLean: false } } },
-      } satisfies OpenClawConfig,
+      } satisfies SteelEngineConfig,
       expectedLean: false,
       expectedAnnouncement: false,
     },
@@ -1286,7 +1286,7 @@ describe("activateSetupInference", () => {
         readConfigFileSnapshot: vi.fn(async () => ({
           exists: true,
           valid: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           issues: [],
           config: initialConfig,
           sourceConfig: initialConfig,
@@ -1339,10 +1339,10 @@ describe("activateSetupInference", () => {
   });
 
   it("rebases model persistence on concurrent default-agent edits", async () => {
-    const probedConfig: OpenClawConfig = {
+    const probedConfig: SteelEngineConfig = {
       agents: { list: [{ id: "work", default: true, model: "openai/broken" }] },
     };
-    const concurrentConfig: OpenClawConfig = {
+    const concurrentConfig: SteelEngineConfig = {
       agents: {
         list: [
           { id: "work", default: true, model: "openai/broken", name: "edited during probe" },
@@ -1397,7 +1397,7 @@ describe("activateSetupInference", () => {
             { id: "other", agentDir: "/tmp/other", model: "openai/broken" },
           ],
         },
-      } satisfies OpenClawConfig,
+      } satisfies SteelEngineConfig,
     },
     {
       name: "default agent",
@@ -1408,7 +1408,7 @@ describe("activateSetupInference", () => {
             { id: "other", default: true, agentDir: "/tmp/other", model: "openai/broken" },
           ],
         },
-      } satisfies OpenClawConfig,
+      } satisfies SteelEngineConfig,
     },
     {
       name: "default agent directory",
@@ -1423,7 +1423,7 @@ describe("activateSetupInference", () => {
             },
           ],
         },
-      } satisfies OpenClawConfig,
+      } satisfies SteelEngineConfig,
     },
     {
       name: "default agent execution settings",
@@ -1441,7 +1441,7 @@ describe("activateSetupInference", () => {
             { id: "other", agentDir: "/tmp/other", model: "openai/broken" },
           ],
         },
-      } satisfies OpenClawConfig,
+      } satisfies SteelEngineConfig,
     },
   ])("rejects a changed $name after the live probe", async ({ concurrent }) => {
     const probedConfig = {
@@ -1451,7 +1451,7 @@ describe("activateSetupInference", () => {
           { id: "other", agentDir: "/tmp/other", model: "openai/broken" },
         ],
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const configHarness = createConfigTransformHarness(concurrent);
 
     await expect(
@@ -1463,7 +1463,7 @@ describe("activateSetupInference", () => {
           readConfigFileSnapshot: vi.fn(async () => ({
             exists: true,
             valid: true,
-            path: "/tmp/openclaw.json",
+            path: "/tmp/steelengine.json",
             issues: [],
             config: probedConfig,
             runtimeConfig: probedConfig,
@@ -1484,11 +1484,11 @@ describe("activateSetupInference", () => {
         defaults: {
           model: "openai/gpt-5.4",
           models: {
-            "anthropic/claude-opus-4-8": { agentRuntime: { id: "openclaw" } },
+            "anthropic/claude-opus-4-8": { agentRuntime: { id: "steelengine" } },
           },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const concurrentConfig = structuredClone(initialConfig);
     concurrentConfig.agents!.defaults!.models!["anthropic/claude-opus-4-8"] = {
       agentRuntime: { id: "codex" },
@@ -1545,8 +1545,8 @@ describe("activateSetupInference", () => {
           },
         },
       },
-    } satisfies OpenClawConfig;
-    const runtimeConfig: OpenClawConfig = structuredClone(sourceConfig);
+    } satisfies SteelEngineConfig;
+    const runtimeConfig: SteelEngineConfig = structuredClone(sourceConfig);
     runtimeConfig.models!.providers!.openai!.models = [
       {
         id: "gpt-5.6",
@@ -1589,10 +1589,10 @@ describe("activateSetupInference", () => {
   it("rejects an existing route that changes after its live probe", async () => {
     const initialConfig = {
       agents: { defaults: { model: "openai/gpt-5.5" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const changedConfig = {
       agents: { defaults: { model: "anthropic/claude-opus-4-8" } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const readConfigFileSnapshot = vi
       .fn()
       .mockResolvedValueOnce({ exists: true, valid: true, config: initialConfig })
@@ -1649,7 +1649,7 @@ describe("activateSetupInference", () => {
           },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const result = await activateSetupInference({
       kind: "existing-model",
       surface: "gateway",
@@ -1716,7 +1716,7 @@ describe("activateSetupInference", () => {
   });
 
   it("does not configure Codex while selecting Claude as the primary backend", async () => {
-    const sourceConfig = {} satisfies OpenClawConfig;
+    const sourceConfig = {} satisfies SteelEngineConfig;
     const configHarness = createConfigTransformHarness(sourceConfig);
     const ensureCodexRuntimePlugin = vi.fn();
     const runCliAgent = vi.fn(async (params: SuccessfulRunParams) => {
@@ -1733,7 +1733,7 @@ describe("activateSetupInference", () => {
         readConfigFileSnapshot: vi.fn(async () => ({
           exists: true,
           valid: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           issues: [],
           sourceConfig,
           config: sourceConfig,
@@ -1763,7 +1763,7 @@ describe("activateSetupInference", () => {
   it.each([
     [
       "an explicitly disabled Codex plugin",
-      { plugins: { entries: { codex: { enabled: false } } } } satisfies OpenClawConfig,
+      { plugins: { entries: { codex: { enabled: false } } } } satisfies SteelEngineConfig,
     ],
     [
       "an explicit supervision opt-out",
@@ -1771,9 +1771,9 @@ describe("activateSetupInference", () => {
         plugins: {
           entries: { codex: { config: { supervision: { enabled: false } } } },
         },
-      } satisfies OpenClawConfig,
+      } satisfies SteelEngineConfig,
     ],
-    ["plugin policy", { plugins: { deny: ["codex"] } } satisfies OpenClawConfig],
+    ["plugin policy", { plugins: { deny: ["codex"] } } satisfies SteelEngineConfig],
   ])("preserves %s while selecting another backend", async (_label, config) => {
     const ensureCodexRuntimePlugin = vi.fn();
     const configHarness = createConfigTransformHarness(config);
@@ -1786,7 +1786,7 @@ describe("activateSetupInference", () => {
         readConfigFileSnapshot: vi.fn(async () => ({
           exists: true,
           valid: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           issues: [],
           sourceConfig: config,
           config,
@@ -1980,7 +1980,7 @@ describe("activateSetupInference", () => {
           },
         ],
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const runEmbeddedAgent = vi.fn(successfulRunner("anthropic", "claude-opus-4-8"));
     const configHarness = createConfigTransformHarness(initialConfig);
 
@@ -1992,7 +1992,7 @@ describe("activateSetupInference", () => {
         readConfigFileSnapshot: vi.fn(async () => ({
           exists: true,
           valid: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           issues: [],
           config: initialConfig,
           runtimeConfig: initialConfig,
@@ -2006,10 +2006,10 @@ describe("activateSetupInference", () => {
     expect(result).toMatchObject({ ok: true, modelRef: "anthropic/claude-opus-4-8" });
     expect(runEmbeddedAgent).toHaveBeenCalledWith(
       expect.objectContaining({
-        agentId: "openclaw",
+        agentId: "steelengine",
         provider: "anthropic",
         model: "claude-opus-4-8",
-        agentHarnessRuntimeOverride: "openclaw",
+        agentHarnessRuntimeOverride: "steelengine",
         config: expect.objectContaining({
           agents: expect.objectContaining({
             list: [
@@ -2018,7 +2018,7 @@ describe("activateSetupInference", () => {
                 model: { primary: "anthropic/claude-opus-4-8" },
                 models: {
                   "anthropic/claude-opus-4-8": {
-                    agentRuntime: { id: "openclaw" },
+                    agentRuntime: { id: "steelengine" },
                   },
                 },
               }),
@@ -2051,13 +2051,13 @@ describe("activateSetupInference", () => {
     const agentDir = path.join(stateDir, "agent");
     const initialConfig = {
       agents: { list: [{ id: "main", default: true, agentDir }] },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const runtimeConfig = {
       agents: {
         ...initialConfig.agents,
         defaults: { models: { "openai/gpt-5.4": {} } },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     resolveAgentDir(initialConfig, "main");
     const runAuth = vi.fn(async () => ({
       profiles: [
@@ -2093,7 +2093,7 @@ describe("activateSetupInference", () => {
       const result = await activateSetupInference({
         kind: "provider-auth",
         authChoice: "openai",
-        workspace: "/tmp/openclaw-workspace",
+        workspace: "/tmp/steelengine-workspace",
         surface: "gateway",
         runtime,
         prompter: { note: vi.fn(async () => {}) } as never,
@@ -2101,7 +2101,7 @@ describe("activateSetupInference", () => {
           readConfigFileSnapshot: vi.fn(async () => ({
             exists: true,
             valid: true,
-            path: "/tmp/openclaw.json",
+            path: "/tmp/steelengine.json",
             issues: [],
             config: initialConfig,
             sourceConfig: initialConfig,
@@ -2194,7 +2194,7 @@ describe("activateSetupInference", () => {
             "groq:legacy": { provider: "groq", mode: credentialType },
           },
         },
-      } satisfies OpenClawConfig;
+      } satisfies SteelEngineConfig;
       // Custom agent directories must be bound to their configured owner before
       // the shared per-agent database is created.
       resolveAgentDir(initialConfig, "main");
@@ -2241,7 +2241,7 @@ describe("activateSetupInference", () => {
         ],
       };
       const resolvePluginProviders = vi.fn(() => [provider]);
-      const enablePluginInConfig = vi.fn((config: OpenClawConfig, pluginId: string) => ({
+      const enablePluginInConfig = vi.fn((config: SteelEngineConfig, pluginId: string) => ({
         config: {
           ...config,
           plugins: { entries: { [pluginId]: { enabled: true } } },
@@ -2259,14 +2259,14 @@ describe("activateSetupInference", () => {
           kind: "api-key",
           authChoice: "groq-api-key",
           apiKey: "test-groq-key",
-          workspace: "/tmp/openclaw-workspace",
+          workspace: "/tmp/steelengine-workspace",
           surface: "gateway",
           runtime,
           deps: {
             readConfigFileSnapshot: vi.fn(async () => ({
               exists: true,
               valid: true,
-              path: "/tmp/openclaw.json",
+              path: "/tmp/steelengine.json",
               issues: [],
               config: initialConfig,
               runtimeConfig: initialConfig,
@@ -2294,7 +2294,7 @@ describe("activateSetupInference", () => {
               plugins: { entries: { groq: { enabled: true } } },
             }),
             onlyPluginIds: ["groq"],
-            workspaceDir: "/tmp/openclaw-workspace",
+            workspaceDir: "/tmp/steelengine-workspace",
           }),
         );
         expect(runAuth).toHaveBeenCalledWith(
@@ -2311,7 +2311,7 @@ describe("activateSetupInference", () => {
         expect(activatedProfileId).toMatch(/^groq:setup-/);
         expect(runEmbeddedAgent).toHaveBeenCalledWith(
           expect.objectContaining({
-            agentId: "openclaw",
+            agentId: "steelengine",
             provider: "groq",
             model: "llama-3.3-70b-versatile",
             authProfileId: activatedProfileId,
@@ -2353,7 +2353,7 @@ describe("activateSetupInference", () => {
     const agentDir = path.join(stateDir, "agent");
     const initialConfig = {
       agents: { list: [{ id: "main", default: true, agentDir }] },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     resolveAgentDir(initialConfig, "main");
     const transformConfig = vi.fn();
     const runEmbeddedAgent = vi.fn(
@@ -2424,7 +2424,7 @@ describe("activateSetupInference", () => {
       plugins: {
         entries: { operator: { enabled: true, config: { revision: "initial" } } },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const concurrentConfig = structuredClone(initialConfig);
     concurrentConfig.gateway = { port: 19_000 };
     concurrentConfig.agents!.defaults!.workspace = "/operator/concurrent";
@@ -2493,7 +2493,7 @@ describe("activateSetupInference", () => {
         },
       ],
     };
-    const enablePluginInConfig = (config: OpenClawConfig, pluginId: string) => ({
+    const enablePluginInConfig = (config: SteelEngineConfig, pluginId: string) => ({
       enabled: true as const,
       config: {
         ...config,
@@ -2507,7 +2507,7 @@ describe("activateSetupInference", () => {
       },
     });
     const runEmbeddedAgent = vi.fn(
-      async (params: SuccessfulRunParams & { config: OpenClawConfig }) =>
+      async (params: SuccessfulRunParams & { config: SteelEngineConfig }) =>
         successfulRun("groq", "llama-3.3-70b-versatile", params),
     );
     const configHarness = createConfigTransformHarness(concurrentConfig);
@@ -2550,7 +2550,7 @@ describe("activateSetupInference", () => {
         },
       });
       expect(probeConfig.agents?.list?.[0]?.models).toMatchObject({
-        "groq/llama-3.3-70b-versatile": { agentRuntime: { id: "openclaw" } },
+        "groq/llama-3.3-70b-versatile": { agentRuntime: { id: "steelengine" } },
       });
       expect(probeConfig.plugins?.entries?.groq).toEqual({
         enabled: true,
@@ -2594,7 +2594,7 @@ describe("activateSetupInference", () => {
     const agentDir = path.join(stateDir, "agent");
     const initialConfig = {
       agents: { list: [{ id: "main", default: true, agentDir }] },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     resolveAgentDir(initialConfig, "main");
     const configHarness = createConfigTransformHarness(initialConfig);
     const runEmbeddedAgent = vi.fn(
@@ -2673,7 +2673,7 @@ describe("activateSetupInference", () => {
     const initialConfig = {
       agents: { list: [{ id: "main", default: true, agentDir }] },
       auth: { profiles: { "groq:default": { provider: "groq", mode: "api_key" } } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     resolveAgentDir(initialConfig, "main");
     const provider: ProviderPlugin = {
       id: "groq",
@@ -2759,7 +2759,7 @@ describe("activateSetupInference", () => {
     const agentDir = path.join(stateDir, "agent");
     const initialConfig = {
       agents: { list: [{ id: "main", default: true, agentDir }] },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     resolveAgentDir(initialConfig, "main");
     const credential = {
       type: "api_key" as const,
@@ -2846,14 +2846,14 @@ describe("activateSetupInference", () => {
     const agentDir = path.join(stateDir, "agent");
     const initialConfig = {
       agents: { list: [{ id: "main", default: true, agentDir }] },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const concurrentConfig = {
       ...initialConfig,
       agents: {
         ...initialConfig.agents,
         defaults: { model: "openai/gpt-5.5" },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     resolveAgentDir(initialConfig, "main");
     const readConfigFileSnapshot = vi
       .fn()
@@ -2884,7 +2884,7 @@ describe("activateSetupInference", () => {
           kind: "api-key",
           authChoice: "groq-api-key",
           apiKey: "candidate-key",
-          workspace: "/tmp/openclaw-workspace",
+          workspace: "/tmp/steelengine-workspace",
           surface: "gateway",
           runtime,
           deps: {
@@ -2914,9 +2914,9 @@ describe("activateSetupInference", () => {
     const agentDir = path.join(stateDir, "agent");
     const initialConfig = {
       agents: { list: [{ id: "main", default: true, agentDir }] },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     resolveAgentDir(initialConfig, "main");
-    let currentConfig: OpenClawConfig = initialConfig;
+    let currentConfig: SteelEngineConfig = initialConfig;
     const readConfigFileSnapshot = vi.fn(async () => ({
       exists: true,
       valid: true,
@@ -2982,7 +2982,7 @@ describe("activateSetupInference", () => {
     const agentDir = path.join(stateDir, "agent");
     const initialConfig = {
       agents: { list: [{ id: "main", default: true, agentDir }] },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     resolveAgentDir(initialConfig, "main");
     const transformConfig = vi.fn(async (params: { transform: Function }) => {
       await params.transform(initialConfig, {
@@ -3038,7 +3038,7 @@ describe("activateSetupInference", () => {
     const agentDir = path.join(stateDir, "agent");
     const initialConfig = {
       agents: { list: [{ id: "main", default: true, agentDir }] },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     resolveAgentDir(initialConfig, "main");
     const concurrentConfig = {
       ...initialConfig,
@@ -3046,7 +3046,7 @@ describe("activateSetupInference", () => {
         ...initialConfig.agents,
         defaults: { model: "openai/gpt-5.5" },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     let realStoreWrites = 0;
     const updateAuthProfileStore = vi.fn(async (params) => {
       if (params.agentDir === agentDir) {
@@ -3078,7 +3078,7 @@ describe("activateSetupInference", () => {
         kind: "api-key",
         authChoice: "groq-api-key",
         apiKey: "candidate-key",
-        workspace: "/tmp/openclaw-workspace",
+        workspace: "/tmp/steelengine-workspace",
         surface: "gateway",
         runtime,
         deps: {
@@ -3120,7 +3120,7 @@ describe("activateSetupInference", () => {
     const agentDir = path.join(stateDir, "agent");
     const initialConfig = {
       agents: { list: [{ id: "main", default: true, agentDir }] },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     resolveAgentDir(initialConfig, "main");
     const transformConfig = vi.fn();
     let realStoreUpdates = 0;
@@ -3139,7 +3139,7 @@ describe("activateSetupInference", () => {
           kind: "api-key",
           authChoice: "groq-api-key",
           apiKey: "candidate-key",
-          workspace: "/tmp/openclaw-workspace",
+          workspace: "/tmp/steelengine-workspace",
           surface: "gateway",
           runtime,
           deps: {
@@ -3195,8 +3195,8 @@ describe("activateSetupInference", () => {
     const initialConfig = {
       agents: { list: [{ id: "main", default: true, agentDir }] },
       models: { providers: { aux: auxProvider } },
-    } satisfies OpenClawConfig;
-    const concurrentConfig: OpenClawConfig = {
+    } satisfies SteelEngineConfig;
+    const concurrentConfig: SteelEngineConfig = {
       ...initialConfig,
       models: {
         providers: {
@@ -3262,7 +3262,7 @@ describe("activateSetupInference", () => {
     const agentDir = path.join(stateDir, "agent");
     const initialConfig = {
       agents: { list: [{ id: "main", default: true, agentDir }] },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     resolveAgentDir(initialConfig, "main");
     const authWriteDirs: string[] = [];
     const deps = {
@@ -3325,7 +3325,7 @@ describe("activateSetupInference", () => {
       async (ctx: {
         agentDir?: string;
         opts: { githubCopilotToken?: unknown };
-        config: OpenClawConfig;
+        config: SteelEngineConfig;
       }) => {
         const token =
           typeof ctx.opts.githubCopilotToken === "string" ? ctx.opts.githubCopilotToken : "";
@@ -3345,7 +3345,7 @@ describe("activateSetupInference", () => {
               },
             },
           },
-        } satisfies OpenClawConfig;
+        } satisfies SteelEngineConfig;
       },
     );
     const provider: ProviderPlugin = {
@@ -3373,14 +3373,14 @@ describe("activateSetupInference", () => {
         defaults: { model: { primary: existingModel } },
         list: [{ id: "main", default: true, agentDir }],
       },
-    } satisfies OpenClawConfig;
-    const concurrentConfig: OpenClawConfig = {
+    } satisfies SteelEngineConfig;
+    const concurrentConfig: SteelEngineConfig = {
       gateway: { port: 19000 },
       agents: {
         defaults: { model: { primary: existingModel } },
         list: [{ id: "main", default: true, agentDir }],
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const configHarness = createConfigTransformHarness(concurrentConfig);
 
     try {
@@ -3388,14 +3388,14 @@ describe("activateSetupInference", () => {
         kind: "api-key",
         authChoice: "github-copilot",
         apiKey: "github-token",
-        workspace: "/tmp/openclaw-workspace",
+        workspace: "/tmp/steelengine-workspace",
         surface: "gateway",
         runtime,
         deps: {
           readConfigFileSnapshot: vi.fn(async () => ({
             exists: true,
             valid: true,
-            path: "/tmp/openclaw.json",
+            path: "/tmp/steelengine.json",
             issues: [],
             config: initialConfig,
             runtimeConfig: initialConfig,
@@ -3434,7 +3434,7 @@ describe("activateSetupInference", () => {
       expect(activatedProfileId).toMatch(/^github-copilot:setup-/);
       expect(runEmbeddedAgent).toHaveBeenCalledWith(
         expect.objectContaining({
-          agentId: "openclaw",
+          agentId: "steelengine",
           agentDir: expect.stringContaining("setup-inference-test-"),
           authProfileId: activatedProfileId,
           provider: "github-copilot",
@@ -3487,7 +3487,7 @@ describe("activateSetupInference", () => {
         kind: "api-key",
         authChoice: "groq-api-key",
         apiKey: "bad-groq-key",
-        workspace: "/tmp/openclaw-workspace",
+        workspace: "/tmp/steelengine-workspace",
         surface: "gateway",
         runtime,
         deps: {
@@ -3534,7 +3534,7 @@ describe("activateSetupInference", () => {
               fallbacks: ["google/gemini-3.1-pro-preview"],
             },
             models: {
-              "openai/gpt-5.5": { agentRuntime: { id: "openclaw" } },
+              "openai/gpt-5.5": { agentRuntime: { id: "steelengine" } },
             },
           },
         ],
@@ -3554,8 +3554,8 @@ describe("activateSetupInference", () => {
           },
         },
       },
-    } satisfies OpenClawConfig;
-    const ensureCodex = vi.fn(async (params: { cfg: OpenClawConfig }) => {
+    } satisfies SteelEngineConfig;
+    const ensureCodex = vi.fn(async (params: { cfg: SteelEngineConfig }) => {
       events.push("install-plugin");
       return {
         cfg: {
@@ -3573,7 +3573,7 @@ describe("activateSetupInference", () => {
               ...params.cfg.plugins?.installs,
               codex: {
                 source: "npm" as const,
-                spec: "@openclaw/codex",
+                spec: "@steelengine/codex",
                 installPath: "/tmp/plugins/codex",
               },
             },
@@ -3588,7 +3588,7 @@ describe("activateSetupInference", () => {
       events.push("live-test");
       return successfulRun("openai", "gpt-5.6-sol", params);
     });
-    let persistedConfig: OpenClawConfig = {
+    let persistedConfig: SteelEngineConfig = {
       ...initialConfig,
       gateway: { port: 19000 },
     };
@@ -3597,15 +3597,15 @@ describe("activateSetupInference", () => {
     const transformConfig = vi.fn(
       async (params: {
         transform: (
-          config: OpenClawConfig,
+          config: SteelEngineConfig,
           context: {
             snapshot: {
-              config: OpenClawConfig;
-              sourceConfig: OpenClawConfig;
-              runtimeConfig: OpenClawConfig;
+              config: SteelEngineConfig;
+              sourceConfig: SteelEngineConfig;
+              runtimeConfig: SteelEngineConfig;
             };
           },
-        ) => Promise<{ nextConfig: OpenClawConfig }> | { nextConfig: OpenClawConfig };
+        ) => Promise<{ nextConfig: SteelEngineConfig }> | { nextConfig: SteelEngineConfig };
       }) => {
         const transformed = (
           await params.transform(persistedConfig, {
@@ -3643,7 +3643,7 @@ describe("activateSetupInference", () => {
     });
     const result = await activateSetupInference({
       kind: "codex-cli",
-      workspace: "/tmp/openclaw-workspace",
+      workspace: "/tmp/steelengine-workspace",
       surface: "gateway",
       runtime: { log: runtimeLog, error: () => {}, exit: () => {} } as never,
       deps: {
@@ -3652,7 +3652,7 @@ describe("activateSetupInference", () => {
           return {
             exists: true,
             valid: true,
-            path: "/tmp/openclaw.json",
+            path: "/tmp/steelengine.json",
             issues: [],
             config,
             sourceConfig: config,
@@ -3684,7 +3684,7 @@ describe("activateSetupInference", () => {
                   fallbacks: ["google/gemini-3.1-pro-preview"],
                 },
                 models: {
-                  "openai/gpt-5.5": { agentRuntime: { id: "openclaw" } },
+                  "openai/gpt-5.5": { agentRuntime: { id: "steelengine" } },
                   "openai/gpt-5.6-sol": { agentRuntime: { id: "codex" } },
                 },
               }),
@@ -3711,8 +3711,8 @@ describe("activateSetupInference", () => {
       expect.objectContaining({
         reason: "source-changed",
         policyPluginIds: ["codex"],
-        traceCommand: "openclaw-setup-probe",
-        workspaceDir: "/tmp/openclaw-workspace",
+        traceCommand: "steelengine-setup-probe",
+        workspaceDir: "/tmp/steelengine-workspace",
       }),
     );
     expect(refreshPluginRegistry).toHaveBeenCalledTimes(2);
@@ -3733,18 +3733,18 @@ describe("activateSetupInference", () => {
     expect(refreshPluginRegistry).toHaveBeenCalledWith({
       config: persistedConfig,
       reason: "source-changed",
-      workspaceDir: "/tmp/openclaw-workspace",
+      workspaceDir: "/tmp/steelengine-workspace",
       logger: expect.objectContaining({ warn: expect.any(Function) }),
     });
     expect(ensureRegistryLoaded).toHaveBeenCalledWith({
       scope: "all",
       config: persistedConfig,
       activationSourceConfig: persistedConfig,
-      workspaceDir: "/tmp/openclaw-workspace",
+      workspaceDir: "/tmp/steelengine-workspace",
     });
     // Harness selection: codex tests run embedded with the codex harness.
     expect(runEmbeddedAgent.mock.calls[0]?.[0]).toMatchObject({
-      agentId: "openclaw",
+      agentId: "steelengine",
       agentDir: resolveAgentDir(initialConfig, "ops"),
       provider: "openai",
       authProfileStateMode: "read-only",
@@ -3761,7 +3761,7 @@ describe("activateSetupInference", () => {
                 fallbacks: ["google/gemini-3.1-pro-preview"],
               },
               models: {
-                "openai/gpt-5.5": { agentRuntime: { id: "openclaw" } },
+                "openai/gpt-5.5": { agentRuntime: { id: "steelengine" } },
                 "openai/gpt-5.6-sol": { agentRuntime: { id: "codex" } },
               },
             }),
@@ -3808,7 +3808,7 @@ describe("activateSetupInference", () => {
               fallbacks: ["google/gemini-3.1-pro-preview"],
             },
             models: {
-              "openai/gpt-5.5": { agentRuntime: { id: "openclaw" } },
+              "openai/gpt-5.5": { agentRuntime: { id: "steelengine" } },
               "openai/gpt-5.6-sol": { agentRuntime: { id: "codex" } },
             },
           }),
@@ -3833,16 +3833,16 @@ describe("activateSetupInference", () => {
     expect(persistedConfig.plugins?.installs).toBeUndefined();
     expect(pendingCodexInstalls[0]).toMatchObject({
       source: "npm",
-      spec: "@openclaw/codex",
+      spec: "@steelengine/codex",
       installPath: "/tmp/plugins/codex",
     });
     expect(pendingCodexInstalls).toHaveLength(1);
   });
 
   it("probes and persists an exact non-default model through the Codex route", async () => {
-    const initialConfig: OpenClawConfig = {};
+    const initialConfig: SteelEngineConfig = {};
     const configHarness = createConfigTransformHarness(initialConfig);
-    const ensureCodex = vi.fn(async ({ cfg }: { cfg: OpenClawConfig }) => ({
+    const ensureCodex = vi.fn(async ({ cfg }: { cfg: SteelEngineConfig }) => ({
       cfg: {
         ...cfg,
         plugins: {
@@ -3878,7 +3878,7 @@ describe("activateSetupInference", () => {
         readConfigFileSnapshot: vi.fn(async () => ({
           exists: true,
           valid: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           issues: [],
           config: initialConfig,
           sourceConfig: initialConfig,
@@ -3906,7 +3906,7 @@ describe("activateSetupInference", () => {
       expect.objectContaining({
         reason: "source-changed",
         policyPluginIds: ["codex"],
-        traceCommand: "openclaw-setup-probe",
+        traceCommand: "steelengine-setup-probe",
         workspaceDir: "/tmp/work",
       }),
     );
@@ -3970,39 +3970,39 @@ describe("activateSetupInference", () => {
     const staleAuthoredRecords = {
       codex: {
         source: "npm" as const,
-        spec: "@openclaw/codex@1.0.0",
+        spec: "@steelengine/codex@1.0.0",
         installPath: "/tmp/plugins/codex-v1",
       },
       unrelated: {
         source: "npm" as const,
-        spec: "@openclaw/unrelated@1.0.0",
+        spec: "@steelengine/unrelated@1.0.0",
         installPath: "/tmp/plugins/unrelated-v1",
       },
     };
     const canonicalRecords = {
       codex: {
         source: "npm" as const,
-        spec: "@openclaw/codex@2.0.0",
+        spec: "@steelengine/codex@2.0.0",
         installPath: "/tmp/plugins/codex-v2",
       },
       unrelated: {
         source: "npm" as const,
-        spec: "@openclaw/unrelated@2.0.0",
+        spec: "@steelengine/unrelated@2.0.0",
         installPath: "/tmp/plugins/unrelated-v2",
       },
     };
     const refreshedCodexRecord = {
       source: "npm" as const,
-      spec: "@openclaw/codex@3.0.0",
+      spec: "@steelengine/codex@3.0.0",
       installPath: "/tmp/plugins/codex-v3",
     };
     const sourceConfig = {
       plugins: { installs: staleAuthoredRecords },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const runtimeConfig = {
       plugins: { installs: canonicalRecords },
-    } satisfies OpenClawConfig;
-    const ensureCodex = vi.fn(async (params: { cfg: OpenClawConfig }) => ({
+    } satisfies SteelEngineConfig;
+    const ensureCodex = vi.fn(async (params: { cfg: SteelEngineConfig }) => ({
       cfg: {
         ...params.cfg,
         plugins: {
@@ -4014,21 +4014,21 @@ describe("activateSetupInference", () => {
       installed: true,
       status: "installed" as const,
     }));
-    let persistedConfig: OpenClawConfig = sourceConfig;
+    let persistedConfig: SteelEngineConfig = sourceConfig;
     let installIndex: Record<string, PluginInstallRecord> = structuredClone(canonicalRecords);
     const pendingInstallRecords: unknown[] = [];
     const transformConfig = vi.fn(
       async (params: {
         transform: (
-          config: OpenClawConfig,
+          config: SteelEngineConfig,
           context: {
             snapshot: {
-              config: OpenClawConfig;
-              sourceConfig: OpenClawConfig;
-              runtimeConfig: OpenClawConfig;
+              config: SteelEngineConfig;
+              sourceConfig: SteelEngineConfig;
+              runtimeConfig: SteelEngineConfig;
             };
           },
-        ) => Promise<{ nextConfig: OpenClawConfig }> | { nextConfig: OpenClawConfig };
+        ) => Promise<{ nextConfig: SteelEngineConfig }> | { nextConfig: SteelEngineConfig };
       }) => {
         const transformed = (
           await params.transform(persistedConfig, {
@@ -4045,14 +4045,14 @@ describe("activateSetupInference", () => {
 
     const result = await activateSetupInference({
       kind: "codex-cli",
-      workspace: "/tmp/openclaw-workspace",
+      workspace: "/tmp/steelengine-workspace",
       surface: "gateway",
       runtime,
       deps: {
         readConfigFileSnapshot: vi.fn(async () => ({
           exists: true,
           valid: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           issues: [],
           config: sourceConfig,
           runtimeConfig,
@@ -4113,7 +4113,7 @@ describe("activateSetupInference", () => {
   it("fails closed before inference when the staged Codex package cannot be retained", async () => {
     const installRecord: PluginInstallRecord = {
       source: "npm",
-      spec: "@openclaw/codex",
+      spec: "@steelengine/codex",
       installPath: "/tmp/plugins/codex-unretained",
     };
     const runEmbeddedAgent = vi.fn();
@@ -4125,19 +4125,19 @@ describe("activateSetupInference", () => {
     const refreshPluginRegistry = vi.fn(async () => {});
     const result = await activateSetupInference({
       kind: "codex-cli",
-      workspace: "/tmp/openclaw-workspace",
+      workspace: "/tmp/steelengine-workspace",
       surface: "gateway",
       runtime,
       deps: {
         readConfigFileSnapshot: vi.fn(async () => ({
           exists: true,
           valid: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           issues: [],
           config: {},
           runtimeConfig: {},
         })) as never,
-        ensureCodexRuntimePlugin: vi.fn(async ({ cfg }: { cfg: OpenClawConfig }) => ({
+        ensureCodexRuntimePlugin: vi.fn(async ({ cfg }: { cfg: SteelEngineConfig }) => ({
           cfg: {
             ...cfg,
             plugins: { ...cfg.plugins, installs: { codex: installRecord } },
@@ -4171,7 +4171,7 @@ describe("activateSetupInference", () => {
     expect(refreshPluginRegistry).toHaveBeenCalledWith({
       config: {},
       reason: "source-changed",
-      workspaceDir: "/tmp/openclaw-workspace",
+      workspaceDir: "/tmp/steelengine-workspace",
       logger: expect.objectContaining({ warn: expect.any(Function) }),
     });
   });
@@ -4179,7 +4179,7 @@ describe("activateSetupInference", () => {
   it("reports an indeterminate activation when final Codex retention fails", async () => {
     const installRecord: PluginInstallRecord = {
       source: "npm",
-      spec: "@openclaw/codex",
+      spec: "@steelengine/codex",
       installPath: "/tmp/plugins/codex-final-retention-failure",
     };
     const markRetainedInstall = vi.fn().mockResolvedValueOnce(true).mockResolvedValueOnce(false);
@@ -4187,19 +4187,19 @@ describe("activateSetupInference", () => {
     let tempDir: string | undefined;
     const activation = activateSetupInference({
       kind: "codex-cli",
-      workspace: "/tmp/openclaw-workspace",
+      workspace: "/tmp/steelengine-workspace",
       surface: "gateway",
       runtime,
       deps: {
         readConfigFileSnapshot: vi.fn(async () => ({
           exists: true,
           valid: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           issues: [],
           config: {},
           runtimeConfig: {},
         })) as never,
-        ensureCodexRuntimePlugin: vi.fn(async ({ cfg }: { cfg: OpenClawConfig }) => ({
+        ensureCodexRuntimePlugin: vi.fn(async ({ cfg }: { cfg: SteelEngineConfig }) => ({
           cfg: {
             ...cfg,
             plugins: { ...cfg.plugins, installs: { codex: installRecord } },
@@ -4237,10 +4237,10 @@ describe("activateSetupInference", () => {
     resetPluginRuntimeStateForTest();
     const installRecord: PluginInstallRecord = {
       source: "npm",
-      spec: "@openclaw/codex",
+      spec: "@steelengine/codex",
       installPath: "/tmp/plugins/codex-staged-registry",
     };
-    const persistedConfig = { plugins: { enabled: false } } satisfies OpenClawConfig;
+    const persistedConfig = { plugins: { enabled: false } } satisfies SteelEngineConfig;
     const stagedRegistry = createEmptyPluginRegistry();
     stagedRegistry.plugins.push({
       id: "codex",
@@ -4258,7 +4258,7 @@ describe("activateSetupInference", () => {
     try {
       const result = await activateSetupInference({
         kind: "codex-cli",
-        workspace: "/tmp/openclaw-workspace",
+        workspace: "/tmp/steelengine-workspace",
         surface: "gateway",
         runtime,
         deps: {
@@ -4267,14 +4267,14 @@ describe("activateSetupInference", () => {
             return {
               exists: true,
               valid: true,
-              path: "/tmp/openclaw.json",
+              path: "/tmp/steelengine.json",
               issues: [],
               config,
               sourceConfig: config,
               runtimeConfig: config,
             };
           }) as never,
-          ensureCodexRuntimePlugin: vi.fn(async ({ cfg }: { cfg: OpenClawConfig }) => ({
+          ensureCodexRuntimePlugin: vi.fn(async ({ cfg }: { cfg: SteelEngineConfig }) => ({
             cfg: {
               ...cfg,
               plugins: { ...cfg.plugins, installs: { codex: installRecord } },
@@ -4308,14 +4308,14 @@ describe("activateSetupInference", () => {
         scope: "all",
         config: persistedConfig,
         activationSourceConfig: persistedConfig,
-        workspaceDir: "/tmp/openclaw-workspace",
+        workspaceDir: "/tmp/steelengine-workspace",
       });
       expect(getActivePluginRegistry()).not.toBe(stagedRegistry);
       expect(getActivePluginRegistry()?.plugins.some((plugin) => plugin.id === "codex")).toBe(
         false,
       );
       expect(getActivePluginRegistryKey()).not.toBe("staged-codex-registry");
-      expect(getActivePluginRegistryWorkspaceDir()).toBe("/tmp/openclaw-workspace");
+      expect(getActivePluginRegistryWorkspaceDir()).toBe("/tmp/steelengine-workspace");
     } finally {
       resetPluginRuntimeStateForTest();
     }
@@ -4326,7 +4326,7 @@ describe("activateSetupInference", () => {
     const runEmbeddedAgent = vi.fn();
     const transformConfig = vi.fn();
     const refreshPluginRegistry = vi.fn();
-    const blockedConfig: OpenClawConfig = { plugins: { allow: ["other"] } };
+    const blockedConfig: SteelEngineConfig = { plugins: { allow: ["other"] } };
     const result = await activateSetupInference({
       kind: "codex-cli",
       surface: "gateway",
@@ -4335,7 +4335,7 @@ describe("activateSetupInference", () => {
         readConfigFileSnapshot: vi.fn(async () => ({
           exists: true,
           valid: true,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           issues: [],
           config: blockedConfig,
           runtimeConfig: blockedConfig,
@@ -4361,7 +4361,7 @@ describe("activateSetupInference", () => {
 
   it("marks an unowned Codex package generation retained when the live test fails", async () => {
     const installProjectDir = await makeTempDir();
-    const packageDir = path.join(installProjectDir, "node_modules", "@openclaw", "codex");
+    const packageDir = path.join(installProjectDir, "node_modules", "@steelengine", "codex");
     await fs.mkdir(packageDir, { recursive: true });
     const transformConfig = vi.fn();
     const refreshPluginRegistry = vi.fn();
@@ -4374,7 +4374,7 @@ describe("activateSetupInference", () => {
         surface: "gateway",
         runtime,
         deps: {
-          ensureCodexRuntimePlugin: vi.fn(async (params: { cfg: OpenClawConfig }) => ({
+          ensureCodexRuntimePlugin: vi.fn(async (params: { cfg: SteelEngineConfig }) => ({
             cfg: {
               ...params.cfg,
               plugins: {
@@ -4383,7 +4383,7 @@ describe("activateSetupInference", () => {
                   ...params.cfg.plugins?.installs,
                   codex: {
                     source: "npm" as const,
-                    spec: "@openclaw/codex",
+                    spec: "@steelengine/codex",
                     installPath: packageDir,
                   },
                 },
@@ -4426,12 +4426,12 @@ describe("activateSetupInference", () => {
     const installRecords = [
       {
         source: "npm" as const,
-        spec: "@openclaw/codex@generation-1",
+        spec: "@steelengine/codex@generation-1",
         installPath: "/tmp/plugins/codex-generation-1",
       },
       {
         source: "npm" as const,
-        spec: "@openclaw/codex@generation-2",
+        spec: "@steelengine/codex@generation-2",
         installPath: "/tmp/plugins/codex-generation-2",
       },
     ];
@@ -4439,7 +4439,7 @@ describe("activateSetupInference", () => {
     let installedRecordCache: PluginInstallRecord | undefined;
     let metadataCache: PluginInstallRecord | undefined;
     let discoveryCache: PluginInstallRecord | undefined;
-    const ensureCodex = vi.fn(async ({ cfg }: { cfg: OpenClawConfig }) => {
+    const ensureCodex = vi.fn(async ({ cfg }: { cfg: SteelEngineConfig }) => {
       const cachedRecord = installedRecordCache ?? metadataCache ?? discoveryCache;
       if (cachedRecord) {
         return {
@@ -4488,9 +4488,9 @@ describe("activateSetupInference", () => {
     const transformConfig = vi.fn(
       async (params: {
         transform: (
-          config: OpenClawConfig,
-          context: { snapshot: { config: OpenClawConfig; runtimeConfig: OpenClawConfig } },
-        ) => Promise<{ nextConfig: OpenClawConfig }>;
+          config: SteelEngineConfig,
+          context: { snapshot: { config: SteelEngineConfig; runtimeConfig: SteelEngineConfig } },
+        ) => Promise<{ nextConfig: SteelEngineConfig }>;
       }) => {
         const transformed = await params.transform(
           {},
@@ -4535,17 +4535,17 @@ describe("activateSetupInference", () => {
     expect(markRetained).toHaveBeenNthCalledWith(1, {
       packageDir: expectDefined(installRecords[0], "installRecords[0] test invariant").installPath,
       pluginId: "codex",
-      reason: "openclaw-inference-activation-not-committed",
+      reason: "steelengine-inference-activation-not-committed",
     });
     expect(markRetained).toHaveBeenNthCalledWith(2, {
       packageDir: expectDefined(installRecords[0], "installRecords[0] test invariant").installPath,
       pluginId: "codex",
-      reason: "openclaw-inference-activation-not-committed",
+      reason: "steelengine-inference-activation-not-committed",
     });
     expect(markRetained).toHaveBeenNthCalledWith(3, {
       packageDir: expectDefined(installRecords[1], "installRecords[1] test invariant").installPath,
       pluginId: "codex",
-      reason: "openclaw-inference-activation-not-committed",
+      reason: "steelengine-inference-activation-not-committed",
     });
     expect(clearInstallRecords).toHaveBeenCalledTimes(3);
     expect(clearMetadata).toHaveBeenCalledTimes(3);
@@ -4561,7 +4561,7 @@ describe("activateSetupInference", () => {
       installRecords: {
         codex: {
           source: "npm" as const,
-          spec: "@openclaw/codex@other",
+          spec: "@steelengine/codex@other",
           installPath: "/tmp/plugins/codex-other",
         },
       },
@@ -4575,11 +4575,11 @@ describe("activateSetupInference", () => {
   ])("reconciles a post-write Codex error only with an $name install record", async (testCase) => {
     const installRecord: PluginInstallRecord = {
       source: "npm",
-      spec: "@openclaw/codex",
+      spec: "@steelengine/codex",
       installPath: "/tmp/plugins/codex",
     };
     const installRecords = testCase.installRecords ?? { codex: installRecord };
-    let committedConfig: OpenClawConfig | undefined;
+    let committedConfig: SteelEngineConfig | undefined;
     const readConfigFileSnapshot = vi.fn(async () => {
       const sourceConfig = committedConfig ?? {};
       return {
@@ -4593,9 +4593,9 @@ describe("activateSetupInference", () => {
     const transformConfig = vi.fn(
       async (params: {
         transform: (
-          config: OpenClawConfig,
-          context: { snapshot: { config: OpenClawConfig; runtimeConfig: OpenClawConfig } },
-        ) => Promise<{ nextConfig: OpenClawConfig }>;
+          config: SteelEngineConfig,
+          context: { snapshot: { config: SteelEngineConfig; runtimeConfig: SteelEngineConfig } },
+        ) => Promise<{ nextConfig: SteelEngineConfig }>;
       }) => {
         const transformed = await params.transform(
           {},
@@ -4614,7 +4614,7 @@ describe("activateSetupInference", () => {
       runtime,
       deps: {
         readConfigFileSnapshot: readConfigFileSnapshot as never,
-        ensureCodexRuntimePlugin: vi.fn(async ({ cfg }: { cfg: OpenClawConfig }) => ({
+        ensureCodexRuntimePlugin: vi.fn(async ({ cfg }: { cfg: SteelEngineConfig }) => ({
           cfg: {
             ...cfg,
             plugins: {
@@ -4658,7 +4658,7 @@ describe("resolvePersistentApplyInference", () => {
       modelLabel: "openai/gpt-5.5",
       provider: "openai",
       model: "gpt-5.5",
-      agentDir: "/tmp/openclaw-agent",
+      agentDir: "/tmp/steelengine-agent",
       agentId: "main",
       agentHarnessRuntimeOverride: "codex",
     };
@@ -4769,7 +4769,7 @@ describe("resolvePersistentApplyInference", () => {
     if (changedBinding.execution.runner !== "embedded") {
       throw new Error("expected embedded fixture");
     }
-    changedBinding.execution.agentHarnessRuntimeOverride = "openclaw";
+    changedBinding.execution.agentHarnessRuntimeOverride = "steelengine";
     const resolveVerifiedInferenceRoute = vi.fn(async () => binding.execution);
 
     await expect(
@@ -4822,7 +4822,7 @@ describe("activateSetupInference Codex configuration", () => {
   it.each([
     {
       name: "omitted",
-      config: {} satisfies OpenClawConfig,
+      config: {} satisfies SteelEngineConfig,
       expectedSupervision: undefined,
     },
     {
@@ -4831,7 +4831,7 @@ describe("activateSetupInference Codex configuration", () => {
         plugins: {
           entries: { codex: { config: { supervision: {} } } },
         },
-      } satisfies OpenClawConfig,
+      } satisfies SteelEngineConfig,
       expectedSupervision: {},
     },
   ])("does not add Codex supervision when it is $name", async (testCase) => {
@@ -4866,7 +4866,7 @@ describe("activateSetupInference Codex configuration", () => {
           },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
 
     const { result, persistedConfig } = await runCodexSetupWithFinalConfig({
       currentConfig: config,
@@ -4897,7 +4897,7 @@ describe("activateSetupInference Codex configuration", () => {
           },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
 
     const { result, persistedConfig } = await runCodexSetupWithFinalConfig({
       currentConfig: config,
@@ -4924,7 +4924,7 @@ describe("activateSetupInference Codex configuration", () => {
           codex: { config: { supervision: { enabled: false } } },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
 
     const { result, persistedConfig } = await runCodexSetupWithFinalConfig({
       initialConfig: resolvedSource,
@@ -4941,7 +4941,7 @@ describe("activateSetupInference Codex configuration", () => {
   });
 
   it("fails closed when effective plugin policy changes before the success commit", async () => {
-    const denied = { plugins: { deny: ["codex"] } } satisfies OpenClawConfig;
+    const denied = { plugins: { deny: ["codex"] } } satisfies SteelEngineConfig;
     const { result, refreshPluginRegistry, transformConfig } = await runCodexSetupWithFinalConfig({
       initialConfig: {},
       currentConfig: denied,
@@ -5001,7 +5001,7 @@ describe("verifySetupInference", () => {
         readConfigFileSnapshot: vi.fn(async () => ({
           exists: true,
           valid: false,
-          path: "/tmp/openclaw.json",
+          path: "/tmp/steelengine.json",
           issues: [{ path: "agents.defaults.model", message: "Expected a model reference" }],
           config: {},
         })) as never,
@@ -5032,12 +5032,12 @@ describe("verifySetupInference", () => {
     expect(result).toMatchObject({ ok: true, modelRef: "openai/gpt-5.5" });
   });
 
-  it("locks the exact winning profile into a bound OpenClaw session", async () => {
+  it("locks the exact winning profile into a bound SteelEngine session", async () => {
     const config = {
       agents: {
         defaults: {
           model: { primary: "openai/gpt-5.5" },
-          models: { "openai/gpt-5.5": { agentRuntime: { id: "openclaw" } } },
+          models: { "openai/gpt-5.5": { agentRuntime: { id: "steelengine" } } },
         },
       },
       auth: {
@@ -5046,7 +5046,7 @@ describe("verifySetupInference", () => {
           "openai:p2": { provider: "openai", mode: "api_key" },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const profiles = {
       "openai:p1": { type: "api_key" as const, provider: "openai", key: "key-1" },
       "openai:p2": { type: "api_key" as const, provider: "openai", key: "key-2" },
@@ -5073,7 +5073,7 @@ describe("verifySetupInference", () => {
       }) => {
         params.onSuccessfulAuthBinding?.({
           authProfileId: "openai:p2",
-          agentHarnessId: "openclaw",
+          agentHarnessId: "steelengine",
           authFingerprint: verifiedAuthFingerprint,
         });
         return successfulRun("openai", "gpt-5.5");
@@ -5122,7 +5122,7 @@ describe("verifySetupInference", () => {
     const config = {
       agents: { defaults: { model: `openai/gpt-5.5@${profileId}` } },
       auth: { profiles: { [profileId]: { provider: "openai", mode: "api_key" } } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const captureSystemAgentOwnerPluginArtifacts = vi.fn(() => ({
       ownerPluginIds: ["openai"],
       ownerPluginArtifacts: [{ pluginId: "openai", fingerprint: "openai-runtime-v1" }],
@@ -5175,9 +5175,9 @@ describe("verifySetupInference", () => {
     expect(createChangedVerifiedInferenceBinding).toHaveBeenCalledOnce();
   });
 
-  it("binds a runtime-only Codex profile after activation and runs the first OpenClaw turn", async () => {
+  it("binds a runtime-only Codex profile after activation and runs the first SteelEngine turn", async () => {
     const stateDir = await makeTempDir();
-    vi.stubEnv("OPENCLAW_STATE_DIR", stateDir);
+    vi.stubEnv("STEELENGINE_STATE_DIR", stateDir);
     const profileId = "openai:default";
     const credential = {
       type: "oauth" as const,
@@ -5202,7 +5202,7 @@ describe("verifySetupInference", () => {
         },
       },
       plugins: { entries: { codex: { enabled: true } } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const externalStore = vi.fn(
       (_agentDir?: string, options?: { externalCliProviderIds?: Iterable<string> }) => {
         const exposeCodexProfile = Array.from(options?.externalCliProviderIds ?? []).includes(
@@ -5300,12 +5300,12 @@ describe("verifySetupInference", () => {
         authProfileId: profileId,
         authProfileIdSource: "user",
         agentHarnessRuntimeOverride: "codex",
-        agentId: "openclaw",
-        toolsAllow: ["openclaw"],
+        agentId: "steelengine",
+        toolsAllow: ["steelengine"],
       });
       const systemAgentTurnParams = runEmbeddedAgent.mock.calls[2]?.[0];
       expect(systemAgentTurnParams).toBeDefined();
-      expect((systemAgentTurnParams as { config?: OpenClawConfig }).config).toBe(
+      expect((systemAgentTurnParams as { config?: SteelEngineConfig }).config).toBe(
         verification.binding.execution.runConfig,
       );
       expect(validateAgentHarnessRuntimeArtifact).toHaveBeenCalledWith({
@@ -5336,7 +5336,7 @@ describe("verifySetupInference", () => {
           "openai:p2": { provider: "openai", mode: "api_key" },
         },
       },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const profiles = {
       "openai:p1": { type: "api_key" as const, provider: "openai", key: "key-1" },
       "openai:p2": { type: "api_key" as const, provider: "openai", key: "key-2" },
@@ -5367,10 +5367,10 @@ describe("verifySetupInference", () => {
   it("rejects a configured route that changes during its live check", async () => {
     const initialConfig = {
       agents: { defaults: { model: { primary: "openai/gpt-5.5" } } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const changedConfig = {
       agents: { defaults: { model: { primary: "anthropic/claude-opus-4-8" } } },
-    } satisfies OpenClawConfig;
+    } satisfies SteelEngineConfig;
     const readConfigFileSnapshot = vi
       .fn()
       .mockResolvedValueOnce({ exists: true, valid: true, config: initialConfig })
@@ -5421,7 +5421,7 @@ describe("verifySetupInference", () => {
     expect(result).toMatchObject({ ok: true, modelRef: "openai/gpt-5.5" });
     expect(runEmbeddedAgent).toHaveBeenCalledWith(
       expect.objectContaining({
-        agentId: "openclaw",
+        agentId: "steelengine",
         provider: "openai",
         model: "gpt-5.5",
         agentHarnessRuntimeOverride: "codex",
@@ -5583,7 +5583,7 @@ describe("verifySetupInference", () => {
       successfulRun("google-gemini-cli", "gemini-3.1-pro-preview"),
     );
     const modelRef = "google/gemini-3.1-pro-preview";
-    const config: OpenClawConfig = {
+    const config: SteelEngineConfig = {
       auth: {
         order: { [testCase.profileProvider]: [testCase.profileId] },
       },

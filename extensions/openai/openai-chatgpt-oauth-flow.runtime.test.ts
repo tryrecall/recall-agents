@@ -1,15 +1,15 @@
 // Openai tests cover openai chatgpt oauth flow plugin behavior.
 import { Agent, createServer, get, type IncomingHttpHeaders, type Server } from "node:http";
-import type { ProviderAuthContext } from "openclaw/plugin-sdk/plugin-entry";
+import type { ProviderAuthContext } from "steelengine/plugin-sdk/plugin-entry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const ssrfMocks = vi.hoisted(() => ({
   fetchWithSsrFGuard: vi.fn(),
 }));
 
-vi.mock("openclaw/plugin-sdk/ssrf-runtime", async () => {
-  const actual = await vi.importActual<typeof import("openclaw/plugin-sdk/ssrf-runtime")>(
-    "openclaw/plugin-sdk/ssrf-runtime",
+vi.mock("steelengine/plugin-sdk/ssrf-runtime", async () => {
+  const actual = await vi.importActual<typeof import("steelengine/plugin-sdk/ssrf-runtime")>(
+    "steelengine/plugin-sdk/ssrf-runtime",
   );
   return {
     ...actual,
@@ -21,7 +21,7 @@ import {
   resolvePinnedHostnameWithPolicy,
   type LookupFn,
   type SsrFPolicy,
-} from "openclaw/plugin-sdk/ssrf-runtime";
+} from "steelengine/plugin-sdk/ssrf-runtime";
 import {
   createOpenAIAuthorizationFlow,
   resolveOpenAICallbackHost,
@@ -143,14 +143,14 @@ describe("OpenAI Codex OAuth flow", () => {
   it("waits for Node OAuth runtime before creating an authorization flow", async () => {
     const callbackHost = resolveOpenAICallbackHost();
     const flow = await createOpenAIAuthorizationFlow(
-      "openclaw-test",
+      "steelengine-test",
       resolveOpenAIRedirectUri(callbackHost),
     );
     const url = new URL(flow.url);
 
     expect(flow.state).toMatch(/^[a-f0-9]{32}$/u);
     expect(url.searchParams.get("state")).toBe(flow.state);
-    expect(url.searchParams.get("originator")).toBe("openclaw-test");
+    expect(url.searchParams.get("originator")).toBe("steelengine-test");
     const redirectUri = url.searchParams.get("redirect_uri");
     expect(redirectUri).toBeTruthy();
     expect(flow.redirectUri).toBe(redirectUri);
@@ -162,7 +162,7 @@ describe("OpenAI Codex OAuth flow", () => {
   });
 
   it("rejects non-loopback callback bind hosts", () => {
-    expect(() => resolveOpenAICallbackHost({ OPENCLAW_OAUTH_CALLBACK_HOST: "0.0.0.0" })).toThrow(
+    expect(() => resolveOpenAICallbackHost({ STEELENGINE_OAUTH_CALLBACK_HOST: "0.0.0.0" })).toThrow(
       "callback host must be localhost, 127.0.0.1, or ::1",
     );
   });

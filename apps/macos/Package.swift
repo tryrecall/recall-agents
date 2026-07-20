@@ -1,18 +1,18 @@
 // swift-tools-version: 6.2
-// Package manifest for the OpenClaw macOS companion (menu bar app + IPC library).
+// Package manifest for the SteelEngine macOS companion (menu bar app + IPC library).
 
 import PackageDescription
 
 let package = Package(
-    name: "OpenClaw",
+    name: "SteelEngine",
     platforms: [
         .macOS(.v15),
     ],
     products: [
-        .library(name: "OpenClawIPC", targets: ["OpenClawIPC"]),
-        .library(name: "OpenClawDiscovery", targets: ["OpenClawDiscovery"]),
-        .executable(name: "OpenClaw", targets: ["OpenClaw"]),
-        .executable(name: "openclaw-mac", targets: ["OpenClawMacCLI"]),
+        .library(name: "SteelEngineIPC", targets: ["SteelEngineIPC"]),
+        .library(name: "SteelEngineDiscovery", targets: ["SteelEngineDiscovery"]),
+        .executable(name: "SteelEngine", targets: ["SteelEngine"]),
+        .executable(name: "steelengine-mac", targets: ["SteelEngineMacCLI"]),
     ],
     dependencies: [
         .package(url: "https://github.com/sindresorhus/KeyboardShortcuts", exact: "3.0.1"),
@@ -22,35 +22,35 @@ let package = Package(
         .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.9.0"),
         .package(url: "https://github.com/steipete/Peekaboo.git", exact: "3.9.3"),
         .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", from: "1.3.1"),
-        .package(path: "../shared/OpenClawKit"),
-        .package(path: "../shared/OpenClawMLXTTSProtocol"),
+        .package(path: "../shared/SteelEngineKit"),
+        .package(path: "../shared/SteelEngineMLXTTSProtocol"),
         .package(path: "../swabble"),
     ],
     targets: [
         .target(
-            name: "OpenClawIPC",
+            name: "SteelEngineIPC",
             dependencies: [],
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency"),
             ]),
         .target(
-            name: "OpenClawDiscovery",
+            name: "SteelEngineDiscovery",
             dependencies: [
-                .product(name: "OpenClawKit", package: "OpenClawKit"),
+                .product(name: "SteelEngineKit", package: "SteelEngineKit"),
             ],
-            path: "Sources/OpenClawDiscovery",
+            path: "Sources/SteelEngineDiscovery",
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency"),
             ]),
         .executableTarget(
-            name: "OpenClaw",
+            name: "SteelEngine",
             dependencies: [
-                "OpenClawIPC",
-                "OpenClawDiscovery",
-                .product(name: "OpenClawKit", package: "OpenClawKit"),
-                .product(name: "OpenClawChatUI", package: "OpenClawKit"),
-                .product(name: "OpenClawMLXTTSProtocol", package: "OpenClawMLXTTSProtocol"),
-                .product(name: "OpenClawProtocol", package: "OpenClawKit"),
+                "SteelEngineIPC",
+                "SteelEngineDiscovery",
+                .product(name: "SteelEngineKit", package: "SteelEngineKit"),
+                .product(name: "SteelEngineChatUI", package: "SteelEngineKit"),
+                .product(name: "SteelEngineMLXTTSProtocol", package: "SteelEngineMLXTTSProtocol"),
+                .product(name: "SteelEngineProtocol", package: "SteelEngineKit"),
                 .product(name: "SwabbleKit", package: "swabble"),
                 .product(name: "MenuBarExtraAccess", package: "MenuBarExtraAccess"),
                 .product(name: "Subprocess", package: "swift-subprocess"),
@@ -66,7 +66,7 @@ let package = Package(
                 "Resources/Localizable.xcstrings",
             ],
             resources: [
-                .copy("Resources/OpenClaw.icns"),
+                .copy("Resources/SteelEngine.icns"),
                 .copy("Resources/DeviceModels"),
                 .copy("Resources/ProviderIcons"),
             ],
@@ -74,27 +74,27 @@ let package = Package(
                 .enableUpcomingFeature("StrictConcurrency"),
             ]),
         .executableTarget(
-            name: "OpenClawMacCLI",
+            name: "SteelEngineMacCLI",
             dependencies: [
-                "OpenClawDiscovery",
-                .product(name: "OpenClawKit", package: "OpenClawKit"),
-                .product(name: "OpenClawProtocol", package: "OpenClawKit"),
+                "SteelEngineDiscovery",
+                .product(name: "SteelEngineKit", package: "SteelEngineKit"),
+                .product(name: "SteelEngineProtocol", package: "SteelEngineKit"),
             ],
-            path: "Sources/OpenClawMacCLI",
+            path: "Sources/SteelEngineMacCLI",
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency"),
             ]),
         .testTarget(
-            name: "OpenClawIPCTests",
+            name: "SteelEngineIPCTests",
             dependencies: [
-                "OpenClawIPC",
-                "OpenClaw",
-                "OpenClawMacCLI",
-                "OpenClawDiscovery",
-                .product(name: "OpenClawChatUI", package: "OpenClawKit"),
-                .product(name: "OpenClawKit", package: "OpenClawKit"),
-                .product(name: "OpenClawMLXTTSProtocol", package: "OpenClawMLXTTSProtocol"),
-                .product(name: "OpenClawProtocol", package: "OpenClawKit"),
+                "SteelEngineIPC",
+                "SteelEngine",
+                "SteelEngineMacCLI",
+                "SteelEngineDiscovery",
+                .product(name: "SteelEngineChatUI", package: "SteelEngineKit"),
+                .product(name: "SteelEngineKit", package: "SteelEngineKit"),
+                .product(name: "SteelEngineMLXTTSProtocol", package: "SteelEngineMLXTTSProtocol"),
+                .product(name: "SteelEngineProtocol", package: "SteelEngineKit"),
                 .product(name: "SwabbleKit", package: "swabble"),
             ],
             swiftSettings: [

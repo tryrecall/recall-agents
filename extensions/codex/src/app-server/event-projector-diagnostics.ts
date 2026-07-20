@@ -1,6 +1,6 @@
-import { embeddedAgentLog } from "openclaw/plugin-sdk/agent-harness-runtime";
-import { redactSensitiveText } from "openclaw/plugin-sdk/logging-core";
-import { sanitizeTerminalText } from "openclaw/plugin-sdk/text-chunking";
+import { embeddedAgentLog } from "steelengine/plugin-sdk/agent-harness-runtime";
+import { redactSensitiveText } from "steelengine/plugin-sdk/logging-core";
+import { sanitizeTerminalText } from "steelengine/plugin-sdk/text-chunking";
 import { unknownItemStatus } from "./event-projector-items.js";
 import {
   readCodexNotificationThreadId,

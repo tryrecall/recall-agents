@@ -6,7 +6,7 @@ import { copyBundledPluginMetadata } from "../../scripts/copy-bundled-plugin-met
 import { cleanupTempDirs, makeTempRepoRoot, writeJsonFile } from "../../test/helpers/temp-repo.js";
 
 const tempDirs: string[] = [];
-const excludeOptionalEnv = { OPENCLAW_INCLUDE_OPTIONAL_BUNDLED: "0" } as const;
+const excludeOptionalEnv = { STEELENGINE_INCLUDE_OPTIONAL_BUNDLED: "0" } as const;
 const copyBundledPluginMetadataWithEnv = copyBundledPluginMetadata as (params?: {
   repoRoot?: string;
   env?: NodeJS.ProcessEnv;
@@ -26,19 +26,19 @@ function createPlugin(
     id: string;
     packageName: string;
     manifest?: Record<string, unknown>;
-    packageOpenClaw?: Record<string, unknown>;
+    packageSteelEngine?: Record<string, unknown>;
   },
 ) {
   const pluginDir = path.join(repoRoot, "extensions", params.id);
   fs.mkdirSync(pluginDir, { recursive: true });
-  writeJson(path.join(pluginDir, "openclaw.plugin.json"), {
+  writeJson(path.join(pluginDir, "steelengine.plugin.json"), {
     id: params.id,
     configSchema: { type: "object" },
     ...params.manifest,
   });
   writeJson(path.join(pluginDir, "package.json"), {
     name: params.packageName,
-    ...(params.packageOpenClaw ? { openclaw: params.packageOpenClaw } : {}),
+    ...(params.packageSteelEngine ? { steelengine: params.packageSteelEngine } : {}),
   });
   return pluginDir;
 }
@@ -46,7 +46,7 @@ function createPlugin(
 function readBundledManifest(repoRoot: string, pluginId: string): Record<string, unknown> {
   return JSON.parse(
     fs.readFileSync(
-      path.join(repoRoot, "dist", "extensions", pluginId, "openclaw.plugin.json"),
+      path.join(repoRoot, "dist", "extensions", pluginId, "steelengine.plugin.json"),
       "utf8",
     ),
   ) as Record<string, unknown>;
@@ -55,7 +55,7 @@ function readBundledManifest(repoRoot: string, pluginId: string): Record<string,
 function readBundledPackageJson(repoRoot: string, pluginId: string) {
   return JSON.parse(
     fs.readFileSync(path.join(repoRoot, "dist", "extensions", pluginId, "package.json"), "utf8"),
-  ) as { openclaw?: { extensions?: string[] } };
+  ) as { steelengine?: { extensions?: string[] } };
 }
 
 function bundledPluginDir(repoRoot: string, pluginId: string) {
@@ -73,9 +73,9 @@ function expectBundledSkills(repoRoot: string, pluginId: string, skills: string[
 function createTlonSkillPlugin(repoRoot: string, skillPath = "node_modules/@tloncorp/tlon-skill") {
   return createPlugin(repoRoot, {
     id: "tlon",
-    packageName: "@openclaw/tlon",
+    packageName: "@steelengine/tlon",
     manifest: { skills: [skillPath] },
-    packageOpenClaw: { extensions: ["./index.ts"] },
+    packageSteelEngine: { extensions: ["./index.ts"] },
   });
 }
 
@@ -85,12 +85,12 @@ afterEach(() => {
 
 describe("copyBundledPluginMetadata", () => {
   it("copies plugin manifests, package metadata, and local skill directories", () => {
-    const repoRoot = makeRepoRoot("openclaw-bundled-plugin-meta-");
+    const repoRoot = makeRepoRoot("steelengine-bundled-plugin-meta-");
     const pluginDir = createPlugin(repoRoot, {
       id: "acpx",
-      packageName: "@openclaw/acpx",
+      packageName: "@steelengine/acpx",
       manifest: { skills: ["./skills"] },
-      packageOpenClaw: { extensions: ["./index.ts"] },
+      packageSteelEngine: { extensions: ["./index.ts"] },
     });
     fs.mkdirSync(path.join(pluginDir, "skills", "acp-router"), { recursive: true });
     fs.writeFileSync(
@@ -102,7 +102,7 @@ describe("copyBundledPluginMetadata", () => {
     copyBundledPluginMetadata({ repoRoot });
 
     expect(
-      fs.existsSync(path.join(repoRoot, "dist", "extensions", "acpx", "openclaw.plugin.json")),
+      fs.existsSync(path.join(repoRoot, "dist", "extensions", "acpx", "steelengine.plugin.json")),
     ).toBe(true);
     expect(
       fs.readFileSync(
@@ -112,14 +112,14 @@ describe("copyBundledPluginMetadata", () => {
     ).toContain("ACP Router");
     expectBundledSkills(repoRoot, "acpx", ["./skills"]);
     const packageJson = readBundledPackageJson(repoRoot, "acpx");
-    expect(packageJson.openclaw?.extensions).toEqual(["./index.js"]);
+    expect(packageJson.steelengine?.extensions).toEqual(["./index.js"]);
   });
 
   it("copies generated bundled channel config schemas into dist manifests", () => {
-    const repoRoot = makeRepoRoot("openclaw-bundled-channel-config-meta-");
+    const repoRoot = makeRepoRoot("steelengine-bundled-channel-config-meta-");
     createPlugin(repoRoot, {
       id: "telegram",
-      packageName: "@openclaw/telegram",
+      packageName: "@steelengine/telegram",
       manifest: {
         channels: ["telegram"],
         channelConfigs: {
@@ -131,7 +131,7 @@ describe("copyBundledPluginMetadata", () => {
           },
         },
       },
-      packageOpenClaw: { extensions: ["./index.ts"] },
+      packageSteelEngine: { extensions: ["./index.ts"] },
     });
     fs.mkdirSync(path.join(repoRoot, "src", "config"), { recursive: true });
     fs.writeFileSync(
@@ -180,7 +180,7 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("relocates node_modules-backed skill paths into bundled-skills and rewrites the manifest", () => {
-    const repoRoot = makeRepoRoot("openclaw-bundled-plugin-node-modules-");
+    const repoRoot = makeRepoRoot("steelengine-bundled-plugin-node-modules-");
     const pluginDir = createTlonSkillPlugin(repoRoot);
     const storeSkillDir = path.join(
       repoRoot,
@@ -230,7 +230,7 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("falls back to repo-root hoisted node_modules skill paths", () => {
-    const repoRoot = makeRepoRoot("openclaw-bundled-plugin-hoisted-skill-");
+    const repoRoot = makeRepoRoot("steelengine-bundled-plugin-hoisted-skill-");
     const pluginDir = createTlonSkillPlugin(repoRoot);
     const hoistedSkillDir = path.join(repoRoot, "node_modules", "@tloncorp", "tlon-skill");
     fs.mkdirSync(hoistedSkillDir, { recursive: true });
@@ -249,7 +249,7 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("omits missing declared skill paths and removes stale generated outputs", () => {
-    const repoRoot = makeRepoRoot("openclaw-bundled-plugin-missing-skill-");
+    const repoRoot = makeRepoRoot("steelengine-bundled-plugin-missing-skill-");
     createTlonSkillPlugin(repoRoot);
     const staleBundledSkillDir = path.join(
       bundledPluginDir(repoRoot, "tlon"),
@@ -272,12 +272,12 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("retries transient skill copy races from concurrent runtime postbuilds", () => {
-    const repoRoot = makeRepoRoot("openclaw-bundled-plugin-retry-");
+    const repoRoot = makeRepoRoot("steelengine-bundled-plugin-retry-");
     const pluginDir = createPlugin(repoRoot, {
       id: "diffs",
-      packageName: "@openclaw/diffs",
+      packageName: "@steelengine/diffs",
       manifest: { skills: ["./skills"] },
-      packageOpenClaw: { extensions: ["./index.ts"] },
+      packageSteelEngine: { extensions: ["./index.ts"] },
     });
     fs.mkdirSync(path.join(pluginDir, "skills", "diffs"), { recursive: true });
     fs.writeFileSync(path.join(pluginDir, "skills", "diffs", "SKILL.md"), "# Diffs\n", "utf8");
@@ -309,7 +309,7 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("removes generated outputs for plugins no longer present in source", () => {
-    const repoRoot = makeRepoRoot("openclaw-bundled-plugin-removed-");
+    const repoRoot = makeRepoRoot("steelengine-bundled-plugin-removed-");
     const staleBundledSkillDir = path.join(
       repoRoot,
       "dist",
@@ -334,13 +334,13 @@ describe("copyBundledPluginMetadata", () => {
       "export default {}\n",
       "utf8",
     );
-    writeJson(path.join(repoRoot, "dist", "extensions", "removed-plugin", "openclaw.plugin.json"), {
+    writeJson(path.join(repoRoot, "dist", "extensions", "removed-plugin", "steelengine.plugin.json"), {
       id: "removed-plugin",
       configSchema: { type: "object" },
       skills: ["./bundled-skills/@scope/skill"],
     });
     writeJson(path.join(repoRoot, "dist", "extensions", "removed-plugin", "package.json"), {
-      name: "@openclaw/removed-plugin",
+      name: "@steelengine/removed-plugin",
     });
     fs.mkdirSync(path.join(repoRoot, "extensions"), { recursive: true });
 
@@ -350,18 +350,18 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("removes stale dist outputs when a source extension directory no longer has a manifest", () => {
-    const repoRoot = makeRepoRoot("openclaw-bundled-plugin-manifestless-source-");
+    const repoRoot = makeRepoRoot("steelengine-bundled-plugin-manifestless-source-");
     const sourcePluginDir = path.join(repoRoot, "extensions", "google-gemini-cli-auth");
     fs.mkdirSync(path.join(sourcePluginDir, "node_modules"), { recursive: true });
     const staleDistDir = path.join(repoRoot, "dist", "extensions", "google-gemini-cli-auth");
     fs.mkdirSync(staleDistDir, { recursive: true });
     fs.writeFileSync(path.join(staleDistDir, "index.js"), "export default {}\n", "utf8");
-    writeJson(path.join(staleDistDir, "openclaw.plugin.json"), {
+    writeJson(path.join(staleDistDir, "steelengine.plugin.json"), {
       id: "google-gemini-cli-auth",
       configSchema: { type: "object" },
     });
     writeJson(path.join(staleDistDir, "package.json"), {
-      name: "@openclaw/google-gemini-cli-auth",
+      name: "@steelengine/google-gemini-cli-auth",
     });
 
     copyBundledPluginMetadata({ repoRoot });
@@ -370,11 +370,11 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("removes non-packaged private QA plugin metadata unless private QA build is enabled", () => {
-    const repoRoot = makeRepoRoot("openclaw-private-qa-metadata-");
+    const repoRoot = makeRepoRoot("steelengine-private-qa-metadata-");
     createPlugin(repoRoot, {
       id: "qa-lab",
-      packageName: "@openclaw/qa-lab",
-      packageOpenClaw: { extensions: ["./index.ts"] },
+      packageName: "@steelengine/qa-lab",
+      packageSteelEngine: { extensions: ["./index.ts"] },
     });
     const staleDistDir = path.join(repoRoot, "dist", "extensions", "qa-lab");
     fs.mkdirSync(staleDistDir, { recursive: true });
@@ -386,10 +386,10 @@ describe("copyBundledPluginMetadata", () => {
 
     copyBundledPluginMetadataWithEnv({
       repoRoot,
-      env: { OPENCLAW_BUILD_PRIVATE_QA: "1" } as NodeJS.ProcessEnv,
+      env: { STEELENGINE_BUILD_PRIVATE_QA: "1" } as NodeJS.ProcessEnv,
     });
 
-    expect(fs.existsSync(path.join(staleDistDir, "openclaw.plugin.json"))).toBe(true);
+    expect(fs.existsSync(path.join(staleDistDir, "steelengine.plugin.json"))).toBe(true);
     expect(fs.existsSync(path.join(staleDistDir, "package.json"))).toBe(true);
   });
 
@@ -397,28 +397,28 @@ describe("copyBundledPluginMetadata", () => {
     {
       name: "skips metadata for optional bundled clusters only when explicitly disabled",
       pluginId: "acpx",
-      packageName: "@openclaw/acpx-plugin",
-      packageOpenClaw: { extensions: ["./index.ts"] },
+      packageName: "@steelengine/acpx-plugin",
+      packageSteelEngine: { extensions: ["./index.ts"] },
       env: excludeOptionalEnv,
       expectedExists: false,
     },
     {
       name: "removes externalized optional plugin metadata from the core dist",
       pluginId: "whatsapp",
-      packageName: "@openclaw/whatsapp",
-      packageOpenClaw: {
+      packageName: "@steelengine/whatsapp",
+      packageSteelEngine: {
         extensions: ["./index.ts"],
-        install: { npmSpec: "@openclaw/whatsapp" },
+        install: { npmSpec: "@steelengine/whatsapp" },
       },
       env: {},
       expectedExists: false,
     },
-  ] as const)("$name", ({ pluginId, packageName, packageOpenClaw, env, expectedExists }) => {
-    const repoRoot = makeRepoRoot(`openclaw-bundled-plugin-${pluginId}-`);
+  ] as const)("$name", ({ pluginId, packageName, packageSteelEngine, env, expectedExists }) => {
+    const repoRoot = makeRepoRoot(`steelengine-bundled-plugin-${pluginId}-`);
     createPlugin(repoRoot, {
       id: pluginId,
       packageName,
-      packageOpenClaw,
+      packageSteelEngine,
     });
 
     copyBundledPluginMetadataWithEnv({ repoRoot, env });
@@ -427,11 +427,11 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("removes build-excluded bundled plugin metadata", () => {
-    const repoRoot = makeRepoRoot("openclaw-bundled-plugin-excluded-meta-");
+    const repoRoot = makeRepoRoot("steelengine-bundled-plugin-excluded-meta-");
     createPlugin(repoRoot, {
       id: "qqbot",
-      packageName: "@openclaw/qqbot",
-      packageOpenClaw: {
+      packageName: "@steelengine/qqbot",
+      packageSteelEngine: {
         extensions: ["./index.ts"],
         setupEntry: "./setup-entry.ts",
       },
@@ -446,11 +446,11 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("preserves manifest-less runtime support package outputs and copies package metadata", () => {
-    const repoRoot = makeRepoRoot("openclaw-bundled-runtime-support-");
+    const repoRoot = makeRepoRoot("steelengine-bundled-runtime-support-");
     const pluginDir = path.join(repoRoot, "extensions", "image-generation-core");
     fs.mkdirSync(pluginDir, { recursive: true });
     writeJson(path.join(pluginDir, "package.json"), {
-      name: "@openclaw/image-generation-core",
+      name: "@steelengine/image-generation-core",
       version: "0.0.1",
       private: true,
       type: "module",
@@ -477,7 +477,7 @@ describe("copyBundledPluginMetadata", () => {
     ).toBe(true);
     expect(
       fs.existsSync(
-        path.join(repoRoot, "dist", "extensions", "image-generation-core", "openclaw.plugin.json"),
+        path.join(repoRoot, "dist", "extensions", "image-generation-core", "steelengine.plugin.json"),
       ),
     ).toBe(false);
     expect(
@@ -488,7 +488,7 @@ describe("copyBundledPluginMetadata", () => {
         ),
       ),
     ).toEqual({
-      name: "@openclaw/image-generation-core",
+      name: "@steelengine/image-generation-core",
       version: "0.0.1",
       private: true,
       type: "module",

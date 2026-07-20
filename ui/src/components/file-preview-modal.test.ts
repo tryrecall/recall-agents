@@ -2,7 +2,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { i18n } from "../i18n/index.ts";
-import { OpenClawFilePreviewModal } from "./file-preview-modal.ts";
+import { SteelEngineFilePreviewModal } from "./file-preview-modal.ts";
 
 type FilePreviewModalElement = HTMLElement & {
   files: typeof files;
@@ -14,9 +14,9 @@ type FilePreviewModalElement = HTMLElement & {
 
 let container: HTMLDivElement;
 
-const FILE_PREVIEW_MODAL_ELEMENT_NAME = `test-openclaw-file-preview-modal-${crypto.randomUUID()}`;
+const FILE_PREVIEW_MODAL_ELEMENT_NAME = `test-steelengine-file-preview-modal-${crypto.randomUUID()}`;
 
-customElements.define(FILE_PREVIEW_MODAL_ELEMENT_NAME, class extends OpenClawFilePreviewModal {});
+customElements.define(FILE_PREVIEW_MODAL_ELEMENT_NAME, class extends SteelEngineFilePreviewModal {});
 
 const files = [
   {
@@ -57,7 +57,7 @@ function shadowText(modal: FilePreviewModalElement): string {
   return modal.shadowRoot?.textContent ?? "";
 }
 
-describe("openclaw-file-preview-modal", () => {
+describe("steelengine-file-preview-modal", () => {
   beforeEach(() => {
     container = document.createElement("div");
     document.body.append(container);
@@ -146,7 +146,7 @@ describe("openclaw-file-preview-modal", () => {
     const onSelect = vi.fn();
     modal.addEventListener("file-preview-select", onSelect);
 
-    const dialog = modal.shadowRoot?.querySelector<HTMLElement>("openclaw-modal-dialog");
+    const dialog = modal.shadowRoot?.querySelector<HTMLElement>("steelengine-modal-dialog");
     const arrowDown = new KeyboardEvent("keydown", {
       key: "ArrowDown",
       bubbles: true,
@@ -264,7 +264,7 @@ describe("openclaw-file-preview-modal", () => {
     await modal.updateComplete;
 
     expect(
-      modal.shadowRoot?.querySelector<HTMLElement & { label: string }>("openclaw-modal-dialog")
+      modal.shadowRoot?.querySelector<HTMLElement & { label: string }>("steelengine-modal-dialog")
         ?.label,
     ).toBe("Arquivos de suporte");
     expect(shadowText(modal)).toContain("2 arquivos");

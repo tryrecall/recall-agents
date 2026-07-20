@@ -1,13 +1,13 @@
 {
-  "name": "@openclaw/minimax-provider",
+  "name": "@steelengine/minimax-provider",
   "version": "2026.7.2-beta.3",
   "private": true,
-  "description": "OpenClaw MiniMax provider and OAuth plugin",
+  "description": "SteelEngine MiniMax provider and OAuth plugin",
   "type": "module",
   "devDependencies": {
-    "@openclaw/plugin-sdk": "workspace:*"
+    "@steelengine/plugin-sdk": "workspace:*"
   },
-  "openclaw": {
+  "steelengine": {
     "extensions": [
       "./index.ts"
     ]

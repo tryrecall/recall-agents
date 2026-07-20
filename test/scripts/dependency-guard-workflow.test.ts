@@ -1,6 +1,6 @@
 // Dependency Guard Workflow tests cover dependency guard workflow script behavior.
 import { readFileSync } from "node:fs";
-import { expectDefined } from "@openclaw/normalization-core";
+import { expectDefined } from "@steelengine/normalization-core";
 import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
@@ -137,7 +137,7 @@ describe("dependency guard workflow", () => {
     );
     const autoscrubRunStep = workflowStep(autoscrubSteps, 3, "dependency guard autoscrub run step");
     const finalRunStep = workflowStep(finalSteps, 1, "dependency guard final run step");
-    expect(detectRunStep.env?.OPENCLAW_DEPENDENCY_GUARD_MODE).toBe("detect");
+    expect(detectRunStep.env?.STEELENGINE_DEPENDENCY_GUARD_MODE).toBe("detect");
     expect(primaryTokenStep.uses).toBe(
       "actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3",
     );
@@ -159,11 +159,11 @@ describe("dependency guard workflow", () => {
     });
     expect(fallbackTokenStep["continue-on-error"]).toBe(true);
     expect(autoscrubRunStep.env?.GITHUB_TOKEN).toBe("${{ github.token }}");
-    expect(autoscrubRunStep.env?.OPENCLAW_DEPENDENCY_GUARD_AUTOSCRUB_TOKEN).toBe(
+    expect(autoscrubRunStep.env?.STEELENGINE_DEPENDENCY_GUARD_AUTOSCRUB_TOKEN).toBe(
       "${{ steps.app-token.outputs.token || steps.app-token-fallback.outputs.token }}",
     );
-    expect(autoscrubRunStep.env?.OPENCLAW_DEPENDENCY_GUARD_MODE).toBe("autoscrub");
-    expect(finalRunStep.env?.OPENCLAW_DEPENDENCY_GUARD_MODE).toBe("enforce");
+    expect(autoscrubRunStep.env?.STEELENGINE_DEPENDENCY_GUARD_MODE).toBe("autoscrub");
+    expect(finalRunStep.env?.STEELENGINE_DEPENDENCY_GUARD_MODE).toBe("enforce");
   });
 
   it("preserves dependency-guard as the final required check", () => {
@@ -183,8 +183,8 @@ describe("dependency guard workflow", () => {
     const runStep = workflowStep(detectSteps, 1, "dependency guard bounded comment run step");
     const script = readFileSync("scripts/github/dependency-guard.mjs", "utf8");
 
-    expect(runStep.env?.OPENCLAW_SECURITY_TEAM_SLUG).toBe("openclaw-secops");
-    expect(runStep.env?.OPENCLAW_SECURITY_APPROVERS).toBe("vincentkoc,steipete,joshavant");
+    expect(runStep.env?.STEELENGINE_SECURITY_TEAM_SLUG).toBe("steelengine-secops");
+    expect(runStep.env?.STEELENGINE_SECURITY_APPROVERS).toBe("vincentkoc,steipete,joshavant");
     expect(workflow).toContain("scripts/github/dependency-guard.mjs");
     expect(script).toContain('"dependencies-changed"');
     expect(script).not.toContain('"blocked: dependencies"');
@@ -213,7 +213,7 @@ describe("dependency guard workflow", () => {
     expect(script).toContain('"overrides"');
     expect(script).toContain('"packageManager"');
     expect(script).toContain("/allow-dependencies-change");
-    expect(script).toContain("openclaw-secops");
+    expect(script).toContain("steelengine-secops");
     expect(script).toContain("securityApproverSet");
     expect(guardSources).toContain("/memberships/");
     expect(guardSources).toContain("isCommentNewerThan");
@@ -259,15 +259,15 @@ describe("dependency guard workflow", () => {
   it("requires secops review for future workflow or guard changes", () => {
     const codeowners = readFileSync(CODEOWNERS, "utf8");
     expect(codeowners).toContain(
-      "/.github/workflows/dependency-guard.yml @openclaw/openclaw-secops",
+      "/.github/workflows/dependency-guard.yml @steelengine/steelengine-secops",
     );
     expect(codeowners).toContain(
-      "/test/scripts/dependency-guard-workflow.test.ts @openclaw/openclaw-secops",
+      "/test/scripts/dependency-guard-workflow.test.ts @steelengine/steelengine-secops",
     );
-    expect(codeowners).toContain("/scripts/github/dependency-guard.mjs @openclaw/openclaw-secops");
-    expect(codeowners).toContain("/package-lock.json @openclaw/openclaw-secops");
-    expect(codeowners).toContain("/npm-shrinkwrap.json @openclaw/openclaw-secops");
-    expect(codeowners).toContain("/extensions/*/package-lock.json @openclaw/openclaw-secops");
-    expect(codeowners).toContain("/extensions/*/npm-shrinkwrap.json @openclaw/openclaw-secops");
+    expect(codeowners).toContain("/scripts/github/dependency-guard.mjs @steelengine/steelengine-secops");
+    expect(codeowners).toContain("/package-lock.json @steelengine/steelengine-secops");
+    expect(codeowners).toContain("/npm-shrinkwrap.json @steelengine/steelengine-secops");
+    expect(codeowners).toContain("/extensions/*/package-lock.json @steelengine/steelengine-secops");
+    expect(codeowners).toContain("/extensions/*/npm-shrinkwrap.json @steelengine/steelengine-secops");
   });
 });

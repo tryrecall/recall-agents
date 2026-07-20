@@ -6,19 +6,19 @@ import {
   getNodeSqliteKysely,
 } from "../infra/kysely-sync.js";
 import { normalizeAgentId, parseAgentSessionKey } from "../routing/session-key.js";
-import type { DB as OpenClawStateKyselyDatabase } from "../state/openclaw-state-db.generated.js";
+import type { DB as SteelEngineStateKyselyDatabase } from "../state/steelengine-state-db.generated.js";
 import {
-  openOpenClawStateDatabase,
-  runOpenClawStateWriteTransaction,
-} from "../state/openclaw-state-db.js";
+  openSteelEngineStateDatabase,
+  runSteelEngineStateWriteTransaction,
+} from "../state/steelengine-state-db.js";
 import type { TuiSessionList } from "./tui-backend.js";
 import type { SessionScope } from "./tui-types.js";
 
-type TuiLastSessionDatabase = Pick<OpenClawStateKyselyDatabase, "tui_last_sessions">;
+type TuiLastSessionDatabase = Pick<SteelEngineStateKyselyDatabase, "tui_last_sessions">;
 
 function stateDatabaseOptions(stateDir?: string) {
   return stateDir
-    ? { env: { ...process.env, OPENCLAW_STATE_DIR: stateDir } }
+    ? { env: { ...process.env, STEELENGINE_STATE_DIR: stateDir } }
     : { env: process.env };
 }
 
@@ -66,7 +66,7 @@ export async function readTuiLastSessionKey(params: {
   scopeKey: string;
   stateDir?: string;
 }): Promise<string | null> {
-  const database = openOpenClawStateDatabase(stateDatabaseOptions(params.stateDir));
+  const database = openSteelEngineStateDatabase(stateDatabaseOptions(params.stateDir));
   const row = executeSqliteQueryTakeFirstSync(
     database.db,
     getNodeSqliteKysely<TuiLastSessionDatabase>(database.db)
@@ -89,7 +89,7 @@ export async function writeTuiLastSessionKey(params: {
     return;
   }
   const updatedAt = Date.now();
-  runOpenClawStateWriteTransaction(({ db }) => {
+  runSteelEngineStateWriteTransaction(({ db }) => {
     const tuiDb = getNodeSqliteKysely<TuiLastSessionDatabase>(db);
     executeSqliteQuerySync(
       db,
@@ -118,7 +118,7 @@ export function clearTuiLastSessionPointers(params: {
   if (params.sessionKeys.size === 0) {
     return 0;
   }
-  return runOpenClawStateWriteTransaction(({ db }) => {
+  return runSteelEngineStateWriteTransaction(({ db }) => {
     const result = executeSqliteQuerySync(
       db,
       getNodeSqliteKysely<TuiLastSessionDatabase>(db)

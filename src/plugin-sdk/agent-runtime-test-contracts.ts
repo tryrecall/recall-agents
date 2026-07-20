@@ -9,11 +9,11 @@ export { DELIVERY_NO_REPLY_RUNTIME_CONTRACT } from "./test-helpers/agents/delive
 export {
   createTerminalPresentationContractTool,
   installCodexToolResultMiddleware,
-  installOpenClawOwnedToolHooks,
+  installSteelEngineOwnedToolHooks,
   mediaToolResult,
-  resetOpenClawOwnedToolHooks,
+  resetSteelEngineOwnedToolHooks,
   textToolResult,
-} from "./test-helpers/agents/openclaw-owned-tool-runtime-contract.js";
+} from "./test-helpers/agents/steelengine-owned-tool-runtime-contract.js";
 export {
   createContractFallbackConfig,
   createContractRunResult,

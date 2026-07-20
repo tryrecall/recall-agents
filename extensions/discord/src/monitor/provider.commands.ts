@@ -3,27 +3,27 @@ import {
   listNativeCommandSpecsForConfig,
   listSkillCommandsForAgents,
   type NativeCommandSpec,
-} from "openclaw/plugin-sdk/command-auth-native";
-import type { OpenClawConfig } from "openclaw/plugin-sdk/config-contracts";
-import { createLazyRuntimeNamedExport } from "openclaw/plugin-sdk/lazy-runtime";
-import { danger, warn, type RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
+} from "steelengine/plugin-sdk/command-auth-native";
+import type { SteelEngineConfig } from "steelengine/plugin-sdk/config-contracts";
+import { createLazyRuntimeNamedExport } from "steelengine/plugin-sdk/lazy-runtime";
+import { danger, warn, type RuntimeEnv } from "steelengine/plugin-sdk/runtime-env";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeStringEntriesLower,
-} from "openclaw/plugin-sdk/string-coerce-runtime";
+} from "steelengine/plugin-sdk/string-coerce-runtime";
 
 export type GetPluginCommandSpecs =
-  typeof import("openclaw/plugin-sdk/plugin-runtime").getPluginCommandSpecs;
+  typeof import("steelengine/plugin-sdk/plugin-runtime").getPluginCommandSpecs;
 
 const loadPluginCommandSpecs = createLazyRuntimeNamedExport(
-  () => import("openclaw/plugin-sdk/plugin-runtime"),
+  () => import("steelengine/plugin-sdk/plugin-runtime"),
   "getPluginCommandSpecs",
 );
 
 async function appendPluginCommandSpecs(params: {
   commandSpecs: NativeCommandSpec[];
   runtime: RuntimeEnv;
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   getPluginCommandSpecs?: GetPluginCommandSpecs;
 }): Promise<NativeCommandSpec[]> {
   const merged = [...params.commandSpecs];
@@ -53,7 +53,7 @@ async function appendPluginCommandSpecs(params: {
 }
 
 export async function resolveDiscordProviderCommandSpecs(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   runtime: RuntimeEnv;
   nativeEnabled: boolean;
   nativeSkillsEnabled: boolean;

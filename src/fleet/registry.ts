@@ -6,11 +6,11 @@ import {
   executeSqliteQueryTakeFirstSync,
   getNodeSqliteKysely,
 } from "../infra/kysely-sync.js";
-import type { DB as OpenClawStateKyselyDatabase } from "../state/openclaw-state-db.generated.js";
+import type { DB as SteelEngineStateKyselyDatabase } from "../state/steelengine-state-db.generated.js";
 import {
-  openOpenClawStateDatabase,
-  runOpenClawStateWriteTransaction,
-} from "../state/openclaw-state-db.js";
+  openSteelEngineStateDatabase,
+  runSteelEngineStateWriteTransaction,
+} from "../state/steelengine-state-db.js";
 import { allocateHostPort } from "./cell-profile.js";
 
 export type FleetCellRecord = {
@@ -27,9 +27,9 @@ type ReserveFleetCellParams = Omit<FleetCellRecord, "hostPort"> & {
   requestedPort?: number;
 };
 
-type FleetCellsTable = OpenClawStateKyselyDatabase["fleet_cells"];
+type FleetCellsTable = SteelEngineStateKyselyDatabase["fleet_cells"];
 type FleetCellRow = Selectable<FleetCellsTable>;
-type FleetRegistryDatabase = Pick<OpenClawStateKyselyDatabase, "fleet_cells" | "state_leases">;
+type FleetRegistryDatabase = Pick<SteelEngineStateKyselyDatabase, "fleet_cells" | "state_leases">;
 
 const FLEET_OPERATION_LEASE_SCOPE = "fleet-cell-operation";
 const FLEET_OPERATION_LEASE_TTL_MS = 5 * 60_000;
@@ -86,7 +86,7 @@ function recordToRow(record: FleetCellRecord): Insertable<FleetCellsTable> {
 }
 
 export function listFleetCells(env: NodeJS.ProcessEnv = process.env): FleetCellRecord[] {
-  const db = openOpenClawStateDatabase({ env }).db;
+  const db = openSteelEngineStateDatabase({ env }).db;
   const rows = executeSqliteQuerySync(
     db,
     kyselyFor(db).selectFrom("fleet_cells").selectAll().orderBy("tenant_id", "asc"),
@@ -98,7 +98,7 @@ export function getFleetCell(
   env: NodeJS.ProcessEnv,
   tenantId: string,
 ): FleetCellRecord | undefined {
-  const db = openOpenClawStateDatabase({ env }).db;
+  const db = openSteelEngineStateDatabase({ env }).db;
   const row = executeSqliteQueryTakeFirstSync(
     db,
     kyselyFor(db).selectFrom("fleet_cells").selectAll().where("tenant_id", "=", tenantId),
@@ -110,7 +110,7 @@ export function reserveFleetCell(
   env: NodeJS.ProcessEnv,
   params: ReserveFleetCellParams,
 ): FleetCellRecord {
-  return runOpenClawStateWriteTransaction(
+  return runSteelEngineStateWriteTransaction(
     ({ db }) => {
       const kysely = kyselyFor(db);
       const existing = executeSqliteQueryTakeFirstSync(
@@ -151,7 +151,7 @@ export function updateFleetCellImage(
   tenantId: string,
   image: string,
 ): void {
-  runOpenClawStateWriteTransaction(
+  runSteelEngineStateWriteTransaction(
     ({ db }) => {
       const result = executeSqliteQuerySync(
         db,
@@ -175,7 +175,7 @@ export function acquireFleetCellOperation(params: {
   const nowMs = params.nowMs ?? Date.now();
   const expiresAt = nowMs + FLEET_OPERATION_LEASE_TTL_MS;
   const owner = params.owner ?? crypto.randomUUID();
-  runOpenClawStateWriteTransaction(
+  runSteelEngineStateWriteTransaction(
     ({ db }) => {
       const kysely = kyselyFor(db);
       executeSqliteQuerySync(
@@ -236,7 +236,7 @@ export function acquireFleetCellOperation(params: {
     owner,
     heartbeat: (heartbeatNowMs = Date.now()) => {
       const heartbeatExpiresAt = heartbeatNowMs + FLEET_OPERATION_LEASE_TTL_MS;
-      runOpenClawStateWriteTransaction(
+      runSteelEngineStateWriteTransaction(
         ({ db }) => {
           const result = executeSqliteQuerySync(
             db,
@@ -260,7 +260,7 @@ export function acquireFleetCellOperation(params: {
       );
     },
     release: () => {
-      runOpenClawStateWriteTransaction(
+      runSteelEngineStateWriteTransaction(
         ({ db }) => {
           executeSqliteQuerySync(
             db,
@@ -278,7 +278,7 @@ export function acquireFleetCellOperation(params: {
 }
 
 export function deleteFleetCell(env: NodeJS.ProcessEnv, tenantId: string): void {
-  runOpenClawStateWriteTransaction(
+  runSteelEngineStateWriteTransaction(
     ({ db }) => {
       executeSqliteQuerySync(
         db,

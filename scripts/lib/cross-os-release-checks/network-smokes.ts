@@ -103,7 +103,7 @@ async function configureDiscordSmoke(params: {
       lane: params.lane,
       cliPath: params.cliPath,
       env: gatewayEnv,
-      logPath: join(params.cwd, `.openclaw/logs/${params.lane.name}-discord-gateway.log`),
+      logPath: join(params.cwd, `.steelengine/logs/${params.lane.name}-discord-gateway.log`),
     });
     if (params.gatewayHolder) {
       params.gatewayHolder.current = gateway;
@@ -212,8 +212,8 @@ export function dashboardHtmlMarkerStatus(html: string): {
   ready: boolean;
   title: boolean;
 } {
-  const title = html.includes("<title>OpenClaw Control</title>");
-  const app = html.includes("<openclaw-app></openclaw-app>");
+  const title = html.includes("<title>SteelEngine Control</title>");
+  const app = html.includes("<steelengine-app></steelengine-app>");
   return { app, ready: title && app, title };
 }
 
@@ -396,11 +396,11 @@ export async function maybeRunDiscordRoundtrip(params: {
   logPath: string;
 }) {
   const token =
-    process.env.OPENCLAW_DISCORD_SMOKE_BOT_TOKEN?.trim() ||
+    process.env.STEELENGINE_DISCORD_SMOKE_BOT_TOKEN?.trim() ||
     process.env.DISCORD_BOT_TOKEN?.trim() ||
     "";
-  const guildId = process.env.OPENCLAW_DISCORD_SMOKE_GUILD_ID?.trim() || "";
-  const channelId = process.env.OPENCLAW_DISCORD_SMOKE_CHANNEL_ID?.trim() || "";
+  const guildId = process.env.STEELENGINE_DISCORD_SMOKE_GUILD_ID?.trim() || "";
+  const channelId = process.env.STEELENGINE_DISCORD_SMOKE_CHANNEL_ID?.trim() || "";
   if (!token || !guildId || !channelId) {
     return "skipped-missing-config";
   }

@@ -1,6 +1,6 @@
 /** Tests web-tool secret metadata resolution from config and plugins. */
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SteelEngineConfig } from "../config/config.js";
 import type {
   PluginWebFetchProviderEntry,
   PluginWebSearchProviderEntry,
@@ -103,8 +103,8 @@ vi.mock("../plugins/installed-plugin-index-records.js", () => ({
   loadInstalledPluginIndexInstallRecordsSync: loadInstalledPluginIndexInstallRecordsSyncMock,
 }));
 
-function asConfig(value: unknown): OpenClawConfig {
-  return value as OpenClawConfig;
+function asConfig(value: unknown): SteelEngineConfig {
+  return value as SteelEngineConfig;
 }
 
 function providerPluginId(provider: ProviderUnderTest): string {
@@ -133,7 +133,7 @@ function ensureRecord(target: Record<string, unknown>, key: string): Record<stri
 }
 
 function setConfiguredProviderKey(
-  configTarget: OpenClawConfig,
+  configTarget: SteelEngineConfig,
   pluginId: string,
   value: unknown,
 ): void {
@@ -145,7 +145,7 @@ function setConfiguredProviderKey(
   webSearch.apiKey = value;
 }
 
-function setConfiguredFetchProviderKey(configTarget: OpenClawConfig, value: unknown): void {
+function setConfiguredFetchProviderKey(configTarget: SteelEngineConfig, value: unknown): void {
   const plugins = ensureRecord(configTarget as Record<string, unknown>, "plugins");
   const entries = ensureRecord(plugins, "entries");
   const pluginEntry = ensureRecord(entries, "firecrawl");
@@ -282,7 +282,7 @@ function buildTestWebFetchProviders(): PluginWebFetchProviderEntry[] {
 }
 
 async function runRuntimeWebTools(params: {
-  config: OpenClawConfig;
+  config: SteelEngineConfig;
   env?: NodeJS.ProcessEnv;
   allowUnavailableSecretOwners?: boolean;
 }) {
@@ -304,7 +304,7 @@ async function runRuntimeWebTools(params: {
 function createProviderSecretRefConfig(
   provider: ProviderUnderTest,
   envRefId: string,
-): OpenClawConfig {
+): SteelEngineConfig {
   return asConfig({
     tools: {
       web: {
@@ -329,7 +329,7 @@ function createProviderSecretRefConfig(
   });
 }
 
-function readProviderKey(config: OpenClawConfig, provider: ProviderUnderTest): unknown {
+function readProviderKey(config: SteelEngineConfig, provider: ProviderUnderTest): unknown {
   const pluginConfig = config.plugins?.entries?.[providerPluginId(provider)]?.config as
     | { webSearch?: { apiKey?: unknown } }
     | undefined;
@@ -1417,7 +1417,7 @@ describe("runtime web tools resolution", () => {
     loadInstalledPluginIndexInstallRecordsSyncMock.mockReturnValue({
       "external-search": {
         source: "npm",
-        spec: "@openclaw/external-search",
+        spec: "@steelengine/external-search",
       },
     });
 
@@ -1465,7 +1465,7 @@ describe("runtime web tools resolution", () => {
     loadInstalledPluginIndexInstallRecordsSyncMock.mockReturnValue({
       firecrawl: {
         source: "npm",
-        spec: "@openclaw/firecrawl-plugin",
+        spec: "@steelengine/firecrawl-plugin",
       },
     });
     resolveManifestContractOwnerPluginIdMock.mockReturnValueOnce(undefined);
@@ -1823,7 +1823,7 @@ describe("runtime web tools resolution", () => {
 
     beforeEach(() => {
       loadInstalledPluginIndexInstallRecordsSyncMock.mockReturnValue({
-        brave: { source: "npm", spec: "@openclaw/brave-search" },
+        brave: { source: "npm", spec: "@steelengine/brave-search" },
       });
       resolveManifestContractOwnerPluginIdMock.mockImplementation(externalBraveImpl);
     });

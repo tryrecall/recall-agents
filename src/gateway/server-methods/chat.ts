@@ -31,7 +31,7 @@ import {
   isSessionTranscriptProjectionUnavailableError,
   resolveTranscriptSessionKeyBySessionId,
 } from "../../config/sessions/session-accessor.js";
-import type { OpenClawConfig } from "../../config/types.openclaw.js";
+import type { SteelEngineConfig } from "../../config/types.steelengine.js";
 import {
   clearAgentRunContext,
   getAgentEventLifecycleGeneration,
@@ -203,7 +203,7 @@ async function handleChatMetadataRequest({
 }
 
 async function buildChatMetadataResult(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   context: GatewayRequestContext;
   agentId: string;
 }): Promise<ChatMetadataResult> {
@@ -230,7 +230,7 @@ async function buildChatMetadataResult(params: {
 }
 
 async function buildChatStartupMetadataResult(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   context: GatewayRequestContext;
   agentId: string;
   modelCatalog: ModelCatalogSnapshot | undefined;
@@ -262,7 +262,7 @@ async function buildChatStartupMetadataResult(params: {
 }
 
 async function buildChatStartupModelCatalogProjection(params: {
-  cfg: OpenClawConfig;
+  cfg: SteelEngineConfig;
   snapshot: ModelCatalogSnapshot;
   sessionAgentId: string;
   sessionEntry: ReturnType<typeof loadSessionEntry>["entry"];
@@ -344,7 +344,7 @@ function resolveWebchatPromptCacheKey(params: {
     )
     .digest("hex")
     .slice(0, 32);
-  return `openclaw-webchat-${digest}`;
+  return `steelengine-webchat-${digest}`;
 }
 
 export {
@@ -494,7 +494,7 @@ async function handleChatHistoryRequest({
   }
   const agentIdOverride = normalizeOptionalText((params as { agentId?: string }).agentId);
   const requestedAgentId = resolveRequestedChatAgentId({
-    cfg: (context as { getRuntimeConfig?: () => OpenClawConfig }).getRuntimeConfig?.(),
+    cfg: (context as { getRuntimeConfig?: () => SteelEngineConfig }).getRuntimeConfig?.(),
     requestedSessionKey: sessionKey,
     agentId: agentIdOverride,
   });
@@ -853,7 +853,7 @@ export const chatHandlers: GatewayRequestHandlers = {
     };
     const agentIdOverride = normalizeOptionalText((params as { agentId?: string }).agentId);
     const requestedAgentId = resolveRequestedChatAgentId({
-      cfg: (context as { getRuntimeConfig?: () => OpenClawConfig }).getRuntimeConfig?.(),
+      cfg: (context as { getRuntimeConfig?: () => SteelEngineConfig }).getRuntimeConfig?.(),
       requestedSessionKey: sessionKey,
       agentId: agentIdOverride,
     });
@@ -1452,7 +1452,7 @@ export const chatHandlers: GatewayRequestHandlers = {
               }
               let broadcastedSourceReplyFinal = false;
               // WebChat persistence has two owners. Agent runs persist model-visible turns
-              // through OpenClaw runtime's SessionManager; this dispatcher only owns live delivery payloads.
+              // through SteelEngine runtime's SessionManager; this dispatcher only owns live delivery payloads.
               // Do not blindly mirror agent-run final payloads into JSONL or chat.history can
               // duplicate normal embedded-agent assistant turns. The non-agent branch below has no
               // runtime-owned assistant turn, so it appends a gateway-injected assistant entry before
@@ -1615,7 +1615,7 @@ export const chatHandlers: GatewayRequestHandlers = {
     // Load session to find transcript file
     const rawSessionKey = p.sessionKey;
     const requestedAgentId = resolveRequestedChatAgentId({
-      cfg: (context as { getRuntimeConfig?: () => OpenClawConfig }).getRuntimeConfig?.(),
+      cfg: (context as { getRuntimeConfig?: () => SteelEngineConfig }).getRuntimeConfig?.(),
       requestedSessionKey: rawSessionKey,
       agentId: p.agentId,
     });

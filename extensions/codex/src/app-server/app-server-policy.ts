@@ -1,25 +1,25 @@
 /**
- * Policy promotion for Codex app-server runs that can safely use OpenClaw tool
+ * Policy promotion for Codex app-server runs that can safely use SteelEngine tool
  * approvals.
  */
 import {
   canUseCodexModelBackedApprovalsReviewerForModel,
   type CodexAppServerRuntimeOptions,
   type CodexPluginConfig,
-  type OpenClawExecPolicyForCodexAppServer,
+  type SteelEngineExecPolicyForCodexAppServer,
 } from "./config.js";
 
 /**
  * Promotes implicit `never` approval policy to `untrusted` only when runtime
- * requirements allow OpenClaw to handle tool approvals.
+ * requirements allow SteelEngine to handle tool approvals.
  */
-export function resolveCodexAppServerForOpenClawToolPolicy(params: {
+export function resolveCodexAppServerForSteelEngineToolPolicy(params: {
   appServer: CodexAppServerRuntimeOptions;
   pluginConfig: CodexPluginConfig;
   env: NodeJS.ProcessEnv;
   shouldPromote: boolean;
   canUseUntrustedApprovalPolicy: boolean;
-  execPolicy?: OpenClawExecPolicyForCodexAppServer;
+  execPolicy?: SteelEngineExecPolicyForCodexAppServer;
 }): CodexAppServerRuntimeOptions {
   if (
     !params.shouldPromote ||
@@ -31,11 +31,11 @@ export function resolveCodexAppServerForOpenClawToolPolicy(params: {
   const explicitMode =
     params.execPolicy?.mode === "full" ||
     params.pluginConfig.appServer?.mode !== undefined ||
-    isCodexAppServerPolicyMode(params.env.OPENCLAW_CODEX_APP_SERVER_MODE);
+    isCodexAppServerPolicyMode(params.env.STEELENGINE_CODEX_APP_SERVER_MODE);
   const explicitApprovalPolicy =
     params.pluginConfig.appServer?.approvalPolicy !== undefined ||
     isConfiguredCodexAppServerApprovalPolicy(
-      params.env.OPENCLAW_CODEX_APP_SERVER_APPROVAL_POLICY,
+      params.env.STEELENGINE_CODEX_APP_SERVER_APPROVAL_POLICY,
     ) ||
     params.appServer.approvalPolicySource === "requirements";
   if (explicitMode || explicitApprovalPolicy) {

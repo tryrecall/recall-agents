@@ -10,7 +10,7 @@ import {
   registerNativeHookRelay,
   testing as nativeHookRelayTesting,
 } from "../agents/harness/native-hook-relay.js";
-import { resolveOpenClawStateSqlitePath } from "../state/openclaw-state-db.paths.js";
+import { resolveSteelEngineStateSqlitePath } from "../state/steelengine-state-db.paths.js";
 
 const tempDirs = useAutoCleanupTempDirTracker(afterEach);
 const activeChildren = new Set<ChildProcessWithoutNullStreams>();
@@ -36,7 +36,7 @@ async function createLingeringPluginFixture(): Promise<{
   markerPath: string;
   stateDir: string;
 }> {
-  const root = tempDirs.make("openclaw-hooks-cli-");
+  const root = tempDirs.make("steelengine-hooks-cli-");
   const stateDir = path.join(root, "state");
   const pluginDir = path.join(root, "linger-plugin");
   const markerPath = path.join(root, "registered");
@@ -48,11 +48,11 @@ async function createLingeringPluginFixture(): Promise<{
       name: "linger-plugin",
       version: "1.0.0",
       type: "module",
-      openclaw: { extensions: ["./index.js"] },
+      steelengine: { extensions: ["./index.js"] },
     }),
   );
   await fs.writeFile(
-    path.join(pluginDir, "openclaw.plugin.json"),
+    path.join(pluginDir, "steelengine.plugin.json"),
     JSON.stringify({
       id: "linger",
       name: "Linger",
@@ -74,7 +74,7 @@ async function createLingeringPluginFixture(): Promise<{
       "",
     ].join("\n"),
   );
-  const configPath = path.join(stateDir, "openclaw.json");
+  const configPath = path.join(stateDir, "steelengine.json");
   await fs.writeFile(
     configPath,
     JSON.stringify({
@@ -92,7 +92,7 @@ async function createLingeringPreloadFixture(): Promise<{
   preloadPath: string;
   stateDir: string;
 }> {
-  const root = tempDirs.make("openclaw-hooks-relay-");
+  const root = tempDirs.make("steelengine-hooks-relay-");
   const markerPath = path.join(root, "loaded");
   const preloadPath = path.join(root, "linger.mjs");
   const stateDir = path.join(root, "state");
@@ -206,9 +206,9 @@ async function runHooksRelay(params: { event: "post_tool_use" | "pre_tool_use"; 
     env: {
       LINGER_MARKER: fixture.markerPath,
       NODE_OPTIONS: `--import=${pathToFileURL(fixture.preloadPath).href}`,
-      OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1",
-      OPENCLAW_NO_RESPAWN: "1",
-      OPENCLAW_STATE_DIR: fixture.stateDir,
+      STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1",
+      STEELENGINE_NO_RESPAWN: "1",
+      STEELENGINE_STATE_DIR: fixture.stateDir,
     },
     stdin: params.stdin,
   });
@@ -229,7 +229,7 @@ describe("hooks CLI process lifecycle", () => {
       .poll(() => nativeHookRelayTesting.getNativeHookRelayBridgeRecordForTests(relay.relayId))
       .toBeDefined();
 
-    const childStateDir = path.join(tempDirs.make("openclaw-hooks-relay-other-state-"), "state");
+    const childStateDir = path.join(tempDirs.make("steelengine-hooks-relay-other-state-"), "state");
     await fs.mkdir(childStateDir, { recursive: true });
     const result = await runHooksCli({
       args: [
@@ -240,7 +240,7 @@ describe("hooks CLI process lifecycle", () => {
         "--relay-id",
         relay.relayId,
         "--state-db",
-        resolveOpenClawStateSqlitePath(),
+        resolveSteelEngineStateSqlitePath(),
         "--generation",
         relay.generation,
         "--event",
@@ -251,9 +251,9 @@ describe("hooks CLI process lifecycle", () => {
       completion: "exit",
       label: "hooks relay explicit state database",
       env: {
-        OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1",
-        OPENCLAW_NO_RESPAWN: "1",
-        OPENCLAW_STATE_DIR: childStateDir,
+        STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1",
+        STEELENGINE_NO_RESPAWN: "1",
+        STEELENGINE_STATE_DIR: childStateDir,
       },
       stdin: JSON.stringify({ hook_event_name: "PostToolUse" }),
     });
@@ -274,9 +274,9 @@ describe("hooks CLI process lifecycle", () => {
       label: "hooks list",
       env: {
         LINGER_MARKER: fixture.markerPath,
-        OPENCLAW_CONFIG_PATH: fixture.configPath,
-        OPENCLAW_DISABLE_BUNDLED_PLUGINS: "1",
-        OPENCLAW_STATE_DIR: fixture.stateDir,
+        STEELENGINE_CONFIG_PATH: fixture.configPath,
+        STEELENGINE_DISABLE_BUNDLED_PLUGINS: "1",
+        STEELENGINE_STATE_DIR: fixture.stateDir,
       },
     });
     const relayResult = await runHooksRelay({ event: "pre_tool_use", stdin: "{}" });
