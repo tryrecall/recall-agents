@@ -15,6 +15,7 @@ import { HISTORY_CONTEXT_MARKER } from "../auto-reply/reply/history.js";
 import { CURRENT_MESSAGE_MARKER } from "../auto-reply/reply/mentions.js";
 import { resetConfigRuntimeState } from "../config/config.js";
 import { emitAgentEvent } from "../infra/agent-events.js";
+import { isGatewaySubordinateWorkAdmissionClosed } from "../process/gateway-work-admission.js";
 import { buildAssistantDeltaResult } from "./test-helpers.agent-results.js";
 import {
   agentCommand,
@@ -1875,6 +1876,38 @@ describe("OpenAI-compatible HTTP API (e2e)", () => {
         },
       },
     );
+  });
+
+  it("retains request admission until detached streaming agent work completes", async () => {
+    const port = enabledPort;
+    let releaseAgent!: () => void;
+    const agentCanRun = new Promise<void>((resolve) => {
+      releaseAgent = resolve;
+    });
+
+    agentCommand.mockClear();
+    agentCommand.mockImplementationOnce((async (opts: unknown) => {
+      await agentCanRun;
+      expect(isGatewaySubordinateWorkAdmissionClosed()).toBe(false);
+      return buildAssistantDeltaResult({
+        opts,
+        emit: emitAgentEvent,
+        deltas: ["retained"],
+        text: "retained",
+      });
+    }) as never);
+
+    const res = await postChatCompletions(port, {
+      stream: true,
+      model: "steelengine",
+      messages: [{ role: "user", content: "hi" }],
+    });
+    expect(res.status).toBe(200);
+
+    releaseAgent();
+    const text = await res.text();
+    expect(text).toContain("retained");
+    expect(text).not.toContain("Error: internal error");
   });
 
   it("streams SSE chunks when stream=true", async () => {
