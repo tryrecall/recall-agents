@@ -746,14 +746,25 @@ function resolveAgentResponseCommentary(result: unknown): string {
 }
 
 function resolveActualResponseModel(result: unknown, fallback: string): string {
-  const agentMeta = (
-    result as { meta?: { agentMeta?: { provider?: unknown; model?: unknown } } } | null
-  )?.meta?.agentMeta;
-  const provider = typeof agentMeta?.provider === "string" ? agentMeta.provider.trim() : "";
-  const selectedModel = typeof agentMeta?.model === "string" ? agentMeta.model.trim() : "";
-  if (!selectedModel) return fallback;
-  if (!provider || selectedModel.includes("/")) return selectedModel;
-  return `${provider}/${selectedModel}`;
+  type ModelResult = {
+    meta?: {
+      agentMeta?: { provider?: unknown; model?: unknown };
+      executionTrace?: { winnerProvider?: unknown; winnerModel?: unknown };
+    };
+  };
+  const root = result as (ModelResult & { result?: ModelResult }) | null;
+  for (const candidate of [root, root?.result]) {
+    const trace = candidate?.meta?.executionTrace;
+    const agentMeta = candidate?.meta?.agentMeta;
+    const providerValue = trace?.winnerProvider ?? agentMeta?.provider;
+    const modelValue = trace?.winnerModel ?? agentMeta?.model;
+    const provider = typeof providerValue === "string" ? providerValue.trim() : "";
+    const selectedModel = typeof modelValue === "string" ? modelValue.trim() : "";
+    if (!selectedModel) continue;
+    if (!provider || selectedModel.startsWith(`${provider}/`)) return selectedModel;
+    return `${provider}/${selectedModel}`;
+  }
+  return fallback;
 }
 
 type AgentUsageMeta = {

@@ -1289,7 +1289,10 @@ describe("OpenAI-compatible HTTP API (e2e)", () => {
         agentCommand.mockClear();
         agentCommand.mockResolvedValueOnce({
           payloads: [{ text: "actual model" }],
-          meta: { agentMeta: { provider: "openai", model: "gpt-5.6-luna" } },
+          meta: {
+            agentMeta: { provider: "google", model: "gemini-2.5-pro" },
+            executionTrace: { winnerProvider: "openai", winnerModel: "gpt-5.6-luna" },
+          },
         } as never);
         const json = await postSyncUserMessage("which model?");
         expect(json.model).toBe("openai/gpt-5.6-luna");
@@ -1962,13 +1965,17 @@ describe("OpenAI-compatible HTTP API (e2e)", () => {
       {
         agentCommand.mockClear();
         agentCommand.mockImplementationOnce((async (opts: unknown) => ({
-          ...buildAssistantDeltaResult({
-            opts,
-            emit: emitAgentEvent,
-            deltas: ["actual"],
-            text: "actual",
-          }),
-          meta: { agentMeta: { provider: "openai", model: "gpt-5.6-luna" } },
+          result: {
+            ...buildAssistantDeltaResult({
+              opts,
+              emit: emitAgentEvent,
+              deltas: ["actual"],
+              text: "actual",
+            }),
+            meta: {
+              executionTrace: { winnerProvider: "openai", winnerModel: "gpt-5.6-luna" },
+            },
+          },
         })) as never);
 
         const res = await postChatCompletions(port, {
