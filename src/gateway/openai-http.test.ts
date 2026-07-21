@@ -1301,6 +1301,21 @@ describe("OpenAI-compatible HTTP API (e2e)", () => {
       {
         agentCommand.mockClear();
         agentCommand.mockImplementationOnce((async (opts: unknown) => {
+          const onSelected = (
+            opts as {
+              onActiveModelSelected?: (ctx: { provider: string; model: string }) => void;
+            }
+          ).onActiveModelSelected;
+          onSelected?.({ provider: "openai", model: "gpt-5.6-luna" });
+          return { payloads: [{ text: "selected by callback" }] };
+        }) as never);
+        const json = await postSyncUserMessage("which model callback?");
+        expect(json.model).toBe("openai/gpt-5.6-luna");
+      }
+
+      {
+        agentCommand.mockClear();
+        agentCommand.mockImplementationOnce((async (opts: unknown) => {
           const runId = (opts as { runId?: string } | undefined)?.runId ?? "";
           const { session, emit } = createStubSessionHarness();
           subscribeEmbeddedAgentSession({ session, runId });

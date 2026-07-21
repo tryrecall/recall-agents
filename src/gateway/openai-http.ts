@@ -166,6 +166,7 @@ function buildAgentCommandInput(params: {
   messageChannel: string;
   abortSignal?: AbortSignal;
   streamParams?: AgentStreamParams;
+  onActiveModelSelected?: (ctx: { provider: string; model: string }) => void;
 }) {
   return {
     message: params.prompt.message,
@@ -181,6 +182,7 @@ function buildAgentCommandInput(params: {
     allowModelOverride: params.modelOverride !== undefined,
     abortSignal: params.abortSignal,
     streamParams: params.streamParams,
+    onActiveModelSelected: params.onActiveModelSelected,
   };
 }
 
@@ -1083,6 +1085,7 @@ export async function handleOpenAiHttpRequest(
   const runId = `chatcmpl_${randomUUID()}`;
   const deps = createDefaultDeps();
   const abortController = new AbortController();
+  let activeResponseModel = model;
   const mergedExtraSystemPrompt = [prompt.extraSystemPrompt, toolChoicePrompt]
     .filter((part): part is string => Boolean(part))
     .join("\n\n");
@@ -1099,6 +1102,9 @@ export async function handleOpenAiHttpRequest(
     messageChannel,
     abortSignal: abortController.signal,
     streamParams,
+    onActiveModelSelected: (ctx) => {
+      activeResponseModel = resolveActualResponseModel({ meta: { agentMeta: ctx } }, model);
+    },
   });
 
   if (!stream) {
@@ -1111,7 +1117,7 @@ export async function handleOpenAiHttpRequest(
       }
 
       const usage = resolveChatCompletionUsage(result);
-      const responseModel = resolveActualResponseModel(result, model);
+      const responseModel = resolveActualResponseModel(result, activeResponseModel);
       const meta = (result as { meta?: unknown } | null)?.meta;
       const { stopReason, pendingToolCalls } = resolveStopReasonAndPendingToolCalls(meta);
 
@@ -1385,7 +1391,7 @@ export async function handleOpenAiHttpRequest(
   await (async () => {
     try {
       const result = await agentCommandFromIngress(commandInput, defaultRuntime, deps);
-      finalResponseModel = resolveActualResponseModel(result, model);
+      finalResponseModel = resolveActualResponseModel(result, activeResponseModel);
       resultResolved = true;
 
       if (closed) {
