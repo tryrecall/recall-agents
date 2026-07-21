@@ -745,6 +745,17 @@ function resolveAgentResponseCommentary(result: unknown): string {
     .join("\n\n");
 }
 
+function resolveActualResponseModel(result: unknown, fallback: string): string {
+  const agentMeta = (
+    result as { meta?: { agentMeta?: { provider?: unknown; model?: unknown } } } | null
+  )?.meta?.agentMeta;
+  const provider = typeof agentMeta?.provider === "string" ? agentMeta.provider.trim() : "";
+  const selectedModel = typeof agentMeta?.model === "string" ? agentMeta.model.trim() : "";
+  if (!selectedModel) return fallback;
+  if (!provider || selectedModel.includes("/")) return selectedModel;
+  return `${provider}/${selectedModel}`;
+}
+
 type AgentUsageMeta = {
   input?: number;
   output?: number;
@@ -1089,6 +1100,7 @@ export async function handleOpenAiHttpRequest(
       }
 
       const usage = resolveChatCompletionUsage(result);
+      const responseModel = resolveActualResponseModel(result, model);
       const meta = (result as { meta?: unknown } | null)?.meta;
       const { stopReason, pendingToolCalls } = resolveStopReasonAndPendingToolCalls(meta);
 
@@ -1117,7 +1129,7 @@ export async function handleOpenAiHttpRequest(
           id: runId,
           object: "chat.completion",
           created: Math.floor(Date.now() / 1000),
-          model,
+          model: responseModel,
           choices: [
             {
               index: 0,
@@ -1143,7 +1155,7 @@ export async function handleOpenAiHttpRequest(
         id: runId,
         object: "chat.completion",
         created: Math.floor(Date.now() / 1000),
-        model,
+        model: responseModel,
         choices: [
           {
             index: 0,
@@ -1186,6 +1198,7 @@ export async function handleOpenAiHttpRequest(
   let bufferedAssistantContent = "";
   let bufferedReplaceableAssistantContent = "";
   let finalUsage: OpenAiChatCompletionsUsage | undefined;
+  let finalResponseModel = model;
   let finalizeRequested = false;
   let finalizeFinishReason: "stop" | "tool_calls" = "stop";
   let resultResolved = false;
@@ -1206,11 +1219,15 @@ export async function handleOpenAiHttpRequest(
     stopWatchingDisconnect();
     unsubscribe();
     if (!wroteStopChunk) {
-      writeAssistantFinishChunk(res, { runId, model, finishReason: finalizeFinishReason });
+      writeAssistantFinishChunk(res, {
+        runId,
+        model: finalResponseModel,
+        finishReason: finalizeFinishReason,
+      });
       wroteStopChunk = true;
     }
     if (streamIncludeUsage && finalUsage) {
-      writeUsageChunk(res, { runId, model, usage: finalUsage });
+      writeUsageChunk(res, { runId, model: finalResponseModel, usage: finalUsage });
     }
     writeDone(res);
     res.end();
@@ -1357,6 +1374,7 @@ export async function handleOpenAiHttpRequest(
   await (async () => {
     try {
       const result = await agentCommandFromIngress(commandInput, defaultRuntime, deps);
+      finalResponseModel = resolveActualResponseModel(result, model);
       resultResolved = true;
 
       if (closed) {

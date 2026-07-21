@@ -1287,6 +1287,16 @@ describe("OpenAI-compatible HTTP API (e2e)", () => {
 
       {
         agentCommand.mockClear();
+        agentCommand.mockResolvedValueOnce({
+          payloads: [{ text: "actual model" }],
+          meta: { agentMeta: { provider: "openai", model: "gpt-5.6-luna" } },
+        } as never);
+        const json = await postSyncUserMessage("which model?");
+        expect(json.model).toBe("openai/gpt-5.6-luna");
+      }
+
+      {
+        agentCommand.mockClear();
         agentCommand.mockImplementationOnce((async (opts: unknown) => {
           const runId = (opts as { runId?: string } | undefined)?.runId ?? "";
           const { session, emit } = createStubSessionHarness();
@@ -1947,6 +1957,37 @@ describe("OpenAI-compatible HTTP API (e2e)", () => {
         expect(allContent).toBe("hello");
         const usageChunks = jsonChunks.filter((c) => "usage" in c);
         expect(usageChunks).toHaveLength(0);
+      }
+
+      {
+        agentCommand.mockClear();
+        agentCommand.mockImplementationOnce((async (opts: unknown) => ({
+          ...buildAssistantDeltaResult({
+            opts,
+            emit: emitAgentEvent,
+            deltas: ["actual"],
+            text: "actual",
+          }),
+          meta: { agentMeta: { provider: "openai", model: "gpt-5.6-luna" } },
+        })) as never);
+
+        const res = await postChatCompletions(port, {
+          stream: true,
+          model: "steelengine",
+          messages: [{ role: "user", content: "which model?" }],
+        });
+        expect(res.status).toBe(200);
+        const chunks = parseSseDataLines(await res.text())
+          .filter((data) => data !== "[DONE]")
+          .map(
+            (data) =>
+              JSON.parse(data) as {
+                model?: string;
+                choices?: Array<{ finish_reason?: string | null }>;
+              },
+          );
+        const finish = chunks.find((chunk) => chunk.choices?.[0]?.finish_reason === "stop");
+        expect(finish?.model).toBe("openai/gpt-5.6-luna");
       }
 
       {
