@@ -15,6 +15,7 @@ import { HISTORY_CONTEXT_MARKER } from "../auto-reply/reply/history.js";
 import { CURRENT_MESSAGE_MARKER } from "../auto-reply/reply/mentions.js";
 import { resetConfigRuntimeState } from "../config/config.js";
 import { emitAgentEvent } from "../infra/agent-events.js";
+import { isGatewaySubordinateWorkAdmissionClosed } from "../process/gateway-work-admission.js";
 import { buildAssistantDeltaResult } from "./test-helpers.agent-results.js";
 import {
   agentCommand,
@@ -1286,6 +1287,34 @@ describe("OpenAI-compatible HTTP API (e2e)", () => {
 
       {
         agentCommand.mockClear();
+        agentCommand.mockResolvedValueOnce({
+          payloads: [{ text: "actual model" }],
+          meta: {
+            agentMeta: { provider: "google", model: "gemini-2.5-pro" },
+            executionTrace: { winnerProvider: "openai", winnerModel: "gpt-5.6-luna" },
+          },
+        } as never);
+        const json = await postSyncUserMessage("which model?");
+        expect(json.model).toBe("openai/gpt-5.6-luna");
+      }
+
+      {
+        agentCommand.mockClear();
+        agentCommand.mockImplementationOnce((async (opts: unknown) => {
+          const onSelected = (
+            opts as {
+              onActiveModelSelected?: (ctx: { provider: string; model: string }) => void;
+            }
+          ).onActiveModelSelected;
+          onSelected?.({ provider: "openai", model: "gpt-5.6-luna" });
+          return { payloads: [{ text: "selected by callback" }] };
+        }) as never);
+        const json = await postSyncUserMessage("which model callback?");
+        expect(json.model).toBe("openai/gpt-5.6-luna");
+      }
+
+      {
+        agentCommand.mockClear();
         agentCommand.mockImplementationOnce((async (opts: unknown) => {
           const runId = (opts as { runId?: string } | undefined)?.runId ?? "";
           const { session, emit } = createStubSessionHarness();
@@ -1877,6 +1906,38 @@ describe("OpenAI-compatible HTTP API (e2e)", () => {
     );
   });
 
+  it("retains request admission until detached streaming agent work completes", async () => {
+    const port = enabledPort;
+    let releaseAgent!: () => void;
+    const agentCanRun = new Promise<void>((resolve) => {
+      releaseAgent = resolve;
+    });
+
+    agentCommand.mockClear();
+    agentCommand.mockImplementationOnce((async (opts: unknown) => {
+      await agentCanRun;
+      expect(isGatewaySubordinateWorkAdmissionClosed()).toBe(false);
+      return buildAssistantDeltaResult({
+        opts,
+        emit: emitAgentEvent,
+        deltas: ["retained"],
+        text: "retained",
+      });
+    }) as never);
+
+    const res = await postChatCompletions(port, {
+      stream: true,
+      model: "steelengine",
+      messages: [{ role: "user", content: "hi" }],
+    });
+    expect(res.status).toBe(200);
+
+    releaseAgent();
+    const text = await res.text();
+    expect(text).toContain("retained");
+    expect(text).not.toContain("Error: internal error");
+  });
+
   it("streams SSE chunks when stream=true", async () => {
     const port = enabledPort;
     try {
@@ -1914,6 +1975,41 @@ describe("OpenAI-compatible HTTP API (e2e)", () => {
         expect(allContent).toBe("hello");
         const usageChunks = jsonChunks.filter((c) => "usage" in c);
         expect(usageChunks).toHaveLength(0);
+      }
+
+      {
+        agentCommand.mockClear();
+        agentCommand.mockImplementationOnce((async (opts: unknown) => ({
+          result: {
+            ...buildAssistantDeltaResult({
+              opts,
+              emit: emitAgentEvent,
+              deltas: ["actual"],
+              text: "actual",
+            }),
+            meta: {
+              executionTrace: { winnerProvider: "openai", winnerModel: "gpt-5.6-luna" },
+            },
+          },
+        })) as never);
+
+        const res = await postChatCompletions(port, {
+          stream: true,
+          model: "steelengine",
+          messages: [{ role: "user", content: "which model?" }],
+        });
+        expect(res.status).toBe(200);
+        const chunks = parseSseDataLines(await res.text())
+          .filter((data) => data !== "[DONE]")
+          .map(
+            (data) =>
+              JSON.parse(data) as {
+                model?: string;
+                choices?: Array<{ finish_reason?: string | null }>;
+              },
+          );
+        const finish = chunks.find((chunk) => chunk.choices?.[0]?.finish_reason === "stop");
+        expect(finish?.model).toBe("openai/gpt-5.6-luna");
       }
 
       {

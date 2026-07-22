@@ -166,6 +166,7 @@ function buildAgentCommandInput(params: {
   messageChannel: string;
   abortSignal?: AbortSignal;
   streamParams?: AgentStreamParams;
+  onActiveModelSelected?: (ctx: { provider: string; model: string }) => void;
 }) {
   return {
     message: params.prompt.message,
@@ -181,6 +182,7 @@ function buildAgentCommandInput(params: {
     allowModelOverride: params.modelOverride !== undefined,
     abortSignal: params.abortSignal,
     streamParams: params.streamParams,
+    onActiveModelSelected: params.onActiveModelSelected,
   };
 }
 
@@ -745,6 +747,28 @@ function resolveAgentResponseCommentary(result: unknown): string {
     .join("\n\n");
 }
 
+function resolveActualResponseModel(result: unknown, fallback: string): string {
+  type ModelResult = {
+    meta?: {
+      agentMeta?: { provider?: unknown; model?: unknown };
+      executionTrace?: { winnerProvider?: unknown; winnerModel?: unknown };
+    };
+  };
+  const root = result as (ModelResult & { result?: ModelResult }) | null;
+  for (const candidate of [root, root?.result]) {
+    const trace = candidate?.meta?.executionTrace;
+    const agentMeta = candidate?.meta?.agentMeta;
+    const providerValue = trace?.winnerProvider ?? agentMeta?.provider;
+    const modelValue = trace?.winnerModel ?? agentMeta?.model;
+    const provider = typeof providerValue === "string" ? providerValue.trim() : "";
+    const selectedModel = typeof modelValue === "string" ? modelValue.trim() : "";
+    if (!selectedModel) continue;
+    if (!provider || selectedModel.startsWith(`${provider}/`)) return selectedModel;
+    return `${provider}/${selectedModel}`;
+  }
+  return fallback;
+}
+
 type AgentUsageMeta = {
   input?: number;
   output?: number;
@@ -1061,6 +1085,7 @@ export async function handleOpenAiHttpRequest(
   const runId = `chatcmpl_${randomUUID()}`;
   const deps = createDefaultDeps();
   const abortController = new AbortController();
+  let activeResponseModel = model;
   const mergedExtraSystemPrompt = [prompt.extraSystemPrompt, toolChoicePrompt]
     .filter((part): part is string => Boolean(part))
     .join("\n\n");
@@ -1077,6 +1102,9 @@ export async function handleOpenAiHttpRequest(
     messageChannel,
     abortSignal: abortController.signal,
     streamParams,
+    onActiveModelSelected: (ctx) => {
+      activeResponseModel = resolveActualResponseModel({ meta: { agentMeta: ctx } }, model);
+    },
   });
 
   if (!stream) {
@@ -1089,6 +1117,7 @@ export async function handleOpenAiHttpRequest(
       }
 
       const usage = resolveChatCompletionUsage(result);
+      const responseModel = resolveActualResponseModel(result, activeResponseModel);
       const meta = (result as { meta?: unknown } | null)?.meta;
       const { stopReason, pendingToolCalls } = resolveStopReasonAndPendingToolCalls(meta);
 
@@ -1117,7 +1146,7 @@ export async function handleOpenAiHttpRequest(
           id: runId,
           object: "chat.completion",
           created: Math.floor(Date.now() / 1000),
-          model,
+          model: responseModel,
           choices: [
             {
               index: 0,
@@ -1143,7 +1172,7 @@ export async function handleOpenAiHttpRequest(
         id: runId,
         object: "chat.completion",
         created: Math.floor(Date.now() / 1000),
-        model,
+        model: responseModel,
         choices: [
           {
             index: 0,
@@ -1186,6 +1215,7 @@ export async function handleOpenAiHttpRequest(
   let bufferedAssistantContent = "";
   let bufferedReplaceableAssistantContent = "";
   let finalUsage: OpenAiChatCompletionsUsage | undefined;
+  let finalResponseModel = model;
   let finalizeRequested = false;
   let finalizeFinishReason: "stop" | "tool_calls" = "stop";
   let resultResolved = false;
@@ -1206,11 +1236,15 @@ export async function handleOpenAiHttpRequest(
     stopWatchingDisconnect();
     unsubscribe();
     if (!wroteStopChunk) {
-      writeAssistantFinishChunk(res, { runId, model, finishReason: finalizeFinishReason });
+      writeAssistantFinishChunk(res, {
+        runId,
+        model: finalResponseModel,
+        finishReason: finalizeFinishReason,
+      });
       wroteStopChunk = true;
     }
     if (streamIncludeUsage && finalUsage) {
-      writeUsageChunk(res, { runId, model, usage: finalUsage });
+      writeUsageChunk(res, { runId, model: finalResponseModel, usage: finalUsage });
     }
     writeDone(res);
     res.end();
@@ -1354,9 +1388,10 @@ export async function handleOpenAiHttpRequest(
   wroteRole = true;
   writeAssistantRoleChunk(res, { runId, model });
 
-  void (async () => {
+  await (async () => {
     try {
       const result = await agentCommandFromIngress(commandInput, defaultRuntime, deps);
+      finalResponseModel = resolveActualResponseModel(result, activeResponseModel);
       resultResolved = true;
 
       if (closed) {
